@@ -47,11 +47,13 @@ public class Banana implements Fruit
         return peeled;
     }
 
+    @Override
     public void bite()
     {
         bitten = true;
     }
 
+    @Override
     public boolean isBitten()
     {
         return bitten;

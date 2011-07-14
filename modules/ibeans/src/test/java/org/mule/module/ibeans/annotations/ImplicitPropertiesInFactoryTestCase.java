@@ -17,7 +17,6 @@ import static org.junit.Assert.fail;
 
 public class ImplicitPropertiesInFactoryTestCase extends AbstractIBeansTestCase
 {
-    @SuppressWarnings("unused")
     @IntegrationBean
     private TestImplicitPropertiesinFactoryIBean testIBean;
 
@@ -38,5 +37,4 @@ public class ImplicitPropertiesInFactoryTestCase extends AbstractIBeansTestCase
             fail("It seems the HTTP method property was not set implicitly: " + e.getMessage());
         }
     }
-
 }

@@ -46,9 +46,8 @@ public class StringToNumber extends AbstractTransformer implements DiscoverableT
         this.numberFormat = numberFormat;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    public Object doTransform(Object src, String encoding) throws TransformerException
+    public Object doTransform(Object src, String outputEncoding) throws TransformerException
     {
         if (src == null)
         {
@@ -95,11 +94,13 @@ public class StringToNumber extends AbstractTransformer implements DiscoverableT
         }
     }
 
+    @Override
     public int getPriorityWeighting()
     {
         return priorityWeighting;
     }
 
+    @Override
     public void setPriorityWeighting(int priorityWeighting)
     {
         this.priorityWeighting = priorityWeighting;

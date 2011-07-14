@@ -16,13 +16,9 @@ import org.mule.api.service.Service;
 import org.mule.config.DefaultMuleConfiguration;
 import org.mule.context.DefaultMuleContextBuilder;
 import org.mule.tck.FunctionalTestCase;
-import org.mule.util.queue.QueueConfiguration;
-import org.mule.util.queue.QueueManager;
-import org.mule.util.queue.TransactionalQueueManager;
 import org.mule.util.store.QueuePersistenceObjectStore;
 
 import java.io.File;
-import java.io.Serializable;
 
 import org.apache.commons.io.FileUtils;
 

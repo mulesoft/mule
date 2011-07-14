@@ -76,6 +76,7 @@ public class MuleUniversalTransport extends AbstractTransportFactory
         this.connector = connector;
     }
 
+    @Override
     public Destination getDestination(EndpointInfo ei) throws IOException
     {
         return getDestination(ei, createReference(ei));
@@ -107,11 +108,13 @@ public class MuleUniversalTransport extends AbstractTransportFactory
         return new MuleUniversalDestination(this, reference, ei);
     }
 
+    @Override
     public Conduit getConduit(EndpointInfo ei) throws IOException
     {
         return new MuleUniversalConduit(this, connector, ei, null);
     }
 
+    @Override
     public Conduit getConduit(EndpointInfo ei, EndpointReferenceType target) throws IOException
     {
         return new MuleUniversalConduit(this, connector, ei, target);
@@ -132,11 +135,13 @@ public class MuleUniversalTransport extends AbstractTransportFactory
         return PREFIXES;
     }
 
+    @Override
     public Bus getBus()
     {
         return bus;
     }
 
+    @Override
     public void setBus(Bus bus)
     {
         this.bus = bus;
@@ -155,18 +160,19 @@ public class MuleUniversalTransport extends AbstractTransportFactory
     // Stuff relating to building of the <soap:address/> -
     // I have no idea how this really works, but it does
 
+    @Override
     public void createPortExtensors(EndpointInfo ei, Service service)
     {
         // TODO
     }
 
-    @SuppressWarnings("unchecked")
+    @Override
     public EndpointInfo createEndpointInfo(ServiceInfo serviceInfo, BindingInfo b, Port port)
     {
         if (port != null)
         {
-            List ees = port.getExtensibilityElements();
-            for (Iterator itr = ees.iterator(); itr.hasNext();)
+            List<?> ees = port.getExtensibilityElements();
+            for (Iterator<?> itr = ees.iterator(); itr.hasNext();)
             {
                 Object extensor = itr.next();
 
@@ -208,6 +214,7 @@ public class MuleUniversalTransport extends AbstractTransportFactory
             super(serv, trans);
         }
 
+        @Override
         public void setAddress(String s)
         {
             super.setAddress(s);
@@ -217,6 +224,7 @@ public class MuleUniversalTransport extends AbstractTransportFactory
             }
         }
 
+        @Override
         public void addExtensor(Object el)
         {
             super.addExtensor(el);
@@ -235,11 +243,13 @@ public class MuleUniversalTransport extends AbstractTransportFactory
             setElementType(new QName("http://schemas.xmlsoap.org/wsdl/soap/", "address"));
         }
 
+        @Override
         public String getLocationURI()
         {
             return getLocation();
         }
 
+        @Override
         public void setLocationURI(String locationURI)
         {
             setLocation(locationURI);

@@ -16,7 +16,6 @@ import java.sql.SQLException;
 
 import javax.sql.DataSource;
 import javax.sql.XADataSource;
-import javax.transaction.TransactionManager;
 
 /**
  * Using for unification XADataSource and DataSource
@@ -36,34 +35,40 @@ public class DataSourceWrapper implements DataSource
         this.xaDataSource = xaDataSource;
     }
 
+    @Override
     public int getLoginTimeout() throws SQLException
     {
         return xaDataSource.getLoginTimeout();
     }
 
+    @Override
     public void setLoginTimeout(int seconds) throws SQLException
     {
         xaDataSource.setLoginTimeout(seconds);
     }
 
+    @Override
     public PrintWriter getLogWriter() throws SQLException
     {
         return xaDataSource.getLogWriter();
     }
 
+    @Override
     public void setLogWriter(PrintWriter out) throws SQLException
     {
         xaDataSource.setLogWriter(out);
     }
 
+    @Override
     public Connection getConnection() throws SQLException
     {
         return new ConnectionWrapper(xaDataSource.getXAConnection());
     }
 
+    @Override
     public Connection getConnection(String username, String password) throws SQLException
     {
-        return new ConnectionWrapper(xaDataSource.getXAConnection(username, password));    
+        return new ConnectionWrapper(xaDataSource.getXAConnection(username, password));
     }
 
     /**
@@ -82,11 +87,13 @@ public class DataSourceWrapper implements DataSource
         this.xaDataSource = xads;
     }
 
+    @Override
     public boolean isWrapperFor(Class<?> iface) throws SQLException
     {
         return false;
     }
 
+    @Override
     public <T> T unwrap(Class<T> iface) throws SQLException
     {
         return null;

@@ -29,24 +29,20 @@ import java.util.concurrent.TimeUnit;
  */
 public class InMemoryObjectStore<T extends Serializable> extends AbstractMonitoredObjectStore<T>
 {
-    protected ConcurrentSkipListMap/*<Long, StoredObject>*/ store;
+    protected ConcurrentSkipListMap<Long, StoredObject<T>> store;
 
     public InMemoryObjectStore()
     {
-        this.store = new ConcurrentSkipListMap();
+        this.store = new ConcurrentSkipListMap<Long, StoredObject<T>>();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public boolean isPersistent()
     {
         return false;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public boolean contains(Serializable key) throws ObjectStoreException
     {
         if (key == null)
@@ -60,9 +56,7 @@ public class InMemoryObjectStore<T extends Serializable> extends AbstractMonitor
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void store(Serializable id, T value) throws ObjectStoreException
     {
         if (id == null)
@@ -89,9 +83,7 @@ public class InMemoryObjectStore<T extends Serializable> extends AbstractMonitor
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     @SuppressWarnings("unchecked")
     public T retrieve(Serializable key) throws ObjectStoreException
     {
@@ -100,11 +92,11 @@ public class InMemoryObjectStore<T extends Serializable> extends AbstractMonitor
             Map.Entry<?, ?> entry = findEntry(key);
             if (entry != null)
             {
-                StoredObject object = (StoredObject) entry.getValue();
-                return (T)object.getItem();
+                StoredObject<T> object = (StoredObject<T>) entry.getValue();
+                return object.getItem();
             }
         }
-        
+
         throw new ObjectDoesNotExistException(CoreMessages.objectNotFound(key));
     }
 
@@ -115,8 +107,8 @@ public class InMemoryObjectStore<T extends Serializable> extends AbstractMonitor
         while (entryIterator.hasNext())
         {
             Map.Entry<?, ?> entry = (Map.Entry<?, ?>) entryIterator.next();
-            
-            StoredObject object = (StoredObject) entry.getValue();
+
+            StoredObject<T> object = (StoredObject<T>) entry.getValue();
             if (object.getId().equals(key))
             {
                 return entry;
@@ -125,7 +117,7 @@ public class InMemoryObjectStore<T extends Serializable> extends AbstractMonitor
         return null;
     }
 
-    @SuppressWarnings("unchecked")
+    @Override
     public T remove(Serializable key) throws ObjectStoreException
     {
         synchronized (store)
@@ -133,20 +125,20 @@ public class InMemoryObjectStore<T extends Serializable> extends AbstractMonitor
             Map.Entry<?, ?> entry = findEntry(key);
             if (entry != null)
             {
-                StoredObject removedObject = (StoredObject) store.remove(entry.getKey());
-                return (T)removedObject.getItem();
+                StoredObject<T> removedObject = store.remove(entry.getKey());
+                return removedObject.getItem();
             }
         }
-        
+
         throw new ObjectDoesNotExistException(CoreMessages.objectNotFound(key));
     }
-    
+
     @Override
     public void expire()
     {
         // this is not guaranteed to be precise, but we don't mind
         int currentSize = store.size();
-        
+
         // first trim to maxSize if necessary
         currentSize = trimToMaxSize(currentSize);
 
@@ -187,7 +179,7 @@ public class InMemoryObjectStore<T extends Serializable> extends AbstractMonitor
         {
             return currentSize;
         }
-        
+
         int excess = (currentSize - maxEntries);
         if (excess > 0)
         {
@@ -248,7 +240,7 @@ public class InMemoryObjectStore<T extends Serializable> extends AbstractMonitor
                 return false;
             }
 
-            StoredObject that = (StoredObject) o;
+            StoredObject<T> that = (StoredObject<T>) o;
 
             if (!id.equals(that.id))
             {

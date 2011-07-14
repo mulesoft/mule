@@ -72,21 +72,25 @@ public class MuleRequestContext extends AbstractRequestContext implements Reques
         return request.getInboundProperty(HttpConnector.HTTP_METHOD_PROPERTY, StringUtils.EMPTY);
     }
 
+    @Override
     public Locale getPreferredLocale()
     {
         return null;
     }
 
+    @Override
     public Locale[] getPreferredLocales()
     {
         return null;
     }
 
+    @Override
     public String getTargetBasePath()
     {
         return event.getEndpointURI().getPath();
     }
 
+    @Override
     public Object getProperty(Property property)
     {
         switch (property)
@@ -136,6 +140,7 @@ public class MuleRequestContext extends AbstractRequestContext implements Reques
         }
     }
 
+    @Override
     public Reader getReader() throws IOException
     {
         Object payload = request.getPayload();
@@ -166,6 +171,7 @@ public class MuleRequestContext extends AbstractRequestContext implements Reques
         }
     }
 
+    @Override
     public InputStream getInputStream() throws IOException
     {
         Object payload = request.getPayload();
@@ -192,6 +198,7 @@ public class MuleRequestContext extends AbstractRequestContext implements Reques
         }
     }
 
+    @Override
     public RequestContext setAttribute(Scope scope, String name, Object value)
     {
         switch (scope)
@@ -207,6 +214,7 @@ public class MuleRequestContext extends AbstractRequestContext implements Reques
         return this;
     }
 
+    @Override
     public Object getAttribute(Scope scope, String name)
     {
         switch (scope)
@@ -222,36 +230,39 @@ public class MuleRequestContext extends AbstractRequestContext implements Reques
         return null;
     }
 
-    @SuppressWarnings("unchecked")
+    @Override
     public String[] getAttributeNames(Scope scope)
     {
         switch (scope)
         {
             case REQUEST:
-                Set names = request.getPropertyNames();
-                return (String[]) names.toArray(new String[names.size()]);
+                Set<String> names = request.getPropertyNames();
+                return names.toArray(new String[names.size()]);
             case SESSION:
                 return new String[0];
         }
         return null;
     }
 
+    @Override
     public String getParameter(String name)
     {
         return null;
     }
 
-    @SuppressWarnings("unchecked")
+    @Override
     public String[] getParameterNames()
     {
         return new String[0];
     }
 
+    @Override
     public List<String> getParameters(String name)
     {
         return Collections.emptyList();
     }
 
+    @Override
     public Date getDateHeader(String name)
     {
 //        long value = request.getDateHeader(name);
@@ -259,6 +270,7 @@ public class MuleRequestContext extends AbstractRequestContext implements Reques
         throw new UnsupportedOperationException();
     }
 
+    @Override
     public String getHeader(String name)
     {
         Object prop = request.getInboundProperty(name);
@@ -269,22 +281,22 @@ public class MuleRequestContext extends AbstractRequestContext implements Reques
         return prop.toString();
     }
 
-    @SuppressWarnings("unchecked")
+    @Override
     public String[] getHeaderNames()
     {
-        Set propNames = request.getPropertyNames();
-        return (String[]) propNames.toArray(new String[propNames.size()]);
+        Set<String> propNames = request.getPropertyNames();
+        return propNames.toArray(new String[propNames.size()]);
     }
 
-    @SuppressWarnings("unchecked")
+    @Override
     public Object[] getHeaders(String name)
     {
         List<String> values = new ArrayList<String>();
-        Set propNames = request.getPropertyNames();
+        Set<String> propNames = request.getPropertyNames();
 
-        for (Object n : propNames)
+        for (String n : propNames)
         {
-            Object prop = request.getProperty((String) n);
+            Object prop = request.getProperty(n);
             if (prop instanceof String)
             {
                 values.add((String) prop);
@@ -292,7 +304,7 @@ public class MuleRequestContext extends AbstractRequestContext implements Reques
         }
         return values.toArray();
     }
-//    
+//
 //    private static String getHost(ServiceContext context, HttpServletRequest request) {
 //        Abdera abdera = context.getAbdera();
 //        String host = abdera.getConfiguration()
@@ -307,11 +319,13 @@ public class MuleRequestContext extends AbstractRequestContext implements Reques
 //        return (port != null) ? Integer.parseInt(port) : request.getServerPort();
 //    }
 
+    @Override
     public boolean isUserInRole(String role)
     {
         return false; // TODO
     }
 
+    @Override
     public String getContextPath()
     {
         return event.getEndpointURI().getPath();

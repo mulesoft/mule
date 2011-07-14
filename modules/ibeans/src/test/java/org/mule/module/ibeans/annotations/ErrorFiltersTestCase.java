@@ -21,10 +21,8 @@ import static org.junit.Assert.fail;
 
 public class ErrorFiltersTestCase extends AbstractIBeansTestCase
 {
-    @SuppressWarnings("unused")
     @IntegrationBean
     private ErrorFilterIBean errorFilter;
-
 
     @Test
     public void testJsonFilter() throws Exception
@@ -47,12 +45,12 @@ public class ErrorFiltersTestCase extends AbstractIBeansTestCase
         try
         {
             errorFilter.jsonErrorFilter("{\"message\" : {\"errorMsg\" : \"it didnt work dude\"}}", MimeTypes.JSON);
-            fail("Error should have been caught");            
+            fail("Error should have been caught");
         }
         catch (CallException e)
         {
             //expected
-            assertTrue(e.getMessage().contains("it didnt work dude"));            
+            assertTrue(e.getMessage().contains("it didnt work dude"));
         }
     }
 

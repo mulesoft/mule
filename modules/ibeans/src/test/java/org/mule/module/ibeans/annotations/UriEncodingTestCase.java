@@ -16,7 +16,6 @@ import static org.junit.Assert.assertEquals;
 
 public class UriEncodingTestCase extends AbstractIBeansTestCase
 {
-    @SuppressWarnings("unused")    
     @IntegrationBean
     private TestUriIBean test;
 

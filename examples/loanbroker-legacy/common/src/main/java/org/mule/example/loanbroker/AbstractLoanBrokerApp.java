@@ -23,7 +23,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Runs the LoanBroker example application.
@@ -116,6 +115,7 @@ public abstract class AbstractLoanBrokerApp
                     System.out.println(LocaleMessage.exiting());
                     dispose();
                     System.exit(0);
+                    break; // no, we never reach this statement. But it shuts off the compiler warning
                 }
 
                 default :
@@ -184,7 +184,7 @@ public abstract class AbstractLoanBrokerApp
             System.out.println(LocaleMessage.sentAsync());
             // let the request catch up
             Thread.sleep(3000);
-            
+
         }
         else
         {
@@ -210,16 +210,11 @@ public abstract class AbstractLoanBrokerApp
 
     public List<Object> requestSend(int number, String endpoint) throws Exception
     {
-        return requestSend(number, endpoint, null);
-    }
-
-    public List<Object> requestSend(int number, String endpoint, Map properties) throws Exception
-    {
         List<Object> results = new ArrayList<Object>(number);
         for (int i = 0; i < number; i++)
         {
-            MuleMessage result = remoteClient.sendRemote(endpoint, createRequest(), properties);
-            
+            MuleMessage result = remoteClient.sendRemote(endpoint, createRequest(), null);
+
             if (result != null)
             {
                 results.add(result.getPayload());

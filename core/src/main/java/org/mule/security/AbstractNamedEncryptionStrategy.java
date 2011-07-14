@@ -16,7 +16,6 @@ import org.mule.api.security.CryptoFailureException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 
 import org.apache.commons.io.IOUtils;
 
@@ -34,7 +33,7 @@ public abstract class AbstractNamedEncryptionStrategy implements EncryptionStrat
     {
         this.name = name;
     }
-    
+
     public byte[] encrypt(byte[] data, Object info) throws CryptoFailureException {
         InputStream io = this.encrypt(new ByteArrayInputStream(data), info);
         try

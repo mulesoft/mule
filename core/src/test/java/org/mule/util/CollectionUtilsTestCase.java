@@ -25,7 +25,6 @@ import static junit.framework.Assert.assertFalse;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 public class CollectionUtilsTestCase extends AbstractMuleTestCase
 {
@@ -66,7 +65,7 @@ public class CollectionUtilsTestCase extends AbstractMuleTestCase
     @Test
     public void testToStringNull() throws Exception
     {
-        Collection c = null;
+        Collection<?> c = null;
         assertEquals("[]", CollectionUtils.toString(c, false));
         assertEquals("[]", CollectionUtils.toString(c, true));
     }
@@ -74,7 +73,7 @@ public class CollectionUtilsTestCase extends AbstractMuleTestCase
     @Test
     public void testToStringEmpty() throws Exception
     {
-        Collection c = new ArrayList();
+        Collection<?> c = new ArrayList<Object>();
         assertEquals("[]", CollectionUtils.toString(c, false));
         assertEquals("[]", CollectionUtils.toString(c, true));
     }
@@ -119,7 +118,7 @@ public class CollectionUtilsTestCase extends AbstractMuleTestCase
     @Test
     public void testContainsTypeTrue()
     {
-        Collection c = new ArrayList();
+        Collection<Object> c = new ArrayList<Object>();
         c.add(new String());
         c.add(new Date());
         assertTrue(CollectionUtils.containsType(c, Date.class));
@@ -128,7 +127,7 @@ public class CollectionUtilsTestCase extends AbstractMuleTestCase
     @Test
     public void testContainsTypeFalse()
     {
-        Collection c = new ArrayList();
+        Collection<Object> c = new ArrayList<Object>();
         c.add(new String());
         c.add(new Integer(1));
         assertFalse(CollectionUtils.containsType(c, Date.class));
@@ -137,7 +136,7 @@ public class CollectionUtilsTestCase extends AbstractMuleTestCase
     @Test
     public void testContainsTypeNullChecks()
     {
-        Collection c = new ArrayList();
+        Collection<Object> c = new ArrayList<Object>();
         c.add(new String());
         c.add(new Integer(1));
         assertFalse(CollectionUtils.containsType(c, null));
@@ -147,7 +146,7 @@ public class CollectionUtilsTestCase extends AbstractMuleTestCase
     @Test
     public void testRemoveType()
     {
-        Collection c = new ArrayList();
+        Collection<Object> c = new ArrayList<Object>();
         c.add(new String());
         c.add(new Integer(1));
         CollectionUtils.removeType(c, String.class);

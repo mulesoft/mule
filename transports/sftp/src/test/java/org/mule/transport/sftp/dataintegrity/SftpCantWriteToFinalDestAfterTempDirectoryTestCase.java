@@ -10,13 +10,12 @@
 
 package org.mule.transport.sftp.dataintegrity;
 
-import java.io.IOException;
-
-import org.apache.commons.lang.NotImplementedException;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.transport.DispatchException;
 import org.mule.module.client.MuleClient;
 import org.mule.transport.sftp.SftpClient;
+
+import java.io.IOException;
 
 /**
  * Tests that files are not deleted if the final destination is not writable when

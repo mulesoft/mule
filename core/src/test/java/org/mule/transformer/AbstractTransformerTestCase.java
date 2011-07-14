@@ -27,7 +27,6 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 public abstract class AbstractTransformerTestCase extends AbstractMuleContextTestCase
@@ -178,7 +177,7 @@ public abstract class AbstractTransformerTestCase extends AbstractMuleContextTes
         {
             expected = IOUtils.toString((InputStream)expected);
         }
-        
+
         // Special case for Strings: normalize comparison arguments
         if (expected instanceof String && result instanceof String)
         {

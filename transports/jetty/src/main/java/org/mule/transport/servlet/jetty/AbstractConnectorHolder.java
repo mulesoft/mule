@@ -32,24 +32,26 @@ public abstract class AbstractConnectorHolder<S extends Servlet, R extends Messa
     protected S servlet;
     protected boolean started = false;
 
-    @SuppressWarnings("unused")
     public AbstractConnectorHolder(Connector connector, S servlet, R receiver)
     {
         this.connector = connector;
         this.servlet = servlet;
     }
 
+    @Override
     public S getServlet()
     {
         return servlet;
     }
 
+    @Override
     public Connector getConnector()
     {
         return connector;
     }
 
 
+    @Override
     public void start() throws MuleException
     {
         try
@@ -63,6 +65,7 @@ public abstract class AbstractConnectorHolder<S extends Servlet, R extends Messa
         }
     }
 
+    @Override
     public void stop() throws MuleException
     {
         try
@@ -74,7 +77,6 @@ public abstract class AbstractConnectorHolder<S extends Servlet, R extends Messa
         {
             logger.warn("Jetty connector did not close cleanly: " + e.getMessage());
         }
-
     }
 
 }

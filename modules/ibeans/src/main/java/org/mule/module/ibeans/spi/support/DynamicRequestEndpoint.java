@@ -213,7 +213,6 @@ public class DynamicRequestEndpoint extends DynamicURIInboundEndpoint
             return Collections.emptyList();
         }
 
-        @SuppressWarnings("unused")
         public MuleEvent process(MuleEvent event) throws MuleException
         {
             throw new UnsupportedOperationException("process");

@@ -120,6 +120,8 @@ public class SpringRegistry extends AbstractRegistry
         return new SpringRegistryLifecycleManager(getRegistryId(), this, muleContext);
     }
 
+    @SuppressWarnings("unchecked")
+    @Override
     public Object lookupObject(String key)
     {
         if (StringUtils.isBlank(key))
@@ -148,11 +150,12 @@ public class SpringRegistry extends AbstractRegistry
         }
     }
 
+    @Override
     public <T> Collection<T> lookupObjects(Class<T> type)
     {
         return lookupByType(type).values();
     }
-    
+
     /**
      * For lifecycle we only want spring to return singleton objects from it's application context
      */
@@ -162,13 +165,12 @@ public class SpringRegistry extends AbstractRegistry
         return internalLookupByType(type, false, false).values();
     }
 
-    @SuppressWarnings("unchecked")
+    @Override
     public <T> Map<String, T> lookupByType(Class<T> type)
     {
         return internalLookupByType(type, true, true);
     }
 
-    @SuppressWarnings("unchecked")
     protected <T> Map<String, T> internalLookupByType(Class<T> type, boolean nonSingletons, boolean eagerInit)
     {
         try
@@ -187,32 +189,37 @@ public class SpringRegistry extends AbstractRegistry
             return Collections.emptyMap();
         }
     }
-    
-    
+
+
     ////////////////////////////////////////////////////////////////////////////////////
     // Registry is read-only
     ////////////////////////////////////////////////////////////////////////////////////
 
+    @Override
     public void registerObject(String key, Object value) throws RegistrationException
     {
         throw new UnsupportedOperationException("Registry is read-only so objects cannot be registered or unregistered.");
     }
 
+    @Override
     public void registerObject(String key, Object value, Object metadata) throws RegistrationException
     {
         throw new UnsupportedOperationException("Registry is read-only so objects cannot be registered or unregistered.");
     }
 
-    public void registerObjects(Map objects) throws RegistrationException
+    @Override
+    public void registerObjects(Map<String, Object> objects) throws RegistrationException
     {
         throw new UnsupportedOperationException("Registry is read-only so objects cannot be registered or unregistered.");
     }
 
+    @Override
     public void unregisterObject(String key)
     {
         throw new UnsupportedOperationException("Registry is read-only so objects cannot be registered or unregistered.");
     }
 
+    @Override
     public void unregisterObject(String key, Object metadata) throws RegistrationException
     {
         throw new UnsupportedOperationException("Registry is read-only so objects cannot be registered or unregistered.");
@@ -222,11 +229,13 @@ public class SpringRegistry extends AbstractRegistry
     // Registry meta-data
     ////////////////////////////////////////////////////////////////////////////////////
 
+    @Override
     public boolean isReadOnly()
     {
         return true;
     }
 
+    @Override
     public boolean isRemote()
     {
         return false;

@@ -11,7 +11,6 @@ package org.mule.api.annotations.param;
 
 import org.mule.api.model.InvocationResult;
 import org.mule.tck.testmodels.fruit.Banana;
-import org.mule.tck.testmodels.fruit.Fruit;
 import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.tck.testmodels.fruit.RedApple;
 
@@ -44,7 +43,7 @@ public class LookupEntrypointInjectionTestCase extends AbstractAnnotatedEntrypoi
 
         InvocationResult response = invokeResolver("listFruit", eventContext);
         assertTrue("Message payload should be a List", response.getResult() instanceof List);
-        List<Fruit> result = (List<Fruit>) response.getResult();
+        List<?> result = (List<?>) response.getResult();
         assertEquals(2, result.size());
 
         assertEquals(redApple, result.get(1));
@@ -53,7 +52,7 @@ public class LookupEntrypointInjectionTestCase extends AbstractAnnotatedEntrypoi
         muleContext.getRegistry().registerObject("orange", new Orange());
         response = invokeResolver("listFruit", eventContext);
         assertTrue("Message payload should be a List", response.getResult() instanceof List);
-        result = (List<Fruit>) response.getResult();
+        result = (List<?>) response.getResult();
         //We now have an orange
         assertEquals(3, result.size());
 
@@ -69,6 +68,5 @@ public class LookupEntrypointInjectionTestCase extends AbstractAnnotatedEntrypoi
         {
             //expected
         }
-
     }
 }

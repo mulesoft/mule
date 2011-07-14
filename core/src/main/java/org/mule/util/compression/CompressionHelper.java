@@ -42,9 +42,10 @@ public final class CompressionHelper
     {
         if (defaultStrategy == null)
         {
-            defaultStrategy = (CompressionStrategy) AccessController.doPrivileged(new PrivilegedAction()
+            defaultStrategy = AccessController.doPrivileged(new PrivilegedAction<CompressionStrategy>()
             {
-                public Object run()
+                @Override
+                public CompressionStrategy run()
                 {
                     try
                     {
@@ -54,7 +55,7 @@ public final class CompressionHelper
                         {
                             logger.debug("Found CompressionStrategy: " + o.getClass().getName());
                         }
-                        return o;
+                        return (CompressionStrategy) o;
                     }
                     catch (Exception e)
                     {

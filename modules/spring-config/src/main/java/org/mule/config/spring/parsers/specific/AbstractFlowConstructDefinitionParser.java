@@ -12,6 +12,7 @@ package org.mule.config.spring.parsers.specific;
 
 import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
 import org.mule.util.StringUtils;
+
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
@@ -38,8 +39,7 @@ public abstract class AbstractFlowConstructDefinitionParser extends AbstractMule
     protected static final String RESPONSE_TRANSFORMER_REFS_ATTRIBUTE = "responseTransformer-refs";
 
     @Override
-    @SuppressWarnings("unchecked")
-    protected BeanDefinitionBuilder createBeanDefinitionBuilder(Element element, Class beanClass)
+    protected BeanDefinitionBuilder createBeanDefinitionBuilder(Element element, Class<?> beanClass)
     {
         return BeanDefinitionBuilder.genericBeanDefinition(beanClass);
     }

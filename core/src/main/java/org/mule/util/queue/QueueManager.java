@@ -12,9 +12,6 @@ package org.mule.util.queue;
 
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
-import org.mule.api.store.ListableObjectStore;
-
-import java.io.Serializable;
 
 /**
  * A Queue manager is responsible for managing one or more Queue resources and

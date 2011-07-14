@@ -13,7 +13,6 @@ package org.mule.tck.testmodels.fruit;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -27,7 +26,7 @@ public class FruitBowl
      */
     private static final Log logger = LogFactory.getLog(FruitBowl.class);
 
-    private final Map bowl = Collections.synchronizedMap(new HashMap());
+    private final Map<Class<?>, Fruit> bowl = Collections.synchronizedMap(new HashMap<Class<?>, Fruit>());
 
     public FruitBowl()
     {
@@ -80,15 +79,15 @@ public class FruitBowl
 
     public List<Fruit> getFruit()
     {
-        return new ArrayList(bowl.values());
+        return new ArrayList<Fruit>(bowl.values());
     }
 
     public Object consumeFruit(FruitLover fruitlover)
     {
         logger.debug("Got a fruit lover who says: " + fruitlover.speak());
-        for (Iterator iter = bowl.values().iterator(); iter.hasNext();)
+        for (Fruit fruit : bowl.values())
         {
-            ((Fruit) iter.next()).bite();
+            fruit.bite();
         }
         return fruitlover;
     }
@@ -101,9 +100,9 @@ public class FruitBowl
         }
     }
 
-    public void setFruit(List fruit)
+    public void setFruit(List<Fruit> fruit)
     {
-        this.setFruit((Fruit[]) fruit.toArray(new Fruit[fruit.size()]));
+        this.setFruit(fruit.toArray(new Fruit[fruit.size()]));
     }
 
     public Apple getApple()

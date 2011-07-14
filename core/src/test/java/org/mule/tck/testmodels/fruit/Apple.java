@@ -62,16 +62,19 @@ public class Apple implements Fruit, Callable
         return washed;
     }
 
+    @Override
     public void bite()
     {
         bitten = true;
     }
 
+    @Override
     public boolean isBitten()
     {
         return bitten;
     }
 
+    @Override
     public Object onCall(MuleEventContext context) throws MuleException
     {
         logger.debug("Apple received an event in Callable.onEvent! MuleEvent says: "
@@ -96,6 +99,7 @@ public class Apple implements Fruit, Callable
         return null;
     }
 
+    @Override
     public boolean equals(Object o)
     {
         if (this == o)
@@ -121,6 +125,7 @@ public class Apple implements Fruit, Callable
         return true;
     }
 
+    @Override
     public int hashCode()
     {
         int result;
@@ -129,6 +134,7 @@ public class Apple implements Fruit, Callable
         return result;
     }
 
+    @Override
     public String toString()
     {
         return "Just an apple.";

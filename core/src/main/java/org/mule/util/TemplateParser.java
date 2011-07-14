@@ -279,7 +279,7 @@ public final class TemplateParser
                     case '#':
                     case '*':
                         buffer.append("\\");
-                        // fall through to append original character
+                        // $FALL-THROUGH$ fall through to append original character
                     default:
                         buffer.append(currentCharacter);
                 }

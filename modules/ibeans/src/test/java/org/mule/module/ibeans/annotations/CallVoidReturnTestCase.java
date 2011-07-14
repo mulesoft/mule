@@ -14,7 +14,6 @@ import org.junit.Test;
 
 public class CallVoidReturnTestCase extends AbstractIBeansTestCase
 {
-    @SuppressWarnings("unused")
     @IntegrationBean
     private SearchIBean search;
 
@@ -29,5 +28,4 @@ public class CallVoidReturnTestCase extends AbstractIBeansTestCase
         //we just need to test that the call doesn't fail
         search.searchGoogleAndReturnVoid("foo");
     }
-
 }

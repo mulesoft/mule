@@ -16,11 +16,9 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 
 public class OptionalParamsTestCase extends AbstractIBeansTestCase
 {
-    @SuppressWarnings("unused")
     @IntegrationBean
     private TestUriIBean test;
 
@@ -44,5 +42,4 @@ public class OptionalParamsTestCase extends AbstractIBeansTestCase
     {
         test.doSomethingElse("x", null);
     }
-
 }

@@ -52,6 +52,7 @@ public abstract class AbstractRegistry implements Registry
         lifecycleManager = createLifecycleManager();
     }
 
+    @Override
     public final synchronized void dispose()
     {
         if(lifecycleManager.getState().isStarted())
@@ -95,6 +96,7 @@ public abstract class AbstractRegistry implements Registry
 
     abstract protected void doDispose();
 
+    @Override
     public final void initialise() throws InitialisationException
     {
         if (id == null)
@@ -133,6 +135,7 @@ public abstract class AbstractRegistry implements Registry
         return lifecycleManager;
     }
 
+    @Override
     public void fireLifecycle(String phase) throws LifecycleException
     {
         //Implicitly call stop if necessary when disposing
@@ -143,17 +146,18 @@ public abstract class AbstractRegistry implements Registry
         getLifecycleManager().fireLifecycle(phase);
     }
 
-    @SuppressWarnings("unchecked")
+    @Override
     public <T> T get(String key)
     {
-        return (T) lookupObject(key);
+        return lookupObject(key);
     }
 
+    @Override
     public <T> T lookupObject(Class<T> type) throws RegistrationException
     {
         // Accumulate objects from all registries.
         Collection<T> objects = lookupObjects(type);
-        
+
         if (objects.size() == 1)
         {
             return objects.iterator().next();
@@ -167,7 +171,8 @@ public abstract class AbstractRegistry implements Registry
             return null;
         }
     }
-    
+
+    @Override
     public <T> Collection<T> lookupObjectsForLifecycle(Class<T> type)
     {
         // By default use the normal lookup. If a registry implementation needs a
@@ -181,6 +186,7 @@ public abstract class AbstractRegistry implements Registry
     // Registry Metadata
     // /////////////////////////////////////////////////////////////////////////
 
+    @Override
     public final String getRegistryId()
     {
         return id;

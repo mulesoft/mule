@@ -24,7 +24,6 @@ import static org.junit.Assert.assertNotNull;
 @ContainsTransformerMethods
 public class ReturnAnnotationTestCase extends AbstractIBeansTestCase
 {
-    @SuppressWarnings("unused")
     @IntegrationBean
     private SearchIBean search;
 
@@ -50,5 +49,4 @@ public class ReturnAnnotationTestCase extends AbstractIBeansTestCase
     {
         return new URL(urlString);
     }
-
 }

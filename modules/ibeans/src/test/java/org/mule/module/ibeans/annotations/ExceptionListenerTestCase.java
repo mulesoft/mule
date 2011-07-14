@@ -25,10 +25,8 @@ import static org.junit.Assert.assertTrue;
  */
 public class ExceptionListenerTestCase extends AbstractIBeansTestCase
 {
-    @SuppressWarnings("unused")    
     @IntegrationBean
     private TestExceptionIBean test;
-
 
     @Test
     public void testExceptionIsCaughtByListener() throws Exception
@@ -36,6 +34,7 @@ public class ExceptionListenerTestCase extends AbstractIBeansTestCase
         final AtomicBoolean exceptionThrown = new AtomicBoolean(false);
         test.setExceptionListener(new ExceptionListener()
         {
+            @Override
             public void exceptionThrown(Exception e)
             {
                 exceptionThrown.set(true);
@@ -53,6 +52,7 @@ public class ExceptionListenerTestCase extends AbstractIBeansTestCase
         final AtomicBoolean exceptionThrown = new AtomicBoolean(false);
         test.setExceptionListener(new ExceptionListener()
         {
+            @Override
             public void exceptionThrown(Exception e)
             {
                 exceptionThrown.set(true);

@@ -59,23 +59,26 @@ public class Orange implements Callable, OrangeInterface
         this.brand = brand;
     }
 
-    public Orange(HashMap props) throws MuleException
+    public Orange(HashMap<String, Object> props) throws MuleException
     {
         setBrand((String) props.get("brand"));
         setRadius((Double) props.get("radius"));
         setSegments((Integer) props.get("segments"));
     }
 
+    @Override
     public void bite()
     {
         bitten = true;
     }
 
+    @Override
     public boolean isBitten()
     {
         return bitten;
     }
 
+    @Override
     public Object onCall(MuleEventContext context) throws MuleException
     {
         logger.debug("Orange received an event in Callable.onEvent! MuleEvent says: "
@@ -84,31 +87,37 @@ public class Orange implements Callable, OrangeInterface
         return null;
     }
 
+    @Override
     public String getBrand()
     {
         return brand;
     }
 
+    @Override
     public Integer getSegments()
     {
         return segments;
     }
 
+    @Override
     public Double getRadius()
     {
         return radius;
     }
 
+    @Override
     public void setBrand(String string)
     {
         brand = string;
     }
 
+    @Override
     public void setSegments(Integer integer)
     {
         segments = integer;
     }
 
+    @Override
     public void setRadius(Double double1)
     {
         radius = double1;
@@ -117,6 +126,7 @@ public class Orange implements Callable, OrangeInterface
     /**
      * @return Returns the listProperties.
      */
+    @Override
     public List getListProperties()
     {
         return listProperties;
@@ -125,6 +135,7 @@ public class Orange implements Callable, OrangeInterface
     /**
      * @param listProperties The listProperties to set.
      */
+    @Override
     public void setListProperties(List listProperties)
     {
         this.listProperties = listProperties;
@@ -133,6 +144,7 @@ public class Orange implements Callable, OrangeInterface
     /**
      * @return Returns the mapProperties.
      */
+    @Override
     public Map getMapProperties()
     {
         return mapProperties;

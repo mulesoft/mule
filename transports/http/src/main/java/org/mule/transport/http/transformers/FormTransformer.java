@@ -69,7 +69,6 @@ public class FormTransformer extends AbstractMessageTransformer
         }
         else if (existingValue instanceof List)
         {
-            @SuppressWarnings("unchecked")
             List<String> list = (List<String>) existingValue;
             list.add(value);
         }
