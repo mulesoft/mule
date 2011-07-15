@@ -11,8 +11,7 @@
 package org.mule.test.integration.construct;
 
 import org.mule.api.MuleMessage;
-import org.mule.api.client.LocalMuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
 
@@ -21,16 +20,15 @@ import java.util.Map;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+
 public class SimpleServiceTestCase extends FunctionalTestCase
 {
-    private LocalMuleClient muleClient;
-
     @Override
     protected void doSetUp() throws Exception
     {
-        super.setDisposeManagerPerSuite(true);
+        setDisposeContextPerClass(true);
         super.doSetUp();
-        muleClient = muleContext.getClient();
     }
 
     @Override
@@ -45,7 +43,7 @@ public class SimpleServiceTestCase extends FunctionalTestCase
         final Map<String, Object> props = new HashMap<String, Object>();
         props.put(HttpConnector.HTTP_METHOD_PROPERTY, HttpConstants.METHOD_POST);
         props.put(HttpConstants.HEADER_CONTENT_TYPE, "application/xml");
-        final MuleMessage result = muleClient.send("http://localhost:6099/rest/weather-report",
+        MuleMessage result = muleContext.getClient().send("http://localhost:6099/rest/weather-report",
             "<fake_report/>", props);
         assertEquals((Integer) 201, result.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0));
     }

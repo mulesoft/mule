@@ -47,7 +47,6 @@ public class WSProxyTestCase extends AbstractServiceAndFlowTestCase
     public WSProxyTestCase(ConfigVariant variant, String configResources)
     {
         super(variant, configResources);
-        setDisposeContextPerClass(true);
     }
 
     @Override

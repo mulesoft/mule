@@ -29,7 +29,6 @@ public abstract class AbstractNotificationTestCase extends AbstractServiceAndFlo
     public AbstractNotificationTestCase(ConfigVariant variant, String configResources)
     {
         super(variant, configResources);
-        setDisposeContextPerClass(true);
     }
 
     @SuppressWarnings("unchecked")
