@@ -31,11 +31,6 @@ import static org.junit.Assert.assertTrue;
 
 public class MulticastAsyncWithTransformersTestCase extends AbstractServiceAndFlowTestCase
 {
-    public MulticastAsyncWithTransformersTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
-
     @Parameters
     public static Collection<Object[]> parameters()
     {
@@ -43,6 +38,11 @@ public class MulticastAsyncWithTransformersTestCase extends AbstractServiceAndFl
             {ConfigVariant.SERVICE, "org/mule/test/integration/routing/outbound/multicaster-async-with-transformers-test-service.xml"},
             {ConfigVariant.FLOW, "org/mule/test/integration/routing/outbound/multicaster-async-with-transformers-test-flow.xml"}
         });
+    }
+
+    public MulticastAsyncWithTransformersTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
     }
 
     @Test

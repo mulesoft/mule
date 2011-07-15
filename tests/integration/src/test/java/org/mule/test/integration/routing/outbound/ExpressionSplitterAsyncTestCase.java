@@ -31,11 +31,6 @@ import static org.junit.Assert.assertTrue;
 
 public class ExpressionSplitterAsyncTestCase extends AbstractServiceAndFlowTestCase
 {
-    public ExpressionSplitterAsyncTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
-
     @Parameters
     public static Collection<Object[]> parameters()
     {
@@ -44,6 +39,11 @@ public class ExpressionSplitterAsyncTestCase extends AbstractServiceAndFlowTestC
                 "org/mule/test/integration/routing/outbound/expression-splitter-async-test-service.xml"},
             {ConfigVariant.FLOW,
                 "org/mule/test/integration/routing/outbound/expression-splitter-async-test-flow.xml"}});
+    }
+
+    public ExpressionSplitterAsyncTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
     }
 
     @Test
@@ -73,5 +73,4 @@ public class ExpressionSplitterAsyncTestCase extends AbstractServiceAndFlowTestC
         assertTrue(results.contains("Banana Received in ServiceTwo"));
         assertTrue(results.contains("Orange Received in ServiceThree"));
     }
-
 }

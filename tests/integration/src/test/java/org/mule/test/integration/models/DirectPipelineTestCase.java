@@ -12,6 +12,7 @@ package org.mule.test.integration.models;
 
 public class DirectPipelineTestCase extends AbstractPipelineTestCase
 {
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/test/integration/models/direct-pipeline-test-config.xml," +

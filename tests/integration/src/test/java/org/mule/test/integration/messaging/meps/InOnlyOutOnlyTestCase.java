@@ -25,7 +25,7 @@ import org.junit.runners.Parameterized.Parameters;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-// START SNIPPET: full-class
+//START SNIPPET: full-class
 public class InOnlyOutOnlyTestCase extends AbstractServiceAndFlowTestCase
 {
     public static final long TIMEOUT = 3000;
@@ -61,7 +61,5 @@ public class InOnlyOutOnlyTestCase extends AbstractServiceAndFlowTestCase
         result = client.request("notReceivedEndpoint", TIMEOUT);
         assertNotNull(result);
         assertEquals("foo header not received", result.getPayloadAsString());
-
     }
 }
-// END SNIPPET: full-class

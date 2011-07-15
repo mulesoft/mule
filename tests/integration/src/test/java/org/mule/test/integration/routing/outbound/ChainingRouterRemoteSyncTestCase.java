@@ -14,18 +14,25 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transport.NullPayload;
 
-/**
- */
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+
 public class ChainingRouterRemoteSyncTestCase extends FunctionalTestCase
 {
+
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/test/integration/routing/outbound/chaining-router-remote-sync.xml";
     }
 
+    @Test
     public void testRemoteSync() throws Exception
     {
 
@@ -40,6 +47,7 @@ public class ChainingRouterRemoteSyncTestCase extends FunctionalTestCase
      * MULE-4619 ChainingRouter sets MULE_REMOTE_SYNC_PROPERTY true on message when dispatching to last endpoint
      * @throws Exception
      */
+    @Test
     public void testRemoteSyncLastEndpointDispatch() throws Exception
     {
 

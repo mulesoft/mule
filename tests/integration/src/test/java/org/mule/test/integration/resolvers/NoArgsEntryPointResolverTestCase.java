@@ -18,12 +18,6 @@ import org.junit.runners.Parameterized.Parameters;
 
 public class NoArgsEntryPointResolverTestCase extends AbstractEntryPointResolverTestCase
 {
-
-    public NoArgsEntryPointResolverTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
-    
     @Parameters
     public static Collection<Object[]> parameters()
     {
@@ -33,6 +27,11 @@ public class NoArgsEntryPointResolverTestCase extends AbstractEntryPointResolver
         });
     }      
     
+    public NoArgsEntryPointResolverTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
+    }
+
     @Test
     public void testIgnored() throws Exception
     {
@@ -44,5 +43,4 @@ public class NoArgsEntryPointResolverTestCase extends AbstractEntryPointResolver
     {
         doTest("selected", new Object(), "selected");
     }
-
 }

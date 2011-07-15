@@ -62,4 +62,3 @@ public class InOnlyTestCase extends AbstractServiceAndFlowTestCase
         assertTrue(latch.await(TIMEOUT, TimeUnit.MILLISECONDS));
     }
 }
-// END SNIPPET: full-class

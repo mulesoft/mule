@@ -12,10 +12,13 @@ package org.mule.test.integration.routing.nested;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
-import org.mule.transport.NullPayload;
+import org.mule.tck.junit4.FunctionalTestCase;
 
-import java.util.Date;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 public class ComponentBindingTestCase extends FunctionalTestCase
 {
@@ -25,6 +28,24 @@ public class ComponentBindingTestCase extends FunctionalTestCase
     protected String getConfigResources()
     {
         return "org/mule/test/integration/routing/nested/interface-binding-test.xml";
+    }
+
+    @Test
+    public void testVmBinding() throws Exception
+    {
+        internalTest("vm://");
+    }
+
+    @Test
+    public void testJmsQueueBinding() throws Exception
+    {
+        internalTest("jms://");
+    }
+
+    @Test
+    public void testJmsTopicBinding() throws Exception
+    {
+        internalTest("jms://topic:t");
     }
 
     private void internalTest(String prefix) throws Exception
@@ -37,31 +58,4 @@ public class ComponentBindingTestCase extends FunctionalTestCase
         assertNull(reply.getExceptionPayload());
         assertEquals("Received: Hello " + message + " " + number, reply.getPayload());
     }
-
-    private void internalNullTest(String prefix) throws Exception
-    {
-        MuleClient client = new MuleClient(muleContext);
-        Date message = new Date();
-        client.dispatch(prefix + "invoker.in", message, null);
-        MuleMessage reply = client.request(prefix + "invoker.out", RECEIVE_TIMEOUT);
-        assertNotNull(reply);
-        assertNull(reply.getExceptionPayload());
-        assertEquals(NullPayload.getInstance(), reply.getPayload());
-    }
-
-    public void testVmBinding() throws Exception
-    {
-        internalTest("vm://");
-    }
-
-    public void testJmsQueueBinding() throws Exception
-    {
-        internalTest("jms://");
-    }
-
-    public void testJmsTopicBinding() throws Exception
-    {
-        internalTest("jms://topic:t");
-    }
-
 }

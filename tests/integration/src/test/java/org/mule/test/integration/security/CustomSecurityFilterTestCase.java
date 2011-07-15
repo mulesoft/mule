@@ -12,22 +12,27 @@ package org.mule.test.integration.security;
 
 import org.mule.api.MuleMessage;
 import org.mule.client.DefaultLocalMuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import java.util.HashMap;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
 
 /**
  * See MULE-4916: spring beans inside a security filter
  */
 public class CustomSecurityFilterTestCase extends FunctionalTestCase
 {
-
     @Override
     protected String getConfigResources()
     {
         return "org/mule/test/integration/security/custom-security-filter-test.xml";
     }
 
+    @Test
     public void testOutboundAutenticationSend() throws Exception
     {
         DefaultLocalMuleClient client = new DefaultLocalMuleClient(muleContext);

@@ -13,22 +13,29 @@ package org.mule.test.integration.messaging.meps;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.util.WebServiceOnlineCheck;
 import org.mule.transport.http.HttpConstants;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 public class MessagePropertiesPropagationTestCase extends FunctionalTestCase
 {
-    public MessagePropertiesPropagationTestCase()
+
+    @Override
+    protected boolean isFailOnTimeout()
     {
-        super();
-        
         // Do not fail test case upon timeout because this probably just means
         // that the 3rd-party web service is off-line.
-        setFailOnTimeout(false);
+        return false;
     }
     
     /**
@@ -51,6 +58,7 @@ public class MessagePropertiesPropagationTestCase extends FunctionalTestCase
     /**
      * As per EE-1613, the Correlation-related properties _should_ be propagated to the response message by default.
      */
+    @Test
     public void testPropagatedPropertiesWithHttpTransport() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -72,6 +80,7 @@ public class MessagePropertiesPropagationTestCase extends FunctionalTestCase
     /**
      * As per EE-1613, the Correlation-related properties _should_ be propagated to the response message by default.
      */
+    @Test
     public void testPropagatedPropertiesWithCxfTransport() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -93,6 +102,7 @@ public class MessagePropertiesPropagationTestCase extends FunctionalTestCase
      * As per EE-1611/MULE-4302, custom properties and non-Correlation-related properties _should not_ be propagated
      * to the response message by default.
      */
+    @Test
     public void testNotPropagatedPropertiesWithHttpTransport() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -115,6 +125,7 @@ public class MessagePropertiesPropagationTestCase extends FunctionalTestCase
      * As per EE-1611/MULE-4302, custom properties and non-Correlation-related properties _should not_ be propagated
      * to the response message by default.
      */
+    @Test
     public void testNotPropagatedPropertiesWithCxfTransport() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -135,6 +146,7 @@ public class MessagePropertiesPropagationTestCase extends FunctionalTestCase
     /**
      * Force the properties to be propagated to the response message.
      */
+    @Test
     public void testForcePropagatedPropertiesWithHttpTransport() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);

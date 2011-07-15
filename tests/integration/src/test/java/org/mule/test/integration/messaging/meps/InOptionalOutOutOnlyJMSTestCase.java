@@ -29,7 +29,7 @@ import org.junit.runners.Parameterized.Parameters;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-// START SNIPPET: full-class
+//START SNIPPET: full-class
 public class InOptionalOutOutOnlyJMSTestCase extends AbstractServiceAndFlowTestCase
 {
     public static final long TIMEOUT = 3000;
@@ -50,11 +50,6 @@ public class InOptionalOutOutOnlyJMSTestCase extends AbstractServiceAndFlowTestC
         broker.stop();
     }
 
-    public InOptionalOutOutOnlyJMSTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
-
     @Parameters
     public static Collection<Object[]> parameters()
     {
@@ -63,6 +58,11 @@ public class InOptionalOutOutOnlyJMSTestCase extends AbstractServiceAndFlowTestC
                 "org/mule/test/integration/messaging/meps/pattern_In-Optional-Out_Out-Only_JMS-service.xml"},
             {ConfigVariant.FLOW,
                 "org/mule/test/integration/messaging/meps/pattern_In-Optional-Out_Out-Only_JMS-flow.xml"}});
+    }
+
+    public InOptionalOutOutOnlyJMSTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
     }
 
     @Test
@@ -91,4 +91,3 @@ public class InOptionalOutOutOnlyJMSTestCase extends AbstractServiceAndFlowTestC
         assertEquals("foo header received", result.getPayload());
     }
 }
-// END SNIPPET: full-class

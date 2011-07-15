@@ -29,16 +29,16 @@ import static org.junit.Assert.assertNotNull;
 
 public class ExceptionBasedRouterTestCase extends AbstractServiceAndFlowTestCase
 {
-    public ExceptionBasedRouterTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
-
     @Parameters
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{{ConfigVariant.SERVICE,
             "org/mule/test/integration/routing/outbound/exception-based-router-service.xml"},});
+    }
+
+    public ExceptionBasedRouterTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
     }
 
     @Test

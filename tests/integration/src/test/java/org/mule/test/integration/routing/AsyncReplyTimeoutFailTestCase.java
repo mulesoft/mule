@@ -13,21 +13,28 @@ package org.mule.test.integration.routing;
 import org.mule.api.context.notification.RoutingNotificationListener;
 import org.mule.context.notification.RoutingNotification;
 import org.mule.routing.correlation.CorrelationTimeoutException;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.util.ExceptionUtils;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class AsyncReplyTimeoutFailTestCase extends FunctionalTestCase
 {
+
     private CountDownLatch latch;
 
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/test/integration/routing/multi-async-repy-timeout-fail.xml";
     }
 
+    @Test
     public void testAggregatorTimeoutWithFailure() throws Exception
     {
         latch = new CountDownLatch(1);

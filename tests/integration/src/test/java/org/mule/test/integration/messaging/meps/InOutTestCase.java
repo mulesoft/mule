@@ -25,15 +25,10 @@ import org.junit.runners.Parameterized.Parameters;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-// START SNIPPET: full-class
+//START SNIPPET: full-class
 public class InOutTestCase extends AbstractServiceAndFlowTestCase
 {
     public static final long TIMEOUT = 3000;
-
-    public InOutTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
 
     @Parameters
     public static Collection<Object[]> parameters()
@@ -41,6 +36,11 @@ public class InOutTestCase extends AbstractServiceAndFlowTestCase
         return Arrays.asList(new Object[][]{
             {ConfigVariant.SERVICE, "org/mule/test/integration/messaging/meps/pattern_In-Out-service.xml"},
             {ConfigVariant.FLOW, "org/mule/test/integration/messaging/meps/pattern_In-Out-flow.xml"}});
+    }
+
+    public InOutTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
     }
 
     @Test
@@ -59,4 +59,3 @@ public class InOutTestCase extends AbstractServiceAndFlowTestCase
         assertEquals("foo header received", result.getPayloadAsString());
     }
 }
-// END SNIPPET: full-class

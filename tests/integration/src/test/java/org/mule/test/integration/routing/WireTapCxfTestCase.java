@@ -32,15 +32,10 @@ import static org.junit.Assert.assertTrue;
 
 public class WireTapCxfTestCase extends AbstractServiceAndFlowTestCase
 {
+    private static final Latch tapLatch = new Latch();
+
     @Rule
     public DynamicPort port1 = new DynamicPort("port1");
-
-    static final Latch tapLatch = new Latch();
-
-    public WireTapCxfTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
 
     @Parameters
     public static Collection<Object[]> parameters()
@@ -48,6 +43,11 @@ public class WireTapCxfTestCase extends AbstractServiceAndFlowTestCase
         return Arrays.asList(new Object[][]{
             {ConfigVariant.SERVICE, "org/mule/test/integration/routing/wire-tap-cxf-service.xml"},
             {ConfigVariant.FLOW, "org/mule/test/integration/routing/wire-tap-cxf-flow.xml"}});
+    }
+
+    public WireTapCxfTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
     }
 
     @Override

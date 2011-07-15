@@ -61,12 +61,6 @@ public class ExpressionSplitterXPathTestCase extends AbstractServiceAndFlowTestC
             "    </Trade>";
 
 
-    public ExpressionSplitterXPathTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-        XMLUnit.setIgnoreWhitespace(true);
-    }
-
     @Parameters
     public static Collection<Object[]> parameters()
     {
@@ -74,6 +68,12 @@ public class ExpressionSplitterXPathTestCase extends AbstractServiceAndFlowTestC
             {ConfigVariant.SERVICE, "org/mule/test/integration/routing/outbound/expression-splitter-xpath-test-service.xml"},
             {ConfigVariant.FLOW, "org/mule/test/integration/routing/outbound/expression-splitter-xpath-test-flow.xml"}
         });
+    }
+
+    public ExpressionSplitterXPathTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
+        XMLUnit.setIgnoreWhitespace(true);
     }
 
     @Test

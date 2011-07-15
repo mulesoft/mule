@@ -27,18 +27,17 @@ import static org.junit.Assert.assertTrue;
 
 public class WireTapTestCase extends AbstractServiceAndFlowTestCase
 {
-
-    public WireTapTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
-
     @Parameters
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
             {ConfigVariant.SERVICE, "org/mule/test/integration/routing/wire-tap-service.xml"},
             {ConfigVariant.FLOW, "org/mule/test/integration/routing/wire-tap-flow.xml"}});
+    }
+
+    public WireTapTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
     }
 
     @Test

@@ -29,11 +29,6 @@ import static org.junit.Assert.assertTrue;
 
 public class ExpressionRecipientListSyncTestCase extends AbstractServiceAndFlowTestCase
 {
-    public ExpressionRecipientListSyncTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
-
     @Parameters
     public static Collection<Object[]> parameters()
     {
@@ -41,6 +36,11 @@ public class ExpressionRecipientListSyncTestCase extends AbstractServiceAndFlowT
             {ConfigVariant.SERVICE, "org/mule/test/integration/routing/outbound/expression-recipient-list-sync-test-service.xml"},
             {ConfigVariant.FLOW, "org/mule/test/integration/routing/outbound/expression-recipient-list-sync-test-flow.xml"}
         });
+    }
+
+    public ExpressionRecipientListSyncTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
     }
 
     @Test

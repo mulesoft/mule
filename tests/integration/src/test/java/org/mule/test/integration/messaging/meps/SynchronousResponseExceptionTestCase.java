@@ -25,11 +25,6 @@ import static org.junit.Assert.fail;
  */
 public class SynchronousResponseExceptionTestCase extends AbstractServiceAndFlowTestCase
 {
-    public SynchronousResponseExceptionTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
-
     @Parameters
     public static Collection<Object[]> parameters()
     {
@@ -38,6 +33,11 @@ public class SynchronousResponseExceptionTestCase extends AbstractServiceAndFlow
                 "org/mule/test/integration/messaging/meps/synchronous-response-exception-service.xml"},
             {ConfigVariant.FLOW,
                 "org/mule/test/integration/messaging/meps/synchronous-response-exception-flow.xml"}});
+    }
+
+    public SynchronousResponseExceptionTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
     }
 
     @Test

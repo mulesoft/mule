@@ -11,7 +11,7 @@
 package org.mule.test.integration.messaging.meps;
 
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 
 import java.util.Arrays;
@@ -23,7 +23,7 @@ import org.junit.runners.Parameterized.Parameters;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-// START SNIPPET: full-class
+//START SNIPPET: full-class
 public class BindingInOnlyInOutOutOnlyTestCase extends AbstractServiceAndFlowTestCase
 {
     public static final long TIMEOUT = 3000;
@@ -46,7 +46,7 @@ public class BindingInOnlyInOutOutOnlyTestCase extends AbstractServiceAndFlowTes
     @Test
     public void testExchange() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
 
         client.dispatch("inboundEndpoint", new int[]{1, 2, 3, 4, 5}, null);
 
@@ -55,4 +55,3 @@ public class BindingInOnlyInOutOutOnlyTestCase extends AbstractServiceAndFlowTes
         assertEquals("Total: 15", result.getPayloadAsString());
     }
 }
-// END SNIPPET: full-class

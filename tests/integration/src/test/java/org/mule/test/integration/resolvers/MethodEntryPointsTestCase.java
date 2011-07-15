@@ -107,6 +107,7 @@ public class MethodEntryPointsTestCase extends AbstractServiceAndFlowTestCase
         assertEquals("olleh", message.getPayloadAsString());
     }
 
+    @Test
     public void testValidCallToUpperCaseMethodSetOnEndpoint() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -115,6 +116,7 @@ public class MethodEntryPointsTestCase extends AbstractServiceAndFlowTestCase
         assertEquals(message.getPayloadAsString(), "HELLO");
     }
 
+    @Test
     public void testValidCallToReverseMethodSetAsHeader() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -125,6 +127,7 @@ public class MethodEntryPointsTestCase extends AbstractServiceAndFlowTestCase
         assertEquals("olleh", message.getPayloadAsString());
     }
 
+    @Test
     public void testValidCallToUpperCaseMethodSetAsHeader() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);

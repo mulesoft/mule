@@ -13,19 +13,22 @@ package org.mule.test.integration.resolvers;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.util.Base64;
 
 import java.util.List;
 import java.util.Random;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 public class DefaultEntryPointResolverSetMultithreadingTestCase extends FunctionalTestCase
 {
-    public DefaultEntryPointResolverSetMultithreadingTestCase()
-    {
-        super();    
-        testTimeoutSecs = testTimeoutSecs * 2;
-    }
     
     @Override
     protected String getConfigResources()
@@ -39,6 +42,7 @@ public class DefaultEntryPointResolverSetMultithreadingTestCase extends Function
         return 120;
     }
 
+    @Test
     public void testMultithreaded() throws Exception
     {
         final int numberOfThreads = 50;

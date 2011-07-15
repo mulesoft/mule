@@ -64,6 +64,7 @@ public class EntryPointResolverTestCase extends AbstractEntryPointResolverTestCa
         doTest("callable2", new Object(), "callable");
     }
 
+    @Test
     public void testCustomEntryPointResolverOnModel() throws Exception
     {
         if (variant.equals(ConfigVariant.SERVICE))
@@ -115,7 +116,7 @@ public class EntryPointResolverTestCase extends AbstractEntryPointResolverTestCa
     {
         if (variant.equals(ConfigVariant.SERVICE))
         {
-            Map properties = new HashMap();
+            Map<String, Object> properties = new HashMap<String, Object>();
             properties.put("propertyName", "property");
             doTest("property", new Object(), "property", properties);
         }
@@ -124,7 +125,7 @@ public class EntryPointResolverTestCase extends AbstractEntryPointResolverTestCa
     @Test
     public void testPropertyEntryPointResolverOnComponent() throws Exception
     {
-        Map properties = new HashMap();
+        Map<String, Object> properties = new HashMap<String, Object>();
         properties.put("propertyName", "property");
         doTest("property2", new Object(), "property", properties);
     }

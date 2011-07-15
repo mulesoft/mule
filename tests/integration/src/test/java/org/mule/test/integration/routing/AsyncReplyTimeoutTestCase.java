@@ -15,13 +15,19 @@ import org.mule.api.MuleMessageCollection;
 import org.mule.api.context.notification.RoutingNotificationListener;
 import org.mule.context.notification.RoutingNotification;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class AsyncReplyTimeoutTestCase extends FunctionalTestCase
 {
+    
     private CountDownLatch latch;
     
     @Override
@@ -30,6 +36,7 @@ public class AsyncReplyTimeoutTestCase extends FunctionalTestCase
         return "org/mule/test/integration/routing/multi-async-repy-timeout.xml";
     }
 
+    @Test
     public void testAggregatorTimeoutWithoutFailure() throws Exception
     {
         latch = new CountDownLatch(1);

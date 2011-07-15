@@ -32,11 +32,6 @@ import static org.junit.Assert.assertTrue;
 
 public class ExpressionSplitterSyncTestCase extends AbstractServiceAndFlowTestCase
 {
-    public ExpressionSplitterSyncTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
-
     @Parameters
     public static Collection<Object[]> parameters()
     {
@@ -45,6 +40,11 @@ public class ExpressionSplitterSyncTestCase extends AbstractServiceAndFlowTestCa
                 "org/mule/test/integration/routing/outbound/expression-splitter-sync-test-service.xml"},
             {ConfigVariant.FLOW,
                 "org/mule/test/integration/routing/outbound/expression-splitter-sync-test-flow.xml"}});
+    }
+
+    public ExpressionSplitterSyncTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
     }
 
     @Test

@@ -28,11 +28,6 @@ import static org.junit.Assert.assertTrue;
 
 public class InboundAggregationNoTimeoutTestCase extends AbstractServiceAndFlowTestCase
 {
-    public InboundAggregationNoTimeoutTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
-
     @Parameters
     public static Collection<Object[]> parameters()
     {
@@ -40,6 +35,11 @@ public class InboundAggregationNoTimeoutTestCase extends AbstractServiceAndFlowT
             {ConfigVariant.SERVICE, "org/mule/test/integration/routing/multi-inbound-aggregator-no-timeout-service.xml"},
             {ConfigVariant.FLOW, "org/mule/test/integration/routing/multi-inbound-aggregator-no-timeout-flow.xml"}
         });
+    }
+
+    public InboundAggregationNoTimeoutTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
     }
 
     @Test

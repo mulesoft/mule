@@ -26,7 +26,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
-// START SNIPPET: full-class
 public class InOnlyOptionalOutTestCase extends AbstractServiceAndFlowTestCase
 {
     public static final long TIMEOUT = 3000;
@@ -64,4 +63,3 @@ public class InOnlyOptionalOutTestCase extends AbstractServiceAndFlowTestCase
         assertNull(result);
     }
 }
-// END SNIPPET: full-class

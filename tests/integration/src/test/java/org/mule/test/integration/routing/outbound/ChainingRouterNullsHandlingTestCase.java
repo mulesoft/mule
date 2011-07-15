@@ -29,16 +29,16 @@ import static org.junit.Assert.fail;
 
 public class ChainingRouterNullsHandlingTestCase extends AbstractServiceAndFlowTestCase
 {
-    public ChainingRouterNullsHandlingTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
-
     @Parameters
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{{ConfigVariant.SERVICE,
             "org/mule/test/integration/routing/outbound/chaining-router-null-handling-service.xml"}});
+    }
+
+    public ChainingRouterNullsHandlingTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
     }
 
     @Test

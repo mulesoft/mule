@@ -29,12 +29,6 @@ import static org.junit.Assert.fail;
 
 public class IdempotentRouterWithFilterTestCase extends AbstractServiceAndFlowTestCase
 {
-
-    public IdempotentRouterWithFilterTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
-
     @Parameters
     public static Collection<Object[]> parameters()
     {
@@ -42,6 +36,11 @@ public class IdempotentRouterWithFilterTestCase extends AbstractServiceAndFlowTe
             {ConfigVariant.SERVICE, "org/mule/test/integration/routing/inbound/idempotent-router-with-filter-service.xml"},
             {ConfigVariant.FLOW, "org/mule/test/integration/routing/inbound/idempotent-router-with-filter-flow.xml"}
         });
+    }
+
+    public IdempotentRouterWithFilterTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
     }
 
     @Test
@@ -96,5 +95,4 @@ public class IdempotentRouterWithFilterTestCase extends AbstractServiceAndFlowTe
 
         assertNull(response);
     }
-
 }

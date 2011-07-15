@@ -36,5 +36,4 @@ public abstract class AbstractEntryPointResolverTestCase extends AbstractService
         MuleMessage response = client.send("vm://" + path, payload, properties);
         assertEquals(result, response.getPayloadAsString());
     }
-
 }
