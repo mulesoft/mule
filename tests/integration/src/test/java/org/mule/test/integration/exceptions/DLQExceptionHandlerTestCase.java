@@ -22,6 +22,10 @@ import java.util.Collection;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
 public class DLQExceptionHandlerTestCase extends AbstractServiceAndFlowTestCase
 {
     @Parameters

@@ -20,6 +20,8 @@ import java.util.Collection;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
+import static org.junit.Assert.fail;
+
 public class FileExceptionStrategyFunctionalTestCase extends AbstractServiceAndFlowTestCase
 {
     public FileExceptionStrategyFunctionalTestCase(ConfigVariant variant, String configResources)

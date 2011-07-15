@@ -23,6 +23,9 @@ import java.util.Collection;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
+
 /**
  * When exception strategies are used with transactions it should be possible to send
  * the exception message while rolling back the transaction. See MULE-4338

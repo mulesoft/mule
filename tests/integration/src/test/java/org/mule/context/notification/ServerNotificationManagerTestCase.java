@@ -19,6 +19,8 @@ import java.util.Collection;
 import org.junit.Ignore;
 import org.junit.runners.Parameterized.Parameters;
 
+import static org.junit.Assert.assertNotNull;
+
 @Ignore
 public class ServerNotificationManagerTestCase extends AbstractNotificationTestCase
 {

@@ -10,36 +10,42 @@
 
 package org.mule.test.integration.messaging.meps;
 
+import org.mule.api.MuleMessage;
+import org.mule.module.client.MuleClient;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.transport.NullPayload;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.activemq.broker.BrokerService;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
-import org.mule.transport.NullPayload;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 // START SNIPPET: full-class
 public class InOptionalOutOutOnlyJMSTestCase extends AbstractServiceAndFlowTestCase
 {
     public static final long TIMEOUT = 3000;
 
-    private BrokerService broker;
+    private static BrokerService broker;
 
-    @Override
-    protected void suitePreSetUp() throws Exception
+    @BeforeClass
+    public static void startBroker() throws Exception
     {
         broker = new BrokerService();
         broker.addConnector("tcp://localhost:61616");
         broker.start();
     }
 
-    @Override
-    protected void suitePostTearDown() throws Exception
+    @AfterClass
+    public static void stopBroker() throws Exception
     {
         broker.stop();
     }

@@ -20,6 +20,8 @@ import java.util.Collection;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
+import static org.junit.Assert.assertEquals;
+
 public class VmPropertyScopeTestCase extends AbstractPropertyScopeTestCase
 {
     public VmPropertyScopeTestCase(ConfigVariant variant, String configResources)

@@ -10,6 +10,8 @@
 
 package org.mule.test.integration.transport.jms;
 
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+
 import java.util.Arrays;
 import java.util.Collection;
 
@@ -26,7 +28,9 @@ import javax.jms.TextMessage;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class QosHeadersTestCase extends AbstractServiceAndFlowTestCase
 {

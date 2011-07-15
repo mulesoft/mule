@@ -22,6 +22,9 @@ import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 import org.w3c.dom.Node;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 public class W3CDocumentXPathNodeEvaluatorTestCase extends AbstractServiceAndFlowTestCase
 {
     private static final String XML_INPUT =

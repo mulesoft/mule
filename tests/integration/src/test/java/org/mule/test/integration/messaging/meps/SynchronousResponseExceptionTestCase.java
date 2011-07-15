@@ -10,12 +10,15 @@
 
 package org.mule.test.integration.messaging.meps;
 
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+
 import java.util.Arrays;
 import java.util.Collection;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+
+import static org.junit.Assert.fail;
 
 /**
  * @see MULE-4512

@@ -25,6 +25,8 @@ import java.util.concurrent.TimeUnit;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
+import static org.junit.Assert.assertTrue;
+
 public class AutoTransformerTestCase extends AbstractServiceAndFlowTestCase
 {
     public AutoTransformerTestCase(ConfigVariant variant, String configResources)
@@ -33,7 +35,7 @@ public class AutoTransformerTestCase extends AbstractServiceAndFlowTestCase
     }
 
     private static Latch latch;
-    
+
     @Parameters
     public static Collection<Object[]> parameters()
     {

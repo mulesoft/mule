@@ -13,9 +13,9 @@ package org.mule.test.integration.transport.file;
 import org.mule.api.MuleEventContext;
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.tck.functional.FunctionalTestNotification;
 import org.mule.tck.functional.FunctionalTestNotificationListener;
-import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.util.FileUtils;
 import org.mule.util.IOUtils;
 
@@ -27,6 +27,10 @@ import java.util.Collection;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class FileFunctionalTestCase extends AbstractServiceAndFlowTestCase
     implements FunctionalTestNotificationListener
@@ -92,6 +96,7 @@ public class FileFunctionalTestCase extends AbstractServiceAndFlowTestCase
         }
     }
 
+    @Override
     public void onNotification(ServerNotification notification)
     {
         synchronized (this)
@@ -104,6 +109,7 @@ public class FileFunctionalTestCase extends AbstractServiceAndFlowTestCase
 
     public static class FileTestComponent extends FunctionalTestComponent
     {
+        @Override
         public Object onCall(MuleEventContext context) throws Exception
         {
             // there should not be any transformers configured by default, so the
@@ -112,5 +118,4 @@ public class FileFunctionalTestCase extends AbstractServiceAndFlowTestCase
             return super.onCall(context);
         }
     }
-
 }

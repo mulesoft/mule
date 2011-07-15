@@ -10,30 +10,33 @@
 
 package org.mule.issues;
 
-import java.util.Arrays;
-import java.util.Collection;
-
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
+import java.util.Arrays;
+import java.util.Collection;
+
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+
+import static org.junit.Assert.assertNull;
+
 public class InOutOutOnlyMessageCopyMule3007TestCase extends AbstractServiceAndFlowTestCase
 {
-    
+
     @Rule
     public DynamicPort port1 = new DynamicPort("port1");
-    
+
     public InOutOutOnlyMessageCopyMule3007TestCase(ConfigVariant variant, String configResources)
     {
         super(variant, configResources);
 
     }
-    
+
     @Parameters
     public static Collection<Object[]> parameters()
     {
@@ -41,8 +44,8 @@ public class InOutOutOnlyMessageCopyMule3007TestCase extends AbstractServiceAndF
             {ConfigVariant.SERVICE, "org/mule/issues/inout-outonly-message-copy-mule3007-test-service.xml"},
             {ConfigVariant.FLOW, "org/mule/issues/inout-outonly-message-copy-mule3007-test-flow.xml"}
         });
-    }      
-    
+    }
+
     @Test
     public void testStreamMessage() throws MuleException
     {

@@ -22,6 +22,8 @@ import java.util.Collection;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
+import static org.junit.Assert.assertTrue;
+
 /*
  * This test has been added due to MULE-610
  */

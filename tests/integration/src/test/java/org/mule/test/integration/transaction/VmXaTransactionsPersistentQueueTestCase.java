@@ -10,26 +10,25 @@
 
 package org.mule.test.integration.transaction;
 
+import org.mule.api.MuleMessage;
+import org.mule.module.client.MuleClient;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+
 import java.util.Arrays;
 import java.util.Collection;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 public class VmXaTransactionsPersistentQueueTestCase extends AbstractServiceAndFlowTestCase
 {
-
     private static final String TEST_MESSAGE = "TEST_MESSAGE";
 
     private final long timeout = getTestTimeoutSecs() * 1000 / 30;
-
-    public VmXaTransactionsPersistentQueueTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
 
     @Parameters
     public static Collection<Object[]> parameters()
@@ -39,6 +38,11 @@ public class VmXaTransactionsPersistentQueueTestCase extends AbstractServiceAndF
                 "org/mule/test/integration/transaction/vm-xa-transaction-persistent-queue-service.xml"},
             {ConfigVariant.FLOW,
                 "org/mule/test/integration/transaction/vm-xa-transaction-persistent-queue-flow.xml"}});
+    }
+
+    public VmXaTransactionsPersistentQueueTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
     }
 
     @Test
@@ -51,5 +55,4 @@ public class VmXaTransactionsPersistentQueueTestCase extends AbstractServiceAndF
         assertNull(msg.getExceptionPayload());
         assertEquals("Wrong message returned", TEST_MESSAGE + " Received", msg.getPayload());
     }
-
 }

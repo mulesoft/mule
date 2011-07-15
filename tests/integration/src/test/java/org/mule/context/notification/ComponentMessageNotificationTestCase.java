@@ -17,6 +17,8 @@ import java.util.Collection;
 
 import org.junit.runners.Parameterized.Parameters;
 
+import static org.junit.Assert.assertNotNull;
+
 /**
  * Test ComponentNotifications/Listeners by sending events to a component. A pre and
  * post notification should be received by listeners.
@@ -39,9 +41,9 @@ public class ComponentMessageNotificationTestCase extends AbstractNotificationTe
     public void doTest() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
-        assertNotNull(client.send("vm://in-1?connector=direct", "hello sweet world", null));
-        client.dispatch("vm://in-2?connector=direct", "goodbye cruel world", null);
-        assertNotNull(client.request("vm://out-2?connector=queue", 5000));
+        assertNotNull(client.send("vm://in-1", "hello sweet world", null));
+        client.dispatch("vm://in-2", "goodbye cruel world", null);
+        assertNotNull(client.request("vm://out-2", 5000));
     }
 
     @Override

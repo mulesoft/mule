@@ -22,6 +22,9 @@ import java.util.Collection;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 public class ExceptionsWithRouterMule2715TestCase extends AbstractServiceAndFlowTestCase
 {
     public static final String MESSAGE = "message";

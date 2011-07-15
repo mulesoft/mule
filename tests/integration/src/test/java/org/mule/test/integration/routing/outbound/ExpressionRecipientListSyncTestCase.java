@@ -23,6 +23,10 @@ import java.util.Map;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 public class ExpressionRecipientListSyncTestCase extends AbstractServiceAndFlowTestCase
 {
     public ExpressionRecipientListSyncTestCase(ConfigVariant variant, String configResources)
@@ -37,8 +41,8 @@ public class ExpressionRecipientListSyncTestCase extends AbstractServiceAndFlowT
             {ConfigVariant.SERVICE, "org/mule/test/integration/routing/outbound/expression-recipient-list-sync-test-service.xml"},
             {ConfigVariant.FLOW, "org/mule/test/integration/routing/outbound/expression-recipient-list-sync-test-flow.xml"}
         });
-    }      
-    
+    }
+
     @Test
     public void testRecipientList() throws Exception
     {
@@ -51,7 +55,7 @@ public class ExpressionRecipientListSyncTestCase extends AbstractServiceAndFlowT
         MuleMessage result = client.send("vm://distributor.queue", message, props);
 
         assertNotNull(result);
-        
+
         assertTrue(result instanceof MuleMessageCollection);
         MuleMessageCollection coll = (MuleMessageCollection)result;
         assertEquals(3, coll.size());

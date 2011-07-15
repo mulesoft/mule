@@ -10,25 +10,22 @@
 
 package org.mule.test.integration.security;
 
+import org.mule.module.client.MuleClient;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+
 import java.util.Arrays;
 import java.util.Collection;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * See MULE-3851
  */
 public class OutboundHttpEndpointAuthenticationTestCase extends AbstractServiceAndFlowTestCase
 {
-
-    public OutboundHttpEndpointAuthenticationTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
-
     @Parameters
     public static Collection<Object[]> parameters()
     {
@@ -37,7 +34,11 @@ public class OutboundHttpEndpointAuthenticationTestCase extends AbstractServiceA
             {ConfigVariant.FLOW, "org/mule/test/integration/security/outbound-http-endpoint-authentication-test-flow.xml"}
         });
     }
-    
+
+    public OutboundHttpEndpointAuthenticationTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
+    }
 
     @Test
     public void testOutboundAutenticationSend() throws Exception

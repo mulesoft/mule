@@ -145,6 +145,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase
         contextStartedLatch.set(new Latch());
         muleContext.registerListener(new MuleContextNotificationListener<MuleContextNotification>()
         {
+            @Override
             public void onNotification(MuleContextNotification notification)
             {
                 if (notification.getAction() == MuleContextNotification.CONTEXT_STARTED)
@@ -163,13 +164,14 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase
      * Enables the adding of extra behavior on the set up stage of a test right
      * after the creation of the mule context in {@link #setUpMuleContext}.
      * <p>
-     * Under normal circumstances this method could be replace with a
+     * Under normal circumstances this method could be replaced by a
      * <code>@Before</code> annotated method.
      *
      * @throws Exception if something fails that should halt the test case
      */
     protected void doSetUp() throws Exception
     {
+        // template method
     }
 
     protected MuleContext createMuleContext() throws Exception
@@ -280,6 +282,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase
      */
     protected void doTearDown() throws Exception
     {
+        // template method
     }
 
     public static InboundEndpoint getTestInboundEndpoint(String name) throws Exception

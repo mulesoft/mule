@@ -10,6 +10,10 @@
 
 package org.mule.test.integration.messaging.meps;
 
+import org.mule.api.MuleMessage;
+import org.mule.module.client.MuleClient;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
@@ -17,9 +21,9 @@ import java.util.Map;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 // START SNIPPET: full-class
 public class InOutTestCase extends AbstractServiceAndFlowTestCase
@@ -48,7 +52,7 @@ public class InOutTestCase extends AbstractServiceAndFlowTestCase
         assertNotNull(result);
         assertEquals("foo header not received", result.getPayloadAsString());
 
-        Map props = new HashMap();
+        Map<String, Object> props = new HashMap<String, Object>();
         props.put("foo", "bar");
         result = client.send("inboundEndpoint", "some data", props);
         assertNotNull(result);

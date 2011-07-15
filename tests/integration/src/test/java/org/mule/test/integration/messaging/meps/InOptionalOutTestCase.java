@@ -10,6 +10,11 @@
 
 package org.mule.test.integration.messaging.meps;
 
+import org.mule.api.MuleMessage;
+import org.mule.api.client.MuleClient;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.util.StringUtils;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
@@ -17,20 +22,14 @@ import java.util.Map;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
-import org.mule.util.StringUtils;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 // START SNIPPET: full-class
 public class InOptionalOutTestCase extends AbstractServiceAndFlowTestCase
 {
     public static final long TIMEOUT = 3000;
-
-    public InOptionalOutTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
 
     @Parameters
     public static Collection<Object[]> parameters()
@@ -39,18 +38,23 @@ public class InOptionalOutTestCase extends AbstractServiceAndFlowTestCase
             {ConfigVariant.SERVICE, "org/mule/test/integration/messaging/meps/pattern_In-Optional-Out-service.xml"},
             {ConfigVariant.FLOW, "org/mule/test/integration/messaging/meps/pattern_In-Optional-Out-flow.xml"}
         });
-    }    
-    
+    }
+
+    public InOptionalOutTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
+    }
+
     @Test
     public void testExchange() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
 
         MuleMessage result = client.send("inboundEndpoint", "some data", null);
         assertNotNull(result);
         assertEquals(StringUtils.EMPTY, result.getPayloadAsString());
 
-        Map props = new HashMap();
+        Map<String, Object> props = new HashMap<String, Object>();
         props.put("foo", "bar");
         result = client.send("inboundEndpoint", "some data", props);
         assertNotNull(result);

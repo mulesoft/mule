@@ -21,21 +21,24 @@ import java.util.Collection;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+
 public class FilePersistenceTestCase extends AbstractServiceAndFlowTestCase
 {
-
-    public FilePersistenceTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
-
     @Parameters
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
             {ConfigVariant.SERVICE,
-                "org/mule/test/integration/persistence/file-persistence-config-service.xml"},
+            "org/mule/test/integration/persistence/file-persistence-config-service.xml"},
             {ConfigVariant.FLOW, "org/mule/test/integration/persistence/file-persistence-config-flow.xml"}});
+    }
+
+    public FilePersistenceTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
     }
 
     @Test

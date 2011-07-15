@@ -31,6 +31,13 @@ import java.util.Set;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 public class InboundHeadersAnnotationTestCase extends AbstractServiceAndFlowTestCase
 {
     private Map<String, Object> props;
@@ -38,7 +45,7 @@ public class InboundHeadersAnnotationTestCase extends AbstractServiceAndFlowTest
     public InboundHeadersAnnotationTestCase(ConfigVariant variant, String configResources)
     {
         super(variant, configResources);
-        setDisposeManagerPerSuite(true);
+        setDisposeContextPerClass(true);
     }
 
     @Parameters

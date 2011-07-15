@@ -19,9 +19,8 @@ import org.mule.tck.junit4.rule.DynamicPort;
 import org.junit.Rule;
 import org.junit.Test;
 
-/**
- * TODO
- */
+import static org.junit.Assert.assertEquals;
+
 public abstract class AbstractPropertyScopeTestCase extends AbstractServiceAndFlowTestCase
 {
     @Rule

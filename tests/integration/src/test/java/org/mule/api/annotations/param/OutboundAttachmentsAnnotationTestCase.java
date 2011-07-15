@@ -24,6 +24,11 @@ import javax.activation.DataHandler;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 public class OutboundAttachmentsAnnotationTestCase extends AbstractServiceAndFlowTestCase
 {
     @Parameters
@@ -37,7 +42,7 @@ public class OutboundAttachmentsAnnotationTestCase extends AbstractServiceAndFlo
     public OutboundAttachmentsAnnotationTestCase(ConfigVariant variant, String configResources)
     {
         super(variant, configResources);
-        setDisposeManagerPerSuite(true);
+        setDisposeContextPerClass(true);
     }
 
     @Test

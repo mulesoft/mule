@@ -28,6 +28,9 @@ import org.apache.commons.lang.SerializationUtils;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 public class MessageChunkingTestCase extends AbstractServiceAndFlowTestCase
 {
     public MessageChunkingTestCase(ConfigVariant variant, String configResources)
@@ -84,6 +87,7 @@ public class MessageChunkingTestCase extends AbstractServiceAndFlowTestCase
         // Listen to events fired by the ChunkingReceiver service
         muleContext.registerListener(new FunctionalTestNotificationListener()
         {
+            @Override
             public void onNotification(ServerNotification notification)
             {
                 // Not strictly necessary to test for this as when we register the
@@ -108,6 +112,7 @@ public class MessageChunkingTestCase extends AbstractServiceAndFlowTestCase
         // determine how many message parts have been received
         muleContext.registerListener(new EndpointMessageNotificationListener<EndpointMessageNotification>()
         {
+            @Override
             public void onNotification(EndpointMessageNotification notification)
             {
                 if (notification.getAction() == EndpointMessageNotification.MESSAGE_RECEIVED)
@@ -134,6 +139,7 @@ public class MessageChunkingTestCase extends AbstractServiceAndFlowTestCase
         // Listen to events fired by the ChunkingReceiver service
         muleContext.registerListener(new FunctionalTestNotificationListener()
         {
+            @Override
             public void onNotification(ServerNotification notification)
             {
                 // Not strictly necessary to test for this as when we register the
@@ -151,6 +157,7 @@ public class MessageChunkingTestCase extends AbstractServiceAndFlowTestCase
         // determine how many message parts have been received
         muleContext.registerListener(new EndpointMessageNotificationListener<EndpointMessageNotification>()
         {
+            @Override
             public void onNotification(EndpointMessageNotification notification)
             {
                 if (notification.getAction() == EndpointMessageNotification.MESSAGE_RECEIVED)

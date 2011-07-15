@@ -20,13 +20,16 @@ import java.util.Collection;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
 /**
  * This test re-written to use entry point resolvers.  As a consequence, some tests, which verified
  * implementation details rather than functionality, were dropped.
  */
 public class NoArgsCallComponentTestCase extends AbstractServiceAndFlowTestCase
 {
-
     public static final String INPUT_DC_QUEUE_NAME = "vm://in";
     public static final String OUTPUT_DC_QUEUE_NAME = "vm://out";
     public static final String INPUT_DI_QUEUE_NAME = "vm://invokeWithInjected";

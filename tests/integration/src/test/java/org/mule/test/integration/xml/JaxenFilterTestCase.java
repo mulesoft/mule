@@ -23,19 +23,22 @@ import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 import org.w3c.dom.Document;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 public class JaxenFilterTestCase extends AbstractServiceAndFlowTestCase
 {
-    public JaxenFilterTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
-
     @Parameters
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
             {ConfigVariant.SERVICE, "org/mule/test/integration/xml/jaxen-routing-conf-service.xml"},
             {ConfigVariant.FLOW, "org/mule/test/integration/xml/jaxen-routing-conf-flow.xml"}});
+    }
+
+    public JaxenFilterTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
     }
 
     @Test

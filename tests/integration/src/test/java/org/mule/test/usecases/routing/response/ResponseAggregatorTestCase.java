@@ -10,18 +10,23 @@
 
 package org.mule.test.usecases.routing.response;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Map;
-
-import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.routing.requestreply.AbstractAsyncRequestReplyRequester;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.SensingNullMessageProcessor;
+
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Map;
+
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class ResponseAggregatorTestCase extends AbstractServiceAndFlowTestCase
 {
@@ -64,7 +69,7 @@ public class ResponseAggregatorTestCase extends AbstractServiceAndFlowTestCase
 
         mp.process(event);
 
-        Map responseEvents = mp.getResponseEvents();
+        Map<String, MuleEvent> responseEvents = mp.getResponseEvents();
         assertTrue("Response events should be cleaned up.", responseEvents.isEmpty());
     }
 
@@ -73,7 +78,7 @@ public class ResponseAggregatorTestCase extends AbstractServiceAndFlowTestCase
      */
     private static final class RelaxedAsyncReplyMP extends AbstractAsyncRequestReplyRequester
     {
-        public Map getResponseEvents()
+        public Map<String, MuleEvent> getResponseEvents()
         {
             return responseEvents;
         }

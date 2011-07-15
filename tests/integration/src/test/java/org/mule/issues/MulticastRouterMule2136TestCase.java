@@ -21,6 +21,10 @@ import java.util.Collection;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 /**
  * This is a simplified version of
  * {@link org.mule.module.xml.functional.XmlTransformerFunctionalTestCase} The

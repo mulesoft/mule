@@ -23,8 +23,11 @@ import java.util.Collection;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 public class HttpTransformTestCase extends AbstractServiceAndFlowTestCase
-{   
+{
     public HttpTransformTestCase(ConfigVariant variant, String configResources)
     {
         super(variant, configResources);
@@ -38,7 +41,7 @@ public class HttpTransformTestCase extends AbstractServiceAndFlowTestCase
             {ConfigVariant.FLOW, "org/mule/test/usecases/sync/http-transform-flow.xml"}
         });
     }
-    
+
     @Test
     public void testTransform() throws Exception
     {

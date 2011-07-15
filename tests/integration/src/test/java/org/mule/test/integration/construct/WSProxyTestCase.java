@@ -22,6 +22,9 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 public class WSProxyTestCase extends AbstractServiceAndFlowTestCase
 {
     @Rule
@@ -44,7 +47,7 @@ public class WSProxyTestCase extends AbstractServiceAndFlowTestCase
     public WSProxyTestCase(ConfigVariant variant, String configResources)
     {
         super(variant, configResources);
-//        setDisposeContextPerClass(true);
+        setDisposeContextPerClass(true);
     }
 
     @Override

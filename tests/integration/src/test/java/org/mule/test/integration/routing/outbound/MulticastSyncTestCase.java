@@ -23,6 +23,10 @@ import java.util.List;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 public class MulticastSyncTestCase extends AbstractServiceAndFlowTestCase
 {
     public MulticastSyncTestCase(ConfigVariant variant, String configResources)

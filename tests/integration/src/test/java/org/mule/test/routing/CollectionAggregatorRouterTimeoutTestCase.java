@@ -24,20 +24,22 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 public class CollectionAggregatorRouterTimeoutTestCase extends AbstractServiceAndFlowTestCase
 {
-
-    public CollectionAggregatorRouterTimeoutTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
-
     @Parameters
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
             {ConfigVariant.SERVICE, "collection-aggregator-router-timeout-test-service.xml"},
             {ConfigVariant.FLOW, "collection-aggregator-router-timeout-test-flow.xml"}});
+    }
+
+    public CollectionAggregatorRouterTimeoutTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
     }
 
     @Test
@@ -47,6 +49,7 @@ public class CollectionAggregatorRouterTimeoutTestCase extends AbstractServiceAn
         final AtomicInteger correlationTimeoutCount = new AtomicInteger(0);
         muleContext.registerListener(new RoutingNotificationListener<RoutingNotification>()
         {
+            @Override
             public void onNotification(RoutingNotification notification)
             {
                 if (notification.getAction() == RoutingNotification.CORRELATION_TIMEOUT)
@@ -60,7 +63,7 @@ public class CollectionAggregatorRouterTimeoutTestCase extends AbstractServiceAn
         FunctionalTestComponent aggregator = (FunctionalTestComponent) getComponent("aggregator");
 
         MuleClient client = new MuleClient(muleContext);
-        List list = Arrays.asList("first", "second");
+        List<String> list = Arrays.asList("first", "second");
         client.dispatch("vm://splitter", list, null);
 
         Thread.sleep(5000);

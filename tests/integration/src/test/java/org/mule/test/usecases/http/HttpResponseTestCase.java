@@ -14,7 +14,6 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
-import org.mule.tck.FunctionalTestCase;
 import org.mule.transport.NullPayload;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
@@ -24,6 +23,12 @@ import java.util.Collection;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertNull;
 
 public class HttpResponseTestCase extends AbstractServiceAndFlowTestCase
 {
@@ -39,8 +44,8 @@ public class HttpResponseTestCase extends AbstractServiceAndFlowTestCase
             {ConfigVariant.SERVICE, "org/mule/test/usecases/http/http-response-service.xml"},
             {ConfigVariant.FLOW, "org/mule/test/usecases/http/http-response-flow.xml"}
         });
-    } 
-    
+    }
+
     @Test
     public void testNullPayloadUsingAsync() throws Exception
     {
@@ -73,7 +78,7 @@ public class HttpResponseTestCase extends AbstractServiceAndFlowTestCase
         assertFalse(reply.getPayload() instanceof NullPayload);
         assertEquals("test", reply.getPayloadAsString());
     }
-    
+
     /**
      * See MULE-4522
      * @throws Exception
@@ -99,5 +104,5 @@ public class HttpResponseTestCase extends AbstractServiceAndFlowTestCase
         assertNotSame("chunked", reply.getInboundProperty(HttpConstants.HEADER_TRANSFER_ENCODING));
         assertNotNull(reply.getInboundProperty(HttpConstants.HEADER_CONTENT_LENGTH));
     }
-    
+
 }

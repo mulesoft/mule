@@ -20,6 +20,8 @@ import java.util.Collection;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
+import static org.junit.Assert.fail;
+
 public class FileRuntimeExceptionStrategyFunctionalTestCase extends AbstractServiceAndFlowTestCase
 {
     public FileRuntimeExceptionStrategyFunctionalTestCase(ConfigVariant variant, String configResources)
@@ -62,5 +64,4 @@ public class FileRuntimeExceptionStrategyFunctionalTestCase extends AbstractServ
             fail("Exception strategy hasn't moved the file to the error folder.");
         }
     }
-
 }

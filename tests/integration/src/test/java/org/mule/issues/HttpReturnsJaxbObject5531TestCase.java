@@ -10,12 +10,6 @@
 
 package org.mule.issues;
 
-import java.util.Arrays;
-import java.util.Collection;
-
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 import org.mule.api.MuleEventContext;
 import org.mule.api.lifecycle.Callable;
 import org.mule.module.client.MuleClient;
@@ -23,11 +17,21 @@ import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transformer.simple.ObjectToString;
 
+import java.util.Arrays;
+import java.util.Collection;
+
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 public class HttpReturnsJaxbObject5531TestCase extends AbstractServiceAndFlowTestCase
 {
     @Rule
     public DynamicPort port1 = new DynamicPort("port1");
-    
+
     public HttpReturnsJaxbObject5531TestCase(ConfigVariant variant, String configResources)
     {
         super(variant, configResources);
@@ -43,7 +47,7 @@ public class HttpReturnsJaxbObject5531TestCase extends AbstractServiceAndFlowTes
                                                + "<Pressure>29.91R</Pressure><Visibility /><WindChill /><Remarks /></GetCityWeatherByZIPResult>"
                                                + "</GetCityWeatherByZIPResponse></soap:Body></soap:Envelope>";
 
-    
+
 
     @Parameters
     public static Collection<Object[]> parameters()
@@ -67,6 +71,7 @@ public class HttpReturnsJaxbObject5531TestCase extends AbstractServiceAndFlowTes
 
     public static class WeatherReport implements Callable
     {
+        @Override
         public Object onCall(MuleEventContext eventContext) throws Exception
         {
             return ZIP_RESPONSE;

@@ -22,6 +22,10 @@ import java.util.List;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 public class InboundAggregationNoTimeoutTestCase extends AbstractServiceAndFlowTestCase
 {
     public InboundAggregationNoTimeoutTestCase(ConfigVariant variant, String configResources)
@@ -36,7 +40,7 @@ public class InboundAggregationNoTimeoutTestCase extends AbstractServiceAndFlowT
             {ConfigVariant.SERVICE, "org/mule/test/integration/routing/multi-inbound-aggregator-no-timeout-service.xml"},
             {ConfigVariant.FLOW, "org/mule/test/integration/routing/multi-inbound-aggregator-no-timeout-flow.xml"}
         });
-    }      
+    }
 
     @Test
     public void testAggregatorWithNoTimeout() throws Exception
@@ -60,7 +64,7 @@ public class InboundAggregationNoTimeoutTestCase extends AbstractServiceAndFlowT
 
     public static class TestCollectionService
     {
-        public Object process(List responseMessages)
+        public Object process(List<?> responseMessages)
         {
             assertEquals(3, responseMessages.size());
             return responseMessages;

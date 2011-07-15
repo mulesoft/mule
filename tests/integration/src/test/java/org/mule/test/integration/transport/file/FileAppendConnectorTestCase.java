@@ -27,24 +27,16 @@ import java.util.concurrent.TimeUnit;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 public class FileAppendConnectorTestCase extends AbstractServiceAndFlowTestCase implements EndpointMessageNotificationListener<EndpointMessageNotification>
 {
     protected static final String OUTPUT_DIR = "myout";
     protected static final String OUTPUT_FILE = "out.txt";
-    
+
     protected CountDownLatch fileReceiveLatch = new CountDownLatch(2);
-    
-    @Override
-    protected void doSetUp() throws Exception
-    {
-        super.doSetUp();
-        muleContext.registerListener(this);
-    }
-    
-    public FileAppendConnectorTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
 
     @Parameters
     public static Collection<Object[]> parameters()
@@ -53,14 +45,26 @@ public class FileAppendConnectorTestCase extends AbstractServiceAndFlowTestCase 
             {ConfigVariant.SERVICE, "org/mule/test/integration/providers/file/mule-fileappend-connector-config-service.xml"},
             {ConfigVariant.FLOW, "org/mule/test/integration/providers/file/mule-fileappend-connector-config-flow.xml"}
         });
-    }      
-    
+    }
+
+    public FileAppendConnectorTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
+    }
+
+    @Override
+    protected void doSetUp() throws Exception
+    {
+        super.doSetUp();
+        muleContext.registerListener(this);
+    }
+
     @Override
     protected void doTearDown() throws Exception
     {
         File outputDir = FileUtils.newFile(OUTPUT_DIR);
         FileUtils.deleteTree(outputDir);
-        
+
         super.doTearDown();
     }
 
@@ -79,7 +83,7 @@ public class FileAppendConnectorTestCase extends AbstractServiceAndFlowTestCase 
             client.send("vm://fileappend", "Hello2", null);
 
             assertTrue(fileReceiveLatch.await(30, TimeUnit.SECONDS));
-            
+
             // the output file should exist now
             myFileStream = new FileInputStream(myFile);
             assertEquals("Hello1Hello2", IOUtils.toString(myFileStream));
@@ -90,6 +94,7 @@ public class FileAppendConnectorTestCase extends AbstractServiceAndFlowTestCase 
         }
     }
 
+    @Override
     public void onNotification(EndpointMessageNotification notification)
     {
         if (notification.getEndpoint().contains("myout"))

@@ -10,6 +10,12 @@
 
 package org.mule.test.integration.construct;
 
+import org.mule.api.MuleMessage;
+import org.mule.module.client.MuleClient;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.util.StringUtils;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -19,21 +25,17 @@ import java.util.Map;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
-import org.mule.tck.junit4.rule.DynamicPort;
-import org.mule.util.StringUtils;
+
+import static org.junit.Assert.assertEquals;
 
 public class HttpProxyTestCase extends AbstractServiceAndFlowTestCase
 {
-    
     @Rule
     public DynamicPort port1 = new DynamicPort("port1");
-    
+
     @Rule
     public DynamicPort port2 = new DynamicPort("port2");
-    
+
     public HttpProxyTestCase(ConfigVariant variant, String configResources)
     {
         super(variant, configResources);

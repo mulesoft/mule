@@ -29,6 +29,11 @@ import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 import org.springframework.util.FileCopyUtils;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 public class SimpleServiceTestCase extends AbstractServiceAndFlowTestCase
 {
     @Rule
@@ -51,7 +56,7 @@ public class SimpleServiceTestCase extends AbstractServiceAndFlowTestCase
     public SimpleServiceTestCase(ConfigVariant variant, String configResources)
     {
         super(variant, configResources);
-//        setDisposeContextPerClass(true);
+        setDisposeContextPerClass(true);
     }
 
     @Override

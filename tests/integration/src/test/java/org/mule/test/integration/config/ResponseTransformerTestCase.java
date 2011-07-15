@@ -22,6 +22,9 @@ import java.util.List;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+
 public class ResponseTransformerTestCase extends AbstractServiceAndFlowTestCase
 {
     @Parameters

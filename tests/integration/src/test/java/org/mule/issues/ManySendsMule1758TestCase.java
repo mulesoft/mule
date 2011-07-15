@@ -20,6 +20,9 @@ import java.util.Collection;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 public class ManySendsMule1758TestCase extends AbstractServiceAndFlowTestCase
 {
     private static int NUM_MESSAGES = 3000;

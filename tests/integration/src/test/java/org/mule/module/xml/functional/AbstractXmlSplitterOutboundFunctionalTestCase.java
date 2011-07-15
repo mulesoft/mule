@@ -24,6 +24,10 @@ import org.dom4j.Document;
 import org.dom4j.Element;
 import org.junit.runners.Parameterized.Parameters;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 public abstract class AbstractXmlSplitterOutboundFunctionalTestCase extends AbstractXmlFunctionalTestCase
 {
     public static final String SERVICE_SPLITTER = "service splitter";

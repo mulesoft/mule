@@ -23,6 +23,10 @@ import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 public class ExpressionSplitterXPathTestCase extends AbstractServiceAndFlowTestCase
 {
     private final String MESSAGE = "<Batch xmlns=\"http://acme.com\">\n" +
@@ -62,7 +66,7 @@ public class ExpressionSplitterXPathTestCase extends AbstractServiceAndFlowTestC
         super(variant, configResources);
         XMLUnit.setIgnoreWhitespace(true);
     }
-    
+
     @Parameters
     public static Collection<Object[]> parameters()
     {
@@ -70,8 +74,8 @@ public class ExpressionSplitterXPathTestCase extends AbstractServiceAndFlowTestC
             {ConfigVariant.SERVICE, "org/mule/test/integration/routing/outbound/expression-splitter-xpath-test-service.xml"},
             {ConfigVariant.FLOW, "org/mule/test/integration/routing/outbound/expression-splitter-xpath-test-flow.xml"}
         });
-    }      
-    
+    }
+
     @Test
     public void testRecipientList() throws Exception
     {

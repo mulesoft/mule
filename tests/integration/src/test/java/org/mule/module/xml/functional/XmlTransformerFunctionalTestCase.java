@@ -22,6 +22,10 @@ import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 import org.w3c.dom.Document;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 public class XmlTransformerFunctionalTestCase extends AbstractXmlFunctionalTestCase
 {
 	public static final String SIMPLE_XML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<parent><child name=\"poot\"/></parent>";
@@ -30,11 +34,6 @@ public class XmlTransformerFunctionalTestCase extends AbstractXmlFunctionalTestC
             "  <child/>\n" +
             "</org.mule.module.xml.functional.XmlTransformerFunctionalTestCase_-Parent>";
 
-    public XmlTransformerFunctionalTestCase(ConfigVariant variant, String configResources)
-    {
-		super(variant, configResources);
-	}
-
     @Parameters
     public static Collection<Object[]> parameters()
     {
@@ -42,6 +41,11 @@ public class XmlTransformerFunctionalTestCase extends AbstractXmlFunctionalTestC
             {ConfigVariant.SERVICE, "org/mule/module/xml/xml-transformer-functional-test-service.xml"},
             {ConfigVariant.FLOW, "org/mule/module/xml/xml-transformer-functional-test-flow.xml"}
         });
+    }
+
+    public XmlTransformerFunctionalTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
     }
 
     protected MuleClient sendXml() throws MuleException

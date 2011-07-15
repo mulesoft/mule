@@ -10,28 +10,31 @@
 
 package org.mule.test.integration.transformer;
 
+import org.mule.api.MuleMessage;
+import org.mule.api.client.MuleClient;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+
 import java.util.Arrays;
 import java.util.Collection;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-import org.mule.api.MuleMessage;
-import org.mule.api.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+
+import static org.junit.Assert.assertEquals;
 
 public class TransformerTrackerLifecycleTestCase extends AbstractServiceAndFlowTestCase
 {
-    public TransformerTrackerLifecycleTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
-
     @Parameters
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
             {ConfigVariant.SERVICE, "org/mule/test/transformers/transformer-lifecycle-service.xml"},
             {ConfigVariant.FLOW, "org/mule/test/transformers/transformer-lifecycle-flow.xml"}});
+    }
+
+    public TransformerTrackerLifecycleTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
     }
 
     @Test

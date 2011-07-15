@@ -36,6 +36,8 @@ import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 import org.xml.sax.InputSource;
 
+import static org.junit.Assert.assertTrue;
+
 public class CloseStreamOnMuleExceptionTestCase extends AbstractServiceAndFlowTestCase
 {
     private final int timeoutMs = 3000;
@@ -45,17 +47,27 @@ public class CloseStreamOnMuleExceptionTestCase extends AbstractServiceAndFlowTe
     private TestByteArrayInputStream inputStream;
     private MuleClient client;
 
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE,
+            "org/mule/test/integration/streaming/close-stream-on-mule-exception-test-service.xml"},
+            {ConfigVariant.FLOW,
+            "org/mule/test/integration/streaming/close-stream-on-mule-exception-test-flow.xml"}});
+    }
+
     public CloseStreamOnMuleExceptionTestCase(ConfigVariant variant, String configResources)
     {
         super(variant, configResources);
-    }   
+    }
 
     @Override
     protected void doSetUp() throws Exception
-    {                
+    {
         super.doSetUp();
         client = new MuleClient(muleContext);
-        inputStream = new TestByteArrayInputStream(xmlText.getBytes());        
+        inputStream = new TestByteArrayInputStream(xmlText.getBytes());
         streamReaderLatch = new Latch();
     }
 
@@ -154,15 +166,6 @@ public class CloseStreamOnMuleExceptionTestCase extends AbstractServiceAndFlowTe
     // assertTrue(((TestByteArrayInputStream) inputStream).isClosed());
     // }
 
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE,
-                "org/mule/test/integration/streaming/close-stream-on-mule-exception-test-service.xml"},
-            {ConfigVariant.FLOW,
-                "org/mule/test/integration/streaming/close-stream-on-mule-exception-test-flow.xml"}});
-    }
 
     static class TestByteArrayInputStream extends ByteArrayInputStream
     {
@@ -214,5 +217,4 @@ public class CloseStreamOnMuleExceptionTestCase extends AbstractServiceAndFlowTe
             streamReaderLatch.countDown();
         }
     }
-
 }

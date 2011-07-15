@@ -10,17 +10,21 @@
 
 package org.mule.test.properties;
 
+import org.mule.DefaultMuleMessage;
+import org.mule.api.MuleMessage;
+import org.mule.module.client.MuleClient;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.functional.FunctionalTestComponent;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-import org.mule.DefaultMuleMessage;
-import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
-import org.mule.tck.functional.FunctionalTestComponent;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 public class PropertiesTestCase extends AbstractServiceAndFlowTestCase
 {
@@ -38,7 +42,7 @@ public class PropertiesTestCase extends AbstractServiceAndFlowTestCase
         });
     }
 
-    
+
     /**
      * Test that the VM transport correctly copies outbound to inbound properties both for requests amd responses
      */

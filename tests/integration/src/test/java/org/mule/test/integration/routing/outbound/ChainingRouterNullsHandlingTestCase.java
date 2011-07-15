@@ -22,9 +22,13 @@ import java.util.Collection;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 public class ChainingRouterNullsHandlingTestCase extends AbstractServiceAndFlowTestCase
 {
-
     public ChainingRouterNullsHandlingTestCase(ConfigVariant variant, String configResources)
     {
         super(variant, configResources);

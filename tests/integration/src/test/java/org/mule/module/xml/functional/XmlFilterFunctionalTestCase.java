@@ -20,6 +20,9 @@ import java.util.Random;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 public class XmlFilterFunctionalTestCase extends AbstractXmlFunctionalTestCase
 {
     public static final int MAX_COUNT = 100;

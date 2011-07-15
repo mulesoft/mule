@@ -13,6 +13,9 @@ package org.mule.config.spring;
 import org.mule.api.MuleException;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 public abstract class AbstractInterceptorTestCase extends AbstractServiceAndFlowTestCase
 {
     public static final String MESSAGE = "boo";

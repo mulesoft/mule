@@ -20,6 +20,9 @@ import java.util.Collection;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 public class EndpointBridgingTestCase extends AbstractServiceAndFlowTestCase
 {
 
@@ -27,7 +30,7 @@ public class EndpointBridgingTestCase extends AbstractServiceAndFlowTestCase
     {
         super(variant, configResources);
     }
-   
+
     @Parameters
     public static Collection<Object[]> parameters()
     {

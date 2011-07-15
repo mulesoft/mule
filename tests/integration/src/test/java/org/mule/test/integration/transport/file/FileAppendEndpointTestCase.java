@@ -20,6 +20,8 @@ import java.util.Collection;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
+import static org.junit.Assert.assertFalse;
+
 public class FileAppendEndpointTestCase extends FileAppendConnectorTestCase
 {
     public FileAppendEndpointTestCase(ConfigVariant variant, String configResources)

@@ -10,13 +10,6 @@
 
 package org.mule.test.integration.routing;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.concurrent.TimeUnit;
-
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 import org.mule.api.MuleMessage;
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.module.client.MuleClient;
@@ -24,6 +17,18 @@ import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.functional.FunctionalTestNotificationListener;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.util.concurrent.Latch;
+
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.concurrent.TimeUnit;
+
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class WireTapCxfTestCase extends AbstractServiceAndFlowTestCase
 {
@@ -52,6 +57,7 @@ public class WireTapCxfTestCase extends AbstractServiceAndFlowTestCase
 
         muleContext.registerListener(new FunctionalTestNotificationListener()
         {
+            @Override
             public void onNotification(ServerNotification notification)
             {
                 tapLatch.release();

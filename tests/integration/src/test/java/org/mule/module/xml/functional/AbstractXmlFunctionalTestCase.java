@@ -18,6 +18,8 @@ import java.io.InputStream;
 
 import org.apache.commons.io.IOUtils;
 
+import static org.junit.Assert.assertNotNull;
+
 public abstract class AbstractXmlFunctionalTestCase extends AbstractServiceAndFlowTestCase
 {
     public AbstractXmlFunctionalTestCase(ConfigVariant variant,

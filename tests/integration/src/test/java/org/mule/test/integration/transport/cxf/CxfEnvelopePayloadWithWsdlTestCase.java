@@ -10,15 +10,18 @@
 
 package org.mule.test.integration.transport.cxf;
 
+import org.mule.api.MuleMessage;
+import org.mule.module.client.MuleClient;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+
 import java.util.Arrays;
 import java.util.Collection;
 
 import org.custommonkey.xmlunit.XMLAssert;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+
+import static org.junit.Assert.assertNotNull;
 
 public class CxfEnvelopePayloadWithWsdlTestCase extends AbstractServiceAndFlowTestCase
 {

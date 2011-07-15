@@ -10,30 +10,36 @@
 
 package org.mule.test.integration.tck;
 
+import org.mule.api.MuleMessage;
+import org.mule.module.client.MuleClient;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.util.ExceptionUtils;
+
 import java.io.FileNotFoundException;
 import java.util.Arrays;
 import java.util.Collection;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
-import org.mule.util.ExceptionUtils;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 public class MuleTestNamespaceFunctionalTestCase extends AbstractServiceAndFlowTestCase
 {
-    public MuleTestNamespaceFunctionalTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
-
     @Parameters
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
             {ConfigVariant.SERVICE, "org/mule/test/integration/tck/test-namespace-config-service.xml"},
             {ConfigVariant.FLOW, "org/mule/test/integration/tck/test-namespace-config-flow.xml"}});
+    }
+
+    public MuleTestNamespaceFunctionalTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
     }
 
     @Test

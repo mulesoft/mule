@@ -22,6 +22,11 @@ import java.util.Collection;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 /**
  * Test for MULE-4412 : selective-consumer filter is applied twice. We test that the
  * filter is only applied once in the positive case, plus make sure it doesn't get

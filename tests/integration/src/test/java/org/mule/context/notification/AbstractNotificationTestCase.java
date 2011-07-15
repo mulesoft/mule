@@ -17,24 +17,27 @@ import java.util.Iterator;
 
 import org.junit.Test;
 
+import static org.junit.Assert.fail;
+
 /**
  * Tests must define a "notificationLogger" listener
  */
 public abstract class AbstractNotificationTestCase extends AbstractServiceAndFlowTestCase
 {
-    private AbstractNotificationLogger notifications;
+    private AbstractNotificationLogger<? extends ServerNotification> notificationLogger;
 
     public AbstractNotificationTestCase(ConfigVariant variant, String configResources)
     {
         super(variant, configResources);
-//        setDisposeContextPerClass(true);
+        setDisposeContextPerClass(true);
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     public final void testNotifications() throws Exception
     {
         doTest();
-        notifications = (AbstractNotificationLogger) muleContext.getRegistry().lookupObject(
+        notificationLogger = (AbstractNotificationLogger<? extends ServerNotification>) muleContext.getRegistry().lookupObject(
             "notificationLogger");
 
         // Need to explicitly dispose manager here to get disposal notifications
@@ -56,8 +59,8 @@ public abstract class AbstractNotificationTestCase extends AbstractServiceAndFlo
 
     protected void logNotifications()
     {
-        logger.info("Number of notifications: " + notifications.getNotifications().size());
-        for (Iterator iterator = notifications.getNotifications().iterator(); iterator.hasNext();)
+        logger.info("Number of notifications: " + notificationLogger.getNotifications().size());
+        for (Iterator<?> iterator = notificationLogger.getNotifications().iterator(); iterator.hasNext();)
         {
             ServerNotification notification = (ServerNotification) iterator.next();
             logger.info(notification);
@@ -69,7 +72,7 @@ public abstract class AbstractNotificationTestCase extends AbstractServiceAndFlo
      */
     protected void assertExpectedNotifications(RestrictedNode spec)
     {
-        for (Iterator iterator = notifications.getNotifications().iterator(); iterator.hasNext();)
+        for (Iterator<?> iterator = notificationLogger.getNotifications().iterator(); iterator.hasNext();)
         {
             ServerNotification notification = (ServerNotification) iterator.next();
             switch (spec.match(notification))
@@ -89,7 +92,7 @@ public abstract class AbstractNotificationTestCase extends AbstractServiceAndFlo
         }
     }
 
-    protected void verifyAllNotifications(RestrictedNode spec, Class clazz, int from, int to)
+    protected void verifyAllNotifications(RestrictedNode spec, Class<?> clazz, int from, int to)
     {
         for (int action = from; action <= to; ++action)
         {
@@ -100,12 +103,11 @@ public abstract class AbstractNotificationTestCase extends AbstractServiceAndFlo
         }
     }
 
-    protected void verifyNotification(RestrictedNode spec, Class clazz, int action)
+    protected void verifyNotification(RestrictedNode spec, Class<?> clazz, int action)
     {
         if (!spec.contains(clazz, action))
         {
             fail("Specification missed action " + action + " for class " + clazz);
         }
     }
-
 }

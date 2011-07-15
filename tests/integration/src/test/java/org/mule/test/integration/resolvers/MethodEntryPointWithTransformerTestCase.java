@@ -20,13 +20,11 @@ import java.util.Collection;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 public class MethodEntryPointWithTransformerTestCase extends AbstractServiceAndFlowTestCase
 {
-    public MethodEntryPointWithTransformerTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
-
     @Parameters
     public static Collection<Object[]> parameters()
     {
@@ -35,6 +33,11 @@ public class MethodEntryPointWithTransformerTestCase extends AbstractServiceAndF
                 "org/mule/test/integration/resolvers/method-entrypoint-with-transformer-config-service.xml"},
             {ConfigVariant.FLOW,
                 "org/mule/test/integration/resolvers/method-entrypoint-with-transformer-config-flow.xml"}});
+    }
+
+    public MethodEntryPointWithTransformerTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
     }
 
     /**

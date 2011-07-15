@@ -26,6 +26,9 @@ import java.util.List;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 public class MulticastAsyncWithTransformersTestCase extends AbstractServiceAndFlowTestCase
 {
     public MulticastAsyncWithTransformersTestCase(ConfigVariant variant, String configResources)
@@ -40,7 +43,7 @@ public class MulticastAsyncWithTransformersTestCase extends AbstractServiceAndFl
             {ConfigVariant.SERVICE, "org/mule/test/integration/routing/outbound/multicaster-async-with-transformers-test-service.xml"},
             {ConfigVariant.FLOW, "org/mule/test/integration/routing/outbound/multicaster-async-with-transformers-test-flow.xml"}
         });
-    }      
+    }
 
     @Test
     public void testSyncMulticast() throws Exception

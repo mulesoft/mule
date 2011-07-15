@@ -15,13 +15,17 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
-import org.mule.tck.FunctionalTestCase;
 
 import java.util.Arrays;
 import java.util.Collection;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
 
 public class IdempotentRouterWithFilterTestCase extends AbstractServiceAndFlowTestCase
 {
@@ -38,9 +42,10 @@ public class IdempotentRouterWithFilterTestCase extends AbstractServiceAndFlowTe
             {ConfigVariant.SERVICE, "org/mule/test/integration/routing/inbound/idempotent-router-with-filter-service.xml"},
             {ConfigVariant.FLOW, "org/mule/test/integration/routing/inbound/idempotent-router-with-filter-flow.xml"}
         });
-    }      
-    
+    }
+
     @Test
+    @SuppressWarnings("null")
     public void testWithValidData()
     {
         /*

@@ -10,6 +10,10 @@
 
 package org.mule.test.integration.streaming;
 
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.util.FileUtils;
+
 import java.io.File;
 import java.util.Arrays;
 import java.util.Collection;
@@ -17,9 +21,8 @@ import java.util.Collection;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
-import org.mule.tck.junit4.rule.DynamicPort;
-import org.mule.util.FileUtils;
+
+import static org.junit.Assert.assertEquals;
 
 public class FileToTcpStreamingTestCase extends AbstractServiceAndFlowTestCase
 {
@@ -46,8 +49,8 @@ public class FileToTcpStreamingTestCase extends AbstractServiceAndFlowTestCase
             {ConfigVariant.SERVICE, "org/mule/test/integration/streaming/file-to-tcp-streaming-service.xml"},
             {ConfigVariant.FLOW, "org/mule/test/integration/streaming/file-to-tcp-streaming-flow.xml"}
         });
-    }     
-   
+    }
+
     @Test
     public void testStreamingFromFileToTcp() throws Exception
     {

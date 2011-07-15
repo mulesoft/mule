@@ -10,27 +10,25 @@
 
 package org.mule.test.integration.messaging.meps;
 
+import org.mule.api.client.MuleClient;
+import org.mule.api.context.notification.ServerNotification;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.functional.FunctionalTestNotificationListener;
+import org.mule.util.concurrent.Latch;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-import org.mule.api.context.notification.ServerNotification;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
-import org.mule.tck.functional.FunctionalTestNotificationListener;
-import org.mule.util.concurrent.Latch;
+
+import static org.junit.Assert.assertTrue;
 
 // START SNIPPET: full-class
 public class InOnlyTestCase extends AbstractServiceAndFlowTestCase
 {
     public static final long TIMEOUT = 3000;
-
-    public InOnlyTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
 
     @Parameters
     public static Collection<Object[]> parameters()
@@ -40,14 +38,20 @@ public class InOnlyTestCase extends AbstractServiceAndFlowTestCase
             {ConfigVariant.FLOW, "org/mule/test/integration/messaging/meps/pattern_In-Only-flow.xml"}});
     }
 
+    public InOnlyTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
+    }
+
     @Test
     public void testExchange() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
 
         final Latch latch = new Latch();
-        client.getMuleContext().registerListener(new FunctionalTestNotificationListener()
+        muleContext.registerListener(new FunctionalTestNotificationListener()
         {
+            @Override
             public void onNotification(ServerNotification notification)
             {
                 latch.countDown();

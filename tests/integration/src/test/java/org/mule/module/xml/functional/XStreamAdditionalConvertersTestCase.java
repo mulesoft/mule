@@ -27,14 +27,12 @@ import java.util.concurrent.TimeUnit;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 public class XStreamAdditionalConvertersTestCase extends AbstractServiceAndFlowTestCase
 {
     private CountDownLatch latch = new CountDownLatch(1);
-
-    public XStreamAdditionalConvertersTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
 
     @Parameters
     public static Collection<Object[]> parameters()
@@ -42,6 +40,11 @@ public class XStreamAdditionalConvertersTestCase extends AbstractServiceAndFlowT
         return Arrays.asList(new Object[][]{
             {ConfigVariant.SERVICE, "org/mule/module/xml/xstream-additional-converters-service.xml"},
             {ConfigVariant.FLOW, "org/mule/module/xml/xstream-additional-converters-flow.xml"}});
+    }
+
+    public XStreamAdditionalConvertersTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
     }
 
     @Override

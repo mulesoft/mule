@@ -22,6 +22,10 @@ import java.util.HashMap;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 /**
  * Test an entry-point resolver used for multiple classes
  */

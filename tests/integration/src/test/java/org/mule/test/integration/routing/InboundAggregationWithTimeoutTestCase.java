@@ -14,7 +14,6 @@ import org.mule.api.context.notification.RoutingNotificationListener;
 import org.mule.context.notification.RoutingNotification;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
-import org.mule.tck.AbstractServiceAndFlowTestCase.ConfigVariant;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -23,6 +22,8 @@ import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
+
+import static org.junit.Assert.assertTrue;
 
 public class InboundAggregationWithTimeoutTestCase extends AbstractServiceAndFlowTestCase
 {
@@ -38,8 +39,8 @@ public class InboundAggregationWithTimeoutTestCase extends AbstractServiceAndFlo
             {ConfigVariant.SERVICE, "org/mule/test/integration/routing/multi-inbound-aggregator-with-timeout-service.xml"},
             {ConfigVariant.FLOW, "org/mule/test/integration/routing/multi-inbound-aggregator-with-timeout-flow.xml"}
         });
-    }      
-    
+    }
+
     @Test
     public void testAggregatorTimeout() throws Exception
     {
@@ -47,6 +48,7 @@ public class InboundAggregationWithTimeoutTestCase extends AbstractServiceAndFlo
 
         muleContext.registerListener(new RoutingNotificationListener<RoutingNotification>()
         {
+            @Override
             public void onNotification(RoutingNotification notification)
             {
                 if (notification.getAction() == RoutingNotification.CORRELATION_TIMEOUT)

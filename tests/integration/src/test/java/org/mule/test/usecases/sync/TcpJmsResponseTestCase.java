@@ -10,18 +10,21 @@
 
 package org.mule.test.usecases.sync;
 
+import org.mule.api.MuleMessage;
+import org.mule.module.client.MuleClient;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+
 import java.util.Arrays;
 import java.util.Collection;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class TcpJmsResponseTestCase extends AbstractServiceAndFlowTestCase
 {
-
     public TcpJmsResponseTestCase(ConfigVariant variant, String configResources)
     {
         super(variant, configResources);

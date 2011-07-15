@@ -16,6 +16,8 @@ import org.mule.tck.AbstractServiceAndFlowTestCase;
 
 import java.util.Map;
 
+import static org.junit.Assert.assertEquals;
+
 public abstract class AbstractEntryPointResolverTestCase extends AbstractServiceAndFlowTestCase
 {
     public AbstractEntryPointResolverTestCase(ConfigVariant variant, String configResources)

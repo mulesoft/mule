@@ -21,6 +21,10 @@ import java.util.Collection;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 public class ComponentReturningNullFlowTestCase extends AbstractServiceAndFlowTestCase
 {
     @Parameters

@@ -20,14 +20,11 @@ import java.util.Collection;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 public class HttpPostTestCase extends AbstractServiceAndFlowTestCase
 {
-
-    public HttpPostTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
-
     @Parameters
     public static Collection<Object[]> parameters()
     {
@@ -35,8 +32,13 @@ public class HttpPostTestCase extends AbstractServiceAndFlowTestCase
             {ConfigVariant.SERVICE, "org/mule/test/usecases/http/http-post-service.xml"},
             {ConfigVariant.FLOW, "org/mule/test/usecases/http/http-post-flow.xml"}
         });
-    }      
-    
+    }
+
+    public HttpPostTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
+    }
+
     @Test
     public void testPost() throws Exception
     {
@@ -46,5 +48,4 @@ public class HttpPostTestCase extends AbstractServiceAndFlowTestCase
         assertNotNull(message.getPayloadAsString());
         assertEquals("IncidentData=payload", message.getPayloadAsString());
     }
-
 }

@@ -21,6 +21,9 @@ import java.util.Collection;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 /*
  * In this Test Case we make use of a Custom Catch All Strategy in order to show how
  * to send the transformed message instead of the non-transformed message.

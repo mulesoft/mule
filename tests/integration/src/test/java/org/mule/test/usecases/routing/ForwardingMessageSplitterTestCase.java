@@ -22,6 +22,9 @@ import java.util.List;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 public class ForwardingMessageSplitterTestCase extends AbstractServiceAndFlowTestCase
 {
     public ForwardingMessageSplitterTestCase(ConfigVariant variant, String configResources)
@@ -36,14 +39,14 @@ public class ForwardingMessageSplitterTestCase extends AbstractServiceAndFlowTes
             {ConfigVariant.SERVICE, "org/mule/test/usecases/routing/forwarding-message-splitter-service.xml"},
             {ConfigVariant.FLOW, "org/mule/test/usecases/routing/forwarding-message-splitter-flow.xml"}
         });
-    }      
-    
+    }
+
     @Test
     public void testSyncResponse() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
 
-        List payload = new ArrayList();
+        List<Object> payload = new ArrayList<Object>();
         payload.add("hello");
         payload.add(new Integer(3));
         payload.add(new Exception());

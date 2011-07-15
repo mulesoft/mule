@@ -23,16 +23,12 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
+import static org.junit.Assert.assertNotNull;
+
 public class MuleAdminTestCase extends AbstractServiceAndFlowTestCase
 {
     @Rule
     public DynamicPort port1 = new DynamicPort("port1");
-
-    public MuleAdminTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-
-    }
 
     @Parameters
     public static Collection<Object[]> parameters()
@@ -40,6 +36,11 @@ public class MuleAdminTestCase extends AbstractServiceAndFlowTestCase
         return Arrays.asList(new Object[][]{
             {ConfigVariant.SERVICE, "org/mule/test/integration/spring/mule-admin-spring-service.xml"},
             {ConfigVariant.FLOW, "org/mule/test/integration/spring/mule-admin-spring-flow.xml"}});
+    }
+
+    public MuleAdminTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
     }
 
     @Test

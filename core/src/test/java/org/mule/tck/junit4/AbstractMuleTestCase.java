@@ -134,7 +134,7 @@ public abstract class AbstractMuleTestCase
     {
         boolean result = false;
 
-        final String name = test.getClass().getName();
+        final String testName = test.getClass().getName();
         try
         {
             // We find the physical classpath root URL of the test class and
@@ -156,9 +156,10 @@ public abstract class AbstractMuleTestCase
                     // ..and this finds non-comments that match the test case name
                     result = IteratorUtils.filteredIterator(lines, new Predicate()
                     {
+                        @Override
                         public boolean evaluate(Object object)
                         {
-                            return StringUtils.equals(name, StringUtils.trimToEmpty((String) object));
+                            return StringUtils.equals(testName, StringUtils.trimToEmpty((String) object));
                         }
                     }).hasNext();
                 }
@@ -274,19 +275,26 @@ public abstract class AbstractMuleTestCase
     {
         if (verbose)
         {
-            System.out.println(StringMessageUtils.getBoilerPlate("Testing: " + name.getMethodName(), '=', 80));
+            System.out.println(StringMessageUtils.getBoilerPlate(getTestHeader(), '=', 80));
         }
+    }
+
+    protected String getTestHeader()
+    {
+        return "Testing: " + name.getMethodName();
     }
 
     private void skipTestWhenExcluded()
     {
         assumeThat(this, new BaseMatcher<AbstractMuleTestCase>()
         {
+            @Override
             public boolean matches(Object o)
             {
                 return !isExcluded();
             }
 
+            @Override
             public void describeTo(Description description)
             {
                 description.appendText("Test " + name.getMethodName() + " is excluded");
@@ -298,11 +306,13 @@ public abstract class AbstractMuleTestCase
     {
         assumeThat(this, new BaseMatcher<AbstractMuleTestCase>()
         {
+            @Override
             public boolean matches(Object o)
             {
                 return !(isDisabledInThisEnvironment() || isDisabledInThisEnvironment(name.getMethodName()));
             }
 
+            @Override
             public void describeTo(Description description)
             {
                 description.appendText("Test " + name.getMethodName() + " disabled in this environment");

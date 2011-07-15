@@ -10,17 +10,20 @@
 
 package org.mule.test.integration.routing;
 
+import org.mule.api.context.notification.ServerNotification;
+import org.mule.module.client.MuleClient;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.functional.FunctionalTestNotificationListener;
+import org.mule.util.concurrent.Latch;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-import org.mule.api.context.notification.ServerNotification;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
-import org.mule.tck.functional.FunctionalTestNotificationListener;
-import org.mule.util.concurrent.Latch;
+
+import static org.junit.Assert.assertTrue;
 
 public class WireTapTestCase extends AbstractServiceAndFlowTestCase
 {
@@ -46,6 +49,7 @@ public class WireTapTestCase extends AbstractServiceAndFlowTestCase
         final Latch tappedReceiver2Latch = new Latch();
         muleContext.registerListener(new FunctionalTestNotificationListener()
         {
+            @Override
             public void onNotification(ServerNotification notification)
             {
                 if (notification.getResourceIdentifier().equals("Receiver"))

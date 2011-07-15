@@ -20,6 +20,9 @@ import java.util.Collection;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 /**
  * The Quartz transport can be used to trigger an event to be received by the
  * component based on the endpoint configuration. In Mule an event is usually

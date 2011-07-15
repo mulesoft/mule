@@ -10,18 +10,23 @@
 
 package org.mule.test.construct;
 
-import java.util.Arrays;
-import java.util.Collection;
-
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 import org.mule.api.ExceptionPayload;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.module.client.RemoteDispatcher;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
+
+import java.util.Arrays;
+import java.util.Collection;
+
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Test remote dispatcher using serialization wire format
@@ -30,7 +35,7 @@ public class RemoteDispatcherTestCase extends AbstractServiceAndFlowTestCase
 {
     @Rule
     public DynamicPort port1 = new DynamicPort("port1");
-    
+
     public RemoteDispatcherTestCase(ConfigVariant variant, String configResources)
     {
         super(variant, configResources);
@@ -42,11 +47,11 @@ public class RemoteDispatcherTestCase extends AbstractServiceAndFlowTestCase
     {
         return Arrays.asList(new Object[][]{
             {ConfigVariant.SERVICE, "org/mule/test/construct/remote-dispatcher.xml"}
-            
+
 
         });
     }
-    
+
     @Test
     public void testRemoting() throws Exception
     {

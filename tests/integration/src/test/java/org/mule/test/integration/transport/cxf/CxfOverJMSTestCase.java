@@ -15,13 +15,15 @@ import org.mule.api.MuleMessage;
 import org.mule.api.transport.PropertyScope;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
-import org.mule.tck.FunctionalTestCase;
 
 import java.util.Arrays;
 import java.util.Collection;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class CxfOverJMSTestCase extends AbstractServiceAndFlowTestCase
 {
@@ -37,7 +39,7 @@ public class CxfOverJMSTestCase extends AbstractServiceAndFlowTestCase
     {
         super(variant, configResources);
     }
-    
+
     @Parameters
     public static Collection<Object[]> parameters()
     {
@@ -45,7 +47,7 @@ public class CxfOverJMSTestCase extends AbstractServiceAndFlowTestCase
             {ConfigVariant.SERVICE, "org/mule/test/integration/transport/cxf/cxf-over-jms-config-service.xml"},
             {ConfigVariant.FLOW, "org/mule/test/integration/transport/cxf/cxf-over-jms-config-flow.xml"}
         });
-    }        
+    }
 
     @Test
     public void testCxf() throws Exception

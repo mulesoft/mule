@@ -21,6 +21,8 @@ import java.util.Collection;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
+import static org.junit.Assert.assertNotNull;
+
 public class MessageContextTestCase extends AbstractServiceAndFlowTestCase
 {
     @Parameters

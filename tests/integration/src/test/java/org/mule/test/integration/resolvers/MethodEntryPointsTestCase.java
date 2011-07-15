@@ -26,14 +26,13 @@ import java.util.Map;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 public class MethodEntryPointsTestCase extends AbstractServiceAndFlowTestCase
 {
-
-    public MethodEntryPointsTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
-
     @Parameters
     public static Collection<Object[]> parameters()
     {
@@ -41,8 +40,13 @@ public class MethodEntryPointsTestCase extends AbstractServiceAndFlowTestCase
             {ConfigVariant.SERVICE, "org/mule/test/integration/resolvers/method-entrypoints-config-service.xml"},
             {ConfigVariant.FLOW, "org/mule/test/integration/resolvers/method-entrypoints-config-flow.xml"}
         });
-    }      
-    
+    }
+
+    public MethodEntryPointsTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
+    }
+
     @Test
     public void testTooManySatisfiableMethods() throws Exception
     {
@@ -114,7 +118,7 @@ public class MethodEntryPointsTestCase extends AbstractServiceAndFlowTestCase
     public void testValidCallToReverseMethodSetAsHeader() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
-        Map props = new HashMap();
+        Map<String, Object> props = new HashMap<String, Object>();
         props.put(MuleProperties.MULE_METHOD_PROPERTY, "reverseString");
         MuleMessage message = client.send("vm://service", "hello", props);
         assertNotNull(message);
@@ -124,7 +128,7 @@ public class MethodEntryPointsTestCase extends AbstractServiceAndFlowTestCase
     public void testValidCallToUpperCaseMethodSetAsHeader() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
-        Map props = new HashMap();
+        Map<String, Object> props = new HashMap<String, Object>();
         props.put(MuleProperties.MULE_METHOD_PROPERTY, "upperCaseString");
         MuleMessage message = client.send("vm://service", "hello", props);
         assertNotNull(message);

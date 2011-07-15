@@ -26,6 +26,9 @@ import java.util.List;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 public class ExpressionSplitterAsyncTestCase extends AbstractServiceAndFlowTestCase
 {
     public ExpressionSplitterAsyncTestCase(ConfigVariant variant, String configResources)

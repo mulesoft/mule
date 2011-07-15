@@ -17,6 +17,8 @@ import java.util.Collection;
 
 import org.junit.runners.Parameterized.Parameters;
 
+import static org.junit.Assert.assertNotNull;
+
 public class EndpointMessageNotificationTestCase extends AbstractNotificationTestCase
 {
     public static final String NO_ID = null;

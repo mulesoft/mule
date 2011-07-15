@@ -10,11 +10,8 @@
 
 package org.mule.tck;
 
+import org.mule.tck.junit4.FunctionalTestCase;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.rules.TestName;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
@@ -24,35 +21,11 @@ public abstract class AbstractServiceAndFlowTestCase extends FunctionalTestCase
     protected ConfigVariant variant;
     protected String configResources;
 
-    @Rule
-    public TestName name = new TestName();
-
     public AbstractServiceAndFlowTestCase(ConfigVariant variant, String configResources)
     {
         super();
         this.variant = variant;
         this.configResources = configResources;
-    }
-
-    /**
-     * We use JUnit 4 features in this subclass but our superclass is still JUnit 3 style. This
-     * annotated method builds the bridge between the two worlds.
-     */
-    @Before
-    public void before() throws Exception
-    {
-        setName(name.getMethodName());
-        setUp();
-    }
-
-    /**
-     * We use JUnit 4 features in this subclass but our superclass is still JUnit 3 style. This
-     * annotated method builds the bridge between the two worlds.
-     */
-    @After
-    public void after() throws Exception
-    {
-        tearDown();
     }
 
     @Override
@@ -91,7 +64,7 @@ public abstract class AbstractServiceAndFlowTestCase extends FunctionalTestCase
     @Override
     protected String getTestHeader()
     {
-        return String.format("Testing: %s (%s)", getName(), variant);
+        return "Testing: " + name.getMethodName() + " (" + variant + ")";
     }
 
     public static enum ConfigVariant

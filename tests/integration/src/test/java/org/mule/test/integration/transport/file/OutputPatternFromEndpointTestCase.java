@@ -27,10 +27,23 @@ import junit.framework.AssertionFailedError;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 public class OutputPatternFromEndpointTestCase extends AbstractServiceAndFlowTestCase
     implements EndpointMessageNotificationListener<EndpointMessageNotification>
 {
     protected CountDownLatch fileReceiveLatch;
+
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE,
+            "org/mule/test/integration/providers/file/mule-file-output-pattern-from-endpoint-service.xml"},
+            {ConfigVariant.FLOW,
+            "org/mule/test/integration/providers/file/mule-file-output-pattern-from-endpoint-flow.xml"}});
+    }
 
     public OutputPatternFromEndpointTestCase(ConfigVariant variant, String configResources)
     {
@@ -43,16 +56,6 @@ public class OutputPatternFromEndpointTestCase extends AbstractServiceAndFlowTes
         super.doSetUp();
         muleContext.registerListener(this);
         fileReceiveLatch = new CountDownLatch(2);
-    }
-
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE,
-                "org/mule/test/integration/providers/file/mule-file-output-pattern-from-endpoint-service.xml"},
-            {ConfigVariant.FLOW,
-                "org/mule/test/integration/providers/file/mule-file-output-pattern-from-endpoint-flow.xml"}});
     }
 
     @Test
@@ -120,6 +123,7 @@ public class OutputPatternFromEndpointTestCase extends AbstractServiceAndFlowTes
         }
     }
 
+    @Override
     public void onNotification(EndpointMessageNotification notification)
     {
         if (notification.getEndpoint().contains("SecondWrite"))
