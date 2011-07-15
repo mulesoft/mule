@@ -15,8 +15,10 @@ import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.api.expression.ExpressionEvaluator;
 import org.mule.message.ExceptionMessage;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
 public class ExceptionStrategyWithCustomExpressionEvaluatorTestCase extends FunctionalTestCase
@@ -33,7 +35,7 @@ public class ExceptionStrategyWithCustomExpressionEvaluatorTestCase extends Func
     {
         MuleClient client = muleContext.getClient();
         client.send("vm://in", TEST_MESSAGE, null);
-        MuleMessage message = client.request("vm://out", DEFAULT_MULE_TEST_TIMEOUT_SECS);
+        MuleMessage message = client.request("vm://out", DEFAULT_TEST_TIMEOUT_SECS);
         assertNotNull(message);
         assertTrue(message.getPayload() instanceof ExceptionMessage);
     }
