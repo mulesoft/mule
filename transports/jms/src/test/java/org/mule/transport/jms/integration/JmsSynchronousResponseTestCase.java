@@ -18,6 +18,9 @@ import org.mule.util.StringUtils;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 
 /**
  * @see EE-1688/MULE-3059

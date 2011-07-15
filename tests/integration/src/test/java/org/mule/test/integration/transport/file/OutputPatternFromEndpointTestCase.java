@@ -91,7 +91,7 @@ public class OutputPatternFromEndpointTestCase extends FunctionalTestCase
 
                 public String describeFailure()
                 {
-                    return "Failed to created the expected files";
+                    return "Failed to create the expected files";
                 }
             });
         }

@@ -15,7 +15,7 @@ import org.mule.api.routing.OutboundRouterCollection;
 import org.mule.api.service.Service;
 import org.mule.routing.outbound.AbstractOutboundRouter;
 import org.mule.service.ServiceCompositeMessageSource;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transport.quartz.QuartzConnector;
 import org.mule.transport.quartz.jobs.CustomJobConfig;
 import org.mule.transport.quartz.jobs.CustomJobFromMessageConfig;
@@ -26,7 +26,13 @@ import org.mule.transport.quartz.jobs.EventGeneratorJobConfig;
 import org.mule.transport.quartz.jobs.ScheduledDispatchJob;
 import org.mule.transport.quartz.jobs.ScheduledDispatchJobConfig;
 
+import org.junit.Test;
 import org.quartz.impl.StdScheduler;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 
 /**
@@ -34,11 +40,14 @@ import org.quartz.impl.StdScheduler;
  */
 public class QuartzNamespaceHandlerTestCase extends FunctionalTestCase
 {
+
+    @Override
     protected String getConfigResources()
     {
         return "quartz-namespace-config.xml";
     }
 
+    @Test
     public void testDefaultConfig() throws Exception
     {
         QuartzConnector c = (QuartzConnector)muleContext.getRegistry().lookupConnector("quartzConnectorDefaults");
@@ -53,6 +62,7 @@ public class QuartzNamespaceHandlerTestCase extends FunctionalTestCase
         assertTrue(c.isStarted());
     }
     
+    @Test
     public void testInjectedSchedulerBean() throws Exception
     {
         QuartzConnector c = (QuartzConnector)muleContext.getRegistry().lookupConnector("quartzConnector1");
@@ -67,6 +77,7 @@ public class QuartzNamespaceHandlerTestCase extends FunctionalTestCase
         assertTrue(c.isStarted());
     }
     
+    @Test
     public void testFactoryProperties() throws Exception
     {
         QuartzConnector c = (QuartzConnector)muleContext.getRegistry().lookupConnector("quartzConnector2");
@@ -81,6 +92,7 @@ public class QuartzNamespaceHandlerTestCase extends FunctionalTestCase
         assertTrue(c.isStarted());
     }
 
+    @Test
     public void testEndpoint1Config() throws Exception
     {
         Service service = muleContext.getRegistry().lookupService("testService1");
@@ -94,6 +106,7 @@ public class QuartzNamespaceHandlerTestCase extends FunctionalTestCase
         assertEquals("foo", config.getPayload());
     }
 
+    @Test
     public void testEndpoint2Config() throws Exception
     {
         Service service = muleContext.getRegistry().lookupService("testService2");
@@ -106,7 +119,7 @@ public class QuartzNamespaceHandlerTestCase extends FunctionalTestCase
         assertEquals("foo bar", config.getPayload());
     }
 
-
+    @Test
     public void testEndpoint3Config() throws Exception
     {
         Service service = muleContext.getRegistry().lookupService("testService3");
@@ -122,8 +135,7 @@ public class QuartzNamespaceHandlerTestCase extends FunctionalTestCase
         //Test grabbing the Job instance
     }
 
-
-
+    @Test
     public void testEndpoint4Config() throws Exception
     {
         Service service = muleContext.getRegistry().lookupService("testService4");
@@ -137,6 +149,7 @@ public class QuartzNamespaceHandlerTestCase extends FunctionalTestCase
         assertTrue(config.getJob() instanceof EventGeneratorJob);
     }
 
+    @Test
     public void testEndpoint5Config() throws Exception
     {
         Service service = muleContext.getRegistry().lookupService("testService5");
@@ -151,6 +164,7 @@ public class QuartzNamespaceHandlerTestCase extends FunctionalTestCase
         assertEquals(4000, config.getTimeout());
     }
 
+    @Test
     public void testEndpoint6Config() throws Exception
     {
         Service service = muleContext.getRegistry().lookupService("testService6");

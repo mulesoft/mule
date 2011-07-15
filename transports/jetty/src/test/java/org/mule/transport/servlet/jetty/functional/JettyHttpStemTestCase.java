@@ -12,18 +12,24 @@ package org.mule.transport.servlet.jetty.functional;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transport.http.HttpConnector;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 
 public class JettyHttpStemTestCase extends FunctionalTestCase
 {
+
     @Override
     protected String getConfigResources()
     {
         return "jetty-http-stem-test.xml";
     }
 
+    @Test
     public void testStemMatchingHttp() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);

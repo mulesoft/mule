@@ -18,6 +18,11 @@ import org.mule.transport.http.transformers.HttpResponseToString;
 import org.mule.transport.http.transformers.MuleMessageToHttpResponse;
 import org.mule.transport.http.transformers.ObjectToHttpClientMethodRequest;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 
 public class HttpNamespaceHandlerTestCase extends AbstractNamespaceHandlerTestCase
 {
@@ -27,6 +32,7 @@ public class HttpNamespaceHandlerTestCase extends AbstractNamespaceHandlerTestCa
         super("http");
     }
 
+    @Test
     public void testConnectorProperties()
     {
         HttpConnector connector =
@@ -34,6 +40,7 @@ public class HttpNamespaceHandlerTestCase extends AbstractNamespaceHandlerTestCa
         testBasicProperties(connector);
     }
 
+    @Test
     public void testPollingProperties()
     {
          HttpPollingConnector connector =
@@ -44,6 +51,7 @@ public class HttpNamespaceHandlerTestCase extends AbstractNamespaceHandlerTestCa
         assertFalse(connector.isDiscardEmptyContent());
     }
     
+    @Test
     public void testTransformersOnEndpoints() throws Exception
     {
         Object transformer1 = lookupInboundEndpoint("ep1").getTransformers().get(0);
@@ -63,6 +71,7 @@ public class HttpNamespaceHandlerTestCase extends AbstractNamespaceHandlerTestCa
         assertEquals(ObjectToHttpClientMethodRequest.class, transformer4.getClass());
     }
 
+    @Test
     public void testFiltersOnEndpoints() throws Exception
     {
         Filter filter = lookupInboundEndpoint("ep5").getFilter();

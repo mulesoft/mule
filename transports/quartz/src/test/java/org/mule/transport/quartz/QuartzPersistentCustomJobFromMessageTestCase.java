@@ -12,11 +12,17 @@ package org.mule.transport.quartz;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transport.quartz.jobs.ScheduledDispatchJobConfig;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class QuartzPersistentCustomJobFromMessageTestCase extends FunctionalTestCase
 {
+
     private static final long TIMEOUT = 30000;
 
     @Override
@@ -25,6 +31,7 @@ public class QuartzPersistentCustomJobFromMessageTestCase extends FunctionalTest
         return "quartz-persistent-custom-job-generator.xml";
     }
 
+    @Test
     public void testSendToCustomEventScheduler() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);

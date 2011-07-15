@@ -36,12 +36,16 @@ import javax.jms.TextMessage;
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 /**
  * <code>JmsTransformersTestCase</code> Tests the JMS transformer implementations.
  */
 
 public class JmsTransformersTestCase extends AbstractJmsFunctionalTestCase
 {
+
     private Session session = null;
 
     @Override
@@ -134,7 +138,6 @@ public class JmsTransformersTestCase extends AbstractJmsFunctionalTestCase
         assertEquals("Value1", m.get("Key1"));
         assertTrue(Arrays.equals(new byte[]{1,2,3}, (byte[])m.get("Key2")));
         assertEquals(new Double(99.999), m.get("Key3"));
-
     }
 
     @Test
@@ -165,7 +168,6 @@ public class JmsTransformersTestCase extends AbstractJmsFunctionalTestCase
         assertTrue(Arrays.equals(new byte[]{1,2,3}, (byte[])m.get("Key2")));
         assertEquals(new Double(99.999), m.get("Key3"));
         assertEquals(new Orange(), m.get("Key4"));
-
     }
 
     @Test

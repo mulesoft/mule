@@ -19,9 +19,12 @@ import java.util.Map;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+
 public class JmsCustomCorrelationIdTestCase extends AbstractJmsFunctionalTestCase
 {
 
+    @Override
     protected String getConfigResources()
     {
         return "integration/jms-custom-correlation.xml";

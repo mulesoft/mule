@@ -15,7 +15,7 @@ import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.transaction.Transaction;
 import org.mule.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.util.ClassUtils;
 import org.mule.util.CollectionUtils;
@@ -49,8 +49,12 @@ import javax.transaction.SystemException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.junit.After;
-import org.junit.Before;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * This is the base class for all integration tests that are part of the JMS integration test suite.  This is
@@ -179,30 +183,6 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
         }
     }
 
-    /**
-     * Since we are using JUnit 4, but the Mule Test Framework assumes JUnit 3, we
-     * need to explicitly call the setUp and tearDown methods
-     *
-     * @throws Exception if, well, anything goes wrong
-     */
-    @Before
-    public void before() throws Exception
-    {
-        super.setUp();
-    }
-
-    /**
-     * Since we are using JUnit 4, but the Mule Test Framework assumes JUnit 3, we
-     * need to explicitly call the setUp and tearDown methods
-     *
-     * @throws Exception if, well, anything goes wrong
-     */
-    @After
-    public void after() throws Exception
-    {
-        super.tearDown();
-    }
-
     public AbstractJmsFunctionalTestCase()
     {
         // TODO jmsProviderConfigs() can return more than one provider, but our test class can only handle one at a time
@@ -220,15 +200,23 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
     }
 
     @Override
-    protected void suitePreSetUp() throws Exception
+    protected void doSetUp() throws Exception
     {
-        super.suitePreSetUp();
+        super.doSetUp();
 
         if (purgeQueuesOnPreSetUp)
         {
             purge(getInboundQueueName());
             purge(getOutboundQueueName());
             // TODO DZ: get all of the queue/topic names from the Mule config and just purge those
+        }
+
+        client = new MuleClient(muleContext);
+        Transaction tx = TransactionCoordination.getInstance().getTransaction();
+        if (tx != null)
+        {
+            TransactionCoordination.getInstance().unbindTransaction(tx);
+            logger.warn("Transaction was active when this test began");
         }
     }
 
@@ -518,18 +506,6 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
         assertNull(result);
     }
 
-    protected void doSetUp() throws Exception
-    {
-        super.doSetUp();
-        client = new MuleClient(muleContext);
-        Transaction tx = TransactionCoordination.getInstance().getTransaction();
-        if (tx != null)
-        {
-            TransactionCoordination.getInstance().unbindTransaction(tx);
-            logger.warn("Transaction was active when this test began");
-        }
-    }
-
     protected void doTearDown() throws Exception
     {
         if (purgeQueuesOnTearDown)
@@ -680,10 +656,7 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
      * other tests may still exist from other tests' runs.
      * <p/>
      * Well-behaving tests should drain both inbound and outbound destinations, as well as any intermediary ones.
-     * Typically this method is called from {@link #suitePreSetUp()} and {@link #suitePostTearDown()}, with proper super calls.
      * @param destination destination name without any protocol specifics
-     * @see #suitePreSetUp()
-     * @see #suitePostTearDown()
      */
     protected void purge(final String destination) throws JMSException
     {

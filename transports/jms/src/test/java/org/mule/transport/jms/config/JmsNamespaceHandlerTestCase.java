@@ -17,7 +17,7 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.routing.filter.Filter;
 import org.mule.routing.filters.logic.NotFilter;
 import org.mule.service.ServiceCompositeMessageSource;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.testmodels.mule.TestTransactionFactory;
 import org.mule.transaction.MuleTransactionConfig;
 import org.mule.transaction.XaTransactionFactory;
@@ -31,6 +31,13 @@ import org.mule.transport.jms.test.TestRedeliveryHandlerFactory;
 
 import javax.jms.Session;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Tests the "jms" namespace.
@@ -41,12 +48,14 @@ public class JmsNamespaceHandlerTestCase extends FunctionalTestCase
     {
         setStartContext(false);
     }
-    
+
+    @Override
     protected String getConfigResources()
     {
         return "jms-namespace-config.xml";
     }
 
+    @Test
     public void testDefaultConfig() throws Exception
     {
         JmsConnector c = (JmsConnector)muleContext.getRegistry().lookupConnector("jmsConnectorDefaults");
@@ -73,6 +82,7 @@ public class JmsNamespaceHandlerTestCase extends FunctionalTestCase
         assertFalse(c.isEmbeddedMode());
     }
     
+    @Test
     public void testConnectorConfig() throws Exception
     {
         JmsConnector c = (JmsConnector) muleContext.getRegistry().lookupConnector("jmsConnector1");
@@ -102,6 +112,7 @@ public class JmsNamespaceHandlerTestCase extends FunctionalTestCase
         assertTrue(c.isEmbeddedMode());
     }
 
+    @Test
     public void testCustomConnectorConfig() throws Exception
     {
         JmsConnector c = (JmsConnector) muleContext.getRegistry().lookupConnector("jmsConnector2");
@@ -110,6 +121,7 @@ public class JmsNamespaceHandlerTestCase extends FunctionalTestCase
         assertEquals("1.1", c.getSpecification()); // 1.0.2b is the default, should be changed in the config
     }
     
+    @Test
     public void testTestConnectorConfig() throws Exception
     {
         JmsConnector c = (JmsConnector) muleContext.getRegistry().lookupConnector("jmsConnector3");
@@ -134,6 +146,7 @@ public class JmsNamespaceHandlerTestCase extends FunctionalTestCase
         assertEquals("1.1", c.getSpecification()); // 1.0.2b is the default, should be changed in the config
     }
 
+    @Test
     public void testEndpointConfig() throws MuleException
     {
         ImmutableEndpoint endpoint1 = muleContext.getRegistry().lookupEndpointBuilder("endpoint1").buildInboundEndpoint();
@@ -159,6 +172,7 @@ public class JmsNamespaceHandlerTestCase extends FunctionalTestCase
         assertEquals("testCustomDurableName", inboundEndpoint.getProperty(JmsConstants.DURABLE_NAME_PROPERTY));
     }
 
+    @Test
     public void testCustomTransactions() throws EndpointException, InitialisationException
     {
         ImmutableEndpoint endpoint3 = muleContext.getRegistry().lookupEndpointBuilder("endpoint3").buildInboundEndpoint();
@@ -168,6 +182,7 @@ public class JmsNamespaceHandlerTestCase extends FunctionalTestCase
         assertEquals("foo", factory.getValue());
     }
     
+    @Test
     public void testXaTransactions() throws Exception
     {
         ImmutableEndpoint endpoint = muleContext.getRegistry().lookupEndpointBuilder("endpoint4").buildInboundEndpoint();
@@ -177,6 +192,7 @@ public class JmsNamespaceHandlerTestCase extends FunctionalTestCase
         assertEquals(MuleTransactionConfig.ACTION_ALWAYS_JOIN, endpoint.getTransactionConfig().getAction());
     }
 
+    @Test
     public void testJndiConnectorAtributes() throws Exception
     {
         JmsConnector connector = (JmsConnector) muleContext.getRegistry().lookupConnector("jmsJndiConnector");
@@ -193,6 +209,7 @@ public class JmsNamespaceHandlerTestCase extends FunctionalTestCase
         assertEquals("customValue", ((TestConnectionFactory) connector.getConnectionFactory()).getCustomProperty());
     }
 
+    @Test
     public void testActiveMqConnectorConfig() throws Exception
     {
         JmsConnector c = (JmsConnector) muleContext.getRegistry().lookupConnector("jmsActiveMqConnector");

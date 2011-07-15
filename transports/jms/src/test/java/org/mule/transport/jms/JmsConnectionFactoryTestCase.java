@@ -10,13 +10,21 @@
 
 package org.mule.transport.jms;
 
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transport.jms.test.TestConnectionFactory;
 
 import javax.jms.ConnectionFactory;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 public class JmsConnectionFactoryTestCase extends FunctionalTestCase
 {
+    
+    @Override
     protected String getConfigResources()
     {
         return "jms-connection-factory.xml";
@@ -26,6 +34,7 @@ public class JmsConnectionFactoryTestCase extends FunctionalTestCase
      * Test providerProperties set on JmsConnector are not passed to the underlying
      * ConnectionFactory.
      */
+    @Test
     public void testProviderPropertiesNotPassed() throws Exception
     {
         JmsConnector c = (JmsConnector)muleContext.getRegistry().lookupConnector("jmsConnector1");
@@ -41,6 +50,7 @@ public class JmsConnectionFactoryTestCase extends FunctionalTestCase
      * Test connectionFactoryProperties set on JmsConnector are actually passed to
      * the underlying ConnectionFactory.
      */
+    @Test
     public void testConnectionFactoryPropertiesPassed() throws Exception
     {
         JmsConnector c = (JmsConnector)muleContext.getRegistry().lookupConnector("jmsConnector2");

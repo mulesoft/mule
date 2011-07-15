@@ -17,6 +17,8 @@ import org.junit.Test;
  */
 public class JmsDurableTopicSingleTxTestCase extends JmsDurableTopicTestCase
 {
+
+    @Override
     protected String getConfigResources()
     {
         return "integration/jms-durable-topic-single-tx.xml";
@@ -48,6 +50,8 @@ public class JmsDurableTopicSingleTxTestCase extends JmsDurableTopicTestCase
 
     Scenario scenarioCommit = new ScenarioCommit()
     {
+
+        @Override
         public String getOutputDestinationName()
         {
             return getJmsConfig().getBroadcastDestinationName();
@@ -56,6 +60,8 @@ public class JmsDurableTopicSingleTxTestCase extends JmsDurableTopicTestCase
 
     Scenario scenarioRollback = new ScenarioRollback()
     {
+
+        @Override
         public String getOutputDestinationName()
         {
             return getJmsConfig().getBroadcastDestinationName();
@@ -64,6 +70,8 @@ public class JmsDurableTopicSingleTxTestCase extends JmsDurableTopicTestCase
 
     Scenario scenarioNotReceive = new ScenarioNotReceive()
     {
+
+        @Override
         public String getOutputDestinationName()
         {
             return getJmsConfig().getBroadcastDestinationName();

@@ -10,18 +10,25 @@
 
 package org.mule.transport.quartz;
 
-import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.functional.CountdownCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
+import org.mule.tck.junit4.FunctionalTestCase;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class QuartzFunctionalTestCase extends FunctionalTestCase
 {
+
     @Override
     protected String getConfigResources()
     {
         return "quartz-functional-test.xml";
     }
 
+    @Test
     public void testMuleReceiverJob() throws Exception
     {
         FunctionalTestComponent component = (FunctionalTestComponent) getComponent("quartzService1");

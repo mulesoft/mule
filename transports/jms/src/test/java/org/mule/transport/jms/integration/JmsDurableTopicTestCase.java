@@ -20,8 +20,10 @@ import org.junit.Test;
 
 public class JmsDurableTopicTestCase extends AbstractJmsFunctionalTestCase
 {
+
     private String clientId;
 
+    @Override
     protected String getConfigResources()
     {
         return "integration/jms-durable-topic.xml";
@@ -56,6 +58,8 @@ public class JmsDurableTopicTestCase extends AbstractJmsFunctionalTestCase
 
     Scenario scenarioNotReceive = new ScenarioNotReceive()
     {
+
+        @Override
         public String getOutputDestinationName()
         {
             return getJmsConfig().getBroadcastDestinationName();

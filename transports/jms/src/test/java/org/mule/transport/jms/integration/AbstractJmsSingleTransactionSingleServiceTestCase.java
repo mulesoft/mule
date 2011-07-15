@@ -18,9 +18,10 @@ import java.util.Properties;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
-
-import org.junit.Before;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * This tests single resource transactions through a single service definition (even
@@ -43,7 +44,6 @@ public abstract class AbstractJmsSingleTransactionSingleServiceTestCase extends 
     public static final String JMS_QUEUE_INPUT_CONF_E = "in5";
     public static final String JMS_QUEUE_OUTPUT_CONF_E = "out5";
 
-    @Before
     @Override
     protected void doSetUp() throws Exception
     {

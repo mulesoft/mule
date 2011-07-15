@@ -15,8 +15,14 @@ import javax.jms.TextMessage;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 public class JmsSingleTransactionRecieveAndSendTestCase extends AbstractJmsFunctionalTestCase
 {
+
+    @Override
     protected String getConfigResources()
     {
         return "integration/jms-single-tx-receive-send-in-one-tx.xml";

@@ -17,15 +17,17 @@ import org.junit.Test;
  */
 public class JmsSingleTransactionNoneTestCase extends AbstractJmsFunctionalTestCase
 {
+
+    @Override
     protected String getConfigResources()
     {
         return "integration/jms-single-tx-NONE.xml";
     }
 
     @Override
-    protected void suitePreSetUp() throws Exception
+    protected void doSetUp() throws Exception
     {
-        super.suitePreSetUp();
+        super.doSetUp();
 
         purge(getInboundQueueName());
         purge(getJmsConfig().getMiddleDestinationName());

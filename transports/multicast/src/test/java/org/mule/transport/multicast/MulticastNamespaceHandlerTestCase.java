@@ -9,19 +9,24 @@
  */
 package org.mule.transport.multicast;
 
-import org.mule.tck.FunctionalTestCase;
-import org.mule.transport.multicast.MulticastConnector;
+import org.mule.tck.junit4.FunctionalTestCase;
 
-/**
- * TODO
- */
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 public class MulticastNamespaceHandlerTestCase extends FunctionalTestCase
 {
+
+    @Override
     protected String getConfigResources()
     {
         return "multicast-namespace-config.xml";
     }
 
+    @Test
     public void testConfig() throws Exception
     {
         MulticastConnector c = (MulticastConnector)muleContext.getRegistry().lookupConnector("multicastConnector");

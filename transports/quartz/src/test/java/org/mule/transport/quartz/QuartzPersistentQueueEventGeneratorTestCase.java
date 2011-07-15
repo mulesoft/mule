@@ -12,11 +12,18 @@ package org.mule.transport.quartz;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transport.NullPayload;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 
 public class QuartzPersistentQueueEventGeneratorTestCase extends FunctionalTestCase
 {
+
     private static final long TIMEOUT = 30000;
 
     @Override
@@ -24,7 +31,8 @@ public class QuartzPersistentQueueEventGeneratorTestCase extends FunctionalTestC
     {
         return "quartz-persistent-event-generator.xml";
     }
-    
+
+    @Test
     public void testReceiveEvent() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);

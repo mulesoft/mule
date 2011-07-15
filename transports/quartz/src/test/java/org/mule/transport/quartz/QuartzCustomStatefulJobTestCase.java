@@ -10,14 +10,16 @@
 
 package org.mule.transport.quartz;
 
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
-
+import org.junit.Test;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.quartz.StatefulJob;
+
+import static org.junit.Assert.assertTrue;
 
 public class QuartzCustomStatefulJobTestCase extends FunctionalTestCase
 {
@@ -27,6 +29,7 @@ public class QuartzCustomStatefulJobTestCase extends FunctionalTestCase
         return "quartz-custom-stateful-job.xml";
     }
     
+    @Test
     public void testCustomStatefulJob() throws Exception
     {
         CountDownLatch eventLatch = (CountDownLatch) muleContext.getRegistry().lookupObject("latch");

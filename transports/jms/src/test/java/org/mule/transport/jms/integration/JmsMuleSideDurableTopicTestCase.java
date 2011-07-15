@@ -24,10 +24,16 @@ import javax.jms.TopicSession;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 public class JmsMuleSideDurableTopicTestCase extends AbstractJmsFunctionalTestCase
 {
+
     public static final String CONNECTOR1_NAME = "jmsConnectorC1";
 
+    @Override
     protected String getConfigResources()
     {
         return "integration/jms-muleside-durable-topic.xml";
@@ -47,7 +53,6 @@ public class JmsMuleSideDurableTopicTestCase extends AbstractJmsFunctionalTestCa
         logger.info(CONNECTOR1_NAME + " is started");
         receive(scenarioNoTx);
         receive(scenarioNoTx);
-
     }
 
     Scenario scenarioNoTx = new NonTransactedScenario()

@@ -13,7 +13,7 @@ package org.mule.transport.servlet.jetty;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.client.DefaultLocalMuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transport.http.HttpConnector;
 import org.mule.util.ClassUtils;
 
@@ -23,9 +23,18 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 public class WebappsTestCase extends FunctionalTestCase
 {
+
+    @Override
+    protected String getConfigResources()
+    {
+        return "jetty-webapps.xml";
+    }
 
     @Override
     protected boolean isStartContext()
@@ -50,24 +59,18 @@ public class WebappsTestCase extends FunctionalTestCase
         muleContext.start();
     }
 
+    @Test
     public void testWebapps() throws Exception
     {
         Map<String,Object> props = new HashMap<String,Object>();
         props.put(HttpConnector.HTTP_METHOD_PROPERTY, "GET");
-        
+
         DefaultLocalMuleClient client = new DefaultLocalMuleClient(muleContext);
-        MuleMessage result = client.send("http://localhost:63081/test/hello", 
+        MuleMessage result = client.send("http://localhost:63081/test/hello",
             new DefaultMuleMessage("", muleContext),
             props);
-        
+
         assertEquals("Hello", result.getPayloadAsString());
     }
-    
-    @Override
-    protected String getConfigResources()
-    {
-        return "jetty-webapps.xml";
-    }
-
 
 }

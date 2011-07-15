@@ -21,6 +21,8 @@ import org.junit.Test;
 public class JmsSingleTransactionSingleServiceJoinIfPossibleConfigurationTestCase extends
     AbstractJmsSingleTransactionSingleServiceTestCase
 {
+
+    @Override
     protected String getConfigResources()
     {
         return "integration/transactions/local/jms-single-tx-single-service-join-if-possible.xml";

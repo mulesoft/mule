@@ -10,7 +10,7 @@
 
 package org.mule.transport.jms.vendors;
 
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transport.jms.DefaultJmsTopicResolver;
 import org.mule.transport.jms.JmsConnector;
 import org.mule.transport.jms.activemq.ActiveMQJmsConnector;
@@ -21,14 +21,24 @@ import javax.jms.ConnectionFactory;
 import javax.jms.Session;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 public class ActiveMQJmsConnectorTestCase extends FunctionalTestCase
 {
+
+    @Override
     protected String getConfigResources()
     {
         return "integration/activemq-config.xml";
     }
 
+    @Test
     public void testConfigurationDefaults() throws Exception
     {
         JmsConnector c = (JmsConnector)muleContext.getRegistry().lookupConnector("jmsConnector");
@@ -45,6 +55,7 @@ public class ActiveMQJmsConnectorTestCase extends FunctionalTestCase
                    c.getTopicResolver() instanceof DefaultJmsTopicResolver);
     }
     
+    @Test
     public void testDefaultActiveMqConnectorConfig() throws Exception
     {
         JmsConnector c = (JmsConnector) muleContext.getRegistry().lookupConnector("activeMqJmsConnector");
@@ -71,6 +82,7 @@ public class ActiveMQJmsConnectorTestCase extends FunctionalTestCase
         assertEquals("1.0.2b", c.getSpecification());
     }
     
+    @Test
     public void testCustomActiveMqConnectorConfig() throws Exception
     {
         JmsConnector c = (JmsConnector) muleContext.getRegistry().lookupConnector("customActiveMqJmsConnector");

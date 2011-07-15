@@ -11,23 +11,30 @@
 package org.mule.transport.quartz;
 
 import org.mule.api.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.functional.CountdownCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transport.NullPayload;
 import org.mule.transport.quartz.jobs.ScheduledDispatchJobConfig;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 public class QuartzCustomJobFromMessageTestCase extends FunctionalTestCase
 {
+
     @Override
     protected String getConfigResources()
     {
         return "quartz-receive-dispatch-delegating-job.xml";
     }
 
+    @Test
     public void testDelegatingJobAsProperty() throws Exception
     {
         FunctionalTestComponent component = (FunctionalTestComponent) getComponent("scheduledService");
@@ -50,6 +57,7 @@ public class QuartzCustomJobFromMessageTestCase extends FunctionalTestCase
         component.setEventCallback(null);
     }
 
+    @Test
     public void testDelegatingJobAsPayload() throws Exception
     {
         FunctionalTestComponent component = (FunctionalTestComponent) getComponent("scheduledService");

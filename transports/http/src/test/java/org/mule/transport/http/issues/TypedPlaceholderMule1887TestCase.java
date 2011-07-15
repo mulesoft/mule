@@ -13,6 +13,8 @@ package org.mule.transport.http.issues;
 import org.mule.transport.http.AbstractNamespaceHandlerTestCase;
 import org.mule.transport.http.HttpConnector;
 
+import org.junit.Test;
+
 public class TypedPlaceholderMule1887TestCase extends AbstractNamespaceHandlerTestCase
 {
 
@@ -21,11 +23,13 @@ public class TypedPlaceholderMule1887TestCase extends AbstractNamespaceHandlerTe
         super("http");
     }
 
+    @Override
     protected String getConfigResources()
     {
         return "typed-placeholder-mule-1887-test.xml";
     }
 
+    @Test
     public void testConnectorProperties()
     {
         HttpConnector connector =

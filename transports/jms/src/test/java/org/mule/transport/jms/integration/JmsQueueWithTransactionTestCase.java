@@ -16,8 +16,13 @@ import org.mule.module.client.MuleClient;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 public class JmsQueueWithTransactionTestCase extends AbstractJmsFunctionalTestCase
 {
+
+    @Override
     protected String getConfigResources()
     {
         return "integration/jms-queue-with-transaction.xml";
