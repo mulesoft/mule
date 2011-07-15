@@ -42,18 +42,17 @@ import org.junit.runners.Parameterized.Parameters;
  */
 public class MuleEndpointConfigurationTestCase extends AbstractServiceAndFlowTestCase
 {
-
-    public MuleEndpointConfigurationTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
-
     @Parameters
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
             {ConfigVariant.SERVICE, "org/mule/test/integration/test-endpoints-config-service.xml"},
             {ConfigVariant.FLOW, "org/mule/test/integration/test-endpoints-config-flow.xml"}});
+    }
+
+    public MuleEndpointConfigurationTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
     }
 
     @Test
@@ -82,7 +81,6 @@ public class MuleEndpointConfigurationTestCase extends AbstractServiceAndFlowTes
             assertEquals("udp", endpoint.getConnector().getProtocol().toLowerCase());
             assertEquals("udp://localhost:56731", endpoint.getEndpointURI().getAddress());
             assertTrue(endpoint instanceof OutboundEndpoint);
-
             endpoint = (ImmutableEndpoint) router2.getRoutes().get(1);
             assertEquals("test", endpoint.getConnector().getProtocol().toLowerCase());
             assertEquals("test.queue2", endpoint.getEndpointURI().getAddress());
@@ -168,7 +166,6 @@ public class MuleEndpointConfigurationTestCase extends AbstractServiceAndFlowTes
     public void testComponent4OutboundEndpoint() throws Exception
     {
         Object serviceFlow = muleContext.getRegistry().lookupObject("TestComponent4");
-
         if (serviceFlow instanceof Service)
         {
             assertNotNull(serviceFlow);
@@ -210,7 +207,6 @@ public class MuleEndpointConfigurationTestCase extends AbstractServiceAndFlowTes
     public void testComponent5RouterEndpoints() throws Exception
     {
         Object serviceFlow = muleContext.getRegistry().lookupObject("TestComponent5");
-
         if (serviceFlow instanceof Service)
         {
             assertNotNull(serviceFlow);

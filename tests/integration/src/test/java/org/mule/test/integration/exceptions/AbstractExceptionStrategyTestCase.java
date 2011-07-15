@@ -11,7 +11,7 @@
 package org.mule.test.integration.exceptions;
 
 import org.mule.api.client.LocalMuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.testmodels.mule.TestExceptionStrategy;
 import org.mule.tck.testmodels.mule.TestExceptionStrategy.ExceptionCallback;
 import org.mule.util.concurrent.Latch;
@@ -60,7 +60,6 @@ public abstract class AbstractExceptionStrategyTestCase extends FunctionalTestCa
                 latch.countDown();
             }
         });
-
     }
 
     @Override

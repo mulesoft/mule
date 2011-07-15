@@ -14,20 +14,27 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
 
 import java.util.concurrent.atomic.AtomicBoolean;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class ChainingRouterPropertyPropagationTestCase extends FunctionalTestCase
 {
 
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/test/integration/routing/outbound/chaining-router-properties-propagation-config.xml";
     }
 
+    @Test
     public void testPropertiesPropagation() throws Exception
     {
         FunctionalTestComponent hop1 = getFunctionalTestComponent("hop1Service");

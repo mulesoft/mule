@@ -12,10 +12,15 @@ package org.mule.test.integration.exceptions;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 
-// TODO This test case is illogical because if the request is end-to-end synchronous, no exception strategy 
-// will be called, the exception is simple returned to the client.
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+//TODO This test case is illogical because if the request is end-to-end synchronous, no exception strategy
+//will be called, the exception is simple returned to the client.
 public class ExceptionStrategyReturnMessageTestCase extends FunctionalTestCase
 {
     @Override
@@ -24,6 +29,7 @@ public class ExceptionStrategyReturnMessageTestCase extends FunctionalTestCase
         return "org/mule/test/integration/exceptions/exception-strategy-return-message.xml";
     }
 
+    @Test
     public void testExceptionMessage() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);

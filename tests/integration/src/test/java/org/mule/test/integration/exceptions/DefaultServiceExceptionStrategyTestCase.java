@@ -36,11 +36,6 @@ import org.junit.runners.Parameterized.Parameters;
 
 public class DefaultServiceExceptionStrategyTestCase extends AbstractServiceAndFlowTestCase
 {
-    public DefaultServiceExceptionStrategyTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
-
     @Parameters
     public static Collection<Object[]> parameters()
     {
@@ -49,6 +44,11 @@ public class DefaultServiceExceptionStrategyTestCase extends AbstractServiceAndF
                 "org/mule/test/integration/exceptions/default-service-exception-strategy-config-service.xml"},
             {ConfigVariant.FLOW,
                 "org/mule/test/integration/exceptions/default-service-exception-strategy-config-flow.xml"}});
+    }
+
+    public DefaultServiceExceptionStrategyTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
     }
 
     @Test
@@ -153,11 +153,13 @@ public class DefaultServiceExceptionStrategyTestCase extends AbstractServiceAndF
         Prober prober = new PollingProber(5000, 100);
         prober.check(new Probe()
         {
+            @Override
             public boolean isSatisfied()
             {
                 return !service.getLifecycleState().isStarted();
             }
 
+            @Override
             public String describeFailure()
             {
                 return "Service was not stopped after processing the exception";

@@ -25,12 +25,7 @@ import org.junit.runners.Parameterized.Parameters;
  */
 public class MessageVersionCompatibilityTestCase extends AbstractServiceAndFlowTestCase
 {
-    private int TIMEOUT = 5000;
-    
-    public MessageVersionCompatibilityTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
+    private final int TIMEOUT = 5000;
 
     @Parameters
     public static Collection<Object[]> parameters()
@@ -39,7 +34,12 @@ public class MessageVersionCompatibilityTestCase extends AbstractServiceAndFlowT
             {ConfigVariant.SERVICE, "org/mule/test/integration/messaging/message-version-compatibility-service.xml"},
             {ConfigVariant.FLOW, "org/mule/test/integration/messaging/message-version-compatibility-flow.xml"}
         });
-    }    
+    }
+
+    public MessageVersionCompatibilityTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
+    }
 
     @Test
     public void testOldToOld() throws Exception
@@ -74,7 +74,7 @@ public class MessageVersionCompatibilityTestCase extends AbstractServiceAndFlowT
         // "java.lang.IllegalArgumentException: Session variable ... is malfomed and cannot be read"
         assertNull(reply);
     }
-    
+
     @Test
     public void testNewToNew() throws Exception
     {

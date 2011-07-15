@@ -24,11 +24,6 @@ public class MuleClientInThreadTestCase extends AbstractServiceAndFlowTestCase
 {
     int numMessages = 100000;
 
-    public MuleClientInThreadTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
-
     @Parameters
     public static Collection<Object[]> parameters()
     {
@@ -36,15 +31,20 @@ public class MuleClientInThreadTestCase extends AbstractServiceAndFlowTestCase
             {ConfigVariant.SERVICE, "org/mule/test/integration/client/client-in-thread-service.xml"},
             {ConfigVariant.FLOW, "org/mule/test/integration/client/client-in-thread-flow.xml"}
         });
-    }    
-    
+    }
+
+    public MuleClientInThreadTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
+    }
+
     @Test
     public void testException() throws Exception
     {
         Thread tester1 = new Tester();
         tester1.start();
     }
-    
+
     class Tester extends Thread
     {
         @Override
@@ -53,12 +53,12 @@ public class MuleClientInThreadTestCase extends AbstractServiceAndFlowTestCase
             try
             {
                 MuleClient client = new MuleClient(muleContext);
-                
+
                 for (int i = 0; i < numMessages; ++i)
                 {
                     client.dispatch("vm://in", "test", null);
                 }
-    
+
                 MuleMessage msg;
                 for (int i = 0; i < numMessages; ++i)
                 {
@@ -70,6 +70,6 @@ public class MuleClientInThreadTestCase extends AbstractServiceAndFlowTestCase
             {
                 fail(e.getMessage());
             }
-        }        
+        }
     }
 }

@@ -10,30 +10,25 @@
 
 package org.mule.test.integration.construct;
 
+import org.mule.module.client.MuleClient;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.test.integration.tck.WeatherForecaster;
+
 import java.util.Arrays;
 import java.util.Collection;
 
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
-import org.mule.tck.junit4.rule.DynamicPort;
-import org.mule.test.integration.tck.WeatherForecaster;
 
 public class WSProxyTestCase extends AbstractServiceAndFlowTestCase
 {
     @Rule
     public DynamicPort port1 = new DynamicPort("port1");
-    
+
     @Rule
     public DynamicPort port2 = new DynamicPort("port2");
-    
-    public WSProxyTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-
-    }
 
     private MuleClient muleClient;
 
@@ -46,6 +41,11 @@ public class WSProxyTestCase extends AbstractServiceAndFlowTestCase
         });
     }
 
+    public WSProxyTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
+//        setDisposeContextPerClass(true);
+    }
 
     @Override
     protected void doSetUp() throws Exception
@@ -137,5 +137,4 @@ public class WSProxyTestCase extends AbstractServiceAndFlowTestCase
 
         assertEquals(new WeatherForecaster().getByZipCode("95050"), weatherForecast);
     }
-
 }

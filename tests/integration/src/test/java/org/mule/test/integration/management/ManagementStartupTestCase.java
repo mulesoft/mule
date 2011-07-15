@@ -12,16 +12,23 @@ package org.mule.test.integration.management;
 
 import org.mule.api.MuleException;
 import org.mule.module.management.agent.JmxAgent;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class ManagementStartupTestCase extends FunctionalTestCase
 {
 
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/test/integration/management/management-startup-test.xml";
     }
 
+    @Test
     public void testAgentConfiguration() throws MuleException
     {
         JmxAgent agent = muleContext.getRegistry().lookupObject(JmxAgent.class);

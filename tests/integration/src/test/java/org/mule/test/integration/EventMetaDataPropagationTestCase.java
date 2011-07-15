@@ -20,12 +20,12 @@ import org.mule.api.MuleSession;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.Callable;
 import org.mule.api.service.Service;
+import org.mule.construct.Flow;
 import org.mule.service.ServiceCompositeMessageSource;
 import org.mule.session.DefaultMuleSession;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.transformer.AbstractMessageAwareTransformer;
-import org.mule.construct.Flow;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -43,17 +43,17 @@ import org.junit.runners.Parameterized.Parameters;
 
 public class EventMetaDataPropagationTestCase extends AbstractServiceAndFlowTestCase
 {
-    public EventMetaDataPropagationTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
-
     @Parameters
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
             {ConfigVariant.SERVICE, "org/mule/test/integration/event-metadata-propagation-config-service.xml"},
             {ConfigVariant.FLOW, "org/mule/test/integration/event-metadata-propagation-config-flow.xml"}});
+    }
+
+    public EventMetaDataPropagationTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
     }
 
     @Test
@@ -79,6 +79,7 @@ public class EventMetaDataPropagationTestCase extends AbstractServiceAndFlowTest
 
     public static class DummyComponent implements Callable
     {
+        @Override
         public Object onCall(MuleEventContext context) throws Exception
         {
             if ("component1".equals(context.getFlowConstruct().getName()))
@@ -93,21 +94,25 @@ public class EventMetaDataPropagationTestCase extends AbstractServiceAndFlowTest
                 MuleMessage msg = new DefaultMuleMessage(context.getMessageAsString(), props, muleContext);
                 msg.addAttachment("test1", new DataHandler(new DataSource()
                 {
+                    @Override
                     public InputStream getInputStream() throws IOException
                     {
                         return null;
                     }
 
+                    @Override
                     public OutputStream getOutputStream() throws IOException
                     {
                         return null;
                     }
 
+                    @Override
                     public String getContentType()
                     {
                         return "text/plain";
                     }
 
+                    @Override
                     public String getName()
                     {
                         return "test1";

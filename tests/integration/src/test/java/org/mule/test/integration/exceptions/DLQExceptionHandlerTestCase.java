@@ -12,8 +12,8 @@ package org.mule.test.integration.exceptions;
 
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
 import org.mule.message.ExceptionMessage;
+import org.mule.module.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 
 import java.util.Arrays;
@@ -24,17 +24,17 @@ import org.junit.runners.Parameterized.Parameters;
 
 public class DLQExceptionHandlerTestCase extends AbstractServiceAndFlowTestCase
 {
-    public DLQExceptionHandlerTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
-
     @Parameters
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
             {ConfigVariant.SERVICE, "org/mule/test/integration/exceptions/exception-dlq-service.xml"},
             {ConfigVariant.FLOW, "org/mule/test/integration/exceptions/exception-dlq-flow.xml"}});
+    }
+
+    public DLQExceptionHandlerTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
     }
 
     @Test

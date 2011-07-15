@@ -13,20 +13,17 @@ package org.mule.test.integration.message;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.transport.NullPayload;
 
 import java.util.Arrays;
 import java.util.Collection;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
-public class MessagePropertyScopesTestCase extends AbstractServiceAndFlowTestCase {
-
-    public MessagePropertyScopesTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
-
+public class MessagePropertyScopesTestCase extends AbstractServiceAndFlowTestCase
+{
     @Parameters
     public static Collection<Object[]> parameters()
     {
@@ -34,8 +31,13 @@ public class MessagePropertyScopesTestCase extends AbstractServiceAndFlowTestCas
             {ConfigVariant.SERVICE, "org/mule/test/integration/messaging/message-property-scopes-config-service.xml"},
             {ConfigVariant.FLOW, "org/mule/test/integration/messaging/message-property-scopes-config-flow.xml"}
         });
-    }      
-    
+    }
+
+    public MessagePropertyScopesTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
+    }
+
     @Test
     public void testSessionProperty() throws Exception {
 
@@ -47,13 +49,13 @@ public class MessagePropertyScopesTestCase extends AbstractServiceAndFlowTestCas
         assertEquals("java.util.Date", payload);
     }
 
-    /* Test fails
-    public void testInvocationProperty() throws Exception {
-        
-        MuleClient client = new MuleClient();
+    @Ignore
+    @Test
+    public void testInvocationProperty() throws Exception
+    {
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage response = client.send("vm://in2", "Hello World", null);
         // scope = "invocation" should not propagate the property on to the next service
         assertTrue(response.getPayload() instanceof NullPayload);
     }
-    */
 }

@@ -20,11 +20,6 @@ import org.junit.runners.Parameterized.Parameters;
 
 public class MultipleCollectionAggregatorsTestCase extends AbstractServiceAndFlowTestCase
 {
-    public MultipleCollectionAggregatorsTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
-
     @Parameters
     public static Collection<Object[]> parameters()
     {
@@ -32,8 +27,13 @@ public class MultipleCollectionAggregatorsTestCase extends AbstractServiceAndFlo
             {ConfigVariant.SERVICE, "multiple-collection-aggregators-config-service.xml"},
             {ConfigVariant.FLOW, "multiple-collection-aggregators-config-flow.xml"}
         });
-    }      
-    
+    }
+
+    public MultipleCollectionAggregatorsTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
+    }
+
     @Test
     public void testStartsCorrectly()
     {

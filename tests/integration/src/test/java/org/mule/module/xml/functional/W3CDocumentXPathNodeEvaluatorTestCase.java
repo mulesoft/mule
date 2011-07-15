@@ -10,15 +10,16 @@
 
 package org.mule.module.xml.functional;
 
+import org.mule.DefaultMuleMessage;
+import org.mule.api.MuleMessage;
+import org.mule.api.client.MuleClient;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+
 import java.util.Arrays;
 import java.util.Collection;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-import org.mule.DefaultMuleMessage;
-import org.mule.api.MuleMessage;
-import org.mule.api.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.w3c.dom.Node;
 
 public class W3CDocumentXPathNodeEvaluatorTestCase extends AbstractServiceAndFlowTestCase
@@ -31,11 +32,6 @@ public class W3CDocumentXPathNodeEvaluatorTestCase extends AbstractServiceAndFlo
         "    <length>120</length>" +
         "  </table>" +
         "</root>";
-    
-    public W3CDocumentXPathNodeEvaluatorTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
 
     @Parameters
     public static Collection<Object[]> parameters()
@@ -46,7 +42,11 @@ public class W3CDocumentXPathNodeEvaluatorTestCase extends AbstractServiceAndFlo
         });
     }
 
-   
+    public W3CDocumentXPathNodeEvaluatorTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
+    }
+
     @Test
     public void testW3CDocument() throws Exception
     {

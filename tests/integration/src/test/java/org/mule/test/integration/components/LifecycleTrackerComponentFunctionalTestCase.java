@@ -26,11 +26,6 @@ import org.junit.runners.Parameterized.Parameters;
  */
 public class LifecycleTrackerComponentFunctionalTestCase extends AbstractServiceAndFlowTestCase
 {
-    public LifecycleTrackerComponentFunctionalTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
-
     @Parameters
     public static Collection<Object[]> parameters()
     {
@@ -40,13 +35,18 @@ public class LifecycleTrackerComponentFunctionalTestCase extends AbstractService
             {ConfigVariant.FLOW, "org/mule/test/integration/components/component-lifecycle-config-flow.xml"}});
     }
 
+    public LifecycleTrackerComponentFunctionalTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
+    }
+
     /**
      * ASSERT: - Mule stop/start lifecycle methods invoked - Mule initialize/dipose
      * lifecycle methods NOT invoked - Spring lifecycle methods invoked - Service and
      * muleContext injected (Component implements ServiceAware/MuleContextAware)
      * NOTE: muleContext is injected twice, once by registry and once by
      * lifecycleAdaptor
-     * 
+     *
      * @throws Exception
      */
     @Test
@@ -72,7 +72,7 @@ public class LifecycleTrackerComponentFunctionalTestCase extends AbstractService
      * and muleContext injected (Component implements ServiceAware/MuleContextAware)
      * NOTE: muleContext is injected twice, once by registry and once by
      * lifecycleAdaptor
-     * 
+     *
      * @throws Exception
      */
     @Test
@@ -95,7 +95,7 @@ public class LifecycleTrackerComponentFunctionalTestCase extends AbstractService
     /**
      * ASSERT: - Mule lifecycle methods invoked - Service and muleContext injected
      * (Component implements ServiceAware/MuleContextAware)
-     * 
+     *
      * @throws Exception
      */
     @Test
@@ -118,7 +118,7 @@ public class LifecycleTrackerComponentFunctionalTestCase extends AbstractService
     /**
      * ASSERT: - Mule lifecycle methods invoked - Service and muleContext injected
      * (Component implements ServiceAware/MuleContextAware)
-     * 
+     *
      * @throws Exception
      */
     @Test
@@ -141,7 +141,7 @@ public class LifecycleTrackerComponentFunctionalTestCase extends AbstractService
     /**
      * ASSERT: - Mule lifecycle methods invoked - Service and muleContext injected
      * (Component implements ServiceAware/MuleContextAware)
-     * 
+     *
      * @throws Exception
      */
     @Test
@@ -166,7 +166,7 @@ public class LifecycleTrackerComponentFunctionalTestCase extends AbstractService
      * new object in pool - Service and muleContext injected each time singleton is
      * used to create new object in pool (Component implements
      * ServiceAware/MuleContextAware)
-     * 
+     *
      * @throws Exception
      */
     @Test

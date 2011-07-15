@@ -13,16 +13,23 @@ package org.mule.test.integration.client;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class MuleClientTestCase extends FunctionalTestCase
 {
 
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/test/integration/client/test-client-mule-config.xml";
     }
 
+    @Test
     public void testClientSendDirect() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -32,6 +39,7 @@ public class MuleClientTestCase extends FunctionalTestCase
         assertEquals("Test Client Send message Received", message.getPayload());
     }
 
+    @Test
     public void testClientDispatchDirect() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -39,6 +47,7 @@ public class MuleClientTestCase extends FunctionalTestCase
         client.dispatchDirect("TestReceiverUMO", "Test Client dispatch message", null);
     }
 
+    @Test
     public void testClientSendGlobalEndpoint() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -48,6 +57,7 @@ public class MuleClientTestCase extends FunctionalTestCase
         assertEquals("Test Client Send message Received", message.getPayload());
     }
 
+    @Test
     public void testClientSend() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -57,6 +67,7 @@ public class MuleClientTestCase extends FunctionalTestCase
         assertEquals("Test Client Send message Received", message.getPayload());
     }
 
+    @Test
     public void testClientMultiSend() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -69,6 +80,7 @@ public class MuleClientTestCase extends FunctionalTestCase
         }
     }
 
+    @Test
     public void testClientMultidispatch() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);

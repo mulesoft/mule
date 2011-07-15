@@ -22,20 +22,11 @@ import org.mule.tck.exceptions.FunctionalTestException;
 import java.util.Arrays;
 import java.util.Collection;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
 public class ExceptionStrategyConstructsTestCase extends AbstractServiceAndFlowTestCase
 {
-    protected transient Log logger = LogFactory.getLog(getClass());
-
-    public ExceptionStrategyConstructsTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
-
     @Parameters
     public static Collection<Object[]> parameters()
     {
@@ -44,6 +35,11 @@ public class ExceptionStrategyConstructsTestCase extends AbstractServiceAndFlowT
                 "org/mule/test/integration/exceptions/exception-strategy-constructs-config-service.xml"},
             {ConfigVariant.FLOW,
                 "org/mule/test/integration/exceptions/exception-strategy-constructs-config-flow.xml"}});
+    }
+
+    public ExceptionStrategyConstructsTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
     }
 
     @Test
@@ -93,6 +89,7 @@ public class ExceptionStrategyConstructsTestCase extends AbstractServiceAndFlowT
 
     public static class ExceptionThrowingProcessor implements MessageProcessor
     {
+        @Override
         public MuleEvent process(MuleEvent event) throws MuleException
         {
             throw new FunctionalTestException();
@@ -106,5 +103,4 @@ public class ExceptionStrategyConstructsTestCase extends AbstractServiceAndFlowT
             throw new FunctionalTestException();
         }
     }
-
 }

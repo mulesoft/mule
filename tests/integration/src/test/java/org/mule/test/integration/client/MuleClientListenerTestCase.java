@@ -24,13 +24,9 @@ import java.util.Collection;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
+
 public class MuleClientListenerTestCase extends AbstractServiceAndFlowTestCase
 {
-    public MuleClientListenerTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
-
     @Parameters
     public static Collection<Object[]> parameters()
     {
@@ -38,6 +34,11 @@ public class MuleClientListenerTestCase extends AbstractServiceAndFlowTestCase
             {ConfigVariant.SERVICE,
                 "org/mule/test/integration/client/mule-client-listener-config-service.xml"},
             {ConfigVariant.FLOW, "org/mule/test/integration/client/mule-client-listener-config-flow.xml"}});
+    }
+
+    public MuleClientListenerTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
     }
 
     public void doTestRegisterListener(String component, String endpoint, boolean canSendWithoutReceiver)
@@ -53,7 +54,6 @@ public class MuleClientListenerTestCase extends AbstractServiceAndFlowTestCase
         {
             if (!canSendWithoutReceiver)
             {
-                assertTrue(e instanceof DispatchException);
                 assertTrue(e.getCause() instanceof NoReceiverForEndpointException);
             }
         }
@@ -81,7 +81,6 @@ public class MuleClientListenerTestCase extends AbstractServiceAndFlowTestCase
         {
             if (!canSendWithoutReceiver)
             {
-                assertTrue(e instanceof DispatchException);
                 assertTrue(e.getCause() instanceof NoReceiverForEndpointException);
             }
         }
@@ -98,5 +97,4 @@ public class MuleClientListenerTestCase extends AbstractServiceAndFlowTestCase
     {
         doTestRegisterListener("tcpComponent", "tcp://localhost:56324", true);
     }
-
 }

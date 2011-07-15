@@ -23,16 +23,16 @@ import org.junit.runners.Parameterized.Parameters;
 
 public class JXPathTestCase extends AbstractServiceAndFlowTestCase
 {
-    public JXPathTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
-
     @Parameters
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{{ConfigVariant.SERVICE, "jxpath-config-service.xml"},
             {ConfigVariant.FLOW, "jxpath-config-flow.xml"}});
+    }
+
+    public JXPathTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
     }
 
     @Test
@@ -68,7 +68,7 @@ public class JXPathTestCase extends AbstractServiceAndFlowTestCase
 
         doTest(xml);
     }
-    
+
     private void doTest(String xml) throws MuleException
     {
         MuleClient client = new MuleClient(muleContext);

@@ -10,11 +10,6 @@
 
 package org.mule.test.integration.interceptor;
 
-import java.util.Arrays;
-import java.util.Collection;
-
-import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
@@ -23,14 +18,14 @@ import org.mule.api.interceptor.Interceptor;
 import org.mule.processor.AbstractInterceptingMessageProcessor;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 
+import java.util.Arrays;
+import java.util.Collection;
+
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+
 public class SharedInterceptorStackTestCase extends AbstractServiceAndFlowTestCase
 {
-    
-    public SharedInterceptorStackTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
-
     @Parameters
     public static Collection<Object[]> parameters()
     {
@@ -39,12 +34,17 @@ public class SharedInterceptorStackTestCase extends AbstractServiceAndFlowTestCa
             {ConfigVariant.FLOW, "shared-interceptor-stack-flow.xml"}
         });
     }
-    
+
+    public SharedInterceptorStackTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
+    }
+
     @Test
     public void testSharedInterceptorOnServiceOne() throws MuleException
     {
         MuleClient client = muleContext.getClient();
-        
+
         MuleMessage response = client.send("vm://stackOne", TEST_MESSAGE, null);
         assertEquals(TEST_MESSAGE + " CustomInterceptor ComponentOne", response.getPayload());
     }
@@ -53,13 +53,14 @@ public class SharedInterceptorStackTestCase extends AbstractServiceAndFlowTestCa
     public void testSharedInterceptorOnServiceTwo() throws MuleException
     {
         MuleClient client = muleContext.getClient();
-        
+
         MuleMessage response = client.send("vm://stackTwo", TEST_MESSAGE, null);
         assertEquals(TEST_MESSAGE + " CustomInterceptor ComponentTwo", response.getPayload());
     }
 
     public static class CustomInterceptor extends AbstractInterceptingMessageProcessor implements Interceptor
     {
+        @Override
         public MuleEvent process(MuleEvent event) throws MuleException
         {
             MuleMessage message = event.getMessage();
@@ -72,12 +73,12 @@ public class SharedInterceptorStackTestCase extends AbstractServiceAndFlowTestCa
     public static class CustomComponent
     {
         private String appendString;
-        
+
         public String process(String input)
         {
             return input + appendString;
         }
-        
+
         public void setAppendString(String string)
         {
             this.appendString = string;

@@ -12,20 +12,27 @@ package org.mule.test.integration.message;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.NonSerializableObject;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @see EE-1821
  */
 public class SessionPropertyChainingRouterTestCase extends FunctionalTestCase
 {
+
     @Override
     protected String getConfigResources()
     {
         return "org/mule/test/integration/messaging/session-property-chaining-router.xml";
     }
 
+    @Test
     public void testRouter() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);

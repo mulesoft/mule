@@ -10,19 +10,19 @@
 
 package org.mule.module.xml.functional;
 
+import org.mule.api.MuleMessage;
+import org.mule.module.client.MuleClient;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+
 import java.util.Arrays;
 import java.util.Collection;
 
 import org.custommonkey.xmlunit.XMLAssert;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
 
 public class XPathNodeExpressionEvaluatorTestCase extends AbstractServiceAndFlowTestCase
 {
-
     private static final String SAMPLE_REQUEST =
             "<root>" +
             "<table>" +
@@ -36,11 +36,6 @@ public class XPathNodeExpressionEvaluatorTestCase extends AbstractServiceAndFlow
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
             "<name>African Coffee Table</name>";
 
-    public XPathNodeExpressionEvaluatorTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
-
     @Parameters
     public static Collection<Object[]> parameters()
     {
@@ -49,7 +44,12 @@ public class XPathNodeExpressionEvaluatorTestCase extends AbstractServiceAndFlow
             {ConfigVariant.FLOW, "org/mule/module/xml/xpath-node-config-flow.xml"}
         });
     }
-    
+
+    public XPathNodeExpressionEvaluatorTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
+    }
+
     @Test
     public void testExpressionTransformerUsingXpathNode() throws Exception
     {

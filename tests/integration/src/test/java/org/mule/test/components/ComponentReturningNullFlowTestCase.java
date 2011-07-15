@@ -23,17 +23,17 @@ import org.junit.runners.Parameterized.Parameters;
 
 public class ComponentReturningNullFlowTestCase extends AbstractServiceAndFlowTestCase
 {
-    public ComponentReturningNullFlowTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
-
     @Parameters
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
             {ConfigVariant.SERVICE, "org/mule/test/components/component-returned-null-service.xml"},
             {ConfigVariant.FLOW, "org/mule/test/components/component-returned-null-flow.xml"}});
+    }
+
+    public ComponentReturningNullFlowTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
     }
 
     @Test

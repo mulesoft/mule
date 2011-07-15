@@ -10,6 +10,10 @@
 
 package org.mule.test.integration.config;
 
+import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.transformer.Transformer;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
@@ -17,24 +21,20 @@ import java.util.List;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-import org.mule.api.endpoint.ImmutableEndpoint;
-import org.mule.api.transformer.Transformer;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
 
 public class ResponseTransformerTestCase extends AbstractServiceAndFlowTestCase
 {
-
-    public ResponseTransformerTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
-
     @Parameters
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
             {ConfigVariant.SERVICE, "org/mule/test/integration/config/response-transformer-test-service.xml"},
             {ConfigVariant.FLOW, "org/mule/test/integration/config/response-transformer-test-flow.xml"}});
+    }
+
+    public ResponseTransformerTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
     }
 
     @Test
@@ -49,15 +49,14 @@ public class ResponseTransformerTestCase extends AbstractServiceAndFlowTestCase
         checkNames("response", endpoint.getResponseTransformers());
     }
 
-    protected void checkNames(String prefix, List transformers)
+    protected void checkNames(String prefix, List<Transformer> transformers)
     {
-        Iterator iterator = transformers.iterator();
+        Iterator<Transformer> iterator = transformers.iterator();
         for (int count = 1; iterator.hasNext(); count++)
         {
-            Transformer transformer = (Transformer) iterator.next();
+            Transformer transformer = iterator.next();
             logger.debug(transformer);
             assertEquals(prefix + count, transformer.getName());
         }
     }
-
 }

@@ -14,12 +14,19 @@ import org.mule.api.MuleMessage;
 import org.mule.api.lifecycle.Callable;
 import org.mule.message.ExceptionMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.util.IOUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 public class MulticastRouterTestCase extends FunctionalTestCase
 {
@@ -32,6 +39,7 @@ public class MulticastRouterTestCase extends FunctionalTestCase
         return "org/mule/test/integration/routing/outbound/multicasting-router-config.xml";
     }
 
+    @Test
     public void testAll() throws Exception
     {
         ByteArrayInputStream bis = new ByteArrayInputStream("Hello, world".getBytes("UTF-8"));
@@ -46,6 +54,7 @@ public class MulticastRouterTestCase extends FunctionalTestCase
         assertTrue(payload instanceof ExceptionMessage);
     }
 
+    @Test
     public void testFirstSuccessful() throws Exception
     {
         ByteArrayInputStream bis = new ByteArrayInputStream("Hello, world".getBytes("UTF-8"));

@@ -27,17 +27,17 @@ import org.junit.runners.Parameterized.Parameters;
  */
 public class EntryPointResolverCacheTestCase extends AbstractServiceAndFlowTestCase
 {
-    public EntryPointResolverCacheTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
-
     @Parameters
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
             {ConfigVariant.SERVICE, "org/mule/test/components/entry-point-resolver-cache-service.xml"},
             {ConfigVariant.FLOW, "org/mule/test/components/entry-point-resolver-cache-flow.xml"}});
+    }
+
+    public EntryPointResolverCacheTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
     }
 
     @Test
@@ -81,6 +81,7 @@ public class EntryPointResolverCacheTestCase extends AbstractServiceAndFlowTestC
 
     public static class RefDataServiceOne implements ReferenceDataService
     {
+        @Override
         public String retrieveReferenceData(String refKey)
         {
             return "ServiceOne";
@@ -89,10 +90,10 @@ public class EntryPointResolverCacheTestCase extends AbstractServiceAndFlowTestC
 
     public static class RefDataServiceTwo implements ReferenceDataService
     {
+        @Override
         public String retrieveReferenceData(String refKey)
         {
             return "ServiceTwo";
         }
-
     }
 }

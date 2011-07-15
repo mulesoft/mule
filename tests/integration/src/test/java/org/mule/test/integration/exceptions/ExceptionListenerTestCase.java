@@ -26,11 +26,6 @@ public class ExceptionListenerTestCase extends AbstractServiceAndFlowTestCase
 {
     private MuleClient client;
 
-    public ExceptionListenerTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
-
     @Parameters
     public static Collection<Object[]> parameters()
     {
@@ -38,8 +33,13 @@ public class ExceptionListenerTestCase extends AbstractServiceAndFlowTestCase
             {ConfigVariant.SERVICE, "org/mule/test/integration/exceptions/exception-listener-config-service.xml"},
             {ConfigVariant.FLOW, "org/mule/test/integration/exceptions/exception-listener-config-flow.xml"}
         });
-    }      
-    
+    }
+
+    public ExceptionListenerTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
+    }
+
     @Override
     protected void doSetUp() throws Exception
     {
@@ -53,7 +53,7 @@ public class ExceptionListenerTestCase extends AbstractServiceAndFlowTestCase
         assertQueueIsEmpty("vm://error.queue");
 
         client.send("vm://component.in", "test", null);
-        
+
         assertQueueIsEmpty("vm://component.out");
 
         MuleMessage message = client.request("vm://error.queue", 2000);

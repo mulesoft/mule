@@ -29,13 +29,7 @@ import org.junit.runners.Parameterized.Parameters;
  */
 public class ExceptionStrategyTransactionTestCase extends AbstractServiceAndFlowTestCase
 {
-
     private static String failure;
-
-    public ExceptionStrategyTransactionTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
 
     @Parameters
     public static Collection<Object[]> parameters()
@@ -44,8 +38,13 @@ public class ExceptionStrategyTransactionTestCase extends AbstractServiceAndFlow
             {ConfigVariant.SERVICE, "org/mule/test/integration/exceptions/exception-strategy-transaction-test-service.xml"},
             {ConfigVariant.FLOW, "org/mule/test/integration/exceptions/exception-strategy-transaction-test-flow.xml"}
         });
-    }      
-    
+    }
+
+    public ExceptionStrategyTransactionTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
+    }
+
     @Test
     public void testRequestReply() throws Exception
     {
@@ -68,7 +67,7 @@ public class ExceptionStrategyTransactionTestCase extends AbstractServiceAndFlow
         client.dispatch("InputQueueClient2", "payload", null);
 
         Thread.sleep(500);
-        
+
         if (failure != null)
         {
             fail(failure);
@@ -76,7 +75,7 @@ public class ExceptionStrategyTransactionTestCase extends AbstractServiceAndFlow
 
     }
 
-    static class AssertRollbackServiceExceptionStrategy extends DefaultMessagingExceptionStrategy
+    public static class AssertRollbackServiceExceptionStrategy extends DefaultMessagingExceptionStrategy
     {
         private int visits = 0;
 

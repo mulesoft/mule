@@ -10,14 +10,15 @@
 
 package org.mule.test.integration.components;
 
+import org.mule.api.MuleMessage;
+import org.mule.module.client.MuleClient;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+
 import java.util.Arrays;
 import java.util.Collection;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
 
 /**
  * This test re-written to use entry point resolvers.  As a consequence, some tests, which verified
@@ -34,18 +35,7 @@ public class NoArgsCallComponentTestCase extends AbstractServiceAndFlowTestCase
     public static final String DEFAULT_INPUT_MESSAGE = "test";
     public static final String DEFUALT_OUTPUT_MESSAGE = "Just an apple.";
 
-    public static final String SERVICE_DC_NAME="WORMS";
-    public static final String SERVICE_DI_NAME="TIRANA";
-
-    public static final String DELEGATE_DC_METHOD_NAME="toString";
-    public static final String DELEGATE_DI_METHOD_NAME="wash";
-
     public static final int TIMEOUT = 5000;
-
-    public NoArgsCallComponentTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
 
     @Parameters
     public static Collection<Object[]> parameters()
@@ -55,7 +45,12 @@ public class NoArgsCallComponentTestCase extends AbstractServiceAndFlowTestCase
             {ConfigVariant.FLOW, "org/mule/test/integration/components/no-args-call-component-functional-test-flow.xml"}
         });
     }
-    
+
+    public NoArgsCallComponentTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
+    }
+
     @Test
     public void testDelegateClass() throws Exception
     {
@@ -65,7 +60,6 @@ public class NoArgsCallComponentTestCase extends AbstractServiceAndFlowTestCase
         assertNotNull(message);
         assertEquals(message.getPayload(), DEFUALT_OUTPUT_MESSAGE);
         client.dispose();
-
     }
 
     @Test
@@ -79,7 +73,4 @@ public class NoArgsCallComponentTestCase extends AbstractServiceAndFlowTestCase
         // same as original input
         assertEquals(DEFAULT_INPUT_MESSAGE, reply.getPayload());
     }
-
-
-
 }

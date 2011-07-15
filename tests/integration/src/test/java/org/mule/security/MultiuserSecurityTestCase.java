@@ -10,14 +10,6 @@
 
 package org.mule.security;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-
-import org.junit.Ignore;
-import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 import org.mule.api.EncryptionStrategy;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
@@ -26,23 +18,25 @@ import org.mule.module.client.MuleClient;
 import org.mule.session.MuleSessionHandler;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.junit.Ignore;
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+
 /**
- * Tests multi-user security against a security provider which only authenticates 
- * a single user at a time (i.e., authentication of a new user overwrites the 
- * previous authentication).  
- * 
+ * Tests multi-user security against a security provider which only authenticates
+ * a single user at a time (i.e., authentication of a new user overwrites the
+ * previous authentication).
+ *
  * see EE-979
  */
 @Ignore
 public class MultiuserSecurityTestCase extends AbstractServiceAndFlowTestCase
 {
-    
-    public MultiuserSecurityTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-        
-    }
-
     @Parameters
     public static Collection<Object[]> parameters()
     {
@@ -50,8 +44,11 @@ public class MultiuserSecurityTestCase extends AbstractServiceAndFlowTestCase
             {ConfigVariant.SERVICE, "multiuser-security-test-service.xml, singleuser-security-provider.xml"},
             {ConfigVariant.FLOW, "multiuser-security-test-flow.xml, singleuser-security-provider.xml"}});
     }
-    
-    
+
+    public MultiuserSecurityTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
+    }
 
     @Test
     public void testMultipleAuthentications() throws Exception
@@ -62,7 +59,7 @@ public class MultiuserSecurityTestCase extends AbstractServiceAndFlowTestCase
         Map props;
 
         EncryptionStrategy strategy = muleContext.getSecurityManager().getEncryptionStrategy("PBE");
-        
+
         props = new HashMap();
         props.put(MuleProperties.MULE_USER_PROPERTY, MuleCredentials.createHeader("marie", "marie", "PBE", strategy));
         reply = client.send("vm://test", "Data1", props);
@@ -74,7 +71,7 @@ public class MultiuserSecurityTestCase extends AbstractServiceAndFlowTestCase
         reply = client.send("vm://test", "Data2", props);
         assertNotNull(reply);
         assertEquals("user = stan, logins = 1, color = metallic blue", reply.getPayload());
-        
+
         props = new HashMap();
         props.put(MuleProperties.MULE_USER_PROPERTY, MuleCredentials.createHeader("cindy", "cindy", "PBE", strategy));
         reply = client.send("vm://test", "Data3", props);
@@ -96,6 +93,6 @@ public class MultiuserSecurityTestCase extends AbstractServiceAndFlowTestCase
         props.put(MuleProperties.MULE_USER_PROPERTY, MuleCredentials.createHeader("stan", "stan", "PBE", strategy));
         reply = client.send("vm://test", "Data2", props);
         assertNotNull(reply);
-        assertEquals("user = stan, logins = 2, color = metallic blue", reply.getPayload());        
+        assertEquals("user = stan, logins = 2, color = metallic blue", reply.getPayload());
     }
 }

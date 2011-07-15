@@ -26,12 +26,6 @@ import org.junit.runners.Parameterized.Parameters;
  */
 public class TransientLifecycleTrackerComponentFunctionalTestCase extends AbstractServiceAndFlowTestCase
 {
-
-    public TransientLifecycleTrackerComponentFunctionalTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
-
     @Parameters
     public static Collection<Object[]> parameters()
     {
@@ -39,6 +33,11 @@ public class TransientLifecycleTrackerComponentFunctionalTestCase extends Abstra
             {ConfigVariant.SERVICE,
                 "org/mule/test/integration/components/component-lifecycle-config-service.xml"},
             {ConfigVariant.FLOW, "org/mule/test/integration/components/component-lifecycle-config-flow.xml"}});
+    }
+
+    public TransientLifecycleTrackerComponentFunctionalTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
     }
 
     /**

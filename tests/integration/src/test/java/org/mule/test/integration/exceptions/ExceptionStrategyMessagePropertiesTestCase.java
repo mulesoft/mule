@@ -24,13 +24,8 @@ import org.junit.runners.Parameterized.Parameters;
 
 public class ExceptionStrategyMessagePropertiesTestCase extends AbstractServiceAndFlowTestCase
 {
-    int numMessages = 100;
-    
-    public ExceptionStrategyMessagePropertiesTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
-    
+    private final int numMessages = 100;
+
     @Parameters
     public static Collection<Object[]> parameters()
     {
@@ -38,8 +33,13 @@ public class ExceptionStrategyMessagePropertiesTestCase extends AbstractServiceA
             {ConfigVariant.SERVICE, "org/mule/test/integration/exceptions/exception-strategy-message-properties-service.xml"},
             {ConfigVariant.FLOW, "org/mule/test/integration/exceptions/exception-strategy-message-properties-flow.xml"}
         });
-    }      
-    
+    }
+
+    public ExceptionStrategyMessagePropertiesTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
+    }
+
     @Test
     public void testException() throws Exception
     {
@@ -47,7 +47,7 @@ public class ExceptionStrategyMessagePropertiesTestCase extends AbstractServiceA
         Thread tester2 = new Tester();
         tester1.start();
         tester2.start();
-        
+
         MuleClient client = new MuleClient(muleContext);
         MuleMessage msg;
         for (int i = 0; i < numMessages; ++i)
@@ -55,9 +55,9 @@ public class ExceptionStrategyMessagePropertiesTestCase extends AbstractServiceA
             msg = client.request("vm://error", 5000);
             assertNotNull(msg);
             assertEquals("bar", msg.getInboundProperty("foo"));
-        }        
+        }
     }
-    
+
     class Tester extends Thread
     {
         @Override
@@ -66,18 +66,18 @@ public class ExceptionStrategyMessagePropertiesTestCase extends AbstractServiceA
             try
             {
                 MuleClient client = new MuleClient(muleContext);
-                
+
                 Map<String, Object> props = new HashMap<String, Object>();
                 props.put("foo", "bar");
                 for (int i = 0; i < numMessages; ++i)
                 {
                     client.dispatch("vm://in", "test", props);
-                }    
+                }
             }
             catch (Exception e)
             {
                 fail(e.getMessage());
             }
-        }        
+        }
     }
 }

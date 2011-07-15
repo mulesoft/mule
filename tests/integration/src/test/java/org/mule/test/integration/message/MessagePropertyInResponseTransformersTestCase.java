@@ -12,7 +12,11 @@ package org.mule.test.integration.message;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 
 /**
@@ -20,12 +24,14 @@ import org.mule.tck.FunctionalTestCase;
  */
 public class MessagePropertyInResponseTransformersTestCase extends FunctionalTestCase
 {
+
     @Override
     protected String getConfigResources()
     {
         return "org/mule/test/integration/messaging/message-property-in-response-transformers.xml";
     }
 
+    @Test
     public void testSend() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);

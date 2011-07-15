@@ -27,20 +27,6 @@ import org.junit.runners.Parameterized.Parameters;
  */
 public class GlobalEndpointAndTransformerTestCase extends AbstractServiceAndFlowTestCase
 {
-    
-    @Test
-    public void testNormal() throws MuleException
-    {
-        MuleClient client = new MuleClient(muleContext);
-        MuleMessage msg=client.send("vm://in",new DefaultMuleMessage("HELLO!", muleContext));
-        assertTrue(msg.getPayload() instanceof byte[]);        
-    }
-
-    public GlobalEndpointAndTransformerTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
-
     @Parameters
     public static Collection<Object[]> parameters()
     {
@@ -48,7 +34,18 @@ public class GlobalEndpointAndTransformerTestCase extends AbstractServiceAndFlow
             {ConfigVariant.SERVICE, "org/mule/test/integration/config/globalendpointandtransformer-mule-config-service.xml"},
             {ConfigVariant.FLOW, "org/mule/test/integration/config/globalendpointandtransformer-mule-config-flow.xml"}
         });
-    }      
+    }
+
+    public GlobalEndpointAndTransformerTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
+    }
+
+    @Test
+    public void testNormal() throws MuleException
+    {
+        MuleClient client = new MuleClient(muleContext);
+        MuleMessage msg=client.send("vm://in",new DefaultMuleMessage("HELLO!", muleContext));
+        assertTrue(msg.getPayload() instanceof byte[]);
+    }
 }
-
-

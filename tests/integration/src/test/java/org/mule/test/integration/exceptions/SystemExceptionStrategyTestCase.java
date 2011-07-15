@@ -14,15 +14,21 @@ import org.mule.api.lifecycle.LifecycleException;
 import org.mule.tck.testmodels.mule.TestConnector;
 
 import java.util.concurrent.TimeUnit;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 public class SystemExceptionStrategyTestCase extends AbstractExceptionStrategyTestCase
 {
+    
     @Override
     protected String getConfigResources()
     {
         return "org/mule/test/integration/exceptions/system-exception-strategy.xml";
     }
 
+    @Test
     public void testConnectorStartup() throws Exception
     {
         try
@@ -41,6 +47,7 @@ public class SystemExceptionStrategyTestCase extends AbstractExceptionStrategyTe
         assertEquals(1, systemExceptionCounter.get());
     }
 
+    @Test
     public void testConnectorPolling() throws Exception
     {
         muleContext.getRegistry().lookupService("Polling").start();

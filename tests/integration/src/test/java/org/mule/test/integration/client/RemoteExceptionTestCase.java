@@ -10,12 +10,6 @@
 
 package org.mule.test.integration.client;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Date;
-
-import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 import org.mule.api.ExceptionPayload;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.MalformedEndpointException;
@@ -25,14 +19,15 @@ import org.mule.module.client.RemoteDispatcher;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.exceptions.FunctionalTestException;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Date;
+
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+
 public class RemoteExceptionTestCase extends AbstractServiceAndFlowTestCase
 {
-
-    public RemoteExceptionTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
-
     @Parameters
     public static Collection<Object[]> parameters()
     {
@@ -41,7 +36,11 @@ public class RemoteExceptionTestCase extends AbstractServiceAndFlowTestCase
             {ConfigVariant.FLOW, "org/mule/test/integration/client/remote-exception-config-flow.xml"}
         });
     }
-    
+
+    public RemoteExceptionTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
+    }
 
     @Test
     public void testClientTransformerException() throws Exception
@@ -77,9 +76,8 @@ public class RemoteExceptionTestCase extends AbstractServiceAndFlowTestCase
         assertNotNull(result);
         ExceptionPayload exceptionPayload = result.getExceptionPayload();
         assertNotNull(exceptionPayload);
-        assertTrue(exceptionPayload.getRootException().getClass().getName(), 
+        assertTrue(exceptionPayload.getRootException().getClass().getName(),
                    exceptionPayload.getRootException() instanceof FunctionalTestException);
         assertEquals("Functional Test Service Exception", exceptionPayload.getRootException().getMessage());
     }
-
 }

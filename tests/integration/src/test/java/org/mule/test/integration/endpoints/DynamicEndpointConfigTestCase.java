@@ -14,7 +14,6 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.DataType;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
-import org.mule.tck.FunctionalTestCase;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -22,16 +21,8 @@ import java.util.Collection;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
-/**
- *
- */
 public class DynamicEndpointConfigTestCase extends AbstractServiceAndFlowTestCase
 {
-    public DynamicEndpointConfigTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
-    
     @Parameters
     public static Collection<Object[]> parameters()
     {
@@ -39,12 +30,16 @@ public class DynamicEndpointConfigTestCase extends AbstractServiceAndFlowTestCas
             {ConfigVariant.SERVICE, "org/mule/test/integration/endpoints/dynamic-endpoint-config-service.xml"},
             {ConfigVariant.FLOW, "org/mule/test/integration/endpoints/dynamic-endpoint-config-flow.xml"}
         });
-    }       
+    }
+
+    public DynamicEndpointConfigTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
+    }
 
     @Test
     public void testName() throws Exception
     {
-
         MuleMessage msg = new DefaultMuleMessage("Data", muleContext);
         msg.setOutboundProperty("testProp", "testPath");
         MuleMessage response = muleContext.getClient().send("vm://in1", msg);

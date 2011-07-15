@@ -10,16 +10,16 @@
 
 package org.mule.test.cookbook.quartz;
 
+import org.mule.api.MuleMessage;
+import org.mule.module.client.MuleClient;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+
 import java.util.Arrays;
 import java.util.Collection;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
 
-// START SNIPPET: documentation
 /**
  * The Quartz transport can be used to trigger an event to be received by the
  * component based on the endpoint configuration. In Mule an event is usually
@@ -29,21 +29,19 @@ import org.mule.tck.AbstractServiceAndFlowTestCase;
  * service method, and by not specifying a 'payload' element there is no data to try
  * and match to the service method, so Mule will match a method with no arguments.
  */
-// END SNIPPET: documentation
-// START SNIPPET: full-class
 public class TriggerNoArgsServiceMethodTestCase extends AbstractServiceAndFlowTestCase
 {
-    public TriggerNoArgsServiceMethodTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
-
     @Parameters
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
             {ConfigVariant.SERVICE, "org/mule/test/cookbook/quartz/trigger-no-args-method-config-service.xml"},
             {ConfigVariant.FLOW, "org/mule/test/cookbook/quartz/trigger-no-args-method-config-flow.xml"}});
+    }
+
+    public TriggerNoArgsServiceMethodTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
     }
 
     @Test
@@ -61,4 +59,3 @@ public class TriggerNoArgsServiceMethodTestCase extends AbstractServiceAndFlowTe
         assertEquals("Bullseye!", result.getPayloadAsString());
     }
 }
-// END SNIPPET: full-class

@@ -22,11 +22,6 @@ import org.junit.runners.Parameterized.Parameters;
 
 public class JSR250LifecycleTrackerComponentFunctionalTestCase extends AbstractServiceAndFlowTestCase
 {
-    public JSR250LifecycleTrackerComponentFunctionalTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
-
     @Parameters
     public static Collection<Object[]> parameters()
     {
@@ -37,10 +32,15 @@ public class JSR250LifecycleTrackerComponentFunctionalTestCase extends AbstractS
                 "org/mule/test/integration/components/jsr250-component-lifecycle-config-flow.xml"}});
     }
 
+    public JSR250LifecycleTrackerComponentFunctionalTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
+    }
+
     /**
      * ASSERT: - Mule lifecycle methods invoked - Service and muleContext injected
      * (Component implements ServiceAware/MuleContextAware)
-     * 
+     *
      * @throws Exception
      */
     @Test
@@ -61,7 +61,7 @@ public class JSR250LifecycleTrackerComponentFunctionalTestCase extends AbstractS
     /**
      * ASSERT: - Mule lifecycle methods invoked - Service and muleContext injected
      * (Component implements ServiceAware/MuleContextAware)
-     * 
+     *
      * @throws Exception
      */
     @Test
@@ -82,9 +82,10 @@ public class JSR250LifecycleTrackerComponentFunctionalTestCase extends AbstractS
     /**
      * ASSERT: - Mule lifecycle methods invoked - Service and muleContext injected
      * (Component implements ServiceAware/MuleContextAware)
-     * 
+     *
      * @throws Exception
      */
+    @Test
     public void testMulePooledPrototypeServiceLifecycle() throws Exception
     {
         if (variant.equals(ConfigVariant.FLOW))
@@ -104,7 +105,7 @@ public class JSR250LifecycleTrackerComponentFunctionalTestCase extends AbstractS
      * new object in pool - Service and muleContext injected each time singleton is
      * used to create new object in pool (Component implements
      * ServiceAware/MuleContextAware)
-     * 
+     *
      * @throws Exception
      */
     @Test

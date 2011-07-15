@@ -24,15 +24,9 @@ import org.junit.runners.Parameterized.Parameters;
 
 public class ExceptionsWithRouterMule2715TestCase extends AbstractServiceAndFlowTestCase
 {
-
     public static final String MESSAGE = "message";
     public static final long TIMEOUT = 5000L;
 
-    public ExceptionsWithRouterMule2715TestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
-    
     @Parameters
     public static Collection<Object[]> parameters()
     {
@@ -40,8 +34,13 @@ public class ExceptionsWithRouterMule2715TestCase extends AbstractServiceAndFlow
             {ConfigVariant.SERVICE, "org/mule/test/integration/exceptions/exceptions-with-router-mule-2715-service.xml"},
             {ConfigVariant.FLOW, "org/mule/test/integration/exceptions/exceptions-with-router-mule-2715-flow.xml"}
         });
-    }     
-    
+    }
+
+    public ExceptionsWithRouterMule2715TestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
+    }
+
     @Test
     public void testWithRouter() throws Exception
     {
@@ -63,5 +62,4 @@ public class ExceptionsWithRouterMule2715TestCase extends AbstractServiceAndFlow
         assertTrue(response.getPayload() instanceof ExceptionMessage);
         assertTrue(((ExceptionMessage) response.getPayload()).getException() instanceof TransformerMessagingException);
     }
-
 }

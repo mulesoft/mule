@@ -17,20 +17,12 @@ import org.mule.tck.AbstractServiceAndFlowTestCase;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Map;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
 public class AsyncExceptionHandlingTestCase extends AbstractServiceAndFlowTestCase
 {
-    String request = "Hello World";
-
-    public AsyncExceptionHandlingTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
-
     @Parameters
     public static Collection<Object[]> parameters()
     {
@@ -40,13 +32,17 @@ public class AsyncExceptionHandlingTestCase extends AbstractServiceAndFlowTestCa
         });
     }
 
+    public AsyncExceptionHandlingTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
+    }
+
     @Test
     public void testAsyncExceptionHandlingTestCase() throws Exception
     {
         MuleClient client1 = new MuleClient(muleContext);
-        DefaultMuleMessage msg1 = new DefaultMuleMessage(request, (Map) null, muleContext);
+        DefaultMuleMessage msg1 = new DefaultMuleMessage("Hello World", muleContext);
         MuleMessage response1 = client1.send("search.inbound.endpoint", msg1, 300000);
         assertNotNull(response1);
     }
-
 }

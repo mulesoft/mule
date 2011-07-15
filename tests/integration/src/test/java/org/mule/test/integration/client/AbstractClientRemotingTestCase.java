@@ -15,12 +15,20 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.module.client.RemoteDispatcher;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 public abstract class AbstractClientRemotingTestCase extends FunctionalTestCase
 {
+
     public abstract String getRemoteEndpointUri();
 
+    @Test
     public void testClientSendToRemoteComponent() throws Exception
     {
         // Will connect to the server using remote endpoint
@@ -32,6 +40,7 @@ public abstract class AbstractClientRemotingTestCase extends FunctionalTestCase
         assertEquals("Test Client Send message Received", message.getPayload());
     }
 
+    @Test
     public void testClientRequestResponseOnEndpoint() throws Exception
     {
         // Will connect to the server using tcp://localhost:60504
@@ -49,6 +58,7 @@ public abstract class AbstractClientRemotingTestCase extends FunctionalTestCase
      *
      * @throws Exception
      */
+    @Test
     public void testClientSendAndReceiveRemote() throws Exception
     {
         String remoteEndpoint = "vm://remote.queue?connector=vmRemoteQueueConnector";
