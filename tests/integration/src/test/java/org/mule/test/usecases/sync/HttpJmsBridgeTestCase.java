@@ -12,19 +12,26 @@ package org.mule.test.usecases.sync;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 public class HttpJmsBridgeTestCase extends FunctionalTestCase
 {
+
     @Override
     protected String getConfigResources()
     {
         return "org/mule/test/usecases/sync/http-jms-bridge.xml";
     }
 
+    @Test
     public void testBridge() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);

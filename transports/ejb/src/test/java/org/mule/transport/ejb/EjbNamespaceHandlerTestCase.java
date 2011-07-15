@@ -9,19 +9,27 @@
  */
 package org.mule.transport.ejb;
 
-import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.jndi.InMemoryContext;
-import org.mule.transport.ejb.EjbConnector;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transport.rmi.DummySecurityManager;
 import org.mule.transport.rmi.RmiConnector;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 public class EjbNamespaceHandlerTestCase extends FunctionalTestCase
 {
+    
+    @Override
     protected String getConfigResources()
     {
         return "ejb-namespace-config.xml";
     }
 
+    @Test
     public void testConfig() throws Exception
     {
         EjbConnector c = (EjbConnector) muleContext.getRegistry().lookupConnector("ejbConnector");
@@ -41,6 +49,7 @@ public class EjbNamespaceHandlerTestCase extends FunctionalTestCase
         assertEquals("hij", c.getJndiProviderProperties().get("ghi"));
     }
 
+    @Test
     public void testConfig2() throws Exception
     {
         RmiConnector c = (RmiConnector) muleContext.getRegistry().lookupConnector("ejbConnector2");

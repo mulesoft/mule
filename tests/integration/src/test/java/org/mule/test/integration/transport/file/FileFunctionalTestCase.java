@@ -13,7 +13,7 @@ package org.mule.test.integration.transport.file;
 
 import org.mule.api.MuleEventContext;
 import org.mule.api.context.notification.ServerNotification;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.functional.FunctionalTestNotification;
 import org.mule.tck.functional.FunctionalTestNotificationListener;
 import org.mule.tck.functional.FunctionalTestComponent;
@@ -25,8 +25,15 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 public class FileFunctionalTestCase extends FunctionalTestCase implements FunctionalTestNotificationListener
 {
+
     private Object receivedData = null;
 
     @Override
@@ -49,6 +56,7 @@ public class FileFunctionalTestCase extends FunctionalTestCase implements Functi
         return "org/mule/test/integration/providers/file/file-config.xml";
     }
 
+    @Test
     public void testRelative() throws IOException, InterruptedException
     {
         // create binary file data to be written

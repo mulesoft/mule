@@ -11,21 +11,27 @@
 package org.mule.test.integration.transport.file;
 
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.util.FileUtils;
 
 import java.io.File;
 
 import junit.framework.AssertionFailedError;
+import org.junit.Test;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class OutputPatternFromEndpointTestCase extends FunctionalTestCase
 {
 
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/test/integration/providers/file/mule-file-output-pattern-from-endpoint.xml";
     }
 
+    @Test
     public void testBasic() throws Exception
     {
         String myFirstDirName = "FirstWrite";

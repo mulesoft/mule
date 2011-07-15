@@ -15,7 +15,11 @@ import org.mule.api.routing.filter.Filter;
 import org.mule.api.transformer.Transformer;
 import org.mule.construct.SimpleFlowConstruct;
 import org.mule.routing.MessageFilter;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertNotSame;
 
 public class Mule5038TestCase extends FunctionalTestCase
 {
@@ -26,6 +30,7 @@ public class Mule5038TestCase extends FunctionalTestCase
         return "org/mule/test/issues/mule-5038-config.xml";
     }
 
+    @Test
     public void testTransformerOnGlobalEndpoint()
     {
         SimpleFlowConstruct flow1 = muleContext.getRegistry().lookupObject("flow1");
@@ -36,6 +41,7 @@ public class Mule5038TestCase extends FunctionalTestCase
         assertNotSame(flow1Filter, flow2Filter);
     }
 
+    @Test
     public void testFilterOnGlobalEndpoint()
     {
         SimpleFlowConstruct flow1 = muleContext.getRegistry().lookupObject("flow1");
@@ -46,6 +52,7 @@ public class Mule5038TestCase extends FunctionalTestCase
         assertNotSame(flow1Transoformer, flow2Transoformer);
     }
 
+    @Test
     public void testCustomProcessorOnGlobalEndpoint()
     {
         SimpleFlowConstruct flow1 = muleContext.getRegistry().lookupObject("flow1");
@@ -56,6 +63,7 @@ public class Mule5038TestCase extends FunctionalTestCase
         assertNotSame(flow1Processor, flow2Processor);
     }
 
+    @Test
     public void testCompositeProcessorOnGlobalEndpoint()
     {
         SimpleFlowConstruct flow1 = muleContext.getRegistry().lookupObject("flow1");

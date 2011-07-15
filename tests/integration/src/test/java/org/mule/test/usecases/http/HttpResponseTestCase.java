@@ -13,18 +13,29 @@ package org.mule.test.usecases.http;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transport.NullPayload;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertNull;
+
 public class HttpResponseTestCase extends FunctionalTestCase
 {
+
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/test/usecases/http/http-response.xml";
     }
 
+    @Test
     public void testNullPayloadUsingAsync() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -37,6 +48,7 @@ public class HttpResponseTestCase extends FunctionalTestCase
         assertEquals(0, reply.getPayloadAsString().length());
     }
 
+    @Test
     public void testPayloadIsNotEmptyNoRemoteSynch() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -46,6 +58,7 @@ public class HttpResponseTestCase extends FunctionalTestCase
         assertEquals("test", reply.getPayloadAsString());
     }
 
+    @Test
     public void testPayloadIsNotEmptyWithRemoteSynch() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -59,6 +72,7 @@ public class HttpResponseTestCase extends FunctionalTestCase
      * See MULE-4522
      * @throws Exception
      */
+    @Test
     public void testChunkingContentLength() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -69,6 +83,7 @@ public class HttpResponseTestCase extends FunctionalTestCase
         assertNull(reply.getInboundProperty(HttpConstants.HEADER_CONTENT_LENGTH));
     }
 
+    @Test
     public void testNoChunkingContentLength() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);

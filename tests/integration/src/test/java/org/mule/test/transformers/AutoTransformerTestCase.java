@@ -10,24 +10,31 @@
 
 package org.mule.test.transformers;
 
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.testmodels.fruit.FruitBasket;
 import org.mule.tck.testmodels.fruit.FruitBowl;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Banana;
-import org.mule.module.client.MuleClient;
+import org.mule.module.client. MuleClient;
 import org.mule.util.concurrent.Latch;
 
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+import org.junit.Test;
+
+import static org.junit.Assert.assertTrue;
 
 public class AutoTransformerTestCase extends FunctionalTestCase
 {
+
     private static Latch latch;
+
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/test/integration/transformer/auto-transformer-test.xml";
     }
 
+    @Test
     public void testInboundAutoTransform() throws Exception
     {
         latch = new Latch();

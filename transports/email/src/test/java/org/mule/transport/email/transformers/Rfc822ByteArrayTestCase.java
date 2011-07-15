@@ -13,7 +13,7 @@ package org.mule.transport.email.transformers;
 import org.mule.api.MuleException;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.transformer.TransformerException;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transport.email.SmtpConnector;
 
 import java.io.IOException;
@@ -24,19 +24,27 @@ import javax.mail.Session;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 public class Rfc822ByteArrayTestCase extends FunctionalTestCase
 {
+
     @Override
     protected String getConfigResources()
     {
         return "rfc822-byte-array-test.xml";
     }
 
+    @Test
     public void testToByteArray() throws MessagingException, TransformerException
     {
         mimeMessageToByteArray(newMimeMessage());
     }
 
+    @Test
     public void testToByteArrayAndBack() throws MessagingException, MuleException, IOException
     {
         MimeMessage first = newMimeMessage();

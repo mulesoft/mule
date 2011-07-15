@@ -13,22 +13,28 @@ package org.mule.test.routing;
 import org.mule.api.context.notification.RoutingNotificationListener;
 import org.mule.context.notification.RoutingNotification;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.functional.FunctionalTestComponent;
 
 import java.util.Arrays;
 import java.util.List;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicInteger;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class CollectionAggregatorRouterTimeoutTestCase extends FunctionalTestCase
 {
 
+    @Override
     protected String getConfigResources()
     {
         return "collection-aggregator-router-timeout-test.xml";
     }
 
+    @Test
     public void testNoFailOnTimeout() throws Exception
     {
         // correlation timeouts should not fire in this scenario, check it

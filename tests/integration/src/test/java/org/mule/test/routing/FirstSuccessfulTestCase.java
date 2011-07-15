@@ -14,16 +14,24 @@ import org.mule.api.ExceptionPayload;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class FirstSuccessfulTestCase extends FunctionalTestCase
 {
+
     @Override
     protected String getConfigResources()
     {
         return "first-successful-test.xml";
     }
 
+    @Test
     public void testFirstSuccessful() throws Exception
     {
         MuleClient client = muleContext.getClient();
@@ -43,6 +51,7 @@ public class FirstSuccessfulTestCase extends FunctionalTestCase
         assertTrue(ex instanceof MessagingException);
     }
 
+    @Test
     public void testFirstSuccessfulWithExpression() throws Exception
     {
         MuleClient client = muleContext.getClient();
@@ -50,6 +59,7 @@ public class FirstSuccessfulTestCase extends FunctionalTestCase
         assertEquals("XYZ is a string", response.getPayloadAsString());
     }
 
+    @Test
     public void testFirstSuccessfulWithExpressionAllFail() throws Exception
     {
         MuleClient client = muleContext.getClient();
@@ -60,6 +70,7 @@ public class FirstSuccessfulTestCase extends FunctionalTestCase
         assertTrue(ex instanceof MessagingException);
     }
 
+    @Test
     public void testFirstSuccessfulWithOneWayEndpoints() throws Exception
     {
         MuleClient client = muleContext.getClient();

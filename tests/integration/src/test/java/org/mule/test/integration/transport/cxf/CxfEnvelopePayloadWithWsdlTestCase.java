@@ -12,14 +12,17 @@ package org.mule.test.integration.transport.cxf;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import org.custommonkey.xmlunit.XMLAssert;
+import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
 
 public class CxfEnvelopePayloadWithWsdlTestCase extends FunctionalTestCase
 {
 
-    final String msg = "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" "
+    private static final String msg = "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" "
                        + "xmlns:emop=\"http://www.wcs.com/2010/07/14/emop\">"
                        + "  <soapenv:Header>\n"
                        + "    <header UserName=\"nothing\" Password=\"important\"/>\n"
@@ -38,6 +41,7 @@ public class CxfEnvelopePayloadWithWsdlTestCase extends FunctionalTestCase
         return "org/mule/test/integration/transport/cxf/scratchcard-service-config.xml";
     }
 
+    @Test
     public void testEnvelopePayloadIsProcessedWhenMessageAndWsdlContainsHeaders() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);

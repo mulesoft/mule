@@ -13,7 +13,12 @@ package org.mule.test.usecases.routing;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /*
  * In this Test Case we make use of a Custom Catch All Strategy in order to show how
@@ -21,6 +26,14 @@ import org.mule.tck.FunctionalTestCase;
  */
 public class InboundTransformingCatchAllTestCase extends FunctionalTestCase
 {
+
+    @Override
+    protected String getConfigResources()
+    {
+        return "org/mule/test/usecases/routing/inbound-transforming-catchall.xml";
+    }
+
+    @Test
     public void testNormal() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -33,11 +46,5 @@ public class InboundTransformingCatchAllTestCase extends FunctionalTestCase
         msg = client.request("vm://catchall", 3000);
         assertNotNull(msg);
         assertTrue(msg.getPayload() instanceof byte[]);
-    }
-
-    @Override
-    protected String getConfigResources()
-    {
-        return "org/mule/test/usecases/routing/inbound-transforming-catchall.xml";
     }
 }

@@ -12,23 +12,29 @@ package org.mule.test.integration.xml;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.util.IOUtils;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import org.custommonkey.xmlunit.XMLUnit;
+import org.junit.Test;
 
-//START SNIPPET: test-code
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 public class XSLTWikiDocsTestCase extends FunctionalTestCase
 {
+
     @Override
     protected String getConfigResources()
     {
         return "org/mule/test/integration/xml/xslt-functional-test.xml";
     }
 
+    @Test
     public void testMessageTransform() throws Exception
         {
             //We're using Xml Unit to compare results
@@ -58,4 +64,3 @@ public class XSLTWikiDocsTestCase extends FunctionalTestCase
             assertTrue(XMLUnit.compareXML(message.getPayloadAsString(), resultData).similar());
         }
     }
-//END SNIPPET: test-code

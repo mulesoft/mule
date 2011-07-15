@@ -15,7 +15,7 @@ import org.mule.module.client.MuleClient;
 import org.mule.module.xml.stax.DelegateXMLStreamReader;
 import org.mule.module.xml.stax.StaxSource;
 import org.mule.module.xml.util.XMLUtils;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -28,14 +28,17 @@ import javax.xml.transform.Source;
 import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamSource;
 
+import org.junit.Test;
 import org.xml.sax.InputSource;
+
+import static org.junit.Assert.assertTrue;
 
 public class CloseStreamOnMuleExceptionTestCase extends FunctionalTestCase
 {
 
     private String xmlText = "<test attribute=\"1\"/>";
     private TestByteArrayInputStream inputStream;
-    MuleClient client;
+    private MuleClient client;
 
     @Override
     protected void doSetUp() throws Exception
@@ -45,6 +48,7 @@ public class CloseStreamOnMuleExceptionTestCase extends FunctionalTestCase
         inputStream = new TestByteArrayInputStream(xmlText.getBytes());
     }
 
+    @Test
     public void testCloseStreamOnComponentException() throws MuleException, InterruptedException, IOException
     {
 
@@ -52,6 +56,7 @@ public class CloseStreamOnMuleExceptionTestCase extends FunctionalTestCase
         assertTrue(inputStream.isClosed());
     }
 
+    @Test
     public void testCloseXMLInputSourceOnComponentException()
         throws MuleException, InterruptedException, IOException
     {
@@ -62,6 +67,7 @@ public class CloseStreamOnMuleExceptionTestCase extends FunctionalTestCase
         assertTrue(((TestByteArrayInputStream) stream.getByteStream()).isClosed());
     }
 
+    @Test
     public void testCloseXMLStreamSourceOnComponentException() throws FactoryConfigurationError, Exception
     {
         Source stream = XMLUtils.toXmlSource(XMLInputFactory.newInstance(), false, inputStream);
@@ -71,6 +77,7 @@ public class CloseStreamOnMuleExceptionTestCase extends FunctionalTestCase
         assertTrue(((TestByteArrayInputStream) ((StreamSource) stream).getInputStream()).isClosed());
     }
 
+    @Test
     public void testCloseXMLStreamReaderOnComponentException()
         throws MuleException, InterruptedException, IOException, XMLStreamException,
         FactoryConfigurationError
@@ -83,6 +90,7 @@ public class CloseStreamOnMuleExceptionTestCase extends FunctionalTestCase
         assertTrue(stream.isClosed());
     }
 
+    @Test
     public void testCloseSaxSourceOnComponentException()
         throws MuleException, InterruptedException, IOException, XMLStreamException,
         FactoryConfigurationError
@@ -94,6 +102,7 @@ public class CloseStreamOnMuleExceptionTestCase extends FunctionalTestCase
         assertTrue(((TestByteArrayInputStream) stream.getInputSource().getByteStream()).isClosed());
     }
 
+    @Test
     public void testCloseStaxSourceOnComponentException()
         throws MuleException, InterruptedException, IOException, XMLStreamException,
         FactoryConfigurationError
@@ -108,6 +117,7 @@ public class CloseStreamOnMuleExceptionTestCase extends FunctionalTestCase
     }
 
     //TODO fix
+//    @Test
 //    public void testCloseStreamOnDispatcherException()
 //        throws MuleException, InterruptedException, IOException
 //    {
@@ -123,6 +133,7 @@ public class CloseStreamOnMuleExceptionTestCase extends FunctionalTestCase
     // exceptionStrategy being called but because RequestContext is empty the message
     // is not available in the AbstractExceptionListener and cannot be closed.
 
+//    @Test
 //    public void testCloseStreamOnInboundFilterException()
 //        throws MuleException, InterruptedException, IOException
 //    {

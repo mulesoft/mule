@@ -13,11 +13,18 @@ package org.mule.test.integration.transaction;
 
 import java.util.List;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 
 public class XABridgeJmsJdbcTestCase extends AbstractDerbyTestCase
 {
+
     private static final int NUMBER_OF_MESSAGES = 1;
     
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/test/integration/transaction/xabridge-jms-jdbc-mule.xml";
@@ -67,11 +74,13 @@ public class XABridgeJmsJdbcTestCase extends AbstractDerbyTestCase
         assertTrue(results.size() >= NUMBER_OF_MESSAGES);
     }
 
+    @Test
     public void testXaBridgeWithoutRollbacks() throws Exception
     {
         doTestXaBridge(false);
     }
 
+    @Test
     public void testXaBridgeWithRollbacks() throws Exception
     {
         doTestXaBridge(true);

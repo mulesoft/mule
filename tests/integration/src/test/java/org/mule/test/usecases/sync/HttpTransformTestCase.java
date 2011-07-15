@@ -12,12 +12,17 @@ package org.mule.test.usecases.sync;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transformer.compression.GZipUncompressTransformer;
 import org.mule.transformer.simple.ByteArrayToSerializable;
 import org.mule.transformer.types.DataTypeFactory;
 
 import java.util.Arrays;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class HttpTransformTestCase extends FunctionalTestCase
 {
@@ -28,6 +33,7 @@ public class HttpTransformTestCase extends FunctionalTestCase
         return "org/mule/test/usecases/sync/http-transform.xml";
     }
 
+    @Test
     public void testTransform() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -41,6 +47,7 @@ public class HttpTransformTestCase extends FunctionalTestCase
         assertEquals("<string>payload</string>", result);
     }
 
+    @Test
     public void testBinary() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -54,6 +61,7 @@ public class HttpTransformTestCase extends FunctionalTestCase
         assertEquals(payload, result);
     }
 
+    @Test
     public void testBinaryWithBridge() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);

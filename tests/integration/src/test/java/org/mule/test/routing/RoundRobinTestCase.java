@@ -13,13 +13,18 @@ package org.mule.test.routing;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
+
 public class RoundRobinTestCase extends FunctionalTestCase
 {
+
     private static final int NUMBER_OF_MESSAGES = 10;
     private static final int NUMBER_OF_WRITERS = 10;
     private static final int NUMBER_OF_ENDPOINTS = 5;
@@ -31,6 +36,7 @@ public class RoundRobinTestCase extends FunctionalTestCase
         return "round-robin-test.xml";
     }
 
+    @Test
     public void testRoundRobin() throws Exception
     {
         client = new MuleClient(muleContext);

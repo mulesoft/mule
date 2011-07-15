@@ -14,19 +14,27 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.routing.requestreply.AbstractAsyncRequestReplyRequester;
-import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.SensingNullMessageProcessor;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import java.util.Map;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 public class ResponseAggregatorTestCase extends FunctionalTestCase
 {
+
     @Override
     protected String getConfigResources()
     {
         return "org/mule/test/usecases/routing/response/response-router.xml";
     }
 
+    @Test
     public void testSyncResponse() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -35,6 +43,7 @@ public class ResponseAggregatorTestCase extends FunctionalTestCase
         assertEquals("Received: request", new String(message.getPayloadAsBytes()));
     }
 
+    @Test
     public void testResponseEventsCleanedUp() throws Exception
     {
         RelaxedAsyncReplyMP mp = new RelaxedAsyncReplyMP();

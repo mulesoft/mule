@@ -14,15 +14,22 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.transport.Connector;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transport.soap.axis.AxisConnector;
 
 import java.util.Collection;
 import java.util.Iterator;
 
+import org.junit.Test;
+
+import static junit.framework.Assert.assertTrue;
+import static org.junit.Assert.assertNotNull;
+
 
 public abstract class AbstractAxisOverJMSWithTransactionsTestCase extends FunctionalTestCase
 {
+
+    @Test
     public void testTransactionPropertiesOnEndpoint() throws Exception
     {
         Collection<?> connectors = muleContext.getRegistry().lookupObjects(Connector.class);
@@ -41,6 +48,7 @@ public abstract class AbstractAxisOverJMSWithTransactionsTestCase extends Functi
         //assertNotNull(axisDescriptor.getInboundRouter().getEndpoint("jms.TestComponent").getTransactionConfig());
     }
 
+    @Test
     public void testTransactionsOverAxis() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);

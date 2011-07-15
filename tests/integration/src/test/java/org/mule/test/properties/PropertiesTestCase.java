@@ -13,13 +13,19 @@ package org.mule.test.properties;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.functional.FunctionalTestComponent;
 
 import java.util.Map;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+
 public class PropertiesTestCase extends FunctionalTestCase
 {
+
     @Override
     protected String getConfigResources()
     {
@@ -29,6 +35,7 @@ public class PropertiesTestCase extends FunctionalTestCase
     /**
      * Test that the VM transport correctly copies outbound to inbound properties both for requests amd responses
      */
+    @Test
     public void testProperties() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);

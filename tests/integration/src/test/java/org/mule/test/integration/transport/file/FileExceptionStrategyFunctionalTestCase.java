@@ -10,19 +10,25 @@
 
 package org.mule.test.integration.transport.file;
 
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.util.FileUtils;
 
 import java.io.File;
 
+import org.junit.Test;
+
+import static org.junit.Assert.fail;
+
 public class FileExceptionStrategyFunctionalTestCase extends FunctionalTestCase
 {
 
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/test/integration/providers/file/file-exception-strategy.xml";
     }
 
+    @Test
     public void testExceptionInTransformer() throws Exception
     {
         File f = FileUtils.newFile("./.mule/in/test.txt");

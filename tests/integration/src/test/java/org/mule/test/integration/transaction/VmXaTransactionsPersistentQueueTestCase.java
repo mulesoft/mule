@@ -12,7 +12,13 @@ package org.mule.test.integration.transaction;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 public class VmXaTransactionsPersistentQueueTestCase extends FunctionalTestCase
 {
@@ -21,11 +27,13 @@ public class VmXaTransactionsPersistentQueueTestCase extends FunctionalTestCase
 
     private final long timeout = getTestTimeoutSecs() * 1000 / 30;
 
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/test/integration/transaction/vm-xa-transaction-persistent-queue.xml";
     }
 
+    @Test
     public void testOutboundRouterTransactions() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);

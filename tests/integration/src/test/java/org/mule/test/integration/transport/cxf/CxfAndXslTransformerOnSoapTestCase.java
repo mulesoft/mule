@@ -13,7 +13,7 @@ package org.mule.test.integration.transport.cxf;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.module.cxf.support.OutputPayloadInterceptor;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.testmodels.mule.TestExceptionStrategy;
 import org.mule.tck.testmodels.mule.TestExceptionStrategy.ExceptionCallback;
 import org.mule.util.concurrent.Latch;
@@ -21,10 +21,15 @@ import org.mule.util.concurrent.Latch;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 
 public class CxfAndXslTransformerOnSoapTestCase extends FunctionalTestCase
 {
-    final String msg = "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:emop=\"http://www.wcs.com/2010/07/14/emop\">"
+    private static final String msg = "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:emop=\"http://www.wcs.com/2010/07/14/emop\">"
                        + "  <soapenv:Header>\n"
                        + "    <header UserName=\"nothing\" Password=\"important\"/>\n"
                        + "  </soapenv:Header>\n"
@@ -58,6 +63,7 @@ public class CxfAndXslTransformerOnSoapTestCase extends FunctionalTestCase
      * 
      * @throws Exception
      */
+    @Test
     public void testUsesTransformersCorrectly() throws Exception
     {
         TestExceptionStrategy exceptionStrategy = new TestExceptionStrategy();

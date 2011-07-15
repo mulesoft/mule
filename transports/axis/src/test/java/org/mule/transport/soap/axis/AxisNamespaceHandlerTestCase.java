@@ -12,7 +12,7 @@ package org.mule.transport.soap.axis;
 
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.module.cxf.SoapConstants;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transport.soap.axis.mock.MockAxisServer;
 import org.mule.transport.soap.axis.mock.MockProvider;
 
@@ -21,15 +21,23 @@ import java.util.Map;
 
 import org.apache.axis.constants.Style;
 import org.apache.axis.constants.Use;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class AxisNamespaceHandlerTestCase extends FunctionalTestCase
 {
+
     @Override
     protected String getConfigResources()
     {
         return "axis-namespace-config.xml";
     }
 
+    @Test
     public void testConfig()
     {
         AxisConnector connector =
@@ -47,6 +55,7 @@ public class AxisNamespaceHandlerTestCase extends FunctionalTestCase
         assertEquals("http", connector.getSupportedSchemes().get(0));
     }
 
+    @Test
     public void testInjectedObjects()
     {
         AxisConnector connector =
@@ -57,6 +66,7 @@ public class AxisNamespaceHandlerTestCase extends FunctionalTestCase
         assertEquals(MockProvider.class, connector.getClientProvider().getClass());
     }
 
+    @Test
     public void testEndpointProperties() throws Exception
     {
         ImmutableEndpoint endpoint =

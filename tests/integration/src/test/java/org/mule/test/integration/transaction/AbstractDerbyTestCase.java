@@ -10,30 +10,38 @@
 
 package org.mule.test.integration.transaction;
 
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.util.MuleDerbyTestUtils;
 import org.mule.transport.jdbc.JdbcUtils;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.util.List;
 
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.handlers.ArrayListHandler;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 
 public abstract class AbstractDerbyTestCase extends FunctionalTestCase
 {
     
     private static String connectionString;
 
-    protected void suitePreSetUp() throws Exception
+    @BeforeClass
+    public static void startDatabase() throws Exception
     {
         String dbName = MuleDerbyTestUtils.loadDatabaseName("derby.properties", "database.name");
-    
+
         MuleDerbyTestUtils.defaultDerbyCleanAndInit("derby.properties", "database.name");
         connectionString = "jdbc:derby:" + dbName;
-    
-        super.suitePreSetUp();
+    }
+
+    @AfterClass
+    public static void stopDatabase() throws SQLException
+    {
+        MuleDerbyTestUtils.stopDatabase();
     }
 
     protected void doSetUp() throws Exception

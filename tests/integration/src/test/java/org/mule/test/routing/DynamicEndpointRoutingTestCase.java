@@ -12,16 +12,23 @@ package org.mule.test.routing;
 import org.mule.api.FutureMessageResult;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 
-public class DynamicEndpointRoutingTestCase  extends FunctionalTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+public class DynamicEndpointRoutingTestCase extends FunctionalTestCase
 {
+
     @Override
     protected String getConfigResources()
     {
         return "dynamic-endpoint-routing-test.xml";
     }
 
+    @Test
     public void testDynamicEndpoint() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);

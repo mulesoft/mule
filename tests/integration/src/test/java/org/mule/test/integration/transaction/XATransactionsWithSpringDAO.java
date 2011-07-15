@@ -12,44 +12,57 @@ package org.mule.test.integration.transaction;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.util.MuleDerbyTestUtils;
 import org.mule.test.integration.transaction.extras.Book;
 import org.mule.transport.jdbc.JdbcUtils;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.util.List;
 
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.handlers.ArrayListHandler;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class XATransactionsWithSpringDAO extends FunctionalTestCase
 {
+    
     private static final int RECEIVE_TIMEOUT = 10000;
     private static String connectionString;
 
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/test/integration/transaction/xatransactions-with-spring-dao-config.xml";
     }
-    
-    protected void suitePreSetUp() throws Exception
+
+    @BeforeClass
+    public static void startDatabase() throws Exception
     {
         String dbName = MuleDerbyTestUtils.loadDatabaseName("derby.properties", "database.name");
 
         MuleDerbyTestUtils.defaultDerbyCleanAndInit("derby.properties", "database.name");
         connectionString = "jdbc:derby:" + dbName;
-
-        super.suitePreSetUp();
     }
 
-    protected void doSetUp() throws Exception
+    @AfterClass
+    public static void stopDatabase() throws SQLException
     {
-        emptyTable();
+        MuleDerbyTestUtils.stopDatabase();
     }
 
-    protected void emptyTable() throws Exception
+    @Before
+    public void emptyTable() throws Exception
     {
         try
         {
@@ -95,6 +108,7 @@ public class XATransactionsWithSpringDAO extends FunctionalTestCase
         }
     }
 
+    @Test
     public void testXATransactionUsingSpringDaoNoRollback() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -111,6 +125,7 @@ public class XATransactionsWithSpringDAO extends FunctionalTestCase
         }
     }
 
+    @Test
     public void testXATransactionUsingSpringDaoWithRollback() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);

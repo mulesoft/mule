@@ -12,16 +12,23 @@ package org.mule.test.usecases.sync;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class TcpJmsResponseTestCase extends FunctionalTestCase
 {
 
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/test/usecases/sync/tcp-jms-response.xml";
     }
 
+    @Test
     public void testSyncResponse() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);

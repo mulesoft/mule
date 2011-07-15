@@ -13,7 +13,7 @@ package org.mule.test.integration.transport.file;
 import org.mule.api.context.notification.EndpointMessageNotificationListener;
 import org.mule.context.notification.EndpointMessageNotification;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.util.FileUtils;
 import org.mule.util.IOUtils;
 
@@ -22,9 +22,15 @@ import java.io.FileInputStream;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class FileAppendConnectorTestCase extends FunctionalTestCase implements EndpointMessageNotificationListener<EndpointMessageNotification>
 {
+
     protected static final String OUTPUT_DIR = "myout";
     protected static final String OUTPUT_FILE = "out.txt";
     
@@ -52,6 +58,7 @@ public class FileAppendConnectorTestCase extends FunctionalTestCase implements E
         super.doTearDown();
     }
 
+    @Test
     public void testBasic() throws Exception
     {
         FileInputStream myFileStream = null;

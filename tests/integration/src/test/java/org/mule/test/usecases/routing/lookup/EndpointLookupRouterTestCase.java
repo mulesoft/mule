@@ -12,19 +12,27 @@ package org.mule.test.usecases.routing.lookup;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * The router looks up a list of endpoints from an XML file and passes them to the <recipient-list-exception-based-router>
  */
 public class EndpointLookupRouterTestCase extends FunctionalTestCase
 {
+    
     @Override
     protected String getConfigResources()
     {
         return "org/mule/test/usecases/routing/lookup/router-config.xml, org/mule/test/usecases/routing/lookup/services.xml";
     }
 
+    @Test
     public void testRouterSuccess() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -33,6 +41,7 @@ public class EndpointLookupRouterTestCase extends FunctionalTestCase
         assertTrue(reply.getPayloadAsString().contains("<ErrorStatus>Success</ErrorStatus>"));
     }
 
+    @Test
     public void testRouterFailure() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);

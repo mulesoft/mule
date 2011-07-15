@@ -12,18 +12,28 @@ package org.mule.test.integration.tck;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.exceptions.FunctionalTestException;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import java.io.FileNotFoundException;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 public class MuleTestNamespaceFunctionalTestCase extends FunctionalTestCase
 {
+
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/test/integration/tck/test-namespace-config.xml";
     }
 
+    @Test
     public void testService1() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -33,6 +43,7 @@ public class MuleTestNamespaceFunctionalTestCase extends FunctionalTestCase
         assertEquals("Foo Bar Car Jar", message.getPayloadAsString());
     }
 
+    @Test
     public void testService2() throws Exception
     {
         String result = loadResourceAsString("org/mule/test/integration/tck/test-data.txt");
@@ -43,6 +54,7 @@ public class MuleTestNamespaceFunctionalTestCase extends FunctionalTestCase
         assertEquals(result, message.getPayloadAsString());
     }
 
+    @Test
     public void testService3() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -52,6 +64,7 @@ public class MuleTestNamespaceFunctionalTestCase extends FunctionalTestCase
         assertEquals("foo received in testService3", message.getPayloadAsString());
     }
 
+    @Test
     public void testService4() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -61,6 +74,7 @@ public class MuleTestNamespaceFunctionalTestCase extends FunctionalTestCase
         assertEquals(FunctionalTestException.EXCEPTION_MESSAGE, message.getExceptionPayload().getMessage());
     }
 
+    @Test
     public void testService5() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);

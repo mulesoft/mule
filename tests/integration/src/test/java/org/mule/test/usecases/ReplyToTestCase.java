@@ -13,19 +13,27 @@ package org.mule.test.usecases;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transport.NullPayload;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 /**
  * see MULE-2721
  */ 
 public class ReplyToTestCase extends FunctionalTestCase
 {
-    static final long RECEIVE_DELAY = 3000;
+    
+    private static final long RECEIVE_DELAY = 3000;
 
     public ReplyToTestCase()
     {
-        setDisposeManagerPerSuite(true);
+        setDisposeContextPerClass(true);
     }
 
     @Override
@@ -34,6 +42,7 @@ public class ReplyToTestCase extends FunctionalTestCase
         return "org/mule/test/usecases/replyto.xml";
     }
 
+    @Test
     public void testVm() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -55,6 +64,7 @@ public class ReplyToTestCase extends FunctionalTestCase
         assertNull("Extra message received at replyTo destination: " + result, result);        
     }
 
+    @Test
     public void testCxf() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);

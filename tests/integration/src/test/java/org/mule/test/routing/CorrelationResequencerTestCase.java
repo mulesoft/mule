@@ -12,7 +12,7 @@ package org.mule.test.routing;
 
 import org.mule.api.MuleEventContext;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
 
@@ -20,10 +20,15 @@ import java.util.Arrays;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class CorrelationResequencerTestCase extends FunctionalTestCase
-{    
-    CountDownLatch receiveLatch = new CountDownLatch(6);
+{
+
+    private CountDownLatch receiveLatch = new CountDownLatch(6);
     
     @Override
     protected void doSetUp() throws Exception
@@ -46,6 +51,7 @@ public class CorrelationResequencerTestCase extends FunctionalTestCase
         return "correlation-resequencer-test.xml";
     }
 
+    @Test
     public void testResequencer() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);

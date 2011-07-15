@@ -15,16 +15,22 @@ import org.mule.transport.email.Pop3sConnector;
 
 import javax.mail.Flags;
 
-/**
- * TODO
- */
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 public class Pop3NamespaceHandlerTestCase extends AbstractEmailNamespaceHandlerTestCase
 {
+    
+    @Override
     protected String getConfigResources()
     {
         return "pop3-namespace-config.xml";
     }
 
+    @Test
     public void testConfig() throws Exception
     {
         Pop3Connector c = (Pop3Connector)muleContext.getRegistry().lookupConnector("pop3Connector");
@@ -44,6 +50,7 @@ public class Pop3NamespaceHandlerTestCase extends AbstractEmailNamespaceHandlerT
         assertEquals(Flags.Flag.SEEN, c.getDefaultProcessMessageAction());
     }
 
+    @Test
     public void testSecureConfig() throws Exception
     {
         Pop3sConnector c = (Pop3sConnector)muleContext.getRegistry().lookupConnector("pop3sConnector");
@@ -70,6 +77,7 @@ public class Pop3NamespaceHandlerTestCase extends AbstractEmailNamespaceHandlerT
         assertEquals(Flags.Flag.ANSWERED, c.getDefaultProcessMessageAction());
     }
 
+    @Test
     public void testEndpoint() throws MuleException
     {
         testInboundEndpoint("global1", Pop3Connector.POP3);

@@ -12,12 +12,15 @@ package org.mule.test.integration.work;
 
 import org.mule.api.MuleEventContext;
 import org.mule.api.service.Service;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.util.concurrent.Latch;
 
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+import org.junit.Test;
+
+import static org.junit.Assert.assertTrue;
 
 public class GracefulShutdownTimeoutTestCase extends FunctionalTestCase
 {
@@ -43,6 +46,7 @@ public class GracefulShutdownTimeoutTestCase extends FunctionalTestCase
      * 
      * @throws Exception
      */
+    @Test
     public void testGracefulShutdownTimeout() throws Exception
     {
         final Latch latch = new Latch();

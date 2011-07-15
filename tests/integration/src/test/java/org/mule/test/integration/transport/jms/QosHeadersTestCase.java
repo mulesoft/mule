@@ -10,7 +10,7 @@
 
 package org.mule.test.integration.transport.jms;
 
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import javax.jms.Connection;
 import javax.jms.DeliveryMode;
@@ -23,14 +23,21 @@ import javax.jms.Session;
 import javax.jms.TextMessage;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class QosHeadersTestCase extends FunctionalTestCase
 {
+
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/test/integration/providers/jms/qosheaders-test.xml";
     }
     
+    @Test
     public void testQosHeadersHonored() throws JMSException
     {
         String producerQueue = "test.in.kind";
@@ -38,6 +45,7 @@ public class QosHeadersTestCase extends FunctionalTestCase
         doSendReceiveCycle(producerQueue, consumerQueue, true);
     }
 
+    @Test
     public void testQosHeadersNotHonored() throws JMSException
     {
         String producerQueue = "test.in.selfish";

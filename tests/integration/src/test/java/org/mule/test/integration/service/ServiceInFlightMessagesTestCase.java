@@ -15,7 +15,7 @@ import org.mule.api.MuleException;
 import org.mule.api.service.Service;
 import org.mule.config.DefaultMuleConfiguration;
 import org.mule.context.DefaultMuleContextBuilder;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.util.queue.FilePersistenceStrategy;
 import org.mule.util.queue.QueueManager;
 import org.mule.util.queue.TransactionalQueueManager;
@@ -23,9 +23,14 @@ import org.mule.util.queue.TransactionalQueueManager;
 import java.io.File;
 
 import org.apache.commons.io.FileUtils;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class ServiceInFlightMessagesTestCase extends FunctionalTestCase
 {
+
     protected static final int WAIT_TIME_MILLIS = 500;
     protected static final int NUM_MESSAGES = 500;
 
@@ -51,6 +56,7 @@ public class ServiceInFlightMessagesTestCase extends FunctionalTestCase
         super.doTearDown();
     }
 
+    @Test
     public void testInFlightMessagesWhenServiceStopped() throws Exception
     {
         Service service = muleContext.getRegistry().lookupService("TestService");
@@ -64,6 +70,7 @@ public class ServiceInFlightMessagesTestCase extends FunctionalTestCase
         assertSedaQueueEmpty(service);
     }
 
+    @Test
     public void testInFlightMessagesPausedServiceWhenServiceStopped() throws Exception
     {
         Service service = muleContext.getRegistry().lookupService("PausedTestService");
@@ -79,6 +86,7 @@ public class ServiceInFlightMessagesTestCase extends FunctionalTestCase
         assertOutboundEmpty();
     }
 
+    @Test
     public void testInFlightMessagesPersistentQueueServiceWhenServiceStopped() throws Exception
     {
         Service service = muleContext.getRegistry().lookupService("TestPersistentQueueService");
@@ -105,6 +113,7 @@ public class ServiceInFlightMessagesTestCase extends FunctionalTestCase
         assertSedaQueueEmpty(service);
     }
 
+    @Test
     public void testInFlightMessagesPausedPersistentQueueServiceWhenServiceStopped() throws Exception
     {
         Service service = muleContext.getRegistry().lookupService("PausedTestPersistentQueueService");
@@ -134,6 +143,7 @@ public class ServiceInFlightMessagesTestCase extends FunctionalTestCase
         assertSedaQueueEmpty(service);
     }
 
+    @Test
     public void testInFlightMessagesPersistentQueueServiceWhenMuleDisposed() throws Exception
     {
         Service service = muleContext.getRegistry().lookupService("TestPersistentQueueService");

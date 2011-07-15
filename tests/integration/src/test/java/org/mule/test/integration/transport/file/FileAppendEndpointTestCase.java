@@ -15,8 +15,11 @@ import org.mule.util.FileUtils;
 
 import java.io.File;
 
+import static org.junit.Assert.assertFalse;
+
 public class FileAppendEndpointTestCase extends FileAppendConnectorTestCase
 {
+
     @Override
     protected String getConfigResources()
     {
