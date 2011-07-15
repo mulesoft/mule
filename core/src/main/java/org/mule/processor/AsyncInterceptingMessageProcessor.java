@@ -163,7 +163,7 @@ public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessa
             {
                 processNextTimed(event);
             }
-            catch (MuleException e)
+            catch (Exception e)
             {
                 event.getFlowConstruct().getExceptionListener().handleException(e, event);
             }
