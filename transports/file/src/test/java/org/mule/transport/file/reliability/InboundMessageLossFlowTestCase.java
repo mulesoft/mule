@@ -14,6 +14,8 @@ import org.mule.tck.probe.Probe;
 
 import java.io.File;
 
+import org.junit.Test;
+
 
 public class InboundMessageLossFlowTestCase extends InboundMessageLossTestCase
 {
@@ -23,6 +25,7 @@ public class InboundMessageLossFlowTestCase extends InboundMessageLossTestCase
         return "reliability/inbound-message-loss-flow.xml";
     }
 
+    @Test
     @Override
     public void testTransformerException() throws Exception
     {
@@ -30,6 +33,7 @@ public class InboundMessageLossFlowTestCase extends InboundMessageLossTestCase
         final File file = createDataFile(tmpDir, "test1.txt");
         prober.check(new Probe()
         {
+            @Override
             public boolean isSatisfied()
             {
                 // Exception occurs after the SEDA queue for an asynchronous request, so from the client's
@@ -39,13 +43,15 @@ public class InboundMessageLossFlowTestCase extends InboundMessageLossTestCase
                 return !file.exists();
             }
 
+            @Override
             public String describeFailure()
             {
                 return "File should be gone";
             }
         });
     }
-    
+
+    @Test
     @Override
     public void testRouterException() throws Exception
     {
@@ -53,6 +59,7 @@ public class InboundMessageLossFlowTestCase extends InboundMessageLossTestCase
         final File file = createDataFile(tmpDir, "test1.txt");
         prober.check(new Probe()
         {
+            @Override
             public boolean isSatisfied()
             {
                 // Exception occurs after the SEDA queue for an asynchronous request, so from the client's
@@ -62,6 +69,7 @@ public class InboundMessageLossFlowTestCase extends InboundMessageLossTestCase
                 return !file.exists();
             }
 
+            @Override
             public String describeFailure()
             {
                 return "File should be gone";

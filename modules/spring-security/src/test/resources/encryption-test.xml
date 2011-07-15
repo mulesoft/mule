@@ -28,7 +28,7 @@
     <mule-ss:security-manager>
         <mule-ss:delegate-security-provider name="memory-dao" delegate-ref="authenticationManager"/>
     </mule-ss:security-manager>
-    
+
     <security-manager>
         <password-encryption-strategy name="PBE" password="mule"/>
     </security-manager>
@@ -36,10 +36,10 @@
     <model name="test">
         <service name="echo">
             <inbound>
-                <vm:inbound-endpoint path="my.queue" exchange-pattern="one-way">
+                <vm:inbound-endpoint path="my.queue" exchange-pattern="request-response">
                     <encryption-security-filter strategy-ref="PBE"/>
                 </vm:inbound-endpoint>
-                <inbound-endpoint address="http://localhost:4567" exchange-pattern="one-way">
+                <inbound-endpoint address="http://localhost:4567">
                     <encryption-security-filter strategy-ref="PBE"/>
                 </inbound-endpoint>
             </inbound>
