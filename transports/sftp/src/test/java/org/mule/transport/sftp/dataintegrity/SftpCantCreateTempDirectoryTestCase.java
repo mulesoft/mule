@@ -10,17 +10,24 @@
 
 package org.mule.transport.sftp.dataintegrity;
 
-import java.io.IOException;
-
 import org.mule.api.transport.DispatchException;
 import org.mule.module.client.MuleClient;
 import org.mule.transport.sftp.SftpClient;
+
+import java.io.IOException;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Tests that files are not deleted if the temp directory can't be created
  */
 public class SftpCantCreateTempDirectoryTestCase extends AbstractSftpDataIntegrityTestCase
 {
+
     private static String INBOUND_ENDPOINT_NAME = "inboundEndpoint";
     private static String OUTBOUND_ENDPOINT_NAME = "outboundEndpoint";
 
@@ -46,6 +53,7 @@ public class SftpCantCreateTempDirectoryTestCase extends AbstractSftpDataIntegri
      * 
      * @throws Exception If an error occurred
      */
+    @Test
     public void testCantCreateTempDirectory() throws Exception
     {
         MuleClient muleClient = new MuleClient(muleContext);
@@ -86,7 +94,8 @@ public class SftpCantCreateTempDirectoryTestCase extends AbstractSftpDataIntegri
      */
     // Works, but this is more or less the same test as SftpTempDirFunctionalTestCase
     // so don't use this
-    // public void testCanCreateTempDirectory() throws Exception
+    // @Test
+    //public void testCanCreateTempDirectory() throws Exception
     // {
     // MuleClient muleClient = new MuleClient();
     //

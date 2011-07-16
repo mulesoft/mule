@@ -10,16 +10,20 @@
 
 package org.mule.transport.sftp;
 
+import org.junit.Test;
+
 /**
  * Test the sizeCheck feature.
  */
 public class SftpQuartzRequesterFunctionalTestCase extends AbstractSftpTestCase
 {
+
     private static final long TIMEOUT = 20000;
 
     // Size of the generated stream - 2 Mb
     final static int SEND_SIZE = 1024 * 1024 * 2;
 
+    @Override
     protected String getConfigResources()
     {
         return "mule-sftp-quartzRequester-test-config.xml";
@@ -37,6 +41,7 @@ public class SftpQuartzRequesterFunctionalTestCase extends AbstractSftpTestCase
     /**
      * Test a quarts based requester
      */
+    @Test
     public void testQuartzRequester() throws Exception
     {
         // TODO. Add some tests specific to sizeCheck, i.e. create a very large file

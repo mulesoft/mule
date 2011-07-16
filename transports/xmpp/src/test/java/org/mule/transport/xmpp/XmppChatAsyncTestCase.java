@@ -14,8 +14,11 @@ import org.mule.transport.xmpp.JabberSender.Callback;
 
 import org.jivesoftware.smack.packet.Message;
 
+import static org.junit.Assert.assertEquals;
+
 public class XmppChatAsyncTestCase extends XmppMessageAsyncTestCase
 {
+
     @Override
     protected String getXmppConfigResources()
     {

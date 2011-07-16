@@ -13,18 +13,23 @@ package org.mule.transport.sftp;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.module.client.MuleClient;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertTrue;
+
 /**
  * @author Magnus Larsson <code>SftpExpressionFilenameParserTestCase</code> tests
  *         usage of the Expression Filename Parser instead of the default Legacy
  *         Parser.
  */
-
 public class SftpExpressionFilenameParserTestCase extends AbstractSftpTestCase
 {
+
     protected static final long TIMEOUT = 10000;
     private static final String OUTBOUND_ENDPOINT_NAME = "outboundEndpoint";
     private static final String INBOUND_ENDPOINT_NAME = "inboundEndpoint";
 
+    @Override
     protected String getConfigResources()
     {
         return "mule-sftp-expressionFilenameParser-config.xml";
@@ -39,6 +44,7 @@ public class SftpExpressionFilenameParserTestCase extends AbstractSftpTestCase
         initEndpointDirectory(OUTBOUND_ENDPOINT_NAME);
     }
 
+    @Test
     public void testExpressionFilenameParser() throws Exception
     {
         MuleClient muleClient = new MuleClient(muleContext);

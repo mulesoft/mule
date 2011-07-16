@@ -10,7 +10,7 @@
 
 package org.mule.transport.udp.functional;
 
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -22,15 +22,20 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 
 import edu.emory.mathcs.backport.java.util.Arrays;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 public class UdpRoundTripTestCase extends FunctionalTestCase
 {
 
+    @Override
     protected String getConfigResources()
     {
         return "udp-roundtrip-test-config.xml";
     }
 
+    @Test
     public void testSendAndReceiveUDP() throws IOException
     {
         int outPort = 61000;

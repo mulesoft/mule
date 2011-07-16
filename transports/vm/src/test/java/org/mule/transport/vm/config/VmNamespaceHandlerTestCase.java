@@ -13,10 +13,17 @@ import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.transaction.TransactionConfig;
 import org.mule.config.QueueProfile;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.testmodels.mule.TestTransactionFactory;
 import org.mule.transaction.XaTransactionFactory;
 import org.mule.transport.vm.VMConnector;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 
 /**
@@ -24,11 +31,14 @@ import org.mule.transport.vm.VMConnector;
  */
 public class VmNamespaceHandlerTestCase extends FunctionalTestCase
 {
+
+    @Override
     protected String getConfigResources()
     {
         return "vm/vm-namespace-config.xml";
     }
 
+    @Test
     public void testDefaults() throws Exception
     {
         VMConnector c = (VMConnector)muleContext.getRegistry().lookupConnector("vmConnectorDefaults");
@@ -42,6 +52,7 @@ public class VmNamespaceHandlerTestCase extends FunctionalTestCase
         assertTrue(c.isStarted());
     }
     
+    @Test
     public void testDefaultQueueProfile() throws Exception
     {
         VMConnector c = (VMConnector)muleContext.getRegistry().lookupConnector("vmConnector1");
@@ -56,6 +67,7 @@ public class VmNamespaceHandlerTestCase extends FunctionalTestCase
         assertTrue(c.isStarted());
     }
     
+    @Test
     public void testConfig() throws Exception
     {
         VMConnector c = (VMConnector)muleContext.getRegistry().lookupConnector("vmConnector2");
@@ -71,6 +83,7 @@ public class VmNamespaceHandlerTestCase extends FunctionalTestCase
         assertTrue(c.isStarted());
     }
 
+    @Test
     public void testGlobalEndpoint() throws Exception
     {
         ImmutableEndpoint endpoint = muleContext.getEndpointFactory().getInboundEndpoint("vmEndpoint");
@@ -81,6 +94,7 @@ public class VmNamespaceHandlerTestCase extends FunctionalTestCase
         assertEquals(address, "queue");
     }
     
+    @Test
     public void testVmTransaction() throws Exception
     {
         ImmutableEndpoint endpoint = muleContext.getEndpointFactory().getInboundEndpoint("globalWithTx");
@@ -92,6 +106,7 @@ public class VmNamespaceHandlerTestCase extends FunctionalTestCase
         assertEquals(42, txConfig.getTimeout());
     }
 
+    @Test
     public void testCustomTransaction() throws Exception
     {
         ImmutableEndpoint endpoint = muleContext.getRegistry().lookupEndpointBuilder("customTx").buildInboundEndpoint();
@@ -105,6 +120,7 @@ public class VmNamespaceHandlerTestCase extends FunctionalTestCase
         assertEquals("foo", factory.getValue());
     }
 
+    @Test
     public void testXaTransaction() throws Exception
     {
         ImmutableEndpoint endpoint = muleContext.getRegistry().lookupEndpointBuilder("xaTx").buildInboundEndpoint();

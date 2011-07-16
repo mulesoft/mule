@@ -18,12 +18,17 @@ import org.mule.transport.xmpp.JabberSender.Callback;
 import org.mule.util.concurrent.Latch;
 
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
-
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Packet;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class XmppMessageSyncTestCase extends AbstractXmppTestCase
 {
+    
     protected static final long JABBER_SEND_THREAD_SLEEP_TIME = 1000;
     private static final String RECEIVE_SERVICE_NAME = "receiveFromJabber";
         
@@ -33,6 +38,7 @@ public class XmppMessageSyncTestCase extends AbstractXmppTestCase
         return "xmpp-message-sync-config.xml";
     }
 
+    @Test
     public void testSendSync() throws Exception
     {   
         MuleClient client = new MuleClient(muleContext);
@@ -44,6 +50,7 @@ public class XmppMessageSyncTestCase extends AbstractXmppTestCase
         assertReceivedPacketEqualsMessageSent(packet);
     }
     
+    @Test
     public void testReceiveSync() throws Exception
     {
         startService(RECEIVE_SERVICE_NAME);
@@ -65,6 +72,7 @@ public class XmppMessageSyncTestCase extends AbstractXmppTestCase
         component.setEventCallback(callback);
     }
 
+    @Test
     public void testRequestSync() throws Exception
     {
         doTestRequest("xmpp://MESSAGE/mule2@localhost?exchangePattern=request-response");

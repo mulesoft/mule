@@ -12,20 +12,28 @@ package org.mule.issues;
 
 import org.mule.api.config.MuleProperties;
 import org.mule.api.transformer.Transformer;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.testmodels.mule.TestMessageDispatcherFactory;
 import org.mule.tck.transformer.NoActionTransformer;
 import org.mule.transformer.TransformerUtils;
 import org.mule.transport.AbstractConnector;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
 public class ServiceOverridesMule1770TestCase extends FunctionalTestCase
 {
 
+    @Override
     protected String getConfigResources()
     {
         return "issues/service-overrides-mule-1770-test.xml";
     }
 
+    @Test
     public void testServiceOverrides()
     {
         AbstractConnector c = (AbstractConnector)muleContext.getRegistry().lookupConnector("test");
@@ -39,8 +47,8 @@ public class ServiceOverridesMule1770TestCase extends FunctionalTestCase
         assertEquals(NoActionTransformer.class, transformer.getClass());
     }
 
-
     // MULE-1878
+    @Test
     public void testDuplicate()
     {
         AbstractConnector c1 = (AbstractConnector)muleContext.getRegistry().lookupConnector("test");

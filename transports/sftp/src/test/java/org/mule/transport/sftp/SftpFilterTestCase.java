@@ -16,15 +16,22 @@ import org.mule.transport.sftp.dataintegrity.AbstractSftpDataIntegrityTestCase;
 
 import java.util.HashMap;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 /**
  * Simple test to verify that the filter configuration works. Note that the transport
  * uses an "early" filter to improves the performance.
  */
 public class SftpFilterTestCase extends AbstractSftpDataIntegrityTestCase
 {
+
     private static String INBOUND_ENDPOINT_NAME = "inboundEndpoint";
     private static String OUTBOUND_ENDPOINT_NAME = "outboundEndpoint";
 
+    @Override
     protected String getConfigResources()
     {
         return "mule-sftp-filter-config.xml";
@@ -39,6 +46,7 @@ public class SftpFilterTestCase extends AbstractSftpDataIntegrityTestCase
         initEndpointDirectory(OUTBOUND_ENDPOINT_NAME);
     }
 
+    @Test
     public void testFilter() throws Exception
     {
         MuleClient muleClient = new MuleClient(muleContext);

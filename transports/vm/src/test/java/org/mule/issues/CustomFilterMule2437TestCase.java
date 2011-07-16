@@ -13,23 +13,31 @@ package org.mule.issues;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class CustomFilterMule2437TestCase extends FunctionalTestCase
 {
 
     private static final long TIMEOUT = 3000L;
 
+    @Override
     protected String getConfigResources()
     {
         return "issues/custom-filter-mule-2437-test.xml";
     }
 
+    @Test
     public void testVowels() throws Exception
     {
         doTest("aei", "vm://vowels");
     }
 
+    @Test
     public void testConsonants() throws Exception
     {
         doTest("zyx", "vm://consonants");

@@ -14,16 +14,21 @@ import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.transformer.Transformer;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transport.xmpp.transformers.ObjectToXmppPacket;
 import org.mule.transport.xmpp.transformers.XmppPacketToObject;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 public class XmppNamespaceHandlerTestCase extends FunctionalTestCase
 {
+
     public XmppNamespaceHandlerTestCase()
     {
-        super();
-        
         // no need to connect to the Jabber server
         setStartContext(false);
     }
@@ -34,6 +39,7 @@ public class XmppNamespaceHandlerTestCase extends FunctionalTestCase
         return "xmpp-namespace-config.xml";
     }
 
+    @Test
     public void testConfig() throws Exception
     {
         XmppConnector connector = (XmppConnector) muleContext.getRegistry().lookupConnector("xmppConnector");
@@ -47,6 +53,7 @@ public class XmppNamespaceHandlerTestCase extends FunctionalTestCase
         assertTrue(connector.isCreateAccount());
     }
 
+    @Test
     public void testSendingMessageEndpoint() throws Exception
     {
         OutboundEndpoint endpoint = lookupOutboundEndpoint("sendingMessageEndpoint");
@@ -54,12 +61,14 @@ public class XmppNamespaceHandlerTestCase extends FunctionalTestCase
         assertEquals("TheSubject", endpoint.getProperty(XmppConnector.XMPP_SUBJECT));
     }
     
+    @Test
     public void testReceivingChatEndpoint() throws Exception
     {
         InboundEndpoint endpoint = lookupInboundEndpoint("receivingChatEndpoint");
         assertEquals("xmpp://CHAT/sender@jabberhost", endpoint.getEndpointURI().toString());
     }
     
+    @Test
     public void testTransformers() throws Exception
     {
         Transformer transformer = lookupTransformer("ObjectToXmpp");

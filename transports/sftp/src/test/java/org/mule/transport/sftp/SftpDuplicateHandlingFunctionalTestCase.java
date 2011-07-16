@@ -10,16 +10,23 @@
 
 package org.mule.transport.sftp;
 
-import org.apache.commons.lang.NotImplementedException;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.transport.DispatchException;
 import org.mule.module.client.MuleClient;
+
+import org.apache.commons.lang.NotImplementedException;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * Test the archive features.
  */
 public class SftpDuplicateHandlingFunctionalTestCase extends AbstractSftpTestCase
 {
+    
     private static final long TIMEOUT = 10000;
 
     // Size of the generated stream - 2 Mb
@@ -29,14 +36,15 @@ public class SftpDuplicateHandlingFunctionalTestCase extends AbstractSftpTestCas
     {
         // Only start mule once for all tests below, save a lot of time..., if test3
         // starts failing, comment this out
-        setDisposeManagerPerSuite(true);
+        setDisposeContextPerClass(true);
 
         // Increase the timeout of the test to 300 s
-        logger.info("Timeout was set to: " + System.getProperty(PROPERTY_MULE_TEST_TIMEOUT, "-1"));
-        System.setProperty(PROPERTY_MULE_TEST_TIMEOUT, "300000");
-        logger.info("Timeout is now set to: " + System.getProperty(PROPERTY_MULE_TEST_TIMEOUT, "-1"));
+        logger.info("Timeout was set to: " + System.getProperty(TEST_TIMEOUT_SYSTEM_PROPERTY, "-1"));
+        System.setProperty(TEST_TIMEOUT_SYSTEM_PROPERTY, "300000");
+        logger.info("Timeout is now set to: " + System.getProperty(TEST_TIMEOUT_SYSTEM_PROPERTY, "-1"));
     }
 
+    @Override
     protected String getConfigResources()
     {
         return "mule-sftp-duplicateHandling-test-config.xml";
@@ -60,6 +68,7 @@ public class SftpDuplicateHandlingFunctionalTestCase extends AbstractSftpTestCas
     /**
      * Test 1 - test duplicate handling by throwing an exception
      */
+    @Test
     public void testDuplicateHandlingThrowException() throws Exception
     {
         // TODO. Add some tests specific to this test, i.e. not only rely on the
@@ -73,6 +82,7 @@ public class SftpDuplicateHandlingFunctionalTestCase extends AbstractSftpTestCas
      * Test 2 - test duplicate handling by overwriting the existing file Not yet
      * implemented, so currently we check for a valid exception...
      */
+    @Test
     public void testDuplicateHandlingOverwrite() throws Exception
     {
         // TODO. Add some tests specific to this test, i.e. not only rely on the
@@ -97,6 +107,7 @@ public class SftpDuplicateHandlingFunctionalTestCase extends AbstractSftpTestCas
     /**
      * Test 3 - test duplicate handling by adding a sequence number to the new file
      */
+    @Test
     public void testDuplicateHandlingAddSeqNo() throws Exception
     {
         // TODO. Add some tests specific to this test, i.e. not only rely on the
@@ -110,6 +121,7 @@ public class SftpDuplicateHandlingFunctionalTestCase extends AbstractSftpTestCas
      * Test 4 - test duplicate handling by adding a sequence number to the new file
      * using default value on connector
      */
+    @Test
     public void testDuplicateHandlingAddSeqNoUsingConnector() throws Exception
     {
         // TODO. Add some tests specific to this test, i.e. not only rely on the
@@ -130,7 +142,8 @@ public class SftpDuplicateHandlingFunctionalTestCase extends AbstractSftpTestCas
      * without file extension
      */
     /*
-     * public void testDuplicateHandlingAddSeqNoWithNoFileExtension() throws
+     * @Test
+    public void testDuplicateHandlingAddSeqNoWithNoFileExtension() throws
      * Exception { MuleClient muleClient = new MuleClient(); HashMap<String, String>
      * txtProps = new HashMap<String, String>(1);
      * txtProps.put(SftpConnector.PROPERTY_FILENAME, "file5");

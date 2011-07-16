@@ -17,12 +17,16 @@ import java.util.Properties;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
-
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Packet;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 public abstract class AbstractXmppTestCase extends XmppEnableDisableTestCase
 {
+
     private static final long STARTUP_TIMEOUT = 5000;
 
     private CountDownLatch jabberLatch;
@@ -31,18 +35,18 @@ public abstract class AbstractXmppTestCase extends XmppEnableDisableTestCase
     protected String muleJabberUserId;
 
     @Override
-    protected void doSetUp() throws Exception
-    {
-        super.doSetUp();
-        
-        jabberLatch = new CountDownLatch(1);
-        createAndConnectJabberClient();
-    }
-    
-    @Override
     protected final String getConfigResources()
     {
         return "xmpp-connector-config.xml," + getXmppConfigResources();
+    }
+
+    @Override
+    protected void doSetUp() throws Exception
+    {
+        super.doSetUp();
+
+        jabberLatch = new CountDownLatch(1);
+        createAndConnectJabberClient();
     }
 
     /**
@@ -77,7 +81,10 @@ public abstract class AbstractXmppTestCase extends XmppEnableDisableTestCase
     @Override
     protected void doTearDown() throws Exception
     {
-        jabberClient.disconnect();
+        if (jabberClient != null)
+        {
+            jabberClient.disconnect();
+        }
         super.doTearDown();
     }
     

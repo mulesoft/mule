@@ -10,13 +10,6 @@
 
 package org.mule.transport.sftp;
 
-import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
-import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
-import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicInteger;
-import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicReference;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.commons.io.IOUtils;
 import org.mule.api.MuleEventContext;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.functional.EventCallback;
@@ -24,6 +17,19 @@ import org.mule.tck.functional.FunctionalTestComponent;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
+import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicInteger;
+import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicReference;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * <code>SftpFileAgeFunctionalTestCase</code> tests the fileAge functionality.
@@ -33,12 +39,14 @@ import java.util.Map;
 
 public class SftpFileAgeFunctionalTestCase extends AbstractSftpTestCase
 {
+    
     private static final Log logger = LogFactory.getLog(SftpFileAgeFunctionalTestCase.class);
 
     private static final String INBOUND_ENDPOINT_NAME = "inboundEndpoint";
 
     protected static final long TIMEOUT = 10000 * 6;
 
+    @Override
     protected String getConfigResources()
     {
         return "mule-sftp-file-age-config.xml";
@@ -52,6 +60,7 @@ public class SftpFileAgeFunctionalTestCase extends AbstractSftpTestCase
         initEndpointDirectory("inboundEndpoint");
     }
 
+    @Test
     public void testFileAge() throws Exception
     {
         final CountDownLatch latch = new CountDownLatch(1);

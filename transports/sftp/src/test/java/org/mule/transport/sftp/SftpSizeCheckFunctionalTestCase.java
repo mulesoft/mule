@@ -10,16 +10,20 @@
 
 package org.mule.transport.sftp;
 
+import org.junit.Test;
+
 /**
  * Test the sizeCheck feature.
  */
 public class SftpSizeCheckFunctionalTestCase extends AbstractSftpTestCase
 {
+
     private static final long TIMEOUT = 15000;
 
     // Size of the generated stream - 2 Mb
     final static int SEND_SIZE = 1024 * 1024 * 2;
 
+    @Override
     protected String getConfigResources()
     {
         return "mule-sftp-sizeCheck-test-config.xml";
@@ -36,6 +40,7 @@ public class SftpSizeCheckFunctionalTestCase extends AbstractSftpTestCase
     /**
      * Test the sizeCheck feature
      */
+    @Test
     public void testSizeCheck() throws Exception
     {
         // TODO. Add some tests specific to sizeCheck, i.e. create a very large file

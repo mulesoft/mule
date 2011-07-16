@@ -23,12 +23,17 @@ import org.mule.util.concurrent.Latch;
 import java.util.Properties;
 
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
-
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Packet;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class XmppMucSyncTestCase extends AbstractXmppTestCase
 {
+    
     protected static final long JABBER_SEND_THREAD_SLEEP_TIME = 1000;
     private static final String RECEIVE_SERVICE_NAME = "receiveFromJabber";
     private static final long SHORT_RETRIEVE_TIMEOUT = 100;
@@ -53,6 +58,7 @@ public class XmppMucSyncTestCase extends AbstractXmppTestCase
         return "xmpp-muc-sync-config.xml";
     }
 
+    @Test
     public void testSendSync() throws Exception
     {           
         MuleClient client = new MuleClient(muleContext);
@@ -80,6 +86,7 @@ public class XmppMucSyncTestCase extends AbstractXmppTestCase
         assertTrue(inputSeen);
     }
     
+    @Test
     public void testReceiveSync() throws Exception
     {
         startService(RECEIVE_SERVICE_NAME);

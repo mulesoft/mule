@@ -10,11 +10,17 @@
 
 package org.mule.transport.sftp.dataintegrity;
 
-import java.io.IOException;
-
 import org.mule.api.transport.DispatchException;
 import org.mule.module.client.MuleClient;
 import org.mule.transport.sftp.SftpClient;
+
+import java.io.IOException;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Verify that the original file is not lost if the outbound directory doesn't exist
@@ -41,6 +47,7 @@ public class SftpNoWriteAccessToOutboundDirectoryTestCase extends AbstractSftpDa
     }
 
     /** No write access on the outbound directory. The source file should still exist */
+    @Test
     public void testNoWriteAccessToOutboundDirectory() throws Exception
     {
         MuleClient muleClient = new MuleClient(muleContext);

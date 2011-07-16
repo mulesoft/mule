@@ -10,10 +10,6 @@
 
 package org.mule.transport.sftp;
 
-import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
-import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
-import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicInteger;
-import org.apache.commons.io.IOUtils;
 import org.mule.api.MuleEventContext;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.functional.EventCallback;
@@ -23,11 +19,20 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
+import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicInteger;
+import org.apache.commons.io.IOUtils;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 /**
  * <code>SftpPoolingFunctionalTestCase</code> tests sending an receiving multiple
  * small text files.
  */
-
 public class SftpPoolingFunctionalTestCase extends AbstractSftpTestCase
 {
     private static final long TIMEOUT = 30000;
@@ -37,6 +42,7 @@ public class SftpPoolingFunctionalTestCase extends AbstractSftpTestCase
 
     private int nrOfFiles = 100;
 
+    @Override
     protected String getConfigResources()
     {
         return "mule-pooling-test-config.xml";
@@ -50,6 +56,7 @@ public class SftpPoolingFunctionalTestCase extends AbstractSftpTestCase
         initEndpointDirectory("inboundEndpoint");
     }
 
+    @Test
     public void testSftpConfig() throws Exception
     {
         SftpConnector c = (SftpConnector) muleContext.getRegistry().lookupConnector("sftp-pool");
@@ -60,6 +67,7 @@ public class SftpPoolingFunctionalTestCase extends AbstractSftpTestCase
         assertEquals(false, c2.useConnectionPool());
     }
 
+    @Test
     public void testSendAndReceiveMultipleFiles() throws Exception
     {
         sendFiles = new ArrayList<String>();

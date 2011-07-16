@@ -12,19 +12,27 @@ package org.mule.transport.vm.functional;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
+
 public class VMRequestorTestCase extends FunctionalTestCase
 {
-    
+
+    @Override
     protected String getConfigResources()
     {
         return "vm/vm-functional-test.xml";
     }
 
+    @Test
     public void testRequestorWithUpdateonMessage() throws Exception
     {
 

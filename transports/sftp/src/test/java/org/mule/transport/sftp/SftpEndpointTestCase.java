@@ -11,14 +11,21 @@
 package org.mule.transport.sftp;
 
 import org.mule.api.MuleException;
+import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.endpoint.MuleEndpointURI;
 import org.mule.module.client.MuleClient;
-import org.mule.api.endpoint.EndpointURI;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class SftpEndpointTestCase extends AbstractSftpTestCase
 {
 
+    @Override
     protected String getConfigResources()
     {
         return "mule-sftp-endpoint-config.xml";
@@ -28,7 +35,7 @@ public class SftpEndpointTestCase extends AbstractSftpTestCase
      * For general guidelines on writing transports see
      * http://mule.mulesource.org/display/MULE/Writing+Transports
      */
-
+    @Test
     public void testValidEndpointURI() throws Exception
     {
         // TODO test creating and asserting Endpoint values eg
@@ -41,6 +48,7 @@ public class SftpEndpointTestCase extends AbstractSftpTestCase
 
     }
 
+    @Test
     public void testValidEndpointURIWithUserAndPasswd() throws Exception
     {
         EndpointURI url = new MuleEndpointURI("sftp://user1:passwd1@localhost:4242/data2", muleContext);
@@ -54,6 +62,7 @@ public class SftpEndpointTestCase extends AbstractSftpTestCase
 
     }
 
+    @Test
     public void testEndpointConfig() throws MuleException
     {
         MuleClient muleClient = new MuleClient(muleContext);

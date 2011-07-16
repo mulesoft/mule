@@ -13,7 +13,12 @@ package org.mule.issues;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class ResponseTransformerMule2165TestCase extends FunctionalTestCase
 {
@@ -88,52 +93,62 @@ public class ResponseTransformerMule2165TestCase extends FunctionalTestCase
         assertEquals("bad response (" + message + ")  for " + endpoint, response, message);
     }
 
+    @Test
     public void testGlobalNameGlobalTransformer() throws Exception
     {
         testTransformered("global-name-global-transformer", GLOBAL_RESPONSE);
     }
 
+    @Test
     public void testGlobalNameUrlTransformer() throws Exception
     {
         testTransformered("global-name-url-transformer", GLOBAL_RESPONSE);
     }
 
+    @Test
     public void testGlobalNameLocalTransformer() throws Exception
     {
         testTransformered("global-name-local-transformer", LOCAL_RESPONSE);
     }
 
+    @Test
     public void testLocalNameLocalTransformer() throws Exception
     {
         testTransformered("local-name-local-transformer", LOCAL_RESPONSE);
     }
 
+    @Test
     public void testLocalNameUrlTransformer() throws Exception
     {
         testTransformered("local-name-url-transformer", LOCAL_RESPONSE);
     }
 
 
+    @Test
     public void testGlobalNameGlobalTransformerAsync() throws Exception
     {
         testTransformeredAsync("global-name-global-transformer", GLOBAL_RESPONSE);
     }
 
+    @Test
     public void testGlobalNameUrlTransformerAsync() throws Exception
     {
         testTransformeredAsync("global-name-url-transformer", GLOBAL_RESPONSE);
     }
 
+    @Test
     public void testGlobalNameLocalTransformerAsync() throws Exception
     {
         testTransformeredAsync("global-name-local-transformer", LOCAL_RESPONSE);
     }
 
+    @Test
     public void testLocalNameLocalTransformerAsync() throws Exception
     {
         testTransformeredAsync("local-name-local-transformer", LOCAL_RESPONSE);
     }
 
+    @Test
     public void testLocalNameUrlTransformerAsync() throws Exception
     {
         testTransformeredAsync("local-name-url-transformer", LOCAL_RESPONSE);

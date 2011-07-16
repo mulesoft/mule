@@ -10,22 +10,29 @@
 
 package org.mule.transport.vm.functional.transactions;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transport.NullPayload;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 /** Test transaction behavior when "joinExternal" is set to disallow joining external transactions
  * There is one test per legal transactional behavior (e.g. ALWAYS_BEGIN).
  */
 public class MessageFilterTestCase extends FunctionalTestCase
 {
+
     protected static final Log logger = LogFactory.getLog(MessageFilterTestCase.class);
 
     private static String rejectMesage;
@@ -37,6 +44,7 @@ public class MessageFilterTestCase extends FunctionalTestCase
     }
 
     /** Check that the configuration specifies considers external transactions */
+    @Test
     public void testConfiguration() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);

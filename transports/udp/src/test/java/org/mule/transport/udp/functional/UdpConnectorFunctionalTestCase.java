@@ -12,10 +12,14 @@ package org.mule.transport.udp.functional;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import java.util.HashSet;
 import java.util.Set;
+
+import org.junit.Test;
+
+import static org.junit.Assert.fail;
 
 public class UdpConnectorFunctionalTestCase extends FunctionalTestCase
 {
@@ -27,6 +31,7 @@ public class UdpConnectorFunctionalTestCase extends FunctionalTestCase
     public static final long MIN_PAUSE_PERIOD = 10;
     public static final long BETWEEN_BATCH_PAUSE = 5000;
 
+    @Override
     protected String getConfigResources()
     {
         return "udp-functional-test.xml";
@@ -36,6 +41,7 @@ public class UdpConnectorFunctionalTestCase extends FunctionalTestCase
      * We try progressively smaller batches to see if there are issues with internal
      * buffers.  If we don't get 100% success eventually, we fail.
      */
+    @Test
     public void testMany() throws Exception
     {
         int numberOfBatches = 0;

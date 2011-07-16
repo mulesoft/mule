@@ -12,10 +12,16 @@ package org.mule.transport.vm.functional;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import java.util.HashSet;
 import java.util.Set;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 public class PersistentBoundedQueueTestCase extends FunctionalTestCase
 {
@@ -28,6 +34,7 @@ public class PersistentBoundedQueueTestCase extends FunctionalTestCase
         return "vm/persistent-bounded-vm-queue-test.xml";
     }
 
+    @Test
     public void testBoundedQueue() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);

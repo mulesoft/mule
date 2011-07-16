@@ -12,15 +12,21 @@ package org.mule.transport.sftp;
 
 import org.mule.transport.sftp.notification.SftpTransportNotificationTestListener;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 /**
  * Test the notification features.
  */
 public class SftpNotificationFunctionalTestCase extends AbstractSftpTestCase
 {
+    
     private static final long TIMEOUT = 15000;
 
     // Size of the generated stream - 2 Mb
-    final static int SEND_SIZE = 1024 * 1024 * 2;
+    private final static int SEND_SIZE = 1024 * 1024 * 2;
 
     @Override
     protected void doSetUp() throws Exception
@@ -32,6 +38,7 @@ public class SftpNotificationFunctionalTestCase extends AbstractSftpTestCase
         SftpTransportNotificationTestListener.reset();
     }
 
+    @Override
     protected String getConfigResources()
     {
         return "mule-sftp-notification-test-config.xml";
@@ -40,6 +47,7 @@ public class SftpNotificationFunctionalTestCase extends AbstractSftpTestCase
     /**
      * Test notification.
      */
+    @Test
     public void testNotification() throws Exception
     {
         executeBaseTest("inboundEndpoint", "vm://test.upload", FILE_NAME, SEND_SIZE, "receiving", TIMEOUT);

@@ -19,11 +19,15 @@ import java.util.List;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
-
 import org.jivesoftware.smack.packet.Message;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class XmppMessageAsyncTestCase extends AbstractXmppTestCase
 {
+    
     protected static final long JABBER_SEND_THREAD_SLEEP_TIME = 1000;
     private static final String RECEIVE_SERVICE_NAME = "receiveFromJabber";
 
@@ -42,6 +46,7 @@ public class XmppMessageAsyncTestCase extends AbstractXmppTestCase
         client.setMessageLatch(latch);
     }
 
+    @Test
     public void testDispatch() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -56,6 +61,7 @@ public class XmppMessageAsyncTestCase extends AbstractXmppTestCase
         assertXmppMessage(message);
     }
     
+    @Test
     public void testReceiveAsync() throws Exception
     {
         startService(RECEIVE_SERVICE_NAME);

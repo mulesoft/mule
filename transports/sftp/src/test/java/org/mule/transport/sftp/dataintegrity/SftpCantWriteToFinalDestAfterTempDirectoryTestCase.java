@@ -10,13 +10,19 @@
 
 package org.mule.transport.sftp.dataintegrity;
 
-import java.io.IOException;
-
-import org.apache.commons.lang.NotImplementedException;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.transport.DispatchException;
 import org.mule.module.client.MuleClient;
 import org.mule.transport.sftp.SftpClient;
+
+import java.io.IOException;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Tests that files are not deleted if the final destination is not writable when
@@ -49,6 +55,7 @@ public class SftpCantWriteToFinalDestAfterTempDirectoryTestCase extends Abstract
      * directory. The source file should still exist and no file should exist in the
      * TEMP directory.
      */
+    @Test
     public void testCantWriteToFinalDestAfterTempDirectory() throws Exception
     {
         MuleClient muleClient = new MuleClient(muleContext);

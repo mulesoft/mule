@@ -10,9 +10,6 @@
 
 package org.mule.transport.sftp;
 
-import static org.mule.context.notification.EndpointMessageNotification.MESSAGE_DISPATCHED;
-import static org.mule.context.notification.EndpointMessageNotification.MESSAGE_SENT;
-
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleException;
@@ -31,10 +28,9 @@ import org.mule.api.transport.Connector;
 import org.mule.context.notification.EndpointMessageNotification;
 import org.mule.module.client.MuleClient;
 import org.mule.routing.filters.WildcardFilter;
-import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.functional.EventCallback;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transport.sftp.util.ValueHolder;
-import org.mule.util.FileUtils;
 import org.mule.util.IOUtils;
 import org.mule.util.StringMessageUtils;
 
@@ -55,10 +51,15 @@ import java.util.Map;
 import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicInteger;
-
 import org.apache.commons.lang.SystemUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.mule.context.notification.EndpointMessageNotification.MESSAGE_DISPATCHED;
+import static org.mule.context.notification.EndpointMessageNotification.MESSAGE_SENT;
 
 /**
  * @author Lennart Häggkvist, Magnus Larsson Date: Jun 8, 2009

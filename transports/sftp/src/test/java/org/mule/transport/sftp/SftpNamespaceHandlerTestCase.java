@@ -12,13 +12,18 @@ package org.mule.transport.sftp;
 
 import org.mule.tck.FunctionalTestCase;
 
+import org.junit.Test;
+
 public class SftpNamespaceHandlerTestCase extends FunctionalTestCase
 {
+
+    @Override
     protected String getConfigResources()
     {
         return "sftp-namespace-config.xml";
     }
 
+    @Test
     public void testSftpConfig() throws Exception
     {
         SftpConnector c = (SftpConnector) muleContext.getRegistry().lookupConnector("sftpConnector");

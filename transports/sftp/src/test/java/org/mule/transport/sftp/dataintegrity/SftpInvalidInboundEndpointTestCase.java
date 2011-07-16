@@ -10,12 +10,18 @@
 
 package org.mule.transport.sftp.dataintegrity;
 
-import java.io.IOException;
-
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.registry.MuleRegistry;
 import org.mule.transport.sftp.SftpConnector;
+
+import java.io.IOException;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
 
 public class SftpInvalidInboundEndpointTestCase extends AbstractSftpDataIntegrityTestCase
 {
@@ -28,6 +34,7 @@ public class SftpInvalidInboundEndpointTestCase extends AbstractSftpDataIntegrit
         return "dataintegrity/sftp-invalid-inbound-endpoint-config.xml";
     }
 
+    @Test
     public void testInvalidInboundEndpoint() throws Exception
     {
 
