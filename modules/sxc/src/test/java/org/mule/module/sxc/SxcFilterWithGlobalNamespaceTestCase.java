@@ -14,6 +14,6 @@ public class SxcFilterWithGlobalNamespaceTestCase extends SxcFilterTestCase
     @Override
     protected String getConfigResources()
     {
-        return "xpath-filter-with-global-naespace-conf.xml";
+        return "xpath-filter-with-global-namespace-conf.xml";
     }
 }
