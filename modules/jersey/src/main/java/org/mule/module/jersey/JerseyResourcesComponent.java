@@ -13,7 +13,6 @@ package org.mule.module.jersey;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.component.JavaComponent;
-import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transformer.TransformerException;
@@ -126,7 +125,7 @@ public class JerseyResourcesComponent extends AbstractComponent
             path = path.substring(0, queryIdx);
         }
 
-        EndpointURI endpointUri = event.getEndpoint().getEndpointURI();
+        URI endpointUri = event.getMessageSourceURI();
         String host = message.getInboundProperty("Host", endpointUri.getHost());
         String method = message.getInboundProperty(HttpConnector.HTTP_METHOD_PROPERTY);
         InBoundHeaders headers = new InBoundHeaders();
@@ -177,7 +176,7 @@ public class JerseyResourcesComponent extends AbstractComponent
         return new MuleComponentProviderFactory(muleContext, components);
     }
 
-    protected static URI getCompleteUri(EndpointURI endpointUri,
+    protected static URI getCompleteUri(URI endpointUri,
                                         String scheme,
                                         String host,
                                         String path,
@@ -192,7 +191,7 @@ public class JerseyResourcesComponent extends AbstractComponent
         return new URI(uri);
     }
 
-    protected static URI getBaseUri(EndpointURI endpointUri, String scheme, String host, String contextPath)
+    protected static URI getBaseUri(URI endpointUri, String scheme, String host, String contextPath)
         throws URISyntaxException
     {
         if (!contextPath.endsWith("/"))

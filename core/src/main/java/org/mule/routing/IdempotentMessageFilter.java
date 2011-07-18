@@ -160,7 +160,7 @@ public class IdempotentMessageFilter extends AbstractFilteringMessageProcessor i
         {
             logger.error("Exception attempting to determine idempotency of incoming message for "
                          + event.getFlowConstruct().getName() + " from the endpoint "
-                         + event.getEndpoint().getEndpointURI().getUri(), e);
+                         + event.getMessageSourceURI(), e);
             return false;
         }
     }

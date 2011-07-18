@@ -16,6 +16,8 @@ import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.Message;
 
+import java.net.URI;
+
 /**
  * <code>UnauthorisedException</code> is thrown if authentication fails
  */
@@ -49,17 +51,17 @@ public class UnauthorisedException extends SecurityException
 
     public UnauthorisedException(MuleEvent event, SecurityContext context, SecurityFilter filter)
     {
-        super(constructMessage(context, event.getEndpoint(), filter), event);
+        super(constructMessage(context, event.getMessageSourceURI(), filter), event);
     }
 
     @Deprecated
     public UnauthorisedException(MuleEvent event, SecurityContext context, 
         ImmutableEndpoint endpoint, SecurityFilter filter)
     {
-        super(constructMessage(context, endpoint, filter), event);
+        super(constructMessage(context, endpoint.getEndpointURI().getUri(), filter), event);
     }
 
-    private static Message constructMessage(SecurityContext context, ImmutableEndpoint endpoint,
+    private static Message constructMessage(SecurityContext context, URI endpointURI,
                                             SecurityFilter filter)
     {
 
@@ -72,7 +74,7 @@ public class UnauthorisedException extends SecurityException
         {
             m = CoreMessages.authFailedForUser(context.getAuthentication().getPrincipal());
         }
-        m.setNextMessage(CoreMessages.authDeniedOnEndpoint(endpoint.getEndpointURI()));
+        m.setNextMessage(CoreMessages.authDeniedOnEndpoint(endpointURI));
         return m;
     }
 }

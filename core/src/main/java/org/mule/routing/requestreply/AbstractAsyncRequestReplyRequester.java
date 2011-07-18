@@ -236,9 +236,8 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
                 }
                 // Fire a notification to say we received this message
                 event.getMuleContext().fireNotification(
-                    new RoutingNotification(event.getMessage(), event.getEndpoint()
-                        .getEndpointURI()
-                        .toString(), RoutingNotification.MISSED_ASYNC_REPLY));
+                    new RoutingNotification(event.getMessage(), event.getMessageSourceURI().toString(),
+                        RoutingNotification.MISSED_ASYNC_REPLY));
                 return null;
             }
 

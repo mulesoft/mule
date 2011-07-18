@@ -29,6 +29,7 @@ import org.mule.util.UUID;
 
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
+import java.net.URI;
 
 /** An event used for outbound routing tests.  It is not fully fleshed out, containing only the information needed for
  * routing.
@@ -242,5 +243,11 @@ public class OutboundRoutingTestEvent implements MuleEvent
     public boolean isTransacted()
     {
         return false;
+    }
+    
+    @Override
+    public URI getMessageSourceURI()
+    {
+        return null;
     }
 }

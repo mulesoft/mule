@@ -20,6 +20,7 @@ import org.mule.management.stats.ProcessingTime;
 
 import java.io.OutputStream;
 import java.io.Serializable;
+import java.net.URI;
 
 /**
  * <code>MuleEvent</code> represents any data event occuring in the Mule
@@ -271,4 +272,11 @@ public interface MuleEvent extends Serializable
      * Returns true is this event is being processed in a transaction
      */
     boolean isTransacted();
+
+    /**
+     * Returns the {@link URI} of the MessageSource that recieved or generated the message being processed.
+     * 
+     * @return
+     */
+    URI getMessageSourceURI();
 }

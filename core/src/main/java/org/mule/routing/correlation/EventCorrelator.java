@@ -178,7 +178,7 @@ public class EventCorrelator implements Startable, Stoppable
                 }
                 //Fire a notification to say we received this message
                 muleContext.fireNotification(new RoutingNotification(event.getMessage(),
-                                                                     event.getEndpoint().getEndpointURI().toString(),
+                                                                     event.getMessageSourceURI().toString(),
                                                                      RoutingNotification.MISSED_AGGREGATION_GROUP_EVENT));
                 return null;
             }

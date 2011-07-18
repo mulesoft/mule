@@ -21,6 +21,7 @@ import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.lifecycle.Callable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.transport.PropertyScope;
 import org.mule.config.MuleManifest;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
@@ -38,9 +39,11 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 
 import javax.xml.namespace.QName;
 
@@ -149,20 +152,21 @@ public class AxisServiceComponent implements Initialisable, Callable
             // We parse a new uri based on the listening host and port with the
             // request parameters appended
             // Using the soap prefix ensures that we use a soap endpoint builder
-            EndpointURI endpointUri = context.getEndpointURI();
+            EndpointURI endpointUri = new MuleEndpointURI(context.getEndpointURI().toString(), context.getMuleContext());
             //We need to re-parse the URI here because we are only give the listening endpoint, not the actual
             //request endpoint. The request endpoint needs to have the query parameters from the client
             //There is no need to do this for Servlet because it does things differently
-            if (!"true".equalsIgnoreCase(context.getEndpointURI().getParams().getProperty("servlet.endpoint")))
+            if (!"true".equalsIgnoreCase((String) context.getMessage().getInvocationProperty("servlet.endpoint")))
             {
                 String uri = SoapConstants.SOAP_ENDPOINT_PREFIX + context.getEndpointURI().getScheme()
                                 + "://" + context.getEndpointURI().getHost() + ":"
                                 + context.getEndpointURI().getPort();
                 uri += context.getMessage().getInboundProperty(HttpConnector.HTTP_REQUEST_PROPERTY, StringUtils.EMPTY);
                 endpointUri = new MuleEndpointURI(uri, context.getMuleContext());
-                endpointUri.initialise();
             }
 
+            endpointUri.initialise();
+            
             AxisEngine engine = getAxis();
             String pathInfo = endpointUri.getPath();
             boolean wsdlRequested = false;
@@ -240,8 +244,8 @@ public class AxisServiceComponent implements Initialisable, Callable
         String contentType;
         try
         {
-            //EndpointURI endpointUri = getEndpoint(context);
-            EndpointURI endpointUri = context.getEndpointURI();
+            EndpointURI endpointUri = new MuleEndpointURI(context.getEndpointURI().toString(), context.getMuleContext());
+            endpointUri.initialise();
             populateMessageContext(msgContext, context, endpointUri);
             if (securityProvider != null)
             {
@@ -285,7 +289,7 @@ public class AxisServiceComponent implements Initialisable, Callable
             {
                 logger.debug("Invoking Axis Engine.");
             }
-            AxisServiceProxy.setProperties(RequestContext.getEvent().getEndpoint().getProperties());
+            populateAxisProperties();
             engine.invoke(msgContext);
             if (logger.isDebugEnabled())
             {
@@ -468,7 +472,7 @@ public class AxisServiceComponent implements Initialisable, Callable
             AxisEngine engine = getAxis();
             Message msg = new Message(istream, false);
             msgContext.setRequestMessage(msg);
-            AxisServiceProxy.setProperties(RequestContext.getEvent().getEndpoint().getProperties());
+            populateAxisProperties();
             engine.invoke(msgContext);
             responseMsg = msgContext.getResponseMessage();
             response.setProperty(HTTPConstants.HEADER_CACHE_CONTROL, "no-cache");
@@ -491,6 +495,21 @@ public class AxisServiceComponent implements Initialisable, Callable
         }
         response.setProperty(HTTPConstants.HEADER_CONTENT_TYPE, "text/xml");
         response.write(responseMsg.getSOAPPartAsString());
+    }
+    
+    private void populateAxisProperties()
+    {
+
+        Map<String, Object> invocationProperties = new HashMap<String, Object>();
+        Set<String> propertyNames = RequestContext.getEvent()
+            .getMessage()
+            .getPropertyNames(PropertyScope.INVOCATION);
+        for (String propName : propertyNames)
+        {
+            invocationProperties.put(propName,
+                RequestContext.getEvent().getMessage().getInvocationProperty(propName));
+        }
+        AxisServiceProxy.setProperties(invocationProperties);
     }
 
     protected void reportServiceInfo(AxisStringWriter response, SOAPService service, String serviceName)
@@ -754,7 +773,17 @@ public class AxisServiceComponent implements Initialisable, Callable
 
         if (StringUtils.isEmpty(soapAction))
         {
-            soapAction = context.getEndpointURI().getAddress();
+            EndpointURI endpointUri;
+            try
+            {
+                endpointUri = new MuleEndpointURI(context.getEndpointURI().toString(), context.getMuleContext());
+                endpointUri.initialise();
+            }
+            catch (Exception e)
+            {
+                throw new AxisFault(e.getMessage(), e);
+            }
+            soapAction = endpointUri.getAddress();
         }
         return soapAction;
     }

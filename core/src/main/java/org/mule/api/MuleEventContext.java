@@ -21,6 +21,7 @@ import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.TransformerException;
 
 import java.io.OutputStream;
+import java.net.URI;
 
 /**
  * <code>MuleEventContext</code> is the context object for the current request.
@@ -432,7 +433,7 @@ public interface MuleEventContext
      * 
      * @return the receive endpoint for this event context
      */
-    EndpointURI getEndpointURI();
+    URI getEndpointURI();
 
     /**
      * Returns the transaction for the current event or null if there is no

@@ -35,7 +35,7 @@ public class ServiceLoggingMessageProcessor implements MessageProcessor
             if (logger.isDebugEnabled())
             {
                 logger.debug("Service: " + service.getName() + " has received synchronous event on: "
-                             + event.getEndpoint().getEndpointURI());
+                             + event.getMessageSourceURI());
             }
         }
         else
@@ -43,7 +43,7 @@ public class ServiceLoggingMessageProcessor implements MessageProcessor
             if (logger.isDebugEnabled())
             {
                 logger.debug("Service: " + service.getName() + " has received asynchronous event on: "
-                             + event.getEndpoint().getEndpointURI());
+                             + event.getMessageSourceURI());
             }
         }
 

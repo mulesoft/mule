@@ -12,9 +12,10 @@ package org.mule.api.security;
 
 import org.mule.RequestContext;
 import org.mule.api.MuleEvent;
-import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.Message;
+
+import java.net.URI;
 
 /**
  * <code>NotPermittedException</code> is thrown if the user isn't authorized
@@ -49,11 +50,11 @@ public class NotPermittedException extends SecurityException
 
     public NotPermittedException(MuleEvent event, SecurityContext context,SecurityFilter filter)
     {
-        super(constructMessage(context, event.getEndpoint(), filter), event);
+        super(constructMessage(context, event.getMessageSourceURI(), filter), event);
     }
 
     private static Message constructMessage(SecurityContext context, 
-                                            ImmutableEndpoint endpoint,
+                                            URI endpointURI,
                                             SecurityFilter filter)
     {
 
@@ -66,7 +67,7 @@ public class NotPermittedException extends SecurityException
         {
             m = CoreMessages.authFailedForUser(context.getAuthentication().getPrincipal());
         }
-        m.setNextMessage(CoreMessages.authorizationDeniedOnEndpoint(endpoint.getEndpointURI()));
+        m.setNextMessage(CoreMessages.authorizationDeniedOnEndpoint(endpointURI));
         return m;
     }
 }

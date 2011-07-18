@@ -39,6 +39,7 @@ import org.mule.transaction.TransactionCoordination;
 import org.mule.transformer.types.DataTypeFactory;
 
 import java.io.OutputStream;
+import java.net.URI;
 import java.util.concurrent.Callable;
 
 import org.apache.commons.logging.Log;
@@ -664,9 +665,9 @@ public class DefaultMuleEventContext implements MuleEventContext
         return event.getOutputStream();
     }
 
-    public EndpointURI getEndpointURI()
+    public URI getEndpointURI()
     {
-        return event.getEndpoint().getEndpointURI();
+        return event.getMessageSourceURI();
     }
 
     public MessageExchangePattern getExchangePattern()

@@ -830,4 +830,10 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
     {
         return transacted;
     }
+
+    @Override
+    public URI getMessageSourceURI()
+    {
+        return endpoint.getEndpointURI().getUri();
+    }
 }

@@ -117,7 +117,7 @@ public class MuleHttpServletRequest implements HttpServletRequest
 
     public String getScheme()
     {
-        return event.getEndpoint().getEndpointURI().getScheme();
+        return event.getMessageSourceURI().getScheme();
     }
 
     public String getServerName()

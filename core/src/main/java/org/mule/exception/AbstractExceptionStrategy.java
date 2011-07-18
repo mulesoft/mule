@@ -19,7 +19,6 @@ import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.context.notification.ServerNotification;
-import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.security.SecurityException;
@@ -39,6 +38,7 @@ import org.mule.routing.outbound.MulticastingRouter;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.util.CollectionUtils;
 
+import java.net.URI;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -192,7 +192,7 @@ public abstract class AbstractExceptionStrategy extends AbstractMessageProcessor
                 {
                     component = event.getFlowConstruct().getName();
                 }
-                EndpointURI endpointUri = event.getEndpoint().getEndpointURI();
+                URI endpointUri = event.getMessageSourceURI();
 
                 // Create an ExceptionMessage which contains the original payload, the exception, and some additional context info.
                 ExceptionMessage msg = new ExceptionMessage(event, t, component, endpointUri);

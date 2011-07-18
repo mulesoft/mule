@@ -418,7 +418,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
                     JmsConstants.DURABLE_NAME_PROPERTY);
             if (durableName == null && durable && topic)
             {
-                durableName = "mule." + connector.getName() + "." + event.getEndpoint().getEndpointURI().getAddress();
+                durableName = "mule." + connector.getName() + "." + event.getMessageSourceURI();
                 if (logger.isDebugEnabled())
                 {
                     logger.debug("Jms Connector for this receiver is durable but no durable name has been specified. Defaulting to: " +

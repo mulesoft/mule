@@ -15,7 +15,6 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.lifecycle.Callable;
 import org.mule.api.transport.OutputHandler;
 import org.mule.component.DefaultJavaComponent;
@@ -27,6 +26,7 @@ import org.mule.util.StringUtils;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.URI;
 import java.util.Date;
 import java.util.HashMap;
 
@@ -100,7 +100,7 @@ public class AbderaServiceComponent extends DefaultJavaComponent
             }
         }
 
-        private IRI initBaseUri(EndpointURI endpointURI)
+        private IRI initBaseUri(URI endpointURI)
         {
             String iri = endpointURI.toString();
             if (!iri.endsWith("/"))

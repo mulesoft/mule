@@ -11,7 +11,6 @@
 package org.mule.message;
 
 import org.mule.api.MuleEvent;
-import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.transport.PropertyScope;
 
 import java.io.IOException;
@@ -19,6 +18,7 @@ import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.net.URI;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -53,7 +53,7 @@ public class ExceptionMessage implements Serializable
     public ExceptionMessage(MuleEvent event,
                             Throwable exception,
                             String componentName,
-                            EndpointURI endpointUri)
+                            URI endpointUri)
     {
         this.payload = event.getMessage().getPayload();
         properties = new HashMap<String, Object>();

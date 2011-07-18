@@ -10,6 +10,9 @@
 
 package org.mule.registry;
 
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
+
 import org.mule.DefaultMuleMessage;
 import org.mule.MessageExchangePattern;
 import org.mule.OptimizedRequestContext;
@@ -30,12 +33,10 @@ import org.mule.message.DefaultExceptionPayload;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.OutputStream;
+import java.net.URI;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.mock;
 
 public class RequestContextTestCase extends AbstractMuleTestCase
 {
@@ -287,6 +288,12 @@ public class RequestContextTestCase extends AbstractMuleTestCase
         public boolean isTransacted()
         {
             return false;
+        }
+
+        @Override
+        public URI getMessageSourceURI()
+        {
+            return null;
         }
     }
 

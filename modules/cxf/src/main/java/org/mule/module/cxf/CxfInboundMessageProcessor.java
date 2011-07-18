@@ -16,7 +16,6 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.EndpointNotFoundException;
-import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Lifecycle;
 import org.mule.api.transformer.TransformerException;
@@ -37,6 +36,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Reader;
+import java.net.URI;
 
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.Source;
@@ -214,7 +214,7 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
 
     private String getUri(MuleEvent event)
     {
-        EndpointURI epUri = event.getEndpoint().getEndpointURI();
+        URI epUri = event.getMessageSourceURI();
         String host = event.getMessage().getInboundProperty("Host", epUri.getHost());
         String ctx = event.getMessage().getInboundProperty(HttpConnector.HTTP_REQUEST_PROPERTY);
 

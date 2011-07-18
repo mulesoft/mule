@@ -19,7 +19,7 @@ public class WebServiceSecurityException extends org.mule.api.security.SecurityE
     {
         super(MessageFactory.createStaticMessage(
             "Security exception occurred invoking web service\nEndpoint = " 
-            + event.getEndpoint().getEndpointURI() 
+            + event.getMessageSourceURI()
             + "\nSecurity provider(s) = " + event.getMuleContext().getSecurityManager().getProviders()
             + "\nEvent = " + event),
             event, cause);

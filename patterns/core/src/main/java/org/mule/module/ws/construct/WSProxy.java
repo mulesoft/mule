@@ -10,12 +10,6 @@
 
 package org.mule.module.ws.construct;
 
-import java.net.InetAddress;
-import java.net.URI;
-import java.util.List;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.MessageExchangePattern;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
@@ -36,6 +30,13 @@ import org.mule.transformer.TransformerTemplate;
 import org.mule.transport.http.construct.HttpProxy;
 import org.mule.util.ObjectUtils;
 import org.mule.util.StringUtils;
+
+import java.net.InetAddress;
+import java.net.URI;
+import java.util.List;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * This class is implemented to act as a Proxy for a Web Service. It listens for requests on the inbound endpoint and if
@@ -367,7 +368,7 @@ public class WSProxy extends AbstractConfigurationPattern
 
             // create a new mule message with the new WSDL
             final String realWsdlAddress = wsdlAddress.split("\\?")[0];
-            final String proxyWsdlAddress = event.getEndpoint().getEndpointURI().getUri().toString();
+            final String proxyWsdlAddress = event.getMessageSourceURI().toString();
             wsdlString = wsdlString.replaceAll(realWsdlAddress, proxyWsdlAddress);
 
             if (wsdlString.indexOf(LOCALHOST) > -1)
