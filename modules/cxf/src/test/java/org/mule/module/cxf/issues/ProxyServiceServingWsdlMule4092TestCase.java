@@ -10,13 +10,13 @@
 
 package org.mule.module.cxf.issues;
 
-import org.mule.tck.DynamicPortTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.util.IOUtils;
 import org.mule.util.SystemUtils;
 
 import java.io.IOException;
 import java.io.StringReader;
-import java.net.MalformedURLException;
 import java.net.URL;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -24,14 +24,29 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.custommonkey.xmlunit.XMLUnit;
+import org.junit.Rule;
+import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-public class ProxyServiceServingWsdlMule4092TestCase extends DynamicPortTestCase
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
+
+public class ProxyServiceServingWsdlMule4092TestCase extends FunctionalTestCase
 {
     private String expectedWsdlFileName;
+
+    @Rule
+    public DynamicPort dynamicPort = new DynamicPort("port1");
+
+    @Override
+    protected String getConfigResources()
+    {
+        return "issues/proxy-service-serving-wsdl-mule4092.xml";
+    }
 
     @Override
     protected void doSetUp() throws Exception
@@ -69,17 +84,12 @@ public class ProxyServiceServingWsdlMule4092TestCase extends DynamicPortTestCase
         }
     }
 
-    @Override
-    protected String getConfigResources()
-    {
-        return "issues/proxy-service-serving-wsdl-mule4092.xml";
-    }
-
-    public void testProxyServiceWSDL() throws MalformedURLException, IOException, Exception
+    @Test
+    public void testProxyServiceWSDL() throws Exception
     {
         String expected = getXML("issues/" + expectedWsdlFileName);
 
-        URL url = new URL("http://localhost:" + getPorts().get(0) + "/services/onlinestore?wsdl");
+        URL url = new URL("http://localhost:" + dynamicPort.getNumber() + "/services/onlinestore?wsdl");
         String wsdlFromService = IOUtils.toString(url.openStream());
 
         // The exact string representation may differ, so we'll spot check the WSDL contents
@@ -122,27 +132,6 @@ public class ProxyServiceServingWsdlMule4092TestCase extends DynamicPortTestCase
         }
     }
 
-    protected boolean compareResults(String expected, String result)
-    {
-        try
-        {
-            String expectedString = this.normalizeString(expected);
-            String resultString = this.normalizeString(result);
-            return XMLUnit.compareXML(expectedString, resultString).similar();
-        }
-        catch (Exception ex)
-        {
-            return false;
-        }
-    }
-
-    protected String normalizeString(String rawString)
-    {
-        rawString = rawString.replaceAll("\r", "");
-        rawString = rawString.replaceAll("\n", "");
-        return rawString.replaceAll("\t", "");
-    }
-
     private Document buildDOM(String xmlString) throws ParserConfigurationException, IOException, SAXException
     {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -152,9 +141,4 @@ public class ProxyServiceServingWsdlMule4092TestCase extends DynamicPortTestCase
         return builder.parse(source);
     }
 
-    @Override
-    protected int getNumPortsToFind()
-    {
-        return 1;
-    }
 }

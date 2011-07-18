@@ -16,23 +16,35 @@ import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.message.ds.StringDataSource;
 import org.mule.session.DefaultMuleSession;
-import org.mule.tck.DynamicPortTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.AbstractConnector;
 import org.mule.transport.soap.axis.AxisMessageDispatcher;
 
 import javax.activation.DataHandler;
 
-public class SoapAttachmentsFunctionalTestCase extends DynamicPortTestCase
+import org.junit.Rule;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+public class SoapAttachmentsFunctionalTestCase extends FunctionalTestCase
 {
     private static final int SEND_COUNT = 5;
     
     private int callbackCount = 0;
 
+    @Rule
+    public DynamicPort dynamicPort = new DynamicPort("port1");
+
+    @Override
     protected String getConfigResources()
     {
         return "axis-soap-attachments.xml";
     }
 
+    @Test
     public void testSend() throws Exception
     {
         sendTestData(SEND_COUNT);
@@ -59,9 +71,4 @@ public class SoapAttachmentsFunctionalTestCase extends DynamicPortTestCase
         }
     }
 
-    @Override
-    protected int getNumPortsToFind()
-    {
-        return 1;
-    }
 }

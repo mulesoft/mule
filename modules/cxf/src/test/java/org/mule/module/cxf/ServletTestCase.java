@@ -12,7 +12,8 @@ package org.mule.module.cxf;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.DynamicPortTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.servlet.MuleReceiverServlet;
 import org.mule.transport.servlet.jetty.util.EmbeddedJettyServer;
@@ -20,12 +21,20 @@ import org.mule.transport.servlet.jetty.util.EmbeddedJettyServer;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ServletTestCase extends DynamicPortTestCase
+import org.junit.Rule;
+import org.junit.Test;
+
+import static org.junit.Assert.assertTrue;
+
+public class ServletTestCase extends FunctionalTestCase
 {
 
     public int HTTP_PORT = -1;
 
     private EmbeddedJettyServer httpServer;
+
+    @Rule
+    public DynamicPort dynamicPort = new DynamicPort("port1");
 
     @Override
     protected String getConfigResources()
@@ -37,7 +46,7 @@ public class ServletTestCase extends DynamicPortTestCase
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
-        HTTP_PORT = getPorts().get(0);
+        HTTP_PORT = dynamicPort.getNumber();
         httpServer = new EmbeddedJettyServer(HTTP_PORT, getContextPath(), "/services/*", new MuleReceiverServlet(), muleContext);
         httpServer.start();
     }
@@ -58,6 +67,7 @@ public class ServletTestCase extends DynamicPortTestCase
         super.doTearDown();
     }
 
+    @Test
     public void testRequestWsdlWithServlets() throws Exception
     {
         String request =
@@ -79,6 +89,7 @@ public class ServletTestCase extends DynamicPortTestCase
         assertTrue(res.indexOf("Test String") != -1);
     }
 
+    @Test
     public void testHttpGet() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -90,11 +101,6 @@ public class ServletTestCase extends DynamicPortTestCase
         assertTrue(res.indexOf("Test String") != -1);
     }
 
-    @Override
-    protected int getNumPortsToFind()
-    {
-        return 1;
-    }
 }
 
 

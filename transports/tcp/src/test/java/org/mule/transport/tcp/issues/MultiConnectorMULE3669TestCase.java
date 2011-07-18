@@ -9,23 +9,31 @@
  */
 package org.mule.transport.tcp.issues;
 
-import org.mule.tck.DynamicPortTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 
-public class MultiConnectorMULE3669TestCase extends DynamicPortTestCase
+import org.junit.Rule;
+import org.junit.Test;
+
+public class MultiConnectorMULE3669TestCase extends FunctionalTestCase
 {
+
+    @Rule
+    public DynamicPort dynamicPort1 = new DynamicPort("port1");
+
+    @Rule
+    public DynamicPort dynamicPort2 = new DynamicPort("port2");
+
+    @Override
     protected String getConfigResources()
     {
         return "multiconnector-mule3669-test.xml";
     }
 
+    @Test
     public void testInitialisation() throws Exception
     {
-        //Just need to ensure the test sets up connrectly
+        //Just need to ensure the test sets up correctly
     }
 
-    @Override
-    protected int getNumPortsToFind()
-    {
-        return 2;
-    }
 }

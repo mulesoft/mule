@@ -12,24 +12,40 @@ package org.mule.transport.tcp.issues;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.DynamicPortTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 
 import edu.emory.mathcs.backport.java.util.Arrays;
+import org.junit.Rule;
+import org.junit.Test;
 
-public class LengthProtocolLengthTestCase extends DynamicPortTestCase
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+public class LengthProtocolLengthTestCase extends FunctionalTestCase
 {
 
+    @Rule
+    public DynamicPort dynamicPort1 = new DynamicPort("port1");
+
+    @Rule
+    public DynamicPort dynamicPort2 = new DynamicPort("port2");
+
+    @Override
     protected String getConfigResources()
     {
         return "length-protocol-length-test.xml";
     }
 
+    @Test
     public void testLength() throws Exception
     {
         doTest("length", 5, true);
         doTest("length", 15, false);
     }
 
+    @Test
     public void testSafe() throws Exception
     {
         doTest("safe", 5, true);
@@ -70,12 +86,6 @@ public class LengthProtocolLengthTestCase extends DynamicPortTestCase
         {
             // expected
         }
-    }
-
-    @Override
-    protected int getNumPortsToFind()
-    {
-        return 2;
     }
 
 }

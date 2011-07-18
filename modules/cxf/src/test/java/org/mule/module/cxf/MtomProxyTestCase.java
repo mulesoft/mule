@@ -10,10 +10,10 @@
 
 package org.mule.module.cxf;
 
-
 public class MtomProxyTestCase extends MtomTestCase
 {
 
+    @Override
     protected String getConfigResources()
     {
         return "mtom-proxy-conf.xml";

@@ -18,7 +18,6 @@ public class NonRootServletTestCase extends ServletTestCase
     {
         return "/foo";
     }
-
 }
 
 

@@ -11,11 +11,20 @@
 package org.mule.transport.udp;
 
 import org.mule.api.MuleMessage;
-import org.mule.tck.DynamicPortTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 
-public class UdpRequestResponseTestCase extends DynamicPortTestCase
+import org.junit.Rule;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+
+public class UdpRequestResponseTestCase extends FunctionalTestCase
 {
     private static final String EXPECTED = TEST_MESSAGE + " received";
+
+    @Rule
+    public DynamicPort dynamicPort = new DynamicPort("port1");
 
     @Override
     protected String getConfigResources()
@@ -23,12 +32,7 @@ public class UdpRequestResponseTestCase extends DynamicPortTestCase
         return "udp-request-response.xml";
     }
 
-    @Override
-    protected int getNumPortsToFind()
-    {
-        return 1;
-    }
-
+    @Test
     public void testRequestResponse() throws Exception
     {
         MuleMessage response = muleContext.getClient().send("vm://fromTest", TEST_MESSAGE, null);

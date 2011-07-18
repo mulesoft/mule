@@ -13,35 +13,53 @@ package org.mule.module.cxf;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.DynamicPortTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class WSProxyTestCase extends DynamicPortTestCase
+import org.junit.Rule;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+public class WSProxyTestCase extends FunctionalTestCase
 {
 
+    @Rule
+    public DynamicPort dynamicPort1 = new DynamicPort("port1");
+
+    @Rule
+    public DynamicPort dynamicPort2 = new DynamicPort("port2");
+
+    @Rule
+    public DynamicPort dynamicPort3 = new DynamicPort("port3");
+    
     @Override
     protected String getConfigResources()
     {
         return "mule-proxy-config.xml";
     }
 
+    @Test
     public void testDirectRequest() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
-        MuleMessage result = client.send("wsdl-cxf:http://localhost:" + getPorts().get(0) + "/WebService?wsdl&method=echo", 
+        MuleMessage result = client.send("wsdl-cxf:http://localhost:" + dynamicPort1.getNumber() + "/WebService?wsdl&method=echo",
             new DefaultMuleMessage("mule", muleContext));
         assertEquals ("mule", result.getPayloadAsString());
     }
 
-
+    @Test
     public void testWsdlProxyRequest() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
         Map<String, String> props = new HashMap<String, String>();
         props.put("http.method", "GET");
-        MuleMessage replyMessage = client.send("http://localhost:" + getPorts().get(1) + "/webServiceProxy?wsdl", 
+        MuleMessage replyMessage = client.send("http://localhost:" + dynamicPort2.getNumber() + "/webServiceProxy?wsdl",
             "/services/webServiceProxy?WSDL", props);
         assertNotNull(replyMessage);
         
@@ -53,20 +71,22 @@ public class WSProxyTestCase extends DynamicPortTestCase
         assertTrue(wsdl.indexOf("<wsdl:message name=\"echo\">") != -1);
     }
     
+    @Test
     public void testProxyRequest() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
-        MuleMessage result = client.send("wsdl-cxf:http://localhost:" + getPorts().get(1) + "/webServiceProxy?wsdl&method=echo", 
+        MuleMessage result = client.send("wsdl-cxf:http://localhost:" + dynamicPort2.getNumber() + "/webServiceProxy?wsdl&method=echo",
             new DefaultMuleMessage("mule", muleContext));
         assertEquals ("mule", result.getPayloadAsString());
     }
     
+    @Test
     public void testWsdlFileRequest() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
         Map<String, String> props = new HashMap<String, String>();
         props.put("http.method", "GET");
-        MuleMessage replyMessage = client.send("http://localhost:" + getPorts().get(2) + "/webServiceProxy?wsdl", 
+        MuleMessage replyMessage = client.send("http://localhost:" + dynamicPort3.getNumber() + "/webServiceProxy?wsdl",
             "/services/webServiceProxy?WSDL", props);
         assertNotNull(replyMessage);
         
@@ -77,18 +97,13 @@ public class WSProxyTestCase extends DynamicPortTestCase
         assertTrue(wsdl.indexOf("<wsdl:message name=\"echo\">") != -1);
     }
     
+    @Test
     public void testWsdlFileProxyRequest() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
-        MuleMessage result = client.send("wsdl-cxf:http://localhost:" + getPorts().get(2) + "/webServiceProxy?wsdl&method=echo", 
+        MuleMessage result = client.send("wsdl-cxf:http://localhost:" + dynamicPort3.getNumber() + "/webServiceProxy?wsdl&method=echo",
             new DefaultMuleMessage("mule", muleContext));
         assertEquals ("mule", result.getPayloadAsString());
-    }
-
-    @Override
-    protected int getNumPortsToFind()
-    {
-        return 3;
     }
     
 }

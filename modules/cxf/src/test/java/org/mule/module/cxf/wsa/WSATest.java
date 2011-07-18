@@ -12,36 +12,35 @@ package org.mule.module.cxf.wsa;
 
 import org.mule.example.employee.EmployeeDirectory;
 import org.mule.example.employee.EmployeeDirectory_Service;
-import org.mule.tck.DynamicPortTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 
 import javax.xml.ws.BindingProvider;
 import javax.xml.ws.soap.AddressingFeature;
 
-public class WSATest extends DynamicPortTestCase
+import org.junit.Rule;
+import org.junit.Test;
+
+public class WSATest extends FunctionalTestCase
 {
-    public void testWSA() throws Exception
-    {
-        EmployeeDirectory_Service svc = new EmployeeDirectory_Service();
-        
-        EmployeeDirectory port = svc.getEmployeeDirectoryPort(new AddressingFeature());
-        BindingProvider bp = (BindingProvider) port;
-        bp.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, 
-            "http://localhost:" + getPorts().get(0) + "/services/employee");
-        
-        System.out.println(port.getEmployees());
-        
-    }
-    
+    @Rule
+    public DynamicPort dynamicPort = new DynamicPort("port1");
+
     @Override
     protected String getConfigResources()
     {
         return "wsa-conf.xml";
     }
 
-    @Override
-    protected int getNumPortsToFind()
+    @Test
+    public void testWSA() throws Exception
     {
-        return 1;
+        EmployeeDirectory_Service svc = new EmployeeDirectory_Service();
+
+        EmployeeDirectory port = svc.getEmployeeDirectoryPort(new AddressingFeature());
+        BindingProvider bp = (BindingProvider) port;
+        bp.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
+            "http://localhost:" + dynamicPort.getNumber() + "/services/employee");
     }
 
 }

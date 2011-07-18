@@ -10,7 +10,8 @@
 
 package org.mule.module.cxf;
 
-import org.mule.tck.DynamicPortTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -24,64 +25,64 @@ import javax.xml.ws.Holder;
 import javax.xml.ws.soap.SOAPBinding;
 
 import org.apache.cxf.BusFactory;
-import org.apache.cxf.endpoint.Client;
-import org.apache.cxf.feature.LoggingFeature;
-import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.mime.TestMtom;
 import org.apache.cxf.mime.TestMtomService;
+import org.junit.Rule;
+import org.junit.Test;
 
-public class MtomTestCase extends DynamicPortTestCase
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+public class MtomTestCase extends FunctionalTestCase
 {
 
-    public void testEchoService() throws Exception
-    {
-        URL wsdl = getClass().getResource("/wsdl/mtom_xop.wsdl");
-        assertNotNull(wsdl);
-        
-        CxfConfiguration clientConfig = new CxfConfiguration();
-        clientConfig.setMuleContext(muleContext);
-        clientConfig.initialise();
-        BusFactory.setThreadDefaultBus(clientConfig.getCxfBus());
-        
-        TestMtomService svc = new TestMtomService(wsdl);
-        
-        TestMtom port = svc.getTestMtomPort();
-        
-        BindingProvider bp = ((BindingProvider) port);
-        bp.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
-            "http://localhost:" + getPorts().get(0) + "/services/mtom");
-        ((SOAPBinding) bp.getBinding()).setMTOMEnabled(true);
-        // Client client = ClientProxy.getClient(port);
-        // new LoggingFeature().initialize(client, null);
-        
-        File file = new File("src/test/resources/mtom-conf.xml");
-        DataHandler dh = new DataHandler(new FileDataSource(file));
-        
-        Holder<String> name = new Holder<String>("test");
-        Holder<DataHandler> info = new Holder<DataHandler>(dh);
-        
-        port.testXop(name, info);
-        
-        assertEquals("return detail + test", name.value);
-        assertNotNull(info.value);
-        
-        InputStream input = info.value.getInputStream();
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        IOUtils.copy(input, bos);
-        input.close();
-    }
+    @Rule
+    public DynamicPort dynamicPort = new DynamicPort("port1");
 
+    @Override
     protected String getConfigResources()
     {
         return "mtom-conf.xml";
     }
 
-    @Override
-    protected int getNumPortsToFind()
+    @Test
+    public void testEchoService() throws Exception
     {
-        // TODO Auto-generated method stub
-        return 1;
+        URL wsdl = getClass().getResource("/wsdl/mtom_xop.wsdl");
+        assertNotNull(wsdl);
+
+        CxfConfiguration clientConfig = new CxfConfiguration();
+        clientConfig.setMuleContext(muleContext);
+        clientConfig.initialise();
+        BusFactory.setThreadDefaultBus(clientConfig.getCxfBus());
+
+        TestMtomService svc = new TestMtomService(wsdl);
+
+        TestMtom port = svc.getTestMtomPort();
+
+        BindingProvider bp = ((BindingProvider) port);
+        bp.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
+            "http://localhost:" + dynamicPort.getNumber() + "/services/mtom");
+        ((SOAPBinding) bp.getBinding()).setMTOMEnabled(true);
+        // Client client = ClientProxy.getClient(port);
+        // new LoggingFeature().initialize(client, null);
+
+        File file = new File("src/test/resources/mtom-conf.xml");
+        DataHandler dh = new DataHandler(new FileDataSource(file));
+
+        Holder<String> name = new Holder<String>("test");
+        Holder<DataHandler> info = new Holder<DataHandler>(dh);
+
+        port.testXop(name, info);
+
+        assertEquals("return detail + test", name.value);
+        assertNotNull(info.value);
+
+        InputStream input = info.value.getInputStream();
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        IOUtils.copy(input, bos);
+        input.close();
     }
 
 }

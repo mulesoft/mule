@@ -14,6 +14,8 @@ import org.mule.api.MuleException;
 import org.mule.module.client.MuleClient;
 import org.mule.transport.tcp.protocols.SafeProtocolTestCase;
 
+import org.junit.Test;
+
 public class SafeProtocolMule2227TestCase extends SafeProtocolTestCase
 {
 
@@ -31,13 +33,14 @@ public class SafeProtocolMule2227TestCase extends SafeProtocolTestCase
 
     // update - we now do have a maximum size
 
+    @Test
     public void testSafeToUnsafe() throws MuleException
     {
         MuleClient client = new MuleClient(muleContext);
         // this may fail, but should not crash
         try
         {
-            client.send("tcp://localhost:" + getPorts().get(0) + "?connector=safe", TEST_MESSAGE, null);
+            client.send("tcp://localhost:" + dynamicPort1.getNumber() + "?connector=safe", TEST_MESSAGE, null);
         }
         catch(Exception e)
         {

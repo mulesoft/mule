@@ -14,12 +14,24 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.DynamicPortTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.io.InputStream;
 
-public class UsernameTokenProxyTestCase extends DynamicPortTestCase 
+import org.junit.Rule;
+import org.junit.Test;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+public class UsernameTokenProxyTestCase extends FunctionalTestCase 
 {
+
+    @Rule
+    public DynamicPort dynamicPort = new DynamicPort("port1");
+    
     @Override
     protected String getConfigResources() 
     {
@@ -33,17 +45,19 @@ public class UsernameTokenProxyTestCase extends DynamicPortTestCase
         super.doSetUp();
     }
 
+    @Test
     public void testProxyEnvelope() throws Exception 
     {
-        MuleMessage result = sendRequest("http://localhost:" + getPorts().get(0) + "/proxy-envelope");
+        MuleMessage result = sendRequest("http://localhost:" + dynamicPort.getNumber() + "/proxy-envelope");
         System.out.println(result.getPayloadAsString());
         assertFalse(result.getPayloadAsString().contains("Fault"));
         assertTrue(result.getPayloadAsString().contains("joe"));
     }
 
+    @Test
     public void testProxyBody() throws Exception
     {
-        MuleMessage result = sendRequest("http://localhost:" + getPorts().get(0) + "/proxy-body");
+        MuleMessage result = sendRequest("http://localhost:" + dynamicPort.getNumber() + "/proxy-body");
 
         System.out.println(result.getPayloadAsString());
         assertFalse(result.getPayloadAsString().contains("Fault"));
@@ -66,9 +80,4 @@ public class UsernameTokenProxyTestCase extends DynamicPortTestCase
         return "/org/mule/module/cxf/wssec/in-message.xml";
     }
 
-    @Override
-    protected int getNumPortsToFind()
-    {
-        return 1;
-    }
 }

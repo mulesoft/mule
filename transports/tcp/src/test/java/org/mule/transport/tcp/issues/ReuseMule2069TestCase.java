@@ -13,17 +13,23 @@ package org.mule.transport.tcp.issues;
 import org.mule.transport.tcp.TcpConnector;
 import org.mule.transport.tcp.TcpFunctionalTestCase;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertTrue;
+
 /**
  * This is just to check that the Boolean (rather than boolean) doesn't cause any problems
  */
 public class ReuseMule2069TestCase extends TcpFunctionalTestCase
 {
 
+    @Override
     protected String getConfigResources()
     {
         return "reuse-mule-2069.xml";
     }
 
+    @Test
     public void testReuseSetOnConnector()
     {
         assertTrue(((TcpConnector) muleContext.getRegistry().lookupConnector(TcpConnector.TCP)).isReuseAddress().booleanValue());

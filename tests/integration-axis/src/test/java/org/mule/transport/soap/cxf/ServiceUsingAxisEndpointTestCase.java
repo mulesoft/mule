@@ -13,7 +13,8 @@ package org.mule.transport.soap.cxf;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.DynamicPortTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.util.HashMap;
 import java.util.List;
@@ -22,10 +23,19 @@ import java.util.Map;
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
+import org.junit.Rule;
+import org.junit.Test;
 
-public class ServiceUsingAxisEndpointTestCase extends DynamicPortTestCase
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+public class ServiceUsingAxisEndpointTestCase extends FunctionalTestCase
 {
 
+    @Rule
+    public DynamicPort dynamicPort = new DynamicPort("port1");
+    
+    @Test
     public void testCXF() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -36,12 +46,13 @@ public class ServiceUsingAxisEndpointTestCase extends DynamicPortTestCase
         assertEquals("Received: Testing String", reply.getPayloadAsString());
     }
 
+    @Test
     public void testRequestWsdl() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
         Map<String, String> props = new HashMap<String, String>();
         props.put("http.method", "GET");
-        MuleMessage reply = client.send("http://localhost:" + getPorts().get(0) + "/services/CxfService?wsdl",
+        MuleMessage reply = client.send("http://localhost:" + dynamicPort.getNumber() + "/services/CxfService?wsdl",
             "/services/CxfService?wsdl", props);
 
         assertNotNull(reply);
@@ -57,12 +68,6 @@ public class ServiceUsingAxisEndpointTestCase extends DynamicPortTestCase
     protected String getConfigResources()
     {
         return "using-axis-conf.xml";
-    }
-
-    @Override
-    protected int getNumPortsToFind()
-    {
-        return 1;
     }
 
 }

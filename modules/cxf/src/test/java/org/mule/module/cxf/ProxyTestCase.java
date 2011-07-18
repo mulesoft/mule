@@ -14,9 +14,10 @@ import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.module.cxf.testmodels.AsyncService;
-import org.mule.tck.DynamicPortTestCase;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
+import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.http.HttpConstants;
 import org.mule.util.concurrent.Latch;
 
@@ -24,8 +25,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+import org.junit.Rule;
+import org.junit.Test;
 
-public class ProxyTestCase extends DynamicPortTestCase
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+public class ProxyTestCase extends FunctionalTestCase
 {
     String msg = "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">"
         + "<soap:Body><test xmlns=\"http://foo\"> foo </test>" + "</soap:Body>" + "</soap:Envelope>";
@@ -59,43 +66,57 @@ public class ProxyTestCase extends DynamicPortTestCase
         + "<!-- comment 7 -->"
         + "</soap:Envelope>";
 
+    @Rule
+    public DynamicPort dynamicPort = new DynamicPort("port1");
+
+    @Override
+    protected String getConfigResources()
+    {
+        return "proxy-conf.xml";
+    }
+
+    @Test
     public void testServerWithEcho() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
-        MuleMessage result = client.send("http://localhost:" + getPorts().get(0) + "/services/Echo", msg, null);
+        MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/services/Echo", msg, null);
         String resString = result.getPayloadAsString();
 //        System.out.println(resString);
         assertTrue(resString.indexOf("<test xmlns=\"http://foo\"> foo </test>") != -1);
     }
 
+    @Test
     public void testServerClientProxy() throws Exception
     {
         String msg = "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">"
                      + "<soap:Body> <foo xmlns=\"http://foo\"></foo>" + "</soap:Body>" + "</soap:Envelope>";
 
         MuleClient client = new MuleClient(muleContext);
-        MuleMessage result = client.send("http://localhost:" + getPorts().get(0) + "/services/proxy", msg, null);
+        MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/services/proxy", msg, null);
         String resString = result.getPayloadAsString();
 
         assertTrue(resString.indexOf("<foo xmlns=\"http://foo\"") != -1);
     }
 
+
+    @Test
     public void testProxyBodyValidation() throws Exception
     {
-        doTestProxyValidation("http://localhost:" + getPorts().get(0) + "/services/proxyBodyWithValidation");
+        doTestProxyValidation("http://localhost:" + dynamicPort.getNumber() + "/services/proxyBodyWithValidation");
     }
 
-
+    @Test
     public void testProxyBodyValidationWithExternalSchema() throws Exception
     {
-        doTestProxyValidation("http://localhost:" + getPorts().get(0) + "/services/proxyBodyWithValidationAndSchemas");
+        doTestProxyValidation("http://localhost:" + dynamicPort.getNumber() + "/services/proxyBodyWithValidationAndSchemas");
     }
 
+    @Test
     public void testProxyEnvelopeValidation() throws Exception
     {
-        doTestProxyValidation("http://localhost:" + getPorts().get(0) + "/services/proxyEnvelopeWithValidation");
+        doTestProxyValidation("http://localhost:" + dynamicPort.getNumber() + "/services/proxyEnvelopeWithValidation");
     }
-    
+
     public void doTestProxyValidation(String url) throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -115,7 +136,8 @@ public class ProxyTestCase extends DynamicPortTestCase
         resString = result.getPayloadAsString();
         assertTrue(resString.contains("<echoResponse xmlns=\"http://www.muleumo.org\">"));
     }
-    
+
+    @Test
     public void testServerClientProxyWithWsdl() throws Exception
     {
         final Latch latch = new Latch();
@@ -132,12 +154,13 @@ public class ProxyTestCase extends DynamicPortTestCase
                      + "<soap:Body> <test xmlns=\"http://foo\"></test>" + "</soap:Body>" + "</soap:Envelope>";
 
         MuleClient client = new MuleClient(muleContext);
-        MuleMessage result = client.send("http://localhost:" + getPorts().get(0) + "/services/proxyWithWsdl", msg, null);
+        MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/services/proxyWithWsdl", msg, null);
         String resString = result.getPayloadAsString();
         assertTrue(latch.await(1000, TimeUnit.MILLISECONDS));
         assertTrue(resString.indexOf("<test xmlns=\"http://foo\"") != -1);
     }
 
+    @Test
     public void testServerClientProxyWithWsdl2() throws Exception
     {
         final Latch latch = new Latch();
@@ -154,24 +177,26 @@ public class ProxyTestCase extends DynamicPortTestCase
                      + "<soap:Body> <test xmlns=\"http://foo\"></test>" + "</soap:Body>" + "</soap:Envelope>";
 
         MuleClient client = new MuleClient(muleContext);
-        MuleMessage result = client.send("http://localhost:" + getPorts().get(0) + "/services/proxyWithWsdl2", msg, null);
+        MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/services/proxyWithWsdl2", msg, null);
         String resString = result.getPayloadAsString();
         assertTrue(latch.await(1000, TimeUnit.MILLISECONDS));
         assertTrue(resString.indexOf("<test xmlns=\"http://foo\"") != -1);
     }
 
+    @Test
     public void testServerClientProxyWithTransform() throws Exception
     {
         String msg = "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">"
                      + "<soap:Body> <test xmlns=\"http://foo\"></test>" + "</soap:Body>" + "</soap:Envelope>";
 
         MuleClient client = new MuleClient(muleContext);
-        MuleMessage result = client.send("http://localhost:" + getPorts().get(0) + "/services/proxyWithTransform", msg, null);
+        MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/services/proxyWithTransform", msg, null);
         String resString = result.getPayloadAsString();
         System.out.println(resString);
         assertTrue(resString.indexOf("<transformed xmlns=\"http://foo\">") != -1);
     }
 
+    @Test
     public void testProxyWithDatabinding() throws Exception 
     {
         String msg = "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">"
@@ -179,11 +204,12 @@ public class ProxyTestCase extends DynamicPortTestCase
                     "</soap:Body>" + "</soap:Envelope>";
 
         MuleClient client = new MuleClient(muleContext);
-        MuleMessage result = client.send("http://localhost:" + getPorts().get(0) + "/services/greeter-databinding-proxy", msg, null);
+        MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/services/greeter-databinding-proxy", msg, null);
         String resString = result.getPayloadAsString();
         assertTrue(resString.indexOf("greetMeResponse") != -1);
     }
 
+    @Test
     public void testProxyWithFault() throws Exception 
     {
         String msg = "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">"
@@ -191,7 +217,7 @@ public class ProxyTestCase extends DynamicPortTestCase
                     "</soap:Body>" + "</soap:Envelope>";
 
         MuleClient client = new MuleClient(muleContext);
-        MuleMessage result = client.send("http://localhost:" + getPorts().get(0) + "/services/greeter-proxy", msg, null);
+        MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/services/greeter-proxy", msg, null);
         String resString = result.getPayloadAsString();
 
         assertFalse("Status code should not be 'OK' when the proxied endpoint returns a fault",
@@ -200,6 +226,7 @@ public class ProxyTestCase extends DynamicPortTestCase
         assertTrue(resString.indexOf("Fault") != -1);
     }
 
+    @Test
     public void testProxyWithIntermediateTransform() throws Exception 
     {
         String msg = "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">"
@@ -207,11 +234,12 @@ public class ProxyTestCase extends DynamicPortTestCase
                     "</soap:Body>" + "</soap:Envelope>";
 
         MuleClient client = new MuleClient(muleContext);
-        MuleMessage result = client.send("http://localhost:" + getPorts().get(0) + "/services/transform-proxy", msg, null);
+        MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/services/transform-proxy", msg, null);
         String resString = result.getPayloadAsString();
         assertTrue(resString.indexOf("greetMeResponse") != -1);
     }
 
+    @Test
     public void testSoapActionRouting() throws Exception 
     {
         String msg = "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">"
@@ -221,16 +249,17 @@ public class ProxyTestCase extends DynamicPortTestCase
         props.put("SOAPAction", "http://acme.com/transform");
 
         MuleClient client = new MuleClient(muleContext);
-        MuleMessage result = client.send("http://localhost:" + getPorts().get(0) + "/services/routeBasedOnSoapAction", msg, props);
+        MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/services/routeBasedOnSoapAction", msg, props);
         String resString = result.getPayloadAsString();
         System.out.println(resString);
         assertTrue(resString.indexOf("<transformed xmlns=\"http://foo\">") != -1);
     }
 
+    @Test
     public void testOneWaySend() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
-        MuleMessage result = client.send("http://localhost:" + getPorts().get(0) + "/services/oneway",
+        MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/services/oneway",
             prepareOneWayTestMessage(), prepareOneWayTestProperties());
         assertEquals("", result.getPayloadAsString());
 
@@ -238,9 +267,10 @@ public class ProxyTestCase extends DynamicPortTestCase
         assertTrue(component.getLatch().await(10000, TimeUnit.MILLISECONDS));
     }
 
+    @Test
     public void testOneWayDispatch() throws Exception
     {
-        new MuleClient(muleContext).dispatch("http://localhost:" + getPorts().get(0) + "/services/oneway", prepareOneWayTestMessage(),
+        new MuleClient(muleContext).dispatch("http://localhost:" + dynamicPort.getNumber() + "/services/oneway", prepareOneWayTestMessage(),
             prepareOneWayTestProperties());
 
         AsyncService component = (AsyncService) getComponent("asyncService");
@@ -251,38 +281,27 @@ public class ProxyTestCase extends DynamicPortTestCase
      * MULE-4549 ReversibleXMLStreamReader chokes on comments with ClassCastException
      * @throws Exception
      */
+    @Test
     public void testProxyWithCommentInRequest() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
-        MuleMessage result = client.send("http://localhost:" + getPorts().get(0) + "/services/envelope-proxy", msgWithComment, null);
+        MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/services/envelope-proxy", msgWithComment, null);
         String resString = result.getPayloadAsString();
         assertTrue(resString.contains(doGoogleSearch));
     }
-    
+
     protected String prepareOneWayTestMessage()
     {
         return "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">" + "<soap:Body>"
                + "<ns:send xmlns:ns=\"http://testmodels.cxf.module.mule.org/\"><text>hello</text></ns:send>"
                + "</soap:Body>" + "</soap:Envelope>";
     }
-
+    
     protected Map prepareOneWayTestProperties()
     {
         Map<String, Object> props = new HashMap<String, Object>();
         props.put("SOAPAction", "http://acme.com/oneway");
         return props;
-    }
-    
-    protected String getConfigResources()
-    {
-        return "proxy-conf.xml";
-    }
-
-    @Override
-    protected int getNumPortsToFind()
-    {
-        // TODO Auto-generated method stub
-        return 1;
     }
 
 }

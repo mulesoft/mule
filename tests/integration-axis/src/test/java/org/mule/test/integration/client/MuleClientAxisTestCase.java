@@ -13,12 +13,29 @@ package org.mule.test.integration.client;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.DynamicPortTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.testmodels.services.Person;
 
-public class MuleClientAxisTestCase extends DynamicPortTestCase
+import org.junit.Rule;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+public class MuleClientAxisTestCase extends FunctionalTestCase
 {
 
+    @Rule
+    public DynamicPort dynamicPort1 = new DynamicPort("port1");
+
+    @Rule
+    public DynamicPort dynamicPort2 = new DynamicPort("port2");
+
+    @Rule
+    public DynamicPort dynamicPort3 = new DynamicPort("port3");
+    
     @Override
     protected String getConfigResources()
     {
@@ -29,7 +46,7 @@ public class MuleClientAxisTestCase extends DynamicPortTestCase
      * Get the Mule address for a Mule client call
      * 
      * @param muleClient The MuleClient instance to use
-     * @param endpointName The inbound endpoint which contains the address
+     * @param inboundEndpointName The inbound endpoint which contains the address
      * @return A String of the 'Mule' address, which in this case should include
      *         'axis" + 'http://<url>'
      */
@@ -41,6 +58,7 @@ public class MuleClientAxisTestCase extends DynamicPortTestCase
                    inboundEndpointName)).getAddress();
     }
     
+    @Test
     public void testRequestResponse() throws Throwable
     {
         MuleClient client = new MuleClient(muleContext);
@@ -50,6 +68,7 @@ public class MuleClientAxisTestCase extends DynamicPortTestCase
         assertEquals("test", result.getPayloadAsString());
     }
 
+    @Test
     public void testRequestResponseComplex() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -63,6 +82,7 @@ public class MuleClientAxisTestCase extends DynamicPortTestCase
         assertEquals("Flintstone", ((Person)result.getPayload()).getLastName());
     }
 
+    @Test
     public void testRequestResponseComplex2() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -73,7 +93,7 @@ public class MuleClientAxisTestCase extends DynamicPortTestCase
         assertNotNull(result);
         assertTrue(result.getPayload() instanceof Person);
         assertEquals("Betty", ((Person)result.getPayload()).getFirstName());
-        assertEquals("Rubble", ((Person)result.getPayload()).getLastName());
+        assertEquals("Rubble", ((Person) result.getPayload()).getLastName());
 
         // do a receive
         result = client.send(getMuleAddress(client, "inMyComponent3") + "/mycomponent3?method=getPerson",
@@ -85,6 +105,7 @@ public class MuleClientAxisTestCase extends DynamicPortTestCase
 
     }
 
+    @Test
     public void testRequestWithComplexArg() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -97,12 +118,6 @@ public class MuleClientAxisTestCase extends DynamicPortTestCase
         assertTrue(result.getPayload() instanceof Person);
         assertEquals("Joe", ((Person)result.getPayload()).getFirstName());
         assertEquals("Blow", ((Person)result.getPayload()).getLastName());
-    }
-
-    @Override
-    protected int getNumPortsToFind()
-    {
-        return 3;
     }
 
 }

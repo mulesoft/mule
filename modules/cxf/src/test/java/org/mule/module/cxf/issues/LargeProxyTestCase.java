@@ -12,24 +12,38 @@ package org.mule.module.cxf.issues;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.DynamicPortTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+
+import org.junit.Rule;
+import org.junit.Test;
+
+import static org.junit.Assert.assertTrue;
 
 /**
  * Tests large requests sent to the proxy and back.
  *
  * @author lenhag
  */
-public class LargeProxyTestCase extends DynamicPortTestCase
+public class LargeProxyTestCase extends FunctionalTestCase
 {
+
+    @Rule
+    public DynamicPort dynamicPort1 = new DynamicPort("port1");
+
+    @Rule
+    public DynamicPort dynamicPort2 = new DynamicPort("port2");
+
     @Override
     protected String getConfigResources()
     {
         return "largeproxytest-config.xml";
     }
 
+    @Test
     public void testLargeMessageWithEchoProxy() throws Exception
     {
         int length = 5000;
@@ -67,7 +81,7 @@ public class LargeProxyTestCase extends DynamicPortTestCase
                 {
                     try
                     {
-                        MuleMessage result = client.send("http://localhost:" + getPorts().get(0) + "/services/EchoProxy", msg, null);
+                        MuleMessage result = client.send("http://localhost:" + dynamicPort1.getNumber() + "/services/EchoProxy", msg, null);
                         String payloadAsStr = result.getPayloadAsString();
                         assertTrue("The payload length should never be 0", payloadAsStr.length() != 0);
                         assertTrue(payloadAsStr.indexOf(largeString) != -1);
@@ -90,9 +104,4 @@ public class LargeProxyTestCase extends DynamicPortTestCase
         latch.await(50000, TimeUnit.SECONDS);
     }
 
-    @Override
-    protected int getNumPortsToFind()
-    {
-        return 2;
-    }
 }

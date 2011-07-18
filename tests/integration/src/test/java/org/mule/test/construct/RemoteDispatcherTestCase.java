@@ -13,32 +13,39 @@ import org.mule.api.ExceptionPayload;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.module.client.RemoteDispatcher;
-import org.mule.tck.DynamicPortTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
+
+import org.junit.Rule;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Test remote dispatcher using serialization wire format
  */
-public class RemoteDispatcherTestCase extends DynamicPortTestCase
+public class RemoteDispatcherTestCase extends FunctionalTestCase
 {
+
+    @Rule
+    public DynamicPort dynamicPort = new DynamicPort("port1");
+
     @Override
     protected String getConfigResources()
     {
         return "org/mule/test/construct/remote-dispatcher.xml";
     }
 
-    @Override
-    protected int getNumPortsToFind()
-    {
-        return 1;  
-    }
-
+    @Test
     public void testRemoting() throws Exception
     {
         String[] targets = {"service1", "nosuch", "vmConnector", "flow1"};
         String expectedResponses[] = { "Hellogoodbye", null, null, "Helloaloha"};
 
         MuleClient client = new MuleClient(muleContext);
-        RemoteDispatcher dispatcher = client.getRemoteDispatcher("http://localhost:" + getPorts().get(0));
+        RemoteDispatcher dispatcher = client.getRemoteDispatcher("http://localhost:" + dynamicPort.getNumber());
         for (int i = 0; i < targets.length; i++)
         {
             String construct = targets[i];

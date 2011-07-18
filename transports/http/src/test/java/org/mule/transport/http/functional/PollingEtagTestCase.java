@@ -9,21 +9,32 @@
  */
 package org.mule.transport.http.functional;
 
-import org.mule.tck.DynamicPortTestCase;
 import org.mule.tck.functional.CounterCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
+import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicInteger;
+import org.junit.Rule;
+import org.junit.Test;
 
-public class PollingEtagTestCase extends DynamicPortTestCase
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+public class PollingEtagTestCase extends FunctionalTestCase
 {
     private static final int WAIT_TIME = 2500;
 
+    @Rule
+    public DynamicPort dynamicPort = new DynamicPort("port1");
+
+    @Override
     protected String getConfigResources()
     {
         return "polling-etag-test.xml";
     }
 
+    @Test
     public void testPollingReceiversRestart() throws Exception
     {
         Object ftc = getComponent("Test");
@@ -38,10 +49,5 @@ public class PollingEtagTestCase extends DynamicPortTestCase
         assertEquals(1, pollCounter.get());
     }
 
-    @Override
-    protected int getNumPortsToFind()
-    {
-        return 1;
-    }
 }
 

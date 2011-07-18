@@ -12,33 +12,38 @@ package org.mule.transport.tcp.protocols;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.DynamicPortTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class MuleMessageLengthTestCase extends DynamicPortTestCase 
+import org.junit.Rule;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+
+public class MuleMessageLengthTestCase extends FunctionalTestCase
 {
 
     protected static String TEST_MESSAGE = "Test TCP Request";
 
+    @Rule
+    public DynamicPort dynamicPort = new DynamicPort("port1");
+
+    @Override
     protected String getConfigResources()
     {
         return "tcp-mplength-test.xml";
     }
 
+    @Test
     public void testSend() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
         Map props = new HashMap();
         MuleMessage result = client.send("clientEndpoint", TEST_MESSAGE, props);
         assertEquals(TEST_MESSAGE + " Received", result.getPayloadAsString());
-    }
-
-    @Override
-    protected int getNumPortsToFind()
-    {
-        return 1;
     }
 
 }

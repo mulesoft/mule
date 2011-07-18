@@ -13,12 +13,25 @@ package org.mule.transport.tcp;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.DynamicPortTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.util.Arrays;
 
-public class TcpSyncTestCase extends DynamicPortTestCase
+import org.junit.Rule;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+public class TcpSyncTestCase extends FunctionalTestCase
 {
+
+    @Rule
+    public DynamicPort dynamicPort = new DynamicPort("port1");
+    
+    @Override
     protected String getConfigResources()
     {
         return "tcp-sync.xml";
@@ -30,6 +43,7 @@ public class TcpSyncTestCase extends DynamicPortTestCase
         return client.send(((InboundEndpoint) client.getMuleContext().getRegistry().lookupObject("inService")).getAddress(), payload, null);
     }
 
+    @Test
     public void testSendString() throws Exception
     {
         MuleMessage message = send("data");
@@ -38,6 +52,7 @@ public class TcpSyncTestCase extends DynamicPortTestCase
         assertEquals("data", response);
     }
 
+    @Test
     public void testSyncResponseOfBufferSize() throws Exception
     {
         int size = 1024 * 16;
@@ -52,6 +67,7 @@ public class TcpSyncTestCase extends DynamicPortTestCase
         assertTrue(Arrays.equals(data, response));
     }
 
+    @Test
     public void testManySyncResponseOfBufferSize() throws Exception
     {
         int size = 1024 * 16;
@@ -69,6 +85,7 @@ public class TcpSyncTestCase extends DynamicPortTestCase
         }
     }
 
+    @Test
     public void testSyncResponseVeryBig() throws Exception
     {
         byte[] data = fillBuffer(new byte[1024 * 1024]);
@@ -88,9 +105,4 @@ public class TcpSyncTestCase extends DynamicPortTestCase
         return buffer;
     }
 
-    @Override
-    protected int getNumPortsToFind()
-    {
-        return 1;
-    }
 }
