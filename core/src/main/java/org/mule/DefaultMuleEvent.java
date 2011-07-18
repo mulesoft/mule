@@ -836,4 +836,17 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
     {
         return endpoint.getEndpointURI().getUri();
     }
+
+    @Override
+    public String getMessageSourceName()
+    {
+        if (endpoint.getName() != null)
+        {
+            return endpoint.getName();
+        }
+        else
+        {
+            return getMessageSourceURI().toString();
+        }
+    }
 }

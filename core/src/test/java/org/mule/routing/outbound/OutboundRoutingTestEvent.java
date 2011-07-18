@@ -248,6 +248,13 @@ public class OutboundRoutingTestEvent implements MuleEvent
     @Override
     public URI getMessageSourceURI()
     {
-        return null;
+        return URI.create("test://test");
     }
+    
+    @Override
+    public String getMessageSourceName()
+    {
+        return "test";
+    }
+
 }

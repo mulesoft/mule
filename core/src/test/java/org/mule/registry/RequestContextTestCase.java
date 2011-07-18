@@ -293,7 +293,13 @@ public class RequestContextTestCase extends AbstractMuleTestCase
         @Override
         public URI getMessageSourceURI()
         {
-            return null;
+            return URI.create("test://test");
+        }
+        
+        @Override
+        public String getMessageSourceName()
+        {
+            return "test";
         }
     }
 

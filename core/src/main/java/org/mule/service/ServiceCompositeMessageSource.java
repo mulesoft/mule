@@ -119,7 +119,7 @@ public class ServiceCompositeMessageSource extends StartableCompositeMessageSour
             {
                 if (getRouterStatistics().isEnabled())
                 {
-                    getRouterStatistics().incrementRoutedMessage(event.getEndpoint());
+                    getRouterStatistics().incrementRoutedMessage(event.getMessageSourceName());
                 }
                 return processNext(event);
             }
