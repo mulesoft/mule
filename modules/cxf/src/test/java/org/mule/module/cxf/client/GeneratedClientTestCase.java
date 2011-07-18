@@ -12,37 +12,42 @@ package org.mule.module.cxf.client;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.DynamicPortTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 
-public class GeneratedClientTestCase extends DynamicPortTestCase
+import org.junit.Rule;
+import org.junit.Test;
+
+import static org.junit.Assert.assertTrue;
+
+public class GeneratedClientTestCase extends FunctionalTestCase
 {
+
+    @Rule
+    public DynamicPort dynamicPort = new DynamicPort("port1");
+
+    @Override
+    protected String getConfigResources()
+    {
+        return "proxy-conf.xml";
+    }
+
+    @Test
     public void testEchoService() throws Exception
     {
         // URL wsdl = getClass().getResource("/wsdl/hello_world.wsdl");
         // assertNotNull(wsdl);
         // SOAPService service = new SOAPService(wsdl, null);
         // Greeter soapPort = service.getSoapPort();
-        //        
+        //
         String msg = "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">"
                      + "<soap:Body>" + "<test> foo </test>" + "</soap:Body>" + "</soap:Envelope>";
 
         MuleClient client = new MuleClient(muleContext);
-        MuleMessage result = client.send("http://localhost:" + getPorts().get(0) + "/services/Echo", msg, null);
+        MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/services/Echo", msg, null);
         byte[] res = (byte[]) result.getPayload();
         String resString = new String(res);
 
         assertTrue(resString.indexOf("<test> foo </test>") != -1);
     }
-
-    protected String getConfigResources()
-    {
-        return "proxy-conf.xml";
-    }
-
-    @Override
-    protected int getNumPortsToFind()
-    {
-        return 1;
-    }
-
 }

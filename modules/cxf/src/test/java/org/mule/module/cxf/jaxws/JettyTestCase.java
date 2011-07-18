@@ -12,31 +12,39 @@ package org.mule.module.cxf.jaxws;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.DynamicPortTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.cxf.BusFactory;
 import org.apache.hello_world_soap_http.GreeterImpl;
+import org.junit.BeforeClass;
+import org.junit.Rule;
+import org.junit.Test;
 
-public class JettyTestCase extends DynamicPortTestCase
+import static org.junit.Assert.assertEquals;
+
+public class JettyTestCase extends FunctionalTestCase
 {
 
+    @Rule
+    public DynamicPort dynamicPort = new DynamicPort("port1");
+
     @Override
-    protected void suitePreSetUp() throws Exception
+    protected String getConfigResources()
+    {
+        return "jetty-conf.xml";
+    }
+
+    @BeforeClass
+    public static void setUpDefaultBus()
     {
         BusFactory.setDefaultBus(null);
-        super.suitePreSetUp();
     }
 
-    private GreeterImpl getGreeter() throws Exception
-    {
-        Object instance = getComponent("greeterService");
-        
-        return (GreeterImpl) instance;
-    }
-
+    @Test
     public void testClientWithMuleClient() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -44,23 +52,19 @@ public class JettyTestCase extends DynamicPortTestCase
         props.put("operation", "greetMe");
         MuleMessage result = client.send("clientEndpoint", "Dan", props);
         assertEquals("Hello Dan", result.getPayload());
-        
+
         GreeterImpl impl = getGreeter();
-        
+
         Thread.sleep(3000);
-        
+
         assertEquals(1, impl.getInvocationCount());
     }
-    
-    protected String getConfigResources()
-    {
-        return "jetty-conf.xml";
-    }
 
-    @Override
-    protected int getNumPortsToFind()
+    private GreeterImpl getGreeter() throws Exception
     {
-        return 1;
+        Object instance = getComponent("greeterService");
+
+        return (GreeterImpl) instance;
     }
 
 }

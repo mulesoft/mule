@@ -13,14 +13,34 @@ package org.mule.transport.http.issues;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.DynamicPortTestCase;
 import org.mule.tck.functional.StringAppendTestTransformer;
+import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 
-public class HttpTransformersMule1815TestCase extends DynamicPortTestCase
+import org.junit.Rule;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+public class HttpTransformersMule1815TestCase extends FunctionalTestCase
 {
 
     public static final String OUTBOUND_MESSAGE = "Test message";
 
+    @Rule
+    public DynamicPort dynamicPort1 = new DynamicPort("port1");
+
+    @Rule
+    public DynamicPort dynamicPort2 = new DynamicPort("port2");
+
+    @Rule
+    public DynamicPort dynamicPort3 = new DynamicPort("port3");
+
+    @Rule
+    public DynamicPort dynamicPort4 = new DynamicPort("port4");
+
+    @Override
     protected String getConfigResources()
     {
         return "http-transformers-mule-1815-test.xml";
@@ -39,10 +59,10 @@ public class HttpTransformersMule1815TestCase extends DynamicPortTestCase
      *
      * @throws Exception
      */
+    @Test
     public void testBase() throws Exception
     {
-        assertEquals(OUTBOUND_MESSAGE + " Received",
-                sendTo("base").getPayloadAsString());
+        assertEquals(OUTBOUND_MESSAGE + " Received", sendTo("base").getPayloadAsString());
     }
 
     /**
@@ -50,10 +70,10 @@ public class HttpTransformersMule1815TestCase extends DynamicPortTestCase
      *
      * @throws Exception
      */
+    @Test
     public void testAdapted() throws Exception
     {
-        assertEquals(OUTBOUND_MESSAGE + " Received",
-                sendTo("adapted").getPayloadAsString());
+        assertEquals(OUTBOUND_MESSAGE + " Received", sendTo("adapted").getPayloadAsString());
     }
 
     /**
@@ -62,6 +82,7 @@ public class HttpTransformersMule1815TestCase extends DynamicPortTestCase
      *
      * @throws Exception
      */
+    @Test
     public void testIgnored() throws Exception
     {
         assertEquals(OUTBOUND_MESSAGE +" transformed" +" transformed 2" + " Received",
@@ -73,6 +94,7 @@ public class HttpTransformersMule1815TestCase extends DynamicPortTestCase
      *
      * @throws Exception
      */
+    @Test
     public void testInbound() throws Exception
     {
         assertEquals(
@@ -80,12 +102,6 @@ public class HttpTransformersMule1815TestCase extends DynamicPortTestCase
             StringAppendTestTransformer.append(" transformed 2",
                 StringAppendTestTransformer.appendDefault(OUTBOUND_MESSAGE)) + " Received",
                 sendTo("inbound").getPayloadAsString());
-    }
-
-    @Override
-    protected int getNumPortsToFind()
-    {
-        return 4;
     }
 
 }

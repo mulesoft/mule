@@ -10,28 +10,32 @@
 
 package org.mule.transport.http;
 
-import org.mule.tck.DynamicPortTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.GetMethod;
+import org.junit.Rule;
+import org.junit.Test;
 
-public class HttpsFlowTestCase extends DynamicPortTestCase
+import static org.junit.Assert.assertEquals;
+
+public class HttpsFlowTestCase extends FunctionalTestCase
 {
+
+    @Rule
+    public DynamicPort dynamicPort = new DynamicPort("port1");
+
     @Override
     protected String getConfigResources()
     {
         return "https-flow-config.xml";
     }
 
-    @Override
-    protected int getNumPortsToFind()
-    {
-        return 1;
-    }
-
+    @Test
     public void testSecureFlow() throws Exception
     {
-        String url = String.format("https://localhost:%1d/?message=Hello", getPorts().get(0));
+        String url = String.format("https://localhost:%1d/?message=Hello", dynamicPort.getNumber());
 
         GetMethod method = new GetMethod(url);
         HttpClient client = new HttpClient();

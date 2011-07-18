@@ -18,6 +18,10 @@ import org.mule.transport.http.functional.HttpFunctionalTestCase;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+
 public class JettyHttpFunctionalTestCase extends HttpFunctionalTestCase
 {
 
@@ -27,6 +31,7 @@ public class JettyHttpFunctionalTestCase extends HttpFunctionalTestCase
         return "jetty-http-functional-test.xml";
     }
 
+    @Test
     public void testNonRootUrls() throws Exception
     {
         LocalMuleClient client = muleContext.getClient();
@@ -35,6 +40,5 @@ public class JettyHttpFunctionalTestCase extends HttpFunctionalTestCase
         MuleMessage result = client.send("anotherClientEndpoint", TEST_MESSAGE, props);
         assertEquals(TEST_MESSAGE + " Received", result.getPayloadAsString());
     }
-
 
 }

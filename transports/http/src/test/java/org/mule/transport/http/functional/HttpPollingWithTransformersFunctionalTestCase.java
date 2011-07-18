@@ -13,20 +13,34 @@ package org.mule.transport.http.functional;
 import org.mule.api.MuleMessage;
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.DynamicPortTestCase;
 import org.mule.tck.functional.FunctionalTestNotificationListener;
+import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.util.concurrent.Latch;
 
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
+import org.junit.Rule;
+import org.junit.Test;
 
-public class HttpPollingWithTransformersFunctionalTestCase extends DynamicPortTestCase
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+public class HttpPollingWithTransformersFunctionalTestCase extends FunctionalTestCase
 {
+
+    @Rule
+    public DynamicPort dynamicPort = new DynamicPort("port1");
+
+    @Override
     protected String getConfigResources()
     {
         return "mule-http-polling-with-transformers-config.xml";
     }
 
+    @Test
     public void testPollingHttpConnector() throws Exception
     {
         final Latch latch = new Latch();
@@ -50,12 +64,6 @@ public class HttpPollingWithTransformersFunctionalTestCase extends DynamicPortTe
         assertEquals("/foo toClient-only", result.getPayloadAsString());
         //The transform should not have been propagated to the outbound endpoint
         assertFalse(transformPropagated.get());
-    }
-
-    @Override
-    protected int getNumPortsToFind()
-    {
-        return 1;
     }
 
 }

@@ -13,19 +13,31 @@ package org.mule.transport.http.filters;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.DynamicPortTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class HttpRequestWildcardFilterTestCase extends DynamicPortTestCase
+import org.junit.Rule;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+public class HttpRequestWildcardFilterTestCase extends FunctionalTestCase
 {
-    //private static final String HTTP_ENDPOINT = "http://localhost:60201";
-    //private static final String REF_ENDPOINT = "http://localhost:60225";
+    
     private static final String TEST_HTTP_MESSAGE = "Hello=World";
     private static final String TEST_BAD_MESSAGE = "xyz";
+
+    @Rule
+    public DynamicPort dynamicPort1 = new DynamicPort("port1");
+
+    @Rule
+    public DynamicPort dynamicPort2 = new DynamicPort("port2");
 
     @Override
     protected String getConfigResources()
@@ -33,6 +45,7 @@ public class HttpRequestWildcardFilterTestCase extends DynamicPortTestCase
         return "http-wildcard-filter-test.xml";
     }
 
+    @Test
     public void testReference() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -41,6 +54,7 @@ public class HttpRequestWildcardFilterTestCase extends DynamicPortTestCase
         assertEquals(TEST_HTTP_MESSAGE, result.getPayloadAsString());
     }
 
+    @Test
     public void testHttpPost() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -49,6 +63,7 @@ public class HttpRequestWildcardFilterTestCase extends DynamicPortTestCase
         assertEquals(TEST_HTTP_MESSAGE, result.getPayloadAsString());
     }
 
+    @Test
     public void testHttpGetNotFiltered() throws Exception
     {
         Map<String, Object> props = new HashMap<String, Object>();
@@ -60,6 +75,7 @@ public class HttpRequestWildcardFilterTestCase extends DynamicPortTestCase
         assertEquals(TEST_HTTP_MESSAGE, result.getPayloadAsString());
     }
 
+    @Test
     public void testHttpGetFiltered() throws Exception
     {
         Map<String, Object> props = new HashMap<String, Object>();
@@ -74,9 +90,4 @@ public class HttpRequestWildcardFilterTestCase extends DynamicPortTestCase
         assertNotNull(result.getExceptionPayload());
     }
 
-    @Override
-    protected int getNumPortsToFind()
-    {
-        return 2;
-    }   
 }

@@ -12,18 +12,28 @@ package org.mule.transport.http.functional;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.DynamicPortTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 
-public class HttpMultipleCookiesInEndpointTestCase extends DynamicPortTestCase
+import org.junit.Rule;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+public class HttpMultipleCookiesInEndpointTestCase extends FunctionalTestCase
 {
+
+    @Rule
+    public DynamicPort dynamicPort = new DynamicPort("port1");
 
     @Override
     protected String getConfigResources()
     {
-
         return "http-multiple-cookies-on-endpoint-test.xml";
     }
 
+    @Test
     public void testThatThe2CookiesAreSentAndReceivedByTheComponent() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -31,12 +41,6 @@ public class HttpMultipleCookiesInEndpointTestCase extends DynamicPortTestCase
         assertNotNull(response);
         assertNotNull(response.getPayload());
         assertEquals("Both Cookies Found!", response.getPayloadAsString());
-    }
-
-    @Override
-    protected int getNumPortsToFind()
-    {
-        return 1;
     }
 
 }

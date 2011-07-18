@@ -12,11 +12,18 @@ package org.mule.issues;
 import org.mule.api.MuleEventContext;
 import org.mule.api.lifecycle.Callable;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.DynamicPortTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transformer.simple.ObjectToString;
 
+import org.junit.Rule;
+import org.junit.Test;
 
-public class HttpReturnsJaxbObject5531TestCase extends DynamicPortTestCase
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+
+public class HttpReturnsJaxbObject5531TestCase extends FunctionalTestCase
 {
     private static final String ZIP_RESPONSE =
         "<?xml version='1.0' encoding='utf-8'?><soap:Envelope xmlns:soap='http://schemas.xmlsoap.org/soap/envelope/' " +
@@ -28,11 +35,8 @@ public class HttpReturnsJaxbObject5531TestCase extends DynamicPortTestCase
             "<Pressure>29.91R</Pressure><Visibility /><WindChill /><Remarks /></GetCityWeatherByZIPResult>" +
             "</GetCityWeatherByZIPResponse></soap:Body></soap:Envelope>";
 
-    @Override
-    protected int getNumPortsToFind()
-    {
-        return 1;
-    }
+    @Rule
+    public DynamicPort dynamicPort = new DynamicPort("port1");
 
     @Override
     protected String getConfigResources()
@@ -40,9 +44,10 @@ public class HttpReturnsJaxbObject5531TestCase extends DynamicPortTestCase
         return "org/mule/issues/http-returns-jaxb-object-mule-5531-test.xml";
     }
 
+    @Test
     public void testGetWeather() throws Exception
     {
-        String testUrl = "http://localhost:" + getPorts().get(0) + "/test/weather";
+        String testUrl = "http://localhost:" + dynamicPort.getNumber() + "/test/weather";
         MuleClient client = new MuleClient(muleContext);
         Object response = client.send(testUrl, "hello", null);
         assertNotNull(response);

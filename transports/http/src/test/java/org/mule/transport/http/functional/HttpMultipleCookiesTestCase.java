@@ -10,7 +10,8 @@
 
 package org.mule.transport.http.functional;
 
-import org.mule.tck.DynamicPortTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.io.IOException;
 import java.util.concurrent.CountDownLatch;
@@ -29,14 +30,19 @@ import org.apache.commons.httpclient.cookie.CookiePolicy;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.Rule;
+import org.junit.Test;
 import org.mortbay.jetty.Connector;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.bio.SocketConnector;
 import org.mortbay.jetty.servlet.ServletHandler;
 
-public class HttpMultipleCookiesTestCase extends DynamicPortTestCase
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+public class HttpMultipleCookiesTestCase extends FunctionalTestCase
 {
-    //private static final int LOCAL_JETTY_SERVER_PORT = 4020;
+    
     protected static String TEST_MESSAGE = "Test Http Request ";
     protected static final Log logger = LogFactory.getLog(HttpMultipleCookiesTestCase.class);
 
@@ -46,10 +52,21 @@ public class HttpMultipleCookiesTestCase extends DynamicPortTestCase
 
     private Server server = null;
 
+    @Rule
+    public DynamicPort dynamicPort1 = new DynamicPort("port1");
+    
+    @Rule
+    public DynamicPort dynamicPort2 = new DynamicPort("port2");
+
     public HttpMultipleCookiesTestCase()
     {
-        super();
         setStartContext(false);
+    }
+
+    @Override
+    protected String getConfigResources()
+    {
+        return "http-multiple-cookies-test.xml";
     }
 
     @Override
@@ -59,33 +76,28 @@ public class HttpMultipleCookiesTestCase extends DynamicPortTestCase
         startServer();
         assertTrue(simpleServerLatch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS));
     }
-
+            
     @Override
     protected void doTearDown() throws Exception
     {
-        // TODO Auto-generated method stub
         super.doTearDown();
         muleContext.stop();
         stopServer();
         assertTrue(simpleServerShutdownLatch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS));
     }
-            
-    @Override
-    protected String getConfigResources()
-    {
-        return "http-multiple-cookies-test.xml";
-    }
 
+    @Test
     public void testSendDirectly() throws Exception
     {
         muleContext.start();
-        sendMessage(getPorts().get(1));
+        sendMessage(dynamicPort2.getNumber());
     }
 
+    @Test
     public void testSendviaMule() throws Exception
     {
         muleContext.start();
-        sendMessage(getPorts().get(0));
+        sendMessage(dynamicPort1.getNumber());
     }
 
     protected void sendMessage(int port) throws Exception
@@ -112,7 +124,6 @@ public class HttpMultipleCookiesTestCase extends DynamicPortTestCase
             logger.debug(cookie.getName() + " " + cookie.getValue());
         }
         assertEquals(6, client2.getState().getCookies().length);
-
     }
 
     protected void startServer() throws Exception
@@ -120,7 +131,7 @@ public class HttpMultipleCookiesTestCase extends DynamicPortTestCase
         logger.debug("server starting");
         Server server = new Server();
         Connector connector = new SocketConnector();
-        connector.setPort(getPorts().get(1));
+        connector.setPort(dynamicPort2.getNumber());
         server.setConnectors(new Connector[]{connector});
 
         ServletHandler handler = new ServletHandler();
@@ -177,7 +188,6 @@ public class HttpMultipleCookiesTestCase extends DynamicPortTestCase
                 }
                 response.setStatus(HttpServletResponse.SC_OK);
                 response.getWriter().println(TEST_MESSAGE);
-
             }
             catch (Exception e)
             {
@@ -195,9 +205,4 @@ public class HttpMultipleCookiesTestCase extends DynamicPortTestCase
 
     }
 
-    @Override
-    protected int getNumPortsToFind()
-    {
-        return 2;
-    }
 }

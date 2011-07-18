@@ -9,9 +9,10 @@
  */
 package org.mule.module.rss;
 
-import org.mule.tck.DynamicPortTestCase;
 import org.mule.tck.functional.CounterCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
+import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
 import org.mule.tck.probe.Prober;
@@ -22,11 +23,17 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.junit.After;
+import org.junit.Rule;
+import org.junit.Test;
 import org.simpleframework.http.Request;
 import org.simpleframework.http.Response;
 import org.simpleframework.http.core.Container;
 
-public class FeedConsumeAndSplitTestCase extends DynamicPortTestCase
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
+public class FeedConsumeAndSplitTestCase extends FunctionalTestCase
 {
     private static final int ENTRIES_IN_RSS_FEED = 25;
 
@@ -34,17 +41,14 @@ public class FeedConsumeAndSplitTestCase extends DynamicPortTestCase
     private SimpleHttpServer httpServer;
     private AtomicInteger pollCount = new AtomicInteger(0);
 
+    @Rule
+    public DynamicPort dynamicPort = new DynamicPort("port1");
+
     @Override
     protected String getConfigResources()
     {
         return "rss-consume-and-split.xml";
    }
-
-    @Override
-    protected int getNumPortsToFind()
-    {
-        return 1;
-    }
 
     @Override
     protected void doSetUp() throws Exception
@@ -58,8 +62,7 @@ public class FeedConsumeAndSplitTestCase extends DynamicPortTestCase
 
     private void startHttpServer() throws IOException
     {
-        int port = getPorts().get(0).intValue();
-        httpServer = new SimpleHttpServer(port, new RssFeeder());
+        httpServer = new SimpleHttpServer(dynamicPort.getNumber(), new RssFeeder());
         httpServer.start();
     }
 
@@ -69,16 +72,8 @@ public class FeedConsumeAndSplitTestCase extends DynamicPortTestCase
         comp.setEventCallback(counter);
     }
 
-    // shut down the http server after Mule has stopped to avoid exceptions during Mule shutdown
-    // because it tries to access the already stopped server
-    @Override
-    protected void disposeManager()
-    {
-        super.disposeManager();
-        stopHttpServer();
-    }
-
-    private void stopHttpServer()
+    @After
+    public void stopHttpServer()
     {
         if (httpServer != null)
         {
@@ -86,6 +81,7 @@ public class FeedConsumeAndSplitTestCase extends DynamicPortTestCase
         }
     }
 
+    @Test
     public void testConsume() throws Exception
     {
         waitForAllEntriesFromSampleFeedToArrive();

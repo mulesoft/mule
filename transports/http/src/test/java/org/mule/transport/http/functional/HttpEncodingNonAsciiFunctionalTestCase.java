@@ -16,9 +16,10 @@ import org.mule.api.config.MuleProperties;
 import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.LocaleMessageHandler;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.DynamicPortTestCase;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
+import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transformer.AbstractTransformer;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
@@ -30,26 +31,27 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-import junit.framework.Assert;
-
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
-
+import junit.framework.Assert;
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.GetMethod;
+import org.junit.Rule;
+import org.junit.Test;
 
-public class HttpEncodingNonAsciiFunctionalTestCase extends DynamicPortTestCase
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+public class HttpEncodingNonAsciiFunctionalTestCase extends FunctionalTestCase
 {
     private static final String ENCODING_JP = "ISO-2022-JP";
     private static final String FORM_ENCODED_CONTENT_TYPE_HEADER = "application/x-www-form-urlencoded; charset=" + ENCODING_JP;
     private static final String PLAIN_CONTENT_TYPE_HEADER = "text/plain; charset=" + ENCODING_JP;
 
-    @Override
-    protected boolean isDisabledInThisEnvironment()
-    {
-        // MULE-5268
-        return SystemUtils.isIbmJDK();
-    }
+    @Rule
+    public DynamicPort dynamicPort = new DynamicPort("port1");
 
     @Override
     protected String getConfigResources()
@@ -58,11 +60,13 @@ public class HttpEncodingNonAsciiFunctionalTestCase extends DynamicPortTestCase
     }
 
     @Override
-    protected int getNumPortsToFind()
+    protected boolean isDisabledInThisEnvironment()
     {
-        return 1;
+        // MULE-5268
+        return SystemUtils.isIbmJDK();
     }
 
+    @Test
     public void testSendViaGET() throws Exception
     {
         Latch latch = new Latch();
@@ -71,7 +75,7 @@ public class HttpEncodingNonAsciiFunctionalTestCase extends DynamicPortTestCase
         String testMessage = getTestMessage(Locale.JAPAN);
         String encodedPayload = URLEncoder.encode(testMessage, "ISO-2022-JP");
         String url = String.format("http://localhost:%1d/get?%2s=%3s",
-            getPorts().get(0), HttpConnector.DEFAULT_HTTP_GET_BODY_PARAM_PROPERTY, encodedPayload);
+            dynamicPort.getNumber(), HttpConnector.DEFAULT_HTTP_GET_BODY_PARAM_PROPERTY, encodedPayload);
 
         GetMethod method = new GetMethod(url);
         method.addRequestHeader(HttpConstants.HEADER_CONTENT_TYPE, PLAIN_CONTENT_TYPE_HEADER);
@@ -87,6 +91,7 @@ public class HttpEncodingNonAsciiFunctionalTestCase extends DynamicPortTestCase
         assertEquals("text/plain;charset=EUC-JP", responseContentType.getValue());
     }
 
+    @Test
     public void testSendViaPOST() throws Exception
     {
         Object payload = getTestMessage(Locale.JAPAN);
@@ -97,6 +102,7 @@ public class HttpEncodingNonAsciiFunctionalTestCase extends DynamicPortTestCase
         doTestSend(HttpConstants.METHOD_POST, payload, messageProperties, PLAIN_CONTENT_TYPE_HEADER);
     }
 
+    @Test
     public void testSendViaPostMap() throws Exception
     {
         Map<String, Object> messagePayload = new HashMap<String, Object>();
@@ -152,7 +158,7 @@ public class HttpEncodingNonAsciiFunctionalTestCase extends DynamicPortTestCase
         });
     }
 
-    String getTestMessage(Locale locale)
+    private String getTestMessage(Locale locale)
     {
         return LocaleMessageHandler.getString("test-data", locale,
             "HttpEncodingNonAsciiFunctionalTestCase.getMessage", new Object[]{});

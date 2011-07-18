@@ -10,15 +10,25 @@
 
 package org.mule.transport.email;
 
+import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.DynamicPortTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.email.functional.AbstractEmailFunctionalTestCase;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.mail.internet.MimeMessage;
 
+import org.junit.Rule;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * This demonstrates "round trip" processing of email - an email is pulled from a POP
@@ -29,25 +39,61 @@ import org.junit.Test;
  * The Mule services (defined in email-round-trip-test.xml) are started by the test framework.
  * So all we need to do here is test that the message is handled correctly.</p>
  */
-public class EmailRoundTripTestCase extends DynamicPortTestCase
+public class EmailRoundTripTestCase extends FunctionalTestCase
 {
+
     private AbstractGreenMailSupport greenMailSupport = null;
 
+    @Rule
+    public DynamicPort dynamicPort1 = new DynamicPort("port1");
+
+    @Rule
+    public DynamicPort dynamicPort2 = new DynamicPort("port2");
+
+    @Rule
+    public DynamicPort dynamicPort3 = new DynamicPort("port3");
+
+    @Rule
+    public DynamicPort dynamicPort4 = new DynamicPort("port4");
+
+    @Rule
+    public DynamicPort dynamicPort5 = new DynamicPort("port5");
+
+    @Rule
+    public DynamicPort dynamicPort6 = new DynamicPort("port6");
+
+    @Override
     protected String getConfigResources()
     {
         return "email-round-trip-test.xml";
+    }
+
+    @Override
+    protected MuleContext createMuleContext() throws Exception
+    {
+        startServer();
+        return super.createMuleContext();
     }
 
     /**
      * Start the servers when the test starts
      * @throws Exception
      */
-    @Override
-    protected void suitePreSetUp() throws Exception
+    public void startServer() throws Exception
     {
-        // see AbstractGreenMailSupport for all the ports this test uses and their order 
-        greenMailSupport = new FixedPortGreenMailSupport(getPorts().get(1));
-        greenMailSupport.startServers(getPorts());
+        // see AbstractGreenMailSupport for all the ports this test uses and their order
+        //portsForClass = PortUtil.findFreePorts(6);
+        greenMailSupport = new FixedPortGreenMailSupport(dynamicPort2.getNumber());
+
+        List<Integer> ports = new ArrayList<Integer>(6);
+        ports.add(dynamicPort1.getNumber());
+        ports.add(dynamicPort2.getNumber());
+        ports.add(dynamicPort3.getNumber());
+        ports.add(dynamicPort4.getNumber());
+        ports.add(dynamicPort5.getNumber());
+        ports.add(dynamicPort6.getNumber());
+
+        greenMailSupport.startServers(ports);
         greenMailSupport.createBobAndStoreEmail(greenMailSupport.getValidMessage(AbstractGreenMailSupport.ALICE_EMAIL));
     }
 
@@ -55,10 +101,10 @@ public class EmailRoundTripTestCase extends DynamicPortTestCase
      * Stop the servers when the test ends
      * @throws Exception
      */
-    @Override
-    protected void suitePostTearDown() throws Exception
+    protected void doTearDown() throws Exception
     {
         greenMailSupport.stopServers();
+        super.doTearDown();
     }
 
     @Test
@@ -77,10 +123,4 @@ public class EmailRoundTripTestCase extends DynamicPortTestCase
         assertEquals("did not receive 1 mail", 1, messages.length);
     }
 
-    @Override
-    protected int getNumPortsToFind()
-    {
-        // see AbstractGreenMailSupport for all the services this test starts
-        return 6;
-    }
 }

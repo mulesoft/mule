@@ -9,7 +9,8 @@
  */
 package org.mule.module.atom.event;
 
-import org.mule.tck.DynamicPortTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 
 import javax.jcr.Node;
 import javax.jcr.NodeIterator;
@@ -22,11 +23,19 @@ import org.apache.abdera.model.Document;
 import org.apache.abdera.model.Feed;
 import org.apache.abdera.protocol.client.AbderaClient;
 import org.apache.abdera.protocol.client.ClientResponse;
+import org.junit.Rule;
+import org.junit.Test;
 
-public class EventTest extends DynamicPortTestCase
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+public class EventTest extends FunctionalTestCase
 {
 
     private Repository repository;
+
+    @Rule
+    public DynamicPort dynamicPort = new DynamicPort("port1");
 
     @Override
     protected String getConfigResources()
@@ -34,6 +43,7 @@ public class EventTest extends DynamicPortTestCase
         return "eventqueue-conf.xml";
     }
 
+    @Test
     public void testCustomerProvider() throws Exception
     {
         repository = (Repository) muleContext.getRegistry().lookupObject("jcrRepository");
@@ -41,7 +51,7 @@ public class EventTest extends DynamicPortTestCase
         Thread.sleep(5000);
 
         AbderaClient client = new AbderaClient();
-        ClientResponse res = client.get("http://localhost:" + getPorts().get(0) + "/events");
+        ClientResponse res = client.get("http://localhost:" + dynamicPort.getNumber() + "/events");
 
         Document<Feed> doc = res.getDocument();
         // see if this helps with intermittent failures
@@ -102,12 +112,6 @@ public class EventTest extends DynamicPortTestCase
         {
             t.printStackTrace();
         }
-    }
-
-    @Override
-    protected int getNumPortsToFind()
-    {
-        return 1;
     }
 
 }

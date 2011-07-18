@@ -14,19 +14,32 @@ import org.mule.api.MuleMessage;
 import org.mule.api.expression.RequiredValueException;
 import org.mule.api.transport.DispatchException;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.DynamicPortTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class HttpFunctionalWithQueryTestCase extends DynamicPortTestCase
+import org.junit.Rule;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+public class HttpFunctionalWithQueryTestCase extends FunctionalTestCase
 {
+    
+    @Rule
+    public DynamicPort dynamicPort = new DynamicPort("port1");
+    
     @Override
     protected String getConfigResources()
     {
         return "http-functional-test-with-query.xml";
     }
 
+    @Test
     public void testSend() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -34,6 +47,7 @@ public class HttpFunctionalWithQueryTestCase extends DynamicPortTestCase
         assertEquals("boobar", result.getPayloadAsString());
     }
 
+    @Test
     public void testSendWithParams() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -44,6 +58,7 @@ public class HttpFunctionalWithQueryTestCase extends DynamicPortTestCase
         assertEquals("noonar", result.getPayloadAsString());
     }
 
+    @Test
     public void testSendWithBadParams() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -61,11 +76,5 @@ public class HttpFunctionalWithQueryTestCase extends DynamicPortTestCase
             //expected
             assertTrue(e.getCause() instanceof RequiredValueException);
         }
-    }
-
-    @Override
-    protected int getNumPortsToFind()
-    {
-        return 1;
     }
 }

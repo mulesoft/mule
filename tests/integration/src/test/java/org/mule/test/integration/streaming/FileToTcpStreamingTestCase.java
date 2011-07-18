@@ -11,18 +11,21 @@
 package org.mule.test.integration.streaming;
 
 
-import org.mule.tck.DynamicPortTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.util.FileUtils;
 
 import java.io.File;
 
-public class FileToTcpStreamingTestCase extends DynamicPortTestCase
+import org.junit.Rule;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+
+public class FileToTcpStreamingTestCase extends FunctionalTestCase
 {
-    @Override
-    protected void doTearDown() throws Exception
-    {
-        FileUtils.deleteDirectory(FileUtils.newFile(muleContext.getConfiguration().getWorkingDirectory() + "/test-data"));
-    }
+    @Rule
+    public DynamicPort dynamicPort = new DynamicPort("port1");
 
     @Override
     protected String getConfigResources()
@@ -31,11 +34,12 @@ public class FileToTcpStreamingTestCase extends DynamicPortTestCase
     }
 
     @Override
-    protected int getNumPortsToFind()
+    protected void doTearDown() throws Exception
     {
-        return 1;
+        FileUtils.deleteDirectory(FileUtils.newFile(muleContext.getConfiguration().getWorkingDirectory() + "/test-data"));
     }
 
+    @Test
     public void testStreamingFromFileToTcp() throws Exception
     {
         String text = "\nblah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah " +

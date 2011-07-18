@@ -20,5 +20,4 @@ public class JettyContinuationsHttpFunctionalTestCase extends HttpFunctionalTest
     {
         return "jetty-continuations-http-functional-test.xml";
     }
-
 }

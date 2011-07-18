@@ -12,7 +12,8 @@ package org.mule.transport.http.functional;
 
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.DynamicPortTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.http.HttpConstants;
 
 import org.apache.commons.httpclient.Header;
@@ -22,18 +23,27 @@ import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.HttpVersion;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.params.HttpClientParams;
+import org.junit.Rule;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * Tests as per http://www.io.com/~maus/HttpKeepAlive.html
  */
-public class HttpKeepAliveFunctionalTestCase extends DynamicPortTestCase
+public class HttpKeepAliveFunctionalTestCase extends FunctionalTestCase
 {
-    //private static final String URL_WITHOUT_EP_OVERRIDE = "http://localhost:60213/http-in";
-    //private static final String URL_WITH_EP_OVERRIDE = "http://localhost:60216/http-in";
     
     private HttpClient http10Client;
     private HttpClient http11Client;
     private MuleClient client = null;
+
+    @Rule
+    public DynamicPort dynamicPort1 = new DynamicPort("port1");
+
+    @Rule
+    public DynamicPort dynamicPort2 = new DynamicPort("port2");
     
     @Override
     protected void doSetUp() throws Exception
@@ -58,6 +68,7 @@ public class HttpKeepAliveFunctionalTestCase extends DynamicPortTestCase
         return "http-keep-alive-config.xml";
     }
     
+    @Test
     public void testHttp10WithoutConnectionHeader() throws Exception
     {
         GetMethod request = new GetMethod(((InboundEndpoint) client.getMuleContext().getRegistry().lookupObject("inWithoutEndpointOverride")).getAddress());
@@ -65,6 +76,7 @@ public class HttpKeepAliveFunctionalTestCase extends DynamicPortTestCase
         runHttp10MethodAndAssertConnectionHeader(request, "close");
     }
     
+    @Test
     public void testHttp10WithCloseConnectionHeader() throws Exception
     {
         GetMethod request = new GetMethod(((InboundEndpoint) client.getMuleContext().getRegistry().lookupObject("inWithoutEndpointOverride")).getAddress());
@@ -72,11 +84,13 @@ public class HttpKeepAliveFunctionalTestCase extends DynamicPortTestCase
         runHttp10MethodAndAssertConnectionHeader(request, "close");
     }
     
+    @Test
     public void testHttp10KeepAlive() throws Exception
     {
         doTestKeepAlive(((InboundEndpoint) client.getMuleContext().getRegistry().lookupObject("inWithoutEndpointOverride")).getAddress());
     }
     
+    @Test
     public void testHttp10KeepAliveWitEpOverride() throws Exception
     {
         doTestKeepAlive(((InboundEndpoint) client.getMuleContext().getRegistry().lookupObject("inWithoutEndpointOverride")).getAddress());
@@ -101,11 +115,13 @@ public class HttpKeepAliveFunctionalTestCase extends DynamicPortTestCase
         assertEquals(expectedConnectionHeaderValue, connectionHeader);
     }
     
+    @Test
     public void testHttp11KeepAlive() throws Exception
     {
         doTestHttp11KeepAlive(((InboundEndpoint) client.getMuleContext().getRegistry().lookupObject("inWithoutEndpointOverride")).getAddress());
     }
     
+    @Test
     public void testHttp11KeepAliveWithEpOverride() throws Exception
     {
         doTestHttp11KeepAlive(((InboundEndpoint) client.getMuleContext().getRegistry().lookupObject("inWithoutEndpointOverride")).getAddress());
@@ -133,11 +149,6 @@ public class HttpKeepAliveFunctionalTestCase extends DynamicPortTestCase
         assertEquals("/http-in", request.getResponseBodyAsString());
     }
 
-    @Override
-    protected int getNumPortsToFind()
-    {
-        return 2;
-    }
 }
 
 

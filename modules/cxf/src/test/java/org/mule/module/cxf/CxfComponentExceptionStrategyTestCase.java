@@ -15,13 +15,33 @@ import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.module.client.MuleClient;
 import org.mule.module.cxf.testmodels.CustomFault;
 import org.mule.module.cxf.testmodels.CxfEnabledFaultMessage;
-import org.mule.tck.DynamicPortTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.interceptor.Fault;
+import org.junit.Ignore;
+import org.junit.Rule;
+import org.junit.Test;
 
-public class CxfComponentExceptionStrategyTestCase extends DynamicPortTestCase
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+public class CxfComponentExceptionStrategyTestCase extends FunctionalTestCase
 {
+
+    @Rule
+    public DynamicPort dynamicPort = new DynamicPort("port1");
+
+    @Override
+    protected String getConfigResources()
+    {
+        return "exception-strategy-conf.xml";
+    }
+
+    @Test
     public void testDefaultComponentExceptionStrategy() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -37,12 +57,9 @@ public class CxfComponentExceptionStrategyTestCase extends DynamicPortTestCase
         }
     }
 
-    /**
-     * This doesn't work because of a bug in the CXF client code :-(
-     * 
-     * @throws Exception
-     */
-    public void xtestHandledException() throws Exception
+    @Test
+    @Ignore("This doesn't work because of a bug in the CXF client code :-(")
+    public void testHandledException() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
 
@@ -62,6 +79,7 @@ public class CxfComponentExceptionStrategyTestCase extends DynamicPortTestCase
         }
     }
 
+    @Test
     public void testUnhandledException() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -77,14 +95,4 @@ public class CxfComponentExceptionStrategyTestCase extends DynamicPortTestCase
         }
     }
 
-    protected String getConfigResources()
-    {
-        return "exception-strategy-conf.xml";
-    }
-
-    @Override
-    protected int getNumPortsToFind()
-    {
-        return 1;
-    }
 }

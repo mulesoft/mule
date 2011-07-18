@@ -13,28 +13,28 @@ package org.mule.module.cxf;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.DynamicPortTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 
-public class DatabindingTestCase extends DynamicPortTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
+
+public class DatabindingTestCase extends FunctionalTestCase
 {
 
+    @Override
+    protected String getConfigResources()
+    {
+        return "databinding-conf.xml";
+    }
+
+    @Test
     public void testEchoWsdl() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
         MuleMessage result = client.request(((InboundEndpoint) client.getMuleContext().getRegistry()
                         .lookupObject("httpInbound")).getAddress() + "?wsdl", 5000);
         assertNotNull(result.getPayload());
-    }
-
-    protected String getConfigResources()
-    {
-        return "databinding-conf.xml";
-    }
-
-    @Override
-    protected int getNumPortsToFind()
-    {
-        return 1;
     }
 
 }
