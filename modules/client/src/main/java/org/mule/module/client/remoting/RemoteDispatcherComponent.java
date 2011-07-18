@@ -44,7 +44,7 @@ import org.mule.message.DefaultExceptionPayload;
 import org.mule.model.seda.SedaService;
 import org.mule.module.client.i18n.ClientMessages;
 import org.mule.module.client.remoting.notification.RemoteDispatcherNotification;
-import org.mule.object.PrototypeObjectFactory;
+import org.mule.object.SingletonObjectFactory;
 import org.mule.session.DefaultMuleSession;
 import org.mule.transport.AbstractConnector;
 import org.mule.transport.NullPayload;
@@ -52,7 +52,6 @@ import org.mule.util.MapUtils;
 
 import java.io.ByteArrayInputStream;
 import java.lang.reflect.Method;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -85,11 +84,25 @@ public class RemoteDispatcherComponent implements Callable, Initialisable
     protected String encoding;
 
     protected int synchronousEventTimeout = 5000;
+    
+    protected InboundEndpoint inboundEndpoint;
 
     protected MuleContext muleContext;
 
+    public RemoteDispatcherComponent(InboundEndpoint inboundEndpoint, WireFormat wireFormat, String encoding, int synchronousEventTimeout)
+    {
+        this.inboundEndpoint = inboundEndpoint;
+        this.wireFormat = wireFormat;
+        this.encoding = encoding;
+        this.synchronousEventTimeout = synchronousEventTimeout;
+    }
+    
     public void initialise() throws InitialisationException
     {
+        if (inboundEndpoint == null)
+        {
+            throw new InitialisationException(CoreMessages.objectIsNull("inboundEndpoint"), this);
+        }
         if (wireFormat == null)
         {
             throw new InitialisationException(CoreMessages.objectIsNull("wireFormat"), this);
@@ -173,7 +186,7 @@ public class RemoteDispatcherComponent implements Callable, Initialisable
             // transformer associated with the Mule Admin queue will be invoked, but
             // the message will not be of expected type
 
-            EndpointBuilder builder = new EndpointURIEndpointBuilder(RequestContext.getEvent().getEndpoint());
+            EndpointBuilder builder = new EndpointURIEndpointBuilder(inboundEndpoint);
             // TODO - is this correct? it stops any other transformer from being set
             builder.setTransformers(new LinkedList());
             InboundEndpoint ep = muleContext.getEndpointFactory().getInboundEndpoint(builder);
@@ -298,11 +311,10 @@ public class RemoteDispatcherComponent implements Callable, Initialisable
             service.setName(MANAGER_COMPONENT_NAME);
             service.setModel(muleContext.getRegistry().lookupSystemModel());
 
-            Map props = new HashMap();
-            props.put("wireFormat", wireFormat);
-            props.put("encoding", encoding);
-            props.put("synchronousEventTimeout", new Integer(eventTimeout));
-            final SimpleCallableJavaComponent component = new SimpleCallableJavaComponent(new PrototypeObjectFactory(RemoteDispatcherComponent.class, props));
+            RemoteDispatcherComponent rdc = new RemoteDispatcherComponent(endpoint, wireFormat, encoding, new Integer(eventTimeout));
+            
+            final SimpleCallableJavaComponent component = new SimpleCallableJavaComponent(
+                new SingletonObjectFactory(rdc));
             component.setMuleContext(muleContext);
             service.setComponent(component);
 

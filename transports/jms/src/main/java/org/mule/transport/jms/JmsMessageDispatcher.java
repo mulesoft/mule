@@ -407,15 +407,15 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
         //We need to set the durableName and Selector if using topics
         if (topic)
         {
-            String tempDurable = (String) event.getEndpoint().getProperties().get(JmsConstants.DURABLE_PROPERTY);
+            String tempDurable = event.getMessage().getInvocationProperty(JmsConstants.DURABLE_PROPERTY);
             boolean durable = connector.isDurable();
             if (tempDurable != null)
             {
                 durable = Boolean.valueOf(tempDurable);
             }
             // Get the durable subscriber name if there is one
-            durableName = (String) event.getEndpoint().getProperties().get(
-                    JmsConstants.DURABLE_NAME_PROPERTY);
+            durableName = (String) event.getMessage().getInvocationProperty(
+                JmsConstants.DURABLE_NAME_PROPERTY);
             if (durableName == null && durable && topic)
             {
                 durableName = "mule." + connector.getName() + "." + event.getMessageSourceURI();
