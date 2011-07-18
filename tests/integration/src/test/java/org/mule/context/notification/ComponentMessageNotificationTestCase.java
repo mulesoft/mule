@@ -28,8 +28,11 @@ public class ComponentMessageNotificationTestCase extends AbstractNotificationTe
     @Parameters
     public static Collection<Object[]> parameters()
     {
-        return Arrays.asList(new Object[][]{{ConfigVariant.SERVICE,
-            "org/mule/test/integration/notifications/component-message-notification-test.xml"}});
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE,
+                "org/mule/test/integration/notifications/component-message-notification-test-service.xml"},
+            {ConfigVariant.FLOW,
+                "org/mule/test/integration/notifications/component-message-notification-test-flow.xml"}});
     }
 
     public ComponentMessageNotificationTestCase(ConfigVariant variant, String configResources)

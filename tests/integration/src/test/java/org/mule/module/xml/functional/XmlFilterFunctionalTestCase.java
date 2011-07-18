@@ -10,8 +10,8 @@
 
 package org.mule.module.xml.functional;
 
-import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -19,22 +19,20 @@ import java.util.Random;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import org.mule.api.MuleMessage;
+import org.mule.module.client.MuleClient;
 
 public class XmlFilterFunctionalTestCase extends AbstractXmlFunctionalTestCase
 {
     public static final int MAX_COUNT = 100;
     public static final String STRING_MESSAGE = "Hello world";
-
+    
     @Parameters
     public static Collection<Object[]> parameters()
     {
-        return Arrays.asList(new Object[][]{{ConfigVariant.SERVICE,
-            "org/mule/module/xml/xml-filter-functional-test-service.xml"}
-
-        });
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "org/mule/module/xml/xml-filter-functional-test-service.xml"},
+            {ConfigVariant.FLOW, "org/mule/module/xml/xml-filter-functional-test-flow.xml"}});
     }
 
     public XmlFilterFunctionalTestCase(ConfigVariant variant, String configResources)

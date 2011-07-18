@@ -34,9 +34,9 @@
     </sub-flow>
 
     <flow name="filter xml for content">
-        <vm:inbound-endpoint path="xml" connector-ref="default" exchange-pattern="one-way"/>
-        <message-filter onUnaccepted="catchAll">
-            <mxml:jxpath-filter pattern="/mule:mule/mule:model/mule:service[2]/@name" expectedValue="filter xml for content">
+        <vm:inbound-endpoint path="xml" connector-ref="default" exchange-pattern="one-way"/>        
+        <message-filter onUnaccepted="catchAll">                
+            <mxml:jxpath-filter pattern="/mule:mule/mule:flow[2]/@name" expectedValue="filter xml for content">
                 <mxml:namespace prefix="spring" uri="http://www.springframework.org/schema/beans"/>
                 <mxml:namespace prefix="mule" uri="http://www.mulesoft.org/schema/mule/core"/>
             </mxml:jxpath-filter>
@@ -44,7 +44,7 @@
         <outbound-endpoint ref="self"/>
     </flow>
 
-    <sub-flow name="catchAll">
+    <sub-flow name="catchAll">    
         <outbound-endpoint ref="other"/>
     </sub-flow>
 
