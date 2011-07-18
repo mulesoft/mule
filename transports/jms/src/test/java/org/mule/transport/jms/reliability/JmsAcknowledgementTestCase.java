@@ -15,6 +15,8 @@ import javax.jms.Message;
 import javax.jms.MessageListener;
 import javax.jms.Session;
 
+import org.junit.Test;
+
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
@@ -27,6 +29,7 @@ public class JmsAcknowledgementTestCase extends AbstractJmsReliabilityTestCase
         return "reliability/activemq-config.xml";
     }
 
+    @Test
     public void testAutoAckSync() throws Exception
     {
         acknowledgeMode = Session.AUTO_ACKNOWLEDGE;
@@ -39,6 +42,7 @@ public class JmsAcknowledgementTestCase extends AbstractJmsReliabilityTestCase
         assertNull(msg);
     }
 
+    @Test
     public void testClientAckSync() throws Exception
     {
         acknowledgeMode = Session.CLIENT_ACKNOWLEDGE;
@@ -60,6 +64,7 @@ public class JmsAcknowledgementTestCase extends AbstractJmsReliabilityTestCase
         assertNull(msg);
     }
 
+    @Test
     public void testAutoAckAsync() throws Exception
     {
         acknowledgeMode = Session.AUTO_ACKNOWLEDGE;
@@ -81,6 +86,7 @@ public class JmsAcknowledgementTestCase extends AbstractJmsReliabilityTestCase
         assertNull(msg);
     }
 
+    @Test
     public void testAutoAckAsyncWithException() throws Exception
     {
         acknowledgeMode = Session.AUTO_ACKNOWLEDGE;
@@ -109,6 +115,7 @@ public class JmsAcknowledgementTestCase extends AbstractJmsReliabilityTestCase
         assertNotNull(msg);
     }
 
+    @Test
     public void testClientAckAsync() throws Exception
     {
         acknowledgeMode = Session.CLIENT_ACKNOWLEDGE;
@@ -138,6 +145,7 @@ public class JmsAcknowledgementTestCase extends AbstractJmsReliabilityTestCase
         assertNull(msg);
     }
 
+    @Test
     public void testClientAckAsyncWithException() throws Exception
     {
         acknowledgeMode = Session.CLIENT_ACKNOWLEDGE;
@@ -159,5 +167,3 @@ public class JmsAcknowledgementTestCase extends AbstractJmsReliabilityTestCase
         assertNotNull(msg);
     }
 }
-
-
