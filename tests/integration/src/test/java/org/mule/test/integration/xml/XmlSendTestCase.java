@@ -27,12 +27,6 @@ import static org.junit.Assert.assertNotNull;
 
 public class XmlSendTestCase extends AbstractServiceAndFlowTestCase
 {
-
-	public XmlSendTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
-
 	@Parameters
     public static Collection<Object[]> parameters()
     {
@@ -40,6 +34,11 @@ public class XmlSendTestCase extends AbstractServiceAndFlowTestCase
             {ConfigVariant.SERVICE, "org/mule/test/integration/xml/xml-conf-service.xml"},
             {ConfigVariant.FLOW, "org/mule/test/integration/xml/xml-conf-flow.xml"}
         });
+    }
+
+    public XmlSendTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
     }
 
 	@Test

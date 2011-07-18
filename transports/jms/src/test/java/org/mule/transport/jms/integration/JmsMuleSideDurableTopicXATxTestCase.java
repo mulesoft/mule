@@ -15,13 +15,19 @@ import org.mule.module.client.MuleClient;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
 /**
  * Testing durable topic with XA transactions
  */
 public class JmsMuleSideDurableTopicXATxTestCase extends AbstractJmsFunctionalTestCase
 {
+
     public static final String CONNECTOR1_NAME = "jmsConnectorC1";
 
+    @Override
     protected String getConfigResources()
     {
         return "integration/jms-muleside-durable-topic-xa-tx.xml";

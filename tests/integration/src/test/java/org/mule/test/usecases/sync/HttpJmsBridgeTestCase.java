@@ -27,11 +27,6 @@ import static org.junit.Assert.assertNotNull;
 
 public class HttpJmsBridgeTestCase extends AbstractServiceAndFlowTestCase
 {
-    public HttpJmsBridgeTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
-
     @Parameters
     public static Collection<Object[]> parameters()
     {
@@ -39,6 +34,11 @@ public class HttpJmsBridgeTestCase extends AbstractServiceAndFlowTestCase
             {ConfigVariant.SERVICE, "org/mule/test/usecases/sync/http-jms-bridge-service.xml"},
             {ConfigVariant.FLOW, "org/mule/test/usecases/sync/http-jms-bridge-flow.xml"}
         });
+    }
+
+    public HttpJmsBridgeTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
     }
 
     @Test

@@ -13,10 +13,14 @@ package org.mule.transport.servlet.jetty.functional;
 import org.mule.api.MuleMessage;
 import org.mule.api.transport.DispatchException;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 public class JettyHttpFunctionalWithQueryTestCase extends FunctionalTestCase
 {
@@ -26,6 +30,7 @@ public class JettyHttpFunctionalWithQueryTestCase extends FunctionalTestCase
         return "jetty-http-functional-test-with-query.xml";
     }
 
+    @Test
     public void testSend() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -34,6 +39,7 @@ public class JettyHttpFunctionalWithQueryTestCase extends FunctionalTestCase
         assertEquals("boobar", result.getPayloadAsString());
     }
 
+    @Test
     public void testSendWithParams() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -44,6 +50,7 @@ public class JettyHttpFunctionalWithQueryTestCase extends FunctionalTestCase
         assertEquals("noonar", result.getPayloadAsString());
     }
 
+    @Test(expected = DispatchException.class)
     public void testSendWithBadParams() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -51,14 +58,6 @@ public class JettyHttpFunctionalWithQueryTestCase extends FunctionalTestCase
         props.put("hoo", "noo");
         props.put("har", "nar");
 
-        try
-        {
-            client.send("clientEndpoint2", null, props);
-            fail();
-        }
-        catch (DispatchException ex)
-        {
-            // this one was expected
-        }
+        client.send("clientEndpoint2", null, props);
     }
 }

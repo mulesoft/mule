@@ -10,11 +10,18 @@
 
 package org.mule.transport.sftp;
 
+import org.mule.module.client.MuleClient;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ResourceBundle;
 
-import org.mule.module.client.MuleClient;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * Test the archive features.
@@ -46,6 +53,7 @@ public class SftpArchiveFunctionalTestCase extends AbstractSftpTestCase
     private String archive = null;
     private String archiveCanonicalPath = null;
 
+    @Override
     protected String getConfigResources()
     {
         return "mule-sftp-archive-test-config.xml";
@@ -71,6 +79,7 @@ public class SftpArchiveFunctionalTestCase extends AbstractSftpTestCase
     /**
      * Test plain archive functionality with no extra features enabled
      */
+    @Test
     public void testArchive1() throws Exception
     {
         executeBaseTest(INBOUND_ENDPOINT1, "vm://test.upload1", FILE1_TXT, SEND_SIZE, "receiving1", TIMEOUT);
@@ -86,6 +95,7 @@ public class SftpArchiveFunctionalTestCase extends AbstractSftpTestCase
      * Test archive functionality with full usage of temp-dir and creation of unique
      * names of temp-files
      */
+    @Test
     public void testArchive2() throws Exception
     {
         executeBaseTest(INBOUND_ENDPOINT2, "vm://test.upload2", FILE2_TXT, SEND_SIZE, "receiving2", TIMEOUT);
@@ -110,6 +120,7 @@ public class SftpArchiveFunctionalTestCase extends AbstractSftpTestCase
      * Test archive functionality with usage of temp-dir for inbound and outbound
      * endpoints with creation of unique names of temp-files but not for the archive
      */
+    @Test
     public void testArchive3() throws Exception
     {
         executeBaseTest(INBOUND_ENDPOINT3, "vm://test.upload3", FILE3_TXT, SEND_SIZE, "receiving3", TIMEOUT);
@@ -131,6 +142,7 @@ public class SftpArchiveFunctionalTestCase extends AbstractSftpTestCase
      * Test archive functionality with usage of temp-dir for archive but not for
      * inbound and outbound endpoints
      */
+    @Test
     public void testArchive4() throws Exception
     {
         executeBaseTest(INBOUND_ENDPOINT4, "vm://test.upload4", FILE4_TXT, SEND_SIZE, "receiving4", TIMEOUT);
@@ -150,6 +162,7 @@ public class SftpArchiveFunctionalTestCase extends AbstractSftpTestCase
      * Test error handling with plain archive functionality with no extra features
      * enabled
      */
+    @Test
     public void testCantWriteToArchive1() throws Exception
     {
         makeArchiveReadOnly();
@@ -177,6 +190,7 @@ public class SftpArchiveFunctionalTestCase extends AbstractSftpTestCase
      * Test error handling with archive functionality with full usage of temp-dir and
      * creation of unique names of temp-files
      */
+    @Test
     public void testCantWriteToArchive2() throws Exception
     {
         makeArchiveTmpFolderReadOnly();
@@ -214,6 +228,7 @@ public class SftpArchiveFunctionalTestCase extends AbstractSftpTestCase
      * inbound and outbound endpoints with creation of unique names of temp-files but
      * not for the archive
      */
+    @Test
     public void testCantWriteToArchive3() throws Exception
     {
         makeArchiveReadOnly();
@@ -247,6 +262,7 @@ public class SftpArchiveFunctionalTestCase extends AbstractSftpTestCase
      * Test error handling with archive functionality with usage of temp-dir for
      * archive but not for inbound and outbound endpoints
      */
+    @Test
     public void testCantWriteToArchive4() throws Exception
     {
         makeArchiveTmpFolderReadOnly();

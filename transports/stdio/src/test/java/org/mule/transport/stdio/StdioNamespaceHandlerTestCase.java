@@ -10,15 +10,24 @@
 package org.mule.transport.stdio;
 
 import org.mule.api.endpoint.ImmutableEndpoint;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class StdioNamespaceHandlerTestCase extends FunctionalTestCase
 {
+
+    @Override
     protected String getConfigResources()
     {
         return "stdio-namespace-config.xml";
     }
 
+    @Test
     public void testConfig() throws Exception
     {
         PromptStdioConnector c =
@@ -35,6 +44,7 @@ public class StdioNamespaceHandlerTestCase extends FunctionalTestCase
         assertTrue(c.isStarted());
     }
 
+    @Test
     public void testNoBundle() throws Exception
     {
         PromptStdioConnector c =
@@ -49,6 +59,7 @@ public class StdioNamespaceHandlerTestCase extends FunctionalTestCase
         assertTrue(c.isStarted());
     }
 
+    @Test
     public void testSystemAttributeMap()
     {
         testEndpointAttribute("in", "system.in");

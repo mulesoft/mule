@@ -17,6 +17,8 @@ import org.mule.transport.NullPayload;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+
 /**
  * TODO this test does not use the Test scenarios, I think it would need a new Method
  * sendAndReceive It might make sense to leave this test as is because it tests that
@@ -25,6 +27,7 @@ import org.junit.Test;
 public class JmsTemporaryReplyToTestCase extends AbstractJmsFunctionalTestCase
 {
 
+    @Override
     protected String getConfigResources()
     {
         return "integration/jms-temporary-replyTo.xml";

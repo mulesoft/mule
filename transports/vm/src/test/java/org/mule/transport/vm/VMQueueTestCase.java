@@ -12,7 +12,7 @@ package org.mule.transport.vm;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -20,16 +20,24 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.StringTokenizer;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 public class VMQueueTestCase extends FunctionalTestCase
 {
 
     public static final long WAIT = 3000L;
 
+    @Override
     protected String getConfigResources()
     {
         return "vm/vm-queue-test.xml";
     }
 
+    @Test
     public void testSingleMessage() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -39,6 +47,7 @@ public class VMQueueTestCase extends FunctionalTestCase
         assertEquals("Marco", response.getPayload());
     }
 
+    @Test
     public void testMultipleMessages() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -59,6 +68,7 @@ public class VMQueueTestCase extends FunctionalTestCase
         }
     }
 
+    @Test
     public void testPassThrough() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -80,6 +90,7 @@ public class VMQueueTestCase extends FunctionalTestCase
         }
     }
 
+    @Test
     public void testNamedEndpoint() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);

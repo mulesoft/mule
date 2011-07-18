@@ -10,6 +10,8 @@
 
 package org.mule.transport.sftp;
 
+import org.junit.Test;
+
 /**
  * Test sending and receiving a very large message.
  * <p/>
@@ -21,6 +23,7 @@ package org.mule.transport.sftp;
  */
 public class SftpSendReceiveLargeFileFunctionalTestCase extends AbstractSftpTestCase
 {
+
     private static final long TIMEOUT = 600000;
 
     // Size of the generated stream - 200 Mb
@@ -29,14 +32,15 @@ public class SftpSendReceiveLargeFileFunctionalTestCase extends AbstractSftpTest
     public SftpSendReceiveLargeFileFunctionalTestCase()
     {
         // Increase the timeout of the test to 300 s
-        logger.info("Timeout was set to: " + System.getProperty(PROPERTY_MULE_TEST_TIMEOUT, "-1"));
-        System.setProperty(PROPERTY_MULE_TEST_TIMEOUT, "600000");
-        logger.info("Timeout is now set to: " + System.getProperty(PROPERTY_MULE_TEST_TIMEOUT, "-1"));
+        logger.info("Timeout was set to: " + System.getProperty(TEST_TIMEOUT_SYSTEM_PROPERTY, "-1"));
+        System.setProperty(TEST_TIMEOUT_SYSTEM_PROPERTY, "600000");
+        logger.info("Timeout is now set to: " + System.getProperty(TEST_TIMEOUT_SYSTEM_PROPERTY, "-1"));
     }
 
-    // Uses the same config as SftpSendReceiveFunctionalTestCase
+    @Override
     protected String getConfigResources()
     {
+        // Uses the same config as SftpSendReceiveFunctionalTestCase
         return "mule-send-receive-large-file-test-config.xml";
     }
 
@@ -51,6 +55,7 @@ public class SftpSendReceiveLargeFileFunctionalTestCase extends AbstractSftpTest
     /**
      * Test sending and receiving a large file.
      */
+    @Test
     public void testSendAndReceiveLargeFile() throws Exception
     {
         executeBaseTest("inboundEndpoint", "vm://test.upload", "bigfile.txt", SEND_SIZE, "receiving", TIMEOUT);

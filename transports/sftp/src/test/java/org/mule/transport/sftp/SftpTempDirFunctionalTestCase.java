@@ -10,26 +10,27 @@
 
 package org.mule.transport.sftp;
 
-import java.io.IOException;
-
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.module.client.MuleClient;
 
-/**
- * @author Lennart Häggkvist, Magnus Larsson
- *         <code>SftpTempDirFunctionalTestCase</code> tests the tempDir
- *         functionality.
- */
+import java.io.IOException;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class SftpTempDirFunctionalTestCase extends AbstractSftpTestCase
 {
+
     private static final String OUTBOUND_ENDPOINT_NAME = "outboundEndpoint";
     private static final String INBOUND_ENDPOINT_NAME = "inboundEndpoint";
     private static final String INBOUND_ENDPOINT_NAME2 = "inboundEndpoint2";
     private static final String OUTBOUND_ENDPOINT_NAME2 = "outboundEndpoint2";
     private static final String TEMP_DIR = "uploading";
 
+    @Override
     protected String getConfigResources()
     {
         return "mule-sftp-temp-dir-config.xml";
@@ -46,6 +47,7 @@ public class SftpTempDirFunctionalTestCase extends AbstractSftpTestCase
         initEndpointDirectory(OUTBOUND_ENDPOINT_NAME2);
     }
 
+    @Test
     public void testTempDirInbound() throws Exception
     {
         MuleClient muleClient = new MuleClient(muleContext);
@@ -88,6 +90,7 @@ public class SftpTempDirFunctionalTestCase extends AbstractSftpTestCase
 
     }
 
+    @Test
     public void testTempDirOutbound() throws Exception
     {
         MuleClient muleClient = new MuleClient(muleContext);

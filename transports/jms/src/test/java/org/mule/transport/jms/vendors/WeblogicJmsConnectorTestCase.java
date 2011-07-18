@@ -10,18 +10,26 @@
 
 package org.mule.transport.jms.vendors;
 
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transport.jms.JmsConnector;
 import org.mule.transport.jms.JmsTopicResolver;
 import org.mule.transport.jms.weblogic.WeblogicJmsTopicResolver;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 public class WeblogicJmsConnectorTestCase extends FunctionalTestCase
 {
+
+    @Override
     protected String getConfigResources()
     {
         return "weblogic-config.xml";
     }
 
+    @Test
     public void testDefaultConfig() throws Exception
     {
         JmsConnector c = (JmsConnector)muleContext.getRegistry().lookupConnector("jmsConnector");

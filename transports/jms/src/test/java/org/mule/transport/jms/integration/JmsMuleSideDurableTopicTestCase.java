@@ -24,10 +24,16 @@ import javax.jms.TopicSession;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 public class JmsMuleSideDurableTopicTestCase extends AbstractJmsFunctionalTestCase
 {
+
     public static final String CONNECTOR1_NAME = "jmsConnectorC1";
 
+    @Override
     protected String getConfigResources()
     {
         return "integration/jms-muleside-durable-topic.xml";
@@ -47,16 +53,17 @@ public class JmsMuleSideDurableTopicTestCase extends AbstractJmsFunctionalTestCa
         logger.info(CONNECTOR1_NAME + " is started");
         receive(scenarioNoTx);
         receive(scenarioNoTx);
-
     }
 
     Scenario scenarioNoTx = new NonTransactedScenario()
     {
+        @Override
         public String getInputDestinationName()
         {
             return getJmsConfig().getBroadcastDestinationName();
         }
 
+        @Override
         public void send(Session session, MessageProducer producer) throws JMSException
         {
             // publish and send is the same for ActiveMQ
@@ -64,6 +71,7 @@ public class JmsMuleSideDurableTopicTestCase extends AbstractJmsFunctionalTestCa
 
         }
 
+        @Override
         public Message receive(Session session, MessageConsumer consumer) throws JMSException
         {
             Message message = consumer.receive(getTimeout());
@@ -72,9 +80,9 @@ public class JmsMuleSideDurableTopicTestCase extends AbstractJmsFunctionalTestCa
             assertEquals(((TextMessage) message).getText(), DEFAULT_OUTPUT_MESSAGE);
             return message;
         }
-
     };
 
+    @Override
     public void send(Scenario scenario) throws Exception
     {
         TopicConnection connection = null;

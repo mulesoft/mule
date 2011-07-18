@@ -11,7 +11,7 @@ package org.mule.transport.vm.functional;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.transaction.XaTransaction;
 
@@ -27,6 +27,10 @@ import javax.transaction.xa.Xid;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class VmXATransactionTestCase extends FunctionalTestCase
 {
@@ -34,11 +38,13 @@ public class VmXATransactionTestCase extends FunctionalTestCase
     protected static volatile boolean success = true;
     protected static volatile boolean wouldBeDisabled = false;
 
+    @Override
     protected String getConfigResources()
     {
         return "vm-xa-transaction.xml";
     }
 
+    @Test
     public void testTransactionQueueEventsTrue() throws Exception
     {
 
@@ -51,7 +57,6 @@ public class VmXATransactionTestCase extends FunctionalTestCase
             throw new IllegalStateException("Test is wrong, and must be disabled");
         }
         assertTrue(success);
-
     }
 
     public static class TestComponent

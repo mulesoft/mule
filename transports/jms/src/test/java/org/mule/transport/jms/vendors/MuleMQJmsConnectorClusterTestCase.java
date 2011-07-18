@@ -10,19 +10,27 @@
 
 package org.mule.transport.jms.vendors;
 
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transport.jms.DefaultJmsTopicResolver;
 import org.mule.transport.jms.JmsConnector;
 import org.mule.transport.jms.JmsTopicResolver;
 import org.mule.transport.jms.mulemq.MuleMQJmsConnector;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 public class MuleMQJmsConnectorClusterTestCase extends FunctionalTestCase
 {
+
+    @Override
     protected String getConfigResources()
     {
         return "mulemq-cluster-config.xml";
     }
 
+    @Test
     public void testDefaultConfig() throws Exception
     {
         JmsConnector c = (JmsConnector)muleContext.getRegistry().lookupConnector("jmsConnector");

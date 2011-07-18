@@ -10,12 +10,18 @@
 
 package org.mule.transport.sftp.dataintegrity;
 
-import java.io.IOException;
-
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.transport.DispatchException;
 import org.mule.module.client.MuleClient;
 import org.mule.transport.sftp.SftpClient;
+
+import java.io.IOException;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Test the three different types of handling when duplicate files (i.e. file names)
@@ -53,6 +59,7 @@ public class SftpCheckDuplicateFileHandlingTestCase extends AbstractSftpDataInte
      * Try to transfer two files with the same name. The second file will be given a
      * new name.
      */
+    @Test
     public void testDuplicateChangeNameHandling() throws Exception
     {
 
@@ -91,6 +98,7 @@ public class SftpCheckDuplicateFileHandlingTestCase extends AbstractSftpDataInte
      * Test transferring a duplicate file. The default handling of duplicates is to
      * throw an exception.
      */
+    @Test
     public void testDuplicateDefaultExceptionHandling() throws Exception
     {
 

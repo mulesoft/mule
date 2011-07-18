@@ -9,19 +9,24 @@
  */
 package org.mule.transport.udp;
 
-import org.mule.tck.FunctionalTestCase;
-import org.mule.transport.udp.UdpConnector;
+import org.mule.tck.junit4.FunctionalTestCase;
 
-/**
- * TODO
- */
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 public class UdpNamespaceHandlerTestCase extends FunctionalTestCase
 {
+
+    @Override
     protected String getConfigResources()
     {
         return "udp-namespace-config.xml";
     }
 
+    @Test
     public void testConfig() throws Exception
     {
         UdpConnector c = (UdpConnector)muleContext.getRegistry().lookupConnector("udpConnector");

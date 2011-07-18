@@ -12,18 +12,24 @@ package org.mule.transport.ssl.issues;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 public class MultipleConnectorsMule1765TestCase extends FunctionalTestCase
 {
-//    protected static String TEST_SSL_MESSAGE = "Test SSL Request (R�dgr�d), 57 = \u06f7\u06f5 in Arabic";
+
     protected static String TEST_SSL_MESSAGE = "Test SSL Request";
 
+    @Override
     protected String getConfigResources()
     {
         return "multiple-connectors-test.xml";
     }
 
+    @Test
     public void testSend() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);

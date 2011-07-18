@@ -10,8 +10,10 @@
 
 package org.mule.transport.http;
 
-import org.mule.tck.FunctionalTestCase;
-import org.mule.transport.http.HttpConnector;
+import org.mule.tck.junit4.FunctionalTestCase;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public abstract class AbstractNamespaceHandlerTestCase extends FunctionalTestCase
 {
@@ -23,12 +25,12 @@ public abstract class AbstractNamespaceHandlerTestCase extends FunctionalTestCas
         this.prefix = prefix;
     }
 
+    @Override
     protected String getConfigResources()
     {
         return prefix + "-namespace-config.xml";
     }
 
-    
     protected void testBasicProperties(HttpConnector connector)
     {
         assertNotNull(connector);

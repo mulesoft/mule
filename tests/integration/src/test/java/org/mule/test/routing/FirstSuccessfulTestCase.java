@@ -13,7 +13,13 @@ package org.mule.test.routing;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.api.transport.DispatchException;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
 
 public class FirstSuccessfulTestCase extends FunctionalTestCase
 {
@@ -23,6 +29,7 @@ public class FirstSuccessfulTestCase extends FunctionalTestCase
         return "first-successful-test.xml";
     }
 
+    @Test
     public void testFirstSuccessful() throws Exception
     {
         MuleClient client = muleContext.getClient();
@@ -46,6 +53,7 @@ public class FirstSuccessfulTestCase extends FunctionalTestCase
         }
     }
 
+    @Test
     public void testFirstSuccessfulWithExpression() throws Exception
     {
         MuleClient client = muleContext.getClient();
@@ -53,6 +61,7 @@ public class FirstSuccessfulTestCase extends FunctionalTestCase
         assertEquals("XYZ is a string", response.getPayloadAsString());
     }
 
+    @Test
     public void testFirstSuccessfulWithExpressionAllFail() throws Exception
     {
         try
@@ -66,6 +75,7 @@ public class FirstSuccessfulTestCase extends FunctionalTestCase
         }
     }
 
+    @Test
     public void testFirstSuccessfulWithOneWayEndpoints() throws Exception
     {
         MuleClient client = muleContext.getClient();

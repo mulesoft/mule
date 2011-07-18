@@ -13,24 +13,31 @@ package org.mule.transport.servlet;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class RESTTestCase extends FunctionalTestCase
 {
-    public RESTTestCase()
-    {
-        super();
-        
-        // Do not fail test case upon timeout because this probably just means
-        // that the 3rd-party web service is off-line.
-        setFailOnTimeout(false);
-    }
 
+    @Override
     protected String getConfigResources()
     {
         return "rest-functional-test.xml";
     }
+
+    @Override
+    protected boolean isFailOnTimeout()
+    {
+        // Do not fail test case upon timeout because this probably just means
+        // that the 3rd-party web service is off-line.
+        return false;
+    }
     
+    @Test
     public void testRest1ParamPost() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -41,6 +48,7 @@ public class RESTTestCase extends FunctionalTestCase
         assertTrue(reply.getPayloadAsString().indexOf("Symbol&gt;IBM&lt;") > -1);
     }
     
+    @Test
     public void testRest2ParamsPost() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -50,6 +58,7 @@ public class RESTTestCase extends FunctionalTestCase
         assertTrue(reply.getPayloadAsString().indexOf(">1</double>") > -1);
     }
     
+    @Test
     public void testRest1ParamGet() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -61,6 +70,7 @@ public class RESTTestCase extends FunctionalTestCase
         assertTrue("'Symbol&gt;IBM&lt;' not found in reply: " + replyStr, replyStr.indexOf("Symbol&gt;IBM&lt;") > -1);
     }
     
+    @Test
     public void testRest2ParamsGet() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);

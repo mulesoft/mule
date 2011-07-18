@@ -14,6 +14,9 @@ import org.mule.api.context.notification.EndpointMessageNotificationListener;
 import org.mule.context.notification.EndpointMessageNotification;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.probe.PollingProber;
+import org.mule.tck.probe.Probe;
+import org.mule.tck.probe.Prober;
 import org.mule.util.FileUtils;
 
 import java.io.File;
@@ -31,7 +34,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class OutputPatternFromEndpointTestCase extends AbstractServiceAndFlowTestCase
-    implements EndpointMessageNotificationListener<EndpointMessageNotification>
+implements EndpointMessageNotificationListener<EndpointMessageNotification>
 {
     protected CountDownLatch fileReceiveLatch;
 
@@ -63,11 +66,11 @@ public class OutputPatternFromEndpointTestCase extends AbstractServiceAndFlowTes
     {
         String myFirstDirName = "FirstWrite";
         String mySecondDirName = "SecondWrite";
-        String myFileName1 = "export.txt";
-        String myFileName2 = "export.txt.OK";
+        final String myFileName1 = "export.txt";
+        final String myFileName2 = "export.txt.OK";
 
         // make sure there is no directory and file
-        File myDir = FileUtils.newFile(myFirstDirName);
+        final File myDir = FileUtils.newFile(myFirstDirName);
         if (myDir.isDirectory())
         {
             // Delete Any Existing Files
@@ -80,7 +83,7 @@ public class OutputPatternFromEndpointTestCase extends AbstractServiceAndFlowTes
             assertTrue(myDir.delete());
         }
 
-        File myDir2 = FileUtils.newFile(mySecondDirName);
+        final File myDir2 = FileUtils.newFile(mySecondDirName);
         if (myDir2.isDirectory())
         {
             // Delete Any Existing Files
@@ -105,8 +108,22 @@ public class OutputPatternFromEndpointTestCase extends AbstractServiceAndFlowTes
 
             // the output file should exist now
             // check that the files with the correct output pattern were generated
-            assertTrue(FileUtils.newFile(myDir, myFileName1).exists());
-            assertTrue(FileUtils.newFile(myDir2, myFileName2).exists());
+            Prober prober = new PollingProber(2000, 50);
+
+            prober.check(new Probe()
+            {
+                @Override
+                public boolean isSatisfied()
+                {
+                  return FileUtils.newFile(myDir, myFileName1).exists() && FileUtils.newFile(myDir2, myFileName2).exists();
+                }
+
+                @Override
+                public String describeFailure()
+                {
+                    return "Failed to create the expected files";
+                }
+            });
         }
         catch (AssertionFailedError e1)
         {

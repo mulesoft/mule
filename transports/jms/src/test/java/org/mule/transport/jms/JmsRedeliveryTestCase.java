@@ -16,26 +16,34 @@ import org.mule.api.client.MuleClient;
 import org.mule.api.context.notification.ExceptionNotificationListener;
 import org.mule.context.notification.ExceptionNotification;
 import org.mule.message.ExceptionMessage;
-import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.exceptions.FunctionalTestException;
 import org.mule.tck.functional.CounterCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transport.jms.redelivery.MessageRedeliveredException;
 import org.mule.util.concurrent.Latch;
 
 import java.util.concurrent.TimeUnit;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class JmsRedeliveryTestCase extends FunctionalTestCase
 {
+
     private final int timeout = getTestTimeoutSecs() * 1000 / 4;
     private static final String DESTINATION = "jms://in";
     private static final int MAX_REDELIVERY = 3;
 
+    @Override
     protected String getConfigResources()
     {
         return "jms-redelivery.xml";
     }
 
+    @Test
     public void testRedelivery() throws Exception
     {
         MuleClient client = muleContext.getClient();

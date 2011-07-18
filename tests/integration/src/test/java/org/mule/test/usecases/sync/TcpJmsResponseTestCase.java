@@ -25,18 +25,17 @@ import static org.junit.Assert.assertNotNull;
 
 public class TcpJmsResponseTestCase extends AbstractServiceAndFlowTestCase
 {
-    public TcpJmsResponseTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-
-    }
-
     @Parameters
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
             {ConfigVariant.SERVICE, "org/mule/test/usecases/sync/tcp-jms-response-service.xml"},
             {ConfigVariant.FLOW, "org/mule/test/usecases/sync/tcp-jms-response-flow.xml"}});
+    }
+
+    public TcpJmsResponseTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
     }
 
     @Test

@@ -20,8 +20,10 @@ import org.junit.Test;
 
 public class JmsDurableTopicTestCase extends AbstractJmsFunctionalTestCase
 {
+
     private String clientId;
 
+    @Override
     protected String getConfigResources()
     {
         return "integration/jms-durable-topic.xml";
@@ -48,6 +50,7 @@ public class JmsDurableTopicTestCase extends AbstractJmsFunctionalTestCase
 
     Scenario scenarioNonTx = new NonTransactedScenario()
     {
+        @Override
         public String getOutputDestinationName()
         {
             return getJmsConfig().getBroadcastDestinationName();
@@ -56,12 +59,14 @@ public class JmsDurableTopicTestCase extends AbstractJmsFunctionalTestCase
 
     Scenario scenarioNotReceive = new ScenarioNotReceive()
     {
+        @Override
         public String getOutputDestinationName()
         {
             return getJmsConfig().getBroadcastDestinationName();
         }
     };
 
+    @Override
     public Message receive(Scenario scenario) throws Exception
     {
         Connection connection = null;

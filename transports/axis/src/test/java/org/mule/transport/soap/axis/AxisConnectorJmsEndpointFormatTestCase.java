@@ -14,13 +14,26 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.transport.DispatchException;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import org.apache.axis.AxisFault;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class AxisConnectorJmsEndpointFormatTestCase extends FunctionalTestCase
 {
 
+    @Override
+    protected String getConfigResources()
+    {
+        return "axis-jms-endpoint-format-config.xml";
+    }
+
+    @Test
     public void testAxisOverJmsWithQueueNameSameAsComponentName() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -28,7 +41,8 @@ public class AxisConnectorJmsEndpointFormatTestCase extends FunctionalTestCase
         assertNotNull(result.getPayload());
         assertEquals("test1", result.getPayloadAsString());
     }
-    
+
+    @Test
     public void testAxisOverJmsWithQueueNameDifferentFromComponentName() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -36,7 +50,8 @@ public class AxisConnectorJmsEndpointFormatTestCase extends FunctionalTestCase
         assertNotNull(result.getPayload());
         assertEquals("test2", result.getPayloadAsString());
     }
-    
+
+    @Test
     public void testAxisOverJmsWithoutSettingMethodOnEndpoint() throws Exception
     {
         try
@@ -49,7 +64,8 @@ public class AxisConnectorJmsEndpointFormatTestCase extends FunctionalTestCase
             assertTrue(e.getMessage().startsWith("Cannot invoke WS call without an Operation."));
         }
     }
-    
+
+    @Test
     public void testAxisOverJmsWithoutSettingSoapAction() throws Exception
     {
         try
@@ -62,11 +78,6 @@ public class AxisConnectorJmsEndpointFormatTestCase extends FunctionalTestCase
             assertTrue(e.getCause() instanceof AxisFault);
             assertTrue(e.getCause().getMessage().startsWith("The AXIS engine could not find a target service to invoke!"));
         }
-    }
-    
-    protected String getConfigResources()
-    {
-        return "axis-jms-endpoint-format-config.xml";
     }
 
 }

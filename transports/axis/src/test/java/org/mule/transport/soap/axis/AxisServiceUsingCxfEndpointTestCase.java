@@ -13,7 +13,7 @@ package org.mule.transport.soap.axis;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import java.util.HashMap;
 import java.util.List;
@@ -22,10 +22,21 @@ import java.util.Map;
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class AxisServiceUsingCxfEndpointTestCase extends FunctionalTestCase
 {
 
+    @Override
+    protected String getConfigResources()
+    {
+        return "axis-using-cxf-config.xml";
+    }
+
+    @Test
     public void testAxis() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -37,6 +48,7 @@ public class AxisServiceUsingCxfEndpointTestCase extends FunctionalTestCase
         logger.info(reply.getPayloadAsString());
     }
 
+    @Test
     public void testRequestWsdl() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -52,11 +64,6 @@ public class AxisServiceUsingCxfEndpointTestCase extends FunctionalTestCase
 
         nodes = document.selectNodes("//wsdl:definitions/wsdl:service");
         assertEquals(((Element)nodes.get(0)).attribute("name").getStringValue(), "AxisService");
-    }
-
-    protected String getConfigResources()
-    {
-        return "axis-using-cxf-config.xml";
     }
 
 }

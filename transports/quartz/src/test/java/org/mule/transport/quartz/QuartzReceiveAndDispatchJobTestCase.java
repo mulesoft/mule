@@ -11,17 +11,25 @@
 package org.mule.transport.quartz;
 
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.functional.CountdownCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
+import org.mule.tck.junit4.FunctionalTestCase;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class QuartzReceiveAndDispatchJobTestCase extends FunctionalTestCase
 {
+
+    @Override
     protected String getConfigResources()
     {
         return "quartz-receive-dispatch.xml";
     }
 
+    @Test
     public void testMuleClientReceiveAndDispatchJob() throws Exception
     {
         FunctionalTestComponent component = getFunctionalTestComponent("scheduledService");

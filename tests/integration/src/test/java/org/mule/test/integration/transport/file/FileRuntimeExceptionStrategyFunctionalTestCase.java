@@ -24,11 +24,6 @@ import static org.junit.Assert.fail;
 
 public class FileRuntimeExceptionStrategyFunctionalTestCase extends AbstractServiceAndFlowTestCase
 {
-    public FileRuntimeExceptionStrategyFunctionalTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
-
     @Parameters
     public static Collection<Object[]> parameters()
     {
@@ -37,6 +32,11 @@ public class FileRuntimeExceptionStrategyFunctionalTestCase extends AbstractServ
                 "org/mule/test/integration/providers/file/file-runtime-exception-strategy-service.xml"},
             {ConfigVariant.FLOW,
                 "org/mule/test/integration/providers/file/file-runtime-exception-strategy-flow.xml"}});
+    }
+
+    public FileRuntimeExceptionStrategyFunctionalTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
     }
 
     @Test

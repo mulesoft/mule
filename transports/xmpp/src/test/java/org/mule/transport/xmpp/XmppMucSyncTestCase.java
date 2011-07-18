@@ -25,15 +25,20 @@ import java.util.concurrent.TimeUnit;
 
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Packet;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class XmppMucSyncTestCase extends AbstractXmppTestCase
 {
     protected static final long JABBER_SEND_THREAD_SLEEP_TIME = 1000;
     private static final String RECEIVE_SERVICE_NAME = "receiveFromJabber";
     private static final long SHORT_RETRIEVE_TIMEOUT = 100;
-    
+
     private final String testMessage = UUID.getUUID().toString();
-    
+
     @Override
     protected void doSetUp() throws Exception
     {
@@ -42,7 +47,7 @@ public class XmppMucSyncTestCase extends AbstractXmppTestCase
         Properties properties = (Properties) muleContext.getRegistry().lookupObject("properties");
         String chatroom = properties.getProperty("chatroom");
         assertNotNull(chatroom);
-        
+
         jabberClient.joinGroupchat(chatroom);
     }
 
@@ -52,14 +57,15 @@ public class XmppMucSyncTestCase extends AbstractXmppTestCase
         return "xmpp-muc-sync-config.xml";
     }
 
+    @Test
     public void testSendSync() throws Exception
-    {           
+    {
         MuleClient client = new MuleClient(muleContext);
         MuleMessage reply = client.send("vm://in", testMessage, null);
         assertNotNull(reply);
-        
+
         assertEquals(NullPayload.getInstance(), reply.getPayload());
-        
+
         Packet packet = jabberClient.receive(RECEIVE_TIMEOUT);
         // The groupchat may have a backlog of messages whis is sent before our input is transmitted.
         // Poll the entire groupchat history
@@ -78,37 +84,39 @@ public class XmppMucSyncTestCase extends AbstractXmppTestCase
         }
         assertTrue(inputSeen);
     }
-    
+
+    @Test
     public void testReceiveSync() throws Exception
     {
         startService(RECEIVE_SERVICE_NAME);
 
         Latch receiveLatch = new Latch();
         setupTestServiceComponent(receiveLatch);
-        
+
         sendJabberMessageFromNewThread();
         assertTrue(receiveLatch.await(60, TimeUnit.SECONDS));
     }
-    
+
     private void setupTestServiceComponent(Latch receiveLatch) throws Exception
-    {   
+    {
         Object testComponent = getComponent(RECEIVE_SERVICE_NAME);
         assertTrue(testComponent instanceof FunctionalTestComponent);
         FunctionalTestComponent component = (FunctionalTestComponent) testComponent;
-        
+
         XmppGroupchatCallback callback = new XmppGroupchatCallback(receiveLatch);
         component.setEventCallback(callback);
     }
-    
+
     protected Message.Type expectedXmppMessageType()
     {
         return Message.Type.groupchat;
     }
-    
+
     protected void sendJabberMessageFromNewThread()
     {
         JabberSender sender = new JabberSender(new Callback()
         {
+            @Override
             public void doit() throws Exception
             {
                 Thread.sleep(JABBER_SEND_THREAD_SLEEP_TIME);
@@ -117,23 +125,24 @@ public class XmppMucSyncTestCase extends AbstractXmppTestCase
         });
         startSendThread(sender);
     }
-    
+
     private class XmppGroupchatCallback implements EventCallback
     {
         private Latch latch;
-        
+
         public XmppGroupchatCallback(Latch latch)
         {
             super();
             this.latch = latch;
         }
-        
+
+        @Override
         public void eventReceived(MuleEventContext context, Object component) throws Exception
         {
             MuleMessage muleMessage = context.getMessage();
             Object payload = muleMessage.getPayload();
             assertTrue(payload instanceof Message);
-            
+
             Message jabberMessage = (Message) payload;
             if (jabberMessage.getBody().equals(testMessage))
             {

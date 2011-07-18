@@ -19,6 +19,7 @@ import org.mule.tck.AbstractServiceAndFlowTestCase;
 import java.util.Arrays;
 import java.util.Collection;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
@@ -35,11 +36,6 @@ public class CxfOverJMSTestCase extends AbstractServiceAndFlowTestCase
                                       + "</soap:Body>"
                                       + "</soap:Envelope>";
 
-    public CxfOverJMSTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
-
     @Parameters
     public static Collection<Object[]> parameters()
     {
@@ -47,6 +43,11 @@ public class CxfOverJMSTestCase extends AbstractServiceAndFlowTestCase
             {ConfigVariant.SERVICE, "org/mule/test/integration/transport/cxf/cxf-over-jms-config-service.xml"},
             {ConfigVariant.FLOW, "org/mule/test/integration/transport/cxf/cxf-over-jms-config-flow.xml"}
         });
+    }
+
+    public CxfOverJMSTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
     }
 
     @Test
@@ -73,7 +74,9 @@ public class CxfOverJMSTestCase extends AbstractServiceAndFlowTestCase
     }
 
     // MULE-4677
-    public void XXtestCxfOverJMSSyncProxy() throws Exception
+    @Ignore
+    @Test
+    public void testCxfOverJMSSyncProxy() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
         MuleMessage result = client.send("http://localhost:63081/services/testBridge",

@@ -11,22 +11,28 @@ package org.mule.transport.vm.functional;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transaction.TransactionCoordination;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class VmTransactionTestCase extends FunctionalTestCase
 {
     protected static volatile boolean serviceComponentAck = false;
     protected static final Log logger = LogFactory.getLog(VmTransactionTestCase.class);
 
+    @Override
     protected String getConfigResources()
     {
         return "vm/vm-transaction.xml";
     }
 
+    @Test
     public void testDispatch() throws Exception
     {
         serviceComponentAck = false;
@@ -36,6 +42,7 @@ public class VmTransactionTestCase extends FunctionalTestCase
         assertNotNull("Message", message);
     }
 
+    @Test
     public void testSend() throws Exception
     {
         serviceComponentAck = false;

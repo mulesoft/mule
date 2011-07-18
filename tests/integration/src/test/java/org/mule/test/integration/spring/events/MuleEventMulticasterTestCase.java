@@ -13,14 +13,20 @@ package org.mule.test.integration.spring.events;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.functional.EventCallback;
 
 import java.util.concurrent.atomic.AtomicInteger;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class MuleEventMulticasterTestCase extends FunctionalTestCase
 {
-    final AtomicInteger eventCount = new AtomicInteger(0);
+
+    private final AtomicInteger eventCount = new AtomicInteger(0);
 
     @Override
     protected String getConfigResources()
@@ -34,6 +40,7 @@ public class MuleEventMulticasterTestCase extends FunctionalTestCase
         eventCount.set(0);
     }
 
+    @Test
     public void testReceivingASubscriptionEvent() throws Exception
     {
         OrderManagerBean subscriptionBean = (OrderManagerBean) muleContext.getRegistry().lookupObject(

@@ -28,11 +28,6 @@ import static org.junit.Assert.assertNotNull;
 
 public class HttpTransformTestCase extends AbstractServiceAndFlowTestCase
 {
-    public HttpTransformTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
-
     @Parameters
     public static Collection<Object[]> parameters()
     {
@@ -40,6 +35,11 @@ public class HttpTransformTestCase extends AbstractServiceAndFlowTestCase
             {ConfigVariant.SERVICE, "org/mule/test/usecases/sync/http-transform-service.xml"},
             {ConfigVariant.FLOW, "org/mule/test/usecases/sync/http-transform-flow.xml"}
         });
+    }
+
+    public HttpTransformTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
     }
 
     @Test

@@ -11,7 +11,6 @@
 package org.mule.test.integration.transformer;
 
 import org.mule.api.MuleMessage;
-import org.mule.api.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 
 import java.util.Arrays;
@@ -40,10 +39,7 @@ public class TransformerTrackerLifecycleTestCase extends AbstractServiceAndFlowT
     @Test
     public void testLifecycle() throws Exception
     {
-
-        MuleClient muleClient = muleContext.getClient();
-
-        final MuleMessage result = muleClient.send("vm://EchoService.In", "foo", null);
+        final MuleMessage result = muleContext.getClient().send("vm://EchoService.In", "foo", null);
 
         final LifecycleTrackerTransformer ltt = (LifecycleTrackerTransformer) result.getPayload();
 

@@ -32,10 +32,22 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-public class FileFunctionalTestCase extends AbstractServiceAndFlowTestCase
-    implements FunctionalTestNotificationListener
+public class FileFunctionalTestCase extends AbstractServiceAndFlowTestCase implements FunctionalTestNotificationListener
 {
     private Object receivedData = null;
+
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "org/mule/test/integration/providers/file/file-config-service.xml"},
+            {ConfigVariant.FLOW, "org/mule/test/integration/providers/file/file-config-flow.xml"}});
+    }
+
+    public FileFunctionalTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
+    }
 
     @Override
     protected void doSetUp() throws Exception
@@ -49,19 +61,6 @@ public class FileFunctionalTestCase extends AbstractServiceAndFlowTestCase
     {
         super.doTearDown();
         muleContext.unregisterListener(this);
-    }
-
-    public FileFunctionalTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
-
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "org/mule/test/integration/providers/file/file-config-service.xml"},
-            {ConfigVariant.FLOW, "org/mule/test/integration/providers/file/file-config-flow.xml"}});
     }
 
     @Test

@@ -55,5 +55,4 @@ public class JaxenFilterTestCase extends AbstractServiceAndFlowTestCase
         Object payload = res.getPayload();
         assertTrue("payload is of type " + payload.getClass(), payload instanceof Document);
     }
-
 }

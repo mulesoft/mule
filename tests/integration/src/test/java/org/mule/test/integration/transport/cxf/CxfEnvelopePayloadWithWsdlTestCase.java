@@ -25,8 +25,7 @@ import static org.junit.Assert.assertNotNull;
 
 public class CxfEnvelopePayloadWithWsdlTestCase extends AbstractServiceAndFlowTestCase
 {
-
-    final String msg = "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" "
+    private static final String msg = "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" "
                        + "xmlns:emop=\"http://www.wcs.com/2010/07/14/emop\">" + "  <soapenv:Header>\n"
                        + "    <header UserName=\"nothing\" Password=\"important\"/>\n"
                        + "  </soapenv:Header>\n" + "  <soapenv:Body>\n"
@@ -36,11 +35,6 @@ public class CxfEnvelopePayloadWithWsdlTestCase extends AbstractServiceAndFlowTe
                        + "    </emop:ScratchcardValidateAndPayRequestBody>\n" + "  </soapenv:Body>\n"
                        + "</soapenv:Envelope>";
 
-    public CxfEnvelopePayloadWithWsdlTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
-
     @Parameters
     public static Collection<Object[]> parameters()
     {
@@ -49,6 +43,11 @@ public class CxfEnvelopePayloadWithWsdlTestCase extends AbstractServiceAndFlowTe
                 "org/mule/test/integration/transport/cxf/scratchcard-service-config-service.xml"},
             {ConfigVariant.FLOW,
                 "org/mule/test/integration/transport/cxf/scratchcard-service-config-flow.xml"}});
+    }
+
+    public CxfEnvelopePayloadWithWsdlTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
     }
 
     @Test

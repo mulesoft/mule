@@ -12,22 +12,30 @@ package org.mule.test.transformers;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.util.IOUtils;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import org.custommonkey.xmlunit.XMLUnit;
+import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 public class XQueryFunctionalTestCase extends FunctionalTestCase
 {
+
+    @Override
     protected String getConfigResources()
     {
         //Our Mule configuration file
         return "org/mule/test/integration/xml/xquery-functional-test.xml";
     }
 
+    @Test
     public void testMessageTransform() throws Exception
     {
         //We're using Xml Unit to compare results

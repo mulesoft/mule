@@ -21,5 +21,4 @@ public class AxisOverJMSWithTransactionsAlternateTestCase extends AbstractAxisOv
     {
         return "org/mule/test/integration/providers/axis/axis-over-jms-config-alternate.xml";
     }
-
 }

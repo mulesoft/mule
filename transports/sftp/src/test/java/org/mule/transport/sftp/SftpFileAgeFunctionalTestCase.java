@@ -23,6 +23,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.commons.io.IOUtils;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * <code>SftpFileAgeFunctionalTestCase</code> tests the fileAge functionality.
@@ -50,6 +55,7 @@ public class SftpFileAgeFunctionalTestCase extends AbstractSftpTestCase
         initEndpointDirectory("inboundEndpoint");
     }
 
+    @Test
     public void testFileAge() throws Exception
     {
         final CountDownLatch latch = new CountDownLatch(1);

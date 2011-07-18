@@ -15,13 +15,24 @@ import org.mule.transport.email.ImapsConnector;
 
 import javax.mail.Flags;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 public class ImapNamespaceHandlerTestCase extends AbstractEmailNamespaceHandlerTestCase
 {
+    
+    @Override
     protected String getConfigResources()
     {
         return "imap-namespace-config.xml";
     }
 
+    @Test
     public void testConfig() throws Exception
     {
         ImapConnector c = (ImapConnector)muleContext.getRegistry().lookupConnector("imapConnector");
@@ -41,6 +52,7 @@ public class ImapNamespaceHandlerTestCase extends AbstractEmailNamespaceHandlerT
         assertEquals(Flags.Flag.SEEN, c.getDefaultProcessMessageAction());
     }
 
+    @Test
     public void testSecureConfig() throws Exception
     {
         ImapsConnector c = (ImapsConnector)muleContext.getRegistry().lookupConnector("imapsConnector");
@@ -67,6 +79,7 @@ public class ImapNamespaceHandlerTestCase extends AbstractEmailNamespaceHandlerT
         assertNull(c.getDefaultProcessMessageAction());
     }
 
+    @Test
     public void testEndpoint() throws MuleException
     {
         testInboundEndpoint("global1", ImapConnector.IMAP);

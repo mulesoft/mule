@@ -12,17 +12,23 @@ package org.mule.transport.http.functional;
 
 import org.mule.api.transport.Connector;
 import org.mule.api.transport.SessionHandler;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transport.http.HttpConnector;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertTrue;
 
 public class HttpServiceOverridesTestCase extends FunctionalTestCase
 {
 
+    @Override
     protected String getConfigResources()
     {
         return "http-service-overrides.xml";
     }
 
+    @Test
     public void testSessionHandler() 
     {
         Connector connector = muleContext.getRegistry().lookupConnector("httpConnector");

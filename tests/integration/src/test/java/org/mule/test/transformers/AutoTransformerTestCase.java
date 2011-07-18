@@ -29,11 +29,6 @@ import static org.junit.Assert.assertTrue;
 
 public class AutoTransformerTestCase extends AbstractServiceAndFlowTestCase
 {
-    public AutoTransformerTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
-
     private static Latch latch;
 
     @Parameters
@@ -43,6 +38,11 @@ public class AutoTransformerTestCase extends AbstractServiceAndFlowTestCase
             {ConfigVariant.SERVICE, "org/mule/test/integration/transformer/auto-transformer-test-service.xml"},
             {ConfigVariant.FLOW, "org/mule/test/integration/transformer/auto-transformer-test-flow.xml"}
         });
+    }
+
+    public AutoTransformerTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
     }
 
     @Test

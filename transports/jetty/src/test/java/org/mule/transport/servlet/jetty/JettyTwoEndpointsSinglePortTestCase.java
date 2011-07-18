@@ -14,44 +14,56 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.DataType;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.DynamicPortTestCase;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class JettyTwoEndpointsSinglePortTestCase extends DynamicPortTestCase
+import org.junit.Rule;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+public class JettyTwoEndpointsSinglePortTestCase extends FunctionalTestCase
 {
 
+    @Rule
+    public DynamicPort dynamicPort = new DynamicPort("port1");
+
+    @Override
     protected String getConfigResources()
     {
         return "jetty-two-endpoints-single-port.xml";
     }
 
+    @Test
     public void testSendToEach() throws Exception
     {
 
-        sendWithResponse("http://localhost:" + getPorts().get(0) + "/mycomponent1", "test", "mycomponent1", 10);
-        sendWithResponse("http://localhost:" + getPorts().get(0) + "/mycomponent2", "test", "mycomponent2", 10);
+        sendWithResponse("http://localhost:" + dynamicPort.getNumber() + "/mycomponent1", "test", "mycomponent1", 10);
+        sendWithResponse("http://localhost:" + dynamicPort.getNumber() + "/mycomponent2", "test", "mycomponent2", 10);
     }
 
+    @Test
     public void testSendToEachWithBadEndpoint() throws Exception
     {
 
         MuleClient client = new MuleClient(muleContext);
 
-        sendWithResponse("http://localhost:" + getPorts().get(0) + "/mycomponent1", "test", "mycomponent1", 5);
-        sendWithResponse("http://localhost:" + getPorts().get(0) + "/mycomponent2", "test", "mycomponent2", 5);
+        sendWithResponse("http://localhost:" + dynamicPort.getNumber() + "/mycomponent1", "test", "mycomponent1", 5);
+        sendWithResponse("http://localhost:" + dynamicPort.getNumber() + "/mycomponent2", "test", "mycomponent2", 5);
 
-        MuleMessage result = client.send("http://localhost:" + getPorts().get(0) + "/mycomponent-notfound", "test", null);
+        MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/mycomponent-notfound", "test", null);
         assertNotNull(result);
         assertNotNull(result.getExceptionPayload());
         final int status = result.getInboundProperty("http.status", 0);
         assertEquals(404, status);
 
         // Test that after the exception the endpoints still receive events
-        sendWithResponse("http://localhost:" + getPorts().get(0) + "/mycomponent1", "test", "mycomponent1", 5);
-        sendWithResponse("http://localhost:" + getPorts().get(0) + "/mycomponent2", "test", "mycomponent2", 5);
+        sendWithResponse("http://localhost:" + dynamicPort.getNumber() + "/mycomponent1", "test", "mycomponent1", 5);
+        sendWithResponse("http://localhost:" + dynamicPort.getNumber() + "/mycomponent2", "test", "mycomponent2", 5);
     }
 
     protected void sendWithResponse(String endpoint, String message, String response, int noOfMessages)
@@ -71,11 +83,5 @@ public class JettyTwoEndpointsSinglePortTestCase extends DynamicPortTestCase
         {
             assertEquals(response, new String((byte[])results.get(i)));
         }
-    }
-
-    @Override
-    protected int getNumPortsToFind()
-    {
-        return 1;
     }
 }

@@ -10,12 +10,17 @@
 
 package org.mule.transport.sftp.dataintegrity;
 
-import java.io.IOException;
-
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.transport.DispatchException;
 import org.mule.module.client.MuleClient;
 import org.mule.transport.sftp.SftpClient;
+
+import java.io.IOException;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Verify that the original file is not lost if the password for the outbound
@@ -26,6 +31,7 @@ public class SftpWrongPassPhraseOnOutboundDirectoryTestCase extends AbstractSftp
 
     private static String INBOUND_ENDPOINT_NAME = "inboundEndpoint";
 
+    @Override
     protected String getConfigResources()
     {
         return "dataintegrity/sftp-wrong-passphrase-config.xml";
@@ -45,6 +51,7 @@ public class SftpWrongPassPhraseOnOutboundDirectoryTestCase extends AbstractSftp
      * 
      * @throws Exception
      */
+    @Test
     public void testWrongPassPhraseOnOutboundDirectory() throws Exception
     {
         MuleClient muleClient = new MuleClient(muleContext);

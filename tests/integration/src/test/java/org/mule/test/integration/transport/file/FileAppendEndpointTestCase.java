@@ -24,11 +24,6 @@ import static org.junit.Assert.assertFalse;
 
 public class FileAppendEndpointTestCase extends FileAppendConnectorTestCase
 {
-    public FileAppendEndpointTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
-
     @Parameters
     public static Collection<Object[]> parameters()
     {
@@ -37,6 +32,11 @@ public class FileAppendEndpointTestCase extends FileAppendConnectorTestCase
                 "org/mule/test/integration/providers/file/mule-fileappend-endpoint-config-service.xml"},
             {ConfigVariant.FLOW,
                 "org/mule/test/integration/providers/file/mule-fileappend-endpoint-config-flow.xml"}});
+    }
+
+    public FileAppendEndpointTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
     }
 
     @Override

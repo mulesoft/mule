@@ -32,7 +32,7 @@ import static org.junit.Assert.assertNotNull;
 
 public class CxfAndXslTransformerOnSoapTestCase extends AbstractServiceAndFlowTestCase
 {
-    final String msg = "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:emop=\"http://www.wcs.com/2010/07/14/emop\">"
+    private static final String msg = "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:emop=\"http://www.wcs.com/2010/07/14/emop\">"
                        + "  <soapenv:Header>\n"
                        + "    <header UserName=\"nothing\" Password=\"important\"/>\n"
                        + "  </soapenv:Header>\n"
@@ -46,18 +46,6 @@ public class CxfAndXslTransformerOnSoapTestCase extends AbstractServiceAndFlowTe
 
     private final AtomicInteger connectorExceptionCounter = new AtomicInteger();
 
-    @Override
-    protected void doSetUp() throws Exception
-    {
-        super.doSetUp();
-        connectorExceptionCounter.set(0);
-    }
-
-    public CxfAndXslTransformerOnSoapTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
-
     @Parameters
     public static Collection<Object[]> parameters()
     {
@@ -65,6 +53,18 @@ public class CxfAndXslTransformerOnSoapTestCase extends AbstractServiceAndFlowTe
             {ConfigVariant.SERVICE,
                 "org/mule/test/integration/transport/cxf/scratchcard-service-v1-service.xml"},
             {ConfigVariant.FLOW, "org/mule/test/integration/transport/cxf/scratchcard-service-v1-flow.xml"}});
+    }
+
+    public CxfAndXslTransformerOnSoapTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
+    }
+
+    @Override
+    protected void doSetUp() throws Exception
+    {
+        super.doSetUp();
+        connectorExceptionCounter.set(0);
     }
 
     /**

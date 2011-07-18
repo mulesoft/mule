@@ -10,7 +10,7 @@
 
 package org.mule.transport.http;
 
-import org.mule.transport.http.HttpConnector;
+import org.junit.Test;
 
 public class HttpPlaceholderTestCase extends AbstractNamespaceHandlerTestCase
 {
@@ -20,11 +20,13 @@ public class HttpPlaceholderTestCase extends AbstractNamespaceHandlerTestCase
         super("http");
     }
 
+    @Override
     protected String getConfigResources()
     {
         return "http-placeholder-test.xml";
     }
 
+    @Test
     public void testConnectorProperties()
     {
         HttpConnector connector =

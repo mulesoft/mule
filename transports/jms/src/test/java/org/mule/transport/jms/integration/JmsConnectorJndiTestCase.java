@@ -15,6 +15,10 @@ import org.mule.module.client.MuleClient;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
 /**
  * Requires the following connector config: <jms:connector name="jmsConnector1"
  * jndiInitialFactory="org.apache.activemq.jndi.ActiveMQInitialContextFactory"
@@ -34,6 +38,7 @@ import org.junit.Test;
  */
 public class JmsConnectorJndiTestCase extends AbstractJmsFunctionalTestCase
 {
+
     @Override
     protected String getConfigResources()
     {

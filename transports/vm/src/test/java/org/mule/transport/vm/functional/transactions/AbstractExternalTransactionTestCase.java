@@ -13,7 +13,7 @@ package org.mule.transport.vm.functional.transactions;
 import org.mule.api.MuleContext;
 import org.mule.api.transaction.TransactionConfig;
 import org.mule.api.transaction.TransactionException;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transaction.MuleTransactionConfig;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.transaction.TransactionTemplate;

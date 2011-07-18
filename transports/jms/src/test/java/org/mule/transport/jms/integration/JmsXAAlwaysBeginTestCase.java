@@ -23,6 +23,8 @@ import org.apache.commons.logging.LogFactory;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+
 public class JmsXAAlwaysBeginTestCase extends AbstractJmsFunctionalTestCase
 {
 
@@ -30,23 +32,24 @@ public class JmsXAAlwaysBeginTestCase extends AbstractJmsFunctionalTestCase
     private static final List rolledbackTx = new CopyOnWriteArrayList();
     protected static final Log logger = LogFactory.getLog(JmsXAAlwaysBeginTestCase.class);
 
+    @Override
     protected String getConfigResources()
     {
         return "integration/jms-xa-tx-ALWAYS_BEGIN.xml";
     }
 
     @Override
-    protected void suitePreSetUp() throws Exception
+    protected void doSetUp() throws Exception
     {
-        super.suitePreSetUp();
+        super.doSetUp();
         purge(getInboundQueueName());
         purge(getOutboundQueueName());
     }
 
     @Override
-    protected void suitePostTearDown() throws Exception
+    protected void doTearDown() throws Exception
     {
-        super.suitePostTearDown();
+        super.doTearDown();
         purge(getInboundQueueName());
         purge(getOutboundQueueName());
     }

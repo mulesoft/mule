@@ -15,7 +15,7 @@ import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.transaction.Transaction;
 import org.mule.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.util.ClassUtils;
 import org.mule.util.CollectionUtils;
@@ -48,8 +48,12 @@ import javax.transaction.SystemException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.junit.After;
-import org.junit.Before;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * This is the base class for all integration tests that are part of the JMS integration test suite.  This is
@@ -141,7 +145,7 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
      * TODO this method can return more than one provider, but our test class can only handle one at a time
      * IMPORTANT: Only set one class in 'jms-vendor-configs.txt'
      */
-    public static Collection jmsProviderConfigs()
+    public static Collection<?> jmsProviderConfigs()
     {
         JmsVendorConfiguration[][] configs;
         URL url = ClassUtils.getResource("jms-vendor-configs.txt", AbstractJmsFunctionalTestCase.class);
@@ -160,10 +164,10 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
 
         try
         {
-            List classes = IOUtils.readLines(url.openStream());
+            List<?> classes = IOUtils.readLines(url.openStream());
             configs = new JmsVendorConfiguration[1][classes.size()];
             int i = 0;
-            for (Iterator iterator = classes.iterator(); iterator.hasNext(); i++)
+            for (Iterator<?> iterator = classes.iterator(); iterator.hasNext(); i++)
             {
                 String cls = (String) iterator.next();
                 configs[0][i] = (JmsVendorConfiguration) ClassUtils.instanciateClass(cls, ClassUtils.NO_ARGS);
@@ -176,30 +180,6 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
                  "implementation to use in jms-vendor-configs.txt on classpath: " + e.getMessage());
             return CollectionUtils.EMPTY_COLLECTION;
         }
-    }
-
-    /**
-     * Since we are using JUnit 4, but the Mule Test Framework assumes JUnit 3, we
-     * need to explicitly call the setUp and tearDown methods
-     *
-     * @throws Exception if, well, anything goes wrong
-     */
-    @Before
-    public void before() throws Exception
-    {
-        super.setUp();
-    }
-
-    /**
-     * Since we are using JUnit 4, but the Mule Test Framework assumes JUnit 3, we
-     * need to explicitly call the setUp and tearDown methods
-     *
-     * @throws Exception if, well, anything goes wrong
-     */
-    @After
-    public void after() throws Exception
-    {
-        super.tearDown();
     }
 
     public AbstractJmsFunctionalTestCase()
@@ -216,19 +196,6 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
         scenarioRollback = new ScenarioRollback();
         scenarioNotReceive = new ScenarioNotReceive();
         scenarioReceive = new ScenarioReceive();
-    }
-
-    @Override
-    protected void suitePreSetUp() throws Exception
-    {
-        super.suitePreSetUp();
-
-        if (purgeQueuesOnPreSetUp)
-        {
-            purge(getInboundQueueName());
-            purge(getOutboundQueueName());
-            // TODO DZ: get all of the queue/topic names from the Mule config and just purge those
-        }
     }
 
     /**
@@ -260,7 +227,7 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
         props.put(BROADCAST_TOPIC_ENDPOINT_KEY, getJmsConfig().getTopicBroadcastEndpoint());
         props.put("protocol", getJmsConfig().getProtocol());
 
-        Map p = getJmsConfig().getProperties();
+        Map<?, ?> p = getJmsConfig().getProperties();
         if (p != null)
         {
             props.putAll(p);
@@ -402,13 +369,13 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
      * This calls through to {@link org.mule.transport.jms.integration.JmsVendorConfiguration#getDeadLetterDestinationName()}
      *
      * @return The test inbound destination name
-     */    
+     */
     protected final String getDeadLetterQueueName()
     {
         checkConfig();
         return getJmsConfig().getDeadLetterDestinationName();
-    }    
-    
+    }
+
     /**
      * The test outbound queue name.  For consistency this should always be 'out'. Note that you need to make
      * sure that this queue is available in the the JMS provider being tested.
@@ -521,6 +488,14 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
+
+        if (purgeQueuesOnPreSetUp)
+        {
+            purge(getInboundQueueName());
+            purge(getOutboundQueueName());
+            // TODO DZ: get all of the queue/topic names from the Mule config and just purge those
+        }
+
         client = new MuleClient(muleContext);
         Transaction tx = TransactionCoordination.getInstance().getTransaction();
         if (tx != null)
@@ -688,10 +663,7 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
      * other tests may still exist from other tests' runs.
      * <p/>
      * Well-behaving tests should drain both inbound and outbound destinations, as well as any intermediary ones.
-     * Typically this method is called from {@link #suitePreSetUp()} and {@link #suitePostTearDown()}, with proper super calls.
      * @param destination destination name without any protocol specifics
-     * @see #suitePreSetUp()
-     * @see #suitePostTearDown()
      */
     protected void purge(final String destination) throws JMSException
     {
@@ -713,7 +685,7 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
                 logger.debug("Destination " + destination + " isn't empty, draining it");
             }
         }
-        catch (Exception e)        
+        catch (Exception e)
         {
             logger.error("unable to purge : " + destination);
         }

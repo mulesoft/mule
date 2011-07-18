@@ -10,7 +10,6 @@
 
 package org.mule.test.integration.streaming;
 
-import org.mule.api.MuleException;
 import org.mule.module.client.MuleClient;
 import org.mule.module.xml.stax.DelegateXMLStreamReader;
 import org.mule.module.xml.stax.StaxSource;
@@ -24,7 +23,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.concurrent.TimeUnit;
 
-import javax.xml.stream.FactoryConfigurationError;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
@@ -32,6 +30,7 @@ import javax.xml.transform.Source;
 import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamSource;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 import org.xml.sax.InputSource;
@@ -72,7 +71,7 @@ public class CloseStreamOnMuleExceptionTestCase extends AbstractServiceAndFlowTe
     }
 
     @Test
-    public void testCloseStreamOnComponentException() throws MuleException, InterruptedException
+    public void testCloseStreamOnComponentException() throws Exception
     {
         client.dispatch("vm://inEcho?connector=vm", inputStream, null);
         streamReaderLatch.await(timeoutMs, TimeUnit.MILLISECONDS);
@@ -80,7 +79,7 @@ public class CloseStreamOnMuleExceptionTestCase extends AbstractServiceAndFlowTe
     }
 
     @Test
-    public void testCloseXMLInputSourceOnComponentException() throws MuleException, InterruptedException
+    public void testCloseXMLInputSourceOnComponentException() throws Exception
     {
         InputSource stream = new InputSource(inputStream);
 
@@ -91,7 +90,7 @@ public class CloseStreamOnMuleExceptionTestCase extends AbstractServiceAndFlowTe
     }
 
     @Test
-    public void testCloseXMLStreamSourceOnComponentException() throws FactoryConfigurationError, Exception
+    public void testCloseXMLStreamSourceOnComponentException() throws Exception
     {
         Source stream = XMLUtils.toXmlSource(XMLInputFactory.newInstance(), false, inputStream);
 
@@ -102,8 +101,7 @@ public class CloseStreamOnMuleExceptionTestCase extends AbstractServiceAndFlowTe
     }
 
     @Test
-    public void testCloseXMLStreamReaderOnComponentException()
-        throws MuleException, InterruptedException, XMLStreamException, FactoryConfigurationError
+    public void testCloseXMLStreamReaderOnComponentException() throws Exception
     {
         TestXMLStreamReader stream = new TestXMLStreamReader(XMLInputFactory.newInstance()
             .createXMLStreamReader(inputStream));
@@ -115,8 +113,7 @@ public class CloseStreamOnMuleExceptionTestCase extends AbstractServiceAndFlowTe
     }
 
     @Test
-    public void testCloseSaxSourceOnComponentException()
-        throws MuleException, InterruptedException, FactoryConfigurationError
+    public void testCloseSaxSourceOnComponentException() throws Exception
     {
         SAXSource stream = new SAXSource(new InputSource(inputStream));
 
@@ -127,8 +124,7 @@ public class CloseStreamOnMuleExceptionTestCase extends AbstractServiceAndFlowTe
     }
 
     @Test
-    public void testCloseStaxSourceOnComponentException()
-        throws MuleException, InterruptedException, XMLStreamException, FactoryConfigurationError
+    public void testCloseStaxSourceOnComponentException() throws Exception
     {
 
         StaxSource stream = new StaxSource(new TestXMLStreamReader(XMLInputFactory.newInstance()
@@ -141,7 +137,7 @@ public class CloseStreamOnMuleExceptionTestCase extends AbstractServiceAndFlowTe
     }
 
     @Test
-    public void testCloseStreamOnDispatcherException() throws MuleException, InterruptedException
+    public void testCloseStreamOnDispatcherException() throws Exception
     {
         client.dispatch("vm://dispatcherExceptionBridge?connector=vm", inputStream, null);
         Thread.sleep(timeoutMs);
@@ -154,18 +150,16 @@ public class CloseStreamOnMuleExceptionTestCase extends AbstractServiceAndFlowTe
     // not result in stream being closed. These exceptions result in
     // exceptionStrategy being called but because RequestContext is empty the message
     // is not available in the AbstractExceptionListener and cannot be closed.
+    @Ignore
+    @Test
+    public void testCloseStreamOnInboundFilterException() throws Exception
+    {
+        client.dispatch("vm://inboundFilterExceptionBridge?connector=vm", inputStream, null);
 
-    // public void testCloseStreamOnInboundFilterException()
-    // throws MuleException, InterruptedException
-    // {
-    // client.dispatch("vm://inboundFilterExceptionBridge?connector=vm", inputStream,
-    // null);
-    //
-    // Thread.sleep(1000);
-    //
-    // assertTrue(((TestByteArrayInputStream) inputStream).isClosed());
-    // }
+        Thread.sleep(1000);
 
+        assertTrue(inputStream.isClosed());
+    }
 
     static class TestByteArrayInputStream extends ByteArrayInputStream
     {

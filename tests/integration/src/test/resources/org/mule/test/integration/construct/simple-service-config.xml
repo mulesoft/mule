@@ -78,21 +78,21 @@
         parent="global-exception-strategy" address="vm://iexst.in">
         <test:component throwException="true" />
     </pattern:simple-service>
-  
-  <!-- JAX-WS service -->
+
+    <!-- JAX-WS service -->
     <pattern:simple-service name="weather-forecaster-ws"
         address="http://localhost:${port1}/weather-forecast" component-class="org.mule.test.integration.tck.WeatherForecaster"
         type="jax-ws" />
-  
-  <!-- JAXB consumer -->
+
+    <!-- JAXB consumer -->
     <pattern:simple-service name="weather-jaxb-consumer"
         address="vm://weather-consumer.in" component-class="org.mule.test.integration.tck.WeatherReportConsumer" />
 
-  <!-- XPath consumer -->
+    <!-- XPath consumer -->
     <pattern:simple-service name="weather-xpath-consumer"
         address="vm://weather-xpath-consumer.in" component-class="org.mule.test.integration.tck.WeatherReportXpathConsumer" />
-  
-  <!-- type inheritance service, issue MULE-5071 -->
+
+    <!-- type inheritance service, issue MULE-5071 -->
     <pattern:simple-service name="abstract-weather-forecaster-ws"
         abstract="true" component-class="org.mule.test.integration.tck.WeatherForecaster"
         type="jax-ws" />
@@ -105,6 +105,7 @@
         address="vm://ftc1.in">
         <test:component />
     </pattern:simple-service>
+
     <pattern:simple-service abstract="true" name="abstract-service"
         component-class="org.mule.test.integration.tck.WeatherReportConsumer">
         <inbound-endpoint address="test://in" exchange-pattern="request-response">
@@ -119,5 +120,4 @@
 
     <pattern:simple-service name="child-service-2"
         parent="abstract-service" />
-
 </mule>

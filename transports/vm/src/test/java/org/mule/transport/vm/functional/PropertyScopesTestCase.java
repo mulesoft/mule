@@ -14,19 +14,27 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.api.transport.PropertyScope;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 /**
  * Test the propagation of a property in different scopes and in synchronous vs. asynchronous flows.
  */
 public class PropertyScopesTestCase extends FunctionalTestCase
 {
+
     @Override
     protected String getConfigResources()
     {
         return "vm/property-scopes.xml";
     }
     
+    @Test
     public void testInboundScopeSynchronous() throws Exception
     {
         MuleClient client = muleContext.getClient();
@@ -38,6 +46,7 @@ public class PropertyScopesTestCase extends FunctionalTestCase
         assertNull("Property should not have been propogated for this scope", response.getProperty("foo", PropertyScope.INBOUND));
     }
 
+    @Test
     public void testOutboundScopeSynchronous() throws Exception
     {
         MuleClient client = muleContext.getClient();
@@ -49,6 +58,7 @@ public class PropertyScopesTestCase extends FunctionalTestCase
         assertNull("Property should not have been propogated for this scope", response.getProperty("foo", PropertyScope.OUTBOUND));
     }
 
+    @Test
     public void testInvocationScopeSynchronous() throws Exception
     {
         MuleClient client = muleContext.getClient();
@@ -60,6 +70,7 @@ public class PropertyScopesTestCase extends FunctionalTestCase
         assertEquals("bar", response.getProperty("foo", PropertyScope.INVOCATION));
     }
 
+    @Test
     public void testSessionScopeSynchronous() throws Exception
     {
         MuleClient client = muleContext.getClient();
@@ -71,6 +82,7 @@ public class PropertyScopesTestCase extends FunctionalTestCase
         assertEquals("bar", response.getProperty("foo", PropertyScope.SESSION));
     }
 
+    @Test
     public void testInboundScopeAsynchronous() throws Exception
     {
         MuleClient client = muleContext.getClient();
@@ -82,6 +94,7 @@ public class PropertyScopesTestCase extends FunctionalTestCase
         assertNull("Property should not have been propogated for this scope", response.getProperty("foo", PropertyScope.INBOUND));
     }
 
+    @Test
     public void testOutboundScopeAsynchronous() throws Exception
     {
         MuleClient client = muleContext.getClient();
@@ -93,6 +106,7 @@ public class PropertyScopesTestCase extends FunctionalTestCase
         assertNull("Property should not have been propogated for this scope", response.getProperty("foo", PropertyScope.OUTBOUND));
     }
 
+    @Test
     public void testInvocationScopeAsynchronous() throws Exception
     {
         MuleClient client = muleContext.getClient();
@@ -104,6 +118,7 @@ public class PropertyScopesTestCase extends FunctionalTestCase
         assertEquals("bar", response.getProperty("foo", PropertyScope.INVOCATION));
     }
 
+    @Test
     public void testSessionScopeAsynchronous() throws Exception
     {
         MuleClient client = muleContext.getClient();

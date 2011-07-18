@@ -14,11 +14,9 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
-import org.mule.tck.functional.FunctionalTestComponent;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Map;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
@@ -28,11 +26,6 @@ import static org.junit.Assert.assertNull;
 
 public class PropertiesTestCase extends AbstractServiceAndFlowTestCase
 {
-    public PropertiesTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
-
     @Parameters
     public static Collection<Object[]> parameters()
     {
@@ -42,6 +35,10 @@ public class PropertiesTestCase extends AbstractServiceAndFlowTestCase
         });
     }
 
+    public PropertiesTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
+    }
 
     /**
      * Test that the VM transport correctly copies outbound to inbound properties both for requests amd responses
@@ -51,7 +48,6 @@ public class PropertiesTestCase extends AbstractServiceAndFlowTestCase
     {
         MuleClient client = new MuleClient(muleContext);
 
-        Map<String, FunctionalTestComponent> components = muleContext.getRegistry().lookupByType(FunctionalTestComponent.class);
         MuleMessage msg1 = createOutboundMessage();
         MuleMessage response = client.send("vm://in", msg1);
         assertEquals(response.getPayloadAsString(), "OK(success)");

@@ -11,6 +11,13 @@
 package org.mule.transport.http;
 
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 public class HttpsNamespaceHandlerTestCase extends AbstractNamespaceHandlerTestCase
 {
 
@@ -19,6 +26,7 @@ public class HttpsNamespaceHandlerTestCase extends AbstractNamespaceHandlerTestC
         super("https");
     }
 
+    @Test
     public void testConnectorProperties()
     {
         HttpsConnector connector =
@@ -42,6 +50,7 @@ public class HttpsNamespaceHandlerTestCase extends AbstractNamespaceHandlerTestC
         assertEquals("foo", connector.getProtocolHandler());
     }
 
+    @Test
     public void testPollingProperties()
     {
          HttpsPollingConnector connector =

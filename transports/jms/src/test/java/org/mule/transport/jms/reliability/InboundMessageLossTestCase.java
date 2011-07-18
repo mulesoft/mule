@@ -19,19 +19,24 @@ import org.mule.util.concurrent.Latch;
 
 import java.util.concurrent.TimeUnit;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 /**
- * Verify that no inbound messages are lost when exceptions occur.  
- * The message must either make it all the way to the SEDA queue (in the case of 
+ * Verify that no inbound messages are lost when exceptions occur.
+ * The message must either make it all the way to the SEDA queue (in the case of
  * an asynchronous inbound endpoint), or be restored/rolled back at the source.
- * 
- * In the case of JMS, this will cause the failed message to be redelivered if 
+ *
+ * In the case of JMS, this will cause the failed message to be redelivered if
  * JMSRedelivery is configured.
  */
 public class InboundMessageLossTestCase extends AbstractJmsReliabilityTestCase
 {
     protected Latch messageRedelivered;
     protected final int latchTimeout = 5000;
-    
+
     @Override
     protected String getConfigResources()
     {
@@ -42,14 +47,15 @@ public class InboundMessageLossTestCase extends AbstractJmsReliabilityTestCase
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
-        
+
         // Set SystemExceptionStrategy to redeliver messages (this can only be configured programatically for now)
         ((DefaultSystemExceptionStrategy) muleContext.getExceptionListener()).setRollbackTxFilter(new WildcardFilter("*"));
-        
+
         // Tell us when a MessageRedeliverdException has been handled
         messageRedelivered = new Latch();
         muleContext.registerListener(new ExceptionNotificationListener<ExceptionNotification>()
         {
+            @Override
             public void onNotification(ExceptionNotification notification)
             {
                 if (notification.getException() instanceof MessageRedeliveredException)
@@ -60,40 +66,44 @@ public class InboundMessageLossTestCase extends AbstractJmsReliabilityTestCase
         });
     }
 
+    @Test
     public void testNoException() throws Exception
     {
         putMessageOnQueue("noException");
 
-        // Delivery was successful 
-        assertFalse("Message should not have been redelivered", 
+        // Delivery was successful
+        assertFalse("Message should not have been redelivered",
             messageRedelivered.await(latchTimeout, TimeUnit.MILLISECONDS));
     }
-    
+
+    @Test
     public void testTransformerException() throws Exception
     {
         putMessageOnQueue("transformerException");
 
         // Delivery failed so message should have been redelivered
-        assertTrue("Message was not redelivered", 
+        assertTrue("Message was not redelivered",
             messageRedelivered.await(latchTimeout, TimeUnit.MILLISECONDS));
     }
-    
+
+    @Test
     public void testRouterException() throws Exception
     {
         putMessageOnQueue("routerException");
 
         // Delivery failed so message should have been redelivered
-        assertTrue("Message was not redelivered", 
+        assertTrue("Message was not redelivered",
             messageRedelivered.await(latchTimeout, TimeUnit.MILLISECONDS));
     }
-    
+
+    @Test
     public void testComponentException() throws Exception
     {
         putMessageOnQueue("componentException");
-        
+
         // Exception occurs after the SEDA queue for an asynchronous request, so from the client's
         // perspective, the message has been delivered successfully.
-        assertFalse("Message should not have been redelivered", 
+        assertFalse("Message should not have been redelivered",
             messageRedelivered.await(latchTimeout, TimeUnit.MILLISECONDS));
-    }    
+    }
 }

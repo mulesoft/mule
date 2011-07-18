@@ -10,7 +10,7 @@
 package org.mule.transport.tcp;
 
 import org.mule.ResponseOutputStream;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transport.tcp.protocols.AbstractByteProtocol;
 import org.mule.transport.tcp.protocols.CustomClassLoadingLengthProtocol;
 
@@ -19,17 +19,23 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 
-/**
- * TODO
- */
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 public class TcpNamespaceHandlerTestCase extends FunctionalTestCase
 {
+
     @Override
     protected String getConfigResources()
     {
         return "tcp-namespace-config.xml";
     }
 
+    @Test
     public void testConfig() throws Exception
     {
         TcpConnector c = lookupTcpConnector("tcpConnector");
@@ -50,6 +56,7 @@ public class TcpNamespaceHandlerTestCase extends FunctionalTestCase
         assertFalse(((AbstractByteProtocol) c.getTcpProtocol()).isRethrowExceptionOnRead());
     }
     
+    @Test
     public void testSeparateTimeouts() throws Exception
     {
         TcpConnector c = lookupTcpConnector("separateTimeouts");
@@ -60,12 +67,14 @@ public class TcpNamespaceHandlerTestCase extends FunctionalTestCase
         assertTrue(c.isStarted());
     }
     
+    @Test
     public void testTcpProtocolWithClass()
     {
         TcpConnector connector = lookupTcpConnector("connectorWithProtocolClass");
         assertTrue(connector.getTcpProtocol() instanceof MockTcpProtocol);
     }
     
+    @Test
     public void testTcpProtocolWithRef()
     {
         TcpConnector connector = lookupTcpConnector("connectorWithProtocolRef");
@@ -97,6 +106,7 @@ public class TcpNamespaceHandlerTestCase extends FunctionalTestCase
         }
     }
     
+    @Test
     public void testPollingConnector()
     {
         PollingTcpConnector c = (PollingTcpConnector)muleContext.getRegistry().lookupConnector("pollingConnector");
@@ -107,6 +117,7 @@ public class TcpNamespaceHandlerTestCase extends FunctionalTestCase
         assertTrue(c.isStarted());
     }
     
+    @Test
     public void testCustomClassLoadingProtocol() throws Exception
     {
         TcpConnector c = (TcpConnector)muleContext.getRegistry().lookupConnector("custom-class-loading-protocol-connector");
@@ -117,6 +128,7 @@ public class TcpNamespaceHandlerTestCase extends FunctionalTestCase
         assertTrue(((AbstractByteProtocol) c.getTcpProtocol()).isRethrowExceptionOnRead());
     }
     
+    @Test
     public void testMessageDispatcherFactoryConnector() throws Exception {
         TcpConnector c = (TcpConnector)muleContext.getRegistry().lookupConnector("messageDispatcherFactoryConnector");
         assertNotNull(c);

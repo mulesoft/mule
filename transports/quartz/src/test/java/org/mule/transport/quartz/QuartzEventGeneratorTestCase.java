@@ -11,12 +11,18 @@
 package org.mule.transport.quartz;
 
 import org.mule.api.MuleEventContext;
-import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.functional.CountdownCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class QuartzEventGeneratorTestCase extends FunctionalTestCase
 {
@@ -31,6 +37,7 @@ public class QuartzEventGeneratorTestCase extends FunctionalTestCase
         return "quartz-event-generator.xml";
     }
 
+    @Test
     public void testEventGeneratorPayload() throws Exception
     {
         FunctionalTestComponent component = (FunctionalTestComponent) getComponent("quartzService");

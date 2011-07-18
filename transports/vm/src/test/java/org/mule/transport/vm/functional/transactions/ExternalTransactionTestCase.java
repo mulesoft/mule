@@ -20,8 +20,15 @@ import org.mule.util.ExceptionUtils;
 
 import javax.transaction.Transaction;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /** Test transaction behavior when "joinExternal" is set to allow joining external transactions
  * There is one test per legal transactional behavior (e.g. ALWAYS_BEGIN).
@@ -30,14 +37,13 @@ public class ExternalTransactionTestCase extends AbstractExternalTransactionTest
 {
     public static final long WAIT = 3000L;
 
-    protected static final Log logger = LogFactory.getLog(ExternalTransactionTestCase.class);
-
     @Override
     protected String getConfigResources()
     {
         return "org/mule/test/config/external-transaction-config.xml";
     }
 
+    @Test
     public void testBeginOrJoinTransaction() throws Exception
     {
         init();
@@ -50,6 +56,7 @@ public class ExternalTransactionTestCase extends AbstractExternalTransactionTest
         assertNotNull(tx);
         String result = tt.execute(new TransactionCallback<String>()
         {
+            @Override
             public String doInTransaction() throws Exception
             {
                 Transaction muleTx = tm.getTransaction();
@@ -71,6 +78,7 @@ public class ExternalTransactionTestCase extends AbstractExternalTransactionTest
         // now try with no active transaction
         result = tt.execute(new TransactionCallback<String>()
         {
+            @Override
             public String doInTransaction() throws Exception
             {
                 Transaction muleTx = tm.getTransaction();
@@ -84,6 +92,7 @@ public class ExternalTransactionTestCase extends AbstractExternalTransactionTest
         assertEquals(15, resource1.getPersistentValue());
     }
 
+    @Test
     public void testBeginTransaction() throws Exception
     {
         init();
@@ -96,6 +105,7 @@ public class ExternalTransactionTestCase extends AbstractExternalTransactionTest
         assertNotNull(tx);
         String result = tt.execute(new TransactionCallback<String>()
         {
+            @Override
             public String doInTransaction() throws Exception
             {
                 Transaction muleTx = tm.getTransaction();
@@ -117,6 +127,7 @@ public class ExternalTransactionTestCase extends AbstractExternalTransactionTest
 
         result = tt.execute(new TransactionCallback<String>()
         {
+            @Override
             public String doInTransaction() throws Exception
             {
                 Transaction muleTx = tm.getTransaction();
@@ -132,6 +143,7 @@ public class ExternalTransactionTestCase extends AbstractExternalTransactionTest
         assertEquals(15, resource1.getPersistentValue());
     }
 
+    @Test
     public void testNoTransactionProcessing() throws Exception
     {
         init();
@@ -146,6 +158,7 @@ public class ExternalTransactionTestCase extends AbstractExternalTransactionTest
         resource1.setValue(14);
         String result = tt.execute(new TransactionCallback<String>()
         {
+            @Override
             public String doInTransaction() throws Exception
             {
                 Transaction muleTx = tm.getTransaction();
@@ -165,6 +178,7 @@ public class ExternalTransactionTestCase extends AbstractExternalTransactionTest
 
         result = tt.execute(new TransactionCallback<String>()
         {
+            @Override
             public String doInTransaction() throws Exception
             {
                 Transaction muleTx = tm.getTransaction();
@@ -174,6 +188,7 @@ public class ExternalTransactionTestCase extends AbstractExternalTransactionTest
         });
     }
 
+    @Test
     public void testAlwaysJoinTransaction() throws Exception
     {
         init();
@@ -186,6 +201,7 @@ public class ExternalTransactionTestCase extends AbstractExternalTransactionTest
         assertNotNull(tx);
         String result = tt.execute(new TransactionCallback<String>()
         {
+            @Override
             public String doInTransaction() throws Exception
             {
                 Transaction muleTx = tm.getTransaction();
@@ -205,11 +221,11 @@ public class ExternalTransactionTestCase extends AbstractExternalTransactionTest
         assertEquals(14, resource1.getPersistentValue());
 
         // try with no active transaction.. Should throw
-        Exception ex = null;
         try
         {
             result = tt.execute(new TransactionCallback<String>()
             {
+                @Override
                 public String doInTransaction() throws Exception
                 {
                     return "OK";
@@ -219,11 +235,11 @@ public class ExternalTransactionTestCase extends AbstractExternalTransactionTest
         }
         catch (Exception e)
         {
-            ex = e;
             logger.debug("saw exception " + e.getMessage());
         }
     }
 
+    @Test
     public void testJoinTransactionIfPossible() throws Exception
     {
         init();
@@ -236,6 +252,7 @@ public class ExternalTransactionTestCase extends AbstractExternalTransactionTest
         assertNotNull(tx);
         String result = tt.execute(new TransactionCallback<String>()
         {
+            @Override
             public String doInTransaction() throws Exception
             {
                 Transaction muleTx = tm.getTransaction();
@@ -257,6 +274,7 @@ public class ExternalTransactionTestCase extends AbstractExternalTransactionTest
         // try with no active transaction.. Should run with none
         result = tt.execute(new TransactionCallback<String>()
         {
+            @Override
             public String doInTransaction() throws Exception
             {
                 Transaction muleTx = tm.getTransaction();
@@ -267,6 +285,7 @@ public class ExternalTransactionTestCase extends AbstractExternalTransactionTest
         assertEquals("OK", result);
     }
 
+    @Test
     public void testNoTransactionAllowed() throws Exception
     {
         init();
@@ -279,11 +298,11 @@ public class ExternalTransactionTestCase extends AbstractExternalTransactionTest
         assertNotNull(tx);
 
         // This will throw since no transaction is allowed
-        Exception ex = null;
         try
         {
             tt.execute(new TransactionCallback<String>()
             {
+                @Override
                 public String doInTransaction() throws Exception
                 {
                     return "OK";
@@ -293,13 +312,13 @@ public class ExternalTransactionTestCase extends AbstractExternalTransactionTest
         }
         catch (Exception e)
         {
-            ex = e;
             logger.debug("saw exception " + e.getMessage());
         }
         tm.rollback();
     }
 
     /** Check that the configuration specifies considers external transactions */
+    @Test
     public void testConfiguration() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);

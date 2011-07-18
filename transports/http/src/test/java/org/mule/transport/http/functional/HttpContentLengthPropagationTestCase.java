@@ -15,13 +15,19 @@ import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.module.client.MuleClient;
 import org.mule.module.xml.transformer.XsltTransformer;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.util.IOUtils;
 
 import java.io.InputStream;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 public class HttpContentLengthPropagationTestCase extends FunctionalTestCase
 {
+
     private static final String NAME_PAYLOAD = "test-xml-payload.xml";
     private static final String NAME_STYLESHEET = "stylesheet.xsl";
 
@@ -31,6 +37,7 @@ public class HttpContentLengthPropagationTestCase extends FunctionalTestCase
         return "http-content-length-propagation-conf.xml";
     }
 
+    @Test
     public void testContentLengthPropagation() throws Exception
     {
         InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream(NAME_PAYLOAD);

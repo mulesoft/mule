@@ -17,8 +17,9 @@ import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.util.concurrent.Latch;
 
 import junit.framework.Assert;
-
 import org.jivesoftware.smack.packet.Message;
+
+import static org.junit.Assert.assertEquals;
 
 public class XmppCallback implements EventCallback
 {
@@ -39,8 +40,8 @@ public class XmppCallback implements EventCallback
         Assert.assertTrue(payload instanceof Message);
         
         Message xmppMessage = (Message) payload;
-        XmppMessageSyncTestCase.assertEquals(expectedMessageType, xmppMessage.getType());
-        XmppMessageSyncTestCase.assertEquals(AbstractMuleContextTestCase.TEST_MESSAGE, xmppMessage.getBody());
+        assertEquals(expectedMessageType, xmppMessage.getType());
+        assertEquals(AbstractMuleContextTestCase.TEST_MESSAGE, xmppMessage.getBody());
         
         latch.countDown();
     }

@@ -13,21 +13,30 @@ package org.mule.transport.vm.functional;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import java.io.File;
 
 import javax.activation.DataHandler;
 import javax.activation.FileDataSource;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 public class VMAttachmentsTestCase extends FunctionalTestCase
 {
 
+    @Override
     protected String getConfigResources()
     {
         return "vm/vm-attachments-test.xml";
     }
 
+    @Test
     public void testAttachments() throws Exception
     {
         DefaultMuleMessage msg = new DefaultMuleMessage("Mmm... attachments!", muleContext);

@@ -20,6 +20,10 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import org.jivesoftware.smack.packet.Message;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class XmppMessageAsyncTestCase extends AbstractXmppTestCase
 {
@@ -27,7 +31,7 @@ public class XmppMessageAsyncTestCase extends AbstractXmppTestCase
     private static final String RECEIVE_SERVICE_NAME = "receiveFromJabber";
 
     private CountDownLatch latch = new CountDownLatch(1);
-    
+
     @Override
     protected String getXmppConfigResources()
     {
@@ -41,24 +45,26 @@ public class XmppMessageAsyncTestCase extends AbstractXmppTestCase
         client.setMessageLatch(latch);
     }
 
+    @Test
     public void testDispatch() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
         client.dispatch("vm://in", TEST_MESSAGE, null);
-        
+
         assertTrue(latch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS));
-        
+
         List<Message> receivedMessages = jabberClient.getReceivedMessages();
         assertEquals(1, receivedMessages.size());
 
         Message message = receivedMessages.get(0);
         assertXmppMessage(message);
     }
-    
+
+    @Test
     public void testReceiveAsync() throws Exception
     {
         startService(RECEIVE_SERVICE_NAME);
-        
+
         Latch receiveLatch = new Latch();
         setupTestServiceComponent(receiveLatch);
 
@@ -67,11 +73,11 @@ public class XmppMessageAsyncTestCase extends AbstractXmppTestCase
     }
 
     private void setupTestServiceComponent(Latch receiveLatch) throws Exception
-    {   
+    {
         Object testComponent = getComponent(RECEIVE_SERVICE_NAME);
         assertTrue(testComponent instanceof FunctionalTestComponent);
         FunctionalTestComponent component = (FunctionalTestComponent) testComponent;
-        
+
         XmppCallback callback = new XmppCallback(receiveLatch, expectedXmppMessageType());
         component.setEventCallback(callback);
     }
@@ -86,11 +92,12 @@ public class XmppMessageAsyncTestCase extends AbstractXmppTestCase
         assertEquals(Message.Type.normal, message.getType());
         assertEquals(TEST_MESSAGE, message.getBody());
     }
-    
+
     protected void sendJabberMessageFromNewThread()
     {
         JabberSender sender = new JabberSender(new Callback()
         {
+            @Override
             public void doit() throws Exception
             {
                 Thread.sleep(JABBER_SEND_THREAD_SLEEP_TIME);

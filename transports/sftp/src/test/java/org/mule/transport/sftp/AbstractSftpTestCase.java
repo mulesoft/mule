@@ -26,8 +26,8 @@ import org.mule.api.transaction.RollbackMethod;
 import org.mule.api.transport.Connector;
 import org.mule.context.notification.EndpointMessageNotification;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.functional.EventCallback;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transport.sftp.util.ValueHolder;
 import org.mule.util.IOUtils;
 import org.mule.util.StringMessageUtils;
@@ -50,9 +50,10 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.lang.SystemUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import static org.mule.context.notification.EndpointMessageNotification.MESSAGE_DISPATCHED;
 import static org.mule.context.notification.EndpointMessageNotification.MESSAGE_SENT;
 
@@ -61,10 +62,7 @@ import static org.mule.context.notification.EndpointMessageNotification.MESSAGE_
  */
 public abstract class AbstractSftpTestCase extends FunctionalTestCase
 {
-
     protected static final String FILE_NAME = "file.txt";
-
-    protected final Logger logger = LoggerFactory.getLogger(AbstractSftpTestCase.class);
 
     /**
      * Deletes all files in the directory, useful when testing to ensure that no
@@ -89,7 +87,7 @@ public abstract class AbstractSftpTestCase extends FunctionalTestCase
      * Deletes a directory with all its files and sub-directories. The reason it do a
      * "chmod 700" before the delete is that some tests changes the permission, and
      * thus we have to restore the right to delete it...
-     * 
+     *
      * @param muleClient
      * @param endpointName
      * @param relativePath
@@ -212,7 +210,7 @@ public abstract class AbstractSftpTestCase extends FunctionalTestCase
     /**
      * Returns a SftpClient that is logged in to the sftp server that the endpoint is
      * configured against.
-     * 
+     *
      * @param muleClient
      * @param endpointName
      * @return
@@ -521,7 +519,7 @@ public abstract class AbstractSftpTestCase extends FunctionalTestCase
     /**
      * Initiates a list of sftp-endpoint-directories. Ensures that affected services
      * are stopped during the initiation.
-     * 
+     *
      * @param serviceNames
      * @param endpointNames
      * @throws Exception
@@ -563,7 +561,7 @@ public abstract class AbstractSftpTestCase extends FunctionalTestCase
     /**
      * Ensures that the directory exists and is writable by deleting the directory
      * and then recreate it.
-     * 
+     *
      * @param endpointName
      * @throws org.mule.api.MuleException
      * @throws java.io.IOException
@@ -603,7 +601,7 @@ public abstract class AbstractSftpTestCase extends FunctionalTestCase
      * outbound endpoint, i.e. that the file has been consumed by the inbound
      * endpoint and that the content of the file has been sent to the outgoing
      * endpoint.
-     * 
+     *
      * @param p where inboundEndpoint and outboundEndpoint are mandatory, @see
      *            DispatchParameters for details.
      */
@@ -713,7 +711,7 @@ public abstract class AbstractSftpTestCase extends FunctionalTestCase
     /**
      * Helper method for initiating a test and wait for an exception to be caught by
      * the sftp-connector.
-     * 
+     *
      * @param p where sftpConnector and inboundEndpoint are mandatory, @see
      *            DispatchParameters for details.
      * @return
@@ -897,7 +895,7 @@ public abstract class AbstractSftpTestCase extends FunctionalTestCase
 
     /**
      * Asserts that there are no files found on the path <i>path</i>.
-     * 
+     *
      * @param path The path in the local filesystem to check
      * @throws IOException Exception
      */
@@ -908,7 +906,7 @@ public abstract class AbstractSftpTestCase extends FunctionalTestCase
 
     /**
      * Asserts that no files are found on the path that the <i>endpointName</i> use.
-     * 
+     *
      * @param muleClient MuleClient
      * @param endpointName The endpoint name
      * @throws IOException Exception
@@ -921,7 +919,7 @@ public abstract class AbstractSftpTestCase extends FunctionalTestCase
     /**
      * Asserts that no files are found on the sub directory <i>subDirectory</i> under
      * the path that <i>endpointName</i> use.
-     * 
+     *
      * @param muleClient MuleClient
      * @param endpointName The endpoint name
      * @param subDirectory The sub directory
@@ -936,7 +934,7 @@ public abstract class AbstractSftpTestCase extends FunctionalTestCase
     /**
      * Asserts that only the <i>expectedFile</i> is found on the path <i>path</i>,
      * where filenames can be expressed as a regular expression.
-     * 
+     *
      * @param path The path in the local filesystem to check
      * @param expectedFile Expected file
      * @throws IOException Exception
@@ -949,7 +947,7 @@ public abstract class AbstractSftpTestCase extends FunctionalTestCase
     /**
      * Asserts that only the <i>expectedFiles</i> are found on the path <i>path</i>,
      * where filenames can be expressed as a regular expression.
-     * 
+     *
      * @param path The path in the local filesystem to check
      * @param expectedFiles Expected files
      * @throws IOException Exception
@@ -967,7 +965,7 @@ public abstract class AbstractSftpTestCase extends FunctionalTestCase
      * Asserts that only the <i>expectedFile</i> is found on the path that the
      * <i>endpointName</i> use, where filenames can be expressed as a regular
      * expression.
-     * 
+     *
      * @param muleClient MuleClient
      * @param endpointName The endpoint name
      * @param expectedFile Expected file
@@ -983,7 +981,7 @@ public abstract class AbstractSftpTestCase extends FunctionalTestCase
      * Asserts that only the <i>expectedFiles</i> are found on the path that the
      * <i>endpointName</i> use, where filenames can be expressed as a regular
      * expression.
-     * 
+     *
      * @param muleClient MuleClient
      * @param endpointName The endpoint name
      * @param expectedFiles Expected files
@@ -999,7 +997,7 @@ public abstract class AbstractSftpTestCase extends FunctionalTestCase
      * Asserts that only the <i>expectedFile</i> is found on the sub directory
      * <i>subDirectory</i> under the path that <i>endpointName</i> use, where
      * filenames can be expressed as a regular expression.
-     * 
+     *
      * @param muleClient MuleClient
      * @param endpointName The endpoint name
      * @param subDirectory The sub directory
@@ -1018,7 +1016,7 @@ public abstract class AbstractSftpTestCase extends FunctionalTestCase
      * Asserts that only the <i>expectedFiles</i> are found on the sub directory
      * <i>subDirectory</i> under the path that <i>endpointName</i> use, where
      * filenames can be expressed as a regular expression.
-     * 
+     *
      * @param muleClient MuleClient
      * @param endpointName The endpoint name
      * @param subDirectory The sub directory
@@ -1050,7 +1048,7 @@ public abstract class AbstractSftpTestCase extends FunctionalTestCase
     /**
      * Asserts that only the <i>expectedFiles</i> are found on the path <i>path</i>,
      * where filenames can be expressed as a regular expression.
-     * 
+     *
      * @param sftpClient SftpClient
      * @param path The path to check
      * @param expectedFiles Expected files
@@ -1069,7 +1067,7 @@ public abstract class AbstractSftpTestCase extends FunctionalTestCase
     /**
      * Asserts that only the <i>expectedFiles</i> are found in the file-array
      * <i>path</i>, where filenames can be expressed as a regular expression.
-     * 
+     *
      * @param path
      * @param expectedFiles
      * @param foundFiles
@@ -1107,7 +1105,7 @@ public abstract class AbstractSftpTestCase extends FunctionalTestCase
 
     /**
      * Return the first string in a string-list that matches the regexp
-     * 
+     *
      * @param list
      * @param regexp
      * @return the first string that match the regexp or null if no match
@@ -1133,7 +1131,7 @@ public abstract class AbstractSftpTestCase extends FunctionalTestCase
      * Helper class for dynamic assignment of parameters to the method
      * dispatchAndWaitForDelivery() Only inboundEndpoint and outboundEndpoint are
      * mandatory, the rest of the parameters are optional.
-     * 
+     *
      * @author Magnus Larsson
      */
     public class DispatchParameters
@@ -1306,10 +1304,10 @@ public abstract class AbstractSftpTestCase extends FunctionalTestCase
             assertTrue(pairs.getKey() + " is not started", pairs.getValue().getLifecycleState().isStarted());
         }
     }
-    
+
     /**
      * Look for the sftp test properties file in our environment.
-     * If it's not found, don't run these tests 
+     * If it's not found, don't run these tests
      */
     @Override
     protected boolean isDisabledInThisEnvironment()
@@ -1323,7 +1321,7 @@ public abstract class AbstractSftpTestCase extends FunctionalTestCase
         {
             return true;
         }
-        
+
         return false;
     }
 }

@@ -24,11 +24,6 @@ import static org.junit.Assert.fail;
 
 public class FileExceptionStrategyFunctionalTestCase extends AbstractServiceAndFlowTestCase
 {
-    public FileExceptionStrategyFunctionalTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
-
     @Parameters
     public static Collection<Object[]> parameters()
     {
@@ -36,6 +31,11 @@ public class FileExceptionStrategyFunctionalTestCase extends AbstractServiceAndF
             {ConfigVariant.SERVICE,
                 "org/mule/test/integration/providers/file/file-exception-strategy-service.xml"},
             {ConfigVariant.FLOW, "org/mule/test/integration/providers/file/file-exception-strategy-flow.xml"}});
+    }
+
+    public FileExceptionStrategyFunctionalTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
     }
 
     @Test
@@ -63,5 +63,4 @@ public class FileExceptionStrategyFunctionalTestCase extends AbstractServiceAndF
             fail("Exception strategy hasn't moved the file to the error folder.");
         }
     }
-
 }

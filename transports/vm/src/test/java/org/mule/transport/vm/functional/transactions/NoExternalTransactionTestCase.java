@@ -10,8 +10,6 @@
 
 package org.mule.transport.vm.functional.transactions;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.api.transaction.TransactionCallback;
 import org.mule.api.transaction.TransactionConfig;
 import org.mule.module.client.MuleClient;
@@ -19,11 +17,21 @@ import org.mule.transaction.TransactionTemplate;
 
 import javax.transaction.Transaction;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+
 /** Test transaction behavior when "joinExternal" is set to disallow joining external transactions
  * There is one test per legal transactional behavior (e.g. ALWAYS_BEGIN).
  */
 public class NoExternalTransactionTestCase extends AbstractExternalTransactionTestCase
 {
+
     public static final long WAIT = 3000L;
 
     protected static final Log logger = LogFactory.getLog(NoExternalTransactionTestCase.class);
@@ -34,6 +42,7 @@ public class NoExternalTransactionTestCase extends AbstractExternalTransactionTe
         return "org/mule/test/config/no-external-transaction-config.xml";
     }
 
+    @Test
     public void testBeginOrJoinTransaction() throws Exception
     {
         init();
@@ -84,6 +93,7 @@ public class NoExternalTransactionTestCase extends AbstractExternalTransactionTe
         assertEquals(15, resource1.getPersistentValue());
     }
 
+    @Test
     public void testBeginTransaction() throws Exception
     {
         init();
@@ -133,6 +143,7 @@ public class NoExternalTransactionTestCase extends AbstractExternalTransactionTe
         assertEquals(15, resource1.getPersistentValue());
     }
 
+    @Test
     public void testNoTransactionProcessing() throws Exception
     {
         init();
@@ -175,6 +186,7 @@ public class NoExternalTransactionTestCase extends AbstractExternalTransactionTe
         });
     }
 
+    @Test
     public void testAlwaysJoinTransaction() throws Exception
     {
         init();
@@ -231,6 +243,7 @@ public class NoExternalTransactionTestCase extends AbstractExternalTransactionTe
         assertNotNull(ex);
     }
 
+    @Test
     public void testJoinTransactionIfPossible() throws Exception
     {
         init();
@@ -274,6 +287,7 @@ public class NoExternalTransactionTestCase extends AbstractExternalTransactionTe
         assertEquals("OK", result);
     }
 
+    @Test
     public void testNoTransactionAllowed() throws Exception
     {
         init();
@@ -306,6 +320,7 @@ public class NoExternalTransactionTestCase extends AbstractExternalTransactionTe
     }
 
         /** Check that the configuration specifies considers external transactions */
+    @Test
     public void testConfiguration() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);

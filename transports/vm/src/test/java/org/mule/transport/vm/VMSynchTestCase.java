@@ -12,7 +12,12 @@ package org.mule.transport.vm;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * Simple synch test used to study message flow.
@@ -20,11 +25,13 @@ import org.mule.tck.FunctionalTestCase;
 public class VMSynchTestCase extends FunctionalTestCase
 {
 
+    @Override
     protected String getConfigResources()
     {
         return "vm/vm-synch-test.xml";
     }
 
+    @Test
     public void testSingleMessage() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -33,6 +40,7 @@ public class VMSynchTestCase extends FunctionalTestCase
         assertEquals("Message Received", response.getPayload());
     }
 
+    @Test
     public void testManyMessage() throws Exception
     {
         for (int i = 0; i < 1000; i++)

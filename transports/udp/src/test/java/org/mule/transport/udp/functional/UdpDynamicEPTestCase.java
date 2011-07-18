@@ -10,7 +10,7 @@
 
 package org.mule.transport.udp.functional;
 
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transport.ConfigurableKeyedObjectPool;
 
 import java.io.ByteArrayInputStream;
@@ -23,14 +23,19 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.util.Arrays;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+
 public class UdpDynamicEPTestCase extends FunctionalTestCase
 {
-
+    @Override
     protected String getConfigResources()
     {
         return "udp-roundtrip-dynamicep-test-config.xml";
     }
 
+    @Test
     public void testSendAndReceiveUDP() throws IOException
     {
         int outPort = 61000;
@@ -40,15 +45,15 @@ public class UdpDynamicEPTestCase extends FunctionalTestCase
             socket = new DatagramSocket();
 
             // prepare outgoing packet
-                ByteArrayOutputStream bytesOut = new ByteArrayOutputStream();
-                DataOutputStream dataOut = new DataOutputStream(bytesOut);
-                dataOut.writeFloat(1.0f);
-                dataOut.writeFloat(2.0f);
-                byte[] bytesToSend = bytesOut.toByteArray();
+            ByteArrayOutputStream bytesOut = new ByteArrayOutputStream();
+            DataOutputStream dataOut = new DataOutputStream(bytesOut);
+            dataOut.writeFloat(1.0f);
+            dataOut.writeFloat(2.0f);
+            byte[] bytesToSend = bytesOut.toByteArray();
 
-                DatagramPacket outboundPacket = new DatagramPacket(bytesToSend, bytesToSend.length,
-                    InetAddress.getLocalHost(), outPort);
-                socket.send(outboundPacket);
+            DatagramPacket outboundPacket = new DatagramPacket(bytesToSend, bytesToSend.length,
+                InetAddress.getLocalHost(), outPort);
+            socket.send(outboundPacket);
 
             // receive whatever came back
             byte[] receiveBuffer = new byte[bytesToSend.length];
@@ -70,7 +75,10 @@ public class UdpDynamicEPTestCase extends FunctionalTestCase
         {
             try
             {
-                socket.close();
+                if (socket != null)
+                {
+                    socket.close();
+                }
                 socket = null;
             }
             catch (Exception e)
@@ -78,7 +86,7 @@ public class UdpDynamicEPTestCase extends FunctionalTestCase
                 e.printStackTrace();
             }
         }
-        
+
         CustomUdpConnector udpConnector = (CustomUdpConnector) muleContext.getRegistry().lookupConnector("connector.udp.0");
         ConfigurableKeyedObjectPool pool = udpConnector.getDispatchers();
         assertEquals(0, pool.getNumActive());

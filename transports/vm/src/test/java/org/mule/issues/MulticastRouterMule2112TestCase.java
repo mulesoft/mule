@@ -12,20 +12,26 @@ package org.mule.issues;
 
 import org.mule.api.MuleEventContext;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import java.util.concurrent.atomic.AtomicBoolean;
+import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class MulticastRouterMule2112TestCase  extends FunctionalTestCase
 {
 
+    @Override
     protected String getConfigResources()
     {
         return "issues/multicast-router-mule-2112-test.xml";
     }
 
+    @Test
     public void testMulticastRoutingOverTwoEndpoints() throws Exception
     {
         FunctionalTestComponent hop1 = getFunctionalTestComponent("hop1");

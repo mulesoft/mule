@@ -22,12 +22,15 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.io.IOUtils;
+import org.junit.Test;
+
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * <code>SendReceiveFunctionalTestCase</code> tests sending an receiving multiple
  * small text files.
  */
-
 public class SftpSendReceiveFunctionalTestCase extends AbstractSftpTestCase
 {
 
@@ -38,6 +41,7 @@ public class SftpSendReceiveFunctionalTestCase extends AbstractSftpTestCase
 
     private int nrOfFiles = 8;
 
+    @Override
     protected String getConfigResources()
     {
         return "mule-send-receive-test-config.xml";
@@ -51,6 +55,7 @@ public class SftpSendReceiveFunctionalTestCase extends AbstractSftpTestCase
         initEndpointDirectory("inboundEndpoint");
     }
 
+    @Test
     public void testSendAndReceiveSingleFile() throws Exception
     {
         sendFiles = new ArrayList<String>();
@@ -61,6 +66,7 @@ public class SftpSendReceiveFunctionalTestCase extends AbstractSftpTestCase
     }
 
     // Test Mule-1477 (an old VFS Connector issue, but test anyway).
+    @Test
     public void testSendAndReceiveEmptyFile() throws Exception
     {
         sendFiles = new ArrayList<String>();
@@ -70,6 +76,7 @@ public class SftpSendReceiveFunctionalTestCase extends AbstractSftpTestCase
         sendAndReceiveFiles();
     }
 
+    @Test
     public void testSendAndReceiveMultipleFiles() throws Exception
     {
         sendFiles = new ArrayList<String>();
@@ -93,6 +100,7 @@ public class SftpSendReceiveFunctionalTestCase extends AbstractSftpTestCase
 
         EventCallback callback = new EventCallback()
         {
+            @Override
             public void eventReceived(MuleEventContext context, Object component) throws Exception
             {
                 logger.info("called " + loopCount.incrementAndGet() + " times");

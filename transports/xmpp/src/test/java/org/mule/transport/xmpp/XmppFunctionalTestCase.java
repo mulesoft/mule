@@ -14,14 +14,21 @@ import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.transport.NullPayload;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+
 public class XmppFunctionalTestCase extends XmppEnableDisableTestCase
 {
+    
     @Override
     protected String getConfigResources()
     {
         return "xmpp-functional-config.xml";
     }
 
+//    @Test
 //    public void testDispatchNormalMessage() throws Exception
 //    {
 //        MuleClient client = new MuleClient(muleContext);
@@ -32,6 +39,7 @@ public class XmppFunctionalTestCase extends XmppEnableDisableTestCase
 //        Thread.sleep(10000);
 //    }
     
+//    @Test
 //    public void testSendNormalMessage() throws Exception
 //    {
 //        MuleClient client = new MuleClient(muleContext);
@@ -40,6 +48,7 @@ public class XmppFunctionalTestCase extends XmppEnableDisableTestCase
 //        assertFalse(result.getPayload() instanceof NullPayload);
 //    }
 
+//    @Test
 //    public void testDispatchChat() throws Exception
 //    {
 //        MuleClient client = new MuleClient(muleContext);
@@ -48,6 +57,7 @@ public class XmppFunctionalTestCase extends XmppEnableDisableTestCase
 //        Thread.sleep(10000);
 //    }
 
+    @Test
     public void testSendChat() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);

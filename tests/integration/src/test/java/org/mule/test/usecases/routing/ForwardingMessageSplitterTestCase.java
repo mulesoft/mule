@@ -27,11 +27,6 @@ import static org.junit.Assert.assertTrue;
 
 public class ForwardingMessageSplitterTestCase extends AbstractServiceAndFlowTestCase
 {
-    public ForwardingMessageSplitterTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
-
     @Parameters
     public static Collection<Object[]> parameters()
     {
@@ -39,6 +34,11 @@ public class ForwardingMessageSplitterTestCase extends AbstractServiceAndFlowTes
             {ConfigVariant.SERVICE, "org/mule/test/usecases/routing/forwarding-message-splitter-service.xml"},
             {ConfigVariant.FLOW, "org/mule/test/usecases/routing/forwarding-message-splitter-flow.xml"}
         });
+    }
+
+    public ForwardingMessageSplitterTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
     }
 
     @Test

@@ -34,18 +34,17 @@ import static org.junit.Assert.assertNotNull;
 
 public class QosHeadersTestCase extends AbstractServiceAndFlowTestCase
 {
-    public QosHeadersTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-
-    }
-
     @Parameters
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
             {ConfigVariant.SERVICE, "org/mule/test/integration/providers/jms/qosheaders-test-service.xml"},
             {ConfigVariant.FLOW, "org/mule/test/integration/providers/jms/qosheaders-test-flow.xml"}});
+    }
+
+    public QosHeadersTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
     }
 
     @Test

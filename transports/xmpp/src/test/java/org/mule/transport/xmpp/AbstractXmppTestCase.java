@@ -20,6 +20,10 @@ import java.util.concurrent.TimeUnit;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Packet;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 public abstract class AbstractXmppTestCase extends XmppEnableDisableTestCase
 {
     private static final long STARTUP_TIMEOUT = 5000;
@@ -30,18 +34,18 @@ public abstract class AbstractXmppTestCase extends XmppEnableDisableTestCase
     protected String muleJabberUserId;
 
     @Override
-    protected void doSetUp() throws Exception
-    {
-        super.doSetUp();
-        
-        jabberLatch = new CountDownLatch(1);
-        createAndConnectJabberClient();
-    }
-    
-    @Override
     protected final String getConfigResources()
     {
         return "xmpp-connector-config.xml," + getXmppConfigResources();
+    }
+
+    @Override
+    protected void doSetUp() throws Exception
+    {
+        super.doSetUp();
+
+        jabberLatch = new CountDownLatch(1);
+        createAndConnectJabberClient();
     }
 
     /**
@@ -57,14 +61,14 @@ public abstract class AbstractXmppTestCase extends XmppEnableDisableTestCase
         String host = properties.getProperty("host");
         conversationPartner = properties.getProperty("conversationPartner");
         String password = properties.getProperty("conversationPartnerPassword");
-        
+
         // also save the jid that is used to connect to the jabber server
         muleJabberUserId = properties.getProperty("user") + "@" + host;
-        
+
         jabberClient = new JabberClient(host, conversationPartner, password);
         configureJabberClient(jabberClient);
         jabberClient.connect(jabberLatch);
-        
+
         assertTrue(jabberLatch.await(STARTUP_TIMEOUT, TimeUnit.MILLISECONDS));
     }
 
@@ -76,15 +80,18 @@ public abstract class AbstractXmppTestCase extends XmppEnableDisableTestCase
     @Override
     protected void doTearDown() throws Exception
     {
-        jabberClient.disconnect();
+        if (jabberClient != null)
+        {
+            jabberClient.disconnect();
+        }
         super.doTearDown();
     }
-    
+
     protected void startService(String serviceName) throws MuleException
     {
         Service service = muleContext.getRegistry().lookupService(serviceName);
         assertNotNull(service);
-        
+
         service.start();
     }
 
@@ -94,12 +101,12 @@ public abstract class AbstractXmppTestCase extends XmppEnableDisableTestCase
         sendThread.setName("Jabber send");
         sendThread.start();
     }
-    
+
     protected void assertReceivedPacketEqualsMessageSent(Packet packet)
     {
         assertNotNull(packet);
         assertTrue(packet instanceof Message);
         Message messageFromJabber = (Message) packet;
-        assertEquals(TEST_MESSAGE, messageFromJabber.getBody());        
+        assertEquals(TEST_MESSAGE, messageFromJabber.getBody());
     }
 }

@@ -32,11 +32,6 @@ import static org.junit.Assert.assertNull;
 
 public class HttpResponseTestCase extends AbstractServiceAndFlowTestCase
 {
-    public HttpResponseTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
-
     @Parameters
     public static Collection<Object[]> parameters()
     {
@@ -44,6 +39,11 @@ public class HttpResponseTestCase extends AbstractServiceAndFlowTestCase
             {ConfigVariant.SERVICE, "org/mule/test/usecases/http/http-response-service.xml"},
             {ConfigVariant.FLOW, "org/mule/test/usecases/http/http-response-flow.xml"}
         });
+    }
+
+    public HttpResponseTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
     }
 
     @Test

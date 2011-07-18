@@ -17,6 +17,7 @@ import org.jivesoftware.smack.packet.Message.Type;
 
 public class XmppChatSyncTestCase extends XmppMessageSyncTestCase
 {
+
     @Override
     protected String getXmppConfigResources()
     {

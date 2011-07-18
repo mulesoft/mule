@@ -10,7 +10,7 @@
 
 package org.mule.transport.jms.vendors;
 
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transport.jms.JmsConnector;
 import org.mule.transport.jms.xa.ConnectionFactoryWrapper;
 import org.mule.transport.jms.xa.TargetInvocationHandler;
@@ -22,14 +22,21 @@ import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
 
 import org.apache.activemq.ActiveMQXAConnectionFactory;
+import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class ActiveMQXaJmsConnectorTestCase extends FunctionalTestCase
 {
+
+    @Override
     protected String getConfigResources()
     {
         return "activemq-xa.xml";
     }
 
+    @Test
     public void testReflectiveXaCleanup() throws Exception
     {
         JmsConnector c = (JmsConnector)muleContext.getRegistry().lookupConnector("jmsConnector");

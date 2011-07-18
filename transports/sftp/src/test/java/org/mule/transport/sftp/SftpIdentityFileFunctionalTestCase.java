@@ -23,6 +23,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.commons.io.IOUtils;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * <code>LargeFileReceiveFunctionalTestCase</code> tests receiving a large file
@@ -51,6 +56,7 @@ public class SftpIdentityFileFunctionalTestCase extends AbstractSftpTestCase
     }
 
     // Downloads large file in the remote directory specified in config
+    @Test
     public void testIdentityFile() throws Exception
     {
         final CountDownLatch latch = new CountDownLatch(1);

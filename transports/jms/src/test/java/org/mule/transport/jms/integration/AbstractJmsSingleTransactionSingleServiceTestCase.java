@@ -18,14 +18,16 @@ import java.util.Properties;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import org.junit.Before;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * This tests single resource transactions through a single service definition (even
  * though the mule config file will have many service definitions). The idea is to
  * test all possible combinations of single resource transaction types.
- * 
+ *
  * @author dzapata
  */
 public abstract class AbstractJmsSingleTransactionSingleServiceTestCase extends AbstractJmsFunctionalTestCase
@@ -42,7 +44,6 @@ public abstract class AbstractJmsSingleTransactionSingleServiceTestCase extends 
     public static final String JMS_QUEUE_INPUT_CONF_E = "in5";
     public static final String JMS_QUEUE_OUTPUT_CONF_E = "out5";
 
-    @Before
     @Override
     protected void doSetUp() throws Exception
     {
@@ -148,6 +149,7 @@ public abstract class AbstractJmsSingleTransactionSingleServiceTestCase extends 
 
         final ExceptionCallback exceptionCallback = new ExceptionCallback()
         {
+            @Override
             public void onException(Throwable t)
             {
                 assertTrue(ExceptionUtils.containsType(t,
@@ -171,7 +173,7 @@ public abstract class AbstractJmsSingleTransactionSingleServiceTestCase extends 
     }
 
     /**
-     * Call this when you expect the message to make it to the outbound endpoint 
+     * Call this when you expect the message to make it to the outbound endpoint
      * @throws Exception
      */
     protected void runTransactionPass() throws Exception

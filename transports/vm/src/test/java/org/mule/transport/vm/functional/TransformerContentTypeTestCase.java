@@ -15,12 +15,17 @@ import org.mule.api.MuleMessage;
 import org.mule.api.lifecycle.Callable;
 import org.mule.api.transport.PropertyScope;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.activation.MimeType;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class TransformerContentTypeTestCase extends FunctionalTestCase
 {
@@ -31,6 +36,7 @@ public class TransformerContentTypeTestCase extends FunctionalTestCase
         return "org/mule/test/config/content-type-setting-transform-configs.xml";
     }
 
+    @Test
     public void testContentTypes() throws Exception
     {
         MuleMessage response;

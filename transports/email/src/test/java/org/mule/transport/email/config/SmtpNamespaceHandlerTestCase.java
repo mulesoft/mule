@@ -15,14 +15,22 @@ import org.mule.transport.email.SmtpsConnector;
 
 import java.util.Properties;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 public class SmtpNamespaceHandlerTestCase extends AbstractEmailNamespaceHandlerTestCase
 {
+    
     @Override
     protected String getConfigResources()
     {
         return "smtp-namespace-config.xml";
     }
 
+    @Test
     public void testConfig() throws Exception
     {
         SmtpConnector c = (SmtpConnector)muleContext.getRegistry().lookupConnector("smtpConnector");
@@ -45,6 +53,7 @@ public class SmtpNamespaceHandlerTestCase extends AbstractEmailNamespaceHandlerT
         assertTrue(c.isStarted());
     }
 
+    @Test
     public void testSecureConfig() throws Exception
     {
         SmtpsConnector c = (SmtpsConnector)muleContext.getRegistry().lookupConnector("smtpsConnector");
@@ -74,6 +83,7 @@ public class SmtpNamespaceHandlerTestCase extends AbstractEmailNamespaceHandlerT
         assertTrue(c.isStarted());
     }
 
+    @Test
     public void testEndpoint() throws MuleException
     {
         testOutboundEndpoint("global1", SmtpConnector.SMTP);

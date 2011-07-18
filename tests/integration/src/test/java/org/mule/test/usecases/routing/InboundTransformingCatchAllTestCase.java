@@ -30,11 +30,6 @@ import static org.junit.Assert.assertTrue;
  */
 public class InboundTransformingCatchAllTestCase extends AbstractServiceAndFlowTestCase
 {
-    public InboundTransformingCatchAllTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
-
     @Parameters
     public static Collection<Object[]> parameters()
     {
@@ -43,6 +38,12 @@ public class InboundTransformingCatchAllTestCase extends AbstractServiceAndFlowT
 
         });
     }
+
+    public InboundTransformingCatchAllTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
+    }
+
 
     @Test
     public void testNormal() throws Exception

@@ -10,14 +10,16 @@
 
 package org.mule.transport.quartz;
 
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
-
+import org.junit.Test;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
+
+import static org.junit.Assert.assertTrue;
 
 public class QuartzCustomJobTestCase extends FunctionalTestCase
 {
@@ -27,6 +29,7 @@ public class QuartzCustomJobTestCase extends FunctionalTestCase
         return "quartz-custom-job.xml";
     }
 
+    @Test
     public void testCustomJob() throws Exception
     {
         CountDownLatch eventLatch = (CountDownLatch) muleContext.getRegistry().lookupObject("latch");

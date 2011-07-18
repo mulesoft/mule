@@ -13,10 +13,15 @@ package org.mule.issues;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class PropertyScribblingMule893TestCase extends FunctionalTestCase
 {
@@ -27,6 +32,7 @@ public class PropertyScribblingMule893TestCase extends FunctionalTestCase
         return "issues/property-scribbling-mule-893-test.xml";
     }
 
+    @Test
     public void testSingleMessage() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -39,6 +45,7 @@ public class PropertyScribblingMule893TestCase extends FunctionalTestCase
         assertEquals("Message Received", response.getPayload());
     }
 
+    @Test
     public void testManyMessages() throws Exception
     {
         for (int i = 0; i < 1000; i++)

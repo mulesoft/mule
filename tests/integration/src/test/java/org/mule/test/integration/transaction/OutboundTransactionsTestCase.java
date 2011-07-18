@@ -11,17 +11,25 @@
 package org.mule.test.integration.transaction;
 
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 public class OutboundTransactionsTestCase extends FunctionalTestCase
 {
+
     private static final int TIMEOUT = 2000;
 
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/test/integration/transaction/outbound-transactions.xml";
     }
 
+    @Test
     public void testOutboundRouterTransactions() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -44,6 +52,7 @@ public class OutboundTransactionsTestCase extends FunctionalTestCase
         assertNull(client.request("jms://my.queue2", TIMEOUT));
     }
 
+    @Test
     public void testOutboundRouterTransactions2() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);

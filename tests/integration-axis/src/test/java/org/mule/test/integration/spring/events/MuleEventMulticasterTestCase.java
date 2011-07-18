@@ -13,14 +13,24 @@ package org.mule.test.integration.spring.events;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.DynamicPortTestCase;
 import org.mule.tck.functional.EventCallback;
+import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.util.concurrent.atomic.AtomicInteger;
+import org.junit.Rule;
+import org.junit.Test;
 
-public class MuleEventMulticasterTestCase extends DynamicPortTestCase
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+public class MuleEventMulticasterTestCase extends FunctionalTestCase
 {
-    final AtomicInteger eventCount = new AtomicInteger(0);
+
+    private final AtomicInteger eventCount = new AtomicInteger(0);
+
+    @Rule
+    public DynamicPort dynamicPort = new DynamicPort("port1");
 
     @Override
     protected String getConfigResources()
@@ -34,6 +44,7 @@ public class MuleEventMulticasterTestCase extends DynamicPortTestCase
         eventCount.set(0);
     }
 
+    @Test
     public void testReceiveAsWebService() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -49,16 +60,10 @@ public class MuleEventMulticasterTestCase extends DynamicPortTestCase
         orderManager.setEventCallback(callback);
 
         Order order = new Order("Sausage and Mash");
-        MuleMessage result = client.send("axis:http://localhost:" + getPorts().get(0) + "/mule/orderManager?method=processOrder", order,
+        MuleMessage result = client.send("axis:http://localhost:" + dynamicPort.getNumber() + "/mule/orderManager?method=processOrder", order,
             null);
 
         assertNotNull(result);
         assertEquals("Order 'Sausage and Mash' Processed", (result.getPayload()));
-    }
-
-    @Override
-    protected int getNumPortsToFind()
-    {
-        return 1;
     }
 }

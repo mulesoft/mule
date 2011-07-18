@@ -15,11 +15,16 @@ import org.mule.module.client.MuleClient;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
 public class JmsXATransactionComponentTestCase extends AbstractJmsFunctionalTestCase
-    implements junit.framework.Test
 {
+
     public static final String CONNECTOR1_NAME = "jmsConnector";
 
+    @Override
     protected String getConfigResources()
     {
         return "integration/jms-xa-tx-component.xml";

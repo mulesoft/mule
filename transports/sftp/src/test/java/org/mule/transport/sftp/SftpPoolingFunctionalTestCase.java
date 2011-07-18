@@ -23,12 +23,16 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.io.IOUtils;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * <code>SftpPoolingFunctionalTestCase</code> tests sending an receiving multiple
  * small text files.
  */
-
 public class SftpPoolingFunctionalTestCase extends AbstractSftpTestCase
 {
     private static final long TIMEOUT = 30000;
@@ -38,6 +42,7 @@ public class SftpPoolingFunctionalTestCase extends AbstractSftpTestCase
 
     private int nrOfFiles = 100;
 
+    @Override
     protected String getConfigResources()
     {
         return "mule-pooling-test-config.xml";
@@ -51,6 +56,7 @@ public class SftpPoolingFunctionalTestCase extends AbstractSftpTestCase
         initEndpointDirectory("inboundEndpoint");
     }
 
+    @Test
     public void testSftpConfig() throws Exception
     {
         SftpConnector c = (SftpConnector) muleContext.getRegistry().lookupConnector("sftp-pool");
@@ -61,6 +67,7 @@ public class SftpPoolingFunctionalTestCase extends AbstractSftpTestCase
         assertEquals(false, c2.useConnectionPool());
     }
 
+    @Test
     public void testSendAndReceiveMultipleFiles() throws Exception
     {
         sendFiles = new ArrayList<String>();
@@ -83,6 +90,7 @@ public class SftpPoolingFunctionalTestCase extends AbstractSftpTestCase
 
         EventCallback callback = new EventCallback()
         {
+            @Override
             public void eventReceived(MuleEventContext context, Object component) throws Exception
             {
 

@@ -10,16 +10,23 @@
 
 package org.mule.transport.servlet.jetty;
 
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class JettyNamespaceHandlerTestCase extends FunctionalTestCase
 {
 
+    @Override
     protected String getConfigResources()
     {
         return "jetty-namespace-config.xml";
     }
 
+    @Test
     public void testConnectorProperties()
     {
         JettyHttpConnector connector = (JettyHttpConnector) muleContext.getRegistry().lookupConnector("jettyConnector");
@@ -28,6 +35,7 @@ public class JettyNamespaceHandlerTestCase extends FunctionalTestCase
     }
 
     /* See MULE-3603
+    @Test
     public void testEndpointConfig() throws MuleException
     {
         InboundEndpoint endpoint = 

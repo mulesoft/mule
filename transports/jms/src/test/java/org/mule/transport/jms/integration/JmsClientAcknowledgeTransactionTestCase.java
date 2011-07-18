@@ -18,11 +18,14 @@ import javax.jms.Session;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertNotNull;
+
 /**
  * Test jms using JmsClientAcknowledgeTransactionFactory
  */
 public class JmsClientAcknowledgeTransactionTestCase extends AbstractJmsFunctionalTestCase
 {
+
     @Override
     protected String getConfigResources()
     {
@@ -46,11 +49,13 @@ public class JmsClientAcknowledgeTransactionTestCase extends AbstractJmsFunction
             return Session.CLIENT_ACKNOWLEDGE;
         }
 
+        @Override
         public void send(Session session, MessageProducer producer) throws JMSException
         {
             producer.send(session.createTextMessage(DEFAULT_INPUT_MESSAGE));
         }
 
+        @Override
         public Message receive(Session session, MessageConsumer consumer) throws JMSException
         {
             Message message = consumer.receive(getTimeout());

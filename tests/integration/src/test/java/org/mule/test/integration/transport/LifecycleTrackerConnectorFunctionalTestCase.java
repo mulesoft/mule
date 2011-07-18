@@ -10,7 +10,12 @@
 
 package org.mule.test.integration.transport;
 
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class LifecycleTrackerConnectorFunctionalTestCase extends FunctionalTestCase
 {
@@ -30,6 +35,7 @@ public class LifecycleTrackerConnectorFunctionalTestCase extends FunctionalTestC
      * NOTE: muleContext is injected twice, once by registry and once by lifecycleAdaptor
      * @throws Exception
      */
+    @Test
     public void testConnectorLifecycle() throws Exception
     {
         testComponentLifecycle(

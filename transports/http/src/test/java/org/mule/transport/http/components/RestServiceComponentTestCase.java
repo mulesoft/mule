@@ -13,9 +13,15 @@ import org.mule.api.component.Component;
 import org.mule.api.expression.ExpressionManager;
 import org.mule.routing.filters.WildcardFilter;
 import org.mule.routing.filters.logic.NotFilter;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import java.text.MessageFormat;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class RestServiceComponentTestCase extends FunctionalTestCase
 {
@@ -25,11 +31,13 @@ public class RestServiceComponentTestCase extends FunctionalTestCase
                                                                   ExpressionManager.DEFAULT_EXPRESSION_PREFIX,
                                                                   ExpressionManager.DEFAULT_EXPRESSION_POSTFIX);
 
+    @Override
     protected String getConfigResources()
     {
         return "rest-service-component-test.xml";
     }
 
+    @Test
     public void testResetServiceNamespaceHandler() throws Exception
     {
         Component component = muleContext.getRegistry().lookupService(SERVICE_NAME).getComponent();

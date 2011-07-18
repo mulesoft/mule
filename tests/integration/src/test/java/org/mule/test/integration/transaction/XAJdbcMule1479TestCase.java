@@ -14,9 +14,14 @@ import org.mule.module.client.MuleClient;
 
 import java.util.List;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+
 public class XAJdbcMule1479TestCase extends AbstractDerbyTestCase
 {
     
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/test/integration/transaction/jdbc-xatransaction-1479.xml";
@@ -35,6 +40,7 @@ public class XAJdbcMule1479TestCase extends AbstractDerbyTestCase
         }
     }
 
+    @Test
     public void testJdbcXa() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -49,6 +55,7 @@ public class XAJdbcMule1479TestCase extends AbstractDerbyTestCase
         }
     }    
 
+    @Test
     public void testJmsXa() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);

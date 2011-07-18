@@ -17,6 +17,13 @@ import org.mule.transport.sftp.SftpClient;
 
 import java.io.IOException;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 /**
  * Tests that files are not deleted if the final destination is not writable when
  * using a temp directory.
@@ -48,6 +55,7 @@ public class SftpCantWriteToFinalDestAfterTempDirectoryTestCase extends Abstract
      * directory. The source file should still exist and no file should exist in the
      * TEMP directory.
      */
+    @Test
     public void testCantWriteToFinalDestAfterTempDirectory() throws Exception
     {
         MuleClient muleClient = new MuleClient(muleContext);
@@ -86,5 +94,4 @@ public class SftpCantWriteToFinalDestAfterTempDirectoryTestCase extends Abstract
             sftpClient.disconnect();
         }
     }
-
 }

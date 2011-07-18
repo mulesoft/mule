@@ -10,16 +10,16 @@
 
 package org.mule.transport.sftp.dataintegrity;
 
-import java.io.IOException;
-
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.module.client.MuleClient;
 import org.mule.transport.sftp.AbstractSftpTestCase;
 import org.mule.transport.sftp.SftpClient;
 
-/**
- *
- */
+import java.io.IOException;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 public abstract class AbstractSftpDataIntegrityTestCase extends AbstractSftpTestCase
 {
 

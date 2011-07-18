@@ -11,10 +11,14 @@ package org.mule.transport.email.config;
 
 import org.mule.api.MuleException;
 import org.mule.api.endpoint.ImmutableEndpoint;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public abstract class AbstractEmailNamespaceHandlerTestCase extends FunctionalTestCase
 {
+
     protected void testInboundEndpoint(String name, String protocolName) throws MuleException
     {
         ImmutableEndpoint endpoint =

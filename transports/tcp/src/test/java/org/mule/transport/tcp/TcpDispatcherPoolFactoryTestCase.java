@@ -11,11 +11,16 @@
 package org.mule.transport.tcp;
 
 import org.mule.api.transport.Connector;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transport.ConfigurableKeyedObjectPool;
 import org.mule.transport.ConfigurableKeyedObjectPoolFactory;
 import org.mule.transport.DefaultConfigurableKeyedObjectPool;
 import org.mule.transport.DefaultConfigurableKeyedObjectPoolFactory;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class TcpDispatcherPoolFactoryTestCase extends FunctionalTestCase
 {
@@ -40,6 +45,7 @@ public class TcpDispatcherPoolFactoryTestCase extends FunctionalTestCase
         }
     }
 
+    @Test
     public void testConnectorUsingDefaultDispatcherPoolFactory()
     {
         Connector connector = muleContext.getRegistry().lookupConnector("tcpConnectorWithDefaultFactory");
@@ -50,6 +56,7 @@ public class TcpDispatcherPoolFactoryTestCase extends FunctionalTestCase
         assertEquals(DefaultConfigurableKeyedObjectPool.class, tcpConnector.getDispatchers().getClass());
     }
 
+    @Test
     public void testConnectorUsingOverriddenDispatcherPoolFactory()
     {
         Connector connector = muleContext.getRegistry().lookupConnector("tcpConnectorWithOverriddenFactory");

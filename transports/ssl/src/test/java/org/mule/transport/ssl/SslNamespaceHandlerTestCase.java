@@ -9,16 +9,24 @@
  */
 package org.mule.transport.ssl;
 
-import org.mule.tck.FunctionalTestCase;
-import org.mule.transport.ssl.SslConnector;
+import org.mule.tck.junit4.FunctionalTestCase;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class SslNamespaceHandlerTestCase extends FunctionalTestCase
 {
+
+    @Override
     protected String getConfigResources()
     {
         return "ssl-namespace-config.xml";
     }
 
+    @Test
     public void testConnectorProperties() throws Exception
     {
         SslConnector connector =

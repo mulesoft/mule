@@ -12,9 +12,13 @@ package org.mule.transport.vm.functional.transactions;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import java.util.Map;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 public class TransactionWithRecipientListTestCase extends FunctionalTestCase
 {
@@ -25,6 +29,7 @@ public class TransactionWithRecipientListTestCase extends FunctionalTestCase
         return "vm/transaction-with-recipient-list-config.xml";
     }
 
+    @Test
     public void testRecipientListRouterUseDefinedTransaction() throws Exception
     {
         MuleClient client = muleContext.getClient();

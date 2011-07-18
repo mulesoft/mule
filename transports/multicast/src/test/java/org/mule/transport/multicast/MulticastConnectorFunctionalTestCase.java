@@ -12,21 +12,29 @@ package org.mule.transport.multicast;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import java.util.HashSet;
 import java.util.Set;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 public class MulticastConnectorFunctionalTestCase extends FunctionalTestCase
 {
+
     public static final String MESSAGE = "hello";
 
-
+    @Override
     protected String getConfigResources()
     {
         return "multicast-functional-test.xml";
     }
 
+    @Test
     public void testSendTestData() throws Exception
     {
         final int numberOfMessages = 2;

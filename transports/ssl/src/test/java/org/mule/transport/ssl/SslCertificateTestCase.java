@@ -12,23 +12,33 @@ package org.mule.transport.ssl;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.functional.FunctionalTestComponent;
+import org.mule.tck.junit4.FunctionalTestCase;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class SslCertificateTestCase extends FunctionalTestCase
 {
+
     private static int NUM_MESSAGES = 100;
 
+    @Override
     protected String getConfigResources()
     {
         return "ssl-certificate-test.xml";
     }
 
+    @Test
     public void testOnce() throws Exception
     {
         doTests(1);
     }
 
+    @Test
     public void testMany() throws Exception
     {
         doTests(NUM_MESSAGES);

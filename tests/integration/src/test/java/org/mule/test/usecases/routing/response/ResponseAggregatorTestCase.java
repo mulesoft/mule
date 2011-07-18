@@ -30,17 +30,17 @@ import static org.junit.Assert.assertTrue;
 
 public class ResponseAggregatorTestCase extends AbstractServiceAndFlowTestCase
 {
-    public ResponseAggregatorTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
-
     @Parameters
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
             {ConfigVariant.SERVICE, "org/mule/test/usecases/routing/response/response-router-service.xml"},
             {ConfigVariant.FLOW, "org/mule/test/usecases/routing/response/response-router-flow.xml"}});
+    }
+
+    public ResponseAggregatorTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
     }
 
     @Test

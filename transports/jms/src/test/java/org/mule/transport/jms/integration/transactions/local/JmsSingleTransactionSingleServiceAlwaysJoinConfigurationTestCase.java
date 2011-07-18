@@ -20,10 +20,13 @@ import org.junit.Test;
 public class JmsSingleTransactionSingleServiceAlwaysJoinConfigurationTestCase extends
     AbstractJmsSingleTransactionSingleServiceTestCase
 {
+
+    @Override
     protected String getConfigResources()
     {
         return "integration/transactions/local/jms-single-tx-single-service-always-join.xml";
     }
+
     @Test
     public void testNone() throws Exception
     {

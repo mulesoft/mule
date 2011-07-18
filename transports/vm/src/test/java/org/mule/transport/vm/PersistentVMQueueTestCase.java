@@ -12,17 +12,26 @@ package org.mule.transport.vm;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 public class PersistentVMQueueTestCase extends FunctionalTestCase
 {
+
     private static final int RECEIVE_TIMEOUT = 5000;
 
+    @Override
     protected String getConfigResources()
     {
         return "vm/persistent-vmqueue-test.xml";
     }
 
+    @Test
     public void testAsynchronousDispatching() throws Exception
     {
         String input = "Test message";
@@ -41,6 +50,7 @@ public class PersistentVMQueueTestCase extends FunctionalTestCase
         }
     }
 
+    @Test
     public void testAsynchronousDispatchingInFlow() throws Exception
     {
         String input = "Test message";

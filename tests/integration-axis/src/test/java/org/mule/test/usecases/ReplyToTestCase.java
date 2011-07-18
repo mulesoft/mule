@@ -13,19 +13,35 @@ package org.mule.test.usecases;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.DynamicPortTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.NullPayload;
+
+import org.junit.Rule;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 /**
  * see MULE-2721
  */ 
-public class ReplyToTestCase extends DynamicPortTestCase
+public class ReplyToTestCase extends FunctionalTestCase
 {
-    static final long RECEIVE_DELAY = 3000;
+    
+    private static final long RECEIVE_DELAY = 3000;
+
+    @Rule
+    public DynamicPort dynamicPort1 = new DynamicPort("port1");
+
+    @Rule
+    public DynamicPort dynamicPort2 = new DynamicPort("port2");
 
     public ReplyToTestCase()
     {
-        setDisposeManagerPerSuite(true);
+        setDisposeContextPerClass(true);
     }
 
     @Override
@@ -34,6 +50,7 @@ public class ReplyToTestCase extends DynamicPortTestCase
         return "org/mule/test/usecases/replyto.xml";
     }
 
+    @Test
     public void testVm() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -55,6 +72,7 @@ public class ReplyToTestCase extends DynamicPortTestCase
         assertNull("Extra message received at replyTo destination: " + result, result);        
     }
 
+    @Test
     public void testAxis() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -76,6 +94,7 @@ public class ReplyToTestCase extends DynamicPortTestCase
         assertNull("Extra message received at replyTo destination: " + result, result);        
     }
 
+    @Test
     public void testCxf() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -95,11 +114,5 @@ public class ReplyToTestCase extends DynamicPortTestCase
         // Make sure there are no more responses
         result = client.request("ReplyTo", RECEIVE_DELAY);
         assertNull("Extra message received at replyTo destination: " + result, result);        
-    }
-
-    @Override
-    protected int getNumPortsToFind()
-    {
-        return 2;
     }
 }

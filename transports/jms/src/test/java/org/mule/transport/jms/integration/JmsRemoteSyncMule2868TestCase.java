@@ -16,9 +16,12 @@ import org.mule.module.client.MuleClient;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+
 public class JmsRemoteSyncMule2868TestCase extends AbstractJmsFunctionalTestCase
 {
 
+    @Override
     protected String getConfigResources()
     {
         return "integration/jms-remote-sync-mule2868.xml";

@@ -16,12 +16,16 @@ import org.mule.endpoint.AbstractEndpointBuilder;
 import org.mule.module.client.MuleClient;
 import org.mule.module.cxf.CxfOutboundMessageProcessor;
 import org.mule.module.cxf.config.FlowConfiguringMessageProcessor;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import java.util.List;
 import java.util.Map;
 
 import org.apache.cxf.endpoint.Client;
+import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class CxfClientPassivateTestCase extends FunctionalTestCase
 {
@@ -39,6 +43,7 @@ public class CxfClientPassivateTestCase extends FunctionalTestCase
      * memory because of the number of CxfMessageDispatchers that live in the
      * dispatcher pool. See MULE-4899 for more details.
      */
+    @Test
     public void testPassivateCleansClientRequestAndResponseContext() throws Exception
     {
         MuleClient muleClient = new MuleClient(muleContext);

@@ -13,8 +13,13 @@ package org.mule.issues;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.functional.StringAppendTestTransformer;
+import org.mule.tck.junit4.FunctionalTestCase;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class EndpointTransformerMule2131TestCase extends FunctionalTestCase
 {
@@ -23,9 +28,10 @@ public class EndpointTransformerMule2131TestCase extends FunctionalTestCase
 
     public EndpointTransformerMule2131TestCase()
     {
-        setDisposeManagerPerSuite(true);
+        setDisposeContextPerClass(true);
     }
 
+    @Override
     protected String getConfigResources()
     {
         return "issues/endpoint-transformer-mule-2131-test.xml";
@@ -38,6 +44,7 @@ public class EndpointTransformerMule2131TestCase extends FunctionalTestCase
         return client;
     }
 
+    @Test
     public void testDirect() throws Exception
     {
         String response = request(send(), "direct");
@@ -45,6 +52,7 @@ public class EndpointTransformerMule2131TestCase extends FunctionalTestCase
     }
 
     /* TODO This behaviour changed with BL-137, is this acceptable?
+    @Test
     public void testGlobalNameGlobalTransformer() throws Exception
     {
         String response = request(send(), "global-name-global-transformer");
@@ -57,16 +65,19 @@ public class EndpointTransformerMule2131TestCase extends FunctionalTestCase
     }
     */
 
+    @Test
     public void testGlobalNameLocalTransformer() throws Exception
     {
         doTestTransformed("global-name-local-transformer");
     }
 
+    @Test
     public void testNoNameLocalTransformer() throws Exception
     {
         doTestTransformed("vm://no-name-local-transformer");
     }
 
+    @Test
     public void testLocalNameLocalTransformer() throws Exception
     {
         doTestTransformed("vm://local-name-local-transformer");
