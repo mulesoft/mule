@@ -15,7 +15,8 @@ import org.mule.api.config.MuleProperties;
 import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.transport.PropertyScope;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.DynamicPortTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.servlet.MuleReceiverServlet;
 
@@ -25,15 +26,25 @@ import java.util.Map;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
+import org.junit.Rule;
+import org.junit.Test;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.servlet.Context;
 import org.mortbay.jetty.servlet.ServletHolder;
 
-public class AxisServletWithSecurityTestCase extends DynamicPortTestCase
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+public class AxisServletWithSecurityTestCase extends FunctionalTestCase
 {
+
     public static int HTTP_PORT = -1;
 
     private Server httpServer;
+
+    @Rule
+    public DynamicPort dynamicPort = new DynamicPort("port1");
 
     @Override
     protected String getConfigResources()
@@ -44,7 +55,7 @@ public class AxisServletWithSecurityTestCase extends DynamicPortTestCase
     @Override
     protected void doSetUp() throws Exception
     {
-        HTTP_PORT = getPorts().get(0);
+        HTTP_PORT = dynamicPort.getNumber();
         httpServer = new Server(HTTP_PORT);
 
         Context c = new Context(httpServer, "/", Context.SESSIONS);
@@ -71,6 +82,7 @@ public class AxisServletWithSecurityTestCase extends DynamicPortTestCase
         }
     }
 
+    @Test
     public void testSecurityWithServletsUsingGet() throws Exception
     {
         Map<String, Object> props = new HashMap<String, Object>();
@@ -93,9 +105,4 @@ public class AxisServletWithSecurityTestCase extends DynamicPortTestCase
         // assertTrue(result.getPayload() instanceof byte[]);
     }
 
-    @Override
-    protected int getNumPortsToFind()
-    {
-        return 1;
-    }
 }

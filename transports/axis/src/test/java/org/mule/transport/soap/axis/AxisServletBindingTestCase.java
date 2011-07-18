@@ -10,21 +10,31 @@
 
 package org.mule.transport.soap.axis;
 
+import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.servlet.MuleReceiverServlet;
 import org.mule.transport.servlet.jetty.util.EmbeddedJettyServer;
 
+import org.junit.Rule;
+
 public class AxisServletBindingTestCase extends AbstractSoapFunctionalTestCase
 {
-    public static int HTTP_PORT;
 
     private EmbeddedJettyServer httpServer;
+
+    @Rule
+    public DynamicPort dynamicPort = new DynamicPort("port1");
+
+    @Override
+    public String getConfigResources()
+    {
+        return "axis-test-servlet-mule-config.xml";
+    }
 
     @Override
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
-        HTTP_PORT = getPorts().get(0);
-        httpServer = new EmbeddedJettyServer(HTTP_PORT, "/", "/services/*", new MuleReceiverServlet(), muleContext);
+        httpServer = new EmbeddedJettyServer(dynamicPort.getNumber(), "/", "/services/*", new MuleReceiverServlet(), muleContext);
         httpServer.start();
     }
 
@@ -41,74 +51,62 @@ public class AxisServletBindingTestCase extends AbstractSoapFunctionalTestCase
     }
 
     @Override
-    public String getConfigResources()
-    {
-        return "axis-test-servlet-mule-config.xml";
-    }
-
-    @Override
     protected String getRequestResponseEndpoint()
     {
-        return "axis:http://localhost:" + HTTP_PORT + "/services/mycomponent?method=echo";
+        return "axis:http://localhost:" + dynamicPort.getNumber() + "/services/mycomponent?method=echo";
     }
 
     @Override
     protected String getReceiveEndpoint()
     {
-        return "axis:http://localhost:" + HTTP_PORT + "/services/mycomponent?method=getDate";
+        return "axis:http://localhost:" + dynamicPort.getNumber() + "/services/mycomponent?method=getDate";
     }
 
     @Override
     protected String getReceiveComplexEndpoint()
     {
-        return "axis:http://localhost:" + HTTP_PORT + "/services/mycomponent?method=getPerson&param=Fred";
+        return "axis:http://localhost:" + dynamicPort.getNumber() + "/services/mycomponent?method=getPerson&param=Fred";
     }
 
     @Override
     protected String getSendReceiveComplexEndpoint1()
     {
-        return "axis:http://localhost:" + HTTP_PORT + "/services/mycomponent?method=addPerson";
+        return "axis:http://localhost:" + dynamicPort.getNumber() + "/services/mycomponent?method=addPerson";
     }
 
     @Override
     protected String getSendReceiveComplexEndpoint2()
     {
-        return "axis:http://localhost:" + HTTP_PORT + "/services/mycomponent?method=getPerson&param=Dino";
+        return "axis:http://localhost:" + dynamicPort.getNumber() + "/services/mycomponent?method=getPerson&param=Dino";
     }
 
     @Override
     protected String getReceiveComplexCollectionEndpoint()
     {
-        return "axis:http://localhost:" + HTTP_PORT + "/services/mycomponent?method=getPeople";
+        return "axis:http://localhost:" + dynamicPort.getNumber() + "/services/mycomponent?method=getPeople";
     }
 
     @Override
     protected String getDispatchAsyncComplexEndpoint1()
     {
-        return "axis:http://localhost:" + HTTP_PORT + "/services/mycomponent?method=addPerson";
+        return "axis:http://localhost:" + dynamicPort.getNumber() + "/services/mycomponent?method=addPerson";
     }
 
     @Override
     protected String getDispatchAsyncComplexEndpoint2()
     {
-        return "axis:http://localhost:" + HTTP_PORT + "/services/mycomponent?method=getPerson&param=Betty";
+        return "axis:http://localhost:" + dynamicPort.getNumber() + "/services/mycomponent?method=getPerson&param=Betty";
     }
 
     @Override
     protected String getTestExceptionEndpoint()
     {
-        return "axis:http://localhost:" + HTTP_PORT + "/services/mycomponent?method=getDate";
+        return "axis:http://localhost:" + dynamicPort.getNumber() + "/services/mycomponent?method=getDate";
     }
 
     @Override
     protected String getWsdlEndpoint()
     {
-        return "http://localhost:" + HTTP_PORT + "/services/mycomponent?wsdl";
-    }
-
-    @Override
-    protected int getNumPortsToFind()
-    {
-        return 1;
+        return "http://localhost:" + dynamicPort.getNumber() + "/services/mycomponent?wsdl";
     }
 }

@@ -9,12 +9,18 @@
  */
 package org.mule.module.atom;
 
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.functional.CounterCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 public class FeedConsumeAndSplitExplicitTestCase extends FunctionalTestCase
 {
+
     private final CounterCallback counter = new CounterCallback();
 
     @Override
@@ -30,6 +36,7 @@ public class FeedConsumeAndSplitExplicitTestCase extends FunctionalTestCase
         comp.setEventCallback(counter);
     }
 
+    @Test
     public void testConsume() throws Exception {
         // add more time for build server
         Thread.sleep(5000);

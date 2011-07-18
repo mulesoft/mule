@@ -9,14 +9,23 @@
  */
 
 package org.mule.module.cxf.wssec;
-import org.mule.tck.DynamicPortTestCase;
+
+import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.util.concurrent.Latch;
 
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+import org.junit.Rule;
+import org.junit.Test;
 
-public class UsernameTokenTestCase extends DynamicPortTestCase
+import static org.junit.Assert.assertTrue;
+
+public class UsernameTokenTestCase extends FunctionalTestCase
 {
     private Latch greetLatch;
+
+    @Rule
+    public DynamicPort dynamicPort = new DynamicPort("port1");
     
     @Override
     protected String getConfigResources()
@@ -33,6 +42,7 @@ public class UsernameTokenTestCase extends DynamicPortTestCase
         greetLatch = getGreeter().getLatch();
     }
 
+    @Test
     public void testUsernameToken() throws Exception
     {
         assertTrue(greetLatch.await(60, TimeUnit.SECONDS));
@@ -44,11 +54,6 @@ public class UsernameTokenTestCase extends DynamicPortTestCase
         return (GreeterWithLatch) instance;
     }
 
-    @Override
-    protected int getNumPortsToFind()
-    {
-        return 1;
-    }
 }
 
 

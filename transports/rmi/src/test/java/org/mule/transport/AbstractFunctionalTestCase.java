@@ -14,10 +14,17 @@ import org.mule.api.MuleMessage;
 import org.mule.api.transport.DispatchException;
 import org.mule.config.i18n.Message;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transport.rmi.i18n.RmiMessages;
 
 import java.util.HashMap;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public abstract class AbstractFunctionalTestCase extends FunctionalTestCase
 {
@@ -30,8 +37,15 @@ public abstract class AbstractFunctionalTestCase extends FunctionalTestCase
         this.config = config;
     }
 
+    @Override
+    protected String getConfigResources()
+    {
+        return config;
+    }
+
     // from earlier multiple target test case
 
+    @Test
     public void testCase() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -67,6 +81,7 @@ public abstract class AbstractFunctionalTestCase extends FunctionalTestCase
         return client.send(prefix + uri, message, new HashMap());
     }
 
+    @Test
     public void testReverseString() throws Exception
     {
         MuleMessage message = send("://localhost/TestService?method=reverseString", "hello");
@@ -74,6 +89,7 @@ public abstract class AbstractFunctionalTestCase extends FunctionalTestCase
         assertEquals("olleh", message.getPayloadAsString());
     }
 
+    @Test
     public void testUpperCaseString() throws Exception
     {
         MuleMessage message = send("://localhost/TestService?method=upperCaseString", "hello");
@@ -81,6 +97,7 @@ public abstract class AbstractFunctionalTestCase extends FunctionalTestCase
         assertEquals("HELLO", message.getPayloadAsString());
     }
 
+    @Test
     public void testNoMethodSet() throws Exception
     {
         try
@@ -96,6 +113,7 @@ public abstract class AbstractFunctionalTestCase extends FunctionalTestCase
         }
     }
 
+    @Test
     public void testBadMethodName() throws Exception
     {
         try
@@ -109,11 +127,7 @@ public abstract class AbstractFunctionalTestCase extends FunctionalTestCase
         }
     }
 
-    protected String getConfigResources()
-    {
-        return config;
-    }
-
+    @Test
     public void testBadMethodType() throws Exception
     {
         try
@@ -127,6 +141,7 @@ public abstract class AbstractFunctionalTestCase extends FunctionalTestCase
         }
     }
 
+    @Test
     public void testCorrectMethodType() throws Exception
     {
         MuleMessage message = new MuleClient(muleContext).send("GoodType", "hello", null);

@@ -10,6 +10,10 @@
 
 package org.mule.transport.tcp.integration;
 
+import org.mule.tck.junit4.rule.DynamicPort;
+
+import org.junit.Rule;
+
 /**
  * This will happily send 1GB while running in significantly less memory, but it takes some time.
  * Since I'd like this to run in CI I will set at 100MB and test memory delta.  But since memory usage
@@ -22,21 +26,21 @@ package org.mule.transport.tcp.integration;
  */
 public class StreamingCapacityTestCase extends AbstractStreamingCapacityTestCase
 {
+    @Rule
+    public DynamicPort dynamicPort1 = new DynamicPort("port1");
+
+    @Rule
+    public DynamicPort dynamicPort2 = new DynamicPort("port2");
 
     public StreamingCapacityTestCase()
     {
     	super(10 * ONE_GB);
     }
 
+    @Override
     protected String getConfigResources()
     {
         return "tcp-streaming-test.xml";
-    }
-
-    @Override
-    protected int getNumPortsToFind()
-    {
-        return 2;
     }
 
 }

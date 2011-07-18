@@ -19,6 +19,7 @@ import org.mortbay.jetty.servlet.ServletHolder;
 
 public class AjaxContainerFunctionalJsonBindingsTestCase extends AjaxFunctionalJsonBindingsTestCase
 {
+
     private Server httpServer;
 
      @Override
@@ -32,7 +33,7 @@ public class AjaxContainerFunctionalJsonBindingsTestCase extends AjaxFunctionalJ
     {
         // FIXME DZ: we don't use the inherited SERVER_PORT here because it's not set
         // at this point and we can't move super.doSetUp() above this
-        httpServer = new Server(getPorts().get(0));
+        httpServer = new Server(dynamicPort.getNumber());
 
         Context c = new Context(httpServer, "/", Context.SESSIONS);
         c.addServlet(new ServletHolder(new MuleAjaxServlet()), "/ajax/*");
@@ -51,6 +52,5 @@ public class AjaxContainerFunctionalJsonBindingsTestCase extends AjaxFunctionalJ
         {
             httpServer.stop();
         }
-
     }
 }

@@ -13,12 +13,17 @@ package org.mule.test.integration.spring.events.async;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.functional.EventCallback;
 import org.mule.test.integration.spring.events.Order;
 import org.mule.test.integration.spring.events.OrderManagerBean;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicInteger;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * <code>SpringEventsJmsExampleTestCase</code> is a testcase used to test the
@@ -27,7 +32,8 @@ import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicInteger;
  */
 public class SpringEventsJmsAsyncExampleTestCase extends FunctionalTestCase
 {
-    final AtomicInteger eventCount = new AtomicInteger(0);
+
+    private final AtomicInteger eventCount = new AtomicInteger(0);
 
     @Override
     protected void doSetUp() throws Exception
@@ -42,6 +48,7 @@ public class SpringEventsJmsAsyncExampleTestCase extends FunctionalTestCase
         return "org/mule/test/integration/spring/events/async/mule-events-example-async-app-context.xml";
     }
 
+    @Test
     public void testReceivingASubscriptionEvent() throws Exception
     {
         OrderManagerBean subscriptionBean = (OrderManagerBean) muleContext.getRegistry().lookupObject(

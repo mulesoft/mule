@@ -10,7 +10,6 @@
 
 package org.mule.transport.soap.axis;
 
-
 public abstract class AbstractSoapResourceEndpointFunctionalTestCase extends AbstractSoapFunctionalTestCase
 {
     

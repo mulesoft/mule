@@ -10,7 +10,10 @@
 
 package org.mule.transport.http.issues;
 
+import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.tcp.issues.AbstractStreamingDownloadMule1389TestCase;
+
+import org.junit.Rule;
 
 /**
  * This fails to work as described in the issue.  We need more info.
@@ -18,15 +21,13 @@ import org.mule.transport.tcp.issues.AbstractStreamingDownloadMule1389TestCase;
 public class StreamingDownloadMule1389TestCase extends AbstractStreamingDownloadMule1389TestCase
 {
 
+    @Rule
+    public DynamicPort dynamicPort = new DynamicPort("port1");
+
+    @Override
     protected String getConfigResources()
     {
         return "streaming-download-mule-1389.xml";
-    }
-
-    @Override
-    protected int getNumPortsToFind()
-    {
-        return 1;
     }
 
 }

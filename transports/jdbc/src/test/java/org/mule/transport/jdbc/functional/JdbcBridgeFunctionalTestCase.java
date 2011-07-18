@@ -15,15 +15,19 @@ import java.util.List;
 
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.handlers.ArrayListHandler;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class JdbcBridgeFunctionalTestCase extends AbstractJdbcFunctionalTestCase
 {
+
     private static final int TEST_ROWS = 10;
     
     public JdbcBridgeFunctionalTestCase()
     {
-        super();
-        this.setPopulateTestData(false);
+        setPopulateTestData(false);
     }
 
     @Override
@@ -46,6 +50,7 @@ public class JdbcBridgeFunctionalTestCase extends AbstractJdbcFunctionalTestCase
         execSqlUpdate("DELETE FROM TEST_OUT");
     }
 
+    @Test
     public void testBridgeSuccess() throws Exception
     {
         List<?> results = execSqlQuery("SELECT * FROM TEST");

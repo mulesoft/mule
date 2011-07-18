@@ -10,11 +10,26 @@
 
 package org.mule.transport.http.issues;
 
+import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.tcp.integration.AbstractStreamingCapacityTestCase;
 import org.mule.util.SystemUtils;
 
+import org.junit.Rule;
+
 public class StreamingSpeedMule1389TestCase extends AbstractStreamingCapacityTestCase
 {
+
+    @Rule
+    public DynamicPort dynamicPort1 = new DynamicPort("port1");
+
+    @Rule
+    public DynamicPort dynamicPort2 = new DynamicPort("port2");
+
+    public StreamingSpeedMule1389TestCase()
+    {
+        super(100 * ONE_MB);
+    }
+
     @Override
     protected boolean isDisabledInThisEnvironment()
     {
@@ -22,20 +37,10 @@ public class StreamingSpeedMule1389TestCase extends AbstractStreamingCapacityTes
         return (SystemUtils.isIbmJDK() && SystemUtils.isJavaVersionAtLeast(160));
     }
 
-    public StreamingSpeedMule1389TestCase()
-    {
-        super(100 * ONE_MB);
-    }
-
+    @Override
     protected String getConfigResources()
     {
         return "streaming-speed-mule-1389.xml";
-    }
-
-    @Override
-    protected int getNumPortsToFind()
-    {
-        return 2;
     }
 
 }

@@ -13,14 +13,28 @@ package org.mule.transport.soap.axis.functional;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.DynamicPortTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class AxisSoapHeadersTestCase extends DynamicPortTestCase
+import org.junit.Rule;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+
+public class AxisSoapHeadersTestCase extends FunctionalTestCase
 {
+
     private static final String EXPECTED_RESPONSE = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"><soapenv:Body><echoResponse soapenv:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\"><echoReturn xsi:type=\"xsd:string\">Test Message</echoReturn></echoResponse></soapenv:Body></soapenv:Envelope>";
+
+    @Rule
+    public DynamicPort dynamicPort1 = new DynamicPort("port1");
+
+    @Rule
+    public DynamicPort dynamicPort2 = new DynamicPort("port2");
+
 
     @Override
     protected String getConfigResources()
@@ -28,6 +42,7 @@ public class AxisSoapHeadersTestCase extends DynamicPortTestCase
         return "axis-soapheader-test.xml";
     }
 
+    @Test
     public void testSoapRequest() throws Exception
     {
 
@@ -49,7 +64,7 @@ public class AxisSoapHeadersTestCase extends DynamicPortTestCase
             + "<soapenv:Body><echo soapenv:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\"><value0 xsi:type=\"soapenc:string\" xmlns:soapenc=\"http://schemas.xmlsoap.org/soap/encoding/\">Test Message</value0></echo></soapenv:Body>"
             + "</soapenv:Envelope>", muleContext);
 
-        MuleMessage reply = client.send("http://localhost:" + getPorts().get(0) + "/services/component", soapRequest, properties);
+        MuleMessage reply = client.send("http://localhost:" + dynamicPort1.getNumber() + "/services/component", soapRequest, properties);
 
         // Put this in so that no spurious exceptions are thrown
         // TODO research and see why sometimes we get 404 or Connection refused
@@ -60,10 +75,4 @@ public class AxisSoapHeadersTestCase extends DynamicPortTestCase
         assertEquals(EXPECTED_RESPONSE, reply.getPayloadAsString());
     }
 
-    @Override
-    protected int getNumPortsToFind()
-    {
-        // TODO Auto-generated method stub
-        return 2;
-    }
 }

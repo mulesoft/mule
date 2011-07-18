@@ -12,6 +12,8 @@ package org.mule.transport.soap.axis;
 
 public class AxisConnectorJmsFunctionalTestCase extends AxisConnectorVMFunctionalTestCase
 {
+
+    @Override
     protected String getTransportProtocol()
     {
         return "jms";

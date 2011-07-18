@@ -19,14 +19,21 @@ import org.mortbay.jetty.servlet.ServletHolder;
 
 public class AjaxRPCContainerFunctionalTestCase extends AjaxRPCFunctionalTestCase
 {
+
     private Server httpServer;
+
+    @Override
+    protected String getConfigResources()
+    {
+        return "ajax-container-rpc-test.xml";
+    }
 
     @Override
     protected void doSetUp() throws Exception
     {
         // FIXME DZ: we don't use the inherited SERVER_PORT here because it's not set
-        // at this point and we can't move super.doSetUp() above this        
-        httpServer = new Server(getPorts().get(0));
+        // at this point and we can't move super.doSetUp() above this
+        httpServer = new Server(dynamicPort.getNumber());
 
         Context c = new Context(httpServer, "/", Context.SESSIONS);
         c.addServlet(new ServletHolder(new MuleAjaxServlet()), "/ajax/*");
@@ -41,15 +48,10 @@ public class AjaxRPCContainerFunctionalTestCase extends AjaxRPCFunctionalTestCas
     protected void doTearDown() throws Exception
     {
         super.doTearDown();
+
         if (httpServer != null)
         {
             httpServer.stop();
         }
-    }
-
-    @Override
-    protected String getConfigResources()
-    {
-        return "ajax-container-rpc-test.xml";
     }
 }

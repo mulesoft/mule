@@ -14,22 +14,39 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.transport.DispatchException;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.DynamicPortTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.testmodels.services.TestComponent;
 import org.mule.tck.testmodels.services.TestComponentException;
 
-public class AxisExceptionTestCase extends DynamicPortTestCase
+import org.junit.Rule;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+public class AxisExceptionTestCase extends FunctionalTestCase
 {
+
+    @Rule
+    public DynamicPort dynamicPort1 = new DynamicPort("port1");
+
+    @Rule
+    public DynamicPort dynamicPort2 = new DynamicPort("port2");
+    
     @Override
     protected String getConfigResources()
     {
         return "axis-using-cxf-config.xml";
     }
 
+    @Test
     public void testSuccessCall() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
-        MuleMessage reply = client.send("axis:http://localhost:" + getPorts().get(0) + "/services/AxisService?method=receive",
+        MuleMessage reply = client.send("axis:http://localhost:" + dynamicPort1.getNumber() + "/services/AxisService?method=receive",
             new DefaultMuleMessage("test", muleContext));
 
         assertNotNull(reply);
@@ -38,12 +55,13 @@ public class AxisExceptionTestCase extends DynamicPortTestCase
         assertEquals("Received: test", reply.getPayloadAsString());
     }
 
+    @Test
     public void testExceptionCall() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
         try
         {
-            client.send("axis:http://localhost:" + getPorts().get(0) + "/services/AxisService?method=throwsException", new DefaultMuleMessage("test", muleContext));
+            client.send("axis:http://localhost:" + dynamicPort1.getNumber() + "/services/AxisService?method=throwsException", new DefaultMuleMessage("test", muleContext));
             fail("should have thrown exception");
         }
         catch (DispatchException e)
@@ -53,6 +71,7 @@ public class AxisExceptionTestCase extends DynamicPortTestCase
         }
     }
 
+    @Test
     public void testExceptionBasedRoutingForAxis() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -64,9 +83,4 @@ public class AxisExceptionTestCase extends DynamicPortTestCase
         assertEquals("Received: test", reply.getPayloadAsString());
     }
 
-    @Override
-    protected int getNumPortsToFind()
-    {
-        return 2;
-    }
 }

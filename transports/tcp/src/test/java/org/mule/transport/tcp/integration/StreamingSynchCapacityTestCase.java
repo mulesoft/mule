@@ -10,7 +10,10 @@
 
 package org.mule.transport.tcp.integration;
 
+import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.util.SystemUtils;
+
+import org.junit.Rule;
 
 /**
  * Tests a model for which synchonous=true for environment (was "and connector", but that is
@@ -29,6 +32,24 @@ import org.mule.util.SystemUtils;
  */
 public class StreamingSynchCapacityTestCase extends AbstractStreamingCapacityTestCase
 {
+
+    @Rule
+    public DynamicPort dynamicPort1 = new DynamicPort("port1");
+
+    @Rule
+    public DynamicPort dynamicPort2 = new DynamicPort("port2");
+
+    public StreamingSynchCapacityTestCase()
+    {
+        super(100 * ONE_MB);
+    }
+
+    @Override
+    protected String getConfigResources()
+    {
+        return "tcp-streaming2-test.xml";
+    }
+
     @Override
     protected boolean isDisabledInThisEnvironment()
     {
@@ -36,19 +57,4 @@ public class StreamingSynchCapacityTestCase extends AbstractStreamingCapacityTes
         return (SystemUtils.isIbmJDK() && SystemUtils.isJavaVersionAtLeast(160));
     }
 
-    public StreamingSynchCapacityTestCase()
-    {
-    	super(100 * ONE_MB);
-    }
-
-    protected String getConfigResources()
-    {
-        return "tcp-streaming2-test.xml";
-    }
-
-    @Override
-    protected int getNumPortsToFind()
-    {
-        return 2;
-    }
 }

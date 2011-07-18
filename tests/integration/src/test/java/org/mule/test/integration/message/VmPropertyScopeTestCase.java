@@ -13,14 +13,20 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.LocalMuleClient;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+
 public class VmPropertyScopeTestCase extends AbstractPropertyScopeTestCase
 {
+
     @Override
     protected String getConfigResources()
     {
         return "org/mule/test/message/vm-property-scope.xml";
     }
 
+    @Test
     public void testRequestResponseChain() throws Exception
     {
         LocalMuleClient client = muleContext.getClient();

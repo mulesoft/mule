@@ -11,6 +11,7 @@
 package org.mule.transport.http.functional;
 
 import org.mule.module.client.MuleClient;
+import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.http.HttpConstants;
 import org.mule.util.concurrent.Latch;
 
@@ -19,21 +20,25 @@ import java.util.StringTokenizer;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class HttpOutboundTestCase extends AbstractMockHttpServerTestCase
 {
+
+    // Dynamic port is static because test is using setDisposeContextPerClass(true);
+    private static DynamicPort dynamicPort = new DynamicPort("port1");
+
     private Latch testLatch = new Latch();
     private String httpMethod;
 
     public HttpOutboundTestCase()
     {
-        setDisposeManagerPerSuite(true);
-    }
-
-    @Override
-    protected MockHttpServer getHttpServer(CountDownLatch latch)
-    {
-        return new SimpleHttpServer(getPorts().get(0), latch, testLatch);
+        setDisposeContextPerClass(true);
     }
 
     @Override
@@ -42,42 +47,62 @@ public class HttpOutboundTestCase extends AbstractMockHttpServerTestCase
         return "http-outbound-config.xml";
     }
 
-    @Override
-    protected int getNumPortsToFind()
+    @BeforeClass
+    public static void createDynamicPort() throws Throwable
     {
-        return 1;
+        dynamicPort = new DynamicPort("port1");
+        dynamicPort.before();
     }
 
+    @AfterClass
+    public static void releaseDynamicPort()
+    {
+        dynamicPort.after();
+    }
+
+    @Override
+    protected MockHttpServer getHttpServer(CountDownLatch latch)
+    {
+        return new SimpleHttpServer(dynamicPort.getNumber(), latch, testLatch);
+    }
+
+    @Test
     public void testOutboundDelete() throws Exception
     {
         sendHttpRequest("vm://doDelete", HttpConstants.METHOD_DELETE);
     }
 
+    @Test
     public void testOutboundGet() throws Exception
     {
         sendHttpRequest("vm://doGet", HttpConstants.METHOD_GET);
     }
 
+    @Test
     public void testOutboundHead() throws Exception
     {
         sendHttpRequest("vm://doHead", HttpConstants.METHOD_HEAD);
     }
 
+    @Test
     public void testOutboundOptions() throws Exception
     {
         sendHttpRequest("vm://doOptions", HttpConstants.METHOD_OPTIONS);
     }
 
+    @Test
     public void testOutboundPost() throws Exception
     {
         sendHttpRequest("vm://doPost", HttpConstants.METHOD_POST);
     }
 
+    @Test
     public void testOutboundPut() throws Exception
     {
         sendHttpRequest("vm://doPut", HttpConstants.METHOD_PUT);
     }
 
+    @Test
     public void testOutboundTrace() throws Exception
     {
         sendHttpRequest("vm://doTrace", HttpConstants.METHOD_TRACE);

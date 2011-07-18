@@ -19,5 +19,4 @@ public class JnpFunctionalTestCase extends AbstractFunctionalTestCase
     {
         super("jnp", "jnp-functional-test.xml");
     }
-
 }

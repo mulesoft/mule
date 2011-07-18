@@ -19,6 +19,7 @@ import org.mule.test.integration.spring.events.Order;
 import org.mule.test.integration.spring.events.OrderManagerBean;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicInteger;
+import org.junit.Test;
 
 /**
  * <code>SpringEventsJmsExampleTestCase</code> is a testcase used to test the
@@ -42,6 +43,7 @@ public class SpringEventsJmsAsyncExampleTestCase extends DynamicPortTestCase
         return "org/mule/test/integration/spring/events/async/mule-events-example-async-app-context.xml";
     }
 
+    @Test
     public void testReceiveAsWebService() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);

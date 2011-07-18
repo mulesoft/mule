@@ -13,7 +13,7 @@ package org.mule.transport.soap.axis;
 import org.mule.api.MuleMessage;
 import org.mule.api.transport.DispatchException;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.DynamicPortTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.testmodels.services.Person;
 import org.mule.transport.NullPayload;
 import org.mule.transport.http.HttpConnector;
@@ -24,7 +24,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public abstract class AbstractSoapFunctionalTestCase extends DynamicPortTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+public abstract class AbstractSoapFunctionalTestCase extends FunctionalTestCase
 {
 
     protected abstract String getRequestResponseEndpoint();
@@ -47,6 +54,7 @@ public abstract class AbstractSoapFunctionalTestCase extends DynamicPortTestCase
 
     protected abstract String getWsdlEndpoint();
 
+    @Test
     public void testRequestResponse() throws Throwable
     {
         MuleClient client = new MuleClient(muleContext);
@@ -68,6 +76,7 @@ public abstract class AbstractSoapFunctionalTestCase extends DynamicPortTestCase
         }
     }
 
+    @Test
     public void testRequest() throws Throwable
     {
         MuleClient client = new MuleClient(muleContext);
@@ -77,6 +86,7 @@ public abstract class AbstractSoapFunctionalTestCase extends DynamicPortTestCase
         assertTrue(result.getPayload().toString().length() > 0);
     }
 
+    @Test
     public void testReceiveComplex() throws Throwable
     {
         MuleClient client = new MuleClient(muleContext);
@@ -93,6 +103,7 @@ public abstract class AbstractSoapFunctionalTestCase extends DynamicPortTestCase
         assertEquals("Flintstone", ((Person)result.getPayload()).getLastName());
     }
 
+    @Test
     public void testSendAndReceiveComplex() throws Throwable
     {
         MuleClient client = new MuleClient(muleContext);
@@ -107,6 +118,7 @@ public abstract class AbstractSoapFunctionalTestCase extends DynamicPortTestCase
         assertEquals("Flintstone", ((Person)result.getPayload()).getLastName());
     }
 
+    @Test
     public void testReceiveComplexCollection() throws Throwable
     {
         MuleClient client = new MuleClient(muleContext);
@@ -116,6 +128,7 @@ public abstract class AbstractSoapFunctionalTestCase extends DynamicPortTestCase
         assertEquals(3, ((Person[])result.getPayload()).length);
     }
 
+    @Test
     public void testDispatchAsyncComplex() throws Throwable
     {
         MuleClient client = new MuleClient(muleContext);
@@ -133,6 +146,7 @@ public abstract class AbstractSoapFunctionalTestCase extends DynamicPortTestCase
         assertEquals("Rubble", ((Person)result.getPayload()).getLastName());
     }
 
+    @Test
     public void testException() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -148,6 +162,7 @@ public abstract class AbstractSoapFunctionalTestCase extends DynamicPortTestCase
         }
     }
 
+    @Test
     public void testLocationUrlInWSDL() throws Exception
     {
         Map<String, Object> props = new HashMap<String, Object>();

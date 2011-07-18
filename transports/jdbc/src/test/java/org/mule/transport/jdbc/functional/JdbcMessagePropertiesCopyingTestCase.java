@@ -15,16 +15,26 @@ import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.transport.NullPayload;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
 public class JdbcMessagePropertiesCopyingTestCase extends AbstractJdbcFunctionalTestCase
-{    
+{
+
     private static final String PROPERTY_KEY = "custom-key";
     private static final String PROPERTY_VALUE = "custom-value";
 
+    @Override
     protected String getConfigResources()
     {
         return super.getConfigResources() + ", jdbc-message-properties-copying.xml";
     }
 
+    @Test
     public void testMessagePropertiesCopying() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);

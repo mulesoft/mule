@@ -11,6 +11,7 @@ package org.mule.test.integration.message;
 
 public class HttpPropertyScopeTestCase extends AbstractPropertyScopeTestCase
 {
+
     @Override
     protected String getConfigResources()
     {

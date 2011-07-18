@@ -18,18 +18,28 @@ import org.mule.transport.NullPayload;
 import java.util.Collection;
 import java.util.Map;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 public class JdbcNullParamsTestCase extends AbstractJdbcFunctionalTestCase
 {
+    
     public JdbcNullParamsTestCase()
     {
         setPopulateTestData(false);
     }
     
+    @Override
     protected String getConfigResources()
     {
         return "jdbc-null-params.xml";
     }
 
+    @Test
     public void testJdbcNullParams() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);

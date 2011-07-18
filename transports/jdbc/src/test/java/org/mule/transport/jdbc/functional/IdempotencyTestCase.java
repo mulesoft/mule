@@ -9,19 +9,24 @@
  */
 package org.mule.transport.jdbc.functional;
 
-import java.util.Calendar;
-
-import org.apache.commons.dbutils.QueryRunner;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.api.transport.PropertyScope;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.util.DateUtils;
+
+import java.util.Calendar;
+
+import org.apache.commons.dbutils.QueryRunner;
+import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
 
 public class IdempotencyTestCase extends AbstractJdbcFunctionalTestCase
 {
 
+    @Test
     public void testIdempotencySequential() throws Exception
     {
         MuleClient client = muleContext.getClient();

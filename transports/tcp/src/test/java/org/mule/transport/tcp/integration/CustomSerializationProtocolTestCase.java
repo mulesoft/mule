@@ -13,15 +13,32 @@ package org.mule.transport.tcp.integration;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.DynamicPortTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
+
+import org.junit.Rule;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * This test was set for the new changes due to Mule1199
  */
-public class CustomSerializationProtocolTestCase extends DynamicPortTestCase
+public class CustomSerializationProtocolTestCase extends FunctionalTestCase
 {
     final private int messages = 1;
-    
+
+    @Rule
+    public DynamicPort dynamicPort = new DynamicPort("port1");
+
+    @Override
+    protected String getConfigResources()
+    {
+        return "custom-serialisation-mule-config.xml";
+    }
+
+    @Test
     public void testCustomObject() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -41,16 +58,5 @@ public class CustomSerializationProtocolTestCase extends DynamicPortTestCase
             assertEquals(1, received.i);
             assertEquals(true, received.b);
         }
-    }
-
-    protected String getConfigResources()
-    {
-        return "custom-serialisation-mule-config.xml";
-    }
-
-    @Override
-    protected int getNumPortsToFind()
-    {
-        return 1;
     }
 }

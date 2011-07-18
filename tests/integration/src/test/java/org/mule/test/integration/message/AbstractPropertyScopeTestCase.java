@@ -13,13 +13,21 @@ package org.mule.test.integration.message;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.LocalMuleClient;
-import org.mule.tck.DynamicPortTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 
-/**
- * TODO
- */
-public abstract class AbstractPropertyScopeTestCase extends DynamicPortTestCase
+import org.junit.Rule;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+
+public abstract class AbstractPropertyScopeTestCase extends FunctionalTestCase
 {
+
+    @Rule
+    public DynamicPort dynamicPort = new DynamicPort("port1");
+
+    @Test
     public void testRequestResponse() throws Exception
     {
         LocalMuleClient client = muleContext.getClient();
@@ -31,9 +39,4 @@ public abstract class AbstractPropertyScopeTestCase extends DynamicPortTestCase
         assertEquals("fooValue", result.<Object> getInboundProperty("foo"));
     }
 
-    @Override
-    protected int getNumPortsToFind()
-    {
-        return 1;
-    }
 }

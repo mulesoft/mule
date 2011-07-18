@@ -11,19 +11,36 @@ package org.mule.transport.ajax;
 
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.tck.DynamicPortTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.ajax.container.AjaxServletConnector;
 import org.mule.transport.ajax.embedded.AjaxConnector;
 
 import java.net.URL;
 
-public class AjaxNamespaceHandlerTestCase extends DynamicPortTestCase
+import org.junit.Rule;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+public class AjaxNamespaceHandlerTestCase extends FunctionalTestCase
 {
+
+    @Rule
+    public DynamicPort dynamicPort1 = new DynamicPort("port1");
+
+    @Rule
+    public DynamicPort dynamicPort2 = new DynamicPort("port2");
+    
+    @Override
     protected String getConfigResources()
     {
         return "ajax-namespace-config.xml";
     }
 
+    @Test
     public void testConnector1Properties() throws Exception
     {
         AjaxConnector connector =
@@ -38,10 +55,11 @@ public class AjaxNamespaceHandlerTestCase extends DynamicPortTestCase
         assertEquals(3000, connector.getMultiFrameInterval());
         assertEquals(4000, connector.getRefsThreshold());
         assertEquals(50000, connector.getTimeout());
-        assertEquals(new URL("http://0.0.0.0:" + getPorts().get(0) + "/service"), connector.getServerUrl());
+        assertEquals(new URL("http://0.0.0.0:" + dynamicPort1.getNumber() + "/service"), connector.getServerUrl());
         assertEquals("/foo/bar", connector.getResourceBase());
     }
 
+    @Test
     public void testSecureConnector2Properties() throws Exception
     {
         AjaxConnector connector =
@@ -56,7 +74,7 @@ public class AjaxNamespaceHandlerTestCase extends DynamicPortTestCase
         assertEquals(3000, connector.getMultiFrameInterval());
         assertEquals(4000, connector.getRefsThreshold());
         assertEquals(50000, connector.getTimeout());
-        assertEquals(new URL("https://0.0.0.0:" + getPorts().get(1) + "/service"), connector.getServerUrl());
+        assertEquals(new URL("https://0.0.0.0:" + dynamicPort2.getNumber() + "/service"), connector.getServerUrl());
         assertEquals("/foo/bar", connector.getResourceBase());
 
         //The full path gets resolved, we're just checkng that the property got set
@@ -73,6 +91,7 @@ public class AjaxNamespaceHandlerTestCase extends DynamicPortTestCase
         assertTrue(connector.isRequireClientAuthentication());
     }
 
+    @Test
     public void testAjaxServletConnector() throws Exception
     {
         AjaxServletConnector connector = (AjaxServletConnector) muleContext.getRegistry().lookupConnector("connector3");
@@ -80,6 +99,7 @@ public class AjaxNamespaceHandlerTestCase extends DynamicPortTestCase
         //No properties
     }
 
+    @Test
     public void testEmbeddedEndpoint() throws Exception
     {
         EndpointBuilder b = muleContext.getRegistry().lookupEndpointBuilder("endpoint1");
@@ -88,17 +108,12 @@ public class AjaxNamespaceHandlerTestCase extends DynamicPortTestCase
         assertEquals("/request", ep.getEndpointURI().getPath());
     }
 
+    @Test
     public void testServletEndpoint() throws Exception
     {
         EndpointBuilder b = muleContext.getRegistry().lookupEndpointBuilder("endpoint2");
         assertNotNull(b);
         InboundEndpoint ep = b.buildInboundEndpoint();
         assertEquals("/response", ep.getEndpointURI().getPath());
-    }
-
-    @Override
-    protected int getNumPortsToFind()
-    {
-        return 2;
     }
 }

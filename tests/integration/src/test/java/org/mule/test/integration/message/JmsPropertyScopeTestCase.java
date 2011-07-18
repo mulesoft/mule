@@ -13,14 +13,21 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.LocalMuleClient;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 public class JmsPropertyScopeTestCase extends AbstractPropertyScopeTestCase
 {
+
     @Override
     protected String getConfigResources()
     {
         return "org/mule/test/message/jms-property-scope.xml";
     }
 
+    @Test
     public void testRequestResponse() throws Exception
     {
         LocalMuleClient client = muleContext.getClient();

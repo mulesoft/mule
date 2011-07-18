@@ -10,27 +10,36 @@
 
 package org.mule.transport.ajax;
 
-import org.mule.tck.DynamicPortTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.util.concurrent.Latch;
 
 import java.util.concurrent.atomic.AtomicReference;
 
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
-
 import org.cometd.Client;
 import org.cometd.Message;
 import org.cometd.MessageListener;
+import org.junit.Rule;
+import org.junit.Test;
 import org.mortbay.cometd.client.BayeuxClient;
 import org.mortbay.jetty.client.Address;
 import org.mortbay.jetty.client.HttpClient;
 
-public class AjaxRPCFunctionalTestCase extends DynamicPortTestCase
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+public class AjaxRPCFunctionalTestCase extends FunctionalTestCase
 {
+
     public static final String TEST_JSON_MESSAGE = "{\"data\" : {\"value1\" : \"foo\", \"value2\" : \"bar\"}, \"replyTo\" : \"/response\"}";
 
     public static int SERVER_PORT = -1;
 
     private BayeuxClient client;
+
+    @Rule
+    public DynamicPort dynamicPort = new DynamicPort("port1");
 
     @Override
     protected String getConfigResources()
@@ -43,7 +52,7 @@ public class AjaxRPCFunctionalTestCase extends DynamicPortTestCase
     {
         // FIXME DZ: we don't use the inherited SERVER_PORT here because it's not set
         // at this point and we can't move super.doSetUp() above this
-        SERVER_PORT = getPorts().get(0);
+        SERVER_PORT = dynamicPort.getNumber();
         HttpClient http = new HttpClient();
         http.setConnectorType(HttpClient.CONNECTOR_SELECT_CHANNEL);
 
@@ -60,6 +69,7 @@ public class AjaxRPCFunctionalTestCase extends DynamicPortTestCase
         client.stop();
     }
 
+    @Test
     public void testDispatchReceiveSimple() throws Exception
     {
         final Latch latch = new Latch();
@@ -85,11 +95,5 @@ public class AjaxRPCFunctionalTestCase extends DynamicPortTestCase
 
         assertNotNull(data.get());
         assertEquals("{\"value1\":\"foo\",\"value2\":\"bar\"}", data.get());
-    }
-
-    @Override
-    protected int getNumPortsToFind()
-    {
-        return 1;
     }
 }

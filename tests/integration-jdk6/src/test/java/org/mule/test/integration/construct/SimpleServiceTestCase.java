@@ -12,7 +12,7 @@ package org.mule.test.integration.construct;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.client.LocalMuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
 
@@ -21,14 +21,21 @@ import java.util.Map;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+
 public class SimpleServiceTestCase extends FunctionalTestCase
 {
+
     private LocalMuleClient muleClient;
+
+    public SimpleServiceTestCase()
+    {
+        setDisposeContextPerClass(true);
+    }
 
     @Override
     protected void doSetUp() throws Exception
     {
-        super.setDisposeManagerPerSuite(true);
         super.doSetUp();
         muleClient = muleContext.getClient();
     }

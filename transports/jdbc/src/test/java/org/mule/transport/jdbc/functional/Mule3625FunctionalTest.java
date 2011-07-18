@@ -10,13 +10,18 @@
 
 package org.mule.transport.jdbc.functional;
 
+import org.mule.tck.junit4.FunctionalTestCase;
+
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
 
 import javax.sql.DataSource;
 
-import org.mule.tck.FunctionalTestCase;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Test for MULE-3625, submitted by community member Guy Veraghtert
@@ -24,6 +29,7 @@ import org.mule.tck.FunctionalTestCase;
 public class Mule3625FunctionalTest extends FunctionalTestCase
 {
 
+    @Override
     protected String getConfigResources()
     {
         return "jdbc-mule-3625.xml";
@@ -34,6 +40,7 @@ public class Mule3625FunctionalTest extends FunctionalTestCase
      * 
      * @throws Exception
      */
+    @Test
     public void testNonXaTx() throws Exception
     {
         DataSource dataSource = (DataSource) muleContext.getRegistry().lookupObject("hsqldbDataSource");

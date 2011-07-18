@@ -10,10 +10,12 @@
 
 package org.mule.transport.jdbc.functional;
 
-import org.hamcrest.core.IsNull;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
+
+import org.hamcrest.core.IsNull;
+import org.junit.Test;
 
 import static org.junit.Assert.assertThat;
 
@@ -26,6 +28,7 @@ public class JdbcEndpointSessionPropertiesEe2323TestCase extends AbstractJdbcFun
         return super.getConfigResources() + ",jdbc-endpoint-session-properties.xml";
     }
 
+    @Test
     public void testSelectOnOutbound() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
