@@ -48,7 +48,7 @@ public class ServiceCatchAllStrategy extends AbstractCatchAllStrategy
             {
                 if (statistics.isEnabled())
                 {
-                    statistics.incrementRoutedMessage(event.getEndpoint());
+                    statistics.incrementRoutedMessage(event.getMessageSourceName());
                 }
                 ((Service) event.getFlowConstruct()).dispatchEvent(event);
                 return null;
