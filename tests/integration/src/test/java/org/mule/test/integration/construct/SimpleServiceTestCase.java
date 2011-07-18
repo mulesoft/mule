@@ -13,20 +13,17 @@ package org.mule.test.integration.construct;
 import org.mule.api.MuleException;
 import org.mule.api.client.LocalMuleClient;
 import org.mule.construct.SimpleService;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.test.integration.tck.WeatherForecaster;
 import org.mule.util.StringUtils;
 
 import java.io.InputStream;
-import java.util.Arrays;
-import java.util.Collection;
 
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang.math.RandomUtils;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 import org.springframework.util.FileCopyUtils;
 
 import static org.junit.Assert.assertEquals;
@@ -34,7 +31,7 @@ import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-public class SimpleServiceTestCase extends AbstractServiceAndFlowTestCase
+public class SimpleServiceTestCase extends FunctionalTestCase
 {
     @Rule
     public DynamicPort port1 = new DynamicPort("port1");
@@ -44,19 +41,15 @@ public class SimpleServiceTestCase extends AbstractServiceAndFlowTestCase
 
     private LocalMuleClient muleClient;
 
-    @Parameters
-    public static Collection<Object[]> parameters()
+    public SimpleServiceTestCase()
     {
-        return Arrays.asList(new Object[][]{{ConfigVariant.SERVICE,
-            "org/mule/test/integration/construct/simple-service-config.xml"}
-
-        });
+        super();
     }
 
-    public SimpleServiceTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigResources()
     {
-        super(variant, configResources);
-        setDisposeContextPerClass(true);
+        return "org/mule/test/integration/construct/simple-service-config.xml";
     }
 
     @Override
@@ -137,7 +130,7 @@ public class SimpleServiceTestCase extends AbstractServiceAndFlowTestCase
     @Test
     public void testJaxWsService() throws Exception
     {
-        doTestJaxWsService(1);
+        doTestJaxWsService(port1);
     }
 
     @Test
@@ -177,7 +170,17 @@ public class SimpleServiceTestCase extends AbstractServiceAndFlowTestCase
     @Test
     public void testInheritedType() throws Exception
     {
-        doTestJaxWsService(2);
+        doTestJaxWsService(port2);
+    }
+
+    @Test
+    public void testInheritedElementsUnique() throws Exception
+    {
+        final SimpleService child1 = (SimpleService) getFlowConstruct("child-service-1");
+        final SimpleService child2 = (SimpleService) getFlowConstruct("child-service-2");
+        assertNotSame(child1.getMessageSource(), child2.getMessageSource());
+        assertNotSame(child1.getComponent(), child2.getComponent());
+        assertNotSame(child1.getExceptionListener(), child2.getExceptionListener());
     }
 
     private void doTestFunctionalTestComponent(final String ftcUri, final String ftcName)
@@ -203,13 +206,13 @@ public class SimpleServiceTestCase extends AbstractServiceAndFlowTestCase
         assertEquals(s + "barbaz", result);
     }
 
-    private void doTestJaxWsService(final int portId) throws Exception
+    private void doTestJaxWsService(DynamicPort dynamicPort) throws Exception
     {
-        final Integer port = (portId == 1) ? port1.getNumber() : port2.getNumber();
+        int port = dynamicPort.getNumber();
 
-        final String wsdl = new String(
-            FileCopyUtils.copyToByteArray((InputStream) muleClient.request(
-                "http://localhost:" + port + "/weather-forecast?wsdl", getTestTimeoutSecs() * 1000L)
+        String url = String.format("http://localhost:%d/weather-forecast?wsdl", port);
+        String wsdl =  new String(
+            FileCopyUtils.copyToByteArray((InputStream) muleClient.request(url, getTestTimeoutSecs() * 1000L)
                 .getPayload()));
 
         assertTrue(wsdl.contains("GetWeatherByZipCode"));
@@ -219,15 +222,5 @@ public class SimpleServiceTestCase extends AbstractServiceAndFlowTestCase
             "95050", null, getTestTimeoutSecs() * 1000).getPayloadAsString();
 
         assertEquals(new WeatherForecaster().getByZipCode("95050"), weatherForecast);
-    }
-
-    @Test
-    public void testInheritedElementsUnique() throws Exception
-    {
-        final SimpleService child1 = (SimpleService) getFlowConstruct("child-service-1");
-        final SimpleService child2 = (SimpleService) getFlowConstruct("child-service-2");
-        assertNotSame(child1.getMessageSource(), child2.getMessageSource());
-        assertNotSame(child1.getComponent(), child2.getComponent());
-        assertNotSame(child1.getExceptionListener(), child2.getExceptionListener());
     }
 }
