@@ -22,12 +22,6 @@
                 <inbound-endpoint address="vm://in" exchange-pattern="request-response"/>
             </inbound>
             <outbound>
-            
-            <custom-outbound-router class="xxxx">
-            <outbound-endpoint address="vm://log" exchange-pattern="request-response"/>
-                    <sxc:filter pattern="//purchaseOrder[@country]"/>
-            
-            </custom-outbound-router>
                 <sxc:filtering-router>
                     <outbound-endpoint address="vm://log" exchange-pattern="request-response"/>
                     <sxc:filter pattern="//purchaseOrder[@country]"/>
