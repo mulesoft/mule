@@ -10,19 +10,6 @@
 
 package org.mule.module.xml.config;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-
-import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorChain;
 import org.mule.construct.Flow;
@@ -30,33 +17,29 @@ import org.mule.module.xml.filters.IsXmlFilter;
 import org.mule.module.xml.filters.JXPathFilter;
 import org.mule.routing.MessageFilter;
 import org.mule.routing.filters.logic.NotFilter;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 
-public class XmlFilterNamespaceHandlerFlowTestCase extends AbstractServiceAndFlowTestCase
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+public class XmlFilterNamespaceHandlerFlowTestCase extends FunctionalTestCase
 {
-    @Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigResources()
     {
-        return Arrays.asList(new Object[][]{{ConfigVariant.FLOW,
-            "org/mule/module/xml/xml-filter-functional-test-flow.xml"}});
+        return "org/mule/module/xml/xml-filter-functional-test-flow.xml";
     }
 
-    public XmlFilterNamespaceHandlerFlowTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
-
-    /**
-     * IsXmlFilter doesn't have any properties to test, so just check it is created
-     * 
-     * @throws IllegalAccessException
-     * @throws IllegalArgumentException
-     * @throws NoSuchFieldException
-     * @throws SecurityException
-     */
     @Test
-    public void testIsXmlFilter()
-        throws IllegalArgumentException, IllegalAccessException, SecurityException, NoSuchFieldException
+    public void testIsXmlFilter() throws Exception
     {
         Object flow = muleContext.getRegistry().lookupObject("test for xml");
         Object notXmlSubFlowWrapper;

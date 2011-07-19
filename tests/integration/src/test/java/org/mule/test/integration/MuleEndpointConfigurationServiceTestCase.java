@@ -10,16 +10,6 @@
 
 package org.mule.test.integration;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
-import java.util.Arrays;
-import java.util.Collection;
-
-import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.MessageExchangePattern;
@@ -32,26 +22,27 @@ import org.mule.api.routing.OutboundRouterCollection;
 import org.mule.api.service.Service;
 import org.mule.module.xml.transformer.ObjectToXml;
 import org.mule.service.ServiceCompositeMessageSource;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.MuleTestUtils;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transport.tcp.TcpConnector;
 import org.mule.transport.vm.VMConnector;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Test the creation of various targets from the service descriptor
  */
-public class MuleEndpointConfigurationServiceTestCase extends AbstractServiceAndFlowTestCase
+public class MuleEndpointConfigurationServiceTestCase extends FunctionalTestCase
 {
-    @Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigResources()
     {
-        return Arrays.asList(new Object[][]{{ConfigVariant.SERVICE,
-            "org/mule/test/integration/test-endpoints-config-service.xml"}});
-    }
-
-    public MuleEndpointConfigurationServiceTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
+        return "org/mule/test/integration/test-endpoints-config-service.xml";
     }
 
     @Test
@@ -93,8 +84,8 @@ public class MuleEndpointConfigurationServiceTestCase extends AbstractServiceAnd
         assertNotNull(service);
         assertNotNull(((ServiceCompositeMessageSource) service.getMessageSource()).getEndpoints());
         assertEquals(1,
-            ((ServiceCompositeMessageSource) ((Service) service).getMessageSource()).getEndpoints().size());
-        ImmutableEndpoint endpoint = ((ServiceCompositeMessageSource) ((Service) service).getMessageSource()).getEndpoints()
+            ((ServiceCompositeMessageSource) (service).getMessageSource()).getEndpoints().size());
+        ImmutableEndpoint endpoint = ((ServiceCompositeMessageSource) (service).getMessageSource()).getEndpoints()
             .get(0);
         assertNotNull(endpoint);
         assertEquals(VMConnector.VM, endpoint.getConnector().getProtocol().toLowerCase());
@@ -102,7 +93,6 @@ public class MuleEndpointConfigurationServiceTestCase extends AbstractServiceAnd
         assertFalse(endpoint.getTransformers().isEmpty());
         assertTrue(endpoint.getTransformers().get(0) instanceof ObjectToXml);
         assertTrue(endpoint instanceof InboundEndpoint);
-
     }
 
     @Test
@@ -124,7 +114,6 @@ public class MuleEndpointConfigurationServiceTestCase extends AbstractServiceAnd
         // (axis seems to use undefined transformers in some strange way)
         // assertTrue(TransformerUtils.isDefined(endpoint.getTransformers()));
         assertTrue(endpoint instanceof OutboundEndpoint);
-
     }
 
     @Test
@@ -146,7 +135,6 @@ public class MuleEndpointConfigurationServiceTestCase extends AbstractServiceAnd
         // (axis seems to use undefined transformers in some strange way)
         // assertTrue(TransformerUtils.isDefined(endpoint.getTransformers()));
         assertTrue(endpoint instanceof OutboundEndpoint);
-
     }
 
     @Test

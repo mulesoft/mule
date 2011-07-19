@@ -10,17 +10,6 @@
 
 package org.mule.test.integration;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-
-import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.MessageExchangePattern;
@@ -33,26 +22,29 @@ import org.mule.api.routing.OutboundRouter;
 import org.mule.construct.Flow;
 import org.mule.endpoint.DefaultInboundEndpoint;
 import org.mule.module.xml.transformer.ObjectToXml;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.MuleTestUtils;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transport.tcp.TcpConnector;
 import org.mule.transport.vm.VMConnector;
+
+import java.util.List;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Test the creation of various targets from the service descriptor
  */
-public class MuleEndpointConfigurationFlowTestCase extends AbstractServiceAndFlowTestCase
+public class MuleEndpointConfigurationFlowTestCase extends FunctionalTestCase
 {
-    @Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigResources()
     {
-        return Arrays.asList(new Object[][]{{ConfigVariant.FLOW,
-            "org/mule/test/integration/test-endpoints-config-flow.xml"}});
-    }
-
-    public MuleEndpointConfigurationFlowTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
+        return "org/mule/test/integration/test-endpoints-config-flow.xml";
     }
 
     @Test
@@ -83,7 +75,6 @@ public class MuleEndpointConfigurationFlowTestCase extends AbstractServiceAndFlo
         assertEquals("test", endpoint.getConnector().getProtocol().toLowerCase());
         assertEquals("test.queue2", endpoint.getEndpointURI().getAddress());
         assertTrue(endpoint instanceof OutboundEndpoint);
-
     }
 
     @Test
@@ -104,7 +95,6 @@ public class MuleEndpointConfigurationFlowTestCase extends AbstractServiceAndFlo
         assertFalse(endpoint.getTransformers().isEmpty());
         assertTrue(endpoint.getTransformers().get(0) instanceof ObjectToXml);
         assertTrue(endpoint instanceof InboundEndpoint);
-
     }
 
     @Test
@@ -123,7 +113,6 @@ public class MuleEndpointConfigurationFlowTestCase extends AbstractServiceAndFlo
         // (axis seems to use undefined transformers in some strange way)
         // assertTrue(TransformerUtils.isDefined(endpoint.getTransformers()));
         assertTrue(endpoint instanceof OutboundEndpoint);
-
     }
 
     @Test
@@ -142,7 +131,6 @@ public class MuleEndpointConfigurationFlowTestCase extends AbstractServiceAndFlo
         // (axis seems to use undefined transformers in some strange way)
         // assertTrue(TransformerUtils.isDefined(endpoint.getTransformers()));
         assertTrue(endpoint instanceof OutboundEndpoint);
-
     }
 
     @Test
