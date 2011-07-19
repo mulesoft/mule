@@ -57,8 +57,6 @@ public class WebServiceMessageProcessorBuilder
     private FlowConstruct flowConstruct;
     private Service muleService;
     private Class<?> serviceClass;
-
-    private String onException = CxfConstants.CREATE_SOAP_FAULT;
     
     @Override
     protected ServerFactoryBean createServerFactory() throws Exception
@@ -108,9 +106,6 @@ public class WebServiceMessageProcessorBuilder
         {
             invoker = new MuleJAXWSInvoker(invoker);
         }
-        
-        //TODO - I really don't know if this is the best place to do this. - Eugene
-        processor.setOnFaultInvokeStrategy(CxfConstants.INVOKE_EXCEPTION_STRATEGY.equals(this.getOnException()));
         
         return invoker;
     }
@@ -228,13 +223,4 @@ public class WebServiceMessageProcessorBuilder
         this.databinding = databinding;
     }
 
-    public String getOnException() 
-    {
-        return this.onException;
-    }
-    
-    public void setOnException(String onException) 
-    {
-        this.onException = onException;
-    }
 }
