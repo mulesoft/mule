@@ -10,25 +10,38 @@
 
 package org.mule.transport.tcp.integration;
 
+import java.util.Arrays;
+import java.util.Collection;
+
+import org.junit.Rule;
+import org.junit.runners.Parameterized.Parameters;
+import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.util.SystemUtils;
 
 /**
- * Tests a model for which synchonous=true for environment (was "and connector", but that is
- * no longer possible).
- * 
- * Not the same as issue MULE-1687.
- *
- * This will happily send 1GB while running in significantly less memory, but it takes some time.
- * Since I'd like this to run in CI I will set at 100MB and test memory delta.  But since memory usage
- * could be around that anyway, this is may be a little unreliable.  And there's no way to
- * measure memory use directly in 1.4.  We'll see...
- *
- * IMPORTANT - DO NOT RUN THIS TEST IN AN IDE WITH LOG LEVEL OF DEBUG.  USE INFO TO SEE
- * DIAGNOSTICS.  OTHERWISE THE CONSOLE OUTPUT WILL BE SIMILAR SIZE TO DATA TRANSFERRED,
- * CAUSING CONFUSNG AND PROBABLY FATAL MEMORY USE.
+ * Tests a model for which synchonous=true for environment (was "and connector", but
+ * that is no longer possible). Not the same as issue MULE-1687. This will happily
+ * send 1GB while running in significantly less memory, but it takes some time. Since
+ * I'd like this to run in CI I will set at 100MB and test memory delta. But since
+ * memory usage could be around that anyway, this is may be a little unreliable. And
+ * there's no way to measure memory use directly in 1.4. We'll see... IMPORTANT - DO
+ * NOT RUN THIS TEST IN AN IDE WITH LOG LEVEL OF DEBUG. USE INFO TO SEE DIAGNOSTICS.
+ * OTHERWISE THE CONSOLE OUTPUT WILL BE SIMILAR SIZE TO DATA TRANSFERRED, CAUSING
+ * CONFUSNG AND PROBABLY FATAL MEMORY USE.
  */
 public class StreamingSynchCapacityTestCase extends AbstractStreamingCapacityTestCase
 {
+    @Rule
+    public DynamicPort port1 = new DynamicPort("port1");
+
+    @Rule
+    public DynamicPort port2 = new DynamicPort("port2");
+
+    public StreamingSynchCapacityTestCase(ConfigVariant variant, String configResources, long size)
+    {
+        super(variant, configResources, size);
+    }
+
     @Override
     protected boolean isDisabledInThisEnvironment()
     {
@@ -36,19 +49,12 @@ public class StreamingSynchCapacityTestCase extends AbstractStreamingCapacityTes
         return (SystemUtils.isIbmJDK() && SystemUtils.isJavaVersionAtLeast(160));
     }
 
-    public StreamingSynchCapacityTestCase()
+    @Parameters
+    public static Collection<Object[]> parameters()
     {
-        super(100 * ONE_MB);
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "tcp-streaming2-test-service.xml", 100 * ONE_MB},
+            {ConfigVariant.FLOW, "tcp-streaming2-test-flow.xml", 100 * ONE_MB}});
     }
 
-    protected String getConfigResources()
-    {
-        return "tcp-streaming2-test.xml";
-    }
-
-    @Override
-    protected int getNumPortsToFind()
-    {
-        return 2;
-    }
 }

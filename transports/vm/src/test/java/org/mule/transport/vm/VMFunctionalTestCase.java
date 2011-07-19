@@ -10,32 +10,38 @@
 
 package org.mule.transport.vm;
 
-import org.mule.api.MuleMessage;
-import org.mule.api.store.ObjectStoreException;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.junit4.FunctionalTestCase;
-import org.mule.util.store.SimpleMemoryObjectStore;
-
-import java.io.Serializable;
-
-import org.junit.Test;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-public class VMFunctionalTestCase extends FunctionalTestCase
+import java.io.Serializable;
+import java.util.Arrays;
+import java.util.Collection;
+
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+import org.mule.api.MuleMessage;
+import org.mule.api.store.ObjectStoreException;
+import org.mule.module.client.MuleClient;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.util.store.SimpleMemoryObjectStore;
+
+public class VMFunctionalTestCase extends AbstractServiceAndFlowTestCase
 {
-    public VMFunctionalTestCase()
+    public VMFunctionalTestCase(ConfigVariant variant, String configResources)
     {
+        super(variant, configResources);
         setDisposeContextPerClass(true);
     }
 
-    @Override
-    protected String getConfigResources()
+    @Parameters
+    public static Collection<Object[]> parameters()
     {
-        return "vm/vm-functional-test.xml";
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "vm/vm-functional-test-service.xml"},
+            {ConfigVariant.FLOW, "vm/vm-functional-test-flow.xml"}
+        });
     }
 
     @Test

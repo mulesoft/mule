@@ -10,31 +10,40 @@
 
 package org.mule.transport.vm;
 
-import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.junit4.FunctionalTestCase;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.StringTokenizer;
 
 import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+import org.mule.api.MuleMessage;
+import org.mule.module.client.MuleClient;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
-public class VMQueueTestCase extends FunctionalTestCase
+public class VMQueueTestCase extends AbstractServiceAndFlowTestCase
 {
 
     public static final long WAIT = 3000L;
 
-    @Override
-    protected String getConfigResources()
+    public VMQueueTestCase(ConfigVariant variant, String configResources)
     {
-        return "vm/vm-queue-test.xml";
+        super(variant, configResources);
+    }
+    
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "vm/vm-queue-test-service.xml"},
+            {ConfigVariant.FLOW, "vm/vm-queue-test-flow.xml"}
+        });
     }
 
     @Test

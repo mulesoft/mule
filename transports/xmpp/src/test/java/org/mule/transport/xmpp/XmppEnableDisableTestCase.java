@@ -10,15 +10,20 @@
 
 package org.mule.transport.xmpp;
 
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 
 /**
  * This should be the superclass for all unit tests in the XMPP transport that require an external
  * Jabber server to work with. It allows to enable or disable unit tests by setting the system
  * property <em>jabber.test.enabled</em>.
  */
-public abstract class XmppEnableDisableTestCase extends FunctionalTestCase
+public abstract class XmppEnableDisableTestCase extends AbstractServiceAndFlowTestCase
 {
+    public XmppEnableDisableTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
+    }
+
     public static boolean isTestDisabled()
     {
         boolean testEnabled = Boolean.getBoolean("jabber.test.enabled");

@@ -10,21 +10,32 @@
 
 package org.mule.transport.xmpp;
 
-import org.mule.transport.xmpp.JabberSender.Callback;
+import static org.junit.Assert.assertEquals;
+
+import java.util.Arrays;
+import java.util.Collection;
 
 import org.jivesoftware.smack.packet.Message;
-
-import static org.junit.Assert.assertEquals;
+import org.junit.runners.Parameterized.Parameters;
+import org.mule.transport.xmpp.JabberSender.Callback;
 
 public class XmppChatAsyncTestCase extends XmppMessageAsyncTestCase
 {
 
-    @Override
-    protected String getXmppConfigResources()
+    public XmppChatAsyncTestCase(ConfigVariant variant, String configResources)
     {
-        return "xmpp-chat-async-config.xml";
+        super(variant, configResources);
     }
-    
+
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE,
+                AbstractXmppTestCase.COMMON_CONFIG + "," + "xmpp-chat-async-config-service.xml"},
+            {ConfigVariant.FLOW, AbstractXmppTestCase.COMMON_CONFIG + "," + "xmpp-chat-async-config-flow.xml"}});
+    }
+
     @Override
     protected Message.Type expectedXmppMessageType()
     {
@@ -37,7 +48,7 @@ public class XmppChatAsyncTestCase extends XmppMessageAsyncTestCase
         assertEquals(Message.Type.chat, message.getType());
         assertEquals(TEST_MESSAGE, message.getBody());
     }
-    
+
     @Override
     protected void sendJabberMessageFromNewThread()
     {

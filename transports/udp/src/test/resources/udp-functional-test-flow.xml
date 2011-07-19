@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:udp="http://www.mulesoft.org/schema/mule/udp" xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+    xmlns:test="http://www.mulesoft.org/schema/mule/test"
+    xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/3.2/mule-test.xsd
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
+               http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.2/mule-vm.xsd
+               http://www.mulesoft.org/schema/mule/udp http://www.mulesoft.org/schema/mule/udp/3.2/mule-udp.xsd">
+
+    <configuration>
+        <default-threading-profile
+            threadWaitTimeout="60000" threadTTL="60000" />
+    </configuration>
+
+    <vm:connector name="vm-queue" />
+
+    <!-- MULE-2109 -->
+    <!-- mule:endpoint name="serverEndpoint" address="udp://null:60131" exchange-pattern="one-way"/ -->
+    <endpoint name="serverEndpoint" address="udp://localhost:60131"
+        exchange-pattern="one-way" />
+
+
+    <flow name="testUDP1">
+
+        <inbound-endpoint ref="serverEndpoint" />
+
+        <test:component appendString=" Received" />
+
+        <outbound-endpoint address="vm://foo"
+            exchange-pattern="one-way" />
+
+    </flow>
+
+</mule>

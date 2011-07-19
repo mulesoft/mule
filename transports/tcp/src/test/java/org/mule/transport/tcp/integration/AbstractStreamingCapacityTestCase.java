@@ -10,25 +10,31 @@
 
 package org.mule.transport.tcp.integration;
 
-import org.mule.DefaultMuleMessage;
-import org.mule.api.MuleEventContext;
-import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.DynamicPortTestCase;
-import org.mule.tck.functional.EventCallback;
-import org.mule.tck.functional.FunctionalStreamingTestComponent;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
+
+import org.junit.Test;
+import org.mule.DefaultMuleMessage;
+import org.mule.api.MuleEventContext;
+import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.module.client.MuleClient;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.functional.EventCallback;
+import org.mule.tck.functional.FunctionalStreamingTestComponent;
 
 /**
  * IMPORTANT - DO NOT RUN THIS TEST IN AN IDE WITH LOG LEVEL OF DEBUG. USE INFO TO
  * SEE DIAGNOSTICS. OTHERWISE THE CONSOLE OUTPUT WILL BE SIMILAR SIZE TO DATA
  * TRANSFERRED, CAUSING CONFUSNG AND PROBABLY FATAL MEMORY USE.
  */
-public abstract class AbstractStreamingCapacityTestCase extends DynamicPortTestCase
+public abstract class AbstractStreamingCapacityTestCase extends AbstractServiceAndFlowTestCase
 {
+    
     public static final long ONE_KB = 1024;
     public static final long ONE_MB = ONE_KB * ONE_KB;
     public static final long ONE_GB = ONE_KB * ONE_MB;
@@ -36,11 +42,13 @@ public abstract class AbstractStreamingCapacityTestCase extends DynamicPortTestC
 
     private long size;
 
-    public AbstractStreamingCapacityTestCase(long size)
+    public AbstractStreamingCapacityTestCase(ConfigVariant variant, String configResources, long size)
     {
+        super(variant, configResources);
         this.size = size;
     }
 
+    @Test
     public void testSend() throws Exception
     {
         final CountDownLatch latch = new CountDownLatch(1);

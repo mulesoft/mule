@@ -10,18 +10,29 @@
 
 package org.mule.transport.xmpp;
 
-import org.mule.transport.xmpp.JabberSender.Callback;
+import java.util.Arrays;
+import java.util.Collection;
 
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Message.Type;
+import org.junit.runners.Parameterized.Parameters;
+import org.mule.transport.xmpp.JabberSender.Callback;
 
 public class XmppChatSyncTestCase extends XmppMessageSyncTestCase
 {
-
-    @Override
-    protected String getXmppConfigResources()
+    
+    public XmppChatSyncTestCase(ConfigVariant variant, String configResources)
     {
-        return "xmpp-chat-sync-config.xml";
+        super(variant, configResources);
+    }
+
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, AbstractXmppTestCase.COMMON_CONFIG + "," + "xmpp-chat-sync-config-service.xml"},
+            {ConfigVariant.FLOW, AbstractXmppTestCase.COMMON_CONFIG + "," + "xmpp-chat-sync-config-flow.xml"}
+        });
     }
 
     @Override

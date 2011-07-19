@@ -10,24 +10,45 @@
 
 package org.mule.transport.http.functional;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.transformer.DataType;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.DynamicPortTestCase;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 
-import java.util.ArrayList;
-import java.util.List;
-
-public class TwoEndpointsSinglePortTestCase extends DynamicPortTestCase
+public class TwoEndpointsSinglePortTestCase extends AbstractServiceAndFlowTestCase
 {
+    @Rule
+    public DynamicPort port1 = new DynamicPort("port1");
 
-    protected String getConfigResources()
+    public TwoEndpointsSinglePortTestCase(ConfigVariant variant, String configResources)
     {
-        return "two-endpoints-single-port.xml";
+        super(variant, configResources);
+    }
+    
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "two-endpoints-single-port-service.xml"},
+            {ConfigVariant.FLOW, "two-endpoints-single-port-flow.xml"}
+        });
     }
 
+    @Test
     public void testSendToEach() throws Exception
     {
 
@@ -35,6 +56,7 @@ public class TwoEndpointsSinglePortTestCase extends DynamicPortTestCase
         sendWithResponse("inMyComponent2", "test", "mycomponent2", 10);
     }
 
+    @Test
     public void testSendToEachWithBadEndpoint() throws Exception
     {
 
@@ -43,7 +65,8 @@ public class TwoEndpointsSinglePortTestCase extends DynamicPortTestCase
         sendWithResponse("inMyComponent1", "test", "mycomponent1", 5);
         sendWithResponse("inMyComponent2", "test", "mycomponent2", 5);
 
-        MuleMessage result = client.send("http://localhost:" + getPorts().get(0) + "/mycomponent-notfound", "test", null);
+        MuleMessage result = client.send("http://localhost:" + port1.getNumber() + "/mycomponent-notfound",
+            "test", null);
         assertNotNull(result);
         assertNotNull(result.getExceptionPayload());
         final int status = result.getInboundProperty("http.status", 0);
@@ -62,19 +85,17 @@ public class TwoEndpointsSinglePortTestCase extends DynamicPortTestCase
         List results = new ArrayList();
         for (int i = 0; i < noOfMessages; i++)
         {
-            results.add(client.send(((InboundEndpoint) client.getMuleContext().getRegistry().lookupObject(endPointName)).getAddress(), message, null).getPayload(DataType.BYTE_ARRAY_DATA_TYPE));
+            results.add(client.send(
+                ((InboundEndpoint) client.getMuleContext().getRegistry().lookupObject(endPointName)).getAddress(),
+                message, null)
+                .getPayload(DataType.BYTE_ARRAY_DATA_TYPE));
         }
 
         assertEquals(noOfMessages, results.size());
         for (int i = 0; i < noOfMessages; i++)
         {
-            assertEquals(response, new String((byte[])results.get(i)));
+            assertEquals(response, new String((byte[]) results.get(i)));
         }
     }
 
-    @Override
-    protected int getNumPortsToFind()
-    {
-        return 1;
-    }
 }

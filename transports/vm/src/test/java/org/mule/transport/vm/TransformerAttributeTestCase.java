@@ -10,25 +10,35 @@
 
 package org.mule.transport.vm;
 
-import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.functional.StringAppendTestTransformer;
-import org.mule.tck.junit4.FunctionalTestCase;
-
-import org.junit.Test;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-public class TransformerAttributeTestCase extends FunctionalTestCase
-{
+import java.util.Arrays;
+import java.util.Collection;
 
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+import org.mule.api.MuleMessage;
+import org.mule.module.client.MuleClient;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.functional.StringAppendTestTransformer;
+
+public class TransformerAttributeTestCase extends AbstractServiceAndFlowTestCase
+{
     public static final String OUTBOUND_MESSAGE = "Test message";
 
-    @Override
-    protected String getConfigResources()
+    public TransformerAttributeTestCase(ConfigVariant variant, String configResources)
     {
-        return "vm/transformer-attribute-test.xml";
+        super(variant, configResources);
+    }
+    
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "vm/transformer-attribute-test-service.xml"},
+            {ConfigVariant.FLOW, "vm/transformer-attribute-test-flow.xml"}
+        });
     }
 
     @Test

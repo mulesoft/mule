@@ -10,13 +10,11 @@
 
 package org.mule.module.pgp;
 
-import org.mule.api.ExceptionPayload;
-import org.mule.api.MuleMessage;
-import org.mule.api.config.MuleProperties;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.junit4.FunctionalTestCase;
-import org.mule.util.FileUtils;
-import org.mule.util.IOUtils;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -24,22 +22,31 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+import org.mule.api.ExceptionPayload;
+import org.mule.api.MuleMessage;
+import org.mule.api.config.MuleProperties;
+import org.mule.module.client.MuleClient;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.util.FileUtils;
+import org.mule.util.IOUtils;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
-public class PGPSecurityFilterTestCase extends FunctionalTestCase
+public class PGPSecurityFilterTestCase extends AbstractServiceAndFlowTestCase
 {
     protected static final String TARGET = "/encrypted.txt";
     protected static final String DIRECTORY = "output";
     protected static final String MESSAGE_EXCEPTION = "The required object/property \"UserId\" is null. Message payload is of type: String";
+
+    public PGPSecurityFilterTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
+    }
 
     @Override
     protected boolean isDisabledInThisEnvironment()
@@ -47,10 +54,11 @@ public class PGPSecurityFilterTestCase extends FunctionalTestCase
         return (AbstractEncryptionStrategyTestCase.isCryptographyExtensionInstalled() == false);
     }
 
-    @Override
-    protected String getConfigResources()
+    @Parameters
+    public static Collection<Object[]> parameters()
     {
-        return "test-pgp-encrypt-config.xml";
+        return Arrays.asList(new Object[][]{{ConfigVariant.SERVICE, "test-pgp-encrypt-config-service.xml"},
+            {ConfigVariant.FLOW, "test-pgp-encrypt-config-flow.xml"}});
     }
 
     @Test
@@ -66,12 +74,12 @@ public class PGPSecurityFilterTestCase extends FunctionalTestCase
         MuleMessage reply = client.send("vm://echo", new String(msg), props);
         assertNull(reply.getExceptionPayload());
 
-        //poll for the output file; wait for a max of 5 seconds
+        // poll for the output file; wait for a max of 5 seconds
         File pollingFile = null;
-        for(int i = 0; i < 5; i++)
+        for (int i = 0; i < 5; i++)
         {
             pollingFile = new File(DIRECTORY + TARGET);
-            if(!pollingFile.exists())
+            if (!pollingFile.exists())
             {
                 Thread.sleep(1000);
             }
@@ -97,6 +105,7 @@ public class PGPSecurityFilterTestCase extends FunctionalTestCase
             fail("File not successfully created");
         }
     }
+
     private byte[] loadEncryptedMessage() throws IOException
     {
         URL url = Thread.currentThread().getContextClassLoader().getResource("./encrypted-signed.asc");

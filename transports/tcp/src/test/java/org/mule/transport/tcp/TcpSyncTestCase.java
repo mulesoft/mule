@@ -10,18 +10,39 @@
 
 package org.mule.transport.tcp;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+import java.util.Arrays;
+import java.util.Collection;
+
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.DynamicPortTestCase;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 
-import java.util.Arrays;
-
-public class TcpSyncTestCase extends DynamicPortTestCase
+public class TcpSyncTestCase extends AbstractServiceAndFlowTestCase
 {
-    protected String getConfigResources()
+    @Rule
+    public DynamicPort port1 = new DynamicPort("port1");
+    
+    public TcpSyncTestCase(ConfigVariant variant, String configResources)
     {
-        return "tcp-sync.xml";
+        super(variant, configResources);
+    }
+
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "tcp-sync-service.xml"},
+            {ConfigVariant.FLOW, "tcp-sync-flow.xml"}
+        });
     }
 
     protected MuleMessage send(Object payload) throws Exception
@@ -30,6 +51,7 @@ public class TcpSyncTestCase extends DynamicPortTestCase
         return client.send(((InboundEndpoint) client.getMuleContext().getRegistry().lookupObject("inService")).getAddress(), payload, null);
     }
 
+    @Test
     public void testSendString() throws Exception
     {
         MuleMessage message = send("data");
@@ -38,6 +60,7 @@ public class TcpSyncTestCase extends DynamicPortTestCase
         assertEquals("data", response);
     }
 
+    @Test
     public void testSyncResponseOfBufferSize() throws Exception
     {
         int size = 1024 * 16;
@@ -52,6 +75,7 @@ public class TcpSyncTestCase extends DynamicPortTestCase
         assertTrue(Arrays.equals(data, response));
     }
 
+    @Test
     public void testManySyncResponseOfBufferSize() throws Exception
     {
         int size = 1024 * 16;
@@ -69,6 +93,7 @@ public class TcpSyncTestCase extends DynamicPortTestCase
         }
     }
 
+    @Test
     public void testSyncResponseVeryBig() throws Exception
     {
         byte[] data = fillBuffer(new byte[1024 * 1024]);
@@ -87,10 +112,5 @@ public class TcpSyncTestCase extends DynamicPortTestCase
         }
         return buffer;
     }
-
-    @Override
-    protected int getNumPortsToFind()
-    {
-        return 1;
-    }
+    
 }

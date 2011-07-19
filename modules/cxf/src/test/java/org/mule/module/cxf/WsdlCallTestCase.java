@@ -10,33 +10,42 @@
 
 package org.mule.module.cxf;
 
-import org.mule.tck.junit4.FunctionalTestCase;
-import org.mule.transport.servlet.MuleReceiverServlet;
-import org.mule.transport.servlet.jetty.util.EmbeddedJettyServer;
+import static org.junit.Assert.assertEquals;
 
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.transport.servlet.MuleReceiverServlet;
+import org.mule.transport.servlet.jetty.util.EmbeddedJettyServer;
 
-import static org.junit.Assert.assertEquals;
-
-public class WsdlCallTestCase extends FunctionalTestCase
+public class WsdlCallTestCase extends AbstractServiceAndFlowTestCase
 {
-
     //TODO(pablo.kraan): replace with a dynamic port
     public static final int HTTP_PORT = 63088;
 
     private EmbeddedJettyServer httpServer;
 
-    @Override
-    protected String getConfigResources()
+    public WsdlCallTestCase(ConfigVariant variant, String configResources)
     {
-        return "wsdl-conf.xml";
+        super(variant, configResources);
+    }
+    
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "wsdl-conf-service.xml"},
+            {ConfigVariant.FLOW, "wsdl-conf-flow.xml"}
+        });
     }
 
     @Override

@@ -10,7 +10,7 @@
 
 package org.mule.transport.udp.functional;
 
-import org.mule.tck.junit4.FunctionalTestCase;
+import static org.junit.Assert.assertEquals;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -21,17 +21,26 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.util.Arrays;
+import java.util.Collection;
 
 import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 
-import static org.junit.Assert.assertEquals;
-
-public class UdpRoundTripTestCase extends FunctionalTestCase
+public class UdpRoundTripTestCase extends AbstractServiceAndFlowTestCase
 {
-    @Override
-    protected String getConfigResources()
+    public UdpRoundTripTestCase(ConfigVariant variant, String configResources)
     {
-        return "udp-roundtrip-test-config.xml";
+        super(variant, configResources);
+    }
+
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "udp-roundtrip-test-config-service.xml"},
+            {ConfigVariant.FLOW, "udp-roundtrip-test-config-flow.xml"}
+        });
     }
 
     @Test

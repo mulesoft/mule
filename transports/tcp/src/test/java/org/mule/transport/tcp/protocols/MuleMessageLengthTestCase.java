@@ -10,35 +10,48 @@
 
 package org.mule.transport.tcp.protocols;
 
-import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.DynamicPortTestCase;
+import static org.junit.Assert.assertEquals;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-public class MuleMessageLengthTestCase extends DynamicPortTestCase 
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+import org.mule.api.MuleMessage;
+import org.mule.module.client.MuleClient;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
+
+public class MuleMessageLengthTestCase extends AbstractServiceAndFlowTestCase
 {
 
     protected static String TEST_MESSAGE = "Test TCP Request";
 
-    protected String getConfigResources()
+    @Rule
+    public DynamicPort port1 = new DynamicPort("port1");
+
+    public MuleMessageLengthTestCase(ConfigVariant variant, String configResources)
     {
-        return "tcp-mplength-test.xml";
+        super(variant, configResources);
     }
 
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{{ConfigVariant.SERVICE, "tcp-mplength-test-service.xml"},
+            {ConfigVariant.FLOW, "tcp-mplength-test-flow.xml"}});
+    }
+
+    @Test
     public void testSend() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
         Map props = new HashMap();
         MuleMessage result = client.send("clientEndpoint", TEST_MESSAGE, props);
         assertEquals(TEST_MESSAGE + " Received", result.getPayloadAsString());
-    }
-
-    @Override
-    protected int getNumPortsToFind()
-    {
-        return 1;
     }
 
 }

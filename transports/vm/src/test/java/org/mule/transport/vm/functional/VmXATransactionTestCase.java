@@ -9,14 +9,13 @@
  */
 package org.mule.transport.vm.functional;
 
-import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.junit4.FunctionalTestCase;
-import org.mule.transaction.TransactionCoordination;
-import org.mule.transaction.XaTransaction;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -28,22 +27,34 @@ import javax.transaction.xa.Xid;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+import org.mule.api.MuleMessage;
+import org.mule.module.client.MuleClient;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.transaction.TransactionCoordination;
+import org.mule.transaction.XaTransaction;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
-public class VmXATransactionTestCase extends FunctionalTestCase
+public class VmXATransactionTestCase extends AbstractServiceAndFlowTestCase
 {
+    
     protected static final Log logger = LogFactory.getLog(VmTransactionTestCase.class);
     protected static volatile boolean success = true;
     protected static volatile boolean wouldBeDisabled = false;
 
-    @Override
-    protected String getConfigResources()
+    public VmXATransactionTestCase(ConfigVariant variant, String configResources)
     {
-        return "vm-xa-transaction.xml";
+        super(variant, configResources);
     }
-
+    
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "vm-xa-transaction-service.xml"},
+            {ConfigVariant.FLOW, "vm-xa-transaction-flow.xml"}
+        });
+    }
+    
     @Test
     public void testTransactionQueueEventsTrue() throws Exception
     {

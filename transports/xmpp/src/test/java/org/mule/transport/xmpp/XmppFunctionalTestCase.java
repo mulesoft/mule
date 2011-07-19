@@ -10,22 +10,33 @@
 
 package org.mule.transport.xmpp;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+
+import java.util.Arrays;
+import java.util.Collection;
+
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.transport.NullPayload;
 
-import org.junit.Test;
-
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-
 public class XmppFunctionalTestCase extends XmppEnableDisableTestCase
 {
     
-    @Override
-    protected String getConfigResources()
+    public XmppFunctionalTestCase(ConfigVariant variant, String configResources)
     {
-        return "xmpp-functional-config.xml";
+        super(variant, configResources);
+    }
+
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, AbstractXmppTestCase.COMMON_CONFIG + "," + "xmpp-functional-config-service.xml"},
+            {ConfigVariant.FLOW, AbstractXmppTestCase.COMMON_CONFIG + "," + "xmpp-functional-config-flow.xml"}
+        });
     }
 
 //    @Test

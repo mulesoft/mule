@@ -10,31 +10,41 @@
 
 package org.mule.transport.file;
 
-import org.mule.api.MuleEventContext;
-import org.mule.tck.functional.EventCallback;
-import org.mule.tck.functional.FunctionalTestComponent;
-import org.mule.tck.junit4.FunctionalTestCase;
-import org.mule.util.FileUtils;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collection;
 
 import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+import org.mule.api.MuleEventContext;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.functional.EventCallback;
+import org.mule.tck.functional.FunctionalTestComponent;
+import org.mule.util.FileUtils;
 
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
-public class WorkDirectoryTestCase extends FunctionalTestCase
+public class WorkDirectoryTestCase extends AbstractServiceAndFlowTestCase
 {
     
     private static final String TEST_FILENAME = "test.txt";
 
-    @Override
-    protected String getConfigResources()
+    public WorkDirectoryTestCase(ConfigVariant variant, String configResources)
     {
-        return "work-directory-config.xml";
+        super(variant, configResources);
+    }
+    
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "work-directory-config-service.xml"},
+            {ConfigVariant.FLOW, "work-directory-config-flow.xml"}
+        });
     }
 
     @Override

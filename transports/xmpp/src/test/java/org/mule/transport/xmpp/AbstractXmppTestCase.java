@@ -26,17 +26,18 @@ import static org.junit.Assert.assertTrue;
 
 public abstract class AbstractXmppTestCase extends XmppEnableDisableTestCase
 {
+
     private static final long STARTUP_TIMEOUT = 5000;
 
     private CountDownLatch jabberLatch;
     protected JabberClient jabberClient;
     protected String conversationPartner;
     protected String muleJabberUserId;
+    protected static final String COMMON_CONFIG = "xmpp-connector-config.xml";
 
-    @Override
-    protected final String getConfigResources()
+    public AbstractXmppTestCase(ConfigVariant variant, String configResources)
     {
-        return "xmpp-connector-config.xml," + getXmppConfigResources();
+        super(variant, configResources);
     }
 
     @Override
@@ -48,14 +49,10 @@ public abstract class AbstractXmppTestCase extends XmppEnableDisableTestCase
         createAndConnectJabberClient();
     }
 
-    /**
-     * Subclasses implmement this method and return the name of their config file.
-     */
-    protected abstract String getXmppConfigResources();
-
     private void createAndConnectJabberClient() throws Exception
     {
-        // do not hardcode host/user etc here, look it up from the registry so the only place
+        // do not hardcode host/user etc here, look it up from the registry so the
+        // only place
         // that this info is stored is in the config
         Properties properties = (Properties) muleContext.getRegistry().lookupObject("properties");
         String host = properties.getProperty("host");

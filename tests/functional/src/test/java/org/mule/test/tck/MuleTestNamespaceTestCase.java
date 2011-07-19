@@ -9,33 +9,43 @@
  */
 package org.mule.test.tck;
 
-import org.mule.api.transport.Connector;
-import org.mule.tck.functional.CounterCallback;
-import org.mule.tck.functional.FunctionalTestComponent;
-import org.mule.tck.functional.ResponseWriterCallback;
-import org.mule.tck.junit4.FunctionalTestCase;
-import org.mule.tck.testmodels.mule.TestConnector;
-import org.mule.transport.ConfigurableKeyedObjectPool;
-import org.mule.transport.ConfigurableKeyedObjectPoolFactory;
-import org.mule.transport.DefaultConfigurableKeyedObjectPool;
-import org.mule.transport.DefaultConfigurableKeyedObjectPoolFactory;
-
-import java.io.IOException;
-
-import org.junit.Test;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-public class MuleTestNamespaceTestCase extends FunctionalTestCase
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collection;
+
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+import org.mule.api.transport.Connector;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.functional.CounterCallback;
+import org.mule.tck.functional.FunctionalTestComponent;
+import org.mule.tck.functional.ResponseWriterCallback;
+import org.mule.tck.testmodels.mule.TestConnector;
+import org.mule.transport.ConfigurableKeyedObjectPool;
+import org.mule.transport.ConfigurableKeyedObjectPoolFactory;
+import org.mule.transport.DefaultConfigurableKeyedObjectPool;
+import org.mule.transport.DefaultConfigurableKeyedObjectPoolFactory;
+
+public class MuleTestNamespaceTestCase extends AbstractServiceAndFlowTestCase
 {
-    @Override
-    protected String getConfigResources()
+    public MuleTestNamespaceTestCase(ConfigVariant variant, String configResources)
     {
-        return "test-namespace-config.xml";
+        super(variant, configResources);
+    }
+    
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "test-namespace-config-service.xml"},
+            {ConfigVariant.FLOW, "test-namespace-config-flow.xml"}
+        });
     }
 
     @Test

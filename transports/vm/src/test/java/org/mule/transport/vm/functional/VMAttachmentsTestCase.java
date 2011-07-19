@@ -10,30 +10,40 @@
 
 package org.mule.transport.vm.functional;
 
-import org.mule.DefaultMuleMessage;
-import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.junit4.FunctionalTestCase;
-
-import java.io.File;
-
-import javax.activation.DataHandler;
-import javax.activation.FileDataSource;
-
-import org.junit.Test;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-public class VMAttachmentsTestCase extends FunctionalTestCase
+import java.io.File;
+import java.util.Arrays;
+import java.util.Collection;
+
+import javax.activation.DataHandler;
+import javax.activation.FileDataSource;
+
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+import org.mule.DefaultMuleMessage;
+import org.mule.api.MuleMessage;
+import org.mule.module.client.MuleClient;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+
+public class VMAttachmentsTestCase extends AbstractServiceAndFlowTestCase
 {
 
-    @Override
-    protected String getConfigResources()
+    public VMAttachmentsTestCase(ConfigVariant variant, String configResources)
     {
-        return "vm/vm-attachments-test.xml";
+        super(variant, configResources);
+    }
+   
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "vm/vm-attachments-test-service.xml"},
+            {ConfigVariant.FLOW, "vm/vm-attachments-test-flow.xml"}
+        });
     }
 
     @Test

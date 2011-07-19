@@ -9,29 +9,40 @@
  */
 package org.mule.transport.vm.functional;
 
-import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.junit4.FunctionalTestCase;
-import org.mule.transaction.TransactionCoordination;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+import java.util.Arrays;
+import java.util.Collection;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+import org.mule.api.MuleMessage;
+import org.mule.module.client.MuleClient;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.transaction.TransactionCoordination;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
-public class VmTransactionTestCase extends FunctionalTestCase
-{
+public class VmTransactionTestCase extends AbstractServiceAndFlowTestCase
+{    
     protected static volatile boolean serviceComponentAck = false;
     protected static final Log logger = LogFactory.getLog(VmTransactionTestCase.class);
 
-    @Override
-    protected String getConfigResources()
+    public VmTransactionTestCase(ConfigVariant variant, String configResources)
     {
-        return "vm/vm-transaction.xml";
+        super(variant, configResources);
     }
-
+    
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "vm/vm-transaction-service.xml"},
+            {ConfigVariant.FLOW, "vm/vm-transaction-flow.xml"}
+        });
+    }
+   
     @Test
     public void testDispatch() throws Exception
     {

@@ -10,20 +10,22 @@
 
 package org.mule.transport.xmpp;
 
-import org.mule.module.client.MuleClient;
-import org.mule.tck.functional.FunctionalTestComponent;
-import org.mule.transport.xmpp.JabberSender.Callback;
-import org.mule.util.concurrent.Latch;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import org.jivesoftware.smack.packet.Message;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import org.junit.runners.Parameterized.Parameters;
+import org.mule.module.client.MuleClient;
+import org.mule.tck.functional.FunctionalTestComponent;
+import org.mule.transport.xmpp.JabberSender.Callback;
+import org.mule.util.concurrent.Latch;
 
 public class XmppMessageAsyncTestCase extends AbstractXmppTestCase
 {
@@ -32,10 +34,19 @@ public class XmppMessageAsyncTestCase extends AbstractXmppTestCase
 
     private CountDownLatch latch = new CountDownLatch(1);
 
-    @Override
-    protected String getXmppConfigResources()
+    public XmppMessageAsyncTestCase(ConfigVariant variant, String configResources)
     {
-        return "xmpp-message-async-config.xml";
+        super(variant, configResources);
+    }
+
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE,
+                AbstractXmppTestCase.COMMON_CONFIG + "," + "xmpp-message-async-config-service.xml"},
+            {ConfigVariant.FLOW,
+                AbstractXmppTestCase.COMMON_CONFIG + "," + "xmpp-message-async-config-flow.xml"}});
     }
 
     @Override

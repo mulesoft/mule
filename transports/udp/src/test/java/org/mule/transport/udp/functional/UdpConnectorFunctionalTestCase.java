@@ -10,31 +10,40 @@
 
 package org.mule.transport.udp.functional;
 
-import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.junit4.FunctionalTestCase;
+import static org.junit.Assert.fail;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
 import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+import org.mule.api.MuleMessage;
+import org.mule.module.client.MuleClient;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 
-import static org.junit.Assert.fail;
-
-public class UdpConnectorFunctionalTestCase extends FunctionalTestCase
+public class UdpConnectorFunctionalTestCase extends AbstractServiceAndFlowTestCase
 {
-
     public static final String MESSAGE = "hello";
     public static final int TOTAL_MESSAGE_COUNT = 1000;
     public static final int MAX_NUMBER_OF_BATCHES = 128;
     public static final long MAX_PAUSE_PERIOD = 2000;
     public static final long MIN_PAUSE_PERIOD = 10;
     public static final long BETWEEN_BATCH_PAUSE = 5000;
-
-    @Override
-    protected String getConfigResources()
+    
+    public UdpConnectorFunctionalTestCase(ConfigVariant variant, String configResources)
     {
-        return "udp-functional-test.xml";
+        super(variant, configResources);
+    }
+    
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "udp-functional-test-service.xml"},
+            {ConfigVariant.FLOW, "udp-functional-test-flow.xml"}
+        });
     }
 
     /**
