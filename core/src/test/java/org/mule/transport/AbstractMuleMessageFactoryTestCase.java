@@ -65,7 +65,7 @@ public abstract class AbstractMuleMessageFactoryTestCase extends AbstractMuleCon
         assertEquals(payload, message.getPayload());
     }
     
-    @Test
+    @Test // this test cannot use expected=MessageTypeNotSupportedException as it is not always exectued
     public void testUnsupportedPayloadType() throws Exception
     {
         if (runUnsuppoprtedTransportMessageTest == false)

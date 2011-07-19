@@ -27,7 +27,6 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 public class AjaxMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTestCase
 {
@@ -69,22 +68,14 @@ public class AjaxMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTe
         assertEquals("mp-value", message.getInvocationProperty("message-property"));
     }
     
-    @Test
+    @Test(expected=IllegalArgumentException.class)
     public void testMapPayloadWithoutData() throws Exception
     {
         Map<?, ?> payload = (Map<?, ?>) getValidTransportMessage();
         payload.remove(Bayeux.DATA_FIELD);
         
         MuleMessageFactory factory = createMuleMessageFactory();
-        try
-        {
-            factory.create(payload, encoding);
-            fail("Creating a MuleMessage from a map without " + Bayeux.DATA_FIELD + " key must fail");
-        }
-        catch (IllegalArgumentException iae)
-        {
-            // this one was expected
-        }
+        factory.create(payload, encoding);
     }
     
     @Test

@@ -11,34 +11,24 @@
 package org.mule.transport.file;
 
 import org.mule.transport.AbstractMuleMessageFactoryTestCase;
-import org.mule.util.FileUtils;
 
 import java.io.File;
 
-import static org.junit.Assert.assertTrue;
+import org.junit.Rule;
+import org.junit.rules.TemporaryFolder;
 
 public abstract class AbstractFileMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTestCase
 {
+    @Rule
+    public TemporaryFolder tempFolder = new TemporaryFolder();
+    
     protected File tempFile;
-    private File tmpDirectory;
 
     @Override
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
-
-        createWorkDirectory();
-        tempFile = File.createTempFile("simple", ".mule", tmpDirectory);
-    }
-
-    private void createWorkDirectory()
-    {
-        // The working directory is deleted on tearDown (see AbstractMuleTestCase.disposeManager)
-        tmpDirectory = FileUtils.newFile(muleContext.getConfiguration().getWorkingDirectory(), "tmp");
-        if (!tmpDirectory.exists())
-        {
-            assertTrue(tmpDirectory.mkdirs());
-        }
+        tempFile = tempFolder.newFile("simple.mule");
     }
     
     @Override
