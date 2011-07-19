@@ -14,17 +14,31 @@ import org.mule.api.MuleException;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.transport.Connector;
-import org.mule.tck.DynamicPortTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.soap.axis.AxisConnector;
 
-public class EndpointRetrievalMule2021TestCase extends DynamicPortTestCase
+import org.junit.Rule;
+import org.junit.Test;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
+public class EndpointRetrievalMule2021TestCase extends FunctionalTestCase
 {
 
+    @Rule
+    public DynamicPort dynamicPort = new DynamicPort("port1");
+
+    @Override
     protected String getConfigResources()
     {
         return "endpoint-retrieval-mule-2021-test.xml";
     }
 
+    @Test
     public void testLookupEndpoint() throws MuleException
     {
         Object endpoint1 = muleContext.getRegistry().lookupObject("Endpoint");
@@ -37,38 +51,41 @@ public class EndpointRetrievalMule2021TestCase extends DynamicPortTestCase
         assertNotNull(endpointBuiler);
 
         ImmutableEndpoint endpoint2 = (ImmutableEndpoint) muleContext.getRegistry().lookupObject(
-            "axis:http://localhost:" + getPorts().get(0) + "/mule/Service?method=toString");
+            "axis:http://localhost:" + dynamicPort.getNumber() + "/mule/Service?method=toString");
         // Null expected because lookupEndpoint does not create endpoints from uri's.
         assertNull(endpoint2);
     }
 
+    @Test
     public void testGetOutboundEndpoint() throws MuleException
     {
         ImmutableEndpoint endpoint1 = muleContext.getEndpointFactory().getOutboundEndpoint(
             "Endpoint");
         assertEndpointOk(endpoint1);
         ImmutableEndpoint endpoint2 = muleContext.getEndpointFactory().getOutboundEndpoint(
-            "axis:http://localhost:" + getPorts().get(0) + "/mule/Service?method=toString");
+            "axis:http://localhost:" + dynamicPort.getNumber() + "/mule/Service?method=toString");
         assertEndpointOk(endpoint2);
     }
 
+    @Test
     public void testGetInboundEndpoint() throws MuleException
     {
         ImmutableEndpoint endpoint1 = muleContext.getEndpointFactory().getInboundEndpoint(
             "Endpoint");
         assertEndpointOk(endpoint1);
         ImmutableEndpoint endpoint2 = muleContext.getEndpointFactory().getInboundEndpoint(
-            "axis:http://localhost:" + getPorts().get(0) + "/mule/Service?method=toString");
+            "axis:http://localhost:" + dynamicPort.getNumber() + "/mule/Service?method=toString");
         assertEndpointOk(endpoint2);
     }
 
+    @Test
     public void testGetResponseEndpoint() throws MuleException
     {
         ImmutableEndpoint endpoint1 = muleContext.getEndpointFactory().getInboundEndpoint(
             "Endpoint");
         assertEndpointOk(endpoint1);
         ImmutableEndpoint endpoint2 = muleContext.getEndpointFactory().getInboundEndpoint(
-            "axis:http://localhost:" + getPorts().get(0) + "/mule/Service?method=toString");
+            "axis:http://localhost:" + dynamicPort.getNumber() + "/mule/Service?method=toString");
         assertEndpointOk(endpoint2);
     }
 
@@ -77,12 +94,6 @@ public class EndpointRetrievalMule2021TestCase extends DynamicPortTestCase
         assertNotNull("Endpoint is null", endpoint);
         Connector connector = endpoint.getConnector();
         assertTrue("Connector not AXIS", connector instanceof AxisConnector);
-    }
-
-    @Override
-    protected int getNumPortsToFind()
-    {
-        return 1;
     }
 
 }

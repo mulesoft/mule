@@ -19,6 +19,9 @@ import org.mule.transport.jdbc.functional.AbstractJdbcFunctionalTestCase;
 
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.handlers.ArrayHandler;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * Verify that no inbound messages are lost when exceptions occur.  
@@ -57,6 +60,7 @@ public class InboundMessageLossTestCase extends AbstractJdbcFunctionalTestCase
         qr = jdbcConnector.getQueryRunner();
     }
 
+    @Test
     public void testNoException() throws Exception
     {
         assertEquals(1, qr.update(jdbcConnector.getConnection(), 
@@ -64,6 +68,7 @@ public class InboundMessageLossTestCase extends AbstractJdbcFunctionalTestCase
 
         prober.check(new Probe()
         {
+            @Override
             public boolean isSatisfied()
             {
                 try
@@ -79,6 +84,7 @@ public class InboundMessageLossTestCase extends AbstractJdbcFunctionalTestCase
                 }
             }
 
+            @Override
             public String describeFailure()
             {
                 return "Row should be acknowledged (marked read)";
@@ -86,6 +92,7 @@ public class InboundMessageLossTestCase extends AbstractJdbcFunctionalTestCase
         });
     }
     
+    @Test
     public void testTransformerException() throws Exception
     {
         assertEquals(1, qr.update(jdbcConnector.getConnection(), 
@@ -93,6 +100,7 @@ public class InboundMessageLossTestCase extends AbstractJdbcFunctionalTestCase
 
         prober.check(new Probe()
         {
+            @Override
             public boolean isSatisfied()
             {
                 try
@@ -108,6 +116,7 @@ public class InboundMessageLossTestCase extends AbstractJdbcFunctionalTestCase
                 }
             }
 
+            @Override
             public String describeFailure()
             {
                 return "Row should not be acknowledged (marked read)";
@@ -115,6 +124,7 @@ public class InboundMessageLossTestCase extends AbstractJdbcFunctionalTestCase
         });
     }
     
+    @Test
     public void testRouterException() throws Exception
     {
         assertEquals(1, qr.update(jdbcConnector.getConnection(), 
@@ -122,6 +132,7 @@ public class InboundMessageLossTestCase extends AbstractJdbcFunctionalTestCase
 
         prober.check(new Probe()
         {
+            @Override
             public boolean isSatisfied()
             {
                 try
@@ -137,6 +148,7 @@ public class InboundMessageLossTestCase extends AbstractJdbcFunctionalTestCase
                 }
             }
 
+            @Override
             public String describeFailure()
             {
                 return "Row should not be acknowledged (marked read)";
@@ -144,6 +156,7 @@ public class InboundMessageLossTestCase extends AbstractJdbcFunctionalTestCase
         });
     }
     
+    @Test
     public void testComponentException() throws Exception
     {
         assertEquals(1, qr.update(jdbcConnector.getConnection(), 
@@ -151,6 +164,7 @@ public class InboundMessageLossTestCase extends AbstractJdbcFunctionalTestCase
 
         prober.check(new Probe()
         {
+            @Override
             public boolean isSatisfied()
             {
                 try
@@ -167,6 +181,7 @@ public class InboundMessageLossTestCase extends AbstractJdbcFunctionalTestCase
                 }
             }
 
+            @Override
             public String describeFailure()
             {
                 return "Row should be acknowledged (marked read)";

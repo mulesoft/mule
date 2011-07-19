@@ -19,5 +19,4 @@ public class RmiFunctionalTestCase extends AbstractFunctionalTestCase
     {
         super("rmi", "rmi-functional-test.xml");
     }
-
 }

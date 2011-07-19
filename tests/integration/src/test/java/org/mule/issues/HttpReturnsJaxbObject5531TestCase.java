@@ -29,15 +29,6 @@ import static org.junit.Assert.assertTrue;
 
 public class HttpReturnsJaxbObject5531TestCase extends AbstractServiceAndFlowTestCase
 {
-    @Rule
-    public DynamicPort port1 = new DynamicPort("port1");
-
-    public HttpReturnsJaxbObject5531TestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-
-    }
-
     private static final String ZIP_RESPONSE = "<?xml version='1.0' encoding='utf-8'?><soap:Envelope xmlns:soap='http://schemas.xmlsoap.org/soap/envelope/' "
                                                + "xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xmlns:xsd='http://www.w3.org/2001/XMLSchema'>"
                                                + "<soap:Body><GetCityWeatherByZIPResponse xmlns='http://ws.cdyne.com/WeatherWS/'><GetCityWeatherByZIPResult>"
@@ -47,7 +38,8 @@ public class HttpReturnsJaxbObject5531TestCase extends AbstractServiceAndFlowTes
                                                + "<Pressure>29.91R</Pressure><Visibility /><WindChill /><Remarks /></GetCityWeatherByZIPResult>"
                                                + "</GetCityWeatherByZIPResponse></soap:Body></soap:Envelope>";
 
-
+    @Rule
+    public DynamicPort port1 = new DynamicPort("port1");
 
     @Parameters
     public static Collection<Object[]> parameters()
@@ -56,6 +48,11 @@ public class HttpReturnsJaxbObject5531TestCase extends AbstractServiceAndFlowTes
             "org/mule/issues/http-returns-jaxb-object-mule-5531-test.xml"}
 
         });
+    }
+
+    public HttpReturnsJaxbObject5531TestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
     }
 
     @Test

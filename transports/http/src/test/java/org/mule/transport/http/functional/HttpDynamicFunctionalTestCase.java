@@ -12,14 +12,26 @@ package org.mule.transport.http.functional;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.DynamicPortTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class HttpDynamicFunctionalTestCase extends DynamicPortTestCase
+import org.junit.Rule;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+
+public class HttpDynamicFunctionalTestCase extends FunctionalTestCase
 {
     protected static String TEST_REQUEST = "Test Http Request";
+
+    @Rule
+    public DynamicPort dynamicPort1 = new DynamicPort("port1");
+
+    @Rule
+    public DynamicPort dynamicPort2 = new DynamicPort("port2");
 
     @Override
     protected String getConfigResources()
@@ -27,25 +39,20 @@ public class HttpDynamicFunctionalTestCase extends DynamicPortTestCase
         return "http-dynamic-functional-test.xml";
     }
 
+    @Test
     public void testSend() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
 
         Map<String, Object> props = new HashMap<String, Object>();
-        props.put("port", getPorts().get(0));
+        props.put("port", dynamicPort1.getNumber());
         props.put("path", "foo");
 
         MuleMessage result = client.send("clientEndpoint", TEST_REQUEST, props);
         assertEquals(TEST_REQUEST + " Received 1", result.getPayloadAsString());
 
-        props.put("port", getPorts().get(1));
+        props.put("port", dynamicPort2.getNumber());
         result = client.send("clientEndpoint", TEST_REQUEST, props);
         assertEquals(TEST_REQUEST + " Received 2", result.getPayloadAsString());
-    }
-
-    @Override
-    protected int getNumPortsToFind()
-    {
-        return 2;
     }
 }

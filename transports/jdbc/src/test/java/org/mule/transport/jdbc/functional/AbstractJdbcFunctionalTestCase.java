@@ -11,25 +11,34 @@
 package org.mule.transport.jdbc.functional;
 
 import org.mule.api.MuleMessage;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.util.MuleDerbyTestUtils;
 import org.mule.transport.jdbc.JdbcConnector;
 import org.mule.transport.jdbc.JdbcUtils;
 
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.List;
 
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.handlers.ArrayListHandler;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+
+import static junit.framework.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 
 public abstract class AbstractJdbcFunctionalTestCase extends FunctionalTestCase
 {
+
     protected static final String[] TEST_VALUES = {"Test", "The Moon", "Terra"};
 
     protected JdbcConnector jdbcConnector;
 
     private boolean populateTestData = true;
 
+    @Override
     protected String getConfigResources()
     {
         return "jdbc-connector.xml";
@@ -60,7 +69,10 @@ public abstract class AbstractJdbcFunctionalTestCase extends FunctionalTestCase
     @Override
     protected void doTearDown() throws Exception
     {
-        deleteTable();
+        if (jdbcConnector != null)
+        {
+            deleteTable();
+        }
 
         super.doTearDown();
     }
@@ -90,12 +102,17 @@ public abstract class AbstractJdbcFunctionalTestCase extends FunctionalTestCase
         updated = qr.update(jdbcConnector.getConnection(), "INSERT INTO TEST(TYPE, DATA) VALUES (3, '" + TEST_VALUES[2] + "')");
         logger.debug(updated + " rows updated");
     }
-    
-    @Override
-    protected void suitePreSetUp() throws Exception
+
+    @BeforeClass
+    public static void startDatabase() throws Exception
     {
         MuleDerbyTestUtils.defaultDerbyCleanAndInit("derby.properties", "database.name");
-        super.suitePreSetUp();
+    }
+
+    @AfterClass
+    public static void stopDatabase() throws SQLException
+    {
+        MuleDerbyTestUtils.stopDatabase();
     }
 
     /*

@@ -10,13 +10,14 @@
 
 package org.mule.transport.tcp.integration;
 
+import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.util.SystemUtils;
+
 import java.util.Arrays;
 import java.util.Collection;
 
 import org.junit.Rule;
 import org.junit.runners.Parameterized.Parameters;
-import org.mule.tck.junit4.rule.DynamicPort;
-import org.mule.util.SystemUtils;
 
 /**
  * Tests a model for which synchonous=true for environment (was "and connector", but
@@ -37,9 +38,18 @@ public class StreamingSynchCapacityTestCase extends AbstractStreamingCapacityTes
     @Rule
     public DynamicPort port2 = new DynamicPort("port2");
 
-    public StreamingSynchCapacityTestCase(ConfigVariant variant, String configResources, long size)
+    @Parameters
+    public static Collection<Object[]> parameters()
     {
-        super(variant, configResources, size);
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "tcp-streaming2-test-service.xml"},
+            {ConfigVariant.FLOW, "tcp-streaming2-test-flow.xml"}
+        });
+    }
+
+    public StreamingSynchCapacityTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources, 100 * ONE_MB);
     }
 
     @Override
@@ -48,13 +58,4 @@ public class StreamingSynchCapacityTestCase extends AbstractStreamingCapacityTes
         // MULE-4713
         return (SystemUtils.isIbmJDK() && SystemUtils.isJavaVersionAtLeast(160));
     }
-
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "tcp-streaming2-test-service.xml", 100 * ONE_MB},
-            {ConfigVariant.FLOW, "tcp-streaming2-test-flow.xml", 100 * ONE_MB}});
-    }
-
 }

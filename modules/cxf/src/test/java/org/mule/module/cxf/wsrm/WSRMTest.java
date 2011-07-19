@@ -14,34 +14,43 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.client.DefaultLocalMuleClient;
-import org.mule.tck.DynamicPortTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 
-public class WSRMTest extends DynamicPortTestCase
+import org.junit.Rule;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+
+public class WSRMTest extends FunctionalTestCase
 {
-    public void testAnonymous() throws Exception
-    {
-        MuleClient client = new DefaultLocalMuleClient(muleContext);
-        MuleMessage result = client.send("anonymousReplyClientEndpoint", new DefaultMuleMessage("test", muleContext));        
-        assertEquals("Hello test", result.getPayloadAsString());
-    }
 
-    public void testDecoupled() throws Exception
-    {
-        MuleClient client = new DefaultLocalMuleClient(muleContext);
-        MuleMessage result = client.send("decoupledClientEndpoint", new DefaultMuleMessage("test", muleContext));        
-        assertEquals("Hello test", result.getPayloadAsString());
-    }
-    
+    @Rule
+    public DynamicPort dynamicPort1 = new DynamicPort("port1");
+
+    @Rule
+    public DynamicPort dynamicPort2 = new DynamicPort("port2");
+
     @Override
     protected String getConfigResources()
     {
         return "org/mule/module/cxf/wsrm/wsrm-conf.xml";
     }
 
-    @Override
-    protected int getNumPortsToFind()
+    @Test
+    public void testAnonymous() throws Exception
     {
-        return 2;
+        MuleClient client = new DefaultLocalMuleClient(muleContext);
+        MuleMessage result = client.send("anonymousReplyClientEndpoint", new DefaultMuleMessage("test", muleContext));
+        assertEquals("Hello test", result.getPayloadAsString());
+    }
+
+    @Test
+    public void testDecoupled() throws Exception
+    {
+        MuleClient client = new DefaultLocalMuleClient(muleContext);
+        MuleMessage result = client.send("decoupledClientEndpoint", new DefaultMuleMessage("test", muleContext));
+        assertEquals("Hello test", result.getPayloadAsString());
     }
 
 }

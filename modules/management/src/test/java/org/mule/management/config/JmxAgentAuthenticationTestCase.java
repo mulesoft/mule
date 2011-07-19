@@ -10,7 +10,8 @@
 
 package org.mule.management.config;
 
-import org.mule.tck.DynamicPortTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -24,34 +25,31 @@ import javax.management.remote.JMXConnector;
 import javax.management.remote.JMXConnectorFactory;
 import javax.management.remote.JMXServiceURL;
 
-public class JmxAgentAuthenticationTestCase extends DynamicPortTestCase
+import org.junit.Rule;
+import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
+
+public class JmxAgentAuthenticationTestCase extends FunctionalTestCase
 {
+
+    @Rule
+    public DynamicPort dynamicPort = new DynamicPort("port1");
+
     @Override
     protected String getConfigResources()
     {
         return "jmx-authentication-config.xml";
     }
 
-    @Override
-    protected int getNumPortsToFind()
-    {
-        return 1;
-    }
-
+    @Test(expected = SecurityException.class)
     public void testAccessJmxServerWithoutCredentials() throws Exception
     {
-        try
-        {
-            JMXServiceURL serviceUrl = createServiceUrl();
-            JMXConnectorFactory.connect(serviceUrl);
-            fail("Accessing a secured jmx server without credentials must fail");
-        }
-        catch (SecurityException se)
-        {
-            // this one is expected
-        }
+        JMXServiceURL serviceUrl = createServiceUrl();
+        JMXConnectorFactory.connect(serviceUrl);
     }
 
+    @Test
     public void testAccessJmxServerWithValidCredentials() throws Exception
     {
         JMXConnector connector = connectToJmx("jsmith", "foo");
@@ -63,24 +61,17 @@ public class JmxAgentAuthenticationTestCase extends DynamicPortTestCase
         assertNotNull(instance);
     }
 
+    @Test(expected = SecurityException.class)
     public void testAccessJmxServerWithInvalidCredentials() throws Exception
     {
-        try
-        {
-            connectToJmx("invalid", "user");
-            fail("Accessing a secured jmx server with invalid credentials must fail");
-        }
-        catch (SecurityException se)
-        {
-            // this one was expected
-        }
+        connectToJmx("invalid", "user");
     }
 
     private JMXConnector connectToJmx(String user, String password) throws IOException
     {
         JMXServiceURL serviceUrl = createServiceUrl();
 
-        String[] authToken = new String[] { user, password };
+        String[] authToken = new String[] {user, password};
         Map<String, ?> environment = Collections.singletonMap(JMXConnector.CREDENTIALS, authToken);
 
         return JMXConnectorFactory.connect(serviceUrl, environment);
@@ -89,7 +80,7 @@ public class JmxAgentAuthenticationTestCase extends DynamicPortTestCase
     private JMXServiceURL createServiceUrl() throws MalformedURLException
     {
         String url = String.format("service:jmx:rmi:///jndi/rmi://localhost:%d/server",
-            getPorts().get(0));
+                                   dynamicPort.getNumber());
         return new JMXServiceURL(url);
     }
 }

@@ -12,11 +12,24 @@ package org.mule.transport.http.functional;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.DynamicPortTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.http.HttpConstants;
 
-public class HttpHeadersTestCase extends DynamicPortTestCase
+import org.junit.Rule;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+public class HttpHeadersTestCase extends FunctionalTestCase
 {
+
+    @Rule
+    public DynamicPort dynamicPort1 = new DynamicPort("port1");
+
+    @Rule
+    public DynamicPort dynamicPort2 = new DynamicPort("port2");
 
     @Override
     protected String getConfigResources()
@@ -24,6 +37,7 @@ public class HttpHeadersTestCase extends DynamicPortTestCase
         return "http-headers-config.xml";
     }
 
+    @Test
     public void testJettyHeaders() throws Exception 
     {
         MuleClient client = new MuleClient(muleContext);
@@ -36,12 +50,6 @@ public class HttpHeadersTestCase extends DynamicPortTestCase
         String contentDispositionProperty = result.getInboundProperty(HttpConstants.HEADER_CONTENT_DISPOSITION);
         assertNotNull(contentDispositionProperty);
         assertEquals("attachment; filename=foo.zip", contentDispositionProperty);
-    }
-
-    @Override
-    protected int getNumPortsToFind()
-    {
-        return 2;
     }
 
 }

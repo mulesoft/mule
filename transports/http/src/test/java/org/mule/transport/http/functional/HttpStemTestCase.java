@@ -13,23 +13,35 @@ package org.mule.transport.http.functional;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.DynamicPortTestCase;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
+import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.http.HttpConnector;
 
-public class HttpStemTestCase extends DynamicPortTestCase
+import org.junit.Rule;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+public class HttpStemTestCase extends FunctionalTestCase
 {
+
+    @Rule
+    public DynamicPort dynamicPort = new DynamicPort("port1");
+
     @Override
     protected String getConfigResources()
     {
         return "http-stem-test.xml";
     }
 
+    @Test
     public void testStemMatching() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
-        int port = getPorts().get(0);
+        int port = dynamicPort.getNumber();
         doTest(client, "http://localhost:" + port + "/foo", "/foo", "/foo");
         doTest(client, "http://localhost:" + port + "/foo/baz", "/foo", "/foo/baz");
         doTest(client, "http://localhost:" + port + "/bar", "/bar", "/bar");
@@ -60,9 +72,4 @@ public class HttpStemTestCase extends DynamicPortTestCase
         assertEquals(200, status);
     }
 
-    @Override
-    protected int getNumPortsToFind()
-    {
-        return 1;
-    }
 }

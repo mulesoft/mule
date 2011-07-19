@@ -10,36 +10,42 @@
 
 package org.mule.module.cxf.employee;
 
-import org.mule.tck.DynamicPortTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 
-public class MtomClientTestCase extends DynamicPortTestCase
+import org.junit.Rule;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+public class MtomClientTestCase extends FunctionalTestCase
 {
 
-    public void testEchoService() throws Exception
-    {
-        EmployeeDirectoryImpl svc = (EmployeeDirectoryImpl) getComponent("employeeDirectoryService");
-        
-        int count = 0;
-        while (svc.getInvocationCount() == 0 && count < 5000) {
-            count += 500;
-            Thread.sleep(500);
-        }
-        
-        assertEquals(1, svc.getInvocationCount());
-        
-        // ensure that an attachment was actually sent.
-        assertTrue(AttachmentVerifyInterceptor.HasAttachments);
-    }
+    @Rule
+    public DynamicPort dynamicPort = new DynamicPort("port1");
 
+    @Override
     protected String getConfigResources()
     {
         return "mtom-client-conf.xml";
     }
 
-    @Override
-    protected int getNumPortsToFind()
+    @Test
+    public void testEchoService() throws Exception
     {
-        return 1;
+        EmployeeDirectoryImpl svc = (EmployeeDirectoryImpl) getComponent("employeeDirectoryService");
+
+        int count = 0;
+        while (svc.getInvocationCount() == 0 && count < 5000) {
+            count += 500;
+            Thread.sleep(500);
+        }
+
+        assertEquals(1, svc.getInvocationCount());
+
+        // ensure that an attachment was actually sent.
+        assertTrue(AttachmentVerifyInterceptor.HasAttachments);
     }
 
 }

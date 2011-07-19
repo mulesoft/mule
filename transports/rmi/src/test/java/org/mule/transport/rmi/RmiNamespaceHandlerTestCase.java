@@ -9,17 +9,25 @@
  */
 package org.mule.transport.rmi;
 
-import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.jndi.InMemoryContext;
-import org.mule.transport.rmi.RmiConnector;
+import org.mule.tck.junit4.FunctionalTestCase;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class RmiNamespaceHandlerTestCase extends FunctionalTestCase
 {
+
+    @Override
     protected String getConfigResources()
     {
         return "rmi-namespace-config.xml";
     }
 
+    @Test
     public void testConfig() throws Exception
     {
         RmiConnector c = (RmiConnector) muleContext.getRegistry().lookupConnector("rmiConnector");
@@ -39,6 +47,7 @@ public class RmiNamespaceHandlerTestCase extends FunctionalTestCase
         assertEquals("hij", c.getJndiProviderProperties().get("ghi"));
     }
 
+    @Test
     public void testConfig2() throws Exception
     {
         RmiConnector c = (RmiConnector) muleContext.getRegistry().lookupConnector("rmiConnector2");

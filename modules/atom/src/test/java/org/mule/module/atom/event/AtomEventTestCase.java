@@ -12,7 +12,8 @@ package org.mule.module.atom.event;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
-import org.mule.tck.DynamicPortTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -29,19 +30,23 @@ import org.apache.abdera.model.Entry;
 import org.apache.abdera.model.Feed;
 import org.apache.abdera.protocol.client.AbderaClient;
 import org.apache.abdera.protocol.client.ClientResponse;
+import org.junit.Rule;
+import org.junit.Test;
 
-public class AtomEventTestCase extends DynamicPortTestCase
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+public class AtomEventTestCase extends FunctionalTestCase
 {
+
+    @Rule
+    public DynamicPort dynamicPort = new DynamicPort("port1");
+    
     @Override
     protected String getConfigResources()
     {
         return "atom-builder-conf.xml";
-    }
-
-    @Override
-    protected int getNumPortsToFind()
-    {
-        return 1;
     }
 
     @Override
@@ -51,6 +56,7 @@ public class AtomEventTestCase extends DynamicPortTestCase
         super.doTearDown();
     }
 
+    @Test
     public void testCustomProvider() throws Exception
     {
         MuleClient client = muleContext.getClient();
@@ -59,7 +65,7 @@ public class AtomEventTestCase extends DynamicPortTestCase
         Thread.sleep(1000);
 
         AbderaClient aClient = new AbderaClient();
-        String url = "http://localhost:" + getPorts().get(0) + "/events";
+        String url = "http://localhost:" + dynamicPort.getNumber() + "/events";
         ClientResponse res = aClient.get(url);
 
         Document<Feed> doc = res.getDocument();
@@ -72,6 +78,7 @@ public class AtomEventTestCase extends DynamicPortTestCase
         assertEquals("Foo Bar", e.getTitle());
     }
 
+    @Test
     public void testMessageTransformation() throws Exception
     {
         MuleClient client = muleContext.getClient();

@@ -15,7 +15,8 @@ import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.config.i18n.LocaleMessageHandler;
 import org.mule.module.client.MuleClient;
 import org.mule.module.xml.util.XMLUtils;
-import org.mule.tck.DynamicPortTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.http.HttpConstants;
 import org.mule.util.IOUtils;
 
@@ -27,10 +28,25 @@ import java.util.Map;
 import javax.xml.transform.TransformerFactoryConfigurationError;
 
 import org.custommonkey.xmlunit.XMLUnit;
+import org.junit.Rule;
+import org.junit.Test;
 
-public class CxfBasicTestCase extends DynamicPortTestCase
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+public class CxfBasicTestCase extends FunctionalTestCase
 {
     private String echoWsdl;
+
+    @Rule
+    public DynamicPort dynamicPort = new DynamicPort("port1");
+
+    @Override
+    protected String getConfigResources()
+    {
+        return "basic-conf.xml";
+    }
 
     @Override
     protected void doSetUp() throws Exception
@@ -48,6 +64,7 @@ public class CxfBasicTestCase extends DynamicPortTestCase
         }
     }
 
+    @Test
     public void testEchoService() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -62,6 +79,7 @@ public class CxfBasicTestCase extends DynamicPortTestCase
         assertEquals("text/xml; charset=UTF-8", ct);
     }
 
+    @Test
     public void testEchoServiceEncoding() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -76,6 +94,7 @@ public class CxfBasicTestCase extends DynamicPortTestCase
         assertEquals("text/xml; charset=UTF-8", ct);
     }
 
+    @Test
     public void testEchoWsdl() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -84,17 +103,6 @@ public class CxfBasicTestCase extends DynamicPortTestCase
                         .lookupObject("httpInbound")).getAddress() + "?wsdl", 5000);
         assertNotNull(result.getPayload());
         XMLUnit.compareXML(echoWsdl, result.getPayloadAsString());
-    }
-
-    protected String getConfigResources()
-    {
-        return "basic-conf.xml";
-    }
-
-    @Override
-    protected int getNumPortsToFind()
-    {
-        return 1;
     }
 
 }

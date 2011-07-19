@@ -10,8 +10,13 @@
 
 package org.mule.transport.tcp;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import org.mule.DefaultMuleMessage;
+import org.mule.api.MuleMessage;
+import org.mule.api.config.MuleProperties;
+import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.module.client.MuleClient;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -21,27 +26,23 @@ import java.util.Map;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-import org.mule.DefaultMuleMessage;
-import org.mule.api.MuleMessage;
-import org.mule.api.config.MuleProperties;
-import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
-import org.mule.tck.junit4.rule.DynamicPort;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class TcpRemoteSyncTestCase extends AbstractServiceAndFlowTestCase
 {
-
     public static final String message = "mule";
 
     @Rule
-    public DynamicPort port1 = new DynamicPort("port1");
+    public DynamicPort dynamicPort1 = new DynamicPort("port1");
 
     @Rule
-    public DynamicPort port2 = new DynamicPort("port2");
+    public DynamicPort dynamicPort2 = new DynamicPort("port2");
 
     @Rule
-    public DynamicPort port3 = new DynamicPort("port3");
+    public DynamicPort dynamicPort3 = new DynamicPort("port3");
+
 
     public TcpRemoteSyncTestCase(ConfigVariant variant, String configResources)
     {
@@ -63,9 +64,8 @@ public class TcpRemoteSyncTestCase extends AbstractServiceAndFlowTestCase
 
         // must notify the client to wait for a response from the server
         props.put(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, Boolean.TRUE);
-        MuleMessage reply = client.send(((InboundEndpoint) client.getMuleContext()
-            .getRegistry()
-            .lookupObject("echoInTcp")).getAddress(), new DefaultMuleMessage(message, muleContext), props);
+        MuleMessage reply = client.send(((InboundEndpoint) client.getMuleContext().getRegistry().lookupObject("echoInTcp")).getAddress(), 
+            new DefaultMuleMessage(message, muleContext), props);
 
         assertNotNull(reply);
         assertNotNull(reply.getPayload());
@@ -78,12 +78,11 @@ public class TcpRemoteSyncTestCase extends AbstractServiceAndFlowTestCase
         MuleClient client = new MuleClient(muleContext);
         Map<String, Object> props = new HashMap<String, Object>();
 
-        // must notify the client to wait for a response from the server
+        //must notify the client to wait for a response from the server
         props.put(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, Boolean.TRUE);
 
-        MuleMessage reply = client.send(((InboundEndpoint) client.getMuleContext()
-            .getRegistry()
-            .lookupObject("echo2InTcp")).getAddress(), new DefaultMuleMessage(message, muleContext), props);
+        MuleMessage reply = client.send(((InboundEndpoint) client.getMuleContext().getRegistry().lookupObject("echo2InTcp")).getAddress(),
+            new DefaultMuleMessage(message, muleContext), props);
 
         assertNotNull(reply);
         assertNotNull(reply.getPayload());

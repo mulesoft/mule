@@ -13,11 +13,18 @@ package org.mule.module.cxf.functional;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.DynamicPortTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.util.Map;
 
-public class CxfContentTypeTestCase extends DynamicPortTestCase
+import org.junit.Rule;
+import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+public class CxfContentTypeTestCase extends FunctionalTestCase
 {
     private static final String requestPayload =
         "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\"\n" +
@@ -29,12 +36,8 @@ public class CxfContentTypeTestCase extends DynamicPortTestCase
             "</soap:Body>\n" +
             "</soap:Envelope>";
 
-
-    @Override
-    protected int getNumPortsToFind()
-    {
-        return 1;
-    }
+    @Rule
+    public DynamicPort dynamicPort = new DynamicPort("port1");
 
     @Override
     protected String getConfigResources()
@@ -42,16 +45,18 @@ public class CxfContentTypeTestCase extends DynamicPortTestCase
         return "cxf-echo-service-conf.xml";
     }
 
+    @Test
     public void testCxfService() throws Exception
     {
         MuleMessage request = new DefaultMuleMessage(requestPayload, (Map<String,Object>)null, muleContext);
         MuleClient client = new MuleClient(muleContext);
-        MuleMessage received = client.send("http://localhost:" + getPorts().get(0) + "/hello", request);
+        MuleMessage received = client.send("http://localhost:" + dynamicPort.getNumber() + "/hello", request);
         String contentType = received.getInboundProperty("content-type");
         assertNotNull(contentType);
         assertTrue(contentType.contains("charset"));
     }
 
+    @Test
     public void testCxfClient() throws Exception
     {
         MuleMessage request = new DefaultMuleMessage("hello", (Map<String,Object>)null, muleContext);

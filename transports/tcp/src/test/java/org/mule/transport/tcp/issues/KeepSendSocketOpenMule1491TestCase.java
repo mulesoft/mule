@@ -12,7 +12,8 @@ package org.mule.transport.tcp.issues;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.DynamicPortTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.tcp.protocols.LengthProtocol;
 
 import java.io.BufferedInputStream;
@@ -25,9 +26,23 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class KeepSendSocketOpenMule1491TestCase extends DynamicPortTestCase 
+import org.junit.Rule;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+
+public class KeepSendSocketOpenMule1491TestCase extends FunctionalTestCase
 {
     protected static String TEST_TCP_MESSAGE = "Test TCP Request";
+
+    @Rule
+    public DynamicPort dynamicPort1 = new DynamicPort("port1");
+
+    @Rule
+    public DynamicPort dynamicPort2 = new DynamicPort("port2");
+
+    @Rule
+    public DynamicPort dynamicPort3 = new DynamicPort("port3");
 
     @Override
     protected String getConfigResources()
@@ -35,6 +50,7 @@ public class KeepSendSocketOpenMule1491TestCase extends DynamicPortTestCase
         return "tcp-keep-send-socket-open.xml";
     }
 
+    @Test
     public void testSend() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -65,14 +81,16 @@ public class KeepSendSocketOpenMule1491TestCase extends DynamicPortTestCase
         }
     }
 
+    @Test
     public void testOpen() throws Exception
     {
-        useServer("tcp://localhost:" + getPorts().get(1) + "?connector=openConnectorLength", getPorts().get(1), 1);
+        useServer("tcp://localhost:" + dynamicPort2.getNumber() + "?connector=openConnectorLength", dynamicPort2.getNumber(), 1);
     }
 
+    @Test
     public void testClose() throws Exception
     {
-        useServer("tcp://localhost:" + getPorts().get(2) + "?connector=closeConnectorLength", getPorts().get(2), 2);
+        useServer("tcp://localhost:" + dynamicPort3.getNumber() + "?connector=closeConnectorLength", dynamicPort3.getNumber(), 2);
     }
 
     @SuppressWarnings("synthetic-access")
@@ -94,6 +112,7 @@ public class KeepSendSocketOpenMule1491TestCase extends DynamicPortTestCase
             return count.get();
         }
 
+        @Override
         public void run()
         {
             try
@@ -142,11 +161,5 @@ public class KeepSendSocketOpenMule1491TestCase extends DynamicPortTestCase
                 // no-op
             }
         }
-    }
-
-    @Override
-    protected int getNumPortsToFind()
-    {
-        return 3;
     }
 }

@@ -29,19 +29,6 @@ public class FileToTcpStreamingTestCase extends AbstractServiceAndFlowTestCase
     @Rule
     public DynamicPort port1 = new DynamicPort("port1");
 
-    public FileToTcpStreamingTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-
-    }
-
-    @Override
-    protected void doTearDown() throws Exception
-    {
-        FileUtils.deleteDirectory(FileUtils.newFile(muleContext.getConfiguration().getWorkingDirectory()
-                                                    + "/test-data"));
-    }
-
     @Parameters
     public static Collection<Object[]> parameters()
     {
@@ -49,6 +36,18 @@ public class FileToTcpStreamingTestCase extends AbstractServiceAndFlowTestCase
             {ConfigVariant.SERVICE, "org/mule/test/integration/streaming/file-to-tcp-streaming-service.xml"},
             {ConfigVariant.FLOW, "org/mule/test/integration/streaming/file-to-tcp-streaming-flow.xml"}
         });
+    }
+
+    public FileToTcpStreamingTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
+    }
+
+    @Override
+    protected void doTearDown() throws Exception
+    {
+        FileUtils.deleteDirectory(FileUtils.newFile(muleContext.getConfiguration().getWorkingDirectory()
+                                                    + "/test-data"));
     }
 
     @Test

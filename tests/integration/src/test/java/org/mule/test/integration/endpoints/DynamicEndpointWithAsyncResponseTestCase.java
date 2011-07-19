@@ -31,12 +31,6 @@ public class DynamicEndpointWithAsyncResponseTestCase extends AbstractServiceAnd
     @Rule
     public DynamicPort port1 = new DynamicPort("port1");
 
-    public DynamicEndpointWithAsyncResponseTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-
-    }
-
     @Parameters
     public static Collection<Object[]> parameters()
     {
@@ -46,10 +40,14 @@ public class DynamicEndpointWithAsyncResponseTestCase extends AbstractServiceAnd
         });
     }
 
+    public DynamicEndpointWithAsyncResponseTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
+    }
+
     @Test
     public void testDynamicEndpointWithAsyncResponse() throws Exception
     {
-
         DefaultMuleMessage message = new DefaultMuleMessage("hello", muleContext);
         message.setOutboundProperty("host", "localhost");
         message.setOutboundProperty("port", port1.getNumber());

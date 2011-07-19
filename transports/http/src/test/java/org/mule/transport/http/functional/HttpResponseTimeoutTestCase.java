@@ -13,22 +13,34 @@ package org.mule.transport.http.functional;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.DynamicPortTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.util.ExceptionUtils;
 
 import java.net.SocketTimeoutException;
 import java.util.Date;
 
+import org.junit.Rule;
+import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 /**
  * See MULE-4491 "Http outbound endpoint does not use responseTimeout attribute"
  * See MULE-4743 "MuleClient.send() timeout is not respected with http transport"
  */
-public class HttpResponseTimeoutTestCase extends DynamicPortTestCase
+public class HttpResponseTimeoutTestCase extends FunctionalTestCase
 {
 
     protected static String PAYLOAD = "Eugene";
     protected static int DEFAULT_RESPONSE_TIMEOUT = 2000;
     protected MuleClient muleClient;
+
+    @Rule
+    public DynamicPort dynamicPort = new DynamicPort("port1");
 
     @Override
     protected String getConfigResources()
@@ -53,6 +65,7 @@ public class HttpResponseTimeoutTestCase extends DynamicPortTestCase
         muleClient = new MuleClient(muleContext);
     }
 
+    @Test
     public void testDecreaseOutboundEndpointResponseTimeout() throws Exception
     {
         Date beforeCall = new Date();
@@ -73,6 +86,7 @@ public class HttpResponseTimeoutTestCase extends DynamicPortTestCase
         assertTrue((afterCall.getTime() - beforeCall.getTime()) < DEFAULT_RESPONSE_TIMEOUT);
     }
 
+    @Test
     public void testIncreaseOutboundEndpointResponseTimeout() throws Exception
     {
         Date beforeCall = new Date();
@@ -87,10 +101,10 @@ public class HttpResponseTimeoutTestCase extends DynamicPortTestCase
         assertTrue((afterCall.getTime() - beforeCall.getTime()) > DEFAULT_RESPONSE_TIMEOUT);
     }
 
+    @Test
     public void testDecreaseMuleClientSendResponseTimeout() throws Exception
     {
         Date beforeCall = new Date();
-        MuleMessage message;
         Date afterCall;
 
         try
@@ -109,6 +123,7 @@ public class HttpResponseTimeoutTestCase extends DynamicPortTestCase
         assertTrue((afterCall.getTime() - beforeCall.getTime()) < DEFAULT_RESPONSE_TIMEOUT);
     }
 
+    @Test
     public void testIncreaseMuleClientSendResponseTimeout() throws Exception
     {
         Date beforeCall = new Date();
@@ -120,12 +135,6 @@ public class HttpResponseTimeoutTestCase extends DynamicPortTestCase
         assertNull(message.getExceptionPayload());
         assertNotNull(getProcessedPayload(), message.getPayloadAsString());
         assertTrue((afterCall.getTime() - beforeCall.getTime()) > DEFAULT_RESPONSE_TIMEOUT);
-    }
-
-    @Override
-    protected int getNumPortsToFind()
-    {
-        return 1;
     }
 
 }

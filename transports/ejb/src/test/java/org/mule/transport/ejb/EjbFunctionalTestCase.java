@@ -21,16 +21,22 @@ import org.mule.transport.rmi.RmiConnector;
 
 import java.util.Properties;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 /**
  * test EJB object invocations
  */
 public class EjbFunctionalTestCase extends AbstractFunctionalTestCase
 {
+    
     public EjbFunctionalTestCase()
     {
         super("ejb", "ejb-functional-test.xml");
     }
 
+    @Override
     public void testCase() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);

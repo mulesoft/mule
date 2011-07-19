@@ -10,30 +10,34 @@
 
 package org.mule.transport.udp.functional;
 
-import org.mule.tck.DynamicPortTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.udp.util.UdpClient;
 
-public class UdpResponseTransformerTestCase extends DynamicPortTestCase
+import org.junit.Rule;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+
+public class UdpResponseTransformerTestCase extends FunctionalTestCase
 {
+
+    @Rule
+    public DynamicPort dynamicPort = new DynamicPort("port1");
+
     @Override
     protected String getConfigResources()
     {
         return "udp-response-transformer-config.xml";
     }
 
-    @Override
-    protected int getNumPortsToFind()
-    {
-        return 1;
-    }
-
+    @Test
     public void testResponseTransformer() throws Exception
     {
         UdpClient client = null;
         try
         {
-            int port = getPorts().get(0).intValue();
-            client = new UdpClient(port);
+            client = new UdpClient(dynamicPort.getNumber());
             byte[] response = client.send(TEST_MESSAGE);
 
             String expected = TEST_MESSAGE + " In Out Out2";

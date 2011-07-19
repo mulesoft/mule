@@ -13,7 +13,8 @@ package org.mule.transport.soap.axis.style;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.DynamicPortTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.soap.axis.NamedParameter;
 import org.mule.transport.soap.axis.SoapMethod;
 import org.mule.util.StringUtils;
@@ -26,10 +27,18 @@ import javax.xml.rpc.ParameterMode;
 
 import org.apache.axis.client.Call;
 import org.apache.axis.client.Service;
+import org.junit.Rule;
+import org.junit.Test;
 
-public class AxisMessageStyleServiceTestCase extends DynamicPortTestCase
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+public class AxisMessageStyleServiceTestCase extends FunctionalTestCase
 {
     private static String expectedResult = "TEST RESPONSE";
+
+    @Rule
+    public DynamicPort dynamicPort = new DynamicPort("port1");
 
     @Override
     public String getConfigResources()
@@ -39,74 +48,86 @@ public class AxisMessageStyleServiceTestCase extends DynamicPortTestCase
 
     protected String getServiceEndpoint()
     {
-        return "http://localhost:" + getPorts().get(0) + "/ServiceEntryPoint";
+        return "http://localhost:" + dynamicPort.getNumber() + "/ServiceEntryPoint";
     }
 
+    @Test
     public void testDocumentWithNamespace() throws Exception
     {
         doSoapRequest(new QName("http://muleumo.org", "document"), "axis:" + getServiceEndpoint(), false,
             false, false);
     }
 
+    @Test
     public void testDocumentWithQName() throws Exception
     {
         doSoapRequest(new QName("http://muleumo.org", "document"), "axis:" + getServiceEndpoint(), false,
             false, true);
     }
 
+    @Test
     public void testDocumentWithAxisApi() throws Exception
     {
         doSoapRequest(new QName("http://muleumo.org", "document"), getServiceEndpoint(), true, false, false);
     }
 
+    @Test
     public void testDocumentWithSoapMethod() throws Exception
     {
         doSoapRequest(new QName("http://muleumo.org", "document"), "axis:" + getServiceEndpoint(), false,
             true, false);
     }
 
+    @Test
     public void testElementArrayWithSoapMethod() throws Exception
     {
         doSoapRequest(new QName("http://muleumo.org", "elementArray"), "axis:" + getServiceEndpoint(), false,
             true, false);
     }
 
+    @Test
     public void testElementArrayWithNamesapce() throws Exception
     {
         doSoapRequest(new QName("http://muleumo.org", "elementArray"), "axis:" + getServiceEndpoint(), false,
             false, false);
     }
 
+    @Test
     public void testElementArrayWithQName() throws Exception
     {
         doSoapRequest(new QName("http://muleumo.org", "elementArray"), "axis:" + getServiceEndpoint(), false,
             false, true);
     }
 
+    @Test
     public void testElementArrayWithAxisApi() throws Exception
     {
         doSoapRequest(new QName("http://muleumo.org", "elementArray"), getServiceEndpoint(), true, false,
             false);
     }
 
+    @Test
     public void testSoapBodyElementWithSoapMethod() throws Exception
     {
         doSoapRequest(new QName("http://muleumo.org", "soapBodyElement"), "axis:" + getServiceEndpoint(),
             false, true, false);
     }
 
+    @Test
     public void testSoapBodyElementWithNamesapce() throws Exception
     {
         doSoapRequest(new QName("http://muleumo.org", "soapBodyElement"), "axis:" + getServiceEndpoint(),
             false, false, false);
     }
 
+    @Test
     public void testSoapBodyElementWithQName() throws Exception
     {
         doSoapRequest(new QName("http://muleumo.org", "soapBodyElement"), "axis:" + getServiceEndpoint(),
             false, false, true);
     }
 
+    @Test
     public void testSoapBodyElementWithAxisApi() throws Exception
     {
         doSoapRequest(new QName("http://muleumo.org", "soapBodyElement"), getServiceEndpoint(), true, false,
@@ -114,21 +135,25 @@ public class AxisMessageStyleServiceTestCase extends DynamicPortTestCase
     }
 
     // TODO does work , complains about generated namespace...TestNS1
-    // public void testSoapRequestResponseWithSoapMethod() throws Exception {
+    // @Test
+    //public void testSoapRequestResponseWithSoapMethod() throws Exception {
     // doSoapRequest(new QName("http://muleumo.org", "soapRequestResponse"), "axis:"
     // + getServiceEndpoint(), false, true, false);
     // }
     //
-    // public void testSoapRequestResponseWithNamesapce() throws Exception {
+    // @Test
+    //public void testSoapRequestResponseWithNamesapce() throws Exception {
     // doSoapRequest(new QName("http://muleumo.org", "soapRequestResponse"), "axis:"
     // + getServiceEndpoint(), false, false, false);
     // }
     //
-    // public void testSoapRequestResponseWithQName() throws Exception {
+    // @Test
+    //public void testSoapRequestResponseWithQName() throws Exception {
     // doSoapRequest(new QName("http://muleumo.org", "soapRequestResponse"), "axis:"
     // + getServiceEndpoint(), false, false, true);
     // }
 
+    @Test
     public void testSoapRequestResponseWithAxisApi() throws Exception
     {
         doSoapRequest(new QName("http://muleumo.org", "soapRequestResponse"), getServiceEndpoint(), true,
@@ -181,12 +206,6 @@ public class AxisMessageStyleServiceTestCase extends DynamicPortTestCase
             assertNotNull(result);
             assertEquals(expectedResult, result.getPayloadAsString());
         }
-    }
-
-    @Override
-    protected int getNumPortsToFind()
-    {
-        return 1;
     }
 
 }

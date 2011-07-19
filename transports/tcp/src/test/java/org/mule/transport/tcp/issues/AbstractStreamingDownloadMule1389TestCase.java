@@ -13,11 +13,18 @@ package org.mule.transport.tcp.issues;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.DynamicPortTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transport.tcp.integration.AbstractStreamingCapacityTestCase;
 
-public abstract class AbstractStreamingDownloadMule1389TestCase extends DynamicPortTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+public abstract class AbstractStreamingDownloadMule1389TestCase extends FunctionalTestCase
 {
+
+    @Test
     public void testDownloadSpeed() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);

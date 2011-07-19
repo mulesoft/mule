@@ -13,14 +13,31 @@ package org.mule.module.cxf;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.DynamicPortTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.util.Properties;
 
-public class WebServiceWrapperWithCxfTestCase extends DynamicPortTestCase
+import org.junit.Rule;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+public class WebServiceWrapperWithCxfTestCase extends FunctionalTestCase
 {
     private String testString = "test";
-    
+
+    @Rule
+    public DynamicPort dynamicPort = new DynamicPort("port1");
+
+    @Override
+    protected String getConfigResources()
+    {
+        return "mule-ws-wrapper-config.xml";
+    }
+
+    @Test
     public void testWsCall() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -29,24 +46,14 @@ public class WebServiceWrapperWithCxfTestCase extends DynamicPortTestCase
         assertEquals("Payload", testString, result.getPayloadAsString());
     }
     
+    @Test
     public void testWsCallWithUrlFromMessage() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
         Properties props = new Properties();
-        props.setProperty("ws.service.url", "http://localhost:" + getPorts().get(0) + "/services/TestUMO?method=onReceive");
+        props.setProperty("ws.service.url", "http://localhost:" + dynamicPort.getNumber() + "/services/TestUMO?method=onReceive");
         MuleMessage result = client.send("vm://testin2", testString, props);
         assertNotNull(result.getPayload());
         assertEquals("Payload", testString, result.getPayloadAsString());
-    }
-    
-    protected String getConfigResources()
-    {
-        return "mule-ws-wrapper-config.xml";
-    }
-
-    @Override
-    protected int getNumPortsToFind()
-    {
-        return 1;
     }
 }

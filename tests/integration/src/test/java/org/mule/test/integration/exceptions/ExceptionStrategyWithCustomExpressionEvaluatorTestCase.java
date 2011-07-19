@@ -21,6 +21,9 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 public class ExceptionStrategyWithCustomExpressionEvaluatorTestCase extends FunctionalTestCase
 {
 
@@ -39,7 +42,6 @@ public class ExceptionStrategyWithCustomExpressionEvaluatorTestCase extends Func
         assertNotNull(message);
         assertTrue(message.getPayload() instanceof ExceptionMessage);
     }
-
 
     public static class FooExpressionEvaluator implements ExpressionEvaluator
     {

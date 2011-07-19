@@ -18,8 +18,14 @@ import org.mule.api.source.CompositeMessageSource;
 import org.mule.config.ExceptionHelper;
 import org.mule.tck.MuleTestUtils;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 public class AxisConnectorHttpFunctionalTestCase extends AbstractSoapUrlEndpointFunctionalTestCase
 {
+
     public static class ComponentWithoutInterfaces
     {
         public String echo(String msg)
@@ -53,6 +59,7 @@ public class AxisConnectorHttpFunctionalTestCase extends AbstractSoapUrlEndpoint
      * 
      * @throws Throwable
      */
+    @Test
     public void testComponentWithoutInterfaces() throws Throwable
     {
         try
@@ -72,9 +79,4 @@ public class AxisConnectorHttpFunctionalTestCase extends AbstractSoapUrlEndpoint
         }
     }
 
-    @Override
-    protected int getNumPortsToFind()
-    {
-        return 3;
-    }
 }

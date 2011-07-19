@@ -12,20 +12,27 @@ package org.mule.test.usecases.axis;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.DynamicPortTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.soap.axis.AxisConnector;
 
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * TODO document
- */
-public class AxisClientWithComplexTypesTestCase extends DynamicPortTestCase
+import org.junit.Rule;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+public class AxisClientWithComplexTypesTestCase extends FunctionalTestCase
 {
     
     private Trade trade = null;
     private String uri = null;
+
+    @Rule
+    public DynamicPort dynamicPort = new DynamicPort("port1");
 
     @Override
     protected String getConfigResources()
@@ -42,9 +49,10 @@ public class AxisClientWithComplexTypesTestCase extends DynamicPortTestCase
         trade.setCurrency(22);
         trade.setTradeID(22);
         trade.setTransaction(11);
-        uri = "axis:http://localhost:" + getPorts().get(0) + "/services/BackOfficeImplBindingImplUMO?method=submitTrade";
+        uri = "axis:http://localhost:" + dynamicPort.getNumber() + "/services/BackOfficeImplBindingImplUMO?method=submitTrade";
     }
 
+    @Test
     public void testSendComplexDOCLIT() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -65,9 +73,9 @@ public class AxisClientWithComplexTypesTestCase extends DynamicPortTestCase
         assertNotNull(result);
         SubmitTradeResponse response = (SubmitTradeResponse)result.getPayload();
         assertEquals("RECEIVED", response.get_return().getStatus());
-
     }
 
+    @Test
     public void testSendComplexRPCENC() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -76,12 +84,6 @@ public class AxisClientWithComplexTypesTestCase extends DynamicPortTestCase
         assertNotNull(result);
         TradeStatus status = (TradeStatus)result.getPayload();
         assertEquals("RECEIVED", status.getStatus());
-    }
-
-    @Override
-    protected int getNumPortsToFind()
-    {
-        return 1;
     }
 
 }

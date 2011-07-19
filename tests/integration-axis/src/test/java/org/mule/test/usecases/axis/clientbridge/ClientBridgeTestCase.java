@@ -12,16 +12,29 @@ package org.mule.test.usecases.axis.clientbridge;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.DynamicPortTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 
-public class ClientBridgeTestCase extends DynamicPortTestCase
+import org.junit.Rule;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+public class ClientBridgeTestCase extends FunctionalTestCase
 {
 
+    @Rule
+    public DynamicPort dynamicPort = new DynamicPort("port1");
+
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/test/usecases/axis/clientbridge/client-mule-config.xml";
     }
 
+    @Test
     public void testBridgeVMToAxis() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -32,12 +45,6 @@ public class ClientBridgeTestCase extends DynamicPortTestCase
         ComplexData result = (ComplexData)message.getPayload();
         assertEquals(new Integer(84), result.getSomeInteger());
         assertEquals("Foo", result.getSomeString());
-
     }
 
-    @Override
-    protected int getNumPortsToFind()
-    {
-        return 1;
-    }
 }

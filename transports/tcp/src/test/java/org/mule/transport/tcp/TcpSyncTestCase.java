@@ -10,9 +10,11 @@
 
 package org.mule.transport.tcp;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import org.mule.api.MuleMessage;
+import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.module.client.MuleClient;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -20,22 +22,16 @@ import java.util.Collection;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-import org.mule.api.MuleMessage;
-import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
-import org.mule.tck.junit4.rule.DynamicPort;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class TcpSyncTestCase extends AbstractServiceAndFlowTestCase
 {
     @Rule
     public DynamicPort port1 = new DynamicPort("port1");
     
-    public TcpSyncTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
-
     @Parameters
     public static Collection<Object[]> parameters()
     {
@@ -43,6 +39,11 @@ public class TcpSyncTestCase extends AbstractServiceAndFlowTestCase
             {ConfigVariant.SERVICE, "tcp-sync-service.xml"},
             {ConfigVariant.FLOW, "tcp-sync-flow.xml"}
         });
+    }
+
+    public TcpSyncTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
     }
 
     protected MuleMessage send(Object payload) throws Exception
@@ -112,5 +113,4 @@ public class TcpSyncTestCase extends AbstractServiceAndFlowTestCase
         }
         return buffer;
     }
-    
 }

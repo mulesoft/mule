@@ -15,21 +15,34 @@ import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.LocalMuleClient;
 import org.mule.api.config.MuleProperties;
-import org.mule.tck.DynamicPortTestCase;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
+import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.util.IOUtils;
 import org.mule.util.StringDataSource;
 
 import javax.activation.DataHandler;
 
-public class HttpAttachmentsFunctionalTestCase extends DynamicPortTestCase
+import org.junit.Rule;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+public class HttpAttachmentsFunctionalTestCase extends FunctionalTestCase
 {
+
+    @Rule
+    public DynamicPort dynamicPort = new DynamicPort("port1");
+    
+    @Override
     protected String getConfigResources()
     {
         return "http-attachments-functional-test.xml";
     }
 
+    @Test
     public void testSendAttachment() throws Exception
     {
         FunctionalTestComponent ftc = getFunctionalTestComponent("testComponent");
@@ -54,14 +67,9 @@ public class HttpAttachmentsFunctionalTestCase extends DynamicPortTestCase
         assertEquals("We should have no attachments coming back", 0, result.getInboundAttachmentNames().size());
     }
 
-    @Override
-    protected int getNumPortsToFind()
-    {
-        return 1;
-    }
-
 
     //TODO MULE-5005 response attachments
+//    @Test
 //    public void testReceiveAttachment() throws Exception
 //    {
 //        FunctionalTestComponent ftc = getFunctionalTestComponent("testComponent");

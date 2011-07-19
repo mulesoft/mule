@@ -13,18 +13,36 @@ package org.mule.transport.tcp.integration;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.DynamicPortTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
+
+import org.junit.Rule;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * This test was set for the new changes due to Mule1199
  */
-public class MuleMessageProtocolChunkingTestCase extends DynamicPortTestCase
+public class MuleMessageProtocolChunkingTestCase extends FunctionalTestCase
 {
 
     public static final long WAIT_MS = 3000L;
     private static int messages = 2;
     private static int messagelength = 10;
 
+    @Rule
+    public DynamicPort dynamicPort = new DynamicPort("port1");
+    
+    @Override
+    protected String getConfigResources()
+    {
+        return "mule-message-protocol-mule-config.xml";
+    }
+
+    @Test
     public void testChunking() throws Exception
     {
         String message = "";
@@ -36,6 +54,7 @@ public class MuleMessageProtocolChunkingTestCase extends DynamicPortTestCase
         sendString(message);
     }
 
+    @Test
     public void testHugeChunk() throws Exception
     {
         StringBuffer message = new StringBuffer();
@@ -47,6 +66,7 @@ public class MuleMessageProtocolChunkingTestCase extends DynamicPortTestCase
         sendString(message.toString());
     }
 
+    @Test
     public void testCustomObject() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -88,17 +108,6 @@ public class MuleMessageProtocolChunkingTestCase extends DynamicPortTestCase
             MuleMessage msg = client.request("vm://out", WAIT_MS);
             assertEquals(message, new String((byte[])msg.getPayload()));
         }
-    }
-
-    protected String getConfigResources()
-    {
-        return "mule-message-protocol-mule-config.xml";
-    }
-
-    @Override
-    protected int getNumPortsToFind()
-    {
-        return 1;
     }
 
 }

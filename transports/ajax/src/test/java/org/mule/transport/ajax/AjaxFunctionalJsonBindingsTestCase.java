@@ -12,7 +12,8 @@ package org.mule.transport.ajax;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.DynamicPortTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.util.concurrent.Latch;
 
 import java.util.Map;
@@ -23,15 +24,26 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.cometd.Client;
 import org.cometd.Message;
 import org.cometd.MessageListener;
+import org.junit.Rule;
+import org.junit.Test;
 import org.mortbay.cometd.client.BayeuxClient;
 import org.mortbay.jetty.client.Address;
 import org.mortbay.jetty.client.HttpClient;
 
-public class AjaxFunctionalJsonBindingsTestCase extends DynamicPortTestCase
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+public class AjaxFunctionalJsonBindingsTestCase extends FunctionalTestCase
 {
+    
     public static int SERVER_PORT = -1;
 
     private BayeuxClient client;
+
+    @Rule
+    public DynamicPort dynamicPort = new DynamicPort("port1");
 
     @Override
     protected String getConfigResources()
@@ -42,7 +54,7 @@ public class AjaxFunctionalJsonBindingsTestCase extends DynamicPortTestCase
     @Override
     protected void doSetUp() throws Exception
     {
-        SERVER_PORT = getPorts().get(0);
+        SERVER_PORT = dynamicPort.getNumber();
         HttpClient http = new HttpClient();
         http.setConnectorType(HttpClient.CONNECTOR_SELECT_CHANNEL);
 
@@ -72,6 +84,7 @@ public class AjaxFunctionalJsonBindingsTestCase extends DynamicPortTestCase
         }
     }
 
+    @Test
     public void testClientSubscribeWithJsonObjectResponse() throws Exception
     {
         final Latch latch = new Latch();
@@ -79,6 +92,7 @@ public class AjaxFunctionalJsonBindingsTestCase extends DynamicPortTestCase
         final AtomicReference<String> data = new AtomicReference<String>();
         client.addListener(new MessageListener()
         {
+            @Override
             public void deliver(Client fromClient, Client toClient, Message message)
             {
                 if (message.getData() != null)
@@ -105,6 +119,7 @@ public class AjaxFunctionalJsonBindingsTestCase extends DynamicPortTestCase
         assertEquals("Ross", ((Map<?, ?>)result.get("data")).get("name"));
     }
 
+    @Test
     public void testClientPublishWithJsonObject() throws Exception
     {
         client.publish("/test2", "{\"name\":\"Ross\"}", null);
@@ -113,11 +128,5 @@ public class AjaxFunctionalJsonBindingsTestCase extends DynamicPortTestCase
 
         assertNotNull(msg);
         assertEquals("Received: DummyJsonBean{name='Ross'}", msg.getPayloadAsString());
-    }
-
-    @Override
-    protected int getNumPortsToFind()
-    {
-        return 1;
     }
 }

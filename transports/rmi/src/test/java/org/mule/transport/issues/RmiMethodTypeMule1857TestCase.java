@@ -19,5 +19,4 @@ public class RmiMethodTypeMule1857TestCase extends AbstractFunctionalTestCase
     {
         super("rmi", "rmi-method-type-1857-test.xml");
     }
-
 }

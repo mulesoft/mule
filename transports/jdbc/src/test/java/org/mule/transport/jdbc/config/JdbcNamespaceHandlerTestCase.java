@@ -10,7 +10,7 @@
 package org.mule.transport.jdbc.config;
 
 import org.mule.api.endpoint.ImmutableEndpoint;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transaction.MuleTransactionConfig;
 import org.mule.transaction.XaTransactionFactory;
 import org.mule.transport.jdbc.ExtendedQueryRunner;
@@ -20,11 +20,13 @@ import org.mule.transport.jdbc.sqlstrategy.DefaultSqlStatementStrategyFactory;
 import org.mule.transport.jdbc.test.TestDataSource;
 
 import org.apache.commons.dbutils.QueryRunner;
+import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
-/**
- * Tests the "jdbc" namespace.
- */
 public class JdbcNamespaceHandlerTestCase extends FunctionalTestCase
 {
 
@@ -34,6 +36,7 @@ public class JdbcNamespaceHandlerTestCase extends FunctionalTestCase
         return "jdbc-namespace-config.xml";
     }
 
+    @Test
     public void testWithDataSource() throws Exception
     {
         JdbcConnector c = (JdbcConnector) muleContext.getRegistry().lookupConnector("jdbcConnector1");
@@ -44,6 +47,7 @@ public class JdbcNamespaceHandlerTestCase extends FunctionalTestCase
         assertEquals(-1, c.getQueryTimeout());
     }
 
+    @Test
     public void testWithDataSourceViaJndi() throws Exception
     {
         JdbcConnector c = (JdbcConnector) muleContext.getRegistry().lookupConnector("jdbcConnector2");
@@ -56,6 +60,7 @@ public class JdbcNamespaceHandlerTestCase extends FunctionalTestCase
         assertEquals(3, c.getQueryTimeout());
     }
 
+    @Test
     public void testFullyConfigured() throws Exception
     {
         JdbcConnector c = (JdbcConnector) muleContext.getRegistry().lookupConnector("jdbcConnector3");
@@ -70,7 +75,7 @@ public class JdbcNamespaceHandlerTestCase extends FunctionalTestCase
         assertTrue(c.isStarted());
     }
 
-
+    @Test
     public void testEndpointQueryOverride() throws Exception
     {
         JdbcConnector c = (JdbcConnector) muleContext.getRegistry().lookupConnector("jdbcConnector3");
@@ -96,6 +101,7 @@ public class JdbcNamespaceHandlerTestCase extends FunctionalTestCase
         assertEquals(3, ((ExtendedQueryRunner) queryRunner).getQueryTimeout());
     }
 
+    @Test
     public void testEndpointWithTransaction() throws Exception
     {
         ImmutableEndpoint endpoint = muleContext.getRegistry().
@@ -108,6 +114,7 @@ public class JdbcNamespaceHandlerTestCase extends FunctionalTestCase
         assertEquals("-1", endpoint.getProperty("queryTimeout"));
     }
 
+    @Test
     public void testEndpointWithXaTransaction() throws Exception
     {
         ImmutableEndpoint endpoint = muleContext.getRegistry().
@@ -119,6 +126,7 @@ public class JdbcNamespaceHandlerTestCase extends FunctionalTestCase
             endpoint.getTransactionConfig().getAction());
     }
 
+    @Test
     public void testSqlStatementStrategyFactoryOverride() throws Exception
     {
         // class config

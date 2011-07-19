@@ -27,15 +27,8 @@ import static org.junit.Assert.assertNull;
 
 public class InOutOutOnlyMessageCopyMule3007TestCase extends AbstractServiceAndFlowTestCase
 {
-
     @Rule
     public DynamicPort port1 = new DynamicPort("port1");
-
-    public InOutOutOnlyMessageCopyMule3007TestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-
-    }
 
     @Parameters
     public static Collection<Object[]> parameters()
@@ -44,6 +37,11 @@ public class InOutOutOnlyMessageCopyMule3007TestCase extends AbstractServiceAndF
             {ConfigVariant.SERVICE, "org/mule/issues/inout-outonly-message-copy-mule3007-test-service.xml"},
             {ConfigVariant.FLOW, "org/mule/issues/inout-outonly-message-copy-mule3007-test-flow.xml"}
         });
+    }
+
+    public InOutOutOnlyMessageCopyMule3007TestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
     }
 
     @Test

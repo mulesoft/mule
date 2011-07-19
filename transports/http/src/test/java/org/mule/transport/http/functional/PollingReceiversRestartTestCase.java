@@ -9,15 +9,23 @@
  */
 package org.mule.transport.http.functional;
 
-import org.mule.tck.DynamicPortTestCase;
 import org.mule.tck.functional.CounterCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
+import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.util.concurrent.atomic.AtomicInteger;
+import org.junit.Rule;
+import org.junit.Test;
 
-public class PollingReceiversRestartTestCase extends DynamicPortTestCase
+import static org.junit.Assert.assertTrue;
+
+public class PollingReceiversRestartTestCase extends FunctionalTestCase
 {
     private static final int WAIT_TIME = 3000;
+
+    @Rule
+    public DynamicPort dynamicPort = new DynamicPort("port1");
 
     public PollingReceiversRestartTestCase()
     {
@@ -30,6 +38,7 @@ public class PollingReceiversRestartTestCase extends DynamicPortTestCase
         return "polling-receivers-restart-test.xml";
     }
 
+    @Test
     public void testPollingReceiversRestart() throws Exception
     {
         muleContext.start();
@@ -58,9 +67,4 @@ public class PollingReceiversRestartTestCase extends DynamicPortTestCase
         assertTrue("No polls performed", pollCounter.get() > 0);
     }
 
-    @Override
-    protected int getNumPortsToFind()
-    {
-        return 1;
-    }
 }

@@ -13,9 +13,10 @@ package org.mule.transport.http.issues;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.DynamicPortTestCase;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
+import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpVersion;
@@ -23,13 +24,31 @@ import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.RequestEntity;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.apache.commons.httpclient.params.HttpClientParams;
+import org.junit.Rule;
+import org.junit.Test;
 
-public class HttpMessageReceiverMule4456TestCase extends DynamicPortTestCase
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+public class HttpMessageReceiverMule4456TestCase extends FunctionalTestCase
 {
+    
     private static final String MESSAGE = "test message";
 
     private HttpClient httpClient;
     private MuleClient muleClient;
+
+    @Rule
+    public DynamicPort dynamicPort1 = new DynamicPort("port1");
+
+    @Rule
+    public DynamicPort dynamicPort2 = new DynamicPort("port2");
+
+    @Override
+    protected String getConfigResources()
+    {
+        return "http-receiver-mule4456-config.xml";
+    }
 
     @Override
     protected boolean isGracefulShutdown()
@@ -47,12 +66,7 @@ public class HttpMessageReceiverMule4456TestCase extends DynamicPortTestCase
         muleClient = new MuleClient(muleContext);
     }
 
-    @Override
-    protected String getConfigResources()
-    {
-        return "http-receiver-mule4456-config.xml";
-    }
-
+    @Test
     public void testAsyncPost() throws Exception
     {
         FunctionalTestComponent component = getFunctionalTestComponent("AsyncService");
@@ -65,7 +79,7 @@ public class HttpMessageReceiverMule4456TestCase extends DynamicPortTestCase
             }
         });
 
-        PostMethod request = new PostMethod("http://localhost:" + getPorts().get(0));
+        PostMethod request = new PostMethod("http://localhost:" + dynamicPort1.getNumber());
         RequestEntity entity = new StringRequestEntity(MESSAGE, "text/plain", 
             muleContext.getConfiguration().getDefaultEncoding());
         request.setRequestEntity(entity);
@@ -76,6 +90,7 @@ public class HttpMessageReceiverMule4456TestCase extends DynamicPortTestCase
         assertEquals(MESSAGE, message.getPayloadAsString());
     }
 
+    @Test
     public void testAsyncPostWithPersistentSedaQueue() throws Exception
     {
         FunctionalTestComponent component = getFunctionalTestComponent("AsyncPersistentQueueService");
@@ -88,7 +103,7 @@ public class HttpMessageReceiverMule4456TestCase extends DynamicPortTestCase
             }
         });
 
-        PostMethod request = new PostMethod("http://localhost:" + getPorts().get(1));
+        PostMethod request = new PostMethod("http://localhost:" + dynamicPort2.getNumber());
         RequestEntity entity = new StringRequestEntity(MESSAGE, "text/plain", muleContext.getConfiguration()
             .getDefaultEncoding());
         request.setRequestEntity(entity);
@@ -97,11 +112,5 @@ public class HttpMessageReceiverMule4456TestCase extends DynamicPortTestCase
         MuleMessage message = muleClient.request("vm://out", 1000);
         assertNotNull(message);
         assertEquals(MESSAGE, message.getPayloadAsString());
-    }
-
-    @Override
-    protected int getNumPortsToFind()
-    {
-        return 2;
     }
 }

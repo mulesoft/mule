@@ -10,7 +10,8 @@
 
 package org.mule.module.cxf;
 
-import org.mule.tck.DynamicPortTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.http.HttpConstants;
 
 import org.apache.commons.httpclient.HttpClient;
@@ -19,10 +20,15 @@ import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
+import org.junit.Ignore;
+import org.junit.Rule;
+import org.junit.Test;
 
-public class HttpSecurityFilterFunctionalTestCase extends DynamicPortTestCase
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+public class HttpSecurityFilterFunctionalTestCase extends FunctionalTestCase
 {
-    
     private static String soapRequest = 
         "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:unk=\"http://unknown.namespace/\">" +
            "<soapenv:Header/>" +
@@ -33,6 +39,12 @@ public class HttpSecurityFilterFunctionalTestCase extends DynamicPortTestCase
            "</soapenv:Body>" +
         "</soapenv:Envelope>";
 
+    @Rule
+    public DynamicPort dynamicPort1 = new DynamicPort("port1");
+
+    @Rule
+    public DynamicPort dynamicPort2 = new DynamicPort("port2");
+    
     @Override
     protected String getConfigResources()
     {
@@ -44,16 +56,18 @@ public class HttpSecurityFilterFunctionalTestCase extends DynamicPortTestCase
      * 
      * @throws Exception
      */
+    @Test
     public void testAuthenticationFailureBadCredentialsGetHttps() throws Exception
     {
-        doGet(null, "localhost", "anonX", "anonX", "https://localhost:" + getPorts().get(1) + "/services/Echo", false, 401);
+        doGet(null, "localhost", "anonX", "anonX", "https://localhost:" + dynamicPort2.getNumber() + "/services/Echo", true, 401);
     }
 
+    @Test
     public void testAuthenticationFailureNoContextGet() throws Exception
     {
         HttpClient client = new HttpClient();
         client.getParams().setAuthenticationPreemptive(true);
-        GetMethod get = new GetMethod("http://localhost:" + getPorts().get(0) + "/services/Echo");
+        GetMethod get = new GetMethod("http://localhost:" + dynamicPort1.getNumber() + "/services/Echo");
 
         get.setDoAuthentication(false);
 
@@ -64,7 +78,7 @@ public class HttpSecurityFilterFunctionalTestCase extends DynamicPortTestCase
             assertEquals(
                 "Registered authentication is set to org.mule.module.spring.security.filters.http.HttpBasicAuthenticationFilter "
                                 + "but there was no security context on the session. Authentication denied on "
-                                + "endpoint http://localhost:" + getPorts().get(0) + "/services/Echo. Message payload is of type: "
+                                + "endpoint http://localhost:" + dynamicPort1.getNumber() + "/services/Echo. Message payload is of type: "
                                 + "String", get.getResponseBodyAsString());
         }
         finally
@@ -73,11 +87,12 @@ public class HttpSecurityFilterFunctionalTestCase extends DynamicPortTestCase
         }
     }
 
+    @Test
     public void testAuthenticationFailureNoContextPost() throws Exception
     {
         HttpClient client = new HttpClient();
         client.getParams().setAuthenticationPreemptive(true);
-        PostMethod post = new PostMethod("http://localhost:" + getPorts().get(0) + "/services/Echo");
+        PostMethod post = new PostMethod("http://localhost:" + dynamicPort1.getNumber() + "/services/Echo");
 
         post.setDoAuthentication(false);
 
@@ -91,7 +106,7 @@ public class HttpSecurityFilterFunctionalTestCase extends DynamicPortTestCase
             assertEquals(
                 "Registered authentication is set to org.mule.module.spring.security.filters.http.HttpBasicAuthenticationFilter "
                                 + "but there was no security context on the session. Authentication denied on "
-                                + "endpoint http://localhost:" + getPorts().get(0) + "/services/Echo. Message payload is of type: "
+                                + "endpoint http://localhost:" + dynamicPort1.getNumber() + "/services/Echo. Message payload is of type: "
                                 + "ContentLengthInputStream",   post.getResponseBodyAsString());
         }
         finally
@@ -100,74 +115,87 @@ public class HttpSecurityFilterFunctionalTestCase extends DynamicPortTestCase
         }
     }
 
+    @Test
     public void testAuthenticationFailureBadCredentialsGet() throws Exception
     {
-        doGet(null, "localhost", "anonX", "anonX", "http://localhost:" + getPorts().get(0) + "/services/Echo/echo/echo/hello", false, 401);
+        doGet(null, "localhost", "anonX", "anonX", "http://localhost:" + dynamicPort1.getNumber() + "/services/Echo/echo/echo/hello", true, 401);
     }
 
+    @Test
     public void testAuthenticationFailureBadCredentialsPost() throws Exception
     {
-        doPost(null, "localhost", "anonX", "anonX", "http://localhost:" + getPorts().get(0) + "/services/Echo", false, 401);
+        doPost(null, "localhost", "anonX", "anonX", "http://localhost:" + dynamicPort1.getNumber() + "/services/Echo", true, 401);
     }
 
+    @Test
     public void testAuthenticationFailureBadCredentialsPostHttps() throws Exception
     {
-        doPost(null, "localhost", "anonX", "anonX", "https://localhost:" + getPorts().get(1) + "/services/Echo", false, 401);
+        doPost(null, "localhost", "anonX", "anonX", "https://localhost:" + dynamicPort2.getNumber() + "/services/Echo", true, 401);
     }
 
+    @Test
     public void testAuthenticationAuthorisedGet() throws Exception
     {
-        doGet(null, "localhost", "anon", "anon", "http://localhost:" + getPorts().get(0) + "/services/Echo/echo/echo/hello", false, 200);
+        doGet(null, "localhost", "anon", "anon", "http://localhost:" + dynamicPort1.getNumber() + "/services/Echo/echo/echo/hello", false, 200);
     }
 
+    @Test
     public void testAuthenticationAuthorisedGetHttps() throws Exception
     {
-        doGet(null, "localhost", "anon", "anon", "https://localhost:" + getPorts().get(1) + "/services/Echo/echo/echo/hello", false, 200);
+        doGet(null, "localhost", "anon", "anon", "https://localhost:" + dynamicPort2.getNumber() + "/services/Echo/echo/echo/hello", false, 200);
     }
 
+    @Test
     public void testAuthenticationAuthorisedPost() throws Exception
     {
-        doPost(null, "localhost", "anon", "anon", "http://localhost:" + getPorts().get(0) + "/services/Echo", false, 200);
+        doPost(null, "localhost", "anon", "anon", "http://localhost:" + dynamicPort1.getNumber() + "/services/Echo", false, 200);
     }
 
+    @Test
     public void testAuthenticationAuthorisedPostHttps() throws Exception
     {
-        doPost(null, "localhost", "anon", "anon", "https://localhost:" + getPorts().get(1) + "/services/Echo", false, 200);
+        doPost(null, "localhost", "anon", "anon", "https://localhost:" + dynamicPort2.getNumber() + "/services/Echo", false, 200);
     }
 
+    @Test
     public void testAuthenticationAuthorisedWithHandshakeGet() throws Exception
     {
-        doGet(null, "localhost", "anon", "anon", "http://localhost:" + getPorts().get(0) + "/services/Echo/echo/echo/hello", true, 200);
+        doGet(null, "localhost", "anon", "anon", "http://localhost:" + dynamicPort1.getNumber() + "/services/Echo/echo/echo/hello", true, 200);
     }
 
+    @Test
     public void testAuthenticationAuthorisedWithHandshakePost() throws Exception
     {
-        doPost(null, "localhost", "anon", "anon", "http://localhost:" + getPorts().get(0) + "/services/Echo", true, 200);
+        doPost(null, "localhost", "anon", "anon", "http://localhost:" + dynamicPort1.getNumber() + "/services/Echo", true, 200);
     }
 
     // TODO Realm validation seems to be completely ignored
-    //public void testAuthenticationAuthorisedWithHandshakeAndBadRealmGet() throws Exception
-    //{
-    //    doGet("blah", "localhost", "anon", "anon", "http://localhost:" + getPorts().get(0) + "/services/Echo/echo/echo/hello", true, 401);
-    //}
+    @Ignore
+    @Test
+    public void testAuthenticationAuthorisedWithHandshakeAndBadRealmGet() throws Exception
+    {
+        doGet("blah", "localhost", "anon", "anon", "http://localhost:" + dynamicPort1.getNumber() + "/services/Echo/echo/echo/hello", true, 401);
+    }
 
     // TODO Realm validation seems to be completely ignored
-    //public void testAuthenticationAuthorisedWithHandshakeAndBadRealmPost() throws Exception
-    //{
-    //    doPost("blah", "localhost", "anon", "anon", "http://localhost:" + getPorts().get(0) + "/services/Echo", true, 401);
-    //}
+    @Ignore
+    @Test
+    public void testAuthenticationAuthorisedWithHandshakeAndBadRealmPost() throws Exception
+    {
+        doPost("blah", "localhost", "anon", "anon", "http://localhost:" + dynamicPort1.getNumber() + "/services/Echo", true, 401);
+    }
 
-    // TODO Realm validation seems to be completely ignored
-    //public void testAuthenticationAuthorisedWithHandshakeAndRealmGet() throws Exception
-    //{
-    //    doGet("mule-realm", "localhost", "ross", "ross", "http://localhost:" + getPorts().get(0) + "/services/Echo/echo/echo/hello", true, 200);
-    //}
+    @Test
+    public void testAuthenticationAuthorisedWithHandshakeAndRealmGet() throws Exception
+    {
+        doGet("mule-realm", "localhost", "ross", "ross", "http://localhost:" + dynamicPort1.getNumber() + "/services/Echo/echo/echo/hello", true, 200);
+    }
 
-    // TODO Realm validation seems to be completely ignored
-    //public void testAuthenticationAuthorisedWithHandshakeAndRealmPost() throws Exception
-    //{
-    //    doPost("mule-realm", "localhost", "ross", "ross", "http://localhost:" + getPorts().get(0) + "/services/Echo", true, 200);
-    //}
+    @Test
+    public void testAuthenticationAuthorisedWithHandshakeAndRealmPost() throws Exception
+    {
+        doPost("mule-realm", "localhost", "ross", "ross", "http://localhost:" + dynamicPort1.getNumber() + "/services/Echo", true, 200);
+    }
 
     private void doGet(String realm,
                        String host,
@@ -234,11 +262,4 @@ public class HttpSecurityFilterFunctionalTestCase extends DynamicPortTestCase
             post.releaseConnection();
         }
     }
-
-    @Override
-    protected int getNumPortsToFind()
-    {
-        return 2;
-    }
-
 }

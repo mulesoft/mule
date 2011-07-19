@@ -10,10 +10,17 @@
 
 package org.mule.transport.soap.axis;
 
+import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.vm.VMConnector;
+
+import org.junit.Rule;
 
 public class AxisConnectorVMFunctionalTestCase extends AbstractSoapResourceEndpointFunctionalTestCase
 {
+
+    @Rule
+    public DynamicPort dynamicPort = new DynamicPort("port1");
+
     @Override
     protected String getTransportProtocol()
     {
@@ -32,10 +39,4 @@ public class AxisConnectorVMFunctionalTestCase extends AbstractSoapResourceEndpo
         return "axis-" + getTransportProtocol() + "-mule-config.xml";
     }
 
-    @Override
-    protected int getNumPortsToFind()
-    {
-        // don't really need the ports, but the other tests which extend the same abstract class do
-        return 1;
-    }
 }

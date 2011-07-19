@@ -12,19 +12,50 @@ package org.mule.module.cxf;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.DynamicPortTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.http.HttpConstants;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class Http10TestCase extends DynamicPortTestCase
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+
+public class Http10TestCase extends FunctionalTestCase
 {
+    // Dynamic ports is static because test is using setDisposeContextPerClass(true);
+    private static DynamicPort dynamicPort;
+
     public Http10TestCase()
     {
-        setDisposeManagerPerSuite(true);
+        setDisposeContextPerClass(true);
     }
 
+    @Override
+    protected String getConfigResources()
+    {
+        return "http-10-conf.xml";
+    }
+
+    @BeforeClass
+    public static void createDynamicPort() throws Throwable
+    {
+        dynamicPort = new DynamicPort("port1");
+        dynamicPort.before();
+    }
+
+    @AfterClass
+    public static void releaseDynamicPort()
+    {
+        dynamicPort.after();
+    }
+
+    @Test
     public void testHttp10TransformerNotOnProtocol() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -37,6 +68,7 @@ public class Http10TestCase extends DynamicPortTestCase
         assertFalse("chunked".equals(result.getOutboundProperty(HttpConstants.HEADER_TRANSFER_ENCODING)));
     }
 
+    @Test
     public void testHttp10TransformerOnProtocol() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -47,16 +79,5 @@ public class Http10TestCase extends DynamicPortTestCase
         
         result = client.request("vm://out", 1000);
         assertFalse("chunked".equals(result.getOutboundProperty(HttpConstants.HEADER_TRANSFER_ENCODING)));
-    }
-
-    protected String getConfigResources()
-    {
-        return "http-10-conf.xml";
-    }
-
-    @Override
-    protected int getNumPortsToFind()
-    {
-        return 1;
     }
 }

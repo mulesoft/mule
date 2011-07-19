@@ -11,6 +11,7 @@
 package org.mule.transport.http.functional;
 
 import org.mule.module.client.MuleClient;
+import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.io.BufferedReader;
 import java.util.ArrayList;
@@ -20,6 +21,13 @@ import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import org.junit.Rule;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 public class HttpCookieTestCase extends AbstractMockHttpServerTestCase
 {
     private static final String COOKIE_HEADER = "Cookie:";
@@ -28,6 +36,9 @@ public class HttpCookieTestCase extends AbstractMockHttpServerTestCase
     private boolean cookieFound = false;
     private List<String> cookieHeaders  = new ArrayList<String>();
 
+    @Rule
+    public DynamicPort dynamicPort = new DynamicPort("port1");
+
     @Override
     protected String getConfigResources()
     {
@@ -35,17 +46,12 @@ public class HttpCookieTestCase extends AbstractMockHttpServerTestCase
     }
 
     @Override
-    protected int getNumPortsToFind()
-    {
-        return 1;
-    }
-
-    @Override
     protected MockHttpServer getHttpServer(CountDownLatch serverStartLatch)
     {
-        return new SimpleHttpServer(getPorts().get(0), serverStartLatch, latch);
+        return new SimpleHttpServer(dynamicPort.getNumber(), serverStartLatch, latch);
     }
 
+    @Test
     public void testCookies() throws Exception
     {
         Map<String, String> properties = new HashMap<String, String>();

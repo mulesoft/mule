@@ -18,19 +18,28 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 public class JdbcSelectOnOutboundFunctionalTestCase extends AbstractJdbcFunctionalTestCase
 {
+    
     @Override
     protected String getConfigResources()
     {
         return super.getConfigResources() + ",jdbc-select-outbound.xml";
     }
 
+    @Test
     public void testSelectOnOutbound() throws Exception
     {
         doSelectOnOutbound("vm://jdbc.test");
     }
 
+    @Test
     public void testSelectOnOutboundByExpression() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -46,11 +55,13 @@ public class JdbcSelectOnOutboundFunctionalTestCase extends AbstractJdbcFunction
         assertEquals(TEST_VALUES[1], resultMap.get("DATA"));
     }
 
+    @Test
     public void testChain2SelectAlwaysBegin() throws Exception 
     { 
         doSelectOnOutbound("vm://chain.always.begin"); 
     } 
 
+    @Test
     public void testChain2SelectBeginOrJoin() throws Exception 
     { 
         doSelectOnOutbound("vm://chain.begin.or.join"); 

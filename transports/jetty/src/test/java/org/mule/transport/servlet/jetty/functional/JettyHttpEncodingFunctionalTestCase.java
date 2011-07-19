@@ -19,15 +19,22 @@ import org.mule.transport.http.functional.HttpFunctionalTestCase;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 public class JettyHttpEncodingFunctionalTestCase extends HttpFunctionalTestCase
 {
     protected static String TEST_MESSAGE = "Test Http Request (Rødgrød), 57 = \u06f7\u06f5 in Arabic";
 
+    @Override
     protected String getConfigResources()
     {
         return "jetty-http-encoding-test.xml";
     }
 
+    @Test
     public void testSendWithProperResponseContentType() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -44,6 +51,7 @@ public class JettyHttpEncodingFunctionalTestCase extends HttpFunctionalTestCase
     /**
      * MULE-4031 - ensure the content type isn't copied
      */
+    @Test
     public void testSendWithInvalidResponseContentType() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);

@@ -13,17 +13,28 @@ package org.mule.transport.http.functional;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.DynamicPortTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.http.HttpConnector;
 
-public class ChunkingTestCase extends DynamicPortTestCase
+import org.junit.Rule;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+
+public class ChunkingTestCase extends FunctionalTestCase
 {
 
+    @Rule
+    public DynamicPort dynamicPort = new DynamicPort("port1");
+
+    @Override
     protected String getConfigResources()
     {
         return "chunking-test.xml";
     }
 
+    @Test
     public void testPartiallyReadRequest() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -41,12 +52,6 @@ public class ChunkingTestCase extends DynamicPortTestCase
         assertEquals("Hello", result.getPayloadAsString());
         status = result.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0);
         assertEquals(200, status);
-    }
-
-    @Override
-    protected int getNumPortsToFind()
-    {
-        return 1;
     }
 
 }

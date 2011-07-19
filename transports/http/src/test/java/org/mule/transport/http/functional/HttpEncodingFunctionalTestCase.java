@@ -19,6 +19,12 @@ import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.junit.Ignore;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 public class HttpEncodingFunctionalTestCase extends HttpFunctionalTestCase
 {
     protected static String TEST_MESSAGE = "Test Http Request (R�dgr�d), 57 = \u06f7\u06f5 in Arabic";
@@ -26,8 +32,7 @@ public class HttpEncodingFunctionalTestCase extends HttpFunctionalTestCase
 
     public HttpEncodingFunctionalTestCase()
     {
-        super();
-        setDisposeManagerPerSuite(true);
+        setDisposeContextPerClass(true);
     }
 
     @Override
@@ -52,62 +57,72 @@ public class HttpEncodingFunctionalTestCase extends HttpFunctionalTestCase
         assertEquals(TEST_MESSAGE + " Received", reply.getPayloadAsString());
     }
 
+    @Test
     public void testPostEncodingUsAscii() throws Exception
     {
         runPostEncodingTest("US-ASCII", "A");
     }
 
+    @Test
     public void testPostEncodingUtf8() throws Exception
     {
         runPostEncodingTest("UTF-8", "A");
         runPostEncodingTest("UTF-8", TEST_JAPANESE_MESSAGE);
     }
 
-    // TODO MULE-3690 make me run green
-    public void _testPostEncodingShiftJs() throws Exception
+    @Test
+    @Ignore("MULE-3690 make me run green")
+    public void testPostEncodingShiftJs() throws Exception
     {
         runPostEncodingTest("Shift_JIS", TEST_JAPANESE_MESSAGE);
     }
 
-    // TODO MULE-3690 make me run green
-    public void _testPostEncodingWindows31J() throws Exception
+    @Test
+    @Ignore("MULE-3690 make me run green")
+    public void testPostEncodingWindows31J() throws Exception
     {
         runPostEncodingTest("Windows-31J", TEST_JAPANESE_MESSAGE);
     }
 
-    // TODO MULE-3690 make me run green
-    public void _testPostEncodingEucJp() throws Exception
+    @Test
+    @Ignore("MULE-3690 make me run green")
+    public void testPostEncodingEucJp() throws Exception
     {
         runPostEncodingTest("EUC-JP", TEST_JAPANESE_MESSAGE);
     }
 
-    // TODO MULE-3690 make me run green
-    public void _testGetEncodingUsAscii() throws Exception
+    @Test
+    @Ignore("MULE-3690 make me run green")
+    public void testGetEncodingUsAscii() throws Exception
     {
         runGetEncodingTest("US-ASCII", "A");
     }
 
-    // TODO MULE-3690 make me run green
-    public void _testGetEncodingUtf8() throws Exception
+    @Test
+    @Ignore("MULE-3690 make me run green")
+    public void testGetEncodingUtf8() throws Exception
     {
         runGetEncodingTest("UTF-8", "A");
         runGetEncodingTest("UTF-8", TEST_JAPANESE_MESSAGE);
     }
 
-    // TODO MULE-3690 make me run green
-    public void _testGetEncodingShiftJs() throws Exception
+    @Test
+    @Ignore("MULE-3690 make me run green")
+    public void testGetEncodingShiftJs() throws Exception
     {
         runGetEncodingTest("Shift_JIS", TEST_JAPANESE_MESSAGE);
     }
 
-    // TODO MULE-3690 make me run green
-    public void _testGetEncodingWindows31J() throws Exception
+    @Test
+    @Ignore("MULE-3690 make me run green")
+    public void testGetEncodingWindows31J() throws Exception
     {
         runGetEncodingTest("Windows-31J", TEST_JAPANESE_MESSAGE);
     }
 
-    // TODO MULE-3690 make me run green
-    public void _testGetEncodingEucJp() throws Exception
+    @Test
+    @Ignore("MULE-3690 make me run green")
+    public void testGetEncodingEucJp() throws Exception
     {
         runGetEncodingTest("EUC-JP", TEST_JAPANESE_MESSAGE);
     }

@@ -10,7 +10,7 @@
 
 package org.mule.transport.jdbc.functional;
 
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -19,6 +19,9 @@ import java.sql.Statement;
 import javax.sql.DataSource;
 
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Test for MULE-3625, submitted by community member Guy Veraghtert

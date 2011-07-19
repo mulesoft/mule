@@ -13,7 +13,8 @@ package org.mule.transport.soap.axis;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.DynamicPortTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -21,8 +22,16 @@ import java.util.Map;
 import javax.xml.namespace.QName;
 import javax.xml.rpc.ParameterMode;
 
-public class AxisNamedParametersTestCase extends DynamicPortTestCase
+import org.junit.Rule;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+
+public class AxisNamedParametersTestCase extends FunctionalTestCase
 {
+
+    @Rule
+    public DynamicPort dynamicPort = new DynamicPort("port1");
 
     @Override
     protected String getConfigResources()
@@ -30,6 +39,7 @@ public class AxisNamedParametersTestCase extends DynamicPortTestCase
         return "axis-named-param-mule-config.xml";
     }
 
+    @Test
     public void testNamedParameters() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -39,6 +49,7 @@ public class AxisNamedParametersTestCase extends DynamicPortTestCase
         assertEquals("Hello Named", result.getPayload());
     }
 
+    @Test
     public void testNamedParametersViaClient() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -51,14 +62,9 @@ public class AxisNamedParametersTestCase extends DynamicPortTestCase
         // when making the call
         props.put(MuleProperties.MULE_SOAP_METHOD, soapMethod);
 
-        MuleMessage result = client.send("axis:http://localhost:" + getPorts().get(0) + "/mule/mycomponent2?method=echo",
+        MuleMessage result = client.send("axis:http://localhost:" + dynamicPort.getNumber() + "/mule/mycomponent2?method=echo",
             "Hello Named", props);
         assertEquals("Hello Named", result.getPayload());
     }
 
-    @Override
-    protected int getNumPortsToFind()
-    {
-        return 1;
-    }
 }

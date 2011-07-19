@@ -51,5 +51,4 @@ public class MuleAdminTestCase extends AbstractServiceAndFlowTestCase
         MuleMessage result = rd.sendToRemoteComponent("appleComponent", "string", null);
         assertNotNull(result);
     }
-
 }

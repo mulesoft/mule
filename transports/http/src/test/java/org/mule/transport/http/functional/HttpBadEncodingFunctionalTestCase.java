@@ -15,9 +15,13 @@ import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.transport.http.HttpConnector;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 public class HttpBadEncodingFunctionalTestCase extends HttpEncodingFunctionalTestCase
 {
 
+    @Override
     public void testSend() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);

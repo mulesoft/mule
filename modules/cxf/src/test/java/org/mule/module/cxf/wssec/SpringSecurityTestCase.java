@@ -10,11 +10,9 @@
 
 package org.mule.module.cxf.wssec;
 
-/**
- *
- */
 public class SpringSecurityTestCase extends UsernameTokenTestCase
 {
+
     @Override
     protected String getConfigResources()
     {

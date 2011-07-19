@@ -28,16 +28,14 @@ public class JmsPropertyScopeTestCase extends AbstractPropertyScopeTestCase
     @Parameters
     public static Collection<Object[]> parameters()
     {
-        return Arrays.asList(new Object[][]{{ConfigVariant.SERVICE,
-        "org/mule/test/message/jms-property-scope.xml"}
-
+        return Arrays.asList(new Object[][]{
+            { ConfigVariant.SERVICE, "org/mule/test/message/jms-property-scope.xml" }
         });
     }
 
     public JmsPropertyScopeTestCase(ConfigVariant variant, String configResources)
     {
         super(variant, configResources);
-
     }
 
     @Override

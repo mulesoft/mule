@@ -13,6 +13,9 @@ package org.mule.transport.jdbc.reliability;
 import org.mule.tck.probe.Probe;
 
 import org.apache.commons.dbutils.handlers.ArrayHandler;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 
 /**
@@ -32,6 +35,7 @@ public class InboundMessageLossTransactionsTestCase extends InboundMessageLossTe
     }
     
     @Override
+    @Test
     public void testComponentException() throws Exception
     {
         assertEquals(1, qr.update(jdbcConnector.getConnection(), 
@@ -39,6 +43,7 @@ public class InboundMessageLossTransactionsTestCase extends InboundMessageLossTe
 
         prober.check(new Probe()
         {
+            @Override
             public boolean isSatisfied()
             {
                 try
@@ -55,6 +60,7 @@ public class InboundMessageLossTransactionsTestCase extends InboundMessageLossTe
                 }
             }
 
+            @Override
             public String describeFailure()
             {
                 return "Row should not be acknowledged (marked read)";

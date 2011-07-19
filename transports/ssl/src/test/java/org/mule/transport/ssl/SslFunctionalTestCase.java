@@ -13,21 +13,40 @@ package org.mule.transport.ssl;
 import org.mule.api.MuleMessage;
 import org.mule.api.service.Service;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.DynamicPortTestCase;
 import org.mule.tck.functional.CounterCallback;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
+import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.testmodels.mule.TestSedaService;
 
-public class SslFunctionalTestCase extends DynamicPortTestCase 
+import org.junit.Rule;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+public class SslFunctionalTestCase extends FunctionalTestCase 
 {
     private static int NUM_MESSAGES = 100;
 
+    @Rule
+    public DynamicPort dynamicPort1 = new DynamicPort("port1");
+
+    @Rule
+    public DynamicPort dynamicPort2 = new DynamicPort("port2");
+
+    @Rule
+    public DynamicPort dynamicPort3 = new DynamicPort("port3");
+
+    @Override
     protected String getConfigResources()
     {
         return "ssl-functional-test.xml";
     }
 
+    @Test
     public void testSend() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -35,6 +54,7 @@ public class SslFunctionalTestCase extends DynamicPortTestCase
         assertEquals(TEST_MESSAGE + " Received", result.getPayloadAsString());
     }
 
+    @Test
     public void testSendMany() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -56,6 +76,7 @@ public class SslFunctionalTestCase extends DynamicPortTestCase
         assertEquals(NUM_MESSAGES, ((CounterCallback) cc).getCallbackCount());
     }
 
+    @Test
     public void testAsynchronous() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -67,9 +88,4 @@ public class SslFunctionalTestCase extends DynamicPortTestCase
         assertEquals(TEST_MESSAGE + " Received Async", response.getPayloadAsString());
     }
 
-    @Override
-    protected int getNumPortsToFind()
-    {
-        return 3;
-    }
 }

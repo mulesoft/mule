@@ -36,20 +36,18 @@ public class RemoteDispatcherTestCase extends AbstractServiceAndFlowTestCase
     @Rule
     public DynamicPort port1 = new DynamicPort("port1");
 
-    public RemoteDispatcherTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-
-    }
-
     @Parameters
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
             {ConfigVariant.SERVICE, "org/mule/test/construct/remote-dispatcher.xml"}
 
-
         });
+    }
+
+    public RemoteDispatcherTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
     }
 
     @Test

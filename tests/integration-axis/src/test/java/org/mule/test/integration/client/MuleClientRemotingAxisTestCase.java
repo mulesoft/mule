@@ -15,11 +15,29 @@ import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.module.client.MuleClient;
 import org.mule.module.client.RemoteDispatcher;
 import org.mule.module.xml.transformer.wire.XStreamWireFormat;
-import org.mule.tck.DynamicPortTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.testmodels.services.Person;
 
-public class MuleClientRemotingAxisTestCase extends DynamicPortTestCase
+import org.junit.Ignore;
+import org.junit.Rule;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+public class MuleClientRemotingAxisTestCase extends FunctionalTestCase
 {
+
+    @Rule
+    public DynamicPort dynamicPort1 = new DynamicPort("port1");
+
+    @Rule
+    public DynamicPort dynamicPort2 = new DynamicPort("port2");
+
+    @Rule
+    public DynamicPort dynamicPort3 = new DynamicPort("port3");
 
     @Override
     protected String getConfigResources()
@@ -43,6 +61,7 @@ public class MuleClientRemotingAxisTestCase extends DynamicPortTestCase
                    inboundEndpointName)).getAddress();
     }
 
+    @Test
     public void testRequestResponse() throws Throwable
     {
         MuleClient client = new MuleClient(muleContext);
@@ -60,8 +79,9 @@ public class MuleClientRemotingAxisTestCase extends DynamicPortTestCase
         }
     }
 
-    // this test is disabled because of MULE-4844
-    public void _testRequestResponseComplex() throws Exception
+    @Test
+    @Ignore("Disabled because of MULE-4844")
+    public void testRequestResponseComplex() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
         RemoteDispatcher dispatcher = client.getRemoteDispatcher("remoteEndpoint");
@@ -82,8 +102,9 @@ public class MuleClientRemotingAxisTestCase extends DynamicPortTestCase
         }
     }
 
-    // this test is disabled because of MULE-4844
-    public void _testRequestResponseComplex2() throws Exception
+    @Test
+    @Ignore("Disabled because of MULE-4844")
+    public void testRequestResponseComplex2() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
         RemoteDispatcher dispatcher = client.getRemoteDispatcher("remoteEndpoint");
@@ -113,9 +134,4 @@ public class MuleClientRemotingAxisTestCase extends DynamicPortTestCase
         }
     }
 
-    @Override
-    protected int getNumPortsToFind()
-    {
-        return 3;
-    }
 }

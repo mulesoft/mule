@@ -12,7 +12,8 @@ package org.mule.transport.http.functional;
 
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.DynamicPortTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethodBase;
@@ -22,19 +23,19 @@ import org.apache.commons.httpclient.methods.HeadMethod;
 import org.apache.commons.httpclient.methods.OptionsMethod;
 import org.apache.commons.httpclient.methods.PutMethod;
 import org.apache.commons.httpclient.methods.TraceMethod;
+import org.junit.Rule;
+import org.junit.Test;
 
-public class HttpMethodTestCase extends DynamicPortTestCase
+import static org.junit.Assert.assertEquals;
+
+public class HttpMethodTestCase extends FunctionalTestCase
 {
 
     private HttpMethodBase method;
     private MuleClient muleClient = null;
-        
-    @Override
-    protected void doSetUp() throws Exception
-    {
-        super.doSetUp();
-        muleClient = new MuleClient(muleContext);
-    }
+
+    @Rule
+    public DynamicPort dynamicPort = new DynamicPort("port1");
 
     @Override
     protected String getConfigResources()
@@ -42,14 +43,14 @@ public class HttpMethodTestCase extends DynamicPortTestCase
         return "http-method-test.xml";
     }
 
-    protected void doFunctionalTearDown () throws Exception
+    @Override
+    protected void doSetUp() throws Exception
     {
-        if (method != null)
-        {
-            method.releaseConnection();
-        }
+        super.doSetUp();
+        muleClient = new MuleClient(muleContext);
     }
 
+    @Test
     public void testHead() throws Exception
     {
         HttpClient client = new HttpClient();
@@ -59,6 +60,7 @@ public class HttpMethodTestCase extends DynamicPortTestCase
 
     }
 
+    @Test
     public void testOptions() throws Exception
     {
         HttpClient client = new HttpClient();
@@ -67,6 +69,7 @@ public class HttpMethodTestCase extends DynamicPortTestCase
         assertEquals(Integer.toString(HttpStatus.SC_OK), Integer.toString(statusCode));
     }
 
+    @Test
     public void testPut() throws Exception
     {
         HttpClient client = new HttpClient();
@@ -75,6 +78,7 @@ public class HttpMethodTestCase extends DynamicPortTestCase
         assertEquals(Integer.toString(HttpStatus.SC_OK), Integer.toString(statusCode));
     }
 
+    @Test
     public void testDelete() throws Exception
     {
         HttpClient client = new HttpClient();
@@ -83,6 +87,7 @@ public class HttpMethodTestCase extends DynamicPortTestCase
         assertEquals(Integer.toString(HttpStatus.SC_OK), Integer.toString(statusCode));
     }
 
+    @Test
     public void testTrace() throws Exception
     {
         HttpClient client = new HttpClient();
@@ -91,6 +96,7 @@ public class HttpMethodTestCase extends DynamicPortTestCase
         assertEquals(Integer.toString(HttpStatus.SC_OK), Integer.toString(statusCode));
     }
 
+    @Test
     public void testConnect() throws Exception
     {
         HttpClient client = new HttpClient();
@@ -106,6 +112,7 @@ public class HttpMethodTestCase extends DynamicPortTestCase
         assertEquals(Integer.toString(HttpStatus.SC_OK), Integer.toString(statusCode));
     }
 
+    @Test
     public void testFoo() throws Exception
     {
         HttpClient client = new HttpClient();
@@ -121,11 +128,6 @@ public class HttpMethodTestCase extends DynamicPortTestCase
         assertEquals(Integer.toString(HttpStatus.SC_BAD_REQUEST), Integer.toString(statusCode));
     }
 
-    @Override
-    protected int getNumPortsToFind()
-    {
-        return 1;
-    }
 }
 
 

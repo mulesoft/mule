@@ -29,7 +29,6 @@ public abstract class AbstractPropertyScopeTestCase extends AbstractServiceAndFl
     public AbstractPropertyScopeTestCase(ConfigVariant variant, String configResources)
     {
         super(variant, configResources);
-
     }
 
     @Test

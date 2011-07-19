@@ -12,15 +12,34 @@ package org.mule.transport.ssl.issues;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.DynamicPortTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 
-public class AsynchronousSslMule1854TestCase extends DynamicPortTestCase 
+import org.junit.Rule;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+public class AsynchronousSslMule1854TestCase extends FunctionalTestCase
 {
+
+    @Rule
+    public DynamicPort dynamicPort1 = new DynamicPort("port1");
+
+    @Rule
+    public DynamicPort dynamicPort2 = new DynamicPort("port2");
+
+    @Rule
+    public DynamicPort dynamicPort3 = new DynamicPort("port3");
+
+    @Override
     protected String getConfigResources()
     {
         return "ssl-functional-test.xml";
     }
 
+    @Test
     public void testAsynchronous() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -32,9 +51,4 @@ public class AsynchronousSslMule1854TestCase extends DynamicPortTestCase
         assertEquals(TEST_MESSAGE + " Received Async", response.getPayloadAsString());
     }
 
-    @Override
-    protected int getNumPortsToFind()
-    {
-        return 3;
-    }
 }

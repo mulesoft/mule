@@ -12,7 +12,8 @@ package org.mule.transport.ajax;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.DynamicPortTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.util.concurrent.Latch;
 
 import java.util.Map;
@@ -23,20 +24,28 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.cometd.Client;
 import org.cometd.Message;
 import org.cometd.MessageListener;
+import org.junit.Rule;
+import org.junit.Test;
 import org.mortbay.cometd.client.BayeuxClient;
 import org.mortbay.jetty.client.Address;
 import org.mortbay.jetty.client.HttpClient;
 
-public class AjaxFunctionalTestCase extends DynamicPortTestCase
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+public class AjaxFunctionalTestCase extends FunctionalTestCase
 {
     public static int SERVER_PORT = -1;
     
     private HttpClient httpClient;
     private BayeuxClient bayeuxClient;
 
+    @Rule
+    public DynamicPort dynamicPort = new DynamicPort("port1");
+
     public AjaxFunctionalTestCase()
     {
-        super();
         // start the embedded servers before starting mule to try and avoid
         // intermittent failures in testClientPublishWithString        
         setStartContext(false);
@@ -51,7 +60,7 @@ public class AjaxFunctionalTestCase extends DynamicPortTestCase
     @Override
     protected void doSetUp() throws Exception
     {
-        SERVER_PORT = getPorts().get(0);
+        SERVER_PORT = dynamicPort.getNumber();
         httpClient = new HttpClient();
         httpClient.setConnectorType(HttpClient.CONNECTOR_SELECT_CHANNEL);
         httpClient.start();
@@ -93,6 +102,7 @@ public class AjaxFunctionalTestCase extends DynamicPortTestCase
         }
     }
 
+    @Test
     public void testClientSubscribeWithString() throws Exception
     {
         /*
@@ -105,6 +115,7 @@ public class AjaxFunctionalTestCase extends DynamicPortTestCase
         final AtomicReference<Object> data = new AtomicReference<Object>();
         bayeuxClient.addListener(new MessageListener()
         {
+            @Override
             public void deliver(Client fromClient, Client toClient, Message message)
             {
 
@@ -131,6 +142,7 @@ public class AjaxFunctionalTestCase extends DynamicPortTestCase
         assertEquals("Ross Received", result.get("data"));
     }
 
+    @Test
     public void testClientPublishWithString() throws Exception
     {
         MuleClient muleClient = new MuleClient(muleContext);
@@ -142,9 +154,4 @@ public class AjaxFunctionalTestCase extends DynamicPortTestCase
         assertEquals("Ross Received", msg.getPayloadAsString());
     }
 
-    @Override
-    protected int getNumPortsToFind()
-    {
-        return 1;
-    }
 }

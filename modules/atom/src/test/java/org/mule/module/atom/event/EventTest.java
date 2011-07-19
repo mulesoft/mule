@@ -9,7 +9,8 @@
  */
 package org.mule.module.atom.event;
 
-import org.mule.tck.DynamicPortTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 
 import javax.jcr.Node;
 import javax.jcr.NodeIterator;
@@ -22,10 +23,24 @@ import org.apache.abdera.model.Document;
 import org.apache.abdera.model.Feed;
 import org.apache.abdera.protocol.client.AbderaClient;
 import org.apache.abdera.protocol.client.ClientResponse;
+import org.junit.Rule;
+import org.junit.Test;
 
-public class EventTest extends DynamicPortTestCase
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+public class EventTest extends FunctionalTestCase
 {
     private Repository repository;
+
+    @Rule
+    public DynamicPort dynamicPort = new DynamicPort("port1");
+
+    @Override
+    protected String getConfigResources()
+    {
+        return "eventqueue-conf.xml";
+    }
 
     @Override
     protected void doSetUp() throws Exception
@@ -36,44 +51,10 @@ public class EventTest extends DynamicPortTestCase
     }
 
     @Override
-    protected String getConfigResources()
-    {
-        return "eventqueue-conf.xml";
-    }
-
-    @Override
-    protected int getNumPortsToFind()
-    {
-        return 1;
-    }
-
-    @Override
     protected void doTearDown() throws Exception
     {
         clearJcrRepository();
         super.doTearDown();
-    }
-
-    public void testCustomerProvider() throws Exception
-    {
-        repository = (Repository) muleContext.getRegistry().lookupObject("jcrRepository");
-
-        Thread.sleep(5000);
-
-        AbderaClient client = new AbderaClient();
-        ClientResponse res = client.get("http://localhost:" + getPorts().get(0) + "/events");
-
-        Document<Feed> doc = res.getDocument();
-        // see if this helps with intermittent failures
-        doc.complete();
-        Feed feed = doc.getRoot();
-        // see if this helps with intermittent failures
-        feed.complete();
-        assertNotNull("feed is null", feed);
-        assertTrue( feed.getEntries().size() >= 1);
-        EntryReceiver component = (EntryReceiver)getComponent("eventConsumer");
-
-        assertTrue(component.getCount() > 0);
     }
 
     private void clearJcrRepository()
@@ -85,9 +66,9 @@ public class EventTest extends DynamicPortTestCase
                 return;
             }
             Session session = repository.login(new SimpleCredentials("username", "password".toCharArray()));
-
+    
             Node node = session.getRootNode();
-
+    
             for (NodeIterator itr = node.getNodes(); itr.hasNext();)
             {
                 Node child = itr.nextNode();
@@ -107,5 +88,28 @@ public class EventTest extends DynamicPortTestCase
         {
             // do nothing
         }
+    }
+
+    @Test
+    public void testCustomerProvider() throws Exception
+    {
+        repository = (Repository) muleContext.getRegistry().lookupObject("jcrRepository");
+
+        Thread.sleep(5000);
+
+        AbderaClient client = new AbderaClient();
+        ClientResponse res = client.get("http://localhost:" + dynamicPort.getNumber() + "/events");
+
+        Document<Feed> doc = res.getDocument();
+        // see if this helps with intermittent failures
+        doc.complete();
+        Feed feed = doc.getRoot();
+        // see if this helps with intermittent failures
+        feed.complete();
+        assertNotNull("feed is null", feed);
+        assertTrue( feed.getEntries().size() >= 1);
+        EntryReceiver component = (EntryReceiver)getComponent("eventConsumer");
+
+        assertTrue(component.getCount() > 0);
     }
 }

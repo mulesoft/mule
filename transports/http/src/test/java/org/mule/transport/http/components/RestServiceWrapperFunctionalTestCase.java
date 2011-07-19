@@ -12,14 +12,25 @@ package org.mule.transport.http.components;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.DynamicPortTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class RestServiceWrapperFunctionalTestCase extends DynamicPortTestCase
+import org.junit.Rule;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
+
+public class RestServiceWrapperFunctionalTestCase extends FunctionalTestCase
 {
     protected static String TEST_REQUEST = "Test Http Request";
+
+    @Rule
+    public DynamicPort dynamicPort = new DynamicPort("port1");
 
     @Override
     protected String getConfigResources()
@@ -27,6 +38,7 @@ public class RestServiceWrapperFunctionalTestCase extends DynamicPortTestCase
         return "http-rest-service-wrapper-functional-test.xml";
     }
 
+    @Test
     public void testErrorExpressionOnRegexFilterFail() throws Exception
     {
         try
@@ -40,6 +52,7 @@ public class RestServiceWrapperFunctionalTestCase extends DynamicPortTestCase
         }
     }
 
+    @Test
     public void testErrorExpressionOnRegexFilterPass() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -47,6 +60,7 @@ public class RestServiceWrapperFunctionalTestCase extends DynamicPortTestCase
         assertEquals("echo=" + TEST_REQUEST,result.getPayloadAsString());
     }
 
+    @Test
     public void testRequiredParameters() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -57,6 +71,7 @@ public class RestServiceWrapperFunctionalTestCase extends DynamicPortTestCase
         assertEquals("foo=boo&faz=baz&far=bar",result.getPayloadAsString());
     }
 
+    @Test
     public void testOptionalParametersMissing() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -66,9 +81,9 @@ public class RestServiceWrapperFunctionalTestCase extends DynamicPortTestCase
         assertEquals("foo=boo&faz=baz",result.getPayloadAsString());
     }
 
+    @Test
     public void testRequiredParametersMissing() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
         Map<String, Object> props = new HashMap<String, Object>();
 
         try
@@ -82,6 +97,7 @@ public class RestServiceWrapperFunctionalTestCase extends DynamicPortTestCase
         }
     }
 
+    @Test
     public void testRestServiceComponentInFlow() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -91,9 +107,4 @@ public class RestServiceWrapperFunctionalTestCase extends DynamicPortTestCase
         assertEquals("echo=Test Http Request", result.getPayloadAsString());
     }
     
-    @Override
-    protected int getNumPortsToFind()
-    {
-        return 1;
-    }
 }

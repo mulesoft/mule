@@ -10,7 +10,8 @@
 
 package org.mule.module.cxf;
 
-import org.mule.tck.DynamicPortTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -27,10 +28,24 @@ import org.apache.cxf.BusFactory;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.mime.TestMtom;
 import org.apache.cxf.mime.TestMtomService;
+import org.junit.Rule;
+import org.junit.Test;
 
-public class MtomTestCase extends DynamicPortTestCase
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+public class MtomTestCase extends FunctionalTestCase
 {
+    @Rule
+    public DynamicPort dynamicPort = new DynamicPort("port1");
 
+    @Override
+    protected String getConfigResources()
+    {
+        return "mtom-conf.xml";
+    }
+
+    @Test
     public void testEchoService() throws Exception
     {
         URL wsdl = getClass().getResource("/wsdl/mtom_xop.wsdl");
@@ -47,7 +62,7 @@ public class MtomTestCase extends DynamicPortTestCase
 
         BindingProvider bp = ((BindingProvider) port);
         bp.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
-            "http://localhost:" + getPorts().get(0) + "/services/mtom");
+            "http://localhost:" + dynamicPort.getNumber() + "/services/mtom");
         ((SOAPBinding) bp.getBinding()).setMTOMEnabled(true);
         // Client client = ClientProxy.getClient(port);
         // new LoggingFeature().initialize(client, null);
@@ -68,19 +83,5 @@ public class MtomTestCase extends DynamicPortTestCase
         IOUtils.copy(input, bos);
         input.close();
     }
-
-    @Override
-    protected String getConfigResources()
-    {
-        return "mtom-conf.xml";
-    }
-
-    @Override
-    protected int getNumPortsToFind()
-    {
-        // TODO Auto-generated method stub
-        return 1;
-    }
-
 }
 

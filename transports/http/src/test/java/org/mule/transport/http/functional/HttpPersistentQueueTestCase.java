@@ -12,9 +12,10 @@ package org.mule.transport.http.functional;
 
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
-import org.mule.tck.DynamicPortTestCase;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
+import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.http.HttpConstants;
 
 import java.util.concurrent.CountDownLatch;
@@ -26,11 +27,21 @@ import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.NameValuePair;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
+import org.junit.Rule;
+import org.junit.Test;
 
-public class HttpPersistentQueueTestCase extends DynamicPortTestCase
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+public class HttpPersistentQueueTestCase extends FunctionalTestCase
 {
     private CountDownLatch messageDidArrive = new CountDownLatch(1);
     private int port = -1;
+
+    @Rule
+    public DynamicPort dynamicPort = new DynamicPort("port1");
     
     @Override
     protected String getConfigResources()
@@ -46,9 +57,10 @@ public class HttpPersistentQueueTestCase extends DynamicPortTestCase
         FunctionalTestComponent testComponent = (FunctionalTestComponent) getComponent("PersistentQueueAsync");
         assertNotNull(testComponent);
         testComponent.setEventCallback(new Callback(messageDidArrive));
-        port = getPorts().get(0);
+        port = dynamicPort.getNumber();
     }
 
+    @Test
     public void testPersistentMessageDeliveryWithGet() throws Exception
     {
         GetMethod method = new GetMethod("http://localhost:" + port + "/services/Echo?foo=bar");
@@ -56,6 +68,7 @@ public class HttpPersistentQueueTestCase extends DynamicPortTestCase
         doTestPersistentMessageDelivery(method);
     }
 
+    @Test
     public void testPersistentMessageDeliveryWithPost() throws Exception
     {        
         PostMethod method = new PostMethod("http://localhost:" + port + "/services/Echo");        
@@ -108,9 +121,4 @@ public class HttpPersistentQueueTestCase extends DynamicPortTestCase
         }
     }
 
-    @Override
-    protected int getNumPortsToFind()
-    {
-        return 1;
-    } 
 }

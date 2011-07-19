@@ -24,18 +24,17 @@ import static org.junit.Assert.assertEquals;
 
 public class VmPropertyScopeTestCase extends AbstractPropertyScopeTestCase
 {
-    public VmPropertyScopeTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-
-    }
-
     @Parameters
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
             {ConfigVariant.SERVICE, "org/mule/test/message/vm-property-scope-service.xml"},
             {ConfigVariant.FLOW, "org/mule/test/message/vm-property-scope-flow.xml"}});
+    }
+
+    public VmPropertyScopeTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
     }
 
     @Test

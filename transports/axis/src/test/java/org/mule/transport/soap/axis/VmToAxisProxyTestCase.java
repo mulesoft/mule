@@ -12,16 +12,27 @@ package org.mule.transport.soap.axis;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.DynamicPortTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 
-public class VmToAxisProxyTestCase extends DynamicPortTestCase
+import org.junit.Rule;
+import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
+
+public class VmToAxisProxyTestCase extends FunctionalTestCase
 {
 
+    @Rule
+    public DynamicPort dynamicPort = new DynamicPort("port1");
+
+    @Override
     protected String getConfigResources()
     {
         return "vm-to-axis-proxy-mule-config.xml";
     }
 
+    @Test
     public void testWSProxy() throws Exception
     {
         if (isOffline("org.mule.transport.soap.axis.VmToAxisProxyTestCase.testWSProxy()"))
@@ -32,12 +43,6 @@ public class VmToAxisProxyTestCase extends DynamicPortTestCase
         MuleClient client = new MuleClient(muleContext);
         MuleMessage result = client.send("vm://proxy", "ibm", null);
         assertNotNull(result);
-    }
-
-    @Override
-    protected int getNumPortsToFind()
-    {
-        return 1;
     }
 
 }

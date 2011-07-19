@@ -13,9 +13,10 @@ package org.mule.transport.tcp.integration;
 import org.mule.api.MuleEventContext;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.DynamicPortTestCase;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalStreamingTestComponent;
+import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.util.HashMap;
 import java.util.concurrent.CountDownLatch;
@@ -23,15 +24,27 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
+import org.junit.Rule;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 /**
  * This test is more about testing the streaming model than the TCP provider, really.
  */
-public class StreamingTestCase extends DynamicPortTestCase
+public class StreamingTestCase extends FunctionalTestCase
 {
-
     public static final int TIMEOUT = 300000;
     public static final String TEST_MESSAGE = "Test TCP Request";
     public static final String RESULT = "Received stream; length: 16; 'Test...uest'";
+
+    @Rule
+    public DynamicPort dynamicPort1 = new DynamicPort("port1");
+
+    @Rule
+    public DynamicPort dynamicPort2 = new DynamicPort("port2");
 
     @Override
     protected String getConfigResources()
@@ -39,6 +52,7 @@ public class StreamingTestCase extends DynamicPortTestCase
         return "tcp-streaming-test.xml";
     }
 
+    @Test
     public void testSend() throws Exception
     {
         final CountDownLatch latch = new CountDownLatch(1);
@@ -83,11 +97,5 @@ public class StreamingTestCase extends DynamicPortTestCase
 
         latch.await(10, TimeUnit.SECONDS);
         assertEquals(RESULT, message.get());
-    }
-
-    @Override
-    protected int getNumPortsToFind()
-    {
-        return 2;
     }
 }

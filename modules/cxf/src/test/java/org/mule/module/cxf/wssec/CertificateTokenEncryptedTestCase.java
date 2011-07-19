@@ -12,6 +12,7 @@ package org.mule.module.cxf.wssec;
 
 public class CertificateTokenEncryptedTestCase extends CertificateTokenTestCase
 {
+
     @Override
     protected String getConfigResources()
     {

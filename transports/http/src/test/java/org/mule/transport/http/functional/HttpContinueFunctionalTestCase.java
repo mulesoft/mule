@@ -12,7 +12,8 @@ package org.mule.transport.http.functional;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.DynamicPortTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.http.HttpConnector;
 
 import java.util.HashMap;
@@ -21,9 +22,16 @@ import java.util.Map;
 import org.apache.commons.httpclient.HttpVersion;
 import org.apache.commons.httpclient.params.HttpClientParams;
 import org.apache.commons.lang.time.StopWatch;
+import org.junit.Rule;
+import org.junit.Test;
 
-public class HttpContinueFunctionalTestCase extends DynamicPortTestCase
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
+
+public class HttpContinueFunctionalTestCase extends FunctionalTestCase
 {
+
     /**
      * HttpClient has default 3 seconds wait for Expect-Continue calls.
      */
@@ -31,12 +39,16 @@ public class HttpContinueFunctionalTestCase extends DynamicPortTestCase
 
     protected StopWatch stopWatch;
 
+    @Rule
+    public DynamicPort dynamicPort = new DynamicPort("port1");
+
     @Override
     protected String getConfigResources()
     {
         return "http-functional-test.xml";
     }
 
+    @Test
     public void testSendWithContinue() throws Exception
     {
         stopWatch = new StopWatch();
@@ -63,10 +75,4 @@ public class HttpContinueFunctionalTestCase extends DynamicPortTestCase
         }
     }
 
-    @Override
-    protected int getNumPortsToFind()
-    {
-
-        return 1;
-    }
 }

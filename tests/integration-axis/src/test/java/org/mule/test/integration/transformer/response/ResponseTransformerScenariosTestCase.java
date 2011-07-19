@@ -10,13 +10,30 @@
 
 package org.mule.test.integration.transformer.response;
 
-import org.mule.tck.DynamicPortTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 
-public class ResponseTransformerScenariosTestCase extends DynamicPortTestCase
+import org.junit.Rule;
+import org.junit.Test;
+
+public class ResponseTransformerScenariosTestCase extends FunctionalTestCase
 {
+
+    @Rule
+    public DynamicPort dynamicPort1 = new DynamicPort("port1");
+
+    @Rule
+    public DynamicPort dynamicPort2 = new DynamicPort("port2");
+
+    @Rule
+    public DynamicPort dynamicPort3 = new DynamicPort("port3");
+
+    @Rule
+    public DynamicPort dynamicPort4 = new DynamicPort("port4");
+
     public ResponseTransformerScenariosTestCase()
     {
-        setDisposeManagerPerSuite(true);
+        setDisposeContextPerClass(true);
     }
 
     @Override
@@ -43,13 +60,9 @@ public class ResponseTransformerScenariosTestCase extends DynamicPortTestCase
     /**
      * make maven happy
      */
+    @Test
     public void testDummy()
     {
     }
 
-    @Override
-    protected int getNumPortsToFind()
-    {
-        return 4;
-    }
 }

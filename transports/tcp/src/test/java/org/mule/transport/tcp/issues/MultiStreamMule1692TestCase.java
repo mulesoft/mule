@@ -13,22 +13,35 @@ package org.mule.transport.tcp.issues;
 import org.mule.api.MuleEventContext;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.DynamicPortTestCase;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalStreamingTestComponent;
+import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.util.HashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
-public class MultiStreamMule1692TestCase extends DynamicPortTestCase
+import org.junit.Rule;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+public class MultiStreamMule1692TestCase extends FunctionalTestCase
 {
     public static final int TIMEOUT = 3000;
     public static final String TEST_MESSAGE = "Test TCP Request";
     public static final String TEST_MESSAGE_2 = "Second test TCP Request";
     public static final String RESULT = "Received stream; length: 16; 'Test...uest'";
     public static final String RESULT_2 = "Received stream; length: 23; 'Seco...uest'";
+
+    @Rule
+    public DynamicPort dynamicPort1 = new DynamicPort("port1");
+
+    @Rule
+    public DynamicPort dynamicPort2 = new DynamicPort("port2");
 
     @Override
     protected String getConfigResources()
@@ -61,21 +74,20 @@ public class MultiStreamMule1692TestCase extends DynamicPortTestCase
         };
     }
 
+    @Test
     public void testSend() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
 
         Object ftc = getComponent("testComponent");
         assertTrue("FunctionalStreamingTestComponent expected", ftc instanceof FunctionalStreamingTestComponent);
-//        assertNotNull(ftc);
-//        assertEquals(1, ftc.getNumber());
 
 
         final CountDownLatch latch = new CountDownLatch(1);
         final AtomicReference<String> message = new AtomicReference<String>();
         ((FunctionalStreamingTestComponent) ftc).setEventCallback(newCallback(latch, message), TEST_MESSAGE.length());
         client.dispatch(((InboundEndpoint) client.getMuleContext().getRegistry().lookupObject("testInbound")).getAddress(),
-            TEST_MESSAGE, new HashMap());
+            TEST_MESSAGE, new HashMap<Object, Object>());
         latch.await(10, TimeUnit.SECONDS);
         assertEquals(RESULT, message.get());
 
@@ -83,15 +95,8 @@ public class MultiStreamMule1692TestCase extends DynamicPortTestCase
         final AtomicReference<String> message2 = new AtomicReference<String>();
         ((FunctionalStreamingTestComponent) ftc).setEventCallback(newCallback(latch2, message2), TEST_MESSAGE_2.length());
         client.dispatch(((InboundEndpoint) client.getMuleContext().getRegistry().lookupObject("testInbound")).getAddress(),
-            TEST_MESSAGE_2, new HashMap());
+            TEST_MESSAGE_2, new HashMap<Object, Object>());
         latch2.await(10, TimeUnit.SECONDS);
         assertEquals(RESULT_2, message2.get());
     }
-
-    @Override
-    protected int getNumPortsToFind()
-    {
-        return 2;
-    }
 }
-

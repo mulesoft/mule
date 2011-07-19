@@ -10,33 +10,27 @@
 
 package org.mule.transport.tcp.protocols;
 
-import static org.junit.Assert.assertEquals;
-
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
+import java.util.Arrays;
+import java.util.Collection;
+
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+
+import static org.junit.Assert.assertEquals;
+
 public class MuleMessageLengthTestCase extends AbstractServiceAndFlowTestCase
 {
-
     protected static String TEST_MESSAGE = "Test TCP Request";
 
     @Rule
     public DynamicPort port1 = new DynamicPort("port1");
 
-    public MuleMessageLengthTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
 
     @Parameters
     public static Collection<Object[]> parameters()
@@ -45,13 +39,16 @@ public class MuleMessageLengthTestCase extends AbstractServiceAndFlowTestCase
             {ConfigVariant.FLOW, "tcp-mplength-test-flow.xml"}});
     }
 
+    public MuleMessageLengthTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
+    }
+
     @Test
     public void testSend() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
-        Map props = new HashMap();
-        MuleMessage result = client.send("clientEndpoint", TEST_MESSAGE, props);
+        MuleMessage result = client.send("clientEndpoint", TEST_MESSAGE, null);
         assertEquals(TEST_MESSAGE + " Received", result.getPayloadAsString());
     }
-
 }

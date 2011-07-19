@@ -19,6 +19,10 @@ import java.util.Map;
 
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.handlers.ArrayHandler;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class JdbcFunctionalTestCase extends AbstractJdbcFunctionalTestCase
 {
@@ -27,11 +31,13 @@ public class JdbcFunctionalTestCase extends AbstractJdbcFunctionalTestCase
         setPopulateTestData(false);
     }
     
+    @Override
     protected String getConfigResources()
     {
         return super.getConfigResources() + ",jdbc-functional-config.xml";
     }
 
+    @Test
     public void testDirectSql() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -45,6 +51,7 @@ public class JdbcFunctionalTestCase extends AbstractJdbcFunctionalTestCase
         assertResultSetNotEmpty(message);
     }
 
+    @Test
     public void testSend() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -58,6 +65,7 @@ public class JdbcFunctionalTestCase extends AbstractJdbcFunctionalTestCase
         assertEquals(TEST_MESSAGE, obj2[0]);
     }
 
+    @Test
     public void testSendMap() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -73,6 +81,7 @@ public class JdbcFunctionalTestCase extends AbstractJdbcFunctionalTestCase
         assertEquals(TEST_MESSAGE, obj2[0]);
     }
 
+    @Test
     public void testReceive() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -88,6 +97,7 @@ public class JdbcFunctionalTestCase extends AbstractJdbcFunctionalTestCase
         assertResultSetNotEmpty(message);
     }
 
+    @Test
     public void testReceiveAndSend() throws Exception
     {
         QueryRunner qr = jdbcConnector.getQueryRunner();

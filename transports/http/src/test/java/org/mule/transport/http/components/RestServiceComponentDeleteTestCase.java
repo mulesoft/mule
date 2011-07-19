@@ -11,6 +11,7 @@
 package org.mule.transport.http.components;
 
 import org.mule.module.client.MuleClient;
+import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.http.HttpConstants;
 import org.mule.transport.http.functional.AbstractMockHttpServerTestCase;
 import org.mule.transport.http.functional.MockHttpServer;
@@ -20,10 +21,18 @@ import java.util.StringTokenizer;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import org.junit.Rule;
+import org.junit.Test;
+
+import static org.junit.Assert.assertTrue;
+
 public class RestServiceComponentDeleteTestCase extends AbstractMockHttpServerTestCase
 {
     private CountDownLatch serverRequestCompleteLatch = new CountDownLatch(1);
     private boolean deleteRequestFound = false;
+
+    @Rule
+    public DynamicPort dynamicPort = new DynamicPort("port1");
 
     @Override
     protected String getConfigResources()
@@ -32,17 +41,12 @@ public class RestServiceComponentDeleteTestCase extends AbstractMockHttpServerTe
     }
 
     @Override
-    protected int getNumPortsToFind()
-    {
-        return 1;
-    }
-
-    @Override
     protected MockHttpServer getHttpServer(CountDownLatch serverStartLatch)
     {
-        return new SimpleHttpServer(getPorts().get(0), serverStartLatch, serverRequestCompleteLatch);
+        return new SimpleHttpServer(dynamicPort.getNumber(), serverStartLatch, serverRequestCompleteLatch);
     }
 
+    @Test
     public void testRestServiceComponentDelete() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
