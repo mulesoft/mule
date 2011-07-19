@@ -10,30 +10,40 @@
 
 package org.mule.transport.tcp;
 
-import org.mule.api.MuleMessage;
-import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.junit4.FunctionalTestCase;
-import org.mule.tck.junit4.rule.DynamicPort;
-
-import org.junit.Rule;
-import org.junit.Test;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-public class TcpEchoDirectProtocolTestCase extends FunctionalTestCase
-{
+import java.util.Arrays;
+import java.util.Collection;
 
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+import org.mule.api.MuleMessage;
+import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.module.client.MuleClient;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
+
+public class TcpEchoDirectProtocolTestCase extends AbstractServiceAndFlowTestCase
+{
     protected static String TEST_MESSAGE = "Test TCP Request";
 
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
-    @Override
-    protected String getConfigResources()
+    public TcpEchoDirectProtocolTestCase(ConfigVariant variant, String configResources)
     {
-        return "tcp-echo-test.xml";
+        super(variant, configResources);        
+    }
+    
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "tcp-echo-test-service.xml"},
+            {ConfigVariant.FLOW, "tcp-echo-test-flow.xml"}
+        });
     }
 
     @Test
