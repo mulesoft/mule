@@ -22,23 +22,23 @@ import org.junit.runners.Parameterized.Parameters;
 
 public class StreamingSpeedMule1389TestCase extends AbstractStreamingCapacityTestCase
 {
+
     @Rule
     public DynamicPort dynamicPort1 = new DynamicPort("port1");
 
     @Rule
     public DynamicPort dynamicPort2 = new DynamicPort("port2");
 
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][] {
-            {ConfigVariant.SERVICE, "streaming-speed-mule-1389.xml"}
-        });
-    }
-
     public StreamingSpeedMule1389TestCase(ConfigVariant variant, String configResources)
     {
         super(variant, configResources, 100 * ONE_MB);
+    }
+
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{{ConfigVariant.SERVICE, "streaming-speed-mule-1389-service.xml"},
+            {ConfigVariant.FLOW, "streaming-speed-mule-1389-flow.xml"}});
     }
 
     @Override
