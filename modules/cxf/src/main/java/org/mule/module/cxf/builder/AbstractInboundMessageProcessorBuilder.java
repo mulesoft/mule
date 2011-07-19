@@ -20,6 +20,7 @@ import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.processor.MessageProcessorBuilder;
 import org.mule.api.service.ServiceAware;
 import org.mule.module.cxf.CxfConfiguration;
+import org.mule.module.cxf.CxfConstants;
 import org.mule.module.cxf.CxfInboundMessageProcessor;
 import org.mule.module.cxf.MuleInvoker;
 import org.mule.module.cxf.support.CxfUtils;
@@ -73,6 +74,7 @@ public abstract class AbstractInboundMessageProcessorBuilder implements MuleCont
     private Map<String,Object> properties = new HashMap<String, Object>();
     private boolean validationEnabled;
     private List<String> schemaLocations;
+    private String onException = CxfConstants.CREATE_SOAP_FAULT;
 
     public CxfInboundMessageProcessor build() throws MuleException
     {
@@ -165,6 +167,7 @@ public abstract class AbstractInboundMessageProcessorBuilder implements MuleCont
 
         CxfInboundMessageProcessor processor = new CxfInboundMessageProcessor();
         processor.setMuleContext(muleContext);
+        processor.setOnFaultInvokeStrategy(CxfConstants.INVOKE_EXCEPTION_STRATEGY.equals(onException));
         configureMessageProcessor(sfb, processor);
         sfb.setStart(false);
 
@@ -424,6 +427,16 @@ public abstract class AbstractInboundMessageProcessorBuilder implements MuleCont
     public void setSchemaLocations(List<String> schemaLocations)
     {
         this.schemaLocations = schemaLocations;
+    }
+
+    public String getOnException()
+    {
+        return this.onException;
+    }
+
+    public void setOnException(String onException)
+    {
+        this.onException = onException;
     }
     
 }
