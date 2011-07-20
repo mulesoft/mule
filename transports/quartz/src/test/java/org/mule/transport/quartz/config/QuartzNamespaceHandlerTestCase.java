@@ -56,7 +56,8 @@ public class QuartzNamespaceHandlerTestCase extends FunctionalTestCase
         assertNotNull(c.getQuartzScheduler());
         assertEquals(StdScheduler.class, c.getQuartzScheduler().getClass());
         StdScheduler scheduler = (StdScheduler) c.getQuartzScheduler();
-        assertEquals("QuartzScheduler", scheduler.getSchedulerName());
+        String defaultSchedulerName = "scheduler-" + muleContext.getConfiguration().getId();
+        assertEquals(defaultSchedulerName, scheduler.getSchedulerName());
         
         assertTrue(c.isConnected());
         assertTrue(c.isStarted());
