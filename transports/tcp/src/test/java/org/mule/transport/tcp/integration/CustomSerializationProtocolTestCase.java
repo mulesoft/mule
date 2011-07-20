@@ -10,34 +10,46 @@
 
 package org.mule.transport.tcp.integration;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
+
+import java.util.Arrays;
+import java.util.Collection;
 
 import org.junit.Rule;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import org.junit.runners.Parameterized.Parameters;
 
 /**
  * This test was set for the new changes due to Mule1199
  */
-public class CustomSerializationProtocolTestCase extends FunctionalTestCase
+public class CustomSerializationProtocolTestCase extends AbstractServiceAndFlowTestCase
 {
     final private int messages = 1;
 
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
-    @Override
-    protected String getConfigResources()
+    public CustomSerializationProtocolTestCase(ConfigVariant variant, String configResources)
     {
-        return "custom-serialisation-mule-config.xml";
+        super(variant, configResources);
     }
 
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "custom-serialisation-mule-config-service.xml"},
+            {ConfigVariant.FLOW, "custom-serialisation-mule-config-flow.xml"}
+        });
+    }      
+    
     @Test
     public void testCustomObject() throws Exception
     {
