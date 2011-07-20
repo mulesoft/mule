@@ -10,13 +10,7 @@
 
 package org.mule.module.jersey;
 
-import org.mule.api.MuleMessage;
-import org.mule.api.config.MuleProperties;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.junit4.FunctionalTestCase;
-import org.mule.transport.http.HttpConnector;
-import org.mule.transport.http.HttpConstants;
-import org.mule.transport.servlet.MuleReceiverServlet;
+import static org.junit.Assert.assertEquals;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -26,10 +20,15 @@ import javax.servlet.ServletContext;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.servlet.Context;
 import org.mortbay.jetty.servlet.ServletHolder;
+import org.mule.api.MuleMessage;
+import org.mule.api.config.MuleProperties;
+import org.mule.module.client.MuleClient;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.transport.http.HttpConnector;
+import org.mule.transport.http.HttpConstants;
+import org.mule.transport.servlet.MuleReceiverServlet;
 
-import static org.junit.Assert.assertEquals;
-
-public abstract class AbstractServletTestCase extends FunctionalTestCase
+public abstract class AbstractServletTestCase extends AbstractServiceAndFlowTestCase
 {
 
     //TODO(pablo.kraan): replace with a dynamic endpoint
@@ -37,10 +36,10 @@ public abstract class AbstractServletTestCase extends FunctionalTestCase
 
     private Server httpServer;
     private String context;
-
-    public AbstractServletTestCase(String context)
+    
+    public AbstractServletTestCase(ConfigVariant variant, String configResources, String context)
     {
-        super();
+        super(variant, configResources);
         this.context = context;
     }
 

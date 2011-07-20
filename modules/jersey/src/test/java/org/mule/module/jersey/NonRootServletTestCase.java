@@ -10,20 +10,26 @@
 
 package org.mule.module.jersey;
 
+import java.util.Arrays;
+import java.util.Collection;
+
 import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
 
 public class NonRootServletTestCase extends AbstractServletTestCase
 {
-
-    public NonRootServletTestCase()
+    public NonRootServletTestCase(ConfigVariant variant, String configResources)
     {
-        super("/context/*");
+        super(variant, configResources, "/context/*");
     }
 
-    @Override
-    protected String getConfigResources()
+    @Parameters
+    public static Collection<Object[]> parameters()
     {
-        return "non-root-servlet-conf.xml";
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "non-root-servlet-conf-service.xml"},
+            {ConfigVariant.FLOW, "non-root-servlet-conf-flow.xml"}
+        });
     }
 
     @Test
