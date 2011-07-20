@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:spring="http://www.springframework.org/schema/beans"
+    xmlns:sftp="http://www.mulesoft.org/schema/mule/sftp" xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
+        http://www.mulesoft.org/schema/mule/sftp http://www.mulesoft.org/schema/mule/sftp/3.2/mule-sftp.xsd
+        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.2/mule-vm.xsd">
+
+    <spring:beans>
+        <spring:import resource="sftp-properties.xml" />
+    </spring:beans>
+
+    <sftp:connector name="sftp" pollingFrequency="2000" />
+
+    <sftp:connector name="sftpAddSeq" pollingFrequency="2000"
+        duplicateHandling="addSeqNo" />
+
+    <!-- Test 1 - test duplicate handling by throwing an exception -->
+
+    <flow name="sending1">
+
+        <vm:inbound-endpoint path="test.upload1" />
+
+
+        <sftp:outbound-endpoint
+            address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}/~/data1"
+            outputPattern="#[function:dateStamp].dat" connector-ref="sftp"
+            duplicateHandling="throwException" />
+
+    </flow>
+
+
+
+    <flow name="receiving1">
+
+        <!-- synchronous="true" - otherwise the inbound endpoint will trigger 
+            several times -->
+        <sftp:inbound-endpoint name="inboundEndpoint1"
+            connector-ref="sftp"
+            address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}/~/data1" />
+
+        <component>
+            <singleton-object
+                class="org.mule.tck.functional.FunctionalTestComponent" />
+        </component>
+    </flow>
+
+
+    <!-- Test 2 - test duplicate handling by overwriting the existing file -->
+
+    <flow name="sending2">
+
+        <vm:inbound-endpoint path="test.upload2" />
+
+
+        <sftp:outbound-endpoint
+            address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}/~/data2"
+            outputPattern="#[function:dateStamp].dat" connector-ref="sftp"
+            duplicateHandling="overwrite" />
+
+    </flow>
+
+
+
+    <flow name="receiving2">
+
+        <!-- synchronous="true" - otherwise the inbound endpoint will trigger 
+            several times -->
+        <sftp:inbound-endpoint name="inboundEndpoint2"
+            connector-ref="sftp"
+            address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}/~/data2" />
+
+        <component>
+            <singleton-object
+                class="org.mule.tck.functional.FunctionalTestComponent" />
+        </component>
+    </flow>
+
+
+    <!-- Test 3 - test duplicate handling by adding a sequence number to 
+        the new file -->
+
+    <flow name="sending3">
+
+        <vm:inbound-endpoint path="test.upload3" />
+
+        <sftp:outbound-endpoint
+            address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}/~/data3"
+            outputPattern="#[function:dateStamp].dat" connector-ref="sftp"
+            duplicateHandling="addSeqNo" />
+
+    </flow>
+
+
+
+    <flow name="receiving3">
+
+        <!-- synchronous="true" - otherwise the inbound endpoint will trigger 
+            several times -->
+        <sftp:inbound-endpoint name="inboundEndpoint3"
+            connector-ref="sftp"
+            address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}/~/data3" />
+
+        <component>
+            <singleton-object
+                class="org.mule.tck.functional.FunctionalTestComponent" />
+        </component>
+    </flow>
+
+    <!-- Test 4 - test duplicate handling by using the value set on the connector 
+        (addSeqNo) -->
+
+    <flow name="sending4">
+
+        <vm:inbound-endpoint path="test.upload4" />
+
+
+        <sftp:outbound-endpoint
+            address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}/~/data4"
+            outputPattern="#[function:dateStamp].dat" connector-ref="sftpAddSeq"
+            name="send4outbound" />
+
+    </flow>
+
+
+
+    <flow name="receiving4">
+
+        <!-- synchronous="true" - otherwise the inbound endpoint will trigger 
+            several times -->
+        <sftp:inbound-endpoint name="inboundEndpoint4"
+            connector-ref="sftp"
+            address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}/~/data4" />
+
+        <component>
+            <singleton-object
+                class="org.mule.tck.functional.FunctionalTestComponent" />
+        </component>
+    </flow>
+
+</mule>

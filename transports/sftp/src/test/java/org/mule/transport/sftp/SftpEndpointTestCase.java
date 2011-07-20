@@ -10,27 +10,37 @@
 
 package org.mule.transport.sftp;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+import java.util.Arrays;
+import java.util.Collection;
+
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
 import org.mule.api.MuleException;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.endpoint.MuleEndpointURI;
 import org.mule.module.client.MuleClient;
 
-import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
 public class SftpEndpointTestCase extends AbstractSftpTestCase
 {
-
-    @Override
-    protected String getConfigResources()
+    public SftpEndpointTestCase(ConfigVariant variant, String configResources)
     {
-        return "mule-sftp-endpoint-config.xml";
+        super(variant, configResources);
     }
-
+    
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "mule-sftp-endpoint-config-service.xml"},
+            {ConfigVariant.FLOW, "mule-sftp-endpoint-config-flow.xml"}
+        });
+    }
+    
     /*
      * For general guidelines on writing transports see
      * http://mule.mulesource.org/display/MULE/Writing+Transports

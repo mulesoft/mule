@@ -10,31 +10,40 @@
 
 package org.mule.transport.sftp.dataintegrity;
 
-import org.mule.api.transport.DispatchException;
-import org.mule.module.client.MuleClient;
-import org.mule.transport.sftp.SftpClient;
-
-import java.io.IOException;
-
-import org.junit.Test;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collection;
+
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+import org.mule.api.transport.DispatchException;
+import org.mule.module.client.MuleClient;
+import org.mule.transport.sftp.SftpClient;
 
 /**
  * Tests that files are not deleted if the temp directory can't be created
  */
 public class SftpCantCreateTempDirectoryTestCase extends AbstractSftpDataIntegrityTestCase
 {
-
     private static String INBOUND_ENDPOINT_NAME = "inboundEndpoint";
     private static String OUTBOUND_ENDPOINT_NAME = "outboundEndpoint";
 
-    @Override
-    protected String getConfigResources()
+    public SftpCantCreateTempDirectoryTestCase(ConfigVariant variant, String configResources)
     {
-        return "dataintegrity/sftp-dataintegrity-common-with-tempdir-config.xml";
+        super(variant, configResources);
+    }
+    
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "dataintegrity/sftp-dataintegrity-common-with-tempdir-config-service.xml"},
+            {ConfigVariant.FLOW, "dataintegrity/sftp-dataintegrity-common-with-tempdir-config-flow.xml"}
+        });
     }
 
     @Override

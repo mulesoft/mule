@@ -10,11 +10,12 @@
 
 package org.mule.transport.sftp;
 
-import org.mule.api.MuleEventContext;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.functional.EventCallback;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.concurrent.CountDownLatch;
@@ -23,9 +24,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
-
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import org.junit.runners.Parameterized.Parameters;
+import org.mule.api.MuleEventContext;
+import org.mule.module.client.MuleClient;
+import org.mule.tck.functional.EventCallback;
 
 /**
  * <code>SendReceiveFunctionalTestCase</code> tests sending an receiving multiple
@@ -41,10 +43,16 @@ public class SftpSendReceiveFunctionalTestCase extends AbstractSftpTestCase
 
     private int nrOfFiles = 8;
 
-    @Override
-    protected String getConfigResources()
+    public SftpSendReceiveFunctionalTestCase(ConfigVariant variant, String configResources)
     {
-        return "mule-send-receive-test-config.xml";
+        super(variant, configResources);
+    }
+
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{{ConfigVariant.SERVICE, "mule-send-receive-test-config-service.xml"},
+            {ConfigVariant.FLOW, "mule-send-receive-test-config-flow.xml"}});
     }
 
     @Override

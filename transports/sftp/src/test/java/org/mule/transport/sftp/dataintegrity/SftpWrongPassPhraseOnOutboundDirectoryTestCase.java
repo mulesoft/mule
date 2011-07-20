@@ -10,17 +10,19 @@
 
 package org.mule.transport.sftp.dataintegrity;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collection;
+
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.transport.DispatchException;
 import org.mule.module.client.MuleClient;
 import org.mule.transport.sftp.SftpClient;
-
-import java.io.IOException;
-
-import org.junit.Test;
-
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 /**
  * Verify that the original file is not lost if the password for the outbound
@@ -28,13 +30,20 @@ import static org.junit.Assert.assertTrue;
  */
 public class SftpWrongPassPhraseOnOutboundDirectoryTestCase extends AbstractSftpDataIntegrityTestCase
 {
-
     private static String INBOUND_ENDPOINT_NAME = "inboundEndpoint";
 
-    @Override
-    protected String getConfigResources()
+    public SftpWrongPassPhraseOnOutboundDirectoryTestCase(ConfigVariant variant, String configResources)
     {
-        return "dataintegrity/sftp-wrong-passphrase-config.xml";
+        super(variant, configResources);
+    }
+    
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "dataintegrity/sftp-wrong-passphrase-config-service.xml"},
+            {ConfigVariant.FLOW, "dataintegrity/sftp-wrong-passphrase-config-flow.xml"}
+        });
     }
 
     @Override

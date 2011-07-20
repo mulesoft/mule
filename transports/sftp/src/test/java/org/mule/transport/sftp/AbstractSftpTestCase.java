@@ -10,30 +10,11 @@
 
 package org.mule.transport.sftp;
 
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleEventContext;
-import org.mule.api.MuleException;
-import org.mule.api.context.notification.EndpointMessageNotificationListener;
-import org.mule.api.context.notification.ServerNotification;
-import org.mule.api.endpoint.EndpointBuilder;
-import org.mule.api.endpoint.EndpointURI;
-import org.mule.api.endpoint.ImmutableEndpoint;
-import org.mule.api.exception.MessagingExceptionHandler;
-import org.mule.api.exception.SystemExceptionHandler;
-import org.mule.api.model.Model;
-import org.mule.api.service.Service;
-import org.mule.api.transaction.RollbackMethod;
-import org.mule.api.transport.Connector;
-import org.mule.context.notification.EndpointMessageNotification;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.functional.EventCallback;
-import org.mule.tck.junit4.FunctionalTestCase;
-import org.mule.transport.sftp.util.ValueHolder;
-import org.mule.util.IOUtils;
-import org.mule.util.StringMessageUtils;
-
-import com.jcraft.jsch.ChannelSftp;
-import com.jcraft.jsch.SftpException;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.mule.context.notification.EndpointMessageNotification.MESSAGE_DISPATCHED;
+import static org.mule.context.notification.EndpointMessageNotification.MESSAGE_SENT;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -50,20 +31,43 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.lang.SystemUtils;
+import org.mule.api.MuleEvent;
+import org.mule.api.MuleEventContext;
+import org.mule.api.MuleException;
+import org.mule.api.context.notification.EndpointMessageNotificationListener;
+import org.mule.api.context.notification.ServerNotification;
+import org.mule.api.endpoint.EndpointBuilder;
+import org.mule.api.endpoint.EndpointURI;
+import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.exception.MessagingExceptionHandler;
+import org.mule.api.exception.SystemExceptionHandler;
+import org.mule.api.model.Model;
+import org.mule.api.service.Service;
+import org.mule.api.transaction.RollbackMethod;
+import org.mule.api.transport.Connector;
+import org.mule.context.notification.EndpointMessageNotification;
+import org.mule.module.client.MuleClient;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.functional.EventCallback;
+import org.mule.transport.sftp.util.ValueHolder;
+import org.mule.util.IOUtils;
+import org.mule.util.StringMessageUtils;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-import static org.mule.context.notification.EndpointMessageNotification.MESSAGE_DISPATCHED;
-import static org.mule.context.notification.EndpointMessageNotification.MESSAGE_SENT;
+import com.jcraft.jsch.ChannelSftp;
+import com.jcraft.jsch.SftpException;
 
 /**
  * @author Lennart Häggkvist, Magnus Larsson Date: Jun 8, 2009
  */
-public abstract class AbstractSftpTestCase extends FunctionalTestCase
+public abstract class AbstractSftpTestCase extends AbstractServiceAndFlowTestCase
 {
     protected static final String FILE_NAME = "file.txt";
 
+    public AbstractSftpTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
+    }
+    
     /**
      * Deletes all files in the directory, useful when testing to ensure that no
      * files are in the way...

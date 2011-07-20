@@ -10,7 +10,11 @@
 
 package org.mule.transport.sftp;
 
+import java.util.Arrays;
+import java.util.Collection;
+
 import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
 
 /**
  * Test the sizeCheck feature.
@@ -23,10 +27,17 @@ public class SftpQuartzRequesterFunctionalTestCase extends AbstractSftpTestCase
     // Size of the generated stream - 2 Mb
     final static int SEND_SIZE = 1024 * 1024 * 2;
 
-    @Override
-    protected String getConfigResources()
+    public SftpQuartzRequesterFunctionalTestCase(ConfigVariant variant, String configResources)
     {
-        return "mule-sftp-quartzRequester-test-config.xml";
+        super(variant, configResources);
+    }
+
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "mule-sftp-quartzRequester-test-config-service.xml"},
+            {ConfigVariant.FLOW, "mule-sftp-quartzRequester-test-config-flow.xml"}});
     }
 
     @Override

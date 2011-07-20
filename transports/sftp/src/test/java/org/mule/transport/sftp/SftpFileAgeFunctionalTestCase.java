@@ -10,11 +10,12 @@
 
 package org.mule.transport.sftp;
 
-import org.mule.api.MuleEventContext;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.functional.EventCallback;
-import org.mule.tck.functional.FunctionalTestComponent;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
@@ -24,14 +25,15 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import org.junit.runners.Parameterized.Parameters;
+import org.mule.api.MuleEventContext;
+import org.mule.module.client.MuleClient;
+import org.mule.tck.functional.EventCallback;
+import org.mule.tck.functional.FunctionalTestComponent;
 
 /**
  * <code>SftpFileAgeFunctionalTestCase</code> tests the fileAge functionality.
- *
+ * 
  * @author Lennart Häggkvist
  */
 
@@ -41,10 +43,16 @@ public class SftpFileAgeFunctionalTestCase extends AbstractSftpTestCase
 
     protected static final long TIMEOUT = 10000 * 6;
 
-    @Override
-    protected String getConfigResources()
+    public SftpFileAgeFunctionalTestCase(ConfigVariant variant, String configResources)
     {
-        return "mule-sftp-file-age-config.xml";
+        super(variant, configResources);
+    }
+
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{{ConfigVariant.SERVICE, "mule-sftp-file-age-config-service.xml"},
+            {ConfigVariant.FLOW, "mule-sftp-file-age-config-flow.xml"}});
     }
 
     @Override

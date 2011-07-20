@@ -10,12 +10,15 @@
 
 package org.mule.transport.sftp;
 
-import org.mule.api.endpoint.ImmutableEndpoint;
-import org.mule.module.client.MuleClient;
+import static org.junit.Assert.assertTrue;
+
+import java.util.Arrays;
+import java.util.Collection;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertTrue;
+import org.junit.runners.Parameterized.Parameters;
+import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.module.client.MuleClient;
 
 /**
  * @author Magnus Larsson <code>SftpExpressionFilenameParserTestCase</code> tests
@@ -29,12 +32,20 @@ public class SftpExpressionFilenameParserTestCase extends AbstractSftpTestCase
     private static final String OUTBOUND_ENDPOINT_NAME = "outboundEndpoint";
     private static final String INBOUND_ENDPOINT_NAME = "inboundEndpoint";
 
-    @Override
-    protected String getConfigResources()
+    public SftpExpressionFilenameParserTestCase(ConfigVariant variant, String configResources)
     {
-        return "mule-sftp-expressionFilenameParser-config.xml";
+        super(variant, configResources);
     }
-
+    
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "mule-sftp-expressionFilenameParser-config.xml"},
+            {ConfigVariant.FLOW, "mule-sftp-expressionFilenameParser-config.xml"}
+        });
+    }
+    
     @Override
     protected void doSetUp() throws Exception
     {

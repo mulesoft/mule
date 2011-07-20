@@ -10,18 +10,20 @@
 
 package org.mule.transport.sftp.dataintegrity;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collection;
+
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.transport.DispatchException;
 import org.mule.module.client.MuleClient;
 import org.mule.transport.sftp.SftpClient;
-
-import java.io.IOException;
-
-import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 /**
  * Test the three different types of handling when duplicate files (i.e. file names)
@@ -33,16 +35,24 @@ import static org.junit.Assert.assertTrue;
 public class SftpCheckDuplicateFileHandlingTestCase extends AbstractSftpDataIntegrityTestCase
 {
 
+    public SftpCheckDuplicateFileHandlingTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
+    }
+
     private static String INBOUND_ENDPOINT_NAME = "inboundEndpoint";
     private static String OUTBOUND_ENDPOINT_NAME = "outboundEndpoint";
 
     private static String INBOUND_ENDPOINT_NAME2 = "inboundEndpoint2";
     private static String OUTBOUND_ENDPOINT_NAME2 = "outboundEndpoint2";
-
-    @Override
-    protected String getConfigResources()
+    
+    @Parameters
+    public static Collection<Object[]> parameters()
     {
-        return "dataintegrity/sftp-dataintegrity-duplicate-handling.xml";
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "dataintegrity/sftp-dataintegrity-duplicate-handling-service.xml"},
+            {ConfigVariant.FLOW, "dataintegrity/sftp-dataintegrity-duplicate-handling-flow.xml"}
+        });
     }
 
     @Override

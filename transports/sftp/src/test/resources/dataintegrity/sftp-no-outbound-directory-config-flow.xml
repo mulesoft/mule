@@ -1,0 +1,30 @@
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:spring="http://www.springframework.org/schema/beans"
+    xmlns:sftp="http://www.mulesoft.org/schema/mule/sftp"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
+        http://www.mulesoft.org/schema/mule/sftp http://www.mulesoft.org/schema/mule/sftp/3.2/mule-sftp.xsd">
+
+    <spring:beans>
+        <spring:import resource="sftp-properties.xml" />
+    </spring:beans>
+
+    <sftp:connector name="sftp" />
+
+
+    <flow name="service">
+
+        <sftp:inbound-endpoint
+            address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}/~/inbound"
+            name="inboundEndpoint" pollingFrequency="500" />
+
+
+        <sftp:outbound-endpoint
+            address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}/~/DIRECTORY-MISSING"
+            name="outboundEndpointDirMissing" keepFileOnError="true">
+        </sftp:outbound-endpoint>
+
+    </flow>
+
+</mule>

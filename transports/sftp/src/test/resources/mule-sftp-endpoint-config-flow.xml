@@ -1,0 +1,44 @@
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:spring="http://www.springframework.org/schema/beans"
+    xmlns:sftp="http://www.mulesoft.org/schema/mule/sftp"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
+        http://www.mulesoft.org/schema/mule/sftp http://www.mulesoft.org/schema/mule/sftp/3.2/mule-sftp.xsd">
+
+
+    <flow name="test1">
+
+        <sftp:inbound-endpoint user="user42"
+            password="passw0rd" path="data" port="4243" host="foobar-host"
+            pollingFrequency="500" name="inboundEndpoint1" />
+
+        <echo-component />
+
+    </flow>
+
+    <!-- Should be the same as the above -->
+    <flow name="test2">
+
+        <sftp:inbound-endpoint
+            address="sftp://user42:passw0rd@foobar-host:4243/data" name="inboundEndpoint2" />
+
+        <echo-component />
+    </flow>
+
+    <flow name="test3">
+        <sftp:outbound-endpoint
+            address="sftp://user42:passw0rd@foobar-host:4243/data" name="outboundEndpoint1" />
+
+        <echo-component />
+    </flow>
+
+    <flow name="test4">
+        <sftp:outbound-endpoint
+            address="sftp://user42:passw0rd@foobar-host:4243/data" name="outboundEndpoint2"
+            keepFileOnError="false" />
+
+        <echo-component />
+    </flow>
+
+</mule>

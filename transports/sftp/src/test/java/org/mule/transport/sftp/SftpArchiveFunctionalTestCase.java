@@ -10,18 +10,20 @@
 
 package org.mule.transport.sftp;
 
-import org.mule.module.client.MuleClient;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.ResourceBundle;
-
-import org.junit.Test;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.ResourceBundle;
+
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+import org.mule.module.client.MuleClient;
 
 /**
  * Test the archive features.
@@ -53,10 +55,17 @@ public class SftpArchiveFunctionalTestCase extends AbstractSftpTestCase
     private String archive = null;
     private String archiveCanonicalPath = null;
 
-    @Override
-    protected String getConfigResources()
+    public SftpArchiveFunctionalTestCase(ConfigVariant variant, String configResources)
     {
-        return "mule-sftp-archive-test-config.xml";
+        super(variant, configResources);
+    }
+
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "mule-sftp-archive-test-config-service.xml"},
+            {ConfigVariant.FLOW, "mule-sftp-archive-test-config-flow.xml"}});
     }
 
     @Override
@@ -66,11 +75,11 @@ public class SftpArchiveFunctionalTestCase extends AbstractSftpTestCase
 
         // this block moved from the constructor to allow this test to be skipped if
         // the resource isn't found via
-        // AbstractMuleTestCase.isDisabledInThisEnvironment 
+        // AbstractMuleTestCase.isDisabledInThisEnvironment
         ResourceBundle rb = ResourceBundle.getBundle("sftp-settings");
         archive = rb.getString("ARCHIVE");
-        archiveCanonicalPath = new File(archive).getCanonicalPath();        
-        
+        archiveCanonicalPath = new File(archive).getCanonicalPath();
+
         recursiveDeleteInLocalFilesystem(new File(archive));
         initEndpointDirectories(new String[]{"receiving1", "receiving2", "receiving3", "receiving4"},
             new String[]{INBOUND_ENDPOINT1, INBOUND_ENDPOINT2, INBOUND_ENDPOINT3, INBOUND_ENDPOINT4});

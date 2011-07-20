@@ -10,17 +10,19 @@
 
 package org.mule.transport.sftp.dataintegrity;
 
-import org.mule.api.transport.DispatchException;
-import org.mule.module.client.MuleClient;
-import org.mule.transport.sftp.SftpClient;
-
-import java.io.IOException;
-
-import org.junit.Test;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collection;
+
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+import org.mule.api.transport.DispatchException;
+import org.mule.module.client.MuleClient;
+import org.mule.transport.sftp.SftpClient;
 
 /**
  * Verify that the original file is not lost if the outbound directory doesn't exist
@@ -30,10 +32,17 @@ public class SftpNoWriteAccessToOutboundDirectoryTestCase extends AbstractSftpDa
     private static final String OUTBOUND_ENDPOINT_NAME = "outboundEndpoint";
     private static final String INBOUND_ENDPOINT_NAME = "inboundEndpoint";
 
-    @Override
-    protected String getConfigResources()
+    public SftpNoWriteAccessToOutboundDirectoryTestCase(ConfigVariant variant, String configResources)
     {
-        return "dataintegrity/sftp-dataintegrity-common-config.xml";
+        super(variant, configResources);
+    }
+
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "dataintegrity/sftp-dataintegrity-common-config-service.xml"},
+            {ConfigVariant.FLOW, "dataintegrity/sftp-dataintegrity-common-config-flow.xml"}});
     }
 
     @Override

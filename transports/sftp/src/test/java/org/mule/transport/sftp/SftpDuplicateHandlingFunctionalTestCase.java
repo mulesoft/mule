@@ -10,16 +10,19 @@
 
 package org.mule.transport.sftp;
 
-import org.mule.api.endpoint.ImmutableEndpoint;
-import org.mule.api.transport.DispatchException;
-import org.mule.module.client.MuleClient;
-
-import org.apache.commons.lang.NotImplementedException;
-import org.junit.Test;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+
+import java.util.Arrays;
+import java.util.Collection;
+
+import org.apache.commons.lang.NotImplementedException;
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.transport.DispatchException;
+import org.mule.module.client.MuleClient;
 
 /**
  * Test the archive features.
@@ -32,8 +35,10 @@ public class SftpDuplicateHandlingFunctionalTestCase extends AbstractSftpTestCas
     // Size of the generated stream - 2 Mb
     final static int SEND_SIZE = 1024 * 1024 * 2;
 
-    public SftpDuplicateHandlingFunctionalTestCase()
+    public SftpDuplicateHandlingFunctionalTestCase(ConfigVariant variant, String configResources)
     {
+        super(variant, configResources);
+        
         // Only start mule once for all tests below, save a lot of time..., if test3
         // starts failing, comment this out
         setDisposeContextPerClass(true);
@@ -43,11 +48,14 @@ public class SftpDuplicateHandlingFunctionalTestCase extends AbstractSftpTestCas
         System.setProperty(TEST_TIMEOUT_SYSTEM_PROPERTY, "300000");
         logger.info("Timeout is now set to: " + System.getProperty(TEST_TIMEOUT_SYSTEM_PROPERTY, "-1"));
     }
-
-    @Override
-    protected String getConfigResources()
+    
+    @Parameters
+    public static Collection<Object[]> parameters()
     {
-        return "mule-sftp-duplicateHandling-test-config.xml";
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "mule-sftp-duplicateHandling-test-config-service.xml"},
+            {ConfigVariant.FLOW, "mule-sftp-duplicateHandling-test-config-flow.xml"}
+        });
     }
 
     @Override

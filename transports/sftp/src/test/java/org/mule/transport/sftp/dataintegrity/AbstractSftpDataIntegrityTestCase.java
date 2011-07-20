@@ -22,9 +22,13 @@ import static org.junit.Assert.assertTrue;
 
 public abstract class AbstractSftpDataIntegrityTestCase extends AbstractSftpTestCase
 {
-
     protected static final String TEMP_DIR = "uploading";
 
+    public AbstractSftpDataIntegrityTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
+    }
+    
     protected void verifyInAndOutFiles(MuleClient muleClient,
                                        String inboundEndpointName,
                                        String outboundEndpointName,

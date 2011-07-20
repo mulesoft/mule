@@ -10,12 +10,14 @@
 
 package org.mule.transport.sftp;
 
-import org.mule.api.MuleEventContext;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.functional.EventCallback;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -24,10 +26,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import org.junit.runners.Parameterized.Parameters;
+import org.mule.api.MuleEventContext;
+import org.mule.module.client.MuleClient;
+import org.mule.tck.functional.EventCallback;
 
 /**
  * <code>SftpPoolingFunctionalTestCase</code> tests sending an receiving multiple
@@ -35,6 +37,7 @@ import static org.junit.Assert.fail;
  */
 public class SftpPoolingFunctionalTestCase extends AbstractSftpTestCase
 {
+
     private static final long TIMEOUT = 30000;
 
     private List<String> sendFiles;
@@ -42,12 +45,19 @@ public class SftpPoolingFunctionalTestCase extends AbstractSftpTestCase
 
     private int nrOfFiles = 100;
 
-    @Override
-    protected String getConfigResources()
+    public SftpPoolingFunctionalTestCase(ConfigVariant variant, String configResources)
     {
-        return "mule-pooling-test-config.xml";
+        super(variant, configResources);
     }
 
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "mule-pooling-test-config-service.xml"},
+            {ConfigVariant.FLOW, "mule-pooling-test-config-flow.xml"}
+        });
+    }
     @Override
     protected void doSetUp() throws Exception
     {
