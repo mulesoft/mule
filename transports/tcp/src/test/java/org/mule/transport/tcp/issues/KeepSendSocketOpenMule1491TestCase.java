@@ -10,17 +10,15 @@
 
 package org.mule.transport.tcp.issues;
 
-import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.junit4.FunctionalTestCase;
-import org.mule.tck.junit4.rule.DynamicPort;
-import org.mule.transport.tcp.protocols.LengthProtocol;
+import static org.junit.Assert.assertEquals;
 
 import java.io.BufferedInputStream;
 import java.io.InputStream;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -28,10 +26,14 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+import org.mule.api.MuleMessage;
+import org.mule.module.client.MuleClient;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.transport.tcp.protocols.LengthProtocol;
 
-import static org.junit.Assert.assertEquals;
-
-public class KeepSendSocketOpenMule1491TestCase extends FunctionalTestCase
+public class KeepSendSocketOpenMule1491TestCase extends AbstractServiceAndFlowTestCase
 {
     protected static String TEST_TCP_MESSAGE = "Test TCP Request";
 
@@ -44,10 +46,16 @@ public class KeepSendSocketOpenMule1491TestCase extends FunctionalTestCase
     @Rule
     public DynamicPort dynamicPort3 = new DynamicPort("port3");
 
-    @Override
-    protected String getConfigResources()
+    public KeepSendSocketOpenMule1491TestCase(ConfigVariant variant, String configResources)
     {
-        return "tcp-keep-send-socket-open.xml";
+        super(variant, configResources);
+    }
+        
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{{ConfigVariant.SERVICE, "tcp-keep-send-socket-open-service.xml"},
+            {ConfigVariant.FLOW, "tcp-keep-send-socket-open-flow.xml"}});
     }
 
     @Test
