@@ -9,24 +9,35 @@
  */
 package org.mule.transport.stdio;
 
-import org.mule.api.endpoint.ImmutableEndpoint;
-import org.mule.tck.junit4.FunctionalTestCase;
-
-import org.junit.Test;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-public class StdioNamespaceHandlerTestCase extends FunctionalTestCase
+import java.util.Arrays;
+import java.util.Collection;
+
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+
+public class StdioNamespaceHandlerTestCase extends AbstractServiceAndFlowTestCase
 {
 
-    @Override
-    protected String getConfigResources()
+    public StdioNamespaceHandlerTestCase(ConfigVariant variant, String configResources)
     {
-        return "stdio-namespace-config.xml";
+        super(variant, configResources);
     }
-
+    
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "stdio-namespace-config-service.xml"},
+            {ConfigVariant.FLOW, "stdio-namespace-config-flow.xml"}
+        });
+    }
+    
     @Test
     public void testConfig() throws Exception
     {
