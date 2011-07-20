@@ -10,32 +10,42 @@
 
 package org.mule.transport.vm.functional;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.lifecycle.Callable;
 import org.mule.api.transport.PropertyScope;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.activation.MimeType;
 
 import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
-public class TransformerContentTypeTestCase extends FunctionalTestCase
+public class TransformerContentTypeTestCase extends AbstractServiceAndFlowTestCase
 {
-
-    @Override
-    protected String getConfigResources()
+    public TransformerContentTypeTestCase(ConfigVariant variant, String configResources)
     {
-        return "org/mule/test/config/content-type-setting-transform-configs.xml";
+        super(variant, configResources);
     }
 
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "org/mule/test/config/content-type-setting-transform-configs-service.xml"},
+            {ConfigVariant.FLOW, "org/mule/test/config/content-type-setting-transform-configs-flow.xml"}
+        });
+    }      
+    
     @Test
     public void testContentTypes() throws Exception
     {

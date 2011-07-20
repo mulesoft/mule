@@ -10,28 +10,37 @@
 
 package org.mule.module.jersey;
 
+import static org.junit.Assert.assertEquals;
+
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
 
-import static org.junit.Assert.assertEquals;
-
-public class BasicJerseyTestCase extends FunctionalTestCase
+public class BasicJerseyTestCase extends AbstractServiceAndFlowTestCase
 {
-    
-    @Override
-    protected String getConfigResources()
+    public BasicJerseyTestCase(ConfigVariant variant, String configResources)
     {
-        return "basic-conf.xml";
+        super(variant, configResources);
     }
 
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "basic-conf.xml"},            
+        });
+    }      
+    
     @Test
     public void testBasic() throws Exception
     {

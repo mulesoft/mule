@@ -10,14 +10,29 @@
 
 package org.mule.config.spring.parsers;
 
+import java.util.Arrays;
+import java.util.Collection;
+
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+
 public class ConstrainedConnectorExceptionStrategyMule2126TestCase extends AbstractBadConfigTestCase
 {
 
-    protected String getConfigResources()
+    public ConstrainedConnectorExceptionStrategyMule2126TestCase(ConfigVariant variant, String configResources)
     {
-        return "org/mule/config/spring/parsers/constrained-connector-exception-strategy-mule-2126-test.xml";
+        super(variant, configResources);
     }
 
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "org/mule/config/spring/parsers/constrained-connector-exception-strategy-mule-2126-test.xml"}           
+        });
+    }      
+    
+    @Test
     public void testError() throws Exception
     {
         assertErrorContains("Invalid content was found starting with element 'default-connector-exception-strategy'");

@@ -10,14 +10,29 @@
 
 package org.mule.config.spring.parsers;
 
+import java.util.Arrays;
+import java.util.Collection;
+
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+
 public class MuleElementRequiredTestCase extends AbstractBadConfigTestCase
 {
 
-    protected String getConfigResources()
+    public MuleElementRequiredTestCase(ConfigVariant variant, String configResources)
     {
-        return "mule-element-required-test.xml";
+        super(variant, configResources);
     }
 
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "mule-element-required-test.xml"},            
+        });
+    }      
+    
+    @Test
     public void testHelpfulErrorMessage() throws Exception
     {
         assertErrorContains("This element should be embedded");

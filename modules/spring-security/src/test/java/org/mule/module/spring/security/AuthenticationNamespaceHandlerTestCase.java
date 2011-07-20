@@ -27,14 +27,8 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-public class AuthenticationNamespaceHandlerTestCase extends FunctionalTestCase
-{
-    @Override
-    protected String getConfigResources()
-    {
-        return "authentication-config.xml";
-    }
-
+public abstract class AuthenticationNamespaceHandlerTestCase extends FunctionalTestCase
+{    
     @Test
     public void testSecurityManagerConfigured()
     {
@@ -53,17 +47,5 @@ public class AuthenticationNamespaceHandlerTestCase extends FunctionalTestCase
         provider = providersIterator.next();
         assertEquals(SpringProviderAdapter.class, provider.getClass());
         assertEquals(PreAuthenticatedAuthenticationProvider.class, ((SpringProviderAdapter) provider).getAuthenticationProvider().getClass());
-    }
-
-    @Test
-    public void testEndpointConfiguration()
-    {
-        Service service = muleContext.getRegistry().lookupService("echo");
-        assertNotNull(service);
-        assertEquals(1, ((ServiceCompositeMessageSource) service.getMessageSource()).getEndpoints().size());
-
-        ImmutableEndpoint endpoint = ((ServiceCompositeMessageSource) service.getMessageSource()).getEndpoints().get(0);
-        assertNotNull(endpoint.getSecurityFilter());
-        assertEquals(HttpBasicAuthenticationFilter.class, endpoint.getSecurityFilter().getClass());
     }
 }

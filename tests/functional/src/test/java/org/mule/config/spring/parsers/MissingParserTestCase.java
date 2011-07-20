@@ -10,14 +10,29 @@
 
 package org.mule.config.spring.parsers;
 
+import java.util.Arrays;
+import java.util.Collection;
+
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+
 public class MissingParserTestCase extends AbstractBadConfigTestCase
 {
 
-    protected String getConfigResources()
+    public MissingParserTestCase(ConfigVariant variant, String configResources)
     {
-        return "org/mule/config/spring/parsers/missing-parser-test.xml";
+        super(variant, configResources);
     }
 
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "org/mule/config/spring/parsers/missing-parser-test.xml"},
+        });
+    }     
+    
+    @Test
     public void testHelpfulErrorMessage() throws Exception
     {
         assertErrorContains("Is the module or transport");

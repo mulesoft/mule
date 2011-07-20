@@ -10,12 +10,18 @@
 
 package org.mule.transport.ajax;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.util.concurrent.Latch;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
@@ -26,15 +32,12 @@ import org.cometd.Message;
 import org.cometd.MessageListener;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
 import org.mortbay.cometd.client.BayeuxClient;
 import org.mortbay.jetty.client.Address;
 import org.mortbay.jetty.client.HttpClient;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
-public class AjaxFunctionalTestCase extends FunctionalTestCase
+public class AjaxFunctionalTestCase extends AbstractServiceAndFlowTestCase
 {
     public static int SERVER_PORT = -1;
     
@@ -44,18 +47,22 @@ public class AjaxFunctionalTestCase extends FunctionalTestCase
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
-    public AjaxFunctionalTestCase()
+    public AjaxFunctionalTestCase(ConfigVariant variant, String configResources)
     {
         // start the embedded servers before starting mule to try and avoid
-        // intermittent failures in testClientPublishWithString        
+        // intermittent failures in testClientPublishWithString
+        super(variant, configResources);
         setStartContext(false);
     }
 
-    @Override
-    protected String getConfigResources()
+    @Parameters
+    public static Collection<Object[]> parameters()
     {
-        return "ajax-embedded-functional-test.xml";
-    }
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "ajax-embedded-functional-test-service.xml"},
+            {ConfigVariant.FLOW, "ajax-embedded-functional-test-flow.xml"}
+        });
+    }      
 
     @Override
     protected void doSetUp() throws Exception

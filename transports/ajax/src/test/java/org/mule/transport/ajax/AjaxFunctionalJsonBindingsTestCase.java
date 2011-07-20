@@ -10,12 +10,19 @@
 
 package org.mule.transport.ajax;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.util.concurrent.Latch;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
@@ -26,30 +33,34 @@ import org.cometd.Message;
 import org.cometd.MessageListener;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
 import org.mortbay.cometd.client.BayeuxClient;
 import org.mortbay.jetty.client.Address;
 import org.mortbay.jetty.client.HttpClient;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
-public class AjaxFunctionalJsonBindingsTestCase extends FunctionalTestCase
+public class AjaxFunctionalJsonBindingsTestCase extends AbstractServiceAndFlowTestCase
 {
     
+    public AjaxFunctionalJsonBindingsTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
+    }
+
     public static int SERVER_PORT = -1;
 
     private BayeuxClient client;
 
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
-
-    @Override
-    protected String getConfigResources()
+   
+    @Parameters
+    public static Collection<Object[]> parameters()
     {
-        return "ajax-embedded-functional-json-bindings-test.xml";
-    }
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "ajax-embedded-functional-json-bindings-test-service.xml"},
+            {ConfigVariant.FLOW, "ajax-embedded-functional-json-bindings-test-flow.xml"}
+        });
+    }      
 
     @Override
     protected void doSetUp() throws Exception

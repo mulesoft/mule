@@ -10,14 +10,29 @@
 
 package org.mule.config.spring.parsers;
 
-public class EndpointServiceConflictTestCase extends AbstractBadConfigTestCase
-{
+import java.util.Arrays;
+import java.util.Collection;
 
-    protected String getConfigResources()
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+
+public class EndpointServiceConflictTestCase extends AbstractBadConfigTestCase
+{    
+    public EndpointServiceConflictTestCase(ConfigVariant variant, String configResources)
     {
-        return "org/mule/config/spring/parsers/endpoint-service-conflict-test.xml";
+        super(variant, configResources); 
     }
 
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "org/mule/config/spring/parsers/endpoint-service-conflict-test-service.xml"},
+            {ConfigVariant.FLOW, "org/mule/config/spring/parsers/endpoint-service-conflict-test-flow.xml"}
+        });
+    }      
+
+    @Test
     public void testBeanError() throws Exception
     {
         assertErrorContains("A service named LenderService already exists");

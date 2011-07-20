@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xsi:schemaLocation="
+      http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+      http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
+      http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.2/mule-vm.xsd
+      http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/3.2/mule-test.xsd">
+
+
+    <vm:connector name="vm-in1" />
+    <vm:connector name="vm-in2" />
+    <vm:connector name="vm-out1" />
+    <vm:connector name="vm-out2" />
+
+    <vm:endpoint name="inbound1" path="in1" connector-ref="vm-in1" exchange-pattern="request-response"/>
+    <vm:endpoint name="outbound1" path="out1" connector-ref="vm-out1" exchange-pattern="request-response"/>
+    <vm:endpoint name="inbound2" path="in2" connector-ref="vm-in2" exchange-pattern="request-response"/>
+    <vm:endpoint name="outbound2" path="out2" connector-ref="vm-out2" exchange-pattern="request-response"/>
+
+    <test:no-action-transformer name="plain" mimeType="text/plain"/>
+
+    <flow name="testService1">
+        <vm:inbound-endpoint ref="inbound1"/>
+        <outbound-endpoint ref="outbound1">
+            <test:no-action-transformer mimeType="text/xml"/>
+        </outbound-endpoint>
+    </flow>
+
+    <flow name="echo">
+        <vm:inbound-endpoint ref="outbound1"/>
+        <component class="org.mule.transport.vm.functional.TransformerContentTypeTestCase$EchoComponent"/>
+    </flow>
+
+    <flow name="testService2">
+        <vm:inbound-endpoint ref="inbound2"/>
+        <outbound-endpoint ref="outbound2">
+            <transformer ref="plain"/>
+        </outbound-endpoint>
+    </flow>
+
+    <flow name="echo2">
+        <vm:inbound-endpoint ref="outbound2"/>
+        <component class="org.mule.transport.vm.functional.TransformerContentTypeTestCase$EchoComponent"/>
+    </flow>
+    
+</mule>

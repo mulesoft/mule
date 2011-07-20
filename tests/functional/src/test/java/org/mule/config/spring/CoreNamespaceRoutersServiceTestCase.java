@@ -34,13 +34,13 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-public class CoreNamespaceRoutersTestCase extends FunctionalTestCase
+public class CoreNamespaceRoutersServiceTestCase extends FunctionalTestCase
 {
     
     @Override
     public String getConfigResources()
     {
-        return "core-namespace-routers.xml";
+        return "core-namespace-routers-service.xml";
     }
 
     @Test

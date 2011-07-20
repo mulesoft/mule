@@ -10,14 +10,29 @@
 
 package org.mule.config.spring.parsers;
 
+import java.util.Arrays;
+import java.util.Collection;
+
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+
 public class DuplicateBeanNameTestCase extends AbstractBadConfigTestCase
 {
 
-    protected String getConfigResources()
+    public DuplicateBeanNameTestCase(ConfigVariant variant, String configResources)
     {
-        return "org/mule/config/spring/parsers/duplicate-bean-name-test.xml";
+        super(variant, configResources);     
     }
+    
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "org/mule/config/spring/parsers/duplicate-bean-name-test.xml"},            
+        });
+    }      
 
+    @Test
     public void testBeanError() throws Exception
     {
         assertErrorContains("Bean name 'child1' is already used in this file");

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd">
+
+    <flow name="service">
+        <inbound-endpoint address="test://test-in"/>
+        <component class="org.mule.tck.functional.FunctionalTestComponent">
+            <singleton-object class="org.mule.component.simple.StaticComponent"/>
+            <binding interface="java.lang.String" method="setPrefix">
+                <outbound-endpoint address="test://test"/>
+            </binding>
+        </component>
+    </flow>
+    
+</mule>

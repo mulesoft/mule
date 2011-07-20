@@ -10,11 +10,13 @@
 
 package org.mule.config.spring.parsers;
 
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import org.mule.api.config.ConfigurationBuilder;
 import org.mule.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.context.DefaultMuleContextFactory;
-
-import junit.framework.TestCase;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -22,8 +24,16 @@ import org.apache.commons.logging.LogFactory;
 /**
  * A stripped-down version of FunctionalTestCase that allows us to test the parsing of a bad configuration. 
  */
-public abstract class AbstractBadConfigTestCase extends TestCase
+public abstract class AbstractBadConfigTestCase extends AbstractServiceAndFlowTestCase
 {
+    private String configResources;
+    
+    public AbstractBadConfigTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, "");
+        this.configResources = configResources;
+    }
+
     protected final transient Log logger = LogFactory.getLog(getClass());
 
     public void assertErrorContains(String phrase) throws Exception
@@ -34,22 +44,20 @@ public abstract class AbstractBadConfigTestCase extends TestCase
             fail("expected error");
         } 
         catch (Exception e) 
-        {
+        {            
             logger.debug("Caught " + e);
             assertTrue("Missing phrase '" + phrase + "' in '" + e.toString() + "'",
                     e.toString().indexOf(phrase) > -1);
         }
     }
-
+    
     protected void parseConfig() throws Exception
     {
-        new DefaultMuleContextFactory().createMuleContext(getBuilder());
+        new DefaultMuleContextFactory().createMuleContext(getConfigurationBuilder());
     }
 
-    protected ConfigurationBuilder getBuilder() throws Exception
+    protected ConfigurationBuilder getConfigurationBuilder() throws Exception
     {
-        return new SpringXmlConfigurationBuilder(getConfigResources());
+        return new SpringXmlConfigurationBuilder(configResources);
     }
-
-    protected abstract String getConfigResources();
 }

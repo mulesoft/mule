@@ -12,14 +12,30 @@ package org.mule.config.spring.parsers.endpoint;
 
 import org.mule.config.spring.parsers.AbstractBadConfigTestCase;
 
+import java.util.Arrays;
+import java.util.Collection;
+
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+
 public class AttributeErrorTestCase extends AbstractBadConfigTestCase
 {
 
-    protected String getConfigResources()
+    public AttributeErrorTestCase(ConfigVariant variant, String configResources)
     {
-        return "org/mule/config/spring/parsers/endpoint/attribute-error-test.xml";
+        super(variant, configResources);     
     }
 
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "org/mule/config/spring/parsers/endpoint/attribute-error-test-service.xml"},
+            {ConfigVariant.FLOW, "org/mule/config/spring/parsers/endpoint/attribute-error-test-flow.xml"}
+        });
+    }      
+    
+    @Test
     public void testError() throws Exception
     {
         assertErrorContains("do not match the exclusive groups [address] [ref]");

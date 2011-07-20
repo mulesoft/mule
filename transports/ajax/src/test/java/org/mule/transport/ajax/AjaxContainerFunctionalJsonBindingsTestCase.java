@@ -13,6 +13,10 @@ package org.mule.transport.ajax;
 import org.mule.transport.ajax.container.MuleAjaxServlet;
 import org.mule.transport.servlet.MuleServletContextListener;
 
+import java.util.Arrays;
+import java.util.Collection;
+
+import org.junit.runners.Parameterized.Parameters;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.servlet.Context;
 import org.mortbay.jetty.servlet.ServletHolder;
@@ -20,12 +24,19 @@ import org.mortbay.jetty.servlet.ServletHolder;
 public class AjaxContainerFunctionalJsonBindingsTestCase extends AjaxFunctionalJsonBindingsTestCase
 {
 
+    public AjaxContainerFunctionalJsonBindingsTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);     
+    }
+
     private Server httpServer;
 
-     @Override
-    protected String getConfigResources()
+    @Parameters
+    public static Collection<Object[]> parameters()
     {
-        return "ajax-container-functional-json-bindings-test.xml";
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "ajax-container-functional-json-bindings-test-service.xml"},
+            {ConfigVariant.FLOW, "ajax-container-functional-json-bindings-test-flow.xml"}});
     }
 
     @Override
