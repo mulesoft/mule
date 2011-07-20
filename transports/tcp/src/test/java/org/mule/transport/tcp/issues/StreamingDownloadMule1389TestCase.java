@@ -10,22 +10,31 @@
 
 package org.mule.transport.tcp.issues;
 
-import org.mule.tck.junit4.rule.DynamicPort;
+import java.util.Arrays;
+import java.util.Collection;
 
 import org.junit.Rule;
+import org.junit.runners.Parameterized.Parameters;
+import org.mule.tck.junit4.rule.DynamicPort;
 
 /**
  * This fails to work as described in the issue, but isn't HTTP...
  */
 public class StreamingDownloadMule1389TestCase extends AbstractStreamingDownloadMule1389TestCase
 {
-
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
-    @Override
-    protected String getConfigResources()
+    public StreamingDownloadMule1389TestCase(ConfigVariant variant, String configResources)
     {
-        return "streaming-download-mule-1389.xml";
+        super(variant, configResources);
+    }
+    
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "streaming-download-mule-1389-service.xml"},
+            {ConfigVariant.FLOW, "streaming-download-mule-1389-flow.xml"}});
     }
 }
