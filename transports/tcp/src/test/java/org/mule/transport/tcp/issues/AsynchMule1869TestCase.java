@@ -10,21 +10,23 @@
 
 package org.mule.transport.tcp.issues;
 
-import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.junit4.FunctionalTestCase;
-import org.mule.tck.junit4.rule.DynamicPort;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+import org.mule.api.MuleMessage;
+import org.mule.module.client.MuleClient;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
-public class AsynchMule1869TestCase extends FunctionalTestCase
+public class AsynchMule1869TestCase extends AbstractServiceAndFlowTestCase
 {
 
     protected static String TEST_MESSAGE = "Test TCP Request";
@@ -35,10 +37,16 @@ public class AsynchMule1869TestCase extends FunctionalTestCase
     @Rule
     public DynamicPort dynamicPort2 = new DynamicPort("port2");
 
-    @Override
-    protected String getConfigResources()
+    public AsynchMule1869TestCase(ConfigVariant variant, String configResources)
     {
-        return "tcp-functional-test.xml";
+        super(variant, configResources);
+    }
+    
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{{ConfigVariant.SERVICE, "tcp-functional-test-service.xml"},
+            {ConfigVariant.FLOW, "tcp-functional-test-flow.xml"}});
     }
 
     @Test
