@@ -10,23 +10,33 @@
 
 package org.mule.module.spring.remoting;
 
-import org.mule.tck.junit4.FunctionalTestCase;
-
-import org.junit.Test;
-import org.springframework.remoting.httpinvoker.HttpInvokerProxyFactoryBean;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-public class SpringRemotingTestCase extends FunctionalTestCase
-{
+import java.util.Arrays;
+import java.util.Collection;
 
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.springframework.remoting.httpinvoker.HttpInvokerProxyFactoryBean;
+
+public class SpringRemotingTestCase extends AbstractServiceAndFlowTestCase
+{
     private static final String SPRING_HTTP_ENDPOINT = "http://localhost:8003/springService";
 
-    @Override
-    protected String getConfigResources()
+    public SpringRemotingTestCase(ConfigVariant variant, String configResources)
     {
-        return "spring-remoting-mule-config.xml";
+        super(variant, configResources);
+    }
+    
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "spring-remoting-mule-config-service.xml"},
+            {ConfigVariant.FLOW, "spring-remoting-mule-config-flow.xml"}
+        });
     }
 
     @Test
