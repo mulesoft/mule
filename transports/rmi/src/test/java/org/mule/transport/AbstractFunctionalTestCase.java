@@ -10,38 +10,31 @@
 
 package org.mule.transport;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import org.mule.api.MuleMessage;
 import org.mule.api.transport.DispatchException;
 import org.mule.config.i18n.Message;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.transport.rmi.i18n.RmiMessages;
 
 import java.util.HashMap;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
-public abstract class AbstractFunctionalTestCase extends FunctionalTestCase
+public abstract class AbstractFunctionalTestCase extends AbstractServiceAndFlowTestCase
 {
-    private String prefix;
-    private String config;
+    protected String prefix;
 
-    public AbstractFunctionalTestCase(String prefix, String config)
+    public AbstractFunctionalTestCase(ConfigVariant variant, String configResources)
     {
-        this.prefix = prefix;
-        this.config = config;
-    }
-
-    @Override
-    protected String getConfigResources()
-    {
-        return config;
-    }
+        super(variant, configResources);
+        
+    }    
 
     // from earlier multiple target test case
 

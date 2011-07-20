@@ -12,11 +12,25 @@ package org.mule.transport.jnp;
 
 import org.mule.transport.AbstractFunctionalTestCase;
 
+import java.util.Arrays;
+import java.util.Collection;
+
+import org.junit.runners.Parameterized.Parameters;
+
 public class JnpFunctionalTestCase extends AbstractFunctionalTestCase
 {
-
-    public JnpFunctionalTestCase()
+    public JnpFunctionalTestCase(ConfigVariant variant, String configResources)
     {
-        super("jnp", "jnp-functional-test.xml");
+        super(variant, configResources);
+        this.prefix = "jnp";
     }
+    
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "jnp-functional-test-service.xml"},
+            {ConfigVariant.FLOW, "jnp-functional-test-flow.xml"}
+        });
+    }      
 }

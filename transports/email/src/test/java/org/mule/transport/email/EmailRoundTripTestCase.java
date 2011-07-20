@@ -10,25 +10,29 @@
 
 package org.mule.transport.email;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.AbstractServiceAndFlowTestCase.ConfigVariant;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.email.functional.AbstractEmailFunctionalTestCase;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import javax.mail.internet.MimeMessage;
 
 import org.junit.Rule;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import org.junit.runners.Parameterized.Parameters;
 
 /**
  * This demonstrates "round trip" processing of email - an email is pulled from a POP
@@ -39,8 +43,13 @@ import static org.junit.Assert.assertTrue;
  * The Mule services (defined in email-round-trip-test.xml) are started by the test framework.
  * So all we need to do here is test that the message is handled correctly.</p>
  */
-public class EmailRoundTripTestCase extends FunctionalTestCase
+public class EmailRoundTripTestCase extends AbstractServiceAndFlowTestCase
 {
+
+    public EmailRoundTripTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
+    }
 
     private AbstractGreenMailSupport greenMailSupport = null;
 
@@ -61,12 +70,15 @@ public class EmailRoundTripTestCase extends FunctionalTestCase
 
     @Rule
     public DynamicPort dynamicPort6 = new DynamicPort("port6");
-
-    @Override
-    protected String getConfigResources()
+    
+    @Parameters
+    public static Collection<Object[]> parameters()
     {
-        return "email-round-trip-test.xml";
-    }
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "email-round-trip-test-service.xml"},
+            {ConfigVariant.FLOW, "email-round-trip-test-flow.xml"}
+        });
+    }      
 
     @Override
     protected MuleContext createMuleContext() throws Exception

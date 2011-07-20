@@ -10,6 +10,10 @@
 
 package org.mule.transport.ejb;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.OutboundEndpoint;
@@ -19,23 +23,32 @@ import org.mule.module.client.MuleClient;
 import org.mule.transport.AbstractFunctionalTestCase;
 import org.mule.transport.rmi.RmiConnector;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Properties;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import org.junit.runners.Parameterized.Parameters;
 
 /**
  * test EJB object invocations
  */
 public class EjbFunctionalTestCase extends AbstractFunctionalTestCase
 {
-    
-    public EjbFunctionalTestCase()
+    public EjbFunctionalTestCase(ConfigVariant variant, String configResources)
     {
-        super("ejb", "ejb-functional-test.xml");
+        super(variant, configResources);
+        this.prefix = "ejb";
     }
 
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "ejb-functional-test-service.xml"},
+            {ConfigVariant.FLOW, "ejb-functional-test-flow.xml"}
+        });
+    }      
+    
     @Override
     public void testCase() throws Exception
     {

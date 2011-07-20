@@ -10,12 +10,25 @@
 
 package org.mule.module.cxf.wssec;
 
+import java.util.Arrays;
+import java.util.Collection;
+
+import org.junit.runners.Parameterized.Parameters;
+
 public class SpringSecurityProxyTestCase extends UsernameTokenProxyTestCase 
 {
 
-    @Override
-    protected String getConfigResources() 
+    public SpringSecurityProxyTestCase(ConfigVariant variant, String configResources)
     {
-        return "org/mule/module/cxf/wssec/cxf-secure-proxy.xml, org/mule/module/cxf/wssec/spring-security-conf.xml";
+        super(variant, configResources);
     }
+
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "org/mule/module/cxf/wssec/cxf-secure-proxy-service.xml, org/mule/module/cxf/wssec/spring-security-conf.xml"},
+            {ConfigVariant.FLOW, "org/mule/module/cxf/wssec/cxf-secure-proxy-flow.xml, org/mule/module/cxf/wssec/spring-security-conf.xml"}
+        });
+    }          
 }

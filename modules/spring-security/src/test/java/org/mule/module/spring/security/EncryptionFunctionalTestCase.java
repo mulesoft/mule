@@ -10,36 +10,47 @@
 
 package org.mule.module.spring.security;
 
-import org.mule.api.EncryptionStrategy;
-import org.mule.api.MuleMessage;
-import org.mule.api.config.MuleProperties;
-import org.mule.api.security.CredentialsNotSetException;
-import org.mule.api.security.CryptoFailureException;
-import org.mule.security.MuleCredentials;
-import org.mule.tck.junit4.FunctionalTestCase;
-import org.mule.transport.http.HttpConnector;
-import org.mule.transport.http.HttpConstants;
-import org.mule.util.ExceptionUtils;
-
-import java.util.HashMap;
-import java.util.Map;
-
-import org.junit.Test;
-import org.springframework.security.authentication.BadCredentialsException;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-public class EncryptionFunctionalTestCase extends FunctionalTestCase
-{
-    @Override
-    protected String getConfigResources()
+import org.mule.api.EncryptionStrategy;
+import org.mule.api.MuleMessage;
+import org.mule.api.config.MuleProperties;
+import org.mule.api.security.CredentialsNotSetException;
+import org.mule.api.security.CryptoFailureException;
+import org.mule.security.MuleCredentials;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.transport.http.HttpConnector;
+import org.mule.transport.http.HttpConstants;
+import org.mule.util.ExceptionUtils;
+
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+import org.springframework.security.authentication.BadCredentialsException;
+
+public class EncryptionFunctionalTestCase extends AbstractServiceAndFlowTestCase
+{      
+    public EncryptionFunctionalTestCase(ConfigVariant variant, String configResources)
     {
-        return "encryption-test.xml";
+        super(variant, configResources);
     }
+
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "encryption-test-service.xml"},
+            {ConfigVariant.FLOW, "encryption-test-flow.xml"}
+        });
+    }      
 
     @Test
     public void testAuthenticationFailureNoContext() throws Exception

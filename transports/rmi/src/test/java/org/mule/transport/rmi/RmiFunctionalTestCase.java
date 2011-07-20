@@ -12,11 +12,25 @@ package org.mule.transport.rmi;
 
 import org.mule.transport.AbstractFunctionalTestCase;
 
-public class RmiFunctionalTestCase extends AbstractFunctionalTestCase
-{
+import java.util.Arrays;
+import java.util.Collection;
 
-    public RmiFunctionalTestCase()
+import org.junit.runners.Parameterized.Parameters;
+
+public class RmiFunctionalTestCase extends AbstractFunctionalTestCase
+{      
+    public RmiFunctionalTestCase(ConfigVariant variant, String configResources)
     {
-        super("rmi", "rmi-functional-test.xml");
+        super(variant, configResources);
+        this.prefix = "rmi";
     }
+
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "rmi-functional-test-service.xml"},
+            {ConfigVariant.FLOW, "rmi-functional-test-flow.xml"}
+        });
+    }      
 }

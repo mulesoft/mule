@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:test="http://www.mulesoft.org/schema/mule/test"
+       xmlns:spring="http://www.springframework.org/schema/beans"
+    xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
+       http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/3.2/mule-test.xsd">
+
+    <custom-transformer name="t1" class="org.mule.tck.testmodels.mule.TestInboundTransformer" />
+    <custom-transformer name="t2" class="org.mule.tck.testmodels.mule.TestInboundTransformer" />
+
+    <custom-transformer name="rt1" class="org.mule.tck.testmodels.mule.TestResponseTransformer" />
+    <custom-transformer name="rt2" class="org.mule.tck.testmodels.mule.TestResponseTransformer" />
+
+    <endpoint name="ep1" address="test://ep1" transformer-refs="t1" responseTransformer-refs="rt1" />
+
+    <endpoint name="ep2" address="test://ep2" transformer-refs="t1 t2" responseTransformer-refs="rt1 rt2" />
+
+    <flow name="globalEndpoints">
+        <inbound-endpoint ref="ep1"/>
+        <outbound-endpoint ref="ep2"/>
+    </flow>
+
+    <flow name="localEndpoints">
+        <inbound-endpoint address="test://ep3" transformer-refs="t1" responseTransformer-refs="rt1"/>
+        <outbound-endpoint address="test://ep4" transformer-refs="t1" responseTransformer-refs="rt1"/>
+    </flow>
+
+    <flow name="transformerRefsWithChildProcessors">
+        <inbound-endpoint address="test://ep4" transformer-refs="t1" responseTransformer-refs="rt1">
+            <append-string-transformer message="12"/>
+            <response>
+                <append-string-transformer message="12"/>
+            </response>
+        </inbound-endpoint>
+        <outbound-endpoint address="test://ep5" transformer-refs="t1" responseTransformer-refs="rt1">
+            <message-properties-transformer/>
+            <response>
+                <message-properties-transformer/>
+            </response>
+        </outbound-endpoint>
+    </flow>
+    
+</mule>

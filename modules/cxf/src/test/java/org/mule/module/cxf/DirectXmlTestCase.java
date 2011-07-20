@@ -10,13 +10,18 @@
 
 package org.mule.module.cxf;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.module.xml.stax.StaxSource;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 
 import java.io.InputStream;
+import java.util.Arrays;
+import java.util.Collection;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
@@ -25,20 +30,25 @@ import javax.xml.transform.sax.SAXSource;
 
 import org.apache.cxf.helpers.DOMUtils;
 import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
-public class DirectXmlTestCase extends FunctionalTestCase
+public class DirectXmlTestCase extends AbstractServiceAndFlowTestCase
 {
-
-    @Override
-    protected String getConfigResources()
+    public DirectXmlTestCase(ConfigVariant variant, String configResources)
     {
-        return "direct/direct-xml-conf.xml";
+        super(variant, configResources);
     }
+
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "direct/direct-xml-conf-service.xml"},
+            {ConfigVariant.FLOW, "direct/direct-xml-conf-flow.xml"}
+        });
+    }      
 
     @Test
     public void testInputStream() throws Exception

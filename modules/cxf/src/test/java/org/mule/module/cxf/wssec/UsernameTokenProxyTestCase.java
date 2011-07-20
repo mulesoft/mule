@@ -10,33 +10,44 @@
 
 package org.mule.module.cxf.wssec;
 
-import org.mule.DefaultMuleMessage;
-import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.junit4.FunctionalTestCase;
-import org.mule.tck.junit4.rule.DynamicPort;
-
-import java.io.InputStream;
-
-import org.junit.Rule;
-import org.junit.Test;
-
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-public class UsernameTokenProxyTestCase extends FunctionalTestCase 
+import org.mule.DefaultMuleMessage;
+import org.mule.api.MuleException;
+import org.mule.api.MuleMessage;
+import org.mule.module.client.MuleClient;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
+
+import java.io.InputStream;
+import java.util.Arrays;
+import java.util.Collection;
+
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+
+public class UsernameTokenProxyTestCase extends AbstractServiceAndFlowTestCase 
 {
 
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
     
-    @Override
-    protected String getConfigResources() 
+    public UsernameTokenProxyTestCase(ConfigVariant variant, String configResources)
     {
-        return "org/mule/module/cxf/wssec/cxf-secure-proxy.xml, org/mule/module/cxf/wssec/username-token-conf.xml";
+        super(variant, configResources);
     }
+
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "org/mule/module/cxf/wssec/cxf-secure-proxy-service.xml, org/mule/module/cxf/wssec/username-token-conf.xml"},
+            {ConfigVariant.FLOW, "org/mule/module/cxf/wssec/cxf-secure-proxy-flow.xml, org/mule/module/cxf/wssec/username-token-conf.xml"}
+        });
+    }      
 
     @Override
     protected void doSetUp() throws Exception

@@ -10,22 +10,18 @@
 
 package org.mule.module.spring.security;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import org.mule.api.config.MuleProperties;
-import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.security.SecurityProvider;
-import org.mule.api.service.Service;
-import org.mule.module.spring.security.filters.http.HttpBasicAuthenticationFilter;
 import org.mule.security.MuleSecurityManager;
-import org.mule.service.ServiceCompositeMessageSource;
 import org.mule.tck.junit4.FunctionalTestCase;
 
 import java.util.Collection;
 import java.util.Iterator;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 public abstract class AuthenticationNamespaceHandlerTestCase extends FunctionalTestCase
 {    
