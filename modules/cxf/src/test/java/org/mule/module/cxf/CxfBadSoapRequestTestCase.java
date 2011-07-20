@@ -10,14 +10,11 @@
 
 package org.mule.module.cxf;
 
-import org.mule.DefaultMuleMessage;
-import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.junit4.FunctionalTestCase;
-import org.mule.tck.junit4.rule.DynamicPort;
-import org.mule.transport.http.HttpConstants;
-import org.mule.util.StringUtils;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import org.dom4j.Document;
@@ -25,20 +22,33 @@ import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+import org.mule.DefaultMuleMessage;
+import org.mule.api.MuleMessage;
+import org.mule.module.client.MuleClient;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.transport.http.HttpConstants;
+import org.mule.util.StringUtils;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
-public class CxfBadSoapRequestTestCase extends FunctionalTestCase
+public class CxfBadSoapRequestTestCase extends AbstractServiceAndFlowTestCase
 {
 
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
-    @Override
-    protected String getConfigResources()
+    public CxfBadSoapRequestTestCase(ConfigVariant variant, String configResources)
     {
-        return "soap-request-conf.xml";
+        super(variant, configResources);
+    }
+        
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "soap-request-conf-service.xml"},
+            {ConfigVariant.FLOW, "soap-request-conf-flow.xml"}
+        });
     }
 
     @Test
