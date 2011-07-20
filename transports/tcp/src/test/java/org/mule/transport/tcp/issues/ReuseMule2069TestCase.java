@@ -13,7 +13,11 @@ package org.mule.transport.tcp.issues;
 import org.mule.transport.tcp.TcpConnector;
 import org.mule.transport.tcp.TcpFunctionalTestCase;
 
+import java.util.Arrays;
+import java.util.Collection;
+
 import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
 
 import static org.junit.Assert.assertTrue;
 
@@ -22,11 +26,17 @@ import static org.junit.Assert.assertTrue;
  */
 public class ReuseMule2069TestCase extends TcpFunctionalTestCase
 {
-
-    @Override
-    protected String getConfigResources()
+    @Parameters
+    public static Collection<Object[]> parameters()
     {
-        return "reuse-mule-2069.xml";
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "reuse-mule-2069.xml"},
+        });
+    }
+
+    public ReuseMule2069TestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
     }
 
     @Test
@@ -34,5 +44,5 @@ public class ReuseMule2069TestCase extends TcpFunctionalTestCase
     {
         assertTrue(((TcpConnector) muleContext.getRegistry().lookupConnector(TcpConnector.TCP)).isReuseAddress().booleanValue());
     }
-    
+
 }
