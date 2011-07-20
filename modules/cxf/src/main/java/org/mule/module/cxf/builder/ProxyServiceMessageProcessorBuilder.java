@@ -21,11 +21,13 @@ import org.mule.module.cxf.support.ProxyServiceFactoryBean;
 import org.mule.module.cxf.support.ResetStaxInterceptor;
 import org.mule.module.cxf.support.ReversibleStaxInInterceptor;
 
+import org.apache.cxf.binding.soap.interceptor.RPCOutInterceptor;
 import org.apache.cxf.binding.soap.interceptor.SoapOutInterceptor;
 import org.apache.cxf.databinding.stax.StaxDataBinding;
 import org.apache.cxf.databinding.stax.StaxDataBindingFeature;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.frontend.ServerFactoryBean;
+import org.apache.cxf.interceptor.BareOutInterceptor;
 
 /**
  * Creates an inbound proxy based on a specially configure CXF Server.
@@ -67,7 +69,12 @@ public class ProxyServiceMessageProcessorBuilder extends AbstractInboundMessageP
         {
             CxfUtils.removeInterceptor(server.getEndpoint().getBinding().getOutInterceptors(), SoapOutInterceptor.class.getName());
         }
-        
+
+        // RPCOutInterceptor adds an operation node to the response, so if it's present replace if by a BareOutInterceptor
+        if(CxfUtils.removeInterceptor(server.getEndpoint().getBinding().getOutInterceptors(), RPCOutInterceptor.class.getName())) {
+            server.getEndpoint().getBinding().getOutInterceptors().add(new BareOutInterceptor());
+        }
+
         if (isValidationEnabled())
         {
             server.getEndpoint().getInInterceptors().add(new ProxySchemaValidationInInterceptor(getConfiguration().getCxfBus(), 
