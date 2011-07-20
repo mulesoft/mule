@@ -25,19 +25,19 @@
     <endpoint name="noMethodDefined" address="axis:jms://soap.my.queue"
         exchange-pattern="one-way"/>
 
-    
-        <flow name="echoComponent">
-            
+    <model name="test">
+        <service name="echoComponent">
+            <inbound>
                 <inbound-endpoint address="axis:jms://soap.my.queue" exchange-pattern="request-response"/>
-            
+            </inbound>
             <component class="org.mule.component.simple.EchoComponent"/>
-        </flow>
+        </service>
 
-        <flow name="myComponent">
-            
+        <service name="myComponent">
+            <inbound>
                 <inbound-endpoint address="axis:jms://myComponent" exchange-pattern="request-response"/>
-            
+            </inbound>
             <component class="org.mule.component.simple.EchoComponent"/>
-        </flow>
-    
+        </service>
+    </model>
 </mule>
