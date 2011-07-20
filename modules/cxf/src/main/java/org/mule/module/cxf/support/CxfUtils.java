@@ -29,7 +29,7 @@ public final class CxfUtils
 {
 
     @SuppressWarnings("unchecked")
-    public static void removeInterceptor(List<Interceptor<? extends Message>> inInterceptors, String name) {
+    public static boolean removeInterceptor(List<Interceptor<? extends Message>> inInterceptors, String name) {
 
         for (Interceptor<?> i : inInterceptors) {
             if (i instanceof PhaseInterceptor) {
@@ -37,11 +37,14 @@ public final class CxfUtils
 
                 if (p.getId().equals(name)) {
                     inInterceptors.remove(p);
-                    return;
+                    return true;
                 }
             }
         }
+
+        return false;
     }
+
 
     public static Endpoint getEndpoint(DestinationFactory df, String uri)
         throws IOException, EndpointNotFoundException
