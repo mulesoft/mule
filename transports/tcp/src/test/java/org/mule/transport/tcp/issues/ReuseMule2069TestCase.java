@@ -26,17 +26,18 @@ import static org.junit.Assert.assertTrue;
  */
 public class ReuseMule2069TestCase extends TcpFunctionalTestCase
 {
+    public ReuseMule2069TestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
+    }
+    
     @Parameters
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "reuse-mule-2069.xml"},
+            {ConfigVariant.SERVICE, "reuse-mule-2069-service.xml"},
+            {ConfigVariant.FLOW, "reuse-mule-2069-flow.xml"}
         });
-    }
-
-    public ReuseMule2069TestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
     }
 
     @Test
