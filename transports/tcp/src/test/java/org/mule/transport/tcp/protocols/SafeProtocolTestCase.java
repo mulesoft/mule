@@ -10,21 +10,24 @@
 
 package org.mule.transport.tcp.protocols;
 
-import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.junit4.FunctionalTestCase;
-import org.mule.tck.junit4.rule.DynamicPort;
-
-import org.junit.Rule;
-import org.junit.Test;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-public class SafeProtocolTestCase extends FunctionalTestCase
+import java.util.Arrays;
+import java.util.Collection;
+
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+import org.mule.api.MuleException;
+import org.mule.api.MuleMessage;
+import org.mule.module.client.MuleClient;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
+
+public class SafeProtocolTestCase extends AbstractServiceAndFlowTestCase
 {
 
     protected static String TEST_MESSAGE = "Test TCP Request";
@@ -35,24 +38,32 @@ public class SafeProtocolTestCase extends FunctionalTestCase
     @Rule
     public DynamicPort dynamicPort2 = new DynamicPort("port2");
 
-    @Override
-    protected String getConfigResources()
+    public SafeProtocolTestCase(ConfigVariant variant, String configResources)
     {
-        return "safe-protocol-test.xml";
+        super(variant, configResources);
+    }
+
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{{ConfigVariant.SERVICE, "safe-protocol-test-service.xml"},
+            {ConfigVariant.FLOW, "safe-protocol-test-flow.xml"}});
     }
 
     @Test
     public void testSafeToSafe() throws MuleException
     {
         MuleClient client = new MuleClient(muleContext);
-        assertResponseOk(client.send("tcp://localhost:" + dynamicPort1.getNumber() + "?connector=safe", TEST_MESSAGE, null));
+        assertResponseOk(client.send("tcp://localhost:" + dynamicPort1.getNumber() + "?connector=safe",
+            TEST_MESSAGE, null));
     }
 
     @Test
     public void testUnsafeToSafe() throws MuleException
     {
         MuleClient client = new MuleClient(muleContext);
-        assertResponseBad(client.send("tcp://localhost:" + dynamicPort1.getNumber() + "?connector=unsafe", TEST_MESSAGE, null));
+        assertResponseBad(client.send("tcp://localhost:" + dynamicPort1.getNumber() + "?connector=unsafe",
+            TEST_MESSAGE, null));
     }
 
     private void assertResponseOk(MuleMessage message)

@@ -9,28 +9,38 @@
  */
 package org.mule.module.spring.security;
 
-import org.mule.api.MuleMessage;
-import org.mule.api.context.notification.SecurityNotificationListener;
-import org.mule.context.notification.SecurityNotification;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.junit4.FunctionalTestCase;
-import org.mule.transport.http.HttpConnector;
-import org.mule.util.concurrent.Latch;
-
-import java.util.concurrent.TimeUnit;
-
-import org.junit.Test;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-public class SecureHttpPollingFunctionalTestCase extends FunctionalTestCase
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.concurrent.TimeUnit;
+
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+import org.mule.api.MuleMessage;
+import org.mule.api.context.notification.SecurityNotificationListener;
+import org.mule.context.notification.SecurityNotification;
+import org.mule.module.client.MuleClient;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.transport.http.HttpConnector;
+import org.mule.util.concurrent.Latch;
+
+public class SecureHttpPollingFunctionalTestCase extends AbstractServiceAndFlowTestCase
 {
-    @Override
-    protected String getConfigResources()
+    public SecureHttpPollingFunctionalTestCase(ConfigVariant variant, String configResources)
     {
-        return "secure-http-polling-server.xml,secure-http-polling-client.xml";
+        super(variant, configResources);
+    }
+
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "secure-http-polling-server-service.xml,secure-http-polling-client-service.xml"},
+            {ConfigVariant.FLOW, "secure-http-polling-server-flow.xml,secure-http-polling-client-flow.xml"}
+            });
     }
 
     @Test
