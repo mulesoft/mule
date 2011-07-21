@@ -207,6 +207,7 @@ import org.mule.transformer.simple.ObjectToString;
 import org.mule.transformer.simple.SerializableToByteArray;
 import org.mule.transformer.simple.StringAppendTransformer;
 import org.mule.util.store.InMemoryObjectStore;
+import org.mule.util.store.ManagedObjectStore;
 import org.mule.util.store.TextFileObjectStore;
 
 /**
@@ -440,6 +441,7 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("in-memory-store", new ChildDefinitionParser("store", InMemoryObjectStore.class));
         registerBeanDefinitionParser("simple-text-file-store", new ChildDefinitionParser("store", TextFileObjectStore.class));
         registerBeanDefinitionParser("custom-object-store", new ChildDefinitionParser("store", null));
+        registerBeanDefinitionParser("managed-store", new ChildDefinitionParser("store",ManagedObjectStore.class));
 
         //Routers
         registerBeanDefinitionParser("inbound", new ChildDefinitionParser("messageSource", ServiceCompositeMessageSource.class, true));

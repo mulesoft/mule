@@ -4627,6 +4627,64 @@
         </xsd:complexContent>
     </xsd:complexType>
 
+    <xsd:element name="managed-store" type="managedObjectStoreType"
+		substitutionGroup="abstract-object-store">
+		<xsd:annotation>
+			<xsd:documentation>
+				Managed Object Store
+            </xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+
+	<xsd:complexType name="managedObjectStoreType">
+		<xsd:complexContent>
+			<xsd:extension base="abstractObjectStoreType">
+				<xsd:attribute name="storeName" type="xsd:string" use="required">
+					<xsd:annotation>
+						<xsd:documentation>
+							The ID used to retrieve the ObjectStore from the ObjectStoreManager
+    					</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="persistent" type="xsd:boolean">
+					<xsd:annotation>
+						<xsd:documentation>
+							Defines if this store should be persistent or not
+    					</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="maxEntries" type="substitutableInt">
+					<xsd:annotation>
+						<xsd:documentation>
+							The maximum number of entries that this store keeps around. Specify
+							'-1' if the store is supposed to be "unbounded".
+						</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="entryTTL" type="substitutableInt">
+					<xsd:annotation>
+						<xsd:documentation>
+							The time-to-live for each message ID, specified in seconds, or '-1'
+							for entries that should never expire. DO NOT combine this with an
+							unbounded store!
+                        </xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="expirationInterval" type="substitutableInt">
+					<xsd:annotation>
+						<xsd:documentation>
+							The interval for periodic bounded size enforcement and entry
+							expiration, specified in seconds. Arbitrary positive values
+							between one second and several hours or days are possible, but
+							should be chosen carefully according to the expected message rate
+							to prevent OutOfMemory conditions.
+                        </xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+
     <xsd:complexType name="abstractMonitoredObjectStoreType">
         <xsd:complexContent>
             <xsd:extension base="abstractObjectStoreType">
