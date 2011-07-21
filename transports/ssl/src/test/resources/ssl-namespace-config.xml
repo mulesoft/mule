@@ -8,12 +8,12 @@
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
        http://www.mulesoft.org/schema/mule/ssl http://www.mulesoft.org/schema/mule/ssl/3.2/mule-ssl.xsd">
 
-
     <ssl:connector name="sslConnector" sendBufferSize="1024" receiveBufferSize="2048" keepAlive="true">
         <ssl:client
                 path="clientKeystore"
                 storePassword="mulepassword"/>
         <ssl:key-store
+                keyAlias="muleserver"
                 keyPassword="mulepassword"
                 path="serverKeystore"
                 storePassword="mulepassword"/>
@@ -24,5 +24,4 @@
                 requireClientAuthentication="true"/>
         <ssl:protocol-handler property="foo"/>
     </ssl:connector>
-
 </mule>

@@ -19,7 +19,6 @@ import static org.junit.Assert.assertTrue;
 
 public class SslNamespaceHandlerTestCase extends FunctionalTestCase
 {
-
     @Override
     protected String getConfigResources()
     {
@@ -27,7 +26,7 @@ public class SslNamespaceHandlerTestCase extends FunctionalTestCase
     }
 
     @Test
-    public void testConnectorProperties() throws Exception
+    public void checkConnectorProperties() throws Exception
     {
         SslConnector connector =
                 (SslConnector) muleContext.getRegistry().lookupConnector("sslConnector");
@@ -38,6 +37,7 @@ public class SslNamespaceHandlerTestCase extends FunctionalTestCase
 
         //The full path gets resolved, we're just checkng that the property got set
         assertTrue(connector.getKeyStore().endsWith("/serverKeystore"));
+        assertEquals("muleserver", connector.getKeyAlias());
         assertEquals("mulepassword", connector.getKeyPassword());
         assertEquals("mulepassword", connector.getKeyStorePassword());
         //The full path gets resolved, we're just checkng that the property got set

@@ -19,7 +19,6 @@ import static org.junit.Assert.assertTrue;
 
 public class TlsNamespaceHandlerTestCase extends FunctionalTestCase
 {
-
     @Override
     protected String getConfigResources()
     {
@@ -37,6 +36,7 @@ public class TlsNamespaceHandlerTestCase extends FunctionalTestCase
 
         //The full path gets resolved, we're just checkng that the property got set
         assertTrue(connector.getKeyStore().endsWith("/serverKeystore"));
+        assertEquals("muleserver", connector.getKeyAlias());
         assertEquals("mulepassword", connector.getKeyPassword());
         assertEquals("mulepassword", connector.getKeyStorePassword());
         //The full path gets resolved, we're just checkng that the property got set

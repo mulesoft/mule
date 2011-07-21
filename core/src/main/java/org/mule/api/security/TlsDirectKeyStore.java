@@ -16,17 +16,16 @@ import javax.net.ssl.KeyManagerFactory;
 
 /**
  * Configure direct key stores.
- * TLS/SSL connections are made on behalf of an entity, which can be anonymous or identified by a 
+ * TLS/SSL connections are made on behalf of an entity, which can be anonymous or identified by a
  * certificate - this interface specifies how a keystore can be used to provide the certificates
  * (and associated private keys) necessary for identification.
- * 
+ *
  * <p>The information specified in this interface is used to configure a key store directly.
  * For more information see the documentation for the connector or protocol in question.
  * The comments in {@link org.mule.api.security.tls.TlsConfiguration} may also be useful.</p>
  */
 public interface TlsDirectKeyStore
 {
-
     /**
      * @return The location (resolved relative to the current classpath and file system, if possible)
      * of the keystore that contains public certificates and private keys for identification.
@@ -34,11 +33,21 @@ public interface TlsDirectKeyStore
     String getKeyStore();
 
     /**
-     * @param name The location of the keystore that contains public certificates  and private keys 
+     * @param name The location of the keystore that contains public certificates  and private keys
      * for identification.
      * @throws IOException If the location cannot be resolved via the file system or classpath
      */
     void setKeyStore(String name) throws IOException;
+
+    /**
+     * @return The alias of the key from the key store.
+     */
+    String getKeyAlias();
+
+    /**
+     * @param alias of the key from the key store.
+     */
+    void setKeyAlias(String alias);
 
     /**
      * @return The password used to protect the private key(s)
@@ -86,7 +95,6 @@ public interface TlsDirectKeyStore
      * @return A source of key stores generated from the parameters supplied here.
      */
     KeyManagerFactory getKeyManagerFactory();
-
 }
 
 

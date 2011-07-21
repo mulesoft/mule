@@ -16,9 +16,15 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class JettyNamespaceHandlerTestCase extends FunctionalTestCase
 {
+    public JettyNamespaceHandlerTestCase()
+    {
+        super();
+        setStartContext(false);
+    }
 
     @Override
     protected String getConfigResources()
@@ -27,21 +33,40 @@ public class JettyNamespaceHandlerTestCase extends FunctionalTestCase
     }
 
     @Test
-    public void testConnectorProperties()
+    public void checkConnectorProperties()
     {
-        JettyHttpConnector connector = (JettyHttpConnector) muleContext.getRegistry().lookupConnector("jettyConnector");
+        JettyHttpConnector connector =
+            (JettyHttpConnector) muleContext.getRegistry().lookupConnector("jettyConnector");
         assertNotNull(connector.getConfigFile());
         assertEquals("jetty-config.xml", connector.getConfigFile());
+    }
+
+    @Test
+    public void checkSslConnectorProperties()
+    {
+        JettyHttpsConnector connector =
+            (JettyHttpsConnector) muleContext.getRegistry().lookupConnector("jettySslConnector");
+        //The full path gets resolved, we're just checking that the property got set
+        assertTrue(connector.getKeyStore().endsWith("/serverKeystore"));
+        assertEquals("muleserver", connector.getKeyAlias());
+        assertEquals("mulepassword", connector.getKeyPassword());
+        assertEquals("mulepassword", connector.getKeyStorePassword());
+        //The full path gets resolved, we're just checking that the property got set
+        assertTrue(connector.getClientKeyStore().endsWith("/clientKeystore"));
+        assertEquals("mulepassword", connector.getClientKeyStorePassword());
+        //The full path gets resolved, we're just checking that the property got set
+        assertTrue(connector.getTrustStore().endsWith("/trustStore"));
+        assertEquals("mulepassword", connector.getTrustStorePassword());
     }
 
     /* See MULE-3603
     @Test
     public void testEndpointConfig() throws MuleException
     {
-        InboundEndpoint endpoint = 
+        InboundEndpoint endpoint =
             muleContext.getRegistry().lookupEndpointBuilder("endpoint").buildInboundEndpoint();
         assertNotNull(endpoint);
-        // is the following test correct? 
+        // is the following test correct?
         // Can't test it now, the config for the endpoint isn't even valid
         assertEquals("http://localhost:60223/", endpoint.getEndpointURI().getAddress());
     }

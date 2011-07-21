@@ -52,6 +52,7 @@ public class JettyHttpsConnector extends JettyHttpConnector implements TlsDirect
         registerSupportedProtocol("jetty-ssl");
     }
 
+    @Override
     protected void doInitialise() throws InitialisationException
     {
         validateSslConfig();
@@ -70,6 +71,7 @@ public class JettyHttpsConnector extends JettyHttpConnector implements TlsDirect
         }
     }
 
+    @Override
     public String getProtocol()
     {
         return JETTY_SSL;
@@ -103,6 +105,11 @@ public class JettyHttpsConnector extends JettyHttpConnector implements TlsDirect
     public String getKeyPassword()
     {
         return tls.getKeyPassword();
+    }
+
+    public String getKeyAlias()
+    {
+        return tls.getKeyAlias();
     }
 
     public String getKeyStore()
@@ -205,6 +212,11 @@ public class JettyHttpsConnector extends JettyHttpConnector implements TlsDirect
         tls.setKeyPassword(keyPassword);
     }
 
+    public void setKeyAlias(String alias)
+    {
+        tls.setKeyAlias(alias);
+    }
+
     public void setKeyStore(String keyStore) throws IOException
     {
         tls.setKeyStore(keyStore);
@@ -274,12 +286,12 @@ public class JettyHttpsConnector extends JettyHttpConnector implements TlsDirect
     protected AbstractConnector createJettyConnector()
     {
         SslSocketConnector cnn = new SslSocketConnector();
-        
+
         if (SystemUtils.isIbmJDK())
         {
             cnn.setProtocol("SSL_TLS");
         }
-       
+
         if (tls.getKeyStore() != null) cnn.setKeystore(tls.getKeyStore());
         if (tls.getKeyPassword() != null) cnn.setKeyPassword(tls.getKeyPassword());
         if (tls.getKeyStoreType() != null) cnn.setKeystoreType(tls.getKeyStoreType());
