@@ -382,16 +382,14 @@ public class PartitionedPersistentObjectStore<T extends Serializable> extends
         });
         int startIndex = trimToMaxSize(files, maxEntries);
 
-        final long now = System.nanoTime();
+        final long now = System.currentTimeMillis();
 
         for (int i = startIndex; i < files.length; i++)
         {
             if (files[i].getName().endsWith(FILE_EXTENSION))
             {
                 Long lastModified = files[i].lastModified();
-                // TODO this will NOT work as expected on ALL operating systems.
-                // Works for example on Mac but not Ubuntu. Need to have this code more "portable"
-                if ((TimeUnit.NANOSECONDS.toMillis(now) - lastModified) >= entryTTL)
+                if ((now - lastModified) >= entryTTL)
                 {
                     deleteStoreFile(files[i]);
                 }
