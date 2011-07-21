@@ -71,7 +71,8 @@ public class ProxyServiceMessageProcessorBuilder extends AbstractInboundMessageP
         }
 
         // RPCOutInterceptor adds an operation node to the response, so if it's present replace if by a BareOutInterceptor
-        if(CxfUtils.removeInterceptor(server.getEndpoint().getBinding().getOutInterceptors(), RPCOutInterceptor.class.getName())) {
+        if(CxfUtils.removeInterceptor(server.getEndpoint().getBinding().getOutInterceptors(), RPCOutInterceptor.class.getName()))
+        {
             server.getEndpoint().getBinding().getOutInterceptors().add(new BareOutInterceptor());
         }
 
