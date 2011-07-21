@@ -288,18 +288,6 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
             // invoke the actual web service up until right before we serialize the
             // response
             d.getMessageObserver().onMessage(m);
-
-            //If SoapFault should trigger Mule ExceptionStrategy instead of handling it by CXF - intercept it here
-            if (isOnFaultInvokeStrategy())
-            {
-                Object o = exchange.get(Exception.class);
-                if (o != null) {                
-                    if (o instanceof Exception) {
-                        Exception newEx = (Exception)o;
-                        throw new DefaultMuleException(newEx);
-                    }
-                }
-            }
             
             // get the response event
             MuleEvent responseEvent = (MuleEvent) exchange.get(CxfConstants.MULE_EVENT);
@@ -324,6 +312,16 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
                     ExceptionPayload exceptionPayload = new DefaultExceptionPayload(ex);
                     event.getMessage().setExceptionPayload(exceptionPayload);
                     muleResMsg.setOutboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 500);
+                }
+            }
+
+            //If SoapFault should trigger Mule ExceptionStrategy instead of handling it by CXF - intercept it here
+            if (isOnFaultInvokeStrategy())
+            {
+                Object o = exchange.get(Exception.class);
+                if (o != null && o instanceof Exception)
+                {
+                    throw new DefaultMuleException((Exception)o);
                 }
             }
 
