@@ -10,28 +10,37 @@
 
 package org.mule.transport.quartz;
 
-import org.mule.api.client.MuleClient;
-import org.mule.tck.functional.CountdownCallback;
-import org.mule.tck.functional.FunctionalTestComponent;
-import org.mule.tck.junit4.FunctionalTestCase;
-import org.mule.transport.NullPayload;
-import org.mule.transport.quartz.jobs.ScheduledDispatchJobConfig;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+import org.mule.api.client.MuleClient;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.functional.CountdownCallback;
+import org.mule.tck.functional.FunctionalTestComponent;
+import org.mule.transport.NullPayload;
+import org.mule.transport.quartz.jobs.ScheduledDispatchJobConfig;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
-public class QuartzCustomJobFromMessageTestCase extends FunctionalTestCase
+public class QuartzCustomJobFromMessageTestCase extends AbstractServiceAndFlowTestCase
 {
 
-    @Override
-    protected String getConfigResources()
+    public QuartzCustomJobFromMessageTestCase(ConfigVariant variant, String configResources)
     {
-        return "quartz-receive-dispatch-delegating-job.xml";
+        super(variant, configResources);
+    }
+
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "quartz-receive-dispatch-delegating-job-service.xml"},
+            {ConfigVariant.FLOW, "quartz-receive-dispatch-delegating-job-flow.xml"}});
     }
 
     @Test
@@ -52,8 +61,10 @@ public class QuartzCustomJobFromMessageTestCase extends FunctionalTestCase
         client.dispatch("vm://quartz.scheduler1", NullPayload.getInstance(), props);
         assertTrue(count.await(7000));
 
-        // now that the scheduler sent the event, null out the event callback to avoid CountdownCallback
-        // report more messages than requested during shutdown of the test/Mule server
+        // now that the scheduler sent the event, null out the event callback to
+        // avoid CountdownCallback
+        // report more messages than requested during shutdown of the test/Mule
+        // server
         component.setEventCallback(null);
     }
 
@@ -73,8 +84,10 @@ public class QuartzCustomJobFromMessageTestCase extends FunctionalTestCase
         client.dispatch("vm://quartz.scheduler2", jobConfig, null);
         assertTrue(count.await(7000));
 
-        // now that the scheduler sent the event, null out the event callback to avoid CountdownCallback
-        // report more messages than requested during shutdown of the test/Mule server
+        // now that the scheduler sent the event, null out the event callback to
+        // avoid CountdownCallback
+        // report more messages than requested during shutdown of the test/Mule
+        // server
         component.setEventCallback(null);
     }
 }

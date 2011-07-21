@@ -10,23 +10,32 @@
 
 package org.mule.transport.quartz;
 
-import org.mule.module.client.MuleClient;
-import org.mule.tck.functional.CountdownCallback;
-import org.mule.tck.functional.FunctionalTestComponent;
-import org.mule.tck.junit4.FunctionalTestCase;
-
-import org.junit.Test;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-public class QuartzReceiveAndDispatchJobTestCase extends FunctionalTestCase
+import java.util.Arrays;
+import java.util.Collection;
+
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+import org.mule.module.client.MuleClient;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.functional.CountdownCallback;
+import org.mule.tck.functional.FunctionalTestComponent;
+
+public class QuartzReceiveAndDispatchJobTestCase extends AbstractServiceAndFlowTestCase
 {
 
-    @Override
-    protected String getConfigResources()
+    public QuartzReceiveAndDispatchJobTestCase(ConfigVariant variant, String configResources)
     {
-        return "quartz-receive-dispatch.xml";
+        super(variant, configResources);
+    }
+
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{{ConfigVariant.SERVICE, "quartz-receive-dispatch-service.xml"},
+            {ConfigVariant.FLOW, "quartz-receive-dispatch-flow.xml"}});
     }
 
     @Test

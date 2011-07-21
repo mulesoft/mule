@@ -38,13 +38,13 @@ import static org.junit.Assert.assertTrue;
 /**
  * Tests the "quartz" namespace.
  */
-public class QuartzNamespaceHandlerTestCase extends FunctionalTestCase
+public class QuartzNamespaceHandlerServiceTestCase extends FunctionalTestCase
 {
 
     @Override
     protected String getConfigResources()
     {
-        return "quartz-namespace-config.xml";
+        return "quartz-namespace-config-service.xml";
     }
 
     @Test

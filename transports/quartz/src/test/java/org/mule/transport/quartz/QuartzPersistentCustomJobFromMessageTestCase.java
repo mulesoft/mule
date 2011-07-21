@@ -10,25 +10,35 @@
 
 package org.mule.transport.quartz;
 
-import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.junit4.FunctionalTestCase;
-import org.mule.transport.quartz.jobs.ScheduledDispatchJobConfig;
-
-import org.junit.Test;
-
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-public class QuartzPersistentCustomJobFromMessageTestCase extends FunctionalTestCase
+import java.util.Arrays;
+import java.util.Collection;
+
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+import org.mule.api.MuleMessage;
+import org.mule.module.client.MuleClient;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.transport.quartz.jobs.ScheduledDispatchJobConfig;
+
+public class QuartzPersistentCustomJobFromMessageTestCase extends AbstractServiceAndFlowTestCase
 {
 
     private static final long TIMEOUT = 30000;
 
-    @Override
-    protected String getConfigResources()
+    public QuartzPersistentCustomJobFromMessageTestCase(ConfigVariant variant, String configResources)
     {
-        return "quartz-persistent-custom-job-generator.xml";
+        super(variant, configResources);
+    }
+
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "quartz-persistent-custom-job-generator-service.xml"},
+            {ConfigVariant.FLOW, "quartz-persistent-custom-job-generator-flow.xml"}});
     }
 
     @Test

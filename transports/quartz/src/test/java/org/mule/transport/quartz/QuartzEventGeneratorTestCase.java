@@ -10,31 +10,39 @@
 
 package org.mule.transport.quartz;
 
-import org.mule.api.MuleEventContext;
-import org.mule.tck.functional.CountdownCallback;
-import org.mule.tck.functional.FunctionalTestComponent;
-import org.mule.tck.junit4.FunctionalTestCase;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import org.junit.Test;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-public class QuartzEventGeneratorTestCase extends FunctionalTestCase
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+import org.mule.api.MuleEventContext;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.functional.CountdownCallback;
+import org.mule.tck.functional.FunctionalTestComponent;
+
+public class QuartzEventGeneratorTestCase extends AbstractServiceAndFlowTestCase
 {
-    
+
     private static final String PAYLOAD = "TRIGGER STRING";
 
     private final List<String> receivedPayloads = new ArrayList<String>();
-    
-    @Override
-    protected String getConfigResources()
+
+    public QuartzEventGeneratorTestCase(ConfigVariant variant, String configResources)
     {
-        return "quartz-event-generator.xml";
+        super(variant, configResources);
+    }
+
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{{ConfigVariant.SERVICE, "quartz-event-generator-service.xml"},
+            {ConfigVariant.FLOW, "quartz-event-generator-flow.xml"}});
     }
 
     @Test
@@ -50,7 +58,7 @@ public class QuartzEventGeneratorTestCase extends FunctionalTestCase
         assertTrue(receivedPayloads.size() > 0);
         assertEquals(PAYLOAD, receivedPayloads.get(0));
     }
-    
+
     private static class Callback extends CountdownCallback
     {
         private List<String> messageList;
@@ -69,11 +77,9 @@ public class QuartzEventGeneratorTestCase extends FunctionalTestCase
                 String payloadString = context.getMessage().getPayloadAsString();
                 messageList.add(payloadString);
             }
-            
+
             super.eventReceived(context, component);
-        }        
+        }
     }
-    
+
 }
-
-
