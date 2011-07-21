@@ -176,7 +176,7 @@ public class ManagedStoresTestCase extends AbstractMuleTestCase
     {
         objectStore.store("key1", "value1");
         assertEquals("value1", objectStore.retrieve("key1"));
-        Thread.sleep(2000);
+        Thread.sleep(4000);
         assertFalse("Object with key1 still exists.", objectStore.contains("key1"));
 
     }
