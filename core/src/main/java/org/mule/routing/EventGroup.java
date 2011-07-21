@@ -12,23 +12,29 @@ package org.mule.routing;
 
 import org.mule.DefaultMessageCollection;
 import org.mule.DefaultMuleEvent;
+import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
+import org.mule.api.MuleException;
 import org.mule.api.MuleMessageCollection;
+import org.mule.api.config.MuleProperties;
+import org.mule.api.store.ListableObjectStore;
+import org.mule.api.store.ObjectStoreException;
+import org.mule.api.store.ObjectStoreManager;
 import org.mule.util.ClassUtils;
+import org.mule.util.store.DeserializationPostInitialisable;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.collections.IteratorUtils;
 
 /**
- * <code>EventGroup</code> is a holder over events grouped by a common group Id.
- * This can be used by components such as routers to managed related events.
+ * <code>EventGroup</code> is a holder over events grouped by a common group Id. This
+ * can be used by components such as routers to managed related events.
  */
 // @ThreadSafe
-public class EventGroup implements Comparable<EventGroup>, Serializable
+public class EventGroup implements Comparable<EventGroup>, Serializable, DeserializationPostInitialisable
 {
     /**
      * Serial version
@@ -37,22 +43,33 @@ public class EventGroup implements Comparable<EventGroup>, Serializable
 
     public static final MuleEvent[] EMPTY_EVENTS_ARRAY = new MuleEvent[0];
 
+    transient private ObjectStoreManager objectStoreManager = null;
+
     private final Object groupId;
-    // @GuardedBy("this")
-    private final List<MuleEvent> events;
+    transient ListableObjectStore<MuleEvent> events;
     private final long created;
     private final int expectedSize;
+    transient private MuleContext muleContext;
+    private final String storePrefix;
+    public static final String DEFAULT_STORE_PREFIX = "DEFAULT_STORE";
 
-    public EventGroup(Object groupId)
+    public EventGroup(Object groupId, MuleContext muleContext)
     {
-        this(groupId, -1);
+        this(groupId, muleContext, -1, false, DEFAULT_STORE_PREFIX);
     }
 
-    public EventGroup(Object groupId, int expectedSize)
+    public EventGroup(Object groupId,
+                      MuleContext muleContext,
+                      int expectedSize,
+                      boolean persistentStore,
+                      String storePrefix)
     {
         super();
         this.created = System.nanoTime();
-        this.events = new ArrayList<MuleEvent>(expectedSize > 0 ? expectedSize : 10);
+        this.muleContext = muleContext;
+        this.storePrefix = storePrefix;
+        this.events = getObjectStoreManager().getObjectStore(storePrefix + ".eventGroup." + groupId,
+            persistentStore);
         this.expectedSize = expectedSize;
         this.groupId = groupId;
     }
@@ -140,13 +157,14 @@ public class EventGroup implements Comparable<EventGroup>, Serializable
      * wrap the iteration in a synchronized block on the group instance.
      * 
      * @return an iterator over collected {@link MuleEvent}s.
+     * @throws ObjectStoreException
      */
     @SuppressWarnings("unchecked")
-    public Iterator<MuleEvent> iterator()
+    public Iterator<MuleEvent> iterator() throws ObjectStoreException
     {
         synchronized (events)
         {
-            if (events.isEmpty())
+            if (events.allKeys().isEmpty())
             {
                 return IteratorUtils.emptyIterator();
             }
@@ -161,17 +179,23 @@ public class EventGroup implements Comparable<EventGroup>, Serializable
      * Returns a snapshot of collected events in this group.
      * 
      * @return an array of collected {@link MuleEvent}s.
+     * @throws ObjectStoreException
      */
-    public MuleEvent[] toArray()
+    public MuleEvent[] toArray() throws ObjectStoreException
     {
         synchronized (events)
         {
-            if (events.isEmpty())
+            if (events.allKeys().isEmpty())
             {
                 return EMPTY_EVENTS_ARRAY;
             }
-
-            return events.toArray(EMPTY_EVENTS_ARRAY);
+            List<Serializable> keys = events.allKeys();
+            MuleEvent[] eventArray = new MuleEvent[keys.size()];
+            for (int i = 0; i < keys.size(); i++)
+            {
+                eventArray[i] = events.retrieve(keys.get(i));
+            }
+            return eventArray;
         }
     }
 
@@ -179,12 +203,13 @@ public class EventGroup implements Comparable<EventGroup>, Serializable
      * Add the given event to this group.
      * 
      * @param event the event to add
+     * @throws ObjectStoreException
      */
-    public void addEvent(MuleEvent event)
+    public void addEvent(MuleEvent event) throws ObjectStoreException
     {
         synchronized (events)
         {
-            events.add(event);
+            events.store(event.getId(), event);
         }
     }
 
@@ -192,12 +217,13 @@ public class EventGroup implements Comparable<EventGroup>, Serializable
      * Remove the given event from the group.
      * 
      * @param event the evnt to remove
+     * @throws ObjectStoreException
      */
-    public void removeEvent(MuleEvent event)
+    public void removeEvent(MuleEvent event) throws ObjectStoreException
     {
         synchronized (events)
         {
-            events.remove(event);
+            events.remove(event.getId());
         }
     }
 
@@ -220,7 +246,15 @@ public class EventGroup implements Comparable<EventGroup>, Serializable
     {
         synchronized (events)
         {
-            return events.size();
+            try
+            {
+                return events.allKeys().size();
+            }
+            catch (ObjectStoreException e)
+            {
+                // TODO Check if this is ok.
+                return -1;
+            }
         }
     }
 
@@ -237,13 +271,12 @@ public class EventGroup implements Comparable<EventGroup>, Serializable
 
     /**
      * Removes all events from this group.
+     * 
+     * @throws ObjectStoreException
      */
-    public void clear()
+    public void clear() throws ObjectStoreException
     {
-        synchronized (events)
-        {
-            events.clear();
-        }
+        getObjectStoreManager().disposeStore(events);
     }
 
     @Override
@@ -255,26 +288,36 @@ public class EventGroup implements Comparable<EventGroup>, Serializable
         buf.append("id=").append(groupId);
         buf.append(", expected size=").append(expectedSize);
 
-        synchronized (events)
+        try
         {
-            int currentSize = events.size();
-            buf.append(", current events=").append(currentSize);
-
-            if (currentSize > 0)
+            synchronized (events)
             {
-                buf.append(" [");
-                Iterator<MuleEvent> i = events.iterator();
-                while (i.hasNext())
+                int currentSize;
+
+                currentSize = events.allKeys().size();
+
+                buf.append(", current events=").append(currentSize);
+
+                if (currentSize > 0)
                 {
-                    MuleEvent event = i.next();
-                    buf.append(event.getMessage().getUniqueId());
-                    if (i.hasNext())
+                    buf.append(" [");
+                    Iterator<Serializable> i = events.allKeys().iterator();
+                    while (i.hasNext())
                     {
-                        buf.append(", ");
+                        Serializable id = i.next();
+                        buf.append(events.retrieve(id).getMessage().getUniqueId());
+                        if (i.hasNext())
+                        {
+                            buf.append(", ");
+                        }
                     }
+                    buf.append(']');
                 }
-                buf.append(']');
             }
+        }
+        catch (ObjectStoreException e)
+        {
+            buf.append("ObjectStoreException " + e + " caught:" + e.getMessage());
         }
 
         buf.append('}');
@@ -282,34 +325,60 @@ public class EventGroup implements Comparable<EventGroup>, Serializable
         return buf.toString();
     }
 
-    public MuleMessageCollection toMessageCollection()
+    public MuleMessageCollection toMessageCollection() throws ObjectStoreException
     {
         MuleMessageCollection col;
         synchronized (events)
         {
-            if (events.isEmpty())
+            if (events.allKeys().isEmpty())
             {
                 col = new DefaultMessageCollection(null);
             }
-            col = new DefaultMessageCollection(events.get(0).getMuleContext());
-            for (MuleEvent event : events)
+            col = new DefaultMessageCollection(muleContext);
+
+            for (Serializable id : events.allKeys())
             {
-                col.addMessage(event.getMessage());
+                col.addMessage(events.retrieve(id).getMessage());
             }
         }
         return col;
     }
-    
+
     public MuleEvent getMessageCollectionEvent()
     {
-        if (events.size() > 0)
+        try
         {
+            if (size() > 0)
+            {
 
-            return new DefaultMuleEvent(toMessageCollection(), events.get(0));
+                return new DefaultMuleEvent(toMessageCollection(), events.retrieve(events.allKeys().get(0)));
+            }
+            else
+            {
+                return null;
+            }
         }
-        else
+        catch (ObjectStoreException e)
         {
+            // Nothing to do...
             return null;
         }
+    }
+
+    private ObjectStoreManager getObjectStoreManager()
+    {
+        if (objectStoreManager == null)
+        {
+            objectStoreManager = (ObjectStoreManager) muleContext.getRegistry().get(
+                MuleProperties.OBJECT_STORE_MANAGER);
+        }
+        return objectStoreManager;
+    }
+
+    public void initAfterDeserialisation(MuleContext muleContext) throws MuleException
+    {
+        this.muleContext = muleContext;
+        this.events = (ListableObjectStore<MuleEvent>) getObjectStoreManager().getObjectStore(
+            storePrefix + ".eventGroup." + groupId, true);
     }
 }

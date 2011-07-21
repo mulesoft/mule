@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.routing.correlation;
 
 import org.mule.api.MessagingException;
@@ -14,6 +15,7 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessageCollection;
+import org.mule.api.config.MuleProperties;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
@@ -21,6 +23,12 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.MessageInfoMapping;
 import org.mule.api.routing.RoutingException;
 import org.mule.api.service.Service;
+import org.mule.api.store.ListableObjectStore;
+import org.mule.api.store.ObjectAlreadyExistsException;
+import org.mule.api.store.ObjectDoesNotExistException;
+import org.mule.api.store.ObjectStore;
+import org.mule.api.store.ObjectStoreException;
+import org.mule.api.store.ObjectStoreManager;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.context.notification.RoutingNotification;
 import org.mule.routing.EventGroup;
@@ -29,15 +37,12 @@ import org.mule.util.concurrent.ThreadNameHelper;
 import org.mule.util.monitor.Expirable;
 import org.mule.util.monitor.ExpiryMonitor;
 
+import java.io.Serializable;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.collections.buffer.BoundedFifoBuffer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -65,12 +70,12 @@ public class EventCorrelator implements Startable, Stoppable
      * agregated, keyed by message id. There will be one response message for every
      * EventGroup.
      */
-    protected final ConcurrentMap eventGroups = new ConcurrentHashMap();
+    protected ListableObjectStore<EventGroup> eventGroups;
 
     protected final Object groupsLock = new Object();
 
     // @GuardedBy groupsLock
-    protected final BoundedFifoBuffer processedGroups = new BoundedFifoBuffer(MAX_PROCESSED_GROUPS);
+    protected ObjectStore<Long> processedGroups = null;
 
     private long timeout = -1; // undefined
 
@@ -87,16 +92,26 @@ public class EventCorrelator implements Startable, Stoppable
     /**
      * A map with keys = group id and values = group creation time
      */
-    private Map expiredAndDispatchedGroups = new ConcurrentHashMap();
+    private ListableObjectStore<Long> expiredAndDispatchedGroups = null;
 
     private EventCorrelator.ExpiringGroupMonitoringThread expiringGroupMonitoringThread;
     private final String name;
 
-    public EventCorrelator(EventCorrelatorCallback callback, MessageProcessor timeoutMessageProcessor, MessageInfoMapping messageInfoMapping, MuleContext muleContext, String flowConstructName)
+    private final boolean persistentStores;
+    private final String storePrefix;
+
+    public EventCorrelator(EventCorrelatorCallback callback,
+                           MessageProcessor timeoutMessageProcessor,
+                           MessageInfoMapping messageInfoMapping,
+                           MuleContext muleContext,
+                           String flowConstructName,
+                           boolean persistentStores,
+                           String storePrefix)
     {
         if (callback == null)
         {
-            throw new IllegalArgumentException(CoreMessages.objectIsNull("EventCorrelatorCallback").getMessage());
+            throw new IllegalArgumentException(CoreMessages.objectIsNull("EventCorrelatorCallback")
+                .getMessage());
         }
         if (messageInfoMapping == null)
         {
@@ -110,18 +125,40 @@ public class EventCorrelator implements Startable, Stoppable
         this.messageInfoMapping = messageInfoMapping;
         this.muleContext = muleContext;
         this.timeoutMessageProcessor = timeoutMessageProcessor;
-        name = String.format("%s%s.event.correlator", ThreadNameHelper.getPrefix(muleContext), flowConstructName);
+        this.persistentStores = persistentStores;
+        this.storePrefix = storePrefix;
+        name = String.format("%s%s.event.correlator", ThreadNameHelper.getPrefix(muleContext),
+            flowConstructName);
+        ObjectStoreManager objectStoreManager = muleContext.getRegistry().get(
+            MuleProperties.OBJECT_STORE_MANAGER);
+        // TODO check if this should be bounded!
+        expiredAndDispatchedGroups = (ListableObjectStore<Long>) objectStoreManager.getObjectStore(
+            storePrefix + ".expiredAndDispatchedGroups", persistentStores);
+        processedGroups = (ListableObjectStore<Long>) objectStoreManager.getObjectStore(storePrefix
+                                                                                        + ".processedGroups",
+            persistentStores, MAX_PROCESSED_GROUPS, -1, 1000);
+        eventGroups = (ListableObjectStore<EventGroup>) objectStoreManager.getObjectStore(storePrefix
+                                                                                          + ".eventGroups",
+            persistentStores);
     }
 
     public void forceGroupExpiry(String groupId) throws MessagingException
     {
-        if (eventGroups.get(groupId) != null)
+        try
         {
-            handleGroupExpiry((EventGroup) eventGroups.get(groupId));
+            if (eventGroups.retrieve(groupId) != null)
+            {
+                handleGroupExpiry((EventGroup) eventGroups.retrieve(groupId));
+            }
+            else
+            {
+                addProcessedGroup(groupId);
+            }
         }
-        else
+        catch (ObjectStoreException e)
         {
-            addProcessedGroup(groupId);
+            // TODO improve this
+            throw new MessagingException(null, e);
         }
     }
 
@@ -135,9 +172,9 @@ public class EventCorrelator implements Startable, Stoppable
             try
             {
                 logger.trace(String.format("Received async reply message for correlationID: %s%n%s%n%s",
-                                           groupId,
-                                           StringMessageUtils.truncate(StringMessageUtils.toString(event.getMessage().getPayload()), 200, false),
-                                           StringMessageUtils.headersToString(event.getMessage())));
+                    groupId, StringMessageUtils.truncate(
+                        StringMessageUtils.toString(event.getMessage().getPayload()), 200, false),
+                    StringMessageUtils.headersToString(event.getMessage())));
             }
             catch (Exception e)
             {
@@ -168,49 +205,70 @@ public class EventCorrelator implements Startable, Stoppable
                 }
             }
 
-            if (isGroupAlreadyProcessed(groupId))
+            try
             {
-                if (logger.isDebugEnabled())
+                if (isGroupAlreadyProcessed(groupId))
                 {
-                    logger.debug("An event was received for an event group that has already been processed, " +
-                                 "this is probably because the async-reply timed out. Correlation Id is: " + groupId +
-                                 ". Dropping event");
+                    if (logger.isDebugEnabled())
+                    {
+                        logger.debug("An event was received for an event group that has already been processed, "
+                                     + "this is probably because the async-reply timed out. Correlation Id is: "
+                                     + groupId + ". Dropping event");
+                    }
+                    // Fire a notification to say we received this message
+                    muleContext.fireNotification(new RoutingNotification(event.getMessage(),
+                        event.getMessageSourceURI().toString(),
+                        RoutingNotification.MISSED_AGGREGATION_GROUP_EVENT));
+                    return null;
                 }
-                //Fire a notification to say we received this message
-                muleContext.fireNotification(new RoutingNotification(event.getMessage(),
-                                                                     event.getMessageSourceURI().toString(),
-                                                                     RoutingNotification.MISSED_AGGREGATION_GROUP_EVENT));
-                return null;
+            }
+            catch (ObjectStoreException e)
+            {
+                throw new RoutingException(event, timeoutMessageProcessor, e);
             }
 
             // check for an existing group first
-            EventGroup group = this.getEventGroup(groupId);
+            EventGroup group;
+            try
+            {
+                group = this.getEventGroup(groupId);
+            }
+            catch (ObjectStoreException e)
+            {
+                throw new RoutingException(event, timeoutMessageProcessor, e);
+            }
 
             // does the group exist?
             if (group == null)
             {
                 // ..apparently not, so create a new one & add it
-                group = this.addEventGroup(callback.createEventGroup(event, groupId));
+                try
+                {
+                    group = this.addEventGroup(callback.createEventGroup(event, groupId));
+                }
+                catch (ObjectStoreException e)
+                {
+                    throw new RoutingException(event, timeoutMessageProcessor, e);
+                }
             }
 
             // ensure that only one thread at a time evaluates this EventGroup
             synchronized (groupsLock)
             {
-                // make sure no other thread removed the group in the meantime
-                if (group != this.getEventGroup(groupId))
-                {
-                    // if that is the (rare) case, spin
-                    lookupMiss = true;
-                    continue;
-                }
-
                 if (logger.isDebugEnabled())
                 {
                     logger.debug("Adding event to aggregator group: " + groupId);
                 }
 
                 // add the incoming event to the group
-                group.addEvent(event);
+                try
+                {
+                    group.addEvent(event);
+                }
+                catch (ObjectStoreException e)
+                {
+                    throw new RoutingException(event, timeoutMessageProcessor, e);
+                }
 
                 // check to see if the event group is ready to be aggregated
                 if (callback.shouldAggregateEvents(group))
@@ -221,7 +279,14 @@ public class EventCorrelator implements Startable, Stoppable
 
                     // remove the eventGroup as no further message will be received
                     // for this group once we aggregate
-                    this.removeEventGroup(group);
+                    try
+                    {
+                        this.removeEventGroup(group);
+                    }
+                    catch (ObjectStoreException e)
+                    {
+                        throw new RoutingException(event, timeoutMessageProcessor, e);
+                    }
 
                     return returnEvent;
                 }
@@ -233,43 +298,52 @@ public class EventCorrelator implements Startable, Stoppable
         }
     }
 
-    protected EventGroup getEventGroup(String groupId)
+    protected EventGroup getEventGroup(String groupId) throws ObjectStoreException
     {
-        return (EventGroup) eventGroups.get(groupId);
-    }
-
-    protected EventGroup addEventGroup(EventGroup group)
-    {
-        EventGroup previous = (EventGroup) eventGroups.putIfAbsent(group.getGroupId(), group);
-        // a parallel thread might have removed the EventGroup already,
-        // therefore we need to validate our current reference
-        return (previous != null ? previous : group);
-    }
-
-    protected void removeEventGroup(EventGroup group)
-    {
-        final Object groupId = group.getGroupId();
-        eventGroups.remove(groupId);
-        addProcessedGroup(groupId);
-    }
-
-    protected void addProcessedGroup(Object id)
-    {
-        synchronized (groupsLock)
+        try
         {
-            if (processedGroups.isFull())
-            {
-                processedGroups.remove();
-            }
-            processedGroups.add(id);
+            return (EventGroup) eventGroups.retrieve(groupId);
+        }
+        catch (ObjectDoesNotExistException e)
+        {
+            return null;
         }
     }
 
-    protected boolean isGroupAlreadyProcessed(Object id)
+    protected EventGroup addEventGroup(EventGroup group) throws ObjectStoreException
+    {
+        try
+        {
+            eventGroups.store((Serializable) group.getGroupId(), group);
+            return group;
+        }
+        catch (ObjectAlreadyExistsException e)
+        {
+            return (EventGroup) eventGroups.retrieve((Serializable) group.getGroupId());
+        }
+    }
+
+    protected void removeEventGroup(EventGroup group) throws ObjectStoreException
+    {
+        final Object groupId = group.getGroupId();
+        eventGroups.remove((Serializable) groupId);
+        group.clear();
+        addProcessedGroup(groupId);
+    }
+
+    protected void addProcessedGroup(Object id) throws ObjectStoreException
     {
         synchronized (groupsLock)
         {
-            return processedGroups.contains(id);
+            processedGroups.store((Serializable) id, System.nanoTime());
+        }
+    }
+
+    protected boolean isGroupAlreadyProcessed(Object id) throws ObjectStoreException
+    {
+        synchronized (groupsLock)
+        {
+            return processedGroups.contains((Serializable) id);
         }
     }
 
@@ -295,26 +369,39 @@ public class EventCorrelator implements Startable, Stoppable
 
     protected void handleGroupExpiry(EventGroup group) throws MessagingException
     {
-        removeEventGroup(group);
-
-        final FlowConstruct service = group.toArray()[0].getFlowConstruct();
+        try
+        {
+            removeEventGroup(group);
+        }
+        catch (ObjectStoreException e)
+        {
+            throw new MessagingException(group.getMessageCollectionEvent(), e);
+        }
 
         if (isFailOnTimeout())
         {
-            final MuleMessageCollection messageCollection = group.toMessageCollection();
+            MuleMessageCollection messageCollection;
+            try
+            {
+                messageCollection = group.toMessageCollection();
+            }
+            catch (ObjectStoreException e)
+            {
+                throw new MessagingException(group.getMessageCollectionEvent(), e);
+            }
             muleContext.fireNotification(new RoutingNotification(messageCollection, null,
-                                                                 RoutingNotification.CORRELATION_TIMEOUT));
+                RoutingNotification.CORRELATION_TIMEOUT));
             throw new CorrelationTimeoutException(CoreMessages.correlationTimedOut(group.getGroupId()),
-                                                    group.getMessageCollectionEvent());
+                group.getMessageCollectionEvent());
         }
         else
         {
             if (logger.isDebugEnabled())
             {
                 logger.debug(MessageFormat.format(
-                        "Aggregator expired, but ''failOnTimeOut'' is false. Forwarding {0} events out of {1} " +
-                        "total for group ID: {2}", group.size(), group.expectedSize(), group.getGroupId()
-                ));
+                    "Aggregator expired, but ''failOnTimeOut'' is false. Forwarding {0} events out of {1} "
+                                    + "total for group ID: {2}", group.size(), group.expectedSize(),
+                    group.getGroupId()));
             }
 
             try
@@ -324,25 +411,27 @@ public class EventCorrelator implements Startable, Stoppable
                     MuleEvent newEvent = callback.aggregateEvents(group);
                     newEvent.getMessage().setCorrelationId(group.getGroupId().toString());
 
-
-                    if (!expiredAndDispatchedGroups.containsKey(group.getGroupId()))
+                    if (!expiredAndDispatchedGroups.contains((Serializable) group.getGroupId()))
                     {
-                        // TODO which use cases would need a sync reply event returned?
+                        // TODO which use cases would need a sync reply event
+                        // returned?
                         if (timeoutMessageProcessor != null)
                         {
                             timeoutMessageProcessor.process(newEvent);
                         }
                         else
                         {
+                            final FlowConstruct service = group.toArray()[0].getFlowConstruct();
                             if (!(service instanceof Service))
                             {
-                                throw new UnsupportedOperationException("EventAggregator is only supported with Service");
+                                throw new UnsupportedOperationException(
+                                    "EventAggregator is only supported with Service");
                             }
 
                             ((Service) service).dispatchEvent(newEvent);
                         }
-                        expiredAndDispatchedGroups.put(group.getGroupId(),
-                                                       group.getCreated());
+                        expiredAndDispatchedGroups.store((Serializable) group.getGroupId(),
+                            group.getCreated());
                     }
                     else
                     {
@@ -380,7 +469,6 @@ public class EventCorrelator implements Startable, Stoppable
         }
     }
 
-
     private final class ExpiringGroupMonitoringThread extends Thread implements Expirable
     {
         private ExpiryMonitor expiryMonitor;
@@ -391,29 +479,39 @@ public class EventCorrelator implements Startable, Stoppable
         {
             setName(name);
             this.expiryMonitor = new ExpiryMonitor(name, 1000 * 60);
-            //clean up every 30 minutes
+            // clean up every 30 minutes
             this.expiryMonitor.addExpirable(1000 * 60 * 30, TimeUnit.MILLISECONDS, this);
         }
 
         /**
-         * Removes the elements in expiredAndDispatchedGroups when groupLife is reached
+         * Removes the elements in expiredAndDispatchedGroups when groupLife is
+         * reached
+         * 
+         * @throws ObjectStoreException
          */
         public void expired()
         {
-            for (Object o : expiredAndDispatchedGroups.keySet())
+            try
             {
-                Long time = (Long) expiredAndDispatchedGroups.get(o);
-                if (time + groupTimeToLive < System.currentTimeMillis())
+                for (Serializable o : expiredAndDispatchedGroups.allKeys())
                 {
-                    expiredAndDispatchedGroups.remove(o);
-                    logger.warn(MessageFormat.format("Discarding group {0}", o));
+                    Long time = (Long) expiredAndDispatchedGroups.retrieve(o);
+                    if (time + groupTimeToLive < System.currentTimeMillis())
+                    {
+                        expiredAndDispatchedGroups.remove(o);
+                        logger.warn(MessageFormat.format("Discarding group {0}", o));
+                    }
                 }
+            }
+            catch (ObjectStoreException e)
+            {
+                logger.warn("Expiration of objects failed due to ObjectStoreException " + e + ".");
             }
         }
 
         public void release()
         {
-            //no op
+            // no op
         }
 
         public void run()
@@ -427,13 +525,20 @@ public class EventCorrelator implements Startable, Stoppable
                 }
 
                 List<EventGroup> expired = new ArrayList<EventGroup>(1);
-                for (Object o : eventGroups.values())
+                try
                 {
-                    EventGroup group = (EventGroup) o;
-                    if ((group.getCreated() + getTimeout() * MILLI_TO_NANO_MULTIPLIER) < System.nanoTime())
+                    for (Serializable o : eventGroups.allKeys())
                     {
-                        expired.add(group);
+                        EventGroup group = (EventGroup) eventGroups.retrieve(o);
+                        if ((group.getCreated() + getTimeout() * MILLI_TO_NANO_MULTIPLIER) < System.nanoTime())
+                        {
+                            expired.add(group);
+                        }
                     }
+                }
+                catch (ObjectStoreException e)
+                {
+                    logger.warn("expiry failed dues to ObjectStoreException " + e);
                 }
                 if (expired.size() > 0)
                 {
@@ -446,7 +551,10 @@ public class EventCorrelator implements Startable, Stoppable
                         }
                         catch (MessagingException e)
                         {
-                            e.getEvent().getFlowConstruct().getExceptionListener().handleException(e, e.getEvent());
+                            e.getEvent()
+                                .getFlowConstruct()
+                                .getExceptionListener()
+                                .handleException(e, e.getEvent());
                         }
                     }
                 }

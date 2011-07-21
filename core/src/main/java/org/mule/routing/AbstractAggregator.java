@@ -27,16 +27,17 @@ import org.mule.api.service.Service;
 import org.mule.processor.AbstractInterceptingMessageProcessor;
 import org.mule.routing.correlation.EventCorrelator;
 import org.mule.routing.correlation.EventCorrelatorCallback;
+import org.mule.util.concurrent.ThreadNameHelper;
 
 /**
  * <code>AbstractEventAggregator</code> will aggregate a set of messages into a
- * single message.
- *
- * <b>EIP Reference:</b> <a href="http://www.eaipatterns.com/Aggregator.html">http://www.eaipatterns.com/Aggregator.html</a>
+ * single message. <b>EIP Reference:</b> <a
+ * href="http://www.eaipatterns.com/Aggregator.html"
+ * >http://www.eaipatterns.com/Aggregator.html</a>
  */
 
 public abstract class AbstractAggregator extends AbstractInterceptingMessageProcessor
-        implements Initialisable, MuleContextAware, FlowConstructAware, Aggregator, Startable, Stoppable
+    implements Initialisable, MuleContextAware, FlowConstructAware, Aggregator, Startable, Stoppable
 {
 
     protected EventCorrelator eventCorrelator;
@@ -46,6 +47,8 @@ public abstract class AbstractAggregator extends AbstractInterceptingMessageProc
 
     private long timeout = 0;
     private boolean failOnTimeout = true;
+    protected boolean persistentStores;
+    protected String storePrefix = null;
 
     public void initialise() throws InitialisationException
     {
@@ -53,11 +56,16 @@ public abstract class AbstractAggregator extends AbstractInterceptingMessageProc
         {
             messageInfoMapping = flowConstruct.getMessageInfoMapping();
         }
-
+        if (storePrefix == null)
+        {
+            storePrefix = String.format("%s%s.%s.", ThreadNameHelper.getPrefix(muleContext),
+                flowConstruct.getName(), this.getClass().getName());
+        }
         eventCorrelator = new EventCorrelator(getCorrelatorCallback(muleContext), next, messageInfoMapping,
-                                              muleContext, flowConstruct.getName());
+            muleContext, flowConstruct.getName(), persistentStores, storePrefix);
 
-        // Inherit failOnTimeout from async-reply if this aggregator is being used for async-reply
+        // Inherit failOnTimeout from async-reply if this aggregator is being used
+        // for async-reply
         if (flowConstruct instanceof Service)
         {
             Service service = (Service) flowConstruct;
@@ -71,7 +79,7 @@ public abstract class AbstractAggregator extends AbstractInterceptingMessageProc
         eventCorrelator.setFailOnTimeout(isFailOnTimeout());
     }
 
-    public void start() throws MuleException 
+    public void start() throws MuleException
     {
         if (timeout != 0)
         {
@@ -135,4 +143,25 @@ public abstract class AbstractAggregator extends AbstractInterceptingMessageProc
     {
         this.messageInfoMapping = messageInfoMapping;
     }
+
+    public boolean isPersistentStores()
+    {
+        return persistentStores;
+    }
+
+    public void setPersistentStores(boolean persistentStores)
+    {
+        this.persistentStores = persistentStores;
+    }
+
+    public String getStorePrefix()
+    {
+        return storePrefix;
+    }
+
+    public void setStorePrefix(String storePrefix)
+    {
+        this.storePrefix = storePrefix;
+    }
+
 }

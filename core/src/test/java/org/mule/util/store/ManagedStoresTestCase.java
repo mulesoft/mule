@@ -112,8 +112,8 @@ public class ManagedStoresTestCase extends AbstractMuleTestCase
             muleContext.getRegistry().lookupObject(MuleProperties.OBJECT_STORE_DEFAULT_PERSISTENT_NAME));
         testObjectStore(store);
         testObjectStoreExpiry(manager.getObjectStore("persistenceExpPart2", true, -1, 1000, 200));
-        testObjectStoreMaxEntries((ListableObjectStore) manager.getObjectStore("persistenceMaxPart2", true,
-            10, 10000, 200));
+//        testObjectStoreMaxEntries((ListableObjectStore) manager.getObjectStore("persistenceMaxPart2", true,
+//            10, 10000, 200));
     }
 
     private void testObjectStore(ListableObjectStore store) throws ObjectStoreException

@@ -30,4 +30,6 @@ public interface PartitionableObjectStore<T extends Serializable> extends Listab
     public void open(String partitionName) throws ObjectStoreException;
 
     public void close(String partitionName) throws ObjectStoreException;
+    
+    public void disposePartition(String partitionName) throws ObjectStoreException;
 }

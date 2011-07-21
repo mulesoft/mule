@@ -28,7 +28,9 @@ import java.util.Comparator;
  * another router such as the <i>Resequencer</i> can receive the parts and reorder or
  * merge them.
  * <p>
- * <b>EIP Reference:</b> <a href="http://www.eaipatterns.com/Resequencer.html">http://www.eaipatterns.com/Resequencer.html<a/>
+ * <b>EIP Reference:</b> <a
+ * href="http://www.eaipatterns.com/Resequencer.html">http://
+ * www.eaipatterns.com/Resequencer.html<a/>
  */
 public class Resequencer extends AbstractAggregator
 {
@@ -63,7 +65,8 @@ public class Resequencer extends AbstractAggregator
     @Override
     protected EventCorrelatorCallback getCorrelatorCallback(MuleContext muleContext)
     {
-        return new ResequenceMessagesCorrelatorCallback(getEventComparator(), muleContext);
+        return new ResequenceMessagesCorrelatorCallback(getEventComparator(), muleContext, persistentStores,
+            storePrefix);
     }
 
     @Override

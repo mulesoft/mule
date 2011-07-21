@@ -77,8 +77,14 @@ public class ObjectStorePartition<T extends Serializable> implements ListableObj
         return partitionedObjectStore.allKeys(partitionName);
     }
 
-    public PartitionableObjectStore getBaseStore()
+    public PartitionableObjectStore<T> getBaseStore()
     {
         return partitionedObjectStore;
     }
+    
+    public String getPartitionName()
+    {
+        return partitionName;
+    }
+    
 }

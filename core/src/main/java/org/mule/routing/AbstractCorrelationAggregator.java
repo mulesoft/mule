@@ -16,9 +16,9 @@ import org.mule.routing.correlation.CollectionCorrelatorCallback;
 import org.mule.routing.correlation.EventCorrelatorCallback;
 
 /**
- * <code>AbstractCorrelationAggregatingMessageProcessor</code> uses the CorrelationID and
- * CorrelationGroupSize properties of the {@link org.mule.api.MuleMessage} to manage
- * message groups.
+ * <code>AbstractCorrelationAggregatingMessageProcessor</code> uses the CorrelationID
+ * and CorrelationGroupSize properties of the {@link org.mule.api.MuleMessage} to
+ * manage message groups.
  */
 public abstract class AbstractCorrelationAggregator extends AbstractAggregator
 {
@@ -35,7 +35,7 @@ public abstract class AbstractCorrelationAggregator extends AbstractAggregator
     {
         public DelegateCorrelatorCallback(MuleContext muleContext)
         {
-            super(muleContext);
+            super(muleContext, persistentStores, storePrefix);
         }
 
         @Override

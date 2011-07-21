@@ -19,12 +19,14 @@ import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.store.ListableObjectStore;
 import org.mule.api.store.ObjectStore;
+import org.mule.api.store.ObjectStoreException;
 import org.mule.api.store.ObjectStoreManager;
 import org.mule.api.store.PartitionableExpirableObjectStore;
 import org.mule.api.store.PartitionableObjectStore;
 import org.mule.util.concurrent.DaemonThreadFactory;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -217,5 +219,38 @@ public class MuleObjectStoreManager
             }
         }
 
+    }
+
+    @Override
+    public void disposeStore(ObjectStore<? extends Serializable> store) throws ObjectStoreException
+    {
+        if(store instanceof ObjectStorePartition)
+        {
+            ObjectStorePartition partition=(ObjectStorePartition)store;
+            partition.getBaseStore().disposePartition(partition.getPartitionName());
+        }else
+        {
+            if(store instanceof ListableObjectStore)
+            {
+                ListableObjectStore listableStore=(ListableObjectStore)store;
+                while(true)
+                {
+                    List<Serializable> keys=listableStore.allKeys();
+                    if(keys.size()==0)
+                    {
+                        break;
+                    }else
+                    {
+                        for(Serializable key:keys)
+                        {
+                            listableStore.remove(key);
+                        }
+                    }
+                }
+            }else
+            {
+                //there is nothing we can do                
+            }
+        }
     }
 }

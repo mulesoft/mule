@@ -10,6 +10,11 @@
 
 package org.mule.routing;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.MessageExchangePattern;
@@ -30,10 +35,6 @@ import org.mule.tck.testmodels.fruit.Apple;
 import java.util.Comparator;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 
 public class ResequencerTestCase extends AbstractMuleContextTestCase
 {
@@ -63,7 +64,8 @@ public class ResequencerTestCase extends AbstractMuleContextTestCase
         message2.setCorrelationId(correlationId);
         message3.setCorrelationId(correlationId);
 
-        InboundEndpoint endpoint = MuleTestUtils.getTestInboundEndpoint(MessageExchangePattern.ONE_WAY, muleContext);
+        InboundEndpoint endpoint = MuleTestUtils.getTestInboundEndpoint(MessageExchangePattern.ONE_WAY,
+            muleContext);
         MuleEvent event1 = new DefaultMuleEvent(message1, endpoint, session);
         MuleEvent event2 = new DefaultMuleEvent(message2, endpoint, session);
         MuleEvent event3 = new DefaultMuleEvent(message3, endpoint, session);
@@ -76,16 +78,19 @@ public class ResequencerTestCase extends AbstractMuleContextTestCase
         MuleMessage resultMessage = resultEvent.getMessage();
         assertNotNull(resultMessage);
 
-        assertEquals("test event A", resultMessage.getPayloadAsString());
+        assertTrue(resultMessage.getPayloadAsString().equals("test event A")
+                   || resultMessage.getPayloadAsString().equals("test event B")
+                   || resultMessage.getPayloadAsString().equals("test event C"));
 
-        // set a resequencing comparator. We need to reset the router since it will not process the same event group
-        //twice
+        // set a resequencing comparator. We need to reset the router since it will
+        // not process the same event group
+        // twice
         router = new TestEventResequencer(3);
         router.setMuleContext(muleContext);
         router.setEventComparator(new EventPayloadComparator());
+        testService.setName("testService2");
         router.setFlowConstruct(testService);
         router.initialise();
-
 
         assertNull(router.process(event2));
         assertNull(router.process(event3));
@@ -113,7 +118,8 @@ public class ResequencerTestCase extends AbstractMuleContextTestCase
         @Override
         protected EventCorrelatorCallback getCorrelatorCallback(MuleContext muleContext)
         {
-            return new ResequenceMessagesCorrelatorCallback(getEventComparator(), muleContext)
+            return new ResequenceMessagesCorrelatorCallback(getEventComparator(), muleContext, false,
+                storePrefix)
             {
                 @Override
                 public boolean shouldAggregateEvents(EventGroup events)

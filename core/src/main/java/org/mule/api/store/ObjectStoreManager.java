@@ -23,4 +23,5 @@ public interface ObjectStoreManager
                                                                             int maxEntries,
                                                                             int entryTTL,
                                                                             int expirationInterval);
+    public void disposeStore(ObjectStore<? extends Serializable> store) throws ObjectStoreException;
 }

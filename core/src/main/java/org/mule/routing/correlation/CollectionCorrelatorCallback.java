@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.routing.correlation;
 
 import org.mule.api.MuleContext;
@@ -31,23 +32,26 @@ public class CollectionCorrelatorCallback implements EventCorrelatorCallback
     protected transient final Log logger = LogFactory.getLog(getClass());
 
     protected MuleContext muleContext;
+    private final boolean persistantStores;
+    private final String storePrefix;
 
-    public CollectionCorrelatorCallback(MuleContext muleContext)
+    public CollectionCorrelatorCallback(MuleContext muleContext, boolean persistantStores, String storePrefix)
     {
         this.muleContext = muleContext;
+        this.persistantStores = persistantStores;
+        this.storePrefix = storePrefix;
     }
 
     /**
      * This method is invoked if the shouldAggregate method is called and returns
      * true. Once this method returns an aggregated message, the event group is
      * removed from the router.
-     *
+     * 
      * @param events the event group for this request
      * @return an aggregated message
-     * @throws org.mule.routing.AggregationException
-     *          if the aggregation fails. in this scenario the
-     *          whole event group is removed and passed to the exception handler
-     *          for this componenet
+     * @throws org.mule.routing.AggregationException if the aggregation fails. in
+     *             this scenario the whole event group is removed and passed to the
+     *             exception handler for this componenet
      */
     public MuleEvent aggregateEvents(EventGroup events) throws AggregationException
     {
@@ -60,13 +64,14 @@ public class CollectionCorrelatorCallback implements EventCorrelatorCallback
      */
     public EventGroup createEventGroup(MuleEvent event, Object groupId)
     {
-        return new EventGroup(groupId, event.getMessage().getCorrelationGroupSize());
+        return new EventGroup(groupId, muleContext, event.getMessage().getCorrelationGroupSize(),
+            persistantStores, storePrefix);
     }
 
     /**
      * @return <code>true</code> if the correlation size is not set or exactly the
      *         expected size of the event group.
-     * @see org.mule.routing.correlation.EventCorrelatorCallback#shouldAggregateEvents(org.mule.routing.EventGroup) 
+     * @see org.mule.routing.correlation.EventCorrelatorCallback#shouldAggregateEvents(org.mule.routing.EventGroup)
      */
     public boolean shouldAggregateEvents(EventGroup events)
     {
@@ -75,14 +80,15 @@ public class CollectionCorrelatorCallback implements EventCorrelatorCallback
         if (size == -1)
         {
             logger.warn("Correlation Group Size not set, but correlation aggregator is being used."
-                    + " Message is being forwarded as is");
+                        + " Message is being forwarded as is");
             return true;
         }
 
         if (logger.isDebugEnabled())
         {
-            logger.debug(MessageFormat.format("Correlation group size is {0}. Current event group size is {1} for group ID: {2}",
-                                              size, events.size(), events.getGroupId()));
+            logger.debug(MessageFormat.format(
+                "Correlation group size is {0}. Current event group size is {1} for group ID: {2}", size,
+                events.size(), events.getGroupId()));
         }
 
         return size == events.size();

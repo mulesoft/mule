@@ -7,12 +7,14 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.routing.correlation;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
+import org.mule.api.store.ObjectStoreException;
 import org.mule.routing.AggregationException;
 import org.mule.routing.EventGroup;
 import org.mule.routing.Resequencer;
@@ -30,9 +32,12 @@ public class ResequenceCorrelatorCallback extends CollectionCorrelatorCallback
 {
     protected Comparator<MuleEvent> eventComparator;
 
-    public ResequenceCorrelatorCallback(Comparator<MuleEvent> eventComparator, MuleContext muleContext)
+    public ResequenceCorrelatorCallback(Comparator<MuleEvent> eventComparator,
+                                        MuleContext muleContext,
+                                        boolean persistentStores,
+                                        String storePrefix)
     {
-        super(muleContext);
+        super(muleContext, persistentStores, storePrefix);
         this.eventComparator = eventComparator;
         this.muleContext = muleContext;
     }
@@ -41,13 +46,12 @@ public class ResequenceCorrelatorCallback extends CollectionCorrelatorCallback
      * This method is invoked if the shouldAggregate method is called and returns
      * true. Once this method returns an aggregated message, the event group is
      * removed from the router.
-     *
+     * 
      * @param events the event group for this request
      * @return an aggregated message
-     * @throws AggregationException
-     *          if the aggregation fails. in this scenario the
-     *          whole event group is removed and passed to the exception handler
-     *          for this componenet
+     * @throws AggregationException if the aggregation fails. in this scenario the
+     *             whole event group is removed and passed to the exception handler
+     *             for this componenet
      */
     @Override
     public MuleEvent aggregateEvents(EventGroup events) throws AggregationException
@@ -59,10 +63,18 @@ public class ResequenceCorrelatorCallback extends CollectionCorrelatorCallback
         }
         else
         {
-            results = events.toArray();
+            try
+            {
+                results = events.toArray();
+            }
+            catch (ObjectStoreException e)
+            {
+                throw new AggregationException(events, null, e);
+            }
             Arrays.sort(results, eventComparator);
         }
-        //This is a bit of a hack since we wrap the the collection of events in a Mule Message to pass back
+        // This is a bit of a hack since we wrap the the collection of events in a
+        // Mule Message to pass back
         return new DefaultMuleEvent(new DefaultMuleMessage(results, muleContext), results[0]);
     }
 

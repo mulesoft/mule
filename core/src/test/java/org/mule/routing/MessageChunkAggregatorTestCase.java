@@ -10,6 +10,10 @@
 
 package org.mule.routing;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.MessageExchangePattern;
@@ -23,10 +27,6 @@ import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 
 public class MessageChunkAggregatorTestCase extends AbstractMuleContextTestCase
 {
@@ -45,7 +45,7 @@ public class MessageChunkAggregatorTestCase extends AbstractMuleContextTestCase
 
         MessageChunkAggregator router = new MessageChunkAggregator();
         router.setMuleContext(muleContext);
-        router.setFlowConstruct(testService);    
+        router.setFlowConstruct(testService);
         router.initialise();
 
         MuleMessage message1 = new DefaultMuleMessage("test event A", muleContext);
@@ -56,7 +56,8 @@ public class MessageChunkAggregatorTestCase extends AbstractMuleContextTestCase
         message3.setCorrelationId(message1.getUniqueId());
         message1.setCorrelationGroupSize(3);
 
-        InboundEndpoint endpoint = MuleTestUtils.getTestInboundEndpoint(MessageExchangePattern.ONE_WAY, muleContext);
+        InboundEndpoint endpoint = MuleTestUtils.getTestInboundEndpoint(MessageExchangePattern.ONE_WAY,
+            muleContext);
         MuleEvent event1 = new DefaultMuleEvent(message1, endpoint, session);
         MuleEvent event2 = new DefaultMuleEvent(message2, endpoint, session);
         MuleEvent event3 = new DefaultMuleEvent(message3, endpoint, session);
@@ -68,7 +69,10 @@ public class MessageChunkAggregatorTestCase extends AbstractMuleContextTestCase
         MuleMessage resultMessage = resultEvent.getMessage();
         assertNotNull(resultMessage);
         String payload = resultMessage.getPayloadAsString();
-        assertEquals("test event Atest event Btest event C", payload);
-    }
 
+        assertTrue(payload.contains("test event A"));
+        assertTrue(payload.contains("test event B"));
+        assertTrue(payload.contains("test event C"));
+        assertTrue(payload.matches("test event [A,B,C]test event [A,B,C]test event [A,B,C]"));
+    }
 }

@@ -15,6 +15,7 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
+import org.mule.api.store.ObjectStoreException;
 import org.mule.routing.correlation.CollectionCorrelatorCallback;
 import org.mule.routing.correlation.CorrelationSequenceComparator;
 import org.mule.routing.correlation.EventCorrelatorCallback;
@@ -42,23 +43,31 @@ public class MessageChunkAggregator extends AbstractAggregator
     @Override
     protected EventCorrelatorCallback getCorrelatorCallback(MuleContext muleContext)
     {
-        return new CollectionCorrelatorCallback(muleContext)
+        return new CollectionCorrelatorCallback(muleContext, persistentStores, storePrefix)
         {
             /**
-             * This method is invoked if the shouldAggregate method is called and returns
-             * true. Once this method returns an aggregated message the event group is
-             * removed from the router
-             *
+             * This method is invoked if the shouldAggregate method is called and
+             * returns true. Once this method returns an aggregated message the event
+             * group is removed from the router
+             * 
              * @param events the event group for this request
              * @return an aggregated message
-             * @throws org.mule.routing.AggregationException if the aggregation fails. in
-             *             this scenario the whole event group is removed and passed to the
-             *             exception handler for this componenet
+             * @throws org.mule.routing.AggregationException if the aggregation
+             *             fails. in this scenario the whole event group is removed
+             *             and passed to the exception handler for this componenet
              */
             @Override
             public MuleEvent aggregateEvents(EventGroup events) throws AggregationException
             {
-                MuleEvent[] collectedEvents = events.toArray();
+                MuleEvent[] collectedEvents;
+                try
+                {
+                    collectedEvents = events.toArray();
+                }
+                catch (ObjectStoreException e)
+                {
+                    throw new AggregationException(events, MessageChunkAggregator.this, e);
+                }
                 MuleEvent firstEvent = collectedEvents[0];
                 Arrays.sort(collectedEvents, eventComparator);
                 ByteArrayOutputStream baos = new ByteArrayOutputStream(DEFAULT_BUFFER_SIZE);
@@ -72,18 +81,21 @@ public class MessageChunkAggregator extends AbstractAggregator
 
                     MuleMessage message;
 
-                    // try to deserialize message, since ChunkingRouter might have serialized
+                    // try to deserialize message, since ChunkingRouter might have
+                    // serialized
                     // the object...
                     try
                     {
                         // must deserialize in correct classloader
-                        final Object deserialized = SerializationUtils.deserialize(baos.toByteArray(), muleContext);
+                        final Object deserialized = SerializationUtils.deserialize(baos.toByteArray(),
+                            muleContext);
                         message = new DefaultMuleMessage(deserialized, firstEvent.getMessage(), muleContext);
 
                     }
                     catch (SerializationException e)
                     {
-                        message = new DefaultMuleMessage(baos.toByteArray(), firstEvent.getMessage(), muleContext);
+                        message = new DefaultMuleMessage(baos.toByteArray(), firstEvent.getMessage(),
+                            muleContext);
                     }
 
                     message.setCorrelationGroupSize(-1);
@@ -93,7 +105,7 @@ public class MessageChunkAggregator extends AbstractAggregator
                 }
                 catch (Exception e)
                 {
-                    throw new AggregationException(events,MessageChunkAggregator.this, e);
+                    throw new AggregationException(events, MessageChunkAggregator.this, e);
                 }
                 finally
                 {

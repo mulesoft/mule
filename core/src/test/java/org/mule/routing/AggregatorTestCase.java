@@ -10,6 +10,10 @@
 
 package org.mule.routing;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.MessageExchangePattern;
@@ -20,6 +24,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.service.Service;
+import org.mule.api.store.ObjectStoreException;
 import org.mule.routing.correlation.EventCorrelatorCallback;
 import org.mule.tck.MuleTestUtils;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -28,10 +33,6 @@ import org.mule.tck.testmodels.fruit.Apple;
 import java.util.Iterator;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 
 public class AggregatorTestCase extends AbstractMuleContextTestCase
 {
@@ -68,7 +69,10 @@ public class AggregatorTestCase extends AbstractMuleContextTestCase
 
         MuleEvent result = router.process(event3);
         assertNotNull(result);
-        assertEquals("test event A test event B test event C ", result.getMessageAsString());
+        assertTrue(result.getMessageAsString().contains("test event A"));
+        assertTrue(result.getMessageAsString().contains("test event B"));
+        assertTrue(result.getMessageAsString().contains("test event C"));
+        assertTrue(result.getMessageAsString().matches("test event [A,B,C] test event [A,B,C] test event [A,B,C] "));
     }
 
     public static class TestEventAggregator extends AbstractAggregator
@@ -99,7 +103,7 @@ public class AggregatorTestCase extends AbstractMuleContextTestCase
 
                 public EventGroup createEventGroup(MuleEvent event, Object groupId)
                 {
-                    return new EventGroup(groupId, eventThreshold);
+                    return new EventGroup(groupId,muleContext, eventThreshold,false,this.getClass().getName());
                 }
 
                 public MuleEvent aggregateEvents(EventGroup events) throws AggregationException
@@ -111,17 +115,24 @@ public class AggregatorTestCase extends AbstractMuleContextTestCase
 
                     StringBuffer newPayload = new StringBuffer(80);
 
-                    for (Iterator iterator = events.iterator(); iterator.hasNext();)
+                    try
                     {
-                        MuleEvent event = (MuleEvent) iterator.next();
-                        try
+                        for (Iterator iterator = events.iterator(); iterator.hasNext();)
                         {
-                            newPayload.append(event.getMessageAsString()).append(" ");
+                            MuleEvent event = (MuleEvent) iterator.next();
+                            try
+                            {
+                                newPayload.append(event.getMessageAsString()).append(" ");
+                            }
+                            catch (MuleException e)
+                            {
+                                throw new AggregationException(events, next, e);
+                            }
                         }
-                        catch (MuleException e)
-                        {
-                            throw new AggregationException(events, next, e);
-                        }
+                    }
+                    catch (ObjectStoreException e)
+                    {
+                        throw new AggregationException(events, next, e); 
                     }
 
                     return new DefaultMuleEvent(new DefaultMuleMessage(newPayload.toString(), muleContext),

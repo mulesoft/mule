@@ -421,4 +421,11 @@ public class PartitionedPersistentObjectStore<T extends Serializable> extends
         return expired;
     }
 
+    @Override
+    public void disposePartition(String partitionName) throws ObjectStoreException
+    {
+        File partitionFolder = FileUtils.newFile(storeDirectory, partitionName);
+        FileUtils.deleteQuietly(partitionFolder);
+    }
+
 }

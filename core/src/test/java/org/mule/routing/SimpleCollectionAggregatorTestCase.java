@@ -22,6 +22,8 @@ import org.mule.tck.MuleTestUtils;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.junit.Test;
@@ -71,9 +73,12 @@ public class SimpleCollectionAggregatorTestCase extends AbstractMuleContextTestC
         assertNotNull(resultMessage);
         List<String> payload = (List<String>)resultMessage.getPayload();
         assertEquals(3, payload.size());
-        assertEquals("test event A", payload.get(0));
-        assertEquals("test event B", payload.get(1));
-        assertEquals("test event C", payload.get(2));
+        String[] results=new String[3];
+        results=payload.toArray(results);
+        Arrays.sort(results);
+        assertEquals("test event A", results[0]);
+        assertEquals("test event B", results[1]);
+        assertEquals("test event C", results[2]);
     }
 
 }
