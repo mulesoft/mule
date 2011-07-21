@@ -7,35 +7,44 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.transport.http.functional;
-
-import org.mule.tck.functional.CounterCallback;
-import org.mule.tck.functional.FunctionalTestComponent;
-import org.mule.tck.junit4.FunctionalTestCase;
-import org.mule.tck.junit4.rule.DynamicPort;
-
-import java.util.concurrent.atomic.AtomicInteger;
-import org.junit.Rule;
-import org.junit.Test;
 
 import static org.junit.Assert.assertTrue;
 
-public class PollingReceiversRestartTestCase extends FunctionalTestCase
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.functional.CounterCallback;
+import org.mule.tck.functional.FunctionalTestComponent;
+import org.mule.tck.junit4.rule.DynamicPort;
+
+public class PollingReceiversRestartTestCase extends AbstractServiceAndFlowTestCase
 {
+
     private static final int WAIT_TIME = 3000;
 
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
-    public PollingReceiversRestartTestCase()
+    public PollingReceiversRestartTestCase(ConfigVariant variant, String configResources)
     {
+        super(variant, configResources);
         setStartContext(false);
     }
 
-    @Override
-    protected String getConfigResources()
+    @Parameters
+    public static Collection<Object[]> parameters()
     {
-        return "polling-receivers-restart-test.xml";
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "polling-receivers-restart-test-service.xml"},
+            {ConfigVariant.FLOW, "polling-receivers-restart-test-flow.xml"}
+        });
     }
 
     @Test
