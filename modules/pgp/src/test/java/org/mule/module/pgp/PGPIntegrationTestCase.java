@@ -10,22 +10,32 @@
 
 package org.mule.module.pgp;
 
+import static org.junit.Assert.assertEquals;
+
+import java.util.Arrays;
+import java.util.Collection;
+
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 
-import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-
-public class PGPIntegrationTestCase extends FunctionalTestCase
+public class PGPIntegrationTestCase extends AbstractServiceAndFlowTestCase
 {
 
-    @Override
-    protected String getConfigResources()
+    public PGPIntegrationTestCase(ConfigVariant variant, String configResources)
     {
-        return "pgp-integration-mule-config.xml";
+        super(variant, configResources);
+    }
+
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "pgp-integration-mule-config-service.xml"},
+            {ConfigVariant.FLOW, "pgp-integration-mule-config-flow.xml"}});
     }
 
     @Test
@@ -33,7 +43,7 @@ public class PGPIntegrationTestCase extends FunctionalTestCase
     {
         String payload = "this is a super simple test. Hope it works!!!";
         MuleClient client = new MuleClient(muleContext);
-        
+
         client.send("vm://in", new DefaultMuleMessage(payload, muleContext));
         MuleMessage message = client.request("vm://out", 5000);
         assertEquals(payload, message.getPayloadAsString());

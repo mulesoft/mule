@@ -10,23 +10,35 @@
 
 package org.mule.module.pgp;
 
-import org.mule.DefaultMuleMessage;
-import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.junit4.FunctionalTestCase;
-
-import org.junit.Test;
-
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
-public class PGPExpiredIntegrationTestCase extends FunctionalTestCase
+import java.util.Arrays;
+import java.util.Collection;
+
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+import org.mule.DefaultMuleMessage;
+import org.mule.api.MuleMessage;
+import org.mule.module.client.MuleClient;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+
+public class PGPExpiredIntegrationTestCase extends AbstractServiceAndFlowTestCase
 {
 
-    @Override
-    protected String getConfigResources()
+    public PGPExpiredIntegrationTestCase(ConfigVariant variant, String configResources)
     {
-        return "pgp-expired-integration-mule-config.xml";
+        super(variant, configResources);
+        
+    }
+
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "pgp-expired-integration-mule-config-service.xml"},
+            {ConfigVariant.FLOW, "pgp-expired-integration-mule-config-flow.xml"}
+        });
     }
 
     @Test
