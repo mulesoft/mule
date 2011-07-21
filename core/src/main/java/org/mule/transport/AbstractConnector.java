@@ -1440,7 +1440,7 @@ public abstract class AbstractConnector implements Connector, WorkListener
      */
     public ReplyToHandler getReplyToHandler(ImmutableEndpoint endpoint)
     {
-        return new DefaultReplyToHandler(getDefaultResponseTransformers(endpoint), muleContext);
+        return new DefaultReplyToHandler(muleContext);
     }
 
     /**

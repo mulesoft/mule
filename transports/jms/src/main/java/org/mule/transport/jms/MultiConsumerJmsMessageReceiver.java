@@ -10,6 +10,7 @@
 
 package org.mule.transport.jms;
 
+import org.mule.MessageExchangePattern;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleException;
 import org.mule.api.construct.FlowConstruct;
@@ -20,6 +21,7 @@ import org.mule.api.transaction.RollbackMethod;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionException;
 import org.mule.api.transport.Connector;
+import org.mule.api.transport.ReplyToHandler;
 import org.mule.transaction.TransactionCollection;
 import org.mule.transport.AbstractMessageReceiver;
 import org.mule.transport.AbstractReceiverWorker;
@@ -452,5 +454,24 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
             }
         }
     }
+    
+    @Override
+    protected ReplyToHandler getReplyToHandler()
+    {
+        ReplyToHandler replyToHandler = super.getReplyToHandler();
+        if (replyToHandler != null)
+        {
+            if (MessageExchangePattern.REQUEST_RESPONSE.equals(endpoint.getExchangePattern()))
+            {
+                logger.warn("JMS request-response inbound endpoints are deprecated and will no longer be supported as from Mule 3.3");
 
+                if (endpoint.getResponseMessageProcessors().size() > 0)
+                {
+                    logger.error("Response message processors (including transformers) configured on JMS request-response inbound endpoints are ignored and will have no effect.");
+                }
+
+            }
+        }
+        return replyToHandler;
+    }
 }

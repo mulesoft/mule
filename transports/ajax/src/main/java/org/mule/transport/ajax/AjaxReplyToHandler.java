@@ -12,8 +12,11 @@ package org.mule.transport.ajax;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
+import org.mule.api.endpoint.EndpointBuilder;
+import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.Connector;
+import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.transport.DefaultReplyToHandler;
 
 import java.util.List;
@@ -30,9 +33,9 @@ public class AjaxReplyToHandler extends DefaultReplyToHandler
 {
     private Connector connector;
     
-    public AjaxReplyToHandler(List<Transformer> transformers, Connector connector)
+    public AjaxReplyToHandler(Connector connector)
     {
-        super(transformers, connector.getMuleContext());
+        super(connector.getMuleContext());
         this.connector = connector;
     }
 
@@ -54,8 +57,15 @@ public class AjaxReplyToHandler extends DefaultReplyToHandler
             ret = returnMessage.getExceptionPayload().getMessage();
         }
         else
-        {
-            returnMessage.applyTransformers(event, getTransformers());
+        {   
+            EndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(event.getMessageSourceURI().toString(), muleContext);
+            endpointBuilder.setConnector(connector);
+            OutboundEndpoint tempEndpoint = muleContext.getEndpointFactory().getOutboundEndpoint(endpointBuilder);
+            
+            List<Transformer> defaultTransportTransformers =  ((org.mule.transport.AbstractConnector) connector).getDefaultOutboundTransformers(tempEndpoint);
+            
+            returnMessage.applyTransformers(event, defaultTransportTransformers);
+
             ret = returnMessage.getPayload();
         }
         //Publish to interested clients

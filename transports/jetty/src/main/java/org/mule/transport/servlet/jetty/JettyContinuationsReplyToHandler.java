@@ -13,10 +13,7 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.api.transformer.Transformer;
 import org.mule.transport.DefaultReplyToHandler;
-
-import java.util.List;
 
 import org.mortbay.util.ajax.Continuation;
 
@@ -25,9 +22,9 @@ import org.mortbay.util.ajax.Continuation;
  */
 public class JettyContinuationsReplyToHandler extends DefaultReplyToHandler
 {
-    public JettyContinuationsReplyToHandler(List<Transformer> transformers, MuleContext muleContext)
+    public JettyContinuationsReplyToHandler(MuleContext muleContext)
     {
-        super(transformers, muleContext);
+        super(muleContext);
     }
 
     @Override

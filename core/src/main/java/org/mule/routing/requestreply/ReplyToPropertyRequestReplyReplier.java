@@ -12,14 +12,11 @@ package org.mule.routing.requestreply;
 
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
-import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.RequestReplyReplierMessageProcessor;
 import org.mule.api.transport.ReplyToHandler;
 import org.mule.processor.AbstractInterceptingMessageProcessor;
-import org.mule.transport.AbstractConnector;
 
 import org.apache.commons.lang.BooleanUtils;
 
@@ -30,8 +27,6 @@ public class ReplyToPropertyRequestReplyReplier extends AbstractInterceptingMess
     public MuleEvent process(MuleEvent event) throws MuleException
     {
         Object replyTo = event.getMessage().getReplyTo();
-        ReplyToHandler replyToHandler = getReplyToHandler(event.getMessage(),
-            event.getEndpoint());
         // Do not propagate REPLY_TO
         event.getMessage().setReplyTo(null);
 
@@ -42,26 +37,10 @@ public class ReplyToPropertyRequestReplyReplier extends AbstractInterceptingMess
             MuleProperties.MULE_REPLY_TO_STOP_PROPERTY);
         if (resultEvent != null && !BooleanUtils.toBoolean(replyToStop))
         {
-            processReplyTo(event, resultEvent, replyToHandler, replyTo);
+            processReplyTo(event, resultEvent, event.getReplyToHandler(), replyTo);
         }
 
         return resultEvent;
-    }
-
-    protected ReplyToHandler getReplyToHandler(MuleMessage message, InboundEndpoint endpoint)
-    {
-        Object replyTo = message.getReplyTo();
-        ReplyToHandler replyToHandler = null;
-        if (replyTo != null)
-        {
-            replyToHandler = ((AbstractConnector) endpoint.getConnector()).getReplyToHandler(endpoint);
-            // Use the response transformer for the event if one is set
-            if (endpoint.getResponseTransformers() != null)
-            {
-                replyToHandler.setTransformers(endpoint.getResponseTransformers());
-            }
-        }
-        return replyToHandler;
     }
 
     protected void processReplyTo(MuleEvent event,

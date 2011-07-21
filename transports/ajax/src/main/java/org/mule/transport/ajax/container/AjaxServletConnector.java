@@ -222,7 +222,7 @@ public class AjaxServletConnector extends ServletConnector implements BayeuxAwar
     @Override
     public ReplyToHandler getReplyToHandler(ImmutableEndpoint endpoint)
     {
-        return new AjaxReplyToHandler(getDefaultResponseTransformers(endpoint), this);
+        return new AjaxReplyToHandler(this);
     }
 
     @Override

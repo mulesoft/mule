@@ -217,7 +217,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
                        "\n  JMSPriority=" + priority +
                        "\n  JMSReplyTo=" + msg.getJMSReplyTo());
             }
-            connector.getJmsSupport().send(producer, msg, persistent, priority, ttl, topic, endpoint);
+            connector.getJmsSupport().send(producer, msg, persistent, priority, ttl, topic);
 
             if (useReplyToDestination && replyTo != null)
             {
@@ -230,7 +230,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
                     ReplyToListener listener = new ReplyToListener(l);
                     consumer.setMessageListener(listener);
 
-                    connector.getJmsSupport().send(producer, msg, persistent, priority, ttl, topic, endpoint);
+                    connector.getJmsSupport().send(producer, msg, persistent, priority, ttl, topic);
 
                     int timeout = event.getTimeout();
 

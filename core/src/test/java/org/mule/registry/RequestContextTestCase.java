@@ -28,6 +28,7 @@ import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.security.Credentials;
 import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.TransformerException;
+import org.mule.api.transport.ReplyToHandler;
 import org.mule.management.stats.ProcessingTime;
 import org.mule.message.DefaultExceptionPayload;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -300,6 +301,12 @@ public class RequestContextTestCase extends AbstractMuleTestCase
         public String getMessageSourceName()
         {
             return "test";
+        }
+        
+        @Override
+        public ReplyToHandler getReplyToHandler()
+        {
+            return null;
         }
     }
 

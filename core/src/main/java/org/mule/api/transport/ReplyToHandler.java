@@ -13,9 +13,6 @@ package org.mule.api.transport;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.api.transformer.Transformer;
-
-import java.util.List;
 
 /**
  * <code>ReplyToHandler</code> is used to handle routing where a replyTo endpointUri is
@@ -26,7 +23,4 @@ public interface ReplyToHandler
 {
     void processReplyTo(MuleEvent event, MuleMessage returnMessage, Object replyTo) throws MuleException;
 
-    void setTransformers(List<Transformer> transformers);
-
-    List<Transformer> getTransformers();
 }

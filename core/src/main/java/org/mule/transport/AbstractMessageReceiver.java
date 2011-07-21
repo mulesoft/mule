@@ -32,6 +32,7 @@ import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.Connector;
 import org.mule.api.transport.MessageReceiver;
 import org.mule.api.transport.PropertyScope;
+import org.mule.api.transport.ReplyToHandler;
 import org.mule.context.notification.EndpointMessageNotification;
 import org.mule.session.DefaultMuleSession;
 import org.mule.session.LegacySessionHandler;
@@ -79,6 +80,8 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
 
     protected List<Transformer> defaultInboundTransformers;
     protected List<Transformer> defaultResponseTransformers;
+    
+    protected ReplyToHandler replyToHandler;
 
     /**
      * Creates the Message Receiver
@@ -131,6 +134,8 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
         defaultInboundTransformers = connector.getDefaultInboundTransformers(endpoint);
         defaultResponseTransformers = connector.getDefaultResponseTransformers(endpoint);
 
+        replyToHandler = getReplyToHandler();
+        
         super.initialise();
     }
 
@@ -270,7 +275,15 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
         {
             session = new DefaultMuleSession(flowConstruct, connector.getMuleContext());
         }
-        return new DefaultMuleEvent(message, getEndpoint(), session, ros);
+        if (message.getReplyTo() != null)
+        {
+            return new DefaultMuleEvent(message, getEndpoint(), session, ros, replyToHandler);
+
+        }
+        else
+        {
+            return new DefaultMuleEvent(message, getEndpoint(), session, ros, null);
+        }
     }
 
     public EndpointURI getEndpointURI()
@@ -349,5 +362,10 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
         this.listener = null;
         this.flowConstruct = null;
         super.doDispose();
+    }
+    
+    protected ReplyToHandler getReplyToHandler()
+    {
+        return ((AbstractConnector) endpoint.getConnector()).getReplyToHandler(endpoint);
     }
 }

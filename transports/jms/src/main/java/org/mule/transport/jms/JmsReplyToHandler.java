@@ -13,12 +13,13 @@ package org.mule.transport.jms;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.EndpointBuilder;
+import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.service.Service;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.DispatchException;
+import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.management.stats.ServiceStatistics;
-import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transport.DefaultReplyToHandler;
 import org.mule.transport.jms.i18n.JmsMessages;
 import org.mule.transport.jms.transformers.ObjectToJMSMessage;
@@ -50,9 +51,9 @@ public class JmsReplyToHandler extends DefaultReplyToHandler
     private final JmsConnector connector;
     private ObjectToJMSMessage toJmsMessage;
 
-    public JmsReplyToHandler(JmsConnector connector, List<Transformer> transformers)
+    public JmsReplyToHandler(JmsConnector connector)
     {
-        super(transformers, connector.getMuleContext());
+        super(connector.getMuleContext());
         this.connector = connector;
         toJmsMessage = new ObjectToJMSMessage();
     }
@@ -60,7 +61,7 @@ public class JmsReplyToHandler extends DefaultReplyToHandler
     @Override
     public void processReplyTo(MuleEvent event, MuleMessage returnMessage, Object replyTo) throws MuleException
     {
-        Destination replyToDestination = null;
+        Destination replyToDestination = null;  
         MessageProducer replyToProducer = null;
         Session session = null;
         try
@@ -76,21 +77,15 @@ public class JmsReplyToHandler extends DefaultReplyToHandler
                 return;
             }
 
-            //This is a work around for JmsTransformers where the current endpoint needs
-            //to be set on the transformer so that a JMSMessage can be created correctly (the transformer needs a Session)
             Class srcType = returnMessage.getPayload().getClass();
-            for (Transformer t : getTransformers())
-            {
-                if (t.isSourceDataTypeSupported(DataTypeFactory.create(srcType)))
-                {
-                    if (t.getEndpoint() == null)
-                    {
-                        t.setEndpoint(getEndpoint(event, "jms://temporary"));
-                        break;
-                    }
-                }
-            }
-            returnMessage.applyTransformers(event, getTransformers());
+            EndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder("jms://temporary", muleContext);
+            endpointBuilder.setConnector(connector);
+            OutboundEndpoint tempEndpoint = muleContext.getEndpointFactory().getOutboundEndpoint(endpointBuilder);
+            
+            List<Transformer> defaultTransportTransformers =  ((org.mule.transport.AbstractConnector) connector).getDefaultOutboundTransformers(tempEndpoint);
+            
+            returnMessage.applyTransformers(event, defaultTransportTransformers);
+            
             Object payload = returnMessage.getPayload();
 
             if (replyToDestination instanceof Topic && replyToDestination instanceof Queue
@@ -140,10 +135,9 @@ public class JmsReplyToHandler extends DefaultReplyToHandler
                 }
             }
 
-            final ImmutableEndpoint endpoint = event.getEndpoint();
             if (ttlString == null && priorityString == null && persistentDeliveryString == null)
             {
-                connector.getJmsSupport().send(replyToProducer, replyToMessage, topic, endpoint);
+                connector.getJmsSupport().send(replyToProducer, replyToMessage, topic);
             }
             else
             {
@@ -163,7 +157,7 @@ public class JmsReplyToHandler extends DefaultReplyToHandler
                                 : connector.isPersistentDelivery();
 
                 connector.getJmsSupport().send(replyToProducer, replyToMessage, persistent, priority, ttl,
-                    topic, endpoint);
+                    topic);
             }
 
             if (logger.isInfoEnabled())

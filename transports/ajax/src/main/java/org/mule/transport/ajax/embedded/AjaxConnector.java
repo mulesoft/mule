@@ -208,7 +208,7 @@ public class AjaxConnector extends JettyHttpsConnector implements BayeuxAware
     @Override
     public ReplyToHandler getReplyToHandler(ImmutableEndpoint endpoint)
     {
-        return new AjaxReplyToHandler(getDefaultResponseTransformers(endpoint), this);
+        return new AjaxReplyToHandler(this);
     }
 
     void createEmbeddedServer() throws MuleException

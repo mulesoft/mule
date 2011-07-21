@@ -10,14 +10,14 @@
 
 package org.mule.transport.jms.integration;
 
+import static org.junit.Assert.assertEquals;
+
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.transport.NullPayload;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * TODO this test does not use the Test scenarios, I think it would need a new Method
@@ -32,14 +32,6 @@ public class JmsTemporaryReplyToTestCase extends AbstractJmsFunctionalTestCase
     {
         return "integration/jms-temporary-replyTo.xml";
     }
-
-    @Test
-    public void testTemporaryReplyEnabledAsync() throws MuleException
-    {
-        MuleClient muleClient = new MuleClient(muleContext);
-        MuleMessage response = muleClient.send("vm://in1", TEST_MESSAGE, null);
-        assertEquals(TEST_MESSAGE, response.getPayload());
-    }
     
     @Test
     public void testTemporaryReplyEnabledSync() throws MuleException
@@ -47,14 +39,6 @@ public class JmsTemporaryReplyToTestCase extends AbstractJmsFunctionalTestCase
         MuleClient muleClient = new MuleClient(muleContext);
         MuleMessage response = muleClient.send("vm://in1Sync", TEST_MESSAGE, null);
         assertEquals(TEST_MESSAGE + " TestService1", response.getPayload());
-    }
-
-    @Test
-    public void testTemporaryReplyDisabledAsync() throws MuleException
-    {
-        MuleClient muleClient = new MuleClient(muleContext);
-        MuleMessage response = muleClient.send("vm://in2", TEST_MESSAGE, null);
-        assertEquals(TEST_MESSAGE, response.getPayload());
     }
 
     @Test

@@ -67,12 +67,17 @@
             <echo-component />
         </service>
 
+        <!--
+        DF: The following scenario is no longer supported as from Mule 3.2, a error is logged if response
+        transformers are configured on a JMS request-response inbound endpoint.
+
         <service name="JMSSync">
             <inbound>
                 <inbound-endpoint address="jms://sync" exchange-pattern="request-response" responseTransformer-refs="customResponse" />
             </inbound>
             <echo-component />
         </service>
+        -->
 
         <service name="VmSyncOutboundEndpointResponseTransformer">
             <inbound>

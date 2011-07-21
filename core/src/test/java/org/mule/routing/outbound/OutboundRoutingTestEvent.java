@@ -22,6 +22,7 @@ import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.security.Credentials;
 import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.TransformerException;
+import org.mule.api.transport.ReplyToHandler;
 import org.mule.management.stats.ProcessingTime;
 import org.mule.tck.MuleTestUtils;
 import org.mule.transformer.types.DataTypeFactory;
@@ -255,6 +256,12 @@ public class OutboundRoutingTestEvent implements MuleEvent
     public String getMessageSourceName()
     {
         return "test";
+    }
+    
+    @Override
+    public ReplyToHandler getReplyToHandler()
+    {
+        return null;
     }
 
 }

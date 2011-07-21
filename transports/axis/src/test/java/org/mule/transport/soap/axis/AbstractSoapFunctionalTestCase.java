@@ -144,7 +144,6 @@ public abstract class AbstractSoapFunctionalTestCase extends FunctionalTestCase
         assertEquals("Rubble", ((Person)result.getPayload()).getLastName());
     }
 
-    // TODO This test causes an infinite loop in the method org.apache.axis.encoding.SerializationContext.serialize()
     @Test
     public void testException() throws Exception
     {

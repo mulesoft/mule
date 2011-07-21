@@ -17,19 +17,6 @@
     
     <model name="Model">
 
-        <service name="JMSService1">
-            <inbound>
-                <vm:inbound-endpoint path="in1" exchange-pattern="request-response"/>
-            </inbound>
-            <echo-component/>
-            <outbound>
-                <pass-through-router>
-                    <outbound-endpoint address="${outbound.destination}" 
-                        connector-ref="jmsConnector1" exchange-pattern="one-way"/>
-                </pass-through-router>
-            </outbound>
-        </service>
-        
         <service name="JMSService1Sync">
             <inbound>
                 <vm:inbound-endpoint path="in1Sync" exchange-pattern="request-response"/>
@@ -43,21 +30,6 @@
             </outbound>
         </service>
 
-        <service name="JMSService2">
-            <inbound>
-                <vm:inbound-endpoint path="in2" exchange-pattern="request-response"/>
-            </inbound>
-            <echo-component/>
-            <outbound>
-                <pass-through-router>
-                    <outbound-endpoint address="${outbound.destination}" connector-ref="jmsConnector1"
-                        exchange-pattern="one-way">
-                        <property key="disableTemporaryReplyToDestinations" value="true"/>
-                    </outbound-endpoint>
-                </pass-through-router>
-            </outbound>
-        </service>
-        
         <service name="JMSService2Sync">
             <inbound>
                 <vm:inbound-endpoint path="in2Sync" exchange-pattern="request-response"/>

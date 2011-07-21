@@ -22,12 +22,13 @@ import org.mule.api.endpoint.EndpointFactory;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.service.Service;
-import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.DispatchException;
 import org.mule.api.transport.ReplyToHandler;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.management.stats.ServiceStatistics;
+import org.mule.util.store.DeserializationPostInitialisable;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,20 +41,18 @@ import org.apache.commons.logging.LogFactory;
  * replyTo header.
  */
 
-public class DefaultReplyToHandler implements ReplyToHandler
+public class DefaultReplyToHandler implements ReplyToHandler, Serializable, DeserializationPostInitialisable
 {
     /**
      * logger used by this class
      */
     protected transient final Log logger = LogFactory.getLog(getClass());
 
-    private volatile List<Transformer> transformers;
-    private final Map<String, ImmutableEndpoint> endpointCache = new HashMap<String, ImmutableEndpoint>();
-    protected MuleContext muleContext;
+    private transient Map<String, ImmutableEndpoint> endpointCache = new HashMap<String, ImmutableEndpoint>();
+    protected transient MuleContext muleContext;
 
-    public DefaultReplyToHandler(List<Transformer> transformers, MuleContext muleContext)
+    public DefaultReplyToHandler(MuleContext muleContext)
     {
-        this.transformers = transformers;
         this.muleContext = muleContext;
     }
 
@@ -125,23 +124,17 @@ public class DefaultReplyToHandler implements ReplyToHandler
         {
             EndpointFactory endpointFactory = muleContext.getEndpointFactory();
             EndpointBuilder endpointBuilder = endpointFactory.getEndpointBuilder(endpointUri);
-            if (transformers == null)
-            {
-                endpointBuilder.setTransformers(event.getEndpoint().getResponseTransformers());
-            }
             endpoint = endpointFactory.getOutboundEndpoint(endpointBuilder);
             endpointCache.put(endpointUri, endpoint);
         }
         return endpoint;
     }
 
-    public List<Transformer> getTransformers()
+    @SuppressWarnings({"unused", "unchecked"})
+    public void initAfterDeserialisation(MuleContext muleContext) throws MuleException
     {
-        return transformers;
-    }
-
-    public void setTransformers(List<Transformer> transformers)
-    {
-        this.transformers = transformers;
+        this.muleContext = muleContext;
+        endpointCache = new HashMap<String, ImmutableEndpoint>();
+    
     }
 }

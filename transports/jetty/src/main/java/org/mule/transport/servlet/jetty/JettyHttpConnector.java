@@ -379,7 +379,7 @@ public class JettyHttpConnector extends AbstractConnector
     {
         if (isUseContinuations())
         {
-            return new JettyContinuationsReplyToHandler(getDefaultResponseTransformers(endpoint), muleContext);
+            return new JettyContinuationsReplyToHandler(muleContext);
         }
         return super.getReplyToHandler(endpoint);
     }
