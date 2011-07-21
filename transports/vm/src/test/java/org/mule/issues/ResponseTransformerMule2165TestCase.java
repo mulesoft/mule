@@ -10,18 +10,22 @@
 
 package org.mule.issues;
 
-import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.junit4.FunctionalTestCase;
-
-import org.junit.Test;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-public class ResponseTransformerMule2165TestCase extends FunctionalTestCase
+import java.util.Arrays;
+import java.util.Collection;
+
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+import org.mule.api.MuleException;
+import org.mule.api.MuleMessage;
+import org.mule.module.client.MuleClient;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+
+public class ResponseTransformerMule2165TestCase extends AbstractServiceAndFlowTestCase
 {
+
 
     public static final long TIMEOUT = 2000L;
     public static final String MESSAGE = "a message";
@@ -53,10 +57,17 @@ public class ResponseTransformerMule2165TestCase extends FunctionalTestCase
     */
     public static final String GLOBAL_RESPONSE = LOCAL_RESPONSE + " response";
 
-    @Override
-    protected String getConfigResources()
+    public ResponseTransformerMule2165TestCase(ConfigVariant variant, String configResources)
     {
-        return "issues/response-transformer-mule-2165-test.xml";
+        super(variant, configResources);
+    }
+    
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "issues/response-transformer-mule-2165-test-service.xml"},
+            {ConfigVariant.FLOW, "issues/response-transformer-mule-2165-test-flow.xml"}});
     }
 
     protected MuleClient send(String endpoint) throws MuleException
