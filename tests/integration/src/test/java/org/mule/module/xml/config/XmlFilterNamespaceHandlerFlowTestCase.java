@@ -1,5 +1,5 @@
 /*
- * $Id: XmlFilterNamespaceHandlerTestCase.java 22438 2011-07-18 14:33:27Z claude.mamo $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  *

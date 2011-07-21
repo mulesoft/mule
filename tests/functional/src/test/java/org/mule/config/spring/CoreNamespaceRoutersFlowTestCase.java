@@ -1,5 +1,5 @@
 /*
- * $Id: CoreNamespaceRoutersTestCase.java 22414 2011-07-14 13:24:46Z dirk.olmes $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  *

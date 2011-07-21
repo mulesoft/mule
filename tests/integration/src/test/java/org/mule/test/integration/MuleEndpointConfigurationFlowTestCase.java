@@ -1,5 +1,5 @@
 /*
- * $Id: MuleEndpointConfigurationTestCase.java 22421 2011-07-15 05:05:06Z dirk.olmes $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  *
