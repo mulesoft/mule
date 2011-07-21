@@ -10,23 +10,34 @@
 
 package org.mule.transport.ftp;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 
-import org.junit.Test;
+import java.util.Arrays;
+import java.util.Collection;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
 
 public class FtpMessageRequesterTestCase extends AbstractFtpServerTestCase
 {
 
-    @Override
-    protected String getConfigResources()
+    public FtpMessageRequesterTestCase(ConfigVariant variant, String configResources)
     {
-        return "ftp-message-requester-test.xml";
+        super(variant, configResources);
     }
 
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {               
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.FLOW, "ftp-message-requester-test.xml"}            
+        });
+    }      
+    
     @Test
     public void testMessageRequester() throws Exception
     {

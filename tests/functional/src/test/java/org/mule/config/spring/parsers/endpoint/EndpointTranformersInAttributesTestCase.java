@@ -112,8 +112,7 @@ public class EndpointTranformersInAttributesTestCase extends AbstractServiceAndF
     @Test
     public void testGlobalEndpoints() throws MuleException
     {
-        ImmutableEndpoint endpoint;
-        
+        ImmutableEndpoint endpoint;        
         Object service = muleContext.getRegistry().lookupObject("globalEndpoints");
         
         if (variant.equals(ConfigVariant.FLOW))
@@ -184,8 +183,7 @@ public class EndpointTranformersInAttributesTestCase extends AbstractServiceAndF
     @Test
     public void testLocalEndpoints() throws MuleException
     {
-        ImmutableEndpoint endpoint;
-        
+        ImmutableEndpoint endpoint;        
         Object service = muleContext.getRegistry().lookupObject("localEndpoints");
         
         if (variant.equals(ConfigVariant.FLOW))

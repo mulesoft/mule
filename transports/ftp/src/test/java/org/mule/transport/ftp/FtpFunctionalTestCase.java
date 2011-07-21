@@ -10,29 +10,40 @@
 
 package org.mule.transport.ftp;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.api.MuleEventContext;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import org.junit.runners.Parameterized.Parameters;
 
 public class FtpFunctionalTestCase extends AbstractFtpServerTestCase
 {
-    @Override
-    protected String getConfigResources()
+    public FtpFunctionalTestCase(ConfigVariant variant, String configResources)
     {
-        return "ftp-functional-test.xml";
+        super(variant, configResources);     
     }
 
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "ftp-functional-test-service.xml"},
+            {ConfigVariant.FLOW, "ftp-functional-test-flow.xml"}
+        });
+    }      
+    
     @Test
     public void testSendAndRequest() throws Exception
     {

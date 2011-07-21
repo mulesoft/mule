@@ -17,7 +17,11 @@ import org.mule.tck.probe.Probe;
 import org.mule.tck.probe.Prober;
 import org.mule.transport.ftp.AbstractFtpServerTestCase;
 
+import java.util.Arrays;
+import java.util.Collection;
+
 import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
 
 /**
  * Verify that no inbound messages are lost when exceptions occur.
@@ -32,12 +36,19 @@ public class InboundMessageLossTestCase extends AbstractFtpServerTestCase
     /** Polling mechanism to replace Thread.sleep() for testing a delayed result. */
     protected Prober prober = new PollingProber(10000, 100);
 
-    @Override
-    protected String getConfigResources()
+    public InboundMessageLossTestCase(ConfigVariant variant, String configResources)
     {
-        return "reliability/inbound-message-loss.xml";
+        super(variant, configResources);
     }
-
+    
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "reliability/inbound-message-loss.xml"}            
+        });
+    }      
+    
     @Override
     protected void doSetUp() throws Exception
     {

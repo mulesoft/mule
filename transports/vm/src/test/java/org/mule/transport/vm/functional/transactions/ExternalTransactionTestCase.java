@@ -10,18 +10,6 @@
 
 package org.mule.transport.vm.functional.transactions;
 
-import org.mule.api.MuleMessage;
-import org.mule.api.transaction.TransactionCallback;
-import org.mule.api.transaction.TransactionConfig;
-import org.mule.module.client.MuleClient;
-import org.mule.transaction.IllegalTransactionStateException;
-import org.mule.transaction.TransactionTemplate;
-import org.mule.util.ExceptionUtils;
-
-import javax.transaction.Transaction;
-
-import org.junit.Test;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
@@ -30,6 +18,22 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import org.mule.api.MuleMessage;
+import org.mule.api.transaction.TransactionCallback;
+import org.mule.api.transaction.TransactionConfig;
+import org.mule.module.client.MuleClient;
+import org.mule.transaction.IllegalTransactionStateException;
+import org.mule.transaction.TransactionTemplate;
+import org.mule.util.ExceptionUtils;
+
+import java.util.Arrays;
+import java.util.Collection;
+
+import javax.transaction.Transaction;
+
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+
 /** Test transaction behavior when "joinExternal" is set to allow joining external transactions
  * There is one test per legal transactional behavior (e.g. ALWAYS_BEGIN).
  */
@@ -37,12 +41,20 @@ public class ExternalTransactionTestCase extends AbstractExternalTransactionTest
 {
     public static final long WAIT = 3000L;
 
-    @Override
-    protected String getConfigResources()
+    public ExternalTransactionTestCase(ConfigVariant variant, String configResources)
     {
-        return "org/mule/test/config/external-transaction-config.xml";
+        super(variant, configResources);   
     }
-
+    
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "org/mule/test/config/external-transaction-config-service.xml"},
+            {ConfigVariant.FLOW, "org/mule/test/config/external-transaction-config-flow.xml"}
+        });
+    }      
+    
     @Test
     public void testBeginOrJoinTransaction() throws Exception
     {

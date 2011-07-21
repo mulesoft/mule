@@ -10,34 +10,46 @@
 
 package org.mule.transport.soap.axis.issues;
 
-import org.mule.api.MuleException;
-import org.mule.api.endpoint.EndpointBuilder;
-import org.mule.api.endpoint.ImmutableEndpoint;
-import org.mule.api.transport.Connector;
-import org.mule.tck.junit4.FunctionalTestCase;
-import org.mule.tck.junit4.rule.DynamicPort;
-import org.mule.transport.soap.axis.AxisConnector;
-
-import org.junit.Rule;
-import org.junit.Test;
-
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-public class EndpointRetrievalMule2021TestCase extends FunctionalTestCase
+import org.mule.api.MuleException;
+import org.mule.api.endpoint.EndpointBuilder;
+import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.transport.Connector;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.transport.soap.axis.AxisConnector;
+
+import java.util.Arrays;
+import java.util.Collection;
+
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+
+public class EndpointRetrievalMule2021TestCase extends AbstractServiceAndFlowTestCase
 {
+
+    public EndpointRetrievalMule2021TestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources); 
+    }
 
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
-    @Override
-    protected String getConfigResources()
+    @Parameters
+    public static Collection<Object[]> parameters()
     {
-        return "endpoint-retrieval-mule-2021-test.xml";
-    }
-
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "endpoint-retrieval-mule-2021-test-service.xml"},
+            {ConfigVariant.FLOW, "endpoint-retrieval-mule-2021-test-flow.xml"}
+        });
+    }      
+    
     @Test
     public void testLookupEndpoint() throws MuleException
     {

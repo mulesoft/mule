@@ -10,8 +10,12 @@
 
 package org.mule.transport.file;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.api.MuleMessage;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.util.FileUtils;
 import org.mule.util.IOUtils;
 
@@ -21,28 +25,36 @@ import java.io.FileWriter;
 import java.io.InputStream;
 import java.io.Writer;
 import java.net.MalformedURLException;
+import java.util.Arrays;
+import java.util.Collection;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import org.junit.runners.Parameterized.Parameters;
 
 /**
  * We are careful here to access the file system in a generic way. This means setting
  * directories dynamically.
  */
-public abstract class AbstractFileFunctionalTestCase extends FunctionalTestCase
+public abstract class AbstractFileFunctionalTestCase extends AbstractServiceAndFlowTestCase
 {
     public static final String TEST_MESSAGE = "Test file contents";
     public static final String TARGET_FILE = "TARGET_FILE";
 
     protected File tmpDir;
 
-    @Override
-    protected String getConfigResources()
+    public AbstractFileFunctionalTestCase(ConfigVariant variant, String configResources)
     {
-        return "file-functional-test.xml";
+        super(variant, configResources);
     }
 
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "file-functional-test-service.xml"},
+            {ConfigVariant.FLOW, "file-functional-test-flow.xml"}
+        });
+    }      
+    
     protected String fileToUrl(File file) throws MalformedURLException
     {
         return file.getAbsoluteFile().toURI().toURL().toString();

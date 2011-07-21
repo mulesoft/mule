@@ -22,18 +22,23 @@ import java.io.File;
 import org.junit.Test;
 
 /**
- * Verify that no inbound messages are lost when exceptions occur.
- * The message must either make it all the way to the SEDA queue (in the case of
- * an asynchronous inbound endpoint), or be restored/rolled back at the source.
- *
- * In the case of the File transport, this will cause the file to be restored to
- * its original location from the working directory.  Note that a
- * workDirectory must be specified on the connector in order for this to succeed.
+ * Verify that no inbound messages are lost when exceptions occur. The message must
+ * either make it all the way to the SEDA queue (in the case of an asynchronous
+ * inbound endpoint), or be restored/rolled back at the source. In the case of the
+ * File transport, this will cause the file to be restored to its original location
+ * from the working directory. Note that a workDirectory must be specified on the
+ * connector in order for this to succeed.
  */
 public class InboundMessageLossTestCase extends AbstractFileMoveDeleteTestCase
 {
     /** Polling mechanism to replace Thread.sleep() for testing a delayed result. */
     protected Prober prober = new PollingProber(10000, 100);
+
+    public InboundMessageLossTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
+
+    }
 
     @Override
     protected String getConfigResources()
@@ -46,8 +51,10 @@ public class InboundMessageLossTestCase extends AbstractFileMoveDeleteTestCase
     {
         super.doSetUp();
 
-        // Set SystemExceptionStrategy to redeliver messages (this can only be configured programatically for now)
-        ((DefaultSystemExceptionStrategy) muleContext.getExceptionListener()).setRollbackTxFilter(new WildcardFilter("*"));
+        // Set SystemExceptionStrategy to redeliver messages (this can only be
+        // configured programatically for now)
+        ((DefaultSystemExceptionStrategy) muleContext.getExceptionListener()).setRollbackTxFilter(new WildcardFilter(
+            "*"));
     }
 
     @Test
@@ -126,7 +133,8 @@ public class InboundMessageLossTestCase extends AbstractFileMoveDeleteTestCase
             @Override
             public boolean isSatisfied()
             {
-                // Component exception occurs after the SEDA queue for an asynchronous request, so from the client's
+                // Component exception occurs after the SEDA queue for an
+                // asynchronous request, so from the client's
                 // perspective, the message has been delivered successfully.
                 return !file.exists();
             }

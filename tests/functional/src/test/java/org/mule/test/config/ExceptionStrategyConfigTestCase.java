@@ -10,30 +10,41 @@
 
 package org.mule.test.config;
 
-import org.mule.api.service.Service;
-import org.mule.exception.DefaultMessagingExceptionStrategy;
-import org.mule.tck.junit4.FunctionalTestCase;
-
-import org.junit.Test;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-public class ExceptionStrategyConfigTestCase extends FunctionalTestCase
-{
+import org.mule.api.construct.FlowConstruct;
+import org.mule.exception.DefaultMessagingExceptionStrategy;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 
-    @Override
-    protected String getConfigResources()
+import java.util.Arrays;
+import java.util.Collection;
+
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+
+public class ExceptionStrategyConfigTestCase extends AbstractServiceAndFlowTestCase
+{
+    public ExceptionStrategyConfigTestCase(ConfigVariant variant, String configResources)
     {
-        return "org/mule/test/exceptions/exception-strategy-config.xml";
+        super(variant, configResources);
     }
 
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "org/mule/test/exceptions/exception-strategy-config-service.xml"},
+            {ConfigVariant.FLOW, "org/mule/test/exceptions/exception-strategy-config-flow.xml"}
+        });
+    }      
+    
     @Test
     public void testConfig() throws Exception
     {
-        Service service = muleContext.getRegistry().lookupService("testService1");
+        FlowConstruct service = muleContext.getRegistry().lookupFlowConstruct("testService1");
         assertNotNull(service);
         assertNotNull(service.getExceptionListener());
         assertTrue(service.getExceptionListener() instanceof DefaultMessagingExceptionStrategy);

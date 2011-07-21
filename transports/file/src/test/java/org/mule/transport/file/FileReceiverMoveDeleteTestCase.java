@@ -39,6 +39,11 @@ import static org.junit.Assert.fail;
 
 public class FileReceiverMoveDeleteTestCase extends AbstractFileMoveDeleteTestCase
 {
+    public FileReceiverMoveDeleteTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
+    }
+
     @Override
     protected void doSetUp() throws Exception
     {

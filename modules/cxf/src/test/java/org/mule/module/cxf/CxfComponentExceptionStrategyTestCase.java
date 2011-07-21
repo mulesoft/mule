@@ -10,37 +10,49 @@
 
 package org.mule.module.cxf;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import org.mule.api.MessagingException;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.module.client.MuleClient;
 import org.mule.module.cxf.testmodels.CustomFault;
 import org.mule.module.cxf.testmodels.CxfEnabledFaultMessage;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
+
+import java.util.Arrays;
+import java.util.Collection;
 
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.interceptor.Fault;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
-public class CxfComponentExceptionStrategyTestCase extends FunctionalTestCase
+public class CxfComponentExceptionStrategyTestCase extends AbstractServiceAndFlowTestCase
 {
 
-    @Rule
-    public DynamicPort dynamicPort = new DynamicPort("port1");
-
-    @Override
-    protected String getConfigResources()
+    public CxfComponentExceptionStrategyTestCase(ConfigVariant variant, String configResources)
     {
-        return "exception-strategy-conf.xml";
+        super(variant, configResources);
     }
 
+    @Rule
+    public DynamicPort dynamicPort = new DynamicPort("port1");   
+
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "exception-strategy-conf-service.xml"},
+            {ConfigVariant.FLOW, "exception-strategy-conf-flow.xml"}
+        });
+    }      
+    
     @Test
     public void testDefaultComponentExceptionStrategy() throws Exception
     {

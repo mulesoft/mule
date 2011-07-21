@@ -25,6 +25,11 @@ import static org.junit.Assert.assertTrue;
 public abstract class AbstractFileMoveDeleteTestCase extends AbstractFileFunctionalTestCase
 {
 
+    public AbstractFileMoveDeleteTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
+    }
+
     protected File configureConnector(File inFile, boolean stream, boolean move, boolean delete,
                                       Class<? extends AbstractMuleMessageFactory> messageFactoryClass) throws Exception
     {

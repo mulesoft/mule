@@ -10,29 +10,40 @@
 
 package org.mule.transport.ftp;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalStreamingTestComponent;
 
 import java.io.InputStream;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import org.junit.runners.Parameterized.Parameters;
 
 public class FtpStreamingTestCase extends AbstractFtpServerTestCase
 {
-    @Override
-    protected String getConfigResources()
+    public FtpStreamingTestCase(ConfigVariant variant, String configResources)
     {
-        return "ftp-streaming-test.xml";
+        super(variant, configResources);
     }
+    
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "ftp-streaming-test-service.xml"},
+            {ConfigVariant.FLOW, "ftp-streaming-test-flow.xml"}
+        });
+    }      
 
     @Test
     public void testRequest() throws Exception

@@ -10,39 +10,51 @@
 
 package org.mule.config.spring.parsers.endpoint;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.api.MuleException;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorChain;
 import org.mule.api.routing.OutboundRouterCollection;
+import org.mule.construct.Flow;
+import org.mule.endpoint.DefaultInboundEndpoint;
 import org.mule.routing.outbound.OutboundPassThroughRouter;
 import org.mule.service.ServiceCompositeMessageSource;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.testmodels.mule.TestMessageProcessor;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
-public class EndpointMessageProcessorsTestCase extends FunctionalTestCase
+public class EndpointMessageProcessorsTestCase extends AbstractServiceAndFlowTestCase
 {
-
-    @Override
-    protected String getConfigResources()
+    public EndpointMessageProcessorsTestCase(ConfigVariant variant, String configResources)
     {
-        return "org/mule/config/spring/parsers/endpoint/endpoint-message-processors.xml";
+        super(variant, configResources);
     }
+
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "org/mule/config/spring/parsers/endpoint/endpoint-message-processors-service.xml"},
+            {ConfigVariant.FLOW, "org/mule/config/spring/parsers/endpoint/endpoint-message-processors-flow.xml"}
+        });
+    }      
 
     @Test
     public void testGlobalEndpoint1() throws MuleException
     {
         ImmutableEndpoint endpoint = muleContext.getEndpointFactory().getInboundEndpoint("ep1");
-        
-        List <MessageProcessor> processors = endpoint.getMessageProcessors();
+
+        List<MessageProcessor> processors = endpoint.getMessageProcessors();
         assertNotNull(processors);
         assertEquals(1, processors.size());
         assertTrue(processors.get(0) instanceof TestMessageProcessor);
@@ -57,8 +69,8 @@ public class EndpointMessageProcessorsTestCase extends FunctionalTestCase
     public void testGlobalEndpoint2() throws MuleException
     {
         ImmutableEndpoint endpoint = muleContext.getEndpointFactory().getInboundEndpoint("ep2");
-        
-        List <MessageProcessor> processors = endpoint.getMessageProcessors();
+
+        List<MessageProcessor> processors = endpoint.getMessageProcessors();
         assertNotNull(processors);
         assertEquals(2, processors.size());
         assertEquals("1", ((TestMessageProcessor) processors.get(0)).getLabel());
@@ -73,14 +85,25 @@ public class EndpointMessageProcessorsTestCase extends FunctionalTestCase
         assertEquals("3", ((TestMessageProcessor) chain.getMessageProcessors().get(0)).getLabel());
         assertEquals("4", ((TestMessageProcessor) chain.getMessageProcessors().get(1)).getLabel());
     }
-    
+
     @Test
     public void testLocalEndpoints() throws MuleException
     {
-        ImmutableEndpoint endpoint = 
-            ((ServiceCompositeMessageSource) muleContext.getRegistry().lookupService("localEndpoints").getMessageSource()).getEndpoint("ep3");
+        ImmutableEndpoint endpoint;
 
-        List <MessageProcessor> processors = endpoint.getMessageProcessors();
+        if (variant.equals(ConfigVariant.FLOW))
+        {
+            Flow service = muleContext.getRegistry().lookupObject("localEndpoints");
+            endpoint = (ImmutableEndpoint) service.getMessageSource();
+        }
+        else
+        {
+            endpoint = ((ServiceCompositeMessageSource) muleContext.getRegistry()
+                .lookupService("localEndpoints")
+                .getMessageSource()).getEndpoint("ep3");
+        }
+
+        List<MessageProcessor> processors = endpoint.getMessageProcessors();
         assertNotNull(processors);
         assertEquals(2, processors.size());
         assertEquals("A", ((TestMessageProcessor) processors.get(0)).getLabel());
@@ -95,10 +118,20 @@ public class EndpointMessageProcessorsTestCase extends FunctionalTestCase
         assertEquals("C", ((TestMessageProcessor) chain.getMessageProcessors().get(0)).getLabel());
         assertEquals("D", ((TestMessageProcessor) chain.getMessageProcessors().get(1)).getLabel());
 
-        MessageProcessor mp =
-            ((OutboundPassThroughRouter) ((OutboundRouterCollection)muleContext.getRegistry().lookupService("localEndpoints").
-                getOutboundMessageProcessor()).getRoutes().get(0)).getRoute("ep4");
+        MessageProcessor mp;
 
+        if (variant.equals(ConfigVariant.FLOW))
+        {            
+            mp = ((Flow) muleContext.getRegistry().lookupObject("localEndpoints")).getMessageProcessors()
+                .get(0);
+        }
+        else
+        {
+            mp = ((OutboundPassThroughRouter) ((OutboundRouterCollection) muleContext.getRegistry()
+                .lookupService("localEndpoints")
+                .getOutboundMessageProcessor()).getRoutes().get(0)).getRoute("ep4");
+        }
+        
         endpoint = (ImmutableEndpoint) mp;
         processors = endpoint.getMessageProcessors();
         assertNotNull(processors);

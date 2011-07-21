@@ -33,6 +33,11 @@ import static org.junit.Assert.assertTrue;
 public class FileFunctionalTestCase extends AbstractFileFunctionalTestCase
 {
 
+    public FileFunctionalTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
+    }
+
     @Test
     public void testSend() throws Exception
     {

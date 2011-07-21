@@ -10,45 +10,68 @@
 
 package org.mule.module.cxf.functional;
 
+import static org.junit.Assert.assertEquals;
+
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.service.Service;
+import org.mule.construct.Flow;
 import org.mule.endpoint.DefaultInboundEndpoint;
 import org.mule.module.cxf.CxfInboundMessageProcessor;
 import org.mule.module.cxf.config.FlowConfiguringMessageProcessor;
 import org.mule.service.ServiceCompositeMessageSource;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
 
-import static org.junit.Assert.assertEquals;
-
-public class EndpointBindsToCorrectWdslPortTestCase extends FunctionalTestCase
+public class EndpointBindsToCorrectWdslPortTestCase extends AbstractServiceAndFlowTestCase
 {
 
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
-    @Override
-    protected String getConfigResources()
+    public EndpointBindsToCorrectWdslPortTestCase(ConfigVariant variant, String configResources)
     {
-        return "org/mule/module/cxf/functional/endpoint-binds-to-correct-wdsl-port.xml";
+        super(variant, configResources);
     }
+
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "org/mule/module/cxf/functional/endpoint-binds-to-correct-wdsl-port-service.xml"},
+            {ConfigVariant.FLOW, "org/mule/module/cxf/functional/endpoint-binds-to-correct-wdsl-port-flow.xml"}
+        });
+    }      
 
     @Test
     public void testThatTheCorrectSoapPortIsChosen() throws Exception
     {
-        final Service service = muleContext.getRegistry().lookupService("CXFProxyService");
-        ServiceCompositeMessageSource messageSource = (ServiceCompositeMessageSource) service.getMessageSource();
+        DefaultInboundEndpoint inboundEndpoint;
+        
+        if (variant.equals(ConfigVariant.FLOW))
+        {
+            final Flow flow = muleContext.getRegistry().lookupObject("CXFProxyService");
+            inboundEndpoint = (DefaultInboundEndpoint) flow.getMessageSource();                        
+        }
+        else
+        {
+            final Service service = muleContext.getRegistry().lookupService("CXFProxyService");
+            ServiceCompositeMessageSource messageSource = (ServiceCompositeMessageSource) service.getMessageSource();
 
-        List<InboundEndpoint> endpoints = messageSource.getEndpoints();
-        DefaultInboundEndpoint inboundEndpoint = (DefaultInboundEndpoint) endpoints.get(0);
+            List<InboundEndpoint> endpoints = messageSource.getEndpoints();
+            inboundEndpoint = (DefaultInboundEndpoint) endpoints.get(0);            
+        }               
+        
         List<MessageProcessor> processors = inboundEndpoint.getMessageProcessors();
         FlowConfiguringMessageProcessor wrapper = (FlowConfiguringMessageProcessor) processors.get(0);
         CxfInboundMessageProcessor cxfProcessor = (CxfInboundMessageProcessor) wrapper.getWrappedMessageProcessor();

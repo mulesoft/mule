@@ -10,27 +10,37 @@
 
 package org.mule.transport.ftp;
 
+import static org.junit.Assert.assertTrue;
+
 import org.mule.DefaultMuleMessage;
 import org.mule.module.client.MuleClient;
 
 import java.io.File;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertTrue;
+import org.junit.runners.Parameterized.Parameters;
 
 public class FtpMessageDispatcherTestCase extends AbstractFtpServerTestCase
 {
-    private CountDownLatch latch = new CountDownLatch(1);
-
-    @Override
-    protected String getConfigResources()
+    public FtpMessageDispatcherTestCase(ConfigVariant variant, String configResources)
     {
-        return "ftp-message-requester-test.xml";
+        super(variant, configResources);
     }
 
+    private CountDownLatch latch = new CountDownLatch(1);
+
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{            
+            {ConfigVariant.FLOW, "ftp-message-requester-test.xml"}
+        });
+    }      
+    
     @Test
     public void testDispatch() throws Exception
     {

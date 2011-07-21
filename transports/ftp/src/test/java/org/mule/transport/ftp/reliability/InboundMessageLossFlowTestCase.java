@@ -12,7 +12,11 @@ package org.mule.transport.ftp.reliability;
 
 import org.mule.tck.probe.Probe;
 
+import java.util.Arrays;
+import java.util.Collection;
+
 import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
 
 
 /**
@@ -25,12 +29,19 @@ import org.junit.Test;
  */
 public class InboundMessageLossFlowTestCase extends InboundMessageLossTestCase
 {
-    @Override
-    protected String getConfigResources()
+    @Parameters
+    public static Collection<Object[]> parameters()
     {
-        return "reliability/inbound-message-loss-flow.xml";
+        return Arrays.asList(new Object[][]{            
+            {ConfigVariant.FLOW, "reliability/inbound-message-loss-flow.xml"}
+        });
+    }      
+    
+    public InboundMessageLossFlowTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);     
     }
-
+    
     @Override
     @Test
     public void testTransformerException() throws Exception

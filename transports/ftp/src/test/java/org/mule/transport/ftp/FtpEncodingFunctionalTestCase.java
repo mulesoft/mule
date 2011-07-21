@@ -10,16 +10,19 @@
 
 package org.mule.transport.ftp;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.util.FileUtils;
 
 import java.io.File;
+import java.util.Arrays;
+import java.util.Collection;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import org.junit.runners.Parameterized.Parameters;
 
 public class FtpEncodingFunctionalTestCase extends AbstractFtpServerTestCase
 {
@@ -30,12 +33,20 @@ public class FtpEncodingFunctionalTestCase extends AbstractFtpServerTestCase
 
     private File testDataFile;
 
-    @Override
-    protected String getConfigResources()
+    public FtpEncodingFunctionalTestCase(ConfigVariant variant, String configResources)
     {
-        return "ftp-encoding-functional-config.xml";
+        super(variant, configResources);
     }
 
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "ftp-encoding-functional-config-service.xml"},
+            {ConfigVariant.FLOW, "ftp-encoding-functional-config-flow.xml"}
+        });
+    }      
+    
     @Test
     public void testReadingFileWithEucJpEncodingGetsTheRightText() throws Exception
     {
