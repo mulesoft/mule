@@ -10,28 +10,38 @@
 
 package org.mule.transport.vm.functional;
 
-import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.junit4.FunctionalTestCase;
-
-import java.util.HashSet;
-import java.util.Set;
-
-import org.junit.Test;
-
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-public class PersistentBoundedQueueTestCase extends FunctionalTestCase
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+import org.mule.api.MuleMessage;
+import org.mule.module.client.MuleClient;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+
+public class PersistentBoundedQueueTestCase extends AbstractServiceAndFlowTestCase
 {
+
     // add some sizeable delat, as queue store ordering won't be guaranteed
     private static final int SLEEP = 100;
 
-    @Override
-    protected String getConfigResources()
+    public PersistentBoundedQueueTestCase(ConfigVariant variant, String configResources)
     {
-        return "vm/persistent-bounded-vm-queue-test.xml";
+        super(variant, configResources);
+    }
+
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "vm/persistent-bounded-vm-queue-test-service.xml"},
+            {ConfigVariant.FLOW, "vm/persistent-bounded-vm-queue-test-flow.xml"}});
     }
 
     @Test
@@ -48,7 +58,8 @@ public class PersistentBoundedQueueTestCase extends FunctionalTestCase
         // wait enough for queue offer to timeout
         Thread.sleep(muleContext.getConfiguration().getDefaultQueueTimeout());
 
-        // poll the 'out' queue 3 times, the first 2 times we must have a result. The 3rd message
+        // poll the 'out' queue 3 times, the first 2 times we must have a result. The
+        // 3rd message
         // must have been discarded as the queue was bounded.
         Set<String> results = new HashSet<String>();
         pollOutQueue(client, results);

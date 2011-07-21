@@ -10,23 +10,34 @@
 
 package org.mule.transport.vm.functional;
 
-import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.junit4.FunctionalTestCase;
-
-import org.junit.Test;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-public class PersistentUnaddressedVmQueueTestCase extends FunctionalTestCase
+import java.util.Arrays;
+import java.util.Collection;
+
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+import org.mule.api.MuleMessage;
+import org.mule.module.client.MuleClient;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+
+public class PersistentUnaddressedVmQueueTestCase extends AbstractServiceAndFlowTestCase
 {
+
     private static final int RECEIVE_TIMEOUT = 5000;
 
-    @Override
-    protected String getConfigResources()
+    public PersistentUnaddressedVmQueueTestCase(ConfigVariant variant, String configResources)
     {
-        return "vm/persistent-unaddressed-vm-queue-test.xml";
+        super(variant, configResources);
+    }
+
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "vm/persistent-unaddressed-vm-queue-test-service.xml"},
+            {ConfigVariant.FLOW, "vm/persistent-unaddressed-vm-queue-test-flow.xml"}});
     }
 
     @Test
@@ -36,6 +47,6 @@ public class PersistentUnaddressedVmQueueTestCase extends FunctionalTestCase
         client.dispatch("vm://receiver1?connector=Connector1", "Test", null);
         MuleMessage result = client.request("vm://out?connector=Connector2", RECEIVE_TIMEOUT);
         assertNotNull(result);
-        assertEquals(result.getPayloadAsString(),"Test");
+        assertEquals(result.getPayloadAsString(), "Test");
     }
 }

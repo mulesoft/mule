@@ -10,25 +10,35 @@
 
 package org.mule.transport.vm;
 
-import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.junit4.FunctionalTestCase;
-
-import org.junit.Test;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
-public class PersistentVMQueueTestCase extends FunctionalTestCase
+import java.util.Arrays;
+import java.util.Collection;
+
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+import org.mule.api.MuleMessage;
+import org.mule.module.client.MuleClient;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+
+public class PersistentVMQueueTestCase extends AbstractServiceAndFlowTestCase
 {
 
     private static final int RECEIVE_TIMEOUT = 5000;
 
-    @Override
-    protected String getConfigResources()
+    public PersistentVMQueueTestCase(ConfigVariant variant, String configResources)
     {
-        return "vm/persistent-vmqueue-test.xml";
+        super(variant, configResources);
+    }
+
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "vm/persistent-vmqueue-test-service.xml"},
+            {ConfigVariant.FLOW, "vm/persistent-vmqueue-test-flow.xml"}});
     }
 
     @Test
