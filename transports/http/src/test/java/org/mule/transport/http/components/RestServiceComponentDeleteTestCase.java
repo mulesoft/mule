@@ -10,34 +10,44 @@
 
 package org.mule.transport.http.components;
 
-import org.mule.module.client.MuleClient;
-import org.mule.tck.junit4.rule.DynamicPort;
-import org.mule.transport.http.HttpConstants;
-import org.mule.transport.http.functional.AbstractMockHttpServerTestCase;
-import org.mule.transport.http.functional.MockHttpServer;
+import static org.junit.Assert.assertTrue;
 
 import java.io.BufferedReader;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.StringTokenizer;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Rule;
 import org.junit.Test;
-
-import static org.junit.Assert.assertTrue;
+import org.junit.runners.Parameterized.Parameters;
+import org.mule.module.client.MuleClient;
+import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.transport.http.HttpConstants;
+import org.mule.transport.http.functional.AbstractMockHttpServerTestCase;
+import org.mule.transport.http.functional.MockHttpServer;
 
 public class RestServiceComponentDeleteTestCase extends AbstractMockHttpServerTestCase
 {
+
     private CountDownLatch serverRequestCompleteLatch = new CountDownLatch(1);
     private boolean deleteRequestFound = false;
 
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
-    @Override
-    protected String getConfigResources()
+    public RestServiceComponentDeleteTestCase(ConfigVariant variant, String configResources)
     {
-        return "rest-service-component-delete-test.xml";
+        super(variant, configResources);
+    }
+
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "rest-service-component-delete-test-service.xml"},
+            {ConfigVariant.FLOW, "rest-service-component-delete-test-flow.xml"}});
     }
 
     @Override

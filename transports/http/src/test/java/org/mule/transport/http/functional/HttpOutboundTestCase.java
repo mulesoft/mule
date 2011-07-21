@@ -10,12 +10,12 @@
 
 package org.mule.transport.http.functional;
 
-import org.mule.module.client.MuleClient;
-import org.mule.tck.junit4.rule.DynamicPort;
-import org.mule.transport.http.HttpConstants;
-import org.mule.util.concurrent.Latch;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.io.BufferedReader;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.StringTokenizer;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -23,28 +23,32 @@ import java.util.concurrent.TimeUnit;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import org.junit.runners.Parameterized.Parameters;
+import org.mule.module.client.MuleClient;
+import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.transport.http.HttpConstants;
+import org.mule.util.concurrent.Latch;
 
 public class HttpOutboundTestCase extends AbstractMockHttpServerTestCase
 {
+
     // Dynamic port is static because test is using setDisposeContextPerClass(true);
     private static DynamicPort dynamicPort = new DynamicPort("port1");
 
     private Latch testLatch = new Latch();
     private String httpMethod;
 
-    public HttpOutboundTestCase()
+    public HttpOutboundTestCase(ConfigVariant variant, String configResources)
     {
-        super();
+        super(variant, configResources);
         setDisposeContextPerClass(true);
     }
 
-    @Override
-    protected String getConfigResources()
+    @Parameters
+    public static Collection<Object[]> parameters()
     {
-        return "http-outbound-config.xml";
+        return Arrays.asList(new Object[][]{{ConfigVariant.SERVICE, "http-outbound-config-service.xml"},
+            {ConfigVariant.FLOW, "http-outbound-config-flow.xml"}});
     }
 
     @BeforeClass

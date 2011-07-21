@@ -23,7 +23,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-public class RestServiceComponentTestCase extends FunctionalTestCase
+public class RestServiceComponentServiceTestCase extends FunctionalTestCase
 {
 
     public static final String SERVICE_NAME = "WORMS";
@@ -34,7 +34,7 @@ public class RestServiceComponentTestCase extends FunctionalTestCase
     @Override
     protected String getConfigResources()
     {
-        return "rest-service-component-test.xml";
+        return "rest-service-component-test-service.xml";
     }
 
     @Test

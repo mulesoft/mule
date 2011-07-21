@@ -10,11 +10,14 @@
 
 package org.mule.transport.http.functional;
 
-import org.mule.module.client.MuleClient;
-import org.mule.tck.junit4.rule.DynamicPort;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.BufferedReader;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,10 +26,9 @@ import java.util.concurrent.TimeUnit;
 
 import org.junit.Rule;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import org.junit.runners.Parameterized.Parameters;
+import org.mule.module.client.MuleClient;
+import org.mule.tck.junit4.rule.DynamicPort;
 
 public class HttpCookieTestCase extends AbstractMockHttpServerTestCase
 {
@@ -34,15 +36,22 @@ public class HttpCookieTestCase extends AbstractMockHttpServerTestCase
 
     private CountDownLatch latch = new CountDownLatch(1);
     private boolean cookieFound = false;
-    private List<String> cookieHeaders  = new ArrayList<String>();
+    private List<String> cookieHeaders = new ArrayList<String>();
 
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
-    @Override
-    protected String getConfigResources()
+    public HttpCookieTestCase(ConfigVariant variant, String configResources)
     {
-        return "http-cookie-test.xml";
+        super(variant, configResources);
+    }
+
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "http-cookie-test-service.xml"},
+            {ConfigVariant.FLOW, "http-cookie-test-flow.xml"}});
     }
 
     @Override
@@ -55,7 +64,7 @@ public class HttpCookieTestCase extends AbstractMockHttpServerTestCase
     public void testCookies() throws Exception
     {
         Map<String, String> properties = new HashMap<String, String>();
-        properties.put("COOKIE_HEADER","MYCOOKIE");
+        properties.put("COOKIE_HEADER", "MYCOOKIE");
 
         MuleClient client = new MuleClient(muleContext);
         client.dispatch("vm://vm-in", "foobar", properties);
