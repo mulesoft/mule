@@ -65,7 +65,6 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
     private FilenameFilter filenameFilter = null;
     private FileFilter fileFilter = null;
     private boolean forceSync;
-    private String originalSourceFile;
 
     public FileMessageReceiver(Connector connector,
                                FlowConstruct flowConstruct,
@@ -97,13 +96,13 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
             throw new CreateException(FileMessages.invalidFileFilter(endpoint.getEndpointURI()), this);
         }
         
-        checkMustForceSync(endpoint);
+        checkMustForceSync();
     }
 
     /**
      * If we will be autodeleting File objects, events must be processed synchronously to avoid a race
      */
-    private void checkMustForceSync(InboundEndpoint endpoint) throws CreateException
+    protected void checkMustForceSync() throws CreateException
     {
         boolean connectorIsAutoDelete = false;
         boolean isStreaming = false;
@@ -337,9 +336,9 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
                         {
                             rollbackFileMove(sourceFile, originalSourceFile);
                         }
-                        catch (IOException e)
+                        catch (IOException iox)
                         {
-                            logger.warn(e);
+                            logger.warn(iox);
                         }
                     }
                 };
