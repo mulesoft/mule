@@ -29,13 +29,17 @@ public final class CxfUtils
 {
 
     @SuppressWarnings("unchecked")
-    public static boolean removeInterceptor(List<Interceptor<? extends Message>> inInterceptors, String name) {
+    public static boolean removeInterceptor(List<Interceptor<? extends Message>> inInterceptors, String name)
+    {
 
-        for (Interceptor<?> i : inInterceptors) {
-            if (i instanceof PhaseInterceptor) {
+        for (Interceptor<?> i : inInterceptors)
+        {
+            if (i instanceof PhaseInterceptor)
+            {
                 PhaseInterceptor<Message> p = (PhaseInterceptor<Message>)i;
 
-                if (p.getId().equals(name)) {
+                if (p.getId().equals(name))
+                {
                     inInterceptors.remove(p);
                     return true;
                 }
