@@ -131,7 +131,6 @@ public class EventCorrelator implements Startable, Stoppable
             flowConstructName);
         ObjectStoreManager objectStoreManager = muleContext.getRegistry().get(
             MuleProperties.OBJECT_STORE_MANAGER);
-        // TODO check if this should be bounded!
         expiredAndDispatchedGroups = (ListableObjectStore<Long>) objectStoreManager.getObjectStore(
             storePrefix + ".expiredAndDispatchedGroups", persistentStores);
         processedGroups = (ListableObjectStore<Long>) objectStoreManager.getObjectStore(storePrefix

@@ -377,7 +377,12 @@ public class PartitionedPersistentObjectStore<T extends Serializable> extends
         {
             public int compare(File f1, File f2)
             {
-                return Long.valueOf(f1.lastModified()).compareTo(f2.lastModified());
+                int result=Long.valueOf(f1.lastModified()).compareTo(f2.lastModified());
+                if(result==0)
+                {
+                    result=f1.getName().compareTo(f2.getName());
+                }
+                return result;
             }
         });
         int startIndex = trimToMaxSize(files, maxEntries);
