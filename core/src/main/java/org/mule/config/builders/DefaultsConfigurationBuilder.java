@@ -27,6 +27,7 @@ import org.mule.security.MuleSecurityManager;
 import org.mule.util.DefaultStreamCloserService;
 import org.mule.util.queue.QueueManager;
 import org.mule.util.queue.TransactionalQueueManager;
+import org.mule.util.store.MuleObjectStoreManager;
 import org.mule.util.store.QueuePersistenceObjectStore;
 import org.mule.util.store.SimpleMemoryObjectStore;
 
@@ -70,6 +71,7 @@ public class DefaultsConfigurationBuilder extends AbstractConfigurationBuilder
         SimpleMemoryObjectStore<Serializable> memoryStore = new SimpleMemoryObjectStore<Serializable>();
         registry.registerObject(MuleProperties.OBJECT_STORE_DEFAULT_IN_MEMORY_NAME, memoryStore);
         registry.registerObject(MuleProperties.OBJECT_STORE_DEFAULT_PERSISTENT_NAME, new QueuePersistenceObjectStore<Serializable>());
+        registry.registerObject(MuleProperties.OBJECT_STORE_MANAGER, new MuleObjectStoreManager());
 
         registry.registerObject(MuleProperties.OBJECT_MULE_ENDPOINT_FACTORY, new DefaultEndpointFactory());
         registry.registerObject(MuleProperties.OBJECT_MULE_STREAM_CLOSER_SERVICE, new DefaultStreamCloserService());
