@@ -18,6 +18,7 @@
                 storePassword="mulepassword"/>
         <ajax:key-store
                 keyPassword="mulepassword"
+                keyAlias="muleserver"
                 path="serverKeystore"
                 storePassword="mulepassword"/>
         <ajax:server

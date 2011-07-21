@@ -27,13 +27,12 @@ import static org.junit.Assert.assertTrue;
 
 public class AjaxNamespaceHandlerTestCase extends FunctionalTestCase
 {
-
     @Rule
     public DynamicPort dynamicPort1 = new DynamicPort("port1");
 
     @Rule
     public DynamicPort dynamicPort2 = new DynamicPort("port2");
-    
+
     @Override
     protected String getConfigResources()
     {
@@ -79,6 +78,7 @@ public class AjaxNamespaceHandlerTestCase extends FunctionalTestCase
 
         //The full path gets resolved, we're just checkng that the property got set
         assertTrue(connector.getKeyStore().endsWith("/serverKeystore"));
+        assertEquals("muleserver", connector.getKeyAlias());
         assertEquals("mulepassword", connector.getKeyPassword());
         assertEquals("mulepassword", connector.getKeyStorePassword());
         //The full path gets resolved, we're just checkng that the property got set

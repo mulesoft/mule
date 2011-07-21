@@ -51,7 +51,7 @@ public class SslConnector extends TcpConnector
      * Timeout for establishing the SSL connection with the client.
      */
     private long sslHandshakeTimeout = 30000;
-    
+
     public SslConnector(MuleContext context)
     {
         super(context);
@@ -126,6 +126,11 @@ public class SslConnector extends TcpConnector
     public String getKeyStore()
     {
         return tls.getKeyStore();
+    }
+
+    public String getKeyAlias()
+    {
+        return tls.getKeyAlias();
     }
 
     public String getKeyStoreType()
@@ -226,6 +231,11 @@ public class SslConnector extends TcpConnector
     public void setKeyStore(String keyStore) throws IOException
     {
         tls.setKeyStore(keyStore);
+    }
+
+    public void setKeyAlias(String alias)
+    {
+        tls.setKeyAlias(alias);
     }
 
     public void setKeyStoreType(String keystoreType)
