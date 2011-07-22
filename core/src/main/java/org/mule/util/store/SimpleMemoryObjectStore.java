@@ -21,14 +21,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class SimpleMemoryObjectStore<T extends Serializable> extends AbstractObjectStore<T> implements ListableObjectStore<T>
+public class SimpleMemoryObjectStore<T extends Serializable> extends AbstractObjectStore<T>
+    implements ListableObjectStore<T>
 {
     private Map<Serializable, T> map = Collections.synchronizedMap(new HashMap<Serializable, T>());
 
-
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public boolean isPersistent()
     {
         return false;
@@ -63,16 +61,19 @@ public class SimpleMemoryObjectStore<T extends Serializable> extends AbstractObj
         return map.remove(key);
     }
 
+    @Override
     public void open() throws ObjectStoreException
     {
         // this is a no-op
     }
 
+    @Override
     public void close() throws ObjectStoreException
     {
         // this is a no-op
     }
 
+    @Override
     public List<Serializable> allKeys() throws ObjectStoreException
     {
         return new ArrayList<Serializable>(map.keySet());

@@ -61,15 +61,17 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
     public EventGroup(Object groupId,
                       MuleContext muleContext,
                       int expectedSize,
-                      boolean persistentStore,
+                      boolean storeIsPersistent,
                       String storePrefix)
     {
         super();
         this.created = System.nanoTime();
         this.muleContext = muleContext;
         this.storePrefix = storePrefix;
-        this.events = getObjectStoreManager().getObjectStore(storePrefix + ".eventGroup." + groupId,
-            persistentStore);
+
+        String storeKey = storePrefix + ".eventGroup." + groupId;
+        this.events = getObjectStoreManager().getObjectStore(storeKey, storeIsPersistent);
+
         this.expectedSize = expectedSize;
         this.groupId = groupId;
     }
@@ -79,9 +81,10 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
      * have groupIds that are {@link Comparable}, they are used for the comparison;
      * otherwise - since the id can be any object - the group creation time stamp is
      * used as fallback. Older groups are considered "smaller".
-     * 
+     *
      * @see java.lang.Comparable#compareTo(java.lang.Object)
      */
+    @Override
     @SuppressWarnings("unchecked")
     public int compareTo(EventGroup other)
     {
@@ -89,7 +92,7 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
 
         if (groupId instanceof Comparable<?> && otherId instanceof Comparable<?>)
         {
-            return ((Comparable) groupId).compareTo(otherId);
+            return ((Comparable<Object>) groupId).compareTo(otherId);
         }
         else
         {
@@ -99,9 +102,9 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
     }
 
     /**
-     * Compares two EventGroups for equality. EventGroups are considered equal when
+     * Compares two EventGroups for equality. EventGroups are considered equal if
      * their groupIds (as returned by {@link #getGroupId()}) are equal.
-     * 
+     *
      * @see java.lang.Object#equals(Object)
      */
     @Override
@@ -129,7 +132,7 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
     /**
      * The hashCode of an EventGroup is derived from the object returned by
      * {@link #getGroupId()}.
-     * 
+     *
      * @see java.lang.Object#hashCode()
      */
     @Override
@@ -141,7 +144,7 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
     /**
      * Returns an identifier for this EventGroup. It is recommended that this id is
      * unique and {@link Comparable} e.g. a UUID.
-     * 
+     *
      * @return the id of this event group
      */
     public Object getGroupId()
@@ -155,7 +158,7 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
      * {@link #removeEvent(MuleEvent)}. If you need to do so atomically in order to
      * prevent e.g. concurrent reception/aggregation of the group during iteration,
      * wrap the iteration in a synchronized block on the group instance.
-     * 
+     *
      * @return an iterator over collected {@link MuleEvent}s.
      * @throws ObjectStoreException
      */
@@ -177,7 +180,7 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
 
     /**
      * Returns a snapshot of collected events in this group.
-     * 
+     *
      * @return an array of collected {@link MuleEvent}s.
      * @throws ObjectStoreException
      */
@@ -201,7 +204,7 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
 
     /**
      * Add the given event to this group.
-     * 
+     *
      * @param event the event to add
      * @throws ObjectStoreException
      */
@@ -215,7 +218,7 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
 
     /**
      * Remove the given event from the group.
-     * 
+     *
      * @param event the evnt to remove
      * @throws ObjectStoreException
      */
@@ -229,7 +232,7 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
 
     /**
      * Return the creation timestamp of the current group in nanoseconds.
-     * 
+     *
      * @return the timestamp when this group was instantiated.
      */
     public long getCreated()
@@ -239,7 +242,7 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
 
     /**
      * Returns the number of events collected so far.
-     * 
+     *
      * @return number of events in this group or 0 if the group is empty.
      */
     public int size()
@@ -261,7 +264,7 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
     /**
      * Returns the number of events that this EventGroup is expecting before
      * correlation can proceed.
-     * 
+     *
      * @return expected number of events or -1 if no expected size was specified.
      */
     public int expectedSize()
@@ -271,7 +274,7 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
 
     /**
      * Removes all events from this group.
-     * 
+     *
      * @throws ObjectStoreException
      */
     public void clear() throws ObjectStoreException
@@ -375,10 +378,11 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
         return objectStoreManager;
     }
 
-    public void initAfterDeserialisation(MuleContext muleContext) throws MuleException
+    public void initAfterDeserialisation(MuleContext context) throws MuleException
     {
-        this.muleContext = muleContext;
-        this.events = (ListableObjectStore<MuleEvent>) getObjectStoreManager().getObjectStore(
-            storePrefix + ".eventGroup." + groupId, true);
+        this.muleContext = context;
+
+        String storeKey = storePrefix + ".eventGroup." + groupId;
+        this.events = getObjectStoreManager().getObjectStore(storeKey, true);
     }
 }
