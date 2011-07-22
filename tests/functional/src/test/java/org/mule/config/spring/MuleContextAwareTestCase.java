@@ -10,20 +10,31 @@
 
 package org.mule.config.spring;
 
-import org.mule.tck.junit4.FunctionalTestCase;
+import java.util.Arrays;
+import java.util.Collection;
 
 import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 
 /**
  * This tests that we can have references to management context aware objects within a config
  */
-public class MuleContextAwareTestCase extends FunctionalTestCase
+public class MuleContextAwareTestCase extends AbstractServiceAndFlowTestCase
 {
 
-    @Override
-    protected String getConfigResources()
+    public MuleContextAwareTestCase(ConfigVariant variant, String configResources)
     {
-        return "management-context-aware-test.xml";
+        super(variant, configResources);
+    }
+    
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "management-context-aware-test-service.xml"},
+            {ConfigVariant.FLOW, "management-context-aware-test-flow.xml"}
+        });
     }
 
     @Test
