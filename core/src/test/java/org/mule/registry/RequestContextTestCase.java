@@ -24,7 +24,6 @@ import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.ThreadSafeAccess;
 import org.mule.api.construct.FlowConstruct;
-import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.security.Credentials;
 import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.TransformerException;
@@ -184,12 +183,6 @@ public class RequestContextTestCase extends AbstractMuleTestCase
 
         @Override
         public Object getProperty(String key, Object defaultValue)
-        {
-            return null;
-        }
-
-        @Override
-        public InboundEndpoint getEndpoint()
         {
             return null;
         }

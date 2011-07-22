@@ -166,12 +166,6 @@ public class OutboundRoutingTestEvent implements MuleEvent
     }
 
     @Override
-    public InboundEndpoint getEndpoint()
-    {
-        return endpoint;
-    }
-
-    @Override
     public boolean isStopFurtherProcessing()
     {
         return stopFurtherProcessing;

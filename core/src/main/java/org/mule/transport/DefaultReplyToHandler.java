@@ -79,7 +79,7 @@ public class DefaultReplyToHandler implements ReplyToHandler, Serializable, Dese
         returnMessage = new DefaultMuleMessage(returnMessage.getPayload(), returnMessage, muleContext);
 
         // Create the replyTo event asynchronous
-        MuleEvent replyToEvent = new DefaultMuleEvent(returnMessage, event.getEndpoint(), event.getSession(), event.getProcessingTime());
+        MuleEvent replyToEvent = new DefaultMuleEvent(returnMessage, event);
 
         // carry over properties
         List<String> responseProperties = endpoint.getResponseProperties();

@@ -34,6 +34,7 @@ import org.mule.transport.ConnectException;
 import org.mule.transport.polling.MessageProcessorPollingMessageReceiver;
 
 import java.beans.ExceptionListener;
+import java.net.URI;
 import java.util.List;
 import java.util.Map;
 
@@ -208,5 +209,11 @@ public class DefaultInboundEndpoint extends AbstractEndpoint implements InboundE
         // If we don't do this then endpoints which are configured identically but used with different
         // services get mixed up after deserialization of events
         return System.identityHashCode(this);
+    }
+    
+    @Override
+    public URI getURI()
+    {
+        return getEndpointURI().getUri();
     }
 }

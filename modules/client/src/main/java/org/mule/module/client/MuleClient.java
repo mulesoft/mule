@@ -622,7 +622,6 @@ public class MuleClient implements Disposable
             getOutboundEndpoint(url, MessageExchangePattern.REQUEST_RESPONSE, timeout);
         
         MuleEvent event = getEvent(message, MessageExchangePattern.REQUEST_RESPONSE);
-        event.setTimeout(timeout);
 
         MuleEvent response = endpoint.process(event);
         if (response != null)

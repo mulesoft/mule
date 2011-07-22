@@ -10,10 +10,14 @@
 
 package org.mule.transport.http.transformers;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.RequestContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
+import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.transport.NullPayload;
 import org.mule.transport.http.HttpConnector;
@@ -28,16 +32,18 @@ import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.PutMethod;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
 public class ObjectToHttpClientMethodRequestTestCase extends AbstractMuleContextTestCase
 {
+    
+    private InboundEndpoint endpoint;
+    
     private MuleMessage setupRequestContext(final String url, final String method) throws Exception
     {
         HttpRequest request = new HttpRequest(new RequestLine(method, url, HttpVersion.HTTP_1_1), null, "UTF-8");
-
-        MuleEvent event = getTestEvent(request, muleContext.getEndpointFactory().getInboundEndpoint(url));
+        
+        endpoint = muleContext.getEndpointFactory().getInboundEndpoint(url);
+        
+        MuleEvent event = getTestEvent(request, endpoint);
         MuleMessage message = event.getMessage();
         message.setOutboundProperty(HttpConnector.HTTP_METHOD_PROPERTY, method);
         message.setOutboundProperty(MuleProperties.MULE_ENDPOINT_PROPERTY, url);
@@ -50,7 +56,7 @@ public class ObjectToHttpClientMethodRequestTestCase extends AbstractMuleContext
     {
         ObjectToHttpClientMethodRequest transformer = new ObjectToHttpClientMethodRequest();
         transformer.setMuleContext(muleContext);
-        transformer.setEndpoint(RequestContext.getEvent().getEndpoint());
+        transformer.setEndpoint(endpoint);
         transformer.initialise();
         return transformer;
     }

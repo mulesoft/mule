@@ -10,6 +10,13 @@
 
 package org.mule.client;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.stub;
+import static org.mockito.Mockito.verify;
+
 import org.mule.DefaultMuleMessage;
 import org.mule.MessageExchangePattern;
 import org.mule.api.MuleContext;
@@ -26,13 +33,6 @@ import java.util.Map;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Matchers;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.stub;
-import static org.mockito.Mockito.verify;
 
 public class DefaultLocalMuleClientTestCase extends AbstractMuleContextTestCase
 {
@@ -74,7 +74,8 @@ public class DefaultLocalMuleClientTestCase extends AbstractMuleContextTestCase
         assertSame(message.getPayload(), argument.getValue().getMessage().getPayload());
         assertSame(message.getOutboundProperty(PROP_KEY_1), argument.getValue()
                 .getMessage().getOutboundProperty(PROP_KEY_1));
-        assertSame(outboundEndpoint, argument.getValue().getEndpoint());
+        assertSame(outboundEndpoint.getExchangePattern(), argument.getValue().getExchangePattern());
+        assertSame(outboundEndpoint.getEndpointURI().getUri(), argument.getValue().getMessageSourceURI());
 
         assertSame(responseEvent.getMessage(), response);
     }
@@ -90,7 +91,8 @@ public class DefaultLocalMuleClientTestCase extends AbstractMuleContextTestCase
         verify(outboundEndpoint).process(argument.capture());
 
         assertSame(message, argument.getValue().getMessage());
-        assertSame(outboundEndpoint, argument.getValue().getEndpoint());
+        assertSame(outboundEndpoint.getExchangePattern(), argument.getValue().getExchangePattern());
+        assertSame(outboundEndpoint.getEndpointURI().getUri(), argument.getValue().getMessageSourceURI());
         assertSame(responseEvent.getMessage(), response);
     }
 
@@ -114,7 +116,8 @@ public class DefaultLocalMuleClientTestCase extends AbstractMuleContextTestCase
         assertSame(message.getPayload(), argument.getValue().getMessage().getPayload());
         assertSame(message.getOutboundProperty(PROP_KEY_1), argument.getValue()
                 .getMessage().getOutboundProperty(PROP_KEY_1));
-        assertSame(outboundEndpoint, argument.getValue().getEndpoint());
+        assertSame(outboundEndpoint.getExchangePattern(), argument.getValue().getExchangePattern());
+        assertSame(outboundEndpoint.getEndpointURI().getUri(), argument.getValue().getMessageSourceURI());
     }
 
     @Test
@@ -130,7 +133,8 @@ public class DefaultLocalMuleClientTestCase extends AbstractMuleContextTestCase
         assertSame(message.getPayload(), argument.getValue().getMessage().getPayload());
         assertSame(message.getOutboundProperty(PROP_KEY_1), argument.getValue()
                 .getMessage().getOutboundProperty(PROP_KEY_1));
-        assertSame(outboundEndpoint, argument.getValue().getEndpoint());
+        assertSame(outboundEndpoint.getExchangePattern(), argument.getValue().getExchangePattern());
+        assertSame(outboundEndpoint.getEndpointURI().getUri(), argument.getValue().getMessageSourceURI());
 
         assertSame(responseEvent.getMessage(), response);
     }
@@ -146,7 +150,8 @@ public class DefaultLocalMuleClientTestCase extends AbstractMuleContextTestCase
         verify(outboundEndpoint).process(argument.capture());
 
         assertSame(message, argument.getValue().getMessage());
-        assertSame(outboundEndpoint, argument.getValue().getEndpoint());
+        assertSame(outboundEndpoint.getExchangePattern(), argument.getValue().getExchangePattern());
+        assertSame(outboundEndpoint.getEndpointURI().getUri(), argument.getValue().getMessageSourceURI());
 
         assertSame(responseEvent.getMessage(), response);
     }
@@ -164,7 +169,8 @@ public class DefaultLocalMuleClientTestCase extends AbstractMuleContextTestCase
         assertSame(message.getPayload(), argument.getValue().getMessage().getPayload());
         assertSame(message.getOutboundProperty(PROP_KEY_1), argument.getValue()
                 .getMessage().getOutboundProperty(PROP_KEY_1));
-        assertSame(outboundEndpoint, argument.getValue().getEndpoint());
+        assertSame(outboundEndpoint.getExchangePattern(), argument.getValue().getExchangePattern());
+        assertSame(outboundEndpoint.getEndpointURI().getUri(), argument.getValue().getMessageSourceURI());
 
         assertSame(responseEvent.getMessage(), response);
     }
@@ -180,7 +186,8 @@ public class DefaultLocalMuleClientTestCase extends AbstractMuleContextTestCase
         verify(outboundEndpoint).process(argument.capture());
 
         assertSame(message, argument.getValue().getMessage());
-        assertSame(outboundEndpoint, argument.getValue().getEndpoint());
+        assertSame(outboundEndpoint.getExchangePattern(), argument.getValue().getExchangePattern());
+        assertSame(outboundEndpoint.getEndpointURI().getUri(), argument.getValue().getMessageSourceURI());
 
         assertSame(responseEvent.getMessage(), response);
     }
@@ -195,7 +202,8 @@ public class DefaultLocalMuleClientTestCase extends AbstractMuleContextTestCase
         verify(outboundEndpoint).process(argument.capture());
 
         assertSame(message, argument.getValue().getMessage());
-        assertSame(outboundEndpoint, argument.getValue().getEndpoint());
+        assertSame(outboundEndpoint.getExchangePattern(), argument.getValue().getExchangePattern());
+        assertSame(outboundEndpoint.getEndpointURI().getUri(), argument.getValue().getMessageSourceURI());
     }
 
     @Test
@@ -219,7 +227,8 @@ public class DefaultLocalMuleClientTestCase extends AbstractMuleContextTestCase
         assertSame(message.getPayload(), argument.getValue().getMessage().getPayload());
         assertSame(message.getOutboundProperty(PROP_KEY_1), argument.getValue()
                 .getMessage().getOutboundProperty(PROP_KEY_1));
-        assertSame(outboundEndpoint, argument.getValue().getEndpoint());
+        assertSame(outboundEndpoint.getExchangePattern(), argument.getValue().getExchangePattern());
+        assertSame(outboundEndpoint.getEndpointURI().getUri(), argument.getValue().getMessageSourceURI());
 
         assertSame(responseEvent.getMessage(), response);
     }
@@ -235,7 +244,8 @@ public class DefaultLocalMuleClientTestCase extends AbstractMuleContextTestCase
         verify(outboundEndpoint).process(argument.capture());
 
         assertSame(message, argument.getValue().getMessage());
-        assertSame(outboundEndpoint, argument.getValue().getEndpoint());
+        assertSame(outboundEndpoint.getExchangePattern(), argument.getValue().getExchangePattern());
+        assertSame(outboundEndpoint.getEndpointURI().getUri(), argument.getValue().getMessageSourceURI());
 
         assertSame(responseEvent.getMessage(), response);
     }

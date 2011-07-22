@@ -170,7 +170,6 @@ public class MuleUniversalConduit extends AbstractConduit
             {
                 throw new Fault(e);
             }
-            event.setTimeout(MuleEvent.TIMEOUT_NOT_SET_VALUE);
         }
         else 
         {

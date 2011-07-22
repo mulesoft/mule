@@ -23,6 +23,3 @@ org.mule.transport.soap.axis.AxisServletWithSecurityTestCase
 
 # AMQ 5.x seems to have broken temp topic replies
 org.mule.transport.soap.axis.AxisConnectorJmsTopicsFunctionalTestCase
-
-# Broken by MULE-3003 (Test attempts to get outbound connector used from event)
-org.mule.transport.soap.axis.AxisConnectorHttpsTestCase

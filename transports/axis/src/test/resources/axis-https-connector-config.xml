@@ -19,7 +19,9 @@
     <model name="Https_Test_Model">
         <service name="TestUMO">
             <inbound>           
-                <axis:inbound-endpoint address="https://localhost:${port1}" exchange-pattern="request-response" name="inTestUMO"/>
+                <axis:inbound-endpoint address="https://localhost:${port1}" exchange-pattern="request-response" name="inTestUMO">
+                    <custom-processor class="org.mule.transport.soap.axis.AxisConnectorHttpsTestCase$AddConnectorMessageProperty"/>
+                </axis:inbound-endpoint>
             </inbound>
             <component class="org.mule.component.simple.EchoComponent"/>
         </service>

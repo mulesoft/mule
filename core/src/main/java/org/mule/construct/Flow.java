@@ -51,8 +51,7 @@ public class Flow extends AbstractPipeline implements MessageProcessor
     public MuleEvent process(MuleEvent event) throws MuleException
     {
         MuleSession calledSession = new DefaultMuleSession(event.getSession(), this);
-        MuleEvent newEvent = new DefaultMuleEvent(event.getMessage(), event.getEndpoint(), event,
-            calledSession);
+        MuleEvent newEvent = new DefaultMuleEvent(event.getMessage(), event, calledSession);
         RequestContext.setEvent(newEvent);
         try
         {

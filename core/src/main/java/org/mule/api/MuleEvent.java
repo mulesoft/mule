@@ -12,7 +12,6 @@ package org.mule.api;
 
 import org.mule.MessageExchangePattern;
 import org.mule.api.construct.FlowConstruct;
-import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.security.Credentials;
 import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.TransformerException;
@@ -166,13 +165,6 @@ public interface MuleEvent extends Serializable
      */
     @Deprecated
     Object getProperty(String name, Object defaultValue);
-
-    /**
-     * Gets the endpoint associated with this event
-     * 
-     * @return the endpoint associated with this event
-     */
-    InboundEndpoint getEndpoint();
 
     /**
      * Retrieves the service session for the current event

@@ -29,6 +29,7 @@ import org.mule.api.transport.Connector;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.transport.ConnectException;
 
+import java.net.URI;
 import java.util.List;
 import java.util.Map;
 
@@ -309,5 +310,11 @@ public class DynamicURIInboundEndpoint implements InboundEndpoint
     public void setListener(MessageProcessor listener)
     {
         this.listener = listener;
+    }
+    
+    @Override
+    public URI getURI()
+    {
+        return getEndpointURI().getUri();
     }
 }

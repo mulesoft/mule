@@ -99,7 +99,7 @@ public class MessageChunkingRouter extends FilteringOutboundRouter
                     {
                         logger.info(String.format("sending part %d of %d (seq # %d)", count + 1, parts, count));
                     }
-                    super.route(new DefaultMuleEvent(part, event.getEndpoint(), session));
+                    super.route(new DefaultMuleEvent(part, event.getExchangePattern(), session));
                     if (logger.isInfoEnabled())
                     {
                         logger.info("sent");
