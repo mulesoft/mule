@@ -325,8 +325,7 @@ public class EventCorrelator implements Startable, Stoppable
     protected void removeEventGroup(EventGroup group) throws ObjectStoreException
     {
         final Object groupId = group.getGroupId();
-        eventGroups.remove((Serializable) groupId);
-        group.clear();
+        eventGroups.remove((Serializable) groupId);        
         addProcessedGroup(groupId);
     }
 
@@ -408,6 +407,7 @@ public class EventCorrelator implements Startable, Stoppable
                 if (!(group.getCreated() + groupTimeToLive < System.currentTimeMillis()))
                 {
                     MuleEvent newEvent = callback.aggregateEvents(group);
+                    group.clear();
                     newEvent.getMessage().setCorrelationId(group.getGroupId().toString());
 
                     if (!expiredAndDispatchedGroups.contains((Serializable) group.getGroupId()))
