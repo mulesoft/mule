@@ -11,6 +11,7 @@ package org.mule.transport.http.config;
 
 import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
 import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
+import org.mule.config.spring.parsers.specific.MessageProcessorDefinitionParser;
 import org.mule.config.spring.parsers.specific.tls.ClientKeyStoreDefinitionParser;
 import org.mule.config.spring.parsers.specific.tls.KeyStoreDefinitionParser;
 import org.mule.config.spring.parsers.specific.tls.ProtocolHandlerDefinitionParser;
@@ -20,6 +21,7 @@ import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
 import org.mule.transport.http.HttpsConnector;
 import org.mule.transport.http.HttpsPollingConnector;
+import org.mule.transport.http.components.StaticResourceMessageProcessor;
 
 /**
  * Reigsters a Bean Definition Parser for handling <code><https:connector></code> elements.
@@ -39,6 +41,9 @@ public class HttpsNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("tls-client", new ClientKeyStoreDefinitionParser());
         registerBeanDefinitionParser("tls-server", new TrustStoreDefinitionParser());
         registerBeanDefinitionParser("tls-protocol-handler", new ProtocolHandlerDefinitionParser());
+
+        registerMuleBeanDefinitionParser("static-resource-handler",
+                new MessageProcessorDefinitionParser(StaticResourceMessageProcessor.class));
     }
 
 }

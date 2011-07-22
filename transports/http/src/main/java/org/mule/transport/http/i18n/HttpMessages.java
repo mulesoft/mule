@@ -105,6 +105,16 @@ public class HttpMessages extends MessageFactory
     {
         return factory.createMessage(BUNDLE_PATH, 23);
     }
+
+    public static Message noResourceBaseDefined()
+    {
+        return factory.createMessage(BUNDLE_PATH, 24);
+    }
+
+    public static Message fileNotFound(String file)
+    {
+        return factory.createMessage(BUNDLE_PATH, 25, file);
+    }
 }
 
 

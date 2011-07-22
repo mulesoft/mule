@@ -404,4 +404,32 @@
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
+
+    <xsd:element name="static-resource-handler" type="staticResourceHandlerType" substitutionGroup="mule:abstract-message-processor">
+        <xsd:annotation>
+            <xsd:documentation>
+                Serves up static content for use with http. (Since Mule 3.2)
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:complexType name="staticResourceHandlerType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:abstractInterceptingMessageProcessorType">
+                <xsd:attribute name="resourceBase" type="xsd:string" use="required">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The resource base for where documents are served up from.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="defaultFile" type="xsd:string" use="optional" default="index.html">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The default file to sever when a directory is specified. The default value is 'index.html'.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
 </xsd:schema>
