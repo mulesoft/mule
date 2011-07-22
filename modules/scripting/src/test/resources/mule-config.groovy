@@ -35,6 +35,7 @@ import org.mule.tck.testmodels.mule.TestTransactionManagerFactory
 import org.mule.util.store.SimpleMemoryObjectStore
 import org.mule.util.queue.QueueManager
 import org.mule.util.queue.TransactionalQueueManager
+import org.mule.util.store.MuleObjectStoreManager
 
 // Set up defaults / system objects
 QueueManager queueManager = new TransactionalQueueManager();
@@ -44,6 +45,10 @@ muleContext.registry.registerObject(MuleProperties.OBJECT_QUEUE_MANAGER, queueMa
 muleContext.registry.registerObject(MuleProperties.OBJECT_SECURITY_MANAGER, new MuleSecurityManager());
 
 muleContext.registry.registerObject(MuleProperties.OBJECT_MULE_ENDPOINT_FACTORY, new DefaultEndpointFactory());
+
+MuleObjectStoreManager objectStoreManager = new MuleObjectStoreManager();
+muleContext.registry.registerObject(MuleProperties.OBJECT_STORE_MANAGER, objectStoreManager);
+
 
 ThreadingProfile defaultThreadingProfile = new ChainedThreadingProfile();
 defaultThreadingProfile.setThreadWaitTimeout(30);
