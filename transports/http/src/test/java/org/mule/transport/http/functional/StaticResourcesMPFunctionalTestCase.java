@@ -9,12 +9,12 @@
  */
 package org.mule.transport.http.functional;
 
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.methods.GetMethod;
+import org.junit.Test;
 import org.mule.tck.DynamicPortTestCase;
 import org.mule.transport.http.HttpConstants;
 import org.mule.util.ClassUtils;
-
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.methods.GetMethod;
 
 public class StaticResourcesMPFunctionalTestCase extends DynamicPortTestCase
 {
@@ -34,6 +34,7 @@ public class StaticResourcesMPFunctionalTestCase extends DynamicPortTestCase
         return "http-static-resource-test.xml";
     }
 
+    @Test
     public void testHttpStaticResource() throws Exception
     {
         String url = String.format("http://localhost:%1d/static", getPorts().get(0));
@@ -63,7 +64,7 @@ public class StaticResourcesMPFunctionalTestCase extends DynamicPortTestCase
 
     }
 
-
+    @Test
     public void testHttpStaticResourceMimeTypes() throws Exception
     {
         String url = String.format("http://localhost:%1d/static", getPorts().get(0));
@@ -92,6 +93,7 @@ public class StaticResourcesMPFunctionalTestCase extends DynamicPortTestCase
         assertEquals("image/png", method.getResponseHeader("Content-Type").getValue());
     }
 
+    @Test
     public void testHttpsStaticResource() throws Exception
     {
         String url = String.format("https://localhost:%2d/static", getPorts().get(1));
@@ -127,6 +129,7 @@ public class StaticResourcesMPFunctionalTestCase extends DynamicPortTestCase
      *
      * @throws Exception
      */
+    @Test
     public void testFlowBindingOnSamePort() throws Exception
     {
         String url = String.format("http://localhost:%1d/echo", getPorts().get(0));
