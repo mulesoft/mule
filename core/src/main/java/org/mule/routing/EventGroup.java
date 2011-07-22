@@ -212,7 +212,10 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
     {
         synchronized (events)
         {
-            events.store(event.getId(), event);
+            //Using both event ID and CorrelationSequence since in certain instances
+            //when an event is split up, the same event IDs are used.
+            Serializable key=event.getId()+event.getMessage().getCorrelationSequence();            
+            events.store(key, event);
         }
     }
 
