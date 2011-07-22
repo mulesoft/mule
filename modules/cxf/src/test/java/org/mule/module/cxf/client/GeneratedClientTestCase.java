@@ -29,7 +29,7 @@ public class GeneratedClientTestCase extends FunctionalTestCase
     @Override
     protected String getConfigResources()
     {
-        return "proxy-conf.xml";
+        return "proxy-conf-service.xml";
     }
 
     @Test
