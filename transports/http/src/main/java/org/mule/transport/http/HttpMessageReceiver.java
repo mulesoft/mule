@@ -32,6 +32,7 @@ import org.mule.api.security.UnauthorisedException;
 import org.mule.api.transport.Connector;
 import org.mule.api.transport.MessageReceiver;
 import org.mule.api.transport.PropertyScope;
+import org.mule.config.ExceptionHelper;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.session.DefaultMuleSession;
@@ -167,23 +168,15 @@ public class HttpMessageReceiver extends TcpMessageReceiver
                     }
                     catch (Exception e)
                     {
-                        int httpStatus;
-                        if (e instanceof NotPermittedException)
-                        {
-                            httpStatus = HttpConstants.SC_METHOD_NOT_ALLOWED;
-                        }
-                        else if (e instanceof UnauthorisedException)
-                        {
-                            httpStatus = HttpConstants.SC_UNAUTHORIZED;
-                        }
-                        else if (e instanceof FilterUnacceptedException || e instanceof RoutePathNotFoundException)
-                        {
-                            httpStatus = HttpConstants.SC_NOT_ACCEPTABLE;
-                        }
-                        else
-                        {
-                            httpStatus = HttpConstants.SC_INTERNAL_SERVER_ERROR;
-                        }
+                        //MULE-5656 There was custom code here for mapping status codes to exceptions
+                        //I have removed this code and now make an explicit call to the Exception helper,
+                        //but the real fix is to make sure Mule handles this automatically through the
+                        //InboundExceptionDetailsMessageProcessor
+
+                        //Response code mappings are loaded from META-INF/services/org/mule/config/http-exception-mappings.properties
+                        String temp = ExceptionHelper.getErrorMapping(connector.getProtocol(), e.getClass());
+                        int httpStatus = Integer.valueOf(temp);
+
                         conn.writeResponse(buildFailureResponse(request.getRequestLine().getHttpVersion(), httpStatus, e.getMessage()));
                         if (e instanceof MessagingException)
                         {
