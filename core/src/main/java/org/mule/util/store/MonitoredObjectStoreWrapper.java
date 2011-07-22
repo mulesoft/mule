@@ -188,7 +188,8 @@ public class MonitoredObjectStoreWrapper<T extends Serializable>
                 for (Serializable key : keys)
                 {
                     StoredObject<T> obj = getStore().retrieve(key);
-                    if (TimeUnit.NANOSECONDS.toMillis(now - obj.getTimestamp()) >= entryTTL)
+                    //TODO extract the entryTTL>0 outside of loop
+                    if (entryTTL>0 && TimeUnit.NANOSECONDS.toMillis(now - obj.getTimestamp()) >= entryTTL)
                     {
                         remove(key);
                         excess--;
@@ -221,12 +222,15 @@ public class MonitoredObjectStoreWrapper<T extends Serializable>
             }
             else
             {
-                for (Serializable key : keys)
+                if(entryTTL>0)
                 {
-                    StoredObject<T> obj = getStore().retrieve(key);
-                    if (TimeUnit.NANOSECONDS.toMillis(now - obj.getTimestamp()) >= entryTTL)
+                    for (Serializable key : keys)
                     {
-                        remove(key);
+                        StoredObject<T> obj = getStore().retrieve(key);
+                        if (TimeUnit.NANOSECONDS.toMillis(now - obj.getTimestamp()) >= entryTTL)
+                        {
+                            remove(key);
+                        }
                     }
                 }
             }
