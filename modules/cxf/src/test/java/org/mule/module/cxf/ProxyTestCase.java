@@ -81,7 +81,7 @@ public class ProxyTestCase extends AbstractServiceAndFlowTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            //{ConfigVariant.SERVICE, "proxy-conf-service.xml"},
+            {ConfigVariant.SERVICE, "proxy-conf-service.xml"},
             {ConfigVariant.FLOW, "proxy-conf-flow.xml"}
         });
     }
