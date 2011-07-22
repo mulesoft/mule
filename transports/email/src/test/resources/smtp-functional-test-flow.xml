@@ -16,9 +16,12 @@
         <vm:inbound-endpoint path="send" exchange-pattern="one-way">
             <message-properties-transformer scope="outbound">
                 <add-message-property key="contentType" value="#[header:INBOUND:contentType?]"/>
+                <add-message-property key="host" value="localhost"/>
+                <add-message-property key="to" value="bob@example.com"/>
             </message-properties-transformer>
         </vm:inbound-endpoint>
-        <smtp:outbound-endpoint host="localhost" port="${port1}" to="bob@example.com"/>
+        <smtp:outbound-endpoint host="#[header:OUTBOUND:host]" port="${port1}" to="#[header:OUTBOUND:to]"
+                                subject="#[groovy:message.getPayload()]"/>
     </flow>
     
 </mule>

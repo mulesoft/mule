@@ -167,6 +167,15 @@ public class StringToEmailMessage extends AbstractMessageTransformer
         {
             value = message.getInvocationProperty(propName, defaultValue);
         }
+        return evaluate(value, message);
+    }
+
+    public String evaluate(String value, MuleMessage message)
+    {
+        if(value != null && muleContext.getExpressionManager().isExpression(value))
+        {
+            value = (String) muleContext.getExpressionManager().evaluate(value, message);
+        }
         return value;
     }
 
