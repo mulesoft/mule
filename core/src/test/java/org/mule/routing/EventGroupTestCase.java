@@ -189,10 +189,6 @@ public class EventGroupTestCase extends AbstractMuleContextTestCase
         assertTrue(es.indexOf("events=2") != -1);
         assertTrue(es.contains(e.getMessage().getUniqueId()));
         assertTrue(es.contains(e2.getMessage().getUniqueId()));
-        String eitherId="["+e.getMessage().getUniqueId()+","+e2.getMessage().getUniqueId()+"]+";
-        eitherId=eitherId.replace("-", "\\-");
-        String regex="EventGroup \\{id="+eg.getGroupId()+", expected size=-1, current events=2 \\["+eitherId+", "+eitherId+"]}";
-        assertTrue(es.matches(regex));
     }
 
     private static class MyEventGroup extends EventGroup
