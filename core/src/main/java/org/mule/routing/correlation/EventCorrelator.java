@@ -281,6 +281,7 @@ public class EventCorrelator implements Startable, Stoppable
                     try
                     {
                         this.removeEventGroup(group);
+                        group.clear();
                     }
                     catch (ObjectStoreException e)
                     {
@@ -325,7 +326,7 @@ public class EventCorrelator implements Startable, Stoppable
     protected void removeEventGroup(EventGroup group) throws ObjectStoreException
     {
         final Object groupId = group.getGroupId();
-        eventGroups.remove((Serializable) groupId);        
+        eventGroups.remove((Serializable) groupId);
         addProcessedGroup(groupId);
     }
 
@@ -389,8 +390,18 @@ public class EventCorrelator implements Startable, Stoppable
             }
             muleContext.fireNotification(new RoutingNotification(messageCollection, null,
                 RoutingNotification.CORRELATION_TIMEOUT));
+            MuleEvent groupCollectionEvent = group.getMessageCollectionEvent();
+            try
+            {
+                group.clear();
+            }
+            catch (ObjectStoreException e)
+            {
+                logger.warn("Failed to clear group with id " + group.getGroupId()
+                            + " since underlying ObjectStore threw Exception:" + e.getMessage());
+            }
             throw new CorrelationTimeoutException(CoreMessages.correlationTimedOut(group.getGroupId()),
-                group.getMessageCollectionEvent());
+                groupCollectionEvent);
         }
         else
         {
