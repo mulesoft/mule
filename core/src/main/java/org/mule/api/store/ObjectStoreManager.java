@@ -14,14 +14,12 @@ import java.io.Serializable;
 
 public interface ObjectStoreManager
 {
-    public <T extends ObjectStore<? extends Serializable>> T getObjectStore(String name);
+    <T extends ObjectStore<? extends Serializable>> T getObjectStore(String name);
 
-    public <T extends ObjectStore<? extends Serializable>> T getObjectStore(String name, boolean isPersistent);
+    <T extends ObjectStore<? extends Serializable>> T getObjectStore(String name, boolean isPersistent);
 
-    public <T extends ObjectStore<? extends Serializable>> T getObjectStore(String name,
-                                                                            boolean isPersistent,
-                                                                            int maxEntries,
-                                                                            int entryTTL,
-                                                                            int expirationInterval);
-    public void disposeStore(ObjectStore<? extends Serializable> store) throws ObjectStoreException;
+    <T extends ObjectStore<? extends Serializable>> T getObjectStore(String name,
+        boolean isPersistent, int maxEntries, int entryTTL, int expirationInterval);
+
+    void disposeStore(ObjectStore<? extends Serializable> store) throws ObjectStoreException;
 }

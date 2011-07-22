@@ -15,21 +15,21 @@ import java.util.List;
 
 public interface PartitionableObjectStore<T extends Serializable> extends ListableObjectStore<T>
 {
-    public boolean contains(Serializable key, String partitionName) throws ObjectStoreException;
+    boolean contains(Serializable key, String partitionName) throws ObjectStoreException;
 
-    public void store(Serializable key, T value, String partitionName) throws ObjectStoreException;
+    void store(Serializable key, T value, String partitionName) throws ObjectStoreException;
 
-    public T retrieve(Serializable key, String partitionName) throws ObjectStoreException;
+    T retrieve(Serializable key, String partitionName) throws ObjectStoreException;
 
-    public T remove(Serializable key, String partitionName) throws ObjectStoreException;
+    T remove(Serializable key, String partitionName) throws ObjectStoreException;
 
-    public List<Serializable> allKeys(String partitionName) throws ObjectStoreException;
+    List<Serializable> allKeys(String partitionName) throws ObjectStoreException;
 
-    public List<String> allPartitions() throws ObjectStoreException;
+    List<String> allPartitions() throws ObjectStoreException;
 
-    public void open(String partitionName) throws ObjectStoreException;
+    void open(String partitionName) throws ObjectStoreException;
 
-    public void close(String partitionName) throws ObjectStoreException;
-    
-    public void disposePartition(String partitionName) throws ObjectStoreException;
+    void close(String partitionName) throws ObjectStoreException;
+
+    void disposePartition(String partitionName) throws ObjectStoreException;
 }
