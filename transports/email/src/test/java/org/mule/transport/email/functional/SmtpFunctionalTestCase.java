@@ -10,7 +10,10 @@
 
 package org.mule.transport.email.functional;
 
+import javax.mail.internet.MimeMessage;
+
 import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
 public class SmtpFunctionalTestCase extends AbstractEmailFunctionalTestCase
 {
@@ -24,6 +27,13 @@ public class SmtpFunctionalTestCase extends AbstractEmailFunctionalTestCase
     public void testSend() throws Exception
     {
         doSend();
+    }
+
+    @Override
+    public void verifyMessage(MimeMessage message) throws Exception
+    {
+        super.verifyMessage(message);
+        assertEquals(DEFAULT_MESSAGE, message.getSubject());
     }
 
 }
