@@ -10,30 +10,39 @@
 
 package org.mule.transport.http.functional;
 
-import org.mule.api.MuleEventContext;
-import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.functional.EventCallback;
-import org.mule.tck.functional.FunctionalTestComponent;
-import org.mule.tck.junit4.FunctionalTestCase;
-import org.mule.tck.junit4.rule.DynamicPort;
-
-import org.junit.Rule;
-import org.junit.Test;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-public class HttpPollingFunctionalTestCase extends FunctionalTestCase
+import java.util.Arrays;
+import java.util.Collection;
+
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+import org.mule.api.MuleEventContext;
+import org.mule.api.MuleMessage;
+import org.mule.module.client.MuleClient;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.functional.EventCallback;
+import org.mule.tck.functional.FunctionalTestComponent;
+import org.mule.tck.junit4.rule.DynamicPort;
+
+public class HttpPollingFunctionalTestCase extends AbstractServiceAndFlowTestCase
 {
 
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
-    @Override
-    protected String getConfigResources()
+    public HttpPollingFunctionalTestCase(ConfigVariant variant, String configResources)
     {
-        return "mule-http-polling-config.xml";
+        super(variant, configResources);
+    }
+
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{{ConfigVariant.SERVICE, "mule-http-polling-config-service.xml"},
+            {ConfigVariant.FLOW, "mule-http-polling-config-flow.xml"}});
     }
 
     @Test
@@ -41,10 +50,12 @@ public class HttpPollingFunctionalTestCase extends FunctionalTestCase
     {
         FunctionalTestComponent ftc = getFunctionalTestComponent("polled");
         assertNotNull(ftc);
-        ftc.setEventCallback(new EventCallback(){
+        ftc.setEventCallback(new EventCallback()
+        {
             public void eventReceived(MuleEventContext context, Object component) throws Exception
             {
-                assertEquals("The Accept header should be set on the incoming message", "application/xml", context.getMessage().<String>getInboundProperty("Accept"));
+                assertEquals("The Accept header should be set on the incoming message", "application/xml",
+                    context.getMessage().<String> getInboundProperty("Accept"));
             }
         });
         MuleClient client = new MuleClient(muleContext);

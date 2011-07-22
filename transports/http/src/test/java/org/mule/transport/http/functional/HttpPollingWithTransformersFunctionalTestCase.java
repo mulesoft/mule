@@ -10,34 +10,44 @@
 
 package org.mule.transport.http.functional;
 
-import org.mule.api.MuleMessage;
-import org.mule.api.context.notification.ServerNotification;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.functional.FunctionalTestNotificationListener;
-import org.mule.tck.junit4.FunctionalTestCase;
-import org.mule.tck.junit4.rule.DynamicPort;
-import org.mule.util.concurrent.Latch;
-
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
-import org.junit.Rule;
-import org.junit.Test;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-public class HttpPollingWithTransformersFunctionalTestCase extends FunctionalTestCase
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+import org.mule.api.MuleMessage;
+import org.mule.api.context.notification.ServerNotification;
+import org.mule.module.client.MuleClient;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.functional.FunctionalTestNotificationListener;
+import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.util.concurrent.Latch;
+
+public class HttpPollingWithTransformersFunctionalTestCase extends AbstractServiceAndFlowTestCase
 {
 
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
-    @Override
-    protected String getConfigResources()
+    public HttpPollingWithTransformersFunctionalTestCase(ConfigVariant variant, String configResources)
     {
-        return "mule-http-polling-with-transformers-config.xml";
+        super(variant, configResources);
+    }
+
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "mule-http-polling-with-transformers-config-service.xml"},
+            {ConfigVariant.FLOW, "mule-http-polling-with-transformers-config-flow.xml"}});
     }
 
     @Test
@@ -50,7 +60,7 @@ public class HttpPollingWithTransformersFunctionalTestCase extends FunctionalTes
             public void onNotification(ServerNotification notification)
             {
                 latch.countDown();
-                if(notification.getSource().toString().endsWith("toClient-only"))
+                if (notification.getSource().toString().endsWith("toClient-only"))
                 {
                     transformPropagated.set(true);
                 }
@@ -62,7 +72,7 @@ public class HttpPollingWithTransformersFunctionalTestCase extends FunctionalTes
         assertNotNull(result.getPayload());
         assertTrue("Callback called", latch.await(1000, TimeUnit.MILLISECONDS));
         assertEquals("/foo toClient-only", result.getPayloadAsString());
-        //The transform should not have been propagated to the outbound endpoint
+        // The transform should not have been propagated to the outbound endpoint
         assertFalse(transformPropagated.get());
     }
 
