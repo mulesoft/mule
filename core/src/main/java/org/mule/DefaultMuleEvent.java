@@ -55,59 +55,36 @@ import org.apache.commons.logging.LogFactory;
 public class DefaultMuleEvent extends EventObject
     implements MuleEvent, ThreadSafeAccess, DeserializationPostInitialisable
 {
-    /**
-     * Serial version
-     */
     private static final long serialVersionUID = 1L;
 
-    /**
-     * logger used by this class
-     */
     private static Log logger = LogFactory.getLog(DefaultMuleEvent.class);
 
-    /**
-     * the Universally Unique ID for the event
-     */
+
+    /** Immutable MuleEvent state **/
+
+    /** The Universally Unique ID for the event */
     private final String id;
-
-    /**
-     * The payload message used to read the payload of the event
-     */
     private final MuleMessage message;
-
     private final MuleSession session;
+    
+    private final Credentials credentials;
+    private final String encoding;
+    private final MessageExchangePattern exchangePattern;
+    private final URI messageSourceURI;
+    private final String messageSourceName;
+    private final ReplyToHandler replyToHandler;
+    private final boolean transacted;
 
+    /** Mutable MuleEvent state **/
     private boolean stopFurtherProcessing = false;
-
     private int timeout = TIMEOUT_NOT_SET_VALUE;
-
     private transient ResponseOutputStream outputStream;
-
-    private Credentials credentials;
+    private ProcessingTime processingTime;
 
     protected String[] ignoredPropertyOverrides = new String[]{MuleProperties.MULE_METHOD_PROPERTY};
 
-    private ProcessingTime processingTime;
-
-    private final MessageExchangePattern exchangePattern;
-
-    private final boolean transacted;
-
-    private final ReplyToHandler replyToHandler;
-
-    private final URI messageSourceURI;
-
-    private final String messageSourceName;
-
-    private final String encoding;
-
-    public DefaultMuleEvent(MuleMessage message,
-                            MessageExchangePattern exchangePattern,
-                            FlowConstruct flowConstruct)
-    {
-        this(message, exchangePattern, new DefaultMuleSession(flowConstruct, message.getMuleContext()), null);
-    }
-
+    // Constructors for no message source.
+    
     public DefaultMuleEvent(MuleMessage message, MessageExchangePattern exchangePattern, MuleSession session)
     {
         this(message, exchangePattern, session, null);
@@ -119,18 +96,23 @@ public class DefaultMuleEvent extends EventObject
                             ResponseOutputStream outputStream)
     {
         super(message.getPayload());
-        this.message = message;
         this.id = generateEventId();
+        this.message = message;
         this.session = session;
+
         this.exchangePattern = exchangePattern;
-        this.transacted = false;
-        URI uri = URI.create("dynamic://null");
-        this.messageSourceURI = uri;
-        this.messageSourceName = uri.toString();
-        this.timeout = message.getMuleContext().getConfiguration().getDefaultResponseTimeout();
+        this.outputStream = outputStream;
+        
+        this.credentials = null;
         this.encoding = message.getMuleContext().getConfiguration().getDefaultEncoding();
+        this.messageSourceName = null;
+        this.messageSourceURI = URI.create("dynamic://null");;
         this.replyToHandler = null;
+        this.timeout = message.getMuleContext().getConfiguration().getDefaultResponseTimeout();
+        this.transacted = false;
     }
+
+    // Constructors for generic (identifiable) message source.
 
     public DefaultMuleEvent(MuleMessage message,
                             IdentifiableMessageSource messageSource,
@@ -139,12 +121,16 @@ public class DefaultMuleEvent extends EventObject
                             ResponseOutputStream outputStream)
     {
         super(message.getPayload());
-        this.message = message;
         this.id = generateEventId();
+        this.message = message;
         this.session = session;
+
         this.exchangePattern = exchangePattern;
+        this.outputStream = outputStream;
+        
+        this.credentials = null;
+        this.encoding = message.getMuleContext().getConfiguration().getDefaultEncoding();
         this.transacted = false;
-        this.messageSourceURI = messageSource.getURI();
         if (messageSource instanceof NamedObject)
         {
             this.messageSourceName = ((NamedObject) messageSource).getName();
@@ -153,23 +139,16 @@ public class DefaultMuleEvent extends EventObject
         {
             this.messageSourceName = messageSource.getURI().toString();
         }
-        this.timeout = message.getMuleContext().getConfiguration().getDefaultResponseTimeout();
-        this.encoding = message.getMuleContext().getConfiguration().getDefaultEncoding();
+        this.messageSourceURI = messageSource.getURI();
         this.replyToHandler = null;
+        this.timeout = message.getMuleContext().getConfiguration().getDefaultResponseTimeout();
     }
 
+    // Constructors for inbound endpoint
+    
     public DefaultMuleEvent(MuleMessage message, InboundEndpoint endpoint, MuleSession session)
     {
         this(message, endpoint, session, null, null, null);
-    }
-
-    public DefaultMuleEvent(MuleMessage message,
-                            InboundEndpoint endpoint,
-                            MuleSession session,
-                            ResponseOutputStream outputStream,
-                            ReplyToHandler replyToHandler)
-    {
-        this(message, endpoint, session, outputStream, null, replyToHandler);
     }
 
     public DefaultMuleEvent(MuleMessage message,
@@ -180,22 +159,28 @@ public class DefaultMuleEvent extends EventObject
                             ReplyToHandler replyToHandler)
     {
         super(message.getPayload());
-        this.message = message;
-        this.messageSourceURI = endpoint.getEndpointURI().getUri();
-        this.messageSourceName = endpoint.getName();
-        this.timeout = endpoint.getResponseTimeout();
-        this.encoding = endpoint.getEncoding();
-        this.session = session;
         this.id = generateEventId();
+        this.message = message;
+        this.session = session;
+        
         this.outputStream = outputStream;
-        this.exchangePattern = endpoint.getExchangePattern();
-        transacted = endpoint.getTransactionConfig().isTransacted();
-        fillProperties(endpoint);
         this.processingTime = time != null ? time : ProcessingTime.newInstance(this.session,
             message.getMuleContext());
         this.replyToHandler = replyToHandler;
+
+        this.credentials = extractCredentials(endpoint);
+        this.encoding = endpoint.getEncoding();
+        this.exchangePattern = endpoint.getExchangePattern();
+        this.messageSourceName = endpoint.getName();
+        this.messageSourceURI = endpoint.getEndpointURI().getUri();
+        this.timeout = endpoint.getResponseTimeout();
+        this.transacted = endpoint.getTransactionConfig().isTransacted();
+        fillProperties(endpoint);
     }
 
+    // Constructors to copy MuleEvent
+
+    
     /**
      * A helper constructor used to rewrite an event payload
      * 
@@ -216,16 +201,16 @@ public class DefaultMuleEvent extends EventObject
     public DefaultMuleEvent(MuleMessage message, MuleEvent rewriteEvent, MuleSession session)
     {
         super(message.getPayload());
-        this.message = message;
         this.id = rewriteEvent.getId();
+        this.message = message;
         this.session = session;
-        this.messageSourceURI = rewriteEvent.getMessageSourceURI();
-        this.messageSourceName = rewriteEvent.getMessageSourceName();
-        this.timeout = rewriteEvent.getTimeout();
+
+        this.credentials = rewriteEvent.getCredentials();
         this.encoding = rewriteEvent.getEncoding();
-        this.outputStream = (ResponseOutputStream) rewriteEvent.getOutputStream();
         this.exchangePattern = rewriteEvent.getExchangePattern();
-        transacted = rewriteEvent.isTransacted();
+        this.messageSourceName = rewriteEvent.getMessageSourceName();
+        this.messageSourceURI = rewriteEvent.getMessageSourceURI();
+        this.outputStream = (ResponseOutputStream) rewriteEvent.getOutputStream();
         if (rewriteEvent instanceof DefaultMuleEvent)
         {
             this.processingTime = ((DefaultMuleEvent) rewriteEvent).processingTime;
@@ -235,7 +220,8 @@ public class DefaultMuleEvent extends EventObject
             this.processingTime = ProcessingTime.newInstance(this.session, message.getMuleContext());
         }
         this.replyToHandler = rewriteEvent.getReplyToHandler();
-        this.credentials = rewriteEvent.getCredentials();
+        this.timeout = rewriteEvent.getTimeout();
+        transacted = rewriteEvent.isTransacted();
     }
 
     protected void fillProperties(InboundEndpoint endpoint)
@@ -255,8 +241,6 @@ public class DefaultMuleEvent extends EventObject
                 }
             }
         }
-
-        setCredentials(endpoint);
     }
 
     /**
@@ -289,7 +273,7 @@ public class DefaultMuleEvent extends EventObject
         return null != message.getOutboundProperty(key);
     }
 
-    protected void setCredentials(InboundEndpoint endpoint)
+    protected Credentials extractCredentials(InboundEndpoint endpoint)
     {
         if (null != endpoint && null != endpoint.getEndpointURI()
             && null != endpoint.getEndpointURI().getUserInfo())
@@ -298,9 +282,10 @@ public class DefaultMuleEvent extends EventObject
             final String password = endpoint.getEndpointURI().getPassword();
             if (password != null && userName != null)
             {
-                credentials = new MuleCredentials(userName, password.toCharArray());
+                return new MuleCredentials(userName, password.toCharArray());
             }
         }
+        return null;
     }
 
     @Override
@@ -541,7 +526,7 @@ public class DefaultMuleEvent extends EventObject
     @Override
     public void setTimeout(int timeout)
     {
-        if (timeout != TIMEOUT_NOT_SET_VALUE)
+        if (timeout >= 0)
         {
             this.timeout = timeout;
         }
