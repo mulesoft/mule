@@ -83,8 +83,6 @@ public class DefaultMuleEvent extends EventObject
 
     private transient ResponseOutputStream outputStream;
 
-    private transient Object transformedMessage;
-
     private Credentials credentials;
 
     protected String[] ignoredPropertyOverrides = new String[]{MuleProperties.MULE_METHOD_PROPERTY};
@@ -230,7 +228,6 @@ public class DefaultMuleEvent extends EventObject
         transacted = rewriteEvent.isTransacted();
         if (rewriteEvent instanceof DefaultMuleEvent)
         {
-            this.transformedMessage = ((DefaultMuleEvent) rewriteEvent).getCachedMessage();
             this.processingTime = ((DefaultMuleEvent) rewriteEvent).processingTime;
         }
         else
@@ -311,11 +308,6 @@ public class DefaultMuleEvent extends EventObject
     {
         MuleCredentials creds = message.getOutboundProperty(MuleProperties.MULE_CREDENTIALS_PROPERTY);
         return (credentials != null ? credentials : creds);
-    }
-
-    Object getCachedMessage()
-    {
-        return transformedMessage;
     }
 
     @Override
