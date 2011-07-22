@@ -10,22 +10,31 @@
 
 package org.mule.module.jaas;
 
-import org.mule.api.MuleMessage;
-import org.mule.util.SystemUtils;
-
-import java.util.Map;
-
-import org.junit.Test;
-
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Map;
+
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+import org.mule.api.MuleMessage;
+import org.mule.util.SystemUtils;
+
 public class JaasAuthenticationWithNtLoginModule extends AbstractJaasFunctionalTestCase
 {
-    @Override
-    protected String getConfigResources()
+    public JaasAuthenticationWithNtLoginModule(ConfigVariant variant, String configResources)
     {
-        return "mule-conf-with-NTLoginModule.xml";
+        super(variant, configResources);
+    }
+
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{{ConfigVariant.SERVICE, "mule-conf-with-NTLoginModule.xml"}
+
+        });
     }
 
     @Override
