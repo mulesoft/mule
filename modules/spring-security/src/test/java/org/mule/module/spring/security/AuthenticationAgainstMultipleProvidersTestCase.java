@@ -10,7 +10,10 @@
 
 package org.mule.module.spring.security;
 
-import org.mule.tck.junit4.FunctionalTestCase;
+import static org.junit.Assert.assertEquals;
+
+import java.util.Arrays;
+import java.util.Collection;
 
 import org.apache.commons.httpclient.Credentials;
 import org.apache.commons.httpclient.HttpClient;
@@ -20,16 +23,22 @@ import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 
-import static org.junit.Assert.assertEquals;
-
-public class AuthenticationAgainstMultipleProvidersTestCase extends FunctionalTestCase
+public class AuthenticationAgainstMultipleProvidersTestCase extends AbstractServiceAndFlowTestCase
 {
 
-    @Override
-    protected String getConfigResources()
+    public AuthenticationAgainstMultipleProvidersTestCase(ConfigVariant variant, String configResources)
     {
-        return "mule-multiple-providers-config.xml";
+        super(variant, configResources);
+    }
+
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{{ConfigVariant.SERVICE, "mule-multiple-providers-config-service.xml"},
+            {ConfigVariant.FLOW, "mule-multiple-providers-config-flow.xml"}});
     }
 
     @Test
@@ -39,23 +48,23 @@ public class AuthenticationAgainstMultipleProvidersTestCase extends FunctionalTe
         Credentials credentials = new UsernamePasswordCredentials("admin1", "admin1");
         httpClient.getState().setCredentials(AuthScope.ANY, credentials);
         httpClient.getParams().setAuthenticationPreemptive(true);
-        
+
         PostMethod postMethod = new PostMethod("http://localhost:4445");
         postMethod.setDoAuthentication(true);
         postMethod.setRequestEntity(new StringRequestEntity("hello", "text/html", "UTF-8"));
-                                
+
         assertEquals(HttpStatus.SC_OK, httpClient.executeMethod(postMethod));
-        assertEquals("hello", postMethod.getResponseBodyAsString());                  
-        
+        assertEquals("hello", postMethod.getResponseBodyAsString());
+
         credentials = new UsernamePasswordCredentials("asdf", "asdf");
         httpClient.getState().setCredentials(AuthScope.ANY, credentials);
-        assertEquals(HttpStatus.SC_UNAUTHORIZED, httpClient.executeMethod(postMethod)); 
-        
+        assertEquals(HttpStatus.SC_UNAUTHORIZED, httpClient.executeMethod(postMethod));
+
         credentials = new UsernamePasswordCredentials("admin2", "admin2");
         httpClient.getState().setCredentials(AuthScope.ANY, credentials);
-        assertEquals(HttpStatus.SC_UNAUTHORIZED, httpClient.executeMethod(postMethod)); 
-    }    
-    
+        assertEquals(HttpStatus.SC_UNAUTHORIZED, httpClient.executeMethod(postMethod));
+    }
+
     @Test
     public void testProvider2() throws Exception
     {
@@ -63,23 +72,23 @@ public class AuthenticationAgainstMultipleProvidersTestCase extends FunctionalTe
         Credentials credentials = new UsernamePasswordCredentials("admin2", "admin2");
         httpClient.getState().setCredentials(AuthScope.ANY, credentials);
         httpClient.getParams().setAuthenticationPreemptive(true);
-        
+
         PostMethod postMethod = new PostMethod("http://localhost:4446");
         postMethod.setDoAuthentication(true);
         postMethod.setRequestEntity(new StringRequestEntity("hello", "text/html", "UTF-8"));
-                                
+
         assertEquals(HttpStatus.SC_OK, httpClient.executeMethod(postMethod));
-        assertEquals("hello", postMethod.getResponseBodyAsString());    
-        
+        assertEquals("hello", postMethod.getResponseBodyAsString());
+
         credentials = new UsernamePasswordCredentials("asdf", "asdf");
         httpClient.getState().setCredentials(AuthScope.ANY, credentials);
-        assertEquals(HttpStatus.SC_UNAUTHORIZED, httpClient.executeMethod(postMethod)); 
-        
+        assertEquals(HttpStatus.SC_UNAUTHORIZED, httpClient.executeMethod(postMethod));
+
         credentials = new UsernamePasswordCredentials("admin", "admin");
         httpClient.getState().setCredentials(AuthScope.ANY, credentials);
-        assertEquals(HttpStatus.SC_UNAUTHORIZED, httpClient.executeMethod(postMethod)); 
+        assertEquals(HttpStatus.SC_UNAUTHORIZED, httpClient.executeMethod(postMethod));
     }
-    
+
     @Test
     public void testMultipleProviders() throws Exception
     {
@@ -87,24 +96,22 @@ public class AuthenticationAgainstMultipleProvidersTestCase extends FunctionalTe
         Credentials credentials = new UsernamePasswordCredentials("admin1", "admin1");
         httpClient.getState().setCredentials(AuthScope.ANY, credentials);
         httpClient.getParams().setAuthenticationPreemptive(true);
-        
+
         PostMethod postMethod = new PostMethod("http://localhost:4447");
         postMethod.setDoAuthentication(true);
         postMethod.setRequestEntity(new StringRequestEntity("hello", "text/html", "UTF-8"));
-                                
+
         assertEquals(HttpStatus.SC_OK, httpClient.executeMethod(postMethod));
-        assertEquals("hello", postMethod.getResponseBodyAsString());                  
-        
+        assertEquals("hello", postMethod.getResponseBodyAsString());
+
         credentials = new UsernamePasswordCredentials("asdf", "asdf");
         httpClient.getState().setCredentials(AuthScope.ANY, credentials);
-        assertEquals(HttpStatus.SC_UNAUTHORIZED, httpClient.executeMethod(postMethod)); 
-        
+        assertEquals(HttpStatus.SC_UNAUTHORIZED, httpClient.executeMethod(postMethod));
+
         credentials = new UsernamePasswordCredentials("admin2", "admin2");
         httpClient.getState().setCredentials(AuthScope.ANY, credentials);
         assertEquals(HttpStatus.SC_OK, httpClient.executeMethod(postMethod));
         assertEquals("hello", postMethod.getResponseBodyAsString());
     }
-    
+
 }
-
-
