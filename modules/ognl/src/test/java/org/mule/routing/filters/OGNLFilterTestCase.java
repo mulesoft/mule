@@ -10,24 +10,29 @@
 
 package org.mule.routing.filters;
 
-import org.mule.DefaultMuleMessage;
-import org.mule.api.MuleMessage;
-import org.mule.api.config.ConfigurationException;
-import org.mule.api.routing.OutboundRouterCollection;
-import org.mule.module.client.MuleClient;
-import org.mule.module.ognl.filters.OGNLFilter;
-import org.mule.routing.outbound.FilteringOutboundRouter;
-import org.mule.tck.junit4.FunctionalTestCase;
-
-import org.junit.Test;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 
-public class OGNLFilterTestCase extends FunctionalTestCase
+import java.util.Arrays;
+import java.util.Collection;
+
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+import org.mule.DefaultMuleMessage;
+import org.mule.api.MuleMessage;
+import org.mule.api.config.ConfigurationException;
+import org.mule.api.routing.OutboundRouterCollection;
+import org.mule.construct.Flow;
+import org.mule.module.client.MuleClient;
+import org.mule.module.ognl.filters.OGNLFilter;
+import org.mule.routing.MessageFilter;
+import org.mule.routing.outbound.FilteringOutboundRouter;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+
+public class OGNLFilterTestCase extends AbstractServiceAndFlowTestCase
 {
 
     public static final String DEFAULT_INPUT_QUEUE = "vm://in";
@@ -41,10 +46,16 @@ public class OGNLFilterTestCase extends FunctionalTestCase
 
     private OGNLFilter filter;
 
-    @Override
-    protected String getConfigResources()
+    public OGNLFilterTestCase(ConfigVariant variant, String configResources)
     {
-        return "ognl-functional-test.xml";
+        super(variant, configResources);
+    }
+
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{{ConfigVariant.SERVICE, "ognl-functional-test-service.xml"},
+            {ConfigVariant.FLOW, "ognl-functional-test-flow.xml"}});
     }
 
     @Override
@@ -82,9 +93,19 @@ public class OGNLFilterTestCase extends FunctionalTestCase
     @Test
     public void testNamespaceHandler()
     {
-        String expression = ((OGNLFilter) ((FilteringOutboundRouter) ((OutboundRouterCollection) muleContext.getRegistry()
-            .lookupService(SERVICE_NAME)
-            .getOutboundMessageProcessor()).getRoutes().get(0)).getFilter()).getExpression();
+        String expression;
+
+        if (variant.equals(ConfigVariant.SERVICE))
+        {
+            expression = ((OGNLFilter) ((FilteringOutboundRouter) ((OutboundRouterCollection) muleContext.getRegistry()
+                .lookupService(SERVICE_NAME)
+                .getOutboundMessageProcessor()).getRoutes().get(0)).getFilter()).getExpression();
+        }
+        else
+        {
+            expression = ((OGNLFilter) ((MessageFilter) ((Flow) muleContext.getRegistry()
+                .lookupFlowConstruct(SERVICE_NAME)).getMessageProcessors().get(0)).getFilter()).getExpression();
+        }
 
         assertEquals(expression, OGNL_EXSPRESSION);
     }
