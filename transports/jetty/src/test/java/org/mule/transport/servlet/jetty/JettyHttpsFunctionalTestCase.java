@@ -10,36 +10,48 @@
 
 package org.mule.transport.servlet.jetty;
 
-import org.mule.api.MuleEventContext;
-import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.functional.EventCallback;
-import org.mule.tck.functional.FunctionalTestComponent;
-import org.mule.tck.testmodels.mule.TestSedaService;
-import org.mule.transport.http.HttpConstants;
-import org.mule.transport.http.functional.HttpFunctionalTestCase;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import org.mule.api.MuleEventContext;
+import org.mule.api.MuleMessage;
+import org.mule.api.construct.FlowConstruct;
+import org.mule.module.client.MuleClient;
+import org.mule.tck.functional.EventCallback;
+import org.mule.tck.functional.FunctionalTestComponent;
+import org.mule.transport.http.HttpConstants;
+import org.mule.transport.http.functional.HttpFunctionalTestCase;
+
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import org.junit.runners.Parameterized.Parameters;
+
 public class JettyHttpsFunctionalTestCase extends HttpFunctionalTestCase
 {
 
-    @Override
-    protected String getConfigResources()
+    public JettyHttpsFunctionalTestCase(ConfigVariant variant, String configResources)
     {
-        return "jetty-https-functional-test.xml";
+        super(variant, configResources);
     }
 
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "jetty-https-functional-test-service.xml"},
+            {ConfigVariant.FLOW, "jetty-https-functional-test-flow.xml"}
+        });
+    }      
+    
     @Override
     public void testSend() throws Exception
     {
-        final TestSedaService testSedaService = (TestSedaService) muleContext.getRegistry().lookupService("testComponent");
+        final FlowConstruct testSedaService = muleContext.getRegistry().lookupFlowConstruct("testComponent");
         FunctionalTestComponent testComponent = (FunctionalTestComponent) getComponent(testSedaService);
         assertNotNull(testComponent);
 

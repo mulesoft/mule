@@ -10,25 +10,36 @@
 
 package org.mule.module.scripting;
 
-import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.junit4.FunctionalTestCase;
-
-import org.junit.Test;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+import org.mule.api.MuleMessage;
+import org.mule.module.client.MuleClient;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 
-public class GroovyBindingFunctionalTestCase extends FunctionalTestCase
+import java.util.Arrays;
+import java.util.Collection;
+
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+
+
+public class GroovyBindingFunctionalTestCase extends AbstractServiceAndFlowTestCase
 {
-
-    @Override
-    protected String getConfigResources()
+    public GroovyBindingFunctionalTestCase(ConfigVariant variant, String configResources)
     {
-        return "groovy-binding-config.xml";
+        super(variant, configResources);
     }
 
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "groovy-binding-config-service.xml"},
+            {ConfigVariant.FLOW, "groovy-binding-config-flow.xml"}
+        });
+    }      
+    
     @Test
     public void testBindingCallout() throws Exception
     {

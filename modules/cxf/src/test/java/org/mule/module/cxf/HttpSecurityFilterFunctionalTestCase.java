@@ -10,9 +10,15 @@
 
 package org.mule.module.cxf;
 
-import org.mule.tck.junit4.FunctionalTestCase;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.http.HttpConstants;
+
+import java.util.Arrays;
+import java.util.Collection;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
@@ -23,11 +29,9 @@ import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
-public class HttpSecurityFilterFunctionalTestCase extends FunctionalTestCase
+public class HttpSecurityFilterFunctionalTestCase extends AbstractServiceAndFlowTestCase
 {
     private static String soapRequest = 
         "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:unk=\"http://unknown.namespace/\">" +
@@ -45,12 +49,21 @@ public class HttpSecurityFilterFunctionalTestCase extends FunctionalTestCase
     @Rule
     public DynamicPort dynamicPort2 = new DynamicPort("port2");
     
-    @Override
-    protected String getConfigResources()
+    public HttpSecurityFilterFunctionalTestCase(ConfigVariant variant, String configResources)
     {
-        return "http-security-filter-test.xml";
+        super(variant, configResources);
     }
 
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "http-security-filter-test-service.xml"},
+            {ConfigVariant.FLOW, "http-security-filter-test-flow.xml"}
+        });
+    }      
+ 
+    
     /**
      * By putting this test method that uses https first we can test MULE-4558
      * 

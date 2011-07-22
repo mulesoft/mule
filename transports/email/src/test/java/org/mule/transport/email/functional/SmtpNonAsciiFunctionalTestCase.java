@@ -10,18 +10,30 @@
 
 package org.mule.transport.email.functional;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Locale;
 
 import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
 
 public class SmtpNonAsciiFunctionalTestCase extends AbstractEmailFunctionalTestCase
 {
 
-    public SmtpNonAsciiFunctionalTestCase()
+    public SmtpNonAsciiFunctionalTestCase(ConfigVariant variant, String configResources)
     {
-        super(STRING_MESSAGE, "smtp", Locale.JAPAN, "iso-2022-jp");
+        super(variant, STRING_MESSAGE, "smtp", configResources, Locale.JAPAN, "iso-2022-jp");
     }
 
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "smtp-mime-functional-test-service.xml"},
+            {ConfigVariant.FLOW, "smtp-mime-functional-test-flow.xml"}
+        });
+    }      
+    
     @Test
     public void testSend() throws Exception
     {

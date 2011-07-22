@@ -10,19 +10,23 @@
 
 package org.mule.transport.http.functional;
 
-import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.junit4.FunctionalTestCase;
-import org.mule.tck.junit4.rule.DynamicPort;
-import org.mule.transport.http.HttpConstants;
-
-import org.junit.Rule;
-import org.junit.Test;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-public class HttpHeadersTestCase extends FunctionalTestCase
+import org.mule.api.MuleMessage;
+import org.mule.module.client.MuleClient;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.transport.http.HttpConstants;
+
+import java.util.Arrays;
+import java.util.Collection;
+
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+
+public class HttpHeadersTestCase extends AbstractServiceAndFlowTestCase
 {
 
     @Rule
@@ -31,12 +35,20 @@ public class HttpHeadersTestCase extends FunctionalTestCase
     @Rule
     public DynamicPort dynamicPort2 = new DynamicPort("port2");
 
-    @Override
-    protected String getConfigResources()
+    public HttpHeadersTestCase(ConfigVariant variant, String configResources)
     {
-        return "http-headers-config.xml";
+        super(variant, configResources);
     }
 
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "http-headers-config-service.xml"},
+            {ConfigVariant.FLOW, "http-headers-config-flow.xml"}
+        });
+    }      
+    
     @Test
     public void testJettyHeaders() throws Exception 
     {

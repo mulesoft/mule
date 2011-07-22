@@ -10,6 +10,9 @@
 
 package org.mule.transport.email.functional;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.tck.functional.CountdownCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.transport.email.GreenMailUtilities;
@@ -18,23 +21,23 @@ import org.mule.transport.email.ImapConnector;
 import com.icegreen.greenmail.store.StoredMessage;
 import com.icegreen.greenmail.user.UserManager;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import javax.mail.Flags;
 import javax.mail.internet.MimeMessage;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import org.junit.runners.Parameterized.Parameters;
 
 public class ImapCustomSeenHandlingTestCase extends AbstractEmailFunctionalTestCase
 {
     private CountdownCallback messageReceived = new CountdownCallback(1);
 
-    public ImapCustomSeenHandlingTestCase()
+    public ImapCustomSeenHandlingTestCase(ConfigVariant variant, String configResources)
     {
-        super(false, ImapConnector.IMAP);
+        super(variant, false, ImapConnector.IMAP, configResources);
 
         // do not start Mule the IMAP server must be filled with appropriate test data first
         setStartContext(false);
@@ -45,6 +48,15 @@ public class ImapCustomSeenHandlingTestCase extends AbstractEmailFunctionalTestC
     {
         return "imap-custom-seen-flag.xml";
     }
+    
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "imap-functional-test-service.xml"},
+            {ConfigVariant.FLOW, "imap-functional-test-service.xml"}
+        });
+    }      
 
     @Test
     public void testMessagesMatchingFilterGetCustomFlagSet() throws Exception

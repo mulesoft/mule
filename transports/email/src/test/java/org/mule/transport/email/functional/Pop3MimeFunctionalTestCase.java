@@ -10,16 +10,29 @@
 
 package org.mule.transport.email.functional;
 
+import java.util.Arrays;
+import java.util.Collection;
+
 import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
 
 public class Pop3MimeFunctionalTestCase extends AbstractEmailFunctionalTestCase
 {
 
-    public Pop3MimeFunctionalTestCase()
+    public Pop3MimeFunctionalTestCase(ConfigVariant variant, String configResources)
     {
-        super(MIME_MESSAGE, "pop3", "pop3-mime-functional-test.xml");
+        super(variant, MIME_MESSAGE, "pop3", configResources);
     }
 
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "pop3-mime-functional-test-service.xml"},
+            {ConfigVariant.FLOW, "pop3-mime-functional-test-flow.xml"}
+        });
+    }      
+    
     @Test
     public void testRequest() throws Exception
     {

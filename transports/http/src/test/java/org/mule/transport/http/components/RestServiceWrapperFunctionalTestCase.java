@@ -10,33 +10,44 @@
 
 package org.mule.transport.http.components;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
+
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
-
-public class RestServiceWrapperFunctionalTestCase extends FunctionalTestCase
+public class RestServiceWrapperFunctionalTestCase extends AbstractServiceAndFlowTestCase
 {
     protected static String TEST_REQUEST = "Test Http Request";
 
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
-    @Override
-    protected String getConfigResources()
+    public RestServiceWrapperFunctionalTestCase(ConfigVariant variant, String configResources)
     {
-        return "http-rest-service-wrapper-functional-test.xml";
+        super(variant, configResources);
     }
+
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "http-rest-service-wrapper-functional-test-service.xml"},
+            {ConfigVariant.FLOW, "http-rest-service-wrapper-functional-test-flow.xml"}
+        });
+    }      
 
     @Test
     public void testErrorExpressionOnRegexFilterFail() throws Exception

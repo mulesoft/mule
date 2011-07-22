@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:jetty="http://www.mulesoft.org/schema/mule/jetty"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xsi:schemaLocation="
+       http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.2/mule-vm.xsd
+       http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/3.2/mule-test.xsd
+       http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/3.2/mule-http.xsd
+       http://www.mulesoft.org/schema/mule/jetty http://www.mulesoft.org/schema/mule/jetty/3.2/mule-jetty.xsd
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd">
+
+    <vm:connector name="vm"/>
+
+    <http:endpoint name="clientEndpoint" host="localhost" port="${port1}" exchange-pattern="request-response"/>
+    <http:endpoint name="serverEndpoint" host="localhost" port="${port1}" exchange-pattern="request-response"/>
+
+    <http:endpoint name="clientEndpoint2" host="localhost" port="${port2}" contentType="application/xml"
+        exchange-pattern="one-way">
+        <property key="Content-Disposition" value="attachment; filename=foo.zip"/>
+        <property key="X-Test" value="foo"/>
+    </http:endpoint>
+    <http:endpoint name="serverEndpoint2" host="localhost" port="${port2}" exchange-pattern="request-response"/>
+
+    <flow name="ProductDataSourceRepository">
+        <http:inbound-endpoint ref="serverEndpoint" contentType="application/x-download">
+            <properties>
+                <spring:entry key="Content-Disposition" value="attachment; filename=foo.zip"/>
+                <spring:entry key="Content-Type" value="application/x-download"/>
+            </properties>
+        </http:inbound-endpoint>
+        <echo-component></echo-component>
+    </flow>
+
+    <flow name="TestService2">
+        <http:inbound-endpoint ref="serverEndpoint2"/>
+        <test:component logMessageDetails="true"/>
+        <vm:outbound-endpoint path="out" connector-ref="vm" exchange-pattern="one-way"/>
+    </flow>
+    
+</mule>

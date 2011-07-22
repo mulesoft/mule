@@ -10,16 +10,29 @@
 
 package org.mule.transport.email.functional;
 
+import java.util.Arrays;
+import java.util.Collection;
+
 import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
 
 public class SmtpMimeFunctionalTestCase extends AbstractEmailFunctionalTestCase
 {
 
-    public SmtpMimeFunctionalTestCase()
+    public SmtpMimeFunctionalTestCase(ConfigVariant variant, String configResources)
     {
-        super(MIME_MESSAGE, "smtp", "smtp-mime-functional-test.xml");
+        super(variant, MIME_MESSAGE, "smtp", configResources);
     }
 
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "smtp-mime-functional-test-service.xml"},
+            {ConfigVariant.FLOW, "smtp-mime-functional-test-flow.xml"}
+        });
+    }      
+    
     @Test
     public void testSend() throws Exception
     {

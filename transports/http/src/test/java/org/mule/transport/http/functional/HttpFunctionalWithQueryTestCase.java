@@ -10,34 +10,46 @@
 
 package org.mule.transport.http.functional;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import org.mule.api.MuleMessage;
 import org.mule.api.expression.RequiredValueException;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.AbstractServiceAndFlowTestCase.ConfigVariant;
 import org.mule.tck.junit4.rule.DynamicPort;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
-public class HttpFunctionalWithQueryTestCase extends FunctionalTestCase
+public class HttpFunctionalWithQueryTestCase extends AbstractServiceAndFlowTestCase
 {
     
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
     
-    @Override
-    protected String getConfigResources()
+    public HttpFunctionalWithQueryTestCase(ConfigVariant variant, String configResources)
     {
-        return "http-functional-test-with-query.xml";
+        super(variant, configResources);
     }
 
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "http-functional-test-with-query-service.xml"},
+            {ConfigVariant.FLOW, "http-functional-test-with-query-flow.xml"}
+        });
+    }      
+    
     @Test
     public void testSend() throws Exception
     {

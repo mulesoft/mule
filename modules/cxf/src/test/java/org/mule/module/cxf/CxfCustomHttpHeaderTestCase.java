@@ -10,6 +10,11 @@
 
 package org.mule.module.cxf;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
+
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.context.notification.EndpointMessageNotificationListener;
@@ -17,21 +22,19 @@ import org.mule.api.context.notification.ServerNotification;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.context.notification.EndpointMessageNotification;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.concurrent.CountDownLatch;
 
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.fail;
-
-public class CxfCustomHttpHeaderTestCase extends FunctionalTestCase implements EndpointMessageNotificationListener
+public class CxfCustomHttpHeaderTestCase extends AbstractServiceAndFlowTestCase implements EndpointMessageNotificationListener
 {
     protected String endpointAddress = null;
     private MuleMessage notificationMsg = null;
@@ -40,12 +43,20 @@ public class CxfCustomHttpHeaderTestCase extends FunctionalTestCase implements E
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
-    @Override
-    protected String getConfigResources()
+    public CxfCustomHttpHeaderTestCase(ConfigVariant variant, String configResources)
     {
-        return "headers-conf.xml";
+        super(variant, configResources);
     }
 
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "headers-conf-service.xml"},
+            {ConfigVariant.FLOW, "headers-conf-flow.xml"}
+        });
+    }      
+    
     @Override
     protected void doSetUp() throws Exception
     {

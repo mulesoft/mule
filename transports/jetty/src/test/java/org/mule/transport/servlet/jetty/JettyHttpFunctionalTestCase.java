@@ -10,27 +10,38 @@
 
 package org.mule.transport.servlet.jetty;
 
+import static org.junit.Assert.assertEquals;
+
 import org.mule.api.MuleMessage;
 import org.mule.api.client.LocalMuleClient;
 import org.mule.transport.http.HttpConstants;
 import org.mule.transport.http.functional.HttpFunctionalTestCase;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
+import org.junit.runners.Parameterized.Parameters;
 
 public class JettyHttpFunctionalTestCase extends HttpFunctionalTestCase
 {
 
-    @Override
-    protected String getConfigResources()
+    public JettyHttpFunctionalTestCase(ConfigVariant variant, String configResources)
     {
-        return "jetty-http-functional-test.xml";
+        super(variant, configResources);
     }
 
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "jetty-http-functional-test-service.xml"},
+            {ConfigVariant.FLOW, "jetty-http-functional-test-flow.xml"}
+        });
+    }      
+    
     @Test
     public void testNonRootUrls() throws Exception
     {

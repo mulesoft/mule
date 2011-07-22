@@ -10,18 +10,30 @@
 
 package org.mule.transport.email.functional;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Locale;
 
 import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
 
 public class Pop3MimeNonAsciiFunctionalTestCase extends AbstractEmailFunctionalTestCase
 {
 
-    public Pop3MimeNonAsciiFunctionalTestCase()
+    public Pop3MimeNonAsciiFunctionalTestCase(ConfigVariant variant, String configResources)
     {
-        super(MIME_MESSAGE, "pop3", "pop3-mime-functional-test.xml", Locale.JAPAN, "iso-2022-jp");
+        super(variant, MIME_MESSAGE, "pop3", configResources, Locale.JAPAN, "iso-2022-jp");
     }
 
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "pop3-mime-functional-test-service.xml"},
+            {ConfigVariant.FLOW, "pop3-mime-functional-test-flow.xml"}
+        });
+    }      
+    
     @Test
     public void testRequest() throws Exception
     {

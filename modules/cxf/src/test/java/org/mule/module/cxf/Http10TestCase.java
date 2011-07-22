@@ -10,37 +10,44 @@
 
 package org.mule.module.cxf;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.http.HttpConstants;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-
-public class Http10TestCase extends FunctionalTestCase
+public class Http10TestCase extends AbstractServiceAndFlowTestCase
 {
     // Dynamic ports is static because test is using setDisposeContextPerClass(true);
-    private static DynamicPort dynamicPort;
-
-    public Http10TestCase()
+    private static DynamicPort dynamicPort;    
+    
+    public Http10TestCase(ConfigVariant variant, String configResources)
     {
+        super(variant, configResources);
         setDisposeContextPerClass(true);
     }
 
-    @Override
-    protected String getConfigResources()
+    @Parameters
+    public static Collection<Object[]> parameters()
     {
-        return "http-10-conf.xml";
-    }
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "http-10-conf-service.xml"},
+            {ConfigVariant.FLOW, "http-10-conf-flow.xml"}
+        });
+    }      
 
     @BeforeClass
     public static void createDynamicPort() throws Throwable

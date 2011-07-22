@@ -10,38 +10,50 @@
 
 package org.mule.transport.http.functional;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.LocalMuleClient;
 import org.mule.api.config.MuleProperties;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
-import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.util.IOUtils;
 import org.mule.util.StringDataSource;
+
+import java.util.Arrays;
+import java.util.Collection;
 
 import javax.activation.DataHandler;
 
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
-public class HttpAttachmentsFunctionalTestCase extends FunctionalTestCase
+public class HttpAttachmentsFunctionalTestCase extends AbstractServiceAndFlowTestCase
 {
 
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
     
-    @Override
-    protected String getConfigResources()
+    public HttpAttachmentsFunctionalTestCase(ConfigVariant variant, String configResources)
     {
-        return "http-attachments-functional-test.xml";
+        super(variant, configResources);
     }
 
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "http-attachments-functional-test-service.xml"},
+            {ConfigVariant.FLOW, "http-attachments-functional-test-flow.xml"}
+        });
+    }      
+    
     @Test
     public void testSendAttachment() throws Exception
     {

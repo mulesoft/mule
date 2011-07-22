@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:script="http://www.mulesoft.org/schema/mule/scripting"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xsi:schemaLocation="
+       http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/3.2/mule-test.xsd
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
+       http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/3.2/mule-scripting.xsd
+       http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.2/mule-vm.xsd">
+
+    <vm:endpoint name="client_request" path="in1"/>
+    <vm:endpoint name="client_response" path="out1"/>
+    <vm:endpoint name="callout_1" path="callout1"/>
+    <vm:endpoint name="callout_2" path="callout2"/>
+
+
+    <!--// START SNIPPET: binding-config -->
+    <flow name="scriptWithBindings">
+        <description>
+            This example demonstrates how to orchestrate message flows using bindings. The example calls out to two
+            different services and passes the results on to the outbound router.
+            </description>
+        <inbound-endpoint ref="client_request" exchange-pattern="one-way"/>
+        <script:component>
+            <script:script engine="groovy">
+                msg = CalloutService.doSomething(payload)
+                return CalloutService.doSomethingElse(msg)
+                </script:script>
+            <script:java-interface-binding interface="org.mule.components.script.CalloutService"
+                method="doSomething">
+                <outbound-endpoint ref="callout_1" exchange-pattern="request-response"/>
+            </script:java-interface-binding>
+            <script:java-interface-binding interface="org.mule.components.script.CalloutService"
+                method="doSomethingElse">
+                <outbound-endpoint ref="callout_2" exchange-pattern="request-response"/>
+            </script:java-interface-binding>
+        </script:component>
+        <outbound-endpoint ref="client_response" exchange-pattern="one-way"/>
+    </flow>
+
+    <flow name="Callout1">
+        <inbound-endpoint ref="callout_1" exchange-pattern="request-response"/>
+        <test:component appendString=" Received by #[mule:context.serviceName]"/>
+    </flow>
+
+    <flow name="Callout2">
+        <inbound-endpoint ref="callout_2" exchange-pattern="request-response"/>
+        <test:component appendString=" Received by #[mule:context.serviceName]"/>
+    </flow>
+    <!--// END SNIPPET: binding-config -->
+    
+</mule>

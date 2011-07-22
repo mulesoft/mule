@@ -10,13 +10,19 @@
 
 package org.mule.transport.http.issues;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
-import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
+
+import java.util.Arrays;
+import java.util.Collection;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpVersion;
@@ -26,11 +32,9 @@ import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.apache.commons.httpclient.params.HttpClientParams;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
-public class HttpMessageReceiverMule4456TestCase extends FunctionalTestCase
+public class HttpMessageReceiverMule4456TestCase extends AbstractServiceAndFlowTestCase
 {
     
     private static final String MESSAGE = "test message";
@@ -44,12 +48,20 @@ public class HttpMessageReceiverMule4456TestCase extends FunctionalTestCase
     @Rule
     public DynamicPort dynamicPort2 = new DynamicPort("port2");
 
-    @Override
-    protected String getConfigResources()
+    public HttpMessageReceiverMule4456TestCase(ConfigVariant variant, String configResources)
     {
-        return "http-receiver-mule4456-config.xml";
+        super(variant, configResources);
     }
-
+  
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "http-receiver-mule4456-config-service.xml"},
+            {ConfigVariant.FLOW, "http-receiver-mule4456-config-flow.xml"}
+        });
+    }      
+   
     @Override
     protected boolean isGracefulShutdown()
     {

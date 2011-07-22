@@ -10,9 +10,13 @@
 
 package org.mule.transport.email.transformers;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.transport.email.functional.AbstractEmailFunctionalTestCase;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import javax.activation.MimeType;
@@ -20,19 +24,26 @@ import javax.mail.BodyPart;
 import javax.mail.internet.MimeMultipart;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import org.junit.runners.Parameterized.Parameters;
 
 public class SmtpAttachmentsFunctionalInboundAttachmentsOnlyTestCase extends AbstractEmailFunctionalTestCase
 {
 
-    public SmtpAttachmentsFunctionalInboundAttachmentsOnlyTestCase()
+    public SmtpAttachmentsFunctionalInboundAttachmentsOnlyTestCase(ConfigVariant variant, String configResources)
     {
-        super(STRING_MESSAGE, "smtp", "smtp-functional-test-inbound-attachments-only.xml");
+        super(variant, STRING_MESSAGE, "smtp", configResources);
         setAddAttachments(true);
     }
 
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "smtp-functional-test-inbound-attachments-only-service.xml"},
+            {ConfigVariant.FLOW, "smtp-functional-test-inbound-attachments-only-flow.xml"}
+        });
+    }      
+    
     @Test
     public void testSend() throws Exception
     {

@@ -10,29 +10,41 @@
 
 package org.mule.transport.http.functional;
 
-import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.junit4.FunctionalTestCase;
-import org.mule.tck.junit4.rule.DynamicPort;
-
-import org.junit.Rule;
-import org.junit.Test;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-public class HttpMultipleCookiesInEndpointTestCase extends FunctionalTestCase
+import org.mule.api.MuleMessage;
+import org.mule.module.client.MuleClient;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
+
+import java.util.Arrays;
+import java.util.Collection;
+
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+
+public class HttpMultipleCookiesInEndpointTestCase extends AbstractServiceAndFlowTestCase
 {
 
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
-    @Override
-    protected String getConfigResources()
+    public HttpMultipleCookiesInEndpointTestCase(ConfigVariant variant, String configResources)
     {
-        return "http-multiple-cookies-on-endpoint-test.xml";
+        super(variant, configResources);
     }
 
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "http-multiple-cookies-on-endpoint-test-service.xml"},
+            {ConfigVariant.FLOW, "http-multiple-cookies-on-endpoint-test-flow.xml"}
+        });
+    }      
+    
     @Test
     public void testThatThe2CookiesAreSentAndReceivedByTheComponent() throws Exception
     {

@@ -10,10 +10,15 @@
 
 package org.mule.transport.http.functional;
 
-import org.mule.tck.junit4.FunctionalTestCase;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -32,15 +37,13 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
 import org.mortbay.jetty.Connector;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.bio.SocketConnector;
 import org.mortbay.jetty.servlet.ServletHandler;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
-public class HttpMultipleCookiesTestCase extends FunctionalTestCase
+public class HttpMultipleCookiesTestCase extends AbstractServiceAndFlowTestCase
 {
     
     protected static String TEST_MESSAGE = "Test Http Request ";
@@ -58,17 +61,21 @@ public class HttpMultipleCookiesTestCase extends FunctionalTestCase
     @Rule
     public DynamicPort dynamicPort2 = new DynamicPort("port2");
 
-    public HttpMultipleCookiesTestCase()
+    public HttpMultipleCookiesTestCase(ConfigVariant variant, String configResources)
     {
+        super(variant, configResources);
         setStartContext(false);
     }
 
-    @Override
-    protected String getConfigResources()
+    @Parameters
+    public static Collection<Object[]> parameters()
     {
-        return "http-multiple-cookies-test.xml";
-    }
-
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "http-multiple-cookies-test-flow.xml"},
+            {ConfigVariant.FLOW, "http-multiple-cookies-test-service.xml"}
+        });
+    }      
+    
     @Override
     protected void doSetUp() throws Exception
     {

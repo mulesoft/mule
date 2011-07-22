@@ -20,6 +20,10 @@ import static org.junit.Assert.assertNotNull;
 
 public class HttpBadEncodingFunctionalTestCase extends HttpEncodingFunctionalTestCase
 {
+    public HttpBadEncodingFunctionalTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
+    }
 
     @Override
     public void testSend() throws Exception

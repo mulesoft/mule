@@ -10,24 +10,28 @@
 
 package org.mule.transport.http.filters;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.AbstractServiceAndFlowTestCase.ConfigVariant;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
-public class HttpRequestWildcardFilterTestCase extends FunctionalTestCase
+public class HttpRequestWildcardFilterTestCase extends AbstractServiceAndFlowTestCase
 {
     
     private static final String TEST_HTTP_MESSAGE = "Hello=World";
@@ -39,12 +43,20 @@ public class HttpRequestWildcardFilterTestCase extends FunctionalTestCase
     @Rule
     public DynamicPort dynamicPort2 = new DynamicPort("port2");
 
-    @Override
-    protected String getConfigResources()
+    public HttpRequestWildcardFilterTestCase(ConfigVariant variant, String configResources)
     {
-        return "http-wildcard-filter-test.xml";
+        super(variant, configResources);
     }
 
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "http-wildcard-filter-test-flow.xml"},
+            {ConfigVariant.FLOW, "http-wildcard-filter-test-service.xml"}
+        });
+    }      
+    
     @Test
     public void testReference() throws Exception
     {

@@ -10,36 +10,43 @@
 
 package org.mule.transport.http.functional;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
 
 import java.net.URLEncoder;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.Ignore;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import org.junit.runners.Parameterized.Parameters;
 
 public class HttpEncodingFunctionalTestCase extends HttpFunctionalTestCase
 {
     protected static String TEST_MESSAGE = "Test Http Request (R�dgr�d), 57 = \u06f7\u06f5 in Arabic";
     private static String TEST_JAPANESE_MESSAGE = "\u3042";
 
-    public HttpEncodingFunctionalTestCase()
+    public HttpEncodingFunctionalTestCase(ConfigVariant variant, String configResources)
     {
+        super(variant, configResources);
         setDisposeContextPerClass(true);
-    }
+    }  
 
-    @Override
-    protected String getConfigResources()
+    @Parameters
+    public static Collection<Object[]> parameters()
     {
-        return "http-encoding-test.xml";
-    }
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "http-encoding-test-service.xml"},
+            {ConfigVariant.FLOW, "http-encoding-test-flow.xml"}
+        });
+    }      
 
     @Override
     public void testSend() throws Exception

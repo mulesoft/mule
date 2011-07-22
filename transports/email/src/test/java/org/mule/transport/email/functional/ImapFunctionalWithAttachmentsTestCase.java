@@ -10,6 +10,9 @@
 
 package org.mule.transport.email.functional;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
 import org.mule.tck.probe.Prober;
@@ -21,22 +24,22 @@ import com.icegreen.greenmail.util.GreenMailUtil;
 
 import java.io.File;
 import java.io.InputStream;
+import java.util.Arrays;
+import java.util.Collection;
 
 import javax.mail.Message;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import org.junit.runners.Parameterized.Parameters;
 
 public class ImapFunctionalWithAttachmentsTestCase extends AbstractEmailFunctionalTestCase
 {
     private static final String CONFIG_FILE = "email-attachment-save.xml";
     private File saveDir;
 
-    public ImapFunctionalWithAttachmentsTestCase()
+    public ImapFunctionalWithAttachmentsTestCase(ConfigVariant variant, String configResources)
     {
-        super(true, "imap", CONFIG_FILE, true);
+        super(variant, true, "imap", configResources, true);
         setStartContext(false);
         
         // set up email properties for mule config
@@ -48,6 +51,14 @@ public class ImapFunctionalWithAttachmentsTestCase extends AbstractEmailFunction
         System.setProperty("mail.save.dir", saveDir.getAbsolutePath());
     }
 
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{            
+            {ConfigVariant.FLOW, CONFIG_FILE}
+        });
+    }      
+    
     @Override
     protected void doSetUp() throws Exception
     {

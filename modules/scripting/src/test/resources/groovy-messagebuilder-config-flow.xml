@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:spring="http://www.springframework.org/schema/beans"
+       xmlns:script="http://www.mulesoft.org/schema/mule/scripting"
+    xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
+       http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/3.2/mule-scripting.xsd">
+
+    <endpoint name="groovy1.endpoint" address="vm://groovy.1" exchange-pattern="request-response"/>
+    <endpoint name="groovy2.endpoint" address="vm://groovy.2" exchange-pattern="request-response"/>
+    <endpoint name="groovy3.endpoint" address="vm://groovy.3" exchange-pattern="request-response"/>
+
+    <script:script name="myScript" engine="groovy">
+        import org.mule.api.MuleMessage
+        import org.mule.DefaultMuleMessage
+
+        MuleMessage result1 = eventContext.sendEvent(message, "groovy2.endpoint")
+        MuleMessage result2 = eventContext.sendEvent(message, "groovy3.endpoint")
+        return "$payload $result1.payload $result2.payload Received"
+    </script:script>
+
+    <flow name="MessageBuilder">
+        <description>
+            This service used to use the ScriptMessageBuilder which has since been removed.
+        </description>
+        <inbound-endpoint ref="groovy1.endpoint"/>
+        <script:component script-ref="myScript"/>
+
+    </flow>
+
+    <flow name="ScriptA">
+        <inbound-endpoint ref="groovy2.endpoint"/>
+        <script:component>
+            <script:script engine="groovy">
+                return "A"
+                </script:script>
+        </script:component>
+    </flow>
+
+    <flow name="ScriptB">
+        <inbound-endpoint ref="groovy3.endpoint"/>
+        <script:component>
+            <script:script engine="groovy">
+                return "B"
+                </script:script>
+        </script:component>
+    </flow>
+    
+</mule>

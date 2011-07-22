@@ -12,12 +12,23 @@ package org.mule.transport.servlet.jetty;
 
 import org.mule.transport.http.functional.HttpFunctionalTestCase;
 
+import java.util.Arrays;
+import java.util.Collection;
+
+import org.junit.runners.Parameterized.Parameters;
+
 public class JettyContinuationsHttpFunctionalTestCase extends HttpFunctionalTestCase
 {
-
-    @Override
-    protected String getConfigResources()
+    public JettyContinuationsHttpFunctionalTestCase(ConfigVariant variant, String configResources)
     {
-        return "jetty-continuations-http-functional-test.xml";
-    }
+        super(variant, configResources);
+    }    
+    
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+           {ConfigVariant.SERVICE, "jetty-continuations-http-functional-test.xml"}            
+        });
+    }      
 }

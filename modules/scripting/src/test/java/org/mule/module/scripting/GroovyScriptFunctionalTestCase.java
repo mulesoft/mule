@@ -10,29 +10,36 @@
 
 package org.mule.module.scripting;
 
-import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.junit4.FunctionalTestCase;
-
-import org.junit.Test;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-public class GroovyScriptFunctionalTestCase extends FunctionalTestCase
-{
-    
-    public GroovyScriptFunctionalTestCase()
+import org.mule.api.MuleMessage;
+import org.mule.module.client.MuleClient;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+
+import java.util.Arrays;
+import java.util.Collection;
+
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+
+public class GroovyScriptFunctionalTestCase extends AbstractServiceAndFlowTestCase
+{    
+    public GroovyScriptFunctionalTestCase(ConfigVariant variant, String configResources)
     {
         //Groovy really hammers the startup time since it needs to create the interpreter on every start
+        super(variant, configResources);
         setDisposeContextPerClass(true);
     }
 
-    @Override
-    protected String getConfigResources()
+    @Parameters
+    public static Collection<Object[]> parameters()
     {
-        return "groovy-component-config.xml";
-    }
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "groovy-component-config-service.xml"},
+            {ConfigVariant.FLOW, "groovy-component-config-flow.xml"}
+        });
+    }              
 
     @Test
     public void testInlineScript() throws Exception

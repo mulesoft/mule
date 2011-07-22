@@ -10,32 +10,40 @@
 
 package org.mule.module.scripting.filter;
 
-import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.junit4.FunctionalTestCase;
-
-import org.junit.Test;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
-public class GroovyScriptFilterFunctionalTestCase extends FunctionalTestCase
+import org.mule.api.MuleMessage;
+import org.mule.module.client.MuleClient;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+
+import java.util.Arrays;
+import java.util.Collection;
+
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+
+public class GroovyScriptFilterFunctionalTestCase extends AbstractServiceAndFlowTestCase
 {
 
-    public GroovyScriptFilterFunctionalTestCase()
+    public GroovyScriptFilterFunctionalTestCase(ConfigVariant variant, String configResources)
     {
+        super(variant, configResources);
         // Groovy really hammers the startup time since it needs to create the
         // interpreter on every start
         setDisposeContextPerClass(true);
     }
 
-    @Override
-    protected String getConfigResources()
+    @Parameters
+    public static Collection<Object[]> parameters()
     {
-        return "groovy-filter-config.xml";
-    }
-
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "groovy-filter-config-service.xml"},
+            {ConfigVariant.FLOW, "groovy-filter-config-flow.xml"}
+        });
+    }      
+    
     @Test
     public void testFilterScript() throws Exception
     {

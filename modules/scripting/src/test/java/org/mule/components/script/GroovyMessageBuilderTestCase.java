@@ -10,24 +10,35 @@
 
 package org.mule.components.script;
 
-import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.junit4.FunctionalTestCase;
-
-import org.junit.Test;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-public class GroovyMessageBuilderTestCase extends FunctionalTestCase
-{
+import org.mule.api.MuleMessage;
+import org.mule.module.client.MuleClient;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 
-    @Override
-    protected String getConfigResources()
+import java.util.Arrays;
+import java.util.Collection;
+
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+
+public class GroovyMessageBuilderTestCase extends AbstractServiceAndFlowTestCase
+{    
+    public GroovyMessageBuilderTestCase(ConfigVariant variant, String configResources)
     {
-        return "groovy-messagebuilder-config.xml";
+        super(variant, configResources);
     }
 
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "groovy-messagebuilder-config-service.xml"},
+            {ConfigVariant.FLOW, "groovy-messagebuilder-config-flow.xml"}
+        });
+    }      
+    
     @Test
     public void testFunctionBehaviour() throws Exception
     {

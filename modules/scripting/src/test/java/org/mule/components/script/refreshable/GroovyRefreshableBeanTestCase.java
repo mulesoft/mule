@@ -11,11 +11,14 @@
 package org.mule.components.script.refreshable;
 
 
+import java.util.Arrays;
+import java.util.Collection;
+
 import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
 
 public class GroovyRefreshableBeanTestCase extends AbstractRefreshableBeanTestCase
-{
-
+{   
     public static final String RECEIVED = "Received";
     public static final String RECEIVED2 = "Received2";
     public static final String PAYLOAD = "Test:";
@@ -27,12 +30,20 @@ public class GroovyRefreshableBeanTestCase extends AbstractRefreshableBeanTestCa
     public static final String RECEIVE_RECEIVED = "public class GroovyDynamicScript { public String receive(String src) { return src + \"" + RECEIVED + "\"; }}";
     public static final String RECEIVE_RECEIVED2 = RECEIVE_RECEIVED.replaceAll(RECEIVED, RECEIVED2);
 
-    @Override
-    protected String getConfigResources()
+    public GroovyRefreshableBeanTestCase(ConfigVariant variant, String configResources)
     {
-        return "groovy-refreshable-config.xml";
+        super(variant, configResources);
     }
 
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "groovy-refreshable-config-service.xml"},
+            {ConfigVariant.FLOW, "groovy-refreshable-config-flow.xml"}
+        });
+    }      
+    
     @Test
     public void testFirstOnCallRefresh() throws Exception
     {

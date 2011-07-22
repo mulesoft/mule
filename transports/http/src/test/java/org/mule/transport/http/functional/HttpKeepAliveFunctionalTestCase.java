@@ -10,11 +10,17 @@
 
 package org.mule.transport.http.functional;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.http.HttpConstants;
+
+import java.util.Arrays;
+import java.util.Collection;
 
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpClient;
@@ -25,14 +31,12 @@ import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.params.HttpClientParams;
 import org.junit.Rule;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import org.junit.runners.Parameterized.Parameters;
 
 /**
  * Tests as per http://www.io.com/~maus/HttpKeepAlive.html
  */
-public class HttpKeepAliveFunctionalTestCase extends FunctionalTestCase
+public class HttpKeepAliveFunctionalTestCase extends AbstractServiceAndFlowTestCase
 {
     
     private HttpClient http10Client;
@@ -44,6 +48,20 @@ public class HttpKeepAliveFunctionalTestCase extends FunctionalTestCase
 
     @Rule
     public DynamicPort dynamicPort2 = new DynamicPort("port2");
+    
+    public HttpKeepAliveFunctionalTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
+    }
+
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "http-keep-alive-config-service.xml"},
+            {ConfigVariant.FLOW, "http-keep-alive-config-flow.xml"}
+        });
+    }      
     
     @Override
     protected void doSetUp() throws Exception
@@ -62,12 +80,6 @@ public class HttpKeepAliveFunctionalTestCase extends FunctionalTestCase
         return new HttpClient(params);
     }
 
-    @Override
-    protected String getConfigResources()
-    {
-        return "http-keep-alive-config.xml";
-    }
-    
     @Test
     public void testHttp10WithoutConnectionHeader() throws Exception
     {

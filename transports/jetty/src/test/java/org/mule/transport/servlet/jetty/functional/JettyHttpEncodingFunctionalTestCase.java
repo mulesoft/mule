@@ -10,30 +10,41 @@
 
 package org.mule.transport.servlet.jetty.functional;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
 import org.mule.transport.http.functional.HttpFunctionalTestCase;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import org.junit.runners.Parameterized.Parameters;
 
 public class JettyHttpEncodingFunctionalTestCase extends HttpFunctionalTestCase
 {
-    protected static String TEST_MESSAGE = "Test Http Request (Rødgrød), 57 = \u06f7\u06f5 in Arabic";
-
-    @Override
-    protected String getConfigResources()
+    protected static String TEST_MESSAGE = "Test Http Request (Rï¿½dgrï¿½d), 57 = \u06f7\u06f5 in Arabic";
+   
+    public JettyHttpEncodingFunctionalTestCase(ConfigVariant variant, String configResources)
     {
-        return "jetty-http-encoding-test.xml";
+        super(variant, configResources);
     }
 
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "jetty-http-encoding-test-service.xml"},
+            {ConfigVariant.FLOW, "jetty-http-encoding-test-flow.xml"}
+        });
+    }      
+    
     @Test
     public void testSendWithProperResponseContentType() throws Exception
     {

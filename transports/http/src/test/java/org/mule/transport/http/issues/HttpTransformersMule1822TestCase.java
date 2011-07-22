@@ -10,20 +10,24 @@
 
 package org.mule.transport.http.issues;
 
-import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.functional.StringAppendTestTransformer;
-import org.mule.tck.junit4.FunctionalTestCase;
-import org.mule.tck.junit4.rule.DynamicPort;
-
-import org.junit.Rule;
-import org.junit.Test;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-public class HttpTransformersMule1822TestCase extends FunctionalTestCase
+import org.mule.api.MuleException;
+import org.mule.api.MuleMessage;
+import org.mule.module.client.MuleClient;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.functional.StringAppendTestTransformer;
+import org.mule.tck.junit4.rule.DynamicPort;
+
+import java.util.Arrays;
+import java.util.Collection;
+
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+
+public class HttpTransformersMule1822TestCase extends AbstractServiceAndFlowTestCase
 {
     public static final String OUTBOUND_MESSAGE = "Test message";
 
@@ -36,11 +40,19 @@ public class HttpTransformersMule1822TestCase extends FunctionalTestCase
     @Rule
     public DynamicPort dynamicPort3 = new DynamicPort("port3");
 
-    @Override
-    protected String getConfigResources()
+    public HttpTransformersMule1822TestCase(ConfigVariant variant, String configResources)
     {
-        return "http-transformers-mule-1822-test.xml";
+        super(variant, configResources);
     }
+
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "http-transformers-mule-1822-test-service.xml"},
+            {ConfigVariant.FLOW, "http-transformers-mule-1822-test-flow.xml"}
+        });
+    }      
 
     private MuleMessage sendTo(String uri) throws MuleException
     {
