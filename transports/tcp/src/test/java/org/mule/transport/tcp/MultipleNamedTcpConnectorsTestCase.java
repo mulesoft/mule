@@ -10,22 +10,32 @@
 
 package org.mule.transport.tcp;
 
-import org.mule.tck.junit4.FunctionalTestCase;
-import org.mule.tck.junit4.rule.DynamicPort;
+import java.util.Arrays;
+import java.util.Collection;
 
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 
-public class MultipleNamedTcpConnectorsTestCase extends FunctionalTestCase
+public class MultipleNamedTcpConnectorsTestCase extends AbstractServiceAndFlowTestCase
 {
 
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
-    @Override
-    protected String getConfigResources()
+    public MultipleNamedTcpConnectorsTestCase(ConfigVariant variant, String configResources)
     {
-        return "multiple-named-tcp-connectors-test.xml";
+        super(variant, configResources);
+    }
+
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "multiple-named-tcp-connectors-test-service.xml"},
+            {ConfigVariant.FLOW, "multiple-named-tcp-connectors-test-flow.xml"}});
     }
 
     @Test
@@ -35,4 +45,3 @@ public class MultipleNamedTcpConnectorsTestCase extends FunctionalTestCase
     }
 
 }
-

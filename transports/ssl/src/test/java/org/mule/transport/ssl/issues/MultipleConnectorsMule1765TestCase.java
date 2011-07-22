@@ -10,23 +10,32 @@
 
 package org.mule.transport.ssl.issues;
 
-import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.junit4.FunctionalTestCase;
-
-import org.junit.Test;
-
 import static org.junit.Assert.assertEquals;
 
-public class MultipleConnectorsMule1765TestCase extends FunctionalTestCase
+import java.util.Arrays;
+import java.util.Collection;
+
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+import org.mule.api.MuleMessage;
+import org.mule.module.client.MuleClient;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+
+public class MultipleConnectorsMule1765TestCase extends AbstractServiceAndFlowTestCase
 {
 
     protected static String TEST_SSL_MESSAGE = "Test SSL Request";
 
-    @Override
-    protected String getConfigResources()
+    public MultipleConnectorsMule1765TestCase(ConfigVariant variant, String configResources)
     {
-        return "multiple-connectors-test.xml";
+        super(variant, configResources);
+    }
+
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{{ConfigVariant.SERVICE, "multiple-connectors-test-service.xml"},
+            {ConfigVariant.FLOW, "multiple-connectors-test-flow.xml"}});
     }
 
     @Test
