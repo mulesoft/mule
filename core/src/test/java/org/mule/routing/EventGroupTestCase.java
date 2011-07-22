@@ -32,13 +32,8 @@ import static org.junit.Assert.fail;
 
 public class EventGroupTestCase extends AbstractMuleContextTestCase
 {
-    public EventGroupTestCase()
-    {
-        setStartContext(true);
-    }
-
     @Test
-    public void testConcurrentIteration() throws Exception
+    public void concurrentIteration() throws Exception
     {
         EventGroup eg = new EventGroup(UUID.getUUID(),muleContext);
         assertFalse(eg.iterator().hasNext());
@@ -49,7 +44,7 @@ public class EventGroupTestCase extends AbstractMuleContextTestCase
         assertTrue(eg.iterator().hasNext());
 
         // now add events while we iterate over the group
-        Iterator i = eg.iterator();
+        Iterator<MuleEvent> i = eg.iterator();
         assertNotNull(i.next());
         eg.addEvent(getTestEvent("foo3"));
         assertNotNull(i.next());
@@ -61,7 +56,7 @@ public class EventGroupTestCase extends AbstractMuleContextTestCase
     }
 
     @Test
-    public void testEquals()
+    public void eventGroupEquality()
     {
         EventGroup g1 = new EventGroup("foo",muleContext);
         EventGroup g2 = new EventGroup("foo",muleContext);
@@ -80,7 +75,7 @@ public class EventGroupTestCase extends AbstractMuleContextTestCase
     }
 
     @Test
-    public void testHashCode()
+    public void eventGroupHashCode()
     {
         String uuid = UUID.getUUID();
         EventGroup g1 = new EventGroup(uuid,muleContext);
@@ -118,13 +113,13 @@ public class EventGroupTestCase extends AbstractMuleContextTestCase
     }
 
     @Test
-    public void testCompareTo() throws InterruptedException
+    public void eventGroupComparison() throws InterruptedException
     {
         String uuid = UUID.getUUID();
         EventGroup g1 = new EventGroup(uuid,muleContext);
         EventGroup g2 = new EventGroup(uuid,muleContext);
         EventGroup g3 = new EventGroup(UUID.getUUID(),muleContext);
-        
+
         // test comparison against null
         try
         {
@@ -140,26 +135,26 @@ public class EventGroupTestCase extends AbstractMuleContextTestCase
         /*
          * guids are randomly generated, we cannot compare them with '<' '>'
          * we used to generate them this way: generator.generateTimeBasedUUID().toString()
-         * but now we generate them as java.util.UUID.randomUUID().toString() 
-         */               
+         * but now we generate them as java.util.UUID.randomUUID().toString()
+         */
         assertTrue(g1.compareTo(g3) != 0);
         assertTrue(g3.compareTo(g1) != 0);
         assertTrue(g3.compareTo(g2) != 0);
 
         // when the groupId is not Comparable, the creation time is used as fallback
         g1 = new EventGroup(new Object(),muleContext);
-        // sleep a mini bit to ensure that both event groups do not accidentially have the same 
+        // sleep a mini bit to ensure that both event groups do not accidentially have the same
         // creation timestamp
         Thread.sleep(10);
         g2 = new EventGroup(new Object(),muleContext);
-        
+
         // g1 is older (smaller) than g2
         assertTrue(g1.compareTo(g2) < 0);
         assertTrue(g2.compareTo(g1) > 0);
     }
 
     @Test
-    public void testToArray() throws Exception
+    public void eventGroupConversionToArray() throws Exception
     {
         EventGroup eg = new EventGroup(UUID.getUUID(),muleContext);
         eg.addEvent(getTestEvent("foo1"));
@@ -171,24 +166,27 @@ public class EventGroupTestCase extends AbstractMuleContextTestCase
     }
 
     @Test
-    public void testToString() throws Exception
+    public void eventGroupConversionToString() throws Exception
     {
-        EventGroup eg = new EventGroup(UUID.getUUID(),muleContext);
+        EventGroup eg = new EventGroup(UUID.getUUID(), muleContext);
         String es = eg.toString();
         assertTrue(es.endsWith("events=0}"));
 
-        MuleEvent e = getTestEvent("foo");
-        eg.addEvent(e);
+        MuleEvent firstEvent = getTestEvent("foo");
+        String firstId = firstEvent.getMessage().getUniqueId();
+        eg.addEvent(firstEvent);
         es = eg.toString();
-        assertTrue(es.indexOf("events=1") != -1);
-        assertTrue(es.endsWith("[" + e.getMessage().getUniqueId() + "]}"));
+        assertTrue(es.contains("events=1"));
+        assertTrue(es.endsWith("[" + firstId + "]}"));
 
-        MuleEvent e2 = new DefaultMuleEvent(new DefaultMuleMessage("foo2", muleContext),getTestEvent("foo2"));
-        eg.addEvent(e2);
+        MuleEvent secondEvent = new DefaultMuleEvent(new DefaultMuleMessage("foo2", muleContext),
+            getTestEvent("foo2"));
+        String secondId = secondEvent.getMessage().getUniqueId();
+        eg.addEvent(secondEvent);
         es = eg.toString();
-        assertTrue(es.indexOf("events=2") != -1);
-        assertTrue(es.contains(e.getMessage().getUniqueId()));
-        assertTrue(es.contains(e2.getMessage().getUniqueId()));
+        assertTrue(es.contains("events=2"));
+        assertTrue(es.contains(firstId));
+        assertTrue(es.contains(secondId));
     }
 
     private static class MyEventGroup extends EventGroup
