@@ -3431,6 +3431,7 @@
                             <xsd:enumeration value="bean"/>
                             <xsd:enumeration value="custom"/>
                             <xsd:enumeration value="registry"/>
+                            <xsd:enumeration value="variable"/>
                         </xsd:restriction>
                     </xsd:simpleType>
                 </xsd:attribute>
