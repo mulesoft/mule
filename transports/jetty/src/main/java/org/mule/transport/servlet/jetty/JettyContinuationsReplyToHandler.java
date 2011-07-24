@@ -22,6 +22,11 @@ import org.mortbay.util.ajax.Continuation;
  */
 public class JettyContinuationsReplyToHandler extends DefaultReplyToHandler
 {
+    /**
+     * Serial version
+     */
+    private static final long serialVersionUID = 1L;
+
     public JettyContinuationsReplyToHandler(MuleContext muleContext)
     {
         super(muleContext);

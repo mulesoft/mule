@@ -10,6 +10,7 @@
 
 package org.mule.transport.jms;
 
+import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
@@ -48,13 +49,18 @@ import javax.jms.Topic;
  */
 public class JmsReplyToHandler extends DefaultReplyToHandler
 {
-    private final JmsConnector connector;
-    private ObjectToJMSMessage toJmsMessage;
+    /**
+     * Serial version
+     */
+    private static final long serialVersionUID = 1L;
+
+    private transient JmsConnector jmsConnector;
+    private transient ObjectToJMSMessage toJmsMessage;
 
     public JmsReplyToHandler(JmsConnector connector)
     {
         super(connector.getMuleContext());
-        this.connector = connector;
+        this.connector = this.jmsConnector = connector;
         toJmsMessage = new ObjectToJMSMessage();
     }
 
@@ -79,17 +85,17 @@ public class JmsReplyToHandler extends DefaultReplyToHandler
 
             Class srcType = returnMessage.getPayload().getClass();
             EndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder("jms://temporary", muleContext);
-            endpointBuilder.setConnector(connector);
+            endpointBuilder.setConnector(jmsConnector);
             OutboundEndpoint tempEndpoint = muleContext.getEndpointFactory().getOutboundEndpoint(endpointBuilder);
             
-            List<Transformer> defaultTransportTransformers =  ((org.mule.transport.AbstractConnector) connector).getDefaultOutboundTransformers(tempEndpoint);
+            List<Transformer> defaultTransportTransformers =  ((org.mule.transport.AbstractConnector) jmsConnector).getDefaultOutboundTransformers(tempEndpoint);
             
             returnMessage.applyTransformers(event, defaultTransportTransformers);
             
             Object payload = returnMessage.getPayload();
 
             if (replyToDestination instanceof Topic && replyToDestination instanceof Queue
-                    && connector.getJmsSupport() instanceof Jms102bSupport)
+                    && jmsConnector.getJmsSupport() instanceof Jms102bSupport)
             {
                 logger.error(StringMessageUtils.getBoilerPlate("ReplyTo destination implements both Queue and Topic "
                                                                + "while complying with JMS 1.0.2b specification. "
@@ -97,8 +103,8 @@ public class JmsReplyToHandler extends DefaultReplyToHandler
                                                                + "to dev<_at_>mule.codehaus.org or http://mule.mulesoft.org/jira"));
             }
 
-            final boolean topic = connector.getTopicResolver().isTopic(replyToDestination);
-            session = connector.getSession(false, topic);
+            final boolean topic = jmsConnector.getTopicResolver().isTopic(replyToDestination);
+            session = jmsConnector.getSession(false, topic);
 
             //This mimics the OBjectToJmsMessage Transformer behaviour without needing an endpoint
             //TODO clean this up, maybe make the transformer available via a utility class, passing in the Session
@@ -111,7 +117,7 @@ public class JmsReplyToHandler extends DefaultReplyToHandler
                 logger.debug("Sending jms reply to: " + replyToDestination + " ("
                              + replyToDestination.getClass().getName() + ")");
             }
-            replyToProducer = connector.getJmsSupport().createProducer(session, replyToDestination, topic);
+            replyToProducer = jmsConnector.getJmsSupport().createProducer(session, replyToDestination, topic);
 
             // QoS support
             MuleMessage eventMsg = event.getMessage();
@@ -137,7 +143,7 @@ public class JmsReplyToHandler extends DefaultReplyToHandler
 
             if (ttlString == null && priorityString == null && persistentDeliveryString == null)
             {
-                connector.getJmsSupport().send(replyToProducer, replyToMessage, topic, null);
+                jmsConnector.getJmsSupport().send(replyToProducer, replyToMessage, topic, null);
             }
             else
             {
@@ -154,9 +160,9 @@ public class JmsReplyToHandler extends DefaultReplyToHandler
                 }
                 boolean persistent = StringUtils.isNotBlank(persistentDeliveryString)
                                 ? Boolean.valueOf(persistentDeliveryString)
-                                : connector.isPersistentDelivery();
+                                : jmsConnector.isPersistentDelivery();
 
-                connector.getJmsSupport().send(replyToProducer, replyToMessage, persistent, priority, ttl,
+                jmsConnector.getJmsSupport().send(replyToProducer, replyToMessage, persistent, priority, ttl,
                     topic, null);
             }
 
@@ -172,8 +178,8 @@ public class JmsReplyToHandler extends DefaultReplyToHandler
         }
         finally
         {
-            connector.closeQuietly(replyToProducer);
-            connector.closeSessionIfNoTransactionActive(session);
+            jmsConnector.closeQuietly(replyToProducer);
+            jmsConnector.closeSessionIfNoTransactionActive(session);
         }
     }
 
@@ -197,5 +203,13 @@ public class JmsReplyToHandler extends DefaultReplyToHandler
         {
             logger.debug("replyTo message is " + replyToMessage);
         }
+    }
+
+    @Override
+    public void initAfterDeserialisation(MuleContext muleContext) throws MuleException
+    {
+        super.initAfterDeserialisation(muleContext);
+        this.toJmsMessage = new ObjectToJMSMessage();
+        this.jmsConnector = (JmsConnector) this.connector;
     }
 }

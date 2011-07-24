@@ -31,7 +31,10 @@ import org.mortbay.cometd.AbstractBayeux;
  */
 public class AjaxReplyToHandler extends DefaultReplyToHandler
 {
-    private Connector connector;
+    /**
+     * Serial version
+     */
+    private static final long serialVersionUID = 1L;
     
     public AjaxReplyToHandler(Connector connector)
     {
