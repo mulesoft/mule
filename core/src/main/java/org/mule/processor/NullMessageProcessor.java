@@ -14,7 +14,6 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorChain;
-import org.mule.api.processor.policy.Policies;
 import org.mule.util.ObjectUtils;
 
 import java.util.Collections;
@@ -44,8 +43,4 @@ public class NullMessageProcessor implements MessageProcessorChain
         return null;
     }
 
-    public Policies getPolicies()
-    {
-        return new Policies(this);
-    }
 }

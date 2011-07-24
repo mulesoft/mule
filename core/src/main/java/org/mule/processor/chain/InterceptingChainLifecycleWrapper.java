@@ -16,7 +16,6 @@ import org.mule.api.MuleException;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorChain;
-import org.mule.api.processor.policy.Policies;
 import org.mule.context.notification.MessageProcessorNotification;
 
 import java.util.List;
@@ -49,12 +48,6 @@ public class InterceptingChainLifecycleWrapper extends AbstractMessageProcessorC
     public String getName()
     {
         return chain.getName();
-    }
-
-    @Override
-    public Policies getPolicies()
-    {
-        return chain.getPolicies();
     }
 
     @Override

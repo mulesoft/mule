@@ -23,9 +23,6 @@ import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorChain;
-import org.mule.api.processor.policy.AroundPolicy;
-import org.mule.api.processor.policy.Policies;
-import org.mule.api.processor.policy.PolicyInvocation;
 import org.mule.processor.AbstractInterceptingMessageProcessor;
 import org.mule.util.StringUtils;
 
@@ -46,7 +43,6 @@ public abstract class AbstractMessageProcessorChain extends AbstractIntercepting
     protected final transient Log log = LogFactory.getLog(getClass());
     protected String name;
     protected List<MessageProcessor> processors;
-    private final Policies policies = new Policies(this);
 
     public AbstractMessageProcessorChain(String name, List<MessageProcessor> processors)
     {
@@ -65,29 +61,7 @@ public abstract class AbstractMessageProcessorChain extends AbstractIntercepting
             return null;
         }
 
-        final List<AroundPolicy> activePolicies = policies.list();
-        MuleEvent result;
-        if (!activePolicies.isEmpty())
-        {
-            // if there's a policy, adapt, so it can call through to the doProcess() method
-            // TODO I hate to do this, and there are no method delegates in java.
-            // This doProcess() must be abstracted into some chain processor which has the logic,
-            // and have the chain handle the plumbing only
-            PolicyInvocation invocation = new PolicyInvocation(event, activePolicies, new MessageProcessor()
-            {
-                public MuleEvent process(MuleEvent event) throws MuleException
-                {
-                    return doProcess(event);
-                }
-            });
-            final AroundPolicy entryPoint = activePolicies.get(0);
-            result = entryPoint.invoke(invocation);
-        }
-        else
-        {
-            // direct invocation
-            result = doProcess(event);
-        }
+        MuleEvent result = doProcess(event);
         return processNext(result);
     }
 
@@ -169,11 +143,6 @@ public abstract class AbstractMessageProcessorChain extends AbstractIntercepting
 
         final String nl = String.format("%n");
 
-        for (AroundPolicy policy : policies.list())
-        {
-            string.append(String.format("%n  -- policy [%s]: %s", policy.getName(), policy));
-        }
-
         // TODO have it print the nested structure with indents increasing for nested MPCs
         if (mpIterator.hasNext())
         {
@@ -199,8 +168,4 @@ public abstract class AbstractMessageProcessorChain extends AbstractIntercepting
         return processors;
     }
 
-    public Policies getPolicies()
-    {
-        return policies;
-    }
 }
