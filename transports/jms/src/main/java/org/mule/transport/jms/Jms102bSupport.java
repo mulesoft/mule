@@ -253,26 +253,25 @@ public class Jms102bSupport extends Jms11Support
     }
 
     @Override
-    public void send(MessageProducer producer,
-                     Message message,
-                     boolean persistent,
-                     int priority,
-                     long ttl,
-                     boolean topic) throws JMSException
+    public void send(MessageProducer producer, Message message, boolean persistent, int priority, long ttl, boolean topic, ImmutableEndpoint endpoint)
+            throws JMSException
     {
         if (topic && producer instanceof TopicPublisher)
         {
-            ((TopicPublisher) producer).publish(message, (persistent
-                                                                    ? DeliveryMode.PERSISTENT
-                                                                    : DeliveryMode.NON_PERSISTENT), priority,
-                ttl);
+            ((TopicPublisher) producer).publish(
+                    message,
+                    (persistent ? DeliveryMode.PERSISTENT : DeliveryMode.NON_PERSISTENT),
+                    priority,
+                    ttl);
         }
         else if (producer instanceof QueueSender)
         {
             // DO NOT REMOVE THIS CAST, it breaks Weblogic
-            ((QueueSender) producer).send(message, (persistent
-                                                              ? DeliveryMode.PERSISTENT
-                                                              : DeliveryMode.NON_PERSISTENT), priority, ttl);
+            ((QueueSender) producer).send(
+                    message,
+                    (persistent ? DeliveryMode.PERSISTENT : DeliveryMode.NON_PERSISTENT),
+                    priority,
+                    ttl);
         }
         else
         {
@@ -287,19 +286,25 @@ public class Jms102bSupport extends Jms11Support
                      boolean persistent,
                      int priority,
                      long ttl,
-                     boolean topic) throws JMSException
+                     boolean topic, ImmutableEndpoint endpoint) throws JMSException
     {
         if (topic && producer instanceof TopicPublisher)
         {
-            ((TopicPublisher) producer).publish((Topic) dest, message,
-                (persistent ? DeliveryMode.PERSISTENT : DeliveryMode.NON_PERSISTENT), priority, ttl);
+            ((TopicPublisher) producer).publish(
+                    (Topic) dest,
+                    message,
+                    (persistent ? DeliveryMode.PERSISTENT : DeliveryMode.NON_PERSISTENT),
+                    priority,
+                    ttl);
         }
         else if (producer instanceof QueueSender)
         {
-            ((QueueSender) producer).send((Queue) dest, message, (persistent
-                                                                            ? DeliveryMode.PERSISTENT
-                                                                            : DeliveryMode.NON_PERSISTENT),
-                priority, ttl);
+            ((QueueSender) producer).send(
+                    (Queue) dest,
+                    message,
+                    (persistent ? DeliveryMode.PERSISTENT : DeliveryMode.NON_PERSISTENT),
+                    priority,
+                    ttl);
         }
         else
         {

@@ -12,7 +12,6 @@ package org.mule.api.security;
 
 import org.mule.RequestContext;
 import org.mule.api.MuleEvent;
-import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.Message;
 
@@ -56,9 +55,9 @@ public class UnauthorisedException extends SecurityException
 
     @Deprecated
     public UnauthorisedException(MuleEvent event, SecurityContext context, 
-        ImmutableEndpoint endpoint, SecurityFilter filter)
+        URI endpointURI, SecurityFilter filter)
     {
-        super(constructMessage(context, endpoint.getEndpointURI().getUri(), filter), event);
+        super(constructMessage(context, endpointURI, filter), event);
     }
 
     private static Message constructMessage(SecurityContext context, URI endpointURI,

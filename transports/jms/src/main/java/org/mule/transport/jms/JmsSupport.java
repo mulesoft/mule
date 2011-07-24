@@ -59,16 +59,16 @@ public interface JmsSupport
 
     Destination createTemporaryDestination(Session session, boolean topic) throws JMSException;
 
-    void send(MessageProducer producer, Message message, boolean topic) throws JMSException;
+    void send(MessageProducer producer, Message message, boolean topic, ImmutableEndpoint endpoint) throws JMSException;
 
     void send(MessageProducer producer,
               Message message,
               boolean persistent,
               int priority,
               long ttl,
-              boolean topic) throws JMSException;
+              boolean topic, ImmutableEndpoint endpoint) throws JMSException;
 
-    void send(MessageProducer producer, Message message, Destination dest, boolean topic) throws JMSException;
+    void send(MessageProducer producer, Message message, Destination dest, boolean topic, ImmutableEndpoint endpoint) throws JMSException;
 
     void send(MessageProducer producer,
               Message message,
@@ -76,5 +76,5 @@ public interface JmsSupport
               boolean persistent,
               int priority,
               long ttl,
-              boolean topic) throws JMSException;
+              boolean topic, ImmutableEndpoint endpoint) throws JMSException;
 }

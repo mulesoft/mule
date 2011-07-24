@@ -137,7 +137,7 @@ public class JmsReplyToHandler extends DefaultReplyToHandler
 
             if (ttlString == null && priorityString == null && persistentDeliveryString == null)
             {
-                connector.getJmsSupport().send(replyToProducer, replyToMessage, topic);
+                connector.getJmsSupport().send(replyToProducer, replyToMessage, topic, null);
             }
             else
             {
@@ -157,7 +157,7 @@ public class JmsReplyToHandler extends DefaultReplyToHandler
                                 : connector.isPersistentDelivery();
 
                 connector.getJmsSupport().send(replyToProducer, replyToMessage, persistent, priority, ttl,
-                    topic);
+                    topic, null);
             }
 
             if (logger.isInfoEnabled())

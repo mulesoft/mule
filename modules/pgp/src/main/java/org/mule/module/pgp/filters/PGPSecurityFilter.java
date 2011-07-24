@@ -110,7 +110,7 @@ public class PGPSecurityFilter extends AbstractEndpointSecurityFilter
         }
         catch (Exception e2)
         {
-            throw new UnauthorisedException(event, context, endpoint, this);
+            throw new UnauthorisedException(event, context, endpoint.getEndpointURI().getUri(), this);
         }
     }
 

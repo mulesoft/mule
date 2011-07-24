@@ -11,8 +11,9 @@
 package org.mule.api.security;
 
 import org.mule.api.MuleEvent;
-import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.config.i18n.Message;
+
+import java.net.URI;
 
 /**
  * <code>CredentialsNotSetException</code> is thrown when user credentials cannot
@@ -41,9 +42,11 @@ public class CredentialsNotSetException extends UnauthorisedException
     }
     
     @Deprecated
-    public CredentialsNotSetException(MuleEvent event, SecurityContext context,
-        ImmutableEndpoint endpoint, SecurityFilter filter)
+    public CredentialsNotSetException(MuleEvent event,
+                                      SecurityContext context,
+                                      URI endpointUri,
+                                      SecurityFilter filter)
     {
-        super(event, context, endpoint, filter);
+        super(event, context, endpointUri, filter);
     }
 }

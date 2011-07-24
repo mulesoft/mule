@@ -248,17 +248,17 @@ public class Jms11Support implements JmsSupport
         }
     }
 
-    public void send(MessageProducer producer, Message message, boolean topic) throws JMSException
+    public void send(MessageProducer producer, Message message, boolean topic, ImmutableEndpoint endpoint) throws JMSException
     {
         send(producer, message, connector.isPersistentDelivery(), Message.DEFAULT_PRIORITY,
-            Message.DEFAULT_TIME_TO_LIVE, topic);
+            Message.DEFAULT_TIME_TO_LIVE, topic, endpoint);
     }
 
-    public void send(MessageProducer producer, Message message, Destination dest, boolean topic)
+    public void send(MessageProducer producer, Message message, Destination dest, boolean topic, ImmutableEndpoint endpoint)
         throws JMSException
     {
         send(producer, message, dest, connector.isPersistentDelivery(), Message.DEFAULT_PRIORITY,
-            Message.DEFAULT_TIME_TO_LIVE, topic);
+            Message.DEFAULT_TIME_TO_LIVE, topic, endpoint);
     }
 
     public void send(MessageProducer producer,
@@ -266,7 +266,7 @@ public class Jms11Support implements JmsSupport
                      boolean persistent,
                      int priority,
                      long ttl,
-                     boolean topic) throws JMSException
+                     boolean topic, ImmutableEndpoint endpoint) throws JMSException
     {
         producer.send(message, (persistent ? DeliveryMode.PERSISTENT : DeliveryMode.NON_PERSISTENT),
             priority, ttl);
@@ -278,7 +278,7 @@ public class Jms11Support implements JmsSupport
                      boolean persistent,
                      int priority,
                      long ttl,
-                     boolean topic) throws JMSException
+                     boolean topic, ImmutableEndpoint endpoint) throws JMSException
     {
         producer.send(dest, message, (persistent ? DeliveryMode.PERSISTENT : DeliveryMode.NON_PERSISTENT),
             priority, ttl);
