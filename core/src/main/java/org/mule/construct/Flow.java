@@ -16,14 +16,17 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleSession;
-import org.mule.api.construct.PipelineProcessingStrategy;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorChainBuilder;
+import org.mule.api.processor.ProcessingStrategy;
+import org.mule.api.processor.ProcessingStrategy.ThreadNameSource;
 import org.mule.construct.processor.FlowConstructStatisticsMessageProcessor;
 import org.mule.interceptor.ProcessingTimeInterceptor;
 import org.mule.lifecycle.processor.ProcessIfStartedMessageProcessor;
 import org.mule.management.stats.FlowConstructStatistics;
+import org.mule.processor.strategy.AsynchronousProcessingStrategy;
+import org.mule.processor.strategy.QueuedAsynchronousProcessingStrategy;
 import org.mule.routing.requestreply.ReplyToPropertyRequestReplyReplier;
 import org.mule.session.DefaultMuleSession;
 
@@ -33,15 +36,17 @@ import org.mule.session.DefaultMuleSession;
  * <li>Rejects inbound events when Flow is not started</li>
  * <li>Gathers statistics and processing time data</li>
  * <li>Implements MessagePorcessor allowing direct invocation of the pipeline</li>
- * <li>Supports the optional configuration of a {@link PipelineProcessingStrategy} that determines
- * how message processors are processed. The default {@link PipelineProcessingStrategy} is
- * {@link AsynchronousProcessingStrategy}. With this strategy when messages are received from a
- * one-way message source and there is no current transactions message processing in another thread
- * asynchronously.</li>
+ * <li>Supports the optional configuration of a {@link ProcessingStrategy} that determines how message
+ * processors are processed. The default {@link ProcessingStrategy} is {@link AsynchronousProcessingStrategy}.
+ * With this strategy when messages are received from a one-way message source and there is no current
+ * transactions message processing in another thread asynchronously.</li>
  * </ul>
  */
 public class Flow extends AbstractPipeline implements MessageProcessor
 {
+    private int asyncProcessorCount = 0;
+    private int asyncDelegateCount = 0;
+
     public Flow(String name, MuleContext muleContext)
     {
         super(name, muleContext);
@@ -110,5 +115,30 @@ public class Flow extends AbstractPipeline implements MessageProcessor
         }
         statistics.setEnabled(muleContext.getStatistics().isEnabled());
         muleContext.getStatistics().add(statistics);
+    }
+
+    protected void configureMessageProcessors(MessageProcessorChainBuilder builder) throws MuleException
+    {
+        getProcessingStrategy().configureProcessors(getMessageProcessors(),
+            new ProcessingStrategy.ThreadNameSource()
+            {
+                @Override
+                public String getName()
+                {
+                    return Flow.this.getName() + "." + asyncProcessorCount++;
+                }
+            }, builder, muleContext);
+    }
+
+    public ThreadNameSource getAsyncThreadNameSource()
+    {
+        return new ProcessingStrategy.ThreadNameSource()
+        {
+            @Override
+            public String getName()
+            {
+                return Flow.this.getName() + ".async." + asyncDelegateCount++;
+            }
+        };
     }
 }

@@ -11,13 +11,13 @@
 package org.mule.config.spring;
 
 import org.mule.api.config.MuleProperties;
-import org.mule.api.construct.PipelineProcessingStrategy;
+import org.mule.api.processor.ProcessingStrategy;
 import org.mule.api.store.ListableObjectStore;
 import org.mule.config.QueueProfile;
 import org.mule.construct.Flow;
-import org.mule.construct.QueuedAsynchronousProcessingStrategy;
-import org.mule.construct.SynchronousProcessingStrategy;
 import org.mule.model.seda.SedaService;
+import org.mule.processor.strategy.QueuedAsynchronousProcessingStrategy;
+import org.mule.processor.strategy.SynchronousProcessingStrategy;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.util.store.SimpleMemoryObjectStore;
 
@@ -81,7 +81,7 @@ public class QueueStoreConfigurationTestCase extends FunctionalTestCase
         Flow flow = lookupFlow("flowQueuedAsync");
         
         
-        PipelineProcessingStrategy pipeline = flow.getProcessingStrategy();
+        ProcessingStrategy pipeline = flow.getProcessingStrategy();
         assertTrue(pipeline instanceof QueuedAsynchronousProcessingStrategy);
         
         QueuedAsynchronousProcessingStrategy queuedPipeline = (QueuedAsynchronousProcessingStrategy)pipeline;

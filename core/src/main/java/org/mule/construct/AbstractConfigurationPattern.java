@@ -12,9 +12,9 @@ package org.mule.construct;
 
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
-import org.mule.api.construct.PipelineProcessingStrategy;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorChainBuilder;
+import org.mule.api.processor.ProcessingStrategy;
 import org.mule.construct.processor.FlowConstructStatisticsMessageProcessor;
 import org.mule.interceptor.ProcessingTimeInterceptor;
 import org.mule.lifecycle.processor.ProcessIfStartedMessageProcessor;
@@ -83,7 +83,7 @@ public abstract class AbstractConfigurationPattern extends AbstractPipeline
     }
 
     @Override
-    public final void setProcessingStrategy(PipelineProcessingStrategy processingStrategy)
+    public final void setProcessingStrategy(ProcessingStrategy processingStrategy)
     {
         throw new UnsupportedOperationException();
     }

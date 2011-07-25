@@ -34,7 +34,43 @@
     <flow name="customProcessingStrategyFlow" processingStrategy="customStrategy">
         <echo-component />
     </flow>
+    
+    <flow name="defaultAsync">
+        <async>
+            <echo-component />
+        </async>
+    </flow>
+    
+    <flow name="asynchronousAsync">
+        <async processingStrategy="asynchronous">
+            <echo-component />
+        </async>
+    </flow>
 
+    <flow name="queuedAsynchronousAsync">
+        <async processingStrategy="queued-asynchronous">
+            <echo-component />
+        </async>
+    </flow>
+
+    <flow name="customAsynchronousAsync">
+        <async processingStrategy="customAsynchronousStrategy">
+            <echo-component />
+        </async>
+    </flow>
+
+    <flow name="customQueuedAsynchronousAsync">
+        <async processingStrategy="customQueuedAsynchronousStrategy">
+            <echo-component />
+        </async>
+    </flow>
+
+    <flow name="customProcessingStrategyAsync">
+        <async processingStrategy="customStrategy">
+            <echo-component />
+        </async>
+    </flow>
+ 
     <asynchronous-processing-strategy name="customAsynchronousStrategy"
         maxThreads="10" minThreads="5" threadTTL="100" maxBufferSize="10" threadWaitTimeout="1000"
         poolExhaustedAction="WAIT" />
@@ -47,10 +83,5 @@
     <custom-processing-strategy name="customStrategy" class="org.mule.config.spring.flow.FlowProcessingStrategyConfigTestCase$CustomProcessingStrategy">
         <spring:property name="foo" value="bar" />
     </custom-processing-strategy>
-
-
-
-
-
 
 </mule>

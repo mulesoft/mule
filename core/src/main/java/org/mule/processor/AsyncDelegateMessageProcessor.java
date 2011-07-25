@@ -10,16 +10,19 @@
 
 package org.mule.processor;
 
-import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
-import org.mule.api.config.ThreadingProfile;
-import org.mule.api.context.WorkManager;
-import org.mule.api.context.WorkManagerSource;
+import org.mule.api.lifecycle.Initialisable;
+import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.api.processor.MessageProcessorChainBuilder;
+import org.mule.api.processor.ProcessingStrategy;
+import org.mule.api.processor.ProcessingStrategy.ThreadNameSource;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.construct.Flow;
+import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.work.AbstractMuleEventWork;
 import org.mule.work.MuleWorkManager;
 
@@ -31,66 +34,69 @@ import org.apache.commons.logging.LogFactory;
 
 /**
  * Processes {@link MuleEvent}'s asynchronously using a {@link MuleWorkManager} to schedule asynchronous
- * processing of MessageProcessor delegate configured the next {@link MessageProcessor}. The next {@link MessageProcessor} is therefore be executed
- * in a different thread regardless of the exchange-pattern configured on the inbound endpoint. If a
- * transaction is present then an exception is thrown.
+ * processing of MessageProcessor delegate configured the next {@link MessageProcessor}. The next
+ * {@link MessageProcessor} is therefore be executed in a different thread regardless of the exchange-pattern
+ * configured on the inbound endpoint. If a transaction is present then an exception is thrown.
  */
 public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
-    implements MessageProcessor, Startable, Stoppable
+    implements MessageProcessor, Initialisable, Startable, Stoppable
 {
     protected Log logger = LogFactory.getLog(getClass());
 
-    protected WorkManagerSource workManagerSource;
-    protected boolean doThreading = true;
-    protected WorkManager workManager;
     protected MessageProcessor delegate;
 
-    public AsyncDelegateMessageProcessor(ThreadingProfile threadingProfile, String name, int shutdownTimeout)
+    protected List<MessageProcessor> processors;
+    protected ProcessingStrategy processingStrategy;
+    protected ThreadNameSource threadNameSource;
+
+    private MessageProcessor target;
+
+    public AsyncDelegateMessageProcessor(MessageProcessor delegate,
+                                         ProcessingStrategy processingStrategy,
+                                         ThreadNameSource threadNameSource)
     {
-        this.doThreading = threadingProfile.isDoThreading();
-        workManager = threadingProfile.createWorkManager(name, shutdownTimeout);
-        workManagerSource = new WorkManagerSource()
-        {
-            public WorkManager getWorkManager() throws MuleException
-            {
-                return workManager;
-            }
-        };
+        this.delegate = delegate;
+        this.processingStrategy = processingStrategy;
+        this.threadNameSource = threadNameSource;
     }
 
-    public void start() throws MuleException
+    @Override
+    public void initialise() throws InitialisationException
     {
-        if (workManager != null)
+        if (delegate == null)
         {
-            workManager.start();
+            throw new InitialisationException(CoreMessages.objectIsNull("delegate message processor"), this);
         }
-        super.start();
-    }
+        if (processingStrategy == null)
+        {
+            throw new InitialisationException(CoreMessages.objectIsNull("processingStrategy"), this);
+        }
+        if (threadNameSource == null)
+        {
+            threadNameSource = ((Flow) flowConstruct).getAsyncThreadNameSource();
+        }
 
-    public void stop() throws MuleException
-    {
-        if (workManager != null)
+        MessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder(flowConstruct);
+        processingStrategy.configureProcessors(Collections.singletonList(delegate), threadNameSource,
+            builder, muleContext);
+        try
         {
-            workManager.dispose();
+            target = builder.build();
         }
+        catch (MuleException e)
+        {
+            throw new InitialisationException(e, this);
+        }
+        super.initialise();
     }
 
     public MuleEvent process(MuleEvent event) throws MuleException
     {
         // There is no need to copy the event here because it is copied in
         // org.mule.work.AbstractMuleEventWork.run()
-        if (delegate != null)
+        if (target != null)
         {
-            try
-            {
-                workManagerSource.getWorkManager().scheduleWork(new AsyncMessageProcessorWorker(event),
-                    WorkManager.INDEFINITE, null, new AsyncWorkListener(delegate));
-            }
-            catch (Exception e)
-            {
-                new MessagingException(
-                    CoreMessages.errorSchedulingMessageProcessorForAsyncInvocation(delegate), event, e);
-            }
+            return target.process(event);
         }
         return event;
     }
@@ -103,7 +109,12 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
     @Override
     protected List<MessageProcessor> getOwnedMessageProcessors()
     {
-        return Collections.singletonList(delegate);
+        return Collections.singletonList(target);
+    }
+
+    public ProcessingStrategy getProcessingStrategy()
+    {
+        return processingStrategy;
     }
 
     class AsyncMessageProcessorWorker extends AbstractMuleEventWork

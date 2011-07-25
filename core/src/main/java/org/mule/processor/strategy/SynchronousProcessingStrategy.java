@@ -8,40 +8,36 @@
  * LICENSE.txt file.
  */
 
-package org.mule.construct;
+package org.mule.processor.strategy;
 
-import org.mule.api.construct.Pipeline;
+import org.mule.api.MuleContext;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorBuilder;
 import org.mule.api.processor.MessageProcessorChainBuilder;
-import org.mule.util.queue.QueueManager;
+import org.mule.api.processor.ProcessingStrategy;
 
-import javax.resource.spi.work.WorkManager;
+import java.util.List;
 
 /**
- * This strategy uses the {@link QueueManager} to decouple the processing of each message processor. Each
- * queue is polled and a {@link WorkManager} is used to schedule processing of the message processors in a new
- * worker thread.
+ * This strategy processes all message processors in the calling thread.
  */
-public class QueuedThreadPerProcessorProcessingStrategy extends QueuedAsynchronousProcessingStrategy
+public class SynchronousProcessingStrategy implements ProcessingStrategy
 {
-
     @Override
-    public void configureProcessors(Pipeline pipeline, MessageProcessorChainBuilder builder)
+    public void configureProcessors(List<MessageProcessor> processors,
+                                    ThreadNameSource nameSource,
+                                    MessageProcessorChainBuilder chainBuilder,
+                                    MuleContext muleContext)
     {
-        for (int i = 0; i < pipeline.getMessageProcessors().size(); i++)
+        for (Object processor : processors)
         {
-            MessageProcessor processor = pipeline.getMessageProcessors().get(i);
-
-            builder.chain(createAsyncMessageProcessor(pipeline));
-
             if (processor instanceof MessageProcessor)
             {
-                builder.chain(processor);
+                chainBuilder.chain((MessageProcessor) processor);
             }
             else if (processor instanceof MessageProcessorBuilder)
             {
-                builder.chain((MessageProcessorBuilder) processor);
+                chainBuilder.chain((MessageProcessorBuilder) processor);
             }
             else
             {
@@ -50,4 +46,5 @@ public class QueuedThreadPerProcessorProcessingStrategy extends QueuedAsynchrono
             }
         }
     }
+
 }

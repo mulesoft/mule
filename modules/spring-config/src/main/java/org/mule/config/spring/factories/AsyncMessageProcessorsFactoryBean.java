@@ -12,14 +12,12 @@ package org.mule.config.spring.factories;
 
 import org.mule.api.MuleContext;
 import org.mule.api.NameableObject;
-import org.mule.api.config.MuleConfiguration;
-import org.mule.api.config.ThreadingProfile;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorBuilder;
+import org.mule.api.processor.ProcessingStrategy;
 import org.mule.processor.AsyncDelegateMessageProcessor;
 import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
-import org.mule.util.concurrent.ThreadNameHelper;
 
 import java.util.List;
 
@@ -31,17 +29,12 @@ public class AsyncMessageProcessorsFactoryBean implements FactoryBean, MuleConte
     protected MuleContext muleContext;
 
     protected List messageProcessors;
-    protected ThreadingProfile threadingProfile;
+    protected ProcessingStrategy processingStrategy;
     protected String name;
 
     public Class getObjectType()
     {
         return MessageProcessor.class;
-    }
-
-    public void setThreadingProfile(ThreadingProfile threadingProfile)
-    {
-        this.threadingProfile = threadingProfile;
     }
 
     public void setMessageProcessors(List messageProcessors)
@@ -51,19 +44,9 @@ public class AsyncMessageProcessorsFactoryBean implements FactoryBean, MuleConte
 
     public Object getObject() throws Exception
     {
-        if (threadingProfile == null)
-        {
-            threadingProfile = muleContext.getDefaultThreadingProfile();
-        }
-
         DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
         builder.setName("'async' child chain");
-        final MuleConfiguration config = muleContext.getConfiguration();
-        final String threadPrefix = ThreadNameHelper.asyncProcessor(muleContext, name);
 
-        AsyncDelegateMessageProcessor asyncProcessor = new AsyncDelegateMessageProcessor(threadingProfile,
-                                                                                                 threadPrefix,
-                                                                                                 config.getShutdownTimeout());
         for (Object processor : messageProcessors)
         {
             if (processor instanceof MessageProcessor)
@@ -80,8 +63,15 @@ public class AsyncMessageProcessorsFactoryBean implements FactoryBean, MuleConte
                     "MessageProcessorBuilder should only have MessageProcessor's or MessageProcessorBuilder's configured");
             }
         }
-        asyncProcessor.setDelegate(builder.build());
-        return  asyncProcessor;
+        return new AsyncDelegateMessageProcessor(builder.build(), processingStrategy,
+            new ProcessingStrategy.ThreadNameSource()
+            {
+                @Override
+                public String getName()
+                {
+                    return name;
+                }
+            });
     }
 
     public boolean isSingleton()
@@ -102,6 +92,11 @@ public class AsyncMessageProcessorsFactoryBean implements FactoryBean, MuleConte
     public void setName(String name)
     {
         this.name = name;
+    }
+
+    public void setProcessingStrategy(ProcessingStrategy processingStrategy)
+    {
+        this.processingStrategy = processingStrategy;
     }
 
 }

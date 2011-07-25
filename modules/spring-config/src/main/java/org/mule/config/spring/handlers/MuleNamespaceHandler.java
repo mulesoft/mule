@@ -21,7 +21,6 @@ import org.mule.component.simple.EchoComponent;
 import org.mule.component.simple.LogComponent;
 import org.mule.component.simple.NullComponent;
 import org.mule.component.simple.PassThroughComponent;
-import org.mule.config.spring.factories.AsyncMessageProcessorsFactoryBean;
 import org.mule.config.spring.factories.ChoiceRouterFactoryBean;
 import org.mule.config.spring.factories.CompositeMessageSourceFactoryBean;
 import org.mule.config.spring.factories.DefaultMemoryQueueStoreFactoryBean;
@@ -51,6 +50,7 @@ import org.mule.config.spring.parsers.processors.CheckExclusiveAttributes;
 import org.mule.config.spring.parsers.processors.CheckExclusiveAttributesAndChildren;
 import org.mule.config.spring.parsers.processors.CheckRequiredAttributesWhenNoChildren;
 import org.mule.config.spring.parsers.specific.AggregatorDefinitionParser;
+import org.mule.config.spring.parsers.specific.AsyncMessageProcessorsDefinitionParser;
 import org.mule.config.spring.parsers.specific.BindingDefinitionParser;
 import org.mule.config.spring.parsers.specific.BridgeDefinitionParser;
 import org.mule.config.spring.parsers.specific.ComponentDefinitionParser;
@@ -100,10 +100,6 @@ import org.mule.config.spring.parsers.specific.endpoint.EndpointRefParser;
 import org.mule.config.spring.parsers.specific.endpoint.support.ChildEndpointDefinitionParser;
 import org.mule.config.spring.parsers.specific.endpoint.support.OrphanEndpointDefinitionParser;
 import org.mule.config.spring.util.SpringBeanLookup;
-import org.mule.construct.AsynchronousProcessingStrategy;
-import org.mule.construct.QueuedAsynchronousProcessingStrategy;
-import org.mule.construct.QueuedThreadPerProcessorProcessingStrategy;
-import org.mule.construct.ThreadPerProcessorProcessingStrategy;
 import org.mule.context.notification.ListenerSubscriptionPair;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.enricher.MessageEnricher;
@@ -129,6 +125,10 @@ import org.mule.object.PrototypeObjectFactory;
 import org.mule.object.SingletonObjectFactory;
 import org.mule.processor.InvokerMessageProcessor;
 import org.mule.processor.NullMessageProcessor;
+import org.mule.processor.strategy.AsynchronousProcessingStrategy;
+import org.mule.processor.strategy.QueuedAsynchronousProcessingStrategy;
+import org.mule.processor.strategy.QueuedThreadPerProcessorProcessingStrategy;
+import org.mule.processor.strategy.ThreadPerProcessorProcessingStrategy;
 import org.mule.retry.notifiers.ConnectNotifier;
 import org.mule.retry.policies.RetryForeverPolicyTemplate;
 import org.mule.retry.policies.SimpleRetryPolicyTemplate;
@@ -353,8 +353,7 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerMuleBeanDefinitionParser("enrich", new ChildDefinitionParser("enrichExpressionPair",
             EnrichExpressionPair.class));
 
-        registerBeanDefinitionParser("async", new ChildDefinitionParser("messageProcessor",
-            AsyncMessageProcessorsFactoryBean.class));
+        registerBeanDefinitionParser("async", new AsyncMessageProcessorsDefinitionParser());
         registerBeanDefinitionParser("transactional", new ChildDefinitionParser("messageProcessor",
             TransactionalMessageProcessorsFactoryBean.class));
         registerMuleBeanDefinitionParser("logger", new ChildDefinitionParser("messageProcessor",

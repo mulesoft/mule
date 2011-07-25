@@ -11,6 +11,7 @@
 package org.mule.api.construct;
 
 import org.mule.api.processor.MessageProcessor;
+import org.mule.api.processor.ProcessingStrategy;
 import org.mule.api.source.MessageSource;
 
 import java.util.List;
@@ -30,8 +31,8 @@ public interface Pipeline extends FlowConstruct
 
     public List<MessageProcessor> getMessageProcessors();
 
-    public void setProcessingStrategy(PipelineProcessingStrategy processingStrategy);
+    public void setProcessingStrategy(ProcessingStrategy processingStrategy);
 
-    public PipelineProcessingStrategy getProcessingStrategy();
+    public ProcessingStrategy getProcessingStrategy();
     
 }

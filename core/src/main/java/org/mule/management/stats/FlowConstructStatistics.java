@@ -10,8 +10,8 @@
 
 package org.mule.management.stats;
 
-import org.mule.api.construct.PipelineProcessingStrategy;
-import org.mule.construct.AsynchronousProcessingStrategy;
+import org.mule.api.processor.ProcessingStrategy;
+import org.mule.processor.strategy.AsynchronousProcessingStrategy;
 
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -31,7 +31,7 @@ public class FlowConstructStatistics extends AbstractFlowConstructStatistics imp
     private long totalQueuedEvent = 0;
 
 
-    public FlowConstructStatistics(String flowConstructType, String name, PipelineProcessingStrategy processingStrategy)
+    public FlowConstructStatistics(String flowConstructType, String name, ProcessingStrategy processingStrategy)
     {
         super(flowConstructType, name);
         flowStatistics.setEnabled(enabled);

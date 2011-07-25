@@ -10,6 +10,14 @@
 
 package org.mule.test.construct;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -35,14 +43,6 @@ import java.util.Map;
 
 import org.junit.Ignore;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 public class FlowConfigurationFunctionalTestCase extends FunctionalTestCase
 {
@@ -101,6 +101,28 @@ public class FlowConfigurationFunctionalTestCase extends FunctionalTestCase
     {
         muleContext.getClient().send("vm://queued-asynchronous", new DefaultMuleMessage("0", muleContext));
         MuleMessage message = muleContext.getClient().request("vm://queued-asynchronous-out", RECEIVE_TIMEOUT);
+        assertNotNull(message);
+        Thread thread = (Thread) message.getPayload();
+        assertNotNull(thread);
+        assertNotSame(Thread.currentThread(), thread);
+    }
+    
+    @Test
+    public void testAsyncAynchronous() throws MuleException
+    {
+        muleContext.getClient().dispatch("vm://asynchronous-async", new DefaultMuleMessage("0", muleContext));
+        MuleMessage message = muleContext.getClient().request("vm://asynchronous-async-out", RECEIVE_TIMEOUT);
+        assertNotNull(message);
+        Thread thread = (Thread) message.getPayload();
+        assertNotNull(thread);
+        assertNotSame(Thread.currentThread(), thread);
+    }
+
+    @Test
+    public void testAsyncQueuedAsynchronous() throws MuleException
+    {
+        muleContext.getClient().dispatch("vm://queued-asynchronous-async", new DefaultMuleMessage("0", muleContext));
+        MuleMessage message = muleContext.getClient().request("vm://queued-asynchronous-async-out", RECEIVE_TIMEOUT);
         assertNotNull(message);
         Thread thread = (Thread) message.getPayload();
         assertNotNull(thread);
@@ -314,6 +336,20 @@ public class FlowConfigurationFunctionalTestCase extends FunctionalTestCase
         muleContext.getClient().send("vm://async-oneway-in", new DefaultMuleMessage("0", muleContext));
         final MuleMessage result = muleContext.getClient().request("vm://async-oneway-out", RECEIVE_TIMEOUT);
         final MuleMessage asyncResult = muleContext.getClient().request("vm://async-async-oneway-out",
+            RECEIVE_TIMEOUT);
+
+        assertNotNull(result);
+        assertNotNull(asyncResult);
+        assertEquals("0ac", result.getPayloadAsString());
+        assertEquals("0ab", asyncResult.getPayloadAsString());
+    }
+    
+    @Test
+    public void testAsyncSedaOneWayEndpoint() throws Exception
+    {
+        muleContext.getClient().send("vm://async-seda-oneway-in", new DefaultMuleMessage("0", muleContext));
+        final MuleMessage result = muleContext.getClient().request("vm://async-seda-oneway-out", RECEIVE_TIMEOUT);
+        final MuleMessage asyncResult = muleContext.getClient().request("vm://async-async-seda-oneway-out",
             RECEIVE_TIMEOUT);
 
         assertNotNull(result);

@@ -8,30 +8,37 @@
  * LICENSE.txt file.
  */
 
-package org.mule.construct;
+package org.mule.processor.strategy;
 
-import org.mule.api.construct.Pipeline;
+import org.mule.api.MuleContext;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorBuilder;
 import org.mule.api.processor.MessageProcessorChainBuilder;
+import org.mule.util.queue.QueueManager;
+
+import java.util.List;
 
 import javax.resource.spi.work.WorkManager;
 
 /**
- * This strategy uses a {@link WorkManager} to schedule the processing of each message processors in a new
+ * This strategy uses the {@link QueueManager} to decouple the processing of each message processor. Each
+ * queue is polled and a {@link WorkManager} is used to schedule processing of the message processors in a new
  * worker thread.
  */
-public class ThreadPerProcessorProcessingStrategy extends AsynchronousProcessingStrategy
+public class QueuedThreadPerProcessorProcessingStrategy extends QueuedAsynchronousProcessingStrategy
 {
 
     @Override
-    public void configureProcessors(Pipeline pipeline, MessageProcessorChainBuilder builder)
+    public void configureProcessors(List<MessageProcessor> processors,
+                                    ThreadNameSource nameSource,
+                                    MessageProcessorChainBuilder builder,
+                                    MuleContext muleContext)
     {
-        for (int i = 0; i < pipeline.getMessageProcessors().size(); i++)
+        for (int i = 0; i < processors.size(); i++)
         {
-            MessageProcessor processor = pipeline.getMessageProcessors().get(i);
+            MessageProcessor processor = processors.get(i);
 
-            builder.chain(createAsyncMessageProcessor(pipeline));
+            builder.chain(createAsyncMessageProcessor(nameSource, muleContext));
 
             if (processor instanceof MessageProcessor)
             {

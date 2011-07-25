@@ -8,16 +8,17 @@
  * LICENSE.txt file.
  */
 
-package org.mule.construct;
+package org.mule.processor.strategy;
 
 import org.mule.api.MuleContext;
 import org.mule.api.config.ThreadingProfile;
-import org.mule.api.construct.Pipeline;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorChainBuilder;
 import org.mule.config.ChainedThreadingProfile;
 import org.mule.processor.AsyncInterceptingMessageProcessor;
 import org.mule.processor.OptionalAsyncInterceptingMessageProcessor;
-import org.mule.util.concurrent.ThreadNameHelper;
+
+import java.util.List;
 
 import javax.resource.spi.work.WorkManager;
 
@@ -36,21 +37,23 @@ public class AsynchronousProcessingStrategy extends SynchronousProcessingStrateg
     protected Integer poolExhaustedAction;
 
     @Override
-    public void configureProcessors(Pipeline pipeline, MessageProcessorChainBuilder chainBuilder)
+    public void configureProcessors(List<MessageProcessor> processors,
+                                    ThreadNameSource nameSource,
+                                    MessageProcessorChainBuilder chainBuilder,
+                                    MuleContext muleContext)
     {
-        if (pipeline.getMessageProcessors().size() > 0)
+        if (processors.size() > 0)
         {
-            chainBuilder.chain(createAsyncMessageProcessor(pipeline));
-            super.configureProcessors(pipeline, chainBuilder);
+            chainBuilder.chain(createAsyncMessageProcessor(nameSource, muleContext));
+            super.configureProcessors(processors, nameSource, chainBuilder, muleContext);
         }
     }
 
-    protected AsyncInterceptingMessageProcessor createAsyncMessageProcessor(Pipeline pipeline)
+    protected AsyncInterceptingMessageProcessor createAsyncMessageProcessor(ThreadNameSource nameSource,
+                                                                            MuleContext muleContext)
     {
-        MuleContext muleContext = pipeline.getMuleContext();
         return new OptionalAsyncInterceptingMessageProcessor(createThreadingProfile(muleContext),
-            ThreadNameHelper.flow(muleContext, pipeline.getName()), muleContext.getConfiguration()
-                .getShutdownTimeout());
+            nameSource.getName(), muleContext.getConfiguration().getShutdownTimeout());
     }
 
     protected ThreadingProfile createThreadingProfile(MuleContext muleContext)

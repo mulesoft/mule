@@ -58,6 +58,22 @@
         <vm:outbound-endpoint path="queued-asynchronous-out" exchange-pattern="one-way"/>
     </flow>    
 
+    <flow name="asynchronousAsync" processingStrategy="synchronous">
+        <vm:inbound-endpoint path="asynchronous-async" exchange-pattern="one-way"/>
+        <async processingStrategy="asynchronous">
+            <custom-processor class="org.mule.test.construct.FlowConfigurationFunctionalTestCase$ThreadSensingMessageProcessor"/>
+            <vm:outbound-endpoint path="asynchronous-async-out" exchange-pattern="one-way"/>
+        </async>
+    </flow>    
+
+    <flow name="queuedAsynchronousAsync" processingStrategy="synchronous">
+        <vm:inbound-endpoint path="queued-asynchronous-async" exchange-pattern="one-way"/>
+        <async processingStrategy="queued-asynchronous">
+            <custom-processor class="org.mule.test.construct.FlowConfigurationFunctionalTestCase$ThreadSensingMessageProcessor"/>
+            <vm:outbound-endpoint path="queued-asynchronous-async-out" exchange-pattern="one-way"/>
+        </async>
+    </flow>    
+
     <flow name="inout">
         <vm:inbound-endpoint path="inout-in" exchange-pattern="one-way" />
         <vm:outbound-endpoint path="inout-out" exchange-pattern="one-way" />
@@ -174,13 +190,23 @@
     <flow name="async-oneway">
         <vm:inbound-endpoint path="async-oneway-in" exchange-pattern="one-way" />
         <append-string-transformer message="a" />
-        <async>
+        <async processingStrategy="asynchronous">
             <append-string-transformer message="b" />
             <vm:outbound-endpoint path="async-async-oneway-out" exchange-pattern="one-way" />
-            <threading-profile doThreading="true" maxThreadsActive="16"/>
         </async>    
         <append-string-transformer message="c" />    
         <vm:outbound-endpoint path="async-oneway-out" exchange-pattern="one-way" />
+    </flow>
+
+    <flow name="async-seda-oneway">
+        <vm:inbound-endpoint path="async-seda-oneway-in" exchange-pattern="one-way" />
+        <append-string-transformer message="a" />
+        <async>
+            <append-string-transformer message="b" />
+            <vm:outbound-endpoint path="async-async-seda-oneway-out" exchange-pattern="one-way" />
+        </async>    
+        <append-string-transformer message="c" />    
+        <vm:outbound-endpoint path="async-seda-oneway-out" exchange-pattern="one-way" />
     </flow>
 
     <flow name="async-requestresponse">
@@ -189,7 +215,6 @@
         <async>
             <append-string-transformer message="b" />
             <vm:outbound-endpoint path="async-async-requestresponse-out" exchange-pattern="one-way" />
-            <threading-profile doThreading="true" maxThreadsActive="16"/>
         </async>    
         <append-string-transformer message="c" />    
         <vm:outbound-endpoint path="async-requestresponse-out" exchange-pattern="one-way" />
@@ -197,15 +222,12 @@
 
     <flow name="async-tx">
         <vm:inbound-endpoint path="async-tx-in" exchange-pattern="request-response">
-            <!-- Not supported
             <vm:transaction action="ALWAYS_BEGIN"/>
-            -->
         </vm:inbound-endpoint>
         <append-string-transformer message="a" />
         <async>
             <append-string-transformer message="b" />
             <vm:outbound-endpoint path="async-async-tx-out" exchange-pattern="request-response" />
-            <threading-profile doThreading="true" maxThreadsActive="16"/>
         </async>    
         <append-string-transformer message="c" />    
         <vm:outbound-endpoint path="async-tx-out" exchange-pattern="request-response" />
@@ -238,8 +260,8 @@
             <vm:transaction action="JOIN_IF_POSSIBLE" />
         </transactional>    
     </flow>
-     -->
-    
+    -->
+        
     <flow name="multicaster">
         <vm:inbound-endpoint path="multicaster-in" exchange-pattern="request-response"/>
         <all enableCorrelation="ALWAYS">
@@ -364,7 +386,7 @@
         <append-string-transformer message="out" />
         <vm:outbound-endpoint path="poll2-out"/>
     </flow>
-    
+     
     <sub-flow name="pollappend">
         <append-string-transformer message="pollappend" />
     </sub-flow>

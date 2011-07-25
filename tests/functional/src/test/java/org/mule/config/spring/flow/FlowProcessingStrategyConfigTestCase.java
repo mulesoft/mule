@@ -10,14 +10,18 @@
 
 package org.mule.config.spring.flow;
 
-import org.mule.api.construct.Pipeline;
-import org.mule.api.construct.PipelineProcessingStrategy;
+import org.mule.api.MuleContext;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorChainBuilder;
-import org.mule.construct.AsynchronousProcessingStrategy;
+import org.mule.api.processor.ProcessingStrategy;
 import org.mule.construct.Flow;
-import org.mule.construct.QueuedAsynchronousProcessingStrategy;
-import org.mule.construct.SynchronousProcessingStrategy;
+import org.mule.processor.AsyncDelegateMessageProcessor;
+import org.mule.processor.strategy.AsynchronousProcessingStrategy;
+import org.mule.processor.strategy.QueuedAsynchronousProcessingStrategy;
+import org.mule.processor.strategy.SynchronousProcessingStrategy;
 import org.mule.tck.FunctionalTestCase;
+
+import java.util.List;
 
 public class FlowProcessingStrategyConfigTestCase extends FunctionalTestCase
 {
@@ -54,25 +58,16 @@ public class FlowProcessingStrategyConfigTestCase extends FunctionalTestCase
 
     public void testCustomAsynchronous() throws Exception
     {
-        PipelineProcessingStrategy processingStrategy = getFlowProcesingStrategy("customAsynchronousFlow");
+        ProcessingStrategy processingStrategy = getFlowProcesingStrategy("customAsynchronousFlow");
 
         assertEquals(AsynchronousProcessingStrategy.class, processingStrategy.getClass());
 
         assertAsynchronousStrategyConfig((AsynchronousProcessingStrategy) processingStrategy);
     }
 
-    private void assertAsynchronousStrategyConfig(AsynchronousProcessingStrategy processingStrategy)
-    {
-        assertEquals(10, processingStrategy.getMaxThreads().intValue());
-        assertEquals(5, processingStrategy.getMinThreads().intValue());
-        assertEquals(100, processingStrategy.getThreadTTL().intValue());
-        assertEquals(10, processingStrategy.getMaxBufferSize().intValue());
-
-    }
-
     public void testCustomQueuedAsynchronous() throws Exception
     {
-        PipelineProcessingStrategy processingStrategy = getFlowProcesingStrategy("customQueuedAsynchronousFlow");
+        ProcessingStrategy processingStrategy = getFlowProcesingStrategy("customQueuedAsynchronousFlow");
 
         assertEquals(QueuedAsynchronousProcessingStrategy.class, processingStrategy.getClass());
 
@@ -87,28 +82,97 @@ public class FlowProcessingStrategyConfigTestCase extends FunctionalTestCase
 
     public void testCustom() throws Exception
     {
-        PipelineProcessingStrategy processingStrategy = getFlowProcesingStrategy("customProcessingStrategyFlow");
+        ProcessingStrategy processingStrategy = getFlowProcesingStrategy("customProcessingStrategyFlow");
         assertEquals(CustomProcessingStrategy.class, processingStrategy.getClass());
 
         assertEquals("bar", (((CustomProcessingStrategy) processingStrategy).foo));
     }
 
-    private PipelineProcessingStrategy getFlowProcesingStrategy(String flowName) throws Exception
+    public void testDefaultAsync() throws Exception
+    {
+        assertEquals(QueuedAsynchronousProcessingStrategy.class,
+            getAsyncProcesingStrategy("defaultAsync").getClass());
+    }
+
+    public void testAsynchronousAsync() throws Exception
+    {
+        assertEquals(AsynchronousProcessingStrategy.class,
+            getAsyncProcesingStrategy("asynchronousAsync").getClass());
+    }
+
+    public void testQueuedAsynchronousAsync() throws Exception
+    {
+        assertEquals(QueuedAsynchronousProcessingStrategy.class,
+            getAsyncProcesingStrategy("queuedAsynchronousAsync").getClass());
+    }
+
+    public void testCustomAsynchronousAsync() throws Exception
+    {
+        ProcessingStrategy processingStrategy = getAsyncProcesingStrategy("customAsynchronousAsync");
+
+        assertEquals(AsynchronousProcessingStrategy.class, processingStrategy.getClass());
+
+        assertAsynchronousStrategyConfig((AsynchronousProcessingStrategy) processingStrategy);
+    }
+
+    public void testCustomQueuedAsynchronousAsync() throws Exception
+    {
+        ProcessingStrategy processingStrategy = getAsyncProcesingStrategy("customQueuedAsynchronousAsync");
+
+        assertEquals(QueuedAsynchronousProcessingStrategy.class, processingStrategy.getClass());
+
+        assertAsynchronousStrategyConfig((AsynchronousProcessingStrategy) processingStrategy);
+
+        assertEquals(100, ((QueuedAsynchronousProcessingStrategy) processingStrategy).getQueueTimeout()
+            .intValue());
+        assertEquals(10, ((QueuedAsynchronousProcessingStrategy) processingStrategy).getMaxQueueSize()
+            .intValue());
+
+    }
+
+    public void testCustomAsync() throws Exception
+    {
+        ProcessingStrategy processingStrategy = getAsyncProcesingStrategy("customProcessingStrategyAsync");
+        assertEquals(CustomProcessingStrategy.class, processingStrategy.getClass());
+
+        assertEquals("bar", (((CustomProcessingStrategy) processingStrategy).foo));
+    }
+
+    private void assertAsynchronousStrategyConfig(AsynchronousProcessingStrategy processingStrategy)
+    {
+        assertEquals(10, processingStrategy.getMaxThreads().intValue());
+        assertEquals(5, processingStrategy.getMinThreads().intValue());
+        assertEquals(100, processingStrategy.getThreadTTL().intValue());
+        assertEquals(10, processingStrategy.getMaxBufferSize().intValue());
+
+    }
+
+    private ProcessingStrategy getFlowProcesingStrategy(String flowName) throws Exception
     {
         Flow flow = (Flow) getFlowConstruct(flowName);
         return flow.getProcessingStrategy();
     }
 
-    public static class CustomProcessingStrategy implements PipelineProcessingStrategy
+    private ProcessingStrategy getAsyncProcesingStrategy(String flowName) throws Exception
+    {
+        Flow flow = (Flow) getFlowConstruct(flowName);
+        MessageProcessor processor = flow.getMessageProcessors().get(0);
+        assertEquals(AsyncDelegateMessageProcessor.class, processor.getClass());
+        return ((AsyncDelegateMessageProcessor) processor).getProcessingStrategy();
+    }
+
+    public static class CustomProcessingStrategy implements ProcessingStrategy
     {
 
         String foo;
 
         @Override
-        public void configureProcessors(Pipeline pipeline, MessageProcessorChainBuilder chainBuilder)
+        public void configureProcessors(List<MessageProcessor> processors,
+                                        ThreadNameSource nameSource,
+                                        MessageProcessorChainBuilder chainBuilder,
+                                        MuleContext muleContext)
         {
             // TODO Auto-generated method stub
-
         }
 
         public void setFoo(String foo)

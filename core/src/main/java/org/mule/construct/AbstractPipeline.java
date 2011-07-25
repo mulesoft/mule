@@ -14,25 +14,24 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.construct.Pipeline;
-import org.mule.api.construct.PipelineProcessingStrategy;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorBuilder;
 import org.mule.api.processor.MessageProcessorChainBuilder;
+import org.mule.api.processor.ProcessingStrategy;
 import org.mule.api.source.MessageSource;
 import org.mule.processor.AbstractInterceptingMessageProcessor;
 import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
+import org.mule.processor.strategy.SynchronousProcessingStrategy;
 
 import java.util.Collections;
 import java.util.List;
 
 /**
- * Abstract implementation of {@link AbstractFlowConstruct} that allows a list of
- * {@link MessageProcessor}s that will be used to process messages to be configured.
- * These MessageProcessors are chained together using the
- * {@link DefaultMessageProcessorChainBuilder}.
+ * Abstract implementation of {@link AbstractFlowConstruct} that allows a list of {@link MessageProcessor}s
+ * that will be used to process messages to be configured. These MessageProcessors are chained together using
+ * the {@link DefaultMessageProcessorChainBuilder}.
  * <p/>
- * If no message processors are configured then the source message is simply
- * returned.
+ * If no message processors are configured then the source message is simply returned.
  */
 public abstract class AbstractPipeline extends AbstractFlowConstruct implements Pipeline
 {
@@ -41,7 +40,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
 
     protected List<MessageProcessor> messageProcessors = Collections.emptyList();
 
-    protected PipelineProcessingStrategy processingStrategy;
+    protected ProcessingStrategy processingStrategy;
 
     public AbstractPipeline(String name, MuleContext muleContext)
     {
@@ -50,16 +49,14 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     }
 
     /**
-     * Creates a {@link MessageProcessor} that will process messages from the
-     * configured {@link MessageSource} .
+     * Creates a {@link MessageProcessor} that will process messages from the configured {@link MessageSource}
+     * .
      * <p>
-     * The default implementation of this methods uses a
-     * {@link DefaultMessageProcessorChainBuilder} and allows a chain of
-     * {@link MessageProcessor}s to be configured using the
-     * {@link #configureMessageProcessors(org.mule.api.processor.MessageProcessorChainBuilder)}
-     * method but if you wish to use another {@link MessageProcessorBuilder} or just
-     * a single {@link MessageProcessor} then this method can be overridden and
-     * return a single {@link MessageProcessor} instead.
+     * The default implementation of this methods uses a {@link DefaultMessageProcessorChainBuilder} and
+     * allows a chain of {@link MessageProcessor}s to be configured using the
+     * {@link #configureMessageProcessors(org.mule.api.processor.MessageProcessorChainBuilder)} method but if
+     * you wish to use another {@link MessageProcessorBuilder} or just a single {@link MessageProcessor} then
+     * this method can be overridden and return a single {@link MessageProcessor} instead.
      */
     protected MessageProcessor createPipeline() throws MuleException
     {
@@ -106,13 +103,13 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     }
 
     @Override
-    public PipelineProcessingStrategy getProcessingStrategy()
+    public ProcessingStrategy getProcessingStrategy()
     {
         return processingStrategy;
     }
 
     @Override
-    public void setProcessingStrategy(PipelineProcessingStrategy processingStrategy)
+    public void setProcessingStrategy(ProcessingStrategy processingStrategy)
     {
         this.processingStrategy = processingStrategy;
     }
@@ -145,7 +142,15 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
 
     protected void configureMessageProcessors(MessageProcessorChainBuilder builder) throws MuleException
     {
-        getProcessingStrategy().configureProcessors(this, builder);
+        getProcessingStrategy().configureProcessors(getMessageProcessors(),
+            new ProcessingStrategy.ThreadNameSource()
+            {
+                @Override
+                public String getName()
+                {
+                    return getName();
+                }
+            }, builder, muleContext);
     }
 
     @Override

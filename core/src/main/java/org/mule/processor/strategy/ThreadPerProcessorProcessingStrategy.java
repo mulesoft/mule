@@ -8,31 +8,43 @@
  * LICENSE.txt file.
  */
 
-package org.mule.construct;
+package org.mule.processor.strategy;
 
-import org.mule.api.construct.Pipeline;
-import org.mule.api.construct.PipelineProcessingStrategy;
+import org.mule.api.MuleContext;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorBuilder;
 import org.mule.api.processor.MessageProcessorChainBuilder;
 
+import java.util.List;
+
+import javax.resource.spi.work.WorkManager;
+
 /**
- * This strategy processes all message processors in the calling thread.
+ * This strategy uses a {@link WorkManager} to schedule the processing of each message processors in a new
+ * worker thread.
  */
-public class SynchronousProcessingStrategy implements PipelineProcessingStrategy
+public class ThreadPerProcessorProcessingStrategy extends AsynchronousProcessingStrategy
 {
+
     @Override
-    public void configureProcessors(Pipeline pipeline, MessageProcessorChainBuilder chainBuilder)
+    public void configureProcessors(List<MessageProcessor> processors,
+                                    ThreadNameSource nameSource,
+                                    MessageProcessorChainBuilder builder,
+                                    MuleContext muleContext)
     {
-        for (Object processor : pipeline.getMessageProcessors())
+        for (int i = 0; i < processors.size(); i++)
         {
+            MessageProcessor processor = processors.get(i);
+
+            builder.chain(createAsyncMessageProcessor(nameSource, muleContext));
+
             if (processor instanceof MessageProcessor)
             {
-                chainBuilder.chain((MessageProcessor) processor);
+                builder.chain(processor);
             }
             else if (processor instanceof MessageProcessorBuilder)
             {
-                chainBuilder.chain((MessageProcessorBuilder) processor);
+                builder.chain((MessageProcessorBuilder) processor);
             }
             else
             {
@@ -41,5 +53,4 @@ public class SynchronousProcessingStrategy implements PipelineProcessingStrategy
             }
         }
     }
-
 }
