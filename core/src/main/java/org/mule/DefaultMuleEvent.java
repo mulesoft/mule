@@ -73,6 +73,7 @@ public class DefaultMuleEvent extends EventObject
     private final URI messageSourceURI;
     private final String messageSourceName;
     private final ReplyToHandler replyToHandler;
+    private Object replyToParameter;
     private final boolean transacted;
 
     /** Mutable MuleEvent state **/
@@ -108,6 +109,7 @@ public class DefaultMuleEvent extends EventObject
         this.messageSourceName = null;
         this.messageSourceURI = URI.create("dynamic://null");;
         this.replyToHandler = null;
+        this.replyToParameter = null;
         this.timeout = message.getMuleContext().getConfiguration().getDefaultResponseTimeout();
         this.transacted = false;
     }
@@ -141,6 +143,7 @@ public class DefaultMuleEvent extends EventObject
         }
         this.messageSourceURI = messageSource.getURI();
         this.replyToHandler = null;
+        this.replyToParameter = null;
         this.timeout = message.getMuleContext().getConfiguration().getDefaultResponseTimeout();
     }
 
@@ -167,7 +170,6 @@ public class DefaultMuleEvent extends EventObject
         this.processingTime = time != null ? time : ProcessingTime.newInstance(this.session,
             message.getMuleContext());
         this.replyToHandler = replyToHandler;
-
         this.credentials = extractCredentials(endpoint);
         this.encoding = endpoint.getEncoding();
         this.exchangePattern = endpoint.getExchangePattern();
@@ -220,6 +222,7 @@ public class DefaultMuleEvent extends EventObject
             this.processingTime = ProcessingTime.newInstance(this.session, message.getMuleContext());
         }
         this.replyToHandler = rewriteEvent.getReplyToHandler();
+        this.replyToParameter = rewriteEvent.getReplyToParameter();
         this.timeout = rewriteEvent.getTimeout();
         transacted = rewriteEvent.isTransacted();
     }
@@ -570,6 +573,18 @@ public class DefaultMuleEvent extends EventObject
         {
             ((DefaultReplyToHandler) replyToHandler).initAfterDeserialisation(muleContext);
         }
+        if (replyToParameter instanceof DeserializationPostInitialisable)
+        {
+            try
+            {
+                DeserializationPostInitialisable.Implementation.init(replyToParameter, muleContext);
+            }
+            catch (Exception e)
+            {
+                throw new DefaultMuleException(e);
+            }
+
+        }
     }
 
     /**
@@ -674,5 +689,21 @@ public class DefaultMuleEvent extends EventObject
     public ReplyToHandler getReplyToHandler()
     {
         return replyToHandler;
+    }
+
+    @Override
+    public Object getReplyToParameter()
+    {
+        return replyToParameter;
+    }
+
+    @Override
+    public void setReplyToParameter()
+    {
+        if (message != null)
+        {
+            replyToParameter = message.getReplyTo();
+            message.setReplyTo(null);
+        }
     }
 }

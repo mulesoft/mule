@@ -10,21 +10,34 @@
 
 package org.mule.test.integration.transaction;
 
+import org.junit.runners.Parameterized;
 import org.mule.module.client.MuleClient;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import org.junit.Test;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 
 import static org.junit.Assert.assertEquals;
 
 public class XAJdbcMule1479TestCase extends AbstractDerbyTestCase
 {
     
-    @Override
-    protected String getConfigResources()
+    public XAJdbcMule1479TestCase(AbstractServiceAndFlowTestCase.ConfigVariant variant, String configResources)
     {
-        return "org/mule/test/integration/transaction/jdbc-xatransaction-1479.xml";
+        super(variant, configResources);
+    }
+
+    @Parameterized.Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {AbstractServiceAndFlowTestCase.ConfigVariant.SERVICE, "org/mule/test/integration/transaction/jdbc-xatransaction-1479.xml"},
+            // The flow version does not work because flow doesn't support outgoing transaction configuration
+            //{AbstractServiceAndFlowTestCase.ConfigVariant.FLOW, "org/mule/test/integration/transaction/jdbc-xatransaction-1479-flow.xml"}
+        });
     }
 
     @Override

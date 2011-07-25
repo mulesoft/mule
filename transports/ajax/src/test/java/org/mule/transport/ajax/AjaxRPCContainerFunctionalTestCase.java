@@ -17,15 +17,27 @@ import org.mortbay.jetty.Server;
 import org.mortbay.jetty.servlet.Context;
 import org.mortbay.jetty.servlet.ServletHolder;
 
+import org.junit.runners.Parameterized;
+
+import java.util.Arrays;
+import java.util.Collection;
+
 public class AjaxRPCContainerFunctionalTestCase extends AjaxRPCFunctionalTestCase
 {
-
     private Server httpServer;
 
-    @Override
-    protected String getConfigResources()
+    public AjaxRPCContainerFunctionalTestCase(ConfigVariant variant, String configResources)
     {
-        return "ajax-container-rpc-test.xml";
+        super(variant, configResources);
+    }
+
+    @Parameterized.Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "ajax-container-rpc-test.xml"},
+            {ConfigVariant.FLOW, "ajax-container-rpc-test-flow.xml"}
+        });
     }
 
     @Override

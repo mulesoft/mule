@@ -41,10 +41,8 @@ public class ServiceInternalMessageProcessor extends AbstractInterceptingMessage
         MuleEvent resultEvent;
         try
         {
-            Object replyTo = event.getMessage().getReplyTo();
+            Object replyTo = event.getReplyToParameter();
             ReplyToHandler replyToHandler = event.getReplyToHandler();
-            // Do not propagate REPLY_TO beyond the inbound endpoint
-            event.getMessage().setReplyTo(null);
 
             resultEvent = service.getComponent().process(event);
             resultEvent = processNext(resultEvent);

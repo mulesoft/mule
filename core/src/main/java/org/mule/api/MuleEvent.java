@@ -281,6 +281,20 @@ public interface MuleEvent extends Serializable
      */
     String getMessageSourceName();
 
+    /**
+     * Return the replyToHanlder (if any) that will be used to perform async reply
+     */
     ReplyToHandler getReplyToHandler();
+
+    /**
+     * Return the parameter (if any) that will be passed to the reply-to handler.
+     */
+    Object getReplyToParameter();
+
+    /**
+     * Set the reply-to parameter from the current message, and remove it from the message, to
+     * prevent any further propagation.
+     */
+    void setReplyToParameter();
     
 }

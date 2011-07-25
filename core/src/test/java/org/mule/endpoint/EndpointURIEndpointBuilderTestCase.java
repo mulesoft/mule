@@ -132,12 +132,12 @@ public class EndpointURIEndpointBuilderTestCase extends AbstractMuleContextTestC
 
         InboundEndpoint endpoint = endpointBuilder.buildInboundEndpoint();
 
-        assertEquals(2, endpoint.getMessageProcessors().size());
+        assertEquals(3, endpoint.getMessageProcessors().size());
         assertEquals(2, endpoint.getResponseMessageProcessors().size());
 
         endpoint = endpointBuilder.buildInboundEndpoint();
 
-        assertEquals(2, endpoint.getMessageProcessors().size());
+        assertEquals(3, endpoint.getMessageProcessors().size());
         assertEquals(2, endpoint.getResponseMessageProcessors().size());
     }
     

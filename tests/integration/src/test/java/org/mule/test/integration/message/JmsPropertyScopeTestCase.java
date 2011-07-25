@@ -29,7 +29,8 @@ public class JmsPropertyScopeTestCase extends AbstractPropertyScopeTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            { ConfigVariant.SERVICE, "org/mule/test/message/jms-property-scope.xml" }
+            { ConfigVariant.SERVICE, "org/mule/test/message/jms-property-scope.xml" } ,
+            { ConfigVariant.FLOW, "org/mule/test/message/jms-property-scope-flow.xml" }
         });
     }
 

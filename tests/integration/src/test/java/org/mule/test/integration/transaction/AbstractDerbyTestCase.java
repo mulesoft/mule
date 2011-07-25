@@ -10,7 +10,7 @@
 
 package org.mule.test.integration.transaction;
 
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.util.MuleDerbyTestUtils;
 import org.mule.transport.jdbc.JdbcUtils;
 
@@ -24,10 +24,15 @@ import org.apache.commons.dbutils.handlers.ArrayListHandler;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
-public abstract class AbstractDerbyTestCase extends FunctionalTestCase
+public abstract class AbstractDerbyTestCase extends AbstractServiceAndFlowTestCase
 {
     
     private static String connectionString;
+
+    public AbstractDerbyTestCase(AbstractServiceAndFlowTestCase.ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
+    }
 
     @BeforeClass
     public static void startDatabase() throws Exception

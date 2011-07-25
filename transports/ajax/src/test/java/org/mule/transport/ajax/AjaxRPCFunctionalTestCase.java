@@ -10,26 +10,28 @@
 
 package org.mule.transport.ajax;
 
-import org.mule.tck.junit4.FunctionalTestCase;
-import org.mule.tck.junit4.rule.DynamicPort;
-import org.mule.util.concurrent.Latch;
-
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicReference;
-
 import org.cometd.Client;
 import org.cometd.Message;
 import org.cometd.MessageListener;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runners.Parameterized;
 import org.mortbay.cometd.client.BayeuxClient;
 import org.mortbay.jetty.client.Address;
 import org.mortbay.jetty.client.HttpClient;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.util.concurrent.Latch;
+
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-public class AjaxRPCFunctionalTestCase extends FunctionalTestCase
+public class AjaxRPCFunctionalTestCase extends AbstractServiceAndFlowTestCase
 {
     public static final String TEST_JSON_MESSAGE = "{\"data\" : {\"value1\" : \"foo\", \"value2\" : \"bar\"}, \"replyTo\" : \"/response\"}";
 
@@ -40,10 +42,18 @@ public class AjaxRPCFunctionalTestCase extends FunctionalTestCase
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
-    @Override
-    protected String getConfigResources()
+    public AjaxRPCFunctionalTestCase(AbstractServiceAndFlowTestCase.ConfigVariant variant, String configResources)
     {
-        return "ajax-rpc-test.xml";
+        super(variant, configResources);
+    }
+
+    @Parameterized.Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {AbstractServiceAndFlowTestCase.ConfigVariant.SERVICE, "ajax-rpc-test.xml"},
+            {AbstractServiceAndFlowTestCase.ConfigVariant.FLOW, "ajax-rpc-test-flow.xml"}
+        });
     }
 
     @Override

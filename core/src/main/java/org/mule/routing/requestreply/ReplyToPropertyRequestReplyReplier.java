@@ -26,9 +26,8 @@ public class ReplyToPropertyRequestReplyReplier extends AbstractInterceptingMess
     @Override
     public MuleEvent process(MuleEvent event) throws MuleException
     {
-        Object replyTo = event.getMessage().getReplyTo();
-        // Do not propagate REPLY_TO
-        event.getMessage().setReplyTo(null);
+        Object replyTo = event.getReplyToParameter();
+        ReplyToHandler replyToHandler = event.getReplyToHandler();
 
         MuleEvent resultEvent = processNext(event);
 
@@ -37,7 +36,8 @@ public class ReplyToPropertyRequestReplyReplier extends AbstractInterceptingMess
             MuleProperties.MULE_REPLY_TO_STOP_PROPERTY);
         if (resultEvent != null && !BooleanUtils.toBoolean(replyToStop))
         {
-            processReplyTo(event, resultEvent, event.getReplyToHandler(), replyTo);
+            // reply-to processing should not resurrect a dead event
+            processReplyTo(event, resultEvent, replyToHandler, replyTo);
         }
 
         return resultEvent;

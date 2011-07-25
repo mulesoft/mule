@@ -44,7 +44,7 @@ public class RssNamespaceHandlerTestCase extends FunctionalTestCase
         assertNotNull(flowConstruct);
         assertTrue(flowConstruct.getMessageSource() instanceof InboundEndpoint);
         InboundEndpoint ep = ((InboundEndpoint)flowConstruct.getMessageSource());
-        assertEquals(2, ep.getMessageProcessors().size());
+        assertEquals(3, ep.getMessageProcessors().size());
         MessageProcessor mp = ep.getMessageProcessors().get(0);
         assertTrue(mp instanceof FeedSplitter);
         mp = ep.getMessageProcessors().get(1);

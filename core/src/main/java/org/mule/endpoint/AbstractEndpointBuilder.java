@@ -37,6 +37,7 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.Message;
 import org.mule.processor.SecurityFilterMessageProcessor;
 import org.mule.routing.MessageFilter;
+import org.mule.routing.requestreply.ReplyToParameterProcessor;
 import org.mule.transaction.MuleTransactionConfig;
 import org.mule.transformer.TransformerUtils;
 import org.mule.transport.AbstractConnector;
@@ -180,7 +181,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
         EndpointURI endpointURI = uriBuilder.getEndpoint();
         endpointURI.initialise();
         
-        List<MessageProcessor> mergedProcessors = addTransformerProcessors(endpointURI);
+        List<MessageProcessor> mergedProcessors = addReplyToProcessors(addTransformerProcessors(endpointURI));
         List<MessageProcessor> mergedResponseProcessors = addResponseTransformerProcessors(endpointURI);
 
         Connector connector = getConnector();
@@ -260,6 +261,12 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
         tempProcessors.addAll(getTransformersFromUri(endpointURI));
         tempProcessors.addAll(transformers);
         return tempProcessors;
+    }
+
+    protected List<MessageProcessor> addReplyToProcessors(List<MessageProcessor>  processors)
+    {
+        processors.add(new ReplyToParameterProcessor());
+        return processors;
     }
 
     protected List<MessageProcessor> addResponseTransformerProcessors(EndpointURI endpointURI)

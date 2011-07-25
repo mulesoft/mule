@@ -11,9 +11,13 @@
 package org.mule.test.integration.transaction;
 
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import org.junit.Test;
+import org.junit.runners.Parameterized;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -23,12 +27,20 @@ public class XABridgeJmsJdbcTestCase extends AbstractDerbyTestCase
 {
 
     private static final int NUMBER_OF_MESSAGES = 1;
-    
-    @Override
-    protected String getConfigResources()
+
+    public XABridgeJmsJdbcTestCase(AbstractServiceAndFlowTestCase.ConfigVariant variant, String configResources)
     {
-        return "org/mule/test/integration/transaction/xabridge-jms-jdbc-mule.xml";
+        super(variant, configResources);
     }
+
+       @Parameterized.Parameters
+       public static Collection<Object[]> parameters()
+       {
+           return Arrays.asList(new Object[][]{
+               {AbstractServiceAndFlowTestCase.ConfigVariant.SERVICE, "org/mule/test/integration/transaction/xabridge-jms-jdbc-mule.xml"},
+               {AbstractServiceAndFlowTestCase.ConfigVariant.FLOW, "org/mule/test/integration/transaction/xabridge-jms-jdbc-mule-flow.xml"}
+           });
+       }
 
     @Override
     protected void emptyTable() throws Exception

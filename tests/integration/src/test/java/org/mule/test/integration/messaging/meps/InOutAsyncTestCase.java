@@ -10,11 +10,15 @@
 
 package org.mule.test.integration.messaging.meps;
 
+import org.junit.runners.Parameterized;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.module.client.MuleClient;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.junit4.FunctionalTestCase;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -23,15 +27,23 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-public class InOutAsyncTestCase extends FunctionalTestCase
+public class InOutAsyncTestCase extends AbstractServiceAndFlowTestCase
 {
 
     public static final long TIMEOUT = 3000;
 
-    @Override
-    protected String getConfigResources()
+     @Parameterized.Parameters
+    public static Collection<Object[]> parameters()
     {
-        return "org/mule/test/integration/messaging/meps/pattern_In-Out-Async.xml";
+        return Arrays.asList(new Object[][]{
+            { ConfigVariant.SERVICE, "org/mule/test/integration/messaging/meps/pattern_In-Out-Async.xml" } ,
+            { ConfigVariant.FLOW, "org/mule/test/integration/messaging/meps/pattern_In-Out-Async-flow.xml"}
+        });
+    }
+
+    public InOutAsyncTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
     }
 
     @Test

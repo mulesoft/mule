@@ -48,7 +48,7 @@ public class CompositeMessageProcessorDefinitionParserTestCase extends Functiona
     {
         EndpointBuilder endpointBuilder = muleContext.getRegistry().lookupEndpointBuilder("endpoint");
         InboundEndpoint endpoint = endpointBuilder.buildInboundEndpoint();
-        assertEquals(2, endpoint.getMessageProcessors().size());
+        assertEquals(3, endpoint.getMessageProcessors().size());
 
         MessageProcessor endpointProcessor = endpoint.getMessageProcessorsFactory()
             .createInboundMessageProcessorChain(endpoint, null, new NullMessageProcessor());

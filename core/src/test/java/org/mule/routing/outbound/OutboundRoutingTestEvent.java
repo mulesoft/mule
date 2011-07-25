@@ -258,4 +258,15 @@ public class OutboundRoutingTestEvent implements MuleEvent
         return null;
     }
 
+    @Override
+    public Object getReplyToParameter()
+    {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public void setReplyToParameter()
+    {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
 }

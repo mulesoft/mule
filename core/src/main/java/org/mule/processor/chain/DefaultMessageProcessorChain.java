@@ -10,6 +10,7 @@
 
 package org.mule.processor.chain;
 
+import org.mule.MessageExchangePattern;
 import org.mule.OptimizedRequestContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -22,6 +23,7 @@ import org.mule.api.transformer.Transformer;
 import org.mule.construct.Flow;
 import org.mule.context.notification.MessageProcessorNotification;
 import org.mule.routing.MessageFilter;
+import org.mule.routing.requestreply.ReplyToPropertyRequestReplyReplier;
 
 import java.util.Arrays;
 import java.util.Iterator;
@@ -72,30 +74,47 @@ public class DefaultMessageProcessorChain extends AbstractMessageProcessorChain
         MuleEvent resultEvent;
         MuleEvent copy = null;
         Iterator<MessageProcessor> processorIterator = processors.iterator();
-        while (processorIterator.hasNext())
+        MessageProcessor processor = null;
+        if (processorIterator.hasNext())
         {
-            MessageProcessor processor = processorIterator.next();
-
+            processor = processorIterator.next();
+        }
+        boolean resultWasNull = false;
+        while (processor != null)
+        {
+            MessageProcessor nextProcessor = null;
+            if (processorIterator.hasNext())
+            {
+                nextProcessor = processorIterator.next();
+            }
             fireNotification(event.getFlowConstruct(), event, processor,
                 MessageProcessorNotification.MESSAGE_PROCESSOR_PRE_INVOKE);
 
-            if (flowConstruct instanceof Flow && processorIterator.hasNext()
+            if (flowConstruct instanceof Flow && nextProcessor != null
                 && processorMayReturnNull(processor))
             {
                 copy = OptimizedRequestContext.criticalSetEvent(currentEvent);
             }
 
             resultEvent = processor.process(currentEvent);
+            if (resultWasNull && processor instanceof ReplyToPropertyRequestReplyReplier)
+            {
+                // reply-to processing should not resurrect a dead event
+                resultEvent = null;
+            }
 
             fireNotification(event.getFlowConstruct(), resultEvent, processor,
                 MessageProcessorNotification.MESSAGE_PROCESSOR_POST_INVOKE);
 
+
             if (resultEvent != null)
             {
+                resultWasNull = false;
                 currentEvent = resultEvent;
             }
-            else if (flowConstruct instanceof Flow && processorIterator.hasNext())
+            else if (flowConstruct instanceof Flow && nextProcessor != null)
             {
+                resultWasNull = true;
                 // // In a flow when a MessageProcessor returns null the next
                 // processor acts as an implicit
                 // // branch receiving a copy of the message used for previous
@@ -115,6 +134,7 @@ public class DefaultMessageProcessorChain extends AbstractMessageProcessorChain
                 // But in a service we don't do any implicit branching.
                 return null;
             }
+            processor = nextProcessor;
         }
         return currentEvent;
     }
@@ -123,7 +143,8 @@ public class DefaultMessageProcessorChain extends AbstractMessageProcessorChain
     {
         if (processor instanceof OutboundEndpoint)
         {
-            return !((OutboundEndpoint) processor).getExchangePattern().hasResponse();
+            MessageExchangePattern exchangePattern = ((OutboundEndpoint) processor).getExchangePattern();
+            return exchangePattern == null ? true : !exchangePattern.hasResponse();
         }
         else if (processor instanceof Component || processor instanceof Transformer
                  || processor instanceof MessageFilter)

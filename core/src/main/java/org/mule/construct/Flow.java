@@ -24,6 +24,7 @@ import org.mule.construct.processor.FlowConstructStatisticsMessageProcessor;
 import org.mule.interceptor.ProcessingTimeInterceptor;
 import org.mule.lifecycle.processor.ProcessIfStartedMessageProcessor;
 import org.mule.management.stats.FlowConstructStatistics;
+import org.mule.routing.requestreply.ReplyToPropertyRequestReplyReplier;
 import org.mule.session.DefaultMuleSession;
 
 /**
@@ -70,6 +71,13 @@ public class Flow extends AbstractPipeline implements MessageProcessor
         builder.chain(new ProcessIfStartedMessageProcessor(this, getLifecycleState()));
         builder.chain(new ProcessingTimeInterceptor());
         builder.chain(new FlowConstructStatisticsMessageProcessor());
+    }
+
+    @Override
+    protected void configurePostProcessors(MessageProcessorChainBuilder builder) throws MuleException
+    {
+        super.configurePostProcessors(builder);
+        builder.chain(new ReplyToPropertyRequestReplyReplier());
     }
 
     /**

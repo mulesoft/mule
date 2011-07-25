@@ -151,7 +151,7 @@ public class MuleEndpointConfigurationTestCase extends AbstractServiceAndFlowTes
         {
             assertNotNull(serviceFlow);
             assertNotNull(((Flow) serviceFlow).getMessageSource());
-            assertEquals(1,
+            assertEquals(2,
                 ((DefaultInboundEndpoint) ((Flow) serviceFlow).getMessageSource()).getMessageProcessors()
                     .size());
             ImmutableEndpoint endpoint = ((DefaultInboundEndpoint) ((Flow) serviceFlow).getMessageSource());
