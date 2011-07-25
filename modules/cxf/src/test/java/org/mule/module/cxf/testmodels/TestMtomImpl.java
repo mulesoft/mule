@@ -44,7 +44,7 @@ public class TestMtomImpl implements TestMtom
             e.printStackTrace();
         }
 
-        attachinfo.value = new DataHandler(new FileDataSource("src/test/resources/mtom-conf.xml"));
+        attachinfo.value = new DataHandler(new FileDataSource("src/test/resources/mtom-conf-service.xml"));
     }
 
 }
