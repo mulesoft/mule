@@ -10,34 +10,45 @@
 
 package org.mule.transport.servlet.jetty;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.DataType;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
-public class JettyTwoEndpointsSinglePortTestCase extends FunctionalTestCase
+public class JettyTwoEndpointsSinglePortTestCase extends AbstractServiceAndFlowTestCase
 {
 
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
-    @Override
-    protected String getConfigResources()
+    public JettyTwoEndpointsSinglePortTestCase(ConfigVariant variant, String configResources)
     {
-        return "jetty-two-endpoints-single-port.xml";
+        super(variant, configResources);
     }
 
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "jetty-two-endpoints-single-port-service.xml"},
+            {ConfigVariant.FLOW, "jetty-two-endpoints-single-port-flow.xml"}
+        });
+    }      
+    
     @Test
     public void testSendToEach() throws Exception
     {
