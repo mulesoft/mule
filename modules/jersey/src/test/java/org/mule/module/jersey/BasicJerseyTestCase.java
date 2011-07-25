@@ -37,7 +37,7 @@ public class BasicJerseyTestCase extends AbstractServiceAndFlowTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "basic-conf-flow.xml"},            
+            {ConfigVariant.SERVICE, "basic-conf.xml"},            
         });
     }      
     
