@@ -10,33 +10,40 @@
 
 package org.mule.transport.jdbc.functional;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.handlers.ArrayHandler;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import org.junit.runners.Parameterized.Parameters;
 
 public class JdbcFunctionalTestCase extends AbstractJdbcFunctionalTestCase
 {
-    public JdbcFunctionalTestCase()
+    public JdbcFunctionalTestCase(ConfigVariant variant, String configResources)
     {
+        super(variant, configResources);
         setPopulateTestData(false);
     }
     
-    @Override
-    protected String getConfigResources()
+    @Parameters
+    public static Collection<Object[]> parameters()
     {
-        return super.getConfigResources() + ",jdbc-functional-config.xml";
-    }
-
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, AbstractJdbcFunctionalTestCase.getConfig() + ",jdbc-functional-config-service.xml"},
+            {ConfigVariant.FLOW, AbstractJdbcFunctionalTestCase.getConfig() + ",jdbc-functional-config-flow.xml"}
+        });
+    }      
+    
     @Test
     public void testDirectSql() throws Exception
     {

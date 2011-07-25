@@ -10,20 +10,23 @@
 
 package org.mule.transport.tcp.issues;
 
-import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.junit4.FunctionalTestCase;
-import org.mule.tck.junit4.rule.DynamicPort;
-
-import java.util.Arrays;
-import org.junit.Rule;
-import org.junit.Test;
-
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-public class LengthProtocolLengthTestCase extends FunctionalTestCase
+import org.mule.api.MuleMessage;
+import org.mule.module.client.MuleClient;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
+
+import java.util.Arrays;
+import java.util.Collection;
+
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+
+public class LengthProtocolLengthTestCase extends AbstractServiceAndFlowTestCase
 {
 
     @Rule
@@ -32,11 +35,19 @@ public class LengthProtocolLengthTestCase extends FunctionalTestCase
     @Rule
     public DynamicPort dynamicPort2 = new DynamicPort("port2");
 
-    @Override
-    protected String getConfigResources()
+    public LengthProtocolLengthTestCase(ConfigVariant variant, String configResources)
     {
-        return "length-protocol-length-test.xml";
+        super(variant, configResources);
     }
+
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "length-protocol-length-test-service.xml"},
+            {ConfigVariant.FLOW, "length-protocol-length-test-flow.xml"}
+        });
+    }      
 
     @Test
     public void testLength() throws Exception

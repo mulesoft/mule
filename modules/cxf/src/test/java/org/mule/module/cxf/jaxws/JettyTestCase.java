@@ -10,11 +10,15 @@
 
 package org.mule.module.cxf.jaxws;
 
+import static org.junit.Assert.assertEquals;
+
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -23,21 +27,28 @@ import org.apache.hello_world_soap_http.GreeterImpl;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
 
-import static org.junit.Assert.assertEquals;
-
-public class JettyTestCase extends FunctionalTestCase
+public class JettyTestCase extends AbstractServiceAndFlowTestCase
 {
 
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
-    @Override
-    protected String getConfigResources()
+    public JettyTestCase(ConfigVariant variant, String configResources)
     {
-        return "jetty-conf.xml";
+        super(variant, configResources);
     }
 
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "jetty-conf-service.xml"},
+            {ConfigVariant.FLOW, "jetty-conf-flow.xml"}
+        });
+    }      
+    
     @BeforeClass
     public static void setUpDefaultBus()
     {

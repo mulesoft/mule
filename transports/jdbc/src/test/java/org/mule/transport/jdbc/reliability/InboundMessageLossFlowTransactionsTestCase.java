@@ -10,6 +10,11 @@
 
 package org.mule.transport.jdbc.reliability;
 
+import java.util.Arrays;
+import java.util.Collection;
+
+import org.junit.runners.Parameterized.Parameters;
+
 
 
 /**
@@ -22,9 +27,17 @@ package org.mule.transport.jdbc.reliability;
  */
 public class InboundMessageLossFlowTransactionsTestCase extends InboundMessageLossTransactionsTestCase
 {
-    @Override
-    protected String getConfigResources()
+    public InboundMessageLossFlowTransactionsTestCase(ConfigVariant variant, String configResources)
     {
-        return "reliability/jdbc-connector.xml, reliability/inbound-message-loss-flow-transactions.xml";
+        super(variant, configResources);
     }
+
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{            
+            {ConfigVariant.FLOW, "reliability/jdbc-connector.xml, reliability/inbound-message-loss-flow-transactions.xml"}
+        });
+    }      
+    
 }

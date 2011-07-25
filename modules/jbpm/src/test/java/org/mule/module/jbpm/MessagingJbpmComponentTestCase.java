@@ -10,35 +10,45 @@
 
 package org.mule.module.jbpm;
 
-import org.mule.api.MuleMessage;
-import org.mule.api.client.MuleClient;
-import org.mule.module.bpm.BPMS;
-import org.mule.module.bpm.Process;
-import org.mule.tck.junit4.FunctionalTestCase;
-
-import java.util.HashMap;
-import java.util.Map;
-
-import org.junit.Test;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import org.mule.api.MuleMessage;
+import org.mule.api.client.MuleClient;
+import org.mule.module.bpm.BPMS;
+import org.mule.module.bpm.Process;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+
 /**
  * Tests the connector against jBPM with a process which generates
  * a Mule message and processes its response. jBPM is instantiated by Spring.
  */
-public class MessagingJbpmComponentTestCase extends FunctionalTestCase
+public class MessagingJbpmComponentTestCase extends AbstractServiceAndFlowTestCase
 {
-
-    @Override
-    protected String getConfigResources()
+    public MessagingJbpmComponentTestCase(ConfigVariant variant, String configResources)
     {
-        return "jbpm-component-functional-test.xml";
+        super(variant, configResources);
     }
 
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "jbpm-component-functional-test-service.xml"},
+            {ConfigVariant.FLOW, "jbpm-component-functional-test-flow.xml"}
+        });
+    }      
+    
     @Test
     public void testSendMessageProcess() throws Exception
     {

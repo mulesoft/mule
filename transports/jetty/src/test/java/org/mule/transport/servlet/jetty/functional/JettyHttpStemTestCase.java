@@ -10,25 +10,36 @@
 
 package org.mule.transport.servlet.jetty.functional;
 
-import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.junit4.FunctionalTestCase;
-import org.mule.transport.http.HttpConnector;
-
-import org.junit.Test;
-
 import static org.junit.Assert.assertEquals;
 
+import org.mule.api.MuleMessage;
+import org.mule.module.client.MuleClient;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.transport.http.HttpConnector;
 
-public class JettyHttpStemTestCase extends FunctionalTestCase
+import java.util.Arrays;
+import java.util.Collection;
+
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+
+
+public class JettyHttpStemTestCase extends AbstractServiceAndFlowTestCase
 {
-
-    @Override
-    protected String getConfigResources()
+    public JettyHttpStemTestCase(ConfigVariant variant, String configResources)
     {
-        return "jetty-http-stem-test.xml";
+        super(variant, configResources);
     }
 
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "jetty-http-stem-test-service.xml"},
+            {ConfigVariant.FLOW, "jetty-http-stem-test-flow.xml"}
+        });
+    }      
+    
     @Test
     public void testStemMatchingHttp() throws Exception
     {

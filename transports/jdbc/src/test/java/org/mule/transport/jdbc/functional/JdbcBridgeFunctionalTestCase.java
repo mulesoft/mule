@@ -10,31 +10,38 @@
 
 package org.mule.transport.jdbc.functional;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.sql.Connection;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.handlers.ArrayListHandler;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import org.junit.runners.Parameterized.Parameters;
 
 public class JdbcBridgeFunctionalTestCase extends AbstractJdbcFunctionalTestCase
 {
 
     private static final int TEST_ROWS = 10;
     
-    public JdbcBridgeFunctionalTestCase()
+    public JdbcBridgeFunctionalTestCase(ConfigVariant variant, String configResources)
     {
+        super(variant, configResources);
         setPopulateTestData(false);
     }
 
-    @Override
-    protected String getConfigResources()
+    @Parameters
+    public static Collection<Object[]> parameters()
     {
-        return "jdbc-bridge.xml";
-    }
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "jdbc-bridge-service.xml"},
+            {ConfigVariant.FLOW, "jdbc-bridge-flow.xml"}
+        });
+    }          
     
     @Override
     protected void createTable() throws Exception

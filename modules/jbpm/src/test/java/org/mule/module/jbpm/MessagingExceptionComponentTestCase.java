@@ -10,25 +10,36 @@
 
 package org.mule.module.jbpm;
 
-import org.mule.api.client.MuleClient;
-import org.mule.api.transformer.TransformerException;
-import org.mule.tck.exceptions.FunctionalTestException;
-import org.mule.tck.junit4.FunctionalTestCase;
-import org.mule.util.ExceptionUtils;
-
-import org.junit.Test;
-
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-public class MessagingExceptionComponentTestCase extends FunctionalTestCase
+import org.mule.api.client.MuleClient;
+import org.mule.api.transformer.TransformerException;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.exceptions.FunctionalTestException;
+import org.mule.util.ExceptionUtils;
+
+import java.util.Arrays;
+import java.util.Collection;
+
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+
+public class MessagingExceptionComponentTestCase extends AbstractServiceAndFlowTestCase
 {
-    @Override
-    protected String getConfigResources()
+    public MessagingExceptionComponentTestCase(ConfigVariant variant, String configResources)
     {
-        return "jbpm-component-functional-test.xml";
+        super(variant, configResources);
+    }
+
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "jbpm-component-functional-test-flow.xml"},
+            {ConfigVariant.FLOW, "jbpm-component-functional-test-service.xml"}});
     }
 
     @Test

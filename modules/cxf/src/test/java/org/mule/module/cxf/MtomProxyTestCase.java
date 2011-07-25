@@ -10,14 +10,25 @@
 
 package org.mule.module.cxf;
 
+import java.util.Arrays;
+import java.util.Collection;
+
+import org.junit.runners.Parameterized.Parameters;
+
 public class MtomProxyTestCase extends MtomTestCase
 {
 
-    @Override
-    protected String getConfigResources()
+    public MtomProxyTestCase(ConfigVariant variant, String configResources)
     {
-        return "mtom-proxy-conf.xml";
+        super(variant, configResources);
     }
 
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{            
+            {ConfigVariant.FLOW, "mtom-proxy-conf.xml"}
+        });
+    }          
 }
 

@@ -10,30 +10,41 @@
 
 package org.mule.transport.jdbc.functional;
 
-import org.mule.tck.junit4.FunctionalTestCase;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.Arrays;
+import java.util.Collection;
 
 import javax.sql.DataSource;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import org.junit.runners.Parameterized.Parameters;
 
 /**
  * Test for MULE-3625, submitted by community member Guy Veraghtert
  */
-public class Mule3625FunctionalTest extends FunctionalTestCase
+public class Mule3625FunctionalTest extends AbstractServiceAndFlowTestCase
 {
-    @Override
-    protected String getConfigResources()
+    public Mule3625FunctionalTest(ConfigVariant variant, String configResources)
     {
-        return "jdbc-mule-3625.xml";
+        super(variant, configResources);
     }
 
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "jdbc-mule-3625-service.xml"},
+            {ConfigVariant.FLOW, "jdbc-mule-3625-flow.xml"}
+        });
+    }      
+    
     /**
      * Test registering transaction manager for non-XA rtansaction
      *

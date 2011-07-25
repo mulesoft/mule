@@ -27,7 +27,7 @@ public class ForkedProcessComponentTestCase extends FunctionalTestCase
     @Override
     protected String getConfigResources()
     {
-        return "jbpm-component-functional-test.xml";
+        return "jbpm-component-functional-test-service.xml";
     }
 
     @Test

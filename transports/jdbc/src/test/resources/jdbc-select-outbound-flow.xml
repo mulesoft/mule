@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:jdbc="http://www.mulesoft.org/schema/mule/jdbc"
+      xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
+       http://www.mulesoft.org/schema/mule/jdbc http://www.mulesoft.org/schema/mule/jdbc/3.2/mule-jdbc.xsd">
+
+    <flow name="bridge">
+        <inbound-endpoint address="vm://jdbc.test" exchange-pattern="request-response"/>
+        <jdbc:outbound-endpoint queryKey="getTest" exchange-pattern="request-response">
+            <!-- this is substituted in the SQL template defined in jdbc-connector.xml -->
+            <property key="type" value="1"/>
+        </jdbc:outbound-endpoint>
+    </flow>
+
+    <flow name="bridgeA">
+        <inbound-endpoint address="vm://terra" exchange-pattern="request-response"/>
+        <jdbc:outbound-endpoint address="jdbc://getTestPayload" exchange-pattern="request-response"/>
+    </flow>
+
+    <flow name="chain2SelectAlwaysBegin">
+        <inbound-endpoint address="vm://chain.always.begin" exchange-pattern="request-response"/>
+        <jdbc:outbound-endpoint queryKey="selectCount" exchange-pattern="one-way">
+            <jdbc:transaction action="ALWAYS_BEGIN"/>
+        </jdbc:outbound-endpoint>
+        <jdbc:outbound-endpoint address="jdbc://getTest?type=1" exchange-pattern="one-way">
+            <jdbc:transaction action="ALWAYS_BEGIN"/>
+        </jdbc:outbound-endpoint>
+    </flow>
+
+    <flow name="chain2SelectBeginOrJoin">
+        <inbound-endpoint address="vm://chain.begin.or.join" exchange-pattern="request-response"/>
+        <jdbc:outbound-endpoint queryKey="selectCount" exchange-pattern="one-way">
+            <jdbc:transaction action="BEGIN_OR_JOIN"/>
+        </jdbc:outbound-endpoint>
+        <jdbc:outbound-endpoint address="jdbc://getTest?type=1" exchange-pattern="one-way">
+            <jdbc:transaction action="ALWAYS_BEGIN"/>
+        </jdbc:outbound-endpoint>
+    </flow>
+    
+</mule>

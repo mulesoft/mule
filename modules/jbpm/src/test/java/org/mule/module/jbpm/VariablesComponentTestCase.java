@@ -10,33 +10,44 @@
 
 package org.mule.module.jbpm;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.module.bpm.BPMS;
 import org.mule.module.bpm.Process;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
-public class VariablesComponentTestCase extends FunctionalTestCase
+public class VariablesComponentTestCase extends AbstractServiceAndFlowTestCase
 {
 
     private final int TIMEOUT = 10000;
-    
-    @Override
-    protected String getConfigResources()
+
+    public VariablesComponentTestCase(ConfigVariant variant, String configResources)
     {
-        return "jbpm-component-functional-test.xml";
+        super(variant, configResources);
     }
 
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "jbpm-component-functional-test-service.xml"},
+            {ConfigVariant.FLOW, "jbpm-component-functional-test-flow.xml"}
+        });
+    }      
+    
     @Test
     public void testVariables() throws Exception
     {

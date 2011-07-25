@@ -10,8 +10,12 @@
 
 package org.mule.transport.jdbc.functional;
 
+import static junit.framework.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+
 import org.mule.api.MuleMessage;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.util.MuleDerbyTestUtils;
 import org.mule.transport.jdbc.JdbcConnector;
 import org.mule.transport.jdbc.JdbcUtils;
@@ -25,11 +29,7 @@ import org.apache.commons.dbutils.handlers.ArrayListHandler;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
-import static junit.framework.Assert.assertTrue;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-
-public abstract class AbstractJdbcFunctionalTestCase extends FunctionalTestCase
+public abstract class AbstractJdbcFunctionalTestCase extends AbstractServiceAndFlowTestCase
 {
 
     protected static final String[] TEST_VALUES = {"Test", "The Moon", "Terra"};
@@ -37,13 +37,17 @@ public abstract class AbstractJdbcFunctionalTestCase extends FunctionalTestCase
     protected JdbcConnector jdbcConnector;
 
     private boolean populateTestData = true;
-
-    @Override
-    protected String getConfigResources()
+   
+    protected static String getConfig()
     {
         return "jdbc-connector.xml";
     }
 
+    public AbstractJdbcFunctionalTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
+    }            
+    
     @Override
     protected void doSetUp() throws Exception
     {

@@ -10,13 +10,18 @@
 
 package org.mule.module.cxf;
 
-import org.mule.tck.junit4.FunctionalTestCase;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Arrays;
+import java.util.Collection;
 
 import javax.activation.DataHandler;
 import javax.activation.FileDataSource;
@@ -30,20 +35,26 @@ import org.apache.cxf.mime.TestMtom;
 import org.apache.cxf.mime.TestMtomService;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
-public class MtomTestCase extends FunctionalTestCase
+public class MtomTestCase extends AbstractServiceAndFlowTestCase
 {
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
-    @Override
-    protected String getConfigResources()
+    public MtomTestCase(ConfigVariant variant, String configResources)
     {
-        return "mtom-conf.xml";
+        super(variant, configResources);
     }
+
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "mtom-conf-service.xml"},
+            {ConfigVariant.FLOW, "mtom-conf-flow.xml"}
+        });
+    }      
 
     @Test
     public void testEchoService() throws Exception
@@ -67,7 +78,7 @@ public class MtomTestCase extends FunctionalTestCase
         // Client client = ClientProxy.getClient(port);
         // new LoggingFeature().initialize(client, null);
 
-        File file = new File("src/test/resources/mtom-conf.xml");
+        File file = new File("src/test/resources/mtom-conf-service.xml");
         DataHandler dh = new DataHandler(new FileDataSource(file));
 
         Holder<String> name = new Holder<String>("test");

@@ -10,17 +10,21 @@
 
 package org.mule.transport.jdbc.functional;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.transport.NullPayload;
 
-import org.junit.Test;
+import java.util.Arrays;
+import java.util.Collection;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
 
 public class JdbcMessagePropertiesCopyingTestCase extends AbstractJdbcFunctionalTestCase
 {
@@ -28,11 +32,19 @@ public class JdbcMessagePropertiesCopyingTestCase extends AbstractJdbcFunctional
     private static final String PROPERTY_KEY = "custom-key";
     private static final String PROPERTY_VALUE = "custom-value";
 
-    @Override
-    protected String getConfigResources()
+    public JdbcMessagePropertiesCopyingTestCase(ConfigVariant variant, String configResources)
     {
-        return super.getConfigResources() + ", jdbc-message-properties-copying.xml";
+        super(variant, configResources);
     }
+
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, AbstractJdbcFunctionalTestCase.getConfig() + ", jdbc-message-properties-copying-service.xml"},
+            {ConfigVariant.FLOW, AbstractJdbcFunctionalTestCase.getConfig() + ", jdbc-message-properties-copying-flow.xml"}
+        });
+    }      
 
     @Test
     public void testMessagePropertiesCopying() throws Exception

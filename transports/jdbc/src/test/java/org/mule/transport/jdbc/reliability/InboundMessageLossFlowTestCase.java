@@ -10,12 +10,16 @@
 
 package org.mule.transport.jdbc.reliability;
 
+import static org.junit.Assert.assertEquals;
+
 import org.mule.tck.probe.Probe;
+
+import java.util.Arrays;
+import java.util.Collection;
 
 import org.apache.commons.dbutils.handlers.ArrayHandler;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
+import org.junit.runners.Parameterized.Parameters;
 
 
 /**
@@ -28,11 +32,18 @@ import static org.junit.Assert.assertEquals;
  */
 public class InboundMessageLossFlowTestCase extends InboundMessageLossTestCase
 {
-    @Override
-    protected String getConfigResources()
+    public InboundMessageLossFlowTestCase(ConfigVariant variant, String configResources)
     {
-        return "reliability/jdbc-connector.xml, reliability/inbound-message-loss-flow.xml";
+        super(variant, configResources);     
     }
+
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{            
+            {ConfigVariant.FLOW, "reliability/jdbc-connector.xml, reliability/inbound-message-loss-flow.xml"}
+        });
+    }          
 
     @Override
     @Test

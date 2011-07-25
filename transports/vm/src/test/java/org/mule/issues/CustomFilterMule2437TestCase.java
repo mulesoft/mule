@@ -10,27 +10,39 @@
 
 package org.mule.issues;
 
-import org.mule.DefaultMuleMessage;
-import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.junit4.FunctionalTestCase;
-
-import org.junit.Test;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-public class CustomFilterMule2437TestCase extends FunctionalTestCase
+import org.mule.DefaultMuleMessage;
+import org.mule.api.MuleMessage;
+import org.mule.module.client.MuleClient;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+
+import java.util.Arrays;
+import java.util.Collection;
+
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+
+public class CustomFilterMule2437TestCase extends AbstractServiceAndFlowTestCase
 {
 
     private static final long TIMEOUT = 3000L;
 
-    @Override
-    protected String getConfigResources()
+    public CustomFilterMule2437TestCase(ConfigVariant variant, String configResources)
     {
-        return "issues/custom-filter-mule-2437-test.xml";
+        super(variant, configResources);
     }
 
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "issues/custom-filter-mule-2437-test-service.xml"},
+            {ConfigVariant.FLOW, "issues/custom-filter-mule-2437-test-flow.xml"}
+        });
+    }      
+    
     @Test
     public void testVowels() throws Exception
     {

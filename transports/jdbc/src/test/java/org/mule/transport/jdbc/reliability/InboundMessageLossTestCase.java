@@ -10,6 +10,8 @@
 
 package org.mule.transport.jdbc.reliability;
 
+import static org.junit.Assert.assertEquals;
+
 import org.mule.exception.DefaultSystemExceptionStrategy;
 import org.mule.routing.filters.WildcardFilter;
 import org.mule.tck.probe.PollingProber;
@@ -17,11 +19,13 @@ import org.mule.tck.probe.Probe;
 import org.mule.tck.probe.Prober;
 import org.mule.transport.jdbc.functional.AbstractJdbcFunctionalTestCase;
 
+import java.util.Arrays;
+import java.util.Collection;
+
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.handlers.ArrayHandler;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
+import org.junit.runners.Parameterized.Parameters;
 
 /**
  * Verify that no inbound messages are lost when exceptions occur.  
@@ -38,16 +42,19 @@ public class InboundMessageLossTestCase extends AbstractJdbcFunctionalTestCase
         
     protected QueryRunner qr;
     
-    public InboundMessageLossTestCase()
+    public InboundMessageLossTestCase(ConfigVariant variant, String configResources)
     {
+        super(variant, configResources);
         setPopulateTestData(false);
     }
     
-    @Override
-    protected String getConfigResources()
+    @Parameters
+    public static Collection<Object[]> parameters()
     {
-        return "reliability/jdbc-connector.xml, reliability/inbound-message-loss.xml";
-    }
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "reliability/jdbc-connector.xml, reliability/inbound-message-loss.xml"}            
+        });
+    }          
 
     @Override
     protected void doSetUp() throws Exception

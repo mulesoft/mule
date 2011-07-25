@@ -10,35 +10,40 @@
 
 package org.mule.transport.jdbc.functional;
 
-import org.mule.DefaultMuleMessage;
-import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
-import org.mule.transport.NullPayload;
-
-import java.util.Collection;
-import java.util.Map;
-
-import org.junit.Test;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import org.mule.DefaultMuleMessage;
+import org.mule.api.MuleMessage;
+import org.mule.module.client.MuleClient;
+import org.mule.transport.NullPayload;
+
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Map;
+
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+
 public class JdbcNullParamsTestCase extends AbstractJdbcFunctionalTestCase
 {
     
-    public JdbcNullParamsTestCase()
+    public JdbcNullParamsTestCase(ConfigVariant variant, String configResources)
     {
+        super(variant, configResources);
         setPopulateTestData(false);
     }
     
-    @Override
-    protected String getConfigResources()
+    @Parameters
+    public static Collection<Object[]> parameters()
     {
-        return "jdbc-null-params.xml";
-    }
-
+        return Arrays.asList(new Object[][]{            
+            {ConfigVariant.FLOW, "jdbc-null-params.xml"}
+        });
+    }      
+    
     @Test
     public void testJdbcNullParams() throws Exception
     {

@@ -10,26 +10,37 @@
 
 package org.mule.transport.servlet.jetty.functional;
 
+import static org.junit.Assert.assertEquals;
+
 import org.mule.api.MuleMessage;
 import org.mule.api.transport.DispatchException;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
 
-import static org.junit.Assert.assertEquals;
-
-public class JettyHttpFunctionalWithQueryTestCase extends FunctionalTestCase
+public class JettyHttpFunctionalWithQueryTestCase extends AbstractServiceAndFlowTestCase
 {
-    @Override
-    protected String getConfigResources()
+    public JettyHttpFunctionalWithQueryTestCase(ConfigVariant variant, String configResources)
     {
-        return "jetty-http-functional-test-with-query.xml";
+        super(variant, configResources);
     }
 
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "jetty-http-functional-test-with-query-service.xml"},
+            {ConfigVariant.FLOW, "jetty-http-functional-test-with-query-flow.xml"}
+        });
+    }      
+    
     @Test
     public void testSend() throws Exception
     {

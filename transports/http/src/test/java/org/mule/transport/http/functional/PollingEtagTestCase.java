@@ -9,30 +9,28 @@
  */
 package org.mule.transport.http.functional;
 
-import org.mule.tck.functional.CounterCallback;
-import org.mule.tck.functional.FunctionalTestComponent;
-import org.mule.tck.junit4.FunctionalTestCase;
-import org.mule.tck.junit4.rule.DynamicPort;
-
-import java.util.concurrent.atomic.AtomicInteger;
-import org.junit.Rule;
-import org.junit.Test;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-public class PollingEtagTestCase extends FunctionalTestCase
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.functional.CounterCallback;
+import org.mule.tck.functional.FunctionalTestComponent;
+import org.mule.tck.junit4.rule.DynamicPort;
+
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+
+public class PollingEtagTestCase extends AbstractServiceAndFlowTestCase
 {
     private static final int WAIT_TIME = 2500;
 
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
-
-    @Override
-    protected String getConfigResources()
-    {
-        return "polling-etag-test.xml";
-    }
 
     @Test
     public void testPollingReceiversRestart() throws Exception
@@ -49,5 +47,19 @@ public class PollingEtagTestCase extends FunctionalTestCase
         assertEquals(1, pollCounter.get());
     }
 
+    public PollingEtagTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
+    }
+
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "polling-etag-test-service.xml"},
+            {ConfigVariant.FLOW, "polling-etag-test-flow.xml"}
+        });
+    }      
+    
 }
 

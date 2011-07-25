@@ -9,11 +9,16 @@
  */
 package org.mule.module.cxf;
 
+import static org.junit.Assert.assertEquals;
+
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.http.HttpConnector;
+
+import java.util.Arrays;
+import java.util.Collection;
 
 import org.apache.commons.httpclient.Credentials;
 import org.apache.commons.httpclient.HttpClient;
@@ -23,11 +28,10 @@ import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
 
-import static org.junit.Assert.assertEquals;
 
-
-public class HttpSecurityTestCase extends FunctionalTestCase 
+public class HttpSecurityTestCase extends AbstractServiceAndFlowTestCase 
 {
     
     private static String soapRequest = 
@@ -46,12 +50,20 @@ public class HttpSecurityTestCase extends FunctionalTestCase
     @Rule
     public DynamicPort dynamicPort2 = new DynamicPort("port2");
 
-    @Override
-    protected String getConfigResources()
+    public HttpSecurityTestCase(ConfigVariant variant, String configResources)
     {
-        return "http-security-conf.xml";
+        super(variant, configResources);
     }
 
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "http-security-conf-service.xml"},
+            {ConfigVariant.FLOW, "http-security-conf-flow.xml"}
+        });
+    }      
+    
     /**
      * This test doesn't work in Maven because Mule can't load the keystores from the jars
      * @throws Exception
