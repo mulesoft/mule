@@ -94,48 +94,53 @@ public class JAXBUnmarshallerTransformer extends AbstractTransformer
         try
         {
             final Unmarshaller u = jaxbContext.createUnmarshaller();
+            Object result = null;
             if (src instanceof String)
             {
-                return u.unmarshal(new StringReader((String) src));
+                result = u.unmarshal(new StringReader((String) src));
             }
             else if (src instanceof File)
             {
-                return u.unmarshal((File) src);
+                result = u.unmarshal((File) src);
             }
             else if (src instanceof URL)
             {
-                return u.unmarshal((URL) src);
+                result = u.unmarshal((URL) src);
             }
             else if (src instanceof InputStream)
             {
-                return u.unmarshal((InputStream) src);
+                result = u.unmarshal((InputStream) src);
             }
             else if (src instanceof Node)
             {
-                JAXBElement<?> e = u.unmarshal((Node) src, getReturnDataType().getType());
-                return e.getValue();
+                result = u.unmarshal((Node) src, getReturnDataType().getType());
             }
             else if (src instanceof Source)
             {
-                JAXBElement<?> e = u.unmarshal((Source) src, getReturnDataType().getType());
-                return e.getValue();
+                result = u.unmarshal((Source) src, getReturnDataType().getType());
             }
             else if (src instanceof XMLStreamReader)
             {
-                JAXBElement<?> e = u.unmarshal((XMLStreamReader) src, getReturnDataType().getType());
-                return e.getValue();
+                result = u.unmarshal((XMLStreamReader) src, getReturnDataType().getType());
             }
             else if (src instanceof XMLEventReader)
             {
-                JAXBElement<?> e = u.unmarshal((XMLEventReader) src, getReturnDataType().getType());
-                return e.getValue();
+                result = u.unmarshal((XMLEventReader) src, getReturnDataType().getType());
             }
+            if (result != null)
+            {
+                // If we get a JAXB element, return its contents
+                if (result instanceof JAXBElement)
+                {
+                    result = ((JAXBElement)result).getValue();
+                }
+            }
+            return result;
         }
         catch (Exception e)
         {
             throw new TransformerException(this, e);
         }
-        return null;
     }
 
     public JAXBContext getJaxbContext()

@@ -23,7 +23,7 @@
     <!-- We're rendering Wiki test -->
     <xsl:output method="text"/>
 
-    <xsl:include href="http://www.mulesoft.org/xslt/mule/schemadoc/3.0/schemadoc-core-wiki.xsl"/>
+    <xsl:include href="http://www.mulesoft.org/xslt/mule/schemadoc/3.1/schemadoc-core-wiki.xsl"/>
     <!--Use this if testing locally -->
     <!--<xsl:include href="schemadoc-core-wiki.xsl"/>-->
 

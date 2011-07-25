@@ -27,7 +27,7 @@ import static org.junit.Assert.fail;
 
 public class JaxbRoundtripTestCase extends AbstractTransformerTestCase
 {
-    private JAXBContext ctx;
+    protected JAXBContext ctx;
 
     @Override
     protected void doSetUp() throws Exception
