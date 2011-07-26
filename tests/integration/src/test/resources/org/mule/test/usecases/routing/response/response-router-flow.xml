@@ -51,7 +51,11 @@
 
         <request-reply>
             <outbound-endpoint address="vm://getReportW10"
-                exchange-pattern="one-way" />
+                exchange-pattern="one-way">
+                    <message-properties-transformer scope="outbound">
+                        <delete-message-property key="MULE_REPLYTO"/>
+                    </message-properties-transformer>
+                </outbound-endpoint>
             <inbound-endpoint address="vm://W10Response"
                 exchange-pattern="one-way" />
         </request-reply>
@@ -62,7 +66,8 @@
     <flow name="W10Report">
 
         <inbound-endpoint address="vm://getReportW10"
-            exchange-pattern="one-way" />
+                          exchange-pattern="one-way" >
+        </inbound-endpoint>
 
         <echo-component />
 

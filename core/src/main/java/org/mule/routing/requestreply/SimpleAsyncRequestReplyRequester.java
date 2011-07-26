@@ -49,7 +49,7 @@ public class SimpleAsyncRequestReplyRequester extends AbstractAsyncRequestReplyR
 
     private String getReplyTo()
     {
-        return ((InboundEndpoint) replyMessageSource).getEndpointURI().getAddress();
+        return ((InboundEndpoint) replyMessageSource).getEndpointURI().toString();
     }
 
     @Override

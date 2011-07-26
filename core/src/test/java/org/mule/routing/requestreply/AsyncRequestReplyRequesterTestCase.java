@@ -39,7 +39,7 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
     @Test
     public void testSingleEventNoTimeout() throws Exception
     {
-        RequestReplyRequesterMessageProcessor asyncReplyMP = new TestAsyncRequestReplyRequester();
+        TestAsyncRequestReplyRequester asyncReplyMP = new TestAsyncRequestReplyRequester();
         SensingNullMessageProcessor target = getSensingNullMessageProcessor();
 
         asyncReplyMP.setListener(target);
@@ -57,7 +57,7 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
     @Test
     public void testSingleEventNoTimeoutAsync() throws Exception
     {
-        RequestReplyRequesterMessageProcessor asyncReplyMP = new TestAsyncRequestReplyRequester();
+        TestAsyncRequestReplyRequester asyncReplyMP = new TestAsyncRequestReplyRequester();
         SensingNullMessageProcessor target = getSensingNullMessageProcessor();
         AsyncInterceptingMessageProcessor asyncMP = new AsyncInterceptingMessageProcessor(
             new WorkManagerSource()
@@ -122,7 +122,7 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
     @Test
     public void testMultiple() throws Exception
     {
-        final RequestReplyRequesterMessageProcessor asyncReplyMP = new TestAsyncRequestReplyRequester();
+        final TestAsyncRequestReplyRequester asyncReplyMP = new TestAsyncRequestReplyRequester();
         SensingNullMessageProcessor target = getSensingNullMessageProcessor();
         target.setWaitTime(50);
         AsyncInterceptingMessageProcessor asyncMP = new AsyncInterceptingMessageProcessor(

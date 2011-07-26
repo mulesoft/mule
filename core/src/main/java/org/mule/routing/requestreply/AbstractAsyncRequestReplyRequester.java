@@ -24,6 +24,7 @@ import org.mule.api.source.MessageSource;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.context.notification.RoutingNotification;
 import org.mule.processor.AbstractInterceptingMessageProcessor;
+import org.mule.processor.AbstractInterceptingMessageProcessorBase;
 import org.mule.util.ObjectUtils;
 import org.mule.util.concurrent.Latch;
 
@@ -34,7 +35,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.collections.buffer.BoundedFifoBuffer;
 
-public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterceptingMessageProcessor
+public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterceptingMessageProcessorBase
     implements RequestReplyRequesterMessageProcessor, FlowConstructAware
 {
     public static final int MAX_PROCESSED_GROUPS = 50000;

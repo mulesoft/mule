@@ -504,7 +504,9 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint, Disposable
     public void dispose()
     {
         this.muleContext = null;
-        this.messageProcessors.clear();
+        // this.messageProcessors.clear();
+        // Don't clear this, since it changes the hash code, which can foul up shutdown processing
+        // when objects have been keyed by endpoint, e.g. dispatchers
         this.messageProcessorChain = null;
     }
 
