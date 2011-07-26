@@ -96,7 +96,7 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
         // org.mule.work.AbstractMuleEventWork.run()
         if (target != null)
         {
-            return target.process(event);
+            target.process(event);
         }
         return event;
     }
