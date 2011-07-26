@@ -48,12 +48,14 @@
 
     <flow name="Service9">
         <vm:inbound-endpoint path="Service9.in"/>
-        <async>
+        <async processingStrategy="Service9ProcessingStrategy">
             <collection-aggregator timeout="60000" failOnTimeout="false"/>
-            <threading-profile maxBufferSize="5" maxThreadsActive="20" maxThreadsIdle="5"
-                poolExhaustedAction="RUN" threadTTL="500" threadWaitTimeout="500"/>
         </async>
     </flow>
+
+    <asynchronous-processing-strategy name="Service9ProcessingStrategy"
+        maxBufferSize="5" maxThreads="20" minThreads="5" poolExhaustedAction="RUN" threadTTL="500"
+        threadWaitTimeout="500" />
     
     <flow name="Service10">
         <vm:inbound-endpoint path="Service10.in"/>
