@@ -42,6 +42,14 @@ public class InboundNotificationMessageProcessor implements MessageProcessor
         return event;
     }
 
+    /**
+     * @return underlying {@link InboundEndpoint}
+     */
+    public final InboundEndpoint getInboundEndpoint()
+    {
+        return this.endpoint;
+    }
+
     @Override
     public String toString()
     {
