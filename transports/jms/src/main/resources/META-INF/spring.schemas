@@ -1,1 +1,2 @@
 http\://www.mulesoft.org/schema/mule/jms/3.2/mule-jms.xsd=META-INF/mule-jms.xsd
+http\://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd=META-INF/mule-jms.xsd
