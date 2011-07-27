@@ -308,8 +308,16 @@ public class DeploymentService
             logger.info("================== Request to Undeploy Application: " + app.getAppName());
         }
 
-        applications.remove(app);
-        deployer.undeploy(app);
+        try {
+           fireOnUndeploymentStart(app.getAppName());
+
+           applications.remove(app);
+           deployer.undeploy(app);
+
+           fireOnUndeploymentSuccess(app.getAppName());
+        } catch (Throwable t) {
+           fireOnUndeploymentFailure(app.getAppName(), t);
+        }
     }
 
     public void undeploy(String appName)
@@ -459,6 +467,70 @@ public class DeploymentService
             catch (Throwable t)
             {
                 logger.error("Listener failed to process onDeploymentFailure notification", t);
+            }
+        }
+    }
+
+    /**
+     * Notifies all deployment listeners that un-deployment for a given application
+     * has just started.
+     *
+     * @param appName the name of the application being un-deployed.
+     */
+    protected void fireOnUndeploymentStart(String appName)
+    {
+        for (DeploymentListener listener : deploymentListeners)
+        {
+            try
+            {
+                listener.onUndeploymentStart(appName);
+            }
+            catch (Throwable t)
+            {
+                logger.error("Listener failed to process onUndeploymentStart notification", t);
+            }
+        }
+    }
+
+    /**
+     * Notifies all deployment listeners that un-deployment for a given application
+     * has successfully finished.
+     *
+     * @param appName the name of the un-deployed application.
+     */
+    protected void fireOnUndeploymentSuccess(String appName)
+    {
+        for (DeploymentListener listener : deploymentListeners)
+        {
+            try
+            {
+                listener.onUndeploymentSuccess(appName);
+            }
+            catch (Throwable t)
+            {
+                logger.error("Listener failed to process onUndeploymentSuccess notification", t);
+            }
+        }
+    }
+
+    /**
+     * Notifies all deployment listeners that un-deployment for a given application
+     * has finished with a failure.
+     *
+     * @param appName the name of the un-deployed application.
+     * @param cause the cause of the deployment failure.
+     */
+    protected void fireOnUndeploymentFailure(String appName, Throwable cause)
+    {
+        for (DeploymentListener listener : deploymentListeners)
+        {
+            try
+            {
+                listener.onUndeploymentFailure(appName, cause);
+            }
+            catch (Throwable t)
+            {
+                logger.error("Listener failed to process onUndeploymentFailure notification", t);
             }
         }
     }
@@ -618,6 +690,7 @@ public class DeploymentService
                     apps = appsDir.list(DirectoryFileFilter.DIRECTORY);
                 }
 
+                @SuppressWarnings("rawtypes")
                 Collection deployedAppNames = CollectionUtils.collect(applications, new BeanToPropertyValueTransformer("appName"));
 
                 // new exploded Mule apps

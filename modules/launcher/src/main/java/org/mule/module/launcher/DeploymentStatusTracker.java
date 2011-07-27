@@ -17,7 +17,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * Keeps track of the deployment status of all applications in the Mule instance.
  */
-public class DeploymentStatusTracker implements DeploymentListener
+public class DeploymentStatusTracker extends AbstractDeploymentListener
 {
 
     public static enum DeploymentState

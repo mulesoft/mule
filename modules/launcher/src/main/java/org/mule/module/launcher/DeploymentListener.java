@@ -37,4 +37,26 @@ public interface DeploymentListener
      * @param cause       the cause of the failure
      */
     void onDeploymentFailure(String appName, Throwable cause);
+
+    /**
+     * Notifies that an un-deployment for a given application has started.
+     *
+     * @param appName the name of the application being un-deployed
+     */
+    void onUndeploymentStart(String appName);
+
+    /**
+     * Notifies that an un-deployment for a given application has successfully finished.
+     *
+     * @param appName the name of the application being un-deployed
+     */
+    void onUndeploymentSuccess(String appName);
+
+    /**
+     * Notifies that an un-deployment for a given application has finished with a failure.
+     *
+     * @param appName the name of the application being un-deployed
+     * @param cause       the cause of the failure
+     */
+    void onUndeploymentFailure(String appName, Throwable cause);
 }
