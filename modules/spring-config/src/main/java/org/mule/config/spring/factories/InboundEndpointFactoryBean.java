@@ -13,8 +13,10 @@ package org.mule.config.spring.factories;
 import org.mule.api.config.ConfigurationException;
 import org.mule.api.endpoint.EndpointException;
 import org.mule.api.endpoint.EndpointFactory;
+import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.config.i18n.MessageFactory;
+import org.mule.endpoint.AbstractEndpoint;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 
 /**
@@ -44,7 +46,12 @@ public class InboundEndpointFactoryBean extends AbstractEndpointFactoryBean
         EndpointFactory ef = muleContext.getEndpointFactory();
         if (ef != null)
         {
-            return ef.getInboundEndpoint(this);
+            InboundEndpoint inboundEndpoint = ef.getInboundEndpoint(this);
+            if (inboundEndpoint instanceof AbstractEndpoint)
+            {
+                AbstractEndpoint.class.cast(inboundEndpoint).setAnnotations(getAnnotations());
+            }
+            return inboundEndpoint;
         }
         else
         {

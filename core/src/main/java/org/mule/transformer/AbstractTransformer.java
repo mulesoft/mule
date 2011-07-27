@@ -10,6 +10,7 @@
 
 package org.mule.transformer;
 
+import org.mule.api.AnnotatedObject;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -37,10 +38,13 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.activation.MimeType;
 import javax.activation.MimeTypeParseException;
+import javax.xml.namespace.QName;
 import javax.xml.transform.stream.StreamSource;
 
 import org.apache.commons.logging.Log;
@@ -51,7 +55,7 @@ import org.apache.commons.logging.LogFactory;
  * Transformations transform one object into another.
  */
 
-public abstract class AbstractTransformer implements Transformer, MuleContextNotificationListener<MuleContextNotification>
+public abstract class AbstractTransformer implements Transformer, MuleContextNotificationListener<MuleContextNotification>, AnnotatedObject
 {
     public static final DataType<MuleMessage> MULE_MESSAGE_DATA_TYPE = new SimpleDataType<MuleMessage>(MuleMessage.class);
 
@@ -99,6 +103,7 @@ public abstract class AbstractTransformer implements Transformer, MuleContextNot
      */
     protected String mimeType;
     protected String encoding;
+    private final Map<QName, Object> annotations = new ConcurrentHashMap<QName, Object>();
 
     /**
      * default constructor required for discovery
@@ -571,5 +576,21 @@ public abstract class AbstractTransformer implements Transformer, MuleContextNot
         {
             this.dispose();
         }
+    }
+
+    public final Object getAnnotation(QName name)
+    {
+        return annotations.get(name);
+    }
+
+    public final Map<QName, Object> getAnnotations()
+    {
+        return Collections.unmodifiableMap(annotations);
+    }
+
+    public synchronized final void setAnnotations(Map<QName, Object> newAnnotations)
+    {
+        annotations.clear();
+        annotations.putAll(newAnnotations);
     }
 }

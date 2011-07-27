@@ -11,6 +11,7 @@
 package org.mule.endpoint;
 
 import org.mule.MessageExchangePattern;
+import org.mule.api.AnnotatedObject;
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleRuntimeException;
@@ -57,9 +58,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.activation.MimeType;
 import javax.activation.MimeTypeParseException;
+import javax.xml.namespace.QName;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -71,7 +74,7 @@ import org.apache.commons.logging.LogFactory;
  * repeatable fashion (global endpoints), ii) Allow for much more extensibility in
  * endpoint creation for transport specific endpoints, streaming endpoints etc.<br/>
  */
-public abstract class AbstractEndpointBuilder implements EndpointBuilder
+public abstract class AbstractEndpointBuilder implements EndpointBuilder, AnnotatedObject
 {
 
     public static final String PROPERTY_RESPONSE_TIMEOUT = "responseTimeout";
@@ -98,6 +101,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
     protected List<Transformer> responseTransformers = new LinkedList<Transformer>();
     protected Boolean disableTransportTransformer;
     protected String mimeType;
+    private final Map<QName, Object> annotations = new ConcurrentHashMap<QName, Object>();
 
     // not included in equality/hash
     protected String registryId = null;
@@ -201,14 +205,16 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
                 ((MessageFilter) mp).setThrowOnUnaccepted(true);
             }
         }
-        
-        return new DefaultInboundEndpoint(connector, endpointURI,
+
+        DefaultInboundEndpoint inboundEndpoint = new DefaultInboundEndpoint(connector, endpointURI,
                 getName(endpointURI), getProperties(), getTransactionConfig(),
                 getDefaultDeleteUnacceptedMessages(connector),
                 messageExchangePattern, getResponseTimeout(connector), getInitialState(connector),
                 getEndpointEncoding(connector), name, muleContext, getRetryPolicyTemplate(connector),
                 getMessageProcessorsFactory(), mergedProcessors, mergedResponseProcessors,
                 isDisableTransportTransformer(), mimeType);
+        inboundEndpoint.setAnnotations(getAnnotations());
+        return inboundEndpoint;
     }
 
     protected OutboundEndpoint doBuildOutboundEndpoint() throws InitialisationException, EndpointException
@@ -245,13 +251,15 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
 
         checkOutboundExchangePattern();
 
-        return new DefaultOutboundEndpoint(connector, endpointURI,
+        DefaultOutboundEndpoint outboundEndpoint = new DefaultOutboundEndpoint(connector, endpointURI,
                 getName(endpointURI), getProperties(), getTransactionConfig(),
                 getDefaultDeleteUnacceptedMessages(connector), 
                 messageExchangePattern, getResponseTimeout(connector), getInitialState(connector),
                 getEndpointEncoding(connector), name, muleContext, getRetryPolicyTemplate(connector),
                 responsePropertiesList,  getMessageProcessorsFactory(), mergedProcessors,
                 mergedResponseProcessors, isDisableTransportTransformer(), mimeType);
+        outboundEndpoint.setAnnotations(getAnnotations());
+        return outboundEndpoint;
     }
     
     protected List<MessageProcessor> addTransformerProcessors(EndpointURI endpointURI)
@@ -911,4 +919,19 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
         return builder;
     }
 
+    public final Object getAnnotation(QName name)
+    {
+        return annotations.get(name);
+    }
+
+    public final Map<QName, Object> getAnnotations()
+    {
+        return Collections.unmodifiableMap(annotations);
+    }
+
+    public synchronized final void setAnnotations(Map<QName, Object> newAnnotations)
+    {
+        annotations.clear();
+        annotations.putAll(newAnnotations);
+    }
 }

@@ -12,6 +12,7 @@ package org.mule.processor;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
+import org.mule.api.AnnotatedObject;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
@@ -43,6 +44,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
+
+import javax.xml.namespace.QName;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -56,7 +60,7 @@ import org.apache.commons.logging.LogFactory;
  * methods with the same name and same number of arguments are not supported
  * currently.
  */
-public class InvokerMessageProcessor implements MessageProcessor, Initialisable, MuleContextAware
+public class InvokerMessageProcessor implements MessageProcessor, Initialisable, MuleContextAware, AnnotatedObject
 {
     protected final transient Log logger = LogFactory.getLog(getClass());
 
@@ -71,6 +75,7 @@ public class InvokerMessageProcessor implements MessageProcessor, Initialisable,
     protected Method method;
     protected ExpressionManager expressionManager;
     protected MuleContext muleContext;
+    private final Map<QName, Object> annotations = new ConcurrentHashMap<QName, Object>();
 
     @Override
     public void initialise() throws InitialisationException
@@ -358,4 +363,19 @@ public class InvokerMessageProcessor implements MessageProcessor, Initialisable,
         this.objectType = objectType;
     }
 
+    public final Object getAnnotation(QName name)
+    {
+        return annotations.get(name);
+    }
+
+    public final Map<QName, Object> getAnnotations()
+    {
+        return Collections.unmodifiableMap(annotations);
+    }
+
+    public synchronized final void setAnnotations(Map<QName, Object> newAnnotations)
+    {
+        annotations.clear();
+        annotations.putAll(newAnnotations);
+    }
 }

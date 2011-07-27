@@ -14,6 +14,7 @@ import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.OptimizedRequestContext;
 import org.mule.VoidResult;
+import org.mule.api.AnnotatedObject;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -46,6 +47,10 @@ import org.mule.util.ClassUtils;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+import javax.xml.namespace.QName;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -53,7 +58,7 @@ import org.apache.commons.logging.LogFactory;
 /**
  * Abstract {@link Component} to be used by all {@link Component} implementations.
  */
-public abstract class AbstractComponent implements Component, MuleContextAware, Lifecycle
+public abstract class AbstractComponent implements Component, MuleContextAware, Lifecycle, AnnotatedObject
 {
 
     /**
@@ -68,6 +73,7 @@ public abstract class AbstractComponent implements Component, MuleContextAware, 
     protected MessageProcessorChain interceptorChain;
     protected MuleContext muleContext;
     protected ComponentLifecycleManager lifecycleManager;
+    private final Map<QName, Object> annotations = new ConcurrentHashMap<QName, Object>();
 
     public void setMuleContext(MuleContext context)
     {
@@ -340,4 +346,19 @@ public abstract class AbstractComponent implements Component, MuleContextAware, 
         return sb.toString();
     }
 
+    public final Object getAnnotation(QName name)
+    {
+        return annotations.get(name);
+    }
+
+    public final Map<QName, Object> getAnnotations()
+    {
+        return Collections.unmodifiableMap(annotations);
+    }
+
+    public synchronized final void setAnnotations(Map<QName, Object> newAnnotations)
+    {
+        annotations.clear();
+        annotations.putAll(newAnnotations);
+    }
 }

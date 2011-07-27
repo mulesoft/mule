@@ -14,6 +14,7 @@ import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.EndpointException;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.registry.ServiceType;
+import org.mule.endpoint.AbstractEndpoint;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.transport.service.TransportServiceDescriptor;
 
@@ -44,8 +45,13 @@ public class OutboundEndpointFactoryBean extends AbstractEndpointFactoryBean
         String scheme = getEndpointBuilder().getEndpoint().getFullScheme();
         TransportServiceDescriptor tsd = (TransportServiceDescriptor) muleContext.getRegistry().lookupServiceDescriptor(ServiceType.TRANSPORT, scheme, null);
         EndpointBuilder endpointBuilder = tsd.createEndpointBuilder(this);
-        
-        return muleContext.getEndpointFactory().getOutboundEndpoint(endpointBuilder);
+
+        OutboundEndpoint outboundEndpoint = muleContext.getEndpointFactory().getOutboundEndpoint(endpointBuilder);
+        if (outboundEndpoint instanceof AbstractEndpoint)
+        {
+            AbstractEndpoint.class.cast(outboundEndpoint).setAnnotations(getAnnotations());
+        }
+        return outboundEndpoint;
     }
 
 }

@@ -13,8 +13,6 @@ package org.mule.processor;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.config.ExceptionHelper;
-import org.mule.message.DefaultExceptionPayload;
-import org.mule.transport.NullPayload;
 
 public class ExceptionHandlingMessageProcessor extends AbstractInterceptingMessageProcessor
 {

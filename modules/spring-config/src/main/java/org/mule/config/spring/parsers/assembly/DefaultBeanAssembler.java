@@ -10,6 +10,7 @@
 
 package org.mule.config.spring.parsers.assembly;
 
+import org.mule.api.AnnotatedObject;
 import org.mule.config.spring.MuleHierarchicalBeanDefinitionParserDelegate;
 import org.mule.config.spring.parsers.assembly.configuration.PropertyConfiguration;
 import org.mule.config.spring.parsers.assembly.configuration.SingleProperty;
@@ -23,9 +24,12 @@ import org.mule.util.MapCombiner;
 
 import java.lang.reflect.Method;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
+
+import javax.xml.namespace.QName;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -35,6 +39,7 @@ import org.springframework.beans.PropertyValues;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.MapFactoryBean;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
+import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.ManagedList;
 import org.springframework.beans.factory.support.ManagedMap;
@@ -96,22 +101,45 @@ public class DefaultBeanAssembler implements BeanAssembler
      */
     public void extendBean(Attr attribute)
     {
+        AbstractBeanDefinition beanDefinition = bean.getBeanDefinition();
+        String oldName = SpringXMLUtils.attributeName(attribute);
+        String oldValue = attribute.getNodeValue();
         if (attribute.getNamespaceURI() == null)
         {
-            String oldName = SpringXMLUtils.attributeName(attribute);
             if (!beanConfig.isIgnored(oldName))
             {
-                logger.debug(attribute + " for " + bean.getBeanDefinition().getBeanClassName());
-                String oldValue = attribute.getNodeValue();
-                String newName = bestGuessName(beanConfig, oldName, bean.getBeanDefinition().getBeanClassName());
+                logger.debug(attribute + " for " + beanDefinition.getBeanClassName());
+                String newName = bestGuessName(beanConfig, oldName, beanDefinition.getBeanClassName());
                 Object newValue = beanConfig.translateValue(oldName, oldValue);
-                addPropertyWithReference(bean.getBeanDefinition().getPropertyValues(),
+                addPropertyWithReference(beanDefinition.getPropertyValues(),
                     beanConfig.getSingleProperty(oldName), newName, newValue);
             }
         }
+        else if (isAnnotationsPropertyAvailable(beanDefinition.getBeanClass()))
+        {
+            //Add attribute defining namespace as annotated elements. No reconciliation is done here ie new values override old ones.
+            QName name = new QName(attribute.getNamespaceURI(), attribute.getLocalName(), attribute.getPrefix());
+            addAnnotationValue(beanDefinition.getPropertyValues(), name, beanConfig.translateValue(oldName, oldValue));
+        }
         else
         {
-            logger.debug("ignoring global attribute " + attribute.getName());   
+            if (logger.isWarnEnabled())
+            {
+                logger.warn("Cannot assign "+beanDefinition.getBeanClass()+" to "+AnnotatedObject.class+" "+bean);
+            }
+        }
+    }
+
+    /**
+     * @param beanClassName
+     * @return true if specified class defines a setAnnotations method.
+     */
+    protected final boolean isAnnotationsPropertyAvailable(Class<?> beanClass)
+    {
+        try {
+            return AnnotatedObject.class.isAssignableFrom(beanClass);
+        } catch (Exception e) {
+            return false;
         }
     }
 
@@ -363,6 +391,29 @@ public class DefaultBeanAssembler implements BeanAssembler
         {
             throw new IllegalStateException("Bean assembler does not have a target");
         }
+    }
+
+    /**
+     * Add a key/value pair to existing {@link AnnotatedObject#PROPERTY_NAME} property value.
+     * @param properties
+     * @param name
+     * @param value
+     */
+    @SuppressWarnings("unchecked")
+    protected final void addAnnotationValue(MutablePropertyValues properties, QName name, Object value)
+    {
+        PropertyValue propertyValue = properties.getPropertyValue(AnnotatedObject.PROPERTY_NAME);
+        Map<QName, Object> oldValue;
+        if (propertyValue != null)
+        {
+            oldValue = (Map<QName, Object>) propertyValue.getValue();
+        }
+        else
+        {
+            oldValue = new HashMap<QName, Object>();
+            properties.addPropertyValue(AnnotatedObject.PROPERTY_NAME, oldValue);
+        }
+        oldValue.put(name, value);
     }
 
     protected void addPropertyWithReference(MutablePropertyValues properties, SingleProperty config,

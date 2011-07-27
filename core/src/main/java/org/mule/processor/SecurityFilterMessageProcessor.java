@@ -13,13 +13,8 @@ package org.mule.processor;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.endpoint.ImmutableEndpoint;
-import org.mule.api.security.SecurityException;
 import org.mule.api.security.SecurityFilter;
-import org.mule.config.ExceptionHelper;
-import org.mule.context.notification.SecurityNotification;
 import org.mule.endpoint.EndpointAware;
-import org.mule.message.DefaultExceptionPayload;
-import org.mule.transport.AbstractConnector;
 
 /**
  * Filters the flow using the specified {@link SecurityFilter}. 
