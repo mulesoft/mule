@@ -10,12 +10,6 @@
 
 package org.mule.processor;
 
-import java.util.Collections;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
-import javax.xml.namespace.QName;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.api.AnnotatedObject;
@@ -45,7 +39,6 @@ public abstract class AbstractInterceptingMessageProcessorBase
     protected ServerNotificationHandler notificationHandler;
 
     protected MuleContext muleContext;
-    private final Map<QName, Object> annotations = new ConcurrentHashMap<QName, Object>();
 
     public void setMuleContext(MuleContext context)
     {
@@ -136,21 +129,5 @@ public abstract class AbstractInterceptingMessageProcessorBase
         {
             notificationHandler.fireNotification(new MessageProcessorNotification(flowConstruct, event, processor, action));
         }
-    }
-
-    public final Object getAnnotation(QName name)
-    {
-        return annotations.get(name);
-    }
-
-    public final Map<QName, Object> getAnnotations()
-    {
-        return Collections.unmodifiableMap(annotations);
-    }
-
-    public synchronized final void setAnnotations(Map<QName, Object> newAnnotations)
-    {
-        annotations.clear();
-        annotations.putAll(newAnnotations);
     }
 }
