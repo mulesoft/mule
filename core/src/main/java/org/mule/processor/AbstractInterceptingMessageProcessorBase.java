@@ -10,15 +10,21 @@
 
 package org.mule.processor;
 
+import java.util.Collections;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+import javax.xml.namespace.QName;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.mule.api.AnnotatedObject;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.context.notification.ServerNotificationHandler;
-import org.mule.api.processor.InterceptingMessageProcessor;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorChain;
 import org.mule.context.notification.MessageProcessorNotification;
@@ -32,13 +38,14 @@ import org.mule.util.ObjectUtils;
  * attribute.
  */
 public abstract class AbstractInterceptingMessageProcessorBase
-    implements MessageProcessor, MuleContextAware
+    implements MessageProcessor, MuleContextAware, AnnotatedObject
 {
     protected Log logger = LogFactory.getLog(getClass());
 
     protected ServerNotificationHandler notificationHandler;
 
     protected MuleContext muleContext;
+    private final Map<QName, Object> annotations = new ConcurrentHashMap<QName, Object>();
 
     public void setMuleContext(MuleContext context)
     {
@@ -48,6 +55,11 @@ public abstract class AbstractInterceptingMessageProcessorBase
         {
             ((DefaultMessageProcessorChain) next).setMuleContext(context);
         }
+    }
+
+    public final MessageProcessor getListener()
+    {
+        return next;
     }
 
     public void setListener(MessageProcessor next)
@@ -126,4 +138,19 @@ public abstract class AbstractInterceptingMessageProcessorBase
         }
     }
 
+    public final Object getAnnotation(QName name)
+    {
+        return annotations.get(name);
+    }
+
+    public final Map<QName, Object> getAnnotations()
+    {
+        return Collections.unmodifiableMap(annotations);
+    }
+
+    public synchronized final void setAnnotations(Map<QName, Object> newAnnotations)
+    {
+        annotations.clear();
+        annotations.putAll(newAnnotations);
+    }
 }
