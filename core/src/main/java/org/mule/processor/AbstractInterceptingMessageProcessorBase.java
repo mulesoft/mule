@@ -12,7 +12,6 @@ package org.mule.processor;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mule.api.AnnotatedObject;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -32,7 +31,7 @@ import org.mule.util.ObjectUtils;
  * attribute.
  */
 public abstract class AbstractInterceptingMessageProcessorBase
-    implements MessageProcessor, MuleContextAware, AnnotatedObject
+    implements MessageProcessor, MuleContextAware
 {
     protected Log logger = LogFactory.getLog(getClass());
 
