@@ -76,9 +76,16 @@ public class DefaultMuleApplication implements Application
 
     protected String[] absoluteResourcePaths;
 
+    protected DeploymentService deploymentService;
+
     protected DefaultMuleApplication(ApplicationDescriptor appDesc)
     {
         this.descriptor = appDesc;
+    }
+
+    public void setDeploymentService(DeploymentService deploymentService)
+    {
+        this.deploymentService = deploymentService;
     }
 
     @Override
@@ -325,15 +332,41 @@ public class DefaultMuleApplication implements Application
         {
             logger.info(miniSplash(String.format("Redeploying app '%s'", descriptor.getAppName())));
         }
-        dispose();
+
+        String appName = getAppName();
+
+        this.deploymentService.fireOnUndeploymentStart(appName);
+        try
+        {
+            dispose();
+
+            this.deploymentService.fireOnUndeploymentSuccess(appName);
+        }
+        catch (RuntimeException e)
+        {
+            this.deploymentService.fireOnUndeploymentFailure(appName, e);
+
+            throw e;
+        }
+
         install();
 
         // update thread with the fresh new classloader just created during the install phase
         final ClassLoader cl = getDeploymentClassLoader();
         Thread.currentThread().setContextClassLoader(cl);
 
-        init();
-        start();
+        this.deploymentService.fireOnDeploymentStart(appName);
+        try
+        {
+            init();
+            start();
+
+            this.deploymentService.fireOnDeploymentSuccess(appName);
+        }
+        catch(Throwable cause)
+        {
+            this.deploymentService.fireOnDeploymentFailure(appName, cause);
+        }
 
         // release the ref
         Thread.currentThread().setContextClassLoader(null);

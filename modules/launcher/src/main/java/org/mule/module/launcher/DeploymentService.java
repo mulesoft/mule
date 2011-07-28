@@ -315,8 +315,10 @@ public class DeploymentService
            deployer.undeploy(app);
 
            fireOnUndeploymentSuccess(app.getAppName());
-        } catch (Throwable t) {
-           fireOnUndeploymentFailure(app.getAppName(), t);
+        } catch (RuntimeException e) {
+           fireOnUndeploymentFailure(app.getAppName(), e);
+
+           throw e;
         }
     }
 
@@ -333,7 +335,19 @@ public class DeploymentService
         {
             application = deployer.installFrom(appArchiveUrl);
             applications.add(application);
-            deployer.deploy(application);
+
+            try
+            {
+                fireOnDeploymentStart(application.getAppName());
+                deployer.deploy(application);
+                fireOnDeploymentSuccess(application.getAppName());
+            }
+            catch (Throwable t)
+            {
+                fireOnDeploymentFailure(application.getAppName(), t);
+
+                throw t;
+            }
         }
         catch (Throwable t)
         {
@@ -413,7 +427,7 @@ public class DeploymentService
      *
      * @param appName the name of the application being deployed.
      */
-    protected void fireOnDeploymentStart(String appName)
+    public void fireOnDeploymentStart(String appName)
     {
         for (DeploymentListener listener : deploymentListeners)
         {
@@ -434,7 +448,7 @@ public class DeploymentService
      *
      * @param appName the name of the deployed application.
      */
-    protected void fireOnDeploymentSuccess(String appName)
+    public void fireOnDeploymentSuccess(String appName)
     {
         for (DeploymentListener listener : deploymentListeners)
         {
@@ -456,7 +470,7 @@ public class DeploymentService
      * @param appName the name of the deployed application.
      * @param cause the cause of the deployment failure.
      */
-    protected void fireOnDeploymentFailure(String appName, Throwable cause)
+    public void fireOnDeploymentFailure(String appName, Throwable cause)
     {
         for (DeploymentListener listener : deploymentListeners)
         {
@@ -477,7 +491,7 @@ public class DeploymentService
      *
      * @param appName the name of the application being un-deployed.
      */
-    protected void fireOnUndeploymentStart(String appName)
+    public void fireOnUndeploymentStart(String appName)
     {
         for (DeploymentListener listener : deploymentListeners)
         {
@@ -498,7 +512,7 @@ public class DeploymentService
      *
      * @param appName the name of the un-deployed application.
      */
-    protected void fireOnUndeploymentSuccess(String appName)
+    public void fireOnUndeploymentSuccess(String appName)
     {
         for (DeploymentListener listener : deploymentListeners)
         {
@@ -520,7 +534,7 @@ public class DeploymentService
      * @param appName the name of the un-deployed application.
      * @param cause the cause of the deployment failure.
      */
-    protected void fireOnUndeploymentFailure(String appName, Throwable cause)
+    public void fireOnUndeploymentFailure(String appName, Throwable cause)
     {
         for (DeploymentListener listener : deploymentListeners)
         {
@@ -795,7 +809,19 @@ public class DeploymentService
             Application a = appFactory.createApp(appName);
             // add to the list of known apps first to avoid deployment loop on failure
             onApplicationInstalled(a);
-            deployer.deploy(a);
+
+            try
+            {
+                fireOnDeploymentStart(a.getAppName());
+                deployer.deploy(a);
+                fireOnDeploymentSuccess(a.getAppName());
+            }
+            catch (Exception e)
+            {
+                fireOnDeploymentFailure(a.getAppName(), e);
+
+                throw e;
+            }
         }
 
     }

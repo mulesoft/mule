@@ -47,7 +47,9 @@ public class ApplicationFactory
         }
         else
         {
-            return new ApplicationWrapper(new DefaultMuleApplication(descriptor));
+            final DefaultMuleApplication delegate = new DefaultMuleApplication(descriptor);
+            delegate.setDeploymentService(deploymentService);
+            return new ApplicationWrapper(delegate);
         }
     }
 }

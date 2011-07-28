@@ -102,7 +102,14 @@ public class DefaultMuleDeployer implements MuleDeployer
         }
         catch (Throwable t)
         {
-            logger.error(t);
+            if (t instanceof DeploymentException)
+            {
+                // re-throw as is
+                throw ((DeploymentException) t);
+            }
+
+            final String msg = String.format("Failed to undeploy application [%s]", app.getAppName());
+            throw new DeploymentException(MessageFactory.createStaticMessage(msg), t);
         }
         finally
         {
