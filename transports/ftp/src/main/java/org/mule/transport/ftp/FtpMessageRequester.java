@@ -20,6 +20,7 @@ import org.mule.transport.AbstractMessageRequester;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.text.MessageFormat;
 
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
@@ -91,7 +92,9 @@ public class FtpMessageRequester extends AbstractMessageRequester
             fileToProcess = prepareFile(client, fileToProcess);
 
             FtpMuleMessageFactory messageFactory = createMuleMessageFactory(client);
-            return messageFactory.create(fileToProcess, endpoint.getEncoding());
+            MuleMessage message = messageFactory.create(fileToProcess, endpoint.getEncoding());
+            postProcess(client, fileToProcess, message);
+            return message;
         }
         finally
         {
@@ -99,6 +102,21 @@ public class FtpMessageRequester extends AbstractMessageRequester
         }
     }
     
+    protected void postProcess(FTPClient client, FTPFile file, MuleMessage message) throws Exception
+    {
+        if (!connector.isStreaming())
+        {
+            if (!client.deleteFile(file.getName()))
+            {
+                throw new IOException(MessageFormat.format("Failed to delete file {0}. Ftp error: {1}", file.getName(), client.getReplyCode()));
+            }
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Deleted file " + file.getName());
+            }
+        }
+    }
+
     @Override
     protected void initializeMessageFactory() throws InitialisationException
     {
