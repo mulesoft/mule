@@ -12,6 +12,7 @@ package org.mule.processor;
 
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
+import org.mule.api.ThreadSafeAccess;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Startable;
@@ -96,7 +97,7 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
         // org.mule.work.AbstractMuleEventWork.run()
         if (target != null)
         {
-            target.process(event);
+            target.process((MuleEvent) ((ThreadSafeAccess) event).newThreadCopy());
         }
         return event;
     }
