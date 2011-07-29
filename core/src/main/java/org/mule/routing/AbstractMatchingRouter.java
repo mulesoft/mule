@@ -12,6 +12,7 @@ package org.mule.routing;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.OptimizedRequestContext;
+import org.mule.api.AnnotatedObject;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -26,9 +27,14 @@ import org.mule.api.routing.MatchingRouter;
 import org.mule.api.routing.TransformingMatchable;
 import org.mule.config.i18n.CoreMessages;
 
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+
+import javax.xml.namespace.QName;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -38,7 +44,7 @@ import org.apache.commons.logging.LogFactory;
  * and outbound routers.
  */
 
-public class AbstractMatchingRouter implements MatchingRouter
+public class AbstractMatchingRouter implements MatchingRouter, AnnotatedObject
 {
     /**
      * logger used by this class
@@ -49,6 +55,7 @@ public class AbstractMatchingRouter implements MatchingRouter
     protected List<MatchableMessageProcessor> matchableRoutes = new CopyOnWriteArrayList();
     protected boolean matchAll = false;
     protected MessageProcessor defaultRoute;
+    private final Map<QName, Object> annotations = new ConcurrentHashMap<QName, Object>();
 
     public MuleEvent process(MuleEvent event) throws MuleException
     {
@@ -184,4 +191,19 @@ public class AbstractMatchingRouter implements MatchingRouter
         }
     }
 
+    public final Object getAnnotation(QName name)
+    {
+        return annotations.get(name);
+    }
+
+    public final Map<QName, Object> getAnnotations()
+    {
+        return Collections.unmodifiableMap(annotations);
+    }
+
+    public synchronized final void setAnnotations(Map<QName, Object> newAnnotations)
+    {
+        annotations.clear();
+        annotations.putAll(newAnnotations);
+    }
 }

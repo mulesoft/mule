@@ -10,6 +10,7 @@
 
 package org.mule.config.spring.factories;
 
+import org.mule.api.AnnotatedObject;
 import org.mule.api.MuleContext;
 import org.mule.api.NameableObject;
 import org.mule.api.context.MuleContextAware;
@@ -19,11 +20,16 @@ import org.mule.api.processor.ProcessingStrategy;
 import org.mule.processor.AsyncDelegateMessageProcessor;
 import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+import javax.xml.namespace.QName;
 
 import org.springframework.beans.factory.FactoryBean;
 
-public class AsyncMessageProcessorsFactoryBean implements FactoryBean, MuleContextAware, NameableObject
+public class AsyncMessageProcessorsFactoryBean implements FactoryBean, MuleContextAware, NameableObject, AnnotatedObject
 {
 
     protected MuleContext muleContext;
@@ -31,6 +37,7 @@ public class AsyncMessageProcessorsFactoryBean implements FactoryBean, MuleConte
     protected List messageProcessors;
     protected ProcessingStrategy processingStrategy;
     protected String name;
+    private final Map<QName, Object> annotations = new ConcurrentHashMap<QName, Object>();
 
     public Class getObjectType()
     {
@@ -63,15 +70,17 @@ public class AsyncMessageProcessorsFactoryBean implements FactoryBean, MuleConte
                     "MessageProcessorBuilder should only have MessageProcessor's or MessageProcessorBuilder's configured");
             }
         }
-        return new AsyncDelegateMessageProcessor(builder.build(), processingStrategy,
-            new ProcessingStrategy.ThreadNameSource()
-            {
-                @Override
-                public String getName()
+        AsyncDelegateMessageProcessor delegate = new AsyncDelegateMessageProcessor(builder.build(), processingStrategy,
+                new ProcessingStrategy.ThreadNameSource()
                 {
-                    return name;
-                }
-            });
+                    @Override
+                    public String getName()
+                    {
+                        return name;
+                    }
+                });
+        delegate.setAnnotations(getAnnotations());
+        return delegate;
     }
 
     public boolean isSingleton()
@@ -99,4 +108,19 @@ public class AsyncMessageProcessorsFactoryBean implements FactoryBean, MuleConte
         this.processingStrategy = processingStrategy;
     }
 
+    public final Object getAnnotation(QName name)
+    {
+        return annotations.get(name);
+    }
+
+    public final Map<QName, Object> getAnnotations()
+    {
+        return Collections.unmodifiableMap(annotations);
+    }
+
+    public synchronized final void setAnnotations(Map<QName, Object> newAnnotations)
+    {
+        annotations.clear();
+        annotations.putAll(newAnnotations);
+    }
 }

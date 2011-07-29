@@ -10,8 +10,15 @@
 
 package org.mule.service;
 
+import java.util.Collections;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+import javax.xml.namespace.QName;
+
 import org.mule.DefaultMuleEvent;
 import org.mule.RequestContext;
+import org.mule.api.AnnotatedObject;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -59,7 +66,7 @@ import org.apache.commons.logging.LogFactory;
 /**
  * A base implementation for all Services in Mule
  */
-public abstract class AbstractService implements Service, MessageProcessor
+public abstract class AbstractService implements Service, MessageProcessor, AnnotatedObject
 {
 
     /**
@@ -101,6 +108,7 @@ public abstract class AbstractService implements Service, MessageProcessor
 
     protected MessageProcessorChain messageProcessorChain;
     protected MessageInfoMapping messageInfoMapping = new MuleMessageInfoMapping();
+    private final Map<QName, Object> annotations = new ConcurrentHashMap<QName, Object>();
 
     /**
      * Determines the initial state of this service when the model starts. Can be
@@ -725,5 +733,21 @@ public abstract class AbstractService implements Service, MessageProcessor
         {
             ((Resumable) candidate).resume();
         }
+    }
+
+    public final Object getAnnotation(QName name)
+    {
+        return annotations.get(name);
+    }
+
+    public final Map<QName, Object> getAnnotations()
+    {
+        return Collections.unmodifiableMap(annotations);
+    }
+
+    public synchronized final void setAnnotations(Map<QName, Object> newAnnotations)
+    {
+        annotations.clear();
+        annotations.putAll(newAnnotations);
     }
 }

@@ -9,6 +9,7 @@
  */
 package org.mule.processor;
 
+import org.mule.api.AnnotatedObject;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.construct.FlowConstruct;
@@ -22,15 +23,21 @@ import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.processor.MessageProcessor;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+import javax.xml.namespace.QName;
 
 /**
  * An object that owns message processors and delegates startup/shutdown events to them.
  */
-public abstract class AbstractMessageProcessorOwner implements Lifecycle, MuleContextAware, FlowConstructAware
+public abstract class AbstractMessageProcessorOwner implements Lifecycle, MuleContextAware, FlowConstructAware, AnnotatedObject
 {
     protected MuleContext muleContext;
     protected FlowConstruct flowConstruct;
+    private final Map<QName, Object> annotations = new ConcurrentHashMap<QName, Object>();
 
     public void setMuleContext(MuleContext context)
     {
@@ -98,6 +105,22 @@ public abstract class AbstractMessageProcessorOwner implements Lifecycle, MuleCo
             }
 
         }
+    }
+
+    public final Object getAnnotation(QName name)
+    {
+        return annotations.get(name);
+    }
+
+    public final Map<QName, Object> getAnnotations()
+    {
+        return Collections.unmodifiableMap(annotations);
+    }
+
+    public synchronized final void setAnnotations(Map<QName, Object> newAnnotations)
+    {
+        annotations.clear();
+        annotations.putAll(newAnnotations);
     }
 
     protected abstract List<MessageProcessor> getOwnedMessageProcessors();

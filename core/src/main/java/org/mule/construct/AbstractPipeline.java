@@ -10,7 +10,6 @@
 
 package org.mule.construct;
 
-import org.mule.api.AnnotatedObject;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -26,10 +25,6 @@ import org.mule.processor.strategy.SynchronousProcessingStrategy;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
-import javax.xml.namespace.QName;
 
 /**
  * Abstract implementation of {@link AbstractFlowConstruct} that allows a list of {@link MessageProcessor}s
@@ -38,7 +33,7 @@ import javax.xml.namespace.QName;
  * <p/>
  * If no message processors are configured then the source message is simply returned.
  */
-public abstract class AbstractPipeline extends AbstractFlowConstruct implements Pipeline, AnnotatedObject
+public abstract class AbstractPipeline extends AbstractFlowConstruct implements Pipeline
 {
     protected MessageSource messageSource;
     protected MessageProcessor pipeline;
@@ -46,7 +41,6 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     protected List<MessageProcessor> messageProcessors = Collections.emptyList();
 
     protected ProcessingStrategy processingStrategy;
-    private final Map<QName, Object> annotations = new ConcurrentHashMap<QName, Object>();
 
     public AbstractPipeline(String name, MuleContext muleContext)
     {
@@ -181,21 +175,5 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
         disposeIfDisposable(pipeline);
         disposeIfDisposable(messageSource);
         super.doDispose();
-    }
-
-    public final Object getAnnotation(QName name)
-    {
-        return annotations.get(name);
-    }
-
-    public final Map<QName, Object> getAnnotations()
-    {
-        return Collections.unmodifiableMap(annotations);
-    }
-
-    public synchronized final void setAnnotations(Map<QName, Object> newAnnotations)
-    {
-        annotations.clear();
-        annotations.putAll(newAnnotations);
     }
 }
