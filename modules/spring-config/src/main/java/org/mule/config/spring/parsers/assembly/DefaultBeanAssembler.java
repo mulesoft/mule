@@ -118,7 +118,15 @@ public class DefaultBeanAssembler implements BeanAssembler
         else if (isAnnotationsPropertyAvailable(beanDefinition.getBeanClass()))
         {
             //Add attribute defining namespace as annotated elements. No reconciliation is done here ie new values override old ones.
-            QName name = new QName(attribute.getNamespaceURI(), attribute.getLocalName(), attribute.getPrefix());
+            QName name;
+            if (attribute.getPrefix() != null)
+            {
+                name = new QName(attribute.getNamespaceURI(), attribute.getLocalName(), attribute.getPrefix());
+            }
+            else
+            {
+                name = new QName(attribute.getNamespaceURI(), attribute.getLocalName());
+            }
             addAnnotationValue(beanDefinition.getPropertyValues(), name, beanConfig.translateValue(oldName, oldValue));
         }
         else
