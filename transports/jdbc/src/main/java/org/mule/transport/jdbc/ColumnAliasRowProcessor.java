@@ -10,12 +10,13 @@
 
 package org.mule.transport.jdbc;
 
+import org.mule.util.CaseInsensitiveHashMap;
+
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.Map;
 
-import org.apache.commons.collections.map.CaseInsensitiveMap;
 import org.apache.commons.dbutils.BasicRowProcessor;
 
 /**
@@ -33,7 +34,7 @@ public class ColumnAliasRowProcessor extends BasicRowProcessor
     @Override
     public Map toMap(ResultSet rs) throws SQLException
     {
-        Map result = new CaseInsensitiveMap();
+        Map result = new CaseInsensitiveHashMap();
         ResultSetMetaData rsmd = rs.getMetaData();
         int cols = rsmd.getColumnCount();
 
