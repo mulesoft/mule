@@ -57,7 +57,7 @@ org.mule.security.MultiuserSecurityTestCase
 org.mule.test.integration.transaction.XABridgeJmsJdbcTestCase
 
 #No Jira, temporary exclusion because it passes locally but not on the build server
-org.mule.test.transformers.XQueryFunctionalTestCase
+#org.mule.test.transformers.XQueryFunctionalTestCase
 
 # MULE-4483
 org.mule.test.integration.routing.outbound.ExpressionSplitterXPathWithFiltersTestCase

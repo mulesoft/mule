@@ -44,8 +44,8 @@ public class XQueryFunctionalTestCase extends FunctionalTestCase
         XMLUnit.setIgnoreComments(true);
 
         //Read in src and result data
-        String srcData = IOUtils.getResourceAsString("cd-catalog.xml", getClass());
-        String resultData = IOUtils.getResourceAsString("cd-catalog-result-with-params.xml", getClass());
+        String srcData = IOUtils.getResourceAsString("org/mule/test/integration/xml/cd-catalog.xml", getClass());
+        String resultData = IOUtils.getResourceAsString("org/mule/test/integration/xml/cd-catalog-result-with-params.xml", getClass());
 
         //Create a new Mule Client
         MuleClient client = new MuleClient(muleContext);
