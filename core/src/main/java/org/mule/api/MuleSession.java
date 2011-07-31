@@ -122,4 +122,14 @@ public interface MuleSession extends Serializable
      * @return property keys for all session properties
      */
     Set<String> getPropertyNamesAsSet();
+
+    /**
+     * Merge current session with an updated version
+     * Result session will contain all the properties from updatedSession
+     * plus those properties in the current session that couldn't be serialized
+     * In case updatedSession is null, then no change will be applied.
+     *
+     * @param updatedSession mule session with updated properties
+     */
+    void merge(MuleSession updatedSession);
 }

@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OptionalDataException;
+import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -297,6 +298,27 @@ public final class DefaultMuleSession implements MuleSession, DeserializationPos
     public Set<String> getPropertyNamesAsSet()
     {
         return Collections.unmodifiableSet(properties.keySet());
+    }
+
+    public void merge(MuleSession updatedSession)
+    {
+        if (updatedSession == null)
+        {
+            return;
+        }
+        Map<String, Object> oldProperties = this.properties;
+        this.properties = Collections.synchronizedMap(new CaseInsensitiveHashMap/*<String, Object>*/());
+        for (String propertyKey : updatedSession.getPropertyNamesAsSet())
+        {
+            this.properties.put(propertyKey, updatedSession.<Object>getProperty(propertyKey));
+        }
+        for (String propertyKey : oldProperties.keySet())
+        {
+            if (!this.properties.containsKey(propertyKey) && !(oldProperties.get(propertyKey) instanceof Serializable))
+            {
+                this.properties.put(propertyKey, oldProperties.get(propertyKey));
+            }
+        }
     }
 
     ////////////////////////////

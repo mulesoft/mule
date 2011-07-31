@@ -41,7 +41,6 @@ import org.apache.commons.httpclient.HttpVersion;
  */
 public class MuleMessageToHttpResponse extends AbstractMessageTransformer
 {
-    public static final String CUSTOM_HEADER_PREFIX = "";
 
     private String server;
 
@@ -290,30 +289,28 @@ public class MuleMessageToHttpResponse extends AbstractMessageTransformer
             Object v = msg.getOutboundProperty(headerName);
             if (v != null)
             {
+                if (headerName.startsWith(MuleProperties.PROPERTY_PREFIX))
+                {
+                    headerName = HttpConstants.CUSTOM_HEADER_PREFIX + headerName;
+                }
                 response.setHeader(new Header(headerName, v.toString()));
             }
         }
 
-        // Mule properties
-        String user = msg.getOutboundProperty(MuleProperties.MULE_USER_PROPERTY);
-        if (user != null)
-        {
-            response.setHeader(new Header(CUSTOM_HEADER_PREFIX + MuleProperties.MULE_USER_PROPERTY, user));
-        }
         if (msg.getCorrelationId() != null)
         {
-            response.setHeader(new Header(CUSTOM_HEADER_PREFIX + MuleProperties.MULE_CORRELATION_ID_PROPERTY,
+            response.setHeader(new Header(HttpConstants.CUSTOM_HEADER_PREFIX + MuleProperties.MULE_CORRELATION_ID_PROPERTY,
                     msg.getCorrelationId()));
-            response.setHeader(new Header(CUSTOM_HEADER_PREFIX
+            response.setHeader(new Header(HttpConstants.CUSTOM_HEADER_PREFIX
                     + MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY,
                     String.valueOf(msg.getCorrelationGroupSize())));
-            response.setHeader(new Header(CUSTOM_HEADER_PREFIX
+            response.setHeader(new Header(HttpConstants.CUSTOM_HEADER_PREFIX
                     + MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY,
                     String.valueOf(msg.getCorrelationSequence())));
         }
         if (msg.getReplyTo() != null)
         {
-            response.setHeader(new Header(CUSTOM_HEADER_PREFIX + MuleProperties.MULE_REPLY_TO_PROPERTY,
+            response.setHeader(new Header(HttpConstants.CUSTOM_HEADER_PREFIX + MuleProperties.MULE_REPLY_TO_PROPERTY,
                     msg.getReplyTo().toString()));
         }
 

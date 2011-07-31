@@ -72,10 +72,9 @@ public class HttpCookieTestCase extends AbstractMockHttpServerTestCase
         assertTrue(latch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS));
         assertTrue(cookieFound);
 
-        assertEquals(3, cookieHeaders.size());
+        assertEquals(2, cookieHeaders.size());
         assertThereIsCookieWithThisContent("Cookie: $Version=0; customCookie=yes", cookieHeaders);
         assertThereIsCookieWithThisContent("Cookie: $Version=0; expressionCookie=MYCOOKIE", cookieHeaders);
-        assertThereIsCookieWithThisContent("MULE_SESSION=", cookieHeaders);
     }
 
     private void assertThereIsCookieWithThisContent(String content, List<String> listOfRawCookies)

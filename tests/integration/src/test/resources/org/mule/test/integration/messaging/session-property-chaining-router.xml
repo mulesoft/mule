@@ -12,13 +12,8 @@
        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/3.2/mule-http.xsd
        http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/3.2/mule-cxf.xsd">
 
-    <vm:connector name="vmConnector">
-        <service-overrides sessionHandler="org.mule.session.LegacySessionHandler" />
-    </vm:connector>
-
-    <http:connector name="httpConnector">
-        <service-overrides sessionHandler="org.mule.session.LegacySessionHandler" />
-    </http:connector>
+    <vm:connector name="vmConnector"/>
+    <http:connector name="httpConnector"/>
 
     <spring:bean id="nonSerializable" class="org.mule.tck.NonSerializableObject" />
 
@@ -29,6 +24,9 @@
                     <message-properties-transformer scope="session">
                         <add-message-property key="foo" value-ref="nonSerializable" />
                     </message-properties-transformer>
+                    <response>
+      					<expression-transformer expression="session:foo" evaluator="header" />
+      				</response>
                 </vm:inbound-endpoint>
             </inbound>
             <outbound>
@@ -37,12 +35,7 @@
                         address="http://localhost:65082/services/EchoUMO">
                         <cxf:simple-client serviceClass="org.mule.api.component.simple.EchoService" operation="echo" />
                     </outbound-endpoint>
-                    <vm:outbound-endpoint path="service3" exchange-pattern="request-response">
-                        <custom-transformer class="org.mule.transformer.simple.MessagePropertiesTransformer">
-                            <spring:property name="getProperty" value="foo" />
-                            <spring:property name="scopeName" value="session" />
-                        </custom-transformer>
-                    </vm:outbound-endpoint>
+                    <vm:outbound-endpoint path="service3" exchange-pattern="request-response"/>
                 </chaining-router>
             </outbound>
         </service>
