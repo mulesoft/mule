@@ -139,13 +139,24 @@ public class DefaultBeanAssembler implements BeanAssembler
     }
 
     /**
-     * @param beanClassName
      * @return true if specified class defines a setAnnotations method.
      */
-    protected final boolean isAnnotationsPropertyAvailable(Class<?> beanClass)
+    public final boolean isAnnotationsPropertyAvailable(Class<?> beanClass)
     {
         try {
             return AnnotatedObject.class.isAssignableFrom(beanClass);
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    /**
+     * @return true if specified class defines a setAnnotations method.
+     */
+    public final boolean isAnnotationsPropertyAvailable(String beanClassName)
+    {
+        try {
+            return AnnotatedObject.class.isAssignableFrom(Class.forName(beanClassName));
         } catch (Exception e) {
             return false;
         }
@@ -403,12 +414,9 @@ public class DefaultBeanAssembler implements BeanAssembler
 
     /**
      * Add a key/value pair to existing {@link AnnotatedObject#PROPERTY_NAME} property value.
-     * @param properties
-     * @param name
-     * @param value
      */
     @SuppressWarnings("unchecked")
-    protected final void addAnnotationValue(MutablePropertyValues properties, QName name, Object value)
+    public final void addAnnotationValue(MutablePropertyValues properties, QName name, Object value)
     {
         PropertyValue propertyValue = properties.getPropertyValue(AnnotatedObject.PROPERTY_NAME);
         Map<QName, Object> oldValue;

@@ -108,7 +108,7 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="script" type="scriptType" substitutionGroup="mule:abstract-extension">
+    <xsd:element name="script" type="scriptType" substitutionGroup="mule:abstract-mixed-content-extension">
         <xsd:annotation>
             <xsd:documentation>
                 Represents a script that can be used as a component for a service or a transformer. The script text can be pulled in from a script file or can be embedded inside this element. A script can be executed by any JSR-223 compliant script engine such as Groovy, JavaScript(Rhino), Python, Ruby, or Beanshell.
@@ -164,7 +164,7 @@
             </xsd:documentation>
         </xsd:annotation>
         <xsd:complexContent mixed="true">
-            <xsd:extension base="mule:abstractExtensionType">
+            <xsd:extension base="mule:abstractMixedContentExtensionType">
                 <xsd:sequence>
                     <xsd:group ref="mule:propertiesGroup" minOccurs="0"/>
                     <xsd:element name="text" type="xsd:string" minOccurs="0">
@@ -279,7 +279,7 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="lang" type="langType" substitutionGroup="mule:abstract-extension">
+    <xsd:element name="lang" type="langType" substitutionGroup="mule:abstract-mixed-content-extension">
         <xsd:annotation>
             <xsd:documentation>
                 This element allows the http://www.springframework.org/schema/lang namespace to be embedded. Within this element developers can include the Spring {{lang}} namespace.
@@ -288,7 +288,7 @@
     </xsd:element>
     <xsd:complexType name="langType">
         <xsd:complexContent mixed="true">
-            <xsd:extension base="mule:abstractExtensionType">
+            <xsd:extension base="mule:abstractMixedContentExtensionType">
                 <xsd:sequence minOccurs="0" maxOccurs="unbounded">
                     <xsd:any namespace="http://www.springframework.org/schema/lang namespace" processContents="strict"
                              minOccurs="0" maxOccurs="unbounded"/>

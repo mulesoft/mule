@@ -9,12 +9,16 @@
  */
 package org.mule.config.spring.handlers;
 
+import org.mule.config.spring.MuleHierarchicalBeanDefinitionParserDelegate;
 import org.mule.config.spring.factories.InboundEndpointFactoryBean;
 import org.mule.config.spring.factories.OutboundEndpointFactoryBean;
+import org.mule.config.spring.parsers.AbstractChildDefinitionParser;
 import org.mule.config.spring.parsers.MuleDefinitionParser;
 import org.mule.config.spring.parsers.MuleDefinitionParserConfiguration;
 import org.mule.config.spring.parsers.PostProcessor;
 import org.mule.config.spring.parsers.PreProcessor;
+import org.mule.config.spring.parsers.assembly.BeanAssembler;
+import org.mule.config.spring.parsers.assembly.DefaultBeanAssembler;
 import org.mule.config.spring.parsers.assembly.configuration.ValueMap;
 import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
 import org.mule.config.spring.parsers.specific.endpoint.TransportEndpointDefinitionParser;
@@ -22,6 +26,7 @@ import org.mule.config.spring.parsers.specific.endpoint.TransportGlobalEndpointD
 import org.mule.config.spring.parsers.specific.endpoint.support.AddressedEndpointDefinitionParser;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 
+import javax.xml.namespace.QName;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
@@ -30,10 +35,13 @@ import java.util.Set;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.xml.BeanDefinitionParser;
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+
 
 /**
  * This Namespace handler extends the default Spring {@link org.springframework.beans.factory.xml.NamespaceHandlerSupport}
@@ -46,6 +54,11 @@ public abstract class AbstractMuleNamespaceHandler extends NamespaceHandlerSuppo
     public static final String OUTBOUND_ENDPOINT = "outbound-endpoint"; 
 
     protected transient final Log logger = LogFactory.getLog(getClass());
+
+    protected AbstractMuleNamespaceHandler()
+    {
+        registerBeanDefinitionParser("annotations", new AnnotationsBeanDefintionParser());
+    }
 
     /**
      * @param name The name of the element to be ignored.
@@ -250,4 +263,64 @@ public abstract class AbstractMuleNamespaceHandler extends NamespaceHandlerSuppo
         registerBeanDefinitionParser(elementName, parser);
     }
 
+    static class AnnotationsBeanDefintionParser extends AbstractChildDefinitionParser
+    {
+        AnnotationsBeanDefintionParser()
+        {
+            ;
+        }
+
+        @Override
+        protected AbstractBeanDefinition parseInternal(Element element, ParserContext context)
+        {
+            AbstractBeanDefinition beanDef = super.parseInternal(element, context);
+            beanDef.setAttribute(MuleHierarchicalBeanDefinitionParserDelegate.MULE_NO_RECURSE, true);
+            beanDef.setAttribute(MuleHierarchicalBeanDefinitionParserDelegate.MULE_NO_REGISTRATION, true);
+            return beanDef;
+        }
+
+        @Override
+        public String getPropertyName(Element element)
+        {
+            return "annotation";
+        }
+
+        @Override
+        protected Class<?> getBeanClass(Element element)
+        {
+            return Map.class;
+        }
+
+        @Override
+        protected void postProcess(ParserContext context, BeanAssembler beanAssembler, Element element)
+        {
+            if (beanAssembler instanceof DefaultBeanAssembler)
+            {
+                DefaultBeanAssembler assembler = (DefaultBeanAssembler) beanAssembler;
+
+                if (assembler.isAnnotationsPropertyAvailable(assembler.getTarget().getBeanClassName()))
+                {
+                    for (Node node = element.getFirstChild(); node != null; node = node.getNextSibling())
+                    {
+                        if (node.getNodeType() == Node.ELEMENT_NODE)
+                        {
+                            StringBuilder builder = new StringBuilder();
+                            for (Node child = node.getFirstChild(); child != null; child = child.getNextSibling())
+                            {
+                                switch (child.getNodeType())
+                                {
+                                    case Node.TEXT_NODE:
+                                    case Node.CDATA_SECTION_NODE:
+                                        builder.append(child.getNodeValue());
+                                }
+                            }
+                            assembler.addAnnotationValue(context.getContainingBeanDefinition().getPropertyValues(),
+                                                         new QName(node.getNamespaceURI(), node.getLocalName()),
+                                                         builder.toString());
+                        }
+                    }
+                }
+            }
+        }
+    }
 }

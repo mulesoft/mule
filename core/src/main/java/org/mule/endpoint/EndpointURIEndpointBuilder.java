@@ -56,6 +56,7 @@ public class EndpointURIEndpointBuilder extends AbstractEndpointBuilder
         disableTransportTransformer = global.disableTransportTransformer;
         transformers = global.transformers;
         responseTransformers = global.responseTransformers;
+        setAnnotations(global.getAnnotations());
 
     }
 

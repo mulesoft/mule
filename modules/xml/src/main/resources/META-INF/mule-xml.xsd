@@ -626,7 +626,7 @@ The Jaxen filter allows you to route messages based on XPath expressions. The Ja
     </xsd:element>
 
     <xsd:complexType name="xqueryTransformerType">
-        <xsd:complexContent mixed="true">
+        <xsd:complexContent>
             <xsd:extension base="xmlTransformerType">
                 <xsd:sequence>
                     <xsd:element name="context-property" type="spring:entryType" minOccurs="0" maxOccurs="unbounded">
@@ -675,9 +675,10 @@ The Jaxen filter allows you to route messages based on XPath expressions. The Ja
 
     <xsd:complexType name="xqueryTextType" mixed="true">
         <xsd:complexContent mixed="true">
-            <xsd:extension base="mule:abstractExtensionType"/>
+            <xsd:extension base="mule:abstractMixedContentExtensionType"/>
         </xsd:complexContent>
     </xsd:complexType>
+
     <xsd:complexType name="xsltTextType">
         <xsd:sequence maxOccurs="1" minOccurs="1">
             <xsd:any namespace="http://www.w3.org/1999/XSL/Transform" minOccurs="0" maxOccurs="1"

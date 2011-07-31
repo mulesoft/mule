@@ -22,7 +22,29 @@
          global properties).  We then provide some implementations below.  Other modules
          can provide other implementations. -->
 
-    <xsd:complexType name="annotatedType">
+    <xsd:complexType name="annotationsType">
+        <xsd:sequence>
+            <xsd:any minOccurs="0" maxOccurs="unbounded" processContents="lax"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="annotatedType" abstract="true">
+        <xsd:sequence>
+            <xsd:element name="annotations" type="annotationsType" minOccurs="0"/>
+        </xsd:sequence>
+        <xsd:anyAttribute namespace="##other" processContents="lax">
+            <xsd:annotation>
+                <xsd:documentation>
+                    Allow any third-parties to annotate these elements with global attributes
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:anyAttribute>
+    </xsd:complexType>
+
+    <xsd:complexType name="annotatedMixedContentType" abstract="true" mixed="true">
+        <xsd:sequence>
+            <xsd:element name="annotations" type="annotationsType" minOccurs="0"/>
+        </xsd:sequence>
         <xsd:anyAttribute namespace="##other" processContents="lax">
             <xsd:annotation>
                 <xsd:documentation>
@@ -116,6 +138,7 @@
                 </xsd:annotation>
             </xsd:element>
             <xsd:element ref="abstract-extension"/>
+            <xsd:element ref="abstract-mixed-content-extension"/>
             <xsd:element ref="abstract-agent"/>
             <xsd:element ref="abstract-security-manager"/>
             <xsd:element ref="abstract-transaction-manager"/>
@@ -153,6 +176,19 @@
     <xsd:complexType name="abstractExtensionType">
         <xsd:complexContent>
             <xsd:extension base="annotatedType"/>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="abstract-mixed-content-extension" abstract="true" type="abstractMixedContentExtensionType">
+        <xsd:annotation>
+            <xsd:documentation>
+                A placeholder for arbitrary extensions as children of the 'mule' element. Other transports and modules can extend this if they need to add global elements with mixed content to the configuration (but consider the more specific elements like abstract-connector first).
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:complexType name="abstractMixedContentExtensionType">
+        <xsd:complexContent mixed="true">
+            <xsd:extension base="annotatedMixedContentType"/>
         </xsd:complexContent>
     </xsd:complexType>
 
