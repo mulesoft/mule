@@ -41,7 +41,7 @@ public class ServiceInternalMessageProcessor extends AbstractInterceptingMessage
         MuleEvent resultEvent;
         try
         {
-            Object replyTo = event.getReplyToParameter();
+            Object replyTo = event.getReplyToDestination();
             ReplyToHandler replyToHandler = event.getReplyToHandler();
 
             resultEvent = service.getComponent().process(event);

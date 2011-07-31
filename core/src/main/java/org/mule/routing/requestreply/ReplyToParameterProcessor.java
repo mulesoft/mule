@@ -21,7 +21,7 @@ public class ReplyToParameterProcessor implements MessageProcessor
     @Override
     public MuleEvent process(MuleEvent event) throws MuleException
     {
-        event.setReplyToParameter();
+        event.captureReplyToDestination();
         return event;
     }
 }

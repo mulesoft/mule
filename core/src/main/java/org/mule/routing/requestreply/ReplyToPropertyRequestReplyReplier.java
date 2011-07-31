@@ -26,7 +26,7 @@ public class ReplyToPropertyRequestReplyReplier extends AbstractInterceptingMess
     @Override
     public MuleEvent process(MuleEvent event) throws MuleException
     {
-        Object replyTo = event.getReplyToParameter();
+        Object replyTo = event.getReplyToDestination();
         ReplyToHandler replyToHandler = event.getReplyToHandler();
 
         MuleEvent resultEvent = processNext(event);

@@ -282,19 +282,19 @@ public interface MuleEvent extends Serializable
     String getMessageSourceName();
 
     /**
-     * Return the replyToHanlder (if any) that will be used to perform async reply
+     * Return the replyToHandler (if any) that will be used to perform async reply
      */
     ReplyToHandler getReplyToHandler();
 
     /**
-     * Return the parameter (if any) that will be passed to the reply-to handler.
+     * Return the destination (if any) that will be passed to the reply-to handler.
      */
-    Object getReplyToParameter();
+    Object getReplyToDestination();
 
     /**
-     * Set the reply-to parameter from the current message, and remove it from the message, to
+     * Set the reply-to destination from the current message, and remove it from the message, to
      * prevent any further propagation.
      */
-    void setReplyToParameter();
+    void captureReplyToDestination();
     
 }
