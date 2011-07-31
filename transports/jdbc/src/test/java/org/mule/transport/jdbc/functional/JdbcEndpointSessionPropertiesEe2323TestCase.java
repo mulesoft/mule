@@ -11,10 +11,15 @@
 package org.mule.transport.jdbc.functional;
 
 import org.hamcrest.core.IsNull;
+import org.junit.Test;
+import org.junit.runners.Parameterized;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
+
+import java.util.Arrays;
+import java.util.Collection;
 
 import static org.junit.Assert.assertThat;
 
@@ -26,12 +31,15 @@ public class JdbcEndpointSessionPropertiesEe2323TestCase extends AbstractJdbcFun
         setPopulateTestData(false);
     }
 
-    @Override
-    protected String getConfigResources()
+    @Parameterized.Parameters
+    public static Collection<Object[]> parameters()
     {
-        return super.getConfigResources() + ",jdbc-endpoint-session-properties.xml";
+        return Arrays.asList(new Object[][]{
+                {ConfigVariant.FLOW, "jdbc-endpoint-session-properties.xml"}
+        });
     }
 
+    @Test
     public void testSelectOnOutbound() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
