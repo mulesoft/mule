@@ -21,10 +21,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 /**
- * @see EE-2307
- *
- * Non serializable session properties won't be serialized with the mule session
- * but neither it will be lost in the flow were it was stored
+ * @see EE-1821
  */
 public class SessionPropertyChainingRouterTestCase extends FunctionalTestCase
 {

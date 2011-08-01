@@ -75,6 +75,8 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher
                                                                                       endpoint.getEndpointURI()));
         }
 
+        MuleMessage message = event.getMessage();
+        connector.getSessionHandler().storeSessionInfoToMessage(event.getSession(), message);
         TransactionTemplate<MuleMessage> tt = new TransactionTemplate<MuleMessage>(
                                                             receiver.getEndpoint().getTransactionConfig(),
                                                             event.getMuleContext());

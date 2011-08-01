@@ -10,14 +10,14 @@
 
 package org.mule.transport.http.functional;
 
-import org.mule.session.SerializeAndEncodeSessionHandler;
+import org.mule.transport.http.HttpSessionHandler;
 
 /**
- * This is a custom subclass of the regular SerializeAndEncodeSessionHandler that's used in
+ * This is a custom subclass of the regular HttpSessionHandler that's used in
  * HttpServiceOverridesTestCase to see if the service override properly instantiates
  * the right class.
  */
-public class TestSessionHandler extends SerializeAndEncodeSessionHandler
+public class TestSessionHandler extends HttpSessionHandler
 {
     // no custom methods
 }

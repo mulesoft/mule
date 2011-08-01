@@ -89,7 +89,7 @@ public class ChainingRouterTestCase extends AbstractMuleContextTestCase
         MuleMessage message = new DefaultMuleMessage("test event", muleContext);
         assertTrue(router.isMatch(message));
 
-        MuleEvent event = new OutboundRoutingTestEvent(message, (MuleSession)session.proxy(), muleContext);
+        MuleEvent event = new OutboundRoutingTestEvent(message, null, muleContext);
 
         mockendpoint1.expectAndReturn("process", RouterTestUtils.getArgListCheckerMuleEvent(), event);
         mockendpoint2.expectAndReturn("process", RouterTestUtils.getArgListCheckerMuleEvent(), event);
@@ -113,8 +113,7 @@ public class ChainingRouterTestCase extends AbstractMuleContextTestCase
         m.put("barValue", "bar");
         MuleMessage message = new DefaultMuleMessage("test event", m, muleContext);
         assertTrue(router.isMatch(message));
-
-        MuleEvent event = new OutboundRoutingTestEvent(message, (MuleSession)session.proxy(), muleContext);
+        MuleEvent event = new OutboundRoutingTestEvent(message, null, muleContext);
 
         ImmutableEndpoint ep = (ImmutableEndpoint) router.getRoute(2, event);
         assertEquals("test://foo?bar&exchangePattern=request-response", ep.getEndpointURI().toString());
@@ -149,7 +148,7 @@ public class ChainingRouterTestCase extends AbstractMuleContextTestCase
         assertTrue(router.isMatch(message));
 
         message = new DefaultMuleMessage("test event", muleContext);
-        MuleEvent event = new OutboundRoutingTestEvent(message, (MuleSession)session.proxy(), muleContext);
+         MuleEvent event = new OutboundRoutingTestEvent(message, null, muleContext);
 
         mep1.expectAndReturn("process", RouterTestUtils.getArgListCheckerMuleEvent(), event);
         mep2.expectAndReturn("process", RouterTestUtils.getArgListCheckerMuleEvent(), null);

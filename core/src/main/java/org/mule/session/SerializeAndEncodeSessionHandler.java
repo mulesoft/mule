@@ -50,7 +50,7 @@ public class SerializeAndEncodeSessionHandler extends SerializeOnlySessionHandle
     @Override
     public void storeSessionInfoToMessage(MuleSession session, MuleMessage message) throws MuleException
     {        
-        byte[] serializedSession = SerializationUtils.serialize(removeNonSerializableProperties(session,message.getMuleContext()));
+        byte[] serializedSession = SerializationUtils.serialize(removeNonSerializableProperties(session));
         String serializedEncodedSession;
         try
         {

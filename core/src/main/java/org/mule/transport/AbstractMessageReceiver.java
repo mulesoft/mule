@@ -196,11 +196,6 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
             return muleEvent;
         }
 
-        if (resultEvent != null)
-        {
-            connector.getSessionHandler().storeSessionInfoToMessage(resultEvent.getSession(), resultEvent.getMessage());
-        }
-
         if (endpoint.getExchangePattern()== MessageExchangePattern.REQUEST_RESPONSE && resultEvent != null && resultEvent.getMessage() != null && !endpoint.isDisableTransportTransformer())
         {
             applyResponseTransformers(resultEvent);
