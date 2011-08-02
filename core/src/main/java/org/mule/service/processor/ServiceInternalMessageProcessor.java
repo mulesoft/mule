@@ -30,9 +30,6 @@ public class ServiceInternalMessageProcessor extends AbstractInterceptingMessage
 {
 
     protected Service service;
-    protected MessageProcessor receiveAsyncReplyMessageProcessor;
-    private AtomicReference<ReplyToHandler> cachedReplyToHandler = new AtomicReference<ReplyToHandler>();
-
 
     public ServiceInternalMessageProcessor(Service service)
     {
@@ -48,17 +45,15 @@ public class ServiceInternalMessageProcessor extends AbstractInterceptingMessage
         MuleEvent resultEvent;
         try
         {
-            Object replyTo = event.getMessage().getReplyTo();
-            ReplyToHandler replyToHandler = getReplyToHandler(event.getMessage(), event.getEndpoint());
-            // Do not propagate REPLY_TO beyond the inbound endpoint
-            event.getMessage().setReplyTo(null);
+            Object replyTo = event.getReplyToDestination();
+            ReplyToHandler replyToHandler = event.getReplyToHandler();
 
             resultEvent = service.getComponent().process(event);
             resultEvent = processNext(resultEvent);
 
             // Allow components to stop processing of the ReplyTo property (e.g.
             // CXF)
-            if (resultEvent != null)
+            if (resultEvent != null && replyTo != null)
             {
                 String replyToStop = resultEvent.getMessage().getInvocationProperty(MuleProperties.MULE_REPLY_TO_STOP_PROPERTY);
                 if (!event.getEndpoint().getExchangePattern().hasResponse() || !BooleanUtils.toBoolean(replyToStop))
@@ -80,26 +75,6 @@ public class ServiceInternalMessageProcessor extends AbstractInterceptingMessage
                 throw new MessagingException(event, e);
             }
         }
-    }
-
-    protected ReplyToHandler getReplyToHandler(MuleMessage message, ImmutableEndpoint endpoint)
-    {
-        Object replyTo = message.getReplyTo();
-        if (replyTo != null)
-        {
-            if (cachedReplyToHandler.get() == null)
-            {
-                ReplyToHandler replyToHandler = ((AbstractConnector) endpoint.getConnector()).getReplyToHandler(endpoint);
-                // Use the response transformer for the event if one is set
-                if (endpoint.getResponseTransformers() != null)
-                {
-                    replyToHandler.setTransformers(endpoint.getResponseTransformers());
-                }
-                cachedReplyToHandler.compareAndSet(null, replyToHandler);
-            }
-            return cachedReplyToHandler.get();
-        }
-        return null;
     }
 
     protected void processReplyTo(MuleEvent event,

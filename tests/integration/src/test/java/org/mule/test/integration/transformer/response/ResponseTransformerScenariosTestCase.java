@@ -127,14 +127,17 @@ public class ResponseTransformerScenariosTestCase extends FunctionalTestCase
     // ***** RESPONSE ENDPONTS ON INBOUND ENDPOINTS USED FOR REMOTE-SYNC RESPONSE AFTER ROUTRING *****
     // Applied by ReplyToHandler
 
-    @Test
-    public void testJmsSyncResponseTransformer() throws Exception
-    {
-        MuleClient client = new MuleClient(muleContext);
-        MuleMessage message = client.send("jms://sync", "request", null);
-        assertNotNull(message);
-        assertEquals("request" + CUSTOM_RESPONSE, message.getPayloadAsString());
-    }
+    // DF: The following scenario is no longer supported as from Mule 3.2, a error is logged if response
+    // transformers are configured on a jms request-response inbound endpoint.
+
+    // @Test
+    // public void testJmsSyncResponseTransformer() throws Exception
+    // {
+    // MuleClient client = new MuleClient(muleContext);
+    // MuleMessage message = client.send("jms://sync", "request", null);
+    // assertNotNull(message);
+    // assertEquals("request" + CUSTOM_RESPONSE, message.getPayloadAsString());
+    // }
 
     // ***** RESPONSE ENDPONTS ON OUTBOUND ENDPOINT *****
     // Applied by DefaultMuleSession once result message is received from remote endpoint.

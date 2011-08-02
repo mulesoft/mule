@@ -15,6 +15,7 @@ import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.security.Credentials;
 import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.TransformerException;
+import org.mule.api.transport.ReplyToHandler;
 import org.mule.management.stats.ProcessingTime;
 
 import java.io.OutputStream;
@@ -260,4 +261,20 @@ public interface MuleEvent extends Serializable
      * Returns the times spent processing this event (so far)
      */
     ProcessingTime getProcessingTime();
+
+    /**
+     * Return the replyToHandler (if any) that will be used to perform async reply
+     */
+    ReplyToHandler getReplyToHandler();
+
+    /**
+     * Return the destination (if any) that will be passed to the reply-to handler.
+     */
+    Object getReplyToDestination();
+
+    /**
+     * Set the reply-to destination from the current message, and remove it from the message, to
+     * prevent any further propagation.
+     */
+    void captureReplyToDestination();
 }

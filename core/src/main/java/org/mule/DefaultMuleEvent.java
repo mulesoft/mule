@@ -28,6 +28,7 @@ import org.mule.api.security.Credentials;
 import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
+import org.mule.api.transport.ReplyToHandler;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.endpoint.DefaultEndpointFactory;
 import org.mule.endpoint.MuleEndpointURI;
@@ -108,6 +109,10 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
 
     private final ProcessingTime processingTime;
 
+    private Object replyToDestination;
+
+    private ReplyToHandler replyToHanlder;
+
     /**
      * Properties cache that only reads properties once from the inbound message and
      * merges them with any properties on the endpoint. The message properties take
@@ -132,6 +137,8 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
         this.timeout = previousEvent.getTimeout();
         this.outputStream = (ResponseOutputStream) previousEvent.getOutputStream();
         this.processingTime = ProcessingTime.newInstance(this.session, message.getMuleContext());
+        this.replyToDestination = previousEvent.getReplyToDestination();
+        this.replyToHanlder = previousEvent.getReplyToHandler();
         fillProperties();
     }
 
@@ -148,6 +155,8 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
         this.timeout = previousEvent.getTimeout();
         this.outputStream = (ResponseOutputStream) previousEvent.getOutputStream();
         this.processingTime = ProcessingTime.newInstance(this.session, message.getMuleContext());
+        this.replyToDestination = previousEvent.getReplyToDestination();
+        this.replyToHanlder = previousEvent.getReplyToHandler();
         fillProperties();
     }
 
@@ -155,7 +164,7 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
                             ImmutableEndpoint endpoint,
                             MuleSession session)
     {
-        this(message, endpoint, session, null, null);
+        this(message, endpoint, session, null, null, null);
     }
 
     public DefaultMuleEvent(MuleMessage message,
@@ -163,7 +172,7 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
                             MuleSession session,
                             ProcessingTime time)
     {
-        this(message, endpoint, session, null, time);
+        this(message, endpoint, session, null, time, null);
     }
 
     public DefaultMuleEvent(MuleMessage message,
@@ -171,14 +180,15 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
                             MuleSession session,
                             ResponseOutputStream outputStream)
     {
-        this(message, endpoint, session, outputStream, null);
+        this(message, endpoint, session, outputStream, null, null);
     }
 
     public DefaultMuleEvent(MuleMessage message,
                             ImmutableEndpoint endpoint,
                             MuleSession session,
                             ResponseOutputStream outputStream,
-                            ProcessingTime time)
+                            ProcessingTime time,
+                            ReplyToHandler replyToHandler)
     {
         super(message.getPayload());
         this.message = message;
@@ -188,6 +198,7 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
         this.outputStream = outputStream;
         fillProperties();
         this.processingTime = time != null ? time : ProcessingTime.newInstance(this.session, message.getMuleContext());
+        this.replyToHanlder = replyToHandler;
     }
 
     /**
@@ -215,6 +226,8 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
         {
             this.processingTime = ProcessingTime.newInstance(this.session, message.getMuleContext());
         }
+        this.replyToDestination = rewriteEvent.getReplyToDestination();
+        this.replyToHanlder = rewriteEvent.getReplyToHandler();
         fillProperties();
     }
 
@@ -746,6 +759,25 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
     public ProcessingTime getProcessingTime()
     {
         return processingTime;
+    }
+
+    public Object getReplyToDestination()
+    {
+        return replyToDestination;
+    }
+
+    public void captureReplyToDestination()
+    {
+        if (message != null)
+        {
+            replyToDestination = message.getReplyTo();
+            message.setReplyTo(null);
+        }
+    }
+
+    public ReplyToHandler getReplyToHandler()
+    {
+        return replyToHanlder;
     }
 
 }

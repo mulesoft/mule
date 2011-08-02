@@ -49,7 +49,7 @@ public class EndpointTranformersInAttributesTestCase extends FunctionalTestCase
 
         List<MessageProcessor> processors = endpoint.getMessageProcessors();
         assertNotNull(processors);
-        assertEquals(1, processors.size());
+        assertEquals(2, processors.size());
         assertTrue(processors.get(0) instanceof TestInboundTransformer);
         // For backwards-compatibility only
         List<Transformer> transformers = endpoint.getTransformers();
@@ -75,7 +75,7 @@ public class EndpointTranformersInAttributesTestCase extends FunctionalTestCase
 
         List<MessageProcessor> processors = endpoint.getMessageProcessors();
         assertNotNull(processors);
-        assertEquals(2, processors.size());
+        assertEquals(3, processors.size());
         assertTrue(processors.get(0) instanceof TestInboundTransformer);
         assertTrue(processors.get(1) instanceof TestInboundTransformer);
         // For backwards-compatibility only
@@ -108,7 +108,7 @@ public class EndpointTranformersInAttributesTestCase extends FunctionalTestCase
 
         List<MessageProcessor> processors = endpoint.getMessageProcessors();
         assertNotNull(processors);
-        assertEquals(1, processors.size());
+        assertEquals(2, processors.size());
         assertTrue(processors.get(0) instanceof TestInboundTransformer);
         // For backwards-compatibility only
         List<Transformer> transformers = endpoint.getTransformers();
@@ -164,7 +164,7 @@ public class EndpointTranformersInAttributesTestCase extends FunctionalTestCase
 
         List<MessageProcessor> processors = endpoint.getMessageProcessors();
         assertNotNull(processors);
-        assertEquals(1, processors.size());
+        assertEquals(2, processors.size());
         assertTrue(processors.get(0) instanceof TestInboundTransformer);
         // For backwards-compatibility only
         List<Transformer> transformers = endpoint.getTransformers();
@@ -216,7 +216,7 @@ public class EndpointTranformersInAttributesTestCase extends FunctionalTestCase
 
         List<MessageProcessor> processors = endpoint.getMessageProcessors();
         assertNotNull(processors);
-        assertEquals(2, processors.size());
+        assertEquals(3, processors.size());
         assertTrue(processors.get(0) instanceof StringAppendTransformer);
         assertTrue(processors.get(1) instanceof TestInboundTransformer);
 

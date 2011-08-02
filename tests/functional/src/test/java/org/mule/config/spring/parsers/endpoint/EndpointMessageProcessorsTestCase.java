@@ -44,7 +44,7 @@ public class EndpointMessageProcessorsTestCase extends FunctionalTestCase
         
         List <MessageProcessor> processors = endpoint.getMessageProcessors();
         assertNotNull(processors);
-        assertEquals(1, processors.size());
+        assertEquals(2, processors.size());
         assertTrue(processors.get(0) instanceof TestMessageProcessor);
 
         processors = endpoint.getResponseMessageProcessors();
@@ -60,7 +60,7 @@ public class EndpointMessageProcessorsTestCase extends FunctionalTestCase
         
         List <MessageProcessor> processors = endpoint.getMessageProcessors();
         assertNotNull(processors);
-        assertEquals(2, processors.size());
+        assertEquals(3, processors.size());
         assertEquals("1", ((TestMessageProcessor) processors.get(0)).getLabel());
         assertEquals("2", ((TestMessageProcessor) processors.get(1)).getLabel());
 
@@ -82,7 +82,7 @@ public class EndpointMessageProcessorsTestCase extends FunctionalTestCase
 
         List <MessageProcessor> processors = endpoint.getMessageProcessors();
         assertNotNull(processors);
-        assertEquals(2, processors.size());
+        assertEquals(3, processors.size());
         assertEquals("A", ((TestMessageProcessor) processors.get(0)).getLabel());
         assertEquals("B", ((TestMessageProcessor) processors.get(1)).getLabel());
 
