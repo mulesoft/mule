@@ -141,7 +141,12 @@ public class DefaultMessageProcessorChain extends AbstractMessageProcessorChain
     {
         if (processor instanceof OutboundEndpoint)
         {
-            return !((OutboundEndpoint) processor).getExchangePattern().hasResponse();
+            // Dynamic endpoints might not have an exchange pattern set yet unless explicitly specified in the configuration
+            if(((OutboundEndpoint) processor).getExchangePattern() != null)
+            {
+                return  !((OutboundEndpoint) processor).getExchangePattern().hasResponse();
+            }
+            return true;
         }
         else if (processor instanceof Component || processor instanceof Transformer
                  || processor instanceof MessageFilter)
