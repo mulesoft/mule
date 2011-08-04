@@ -125,6 +125,12 @@ public class InvokerMessageProcessor implements MessageProcessor, Initialisable,
 
     protected void lookupObjectInstance() throws InitialisationException
     {
+        if (object == null)
+        {
+            throw new InitialisationException(CoreMessages.initialisationFailure(String.format(
+                "No instance of '%s' was found in the registry", objectType)), this);
+        }
+
         if (logger.isDebugEnabled())
         {
             logger.debug(String.format(
@@ -142,12 +148,6 @@ public class InvokerMessageProcessor implements MessageProcessor, Initialisable,
                 CoreMessages.initialisationFailure(String.format(
                     "Muliple instances of '%s' were found in the registry so you need to configure a specific instance",
                     objectType)), this);
-        }
-        if (object == null)
-        {
-            throw new InitialisationException(CoreMessages.initialisationFailure(String.format(
-                "No instance of '%s' was found in the registry", objectType)), this);
-
         }
     }
 
