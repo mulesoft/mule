@@ -9,6 +9,11 @@
  */
 package org.mule.transport.quartz.config;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.routing.OutboundRouterCollection;
@@ -28,11 +33,6 @@ import org.mule.transport.quartz.jobs.ScheduledDispatchJobConfig;
 
 import org.junit.Test;
 import org.quartz.impl.StdScheduler;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 
 
 /**
@@ -56,7 +56,8 @@ public class QuartzNamespaceHandlerServiceTestCase extends FunctionalTestCase
         assertNotNull(c.getQuartzScheduler());
         assertEquals(StdScheduler.class, c.getQuartzScheduler().getClass());
         StdScheduler scheduler = (StdScheduler) c.getQuartzScheduler();
-        assertEquals("QuartzScheduler", scheduler.getSchedulerName());
+        String defaultSchedulerName = "scheduler-" + muleContext.getConfiguration().getId();
+        assertEquals(defaultSchedulerName, scheduler.getSchedulerName());
         
         assertTrue(c.isConnected());
         assertTrue(c.isStarted());
