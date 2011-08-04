@@ -1562,6 +1562,10 @@ public abstract class AbstractConnector implements Connector, WorkListener
                                 logger.debug("Connecting receiver on endpoint: " + receiver.getEndpoint().getEndpointURI());
                             }
                             receiver.connect();
+                            if (isStarted())
+                            {
+                                receiver.start();
+                            }
                         }
                         catch (MuleException e)
                         {
