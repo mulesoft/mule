@@ -101,7 +101,7 @@
         </xsd:annotation>
     </xsd:element>
 
-    <xsd:element name="mapper" type="mapperType" substitutionGroup="mule:abstract-extension">
+    <xsd:element name="mapper" type="mapperType" substitutionGroup="mule:abstract-mixed-content-extension">
         <xsd:annotation>
             <xsd:documentation>
                 The Jackson mapper to use with a JSON transformer. This isn't required but can be used to configure mixins on the mapper.
@@ -177,7 +177,7 @@
 
     <xsd:complexType name="mapperType" mixed="true">
         <xsd:complexContent>
-            <xsd:extension base="mule:abstractExtensionType">
+            <xsd:extension base="mule:abstractMixedContentExtensionType">
                 <xsd:sequence minOccurs="0" maxOccurs="unbounded">
                     <xsd:element type="mixin" name="mixin"/>
                 </xsd:sequence>
