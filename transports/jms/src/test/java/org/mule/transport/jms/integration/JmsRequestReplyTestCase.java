@@ -27,7 +27,7 @@ public class JmsRequestReplyTestCase extends AbstractJmsFunctionalTestCase {
 
 
     @Test
-    public void testJmsReplyTo() throws Exception
+    public void testJmsWithRequestReply() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
         MuleMessage result = client.send("vm://in4jms", "some data", null);
@@ -36,4 +36,5 @@ public class JmsRequestReplyTestCase extends AbstractJmsFunctionalTestCase {
         assertThat(result.getPayload() instanceof NullPayload, Is.is(false));
         assertThat(result.getPayloadAsString(), Is.is("HELLO"));
     }
+
 }

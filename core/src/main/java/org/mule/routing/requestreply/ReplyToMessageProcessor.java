@@ -14,32 +14,40 @@ import org.apache.commons.lang.BooleanUtils;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.config.MuleProperties;
-import org.mule.api.processor.MessageProcessor;
-import org.mule.api.processor.RequestReplyReplierMessageProcessor;
+import org.mule.api.processor.InterceptingMessageProcessor;
 import org.mule.api.transport.ReplyToHandler;
+import org.mule.construct.SimpleFlowConstruct;
 import org.mule.processor.AbstractInterceptingMessageProcessor;
 
-public class ReplyToPropertyRequestReplyReplier extends AbstractInterceptingMessageProcessor
-    implements RequestReplyReplierMessageProcessor
+/**
+ * Send message according to reply to property
+ */
+public class ReplyToMessageProcessor extends AbstractInterceptingMessageProcessor
+     implements InterceptingMessageProcessor
 {
 
     public MuleEvent process(MuleEvent event) throws MuleException
     {
-        Object replyTo = event.getReplyToDestination();
-        ReplyToHandler replyToHandler = event.getReplyToHandler();
-        // Do not propagate REPLY_TO
-        event.getMessage().setReplyTo(null);
+        MuleEvent resultEvent;
+        //In config is service then this is executed by ServiceInternalMessageProcessor
+        if (event.getFlowConstruct() instanceof SimpleFlowConstruct) {
+            Object replyTo = event.getReplyToDestination();
+            ReplyToHandler replyToHandler = event.getReplyToHandler();
+            // Do not propagate REPLY_TO
+            event.getMessage().setReplyTo(null);
 
-        MuleEvent resultEvent = processNext(event);
+            resultEvent = processNext(event);
 
-        // Allow components to stop processing of the ReplyTo property (e.g. CXF)
-        final String replyToStop = resultEvent.getMessage().getInvocationProperty(
-            MuleProperties.MULE_REPLY_TO_STOP_PROPERTY);
-        if (resultEvent != null && !BooleanUtils.toBoolean(replyToStop))
-        {
-            processReplyTo(event, resultEvent, replyToHandler, replyTo);
+            // Allow components to stop processing of the ReplyTo property (e.g. CXF)
+            final String replyToStop = resultEvent.getMessage().getInvocationProperty(
+                MuleProperties.MULE_REPLY_TO_STOP_PROPERTY);
+            if (resultEvent != null && !BooleanUtils.toBoolean(replyToStop))
+            {
+                processReplyTo(event, resultEvent, replyToHandler, replyTo);
+            }
+        } else {
+            resultEvent = processNext(event);
         }
-
         return resultEvent;
     }
 
@@ -58,11 +66,6 @@ public class ReplyToPropertyRequestReplyReplier extends AbstractInterceptingMess
                 replyToHandler.processReplyTo(event, result.getMessage(), replyTo);
             }
         }
-    }
-
-    public void setReplyProcessor(MessageProcessor replyMessageProcessor)
-    {
-        // Not used
     }
 
 }

@@ -28,7 +28,7 @@ import org.mule.interceptor.ProcessingTimeInterceptor;
 import org.mule.lifecycle.processor.ProcessIfStartedMessageProcessor;
 import org.mule.processor.OptionalAsyncInterceptingMessageProcessor;
 import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
-import org.mule.routing.requestreply.ReplyToPropertyRequestReplyReplier;
+import org.mule.routing.requestreply.ReplyToAsyncProcessor;
 import org.mule.session.DefaultMuleSession;
 import org.mule.util.concurrent.ThreadNameHelper;
 
@@ -90,7 +90,7 @@ public class SimpleFlowConstruct extends AbstractFlowConstruct implements Messag
                     "MessageProcessorBuilder should only have MessageProcessor's or MessageProcessorBuilder's configured");
             }
         }
-        builder.chain(new ReplyToPropertyRequestReplyReplier());
+        builder.chain(new ReplyToAsyncProcessor());
     }
 
     public void setThreadingProfile(ThreadingProfile threadingProfile)

@@ -22,7 +22,7 @@ import org.mule.api.transformer.Transformer;
 import org.mule.construct.SimpleFlowConstruct;
 import org.mule.context.notification.MessageProcessorNotification;
 import org.mule.routing.MessageFilter;
-import org.mule.routing.requestreply.ReplyToPropertyRequestReplyReplier;
+import org.mule.routing.requestreply.ReplyToMessageProcessor;
 
 import java.util.Arrays;
 import java.util.Iterator;
@@ -96,7 +96,7 @@ public class DefaultMessageProcessorChain extends AbstractMessageProcessorChain
             }
 
             resultEvent = processor.process(currentEvent);
-            if (resultWasNull && processor instanceof ReplyToPropertyRequestReplyReplier)
+            if (resultWasNull && processor instanceof ReplyToMessageProcessor)
             {
                 // reply-to processing should not resurrect a dead event
                 resultEvent = null;
