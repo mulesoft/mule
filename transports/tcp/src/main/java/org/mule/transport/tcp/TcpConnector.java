@@ -152,8 +152,7 @@ public class TcpConnector extends AbstractConnector
         socketsPool.setFactory(getSocketFactory());
         socketsPool.setTestOnBorrow(true);
         socketsPool.setTestOnReturn(true);
-        //There should only be one pooled instance per socket (key)
-        socketsPool.setMaxActive(1);
+        setMaxSocketActive();
         socketsPool.setWhenExhaustedAction(GenericKeyedObjectPool.WHEN_EXHAUSTED_BLOCK);
 
         // Use connector's classloader so that other temporary classloaders
@@ -162,6 +161,13 @@ public class TcpConnector extends AbstractConnector
                                                  ThreadNameHelper.getPrefix(muleContext),
                                                  getName());
         keepAliveMonitor = new ExpiryMonitor(monitorName, 1000, this.getClass().getClassLoader());
+    }
+
+    private void setMaxSocketActive()
+    {
+        int maxActive = getDispatcherThreadingProfile().getMaxThreadsActive();
+        socketsPool.setMaxActive(maxActive);
+        socketsPool.setMaxIdle(maxActive);
     }
 
     @Override
