@@ -10,6 +10,11 @@
 
 package org.mule.routing;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.MessageExchangePattern;
@@ -18,7 +23,6 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
-import org.mule.api.config.MuleProperties;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.CouldNotRouteOutboundMessageException;
 import org.mule.message.DefaultExceptionPayload;
@@ -29,11 +33,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 public class FirstSuccessfulTestCase extends AbstractMuleContextTestCase
 {
@@ -132,11 +131,7 @@ public class FirstSuccessfulTestCase extends AbstractMuleContextTestCase
             @Override
             public MuleEvent process(MuleEvent event) throws MuleException
             {
-                MuleMessage message = event.getMessage();
-                Boolean deliveryForcedInSameThread = message.getInboundProperty(
-                    MuleProperties.MULE_FORCE_SYNC_PROPERTY, Boolean.FALSE);
-                assertTrue(deliveryForcedInSameThread.booleanValue());
-
+                assertTrue(event.isSynchronous());
                 return event;
             }
         };

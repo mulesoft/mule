@@ -49,7 +49,7 @@ import javax.resource.spi.work.WorkException;
  * Processes {@link MuleEvent}'s asynchronously using a {@link MuleWorkManager} to
  * schedule asynchronous processing of the next {@link MessageProcessor}.
  */
-public class SedaStageInterceptingMessageProcessor extends OptionalAsyncInterceptingMessageProcessor
+public class SedaStageInterceptingMessageProcessor extends AsyncInterceptingMessageProcessor
     implements Work, Lifecycle, Pausable, Resumable
 {
     protected static final String QUEUE_NAME_PREFIX = "seda.queue";

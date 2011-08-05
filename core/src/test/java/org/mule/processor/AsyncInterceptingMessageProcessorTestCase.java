@@ -10,8 +10,14 @@
 
 package org.mule.processor;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.fail;
+
 import org.mule.MessageExchangePattern;
-import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.context.WorkManager;
@@ -26,16 +32,7 @@ import org.mule.util.concurrent.Latch;
 import java.beans.ExceptionListener;
 import java.util.concurrent.TimeUnit;
 
-
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 public class AsyncInterceptingMessageProcessorTestCase extends AbstractMuleContextTestCase
     implements ExceptionListener
@@ -63,25 +60,23 @@ public class AsyncInterceptingMessageProcessorTestCase extends AbstractMuleConte
     {
         MuleEvent event = getTestEvent(TEST_MESSAGE, getTestInboundEndpoint(MessageExchangePattern.ONE_WAY));
 
-        MuleEvent result = messageProcessor.process(event);
-
-        latch.await(10000, TimeUnit.MILLISECONDS);
-        assertNotNull(target.sensedEvent);
-        // Event is not the same because it gets copied in
-        // AbstractMuleEventWork#run()
-        assertNotSame(event, target.sensedEvent);
-        assertEquals(event.getMessageAsString(), target.sensedEvent.getMessageAsString());
-
-        assertNull(result);
-        assertNull(exceptionThrown);
+        assertAsync(messageProcessor, event);
     }
 
     @Test
     public void testProcessRequestResponse() throws Exception
     {
-        MuleEvent event = getTestEvent(TEST_MESSAGE, getTestInboundEndpoint(MessageExchangePattern.ONE_WAY));
+        MuleEvent event = getTestEvent(TEST_MESSAGE,
+            getTestInboundEndpoint(MessageExchangePattern.REQUEST_RESPONSE));
 
-        assertAsync(messageProcessor, event);
+        try
+        {
+            messageProcessor.process(event);
+            fail("Exception expect: 'Unable to process a synchonrous event asyncronously'");
+        }
+        catch (Exception e)
+        {
+        }
     }
 
     @Test
@@ -95,12 +90,10 @@ public class AsyncInterceptingMessageProcessorTestCase extends AbstractMuleConte
         try
         {
             messageProcessor.process(event);
-            fail("Exception expected");
+            fail("Exception expect: 'Unable to process a synchonrous event asyncronously'");
         }
         catch (Exception e)
         {
-            assertTrue(e instanceof MessagingException);
-            assertNull(target.sensedEvent);
         }
         finally
         {
@@ -119,12 +112,10 @@ public class AsyncInterceptingMessageProcessorTestCase extends AbstractMuleConte
         try
         {
             messageProcessor.process(event);
-            fail("Exception expected");
+            fail("Exception expect: 'Unable to process a synchonrous event asyncronously'");
         }
         catch (Exception e)
         {
-            assertTrue(e instanceof MessagingException);
-            assertNull(target.sensedEvent);
         }
         finally
         {
@@ -138,6 +129,7 @@ public class AsyncInterceptingMessageProcessorTestCase extends AbstractMuleConte
 
         assertSame(event, target.sensedEvent);
         assertSame(event, result);
+        assertSame(Thread.currentThread(), target.thread);
     }
 
     protected void assertAsync(MessageProcessor processor, MuleEvent event)
@@ -151,6 +143,7 @@ public class AsyncInterceptingMessageProcessorTestCase extends AbstractMuleConte
         // AbstractMuleEventWork#run()
         assertNotSame(event, target.sensedEvent);
         assertEquals(event.getMessageAsString(), target.sensedEvent.getMessageAsString());
+        assertNotSame(Thread.currentThread(), target.thread);
 
         assertNull(result);
         assertNull(exceptionThrown);
@@ -168,10 +161,12 @@ public class AsyncInterceptingMessageProcessorTestCase extends AbstractMuleConte
     class TestListener implements MessageProcessor
     {
         MuleEvent sensedEvent;
+        Thread thread;
 
         @Override
         public MuleEvent process(MuleEvent event) throws MuleException
         {
+            thread = Thread.currentThread();
             sensedEvent = event;
             latch.countDown();
             return event;

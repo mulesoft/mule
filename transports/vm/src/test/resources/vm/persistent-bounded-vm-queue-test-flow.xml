@@ -18,8 +18,7 @@
 
     <flow name="vmService">
 
-        <vm:inbound-endpoint path="in"
-            exchange-pattern="request-response" />
+        <vm:inbound-endpoint path="in" />
         <vm:outbound-endpoint address="vm://out" />
                 
     </flow>

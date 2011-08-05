@@ -15,9 +15,9 @@ import org.mule.api.processor.ProcessingStrategy;
 import org.mule.api.store.ListableObjectStore;
 import org.mule.config.QueueProfile;
 import org.mule.construct.Flow;
+import org.mule.construct.flow.DefaultFlowProcessingStrategy;
 import org.mule.model.seda.SedaService;
 import org.mule.processor.strategy.QueuedAsynchronousProcessingStrategy;
-import org.mule.processor.strategy.SynchronousProcessingStrategy;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.util.store.SimpleMemoryObjectStore;
 
@@ -73,7 +73,7 @@ public class QueueStoreConfigurationTestCase extends FunctionalTestCase
         Flow flow = lookupFlow("flowDefault");
         
         // default for flow is sync processing -> no queueing
-        assertTrue(flow.getProcessingStrategy() instanceof SynchronousProcessingStrategy);
+        assertTrue(flow.getProcessingStrategy() instanceof DefaultFlowProcessingStrategy);
     }
     
     public void testFlowQueuedAsync()

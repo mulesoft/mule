@@ -18,7 +18,6 @@ import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.MessageExchangePattern;
 import org.mule.api.MuleContext;
-import org.mule.api.MuleSession;
 import org.mule.api.context.notification.SecurityNotificationListener;
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.api.context.notification.ServerNotificationListener;
@@ -116,7 +115,7 @@ public class ServerNotificationManagerTestCase extends FunctionalTestCase
     }
 
     @Test
-    public void testDisabledNotification() throws InterruptedException
+    public void testDisabledNotification() throws Exception
     {
         ServerNotificationManager manager = muleContext.getNotificationManager();
         Collection listeners = manager.getListeners();
@@ -209,12 +208,12 @@ public class ServerNotificationManagerTestCase extends FunctionalTestCase
     protected static class TestSecurityEvent extends SecurityNotification
     {
 
-        public TestSecurityEvent(MuleContext muleContext)
+        public TestSecurityEvent(MuleContext muleContext) throws Exception
         {
             super(
                 new UnauthorisedException(CoreMessages.createStaticMessage("dummy"), new DefaultMuleEvent(
                     new DefaultMuleMessage(NullPayload.getInstance(), muleContext), MessageExchangePattern.REQUEST_RESPONSE,
-                    (MuleSession) null)), 0);
+                    getTestSession(getTestService(), muleContext))), 0);
         }
 
     }

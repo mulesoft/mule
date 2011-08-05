@@ -21,12 +21,12 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorChainBuilder;
 import org.mule.api.processor.ProcessingStrategy;
 import org.mule.api.processor.ProcessingStrategy.ThreadNameSource;
+import org.mule.construct.flow.DefaultFlowProcessingStrategy;
 import org.mule.construct.processor.FlowConstructStatisticsMessageProcessor;
 import org.mule.interceptor.ProcessingTimeInterceptor;
 import org.mule.lifecycle.processor.ProcessIfStartedMessageProcessor;
 import org.mule.management.stats.FlowConstructStatistics;
 import org.mule.processor.strategy.AsynchronousProcessingStrategy;
-import org.mule.processor.strategy.QueuedAsynchronousProcessingStrategy;
 import org.mule.routing.requestreply.ReplyToPropertyRequestReplyReplier;
 import org.mule.session.DefaultMuleSession;
 
@@ -50,7 +50,7 @@ public class Flow extends AbstractPipeline implements MessageProcessor
     public Flow(String name, MuleContext muleContext)
     {
         super(name, muleContext);
-        processingStrategy = new QueuedAsynchronousProcessingStrategy();
+        processingStrategy = new DefaultFlowProcessingStrategy();
     }
 
     @Override

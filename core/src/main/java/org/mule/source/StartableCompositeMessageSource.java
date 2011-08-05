@@ -196,6 +196,12 @@ public class StartableCompositeMessageSource
         this.flowConstruct = pattern;
 
     }
+    
+    @Override
+    public List<MessageSource> getSources()
+    {
+        return sources;
+    }
 
     @Override
     public String toString()

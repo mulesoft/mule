@@ -13,14 +13,20 @@ package org.mule.construct;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
+import org.mule.api.construct.FlowConstructInvalidException;
 import org.mule.api.construct.Pipeline;
+import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorBuilder;
 import org.mule.api.processor.MessageProcessorChainBuilder;
 import org.mule.api.processor.ProcessingStrategy;
+import org.mule.api.source.CompositeMessageSource;
 import org.mule.api.source.MessageSource;
+import org.mule.config.i18n.CoreMessages;
+import org.mule.construct.flow.DefaultFlowProcessingStrategy;
 import org.mule.processor.AbstractInterceptingMessageProcessor;
 import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
+import org.mule.processor.strategy.AsynchronousProcessingStrategy;
 import org.mule.processor.strategy.SynchronousProcessingStrategy;
 
 import java.util.Collections;
@@ -113,7 +119,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     {
         this.processingStrategy = processingStrategy;
     }
-
+    
     @Override
     protected void doInitialise() throws MuleException
     {
@@ -151,6 +157,48 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
                     return getName();
                 }
             }, builder, muleContext);
+    }
+    
+    @Override
+    protected void validateConstruct() throws FlowConstructInvalidException
+    {
+        super.validateConstruct();
+
+        // Ensure that inbound endpoints are compatible with processing strategy.
+        boolean userConfiguredAsyncProcessingStrategy = processingStrategy instanceof AsynchronousProcessingStrategy
+                                                        && !(processingStrategy instanceof DefaultFlowProcessingStrategy);
+
+        if (userConfiguredAsyncProcessingStrategy && !isMessageSourceCompatibleWithAsync(messageSource))
+        {
+            throw new FlowConstructInvalidException(
+                CoreMessages.createStaticMessage("One of the inbound endpoint configured on this Flow is not compatible with an asynchronous processing strategy.  Either because it is request-response or has a transaction defined."),
+                this);
+        }
+    }
+
+    private boolean isMessageSourceCompatibleWithAsync(MessageSource source)
+    {
+        if (source instanceof InboundEndpoint)
+        {
+            InboundEndpoint endpoint = ((InboundEndpoint) source);
+            return !endpoint.getExchangePattern().hasResponse()
+                   || !endpoint.getTransactionConfig().isConfigured();
+        }
+        else if (messageSource instanceof CompositeMessageSource)
+        {
+            for (MessageSource childSource : ((CompositeMessageSource) source).getSources())
+            {
+                if (!isMessageSourceCompatibleWithAsync(childSource))
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+        else
+        {
+            return true;
+        }
     }
 
     @Override

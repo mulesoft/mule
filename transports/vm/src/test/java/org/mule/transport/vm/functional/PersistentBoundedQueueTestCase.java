@@ -48,11 +48,11 @@ public class PersistentBoundedQueueTestCase extends AbstractServiceAndFlowTestCa
     public void testBoundedQueue() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
-        client.send("vm://in", "Test1", null);
+        client.dispatch("vm://in", "Test1", null);
         Thread.sleep(SLEEP);
-        client.send("vm://in", "Test2", null);
+        client.dispatch("vm://in", "Test2", null);
         Thread.sleep(SLEEP);
-        client.send("vm://in", "Test3", null);
+        client.dispatch("vm://in", "Test3", null);
         Thread.sleep(SLEEP);
 
         // wait enough for queue offer to timeout

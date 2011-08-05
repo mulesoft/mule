@@ -22,6 +22,7 @@ import org.mule.api.processor.MessageProcessorChain;
 import org.mule.api.transformer.Transformer;
 import org.mule.construct.Flow;
 import org.mule.context.notification.MessageProcessorNotification;
+import org.mule.endpoint.DynamicOutboundEndpoint;
 import org.mule.routing.MessageFilter;
 import org.mule.routing.requestreply.ReplyToPropertyRequestReplyReplier;
 
@@ -141,7 +142,11 @@ public class DefaultMessageProcessorChain extends AbstractMessageProcessorChain
 
     protected boolean processorMayReturnNull(MessageProcessor processor)
     {
-        if (processor instanceof OutboundEndpoint)
+        if (processor instanceof DynamicOutboundEndpoint)
+        {
+            return true;
+        }
+        else if (processor instanceof OutboundEndpoint)
         {
             MessageExchangePattern exchangePattern = ((OutboundEndpoint) processor).getExchangePattern();
             return exchangePattern == null ? true : !exchangePattern.hasResponse();

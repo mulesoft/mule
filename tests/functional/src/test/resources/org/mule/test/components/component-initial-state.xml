@@ -15,19 +15,19 @@
         </service>
         <service name="startedComponent" initialState="started">
             <inbound>
-                <inbound-endpoint address="test://in.started"/>
+                <inbound-endpoint address="test://in.started" exchange-pattern="request-response"/>
             </inbound>
             <echo-component/>
         </service>
         <service name="stoppedComponent" initialState="stopped">
             <inbound>
-                <inbound-endpoint address="test://in.stopped"/>
+                <inbound-endpoint address="test://in.stopped" exchange-pattern="request-response"/>
             </inbound>
             <echo-component/>
         </service>
         <service name="pausedComponent" initialState="paused">
             <inbound>
-                <inbound-endpoint address="test://in.paused"/>
+                <inbound-endpoint address="test://in.paused" exchange-pattern="request-response"/>
             </inbound>
             <echo-component/>
         </service>

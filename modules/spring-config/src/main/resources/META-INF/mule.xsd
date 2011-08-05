@@ -2077,7 +2077,7 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                 <xsd:attribute name="processingStrategy" use="optional" default="queued-asynchronous">
+                 <xsd:attribute name="processingStrategy" use="optional" default="default">
                     <xsd:annotation>
                         <xsd:documentation>
                             Strategy used to process the configured message processors when exchange pattern is 'one-way'.  
@@ -2097,6 +2097,13 @@
                             </xsd:simpleType>
                             <xsd:simpleType>
                                 <xsd:restriction base="xsd:NMTOKEN">
+                                    <xsd:enumeration value="default">
+                                        <xsd:annotation>
+                                            <xsd:documentation>
+                                                This processing strategy uses the 'queued-asynchronous' strategy where possible, but if an event is synchronous it processes it synchronously rather than failing.
+                                            </xsd:documentation>
+                                        </xsd:annotation>
+                                    </xsd:enumeration>
                                     <xsd:enumeration value="synchronous">
                                         <xsd:annotation>
                                             <xsd:documentation>

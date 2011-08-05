@@ -208,7 +208,9 @@ public class DynamicOutboundEndpoint extends DynamicURIOutboundEndpoint
                 return MessageExchangePattern.ONE_WAY;
             }
 
-            return ((AbstractEndpointBuilder) builder).messageExchangePattern;
+            return ((AbstractEndpointBuilder) builder).messageExchangePattern != null
+                                                                                     ? ((AbstractEndpointBuilder) builder).messageExchangePattern
+                                                                                     : MessageExchangePattern.ONE_WAY;
         }
     }
 

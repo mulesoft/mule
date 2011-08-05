@@ -19,7 +19,7 @@
     <model>
         <service name="vmService">
             <inbound>
-                <vm:inbound-endpoint path="in" exchange-pattern="request-response"/>
+                <vm:inbound-endpoint path="in"/>
             </inbound>
             <outbound>
                 <pass-through-router>

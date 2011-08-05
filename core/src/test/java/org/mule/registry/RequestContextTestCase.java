@@ -312,6 +312,12 @@ public class RequestContextTestCase extends AbstractMuleTestCase
         public void captureReplyToDestination()
         {
         }
+        
+        @Override
+        public boolean isSynchronous()
+        {
+            return false;
+        }
     }
 
 }

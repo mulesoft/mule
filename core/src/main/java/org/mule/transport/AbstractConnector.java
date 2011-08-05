@@ -57,10 +57,9 @@ import org.mule.config.i18n.MessageFactory;
 import org.mule.context.notification.ConnectionNotification;
 import org.mule.context.notification.EndpointMessageNotification;
 import org.mule.context.notification.OptimisedNotificationHandler;
-import org.mule.endpoint.EndpointAware;
 import org.mule.endpoint.outbound.OutboundNotificationMessageProcessor;
 import org.mule.model.streaming.DelegatingInputStream;
-import org.mule.processor.OptionalAsyncInterceptingMessageProcessor;
+import org.mule.processor.LaxAsyncInterceptingMessageProcessor;
 import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.routing.filters.WildcardFilter;
 import org.mule.session.SerializeAndEncodeSessionHandler;
@@ -2475,7 +2474,8 @@ public abstract class AbstractConnector implements Connector, WorkListener
         {
             DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
             builder.setName("dispatcher processor chain for '" + endpoint.getAddress() + "'");
-            OptionalAsyncInterceptingMessageProcessor async = new OptionalAsyncInterceptingMessageProcessor(new WorkManagerSource()
+            LaxAsyncInterceptingMessageProcessor async = new LaxAsyncInterceptingMessageProcessor(
+                new WorkManagerSource()
             {
                 @Override
                 public WorkManager getWorkManager() throws MuleException
@@ -2483,7 +2483,6 @@ public abstract class AbstractConnector implements Connector, WorkListener
                     return getDispatcherWorkManager();
                 }
             });
-            ((EndpointAware)async).setEndpoint(endpoint);
             builder.chain(async);
             builder.chain(new DispatcherMessageProcessor(endpoint));
             return builder.build();

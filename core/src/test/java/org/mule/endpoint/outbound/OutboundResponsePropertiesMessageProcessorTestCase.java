@@ -18,7 +18,6 @@ import org.mule.DefaultMuleMessage;
 import org.mule.MessageExchangePattern;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
-import org.mule.api.MuleSession;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.OutboundEndpoint;
@@ -46,8 +45,16 @@ public class OutboundResponsePropertiesMessageProcessorTestCase extends Abstract
             public MuleEvent process(MuleEvent event) throws MuleException
             {
                 // return event with same payload but no properties
-                return new DefaultMuleEvent(new DefaultMuleMessage(event.getMessage().getPayload(),
-                    muleContext), MessageExchangePattern.REQUEST_RESPONSE, (MuleSession) null);
+                try
+                {
+                    return new DefaultMuleEvent(new DefaultMuleMessage(event.getMessage().getPayload(),
+                        muleContext), MessageExchangePattern.REQUEST_RESPONSE, getTestSession(getTestService(),
+                        muleContext));
+                }
+                catch (Exception e)
+                {
+                    throw new RuntimeException(e);
+                }
             }
         });
 

@@ -10,8 +10,11 @@
 
 package org.mule.processor;
 
+import org.mule.DefaultMuleEvent;
+import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
+import org.mule.api.MuleMessage;
 import org.mule.api.ThreadSafeAccess;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
@@ -93,11 +96,18 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
 
     public MuleEvent process(MuleEvent event) throws MuleException
     {
-        // There is no need to copy the event here because it is copied in
-        // org.mule.work.AbstractMuleEventWork.run()
+        if (event.isTransacted())
+        {
+            throw new MessagingException(CoreMessages.asyncDoesNotSupportTransactions(), event);
+        }
+
         if (target != null)
         {
-            target.process((MuleEvent) ((ThreadSafeAccess) event).newThreadCopy());
+            // Clone event and make it async
+            MuleEvent newEvent = new DefaultMuleEvent(
+                (MuleMessage) ((ThreadSafeAccess) event.getMessage()).newThreadCopy(), event,
+                event.getSession(), false);
+            target.process(newEvent);
         }
         return event;
     }

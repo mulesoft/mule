@@ -43,13 +43,6 @@ public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessa
         this.workManagerSource = workManagerSource;
     }
 
-    @Deprecated
-    public AsyncInterceptingMessageProcessor(WorkManagerSource workManagerSource, boolean doThreading)
-    {
-        this.workManagerSource = workManagerSource;
-        this.doThreading = doThreading;
-    }
-
     public AsyncInterceptingMessageProcessor(ThreadingProfile threadingProfile,
                                              String name,
                                              int shutdownTimeout)
@@ -127,12 +120,13 @@ public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessa
 
     protected boolean isProcessAsync(MuleEvent event) throws MessagingException
     {
-        // We do not support transactions and async
-        if (event.isTransacted())
+        if (event.isSynchronous() || event.isTransacted())
         {
-            throw new MessagingException(CoreMessages.asyncDoesNotSupportTransactions(), event);
+            throw new MessagingException(
+                CoreMessages.createStaticMessage("Unable to process a synchonrous event asyncronously"),
+                event);
         }
-        return doThreading;
+        return doThreading && !event.isSynchronous();
     }
 
     protected void processNextAsync(MuleEvent event) throws MuleException

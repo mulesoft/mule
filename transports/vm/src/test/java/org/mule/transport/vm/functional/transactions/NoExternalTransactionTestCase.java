@@ -339,7 +339,7 @@ public class NoExternalTransactionTestCase extends AbstractExternalTransactionTe
         tm.begin();
 
         // This will fail, since there will be no Mule transaction to join
-        client.send("vm://entry?connector=vm-normal", "OK", null);
+        client.dispatch("vm://entry?connector=vm-normal", "OK", null);
         Object response = client.request("queue", WAIT);
         assertNull(response);
 

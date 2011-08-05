@@ -268,4 +268,10 @@ public class OutboundRoutingTestEvent implements MuleEvent
     public void captureReplyToDestination()
     {
     }
+
+    @Override
+    public boolean isSynchronous()
+    {
+        return false;
+    }
 }

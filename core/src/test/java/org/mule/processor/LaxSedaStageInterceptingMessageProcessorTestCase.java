@@ -17,15 +17,20 @@ import org.mule.api.transaction.Transaction;
 import org.mule.tck.testmodels.mule.TestTransaction;
 import org.mule.transaction.TransactionCoordination;
 
-import java.beans.ExceptionListener;
-
 import org.junit.Test;
 
-public class OptionalAsyncInterceptingMessageProcessorTestCase extends
-    AsyncInterceptingMessageProcessorTestCase implements ExceptionListener
+public class LaxSedaStageInterceptingMessageProcessorTestCase extends
+    SedaStageInterceptingMessageProcessorTestCase
 {
 
-    @Override
+    @Test
+    public void testProcessOneWay() throws Exception
+    {
+        MuleEvent event = getTestEvent(TEST_MESSAGE, getTestInboundEndpoint(MessageExchangePattern.ONE_WAY));
+
+        assertAsync(messageProcessor, event);
+    }
+
     @Test
     public void testProcessRequestResponse() throws Exception
     {
@@ -35,16 +40,6 @@ public class OptionalAsyncInterceptingMessageProcessorTestCase extends
         assertSync(messageProcessor, event);
     }
 
-    @Override
-    @Test
-    public void testProcessOneWay() throws Exception
-    {
-        MuleEvent event = getTestEvent(TEST_MESSAGE, getTestInboundEndpoint(MessageExchangePattern.ONE_WAY));
-
-        assertAsync(messageProcessor, event);
-    }
-
-    @Override
     @Test
     public void testProcessOneWayWithTx() throws Exception
     {
@@ -63,7 +58,6 @@ public class OptionalAsyncInterceptingMessageProcessorTestCase extends
         }
     }
 
-    @Override
     @Test
     public void testProcessRequestResponseWithTx() throws Exception
     {
@@ -86,9 +80,11 @@ public class OptionalAsyncInterceptingMessageProcessorTestCase extends
     protected AsyncInterceptingMessageProcessor createAsyncInterceptingMessageProcessor(MessageProcessor listener)
         throws Exception
     {
-        AsyncInterceptingMessageProcessor mp = new OptionalAsyncInterceptingMessageProcessor(
-            new TestWorkManagerSource());
+        LaxSedaStageInterceptingMessageProcessor mp = new LaxSedaStageInterceptingMessageProcessor("name",
+            queueProfile, queueTimeout, muleContext.getDefaultThreadingProfile(), queueStatistics,
+            muleContext);
         mp.setListener(listener);
         return mp;
     }
+
 }

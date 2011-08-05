@@ -12,6 +12,8 @@ package org.mule.api.source;
 
 import org.mule.api.MuleException;
 
+import java.util.List;
+
 /**
  * Composes multiple {@link MessageSource}s.
  */
@@ -20,5 +22,7 @@ public interface CompositeMessageSource extends MessageSource
     void addSource(MessageSource messageSource) throws MuleException;
 
     void removeSource(MessageSource messageSource) throws MuleException;
+
+    List<MessageSource> getSources();
 
 }

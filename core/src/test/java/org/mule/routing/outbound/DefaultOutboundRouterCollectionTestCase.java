@@ -10,6 +10,11 @@
 
 package org.mule.routing.outbound;
 
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import org.mule.MessageExchangePattern;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
@@ -36,11 +41,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 public class DefaultOutboundRouterCollectionTestCase extends AbstractMuleContextTestCase
 {
     public DefaultOutboundRouterCollectionTestCase()
@@ -58,7 +58,7 @@ public class DefaultOutboundRouterCollectionTestCase extends AbstractMuleContext
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
-        testEvent = getTestEvent("TEST_MESSAGE", getTestInboundEndpoint(MessageExchangePattern.REQUEST_RESPONSE));
+        testEvent = getTestEvent("TEST_MESSAGE", getTestInboundEndpoint(MessageExchangePattern.ONE_WAY));
         testService = createService();
         outboundRouter = new TestOutboundRouterCollection();
         testService.setOutboundMessageProcessor(outboundRouter);
@@ -106,7 +106,7 @@ public class DefaultOutboundRouterCollectionTestCase extends AbstractMuleContext
     public void testSingleDoesNotRequireCopyRouterMatchAllTrue() throws Exception
     {
 
-        MuleEvent testEvent = getTestEvent("TEST_MESSAGE");
+        MuleEvent testEvent = getTestEvent("TEST_MESSAGE", MessageExchangePattern.ONE_WAY);
         getOutboundRouterCollection().setMatchAll(true);
         getOutboundRouterCollection().addRoute(new TestDoesNotRequireNewMessageOutboundRouter(false));
 
@@ -192,7 +192,7 @@ public class DefaultOutboundRouterCollectionTestCase extends AbstractMuleContext
     public void testMultipleDoesNotRequireCopyRouterMatchAllTrue() throws Exception
     {
 
-        MuleEvent testEvent = getTestEvent("TEST_MESSAGE");
+        MuleEvent testEvent = getTestEvent("TEST_MESSAGE", MessageExchangePattern.ONE_WAY);
         getOutboundRouterCollection().setMatchAll(true);
         getOutboundRouterCollection().addRoute(new TestDoesNotRequireNewMessageOutboundRouter(true));
         getOutboundRouterCollection().addRoute(new TestDoesNotRequireNewMessageOutboundRouter(true));
@@ -319,14 +319,14 @@ public class DefaultOutboundRouterCollectionTestCase extends AbstractMuleContext
 
         TestRequiresNewMessageOutboundRouter.latch = new CountDownLatch(2);
 
-        testEvent.getMessage().setPayload(new OutputHandler()
+        testEvent = getTestEvent(new OutputHandler()
         {
             @Override
             public void write(MuleEvent event, OutputStream out) throws IOException
             {
                 // do nothing
             }
-        });
+        }, getTestInboundEndpoint(MessageExchangePattern.REQUEST_RESPONSE));
         try
         {
             testService.sendEvent(testEvent);

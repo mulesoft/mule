@@ -10,6 +10,10 @@
 
 package org.mule.processor;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.api.MuleException;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.lifecycle.Initialisable;
@@ -32,12 +36,8 @@ import javax.resource.spi.work.WorkException;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
-public class SedaStageInterceptingMessageProcessorTestCase extends
-    OptionalAsyncInterceptingMessageProcessorTestCase implements ExceptionListener
+public class SedaStageInterceptingMessageProcessorTestCase extends AsyncInterceptingMessageProcessorTestCase
+    implements ExceptionListener
 {
     QueueProfile queueProfile = null;
     int queueTimeout;
@@ -90,8 +90,8 @@ public class SedaStageInterceptingMessageProcessorTestCase extends
     {
         try
         {
-            new AsyncWorkListener(getSensingNullMessageProcessor()).handleWorkException(
-                getTestWorkEvent(), "workRejected");
+            new AsyncWorkListener(getSensingNullMessageProcessor()).handleWorkException(getTestWorkEvent(),
+                "workRejected");
         }
         catch (MuleRuntimeException mrex)
         {

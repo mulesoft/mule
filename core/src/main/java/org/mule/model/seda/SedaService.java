@@ -23,6 +23,7 @@ import org.mule.config.i18n.MessageFactory;
 import org.mule.interceptor.ProcessingTimeInterceptor;
 import org.mule.lifecycle.processor.ProcessIfStartedWaitIfSyncPausedMessageProcessor;
 import org.mule.management.stats.ServiceStatistics;
+import org.mule.processor.LaxSedaStageInterceptingMessageProcessor;
 import org.mule.processor.SedaStageInterceptingMessageProcessor;
 import org.mule.service.AbstractService;
 import org.mule.service.processor.ServiceInternalMessageProcessor;
@@ -82,7 +83,7 @@ public class SedaService extends AbstractService
         builder.chain(new ServiceSetEventRequestContextMessageProcessor());
         if (getThreadingProfile().isDoThreading())
         {
-            sedaStage = new SedaStageInterceptingMessageProcessor(getName(), queueProfile, queueTimeout,
+            sedaStage = new LaxSedaStageInterceptingMessageProcessor(getName(), queueProfile, queueTimeout,
                 threadingProfile, stats, muleContext);
             builder.chain(sedaStage);
         }

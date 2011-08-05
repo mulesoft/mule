@@ -19,7 +19,7 @@ import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.processor.RequestReplyRequesterMessageProcessor;
 import org.mule.api.routing.ResponseTimeoutException;
 import org.mule.api.service.Service;
-import org.mule.processor.AsyncInterceptingMessageProcessor;
+import org.mule.processor.LaxAsyncInterceptingMessageProcessor;
 import org.mule.tck.SensingNullMessageProcessor;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
@@ -59,7 +59,7 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
     {
         TestAsyncRequestReplyRequester asyncReplyMP = new TestAsyncRequestReplyRequester();
         SensingNullMessageProcessor target = getSensingNullMessageProcessor();
-        AsyncInterceptingMessageProcessor asyncMP = new AsyncInterceptingMessageProcessor(
+        LaxAsyncInterceptingMessageProcessor asyncMP = new LaxAsyncInterceptingMessageProcessor(
             new WorkManagerSource()
             {
                 public WorkManager getWorkManager() throws MuleException
@@ -90,7 +90,7 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
         asyncReplyMP.setTimeout(1);
         SensingNullMessageProcessor target = getSensingNullMessageProcessor();
         target.setWaitTime(50);
-        AsyncInterceptingMessageProcessor asyncMP = new AsyncInterceptingMessageProcessor(
+        LaxAsyncInterceptingMessageProcessor asyncMP = new LaxAsyncInterceptingMessageProcessor(
             new WorkManagerSource()
             {
 
@@ -125,7 +125,7 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
         final TestAsyncRequestReplyRequester asyncReplyMP = new TestAsyncRequestReplyRequester();
         SensingNullMessageProcessor target = getSensingNullMessageProcessor();
         target.setWaitTime(50);
-        AsyncInterceptingMessageProcessor asyncMP = new AsyncInterceptingMessageProcessor(
+        LaxAsyncInterceptingMessageProcessor asyncMP = new LaxAsyncInterceptingMessageProcessor(
             new WorkManagerSource()
             {
 

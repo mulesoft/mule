@@ -297,4 +297,6 @@ public interface MuleEvent extends Serializable
      */
     void captureReplyToDestination();
     
+    boolean isSynchronous();
+    
 }

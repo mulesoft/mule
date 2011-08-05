@@ -15,6 +15,7 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorChainBuilder;
 import org.mule.api.processor.ProcessingStrategy;
 import org.mule.construct.Flow;
+import org.mule.construct.flow.DefaultFlowProcessingStrategy;
 import org.mule.processor.AsyncDelegateMessageProcessor;
 import org.mule.processor.strategy.AsynchronousProcessingStrategy;
 import org.mule.processor.strategy.QueuedAsynchronousProcessingStrategy;
@@ -34,7 +35,7 @@ public class FlowProcessingStrategyConfigTestCase extends FunctionalTestCase
 
     public void testDefault() throws Exception
     {
-        assertEquals(QueuedAsynchronousProcessingStrategy.class,
+        assertEquals(DefaultFlowProcessingStrategy.class,
             getFlowProcesingStrategy("defaultFlow").getClass());
     }
 
