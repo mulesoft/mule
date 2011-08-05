@@ -14,6 +14,7 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 
 import junit.framework.TestCase;
 import org.junit.After;
@@ -27,8 +28,11 @@ import static org.junit.Assert.fail;
 
 public class FileUtilsTestCase extends AbstractMuleTestCase
 {
-    private final String TEST_FILE = "testFile.txt";
-    private final String TEST_DIRECTORY = "target" + File.separator + "testDirectory";
+
+    private static final String TEST_FILE = "testFile.txt";
+    private static final String TEST_DIRECTORY = "target" + File.separator + "testDirectory";
+    private static final String UNZIPPED_FILE_PATH = TEST_DIRECTORY + File.separator +  "testFolder" + File.separator + "testFile.txt";
+
     private final File toDir = FileUtils.newFile(TEST_DIRECTORY);
 
     @Before
@@ -323,7 +327,7 @@ public class FileUtilsTestCase extends AbstractMuleTestCase
 
         FileUtils.deleteTree(outputDir);
     }
-    
+
     @Test
     public void testRenameFile()
     {
@@ -331,7 +335,7 @@ public class FileUtilsTestCase extends AbstractMuleTestCase
         {
             File sourceFile = createTestFile("source");
             File destFile = createTestFile("dest");
-    
+
             assertTrue(destFile.delete());
             assertTrue(FileUtils.renameFile(sourceFile, destFile));
             assertTrue(destFile.exists());
@@ -351,7 +355,7 @@ public class FileUtilsTestCase extends AbstractMuleTestCase
             File dir = createTestDir("test");
             File sourceFile = createTestFile("source");
             File destFile = new File(dir, "dest");
-    
+
             assertTrue(FileUtils.renameFile(sourceFile, destFile));
             assertTrue(destFile.exists());
             assertTrue(destFile.delete());
@@ -360,6 +364,21 @@ public class FileUtilsTestCase extends AbstractMuleTestCase
         catch (Exception e)
         {
             fail(e.getMessage());
+        }
+    }
+
+    @Test
+    public void testUnzipFileToSameFolderTwice() throws Exception
+    {
+        URL resourceAsUrl = IOUtils.getResourceAsUrl("testFolder.zip", getClass());
+        File zipFile = new File(resourceAsUrl.getFile());
+        File outputDir = FileUtils.newFile(TEST_DIRECTORY);
+
+        for (int i = 0; i < 2; i++)
+        {
+            FileUtils.unzip(zipFile, outputDir);
+            File testFile = new File(UNZIPPED_FILE_PATH);
+            assertTrue(testFile.exists());
         }
     }
 
