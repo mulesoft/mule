@@ -309,7 +309,7 @@ public class FileUtils extends org.apache.commons.io.FileUtils
                 File f = FileUtils.newFile(directory, entry.getName());
                 if (entry.isDirectory())
                 {
-                    if (!f.mkdirs())
+                    if (!f.exists() && !f.mkdirs())
                     {
                         throw new IOException("Could not create directory: " + f);
                     }
