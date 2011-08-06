@@ -178,7 +178,7 @@
                     <artifactId>backport-util-concurrent</artifactId>
                 </exclusion>
                 <exclusion>
-                    <groupId>jcs</groupId>
+                    <groupId>org.apache.jcs</groupId>
                     <artifactId>jcs</artifactId>
                 </exclusion>
                 <exclusion>
@@ -206,7 +206,7 @@
                     <artifactId>xjavadoc</artifactId>
                 </exclusion>
                 <exclusion>
-                    <groupId>xstream</groupId>
+                    <groupId>com.thoughtworks.xstream</groupId>
                     <artifactId>xstream</artifactId>
                 </exclusion>
                 <exclusion>

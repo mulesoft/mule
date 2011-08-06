@@ -191,9 +191,11 @@ smackx-3.1.0
 spring-aop-3.0.3.RELEASE
 spring-beans-3.0.3.RELEASE
 spring-context-3.0.3.RELEASE
+spring-context-support-3.0.3.RELEASE
 spring-core-3.0.3.RELEASE
 spring-jdbc-3.0.3.RELEASE
 spring-jms-3.0.3.RELEASE
+spring-modules-cache-0.9
 spring-security-core-3.0.3.RELEASE
 spring-security-config-3.0.3.RELEASE
 spring-security-web-3.0.3.RELEASE
