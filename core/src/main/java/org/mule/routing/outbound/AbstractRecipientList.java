@@ -11,6 +11,7 @@
 package org.mule.routing.outbound;
 
 import org.mule.DefaultMuleMessage;
+import org.mule.MessageExchangePattern;
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -156,6 +157,10 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter
         {
             endpointBuilder = (EndpointBuilder) endpointBuilder.clone();
             endpointBuilder.setTransactionConfig(transactionConfig);
+            if (synchronous)
+            {
+                endpointBuilder.setExchangePattern(MessageExchangePattern.REQUEST_RESPONSE);
+            }
         }
         catch (CloneNotSupportedException e)
         {
