@@ -138,7 +138,10 @@ class TransactionalQueueSession extends DefaultXASession implements QueueSession
                     if (id != null)
                     {
                         Serializable item = queueManager.doLoad(queue, id);
-                        queueManager.doRemove(queue, id);
+                        if (item != null)
+                        {
+                            queueManager.doRemove(queue, id);
+                        }
                         return postProcessIfNeeded(item);
                     }
                     return null;
@@ -205,6 +208,9 @@ class TransactionalQueueSession extends DefaultXASession implements QueueSession
             return queue.getName();
         }
 
+        /**
+         *  Note -- this must handle null items
+         */
         private Serializable postProcessIfNeeded(Serializable item)
         {
             try

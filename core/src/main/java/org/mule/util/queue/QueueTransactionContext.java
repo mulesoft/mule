@@ -70,10 +70,11 @@ public class QueueTransactionContext extends AbstractTransactionContext
             }
         }
 
-        Serializable object;
+        Serializable key;
+        Serializable value = null;
         try
         {
-            object = queue.poll(pollTimeout);
+            key = queue.poll(pollTimeout);
         }
         catch (InterruptedException e)
         {
@@ -85,7 +86,7 @@ public class QueueTransactionContext extends AbstractTransactionContext
             return null;
         }
 
-        if (object != null)
+        if (key != null)
         {
             if (removed == null)
             {
@@ -97,10 +98,13 @@ public class QueueTransactionContext extends AbstractTransactionContext
                 queueRemoved = new ArrayList<Serializable>();
                 removed.put(queue, queueRemoved);
             }
-            queueRemoved.add(object);
-            object = transactionalQueueManager.doLoad(queue, object);
+            value = transactionalQueueManager.doLoad(queue, key);
+            if (value != null)
+            {
+                queueRemoved.add(key);
+            }
         }
-        return object;
+        return value;
     }
 
     public Serializable peek(QueueInfo queue) throws InterruptedException, ObjectStoreException
