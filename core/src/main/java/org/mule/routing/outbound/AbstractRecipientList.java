@@ -157,7 +157,7 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter
         {
             endpointBuilder = (EndpointBuilder) endpointBuilder.clone();
             endpointBuilder.setTransactionConfig(transactionConfig);
-            if (synchronous)
+            if (synchronous != null && synchronous)
             {
                 endpointBuilder.setExchangePattern(MessageExchangePattern.REQUEST_RESPONSE);
             }
