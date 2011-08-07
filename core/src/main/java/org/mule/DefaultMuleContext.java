@@ -57,6 +57,7 @@ import org.mule.util.ApplicationStartupSplashScreen;
 import org.mule.util.ServerShutdownSplashScreen;
 import org.mule.util.ServerStartupSplashScreen;
 import org.mule.util.SplashScreen;
+import org.mule.util.UUID;
 import org.mule.util.queue.QueueManager;
 
 import java.io.Serializable;
@@ -119,6 +120,8 @@ public class DefaultMuleContext implements MuleContext
     protected SystemExceptionHandler exceptionListener;
 
     private String clusterId = "";
+
+    private int clusterNodeId;
 
     private PollingController pollingController = new DefaultPollingController();
 
@@ -698,6 +701,16 @@ public class DefaultMuleContext implements MuleContext
         this.clusterId = clusterId;
     }
 
+    public int getClusterNodeId()
+    {
+        return clusterNodeId;
+    }
+
+    public void setClusterNodeId(int clusterNodeId)
+    {
+        this.clusterNodeId = clusterNodeId;
+    }
+
     public void setPollingController(PollingController pollingController)
     {
         this.pollingController = pollingController;
@@ -707,5 +720,11 @@ public class DefaultMuleContext implements MuleContext
     public boolean isPrimaryPollingInstance()
     {
         return pollingController.isPrimaryPollingInstance();
+    }
+
+    @Override
+    public String getUniqueIdString()
+    {
+        return clusterNodeId + ":" + UUID.getUUID();
     }
 }

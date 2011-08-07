@@ -98,7 +98,7 @@ public class DefaultMuleEvent extends EventObject
                             ResponseOutputStream outputStream)
     {
         super(message.getPayload());
-        this.id = generateEventId();
+        this.id = generateEventId(message.getMuleContext());
         this.message = message;
         this.session = session;
 
@@ -108,7 +108,7 @@ public class DefaultMuleEvent extends EventObject
         this.credentials = null;
         this.encoding = message.getMuleContext().getConfiguration().getDefaultEncoding();
         this.messageSourceName = null;
-        this.messageSourceURI = URI.create("dynamic://null");;
+        this.messageSourceURI = URI.create("dynamic://null");
         this.replyToHandler = null;
         this.replyToDestination = null;
         this.timeout = message.getMuleContext().getConfiguration().getDefaultResponseTimeout();
@@ -133,7 +133,7 @@ public class DefaultMuleEvent extends EventObject
                             ResponseOutputStream outputStream)
     {
         super(message.getPayload());
-        this.id = generateEventId();
+        this.id = generateEventId(message.getMuleContext());
         this.message = message;
         this.session = session;
 
@@ -174,7 +174,7 @@ public class DefaultMuleEvent extends EventObject
                             ReplyToHandler replyToHandler)
     {
         super(message.getPayload());
-        this.id = generateEventId();
+        this.id = generateEventId(message.getMuleContext());
         this.message = message;
         this.session = session;
 
@@ -465,9 +465,9 @@ public class DefaultMuleEvent extends EventObject
         return buf.toString();
     }
 
-    protected String generateEventId()
+    protected String generateEventId(MuleContext context)
     {
-        return UUID.getUUID();
+        return context.getUniqueIdString();
     }
 
     @Override

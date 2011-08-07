@@ -210,7 +210,7 @@ public class TransactionalQueueManager extends AbstractXAResourceManager impleme
     {
         ObjectStore<Serializable> store = queue.getStore();
 
-        String id = UUID.getUUID();
+        String id = muleContext == null ? UUID.getUUID() : muleContext.getUniqueIdString();
         Serializable key = new QueueKey(queue.getName(), id);
         store.store(key, object);
         return id;
