@@ -37,12 +37,6 @@ public class OutboundNotificationMessageProcessor implements MessageProcessor
         AbstractConnector connector = (AbstractConnector) endpoint.getConnector();
         if (connector.isEnableMessageEvents())
         {
-            String component = null;
-            if (event.getFlowConstruct() != null)
-            {
-                component = event.getFlowConstruct().getName();
-            }
-
             int notificationAction;
             if (endpoint.getExchangePattern().hasResponse())
             {
@@ -53,7 +47,7 @@ public class OutboundNotificationMessageProcessor implements MessageProcessor
                 notificationAction = EndpointMessageNotification.MESSAGE_DISPATCHED;
             }
             connector.fireNotification(new EndpointMessageNotification(event.getMessage(), endpoint,
-                component, notificationAction));
+                    event.getFlowConstruct(), notificationAction));
         }
 
         return event;

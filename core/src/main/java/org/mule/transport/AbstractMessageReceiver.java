@@ -205,7 +205,7 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
         {
             connector.fireNotification(new EndpointMessageNotification(
                     resultEvent.getMessage(), endpoint, resultEvent
-                            .getFlowConstruct().getName(),
+                            .getFlowConstruct(),
                     EndpointMessageNotification.MESSAGE_RESPONSE));
         }
 

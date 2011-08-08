@@ -11,6 +11,7 @@
 package org.mule.context.notification;
 
 import org.mule.api.MuleMessage;
+import org.mule.api.construct.FlowConstruct;
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.api.endpoint.ImmutableEndpoint;
 
@@ -49,15 +50,19 @@ public class EndpointMessageNotification extends ServerNotification
     }
 
     private String endpoint;
+    private ImmutableEndpoint immutableEndpoint;
+    private FlowConstruct flowConstruct;
 
     public EndpointMessageNotification(MuleMessage resource,
                                ImmutableEndpoint endpoint,
-                               String identifier,
+                               FlowConstruct flowConstruct,
                                int action)
     {
         super(cloneMessage(resource), action);
-        resourceIdentifier = identifier;
+        resourceIdentifier = flowConstruct != null ? flowConstruct.getName() : null;
         this.endpoint = endpoint.getEndpointURI().toString();
+        this.immutableEndpoint = endpoint;
+        this.flowConstruct = flowConstruct;
     }
 
 
@@ -85,6 +90,16 @@ public class EndpointMessageNotification extends ServerNotification
     public String getEndpoint()
     {
         return endpoint;
+    }
+
+    public ImmutableEndpoint getImmutableEndpoint()
+    {
+        return immutableEndpoint;
+    }
+
+    public FlowConstruct getFlowConstruct()
+    {
+        return flowConstruct;
     }
 
     @Override

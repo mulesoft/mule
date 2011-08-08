@@ -36,7 +36,7 @@ public class InboundNotificationMessageProcessor implements MessageProcessor
         if (connector.isEnableMessageEvents())
         {
             connector.fireNotification(new EndpointMessageNotification(event.getMessage(), endpoint,
-                event.getFlowConstruct().getName(), EndpointMessageNotification.MESSAGE_RECEIVED));
+                event.getFlowConstruct(), EndpointMessageNotification.MESSAGE_RECEIVED));
         }
 
         return event;
