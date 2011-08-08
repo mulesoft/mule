@@ -13,6 +13,8 @@ package org.mule.config.spring.handlers;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.config.ThreadingProfile;
 import org.mule.api.processor.LoggerMessageProcessor;
+import org.mule.cache.CachingMessageProcessor;
+import org.mule.cache.ObjectStoreCachingStrategy;
 import org.mule.component.DefaultInterfaceBinding;
 import org.mule.component.DefaultJavaComponent;
 import org.mule.component.PooledJavaComponent;
@@ -35,6 +37,8 @@ import org.mule.config.spring.factories.QueueProfileFactoryBean;
 import org.mule.config.spring.factories.SimpleMemoryQueueStoreFactoryBean;
 import org.mule.config.spring.factories.TransactionalMessageProcessorsFactoryBean;
 import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
+import org.mule.config.spring.parsers.cache.CacheDefinitionParser;
+import org.mule.config.spring.parsers.cache.CachingStrategyDefinitionParser;
 import org.mule.config.spring.parsers.collection.ChildListDefinitionParser;
 import org.mule.config.spring.parsers.collection.ChildListEntryDefinitionParser;
 import org.mule.config.spring.parsers.collection.ChildMapDefinitionParser;
@@ -565,5 +569,9 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("custom-interceptor", new InterceptorDefinitionParser());
         registerBeanDefinitionParser("timer-interceptor", new InterceptorDefinitionParser(TimerInterceptor.class));
         registerBeanDefinitionParser("logging-interceptor", new InterceptorDefinitionParser(LoggingInterceptor.class));
+
+        // Cache
+        registerBeanDefinitionParser("caching-strategy", new CachingStrategyDefinitionParser(ObjectStoreCachingStrategy.class, true));
+        registerBeanDefinitionParser("cache", new CacheDefinitionParser("messageProcessor", CachingMessageProcessor.class));
     }
 }
