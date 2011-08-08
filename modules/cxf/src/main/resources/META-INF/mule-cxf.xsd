@@ -212,6 +212,20 @@
     </xsd:attributeGroup>
     
     <xsd:attributeGroup name="commonAttributes">
+        <xsd:attribute name="soapVersion">
+            <xsd:annotation>
+                <xsd:documentation>
+                    The soapVersion that is going to be used for this endpoint. The specified version is translated into the corresponding bindingId value. This attribute is useful when there's need to avoid the creation of the endpoint with the default binding.
+                    In case the bindingId attribute is set this attribute will override it. If not set and not specified otherwise CXF defaults to SOAP 1.1 binding
+                </xsd:documentation>
+            </xsd:annotation>
+            <xsd:simpleType>
+               <xsd:restriction base="xsd:NMTOKEN">
+                    <xsd:enumeration value="1.1"/>
+                    <xsd:enumeration value="1.2"/>
+                </xsd:restriction>
+            </xsd:simpleType>
+        </xsd:attribute>
         <xsd:attribute name="mtomEnabled" type="mule:substitutableBoolean">
             <xsd:annotation>
                 <xsd:documentation>
@@ -246,7 +260,7 @@
         <xsd:attribute name="bindingId" type="xsd:string">
             <xsd:annotation>
                 <xsd:documentation>
-                    The binding that should be used for this service. It defaults to the SOAP binding by default.
+                    The binding that should be used for this endpoint. It defaults to the SOAP binding by default.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>

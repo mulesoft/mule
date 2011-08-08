@@ -1,3 +1,4 @@
+
 /*
  * $Id$
  * --------------------------------------------------------------------------------------
@@ -13,8 +14,11 @@ package org.mule.module.cxf.support;
 import org.mule.api.endpoint.EndpointNotFoundException;
 
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.List;
 
+import org.apache.cxf.binding.soap.SoapVersion;
+import org.apache.cxf.binding.soap.SoapVersionFactory;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.message.Message;
@@ -77,6 +81,20 @@ public final class CxfUtils
 
         ChainInitiationObserver co = (ChainInitiationObserver) mo;
         return co.getEndpoint();
+    }
+
+    public static String getBindingIdForSoapVersion(String version)
+    {
+        Iterator<SoapVersion> soapVersions = SoapVersionFactory.getInstance().getVersions();
+        while(soapVersions.hasNext())
+        {
+            SoapVersion soapVersion = soapVersions.next();
+            if(Double.toString(soapVersion.getVersion()).equals(version))
+            {
+                return soapVersion.getBindingId();
+            }
+        }
+        throw new IllegalArgumentException("Invalid Soap version " + version);
     }
 
 }

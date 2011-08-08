@@ -55,6 +55,7 @@ public abstract class AbstractOutboundMessageProcessorBuilder
     protected List<AbstractFeature> features;
     protected String wsdlLocation;
     protected boolean mtomEnabled;
+    protected String soapVersion;
     protected boolean enableMuleSoapHeaders = true;
     protected CxfPayloadToArguments payloadToArguments = CxfPayloadToArguments.NULL_PAYLOAD_AS_PARAMETER;
     protected Map<String,Object> properties;
@@ -110,7 +111,7 @@ public abstract class AbstractOutboundMessageProcessorBuilder
         {
             client.getEndpoint().put(Message.MTOM_ENABLED, mtomEnabled);
         }
-        
+
         addMuleInterceptors();
         
         CxfOutboundMessageProcessor processor = createMessageProcessor();
@@ -235,6 +236,16 @@ public abstract class AbstractOutboundMessageProcessorBuilder
     public void setMtomEnabled(boolean mtomEnabled)
     {
         this.mtomEnabled = mtomEnabled;
+    }
+
+    public void setSoapVersion(String soapVersion)
+    {
+        this.soapVersion = soapVersion;
+    }
+
+    public String getSoapVersion()
+    {
+        return soapVersion;
     }
     
     public List<Interceptor<? extends Message>> getInInterceptors()

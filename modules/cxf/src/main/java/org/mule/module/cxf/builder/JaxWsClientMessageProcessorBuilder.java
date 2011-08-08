@@ -13,6 +13,7 @@ package org.mule.module.cxf.builder;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.module.cxf.CxfOutboundMessageProcessor;
 import org.mule.module.cxf.i18n.CxfMessages;
+import org.mule.module.cxf.support.CxfUtils;
 
 import java.io.IOException;
 import java.lang.reflect.Constructor;
@@ -88,12 +89,18 @@ public class JaxWsClientMessageProcessorBuilder extends AbstractClientMessagePro
         cpf.setAddress(getAddress());
         cpf.setBus(getBus());
         cpf.setProperties(properties);
-        
+
+        // If there's a soapVersion defined then the corresponding bindingId will be set
+        if(soapVersion != null)
+        {
+            cpf.setBindingId(CxfUtils.getBindingIdForSoapVersion(soapVersion));
+        }
+
         if (wsdlLocation != null)
         {
             cpf.setWsdlURL(wsdlLocation);
         }
-        
+
         return cpf.create();
     }
 
@@ -130,7 +137,7 @@ public class JaxWsClientMessageProcessorBuilder extends AbstractClientMessagePro
         {
             s = (Service) clientCls.newInstance();
         }
-        
+
         if (port == null)
         {
             throw new CreateException(CxfMessages.mustSpecifyPort(), this);
