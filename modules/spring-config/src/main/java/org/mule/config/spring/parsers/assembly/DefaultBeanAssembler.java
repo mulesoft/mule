@@ -133,7 +133,7 @@ public class DefaultBeanAssembler implements BeanAssembler
         {
             if (logger.isWarnEnabled())
             {
-                logger.warn("Cannot assign "+beanDefinition.getBeanClass()+" to "+AnnotatedObject.class+" "+bean);
+                logger.warn("Cannot assign "+beanDefinition.getBeanClass()+" to "+AnnotatedObject.class);
             }
         }
     }
