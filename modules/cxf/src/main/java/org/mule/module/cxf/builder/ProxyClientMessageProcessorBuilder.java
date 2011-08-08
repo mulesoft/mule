@@ -84,6 +84,12 @@ public class ProxyClientMessageProcessorBuilder extends AbstractOutboundMessageP
         cpf.setAddress(getAddress());
         cpf.setBus(getBus());
         cpf.setProperties(properties);
+
+        // If there's a soapVersion defined then the corresponding bindingId will be set
+        if(soapVersion != null)
+        {
+            cpf.setBindingId(CxfUtils.getBindingIdForSoapVersion(soapVersion));
+        }
         
         if (wsdlLocation != null) 
         {

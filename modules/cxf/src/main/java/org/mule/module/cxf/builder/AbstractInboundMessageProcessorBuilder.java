@@ -62,6 +62,7 @@ public abstract class AbstractInboundMessageProcessorBuilder implements MuleCont
     private String wsdlLocation;
     private String bindingId;
     private String mtomEnabled;
+    private String soapVersion;
     private String service;
     private String namespace;
     private List<AbstractFeature> features;
@@ -185,6 +186,12 @@ public abstract class AbstractInboundMessageProcessorBuilder implements MuleCont
         {
             properties.put("schema-validation-enabled", "true");
         }
+
+        // If there's a soapVersion defined then the corresponding bindingId will be set
+        if(soapVersion != null)
+        {
+            sfb.setBindingId(CxfUtils.getBindingIdForSoapVersion(soapVersion));
+        }
         
         sfb.setProperties(properties);
         sfb.setInvoker(createInvoker(processor));
@@ -304,6 +311,17 @@ public abstract class AbstractInboundMessageProcessorBuilder implements MuleCont
     {
         this.bindingId = bindingId;
     }
+
+    public void setSoapVersion(String soapVersion)
+    {
+        this.soapVersion = soapVersion;
+    }
+
+    public String getSoapVersion()
+    {
+        return soapVersion;
+    }
+
     public String getMtomEnabled()
     {
         return mtomEnabled;

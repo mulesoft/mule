@@ -11,6 +11,7 @@
 package org.mule.module.cxf.builder;
 
 import org.mule.api.lifecycle.CreateException;
+import org.mule.module.cxf.support.CxfUtils;
 
 import org.apache.cxf.aegis.databinding.AegisDatabinding;
 import org.apache.cxf.endpoint.Client;
@@ -35,10 +36,16 @@ public class SimpleClientMessageProcessorBuilder extends AbstractClientMessagePr
         cpf.setAddress(getAddress());
         cpf.setBus(getBus());
         cpf.setProperties(properties);
-        
+
         if (wsdlLocation != null)
         {
             cpf.setWsdlLocation(wsdlLocation);
+        }
+
+        // If there's a soapVersion defined then the corresponding bindingId will be set
+        if(soapVersion != null)
+        {
+            cpf.setBindingId(CxfUtils.getBindingIdForSoapVersion(soapVersion));
         }
 
         return ClientProxy.getClient(cpf.create());
