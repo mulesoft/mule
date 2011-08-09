@@ -15,6 +15,7 @@ package org.mule.example.echo;
  */
 public class CxfEchoFlowTestCase extends CxfEchoTestCase
 {
+
     @Override
     protected String getConfigResources()
     {

@@ -18,13 +18,17 @@ import org.mule.example.loanbroker.messages.LoanQuote;
 import org.mule.example.loanbroker.tests.AbstractAsynchronousLoanBrokerTestCase;
 import org.mule.transport.NullPayload;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class JBpmFunctionalTestCase extends AbstractAsynchronousLoanBrokerTestCase
 {
+
     public JBpmFunctionalTestCase()
     {
         super();
-        setDisposeManagerPerSuite(true);        
+        setDisposeContextPerClass(true);
     }
     
     @Override

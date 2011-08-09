@@ -10,20 +10,26 @@
 
 package org.mule.example.bookstore;
 
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import java.util.Collection;
 
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class BookstoreTestCase extends FunctionalTestCase
 {
+
     @Override
     protected String getConfigResources()
     {
         return "bookstore-config.xml";
     }
     
+    @Test
     public void testGetBooks()
     {
         // Catalog web service
@@ -39,6 +45,7 @@ public class BookstoreTestCase extends FunctionalTestCase
         assertEquals(13, books.size());
     }
 
+    @Test
     public void testOrderBook()
     {
         // Catalog web service
@@ -65,6 +72,7 @@ public class BookstoreTestCase extends FunctionalTestCase
         assertEquals("me@my-mail.com", order.getEmail());
     }
 
+//    @Test
 //    public void testAddBook() throws Exception
 //    {
 //        HttpServletRequest request = new Request();
