@@ -35,7 +35,9 @@
             connector-ref="PollingHttpConnector" exchange-pattern="request-response" />
 
 
-
+        <message-properties-transformer scope="outbound">
+            <add-message-property key="http.status" value="#[header:INBOUND:http.status]" />
+        </message-properties-transformer>
         <outbound-endpoint address="vm://toclient2"
             exchange-pattern="one-way" />
 

@@ -272,7 +272,7 @@ public class Process implements Initialisable, Disposable, MessageService
         {
             message = new DefaultMuleMessage(payload, muleContext);
         }
-        message.addProperties(messageProperties, PropertyScope.INBOUND);
+        message.addProperties(messageProperties, PropertyScope.OUTBOUND);
         message.addProperties(messageProperties, PropertyScope.INVOCATION);
 
         // Use an endpoint cache to prevent memory leaks (see MULE-5422)
