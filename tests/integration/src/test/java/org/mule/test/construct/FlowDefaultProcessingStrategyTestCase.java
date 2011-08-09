@@ -229,10 +229,12 @@ public class FlowDefaultProcessingStrategyTestCase extends FunctionalTestCase
                 message.setOutboundProperty("receiver-thread", Thread.currentThread().getName());
                 MuleEvent event = routeMessage(message);
                 MuleMessage returnedMessage = event == null ? null : event.getMessage();
+                /**
                 if (returnedMessage != null)
                 {
                     returnedMessage = returnedMessage.createInboundMessage();
                 }
+                 **/
                 return returnedMessage;
             }
             catch (Exception e)

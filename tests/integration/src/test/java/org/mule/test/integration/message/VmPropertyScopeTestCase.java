@@ -21,6 +21,7 @@ import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 public class VmPropertyScopeTestCase extends AbstractPropertyScopeTestCase
 {
@@ -46,6 +47,45 @@ public class VmPropertyScopeTestCase extends AbstractPropertyScopeTestCase
 
         MuleMessage result = client.send("inbound2", message);
         assertEquals("test bar", result.getPayload());
-        assertEquals("fooValue", result.<Object> getInboundProperty("foo"));
+        assertEquals("fooValue", result.<Object> getInboundProperty("foo4"));
+    }
+
+    @Test
+    public void testOneWay() throws Exception
+    {
+        LocalMuleClient client = muleContext.getClient();
+        MuleMessage message = new DefaultMuleMessage("test", muleContext);
+        message.setOutboundProperty("foo", "fooValue");
+
+        client.dispatch("vm://queueIn", message);
+        MuleMessage result = client.request("vm://queueOut", 2000);
+        assertEquals("test bar", result.getPayload());
+        assertEquals("fooValue", result.<Object> getInboundProperty("foo2"));
+    }
+
+    @Test
+    public void testRRToOneWay() throws Exception
+    {
+        LocalMuleClient client = muleContext.getClient();
+        MuleMessage message = new DefaultMuleMessage("test", muleContext);
+        message.setOutboundProperty("foo", "rrfooValue");
+
+        MuleMessage echo = client.send("vm://rrQueueIn", message);
+        MuleMessage result = client.request("vm://rrQueueOut", 2000);
+        assertEquals("test baz", result.getPayload());
+        assertEquals("rrfooValue", result.<Object> getInboundProperty("foo2"));
+    }
+
+    @Test
+    public void testSimpleQueueAccess() throws Exception
+    {
+        LocalMuleClient client = muleContext.getClient();
+        MuleMessage message = new DefaultMuleMessage("test", muleContext);
+        message.setOutboundProperty("foo", "rrfooValue");
+
+        client.dispatch("vm://notInConfig", message);
+        MuleMessage result = client.request("vm://notInConfig", 2000);
+        assertEquals("test", result.getPayload());
+        assertEquals("rrfooValue", result.<Object> getInboundProperty("foo"));
     }
 }

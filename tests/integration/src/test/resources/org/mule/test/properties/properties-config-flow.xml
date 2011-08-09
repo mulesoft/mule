@@ -25,6 +25,10 @@
 
         <vm:inbound-endpoint path="inQueue"
             exchange-pattern="one-way" />
+        <message-properties-transformer scope="outbound">
+            <add-message-property key="outbound1" value="#[header:INBOUND:outbound1]" />
+            <add-message-property key="outbound2" value="#[header:INBOUND:outbound2]" />
+        </message-properties-transformer>
 
         <vm:outbound-endpoint path="outQueue"
             exchange-pattern="one-way" />

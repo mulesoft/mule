@@ -36,6 +36,9 @@
 
     <flow name="RequestResponse" processingStrategy="synchronous">
         <vm:inbound-endpoint path="requestresponse-in" exchange-pattern="request-response" />
+        <message-properties-transformer scope="outbound">
+            <add-message-property key="dispatcher-thread" value="#[header:INBOUND:dispatcher-thread]"/>
+        </message-properties-transformer>
         <processor ref="threadSensingProcessor" />
     </flow>
 

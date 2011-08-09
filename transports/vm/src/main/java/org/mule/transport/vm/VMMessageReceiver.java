@@ -15,6 +15,7 @@ import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
+import org.mule.api.ThreadSafeAccess;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
@@ -99,15 +100,8 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
     {
         try
         {
-            // Rewrite the message to treat it as a new message
-            MuleMessage newMessage = message.createInboundMessage();
-            MuleEvent event =  routeMessage(newMessage);
-            MuleMessage returnedMessage = event == null ? null : event.getMessage();
-            if (returnedMessage != null)
-            {
-                returnedMessage = returnedMessage.createInboundMessage();
-            }
-            return returnedMessage;
+            MuleEvent event =  routeMessage(message);
+            return event == null ? null : event.getMessage();
         }
         catch (Exception e)
         {
@@ -187,9 +181,11 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
     {
         MuleMessage message = (MuleMessage) msg;
 
-        // Rewrite the message to treat it as a new message
-        MuleMessage newMessage = message.createInboundMessage();
-        routeMessage(newMessage);
+        if (message instanceof ThreadSafeAccess)
+        {
+            message = (MuleMessage)((ThreadSafeAccess) message).newThreadCopy();
+        }
+        routeMessage(message);
     }
 
     /*

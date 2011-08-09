@@ -10,6 +10,7 @@
 
 package org.mule.transport.vm;
 
+import org.mule.DefaultMuleEvent;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.EndpointURI;
@@ -48,13 +49,15 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher
             throw new DispatchException(CoreMessages.objectIsNull("Endpoint"), event,
                 getEndpoint());
         }
+        MuleMessage newMessage = event.getMessage().createInboundMessage();
+        MuleEvent newEvent = new DefaultMuleEvent(newMessage, event);
         QueueSession session = connector.getQueueSession();
         Queue queue = session.getQueue(endpointUri.getAddress());
-        if (!queue.offer(event, connector.getQueueTimeout()))
+        if (!queue.offer(newEvent, connector.getQueueTimeout()))
         {
             // queue is full
             throw new DispatchException(VMMessages.queueIsFull(queue.getName(), queue.size()),
-                    event, getEndpoint());
+                    newEvent, getEndpoint());
         }
         if (logger.isDebugEnabled())
         {
@@ -75,7 +78,7 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher
                                                                                       endpoint.getEndpointURI()));
         }
 
-        MuleMessage message = event.getMessage();
+        final MuleMessage message = event.getMessage().createInboundMessage();
         connector.getSessionHandler().storeSessionInfoToMessage(event.getSession(), message);
         TransactionTemplate<MuleMessage> tt = new TransactionTemplate<MuleMessage>(
                                                             receiver.getEndpoint().getTransactionConfig(),
@@ -85,7 +88,7 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher
         {
             public MuleMessage doInTransaction() throws Exception
             {
-                return receiver.onCall(event.getMessage());
+                return receiver.onCall(message);
             }
         };
         retMessage = tt.execute(cb);
@@ -93,6 +96,10 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher
         if (logger.isDebugEnabled())
         {
             logger.debug("sent event on endpointUri: " +endpoint.getEndpointURI());
+        }
+        if (retMessage != null)
+        {
+            retMessage = retMessage.createInboundMessage();
         }
         return retMessage;
     }
