@@ -725,6 +725,6 @@ public class DefaultMuleContext implements MuleContext
     @Override
     public String getUniqueIdString()
     {
-        return clusterNodeId + ":" + UUID.getUUID();
+        return clusterNodeId + "-" + UUID.getUUID();
     }
 }

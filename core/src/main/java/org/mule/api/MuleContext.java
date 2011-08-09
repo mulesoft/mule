@@ -265,7 +265,7 @@ public interface MuleContext extends Lifecycle
 
     /**
      * Generate a unique ID string; this will begin with the cluster node ID followed by a
-     * colon, e.g. "3:XXXYYY"
+     * dash, e.g. "3-XXXYYY"
      */
     String getUniqueIdString();
 }
