@@ -66,25 +66,35 @@ public class FlowDefaultProcessingStrategyTestCase extends FunctionalTestCase
         assertFalse(flowThread.equals(dispatcherThread));
     }
 
-    public void testDispatchToOneWayTxInbound() throws Exception
+    public void testDispatchToOneWayTx() throws Exception
     {
         MuleClient client = muleContext.getClient();
-        client.dispatch("vm://onewaytx-in", "a", null);
+        client.dispatch("vm://oneway-tx-in", "a", null);
 
-        MuleMessage result = client.request("vm://onewaytx-out", RECEIVE_TIMEOUT);
+        MuleMessage result = client.request("vm://oneway-tx-out", RECEIVE_TIMEOUT);
 
         assertAllProcessingInRecieverThread(result);
     }
 
-    public void testSendToOneWayTxInbound() throws Exception
+    public void testSendToOneWayTx() throws Exception
     {
         MuleClient client = muleContext.getClient();
-        MuleMessage response = client.send("vm://onewaytx-in", "a", null);
+        MuleMessage response = client.send("vm://oneway-tx-in", "a", null);
 
         assertNull(response);
 
-        MuleMessage result = client.request("vm://onewaytx-out", RECEIVE_TIMEOUT);
+        MuleMessage result = client.request("vm://oneway-tx-out", RECEIVE_TIMEOUT);
         assertAllProcessingInClientThread(result);
+    }
+    
+    public void testDispatchToOneWayOutboundTxOnly() throws Exception
+    {
+        MuleClient client = muleContext.getClient();
+        client.dispatch("vm://oneway-outboundtx-in", "a", null);
+
+        MuleMessage result = client.request("vm://oneway-outboundtx-out", RECEIVE_TIMEOUT);
+
+        assertAllProcessingAsync(result);
     }
 
     public void testSendRequestResponseInbound() throws Exception
