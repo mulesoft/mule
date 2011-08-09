@@ -116,7 +116,7 @@
 
   <pattern:simple-service name="transactional-maths-service"
                   component-class="org.mule.tck.services.SimpleMathsComponent">
-    <vm:inbound-endpoint path="transacted-maths-service.in">
+    <vm:inbound-endpoint path="transacted-maths-service.in" exchange-pattern="request-response">
       <vm:transaction action="JOIN_IF_POSSIBLE"/>
     </vm:inbound-endpoint>
   </pattern:simple-service>

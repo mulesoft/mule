@@ -20,6 +20,7 @@ import org.mule.api.NamedObject;
 import org.mule.api.ThreadSafeAccess;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.construct.FlowConstruct;
+import org.mule.api.construct.Pipeline;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.security.Credentials;
 import org.mule.api.source.IdentifiableMessageSource;
@@ -29,11 +30,11 @@ import org.mule.api.transport.PropertyScope;
 import org.mule.api.transport.ReplyToHandler;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.management.stats.ProcessingTime;
+import org.mule.processor.strategy.SynchronousProcessingStrategy;
 import org.mule.security.MuleCredentials;
 import org.mule.session.DefaultMuleSession;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transport.DefaultReplyToHandler;
-import org.mule.util.UUID;
 import org.mule.util.store.DeserializationPostInitialisable;
 
 import java.io.OutputStream;
@@ -118,10 +119,17 @@ public class DefaultMuleEvent extends EventObject
 
     private boolean resolveEventSynchronicity()
     {
+        boolean syncProcessingStrategy = false;
+        if (session.getFlowConstruct() != null && session.getFlowConstruct() instanceof Pipeline)
+        {
+            syncProcessingStrategy = ((Pipeline) session.getFlowConstruct()).getProcessingStrategy()
+                .getClass()
+                .equals(SynchronousProcessingStrategy.class);
+        }
         return transacted
                || exchangePattern.hasResponse()
                || (Boolean) message.getProperty(MuleProperties.MULE_FORCE_SYNC_PROPERTY,
-                   PropertyScope.INBOUND, Boolean.FALSE);
+                   PropertyScope.INBOUND, Boolean.FALSE) || syncProcessingStrategy;
     }
 
     // Constructors for generic (identifiable) message source.

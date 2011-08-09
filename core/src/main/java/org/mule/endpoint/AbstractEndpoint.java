@@ -168,22 +168,7 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint, Disposable,
         this.retryPolicyTemplate = retryPolicyTemplate;
         this.endpointMimeType = endpointMimeType;
         this.disableTransportTransformer = disableTransportTransformer;
-
-        if (transactionConfig != null && transactionConfig.getFactory() != null &&
-            transactionConfig.getAction() != TransactionConfig.ACTION_NONE &&
-            transactionConfig.getAction() != TransactionConfig.ACTION_NEVER)
-        {
-            if (logger.isDebugEnabled())
-            {
-                logger.debug("Endpoint has a transaction configuration. Defaulting to REQUEST_RESPONSE. Endpoint is: " + toString());
-            }
-            this.messageExchangePattern = MessageExchangePattern.REQUEST_RESPONSE;
-        }
-        else
-        {
-            this.messageExchangePattern = messageExchangePattern;
-        }
-
+        this.messageExchangePattern = messageExchangePattern;
         this.messageProcessorsFactory = messageProcessorsFactory;
         if (messageProcessors == null)
         {

@@ -40,11 +40,11 @@
             </inbound>
             <outbound>
                 <chaining-router>
-                    <jdbc:outbound-endpoint queryKey="selectCount" exchange-pattern="one-way">
+                    <jdbc:outbound-endpoint queryKey="selectCount" exchange-pattern="request-response">
                         <jdbc:transaction action="ALWAYS_BEGIN"/>
                     </jdbc:outbound-endpoint>
                     
-                    <jdbc:outbound-endpoint address="jdbc://getTest?type=1" exchange-pattern="one-way">
+                    <jdbc:outbound-endpoint address="jdbc://getTest?type=1" exchange-pattern="request-response">
                         <jdbc:transaction action="ALWAYS_BEGIN"/>
                     </jdbc:outbound-endpoint>
                     
@@ -59,10 +59,10 @@
             </inbound>
             <outbound>
                 <chaining-router>
-                    <jdbc:outbound-endpoint queryKey="selectCount" exchange-pattern="one-way">
+                    <jdbc:outbound-endpoint queryKey="selectCount" exchange-pattern="request-response">
                         <jdbc:transaction action="BEGIN_OR_JOIN"/>
                     </jdbc:outbound-endpoint>
-                    <jdbc:outbound-endpoint address="jdbc://getTest?type=1" exchange-pattern="one-way">
+                    <jdbc:outbound-endpoint address="jdbc://getTest?type=1" exchange-pattern="request-response">
                         <jdbc:transaction action="ALWAYS_BEGIN"/>
                     </jdbc:outbound-endpoint>
                     

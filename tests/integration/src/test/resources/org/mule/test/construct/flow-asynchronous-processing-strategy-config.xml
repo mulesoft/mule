@@ -19,34 +19,34 @@
         class="org.mule.test.construct.FlowDefaultProcessingStrategyTestCase$ThreadSensingMessageProcessor" />
 
 
-    <flow name="OneWay">
+    <flow name="OneWay" processingStrategy="asynchronous">
         <vm:inbound-endpoint path="oneway-in" />
         <processor ref="threadSensingProcessor" />
         <vm:outbound-endpoint path="oneway-out" />
     </flow>
 
-    <flow name="OneWayTx">
+    <flow name="OneWayTx" processingStrategy="asynchronous">
         <vm:inbound-endpoint path="onewaytx-in" exchange-pattern="one-way">
-            <vm:transaction action="ALWAYS_BEGIN" />
+            <vm:transaction action="ALWAYS_BEGIN"/>
         </vm:inbound-endpoint>
         <processor ref="threadSensingProcessor" />
         <vm:outbound-endpoint path="onewaytx-out" exchange-pattern="one-way">
-            <vm:transaction action="JOIN_IF_POSSIBLE" />
+            <vm:transaction action="JOIN_IF_POSSIBLE"/>
         </vm:outbound-endpoint>
     </flow>
 
-    <flow name="RequestResponse">
+    <flow name="RequestResponse" processingStrategy="asynchronous">
         <vm:inbound-endpoint path="requestresponse-in" exchange-pattern="request-response" />
         <processor ref="threadSensingProcessor" />
     </flow>
 
-    <flow name="RequestResponseOneWayOutbound">
+    <flow name="RequestResponseOneWayOutbound" processingStrategy="asynchronous">
         <vm:inbound-endpoint path="requestresponse-oneway-in" exchange-pattern="request-response" />
         <processor ref="threadSensingProcessor" />
         <vm:outbound-endpoint path="requestresponse-oneway-out" exchange-pattern="one-way" />
     </flow>
 
-    <flow name="RequestResponseFailingOneWayOutbound">
+    <flow name="RequestResponseFailingOneWayOutbound" processingStrategy="asynchronous">
         <vm:inbound-endpoint path="requestresponse-failingoneway-in" exchange-pattern="request-response" />
         <processor ref="threadSensingProcessor" />
         <outbound-endpoint address="test://AlwaysFail" exchange-pattern="one-way" />
