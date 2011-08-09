@@ -5,9 +5,11 @@
 package ${patternBuilderPackageName};
 
 import org.mule.exception.DefaultServiceExceptionStrategy;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import ${patternFQCN};
+
+import static org.junit.Assert.assertEquals;
 
 public class ${patternBuilderClassName}TestCase extends AbstractMuleTestCase
 {

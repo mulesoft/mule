@@ -13,9 +13,13 @@
 package org.mule.transport.${ModuleName.toLowerCase()};
 
 import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
-public class ${ModuleName}ConnectorFactoryTestCase extends AbstractMuleTestCase
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+public class ${ModuleName}ConnectorFactoryTestCase extends AbstractMuleContextTestCase
 {
     /* For general guidelines on writing transports see
        ${TransportDocumentationUrl} */
