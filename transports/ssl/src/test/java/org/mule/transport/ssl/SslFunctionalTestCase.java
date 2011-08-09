@@ -82,7 +82,7 @@ public class SslFunctionalTestCase extends FunctionalTestCase
         MuleClient client = new MuleClient(muleContext);
         client.dispatch("asyncEndpoint", TEST_MESSAGE, null);
         // MULE-2757
-        Thread.sleep(100);
+        Thread.sleep(1000);
         MuleMessage response = client.request("asyncEndpoint", 5000);
         assertNotNull("Response is null", response);
         assertEquals(TEST_MESSAGE + " Received Async", response.getPayloadAsString());
