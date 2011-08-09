@@ -12,9 +12,9 @@ package org.mule.example.loanbroker.esn;
 
 import org.mule.example.loanbroker.tests.AbstractAsynchronousLoanBrokerTestCase;
 
-
 public class VMLoanBrokerAsynchronousFunctionalTestCase extends AbstractAsynchronousLoanBrokerTestCase
 {
+
     @Override
     protected String getConfigResources()
     {

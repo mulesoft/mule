@@ -10,7 +10,8 @@
 
 package org.mule.example.stockquote;
 
-import org.mule.tck.DynamicPortTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.util.WebServiceOnlineCheck;
 import org.mule.transport.http.HttpConstants;
 import org.mule.util.StringUtils;
@@ -19,15 +20,23 @@ import java.util.Locale;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.GetMethod;
+import org.junit.Rule;
+import org.junit.Test;
 
+import static org.junit.Assert.assertTrue;
 
-public class StockQuoteFunctionalTestCase extends DynamicPortTestCase
+public class StockQuoteFunctionalTestCase extends FunctionalTestCase
 {
-    public StockQuoteFunctionalTestCase()
+
+    @Rule
+    public DynamicPort dynamicPort = new DynamicPort("port1");
+
+    @Override
+    protected boolean isFailOnTimeout()
     {
         // Do not fail test case upon timeout because this probably just means
         // that the 3rd-party web service is off-line.
-        setFailOnTimeout(false);
+        return false;
     }
     
     /**
@@ -49,16 +58,19 @@ public class StockQuoteFunctionalTestCase extends DynamicPortTestCase
         return "mule-config.xml";
     }
 
+    @Test
     public void testREST() throws Exception
     {
         runTest("REST");
     }
     
+    @Test
     public void testSOAP() throws Exception
     {
         runTest("SOAP");
     }
 
+    @Test
     public void testWSDL() throws Exception
     {
         runTest("WSDL");
@@ -66,7 +78,7 @@ public class StockQuoteFunctionalTestCase extends DynamicPortTestCase
 
     private void runTest(String method) throws Exception
     {
-        String url = String.format("http://localhost:" + getPorts().get(0) + "/stockquote?symbol=CSCO&method=%1s", method);
+        String url = String.format("http://localhost:" + dynamicPort.getNumber() + "/stockquote?symbol=CSCO&method=%1s", method);
         GetMethod request = new GetMethod(url);
         int responseCode = new HttpClient().executeMethod(request);
         
@@ -90,9 +102,4 @@ public class StockQuoteFunctionalTestCase extends DynamicPortTestCase
         }
     }
 
-    @Override
-    protected int getNumPortsToFind()
-    {
-        return 1;
-    }
 }

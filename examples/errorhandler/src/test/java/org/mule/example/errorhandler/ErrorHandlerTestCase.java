@@ -11,13 +11,16 @@
 package org.mule.example.errorhandler;
 
 import org.mule.api.config.MuleProperties;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.util.SystemUtils;
 
 import java.util.Properties;
 
+import org.junit.Test;
+
 public class ErrorHandlerTestCase extends FunctionalTestCase
 {
+
     @Override
     protected Properties getStartUpProperties()
     {
@@ -32,6 +35,7 @@ public class ErrorHandlerTestCase extends FunctionalTestCase
         return "mule-config.xml";
     }
 
+    @Test
     public void testConfigSanity()
     {
         // empty

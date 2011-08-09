@@ -25,6 +25,11 @@ import java.util.concurrent.CountDownLatch;
 
 import org.apache.commons.lang.time.StopWatch;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 /**
  * Tests the Loan Broker application asynchronously.  Note that a simple thread delay is used to wait for the
  * incoming responses to arrive.  This may or may not be sufficient depending on external factors (processor
@@ -33,6 +38,7 @@ import org.apache.commons.lang.time.StopWatch;
  */
 public abstract class AbstractAsynchronousLoanBrokerTestCase extends AbstractLoanBrokerTestCase
 {
+
     @Override
     protected int getNumberOfRequests()
     {

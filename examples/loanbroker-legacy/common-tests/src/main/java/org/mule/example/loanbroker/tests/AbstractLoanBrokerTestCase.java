@@ -15,8 +15,14 @@ import org.mule.example.loanbroker.messages.Customer;
 import org.mule.example.loanbroker.messages.CustomerQuoteRequest;
 import org.mule.example.loanbroker.messages.LoanQuote;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transport.NullPayload;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public abstract class AbstractLoanBrokerTestCase extends FunctionalTestCase
 {
@@ -26,6 +32,7 @@ public abstract class AbstractLoanBrokerTestCase extends FunctionalTestCase
         return 10;
     }
 
+    @Test
     public void testSingleLoanRequest() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -40,6 +47,7 @@ public abstract class AbstractLoanBrokerTestCase extends FunctionalTestCase
         assertTrue(quote.getInterestRate() > 0);
     }
 
+    @Test
     public void testLotsOfLoanRequests() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);

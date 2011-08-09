@@ -15,7 +15,7 @@ import org.mule.example.loanbroker.message.CustomerQuoteRequest;
 import org.mule.example.loanbroker.model.Customer;
 import org.mule.example.loanbroker.model.LoanQuote;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transformer.simple.ByteArrayToObject;
 import org.mule.transport.NullPayload;
 import org.mule.transport.http.HttpConstants;
@@ -23,6 +23,12 @@ import org.mule.transport.http.HttpConstants;
 import java.util.Map;
 
 import org.apache.commons.collections.map.SingletonMap;
+import org.junit.Test;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 public class LoanBrokerSyncTestCase extends FunctionalTestCase
 {
@@ -33,6 +39,7 @@ public class LoanBrokerSyncTestCase extends FunctionalTestCase
         return "mule-config.xml";
     }
 
+    @Test
     public void testLoanBrokerMuleClient() throws Exception
     {
         muleContext.getRegistry().registerObject("streamToObjectTransformer", new ByteArrayToObject());
@@ -48,6 +55,7 @@ public class LoanBrokerSyncTestCase extends FunctionalTestCase
         assertTrue(quote.getInterestRate() > 0);
     }
 
+    @Test
     public void testLoanBrokerHttpUrlWithDefaults() throws Exception
     {
         muleContext.getRegistry().registerObject("streamToObjectTransformer", new ByteArrayToObject());
@@ -62,8 +70,6 @@ public class LoanBrokerSyncTestCase extends FunctionalTestCase
 
         assertTrue("Unexpected response string", result.getPayloadAsString().matches("Bank #\\d, rate: \\d\\.(\\d)*$"));
     }
-
-
     
 }
 

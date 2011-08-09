@@ -14,6 +14,7 @@ import org.mule.example.loanbroker.tests.AbstractLoanBrokerTestCase;
 
 public class LoanBrokerEsbTestCase extends AbstractLoanBrokerTestCase
 {
+
     @Override
     protected String getConfigResources()
     {

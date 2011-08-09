@@ -10,7 +10,6 @@
 
 package org.mule.example.loanbroker.esn;
 
-
 public class CxfLoanBrokerSynchronousFlowFunctionalTestCase extends CxfLoanBrokerSynchronousFunctionalTestCase
 {
     

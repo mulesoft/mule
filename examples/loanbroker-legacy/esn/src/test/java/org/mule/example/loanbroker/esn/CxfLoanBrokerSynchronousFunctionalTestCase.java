@@ -18,7 +18,6 @@ public class CxfLoanBrokerSynchronousFunctionalTestCase extends AbstractLoanBrok
     @Override
     public void testSingleLoanRequest() throws Exception
     {
-        // TODO Auto-generated method stub
         super.testSingleLoanRequest();
     }
 

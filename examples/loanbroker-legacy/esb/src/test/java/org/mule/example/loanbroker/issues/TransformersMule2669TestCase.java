@@ -15,16 +15,24 @@ import org.mule.api.MuleMessage;
 import org.mule.example.loanbroker.bank.Bank;
 import org.mule.example.loanbroker.messages.LoanBrokerQuoteRequest;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 public class TransformersMule2669TestCase extends FunctionalTestCase
 {
 
+    @Override
     protected String getConfigResources()
     {
         return "transformers-mule-2669.xml";
     }
 
+    @Test
     public void testTransformers() throws MuleException
     {
         MuleClient client = new MuleClient(muleContext);

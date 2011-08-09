@@ -12,7 +12,7 @@ package org.mule.example.echo;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transport.NullPayload;
 import org.mule.util.IOUtils;
 
@@ -21,6 +21,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.custommonkey.xmlunit.XMLAssert;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
 
 /**
  * Tests the echo example using CXF.
@@ -48,6 +55,7 @@ public class CxfEchoTestCase extends FunctionalTestCase
         }
     }
 
+    @Test
     public void testGetEcho() throws Exception
     {
         // CXF has built in support for understanding GET requests. They are of the form:
@@ -62,6 +70,7 @@ public class CxfEchoTestCase extends FunctionalTestCase
         XMLAssert.assertXMLEqual(expectedGetResponse, result.getPayloadAsString());
     }
 
+    @Test
     public void testSoapPostEcho() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
