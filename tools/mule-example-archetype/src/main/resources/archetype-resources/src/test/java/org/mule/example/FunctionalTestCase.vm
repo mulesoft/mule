@@ -12,11 +12,12 @@ import org.mule.module.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transport.NullPayload;
 
+import org.junit.Test;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-
 
 public class ${ModuleName}TestCase extends FunctionalTestCase
 {
@@ -26,6 +27,7 @@ public class ${ModuleName}TestCase extends FunctionalTestCase
         return "${ModuleNameLower}-functional-test-config.xml";
     }
 
+    @Test
     public void test${ModuleName}() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);

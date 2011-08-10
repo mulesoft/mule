@@ -16,13 +16,18 @@ package ${package};
 import org.ibeans.api.CallException;
 import org.ibeans.annotation.IntegrationBean;
 import org.ibeans.api.IBeansException;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
+
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * TODO describe the test
  */
-public class ${artifactId}IBeanTestCase extends AbstractMuleTestCase
+public class ${artifactId}IBeanTestCase extends AbstractMuleContextTestCase
 {
+
     @IntegrationBean
     private ${artifactId}IBean ibean;
 

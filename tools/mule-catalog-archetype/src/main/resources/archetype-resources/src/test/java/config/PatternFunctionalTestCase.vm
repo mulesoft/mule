@@ -7,6 +7,8 @@ package ${patternConfigPackageName};
 import org.mule.module.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
 
+import org.junit.Test;
+
 public class ${patternClassName}FunctionalTestCase extends FunctionalTestCase
 {
     private MuleClient muleClient;
@@ -25,6 +27,7 @@ public class ${patternClassName}FunctionalTestCase extends FunctionalTestCase
         muleClient = new MuleClient(muleContext);
     }
 
+    @Test
     public void test${patternClassName}()
     {
         // TODO test the pattern by sending test messages with muleClient

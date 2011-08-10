@@ -14,6 +14,8 @@ package org.mule.transport.${ModuleName.toLowerCase()};
 
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
+import org.junit.Test;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
@@ -22,6 +24,7 @@ public class ${ModuleName}EndpointTestCase extends AbstractMuleTestCase
     /* For general guidelines on writing transports see
        ${TransportDocumentationUrl} */
 
+    @Test
     public void testValidEndpointURI() throws Exception
     {
         // TODO test creating and asserting Endpoint values eg

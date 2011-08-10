@@ -9,10 +9,14 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import ${patternFQCN};
 
+import org.junit.Test;
+
 import static org.junit.Assert.assertEquals;
 
 public class ${patternBuilderClassName}TestCase extends AbstractMuleTestCase
 {
+
+    @Test
     public void testFullConfiguration() throws Exception
     {
         final String patternName = "${patternTagName}-full-test";

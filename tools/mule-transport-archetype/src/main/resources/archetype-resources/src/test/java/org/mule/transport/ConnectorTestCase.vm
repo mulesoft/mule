@@ -15,6 +15,8 @@ package org.mule.transport.${ModuleName.toLowerCase()};
 import org.mule.api.transport.Connector;
 import org.mule.transport.AbstractConnectorTestCase;
 
+import org.junit.Test;
+
 public class ${ModuleName}ConnectorTestCase extends AbstractConnectorTestCase
 {
     /* For general guidelines on writing transports see
@@ -46,7 +48,7 @@ public class ${ModuleName}ConnectorTestCase extends AbstractConnectorTestCase
         throw new UnsupportedOperationException("getValidMessage");
     }
 
-
+    @Test
     public void testProperties() throws Exception
     {
         // TODO test setting and retrieving any custom properties on the
