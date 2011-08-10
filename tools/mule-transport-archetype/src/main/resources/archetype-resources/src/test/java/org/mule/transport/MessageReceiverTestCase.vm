@@ -19,6 +19,8 @@ import org.mule.transport.AbstractMessageReceiverTestCase;
 
 import com.mockobjects.dynamic.Mock;
 
+import org.junit.Test;
+
 public class ${ModuleName}MessageReceiverTestCase extends AbstractMessageReceiverTestCase
 {
     /* For general guidelines on writing transports see

@@ -8,9 +8,11 @@
 package ${groupId}.${ModuleNameLower};
 
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transport.NullPayload;
+
+import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -25,10 +27,13 @@ public class ${ModuleName}TestCase extends FunctionalTestCase
         return "${ModuleNameLower}-functional-test-config.xml";
     }
 
-    public void test${ModuleName}() throws Exception
+    @Test
+    public void ${ModuleNameLower}() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
-        MuleMessage result = client.send("vm://in", "some data", null);
+        MuleClient client = muleContext.getClient();
+        client.dispatch("vm://in", "some data", null);
+
+        MuleMessage result = client.request("vm://out", RECEIVE_TIMEOUT);
         assertNotNull(result);
         assertNull(result.getExceptionPayload());
         assertFalse(result.getPayload() instanceof NullPayload);
