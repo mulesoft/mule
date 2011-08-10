@@ -32,7 +32,7 @@ public class JmsResponseElementTestCase extends AbstractJmsFunctionalTestCase
     }
 
     @Test
-    public void testOutboundEndopintResponse() throws Exception
+    public void testOutboundEndpointResponse() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
         MuleMessage response = client.send("vm://vminbound", "some message", null);
@@ -42,7 +42,7 @@ public class JmsResponseElementTestCase extends AbstractJmsFunctionalTestCase
     }
 
     @Test
-    public void testInbounEnddopintResponse() throws Exception
+    public void testInboundEndpointResponse() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
         MuleMessage response = client.send("vm://vminbound2", MESSAGE, null);

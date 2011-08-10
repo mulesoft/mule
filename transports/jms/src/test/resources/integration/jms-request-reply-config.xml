@@ -14,13 +14,13 @@
     <flow name="mainJMS">
         <vm:inbound-endpoint path="in4jms" exchange-pattern="request-response"/>
         <request-reply timeout="5000">
-            <jms:outbound-endpoint queue="test.jms.in"/>
-            <jms:inbound-endpoint queue="test.jms.out"/>
+            <outbound-endpoint ref="in"/>
+            <inbound-endpoint ref="out"/>
         </request-reply>
     </flow>
 
     <flow name="TestServiceJMS">
-        <jms:inbound-endpoint queue="test.jms.in"/>
+        <inbound-endpoint ref="in"/>
         <test:component>
             <test:return-data>HELLO</test:return-data>
         </test:component>

@@ -9,6 +9,6 @@
     <jms:activemq-connector name="jmsConnector" />
     
     <jms:endpoint name="in" queue="in" exchange-pattern="request-response"/>
-    <jms:endpoint name="in2" queue="in2" exchange-pattern="request-response"/>
+    <jms:endpoint name="out" queue="out" exchange-pattern="request-response"/>
 
 </mule>

@@ -13,14 +13,14 @@
     <!-- Reseponse tag in jms outbound endpoint -->
     <flow name="vm-in-flow-case-1">
         <vm:inbound-endpoint name="vm.in" path="vminbound" exchange-pattern="request-response"/>
-        <jms:outbound-endpoint queue="in" exchange-pattern="request-response">
+        <outbound-endpoint ref="in" exchange-pattern="request-response">
             <response>
                 <message-properties-transformer scope="outbound">
                     <add-message-property key="test" value="test"/>
                 </message-properties-transformer>
                 <append-string-transformer message=" jms flow content" />
             </response>
-        </jms:outbound-endpoint>
+        </outbound-endpoint>
     </flow>
 
     <flow name="response-flow-case-1">
@@ -34,11 +34,11 @@
     <!-- Reseponse tag in jms inbound endpoint -->
     <flow name="vm-in-flow-case-2">
         <vm:inbound-endpoint name="vm.in2" path="vminbound2" exchange-pattern="request-response"/>
-        <jms:outbound-endpoint queue="in2" exchange-pattern="request-response"/>
+        <jms:outbound-endpoint ref="out" exchange-pattern="request-response"/>
     </flow>
 
     <flow name="response-flow-case-2">
-        <jms:inbound-endpoint ref="in2" exchange-pattern="request-response">
+        <jms:inbound-endpoint ref="out" exchange-pattern="request-response">
             <response>
                 <append-string-transformer message=" jms flow content" />
             </response>

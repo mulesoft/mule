@@ -11,4 +11,7 @@
     <!-- Testing with ActiveMq -->
     <jms:activemq-connector name="jmsConnector1" />
 
+    <jms:endpoint name="in" queue="in"/>
+    <jms:endpoint name="out" queue="out"/>
+
 </mule>
