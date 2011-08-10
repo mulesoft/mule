@@ -132,6 +132,11 @@ class TransactionalQueueSession extends DefaultXASession implements QueueSession
                     Serializable item = ((QueueTransactionContext) localContext).poll(queue, timeout);
                     return postProcessIfNeeded(item);
                 }
+                else if (queue.canTakeFromStore())
+                {
+                    Serializable item = queue.takeNextItemFromStore(timeout);
+                    return postProcessIfNeeded(item);
+                }
                 else
                 {
                     Serializable id = queue.poll(timeout);

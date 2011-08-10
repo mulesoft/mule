@@ -27,6 +27,7 @@ public class QueueInfo
     private String name;
     private QueueInfoDelegate delegate;
     private MuleContext muleContext;
+    private boolean delegateCanTake;
 
     private static Map<Class<? extends ObjectStore>, QueueInfoDelegateFactory> delegateFactories = new HashMap<Class<? extends ObjectStore>, QueueInfoDelegateFactory>();
 
@@ -56,6 +57,7 @@ public class QueueInfo
         if (delegate == null || (config != null && !hadConfig))
         {
             this.delegate = factory != null ? factory.createDelegate(this, muleContext) : new DefaultQueueInfoDelegate(capacity);
+            delegateCanTake = this.delegate instanceof TakingQueueInfoDelegate;
         }
     }
 
@@ -124,6 +126,21 @@ public class QueueInfo
     public int getCapacity()
     {
         return config == null ? null : config.capacity;
+    }
+
+    public boolean canTakeFromStore()
+    {
+        return delegateCanTake;
+    }
+
+    public Serializable takeNextItemFromStore(long timeout) throws InterruptedException
+    {
+        if (canTakeFromStore())
+        {
+            return ((TakingQueueInfoDelegate)delegate).takeFromObjectStore(timeout);
+        }
+
+        throw new UnsupportedOperationException("Method 'takeNextItemFromStore' is not supported for queue " + name);
     }
 
     /**
