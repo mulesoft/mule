@@ -31,7 +31,7 @@ public class ${ModuleName}NamespaceHandlerTestCase extends FunctionalTestCase
     }
 
     @Test
-    public void ${ModuleName}Config() throws Exception
+    public void ${ModuleNameLower}Config() throws Exception
     {
         ${ModuleName}Connector c = (${ModuleName}Connector) muleContext.getRegistry().lookupConnector("${ModuleNameLower}Connector");
         assertNotNull(c);
