@@ -148,7 +148,10 @@ public abstract class AbstractXPathExpressionEvaluator implements ExpressionEval
             Map.Entry<?, ?> entry = (Map.Entry<?, ?>)iterator.next();
             try
             {
-                xpath.addNamespace(entry.getKey().toString(), entry.getValue().toString());
+                synchronized (xpath)
+                {
+                    xpath.addNamespace(entry.getKey().toString(), entry.getValue().toString());
+                }
             }
             catch (JaxenException e)
             {
