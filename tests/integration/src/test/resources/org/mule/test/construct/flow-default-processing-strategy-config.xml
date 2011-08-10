@@ -43,6 +43,14 @@
         </vm:outbound-endpoint>
     </flow>
 
+    <flow name="OneWayInboundTx">
+        <vm:inbound-endpoint path="oneway-inboundtx-in" exchange-pattern="one-way">
+            <vm:transaction action="ALWAYS_BEGIN" />
+        </vm:inbound-endpoint>
+        <processor ref="threadSensingProcessor" />
+        <vm:outbound-endpoint path="oneway-inboundtx-out" exchange-pattern="one-way"/>
+    </flow>
+
     <flow name="RequestResponse">
         <vm:inbound-endpoint path="requestresponse-in" exchange-pattern="request-response" />
         <message-properties-transformer scope="outbound">

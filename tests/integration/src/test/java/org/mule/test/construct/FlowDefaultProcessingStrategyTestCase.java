@@ -86,7 +86,18 @@ public class FlowDefaultProcessingStrategyTestCase extends FunctionalTestCase
         MuleMessage result = client.request("vm://oneway-tx-out", RECEIVE_TIMEOUT);
         assertAllProcessingInClientThread(result);
     }
-    
+
+    // TODO Enable once transaction behaviuor is fixed
+    // public void testDispatchToOneWayInboundTxOnly() throws Exception
+    // {
+    // MuleClient client = muleContext.getClient();
+    // client.dispatch("vm://oneway-inboundtx-in", "a", null);
+    //
+    // MuleMessage result = client.request("vm://oneway-inboundtx-out", RECEIVE_TIMEOUT);
+    //
+    // assertAllProcessingAsync(result);
+    // }
+
     public void testDispatchToOneWayOutboundTxOnly() throws Exception
     {
         MuleClient client = muleContext.getClient();
@@ -240,10 +251,7 @@ public class FlowDefaultProcessingStrategyTestCase extends FunctionalTestCase
                 MuleEvent event = routeMessage(message);
                 MuleMessage returnedMessage = event == null ? null : event.getMessage();
                 /**
-                if (returnedMessage != null)
-                {
-                    returnedMessage = returnedMessage.createInboundMessage();
-                }
+                 * if (returnedMessage != null) { returnedMessage = returnedMessage.createInboundMessage(); }
                  **/
                 return returnedMessage;
             }

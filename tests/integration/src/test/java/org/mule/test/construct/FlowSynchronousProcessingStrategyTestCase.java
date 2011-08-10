@@ -44,4 +44,15 @@ public class FlowSynchronousProcessingStrategyTestCase extends FlowDefaultProces
         assertAllProcessingInClientThread(result);
     }
 
+    @Override
+    public void testDispatchToOneWayOutboundTxOnly() throws Exception
+    {
+        MuleClient client = muleContext.getClient();
+        client.dispatch("vm://oneway-outboundtx-in", "a", null);
+
+        MuleMessage result = client.request("vm://oneway-outboundtx-out", RECEIVE_TIMEOUT);
+
+        assertAllProcessingInRecieverThread(result);
+    }
+
 }
