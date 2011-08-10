@@ -253,6 +253,11 @@ public class MuleContainer
 
     protected void doShutdown()
     {
+        if (deploymentService != null)
+        {
+            deploymentService.stop();
+        }
+
         for (MuleCoreExtension extension : coreExtensions.values())
         {
             try
@@ -263,10 +268,6 @@ public class MuleContainer
             {
                 logger.fatal("Error shutting down core extension " + extension.getName());
             }
-        }
-        if (deploymentService != null)
-        {
-            deploymentService.stop();
         }
 
         System.exit(0);
