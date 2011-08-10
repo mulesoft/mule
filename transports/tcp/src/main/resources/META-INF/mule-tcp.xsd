@@ -138,6 +138,13 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
+                <xsd:attribute name="socketMaxWait" type="mule:substitutableInt">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Sets the maximum amount of time (in milliseconds) the socket pool should block waiting for a socket before throwing an exception. When less than or equal to 0 it may block indefinitely (the default).
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>

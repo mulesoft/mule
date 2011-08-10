@@ -48,6 +48,7 @@ public class TcpNamespaceHandlerTestCase extends FunctionalTestCase
         // wasn't set, but that's not the case
         assertEquals(-1, c.getServerSoTimeout());
         assertEquals(3000, c.getClientSoTimeout());
+        assertEquals(3000, c.getSocketMaxWait());
         assertTrue(c.isKeepAlive());
         assertTrue(c.isConnected());
         assertTrue(c.isStarted());
@@ -63,6 +64,7 @@ public class TcpNamespaceHandlerTestCase extends FunctionalTestCase
         assertNotNull(c);
         assertEquals(4000, c.getServerSoTimeout());
         assertEquals(3000, c.getClientSoTimeout());
+        assertEquals(-1, c.getSocketMaxWait());
         assertTrue(c.isConnected());
         assertTrue(c.isStarted());
     }
@@ -113,6 +115,7 @@ public class TcpNamespaceHandlerTestCase extends FunctionalTestCase
         assertNotNull(c);
         assertEquals(4000, c.getPollingFrequency());
         assertEquals(3000, c.getClientSoTimeout());
+        assertEquals(-1, c.getSocketMaxWait());
         assertTrue(c.isConnected());
         assertTrue(c.isStarted());
     }

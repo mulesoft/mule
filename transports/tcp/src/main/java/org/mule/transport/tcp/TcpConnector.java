@@ -53,6 +53,7 @@ public class TcpConnector extends AbstractConnector
     public static final int DEFAULT_SO_LINGER = INT_VALUE_NOT_SET;
     public static final int DEFAULT_BUFFER_SIZE = INT_VALUE_NOT_SET;
     public static final int DEFAULT_BACKLOG = INT_VALUE_NOT_SET;
+    public static final int DEFAULT_WAIT_TIMEOUT = INT_VALUE_NOT_SET;
 
     // to clarify arg to configureSocket
     public static final boolean SERVER = false;
@@ -60,6 +61,7 @@ public class TcpConnector extends AbstractConnector
 
     private int clientSoTimeout = DEFAULT_SOCKET_TIMEOUT;
     private int serverSoTimeout = DEFAULT_SOCKET_TIMEOUT;
+    private int socketMaxWait = DEFAULT_WAIT_TIMEOUT;
     private int sendBufferSize = DEFAULT_BUFFER_SIZE;
     private int receiveBufferSize = DEFAULT_BUFFER_SIZE;
     private int receiveBacklog = DEFAULT_BACKLOG;
@@ -154,6 +156,7 @@ public class TcpConnector extends AbstractConnector
         socketsPool.setTestOnReturn(true);
         setMaxSocketActive();
         socketsPool.setWhenExhaustedAction(GenericKeyedObjectPool.WHEN_EXHAUSTED_BLOCK);
+        socketsPool.setMaxWait(socketMaxWait);
 
         // Use connector's classloader so that other temporary classloaders
         // aren't used when things are started lazily or from elsewhere.
@@ -330,6 +333,16 @@ public class TcpConnector extends AbstractConnector
     public void setServerSoTimeout(int timeout)
     {
         this.serverSoTimeout = valueOrDefault(timeout, 0, DEFAULT_SOCKET_TIMEOUT);
+    }
+
+    public int getSocketMaxWait()
+    {
+        return socketMaxWait;
+    }
+
+    public void setSocketMaxWait(int timeout)
+    {
+        this.socketMaxWait = valueOrDefault(timeout, 0, DEFAULT_WAIT_TIMEOUT);
     }
 
     /** @deprecated Should use {@link #getSendBufferSize()} or {@link #getReceiveBufferSize()} */
@@ -529,4 +542,25 @@ public class TcpConnector extends AbstractConnector
     {
         return dispatchers;
     }
+
+    public int getSocketsPoolMaxActive()
+    {
+        return socketsPool.getMaxActive();
+    }
+
+    public int getSocketsPoolMaxIdle()
+    {
+        return socketsPool.getMaxIdle();
+    }
+
+    public int getSocketsPoolNumActive()
+    {
+        return socketsPool.getNumActive();
+    }
+
+    public long getSocketsPoolMaxWait()
+    {
+        return socketsPool.getMaxWait();
+    }
+
 }

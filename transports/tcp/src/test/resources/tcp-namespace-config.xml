@@ -15,7 +15,8 @@
                    receiveBacklog="50"
                    reuseAddress="false"
                    clientSoTimeout="3000"
-                   socketSoLinger="1234">
+                   socketSoLinger="1234"
+                   socketMaxWait="3000">
         <tcp:direct-protocol payloadOnly="true"/>
     </tcp:connector>
 
