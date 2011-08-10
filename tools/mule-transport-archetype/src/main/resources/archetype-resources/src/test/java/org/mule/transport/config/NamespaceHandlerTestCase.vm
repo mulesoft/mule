@@ -10,8 +10,11 @@
  */
 package org.mule.transport.${ModuleNameLower}.config;
 
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transport.${ModuleNameLower}.${ModuleName}Connector;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * TODO

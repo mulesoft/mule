@@ -5,7 +5,7 @@
 package ${patternConfigPackageName};
 
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 public class ${patternClassName}FunctionalTestCase extends FunctionalTestCase
 {

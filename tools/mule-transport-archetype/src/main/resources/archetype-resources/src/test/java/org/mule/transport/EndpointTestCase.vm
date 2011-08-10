@@ -12,7 +12,10 @@
 #set($ModuleName = "${ModuleName.substring(0,1).toUpperCase()}${ModuleName.substring(1)}")
 package org.mule.transport.${ModuleName.toLowerCase()};
 
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 public class ${ModuleName}EndpointTestCase extends AbstractMuleTestCase
 {

@@ -7,7 +7,9 @@
  */
 package org.mule.module.${ModuleNameLower};
 
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+
+import static org.junit.Assert.fail;
 
 /**
  * TODO
