@@ -23,7 +23,7 @@ public class FlowAynchronousProcessingStrategyTestCase extends FlowDefaultProces
         return "org/mule/test/construct/flow-asynchronous-processing-strategy-config.xml";
     }
 
-    public void testDispatchToOneWayTxInbound() throws Exception
+    public void testDispatchToOneWayTx() throws Exception
     {
         MuleClient client = muleContext.getClient();
         client.dispatch("vm://onewaytx-in", "a", null);
@@ -34,13 +34,13 @@ public class FlowAynchronousProcessingStrategyTestCase extends FlowDefaultProces
 
     }
 
-    public void testSendToOneWayTxInbound() throws Exception
+    public void testSendToOneWayTx() throws Exception
     {
         MuleClient client = muleContext.getClient();
 
         try
         {
-            client.send("vm://onewaytx-in", "a", null);
+            client.send("vm://oneway-tx-in", "a", null);
             fail("Exception expected");
         }
         catch (Exception e)
