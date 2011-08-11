@@ -5,7 +5,7 @@
 package ${patternBuilderPackageName};
 
 import org.mule.exception.DefaultMessagingExceptionStrategy;
-import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import ${patternFQCN};
 
@@ -13,11 +13,10 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
-public class ${patternBuilderClassName}TestCase extends AbstractMuleTestCase
+public class ${patternBuilderClassName}TestCase extends AbstractMuleContextTestCase
 {
-
     @Test
-    public void testFullConfiguration() throws Exception
+    public void fullConfiguration() throws Exception
     {
         final String patternName = "${patternTagName}-full-test";
 
