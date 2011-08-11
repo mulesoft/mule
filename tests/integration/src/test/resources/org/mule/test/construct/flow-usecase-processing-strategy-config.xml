@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"           
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:smtp="http://www.mulesoft.org/schema/mule/smtp"    
+      xmlns:file="http://www.mulesoft.org/schema/mule/file"
+      xsi:schemaLocation="               
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd                              
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/3.2/mule-http.xsd
+               http://www.mulesoft.org/schema/mule/smtp http://www.mulesoft.org/schema/mule/smtp/3.2/mule-smtp.xsd               
+               http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/3.2/mule-file.xsd">
+
+    <file:connector name="file" autoDelete="true"/>
+
+    <smtp:endpoint name="smtpEndpoint" user="bob" password="" host="smtp.gmail.com" from="Bob" subject="exception"
+                   to="exception@mulesoft.org"/>
+    
+    <flow name="RequestResponseHTTP">
+        <http:inbound-endpoint host="localhost" port="${port1}"/>
+        <echo-component/>
+        <smtp:outbound-endpoint ref="smtpEndpoint" />
+    </flow>
+
+    <flow name="OneWayFile" processingStrategy="synchronous">
+        <file:inbound-endpoint path="./test"/>        
+        <smtp:outbound-endpoint ref="smtpEndpoint" />
+    </flow>
+
+</mule>
