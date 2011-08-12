@@ -18,7 +18,9 @@ import org.mule.api.client.MuleClient;
 import org.mule.message.DefaultExceptionPayload;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
-import org.mule.util.FileUtils;
+import org.mule.tck.probe.PollingProber;
+import org.mule.tck.probe.Probe;
+import org.mule.tck.probe.Prober;
 import org.mule.util.IOUtils;
 
 import java.io.File;
@@ -52,17 +54,30 @@ public class FlowUseCaseProcessingStrategyTestCase extends FunctionalTestCase
     @Ignore
     public void testFileAutoDeleteSyncStrategy() throws Exception
     {
-        File file = FileUtils.newFile("./test/deleteMe");
-        file.createNewFile();
+        Prober prober = new PollingProber(10000, 100, false);
+        final File file = File.createTempFile("mule-file-test-", ".txt");       
+        file.deleteOnExit();
+        file.createNewFile();        
         FileOutputStream fos = new FileOutputStream(file);
         IOUtils.write("The quick brown fox jumps over the lazy dog", fos);
         IOUtils.closeQuietly(fos);
         
-        Thread.sleep(5000);
+        prober.check(new Probe()
+        {
+            @Override
+            public boolean isSatisfied()
+            {
+                return !file.exists();
+            }
 
-        assertTrue(file.exists());
+            @Override
+            public String describeFailure()
+            {
+                return "File should still exist";
+            }
+        });                
     }
-   
+         
 }
 
 
