@@ -111,6 +111,10 @@ public abstract class TransactedPollingMessageReceiver extends AbstractPollingMe
 
         if (this.isReceiveMessagesInTransaction())
         {
+            if (hasNoMessages())
+            {
+                return;
+            }
             // Receive messages and process them in a single transaction
             // Do not enable threading here, but several workers
             // may have been started
@@ -156,6 +160,14 @@ public abstract class TransactedPollingMessageReceiver extends AbstractPollingMe
                 countdown.await();
             }
         }
+    }
+
+    /**
+     * Return true if it can be determined that there are currently no messages to process
+     */
+    protected boolean hasNoMessages()
+    {
+        return  false;
     }
 
     protected class MessageProcessorWorker implements Work, TransactionCallback

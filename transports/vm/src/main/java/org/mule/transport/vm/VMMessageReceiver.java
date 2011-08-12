@@ -19,6 +19,7 @@ import org.mule.api.ThreadSafeAccess;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
+import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transport.Connector;
 import org.mule.transport.ContinuousPollingReceiverWorker;
 import org.mule.transport.PollingReceiverWorker;
@@ -174,6 +175,21 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
         Queue queue = qs.getQueue(endpoint.getEndpointURI().getAddress());
         // try to get the first event off the queue
         return (MuleEvent) queue.poll(connector.getQueueTimeout());
+    }
+
+    @Override
+    protected boolean hasNoMessages()
+    {
+        try
+        {
+            QueueSession qs = connector.getQueueSession();
+            Queue queue = qs.getQueue(endpoint.getEndpointURI().getAddress());
+            return queue.peek() == null;
+        }
+        catch (Exception e)
+        {
+            return false;
+        }
     }
 
     @Override
