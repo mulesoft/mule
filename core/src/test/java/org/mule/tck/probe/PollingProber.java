@@ -22,7 +22,6 @@ public class PollingProber implements Prober
 
     private final long timeoutMillis;
     private final long pollDelayMillis;
-    private final boolean startWithDelay;
 
     public PollingProber() {
         this(DEFAULT_TIMEOUT, DEFAULT_POLLING_INTERVAL);
@@ -32,14 +31,6 @@ public class PollingProber implements Prober
     {
         this.timeoutMillis = timeoutMillis;
         this.pollDelayMillis = pollDelayMillis;
-        this.startWithDelay = false;
-    }
-    
-    public PollingProber(long timeoutMillis, long pollDelayMillis, boolean startWithDelay)
-    {
-        this.timeoutMillis = timeoutMillis;
-        this.pollDelayMillis = pollDelayMillis;
-        this.startWithDelay = startWithDelay;
     }
 
     public void check(Probe probe)
@@ -53,29 +44,19 @@ public class PollingProber implements Prober
     private boolean poll(Probe probe)
     {
         Timeout timeout = new Timeout(timeoutMillis);
-        boolean doCheck = true;
-                
-        if (startWithDelay)
-        {
-            doCheck = false;
-        }
-        
+
         while (true)
         {
-            if (doCheck && probe.isSatisfied())
+            waitFor(pollDelayMillis);
+            
+            if (probe.isSatisfied())
             {
                 return true;
             }
             else if (timeout.hasTimedOut())
             {
                 return false;
-            }
-            else
-            {
-                waitFor(pollDelayMillis);
-            }
-            
-            doCheck = true;
+            }            
         }
     }
 

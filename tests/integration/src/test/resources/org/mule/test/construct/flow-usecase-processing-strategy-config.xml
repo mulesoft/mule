@@ -21,7 +21,9 @@
     </flow>
 
     <flow name="OneWayFile" processingStrategy="synchronous">
-        <file:inbound-endpoint path="./"/>        
+        <file:inbound-endpoint path="./.mule">
+            <file:filename-wildcard-filter pattern="mule-file-test-*"/> 
+        </file:inbound-endpoint>
         <smtp:outbound-endpoint ref="smtpEndpoint" />
     </flow>
 

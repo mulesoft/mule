@@ -54,10 +54,10 @@ public class FlowUseCaseProcessingStrategyTestCase extends FunctionalTestCase
     @Ignore
     public void testFileAutoDeleteSyncStrategy() throws Exception
     {
-        Prober prober = new PollingProber(10000, 100, false);
-        final File file = File.createTempFile("mule-file-test-", ".txt");       
+        Prober prober = new PollingProber(10000, 5000);
+        File directory = new File("./.mule");
+        final File file = File.createTempFile("mule-file-test-", ".txt", directory);       
         file.deleteOnExit();
-        file.createNewFile();        
         FileOutputStream fos = new FileOutputStream(file);
         IOUtils.write("The quick brown fox jumps over the lazy dog", fos);
         IOUtils.closeQuietly(fos);
@@ -67,7 +67,7 @@ public class FlowUseCaseProcessingStrategyTestCase extends FunctionalTestCase
             @Override
             public boolean isSatisfied()
             {
-                return !file.exists();
+                return file.exists();
             }
 
             @Override
