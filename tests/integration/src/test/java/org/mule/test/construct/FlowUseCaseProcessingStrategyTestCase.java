@@ -10,12 +10,11 @@
 
 package org.mule.test.construct;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
 
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
-import org.mule.message.DefaultExceptionPayload;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.probe.PollingProber;
@@ -47,7 +46,7 @@ public class FlowUseCaseProcessingStrategyTestCase extends FunctionalTestCase
         MuleClient client = muleContext.getClient();
         MuleMessage exception = client.send("http://localhost:" + dynamicPort.getNumber(), null, null);
 
-        assertTrue(exception.getExceptionPayload() instanceof DefaultExceptionPayload);
+        assertEquals("500", exception.getInboundProperty("http.status", "0"));        
     }
 
     @Test
