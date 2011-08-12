@@ -23,6 +23,15 @@ public class FlowAynchronousProcessingStrategyTestCase extends FlowDefaultProces
         return "org/mule/test/construct/flow-asynchronous-processing-strategy-config.xml";
     }
 
+    @Override
+    public void testDispatchToOneWayInboundTxOnly() throws Exception
+    {
+        MuleClient client = muleContext.getClient();
+        client.dispatch("vm://oneway-inboundtx-in", "a", null);
+        MuleMessage result = client.request("vm://dead-letter-queue", RECEIVE_TIMEOUT);
+        assertNotNull(result);
+    }
+
     public void testDispatchToOneWayTx() throws Exception
     {
         MuleClient client = muleContext.getClient();

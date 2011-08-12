@@ -87,16 +87,16 @@ public class FlowDefaultProcessingStrategyTestCase extends FunctionalTestCase
         assertAllProcessingInClientThread(result);
     }
 
-    // TODO Enable once transaction behaviuor is fixed
-    // public void testDispatchToOneWayInboundTxOnly() throws Exception
-    // {
-    // MuleClient client = muleContext.getClient();
-    // client.dispatch("vm://oneway-inboundtx-in", "a", null);
-    //
-    // MuleMessage result = client.request("vm://oneway-inboundtx-out", RECEIVE_TIMEOUT);
-    //
-    // assertAllProcessingAsync(result);
-    // }
+
+    public void testDispatchToOneWayInboundTxOnly() throws Exception
+    {
+        MuleClient client = muleContext.getClient();
+        client.dispatch("vm://oneway-inboundtx-in", "a", null);
+
+        MuleMessage result = client.request("vm://oneway-inboundtx-out", RECEIVE_TIMEOUT);
+
+        assertAllProcessingInRecieverThread(result);
+    }
 
     public void testDispatchToOneWayOutboundTxOnly() throws Exception
     {

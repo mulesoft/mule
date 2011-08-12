@@ -49,6 +49,10 @@
         </vm:inbound-endpoint>
         <processor ref="threadSensingProcessor" />
         <vm:outbound-endpoint path="oneway-inboundtx-out" exchange-pattern="one-way"/>
+        <default-exception-strategy >
+            <commit-transaction exception-pattern="*"/>
+            <vm:outbound-endpoint path="dead-letter-queue"/>
+        </default-exception-strategy>
     </flow>
     
     <flow name="RequestResponse" processingStrategy="asynchronous">
