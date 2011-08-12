@@ -93,8 +93,7 @@ public abstract class AbstractExternalTransactionTestCase extends AbstractServic
 
     protected <T> TransactionTemplate<T> createTransactionTemplate(byte action, boolean considerExternal)
     {
-        TransactionConfig tc = new MuleTransactionConfig();
-        tc.setAction(action);
+        TransactionConfig tc = new MuleTransactionConfig(action);
         tc.setFactory(new XaTransactionFactory());
         tc.setInteractWithExternal(considerExternal);
         TransactionTemplate<T> tt = new TransactionTemplate<T>(tc, context);

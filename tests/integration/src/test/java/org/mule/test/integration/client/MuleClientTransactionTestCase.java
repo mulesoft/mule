@@ -58,9 +58,8 @@ public class MuleClientTransactionTestCase extends FunctionalTestCase
             // slurp
         }
 
-        MuleTransactionConfig tc = new MuleTransactionConfig();
+        MuleTransactionConfig tc = new MuleTransactionConfig(TransactionConfig.ACTION_ALWAYS_BEGIN);
         tc.setFactory(new JmsTransactionFactory());
-        tc.setAction(TransactionConfig.ACTION_ALWAYS_BEGIN);
 
         // This enpoint needs to be registered prior to use cause we need to set
         // the transaction config so that the endpoint will "know" it is transacted
@@ -107,9 +106,8 @@ public class MuleClientTransactionTestCase extends FunctionalTestCase
             // hmm..mesages
         }
 
-        MuleTransactionConfig tc = new MuleTransactionConfig();
+        MuleTransactionConfig tc = new MuleTransactionConfig(TransactionConfig.ACTION_ALWAYS_BEGIN);
         tc.setFactory(new JmsTransactionFactory());
-        tc.setAction(TransactionConfig.ACTION_ALWAYS_BEGIN);
 
         // This enpoint needs to be registered prior to use cause we need to set
         // the transaction config so that the endpoint will "know" it is transacted
@@ -162,9 +160,8 @@ public class MuleClientTransactionTestCase extends FunctionalTestCase
             // yum!
         }
 
-        MuleTransactionConfig tc = new MuleTransactionConfig();
+        MuleTransactionConfig tc = new MuleTransactionConfig(TransactionConfig.ACTION_ALWAYS_BEGIN);
         tc.setFactory(new JmsTransactionFactory());
-        tc.setAction(TransactionConfig.ACTION_ALWAYS_BEGIN);
 
         // This enpoint needs to be registered prior to use cause we need to set
         // the transaction config so that the endpoint will "know" it is transacted
@@ -202,9 +199,8 @@ public class MuleClientTransactionTestCase extends FunctionalTestCase
     protected void emptyReplyQueue() throws Exception
     {
         final MuleClient client = new MuleClient(muleContext);
-        MuleTransactionConfig tc = new MuleTransactionConfig();
+        MuleTransactionConfig tc = new MuleTransactionConfig(TransactionConfig.ACTION_ALWAYS_BEGIN);
         tc.setFactory(new JmsTransactionFactory());
-        tc.setAction(TransactionConfig.ACTION_ALWAYS_BEGIN);
         TransactionTemplate<Void> tt = new TransactionTemplate<Void>(tc, muleContext);
         tt.execute(new TransactionCallback<Void>()
         {

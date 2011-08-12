@@ -61,10 +61,16 @@ public interface TransactionConfig
     byte ACTION_NEVER = 5;
 
     /**
-     * Transaction action by default
+     * Be indifferent to any active transaction.  Don;t check for one, and if there is one, don;t commit or abort it
      * <p>
      */
-    byte ACTION_DEFAULT = ACTION_NEVER;
+    byte ACTION_INDIFFERENT = 6;
+
+    /**
+     * Transaction action by default.  Note that before 3.2 it was ACTION_NONE
+     * <p>
+     */
+    byte ACTION_DEFAULT = ACTION_INDIFFERENT;
     
     TransactionFactory getFactory();
 

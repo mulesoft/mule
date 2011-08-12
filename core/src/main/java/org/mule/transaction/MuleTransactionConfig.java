@@ -40,6 +40,7 @@ public class MuleTransactionConfig implements TransactionConfig, MuleContextAwar
     public static final String ACTION_ALWAYS_JOIN_STRING = "ALWAYS_JOIN";
     public static final String ACTION_JOIN_IF_POSSIBLE_STRING = "JOIN_IF_POSSIBLE";
     public static final String ACTION_NEVER_STRING = "NEVER";
+    public static final String ACTION_INDIFFERENT_STRING = "INDIFFERENT";
 
     private TransactionFactory factory;
 
@@ -50,6 +51,15 @@ public class MuleTransactionConfig implements TransactionConfig, MuleContextAwar
     private Integer timeout;
 
     private boolean interactWithExternal = false;
+
+    public MuleTransactionConfig()
+    {
+    }
+
+    public MuleTransactionConfig(byte action)
+    {
+        this.action = action;
+    }
 
     public void setMuleContext(MuleContext context)
     {
@@ -121,6 +131,10 @@ public class MuleTransactionConfig implements TransactionConfig, MuleContextAwar
         {
             this.action = ACTION_NEVER;
         }
+        else if (ACTION_INDIFFERENT_STRING.equals(action))
+        {
+            this.action = ACTION_INDIFFERENT;
+        }
         else
         {
             throw new IllegalArgumentException("Action " + action + " is not recognised as a begin action.");
@@ -141,21 +155,53 @@ public class MuleTransactionConfig implements TransactionConfig, MuleContextAwar
                 return ACTION_JOIN_IF_POSSIBLE_STRING;
             case ACTION_NONE:
                 return ACTION_NONE_STRING;
+            case ACTION_INDIFFERENT:
+                return ACTION_INDIFFERENT_STRING;
             default :
                 return ACTION_NEVER_STRING;
         }
     }
 
+    /**
+     * Will the result, at the end of running the transaction template, be an active transaction?
+     * @return
+     */
     public boolean isTransacted()
     {
-        Transaction tx = TransactionCoordination.getInstance().getTransaction(); 
-        boolean joinPossible = (action != ACTION_JOIN_IF_POSSIBLE || (action == ACTION_JOIN_IF_POSSIBLE && tx != null));
-        if (action != ACTION_NEVER && action != ACTION_NONE && factory == null)
+        if (action == ACTION_NEVER || action == ACTION_NONE)
         {
-            // TODO use TransactionException here? This causes API changes as TE is a checked exception ...
-            throw new MuleRuntimeException(CoreMessages.transactionFactoryIsMandatory(getActionAsString()));
+            return false;
         }
-        return action != ACTION_NEVER && action != ACTION_NONE && factory.isTransacted() && joinPossible;
+        if (factory == null)
+        {
+            if (action != ACTION_INDIFFERENT)
+            {
+                // TODO use TransactionException here? This causes API changes as TE is a checked exception ...
+                throw new MuleRuntimeException(CoreMessages.transactionFactoryIsMandatory(getActionAsString()));
+            }
+
+        }
+        else if (!factory.isTransacted())
+        {
+            return false;
+        }
+
+        switch (action)
+        {
+            case ACTION_ALWAYS_BEGIN:
+            case ACTION_ALWAYS_JOIN:
+            case ACTION_BEGIN_OR_JOIN:
+                return true;
+
+            case ACTION_JOIN_IF_POSSIBLE:
+            case ACTION_INDIFFERENT:
+                return TransactionCoordination.getInstance().getTransaction() != null;
+
+            default:
+                // should not happen
+                return false;
+
+        }
     }
     
     public boolean isConfigured()

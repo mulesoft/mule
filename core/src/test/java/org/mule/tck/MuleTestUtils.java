@@ -282,8 +282,7 @@ public final class MuleTestUtils
             public ImmutableEndpoint getEndpoint(EndpointBuilder builder) throws MuleException
             {
                 builder.setExchangePattern(mep);
-                TransactionConfig txConfig = new MuleTransactionConfig();
-                txConfig.setAction(TransactionConfig.ACTION_BEGIN_OR_JOIN);
+                TransactionConfig txConfig = new MuleTransactionConfig(TransactionConfig.ACTION_BEGIN_OR_JOIN);
                 txConfig.setFactory(new TestTransactionFactory());
                 builder.setTransactionConfig(txConfig);
                 return context.getEndpointFactory().getInboundEndpoint(builder);

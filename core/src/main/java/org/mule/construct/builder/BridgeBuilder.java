@@ -77,9 +77,8 @@ public class BridgeBuilder extends
     {
         if (transacted)
         {
-            MuleTransactionConfig transactionConfig = new MuleTransactionConfig();
+            MuleTransactionConfig transactionConfig = new MuleTransactionConfig(TransactionConfig.ACTION_BEGIN_OR_JOIN);
             transactionConfig.setMuleContext(muleContext);
-            transactionConfig.setAction(TransactionConfig.ACTION_BEGIN_OR_JOIN);
             endpointBuilder.setTransactionConfig(transactionConfig);
         }
     }
@@ -89,9 +88,8 @@ public class BridgeBuilder extends
     {
         if (transacted)
         {
-            MuleTransactionConfig transactionConfig = new MuleTransactionConfig();
+            MuleTransactionConfig transactionConfig = new MuleTransactionConfig(TransactionConfig.ACTION_ALWAYS_JOIN);
             transactionConfig.setMuleContext(muleContext);
-            transactionConfig.setAction(TransactionConfig.ACTION_ALWAYS_JOIN);
             endpointBuilder.setTransactionConfig(transactionConfig);
         }
     }

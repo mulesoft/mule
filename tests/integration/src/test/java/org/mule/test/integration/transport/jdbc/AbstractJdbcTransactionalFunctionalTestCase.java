@@ -118,9 +118,8 @@ public abstract class AbstractJdbcTransactionalFunctionalTestCase extends Abstra
         service.setComponent(new DefaultJavaComponent(new PrototypeObjectFactory(JdbcFunctionalTestComponent.class)));
 
         TransactionFactory tf = getTransactionFactory();
-        TransactionConfig txConfig = new MuleTransactionConfig();
+        TransactionConfig txConfig = new MuleTransactionConfig(txBeginAction);
         txConfig.setFactory(tf);
-        txConfig.setAction(txBeginAction);
         
         EndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(getInDest(), muleContext);
         endpointBuilder.setName("testIn");

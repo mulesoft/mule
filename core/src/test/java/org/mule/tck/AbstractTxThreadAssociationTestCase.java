@@ -131,15 +131,13 @@ public abstract class AbstractTxThreadAssociationTestCase extends AbstractMuleCo
         tm.setTransactionTimeout(TRANSACTION_TIMEOUT_SECONDS);
 
         // this is one component with a TX always begin
-        TransactionConfig config = new MuleTransactionConfig();
+        TransactionConfig config = new MuleTransactionConfig(TransactionConfig.ACTION_ALWAYS_BEGIN);
         config.setFactory(new XaTransactionFactory());
-        config.setAction(TransactionConfig.ACTION_ALWAYS_BEGIN);
         TransactionTemplate template = new TransactionTemplate(config, muleContext);
 
         // and the callee component which should begin new transaction, current must be suspended
-        final TransactionConfig nestedConfig = new MuleTransactionConfig();
+        final TransactionConfig nestedConfig = new MuleTransactionConfig(TransactionConfig.ACTION_ALWAYS_BEGIN);
         nestedConfig.setFactory(new XaTransactionFactory());
-        nestedConfig.setAction(TransactionConfig.ACTION_ALWAYS_BEGIN);
 
         // start the call chain
         template.execute(new TransactionCallback<Void>()
@@ -215,15 +213,13 @@ public abstract class AbstractTxThreadAssociationTestCase extends AbstractMuleCo
         tm.setTransactionTimeout(TRANSACTION_TIMEOUT_SECONDS);
 
         // this is one component with a TX always begin
-        TransactionConfig config = new MuleTransactionConfig();
+        TransactionConfig config = new MuleTransactionConfig(TransactionConfig.ACTION_ALWAYS_BEGIN);
         config.setFactory(new XaTransactionFactory());
-        config.setAction(TransactionConfig.ACTION_ALWAYS_BEGIN);
         TransactionTemplate<Void> template = new TransactionTemplate<Void>(config, muleContext);
 
         // and the callee component which should begin new transaction, current must be suspended
-        final TransactionConfig nestedConfig = new MuleTransactionConfig();
+        final TransactionConfig nestedConfig = new MuleTransactionConfig(TransactionConfig.ACTION_NONE);
         nestedConfig.setFactory(new XaTransactionFactory());
-        nestedConfig.setAction(TransactionConfig.ACTION_NONE);
 
         // start the call chain
         template.execute(new TransactionCallback<Void>()
@@ -311,15 +307,13 @@ public abstract class AbstractTxThreadAssociationTestCase extends AbstractMuleCo
         tm.setTransactionTimeout(TRANSACTION_TIMEOUT_SECONDS);
 
         // this is one service with a TX always begin
-        TransactionConfig config = new MuleTransactionConfig();
+        TransactionConfig config = new MuleTransactionConfig(TransactionConfig.ACTION_ALWAYS_BEGIN);
         config.setFactory(new XaTransactionFactory());
-        config.setAction(TransactionConfig.ACTION_ALWAYS_BEGIN);
         TransactionTemplate template = new TransactionTemplate(config, muleContext);
 
         // and the callee service which should join the current XA transaction, not begin a nested one
-        final TransactionConfig nestedConfig = new MuleTransactionConfig();
+        final TransactionConfig nestedConfig = new MuleTransactionConfig(TransactionConfig.ACTION_BEGIN_OR_JOIN);
         nestedConfig.setFactory(new XaTransactionFactory());
-        nestedConfig.setAction(TransactionConfig.ACTION_BEGIN_OR_JOIN);
 
         // start the call chain
         template.execute(new TransactionCallback<Void>()

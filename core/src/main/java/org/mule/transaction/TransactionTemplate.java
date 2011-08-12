@@ -37,14 +37,15 @@ public class TransactionTemplate<T>
 
     public T execute(TransactionCallback<T> callback) throws Exception
     {
-        //if we want to skip TT
-        if (config == null)
+        byte action;
+
+        // if we want to skip TT
+        if (config == null || (action  = config.getAction()) == TransactionConfig.ACTION_INDIFFERENT)
         {
             return callback.doInTransaction();
         }
 
         Transaction joinedExternal = null;
-        byte action = (config != null) ? config.getAction() : TransactionConfig.ACTION_DEFAULT;
         Transaction tx = TransactionCoordination.getInstance().getTransaction();
         if (tx == null && context != null && config != null && config.isInteractWithExternal())
         {
