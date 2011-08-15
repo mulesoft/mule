@@ -148,6 +148,7 @@ public class MuleObjectStoreManager
                 }
                 monObjectStore = new MonitoredObjectStoreWrapper((ListableObjectStore) store, maxEntries,
                     entryTTL, expirationInterval);
+                monObjectStore.setMuleContext(muleContext);
                 try
                 {
                     monObjectStore.initialise();
@@ -208,14 +209,17 @@ public class MuleObjectStoreManager
         @Override
         public void run()
         {
-            try
+            if (muleContext.isPrimaryPollingInstance())
             {
-                store.expire(entryTTL, maxEntries, partitionName);
-            }
-            catch (Exception e)
-            {
-                MuleObjectStoreManager.logger.warn("Running expirty on partition " + partitionName + " of "
-                                                   + store + " threw " + e + ":" + e.getMessage());
+                try
+                {
+                    store.expire(entryTTL, maxEntries, partitionName);
+                }
+                catch (Exception e)
+                {
+                    MuleObjectStoreManager.logger.warn("Running expirty on partition " + partitionName + " of "
+                        + store + " threw " + e + ":" + e.getMessage());
+                }
             }
         }
 
@@ -228,7 +232,8 @@ public class MuleObjectStoreManager
         {
             ObjectStorePartition partition=(ObjectStorePartition)store;
             partition.getBaseStore().disposePartition(partition.getPartitionName());
-        }else
+        }
+        else
         {
             if(store instanceof ListableObjectStore)
             {
@@ -247,7 +252,8 @@ public class MuleObjectStoreManager
                         }
                     }
                 }
-            }else
+            }
+            else
             {
                 //there is nothing we can do                
             }

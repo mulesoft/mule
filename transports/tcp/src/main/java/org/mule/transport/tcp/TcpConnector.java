@@ -163,7 +163,7 @@ public class TcpConnector extends AbstractConnector
         final String monitorName = String.format("%s%s.socket",
                                                  ThreadNameHelper.getPrefix(muleContext),
                                                  getName());
-        keepAliveMonitor = new ExpiryMonitor(monitorName, 1000, this.getClass().getClassLoader());
+        keepAliveMonitor = new ExpiryMonitor(monitorName, 1000, this.getClass().getClassLoader(), muleContext, false);
     }
 
     private void setMaxSocketActive()

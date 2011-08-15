@@ -31,7 +31,7 @@ public class ExpiryMonitorTestCase extends AbstractMuleTestCase
     @Test
     public void testExpiry() throws InterruptedException
     {
-        ExpiryMonitor monitor = new ExpiryMonitor("test", 100);
+        ExpiryMonitor monitor = new ExpiryMonitor("test", 100, null, false);
         Expirable e = new Expirable()
         {
             public void expired()
@@ -48,7 +48,7 @@ public class ExpiryMonitorTestCase extends AbstractMuleTestCase
     @Test
     public void testNotExpiry() throws InterruptedException
     {
-        ExpiryMonitor monitor = new ExpiryMonitor("test", 100);
+        ExpiryMonitor monitor = new ExpiryMonitor("test", 100, null, false);
         Expirable e = new Expirable()
         {
             public void expired()
@@ -67,7 +67,7 @@ public class ExpiryMonitorTestCase extends AbstractMuleTestCase
     @Test
     public void testExpiryWithReset() throws InterruptedException
     {
-        ExpiryMonitor monitor = new ExpiryMonitor("test", 100);
+        ExpiryMonitor monitor = new ExpiryMonitor("test", 100, null, false);
         Expirable e = new Expirable()
         {
             public void expired()
@@ -90,7 +90,7 @@ public class ExpiryMonitorTestCase extends AbstractMuleTestCase
     @Test
     public void testNotExpiryWithRemove() throws InterruptedException
     {
-        ExpiryMonitor monitor = new ExpiryMonitor("test", 100);
+        ExpiryMonitor monitor = new ExpiryMonitor("test", 100, null, false);
         Expirable e = new Expirable()
         {
             public void expired()

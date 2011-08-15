@@ -10,6 +10,7 @@
 
 package org.mule.util.monitor;
 
+import org.mule.api.MuleContext;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.util.concurrent.DaemonThreadFactory;
@@ -45,28 +46,41 @@ public class ExpiryMonitor implements Runnable, Disposable
     
     private ClassLoader contextClassLoader;
 
-    public ExpiryMonitor(String name)
+    private MuleContext muleContext;
+
+    private boolean onPollingNodeOnly;
+
+    public ExpiryMonitor(MuleContext muleContext, boolean onPollingNodeOnly)
     {
-        this(name, 1000);
+        this.muleContext = muleContext;
+        this.onPollingNodeOnly = onPollingNodeOnly;
     }
 
-    public ExpiryMonitor(String name, int monitorFrequency)
+    public ExpiryMonitor(String name, MuleContext muleContext, boolean onPollingNodeOnly)
     {
+        this(name, 1000, muleContext, onPollingNodeOnly);
+    }
+
+    public ExpiryMonitor(String name, int monitorFrequency, MuleContext muleContext, boolean onPollingNodeOnly)
+    {
+        this(muleContext, onPollingNodeOnly);
         this.name = name;
         this.monitorFrequency = monitorFrequency;
         init();
     }
 
-    public ExpiryMonitor(String name, int monitorFrequency, ClassLoader contextClassLoader)
+    public ExpiryMonitor(String name, int monitorFrequency, ClassLoader contextClassLoader, MuleContext muleContext, boolean onPollingNodeOnly)
     {
+        this(muleContext, onPollingNodeOnly);
         this.name = name;
         this.monitorFrequency = monitorFrequency;
         this.contextClassLoader = contextClassLoader;
         init();
     }
     
-    public ExpiryMonitor(String name, int monitorFrequency, ScheduledThreadPoolExecutor scheduler)
+    public ExpiryMonitor(String name, int monitorFrequency, ScheduledThreadPoolExecutor scheduler, MuleContext muleContext, boolean onPollingNodeOnly)
     {
+        this(muleContext, onPollingNodeOnly);
         this.name = name;
         this.monitorFrequency = monitorFrequency;
         this.scheduler = scheduler;
@@ -147,13 +161,17 @@ public class ExpiryMonitor implements Runnable, Disposable
     public void run()
     {
         ExpirableHolder holder;
-        for (Iterator iterator = monitors.values().iterator(); iterator.hasNext();)
+
+        if (!onPollingNodeOnly || muleContext == null || muleContext.isPrimaryPollingInstance())
         {
-            holder = (ExpirableHolder) iterator.next();
-            if (holder.isExpired())
+            for (Iterator iterator = monitors.values().iterator(); iterator.hasNext();)
             {
-                removeExpirable(holder.getExpirable());
-                holder.getExpirable().expired();
+                holder = (ExpirableHolder) iterator.next();
+                if (holder.isExpired())
+                {
+                    removeExpirable(holder.getExpirable());
+                    holder.getExpirable().expired();
+                }
             }
         }
     }

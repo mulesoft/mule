@@ -10,7 +10,9 @@
 
 package org.mule.util.store;
 
+import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleContext;
+import org.mule.api.MuleException;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Disposable;
@@ -162,7 +164,10 @@ public class MonitoredObjectStoreWrapper<T extends Serializable>
     @Override
     public void run()
     {
-        expire();
+        if (context.isPrimaryPollingInstance())
+        {
+            expire();
+        }
     }
 
     public void expire()
@@ -273,7 +278,7 @@ public class MonitoredObjectStoreWrapper<T extends Serializable>
         }
     }
 
-    protected static class StoredObject<T> implements Serializable
+    protected static class StoredObject<T> implements Serializable, DeserializationPostInitialisable
     {
         private static final long serialVersionUID = 8656763235928199259L;
         final private T item;
@@ -301,6 +306,33 @@ public class MonitoredObjectStoreWrapper<T extends Serializable>
         public Serializable getKey()
         {
             return key;
+        }
+
+        /**
+         * Invoked after deserialization. This is called when the marker interface
+         * {@link org.mule.util.store.DeserializationPostInitialisable} is used. This will get invoked after the
+         * object has been deserialized passing in the current MuleContext when using either
+         * {@link org.mule.transformer.wire.SerializationWireFormat},
+         * {@link org.mule.transformer.wire.SerializedMuleMessageWireFormat} or the
+         * {@link org.mule.transformer.simple.ByteArrayToSerializable} transformer.
+         *
+         * @param muleContext the current muleContext instance
+         * @throws org.mule.api.MuleException if there is an error initializing
+         */
+        @SuppressWarnings({"unused", "unchecked"})
+        private void initAfterDeserialisation(MuleContext muleContext) throws MuleException
+        {
+            if (item instanceof DeserializationPostInitialisable)
+            {
+                try
+                {
+                    DeserializationPostInitialisable.Implementation.init(item, muleContext);
+                }
+                catch (Exception e)
+                {
+                    throw new DefaultMuleException(e);
+                }
+            }
         }
     }
 

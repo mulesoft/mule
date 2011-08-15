@@ -85,7 +85,10 @@ public abstract class AbstractMonitoredObjectStore<T extends Serializable>
 
     public final void run()
     {
-        expire();
+        if (context == null || context.isPrimaryPollingInstance())
+        {
+            expire();
+        }
     }
 
     public void dispose()

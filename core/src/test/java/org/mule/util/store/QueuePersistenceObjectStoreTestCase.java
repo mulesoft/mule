@@ -10,12 +10,18 @@
 
 package org.mule.util.store;
 
+import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
+import org.mule.MessageExchangePattern;
 import org.mule.api.MuleContext;
+import org.mule.api.MuleEvent;
+import org.mule.api.MuleMessage;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.config.MuleConfiguration;
+import org.mule.api.store.ListableObjectStore;
 import org.mule.api.store.ObjectStoreException;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.session.DefaultMuleSession;
 import org.mule.util.FileUtils;
 import org.mule.util.SerializationUtils;
 import org.mule.util.UUID;
@@ -33,6 +39,8 @@ import org.junit.rules.TemporaryFolder;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -63,6 +71,7 @@ public class QueuePersistenceObjectStoreTestCase extends AbstractObjectStoreCont
 
         mockMuleContext = mock(MuleContext.class);
         when(mockMuleContext.getConfiguration()).thenReturn(mockConfig);
+        when(mockMuleContext.getExecutionClassLoader()).thenReturn(getClass().getClassLoader());
         when(mockMuleContext.getExecutionClassLoader()).thenReturn(getClass().getClassLoader());
     }
 
@@ -162,6 +171,27 @@ public class QueuePersistenceObjectStoreTestCase extends AbstractObjectStoreCont
         store.remove(key);
 
         assertFalse(storeFile.exists());
+    }
+
+    @Test
+    public void testMonitoredWrapper() throws Exception
+    {
+        QueuePersistenceObjectStore<Serializable> store = getObjectStore(); 
+        String id = UUID.getUUID();
+        QueueKey key = new QueueKey(QUEUE_NAME, id);
+        MuleMessage msg = new DefaultMuleMessage("Hello", mockMuleContext);
+        MuleEvent event = new DefaultMuleEvent(msg, MessageExchangePattern.ONE_WAY, new DefaultMuleSession(mockMuleContext));
+
+        ListableObjectStore<Serializable> monitored = new MonitoredObjectStoreWrapper(store);
+        monitored.store(key, event);
+        MonitoredObjectStoreWrapper.StoredObject  retrieved = (MonitoredObjectStoreWrapper.StoredObject) store.retrieve(key);
+        Object item = retrieved.getItem();
+        assertTrue(item instanceof MuleEvent);
+        MuleEvent newEvent = (MuleEvent) item;
+        MuleMessage newMessage = newEvent.getMessage();
+        assertNotNull(newMessage);
+        assertEquals(mockMuleContext, newMessage.getMuleContext());
+        assertEquals("Hello", newMessage.getPayload());
     }
 
     private File createAndPopulateStoreFile(String id, String payload) throws IOException
