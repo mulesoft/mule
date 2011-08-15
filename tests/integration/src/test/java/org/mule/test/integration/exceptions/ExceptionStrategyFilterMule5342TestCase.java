@@ -11,28 +11,34 @@
 package org.mule.test.integration.exceptions;
 
 import org.mule.api.MuleMessage;
+import org.mule.api.client.MuleClient;
 import org.mule.api.routing.filter.Filter;
 import org.mule.api.routing.filter.FilterUnacceptedException;
 import org.mule.api.transport.DispatchException;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.util.ExceptionUtils;
 
-public class ExceptionStrategyFilterTestCase extends FunctionalTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertTrue;
+
+public class ExceptionStrategyFilterMule5342TestCase extends FunctionalTestCase
 {
     @Override
     protected String getConfigResources()
     {
-        return "org/mule/test/integration/exceptions/exception-strategy-filter.xml";
+        return "org/mule/test/integration/exceptions/exception-strategy-filter-mule-5342.xml";
     }
 
-    public void testExceptionThrownFromMessageFilterIsSeenBySender() throws Exception
+    @Test
+    public void exceptionThrownFromMessageFilterIsHandledByExceptionHandler() throws Exception
     {
         try
         {
-            muleContext.getClient().send("vm://in", TEST_MESSAGE, null);
-            fail("Message Filter should have thrown FilterUnacceptedException");
+            MuleClient client = muleContext.getClient();
+            client.send("vm://in", TEST_MESSAGE, null);
         }
-        catch(DispatchException e)
+        catch (DispatchException e)
         {
             assertThatRootCauseIsFilterUnacceptedException(e);
         }
