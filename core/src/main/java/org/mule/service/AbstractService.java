@@ -419,6 +419,7 @@ public abstract class AbstractService implements Service, MessageProcessor, Anno
         try
         {
             buildServiceMessageProcessorChain();
+            injectFlowConstructMuleContext(messageProcessorChain);
         }
         catch (MuleException e)
         {
