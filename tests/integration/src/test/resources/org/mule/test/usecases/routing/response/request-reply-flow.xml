@@ -17,7 +17,7 @@
     <flow name="main">
         <vm:inbound-endpoint path="input"/>
         <test:component appendString="-out"/>
-        <request-reply>
+        <request-reply storePrefix="foo" >
             <vm:outbound-endpoint path="request"/>
             <vm:inbound-endpoint path="reply">
                 <logger level="ERROR" message="Got to inbound endpoint: #[payload]"/>

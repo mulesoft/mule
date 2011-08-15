@@ -32,6 +32,7 @@ import org.mule.api.store.ObjectStoreManager;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.context.notification.RoutingNotification;
 import org.mule.routing.EventGroup;
+import org.mule.routing.EventProcessingThread;
 import org.mule.util.StringMessageUtils;
 import org.mule.util.concurrent.ThreadNameHelper;
 import org.mule.util.monitor.Expirable;
@@ -479,16 +480,15 @@ public class EventCorrelator implements Startable, Stoppable
         }
     }
 
-    private final class ExpiringGroupMonitoringThread extends Thread implements Expirable
+    private final class ExpiringGroupMonitoringThread extends EventProcessingThread implements Expirable
     {
         private ExpiryMonitor expiryMonitor;
-
-        private volatile boolean stopRequested;
+        public static final long DELAY_TIME =  10;
 
         public ExpiringGroupMonitoringThread()
         {
-            setName(name);
-            this.expiryMonitor = new ExpiryMonitor(name, 1000 * 60);
+            super(name, DELAY_TIME);
+            this.expiryMonitor = new ExpiryMonitor(name, 1000 * 60, muleContext, true);
             // clean up every 30 minutes
             this.expiryMonitor.addExpirable(1000 * 60 * 30, TimeUnit.MILLISECONDS, this);
         }
@@ -519,84 +519,41 @@ public class EventCorrelator implements Startable, Stoppable
             }
         }
 
-        public void release()
+        public void doRun()
         {
-            // no op
-        }
-
-        public void run()
-        {
-            while (true)
-            {
-                if (stopRequested)
-                {
-                    logger.debug("Received request to stop expiring group monitoring");
-                    break;
-                }
-
-                List<EventGroup> expired = new ArrayList<EventGroup>(1);
-                try
-                {
-                    for (Serializable o : eventGroups.allKeys())
-                    {
-                        EventGroup group = (EventGroup) eventGroups.retrieve(o);
-                        if ((group.getCreated() + getTimeout() * MILLI_TO_NANO_MULTIPLIER) < System.nanoTime())
-                        {
-                            expired.add(group);
-                        }
-                    }
-                }
-                catch (ObjectStoreException e)
-                {
-                    logger.warn("expiry failed dues to ObjectStoreException " + e);
-                }
-                if (expired.size() > 0)
-                {
-                    for (Object anExpired : expired)
-                    {
-                        EventGroup group = (EventGroup) anExpired;
-                        try
-                        {
-                            handleGroupExpiry(group);
-                        }
-                        catch (MessagingException e)
-                        {
-                            e.getEvent()
-                                .getFlowConstruct()
-                                .getExceptionListener()
-                                .handleException(e, e.getEvent());
-                        }
-                    }
-                }
-
-                try
-                {
-                    Thread.sleep(100);
-                }
-                catch (InterruptedException e)
-                {
-                    break;
-                }
-            }
-
-            logger.debug("Expiring group monitoring fully stopped");
-        }
-
-        /**
-         * Stops the monitoring of the expired groups.
-         */
-        public void stopProcessing()
-        {
-            logger.debug("Stopping expiring group monitoring");
-            stopRequested = true;
-
+            List<EventGroup> expired = new ArrayList<EventGroup>(1);
             try
             {
-                this.join();
+                for (Serializable o : eventGroups.allKeys())
+                {
+                    EventGroup group = (EventGroup) eventGroups.retrieve(o);
+                    if ((group.getCreated() + getTimeout() * MILLI_TO_NANO_MULTIPLIER) < System.nanoTime())
+                    {
+                        expired.add(group);
+                    }
+                }
             }
-            catch (InterruptedException e)
+            catch (ObjectStoreException e)
             {
-                // Ignoring
+                logger.warn("expiry failed dues to ObjectStoreException " + e);
+            }
+            if (expired.size() > 0)
+            {
+                for (Object anExpired : expired)
+                {
+                    EventGroup group = (EventGroup) anExpired;
+                    try
+                    {
+                        handleGroupExpiry(group);
+                    }
+                    catch (MessagingException e)
+                    {
+                        e.getEvent()
+                            .getFlowConstruct()
+                            .getExceptionListener()
+                            .handleException(e, e.getEvent());
+                    }
+                }
             }
         }
     }

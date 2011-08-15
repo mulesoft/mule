@@ -105,6 +105,7 @@ public class SimpleAsyncRequestReplyRequester extends AbstractAsyncRequestReplyR
                 ((Startable) requestMessageProcessor).start();
             }
         }
+        super.start();
     }
 
     public void stop() throws MuleException
@@ -129,6 +130,7 @@ public class SimpleAsyncRequestReplyRequester extends AbstractAsyncRequestReplyR
                 ((Disposable) requestMessageProcessor).dispose();
             }
         }
+        super.stop();
     }
 
     @Override

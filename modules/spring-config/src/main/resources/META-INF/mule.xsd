@@ -735,6 +735,13 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
+                <xsd:attribute name="storePrefix" type="substitutableName">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Defines the prefix of the object store names.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>

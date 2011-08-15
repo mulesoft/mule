@@ -11,11 +11,14 @@
 package org.mule.routing.requestreply;
 
 import org.mule.MessageExchangePattern;
+import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
+import org.mule.api.config.MuleProperties;
 import org.mule.api.context.WorkManager;
 import org.mule.api.context.WorkManagerSource;
 import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.processor.RequestReplyRequesterMessageProcessor;
 import org.mule.api.routing.ResponseTimeoutException;
 import org.mule.api.service.Service;
@@ -24,10 +27,12 @@ import org.mule.tck.SensingNullMessageProcessor;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.beans.ExceptionListener;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.resource.spi.work.Work;
 
 import org.junit.Test;
+import org.mule.util.store.MuleObjectStoreManager;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -36,10 +41,31 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
     implements ExceptionListener
 {
 
+    TestAsyncRequestReplyRequester asyncReplyMP;
+
+    @Override
+    protected void doSetUp() throws Exception
+    {
+        super.doSetUp();
+        muleContext.getRegistry().registerObject(MuleProperties.OBJECT_STORE_MANAGER, new MuleObjectStoreManager());
+    }
+
+
+    @Override
+    protected void doTearDown() throws Exception
+    {
+        if (asyncReplyMP != null)
+        {
+            asyncReplyMP.stop();
+            asyncReplyMP.dispose();
+        }
+        super.doTearDown();
+    }
+
     @Test
     public void testSingleEventNoTimeout() throws Exception
     {
-        TestAsyncRequestReplyRequester asyncReplyMP = new TestAsyncRequestReplyRequester();
+        asyncReplyMP = new TestAsyncRequestReplyRequester(muleContext);
         SensingNullMessageProcessor target = getSensingNullMessageProcessor();
 
         asyncReplyMP.setListener(target);
@@ -57,7 +83,7 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
     @Test
     public void testSingleEventNoTimeoutAsync() throws Exception
     {
-        TestAsyncRequestReplyRequester asyncReplyMP = new TestAsyncRequestReplyRequester();
+        asyncReplyMP = new TestAsyncRequestReplyRequester(muleContext);
         SensingNullMessageProcessor target = getSensingNullMessageProcessor();
         LaxAsyncInterceptingMessageProcessor asyncMP = new LaxAsyncInterceptingMessageProcessor(
             new WorkManagerSource()
@@ -86,7 +112,7 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
     @Test
     public void testSingleEventTimeout() throws Exception
     {
-        TestAsyncRequestReplyRequester asyncReplyMP = new TestAsyncRequestReplyRequester();
+        asyncReplyMP = new TestAsyncRequestReplyRequester(muleContext);
         asyncReplyMP.setTimeout(1);
         SensingNullMessageProcessor target = getSensingNullMessageProcessor();
         target.setWaitTime(50);
@@ -122,7 +148,7 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
     @Test
     public void testMultiple() throws Exception
     {
-        final TestAsyncRequestReplyRequester asyncReplyMP = new TestAsyncRequestReplyRequester();
+        asyncReplyMP = new TestAsyncRequestReplyRequester(muleContext);
         SensingNullMessageProcessor target = getSensingNullMessageProcessor();
         target.setWaitTime(50);
         LaxAsyncInterceptingMessageProcessor asyncMP = new LaxAsyncInterceptingMessageProcessor(
@@ -143,6 +169,7 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
         final InboundEndpoint inboundEndpoint = getTestInboundEndpoint(MessageExchangePattern.ONE_WAY);
         final Service service = getTestService();
 
+        final AtomicInteger count = new AtomicInteger();
         for (int i = 0; i < 500; i++)
         {
             muleContext.getWorkManager().scheduleWork(new Work()
@@ -158,6 +185,8 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
                         // Can't assert same because we copy event for async currently
                         assertEquals(event.getMessageAsString(), resultEvent.getMessageAsString());
                         assertEquals(event.getMessage().getUniqueId(), resultEvent.getMessage().getUniqueId());
+                        count.incrementAndGet();
+                        logger.debug("Finished " + count.get());
                     }
                     catch (Exception e)
                     {
@@ -171,6 +200,10 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
                 }
             });
         }
+        while (count.get() < 500)
+        {
+            Thread.sleep(10);
+        }
     }
 
     public void exceptionThrown(Exception e)
@@ -181,6 +214,11 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
 
     class TestAsyncRequestReplyRequester extends AbstractAsyncRequestReplyRequester
     {
-        // no custom methods
+        TestAsyncRequestReplyRequester(MuleContext muleContext) throws MuleException
+        {
+            setMuleContext(muleContext);
+            initialise();
+            start();
+        }
     }
 }

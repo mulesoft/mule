@@ -15,43 +15,67 @@ import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessageCollection;
+import org.mule.api.config.MuleProperties;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.construct.FlowConstructAware;
+import org.mule.api.lifecycle.Disposable;
+import org.mule.api.lifecycle.Initialisable;
+import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.lifecycle.Startable;
+import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.RequestReplyRequesterMessageProcessor;
 import org.mule.api.routing.ResponseTimeoutException;
 import org.mule.api.source.MessageSource;
+import org.mule.api.store.ListableObjectStore;
+import org.mule.api.store.ObjectStore;
+import org.mule.api.store.ObjectStoreException;
+import org.mule.api.store.ObjectStoreManager;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.context.notification.RoutingNotification;
 import org.mule.processor.AbstractInterceptingMessageProcessor;
 import org.mule.processor.AbstractInterceptingMessageProcessorBase;
+import org.mule.routing.EventProcessingThread;
 import org.mule.util.ObjectUtils;
 import org.mule.util.concurrent.Latch;
 
+import java.io.Serializable;
+import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.collections.buffer.BoundedFifoBuffer;
+import org.mule.util.concurrent.ThreadNameHelper;
 
 public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterceptingMessageProcessorBase
-    implements RequestReplyRequesterMessageProcessor, FlowConstructAware
+    implements RequestReplyRequesterMessageProcessor, FlowConstructAware, Initialisable, Startable, Stoppable, Disposable
 {
     public static final int MAX_PROCESSED_GROUPS = 50000;
+    public static final int UNCLAIMED_TIME_TO_LIVE = 60000;
+    public static int UNCLAIMED_INTERVAL = 60000;
 
+
+    public static final String NAME_TEMPLATE = "%s.%s.%s.asyncReplies";
+    protected String name;
+    
     protected volatile long timeout = -1;
     protected volatile boolean failOnTimeout = true;
     protected MessageSource replyMessageSource;
     protected FlowConstruct flowConstruct;
     private final MessageProcessor internalAsyncReplyMessageProcessor = new InternalAsyncReplyMessageProcessor();
-
+    private AsyncReplyMonitoringThread replyThread;
     protected final Map<String, Latch> locks = new ConcurrentHashMap<String, Latch>();
+    private String storePrefix = "";
 
     protected final ConcurrentMap<String, MuleEvent> responseEvents = new ConcurrentHashMap<String, MuleEvent>();
     protected final Object processedLock = new Object();
     // @GuardedBy processedLock
     protected final BoundedFifoBuffer processed = new BoundedFifoBuffer(MAX_PROCESSED_GROUPS);
+
+    protected ListableObjectStore store;
 
     @Override
     public MuleEvent process(MuleEvent event) throws MuleException
@@ -86,6 +110,54 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
         verifyReplyMessageSource(messageSource);
         replyMessageSource = messageSource;
         messageSource.setListener(internalAsyncReplyMessageProcessor);
+    }
+
+    @Override
+    public void initialise() throws InitialisationException
+    {
+        name = String.format(NAME_TEMPLATE, storePrefix, ThreadNameHelper.getPrefix(muleContext),
+            flowConstruct == null ? "" : flowConstruct.getName());
+        store = ((ObjectStoreManager) muleContext.getRegistry().
+            get(MuleProperties.OBJECT_STORE_MANAGER)).
+            getObjectStore(name, false, MAX_PROCESSED_GROUPS, UNCLAIMED_TIME_TO_LIVE, UNCLAIMED_INTERVAL);
+    }
+
+    @Override
+    public void start() throws MuleException
+    {
+        replyThread = new AsyncReplyMonitoringThread(name);
+        replyThread.start();
+    }
+
+    @Override
+    public void stop() throws MuleException
+    {
+        if (replyThread != null)
+        {
+            replyThread.stopProcessing();
+        }
+    }
+
+    @Override
+    public void dispose()
+    {
+        if (store != null)
+        {
+            try
+            {
+                ((ObjectStoreManager) muleContext.getRegistry().
+                    get(MuleProperties.OBJECT_STORE_MANAGER)).disposeStore(store);
+            }
+            catch (ObjectStoreException e)
+            {
+                logger.debug("Exception disposingg of store", e);
+            }
+        }
+    }
+
+    public void setStorePrefix(String storePrefix)
+    {
+        this.storePrefix = storePrefix;
     }
 
     protected void verifyReplyMessageSource(MessageSource messageSource)
@@ -139,6 +211,7 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
             if (!resultAvailable)
             {
                 postLatchAwait(asyncReplyCorrelationId);
+                asyncReplyLatch.await(1000, TimeUnit.MILLISECONDS);
                 resultAvailable = asyncReplyLatch.getCount() == 0;
             }
         }
@@ -226,41 +299,8 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
         public MuleEvent process(MuleEvent event) throws MuleException
         {
             String messageId = getAsyncReplyCorrelationId(event);
-
-            if (isAlreadyProcessed(messageId))
-            {
-                if (logger.isDebugEnabled())
-                {
-                    logger.debug("An event was received for an event group that has already been processed, "
-                                 + "this is probably because the async-reply timed out. Correlation Id is: "
-                                 + messageId + ". Dropping event");
-                }
-                // Fire a notification to say we received this message
-                event.getMuleContext().fireNotification(
-                    new RoutingNotification(event.getMessage(), event.getMessageSourceURI().toString(),
-                        RoutingNotification.MISSED_ASYNC_REPLY));
-                return null;
-            }
-
-            addProcessed(messageId);
-            MuleEvent previousResult = responseEvents.putIfAbsent(messageId, event);
-            if (previousResult != null)
-            {
-                // this would indicate that we need a better way to prevent
-                // continued aggregation for a group that is currently being
-                // processed. Can this actually happen?
-                throw new IllegalStateException("Detected duplicate result message with id: " + messageId);
-            }
-            Latch l = locks.get(messageId);
-            if (l != null)
-            {
-                l.countDown();
-            }
-            else
-            {
-                logger.warn("Unexpected  message with id " + messageId
-                            + " received.   This message will be discarded.");
-            }
+            store.store(messageId, event);
+            replyThread.processNow();
             return null;
         }
     }
@@ -275,5 +315,78 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
     public void setFlowConstruct(FlowConstruct flowConstruct)
     {
         this.flowConstruct = flowConstruct;
+    }
+
+    private class AsyncReplyMonitoringThread extends EventProcessingThread
+    {
+        AsyncReplyMonitoringThread(String name)
+        {
+            super(name, 100);
+        }
+
+        @Override
+        protected void doRun()
+        {
+            try
+            {
+                List<Serializable> ids = store.allKeys();
+                logger.debug("Found " + ids.size() + " objects in store");
+                for (Serializable id : ids)
+                {
+                    try
+                    {
+                        boolean deleteEvent = false;
+                        String correlationId = (String) id;
+
+                        if (isAlreadyProcessed(correlationId))
+                        {
+                            deleteEvent = true;
+                            MuleEvent event = (MuleEvent) store.retrieve(correlationId);
+                            if (logger.isDebugEnabled())
+                            {
+                                logger.debug("An event was received for an event group that has already been processed, "
+                                    + "this is probably because the async-reply timed out. Correlation Id is: "
+                                    + correlationId + ". Dropping event");
+                            }
+                            // Fire a notification to say we received this message
+                            event.getMuleContext().fireNotification(
+                                new RoutingNotification(event.getMessage(), event.getMessageSourceURI().toString(),
+                                    RoutingNotification.MISSED_ASYNC_REPLY));
+                        }
+                        else
+                        {
+                            Latch l = locks.get(correlationId);
+                            if (l != null)
+                            {
+                                MuleEvent event = (MuleEvent) store.retrieve(correlationId);
+                                MuleEvent previousResult = responseEvents.putIfAbsent(correlationId, event);
+                                if (previousResult != null)
+                                {
+                                    // this would indicate that we need a better way to prevent
+                                    // continued aggregation for a group that is currently being
+                                    // processed. Can this actually happen?
+                                    throw new IllegalStateException("Detected duplicate result message with id: " + correlationId);
+                                }
+                                addProcessed(correlationId);
+                                deleteEvent = true;
+                                l.countDown();
+                            }
+                        }
+                        if (deleteEvent)
+                        {
+                            store.remove(correlationId);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        logger.debug("Error processing async replies", ex);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.debug("Error processing async replies", ex);
+            }
+        }
     }
 }
