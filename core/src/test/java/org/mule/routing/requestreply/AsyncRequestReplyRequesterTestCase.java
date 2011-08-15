@@ -115,7 +115,7 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
         asyncReplyMP = new TestAsyncRequestReplyRequester(muleContext);
         asyncReplyMP.setTimeout(1);
         SensingNullMessageProcessor target = getSensingNullMessageProcessor();
-        target.setWaitTime(50);
+        target.setWaitTime(3000);
         LaxAsyncInterceptingMessageProcessor asyncMP = new LaxAsyncInterceptingMessageProcessor(
             new WorkManagerSource()
             {
