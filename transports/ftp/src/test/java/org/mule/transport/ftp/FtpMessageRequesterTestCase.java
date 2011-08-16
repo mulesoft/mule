@@ -12,6 +12,7 @@ package org.mule.transport.ftp;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
@@ -47,6 +48,10 @@ public class FtpMessageRequesterTestCase extends AbstractFtpServerTestCase
         MuleMessage message = client.request(getMuleFtpEndpoint(), getTimeout());
         assertNotNull(message);
         assertEquals(TEST_MESSAGE, message.getPayloadAsString());
+
+        // verify that the file was deleted
+        MuleMessage message2 = client.request(getMuleFtpEndpoint(), getTimeout());
+        assertNull(message2);
     }
 }
 
