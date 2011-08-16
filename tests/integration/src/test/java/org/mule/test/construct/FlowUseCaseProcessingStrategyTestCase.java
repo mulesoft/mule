@@ -40,7 +40,7 @@ public class FlowUseCaseProcessingStrategyTestCase extends FunctionalTestCase
     }
 
     @Test
-    public void testExceptionSyncStrategy() throws MuleException
+    public void testHTTPStatusCodeExceptionSyncStrategy() throws MuleException
     {
         MuleClient client = muleContext.getClient();
         MuleMessage exception = client.send("http://localhost:" + dynamicPort.getNumber(), null, null);
