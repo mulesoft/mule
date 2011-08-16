@@ -579,6 +579,14 @@ public class FlowConfigurationFunctionalTestCase extends FunctionalTestCase
         assertEquals("pollappendout", message.getPayloadAsString());
     }
 
+    @Test
+    public void testSubFlowMessageFilter() throws Exception
+    {
+        muleContext.getClient().dispatch("vm://messagefiltersubflow-in", new DefaultMuleMessage("0", muleContext));
+        MuleMessage message  = muleContext.getClient().request("vm://messagefiltersubflow-out", 5000);
+        assertNotNull(message);
+    }
+    
     public static class ThreadSensingMessageProcessor implements MessageProcessor
     {
         @Override

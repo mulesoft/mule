@@ -386,9 +386,20 @@
         <append-string-transformer message="out" />
         <vm:outbound-endpoint path="poll2-out"/>
     </flow>
+
+    <flow name="messageFilterSubFlow">
+        <vm:inbound-endpoint path="messagefiltersubflow-in" exchange-pattern="one-way"/>
+        <message-filter onUnaccepted="invokedByMessageFilter">
+            <expression-filter expression="false" evaluator="groovy"/>
+        </message-filter>
+    </flow>
      
     <sub-flow name="pollappend">
         <append-string-transformer message="pollappend" />
+    </sub-flow>
+
+    <sub-flow name="invokedByMessageFilter">
+        <vm:outbound-endpoint path="messagefiltersubflow-out" exchange-pattern="one-way"/>
     </sub-flow>
 
     <flow name="customRouter">
