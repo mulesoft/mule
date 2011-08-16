@@ -21,14 +21,17 @@ import javax.jms.Session;
 
 public class WebsphereTransactedJmsMessageReceiver extends XaTransactedJmsMessageReceiver
 {
-    public WebsphereTransactedJmsMessageReceiver(Connector connector, FlowConstruct flowConstruct, 
+    public WebsphereTransactedJmsMessageReceiver(Connector connector, FlowConstruct flowConstruct,
         InboundEndpoint endpoint) throws InitialisationException, CreateException
     {
         super(connector, flowConstruct, endpoint);
     }
-    
+
+    @Override
     protected void doConnect() throws Exception
     {
+        super.doConnect();
+
         if (connector.isConnected() && connector.isEagerConsumer())
         {
             createConsumer();
@@ -36,7 +39,7 @@ public class WebsphereTransactedJmsMessageReceiver extends XaTransactedJmsMessag
 
         // TODO make it configurable. This connection blip is killing performance with WMQ, session create() and close()
         // are the heaviest operations there, synchronizing on a global QM for this machine
-        // MULE-1150 check whether mule is really connected    
+        // MULE-1150 check whether mule is really connected
         if (connector.isConnected() && !this.connected.get() && connector.getSessionFromTransaction() == null)
         {
             // check connection by creating session
