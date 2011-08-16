@@ -9,6 +9,7 @@
  */
 package org.mule.transport.servlet.jetty.util;
 
+import org.mortbay.jetty.Connector;
 import org.mule.api.MuleContext;
 import org.mule.api.config.MuleProperties;
 
@@ -29,17 +30,23 @@ public class EmbeddedJettyServer
 
     public EmbeddedJettyServer(int port, String contextPath, String servletPath, Servlet servlet, final MuleContext context)
     {
-         httpServer = new Server(port);
-
+        httpServer = new Server(port);
+        for (Connector connector : httpServer.getConnectors())
+        {
+            connector.setHeaderBufferSize(16384);
+        }
         Context c = new Context(httpServer, contextPath, Context.SESSIONS);
         c.addServlet(new ServletHolder(servlet), servletPath);
-        c.addEventListener(new ServletContextListener() {
+        c.addEventListener(new ServletContextListener()
+        {
             public void contextInitialized(ServletContextEvent sce)
             {
                 sce.getServletContext().setAttribute(MuleProperties.MULE_CONTEXT_PROPERTY, context);
             }
 
-            public void contextDestroyed(ServletContextEvent sce) { }
+            public void contextDestroyed(ServletContextEvent sce)
+            {
+            }
         });
     }
 

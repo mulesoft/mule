@@ -10,9 +10,10 @@
 
 package org.mule.module.jaas;
 
+import java.io.Serializable;
 import java.security.Principal;
 
-public class MuleJaasPrincipal implements Principal
+public class MuleJaasPrincipal implements Principal, Serializable
 {
     private final String name;
 

@@ -114,8 +114,14 @@ public class HttpConstants
     // Chunked transfer encoding indicator
     public static final String TRANSFER_ENCODING_CHUNKED = "chunked";
 
+    // Custom http header prefix
+    public static final String CUSTOM_HEADER_PREFIX = "X-";
+
     // Key for X-MULE headers
-    public static final String X_PROPERTY_PREFIX = "X-" + MuleProperties.PROPERTY_PREFIX;
+    public static final String X_PROPERTY_PREFIX = CUSTOM_HEADER_PREFIX + MuleProperties.PROPERTY_PREFIX;
+
+    // Custom mule http header
+    public static final String HEADER_MULE_SESSION = CUSTOM_HEADER_PREFIX + MuleProperties.MULE_SESSION_PROPERTY;
 
     // case-insenitive Maps of header names to their normalized representations
     public static final Map<String, String> REQUEST_HEADER_NAMES;

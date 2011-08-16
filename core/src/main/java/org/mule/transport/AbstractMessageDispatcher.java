@@ -11,9 +11,11 @@
 package org.mule.transport;
 
 import org.mule.DefaultMuleEvent;
+import org.mule.RequestContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
+import org.mule.api.MuleSession;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.context.WorkManager;
 import org.mule.api.endpoint.OutboundEndpoint;
@@ -71,12 +73,18 @@ public abstract class AbstractMessageDispatcher extends AbstractTransportMessage
                 applyOutboundTransformers(event);            
             }
             boolean hasResponse = endpoint.getExchangePattern().hasResponse();
-            if (hasResponse)            
+
+            connector.getSessionHandler().storeSessionInfoToMessage(event.getSession(),event.getMessage());
+
+            if (hasResponse)
             {
                 MuleMessage resultMessage = doSend(event);
                 if (resultMessage != null)
                 {
+                    MuleSession storedSession = connector.getSessionHandler().retrieveSessionInfoFromMessage(resultMessage);
+                    event.getSession().merge(storedSession);
                     resultEvent = new DefaultMuleEvent(resultMessage, event);
+                    RequestContext.setEvent(resultEvent);
                     // TODO It seems like this should go here but it causes unwanted behaviour and breaks test cases.
                     //if (!disableTransportTransformer)
                     //{

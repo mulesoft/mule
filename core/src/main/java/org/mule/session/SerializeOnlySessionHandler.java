@@ -10,6 +10,7 @@
 
 package org.mule.session;
 
+import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
@@ -54,7 +55,7 @@ public class SerializeOnlySessionHandler implements SessionHandler
 
     public void storeSessionInfoToMessage(MuleSession session, MuleMessage message) throws MuleException
     {
-        byte[] serializedSession = SerializationUtils.serialize(removeNonSerializableProperties(session));
+        byte[] serializedSession = SerializationUtils.serialize(removeNonSerializableProperties(session,message.getMuleContext()));
         
         if (logger.isDebugEnabled())
         {
@@ -63,19 +64,20 @@ public class SerializeOnlySessionHandler implements SessionHandler
         message.setOutboundProperty(MuleProperties.MULE_SESSION_PROPERTY, serializedSession);
     }
     
-    protected MuleSession removeNonSerializableProperties(MuleSession session)
+    protected MuleSession removeNonSerializableProperties(final MuleSession session, final MuleContext muleContext)
     {
-        for (String key : session.getPropertyNamesAsSet())
+        MuleSession copy = new DefaultMuleSession(session, muleContext);
+        for (String key : copy.getPropertyNamesAsSet())
         {
-            final Object value = session.getProperty(key);
+            final Object value = copy.getProperty(key);
             if (!(value instanceof Serializable))
             {
                 logger.warn(String.format("Property %s is not serializable, it will not be preserved " +
                                           "as part of the MuleSession", key));
-                session.removeProperty(key);
+                copy.removeProperty(key);
             }
         }
-        return session;
+        return copy;
     }
     
     /**
