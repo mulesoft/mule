@@ -10,10 +10,6 @@
 
 package org.mule.tck.probe;
 
-/**
- * Implements {@link Prober} using a polling mechanism that evaluates
- * a {@link Probe} until is satisfied or a timeout is reached.
- */
 public class PollingProber implements Prober
 {
 
@@ -47,8 +43,6 @@ public class PollingProber implements Prober
 
         while (true)
         {
-            waitFor(pollDelayMillis);
-            
             if (probe.isSatisfied())
             {
                 return true;
@@ -56,7 +50,11 @@ public class PollingProber implements Prober
             else if (timeout.hasTimedOut())
             {
                 return false;
-            }            
+            }
+            else
+            {
+                waitFor(pollDelayMillis);
+            }
         }
     }
 
