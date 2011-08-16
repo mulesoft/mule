@@ -3,13 +3,15 @@
       xmlns:http="http://www.mulesoft.org/schema/mule/http"
       xmlns:smtp="http://www.mulesoft.org/schema/mule/smtp"    
       xmlns:file="http://www.mulesoft.org/schema/mule/file"
+       xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
       xsi:schemaLocation="               
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd                              
                http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/3.2/mule-http.xsd
                http://www.mulesoft.org/schema/mule/smtp http://www.mulesoft.org/schema/mule/smtp/3.2/mule-smtp.xsd               
-               http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/3.2/mule-file.xsd">
+               http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/3.2/mule-file.xsd
+               http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.2/mule-vm.xsd">
 
-    <file:connector name="file" autoDelete="true"/>
+    <file:connector name="file" autoDelete="true" streaming="false"/>
 
     <smtp:endpoint name="smtpEndpoint" user="bob" password="" host="smtp.gmail.com" from="Bob" subject="exception"
                    to="exception@mulesoft.org"/>
@@ -20,11 +22,24 @@
         <smtp:outbound-endpoint ref="smtpEndpoint" />
     </flow>
 
-    <flow name="OneWayFile" processingStrategy="synchronous">
+    <flow name="FileSync" processingStrategy="synchronous">
         <file:inbound-endpoint path="./.mule">
-            <file:filename-wildcard-filter pattern="mule-file-test-*"/> 
+            <file:filename-wildcard-filter pattern="mule-file-test-sync-*"/> 
         </file:inbound-endpoint>
         <smtp:outbound-endpoint ref="smtpEndpoint" />
+        <default-exception-strategy>
+            <vm:outbound-endpoint path="exception"/>
+        </default-exception-strategy>
+    </flow>
+
+    <flow name="FileAsync">
+        <file:inbound-endpoint path="./.mule">
+            <file:filename-wildcard-filter pattern="mule-file-test-async-*"/> 
+        </file:inbound-endpoint>
+        <smtp:outbound-endpoint ref="smtpEndpoint" />
+        <default-exception-strategy>
+            <vm:outbound-endpoint path="exception"/>
+        </default-exception-strategy>
     </flow>
 
 </mule>

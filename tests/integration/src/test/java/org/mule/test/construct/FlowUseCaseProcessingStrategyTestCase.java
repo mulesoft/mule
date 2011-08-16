@@ -11,21 +11,20 @@
 package org.mule.test.construct;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
-import org.mule.tck.probe.PollingProber;
-import org.mule.tck.probe.Probe;
-import org.mule.tck.probe.Prober;
 import org.mule.util.IOUtils;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -49,34 +48,39 @@ public class FlowUseCaseProcessingStrategyTestCase extends FunctionalTestCase
         assertEquals("500", exception.getInboundProperty("http.status", "0"));        
     }
 
-    @Test
-    @Ignore
+    @Test    
     public void testFileAutoDeleteSyncStrategy() throws Exception
-    {
-        Prober prober = new PollingProber(10000, 5000);
+    {     
+        MuleClient client = muleContext.getClient();    
+        File tempFile = createTempFile("mule-file-test-sync-");        
+        client.request("vm://exception", 5000);       
+        
+        assertTrue(tempFile.exists());                
+    }
+    
+    @Test
+    public void testFileAutoDeleteAsyncStrategy() throws Exception
+    {  
+        MuleClient client = muleContext.getClient();   
+        File tempFile = createTempFile("mule-file-test-async-");
+        client.request("vm://exception", 5000);
+        
+        assertFalse(tempFile.exists());              
+    }
+    
+    private File createTempFile(String fileName) throws IOException
+    {        
         File directory = new File("./.mule");
-        final File file = File.createTempFile("mule-file-test-", ".txt", directory);       
+        File file = File.createTempFile(fileName, ".txt", directory);       
         file.deleteOnExit();
         FileOutputStream fos = new FileOutputStream(file);
         IOUtils.write("The quick brown fox jumps over the lazy dog", fos);
         IOUtils.closeQuietly(fos);
         
-        prober.check(new Probe()
-        {
-            @Override
-            public boolean isSatisfied()
-            {
-                return file.exists();
-            }
-
-            @Override
-            public String describeFailure()
-            {
-                return "File should still exist";
-            }
-        });                
+        return file;
     }
          
 }
+
 
 
