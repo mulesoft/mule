@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"                      
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:script="http://www.mulesoft.org/schema/mule/scripting"
+      xsi:schemaLocation="               
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd                                                           
+               http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.2/mule-vm.xsd                             
+               http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/3.2/mule-scripting.xsd">
+
+    <flow name="NestedFilters">
+        <vm:inbound-endpoint exchange-pattern="one-way" path="inFilter"/>
+        <and-filter>
+            <message-property-filter scope="inbound" pattern="Currency=MyCurrency"/>
+            <or-filter>
+                <not-filter>
+                    <message-property-filter scope="inbound" pattern="AcquirerCountry=MyCountry"/>
+                </not-filter>
+                <and-filter>
+                    <expression-filter expression="message.getInboundProperty('Amount').toInteger() &lt; 5000"
+                                       evaluator="groovy"/>
+                    <not-filter>
+                        <or-filter>
+                            <payload-type-filter expectedType="org.mule.tck.testmodels.fruit.Apple"/>
+                            <payload-type-filter expectedType="org.mule.transport.NullPayload"/>
+                        </or-filter>
+                    </not-filter>
+                </and-filter>
+            </or-filter>
+        </and-filter>
+        <vm:outbound-endpoint exchange-pattern="one-way" path="outFilter"/>
+    </flow>
+
+    <flow name="NestedChoice">
+        <vm:inbound-endpoint exchange-pattern="one-way" path="inChoice"/>
+        <choice>
+            <when evaluator="payload-type" expression="org.mule.tck.testmodels.fruit.Apple">
+                <script:transformer>
+                    <script:script engine="groovy">
+                        return ""
+                    </script:script>
+                </script:transformer>
+                <append-string-transformer message="A"/>
+                <choice>
+                    <when evaluator="header" expression="INBOUND:AcquirerCountry=MyCountry">
+                        <append-string-transformer message="B"/>
+                        <choice>
+                            <when evaluator="groovy" expression="message.getInboundProperty('Amount').toInteger() &lt; 5000">
+                                <append-string-transformer message="C"/>
+                                <vm:outbound-endpoint exchange-pattern="one-way" path="outChoice"/>
+                            </when>
+                            <otherwise>
+                                <vm:outbound-endpoint exchange-pattern="one-way" path="outChoice"/>
+                            </otherwise>
+                        </choice>
+                    </when>
+                </choice>
+            </when>
+            <otherwise>
+                <vm:outbound-endpoint exchange-pattern="one-way" path="outChoice"/>
+            </otherwise>
+        </choice>
+    </flow>              
+</mule>
