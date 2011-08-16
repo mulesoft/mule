@@ -1793,11 +1793,7 @@
                     <xsd:element ref="abstract-message-info-mapping" minOccurs="0">
                         <xsd:annotation>
                             <xsd:documentation>
-                                The message info mapper used to extract key bits of the message
-                                information, such as Message ID or Correlation ID. these
-                                properties
-                                are used by some routers and this mapping information tells Mule
-                                where to get the information from in the current message.
+                                The message info mapper used to extract key bits of the message information, such as Message ID or Correlation ID. these properties are used by some routers and this mapping information tells Mule where to get the information from in the current message.
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:element>
