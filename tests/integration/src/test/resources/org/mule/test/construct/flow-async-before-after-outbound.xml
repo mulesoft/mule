@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:spring="http://www.springframework.org/schema/beans" xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+    xmlns:script="http://www.mulesoft.org/schema/mule/scripting"
+    xmlns:http="http://www.mulesoft.org/schema/mule/http"
+    xsi:schemaLocation="
+               http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
+               http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.2/mule-vm.xsd
+               http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/3.2/mule-scripting.xsd
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/3.2/mule-http.xsd">
+
+    <custom-processor name="threadSensingProcessor"
+        class="org.mule.test.construct.FlowAsyncBeforeAfterOutboundTestCase$ThreadSensingMessageProcessor" />
+
+    <flow name="test-async-block-before-outbound">
+
+        <vm:inbound-endpoint path="test.before.sync.in"
+            exchange-pattern="request-response" />
+
+        <async>
+            <flow-ref name="set-async-thread-property" />
+            <vm:outbound-endpoint path="test.before.async.out" />
+        </async>
+
+        <flow-ref name="set-rr-thread-property" />
+
+        <vm:outbound-endpoint path="test.before.out" />
+
+        <echo-component />
+
+    </flow>
+
+    <flow name="test-async-block-after-outbound">
+        <vm:inbound-endpoint path="test.after.sync.in"
+            exchange-pattern="request-response" />
+
+        <flow-ref name="set-rr-thread-property" />
+
+        <vm:outbound-endpoint path="test.after.out" />
+
+        <async>
+            <flow-ref name="set-async-thread-property" />
+            <vm:outbound-endpoint path="test.after.async.out" />
+        </async>       
+
+        <echo-component />
+    </flow>
+
+    <sub-flow name="set-rr-thread-property">
+        <message-properties-transformer
+            scope="invocation">
+            <add-message-property key="property-name"
+                value="request-response-thread" />
+        </message-properties-transformer>
+
+        <processor ref="threadSensingProcessor" />
+    </sub-flow>
+
+    <sub-flow name="set-async-thread-property">
+        <message-properties-transformer
+            scope="invocation">
+            <add-message-property key="property-name"
+                value="async-thread" />
+        </message-properties-transformer>
+
+        <processor ref="threadSensingProcessor" />
+    </sub-flow>
+
+</mule>
