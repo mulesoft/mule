@@ -10,7 +10,6 @@
 
 package org.mule.routing.correlation;
 
-import com.sun.org.apache.regexp.internal.RE;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleContext;
