@@ -10,10 +10,12 @@
 
 package org.mule.routing.correlation;
 
+import com.sun.org.apache.regexp.internal.RE;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
+import org.mule.api.ThreadSafeAccess;
 import org.mule.api.store.ObjectStoreException;
 import org.mule.routing.AggregationException;
 import org.mule.routing.EventGroup;
@@ -66,9 +68,20 @@ public class ResequenceMessagesCorrelatorCallback extends CollectionCorrelatorCa
         {
             throw new AggregationException(events, null, e);
         }
+        for (MuleEvent event : results)
+        {
+            System.out.println(event.getMessage().getCorrelationSequence() + ", " + event.getMessage().getPayload());
+        }
         Arrays.sort(results, eventComparator);
         // This is a bit of a hack since we return a collection of events on one
         // message
+        for (int i = 0; i < results.length; i++)
+        {
+            if (results[i] instanceof ThreadSafeAccess)
+            {
+                results[i] = (MuleEvent)((ThreadSafeAccess)results[i]).newThreadCopy();
+            }
+        }
         return new DefaultMuleEvent(new DefaultMuleMessage(results, muleContext), results[0]);
     }
 

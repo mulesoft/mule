@@ -15,11 +15,11 @@
     <flow name="splitter service">
         <vm:inbound-endpoint path="splitter" exchange-pattern="one-way"/>
         <collection-splitter/>
-        <vm:outbound-endpoint path="resequencer" exchange-pattern="request-response"/>
+        <vm:outbound-endpoint path="resequencer" exchange-pattern="one-way"/>
     </flow>
 
     <flow name="resequencer service">
-        <vm:inbound-endpoint path="resequencer" exchange-pattern="request-response"/>
+        <vm:inbound-endpoint path="resequencer" exchange-pattern="one-way"/>
         <resequencer/>
         <vm:outbound-endpoint path="sorted" exchange-pattern="request-response"/>
     </flow>
