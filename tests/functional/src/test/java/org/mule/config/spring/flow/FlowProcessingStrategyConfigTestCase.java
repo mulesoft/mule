@@ -36,30 +36,30 @@ public class FlowProcessingStrategyConfigTestCase extends FunctionalTestCase
     public void testDefault() throws Exception
     {
         assertEquals(DefaultFlowProcessingStrategy.class,
-            getFlowProcesingStrategy("defaultFlow").getClass());
+            getFlowProcessingStrategy("defaultFlow").getClass());
     }
 
     public void testSynchronous() throws Exception
     {
         assertEquals(SynchronousProcessingStrategy.class,
-            getFlowProcesingStrategy("synchronousFlow").getClass());
+            getFlowProcessingStrategy("synchronousFlow").getClass());
     }
 
     public void testAsynchronous() throws Exception
     {
         assertEquals(AsynchronousProcessingStrategy.class,
-            getFlowProcesingStrategy("asynchronousFlow").getClass());
+            getFlowProcessingStrategy("asynchronousFlow").getClass());
     }
 
     public void testQueuedAsynchronous() throws Exception
     {
         assertEquals(QueuedAsynchronousProcessingStrategy.class,
-            getFlowProcesingStrategy("queuedAsynchronousFlow").getClass());
+            getFlowProcessingStrategy("queuedAsynchronousFlow").getClass());
     }
 
     public void testCustomAsynchronous() throws Exception
     {
-        ProcessingStrategy processingStrategy = getFlowProcesingStrategy("customAsynchronousFlow");
+        ProcessingStrategy processingStrategy = getFlowProcessingStrategy("customAsynchronousFlow");
 
         assertEquals(AsynchronousProcessingStrategy.class, processingStrategy.getClass());
 
@@ -68,7 +68,7 @@ public class FlowProcessingStrategyConfigTestCase extends FunctionalTestCase
 
     public void testCustomQueuedAsynchronous() throws Exception
     {
-        ProcessingStrategy processingStrategy = getFlowProcesingStrategy("customQueuedAsynchronousFlow");
+        ProcessingStrategy processingStrategy = getFlowProcessingStrategy("customQueuedAsynchronousFlow");
 
         assertEquals(QueuedAsynchronousProcessingStrategy.class, processingStrategy.getClass());
 
@@ -83,7 +83,7 @@ public class FlowProcessingStrategyConfigTestCase extends FunctionalTestCase
 
     public void testCustom() throws Exception
     {
-        ProcessingStrategy processingStrategy = getFlowProcesingStrategy("customProcessingStrategyFlow");
+        ProcessingStrategy processingStrategy = getFlowProcessingStrategy("customProcessingStrategyFlow");
         assertEquals(CustomProcessingStrategy.class, processingStrategy.getClass());
 
         assertEquals("bar", (((CustomProcessingStrategy) processingStrategy).foo));
@@ -92,24 +92,24 @@ public class FlowProcessingStrategyConfigTestCase extends FunctionalTestCase
     public void testDefaultAsync() throws Exception
     {
         assertEquals(QueuedAsynchronousProcessingStrategy.class,
-            getAsyncProcesingStrategy("defaultAsync").getClass());
+            getAsyncProcessingStrategy("defaultAsync").getClass());
     }
 
     public void testAsynchronousAsync() throws Exception
     {
         assertEquals(AsynchronousProcessingStrategy.class,
-            getAsyncProcesingStrategy("asynchronousAsync").getClass());
+            getAsyncProcessingStrategy("asynchronousAsync").getClass());
     }
 
     public void testQueuedAsynchronousAsync() throws Exception
     {
         assertEquals(QueuedAsynchronousProcessingStrategy.class,
-            getAsyncProcesingStrategy("queuedAsynchronousAsync").getClass());
+            getAsyncProcessingStrategy("queuedAsynchronousAsync").getClass());
     }
 
     public void testCustomAsynchronousAsync() throws Exception
     {
-        ProcessingStrategy processingStrategy = getAsyncProcesingStrategy("customAsynchronousAsync");
+        ProcessingStrategy processingStrategy = getAsyncProcessingStrategy("customAsynchronousAsync");
 
         assertEquals(AsynchronousProcessingStrategy.class, processingStrategy.getClass());
 
@@ -118,7 +118,7 @@ public class FlowProcessingStrategyConfigTestCase extends FunctionalTestCase
 
     public void testCustomQueuedAsynchronousAsync() throws Exception
     {
-        ProcessingStrategy processingStrategy = getAsyncProcesingStrategy("customQueuedAsynchronousAsync");
+        ProcessingStrategy processingStrategy = getAsyncProcessingStrategy("customQueuedAsynchronousAsync");
 
         assertEquals(QueuedAsynchronousProcessingStrategy.class, processingStrategy.getClass());
 
@@ -133,7 +133,7 @@ public class FlowProcessingStrategyConfigTestCase extends FunctionalTestCase
 
     public void testCustomAsync() throws Exception
     {
-        ProcessingStrategy processingStrategy = getAsyncProcesingStrategy("customProcessingStrategyAsync");
+        ProcessingStrategy processingStrategy = getAsyncProcessingStrategy("customProcessingStrategyAsync");
         assertEquals(CustomProcessingStrategy.class, processingStrategy.getClass());
 
         assertEquals("bar", (((CustomProcessingStrategy) processingStrategy).foo));
@@ -148,13 +148,13 @@ public class FlowProcessingStrategyConfigTestCase extends FunctionalTestCase
 
     }
 
-    private ProcessingStrategy getFlowProcesingStrategy(String flowName) throws Exception
+    private ProcessingStrategy getFlowProcessingStrategy(String flowName) throws Exception
     {
         Flow flow = (Flow) getFlowConstruct(flowName);
         return flow.getProcessingStrategy();
     }
 
-    private ProcessingStrategy getAsyncProcesingStrategy(String flowName) throws Exception
+    private ProcessingStrategy getAsyncProcessingStrategy(String flowName) throws Exception
     {
         Flow flow = (Flow) getFlowConstruct(flowName);
         MessageProcessor processor = flow.getMessageProcessors().get(0);
