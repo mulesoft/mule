@@ -9,19 +9,17 @@
  */
 package org.mule.test.routing;
 
-import com.arjuna.ats.internal.jta.utils.arjunacore.StatusConverter;
-import org.junit.Test;
-import static org.junit.Assert.assertEquals;
-
-import org.mule.Echo;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
 
-import java.awt.dnd.MouseDragGestureRecognizer;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 public class RedeliveryPolicyTestCase extends FunctionalTestCase
 {
