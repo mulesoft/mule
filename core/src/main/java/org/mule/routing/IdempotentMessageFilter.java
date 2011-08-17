@@ -13,15 +13,19 @@ package org.mule.routing;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
+import org.mule.api.config.MuleProperties;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.construct.FlowConstructAware;
 import org.mule.api.expression.ExpressionManager;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.routing.RoutingException;
+import org.mule.api.store.ObjectAlreadyExistsException;
 import org.mule.api.store.ObjectStore;
+import org.mule.api.store.ObjectStoreManager;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.processor.AbstractFilteringMessageProcessor;
+import org.mule.util.concurrent.ThreadNameHelper;
 import org.mule.util.store.InMemoryObjectStore;
 
 import java.text.MessageFormat;
@@ -39,8 +43,8 @@ import java.text.MessageFormat;
 public class IdempotentMessageFilter extends AbstractFilteringMessageProcessor implements FlowConstructAware, Initialisable
 {
     protected volatile ObjectStore<String> store;
-    protected volatile String assignedComponentName;
     protected FlowConstruct flowConstruct;
+    protected String storePrefix;
 
     protected String idExpression = MessageFormat.format("{0}message:id{1}",
         ExpressionManager.DEFAULT_EXPRESSION_PREFIX, ExpressionManager.DEFAULT_EXPRESSION_POSTFIX);
@@ -56,6 +60,11 @@ public class IdempotentMessageFilter extends AbstractFilteringMessageProcessor i
     @Override
     public void initialise() throws InitialisationException
     {
+        if (storePrefix == null)
+        {
+            storePrefix = String.format("%s.%s.%s", ThreadNameHelper.getPrefix(muleContext),
+                (flowConstruct == null ? "" : flowConstruct.getName()), this.getClass().getName());
+        }
         if (store == null)
         {
             this.store = createMessageIdStore();
@@ -64,13 +73,9 @@ public class IdempotentMessageFilter extends AbstractFilteringMessageProcessor i
 
     protected ObjectStore<String> createMessageIdStore() throws InitialisationException
     {
-        InMemoryObjectStore<String> s = new InMemoryObjectStore<String>();
-        s.setName(assignedComponentName);
-        s.setMaxEntries(-1);
-        s.setEntryTTL(60 * 5 * 1000);
-        s.setExpirationInterval(6000);
-        s.initialise();
-        return s;
+        ObjectStoreManager objectStoreManager = (ObjectStoreManager) muleContext.getRegistry().get(
+                MuleProperties.OBJECT_STORE_MANAGER);
+        return objectStoreManager.getObjectStore(storePrefix, false, -1,  60 * 5 * 1000, 6000 );
     }
 
     @Override
@@ -80,12 +85,20 @@ public class IdempotentMessageFilter extends AbstractFilteringMessageProcessor i
         String value = getValueForEvent(event);
         try
         {
-            store.store(id, value);
+            try
+            {
+                store.store(id, value);
+            }
+            catch (ObjectAlreadyExistsException ex)
+            {
+                // another thread got in ahead of us
+                logger.debug("Possible duplicate message due to race condition: " + id);
+            }
             return super.processNext(event);
         }
         catch (Exception e)
         {
-            throw new RoutingException(CoreMessages.failedToWriteMessageToStore(id, assignedComponentName),
+            throw new RoutingException(CoreMessages.failedToWriteMessageToStore(id, storePrefix),
                 event, this, e);
         }
     }
@@ -135,7 +148,7 @@ public class IdempotentMessageFilter extends AbstractFilteringMessageProcessor i
         else
         {
             logger.error("This IdempotentMessageFilter was configured on the service: "
-                         + assignedComponentName + " but has received an event for service: "
+                         + storePrefix + " but has received an event for service: "
                          + flowConstruct.getName() + ". Please check your config to make sure each service"
                          + "has its own instance of IdempotentMessageFilter.");
             return false;
@@ -179,5 +192,10 @@ public class IdempotentMessageFilter extends AbstractFilteringMessageProcessor i
     public void setValueExpression(String valueExpression)
     {
         this.valueExpression = valueExpression;
+    }
+
+    public void setStorePrefix(String storePrefix)
+    {
+        this.storePrefix = storePrefix;
     }
 }

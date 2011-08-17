@@ -10,7 +10,7 @@
         http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd">
 
     <flow name="inMemoryStore">
-        <idempotent-message-filter>
+        <idempotent-message-filter idExpression="#[message:id]">
             <in-memory-store entryTTL="1000" expirationInterval="2000" maxEntries="3000"/>
         </idempotent-message-filter>
     </flow>

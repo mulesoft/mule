@@ -23,6 +23,7 @@ import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import com.mockobjects.dynamic.Mock;
 
 import org.junit.Test;
+import org.mule.util.store.InMemoryObjectStore;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -44,6 +45,8 @@ public class IdempotentMessageFilterTestCase extends AbstractMuleContextTestCase
         ir.setIdExpression("#[header:id]");
         ir.setFlowConstruct(service);
         ir.setThrowOnUnaccepted(false);
+        ir.setStorePrefix("foo");
+        ir.setStore(new InMemoryObjectStore<String>());
 
         MuleMessage okMessage = new DefaultMuleMessage("OK", muleContext);
         okMessage.setOutboundProperty("id", "1");

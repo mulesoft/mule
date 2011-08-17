@@ -23,6 +23,7 @@ import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import com.mockobjects.dynamic.Mock;
 
 import org.junit.Test;
+import org.mule.util.store.InMemoryObjectStore;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -46,6 +47,9 @@ public class IdempotentSecureHashMessageFilterTestCase extends AbstractMuleConte
         IdempotentSecureHashMessageFilter ir = new IdempotentSecureHashMessageFilter();
         ir.setFlowConstruct(service);
         ir.setThrowOnUnaccepted(false);
+        ir.setStorePrefix("foo");
+        ir.setStore(new InMemoryObjectStore<String>());
+
 
         MuleMessage okMessage = new DefaultMuleMessage("OK", muleContext);
         MuleEvent event = new DefaultMuleEvent(okMessage, endpoint1, (MuleSession) session.proxy());
