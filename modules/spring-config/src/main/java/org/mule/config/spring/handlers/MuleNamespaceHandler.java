@@ -129,6 +129,7 @@ import org.mule.object.PrototypeObjectFactory;
 import org.mule.object.SingletonObjectFactory;
 import org.mule.processor.InvokerMessageProcessor;
 import org.mule.processor.NullMessageProcessor;
+import org.mule.processor.RedeliveryPolicy;
 import org.mule.processor.strategy.AsynchronousProcessingStrategy;
 import org.mule.processor.strategy.QueuedAsynchronousProcessingStrategy;
 import org.mule.processor.strategy.QueuedThreadPerProcessorProcessingStrategy;
@@ -515,6 +516,8 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("first-successful", new ChildDefinitionParser("messageProcessor", FirstSuccessful.class));
         registerBeanDefinitionParser("until-successful", new ChildDefinitionParser("messageProcessor", UntilSuccessful.class));
         registerBeanDefinitionParser("round-robin", new ChildDefinitionParser("messageProcessor", RoundRobin.class));
+        registerBeanDefinitionParser("redelivery-policy", new ChildDefinitionParser("messageProcessor", RedeliveryPolicy.class));
+        registerBeanDefinitionParser("process-failed-message", new ChildDefinitionParser("failedMessageProcessor", MessageProcessorFilterPairFactoryBean.class));
 
         registerBeanDefinitionParser("custom-router", new ChildDefinitionParser("messageProcessor"));
 

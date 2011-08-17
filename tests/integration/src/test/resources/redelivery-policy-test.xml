@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xsi:schemaLocation="
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/3.2/mule-test.xsd
+        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.2/mule-vm.xsd
+        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd">
+
+    <flow name="success">
+        <vm:inbound-endpoint path="success" exchange-pattern="request-response"/>
+        <redelivery-policy>
+            <process-failed-message>
+                <outbound-endpoint address="vm://dead-letter-queue"/>
+            </process-failed-message>
+        </redelivery-policy>
+    </flow>
+
+    <flow name="limitedFailures">
+        <vm:inbound-endpoint path="limitedFailures" exchange-pattern="request-response"/>
+        <redelivery-policy>
+            <process-failed-message>
+                <outbound-endpoint address="vm://dead-letter-queue"/>
+            </process-failed-message>
+        </redelivery-policy>
+        <component class="org.mule.test.routing.RedeliveryPolicyTestCase$FailThree">
+        </component>
+    </flow>
+
+    <flow name="manyRealFailures">
+        <vm:inbound-endpoint path="manyRealFailures" exchange-pattern="request-response"/>
+        <redelivery-policy>
+            <process-failed-message>
+                <outbound-endpoint address="vm://dead-letter-queue"/>
+            </process-failed-message>
+        </redelivery-policy>
+        <component class="org.mule.test.routing.RedeliveryPolicyTestCase$FailThreeOrSeven">
+        </component>
+    </flow>
+</mule>

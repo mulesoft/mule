@@ -4937,6 +4937,77 @@
                     </xsd:annotation>
                 </xsd:attribute>
                 <xsd:attribute name="throwOnUnaccepted" type="substitutableBoolean" />
+                <xsd:attribute name="storePrefix" type="substitutableName">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Defines the prefix of the object store names.
+                        </xsd:documentation>
+                    </xsd:annotation>
+				</xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+        <xsd:element name="redelivery-policy" type="redeliveryPolicyType"
+                 substitutionGroup="abstract-message-processor">
+        <xsd:annotation>
+            <xsd:documentation>
+                Defines a policy for processing the redelivery of the same message
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="singleTarget">
+       <xsd:complexContent>
+            <xsd:extension base="abstractRoutingMessageProcessorType">
+                <xsd:sequence>
+                    <xsd:group ref="messageProcessorOrOutboundEndpoint" minOccurs="1" maxOccurs="1"/>
+                </xsd:sequence>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="redeliveryPolicyType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractMessageProcessorType">
+                <xsd:sequence>
+                    <xsd:element name="process-failed-message" type="singleTarget">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Message processor to call if a message exceeds its redelivery count without being processed successfully
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                </xsd:sequence>
+                <xsd:attribute name="maxRedeliveryCount" type="xsd:integer" default="5">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The maximum number of times a message can be redelivered and processed unsuccessfully before triggering
+                            process-failed-message
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="useSecureHash" type="xsd:boolean" default="true">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Whether to use a secure hash algorithm to identify a redelivered message
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="messageDigestAlgorithm" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The secure hashing algorithm to use. If not set, the default is SHA-256.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="idExpression" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Defines one or more expressions to use to determine when a message has been redelivered. For example,it would be possible to combine to headers as the unique ID of the message : '#[headers:foo,bar]'. Or, you could combine the message ID with a header: '#[message:id]-#[header:foo]'. This property may only be set if useSecureHash is false..
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
