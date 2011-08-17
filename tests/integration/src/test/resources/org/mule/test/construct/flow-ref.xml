@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:spring="http://www.springframework.org/schema/beans" xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+    xmlns:script="http://www.mulesoft.org/schema/mule/scripting"
+    xmlns:test="http://www.mulesoft.org/schema/mule/test"
+    xsi:schemaLocation="
+               http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
+               http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.2/mule-vm.xsd
+               http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/3.2/mule-scripting.xsd
+               http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/3.2/mule-test.xsd">
+
+    <flow name="flow1">
+        <vm:inbound-endpoint path="two.flow.ref.to.sub.flow"
+            exchange-pattern="request-response" />
+        <flow-ref name="sub-flow" />
+        <flow-ref name="sub-flow" />
+    </flow>
+
+    <sub-flow name="sub-flow">
+        <append-string-transformer message="1" />
+        <append-string-transformer message="2" />
+        <flow-ref name="composite1" />
+
+        <append-string-transformer message="a" />
+        <append-string-transformer message="b" />
+        <append-string-transformer message="c" />
+        <append-string-transformer message="3" />
+
+    </sub-flow>
+
+    <sub-flow name="composite1">
+
+        <append-string-transformer message="x" />
+        <append-string-transformer message="y" />
+        <append-string-transformer message="z" />
+    </sub-flow>
+
+</mule>
