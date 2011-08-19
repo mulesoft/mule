@@ -136,7 +136,7 @@ public class HttpConnector extends TcpConnector
     public static final String HTTP_ENABLE_COOKIES_PROPERTY = "enableCookies";
 
     public static final String COOKIE_SPEC_NETSCAPE = "netscape";
-    public static final String COOKIE_SPEC_RFC2109 = "rcf2109";
+    public static final String COOKIE_SPEC_RFC2109 = "rfc2109";
 
     private String proxyHostname = null;
 
