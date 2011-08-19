@@ -175,7 +175,7 @@ public class Scriptable implements Initialisable, MuleContextAware
             bindings.putAll((Map) properties);
         }
         bindings.put("log", logger);
-        //A place holder for a retuen result if the script doesn't return a result.
+        //A place holder for a returned result if the script doesn't return a result.
         //The script can overwrite this binding
         bindings.put("result", NullPayload.getInstance());
         bindings.put("muleContext", muleContext);

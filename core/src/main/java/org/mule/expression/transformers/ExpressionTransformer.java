@@ -14,6 +14,7 @@ import org.mule.api.expression.ExpressionRuntimeException;
 import org.mule.api.expression.RequiredValueException;
 import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.transport.NullPayload;
 
 import java.util.Iterator;
 
@@ -92,7 +93,7 @@ public class ExpressionTransformer extends AbstractExpressionTransformer
     {
         for (int i = 0; i < objects.length; i++)
         {
-            if (objects[i] != null)
+            if (objects[i] != null && !(objects[i] instanceof NullPayload))
             {
                 return false;
             }

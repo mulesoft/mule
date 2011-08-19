@@ -4211,7 +4211,7 @@
                     <xsd:attributeGroup ref="optionalExpressionAttributes"/>
                     <xsd:attribute name="returnSourceIfNull" type="xsd:boolean" use="optional">
                         <xsd:annotation>
-                            <xsd:documentation>If all expressions return null on this transformer, this flag will cause the source payload to be returned without modification.
+                            <xsd:documentation>If all expressions return null or NullPayload on this transformer, this flag will cause the source payload to be returned without modification.
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:attribute>
