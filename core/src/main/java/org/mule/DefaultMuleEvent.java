@@ -16,14 +16,12 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
-import org.mule.api.NamedObject;
 import org.mule.api.ThreadSafeAccess;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.construct.Pipeline;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.security.Credentials;
-import org.mule.api.source.IdentifiableMessageSource;
 import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.PropertyScope;
@@ -130,41 +128,6 @@ public class DefaultMuleEvent extends EventObject
                || exchangePattern.hasResponse()
                || (Boolean) message.getProperty(MuleProperties.MULE_FORCE_SYNC_PROPERTY,
                    PropertyScope.INBOUND, Boolean.FALSE) || syncProcessingStrategy;
-    }
-
-    // Constructors for generic (identifiable) message source.
-
-    public DefaultMuleEvent(MuleMessage message,
-                            IdentifiableMessageSource messageSource,
-                            MessageExchangePattern exchangePattern,
-                            MuleSession session,
-                            ResponseOutputStream outputStream)
-    {
-        super(message.getPayload());
-        this.id = generateEventId(message.getMuleContext());
-        this.message = message;
-        this.session = session;
-
-        this.exchangePattern = exchangePattern;
-        this.outputStream = outputStream;
-
-        this.credentials = null;
-        this.encoding = message.getMuleContext().getConfiguration().getDefaultEncoding();
-        this.transacted = false;
-        if (messageSource instanceof NamedObject)
-        {
-            this.messageSourceName = ((NamedObject) messageSource).getName();
-        }
-        else
-        {
-            this.messageSourceName = messageSource.getURI().toString();
-        }
-        this.messageSourceURI = messageSource.getURI();
-        this.replyToHandler = null;
-        this.replyToDestination = null;
-        this.timeout = message.getMuleContext().getConfiguration().getDefaultResponseTimeout();
-        this.synchronous = resolveEventSynchronicity();
-
     }
 
     // Constructors for inbound endpoint
