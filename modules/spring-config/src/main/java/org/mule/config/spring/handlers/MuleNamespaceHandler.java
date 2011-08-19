@@ -13,6 +13,7 @@ package org.mule.config.spring.handlers;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.config.ThreadingProfile;
 import org.mule.api.processor.LoggerMessageProcessor;
+import org.mule.api.source.MessageSource;
 import org.mule.cache.CachingMessageProcessor;
 import org.mule.cache.ObjectStoreCachingStrategy;
 import org.mule.component.DefaultInterfaceBinding;
@@ -329,7 +330,6 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         //Endpoint elements
         registerBeanDefinitionParser("endpoint", new OrphanEndpointDefinitionParser(EndpointURIEndpointBuilder.class));
         registerBeanDefinitionParser("inbound-endpoint", new ChildEndpointDefinitionParser(InboundEndpointFactoryBean.class));
-        registerBeanDefinitionParser("poll", new ChildEndpointDefinitionParser(PollingMessageSourceFactoryBean.class));
         registerBeanDefinitionParser("outbound-endpoint", new ChildEndpointDefinitionParser(OutboundEndpointFactoryBean.class));
         registerBeanDefinitionParser("custom-transaction", new TransactionDefinitionParser());
         registerBeanDefinitionParser("xa-transaction", new TransactionDefinitionParser(XaTransactionFactory.class));
@@ -365,9 +365,9 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
             LoggerMessageProcessor.class));
 
         // Message Sources
-        // TODO MULE-4987
-        // registerBeanDefinitionParser("custom-source", new ChildDefinitionParser("messageSource", null, MessageSource.class));
+        registerBeanDefinitionParser("custom-source", new ChildDefinitionParser("messageSource", null, MessageSource.class));
         registerBeanDefinitionParser("composite-source", new ChildDefinitionParser("messageSource", CompositeMessageSourceFactoryBean.class));
+        registerBeanDefinitionParser("poll", new ChildEndpointDefinitionParser(PollingMessageSourceFactoryBean.class));
 
         // Models
         registerBeanDefinitionParser("model", new ModelDefinitionParser());

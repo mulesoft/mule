@@ -410,5 +410,27 @@
             <append-string-transformer message="c" />
         </custom-router>
     </flow>
+    
+    <flow name="customMessageSource">
+        <custom-source class="org.mule.test.construct.FlowConfigurationFunctionalTestCase$TestMessageSource">
+            <spring:property name="appendBefore" value="b"/>
+            <spring:property name="appendAfter" value="d"/>
+        </custom-source>
+        <append-string-transformer message="c" />
+    </flow>
+
+   <flow name="customMessageSourceInComposite">
+        <composite-source>
+            <custom-source class="org.mule.test.construct.FlowConfigurationFunctionalTestCase$TestMessageSource">
+                <spring:property name="appendBefore" value="b"/>
+                <spring:property name="appendAfter" value="d"/>
+            </custom-source>
+            <poll>
+                <flow-ref name="pollappend"/>
+            </poll>        
+        </composite-source>
+        <append-string-transformer message="c" />
+    </flow>
+
 
 </mule>

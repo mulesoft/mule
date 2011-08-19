@@ -843,8 +843,26 @@
             <xsd:extension base="annotatedType"/>
         </xsd:complexContent>
     </xsd:complexType>
+    
+    <xsd:group name="messageSourceOrInboundEndpoint">
+        <xsd:choice>
+            <xsd:element ref="abstract-message-source">
+                <xsd:annotation>
+                    <xsd:documentation>
+                        A message source
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+            <xsd:element ref="abstract-inbound-endpoint">
+                <xsd:annotation>
+                    <xsd:documentation>
+                        An inbound endpoint
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+        </xsd:choice>
+    </xsd:group>
 
-    <!--  TODO MULE-4987
     <xsd:element name="custom-source" type="customMessageSourceType" substitutionGroup="abstract-message-source"/>
     <xsd:complexType name="customMessageSourceType">
         <xsd:complexContent>
@@ -856,32 +874,13 @@
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
-     -->
 
     <xsd:element name="composite-source" type="compositeMessageSourceType" substitutionGroup="abstract-message-source"/>
     <xsd:complexType name="compositeMessageSourceType">
         <xsd:complexContent>
             <xsd:extension base="abstractMessageSourceType">
-                <xsd:sequence>
-                    <xsd:choice minOccurs="1" maxOccurs="unbounded">
-                        <!-- TODO MULE-4987
-                        <xsd:element ref="abstract-message-source" minOccurs="1">
-                            <xsd:annotation>
-                                <xsd:documentation>
-                                    A message source that forms part of the composite message source.
-                                </xsd:documentation>
-                            </xsd:annotation>
-                        </xsd:element>
-                         -->
-                        <xsd:element ref="abstract-inbound-endpoint" minOccurs="1"
-                            maxOccurs="1">
-                            <xsd:annotation>
-                                <xsd:documentation>
-                                    An inbound endpoint that forms part of the composite message source.
-                                </xsd:documentation>
-                            </xsd:annotation>
-                        </xsd:element>
-                    </xsd:choice>
+                <xsd:sequence maxOccurs="unbounded">
+                    <xsd:group ref="messageSourceOrInboundEndpoint"/>
                 </xsd:sequence>
             </xsd:extension>
         </xsd:complexContent>
@@ -2044,24 +2043,7 @@
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:element>
-                    <xsd:choice>
-                        <xsd:element ref="composite-source" minOccurs="0"
-                                     maxOccurs="1">
-                            <xsd:annotation>
-                                <xsd:documentation>
-                                    The source of new messages for this flow
-                                </xsd:documentation>
-                            </xsd:annotation>
-                        </xsd:element>
-                        <xsd:element ref="abstract-inbound-endpoint" minOccurs="1"
-                                     maxOccurs="1">
-                            <xsd:annotation>
-                                <xsd:documentation>
-                                    The inbound endpoint for this flow
-                                </xsd:documentation>
-                            </xsd:annotation>
-                        </xsd:element>
-                    </xsd:choice>
+                    <xsd:group ref="messageSourceOrInboundEndpoint" minOccurs="0"/>
                     <xsd:choice minOccurs="1" maxOccurs="unbounded">
                         <xsd:group ref="messageProcessorOrOutboundEndpoint"/>
                         <xsd:element name="response">
@@ -3089,7 +3071,7 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="poll" type="pollInboundEndpointType" substitutionGroup="abstract-inbound-endpoint">
+    <xsd:element name="poll" type="pollInboundEndpointType" substitutionGroup="abstract-message-source">
         <xsd:annotation>
             <xsd:documentation>
                 Polls the nested message processor for new messages
@@ -3098,7 +3080,7 @@
     </xsd:element>
     <xsd:complexType name="pollInboundEndpointType">
         <xsd:complexContent>
-            <xsd:extension base="abstractInboundEndpointType">
+            <xsd:extension base="abstractMessageSourceType">
                 <xsd:group ref="messageProcessorOrOutboundEndpoint"/>
                 <xsd:attribute name="frequency"  type="substitutableLong" default="1000">
                     <xsd:annotation>
