@@ -40,10 +40,10 @@ import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.exception.MessagingExceptionHandler;
+import org.mule.api.exception.UndoActionCallback;
 import org.mule.api.exception.SystemExceptionHandler;
 import org.mule.api.model.Model;
 import org.mule.api.service.Service;
-import org.mule.api.transaction.RollbackMethod;
 import org.mule.api.transport.Connector;
 import org.mule.context.notification.EndpointMessageNotification;
 import org.mule.module.client.MuleClient;
@@ -369,7 +369,7 @@ public abstract class AbstractSftpTestCase extends AbstractServiceAndFlowTestCas
             muleContext.setExceptionListener(new SystemExceptionHandler()
             {
                 @Override
-                public void handleException(Exception e, RollbackMethod rollbackMethod)
+                public void handleException(Exception e, UndoActionCallback rollbackMethod)
                 {
                     if (logger.isInfoEnabled()) logger.info("expected exception occurred: " + e, e);
                     exceptionHolder.value = e;
@@ -389,7 +389,7 @@ public abstract class AbstractSftpTestCase extends AbstractServiceAndFlowTestCas
                     new MessagingExceptionHandler()
                     {
                         @Override
-                        public MuleEvent handleException(Exception e, MuleEvent event, RollbackMethod rollbackMethod)
+                        public MuleEvent handleException(Exception e, MuleEvent event, UndoActionCallback rollbackMethod)
                         {
                             if (logger.isInfoEnabled()) logger.info("expected exception occurred: " + e, e);
                             exceptionHolder.value = e;
@@ -744,7 +744,7 @@ public abstract class AbstractSftpTestCase extends AbstractServiceAndFlowTestCas
             listener = new SystemExceptionHandler()
             {
                 @Override
-                public void handleException(Exception e, RollbackMethod rollbackMethod)
+                public void handleException(Exception e, UndoActionCallback rollbackMethod)
                 {
                     exceptionHolder.value = e;
                     if (logger.isDebugEnabled())
@@ -763,7 +763,7 @@ public abstract class AbstractSftpTestCase extends AbstractServiceAndFlowTestCas
             messagingListener = new MessagingExceptionHandler()
             {
                 @Override
-                public MuleEvent handleException(Exception e, MuleEvent event, RollbackMethod rollbackMethod)
+                public MuleEvent handleException(Exception e, MuleEvent event, UndoActionCallback rollbackMethod)
                 {
                     exceptionHolder.value = e;
                     if (logger.isDebugEnabled())

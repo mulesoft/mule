@@ -15,9 +15,9 @@ import org.mule.api.MessagingException;
 import org.mule.api.MuleException;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.exception.UndoActionCallback;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.lifecycle.LifecycleException;
-import org.mule.api.transaction.RollbackMethod;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionException;
 import org.mule.api.transport.Connector;
@@ -355,7 +355,7 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
             catch (Exception e)
             {
                 // Use this rollback method in case a transaction has not been configured on the endpoint.
-                RollbackMethod rollbackMethod = new RollbackMethod()
+                UndoActionCallback rollbackMethod = new UndoActionCallback()
                 {                    
                     public void rollback()
                     {

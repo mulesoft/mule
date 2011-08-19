@@ -23,6 +23,7 @@ import org.mule.api.context.WorkManager;
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.api.context.notification.ServerNotificationListener;
 import org.mule.api.endpoint.EndpointFactory;
+import org.mule.api.exception.UndoActionCallback;
 import org.mule.api.exception.SystemExceptionHandler;
 import org.mule.api.expression.ExpressionManager;
 import org.mule.api.lifecycle.Disposable;
@@ -36,7 +37,6 @@ import org.mule.api.registry.RegistrationException;
 import org.mule.api.registry.Registry;
 import org.mule.api.security.SecurityManager;
 import org.mule.api.store.ListableObjectStore;
-import org.mule.api.transaction.RollbackMethod;
 import org.mule.api.transaction.TransactionManagerFactory;
 import org.mule.client.DefaultLocalMuleClient;
 import org.mule.config.DefaultMuleConfiguration;
@@ -652,7 +652,7 @@ public class DefaultMuleContext implements MuleContext
         return localMuleClient;
     }
 
-    public void handleException(Exception e, RollbackMethod rollbackMethod)
+    public void handleException(Exception e, UndoActionCallback rollbackMethod)
     {
         if (e instanceof MessagingException)
         {

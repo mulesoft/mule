@@ -13,8 +13,8 @@ package org.mule.exception;
 import org.mule.RequestContext;
 import org.mule.api.ExceptionPayload;
 import org.mule.api.MuleContext;
+import org.mule.api.exception.UndoActionCallback;
 import org.mule.api.exception.SystemExceptionHandler;
-import org.mule.api.transaction.RollbackMethod;
 import org.mule.message.DefaultExceptionPayload;
 import org.mule.transport.AbstractConnector;
 import org.mule.transport.ConnectException;
@@ -30,7 +30,7 @@ public class AbstractSystemExceptionStrategy extends AbstractExceptionStrategy i
         super(muleContext, rollbackByDefault);
     }
 
-    public void handleException(Exception ex, RollbackMethod rollbackMethod)
+    public void handleException(Exception ex, UndoActionCallback rollbackMethod)
     {
         fireNotification(ex);
 
