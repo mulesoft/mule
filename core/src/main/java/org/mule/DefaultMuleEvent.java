@@ -79,21 +79,119 @@ public class DefaultMuleEvent extends EventObject
     private boolean stopFurtherProcessing = false;
     private int timeout = TIMEOUT_NOT_SET_VALUE;
     private transient ResponseOutputStream outputStream;
-    private ProcessingTime processingTime;
+    private final ProcessingTime processingTime;
     private Object replyToDestination;
 
     protected String[] ignoredPropertyOverrides = new String[]{MuleProperties.MULE_METHOD_PROPERTY};
 
-    // Constructors for no message source.
+    // Constructors
 
+    /**
+     * Constructor used to create a message with no message source with minimal arguments
+     */
     public DefaultMuleEvent(MuleMessage message, MessageExchangePattern exchangePattern, MuleSession session)
     {
-        this(message, exchangePattern, session, null);
+        this(message, exchangePattern, session, message.getMuleContext()
+            .getConfiguration()
+            .getDefaultResponseTimeout(), null, null);
     }
 
+    /**
+     * Constructor used to create a message with no message source with minimal arguments and
+     * ResponseOutputStream
+     */
     public DefaultMuleEvent(MuleMessage message,
                             MessageExchangePattern exchangePattern,
                             MuleSession session,
+                            ResponseOutputStream outputStream)
+    {
+        this(message, exchangePattern, session, message.getMuleContext()
+            .getConfiguration()
+            .getDefaultResponseTimeout(), null, outputStream);
+    }
+
+    /**
+     * Constructor used to create a message with no message source with all additional arguments
+     */
+    public DefaultMuleEvent(MuleMessage message,
+                            MessageExchangePattern exchangePattern,
+                            MuleSession session,
+                            int timeout,
+                            Credentials credentials,
+                            ResponseOutputStream outputStream)
+    {
+        this(message, URI.create("none"), exchangePattern, session, timeout, credentials, outputStream);
+    }
+
+    /**
+     * Constructor used to create a message with a uri that idendifies the message source with minimal
+     * arguments
+     */
+    public DefaultMuleEvent(MuleMessage message,
+                            URI messageSourceURI,
+                            MessageExchangePattern exchangePattern,
+                            MuleSession session)
+    {
+        this(message, messageSourceURI, exchangePattern, session, message.getMuleContext()
+            .getConfiguration()
+            .getDefaultResponseTimeout(), null, null);
+    }
+
+    /**
+     * Constructor used to create a message with a uri that idendifies the message source with minimal
+     * arguments and ResponseOutputStream
+     */
+    public DefaultMuleEvent(MuleMessage message,
+                            URI messageSourceURI,
+                            MessageExchangePattern exchangePattern,
+                            MuleSession session,
+                            ResponseOutputStream outputStream)
+    {
+        this(message, messageSourceURI, exchangePattern, session, message.getMuleContext()
+            .getConfiguration()
+            .getDefaultResponseTimeout(), null, outputStream);
+    }
+
+    /**
+     * Constructor used to create a message with a identifiable message source with all additional arguments
+     */
+    public DefaultMuleEvent(MuleMessage message,
+                            URI messageSourceURI,
+                            MessageExchangePattern exchangePattern,
+                            MuleSession session,
+                            int timeout,
+                            Credentials credentials,
+                            ResponseOutputStream outputStream)
+    {
+        super(message.getPayload());
+        this.id = generateEventId(message.getMuleContext());
+        this.message = message;
+        this.session = session;
+        this.exchangePattern = exchangePattern;
+        this.outputStream = outputStream;
+        this.credentials = null;
+        this.encoding = message.getMuleContext().getConfiguration().getDefaultEncoding();
+        this.messageSourceName = messageSourceURI.toString();
+        this.messageSourceURI = messageSourceURI;
+        this.processingTime = ProcessingTime.newInstance(this.session, message.getMuleContext());
+        this.replyToHandler = null;
+        this.replyToDestination = null;
+        this.timeout = timeout;
+        this.transacted = false;
+        this.synchronous = resolveEventSynchronicity();
+    }
+
+    // Constructors for inbound endpoint
+
+    public DefaultMuleEvent(MuleMessage message, InboundEndpoint endpoint, MuleSession session)
+    {
+        this(message, endpoint, session, null, null);
+    }
+
+    public DefaultMuleEvent(MuleMessage message,
+                            InboundEndpoint endpoint,
+                            MuleSession session,
+                            ReplyToHandler replyToHandler,
                             ResponseOutputStream outputStream)
     {
         super(message.getPayload());
@@ -101,57 +199,8 @@ public class DefaultMuleEvent extends EventObject
         this.message = message;
         this.session = session;
 
-        this.exchangePattern = exchangePattern;
         this.outputStream = outputStream;
-
-        this.credentials = null;
-        this.encoding = message.getMuleContext().getConfiguration().getDefaultEncoding();
-        this.messageSourceName = null;
-        this.messageSourceURI = URI.create("dynamic://null");
-        this.replyToHandler = null;
-        this.replyToDestination = null;
-        this.timeout = message.getMuleContext().getConfiguration().getDefaultResponseTimeout();
-        this.transacted = false;
-        this.synchronous = resolveEventSynchronicity();
-    }
-
-    private boolean resolveEventSynchronicity()
-    {
-        boolean syncProcessingStrategy = false;
-        if (session.getFlowConstruct() != null && session.getFlowConstruct() instanceof Pipeline)
-        {
-            syncProcessingStrategy = ((Pipeline) session.getFlowConstruct()).getProcessingStrategy()
-                .getClass()
-                .equals(SynchronousProcessingStrategy.class);
-        }
-        return transacted
-               || exchangePattern.hasResponse()
-               || (Boolean) message.getProperty(MuleProperties.MULE_FORCE_SYNC_PROPERTY,
-                   PropertyScope.INBOUND, Boolean.FALSE) || syncProcessingStrategy;
-    }
-
-    // Constructors for inbound endpoint
-
-    public DefaultMuleEvent(MuleMessage message, InboundEndpoint endpoint, MuleSession session)
-    {
-        this(message, endpoint, session, null, null, null);
-    }
-
-    public DefaultMuleEvent(MuleMessage message,
-                            InboundEndpoint endpoint,
-                            MuleSession session,
-                            ResponseOutputStream outputStream,
-                            ProcessingTime time,
-                            ReplyToHandler replyToHandler)
-    {
-        super(message.getPayload());
-        this.id = generateEventId(message.getMuleContext());
-        this.message = message;
-        this.session = session;
-
-        this.outputStream = outputStream;
-        this.processingTime = time != null ? time : ProcessingTime.newInstance(this.session,
-            message.getMuleContext());
+        this.processingTime = ProcessingTime.newInstance(this.session, message.getMuleContext());
         this.replyToHandler = replyToHandler;
         this.credentials = extractCredentials(endpoint);
         this.encoding = endpoint.getEncoding();
@@ -162,17 +211,10 @@ public class DefaultMuleEvent extends EventObject
         this.transacted = endpoint.getTransactionConfig().isTransacted();
         fillProperties(endpoint);
         this.synchronous = resolveEventSynchronicity();
-
     }
 
     // Constructors to copy MuleEvent
 
-    public DefaultMuleEvent(MuleMessage message, MuleEvent rewriteEvent, boolean synchronus)
-    {
-        this(message, rewriteEvent, rewriteEvent.getSession(), synchronus);
-    }
-
-    
     /**
      * A helper constructor used to rewrite an event payload
      * 
@@ -182,6 +224,11 @@ public class DefaultMuleEvent extends EventObject
     public DefaultMuleEvent(MuleMessage message, MuleEvent rewriteEvent)
     {
         this(message, rewriteEvent, rewriteEvent.getSession());
+    }
+
+    public DefaultMuleEvent(MuleMessage message, MuleEvent rewriteEvent, boolean synchronus)
+    {
+        this(message, rewriteEvent, rewriteEvent.getSession(), synchronus);
     }
 
     /**
@@ -194,8 +241,11 @@ public class DefaultMuleEvent extends EventObject
     {
         this(message, rewriteEvent, session, rewriteEvent.isSynchronous());
     }
-    
-    public DefaultMuleEvent(MuleMessage message, MuleEvent rewriteEvent, MuleSession session, boolean synchronous)
+
+    protected DefaultMuleEvent(MuleMessage message,
+                            MuleEvent rewriteEvent,
+                            MuleSession session,
+                            boolean synchronous)
     {
         super(message.getPayload());
         this.id = rewriteEvent.getId();
@@ -221,6 +271,55 @@ public class DefaultMuleEvent extends EventObject
         this.timeout = rewriteEvent.getTimeout();
         this.transacted = rewriteEvent.isTransacted();
         this.synchronous = synchronous;
+    }
+
+    // Constructor with everything just in case
+
+    public DefaultMuleEvent(MuleMessage message,
+                            URI messageSourceURI,
+                            String messageSourceName,
+                            MessageExchangePattern exchangePattern,
+                            MuleSession session,
+                            int timeout,
+                            Credentials credentials,
+                            ResponseOutputStream outputStream,
+                            String encoding,
+                            boolean transacted,
+                            boolean synchronous,
+                            Object replyToDestination,
+                            ReplyToHandler replyToHandler)
+    {
+        super(message.getPayload());
+        this.id = generateEventId(message.getMuleContext());
+        this.message = message;
+        this.session = session;
+        this.credentials = credentials;
+        this.encoding = encoding;
+        this.exchangePattern = exchangePattern;
+        this.messageSourceURI = messageSourceURI;
+        this.messageSourceName = messageSourceName;
+        this.processingTime = ProcessingTime.newInstance(this.session, message.getMuleContext());
+        this.replyToHandler = replyToHandler;
+        this.transacted = transacted;
+        this.synchronous = synchronous;
+        this.timeout = timeout;
+        this.outputStream = outputStream;
+        this.replyToDestination = replyToDestination;
+    }
+
+    protected boolean resolveEventSynchronicity()
+    {
+        boolean syncProcessingStrategy = false;
+        if (session.getFlowConstruct() != null && session.getFlowConstruct() instanceof Pipeline)
+        {
+            syncProcessingStrategy = ((Pipeline) session.getFlowConstruct()).getProcessingStrategy()
+                .getClass()
+                .equals(SynchronousProcessingStrategy.class);
+        }
+        return transacted
+               || exchangePattern.hasResponse()
+               || (Boolean) message.getProperty(MuleProperties.MULE_FORCE_SYNC_PROPERTY,
+                   PropertyScope.INBOUND, Boolean.FALSE) || syncProcessingStrategy;
     }
 
     protected void fillProperties(InboundEndpoint endpoint)

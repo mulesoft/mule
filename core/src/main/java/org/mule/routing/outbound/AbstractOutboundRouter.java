@@ -466,7 +466,7 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
      */
     protected MuleEvent createEventToRoute(MuleEvent routedEvent, MuleMessage message, MessageProcessor route)
     {
-        return new DefaultMuleEvent(message, routedEvent, routedEvent.getSession(), true);
+        return new DefaultMuleEvent(message, routedEvent, true);
     }
 
     /**

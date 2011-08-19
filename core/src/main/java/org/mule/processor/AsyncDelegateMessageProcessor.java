@@ -105,8 +105,7 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
         {
             // Clone event and make it async
             MuleEvent newEvent = new DefaultMuleEvent(
-                (MuleMessage) ((ThreadSafeAccess) event.getMessage()).newThreadCopy(), event,
-                event.getSession(), false);
+                (MuleMessage) ((ThreadSafeAccess) event.getMessage()).newThreadCopy(), event, false);
             target.process(newEvent);
         }
         return event;
