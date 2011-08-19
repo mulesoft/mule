@@ -278,7 +278,7 @@ public abstract class AbstractExceptionStrategy extends AbstractMessageProcessor
         }
         else if (rollbackMethod != null)
         {
-            rollbackMethod.rollback();
+            rollbackMethod.undo();
         }
     }
 

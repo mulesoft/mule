@@ -357,7 +357,7 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
                 // Use this rollback method in case a transaction has not been configured on the endpoint.
                 UndoActionCallback rollbackMethod = new UndoActionCallback()
                 {                    
-                    public void rollback()
+                    public void undo()
                     {
                         try
                         {

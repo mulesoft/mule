@@ -17,7 +17,7 @@ package org.mule.api.exception;
  */
 public interface UndoActionCallback
 {
-    public void rollback();
+    public void undo();
 }
 
 

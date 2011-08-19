@@ -330,7 +330,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
                 rollbackMethod = new UndoActionCallback()
                 {                
                     @Override
-                    public void rollback()
+                    public void undo()
                     {
                         try
                         {
