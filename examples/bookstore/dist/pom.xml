@@ -47,6 +47,24 @@
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-jetty</artifactId>
             <version>${muleVersion}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.mortbay.jetty</groupId>
+                    <artifactId>servlet-api</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.tomcat</groupId>
+                    <artifactId>jsp-api</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.tomcat</groupId>
+                    <artifactId>jasper</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.tomcat</groupId>
+                    <artifactId>jasper-el</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <!-- Unit tests -->
