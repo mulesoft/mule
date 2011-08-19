@@ -17,17 +17,42 @@ import org.mule.api.transaction.TransactionFactory;
 
 public class VMTransactionFactory implements TransactionFactory
 {
+    public static TransactionFactory factoryDelegate = new VMTransactionFactoryDelegate();
 
     public Transaction beginTransaction(MuleContext muleContext) throws TransactionException
     {
-        VMTransaction tx = new VMTransaction(muleContext);
-        tx.begin();
-        return tx;
+        return factoryDelegate.beginTransaction(muleContext);
     }
 
     public boolean isTransacted()
     {
-        return true;
+        return factoryDelegate.isTransacted();
+    }
+
+    /**
+     * sets the transaction factory to be used to create VM transactions
+     */
+    public static void setFactoryDelegate(TransactionFactory factoryDelegate)
+    {
+        VMTransactionFactory.factoryDelegate = factoryDelegate;
+    }
+
+    /**
+     * Create normal VM transactions
+     */
+    static class VMTransactionFactoryDelegate implements TransactionFactory
+    {
+        public Transaction beginTransaction(MuleContext muleContext) throws TransactionException
+        {
+            VMTransaction tx = new VMTransaction(muleContext);
+            tx.begin();
+            return tx;
+        }
+
+        public boolean isTransacted()
+        {
+            return true;
+        }
     }
 
 }

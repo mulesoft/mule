@@ -160,50 +160,7 @@ public class TransactionalQueueManager extends AbstractXAResourceManager impleme
     @Override
     protected void doCommit(AbstractTransactionContext context) throws ResourceManagerException
     {
-        QueueTransactionContext ctx = (QueueTransactionContext) context;
-        try
-        {
-            if (ctx.added != null)
-            {
-                for (Map.Entry<QueueInfo, List<Serializable>> entry : ctx.added.entrySet())
-                {
-                    QueueInfo queue = entry.getKey();
-                    List<Serializable> queueAdded = entry.getValue();
-                    if (queueAdded != null && queueAdded.size() > 0)
-                    {
-                        for (Serializable object : queueAdded)
-                        {
-                            Serializable id = doStore(queue, object);
-                            queue.putNow(id);
-                        }
-                    }
-                }
-            }
-            if (ctx.removed != null)
-            {
-                for (Map.Entry<QueueInfo, List<Serializable>> entry : ctx.removed.entrySet())
-                {
-                    QueueInfo queue = entry.getKey();
-                    List<Serializable> queueRemoved = entry.getValue();
-                    if (queueRemoved != null && queueRemoved.size() > 0)
-                    {
-                        for (Serializable id : queueRemoved)
-                        {
-                            doRemove(queue, id);
-                        }
-                    }
-                }
-            }
-        }
-        catch (Exception e)
-        {
-            throw new ResourceManagerException(e);
-        }
-        finally
-        {
-            ctx.added = null;
-            ctx.removed = null;
-        }
+        context.doCommit();
     }
 
     protected Serializable doStore(QueueInfo queue, Serializable object) throws ObjectStoreException
@@ -235,24 +192,7 @@ public class TransactionalQueueManager extends AbstractXAResourceManager impleme
     @Override
     protected void doRollback(AbstractTransactionContext context) throws ResourceManagerException
     {
-        QueueTransactionContext ctx = (QueueTransactionContext) context;
-        if (ctx.removed != null)
-        {
-            for (Map.Entry<QueueInfo, List<Serializable>> entry : ctx.removed.entrySet())
-            {
-                QueueInfo queue = entry.getKey();
-                List<Serializable> queueRemoved = entry.getValue();
-                if (queueRemoved != null && queueRemoved.size() > 0)
-                {
-                    for (Serializable id : queueRemoved)
-                    {
-                        queue.putNow(id);
-                    }
-                }
-            }
-        }
-        ctx.added = null;
-        ctx.removed = null;
+        context.doRollback();
     }
 
     protected synchronized void findAllStores()

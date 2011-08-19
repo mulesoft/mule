@@ -92,4 +92,7 @@ public abstract class AbstractTransactionContext
         notifyAll();
     }
 
+    public abstract void doCommit() throws ResourceManagerException;
+
+    public abstract void doRollback() throws ResourceManagerException;
 }

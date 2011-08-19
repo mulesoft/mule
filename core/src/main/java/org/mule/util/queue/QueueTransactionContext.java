@@ -12,6 +12,7 @@ package org.mule.util.queue;
 
 import org.mule.api.store.ObjectStoreException;
 import org.mule.util.xa.AbstractTransactionContext;
+import org.mule.util.xa.ResourceManagerException;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -22,8 +23,8 @@ import java.util.Map;
 public class QueueTransactionContext extends AbstractTransactionContext
 {
     private final TransactionalQueueManager transactionalQueueManager;
-    protected Map<QueueInfo, List<Serializable>> added;
-    protected Map<QueueInfo, List<Serializable>> removed;
+    private Map<QueueInfo, List<Serializable>> added;
+    private Map<QueueInfo, List<Serializable>> removed;
 
     public QueueTransactionContext(TransactionalQueueManager transactionalQueueManager)
     {
@@ -34,6 +35,12 @@ public class QueueTransactionContext extends AbstractTransactionContext
     public boolean offer(QueueInfo queue, Serializable item, long offerTimeout) throws InterruptedException
     {
         readOnly = false;
+        if (queue.canTakeFromStore())
+        {
+            queue.putNow(item);
+            return true;
+        }
+
         initializeAdded();
 
         List<Serializable> queueAdded = lookupQueue(queue);
@@ -52,6 +59,11 @@ public class QueueTransactionContext extends AbstractTransactionContext
     public void untake(QueueInfo queue, Serializable item) throws InterruptedException
     {
         readOnly = false;
+        if (queue.canTakeFromStore())
+        {
+            queue.putNow(item);
+        }
+
         initializeAdded();
 
         List<Serializable> queueAdded = lookupQueue(queue);
@@ -64,10 +76,16 @@ public class QueueTransactionContext extends AbstractTransactionContext
         if (added != null)
         {
             List<Serializable> queueAdded = added.get(queue);
-            if (queueAdded != null)
+            if (queueAdded != null && queueAdded.size() > 0)
             {
                 return queueAdded.remove(queueAdded.size() - 1);
             }
+        }
+
+        if (queue.canTakeFromStore())
+        {
+            // TODO: verify that the queue is transactional too
+            return queue.takeNextItemFromStore(timeout);
         }
 
         Serializable key;
@@ -78,7 +96,7 @@ public class QueueTransactionContext extends AbstractTransactionContext
         }
         catch (InterruptedException e)
         {
-            if (transactionalQueueManager.getMuleContext().isStopping())
+            if (!transactionalQueueManager.getMuleContext().isStopping())
             {
                 throw e;
             }
@@ -139,6 +157,77 @@ public class QueueTransactionContext extends AbstractTransactionContext
             }
         }
         return sz;
+    }
+
+    @Override
+    public void doCommit() throws ResourceManagerException
+    {
+        try
+        {
+            if (added != null)
+            {
+                for (Map.Entry<QueueInfo, List<Serializable>> entry : added.entrySet())
+                {
+                    QueueInfo queue = entry.getKey();
+                    List<Serializable> queueAdded = entry.getValue();
+                    if (queueAdded != null && queueAdded.size() > 0)
+                    {
+                        for (Serializable object : queueAdded)
+                        {
+                            Serializable id = transactionalQueueManager.doStore(queue, object);
+                            queue.putNow(id);
+                        }
+                    }
+                }
+            }
+            if (removed != null)
+            {
+                for (Map.Entry<QueueInfo, List<Serializable>> entry : removed.entrySet())
+                {
+                    QueueInfo queue = entry.getKey();
+                    List<Serializable> queueRemoved = entry.getValue();
+                    if (queueRemoved != null && queueRemoved.size() > 0)
+                    {
+                        for (Serializable id : queueRemoved)
+                        {
+                            transactionalQueueManager.doRemove(queue, id);
+                        }
+                    }
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            throw new ResourceManagerException(e);
+        }
+        finally
+        {
+            added = null;
+            removed = null;
+        }
+
+    }
+
+    @Override
+    public void doRollback() throws ResourceManagerException
+    {
+        if (removed != null)
+        {
+            for (Map.Entry<QueueInfo, List<Serializable>> entry : removed.entrySet())
+            {
+                QueueInfo queue = entry.getKey();
+                List<Serializable> queueRemoved = entry.getValue();
+                if (queueRemoved != null && queueRemoved.size() > 0)
+                {
+                    for (Serializable id : queueRemoved)
+                    {
+                        queue.putNow(id);
+                    }
+                }
+            }
+        }
+        added = null;
+        removed = null;
     }
 
     protected void initializeAdded()

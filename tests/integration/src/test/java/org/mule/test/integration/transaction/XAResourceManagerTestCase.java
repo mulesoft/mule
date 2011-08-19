@@ -73,6 +73,15 @@ public class XAResourceManagerTestCase extends AbstractMuleContextTestCase
         {
             return new AbstractTransactionContext() 
             {
+                @Override
+                public void doCommit()
+                {
+                }
+
+                @Override
+                public void doRollback()
+                {
+                }
             };
         }
 
