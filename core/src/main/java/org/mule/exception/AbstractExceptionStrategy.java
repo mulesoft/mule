@@ -19,10 +19,10 @@ import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.context.notification.ServerNotification;
+import org.mule.api.exception.RollbackSourceCallback;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.security.SecurityException;
-import org.mule.api.transaction.RollbackMethod;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionException;
 import org.mule.api.util.StreamCloserService;
@@ -249,7 +249,7 @@ public abstract class AbstractExceptionStrategy extends AbstractMessageProcessor
         }
     }
 
-    protected void rollback(RollbackMethod rollbackMethod)
+    protected void rollback(RollbackSourceCallback rollbackMethod)
     {
         Transaction tx = TransactionCoordination.getInstance().getTransaction();
         if (tx != null)

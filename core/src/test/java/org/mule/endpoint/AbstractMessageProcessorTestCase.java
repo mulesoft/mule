@@ -27,13 +27,13 @@ import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.exception.MessagingExceptionHandler;
+import org.mule.api.exception.RollbackSourceCallback;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.filter.Filter;
 import org.mule.api.security.EndpointSecurityFilter;
 import org.mule.api.security.SecurityFilter;
 import org.mule.api.service.Service;
-import org.mule.api.transaction.RollbackMethod;
 import org.mule.api.transaction.TransactionConfig;
 import org.mule.api.transformer.Transformer;
 import org.mule.context.notification.EndpointMessageNotification;
@@ -285,7 +285,7 @@ public abstract class AbstractMessageProcessorTestCase extends AbstractMuleConte
     {
         public Exception sensedException;
 
-        public MuleEvent handleException(Exception exception, MuleEvent event, RollbackMethod rollbackMethod)
+        public MuleEvent handleException(Exception exception, MuleEvent event, RollbackSourceCallback rollbackMethod)
         {
             sensedException = exception;
             event.getMessage().setPayload(NullPayload.getInstance());

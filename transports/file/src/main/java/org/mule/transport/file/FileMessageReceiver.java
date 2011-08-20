@@ -19,8 +19,8 @@ import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.exception.RollbackSourceCallback;
 import org.mule.api.lifecycle.CreateException;
-import org.mule.api.transaction.RollbackMethod;
 import org.mule.api.transport.Connector;
 import org.mule.api.transport.PropertyScope;
 import org.mule.transport.AbstractPollingMessageReceiver;
@@ -324,10 +324,10 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
         }
         catch (Exception e)
         {
-            RollbackMethod rollbackMethod;
+            RollbackSourceCallback rollbackMethod;
             if (!sourceFile.getAbsolutePath().equals(originalSourceFile))
             {
-                rollbackMethod = new RollbackMethod()
+                rollbackMethod = new RollbackSourceCallback()
                 {                
                     @Override
                     public void rollback()

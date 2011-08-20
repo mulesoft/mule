@@ -12,7 +12,7 @@ package org.mule.transport.soap.axis;
 
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
-import org.mule.api.transaction.RollbackMethod;
+import org.mule.api.exception.RollbackSourceCallback;
 import org.mule.exception.DefaultMessagingExceptionStrategy;
 
 import java.util.ArrayList;
@@ -45,7 +45,7 @@ public class UnitTestExceptionStrategy extends DefaultMessagingExceptionStrategy
     }
 
     @Override
-    protected void doHandleException(Exception e, MuleEvent event, RollbackMethod rollbackMethod)
+    protected void doHandleException(Exception e, MuleEvent event, RollbackSourceCallback rollbackMethod)
     {
         messagingExceptions.add(e);
         super.doHandleException(e, event, rollbackMethod);
