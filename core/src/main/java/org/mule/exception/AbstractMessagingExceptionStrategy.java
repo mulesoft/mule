@@ -17,9 +17,9 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.exception.MessagingExceptionHandler;
-import org.mule.api.exception.UndoActionCallback;
 import org.mule.api.lifecycle.Lifecycle;
 import org.mule.api.lifecycle.Stoppable;
+import org.mule.api.transaction.RollbackMethod;
 import org.mule.management.stats.FlowConstructStatistics;
 import org.mule.message.DefaultExceptionPayload;
 import org.mule.transport.NullPayload;
@@ -40,7 +40,7 @@ public abstract class AbstractMessagingExceptionStrategy extends AbstractExcepti
         super(muleContext, rollbackByDefault);
     }
 
-    public MuleEvent handleException(Exception ex, MuleEvent event, UndoActionCallback rollbackMethod)
+    public MuleEvent handleException(Exception ex, MuleEvent event, RollbackMethod rollbackMethod)
     {
         fireNotification(ex);
 
@@ -66,7 +66,7 @@ public abstract class AbstractMessagingExceptionStrategy extends AbstractExcepti
         return handleException(ex, event, null);
     }
     
-    protected void doHandleException(Exception ex, MuleEvent event, UndoActionCallback rollbackMethod)
+    protected void doHandleException(Exception ex, MuleEvent event, RollbackMethod rollbackMethod)
     {
         FlowConstructStatistics statistics = event.getFlowConstruct().getStatistics();
         if (statistics != null && statistics.isEnabled())

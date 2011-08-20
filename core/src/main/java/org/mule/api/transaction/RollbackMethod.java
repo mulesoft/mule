@@ -8,16 +8,16 @@
  * LICENSE.txt file.
  */
 
-package org.mule.api.exception;
+package org.mule.api.transaction;
 
 /**
- * This is used to provide a undo method in order to achieve atomic message delivery without relying on JTA transactions, 
+ * This is used to provide a rollback method in order to achieve atomic message delivery without relying on JTA transactions, 
  * The exact behavior of this method will depend on the transport, e.g. it may send a negative ack, reset a semaphore, 
  * put the resource back in its original state/location, etc.
  */
-public interface UndoActionCallback
+public interface RollbackMethod
 {
-    public void undo();
+    public void rollback();
 }
 
 

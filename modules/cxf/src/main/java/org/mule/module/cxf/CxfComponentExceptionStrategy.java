@@ -11,7 +11,7 @@
 package org.mule.module.cxf;
 
 import org.mule.api.MuleEvent;
-import org.mule.api.exception.UndoActionCallback;
+import org.mule.api.transaction.RollbackMethod;
 import org.mule.exception.DefaultMessagingExceptionStrategy;
 
 import org.apache.cxf.interceptor.Fault;
@@ -24,7 +24,7 @@ import org.apache.cxf.interceptor.Fault;
 public class CxfComponentExceptionStrategy extends DefaultMessagingExceptionStrategy
 {
     @Override
-    protected void doHandleException(Exception e, MuleEvent event, UndoActionCallback rollbackMethod)
+    protected void doHandleException(Exception e, MuleEvent event, RollbackMethod rollbackMethod)
     {
         if (e.getCause() instanceof Fault)
         {

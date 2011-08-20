@@ -16,7 +16,6 @@ import org.mule.api.context.WorkManager;
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.api.context.notification.ServerNotificationListener;
 import org.mule.api.endpoint.EndpointFactory;
-import org.mule.api.exception.UndoActionCallback;
 import org.mule.api.exception.SystemExceptionHandler;
 import org.mule.api.expression.ExpressionManager;
 import org.mule.api.lifecycle.InitialisationException;
@@ -27,6 +26,7 @@ import org.mule.api.registry.RegistrationException;
 import org.mule.api.registry.Registry;
 import org.mule.api.security.SecurityManager;
 import org.mule.api.store.ListableObjectStore;
+import org.mule.api.transaction.RollbackMethod;
 import org.mule.context.notification.NotificationException;
 import org.mule.context.notification.ServerNotificationManager;
 import org.mule.management.stats.AllStatistics;
@@ -241,7 +241,7 @@ public interface MuleContext extends Lifecycle
 
     void setObjectStore(String name, ListableObjectStore<Serializable> store) throws RegistrationException;
     
-    void handleException(Exception e, UndoActionCallback rollbackMethod);
+    void handleException(Exception e, RollbackMethod rollbackMethod);
 
     void handleException(Exception e);
 

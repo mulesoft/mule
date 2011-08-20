@@ -13,8 +13,8 @@ package org.mule.tck.testmodels.mule;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.exception.MessagingExceptionHandler;
-import org.mule.api.exception.UndoActionCallback;
 import org.mule.api.exception.SystemExceptionHandler;
+import org.mule.api.transaction.RollbackMethod;
 import org.mule.exception.AbstractExceptionStrategy;
 
 import java.util.ArrayList;
@@ -64,7 +64,7 @@ public class TestExceptionStrategy extends AbstractExceptionStrategy implements 
         this.testProperty = testProperty;
     }
 
-    public MuleEvent handleException(Exception exception, MuleEvent event, UndoActionCallback rollbackMethod)
+    public MuleEvent handleException(Exception exception, MuleEvent event, RollbackMethod rollbackMethod)
     {
         ExceptionCallback callback = null;
         synchronized (callbackLock)
@@ -99,7 +99,7 @@ public class TestExceptionStrategy extends AbstractExceptionStrategy implements 
         return handleException(exception, event, null);
     }
 
-    public void handleException(Exception exception, UndoActionCallback rollbackMethod)
+    public void handleException(Exception exception, RollbackMethod rollbackMethod)
     {
         handleException(exception, null, rollbackMethod);
     }

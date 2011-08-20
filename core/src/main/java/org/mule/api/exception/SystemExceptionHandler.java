@@ -10,6 +10,7 @@
 
 package org.mule.api.exception;
 
+import org.mule.api.transaction.RollbackMethod;
 
 
 /**
@@ -23,7 +24,7 @@ public interface SystemExceptionHandler extends ExceptionHandler
      * @param exception which occurred
      * @param rollbackMethod will be called if transactions are not used in order to achieve atomic message delivery 
      */
-    void handleException(Exception exception, UndoActionCallback rollbackMethod);
+    void handleException(Exception exception, RollbackMethod rollbackMethod);
 
     /**
      * Take some action when a system exception has occurred (i.e., there was no message in play when the exception occurred).
