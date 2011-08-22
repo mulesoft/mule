@@ -10,10 +10,8 @@
 
 package org.mule.transport.ftp;
 
-import static org.junit.Assert.assertTrue;
-
 import org.mule.DefaultMuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 
 import java.io.File;
 import java.util.Arrays;
@@ -24,27 +22,29 @@ import java.util.concurrent.TimeUnit;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
+import static org.junit.Assert.assertTrue;
+
 public class FtpMessageDispatcherTestCase extends AbstractFtpServerTestCase
 {
-    public FtpMessageDispatcherTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
-
     private CountDownLatch latch = new CountDownLatch(1);
 
+    public FtpMessageDispatcherTestCase(ConfigVariant variant, String configResources)
+    {  
+        super(variant, configResources);
+    }
+    
     @Parameters
     public static Collection<Object[]> parameters()
     {
-        return Arrays.asList(new Object[][]{            
+        return Arrays.asList(new Object[][] {            
             {ConfigVariant.FLOW, "ftp-message-requester-test.xml"}
         });
     }      
     
     @Test
-    public void testDispatch() throws Exception
+    public void dispatch() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         client.dispatch(getMuleFtpEndpoint(), new DefaultMuleMessage(TEST_MESSAGE, muleContext));
 
         // check that the message arrived on the FTP server
@@ -54,11 +54,29 @@ public class FtpMessageDispatcherTestCase extends AbstractFtpServerTestCase
         assertTrue(filesOnServer.length > 0);
     }
 
+    @Test
+    public void dispatchToPath() throws Exception
+    {
+        String dirName = "test_dir";
+
+        File testDir = new File(FTP_SERVER_BASE_DIR, dirName);
+        testDir.deleteOnExit();
+        assertTrue(testDir.mkdir());
+
+        MuleClient client = muleContext.getClient();
+        String path = getMuleFtpEndpoint() + "/" + dirName;
+        client.dispatch(path, new DefaultMuleMessage(TEST_MESSAGE, muleContext));
+
+        // check that the message arrived on the FTP server
+        assertTrue(latch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS));
+
+        String[] filesOnServer = testDir.list();
+        assertTrue(filesOnServer.length > 0);
+    }
+    
     @Override
     public void fileUploadCompleted()
     {
         latch.countDown();
     }
 }
-
-
