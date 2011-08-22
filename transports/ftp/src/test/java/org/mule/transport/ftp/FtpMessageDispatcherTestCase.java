@@ -11,12 +11,13 @@
 package org.mule.transport.ftp;
 
 import org.mule.DefaultMuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 
 import java.io.File;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+
 import org.junit.Test;
 
 import static org.junit.Assert.assertTrue;
@@ -24,6 +25,7 @@ import static org.junit.Assert.assertTrue;
 public class FtpMessageDispatcherTestCase extends AbstractFtpServerTestCase
 {  
     private CountDownLatch latch;
+    private final String dirName = "test_dir";
     
     public FtpMessageDispatcherTestCase()
     {
@@ -38,15 +40,33 @@ public class FtpMessageDispatcherTestCase extends AbstractFtpServerTestCase
     }
 
     @Test
-    public void testDispatch() throws Exception
+    public void dispatch() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         client.dispatch(getMuleFtpEndpoint(), new DefaultMuleMessage(TEST_MESSAGE, muleContext));
         
         // check that the message arrived on the FTP server
         assertTrue(latch.await(getTimeout(), TimeUnit.MILLISECONDS));
 
         String[] filesOnServer = new File(FTP_SERVER_BASE_DIR).list();
+        assertTrue(filesOnServer.length > 0);
+    }
+
+    @Test
+    public void dispatchToPath() throws Exception
+    {
+        File testDir = new File(FTP_SERVER_BASE_DIR, dirName);
+        testDir.deleteOnExit();
+        assertTrue(testDir.mkdir());
+
+        MuleClient client = muleContext.getClient();
+        String path = getMuleFtpEndpoint() + "/" + dirName;
+        client.dispatch(path, new DefaultMuleMessage(TEST_MESSAGE, muleContext));
+
+        // check that the message arrived on the FTP server
+        assertTrue(latch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS));
+
+        String[] filesOnServer = testDir.list();
         assertTrue(filesOnServer.length > 0);
     }
     
@@ -56,5 +76,3 @@ public class FtpMessageDispatcherTestCase extends AbstractFtpServerTestCase
         latch.countDown();
     }
 }
-
-

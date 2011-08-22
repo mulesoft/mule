@@ -33,6 +33,7 @@ import org.mule.transport.ConnectException;
 import org.mule.transport.file.ExpressionFilenameParser;
 import org.mule.transport.file.FilenameParser;
 import org.mule.util.ClassUtils;
+import org.mule.util.StringUtils;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -53,7 +54,6 @@ public class FtpConnector extends AbstractConnector
     public static final String FTP = "ftp";
 
     // endpoint properties
-    public static final String PROPERTY_POLLING_FREQUENCY = "pollingFrequency"; // inbound only
     public static final int DEFAULT_POLLING_FREQUENCY = 1000;
     public static final String PROPERTY_OUTPUT_PATTERN = "outputPattern"; // outbound only
     public static final String PROPERTY_PASSIVE_MODE = "passive";
@@ -102,13 +102,13 @@ public class FtpConnector extends AbstractConnector
     @Override
     public MessageReceiver createReceiver(FlowConstruct flowConstruct, InboundEndpoint endpoint) throws Exception
     {
-        List args = getReceiverArguments(endpoint.getProperties());
+        List<?> args = getReceiverArguments(endpoint.getProperties());
         return serviceDescriptor.createMessageReceiver(this, flowConstruct, endpoint, args.toArray());
     }
 
-    protected List getReceiverArguments(Map endpointProperties)
+    protected List<?> getReceiverArguments(Map endpointProperties)
     {
-        List args = new ArrayList();
+        List<Object> args = new ArrayList<Object>();
 
         long polling = getPollingFrequency();
         if (endpointProperties != null)
@@ -275,7 +275,7 @@ public class FtpConnector extends AbstractConnector
 
         try
         {
-            Class objectFactoryClass = ClassUtils.loadClass(this.connectionFactoryClass, getClass());
+            Class<?> objectFactoryClass = ClassUtils.loadClass(this.connectionFactoryClass, getClass());
             if (!FtpConnectionFactory.class.isAssignableFrom(objectFactoryClass))
             {
                 throw new InitialisationException(MessageFactory.createStaticMessage(
@@ -644,17 +644,22 @@ public class FtpConnector extends AbstractConnector
         this.setupFileType(client, endpoint);
 
         String path = uri.getPath();
-        // MULE-2400: if the path begins with '~' we must strip the first '/' to make things
-        // work with FTPClient
-        if ((path.length() >= 2) && (path.charAt(1) == '~'))
-        {
-            path = path.substring(1);
-        }
 
-        if (!client.changeWorkingDirectory(path))
+        // only change directory if one was configured
+        if (StringUtils.isNotBlank(path))
         {
-            throw new IOException(MessageFormat.format("Failed to change working directory to {0}. Ftp error: {1}",
-                                                       path, client.getReplyCode()));
+            // MULE-2400: if the path begins with '~' we must strip the first '/' to make things
+            // work with FTPClient
+            if ((path.length() >= 2) && (path.charAt(1) == '~'))
+            {
+                path = path.substring(1);
+            }
+
+            if (!client.changeWorkingDirectory(path))
+            {
+                throw new IOException(MessageFormat.format("Failed to change working directory to {0}. Ftp error: {1}",
+                                                           path, client.getReplyCode()));
+            }
         }
         return client;
     }
