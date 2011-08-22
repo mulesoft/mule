@@ -10,18 +10,18 @@
 
 package org.mule.example.bookstore.transformers;
 
-import org.mule.RequestContext;
+import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;
 import org.mule.example.bookstore.Book;
 import org.mule.example.bookstore.Order;
-import org.mule.transformer.AbstractTransformer;
+import org.mule.transformer.AbstractMessageTransformer;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transport.email.MailProperties;
 
 /**
  * Composes an e-mail notification message to be sent based on the Book Order.
  */
-public class OrderToEmailTransformer extends AbstractTransformer
+public class OrderToEmailTransformer extends AbstractMessageTransformer
 {
     public OrderToEmailTransformer()
     {
@@ -29,21 +29,21 @@ public class OrderToEmailTransformer extends AbstractTransformer
         registerSourceType(DataTypeFactory.create(Order.class));
         setReturnDataType(DataTypeFactory.STRING);
     }
-    
+
     @Override
-    protected Object doTransform(Object src, String outputEncoding) throws TransformerException
+    public Object transformMessage(MuleMessage message, String outputEncoding) throws TransformerException
     {
-        Order order = (Order) src;
+        Order order = (Order) message.getPayload();
         Book book = order.getBook();
-        
+
         String body =  "Thank you for placing your order for " +
                        book.getTitle() + " with the Mule-powered On-line Bookstore. " +
                        "Your order will be shipped  to " +
                        order.getAddress() + " by the next business day.";
-        
+
         String email = order.getEmail();
-        RequestContext.getEventContext().getMessage().setOutboundProperty(MailProperties.TO_ADDRESSES_PROPERTY,
-                                                                          email);
+        message.setOutboundProperty(MailProperties.TO_ADDRESSES_PROPERTY, email);
+
         logger.info("Sending e-mail notification to " + email);
         return body;
     }
