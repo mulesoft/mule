@@ -157,6 +157,7 @@
             <xsd:extension base="mule:inboundEndpointTypeWithoutExchangePattern">
                 <xsd:attributeGroup ref="addressAttributes"/>
                 <xsd:attributeGroup ref="inboundAttributes"/>
+                <xsd:attributeGroup ref="inboundEndpointAttributes"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
@@ -178,6 +179,7 @@
             <xsd:extension base="mule:globalEndpointTypeWithoutExchangePattern">
                 <xsd:attributeGroup ref="addressAttributes"/>
                 <xsd:attributeGroup ref="inboundAttributes"/>
+                <xsd:attributeGroup ref="inboundEndpointAttributes"/>
                 <xsd:attributeGroup ref="outboundAttributes"/>
             </xsd:extension>
         </xsd:complexContent>
@@ -220,7 +222,10 @@
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
-        <xsd:attribute name="comparator" type="mule:substitutableClass">
+    </xsd:attributeGroup>
+
+    <xsd:attributeGroup name="inboundEndpointAttributes">
+            <xsd:attribute name="comparator" type="mule:substitutableClass">
             <xsd:annotation>
                 <xsd:documentation>
                     Sorts incoming files using the specified comparator, such as comparator="org.mule.transport.file.comparator.OlderFirstComparator". The class must implement the java.util.Comparator interface.
