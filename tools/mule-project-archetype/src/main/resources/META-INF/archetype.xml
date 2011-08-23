@@ -57,10 +57,6 @@ Which Mule transports do you want to include in this project?
             <file>pom.vm</file>
             <output>pom.xml</output>
         </template>
-        <template>
-            <file>assembly.xml.vm</file>
-            <output>assembly.xml</output>
-        </template>
 
         <template>
             <file>src/main/app/mule-config.xml.vm</file>

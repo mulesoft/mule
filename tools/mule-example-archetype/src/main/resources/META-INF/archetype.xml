@@ -55,10 +55,6 @@
             <file>LICENSE.vm</file>
             <output>LICENSE.txt</output>
         </template>
-        <template>
-            <file>assembly.xml.vm</file>
-            <output>assembly.xml</output>
-        </template>
 
         <template>
             <file>dist/build.xml.vm</file>
