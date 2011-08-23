@@ -305,9 +305,10 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
 
                 // Extract jms selector
                 String selector = null;
-                if (endpoint.getFilter() != null && endpoint.getFilter() instanceof JmsSelectorFilter)
+                JmsSelectorFilter selectorFilter = jmsConnector.getSelector(endpoint);
+                if (selectorFilter != null)
                 {
-                    selector = ((JmsSelectorFilter) endpoint.getFilter()).getExpression();
+                    selector = selectorFilter.getExpression();
                 }
                 else
                 {

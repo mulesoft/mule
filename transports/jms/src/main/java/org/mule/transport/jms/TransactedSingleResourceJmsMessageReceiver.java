@@ -102,9 +102,10 @@ public class TransactedSingleResourceJmsMessageReceiver extends AbstractMessageR
             Destination dest = jmsSupport.createDestination(session, endpoint);
             // Extract jms selector
             String selector = null;
-            if (endpoint.getFilter() != null && endpoint.getFilter() instanceof JmsSelectorFilter)
+            JmsSelectorFilter selectorFilter = connector.getSelector(endpoint);
+            if (selectorFilter != null)
             {
-                selector = ((JmsSelectorFilter) endpoint.getFilter()).getExpression();
+                selector = selectorFilter.getExpression();
             }
             else if (endpoint.getProperties() != null)
             {

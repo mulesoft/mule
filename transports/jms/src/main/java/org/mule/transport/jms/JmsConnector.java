@@ -20,6 +20,7 @@ import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.StartException;
 import org.mule.api.lifecycle.StopException;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionException;
 import org.mule.api.transport.ReplyToHandler;
@@ -28,9 +29,11 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.context.notification.ConnectionNotification;
 import org.mule.context.notification.NotificationException;
+import org.mule.endpoint.AbstractEndpoint;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.transport.AbstractConnector;
 import org.mule.transport.ConnectException;
+import org.mule.transport.jms.filters.JmsSelectorFilter;
 import org.mule.transport.jms.i18n.JmsMessages;
 import org.mule.transport.jms.jndi.JndiNameResolver;
 import org.mule.transport.jms.jndi.SimpleJndiNameResolver;
@@ -1332,5 +1335,18 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
     public void setSameRMOverrideValue(Boolean sameRMOverrideValue)
     {
         this.sameRMOverrideValue = sameRMOverrideValue;
+    }
+
+    public JmsSelectorFilter getSelector(ImmutableEndpoint endpoint)
+    {
+        for (MessageProcessor mp : endpoint.getMessageProcessors())
+        {
+            if (mp instanceof JmsSelectorFilter)
+            {
+                return (JmsSelectorFilter) mp;
+            }
+        }
+
+        return null;
     }
 }

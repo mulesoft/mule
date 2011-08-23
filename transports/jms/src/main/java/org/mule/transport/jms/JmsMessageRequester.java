@@ -108,9 +108,10 @@ public class JmsMessageRequester extends AbstractMessageRequester
 
             // Extract jms selector
             String selector = null;
-            if (endpoint.getFilter() != null && endpoint.getFilter() instanceof JmsSelectorFilter)
+            JmsSelectorFilter selectorFilter = connector.getSelector(endpoint);
+            if (selectorFilter != null)
             {
-                final String expressionTemplate = ((JmsSelectorFilter) endpoint.getFilter()).getExpression();
+                final String expressionTemplate = selectorFilter.getExpression();
                 if (StringUtils.isNotBlank(expressionTemplate))
                 {
                     selector = connector.getMuleContext().getExpressionManager().parse(expressionTemplate, null);

@@ -605,10 +605,10 @@
             <xsd:element ref="mule:abstract-transaction" minOccurs="0"/>
             <xsd:element ref="mule:abstract-xa-transaction" minOccurs="0"/>
             <xsd:choice>
-                <xsd:element ref="mule:abstract-filter" minOccurs="0"/>
+                <!--xsd:element ref="mule:abstract-filter" minOccurs="0"/>    -->
                 <xsd:element name="selector" type="jmsSelectorFilter" minOccurs="0"/>
             </xsd:choice>
-            <xsd:element ref="mule:abstract-security-filter" minOccurs="0"/>
+            <!-- <xsd:element ref="mule:abstract-security-filter" minOccurs="0"/> -->
             <xsd:group ref="mule:propertiesGroup"/>
         </xsd:sequence>
     </xsd:group>
