@@ -20,8 +20,8 @@
         <!-- Tools properties -->
         <eclipsePluginVersion>2.5</eclipsePluginVersion>
         <vmtype>org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType</vmtype>
-        <jdk5Name>J2SE-1.5</jdk5Name>
-        <jdk.version>1.5</jdk.version>
+        <jdkName>JavaSE-1.6</jdkName>
+        <jdk.version>1.6</jdk.version>
 #if($license.id)
         <licenseId>${license.id}</licenseId>
         <licenseUrl>${license.url}</licenseUrl>
@@ -89,7 +89,7 @@
                     <!-- by default download all sources when generating project files -->
                     <downloadSources>true</downloadSources>
                     <classpathContainers>
-                        <classpathContainer>org.eclipse.jdt.launching.JRE_CONTAINER/${D}{vmtype}/${D}{jdk5Name}
+                        <classpathContainer>org.eclipse.jdt.launching.JRE_CONTAINER/${D}{vmtype}/${D}{jdkName}
                         </classpathContainer>
                     </classpathContainers>
                 </configuration>
