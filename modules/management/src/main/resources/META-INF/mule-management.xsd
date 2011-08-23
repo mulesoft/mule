@@ -82,15 +82,6 @@
     <xsd:complexType name="jmxMx4jAdaptorType">
         <xsd:complexContent>
             <xsd:extension base="mule:abstractAgentType">
-                <xsd:sequence>
-                    <xsd:element name="socketFactoryProperties" type="mule:mapType" minOccurs="0" >
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            A map containing properties for SSL server socket factory configuration. If this element contains at least one property, the agent will switch to HTTPS connections. These properties will be delegated as is to the agent's HTTP/S adaptor. For a list of available properties, see the [MX4J API documentation|http://mx4j.sourceforge.net/docs/api/mx4j/tools/adaptor/ssl/SSLAdaptorServerSocketFactory.html].
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:element>
-                </xsd:sequence>
                 <xsd:attribute name="jmxAdaptorUrl" type="xsd:string" >
                     <xsd:annotation>
                         <xsd:documentation>
