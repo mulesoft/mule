@@ -21,7 +21,6 @@ import org.apache.commons.logging.LogFactory;
 
 public abstract class MessageFactory
 {
-
     /**
      * Default is {@link ReloadControl.Always}.
      */
@@ -36,7 +35,11 @@ public abstract class MessageFactory
 
     protected transient Log logger = LogFactory.getLog(getClass());
 
-    protected ResourceBundle.Control reloadControl = DEFAULT_RELOAD_CONTROL;
+    /**
+     * Do not use the default reload control to avoid loading the resource bundle upon each request.
+     * Subclasses can override to provide a different default.
+     */
+    protected ResourceBundle.Control reloadControl = null;
 
     /**
      * Computes the bundle's full path 
