@@ -36,6 +36,7 @@ public class MuleLoggerFactory implements ILoggerFactory
         new LoggerReferenceHandler("Mule.log.slf4j.ref.handler", referenceQueue, refs, repository);
     }
 
+    @Override
     public Logger getLogger(String name)
     {
         final ClassLoader ccl = Thread.currentThread().getContextClassLoader();
