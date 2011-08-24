@@ -18,7 +18,6 @@ import org.mule.module.cxf.testmodels.CxfEnabledFaultMessage;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
-import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.interceptor.Fault;
 import org.junit.Ignore;
 import org.junit.Rule;
@@ -53,7 +52,7 @@ public class CxfComponentExceptionStrategyTestCase extends FunctionalTestCase
         }
         catch (MessagingException e)
         {
-            assertTrue(e.getCause().getCause() instanceof SoapFault);
+            assertTrue(e.getCause().getCause() instanceof CxfEnabledFaultMessage);
         }
     }
 
