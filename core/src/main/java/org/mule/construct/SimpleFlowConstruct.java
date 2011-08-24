@@ -132,6 +132,10 @@ public class SimpleFlowConstruct extends AbstractFlowConstruct implements Messag
         {
             return messageProcessorChain.process(newEvent);
         }
+        catch (Exception e)
+        {
+            return getExceptionListener().handleException(e, newEvent);
+        }
         finally
         {
             RequestContext.setEvent(event);

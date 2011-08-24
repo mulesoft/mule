@@ -656,6 +656,10 @@ public abstract class AbstractService implements Service, MessageProcessor
         {
             return messageProcessorChain.process(newEvent);
         }
+        catch (Exception e)
+        {
+            return getExceptionListener().handleException(e, newEvent);
+        }
         finally
         {
             RequestContext.setEvent(event);
