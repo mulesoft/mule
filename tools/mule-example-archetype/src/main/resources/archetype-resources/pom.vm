@@ -258,12 +258,14 @@
 
         <!-- Mule Modules -->
 #foreach($item in $moduleArray)
+#if($item != 'doc')
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-${item}</artifactId>
             <version>${D}{mule.version}</version>
             <scope>provided</scope>
         </dependency>
+#end
 #end
 
         <!-- for testing -->

@@ -292,6 +292,7 @@
 
         <!-- Mule Modules -->
 #foreach($item in $moduleArray)
+#if($item != 'doc')
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-${item}</artifactId>
@@ -299,7 +300,7 @@
             <scope>provided</scope>
         </dependency>
 #end
-
+#end
         <!-- for testing -->
         <dependency>
             <groupId>org.mule.tests</groupId>

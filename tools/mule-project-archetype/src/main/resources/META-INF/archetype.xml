@@ -38,9 +38,9 @@ Which Mule transports do you want to include in this project?
             <name>modules</name>
             <description>Which Mule modules do you want to include in this project?
 
-(options: annotations, atom, boot, builders, client, cxf, guice, ibeans,
+(options: annotations, atom, boot, builders, client, cxf, doc, guice, ibeans,
           jaas, jbossts, jersey, json, management, ognl, pgp, rss, scripting,
-          spring-extras, spring-security, sxc, ws, xml):
+          spring-extras, spring-security, sxc, xml):
 
             </description>
             <defvalue>client,cxf,management,scripting,sxc,xml</defvalue>
