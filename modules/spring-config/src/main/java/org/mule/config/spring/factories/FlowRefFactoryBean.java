@@ -12,6 +12,7 @@ package org.mule.config.spring.factories;
 
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
+import org.mule.api.construct.FlowConstruct;
 import org.mule.api.processor.MessageProcessor;
 
 import org.springframework.beans.BeansException;
@@ -32,15 +33,22 @@ public class FlowRefFactoryBean implements FactoryBean<MessageProcessor>, Applic
     @Override
     public MessageProcessor getObject() throws Exception
     {
-        // Create new message processor to decouple lifecycle
-        return new MessageProcessor()
+        final MessageProcessor processor = ((MessageProcessor) applicationContext.getBean(refName));
+        if (processor instanceof FlowConstruct)
         {
-            @Override
-            public MuleEvent process(MuleEvent event) throws MuleException
+            // If a FlowConstuct is reference then decouple lifcycle/injection
+            return new MessageProcessor()
             {
-                return ((MessageProcessor) applicationContext.getBean(refName)).process(event);
-            }
-        };
+                public MuleEvent process(MuleEvent event) throws MuleException
+                {
+                    return processor.process(event);
+                }
+            };
+        }
+        else
+        {
+            return processor;
+        }
     }
 
     @Override
