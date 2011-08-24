@@ -14,10 +14,10 @@ import org.mule.api.MessagingException;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.module.client.MuleClient;
+import org.mule.module.cxf.testmodels.CxfEnabledFaultMessage;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
-import org.apache.cxf.binding.soap.SoapFault;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
@@ -50,7 +50,7 @@ public class CxfExceptionHandlingTestCase extends FunctionalTestCase
         }
         catch (MessagingException e)
         {
-            assertTrue(e.getCause().getCause() instanceof SoapFault);
+            assertTrue(e.getCause().getCause() instanceof CxfEnabledFaultMessage);
         }
     }
 

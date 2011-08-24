@@ -82,7 +82,12 @@ public class MuleInvoker implements Invoker
         catch (MuleException e)
         {
             exchange.put(CxfConstants.MULE_EVENT, event);
-            throw new Fault(e);
+
+            Throwable cause = e;
+            if (e instanceof ComponentException) {
+                cause = e.getCause();
+            }
+            throw new Fault(cause);
         }
         catch (RuntimeException e)
         {

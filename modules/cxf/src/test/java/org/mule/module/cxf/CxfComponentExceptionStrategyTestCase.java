@@ -10,11 +10,6 @@
 
 package org.mule.module.cxf;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 import org.mule.api.MessagingException;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.module.client.MuleClient;
@@ -26,12 +21,16 @@ import org.mule.tck.junit4.rule.DynamicPort;
 import java.util.Arrays;
 import java.util.Collection;
 
-import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.interceptor.Fault;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class CxfComponentExceptionStrategyTestCase extends AbstractServiceAndFlowTestCase
 {
@@ -65,7 +64,7 @@ public class CxfComponentExceptionStrategyTestCase extends AbstractServiceAndFlo
         }
         catch (MessagingException e)
         {
-            assertTrue(e.getCause().getCause() instanceof SoapFault);
+            assertTrue(e.getCause().getCause() instanceof CxfEnabledFaultMessage);
         }
     }
 
