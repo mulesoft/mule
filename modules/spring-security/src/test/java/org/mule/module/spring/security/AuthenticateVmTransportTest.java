@@ -10,16 +10,18 @@
 
 package org.mule.module.spring.security;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
 import org.mule.api.MuleMessage;
+import org.mule.api.security.UnauthorisedException;
 import org.mule.client.DefaultLocalMuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
 
 import java.util.HashMap;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.fail;
 
 public class AuthenticateVmTransportTest extends FunctionalTestCase
 {
@@ -52,14 +54,10 @@ public class AuthenticateVmTransportTest extends FunctionalTestCase
         assertNull(result.getExceptionPayload());
 
         props.put("password", "badpass");
-        try
-        {
-            client.send(endpoint, "hi", props);
-            fail("Exception expected");
-        }
-        catch (Exception e)
-        {
-            // expected
-        }
+        MuleMessage result2 = client.send(endpoint, "hi", props);
+        assertNotNull(result2);
+        assertNotNull(result2.getExceptionPayload());
+        assertEquals(UnauthorisedException.class, result2.getExceptionPayload().getException().getClass());
+
     }
 }

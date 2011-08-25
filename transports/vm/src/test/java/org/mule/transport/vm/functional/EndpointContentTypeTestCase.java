@@ -13,7 +13,6 @@ package org.mule.transport.vm.functional;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEventContext;
@@ -54,15 +53,9 @@ public class EndpointContentTypeTestCase extends AbstractServiceAndFlowTestCase
         Map<String, Object> messageProperties = new HashMap<String, Object>();
         messageProperties.put("content-type", "text/xml");
         MuleClient client = muleContext.getClient();
-        try
-        {
-            client.send("vm://in1?connector=vm-in1", "<OK/>", messageProperties);
-            fail("Invalid mime type was not rejected");
-        }
-        catch (Exception e)
-        {
-            assertTrue(e instanceof MessagingException);
-        }
+        MuleMessage result = client.send("vm://in1?connector=vm-in1", "<OK/>", messageProperties);
+        assertNotNull(result.getExceptionPayload());
+        assertTrue(result.getExceptionPayload().getException() instanceof MessagingException);
 
         messageProperties.put("content-type", "text/plain");
         EchoComponent.setExpectedContentType("text/plain");
@@ -101,3 +94,4 @@ public class EndpointContentTypeTestCase extends AbstractServiceAndFlowTestCase
         }
     }
 }
+    

@@ -10,16 +10,15 @@
 
 package org.mule.test.routing;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
-import org.mule.api.transport.DispatchException;
+import org.mule.api.routing.CouldNotRouteOutboundMessageException;
 import org.mule.tck.junit4.FunctionalTestCase;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
 
 public class FirstSuccessfulTestCase extends FunctionalTestCase
 {
@@ -42,15 +41,12 @@ public class FirstSuccessfulTestCase extends FunctionalTestCase
         response = client.send("vm://input", Long.valueOf(42), null);
         assertEquals("42 is a number", response.getPayloadAsString());
 
-        try
-        {
-            response = client.send("vm://input", Boolean.TRUE, null);
-            fail("DispatchException expected");
-        }
-        catch (DispatchException e)
-        {
-            // this one was expected
-        }
+        response = client.send("vm://input", Boolean.TRUE, null);
+        assertNotNull(response);
+        assertNotNull(response.getExceptionPayload());
+        assertEquals(CouldNotRouteOutboundMessageException.class, response.getExceptionPayload()
+            .getRootException()
+            .getClass());
     }
 
     @Test
@@ -64,15 +60,12 @@ public class FirstSuccessfulTestCase extends FunctionalTestCase
     @Test
     public void testFirstSuccessfulWithExpressionAllFail() throws Exception
     {
-        try
-        {
-            muleContext.getClient().send("vm://input3", "XYZ", null);
-            fail("DispatchException expected");
-        }
-        catch (DispatchException e)
-        {
-            // this one was expected
-        }
+        MuleMessage response = muleContext.getClient().send("vm://input3", "XYZ", null);
+        assertNotNull(response);
+        assertNotNull(response.getExceptionPayload());
+        assertEquals(CouldNotRouteOutboundMessageException.class, response.getExceptionPayload()
+            .getRootException()
+            .getClass());
     }
 
     @Test

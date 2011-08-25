@@ -10,22 +10,20 @@
 
 package org.mule.test.integration.routing.outbound;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
-import org.mule.util.ExceptionUtils;
 
 import java.util.Arrays;
 import java.util.Collection;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 public class ChainingRouterNullsHandlingTestCase extends AbstractServiceAndFlowTestCase
 {
@@ -55,31 +53,21 @@ public class ChainingRouterNullsHandlingTestCase extends AbstractServiceAndFlowT
     public void testLastComponentFails() throws Exception
     {
         MuleMessage message = new DefaultMuleMessage("thePayload", muleContext);
-        try
-        {
-            muleContext.getClient().send("vm://incomingLastFail", message);
-            fail("Exception expected");
-        }
-        catch (Exception e)
-        {
-            assertTrue("Exception raised in wrong service",
-                ExceptionUtils.getRootCause(e) instanceof Component2Exception);
-        }
+
+        MuleMessage result = muleContext.getClient().send("vm://incomingLastFail", message);
+        assertNotNull(result);
+        assertNotNull(result.getExceptionPayload());
+        assertEquals(Component2Exception.class, result.getExceptionPayload().getRootException().getClass());
     }
+
 
     @Test
     public void testFirstComponentFails() throws Exception
     {
         MuleMessage message = new DefaultMuleMessage("thePayload", muleContext);
-        try
-        {
-            muleContext.getClient().send("vm://incomingFirstFail", message);
-            fail("Exception expected");
-        }
-        catch (Exception e)
-        {
-            assertTrue("Exception raised in wrong service",
-                ExceptionUtils.getRootCause(e) instanceof Component1Exception);
-        }
+        MuleMessage result = muleContext.getClient().send("vm://incomingFirstFail", message);
+        assertNotNull(result);
+        assertNotNull(result.getExceptionPayload());
+        assertEquals(Component1Exception.class, result.getExceptionPayload().getRootException().getClass());
     }
 }

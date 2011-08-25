@@ -19,6 +19,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import org.mule.DefaultMuleMessage;
+import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
@@ -40,6 +41,7 @@ import org.mule.tck.testmodels.fruit.Fruit;
 import org.mule.tck.testmodels.fruit.FruitBowl;
 import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.transformer.simple.StringAppendTransformer;
+import org.mule.util.ExceptionUtils;
 
 import java.util.HashMap;
 import java.util.List;
@@ -391,15 +393,11 @@ public class FlowConfigurationFunctionalTestCase extends FunctionalTestCase
     @Test
     public void testAsyncTransactionalEndpoint() throws Exception
     {
-        try
-        {
-            muleContext.getClient().send("vm://async-tx-in", new DefaultMuleMessage("0", muleContext));
-            fail("Exception expected");
-        }
-        catch (DispatchException e)
-        {
-            // expected
-        }
+        MuleMessage message = muleContext.getClient().send("vm://async-tx-in",
+            new DefaultMuleMessage("0", muleContext));
+        assertNotNull(message);
+        assertNotNull(message.getExceptionPayload());
+        assertEquals(MessagingException.class, message.getExceptionPayload().getException().getClass());
 
         final MuleMessage result = muleContext.getClient().request("vm://async-requestresponse-out",
             RECEIVE_TIMEOUT);

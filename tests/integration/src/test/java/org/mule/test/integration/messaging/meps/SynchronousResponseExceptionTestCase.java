@@ -10,15 +10,20 @@
 
 package org.mule.test.integration.messaging.meps;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+import org.mule.api.MuleMessage;
+import org.mule.api.transformer.TransformerException;
+import org.mule.api.transport.NoReceiverForEndpointException;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.exceptions.FunctionalTestException;
 
 import java.util.Arrays;
 import java.util.Collection;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-
-import static org.junit.Assert.fail;
 
 /**
  * @see MULE-4512
@@ -43,70 +48,56 @@ public class SynchronousResponseExceptionTestCase extends AbstractServiceAndFlow
     @Test
     public void testComponentException() throws Exception
     {
-        try
-        {
-            muleContext.getClient().send("vm://in1", "request", null);
-            fail("Exception expected");
-        }
-        catch (Exception e)
-        {
-            // expected
-        }
+        MuleMessage message = muleContext.getClient().send("vm://in1", "request", null);
+        assertNotNull(message);
+        assertNotNull(message.getExceptionPayload());
+        assertEquals(FunctionalTestException.class, message.getExceptionPayload()
+            .getRootException()
+            .getClass());
     }
 
     @Test
     public void testOutboundRoutingException() throws Exception
     {
-        try
-        {
-            muleContext.getClient().send("vm://in2", "request", null);
-            fail("Exception expected");
-        }
-        catch (Exception e)
-        {
-            // expected
-        }
+        MuleMessage message = muleContext.getClient().send("vm://in2", "request", null);
+        assertNotNull(message);
+        assertNotNull(message.getExceptionPayload());
+        assertEquals(NoReceiverForEndpointException.class, message.getExceptionPayload()
+            .getRootException()
+            .getClass());
     }
 
     @Test
     public void testInboundTransformerException() throws Exception
     {
-        try
-        {
-            muleContext.getClient().send("vm://in3", "request", null);
-            fail("Exception expected");
-        }
-        catch (Exception e)
-        {
-            // expected
-        }
+        MuleMessage message = muleContext.getClient().send("vm://in3", "request", null);
+        assertNotNull(message);
+        assertNotNull(message.getExceptionPayload());
+        assertEquals(TransformerException.class, message.getExceptionPayload()
+            .getRootException()
+            .getClass());
     }
 
     @Test
     public void testOutboundTransformerException() throws Exception
     {
-        try
-        {
-            muleContext.getClient().send("vm://in4", "request", null);
-            fail("Exception expected");
-        }
-        catch (Exception e)
-        {
-            // expected
-        }
+        MuleMessage message = muleContext.getClient().send("vm://in4", "request", null);
+        assertNotNull(message);
+        assertNotNull(message.getExceptionPayload());
+        assertEquals(TransformerException.class, message.getExceptionPayload()
+            .getRootException()
+            .getClass());
     }
 
     @Test
     public void testResponseTransformerException() throws Exception
     {
-        try
-        {
-            muleContext.getClient().send("vm://in5", "request", null);
-            fail("Exception expected");
-        }
-        catch (Exception e)
-        {
-            // expected
-        }
+        MuleMessage message = muleContext.getClient().send("vm://in5", "request", null);
+        assertNotNull(message);
+        assertNotNull(message.getExceptionPayload());
+        assertEquals(TransformerException.class, message.getExceptionPayload()
+            .getRootException()
+            .getClass());
+
     }
 }

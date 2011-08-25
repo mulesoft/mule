@@ -27,7 +27,6 @@
 				<outbound-endpoint address="vm://hello.in" exchange-pattern="request-response" />
 			</binding>
 		</component>                                    
-		<vm:outbound-endpoint path="invoker.out" exchange-pattern="one-way"/>                        
 	</flow>
     
 </mule>

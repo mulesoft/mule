@@ -10,6 +10,12 @@
 
 package org.mule.api.annotations.param;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.expression.RequiredValueException;
@@ -29,13 +35,6 @@ import javax.activation.DataHandler;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 public class InboundAttachmentsAnnotationTestCase extends AbstractServiceAndFlowTestCase
 {
@@ -153,17 +152,13 @@ public class InboundAttachmentsAnnotationTestCase extends AbstractServiceAndFlow
     @Test
     public void testMapAttachmentsMissing() throws Exception
     {
-        //clear attachments
+        // clear attachments
         muleMessage = createMessage(null, new HashMap<String, DataHandler>());
-        try
-        {
-            muleContext.getClient().send("vm://attachments", muleMessage);
-            fail("Exception expected");
-        }
-        catch (Exception e)
-        {
-            assertTrue(ExceptionUtils.getRootCause(e) instanceof RequiredValueException);
-        }
+        MuleMessage message = muleContext.getClient().send("vm://attachments", muleMessage);
+        assertNotNull(message);
+        assertNotNull(message.getExceptionPayload());
+        assertEquals(RequiredValueException.class,
+            ExceptionUtils.getRootCause(message.getExceptionPayload().getException()).getClass());
     }
 
     @Test
@@ -217,15 +212,11 @@ public class InboundAttachmentsAnnotationTestCase extends AbstractServiceAndFlow
     @Test
     public void testMapAttachmentsUnmodifiable() throws Exception
     {
-        try
-        {
-            muleContext.getClient().send("vm://attachmentsUnmodifiable", muleMessage);
-            fail("Exception expected");
-        }
-        catch (Exception e)
-        {
-            assertTrue(ExceptionUtils.getRootCause(e) instanceof UnsupportedOperationException);
-        }
+        MuleMessage message = muleContext.getClient().send("vm://attachmentsUnmodifiable", muleMessage);
+        assertNotNull(message);
+        assertNotNull(message.getExceptionPayload());
+        assertEquals(UnsupportedOperationException.class,
+            ExceptionUtils.getRootCause(message.getExceptionPayload().getException()).getClass());
     }
 
     @Test
@@ -329,15 +320,12 @@ public class InboundAttachmentsAnnotationTestCase extends AbstractServiceAndFlow
         attachments.put("foo", new DataHandler(new StringDataSource("fooValue")));
         attachments.put("baz", new DataHandler(new StringDataSource("bazValue")));
         muleMessage = createMessage(null, attachments);
-        try
-        {
-            muleContext.getClient().send("vm://attachmentsListOptional", muleMessage);
-            fail("Exception expected");
-        }
-        catch (Exception e)
-        {
-            assertTrue(ExceptionUtils.getRootCause(e) instanceof RequiredValueException);
-        }
+        MuleMessage result = muleContext.getClient().send("vm://attachmentsListOptional", muleMessage);
+        assertNotNull(result);
+        assertNotNull(result.getExceptionPayload());
+        assertEquals(RequiredValueException.class,
+            ExceptionUtils.getRootCause(result.getExceptionPayload().getException()).getClass());
+
     }
 
     @Test
@@ -355,15 +343,11 @@ public class InboundAttachmentsAnnotationTestCase extends AbstractServiceAndFlow
     @Test
     public void testListAttachmentsUnmodifiable() throws Exception
     {
-        try
-        {
-            muleContext.getClient().send("vm://attachmentsListUnmodifiable", muleMessage);
-            fail("Exception expected");
-        }
-        catch (Exception e)
-        {
-            assertTrue(ExceptionUtils.getRootCause(e) instanceof UnsupportedOperationException);
-        }
+        MuleMessage result = muleContext.getClient().send("vm://attachmentsListUnmodifiable", muleMessage);
+        assertNotNull(result);
+        assertNotNull(result.getExceptionPayload());
+        assertEquals(UnsupportedOperationException.class,
+            ExceptionUtils.getRootCause(result.getExceptionPayload().getException()).getClass());
     }
 
     @Test

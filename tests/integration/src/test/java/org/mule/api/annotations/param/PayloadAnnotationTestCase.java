@@ -10,6 +10,10 @@
 
 package org.mule.api.annotations.param;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;
 import org.mule.module.client.MuleClient;
@@ -23,11 +27,6 @@ import java.util.Collection;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 public class PayloadAnnotationTestCase extends AbstractServiceAndFlowTestCase
 {
@@ -69,14 +68,10 @@ public class PayloadAnnotationTestCase extends AbstractServiceAndFlowTestCase
     public void testPayloadFailedTransform() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
-        try
-        {
-            client.send("vm://payload3", null, null);
-            fail("Exception expected");
-        }
-        catch (Exception e)
-        {
-            assertTrue(ExceptionUtils.getRootCause(e) instanceof TransformerException);
-        }
+        MuleMessage message = client.send("vm://payload3", null, null);
+        assertNotNull(message);
+        assertNotNull(message.getExceptionPayload());
+        assertEquals(TransformerException.class,
+            ExceptionUtils.getRootCause(message.getExceptionPayload().getException()).getClass());
     }
 }

@@ -9,6 +9,8 @@
  */
 package org.mule.test.routing;
 
+import static org.junit.Assert.assertEquals;
+
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
@@ -18,8 +20,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
 
 public class RedeliveryPolicyTestCase extends FunctionalTestCase
 {
@@ -43,23 +43,20 @@ public class RedeliveryPolicyTestCase extends FunctionalTestCase
     @Test
     public void testLimitedFailures() throws Exception
     {
-        int success = 0;int failure = 0;
+        int success = 0;
+        int failure = 0;
         for (int i = 0; i < 100; i++)
         {
             MuleClient client = new MuleClient(muleContext);
-            try
-            {
-                MuleMessage msg = client.send("vm://limitedFailures", "hello", null);
-                if (msg.getPayload().equals("hello"))
-                {
-                    success++;
-                }
-            }
-            catch (Exception ex)
+            MuleMessage msg = client.send("vm://limitedFailures", "hello", null);
+            if (msg.getExceptionPayload() != null)
             {
                 failure++;
             }
-
+            else if (msg.getPayload().equals("hello"))
+            {
+                success++;
+            }
         }
         checkNumberOfMessages("vm://dead-letter-queue", 0, 1000);
         assertEquals(25, success);
@@ -69,25 +66,23 @@ public class RedeliveryPolicyTestCase extends FunctionalTestCase
     @Test
     public void testManyRealFailures() throws Exception
     {
-        int success = 0;int failure = 0;
+        int success = 0;
+        int failure = 0;
         for (int i = 0; i < 12; i++)
         {
             for (int j = 0; j < 10; j++)
             {
 
                 MuleClient client = new MuleClient(muleContext);
-                try
-                {
-                    String payload = "hello" + j;
-                    MuleMessage msg = client.send("vm://manyRealFailures", payload, null);
-                    if (msg.getPayload().equals(payload))
-                    {
-                        success++;
-                    }
-                }
-                catch (Exception ex)
+                String payload = "hello" + j;
+                MuleMessage msg = client.send("vm://manyRealFailures", payload, null);
+                if (msg.getExceptionPayload() != null)
                 {
                     failure++;
+                }
+                else if (msg.getPayload().equals(payload))
+                {
+                    success++;
                 }
             }
         }

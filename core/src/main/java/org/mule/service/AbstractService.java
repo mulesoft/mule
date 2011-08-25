@@ -10,12 +10,6 @@
 
 package org.mule.service;
 
-import java.util.Collections;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
-import javax.xml.namespace.QName;
-
 import org.mule.DefaultMuleEvent;
 import org.mule.RequestContext;
 import org.mule.api.AnnotatedObject;
@@ -59,6 +53,12 @@ import org.mule.routing.outbound.DefaultOutboundRouterCollection;
 import org.mule.service.processor.ServiceAsyncRequestReplyRequestor;
 import org.mule.session.DefaultMuleSession;
 import org.mule.util.ClassUtils;
+
+import java.util.Collections;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+import javax.xml.namespace.QName;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -664,6 +664,10 @@ public abstract class AbstractService implements Service, MessageProcessor, Anno
         try
         {
             return messageProcessorChain.process(newEvent);
+        }
+        catch (Exception e)
+        {
+            return getExceptionListener().handleException(e, newEvent);
         }
         finally
         {

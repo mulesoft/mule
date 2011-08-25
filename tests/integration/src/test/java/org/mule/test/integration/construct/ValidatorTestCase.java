@@ -10,8 +10,12 @@
 
 package org.mule.test.integration.construct;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleException;
+import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
@@ -22,9 +26,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang.math.RandomUtils;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 
 public class ValidatorTestCase extends FunctionalTestCase
 {
@@ -71,16 +72,12 @@ public class ValidatorTestCase extends FunctionalTestCase
     {
         doTestValidMessage("validator-with-exception-strategy");
 
-        // ensure the exception strategy kicked in
-        try
-        {
-            muleClient.send("vm://validator-with-exception-strategy.in", "abc", null);
-            fail("Exception expected");
-        }
-        catch (Exception e)
-        {
-            // expected
-        }
+        MuleMessage message = muleClient.send("vm://validator-with-exception-strategy.in", "abc", null);
+        assertNotNull(message);
+        assertNotNull(message.getExceptionPayload());
+        assertEquals(IllegalArgumentException.class, message.getExceptionPayload()
+            .getRootException()
+            .getClass());
     }
 
     @Test

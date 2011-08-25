@@ -10,6 +10,12 @@
 
 package org.mule.api.annotations.param;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.expression.RequiredValueException;
@@ -30,13 +36,6 @@ import java.util.Set;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 public class InboundHeadersAnnotationTestCase extends AbstractServiceAndFlowTestCase
 {
@@ -128,15 +127,11 @@ public class InboundHeadersAnnotationTestCase extends AbstractServiceAndFlowTest
     public void testMapHeadersMissing() throws Exception
     {
         props.remove("foo");
-        try
-        {
-            muleContext.getClient().send("vm://headers", null, null);
-            fail("Exception expected");
-        }
-        catch (Exception e)
-        {
-            assertTrue(ExceptionUtils.getRootCause(e) instanceof RequiredValueException);
-        }
+        MuleMessage message = muleContext.getClient().send("vm://headers", null, null);
+        assertNotNull(message);
+        assertNotNull(message.getExceptionPayload());
+        assertEquals(RequiredValueException.class,
+            ExceptionUtils.getRootCause(message.getExceptionPayload().getException()).getClass());
     }
 
     @Test
@@ -186,15 +181,11 @@ public class InboundHeadersAnnotationTestCase extends AbstractServiceAndFlowTest
     @Test
     public void testMapHeadersUnmodifiable() throws Exception
     {
-        try
-        {
-            muleContext.getClient().send("vm://headersUnmodifiable", null, props);
-            fail("Exception expected");
-        }
-        catch (Exception e)
-        {
-            assertTrue(ExceptionUtils.getRootCause(e) instanceof UnsupportedOperationException);
-        }
+        MuleMessage message = muleContext.getClient().send("vm://headersUnmodifiable", null, props);
+        assertNotNull(message);
+        assertNotNull(message.getExceptionPayload());
+        assertEquals(UnsupportedOperationException.class,
+            ExceptionUtils.getRootCause(message.getExceptionPayload().getException()).getClass());
     }
 
     @Test
@@ -301,15 +292,12 @@ public class InboundHeadersAnnotationTestCase extends AbstractServiceAndFlowTest
     public void testListHeadersWithMissing() throws Exception
     {
         props.remove("bar");
-        try
-        {
-            muleContext.getClient().send("vm://headersListOptional", null, props);
-            fail("Exception expected");
-        }
-        catch (Exception e)
-        {
-            assertTrue(ExceptionUtils.getRootCause(e) instanceof RequiredValueException);
-        }
+        MuleMessage message = muleContext.getClient().send("vm://headersListOptional", null, props);
+        assertNotNull(message);
+        assertNotNull(message.getExceptionPayload());
+        assertEquals(RequiredValueException.class,
+            ExceptionUtils.getRootCause(message.getExceptionPayload().getException()).getClass());
+
     }
 
     @Test
@@ -327,15 +315,12 @@ public class InboundHeadersAnnotationTestCase extends AbstractServiceAndFlowTest
     @Test
     public void testListHeadersUnmodifiable() throws Exception
     {
-        try
-        {
-            muleContext.getClient().send("vm://headersListUnmodifiable", null, props);
-            fail("Exception expected");
-        }
-        catch (Exception e)
-        {
-            assertTrue(ExceptionUtils.getRootCause(e) instanceof UnsupportedOperationException);
-        }
+        MuleMessage message = muleContext.getClient().send("vm://headersListUnmodifiable", null, props);
+        assertNotNull(message);
+        assertNotNull(message.getExceptionPayload());
+        assertEquals(UnsupportedOperationException.class,
+            ExceptionUtils.getRootCause(message.getExceptionPayload().getException()).getClass());
+
     }
 
     @Test

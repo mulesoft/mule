@@ -10,19 +10,19 @@
 
 package org.mule.test.integration.routing.nested;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+import org.mule.api.MuleMessage;
 import org.mule.api.MuleRuntimeException;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
-import org.mule.util.ExceptionUtils;
 
 import java.util.Arrays;
 import java.util.Collection;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 public class BindingExceptionOnInterfaceMethodTestCase extends AbstractServiceAndFlowTestCase
 {
@@ -46,15 +46,11 @@ public class BindingExceptionOnInterfaceMethodTestCase extends AbstractServiceAn
     @Test
     public void testExceptionOnBinding() throws Exception
     {
-        try
-        {
-            muleContext.getClient().send("vm://invoker.in", TEST_MESSAGE, null);
-            fail("Exception expected");
-        }
-        catch (Exception e)
-        {
-            assertTrue(ExceptionUtils.getRootCause(e) instanceof MuleRuntimeException);
-        }
+        MuleMessage reply = muleContext.getClient().send("vm://invoker.in", TEST_MESSAGE, null);
+        assertNotNull(reply);
+        String payload = reply.getPayloadAsString();
+        assertTrue(payload.contains("MuleRuntimeException"));
+        assertTrue(payload.contains(PREFIX));
     }
 
     public static class Component

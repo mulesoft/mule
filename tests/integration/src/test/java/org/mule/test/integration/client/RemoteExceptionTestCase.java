@@ -10,6 +10,10 @@
 
 package org.mule.test.integration.client;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.api.ExceptionPayload;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.MalformedEndpointException;
@@ -25,10 +29,6 @@ import java.util.Date;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 public class RemoteExceptionTestCase extends AbstractServiceAndFlowTestCase
 {
@@ -55,7 +55,7 @@ public class RemoteExceptionTestCase extends AbstractServiceAndFlowTestCase
         assertNotNull(result);
         ExceptionPayload exceptionPayload = result.getExceptionPayload();
         assertNotNull(exceptionPayload);
-        assertTrue(exceptionPayload.getException().getCause().getCause() instanceof TransformerMessagingException);
+        assertTrue(exceptionPayload.getException() instanceof TransformerMessagingException);
         assertTrue(exceptionPayload.getRootException() instanceof Exception);
     }
 

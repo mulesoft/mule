@@ -31,11 +31,6 @@
                     <outbound-endpoint address="vm://hello.in" exchange-pattern="request-response" />
                 </binding>
             </component>
-            <outbound>
-                <pass-through-router>
-                    <vm:outbound-endpoint path="invoker.out" exchange-pattern="one-way"/>
-                </pass-through-router>
-            </outbound>
         </service>
     </model>
 </mule>

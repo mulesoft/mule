@@ -10,6 +10,10 @@
 
 package org.mule.api.annotations.param;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.api.MuleMessage;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.util.ExceptionUtils;
@@ -20,11 +24,6 @@ import java.util.Map;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 public class OutboundHeadersAnnotationTestCase extends AbstractServiceAndFlowTestCase
 {
@@ -66,14 +65,10 @@ public class OutboundHeadersAnnotationTestCase extends AbstractServiceAndFlowTes
     @Test
     public void testInvalidParamType() throws Exception
     {
-        try
-        {
-            muleContext.getClient().send("vm://invalid", null, null);
-            fail("Exception expected");
-        }
-        catch (Exception e)
-        {
-            assertTrue(ExceptionUtils.getRootCause(e) instanceof IllegalArgumentException);
-        }
+        MuleMessage message = muleContext.getClient().send("vm://invalid", null, null);
+        assertNotNull(message);
+        assertNotNull(message.getExceptionPayload());
+        assertEquals(IllegalArgumentException.class,
+            ExceptionUtils.getRootCause(message.getExceptionPayload().getException()).getClass());
     }
 }

@@ -13,7 +13,10 @@ package org.mule.module.jaas;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+
+import org.mule.api.MuleMessage;
+import org.mule.api.security.UnauthorisedException;
+import org.mule.util.ExceptionUtils;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -21,9 +24,6 @@ import java.util.Map;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-import org.mule.api.MuleMessage;
-import org.mule.api.security.UnauthorisedException;
-import org.mule.util.ExceptionUtils;
 
 public class JaasAutenticationWithJaasConfigFileTestCase extends AbstractJaasFunctionalTestCase
 {
@@ -66,15 +66,11 @@ public class JaasAutenticationWithJaasConfigFileTestCase extends AbstractJaasFun
     {
         Map<String, Object> props = createMessagePropertiesWithCredentials("Marie.Rizzo", "anon");
 
-        try
-        {
-            muleContext.getClient().send("vm://test", "Test", props);
-            fail("Exception expected");
-        }
-        catch (Exception e)
-        {
-            assertTrue(ExceptionUtils.containsType(e, UnauthorisedException.class));
-        }
+        MuleMessage message = muleContext.getClient().send("vm://test", "Test", props);
+        assertNotNull(message);
+        assertNotNull(message.getExceptionPayload());
+        assertTrue(ExceptionUtils.containsType(message.getExceptionPayload().getException(),
+            UnauthorisedException.class));
     }
 
     @Test
@@ -82,15 +78,11 @@ public class JaasAutenticationWithJaasConfigFileTestCase extends AbstractJaasFun
     {
         Map<String, Object> props = createMessagePropertiesWithCredentials("Evil", "dragon");
 
-        try
-        {
-            muleContext.getClient().send("vm://test", "Test", props);
-            fail("Exception expected");
-        }
-        catch (Exception e)
-        {
-            assertTrue(ExceptionUtils.containsType(e, UnauthorisedException.class));
-        }
+        MuleMessage message = muleContext.getClient().send("vm://test", "Test", props);
+        assertNotNull(message);
+        assertNotNull(message.getExceptionPayload());
+        assertTrue(ExceptionUtils.containsType(message.getExceptionPayload().getException(),
+            UnauthorisedException.class));
     }
 
     @Test
@@ -98,14 +90,11 @@ public class JaasAutenticationWithJaasConfigFileTestCase extends AbstractJaasFun
     {
         Map<String, Object> props = createMessagePropertiesWithCredentials("Marie.Rizzo", "evil");
 
-        try
-        {
-            muleContext.getClient().send("vm://test", "Test", props);
-            fail("Exception expected");
-        }
-        catch (Exception e)
-        {
-            assertTrue(ExceptionUtils.containsType(e, UnauthorisedException.class));
-        }
+        MuleMessage message = muleContext.getClient().send("vm://test", "Test", props);
+        assertNotNull(message);
+        assertNotNull(message.getExceptionPayload());
+        assertTrue(ExceptionUtils.containsType(message.getExceptionPayload().getException(),
+            UnauthorisedException.class));
+
     }
 }

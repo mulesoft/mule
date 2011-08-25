@@ -11,7 +11,6 @@
 package org.mule.transport.vm;
 
 import org.mule.DefaultMuleMessage;
-import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
@@ -19,7 +18,6 @@ import org.mule.api.ThreadSafeAccess;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
-import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transport.Connector;
 import org.mule.transport.ContinuousPollingReceiverWorker;
 import org.mule.transport.PollingReceiverWorker;
@@ -99,14 +97,19 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
 
     public MuleMessage onCall(MuleMessage message) throws MuleException
     {
+        MuleEvent event = null;
         try
         {
-            MuleEvent event =  routeMessage(message);
+            event = routeMessage(message);
             return event == null ? null : event.getMessage();
         }
         catch (Exception e)
         {
-            throw new DefaultMuleException(e);
+            if (event == null)
+            {
+                event = createMuleEvent(message, null);
+            }
+            return flowConstruct.getExceptionListener().handleException(e, event).getMessage();
         }
     }
 

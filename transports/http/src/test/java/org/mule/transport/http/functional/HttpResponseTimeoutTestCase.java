@@ -10,6 +10,7 @@
 
 package org.mule.transport.http.functional;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -17,6 +18,7 @@ import static org.junit.Assert.fail;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.transport.DispatchException;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -80,15 +82,10 @@ public class HttpResponseTimeoutTestCase extends AbstractServiceAndFlowTestCase
     public void testDecreaseOutboundEndpointResponseTimeout() throws Exception
     {
         Date beforeCall = new Date();
-        try
-        {
-            muleClient.send("vm://decreaseTimeoutRequest", getPayload(), null);
-            fail("Exception expected");
-        }
-        catch (Exception e)
-        {
-            assertTrue(ExceptionUtils.getRootCause(e) instanceof SocketTimeoutException);
-        }
+        MuleMessage result = muleClient.send("vm://decreaseTimeoutRequest", getPayload(), null);
+        assertNotNull(result);
+        assertNotNull(result.getExceptionPayload());
+        assertEquals(DispatchException.class, result.getExceptionPayload().getException().getClass());
 
         // If everything is good the connection will timeout after 5s and throw an
         // exception. The original unprocessed message is returned in the response

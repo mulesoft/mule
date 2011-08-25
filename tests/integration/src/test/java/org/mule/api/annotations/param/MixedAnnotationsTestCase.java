@@ -10,6 +10,11 @@
 
 package org.mule.api.annotations.param;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
@@ -26,11 +31,6 @@ import javax.activation.DataHandler;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 public class MixedAnnotationsTestCase extends AbstractServiceAndFlowTestCase
 {
@@ -108,14 +108,10 @@ public class MixedAnnotationsTestCase extends AbstractServiceAndFlowTestCase
     public void testPayloadNotAnnotated() throws Exception
     {
         // When using param annotations every param needs t obe annotated
-        try
-        {
-            muleContext.getClient().send("vm://someAnnotated", muleMessage);
-            fail("Exception expected");
-        }
-        catch (Exception e)
-        {
-            assertTrue(ExceptionUtils.getRootCause(e) instanceof IllegalArgumentException);
-        }
+        MuleMessage message = muleContext.getClient().send("vm://someAnnotated", muleMessage);
+        assertNotNull(message);
+        assertNotNull(message.getExceptionPayload());
+        assertEquals(IllegalArgumentException.class,
+            ExceptionUtils.getRootCause(message.getExceptionPayload().getException()).getClass());
     }
 }

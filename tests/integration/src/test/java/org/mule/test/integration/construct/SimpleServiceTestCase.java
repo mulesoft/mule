@@ -10,9 +10,16 @@
 
 package org.mule.test.integration.construct;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.api.MuleException;
+import org.mule.api.MuleMessage;
 import org.mule.api.client.LocalMuleClient;
 import org.mule.construct.SimpleService;
+import org.mule.tck.exceptions.FunctionalTestException;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.test.integration.tck.WeatherForecaster;
@@ -25,11 +32,6 @@ import org.apache.commons.lang.math.RandomUtils;
 import org.junit.Rule;
 import org.junit.Test;
 import org.springframework.util.FileCopyUtils;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 public class SimpleServiceTestCase extends FunctionalTestCase
 {
@@ -116,15 +118,10 @@ public class SimpleServiceTestCase extends FunctionalTestCase
     @Test
     public void testInheritedExceptionStrategy() throws Exception
     {
-        try
-        {
-            muleClient.send("vm://iexst.in", "ignored", null).getPayloadAsString();
-            fail("Exception expected");
-        }
-        catch (Exception e)
-        {
-            // expected
-        }
+        MuleMessage message = muleClient.send("vm://iexst.in", "ignored", null);
+        assertNotNull(message);
+        assertNotNull(message.getExceptionPayload());
+        assertEquals(FunctionalTestException.class, message.getExceptionPayload().getRootException().getClass());
     }
 
     @Test

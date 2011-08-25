@@ -63,6 +63,10 @@ public class Flow extends AbstractPipeline implements MessageProcessor
         {
             return pipeline.process(newEvent);
         }
+        catch (Exception e)
+        {
+            return getExceptionListener().handleException(e, newEvent);
+        }
         finally
         {
             RequestContext.setEvent(event);

@@ -10,6 +10,10 @@
 
 package org.mule.test.integration.resolvers;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
@@ -25,11 +29,6 @@ import java.util.Map;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 public class MethodEntryPointsTestCase extends AbstractServiceAndFlowTestCase
 {
@@ -50,30 +49,25 @@ public class MethodEntryPointsTestCase extends AbstractServiceAndFlowTestCase
     @Test
     public void testTooManySatisfiableMethods() throws Exception
     {
-        try
-        {
-            muleContext.getClient().send("vm://service", "hello", null);
-            fail("Exception expected");
-        }
-        catch (Exception e)
-        {
-            assertTrue(ExceptionUtils.getRootCause(e) instanceof EntryPointNotFoundException);
-            assertTrue(ExceptionUtils.getRootCauseMessage(e).indexOf("Found too many possible methods on object") > -1);
-        }
+        MuleMessage message = muleContext.getClient().send("vm://service", "hello", null);
+        assertNotNull(message);
+        assertNotNull(message.getExceptionPayload());
+        assertEquals(EntryPointNotFoundException.class, message.getExceptionPayload()
+            .getRootException()
+            .getClass());
+        assertTrue(ExceptionUtils.getRootCauseMessage(message.getExceptionPayload().getException()).indexOf(
+            "Found too many possible methods on object") > -1);
     }
 
     @Test
     public void testBadMethodName() throws Exception
     {
-        try
-        {
-            muleContext.getClient().send("vm://service?method=foo", "hello", null);
-            fail("Exception expected");
-        }
-        catch (Exception e)
-        {
-            assertTrue(ExceptionUtils.getRootCause(e) instanceof EntryPointNotFoundException);
-        }
+        MuleMessage message = muleContext.getClient().send("vm://service?method=foo", "hello", null);
+        assertNotNull(message);
+        assertNotNull(message.getExceptionPayload());
+        assertEquals(EntryPointNotFoundException.class, message.getExceptionPayload()
+            .getRootException()
+            .getClass());
     }
 
     @Test

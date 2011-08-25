@@ -12,9 +12,9 @@ package org.mule.transport.http.components;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
 
 import org.mule.api.MuleMessage;
+import org.mule.component.ComponentException;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -52,15 +52,10 @@ public class RestServiceWrapperFunctionalTestCase extends AbstractServiceAndFlow
     @Test
     public void testErrorExpressionOnRegexFilterFail() throws Exception
     {
-        try
-        {
-            muleContext.getClient().send("restServiceEndpoint", TEST_REQUEST, null);
-            fail("Exception expected");
-        }
-        catch (Exception e)
-        {
-            // expected
-        }
+        MuleMessage result = muleContext.getClient().send("restServiceEndpoint", TEST_REQUEST, null);
+        assertNotNull(result);
+        assertNotNull(result.getExceptionPayload());
+        assertEquals(RestServiceException.class, result.getExceptionPayload().getException().getClass());
     }
 
     @Test
@@ -97,15 +92,10 @@ public class RestServiceWrapperFunctionalTestCase extends AbstractServiceAndFlow
     {
         Map<String, Object> props = new HashMap<String, Object>();
 
-        try
-        {
-            muleContext.getClient().send("restServiceEndpoint3", null, props);
-            fail("Exception expected");
-        }
-        catch (Exception e)
-        {
-            // expected
-        }
+        MuleMessage result = muleContext.getClient().send("restServiceEndpoint3", null, props);
+        assertNotNull(result);
+        assertNotNull(result.getExceptionPayload());
+        assertEquals(ComponentException.class, result.getExceptionPayload().getException().getClass());
     }
 
     @Test

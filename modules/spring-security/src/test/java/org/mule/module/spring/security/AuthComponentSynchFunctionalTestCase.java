@@ -10,9 +10,15 @@
 
 package org.mule.module.spring.security;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.api.EncryptionStrategy;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
+import org.mule.api.security.UnauthorisedException;
+import org.mule.component.ComponentException;
 import org.mule.module.client.MuleClient;
 import org.mule.security.MuleCredentials;
 import org.mule.tck.junit4.FunctionalTestCase;
@@ -23,10 +29,6 @@ import java.util.Map;
 import org.junit.Test;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.context.SecurityContextImpl;
-
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 public class AuthComponentSynchFunctionalTestCase extends FunctionalTestCase
 {
@@ -71,15 +73,10 @@ public class AuthComponentSynchFunctionalTestCase extends FunctionalTestCase
             .getEncryptionStrategy("PBE");
         String header = MuleCredentials.createHeader("anon", "anon", "PBE", strategy);
         props.put(MuleProperties.MULE_USER_PROPERTY, header);
-        try
-        {
-            client.send("vm://test", "Marie", props);
-            fail("Exception expected");
-        }
-        catch (Exception e)
-        {
-            // expected
-        }
+        MuleMessage result = client.send("vm://test", "Marie", props);
+        assertNotNull(result);
+        assertNotNull(result.getExceptionPayload());
+        assertEquals(ComponentException.class, result.getExceptionPayload().getException().getClass());
     }
 
     @Test
@@ -93,15 +90,10 @@ public class AuthComponentSynchFunctionalTestCase extends FunctionalTestCase
             .getEncryptionStrategy("PBE");
         String header = MuleCredentials.createHeader("anonX", "anonX", "PBE", strategy);
         props.put(MuleProperties.MULE_USER_PROPERTY, header);
-        try
-        {
-            client.send("vm://test", "Marie", props);
-            fail("Exception expected");
-        }
-        catch (Exception e)
-        {
-            // expected
-        }
+        MuleMessage result = client.send("vm://test", "Marie", props);
+        assertNotNull(result);
+        assertNotNull(result.getExceptionPayload());
+        assertEquals(UnauthorisedException.class, result.getExceptionPayload().getException().getClass());
     }
 
 }
