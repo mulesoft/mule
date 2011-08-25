@@ -10,6 +10,8 @@
 </head>
 <script type="text/javascript">
 
+    var map = null
+
     function init()
     {
         setupMap();
@@ -26,7 +28,7 @@
     {
         if (GBrowserIsCompatible())
         {
-            map = new GMap2(document.getElementById("map"));
+            var map = new GMap2(document.getElementById("map"));
             map.addControl(new GSmallMapControl());
             map.addControl(new GMapTypeControl());
 
