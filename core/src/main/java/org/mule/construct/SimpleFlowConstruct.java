@@ -136,7 +136,7 @@ public class SimpleFlowConstruct extends AbstractFlowConstruct implements Messag
             {
                 result.getMessage().release();
             }
-            return event;
+            return result;
         }
         catch (Exception e)
         {
