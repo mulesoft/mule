@@ -10,17 +10,15 @@
 
 package org.mule.test.integration.exceptions;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+
 import org.mule.api.MuleMessage;
 
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-
-//TODO This test case is illogical because if the request is end-to-end synchronous, no exception strategy
-//will be called, the exception is simple returned to the client.
 public class SynchronousMessagingExceptionStrategyTestCase extends AbstractExceptionStrategyTestCase
 {
 
@@ -99,5 +97,3 @@ public class SynchronousMessagingExceptionStrategyTestCase extends AbstractExcep
         assertNull(response);
     }
 }
-
-
