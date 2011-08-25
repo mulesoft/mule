@@ -101,7 +101,12 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
         try
         {
             event = routeMessage(message);
-            return event == null ? null : event.getMessage();
+            MuleMessage returnedMessage = event == null ? null : event.getMessage();
+            if (returnedMessage != null)
+            {
+                returnedMessage.release();
+            }
+            return returnedMessage;
         }
         catch (Exception e)
         {
@@ -110,6 +115,10 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
                 event = createMuleEvent(message, null);
             }
             return flowConstruct.getExceptionListener().handleException(e, event).getMessage();
+        }
+        finally
+        {
+            message.release();
         }
     }
 

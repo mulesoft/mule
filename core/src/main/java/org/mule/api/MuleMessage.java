@@ -600,7 +600,6 @@ public interface MuleMessage extends Serializable
 
     /**
      * Perform any clean up operations on the message resource.
-     * Typically this is used to esure that a message stream is closed
      */
     void release();
 

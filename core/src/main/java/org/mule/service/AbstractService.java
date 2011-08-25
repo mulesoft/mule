@@ -663,7 +663,12 @@ public abstract class AbstractService implements Service, MessageProcessor, Anno
         RequestContext.setEvent(newEvent);
         try
         {
-            return messageProcessorChain.process(newEvent);
+            MuleEvent result = messageProcessorChain.process(newEvent);
+            if (result != null)
+            {
+                result.getMessage().release();
+            }
+            return result;
         }
         catch (Exception e)
         {
@@ -672,6 +677,7 @@ public abstract class AbstractService implements Service, MessageProcessor, Anno
         finally
         {
             RequestContext.setEvent(event);
+            event.getMessage().release();
         }
     }
 

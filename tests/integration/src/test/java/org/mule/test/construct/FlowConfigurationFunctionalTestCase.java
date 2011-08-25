@@ -16,7 +16,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MessagingException;
@@ -29,7 +28,6 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.api.source.CompositeMessageSource;
 import org.mule.api.source.MessageSource;
 import org.mule.api.transformer.Transformer;
-import org.mule.api.transport.DispatchException;
 import org.mule.api.transport.PropertyScope;
 import org.mule.construct.Flow;
 import org.mule.endpoint.DefaultInboundEndpoint;
@@ -41,7 +39,6 @@ import org.mule.tck.testmodels.fruit.Fruit;
 import org.mule.tck.testmodels.fruit.FruitBowl;
 import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.transformer.simple.StringAppendTransformer;
-import org.mule.util.ExceptionUtils;
 
 import java.util.HashMap;
 import java.util.List;
@@ -492,7 +489,7 @@ public class FlowConfigurationFunctionalTestCase extends FunctionalTestCase
     @Test
     public void testFlowRef() throws Exception
     {
-        assertEquals("012xyzabc3",
+        assertEquals("012xyzabc312xyzabc3",
             muleContext.getClient()
                 .send("vm://flow-ref-in", new DefaultMuleMessage("0", muleContext))
                 .getPayloadAsString());

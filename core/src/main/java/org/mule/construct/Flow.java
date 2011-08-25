@@ -61,7 +61,12 @@ public class Flow extends AbstractPipeline implements MessageProcessor
         RequestContext.setEvent(newEvent);
         try
         {
-            return pipeline.process(newEvent);
+            MuleEvent result = pipeline.process(newEvent);
+            if (result != null)
+            {
+                result.getMessage().release();
+            }
+            return result;
         }
         catch (Exception e)
         {
@@ -70,6 +75,7 @@ public class Flow extends AbstractPipeline implements MessageProcessor
         finally
         {
             RequestContext.setEvent(event);
+            event.getMessage().release();
         }
     }
 
