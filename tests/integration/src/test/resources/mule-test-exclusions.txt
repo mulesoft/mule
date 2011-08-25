@@ -95,7 +95,6 @@ org.mule.test.integration.routing.outbound.MulticastWithXaTestCase
 # These test cases no longer apply after the work on ZML because if the request is synchronous, 
 # the exception is simply returned to the client and no exception strategy will be called.
 org.mule.test.integration.exceptions.SynchronousMessagingExceptionStrategyTestCase
-org.mule.test.integration.exceptions.ExceptionStrategyReturnMessageTestCase
 
 # AMQ 5.x never returns a message within xa flow request, regression in amq
 org.mule.test.integration.transport.jms.scripting.JmsRequestFromScriptWithXaTransactionTestCase

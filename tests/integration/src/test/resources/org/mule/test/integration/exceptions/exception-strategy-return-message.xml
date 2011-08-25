@@ -11,7 +11,7 @@
     <model>
         <service name="InputService">
             <inbound>
-                <vm:inbound-endpoint path="in" exchange-pattern="request-response" />
+                <vm:inbound-endpoint path="in-custom-strategy" exchange-pattern="request-response" />
             </inbound>
             <outbound>
                 <pass-through-router>
@@ -20,6 +20,18 @@
             </outbound>
         </service>
 
+        <service name="InputService2">
+            <inbound>
+                <vm:inbound-endpoint path="in-default-strategy" exchange-pattern="request-response" />
+            </inbound>
+            <outbound>
+                <pass-through-router>
+                    <vm:outbound-endpoint path="badService2" exchange-pattern="request-response"/>
+                </pass-through-router>
+            </outbound>
+        </service>
+
+
         <service name="ExceptionService">
             <inbound>
                 <vm:inbound-endpoint path="badService" exchange-pattern="request-response"/>
@@ -27,5 +39,13 @@
             <test:component throwException="true" />
             <custom-exception-strategy class="org.mule.test.integration.exceptions.TestExceptionStrategy" /> 
         </service>
+
+        <service name="ExceptionService2">
+            <inbound>
+                <vm:inbound-endpoint path="badService2" exchange-pattern="request-response"/>
+            </inbound>
+            <test:component throwException="true" />
+        </service>
+
     </model>
 </mule>

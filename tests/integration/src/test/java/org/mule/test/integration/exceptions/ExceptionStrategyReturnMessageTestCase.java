@@ -10,17 +10,17 @@
 
 package org.mule.test.integration.exceptions;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.transport.NullPayload;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
-//TODO This test case is illogical because if the request is end-to-end synchronous, no exception strategy
-//will be called, the exception is simple returned to the client.
 public class ExceptionStrategyReturnMessageTestCase extends FunctionalTestCase
 {
     @Override
@@ -30,10 +30,24 @@ public class ExceptionStrategyReturnMessageTestCase extends FunctionalTestCase
     }
 
     @Test
-    public void testExceptionMessage() throws Exception
+    public void testReturnPayloadDefaultStrategy() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
-        MuleMessage msg = client.send("vm://in", "Test Message", null);
+        MuleMessage msg = client.send("vm://in-default-strategy", "Test Message", null);
+
+        assertNotNull(msg);
+        assertNotNull(msg.getExceptionPayload());
+        assertEquals("Functional Test Service Exception", msg.getExceptionPayload().getMessage());
+
+        assertNotNull(msg.getPayload());
+        assertTrue(msg.getPayload() instanceof NullPayload);
+    }
+
+    @Test
+    public void testReturnPayloadCustomStrategy() throws Exception
+    {
+        MuleClient client = new MuleClient(muleContext);
+        MuleMessage msg = client.send("vm://in-custom-strategy", "Test Message", null);
 
         assertNotNull(msg);
         assertNotNull(msg.getExceptionPayload());
