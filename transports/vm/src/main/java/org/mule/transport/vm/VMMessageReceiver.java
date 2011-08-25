@@ -107,12 +107,17 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
             if (returnedMessage != null)
             {
                 returnedMessage = returnedMessage.createInboundMessage();
+                returnedMessage.release();
             }
             return returnedMessage;
         }
         catch (Exception e)
         {
             throw new DefaultMuleException(e);
+        }
+        finally
+        {
+            message.release();
         }
     }
 

@@ -398,7 +398,7 @@ public class FlowConfigurationFunctionalTestCase extends FunctionalTestCase
     @Test
     public void testFlowRef() throws Exception
     {
-        assertEquals("012xyzabc3", muleContext.getClient().send("vm://flow-ref-in",
+        assertEquals("012xyzabc312xyzabc3", muleContext.getClient().send("vm://flow-ref-in",
             new DefaultMuleMessage("0", muleContext)).getPayloadAsString());
     }
 
