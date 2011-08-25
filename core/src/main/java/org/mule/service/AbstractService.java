@@ -660,7 +660,7 @@ public abstract class AbstractService implements Service, MessageProcessor
             {
                 result.getMessage().release();
             }
-            return event;
+            return result;
         }
         catch (Exception e)
         {
