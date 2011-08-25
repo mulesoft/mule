@@ -7,17 +7,17 @@
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.1/mule.xsd">
 
     <jms:activemq-connector name="jmsConnector" />
-
-    <jms:endpoint name="jmsInTx" queue="in">
+    
+    <jms:endpoint name="in" queue="in" exchange-pattern="one-way">
         <jms:transaction action="ALWAYS_BEGIN"/>
     </jms:endpoint>
-
-    <jms:endpoint name="jmsOutTx" queue="out">
+    
+    <jms:endpoint name="out" queue="out" exchange-pattern="one-way">
         <jms:transaction action="ALWAYS_JOIN"/>
     </jms:endpoint>
 
-    <jms:endpoint name="jmsInNoTx" queue="in2"/>
+    <jms:endpoint name="dlq" queue="dlq" exchange-pattern="one-way">
+        <jms:transaction action="ALWAYS_JOIN"/>
+    </jms:endpoint>
 
-    <jms:endpoint name="jmsOutNoTx" queue="out2"/>
-    
 </mule>

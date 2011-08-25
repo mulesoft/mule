@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: FileExceptionStrategyFunctionalTestCase.java 22431 2011-07-18 07:40:35Z dirk.olmes $
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  *
@@ -7,152 +7,88 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.jms.integration;
 
-import org.mule.api.config.MuleProperties;
-import org.mule.message.ExceptionMessage;
-import org.mule.util.SerializationUtils;
-
-import javax.jms.BytesMessage;
-import javax.jms.JMSException;
-import javax.jms.Message;
-import javax.jms.MessageConsumer;
-import javax.jms.ObjectMessage;
-import javax.jms.Session;
-import javax.jms.TextMessage;
-
+import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+import org.hamcrest.core.Is;
+import org.hamcrest.core.IsNull;
 import org.junit.Test;
+import org.mule.api.MuleEvent;
+import org.mule.api.MuleException;
+import org.mule.api.MuleMessage;
+import org.mule.api.processor.MessageProcessor;
+import org.mule.construct.SimpleFlowConstruct;
+import org.mule.exception.DefaultServiceExceptionStrategy;
+import org.mule.module.client.MuleClient;
+import org.mule.util.concurrent.Latch;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.hamcrest.core.IsNull.notNullValue;
+import static org.junit.Assert.assertThat;
 
-/**
- * Tests a transactional exception strategy.
- */
 public class JmsExceptionStrategyTestCase extends AbstractJmsFunctionalTestCase
 {
-    public static final String DEADLETTER_QUEUE_NAME = "dlq";
 
+    public static final String MESSAGE = "some message";
+    public static final int TIMEOUT = 3000;
+    public static final int SHORT_TIMEOUT = 500;
+    private Latch latch;
+    private MuleClient muleClient;
+    private static final long LATCH_AWAIT_TIMEOUT = 3000;
+
+
+    @Override
     protected String getConfigResources()
     {
         return "integration/jms-exception-strategy.xml";
     }
 
+    @Override
+    protected void doSetUp() throws Exception
+    {
+        latch = new Latch();
+        muleClient = new MuleClient(muleContext);
+        DefaultServiceExceptionStrategy exceptionStrategy = (DefaultServiceExceptionStrategy)muleContext.getRegistry().lookupFlowConstruct("flowWithoutExceptionStrategyAndTx").getExceptionListener();
+        exceptionStrategy.getMessageProcessors().add(new MessageProcessor()
+        {
+            public MuleEvent process(MuleEvent event) throws MuleException
+            {
+                latch.countDown();
+                return event;
+            }
+        });
+    }
+
     @Test
-    public void testTransactedRedeliveryToDLDestination() throws Exception
+    public void testInExceptionDoRollbackJmsTx() throws Exception
     {
-        send(scenarioDeadLetter);
-        // Verify outbound message did _not_ get delivered.
-        receive(scenarioNotReceive);
-        // Verify message got sent to dead letter queue instead.
-        receive(scenarioDeadLetter);
+        muleClient = new MuleClient(muleContext);
+        muleClient.dispatch("jms://in", MESSAGE, null);
+        latch.await(LATCH_AWAIT_TIMEOUT, TimeUnit.MILLISECONDS);
+        //Stop flow to not consume message again
+        SimpleFlowConstruct simpleFlowConstruct = muleContext.getRegistry().get("flowWithoutExceptionStrategyAndTx");
+        simpleFlowConstruct.stop();
+        //Check message rollback
+        MuleMessage muleMessage = muleClient.request("jms://in", TIMEOUT);
+        assertThat(muleMessage, notNullValue());
+        assertThat((String) muleMessage.getPayload(), Is.is(MESSAGE));
+        //Check outbound-endpoint was not executed
+        MuleMessage outboundMessage = muleClient.request("jms://out", SHORT_TIMEOUT);
+        assertThat(outboundMessage, IsNull.<Object>nullValue());
     }
 
     @Test
-    public void testTransactedRedeliveryToDLDestinationRollback() throws Exception
+    public void testInExceptionDoRollbackJmsNoTx() throws Exception
     {
-        send(scenarioDeadLetter);
-        // Receive message but roll back transaction.
-        receive(scenarioDeadLetterRollback);
-        // Receive message again and commit transaction.
-        receive(scenarioDeadLetter);
-        // Verify there is no more message to receive.
-        receive(scenarioDeadLetterNotReceive);
+        muleClient = new MuleClient(muleContext);
+        muleClient.dispatch("jms://in2", MESSAGE, null);
+        latch.await(LATCH_AWAIT_TIMEOUT, TimeUnit.MILLISECONDS);
+        //Stop flow to not consume message again
+        SimpleFlowConstruct simpleFlowConstruct = muleContext.getRegistry().get("flowWithoutExceptionStrategyAndNoTx");
+        simpleFlowConstruct.stop();
+        //Check message was consumed
+        MuleMessage muleMessage = muleClient.request("jms://in2", TIMEOUT);
+        assertThat(muleMessage, IsNull.<Object>nullValue());
     }
 
-    Scenario scenarioDeadLetter = new ScenarioDeadLetter();
-
-    class ScenarioDeadLetter extends ScenarioCommit
-    {
-        // @Override
-        public String getOutputDestinationName()
-        {
-            return DEADLETTER_QUEUE_NAME;
-        }
-
-        // @Override
-        public Message receive(Session session, MessageConsumer consumer) throws JMSException
-        {
-            // Verify message got sent to dead letter queue.
-            Message message = consumer.receive(getTimeout());
-            assertNotNull(message);
-
-            Object obj = null;
-            // ExceptionMessage got serialized by JMS provider
-            if (message instanceof BytesMessage)
-            {
-                byte[] messageBytes = new byte[(int) ((BytesMessage) message).getBodyLength()];
-                ((BytesMessage) message).readBytes(messageBytes);
-                obj = SerializationUtils.deserialize(messageBytes, muleContext);
-            }
-            // ExceptionMessage did not get serialized by JMS provider
-            else if (message instanceof ObjectMessage)
-            {
-                obj = ((ObjectMessage) message).getObject();
-            }
-            else
-            {
-                fail("Message is an unexpected type: " + message.getClass().getName());
-            }
-            assertTrue(obj instanceof ExceptionMessage);
-
-            // The payload should be the original message, not the reply message
-            // since the FTC threw an exception.
-
-            Object payload = ((ExceptionMessage) obj).getPayload();
-            // Original JMS message was serializable
-            if (payload instanceof TextMessage)
-            {
-                assertEquals(DEFAULT_INPUT_MESSAGE, ((TextMessage) payload).getText());
-            }
-            // Original JMS message was not serializable and toString() was called instead
-            // (see AbstractExceptionListener.routeException() )
-            else if (payload instanceof String)
-            {
-                assertEquals(DEFAULT_INPUT_MESSAGE, payload);
-            }
-            else
-            {
-                fail("Payload is an unexpected type: " + payload.getClass().getName());
-            }
-
-            String dest = message.getStringProperty(MuleProperties.MULE_ENDPOINT_PROPERTY);
-            // Some JMS providers do not allow custom properties to be set on JMS messages
-            if (dest != null)
-            {
-                assertEquals("jms://" + DEADLETTER_QUEUE_NAME, dest);
-            }
-
-            applyTransaction(session);
-            return message;
-        }
-    }
-
-    Scenario scenarioDeadLetterRollback = new ScenarioDeadLetterRollback();
-
-    class ScenarioDeadLetterRollback extends ScenarioDeadLetter
-    {
-        // @Override
-        protected void applyTransaction(Session session) throws JMSException
-        {
-            session.rollback();
-        }
-    }
-
-    Scenario scenarioDeadLetterNotReceive = new ScenarioDeadLetterNotReceive();
-
-    class ScenarioDeadLetterNotReceive extends ScenarioDeadLetter
-    {
-        // @Override
-        public Message receive(Session session, MessageConsumer consumer) throws JMSException
-        {
-            Message message = consumer.receive(getSmallTimeout());
-            assertNull(message);
-            return message;
-        }
-    }
 }
+

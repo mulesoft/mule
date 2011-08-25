@@ -23,7 +23,7 @@ import org.junit.runners.Suite.SuiteClasses;
 @SuiteClasses({JmsClientAcknowledgeTransactionTestCase.class,
               JmsConnectorJndiTestCase.class,
               JmsDurableTopicTestCase.class,
-              JmsExceptionStrategyTestCase.class,
+              JmsDeadLetterQueueTestCase.class,
               JmsMessageAwareTransformersMule2685TestCase.class,
               JmsMuleSideDurableTopicTestCase.class,
               JmsMuleSideDurableTopicXATxTestCase.class,
