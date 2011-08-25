@@ -21,7 +21,7 @@
     <flow name="flowWithoutExceptionStrategyAndNoTx">
         <inbound-endpoint ref="jmsInNoTx"/>
         <test:component throwException="true"/>
-        <inbound-endpoint ref="jmsOutNoTx"/>
+        <outbound-endpoint ref="jmsOutNoTx"/>
     </flow>
 
 </mule>
