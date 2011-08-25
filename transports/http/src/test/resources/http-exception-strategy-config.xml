@@ -1,27 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
     xmlns:spring="http://www.springframework.org/schema/beans"
     xmlns:context="http://www.springframework.org/schema/context"
     xmlns:test="http://www.mulesoft.org/schema/mule/test"
+    xmlns:http="http://www.mulesoft.org/schema/mule/http"
+    xmlns:file="http://www.mulesoft.org/schema/mule/file"
     xsi:schemaLocation="
     http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
-    http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/3.2/mule-jms.xsd
     http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/3.2/mule-test.xsd
+    http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/3.2/mule-http.xsd
     http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
     http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd">
 
-    <flow name="flowWithoutExceptionStrategyAndTx">
-        <inbound-endpoint ref="jmsInTx"/>
+    <flow name="flowWithoutExceptionStrategySync">
+        <http:inbound-endpoint name="httpInSync" port="${port1}" host="localhost" path="flowWithoutExceptionStrategySync" exchange-pattern="request-response"/>
         <test:component throwException="true"/>
-        <outbound-endpoint ref="jmsOutTx"/>
-    </flow>
-
-    <flow name="flowWithoutExceptionStrategyAndNoTx">
-        <inbound-endpoint ref="jmsInNoTx"/>
-        <test:component throwException="true"/>
-        <outbound-endpoint ref="jmsOutNoTx"/>
     </flow>
 
 </mule>
