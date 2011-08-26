@@ -10,12 +10,14 @@
 
 package org.mule.test.integration.transport.file;
 
+import org.mule.DefaultMuleContext;
 import org.mule.api.MuleEventContext;
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.tck.functional.FunctionalTestNotification;
 import org.mule.tck.functional.FunctionalTestNotificationListener;
+import org.mule.transport.PollingController;
 import org.mule.util.FileUtils;
 import org.mule.util.IOUtils;
 
@@ -30,11 +32,13 @@ import org.junit.runners.Parameterized.Parameters;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 public class FileFunctionalTestCase extends AbstractServiceAndFlowTestCase implements FunctionalTestNotificationListener
 {
     private Object receivedData = null;
+    private boolean shouldPoll;
 
     @Parameters
     public static Collection<Object[]> parameters()
@@ -79,12 +83,31 @@ public class FileFunctionalTestCase extends AbstractServiceAndFlowTestCase imple
         IOUtils.write(data, fos);
         IOUtils.closeQuietly(fos);
 
-        // atomically rename the file to make it available for polling
+        shouldPoll = false;
+
+        ((DefaultMuleContext) muleContext).setPollingController(new PollingController()
+        {
+            @Override
+            public boolean isPrimaryPollingInstance()
+            {
+                return shouldPoll;
+            }
+        });
+        // atomically rena
+        // me the file to make it available for polling
         f.renameTo(FileUtils.newFile(f.getPath().replaceAll(".temp", ".data")));
 
         // give polling a chance
         Thread.sleep(5000);
 
+        synchronized (this)
+        {
+            assertNull(receivedData);
+        }
+
+        shouldPoll = true;
+        // give polling a chance
+        Thread.sleep(5000);
         synchronized (this)
         {
             assertNotNull(receivedData);
