@@ -1554,6 +1554,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     public void initAfterDeserialisation(MuleContext muleContext) throws MuleException
     {
         this.muleContext = muleContext;
+        initAppliedTransformerHashCodes();
     }
 
     public DataType<?> getDataType()
