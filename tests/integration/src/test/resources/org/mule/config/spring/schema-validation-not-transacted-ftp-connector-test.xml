@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:ftp="http://www.mulesoft.org/schema/mule/ftp"
+    xsi:schemaLocation="
+        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.1/mule.xsd
+        http://www.mulesoft.org/schema/mule/ftp http://www.mulesoft.org/schema/mule/file/3.1/mule-ftp.xsd">
+
+    <ftp:connector name="ftpConnector"
+                   validateConnections="false" numberOfConcurrentTransactedReceivers="1"/>
+
+    <flow name="main">
+        <ftp:inbound-endpoint address="ftp://anonymous:password@localhost:${port1}"
+                    binary="true" passive="true" connector-ref="ftpConnector"/>
+        <component>
+            <singleton-object class="org.mule.tck.functional.FunctionalTestComponent"/>
+        </component>
+    </flow>
+</mule>

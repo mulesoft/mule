@@ -35,7 +35,7 @@
                         </xsd:documentation>
         </xsd:annotation>
         <xsd:complexContent>
-            <xsd:extension base="mule:connectorType">
+            <xsd:extension base="mule:transactedConnectorType">
                 <xsd:sequence>
                     <xsd:element ref="abstract-sqlStatementStrategyFactory" minOccurs="0" maxOccurs="1">
                         <xsd:annotation>

@@ -31,7 +31,7 @@
     <xsd:element name="connector" type="vmConnectorType" substitutionGroup="mule:abstract-connector"/>
     <xsd:complexType name="vmConnectorType">
         <xsd:complexContent>
-            <xsd:extension base="mule:connectorType">
+            <xsd:extension base="mule:transactedConnectorType">
                 <xsd:sequence>
                     <xsd:element name="queueProfile" type="mule:queueProfileType" minOccurs="0">
                         <xsd:annotation>

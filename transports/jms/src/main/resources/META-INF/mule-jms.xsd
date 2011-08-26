@@ -40,7 +40,7 @@
     </xsd:element>
     <xsd:complexType name="genericConnectorType">
         <xsd:complexContent>
-            <xsd:extension base="mule:connectorType">
+            <xsd:extension base="mule:transactedConnectorType">
                 <xsd:sequence minOccurs="0" maxOccurs="unbounded">
                     <xsd:element ref="abstract-jndi-name-resolver" minOccurs="0" maxOccurs="1"/>
                 </xsd:sequence>
@@ -264,7 +264,7 @@
 
     <xsd:complexType name="vendorJmsConnectorType">
         <xsd:complexContent>
-            <xsd:extension base="mule:connectorType">
+            <xsd:extension base="mule:transactedConnectorType">
                 <xsd:sequence minOccurs="0" maxOccurs="unbounded">
                     <xsd:element ref="abstract-jndi-name-resolver" minOccurs="0" maxOccurs="1"/>
                 </xsd:sequence>
