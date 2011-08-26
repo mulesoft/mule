@@ -997,16 +997,24 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="abstract-filter" abstract="true" type="abstractFilterType" substitutionGroup="abstract-message-processor">
+    <xsd:element name="abstract-filter" abstract="true" type="commonFilterType" substitutionGroup="abstract-message-processor">
         <xsd:annotation>
             <xsd:documentation>
                 A placeholder for filter elements, which control which messages are handled.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
-    <xsd:complexType name="abstractFilterType">
+
+    <xsd:complexType name="commonFilterType">
         <xsd:complexContent>
             <xsd:extension base="abstractMessageProcessorType">
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="abstractFilterType">
+        <xsd:complexContent>
+            <xsd:extension base="commonFilterType">
                 <xsd:attribute name="name" type="substitutableName">
                     <xsd:annotation>
                         <xsd:documentation>
@@ -3414,7 +3422,7 @@
     </xsd:element>
     <xsd:complexType name="refFilterType">
         <xsd:complexContent>
-            <xsd:extension base="abstractFilterType">
+            <xsd:extension base="commonFilterType">
                 <xsd:attribute name="ref" type="xsd:string" use="required">
                     <xsd:annotation>
                         <xsd:documentation>

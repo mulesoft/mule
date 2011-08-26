@@ -32,6 +32,13 @@ public class InvalidSchemaValidationTestCase extends AbstractSchemaValidationTes
         doTest("org/mule/config/spring/schema-validation-transformer-ref-test.xml");
     }
 
+    @Test(expected = SAXException.class)
+    public void testFilterReference() throws SAXException, IOException
+    {
+        addSchema("http://www.mulesoft.org/schema/mule/vm","META-INF/mule-vm.xsd");
+        doTest("org/mule/config/spring/schema-validation-filter-ref-test.xml");
+    }
+
     @Test
     public void testTransactedConnectors() throws SAXException, IOException
     {
