@@ -10,8 +10,12 @@
 
 package org.mule.test.integration.routing;
 
+import org.mule.DefaultMuleMessage;
+import org.mule.api.MuleEvent;
+import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleMessageCollection;
+import org.mule.api.lifecycle.Callable;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 
@@ -23,6 +27,7 @@ import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -45,9 +50,9 @@ public class InboundAggregationNoTimeoutTestCase extends AbstractServiceAndFlowT
     @Test
     public void testAggregatorWithNoTimeout() throws Exception
     {
-        String message = "test";
+        MuleMessage message = new DefaultMuleMessage("test", muleContext);
         MuleClient client = new MuleClient(muleContext);
-        client.dispatch("vm://distributor.queue", message, null);
+        client.dispatch("vm://distributor.queue", message);
 
         MuleMessage result = client.request("vm://results", 10000);
 
@@ -59,11 +64,21 @@ public class InboundAggregationNoTimeoutTestCase extends AbstractServiceAndFlowT
         {
             MuleMessage msg = mc.getMessagesAsArray()[i];
             assertEquals("test Received", msg.getPayload());
+            assertEquals(message.getMessageRootId(), msg.getMessageRootId());
         }
+        assertEquals(message.getMessageRootId(), result.getMessageRootId());
     }
 
-    public static class TestCollectionService
+    public static class TestCollectionService implements Callable
     {
+        @Override
+        public Object onCall(MuleEventContext eventContext) throws Exception
+        {
+            MuleMessage message = eventContext.getMessage();
+            process((List<?>) message.getPayload());
+            return message;
+        }
+
         public Object process(List<?> responseMessages)
         {
             assertEquals(3, responseMessages.size());

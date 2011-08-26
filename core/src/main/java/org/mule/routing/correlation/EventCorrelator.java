@@ -276,6 +276,11 @@ public class EventCorrelator implements Startable, Stoppable
                     // create the response event
                     MuleEvent returnEvent = callback.aggregateEvents(group);
                     returnEvent.getMessage().setCorrelationId(groupId);
+                    String rootId = group.getCommonRootId();
+                    if (rootId != null)
+                    {
+                        returnEvent.getMessage().setMessageRootId(rootId);
+                    }
 
                     // remove the eventGroup as no further message will be received
                     // for this group once we aggregate

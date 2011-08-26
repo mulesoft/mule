@@ -116,6 +116,7 @@ public abstract class AbstractMessageSequenceSplitter extends AbstractIntercepti
                 message.setCorrelationGroupSize(count);
                 message.setCorrelationSequence(correlationSequence);
             }
+            message.propagateRootId(event.getMessage());
             resultEvents.add(processNext(new DefaultMuleEvent(message, event)));
         }
         if (correlationSequence == 1)

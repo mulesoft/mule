@@ -21,6 +21,7 @@ import org.mule.api.store.ListableObjectStore;
 import org.mule.api.store.ObjectStoreException;
 import org.mule.api.store.ObjectStoreManager;
 import org.mule.util.ClassUtils;
+import org.mule.util.MuleLogger;
 import org.mule.util.store.DeserializationPostInitialisable;
 
 import java.io.Serializable;
@@ -51,6 +52,9 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
     private final int expectedSize;
     transient private MuleContext muleContext;
     private final String storePrefix;
+    private String commonRootId = null;
+    private static boolean hasNoCommonRootId = false;
+
     public static final String DEFAULT_STORE_PREFIX = "DEFAULT_STORE";
 
     public EventGroup(Object groupId, MuleContext muleContext)
@@ -216,8 +220,23 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
             //when an event is split up, the same event IDs are used.
             Serializable key=event.getId()+event.getMessage().getCorrelationSequence();            
             events.store(key, event);
+
+            if (!hasNoCommonRootId)
+            {
+                String rootId = event.getMessage().getMessageRootId();
+                if (commonRootId == null)
+                {
+                    commonRootId = rootId;
+                }
+                else if (!commonRootId.equals(rootId))
+                {
+                    hasNoCommonRootId = true;
+                    commonRootId = null;
+                }
+            }
         }
     }
+
 
     /**
      * Remove the given event from the group.
@@ -350,6 +369,11 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
         return col;
     }
 
+    public String getCommonRootId()
+    {
+        return commonRootId;
+    }
+
     public MuleEvent getMessageCollectionEvent()
     {
         try
@@ -357,7 +381,13 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
             if (size() > 0)
             {
 
-                return new DefaultMuleEvent(toMessageCollection(), events.retrieve(events.allKeys().get(0)));
+                DefaultMuleEvent muleEvent = new DefaultMuleEvent(toMessageCollection(),
+                    events.retrieve(events.allKeys().get(0)));
+                if (getCommonRootId() != null)
+                {
+                    muleEvent.getMessage().setMessageRootId(commonRootId);
+                }
+                return muleEvent;
             }
             else
             {

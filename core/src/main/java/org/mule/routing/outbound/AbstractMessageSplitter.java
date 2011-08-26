@@ -68,7 +68,7 @@ public abstract class AbstractMessageSplitter extends FilteringOutboundRouter
             {
                 sendMessage = new DefaultMuleMessage(part.getPart(), props, muleContext);
             }
-
+            sendMessage.propagateRootId(message);
             try
             {
                 if (enableCorrelation != CorrelationMode.NEVER)
