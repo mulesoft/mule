@@ -175,6 +175,23 @@ public interface MuleMessage extends Serializable
     String getUniqueId();
 
     /**
+     * gets an identifier that is the same among parent and child messages
+     *
+     * @return a message id for the group of descendant messages. The Id should never be null.
+     */
+    String getMessageRootId();
+
+    /**
+     * set the root ID for the message
+     */
+    void setMessageRootId(String rootId);
+
+    /**
+     * copy the message root id from parent to child
+     */
+    void propagateRootId(MuleMessage parent);
+
+    /**
      * Gets a property from the message
      *
      * @param name the name or key of the property. This must be non-null.

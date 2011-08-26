@@ -36,7 +36,6 @@ import org.mule.util.StringUtils;
 import org.mule.util.UUID;
 import org.mule.util.store.DeserializationPostInitialisable;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -81,6 +80,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
      * message id, this uuid will be ignored
      */
     private String id = UUID.getUUID();
+    private String rootId = id;
 
     private transient Object payload;
     private transient Object originalPayload;
@@ -186,6 +186,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     public DefaultMuleMessage(Object message, MuleMessage previous, MuleContext muleContext)
     {
         id = previous.getUniqueId();
+        rootId = previous.getMessageRootId();
         setMuleContext(muleContext);
         initAppliedTransformerHashCodes();
         setEncoding(previous.getEncoding());
@@ -701,6 +702,27 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     {
         assertAccess(WRITE);
         id = uid;
+    }
+
+    @Override
+    public String getMessageRootId()
+    {
+        assertAccess(READ);
+        return rootId;
+    }
+
+    @Override
+    public void setMessageRootId(String rid)
+    {
+        assertAccess(WRITE);
+        rootId = rid;
+    }
+
+    @Override
+    public void propagateRootId(MuleMessage parent)
+    {
+        assertAccess(WRITE);
+        rootId = parent.getMessageRootId();
     }
 
     /**
