@@ -718,7 +718,14 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="abstract-transformer" abstract="true" type="abstractTransformerType" substitutionGroup="abstract-message-processor">
+    <xsd:complexType name="commonTransformerType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractMessageProcessorType">
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="abstract-transformer" abstract="true" type="commonTransformerType" substitutionGroup="abstract-message-processor">
         <xsd:annotation>
             <xsd:documentation>
                 A placeholder for transformer elements. Transformers convert message payloads.
@@ -727,7 +734,7 @@
     </xsd:element>
     <xsd:complexType name="abstractTransformerType">
         <xsd:complexContent>
-            <xsd:extension base="abstractMessageProcessorType">
+            <xsd:extension base="commonTransformerType">
                 <xsd:attribute name="name" type="substitutableName">
                     <xsd:annotation>
                         <xsd:documentation>
@@ -3320,7 +3327,7 @@
     </xsd:element>
     <xsd:complexType name="refTransformerType">
         <xsd:complexContent>
-            <xsd:extension base="abstractTransformerType">
+            <xsd:extension base="commonTransformerType">
                 <xsd:attribute name="ref" type="xsd:string" use="required">
                     <xsd:annotation>
                         <xsd:documentation>
@@ -3591,26 +3598,27 @@
         </xsd:annotation>
     </xsd:element>
 
-    <xsd:element name="append-string-transformer" substitutionGroup="abstract-transformer">
+    <xsd:element name="append-string-transformer" type="appendStringTransformerType" substitutionGroup="abstract-transformer">
         <xsd:annotation>
             <xsd:documentation>
                 A transformer that appends a string to a string payload.
             </xsd:documentation>
         </xsd:annotation>
-        <xsd:complexType>
-            <xsd:complexContent>
-                <xsd:extension base="abstractTransformerType">
-                    <xsd:attribute name="message" type="xsd:string" use="required">
-                        <xsd:annotation>
-                            <xsd:documentation>
-                                The string to append.
-                            </xsd:documentation>
-                        </xsd:annotation>
-                    </xsd:attribute>
-                </xsd:extension>
-            </xsd:complexContent>
-        </xsd:complexType>
     </xsd:element>
+
+    <xsd:complexType name="appendStringTransformerType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractTransformerType">
+                <xsd:attribute name="message" type="xsd:string" use="required">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The string to append.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
 
     <xsd:element name="encrypt-transformer" type="encryptionTransformerType" substitutionGroup="abstract-transformer">
         <xsd:annotation>
@@ -3690,44 +3698,44 @@
         </xsd:complexType>
     </xsd:element>
 
-    <xsd:element name="expression-transformer" substitutionGroup="abstract-transformer">
+    <xsd:element name="expression-transformer" type="expressionTransformerType" substitutionGroup="abstract-transformer">
         <xsd:annotation>
             <xsd:documentation>
                 A transformer that evaluates one or more expressions on the current message. Each expression equates to a parameter in the return message. The return message for two or more expressions will be an Object[].
             </xsd:documentation>
         </xsd:annotation>
-        <xsd:complexType>
-            <xsd:complexContent>
-                <xsd:extension base="abstractTransformerType">
-                    <xsd:sequence minOccurs="0" maxOccurs="unbounded">
-                        <xsd:element name="return-argument">
-                            <xsd:annotation>
-                                <xsd:documentation>
-                                    A list of expressions, each of which is evaluated and equates to an element in the result message. If just one 'return-argument' is configured, the result will be the evaluation of that expression rather than an object array.
-                                </xsd:documentation>
-                            </xsd:annotation>
-                            <xsd:complexType>
-                                <xsd:attributeGroup ref="expressionAttributes"/>
-                                <xsd:attribute name="optional" type="substitutableBoolean" use="optional">
-                                    <xsd:annotation>
-                                        <xsd:documentation>If the expression evaluates to null, specifies whether to continue to the next expression without error.
-                                        </xsd:documentation>
-                                    </xsd:annotation>
-                                </xsd:attribute>
-                            </xsd:complexType>
-                        </xsd:element>
-                    </xsd:sequence>
-                    <xsd:attributeGroup ref="optionalExpressionAttributes"/>
-                    <xsd:attribute name="returnSourceIfNull" type="xsd:boolean" use="optional">
+    </xsd:element>
+
+    <xsd:complexType name="expressionTransformerType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractTransformerType">
+                <xsd:sequence minOccurs="0" maxOccurs="unbounded">
+                    <xsd:element name="return-argument">
                         <xsd:annotation>
                             <xsd:documentation>If all expressions return null or NullPayload on this transformer, this flag will cause the source payload to be returned without modification.
                             </xsd:documentation>
                         </xsd:annotation>
-                    </xsd:attribute>
-                </xsd:extension>
-            </xsd:complexContent>
-        </xsd:complexType>
-    </xsd:element>
+                        <xsd:complexType>
+                            <xsd:attributeGroup ref="expressionAttributes"/>
+                            <xsd:attribute name="optional" type="substitutableBoolean" use="optional">
+                                <xsd:annotation>
+                                    <xsd:documentation>If the expression evaluates to null, specifies whether to continue to the next expression without error.
+                                    </xsd:documentation>
+                                </xsd:annotation>
+                            </xsd:attribute>
+                        </xsd:complexType>
+                    </xsd:element>
+                </xsd:sequence>
+                <xsd:attributeGroup ref="optionalExpressionAttributes"/>
+                <xsd:attribute name="returnSourceIfNull" type="xsd:boolean" use="optional">
+                    <xsd:annotation>
+                        <xsd:documentation>If all expressions return null on this transformer, this flag will cause the source payload to be returned without modification.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
 
     <xsd:simpleType name="standardExpressionEvaluators">
         <xsd:restriction base="substitutableName">
@@ -6251,20 +6259,6 @@
                         </xsd:annotation>
                     </xsd:element>
                 </xsd:sequence>
-                <xsd:attribute name="createMultipleTransactedReceivers" type="substitutableBoolean">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            Whether to create multiple concurrent receivers for this connector. This property is used by transports that support transactions, specifically receivers that extend the TransactedPollingMessageReceiver, and provides better throughput.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-                <xsd:attribute name="numberOfConcurrentTransactedReceivers" type="substitutableInt">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            If createMultipleTransactedReceivers is set to true, the number of concurrent receivers that will be launched.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
                 <xsd:attribute name="dynamicNotification" type="substitutableBoolean" default="false">
                     <xsd:annotation>
                         <xsd:documentation>
@@ -6306,6 +6300,27 @@
         <xsd:attribute name="inboundExchangePatterns" type="xsd:string"/>
         <xsd:attribute name="outboundExchangePatterns" type="xsd:string"/>
         <xsd:attribute name="defaultExchangePattern" type="xsd:string"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="transactedConnectorType">
+        <xsd:complexContent>
+            <xsd:extension base="connectorType">
+                <xsd:attribute name="createMultipleTransactedReceivers" type="substitutableBoolean">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Whether to create multiple concurrent receivers for this connector. This property is used by transports that support transactions, specifically receivers that extend the TransactedPollingMessageReceiver, and provides better throughput.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="numberOfConcurrentTransactedReceivers" type="substitutableInt">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            If createMultipleTransactedReceivers is set to true, the number of concurrent receivers that will be launched.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
     </xsd:complexType>
 
     <!--==============================================================-->

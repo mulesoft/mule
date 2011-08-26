@@ -37,7 +37,7 @@ public abstract class AbstractSchemaValidationTestCase extends AbstractMuleTestC
 {
 
     public static final String SEPARATOR = " ";
-    private Map schemas = new HashedMap();
+    protected Map schemas = new HashedMap();
 
     // we define these locally so that tests use the latest version rather than grabbing xsi:location
     @Before
