@@ -19,7 +19,6 @@ import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.StartException;
-import org.mule.api.lifecycle.StopException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionException;
@@ -644,7 +643,9 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
             }
             catch (JMSException e)
             {
-                throw new StopException(CoreMessages.failedToStop("Jms Connection"), e, this);
+                // this exception may be thrown when the broker is shut down, but the
+                // stop process should continue all the same
+                logger.warn("Jms connection failed to stop properly: ", e);
             }
         }
 

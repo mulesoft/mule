@@ -10,23 +10,27 @@
 
 package org.mule.transport.jms;
 
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import org.mule.api.transaction.Transaction;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.transaction.TransactionCoordination;
 
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
+import javax.jms.JMSException;
 import javax.jms.Session;
 
 import org.junit.Test;
 import org.mockito.Matchers;
-
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 public class JmsConnectorTestCase extends AbstractMuleContextTestCase
 {
@@ -130,5 +134,18 @@ public class JmsConnectorTestCase extends AbstractMuleContextTestCase
         {
             TransactionCoordination.getInstance().unbindTransaction(transaction);
         }
+    }
+
+    @Test
+    public void ignoreJmsExceptionOnStop() throws Exception
+    {
+        Connection connection = mock(Connection.class);
+        doThrow(new JMSException("connection unavailable")).when(connection).stop();
+        JmsConnector connector = new JmsConnector(muleContext);
+        JmsConnector spy = spy(connector);
+        doReturn(connection).when(spy).createConnection();
+        spy.doConnect();
+        spy.doStop();
+        verify(connection, times(1)).stop();
     }
 }
