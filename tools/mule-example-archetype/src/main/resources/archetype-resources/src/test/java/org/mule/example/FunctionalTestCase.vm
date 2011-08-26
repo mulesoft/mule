@@ -31,7 +31,8 @@ public class ${ModuleName}TestCase extends FunctionalTestCase
     public void test${ModuleName}() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
-        MuleMessage result = client.send("vm://in", "some data", null);
+        result = client.dispatch("vm://in", "some data", null);
+        MuleMessage result = client.request("vm://out", RECEIVE_TIMEOUT);
         assertNotNull(result);
         assertNull(result.getExceptionPayload());
         assertFalse(result.getPayload() instanceof NullPayload);
