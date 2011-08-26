@@ -25,10 +25,6 @@ import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.routing.RoutePathNotFoundException;
-import org.mule.api.routing.filter.FilterUnacceptedException;
-import org.mule.api.security.NotPermittedException;
-import org.mule.api.security.UnauthorisedException;
 import org.mule.api.transport.Connector;
 import org.mule.api.transport.MessageReceiver;
 import org.mule.api.transport.PropertyScope;
@@ -54,8 +50,6 @@ import javax.resource.spi.work.Work;
 
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpVersion;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * <code>HttpMessageReceiver</code> is a simple http server that can be used to
@@ -63,8 +57,6 @@ import org.apache.commons.logging.LogFactory;
  */
 public class HttpMessageReceiver extends TcpMessageReceiver
 {
-    protected final Log logger = LogFactory.getLog(getClass());
-
     public HttpMessageReceiver(Connector connector, FlowConstruct flowConstruct, InboundEndpoint endpoint)
             throws CreateException
     {
@@ -130,7 +122,8 @@ public class HttpMessageReceiver extends TcpMessageReceiver
                 remoteClientAddress = clientAddress.toString();
             }
         }
-        
+
+        @Override
         public void expired()
         {
             if (conn.isOpen())
@@ -139,29 +132,30 @@ public class HttpMessageReceiver extends TcpMessageReceiver
             }
         }
 
+        @Override
         public void run()
         {
             long keepAliveTimeout = ((TcpConnector) connector).getKeepAliveTimeout();
-            
+
             try
             {
                 do
                 {
                     conn.setKeepAlive(false);
-                    
+
                     // Only add a monitor if the timeout has been set
                     if (keepAliveTimeout > 0)
                     {
                         ((HttpConnector) connector).getKeepAliveMonitor().addExpirable(
                             keepAliveTimeout, TimeUnit.MILLISECONDS, this);
                     }
-                    
+
                     HttpRequest request = conn.readRequest();
                     if (request == null)
                     {
                         break;
                     }
-                        
+
                     try
                     {
                         conn.writeResponse(processRequest(request));
@@ -185,7 +179,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
                         }
                         else
                         {
-                            getConnector().getMuleContext().getExceptionListener().handleException(e);                        
+                            getConnector().getMuleContext().getExceptionListener().handleException(e);
                         }
                         break;
                     }
@@ -193,18 +187,18 @@ public class HttpMessageReceiver extends TcpMessageReceiver
                     {
                         // Ensure that we drop any monitors
                         ((HttpConnector) connector).getKeepAliveMonitor().removeExpirable(this);
-                        
+
                         if (request.getBody() != null)
                         {
                             request.getBody().close();
                         }
-                    }                    
+                    }
                 }
                 while (conn.isKeepAlive());
             }
             catch (Exception e)
             {
-                getConnector().getMuleContext().getExceptionListener().handleException(e);                        
+                getConnector().getMuleContext().getExceptionListener().handleException(e);
             }
             finally
             {
@@ -213,7 +207,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
                 if (conn.isOpen())
                 {
                     conn.close();
-                    conn = null;                    
+                    conn = null;
                 }
             }
         }
@@ -254,7 +248,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
             }
 
             message.setProperty(HttpConnector.HTTP_REQUEST_PATH_PROPERTY, path, PropertyScope.INBOUND);
-            
+
             if (logger.isDebugEnabled())
             {
                 logger.debug(message.getInboundProperty(HttpConnector.HTTP_REQUEST_PROPERTY));
@@ -262,7 +256,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
 
             // determine if the request path on this request denotes a different receiver
             MessageReceiver receiver = getTargetReceiver(message, endpoint);
-            
+
             HttpResponse response;
             // the response only needs to be transformed explicitly if
             // A) the request was not served or B) a null result was returned
@@ -295,11 +289,11 @@ public class HttpMessageReceiver extends TcpMessageReceiver
                 {
                     response = transformResponse(returnMessage, returnEvent);
                 }
-                
+
                 response.setupKeepAliveFromRequestVersion(request.getRequestLine().getHttpVersion());
                 HttpConnector httpConnector = (HttpConnector) connector;
                 response.disableKeepAlive(!httpConnector.isKeepAlive());
-                
+
                 Header connectionHeader = request.getFirstHeader("Connection");
                 if (connectionHeader != null)
                 {
@@ -318,7 +312,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
                     else if ("close".equalsIgnoreCase(value))
                     {
                         response.setKeepAlive(false);
-                    } 
+                    }
                 }
             }
             else
@@ -327,12 +321,12 @@ public class HttpMessageReceiver extends TcpMessageReceiver
                 String failedPath = String.format("%s://%s:%d%s",
                                                   uri.getScheme(), uri.getHost(), uri.getPort(),
                                                   message.getInboundProperty(HttpConnector.HTTP_REQUEST_PATH_PROPERTY));
-                response = buildFailureResponse(request.getRequestLine().getHttpVersion(), HttpConstants.SC_NOT_FOUND, 
+                response = buildFailureResponse(request.getRequestLine().getHttpVersion(), HttpConstants.SC_NOT_FOUND,
                                                 HttpMessages.cannotBindToAddress(failedPath).toString());
             }
             return response;
         }
-        
+
         /**
          * Check if endpoint has a keep-alive property configured. Note the translation from
          * keep-alive in the schema to keepAlive here.
@@ -346,7 +340,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
             }
             return true;
         }
-        
+
         protected HttpResponse doOtherValid(RequestLine requestLine, String method) throws MuleException
         {
             MuleMessage message = createMuleMessage(null);
@@ -372,7 +366,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
         private void sendExpect100(HttpRequest request) throws MuleException, IOException
         {
             RequestLine requestLine = request.getRequestLine();
-            
+
             // respond with status code 100, for Expect handshake
             // according to rfc 2616 and http 1.1
             // the processing will continue and the request will be fully
@@ -415,6 +409,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
             message.setProperty(MuleProperties.MULE_REMOTE_CLIENT_ADDRESS, remoteClientAddress, PropertyScope.INBOUND);
         }
 
+        @Override
         public void release()
         {
             conn.close();
@@ -438,13 +433,13 @@ public class HttpMessageReceiver extends TcpMessageReceiver
             requestUri.append(ep.getProtocol()).append("://");
             requestUri.append(ep.getEndpointURI().getHost());
             requestUri.append(':').append(ep.getEndpointURI().getPort());
-            
-            if (!"/".equals(path)) 
+
+            if (!"/".equals(path))
             {
                 requestUri.append(path);
             }
         }
-        
+
         String uriStr = requestUri.toString();
         // first check that there is a receiver on the root address
         if (logger.isTraceEnabled())
@@ -466,7 +461,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
             }
 
             receiver = findReceiverByStem(connector.getReceivers(), uriStr);
-            
+
             if (receiver == null && logger.isWarnEnabled())
             {
                 logger.warn("No receiver found with secondary lookup on connector: " + connector.getName()
@@ -512,7 +507,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
         }
         return receiver;
     }
-    
+
     @Override
     protected void initializeMessageFactory() throws InitialisationException
     {
@@ -528,7 +523,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
             String cookieSpec = MapUtils.getString(endpoint.getProperties(),
                 HttpConnector.HTTP_COOKIE_SPEC_PROPERTY, ((HttpConnector) connector).getCookieSpec());
             factory.setCookieSpec(cookieSpec);
-            
+
             factory.setExchangePattern(endpoint.getExchangePattern());
 
             muleMessageFactory = factory;
@@ -539,7 +534,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
             throw new InitialisationException(message, ce, this);
         }
     }
-    
+
     @Override
     protected MuleMessage handleUnacceptedFilter(MuleMessage message)
     {
