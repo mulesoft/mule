@@ -54,6 +54,8 @@ public class DefaultMessageCollection extends DefaultMuleMessage implements Mule
     public DefaultMessageCollection(DefaultMessageCollection msg, MuleContext muleContext)
     {
         this(muleContext);
+        setUniqueId(msg.getUniqueId());
+        setMessageRootId(msg.getMessageRootId());
         for (int i = 0; i < msg.getMessagesAsArray().length; i++)
         {
             addMessage(msg.getMessagesAsArray()[i]);
@@ -212,6 +214,8 @@ public class DefaultMessageCollection extends DefaultMuleMessage implements Mule
     public MuleMessage createInboundMessage() throws Exception
     {
         DefaultMessageCollection newMessage = new DefaultMessageCollection(getMuleContext());
+        newMessage.setUniqueId(getUniqueId());
+        newMessage.setMessageRootId(getMessageRootId());
         MuleMessage[] messages = getMessagesAsArray();
         for (MuleMessage message : messages)
         {
