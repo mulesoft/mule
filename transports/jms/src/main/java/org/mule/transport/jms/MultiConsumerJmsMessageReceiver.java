@@ -57,7 +57,6 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
     protected final int receiversCount;
 
     private final JmsConnector jmsConnector;
-    private Session session;
 
     public MultiConsumerJmsMessageReceiver(Connector connector, FlowConstruct flowConstruct, InboundEndpoint endpoint)
             throws CreateException
@@ -125,12 +124,6 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
             throw new IllegalStateException("List should be empty, there may be a concurrency issue here (see EE-1275)");
         }
         
-        // Create session if none exists
-        if (session == null)
-        {
-            session = jmsConnector.getSession(endpoint);
-        }
-
         SubReceiver sub;
         for (int i = 0; i < receiversCount; i++)
         {
@@ -159,49 +152,19 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
             }
         }
         consumers.clear();
-        if (session != null)
-        {
-            try
-            {
-                session.close();
             }
-            catch (Exception e)
-            {
-                logger.warn("Failed to close jms session: " + e.getMessage());
-            }
-            finally
-            {
-                session = null;
-            }
-        }
-    }
 
     @Override
     protected void doDispose()
     {
         logger.debug("doDispose()");
-        // Note: the session was probably already disposed by doDisconnect()
-        if (session != null)
-        {
-            try
-            {
-                session.close();
             }
-            catch (Exception e)
-            {
-                logger.warn("Failed to close jms session: " + e.getMessage());
-            }
-            finally
-            {
-                session = null;
-            }
-        }
-    }
 
     private class SubReceiver implements MessageListener
     {
         private final Log subLogger = LogFactory.getLog(getClass());
 
+        private volatile Session session;
         private volatile MessageConsumer consumer;
 
         protected volatile boolean connected;
@@ -236,6 +199,8 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
         {
             jmsConnector.closeQuietly(consumer);
             consumer = null;
+            jmsConnector.closeQuietly(session);
+            session = null;
         }
 
         protected void doStart() throws MuleException
@@ -299,6 +264,12 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
             {
                 JmsSupport jmsSupport = jmsConnector.getJmsSupport();
                 boolean topic = jmsConnector.getTopicResolver().isTopic(endpoint, true);
+
+                // Create session if none exists
+                if (session == null)
+                {
+                    session = jmsConnector.getSession(endpoint);
+                }
 
                 // Create destination
                 Destination dest = jmsSupport.createDestination(session, endpoint);
@@ -439,9 +410,9 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
             {
                 if (logger.isDebugEnabled())
                 {
-                    logger.debug("Binding " + session + " to " + jmsConnector.getConnection());
+                    logger.debug("Binding " + subReceiver.session + " to " + jmsConnector.getConnection());
                 }
-                tx.bindResource(jmsConnector.getConnection(), session);
+                tx.bindResource(jmsConnector.getConnection(), subReceiver.session);
             }
             else
             {
