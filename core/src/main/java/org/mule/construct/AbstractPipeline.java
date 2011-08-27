@@ -182,7 +182,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
         {
             InboundEndpoint endpoint = ((InboundEndpoint) source);
             return !endpoint.getExchangePattern().hasResponse()
-                   || !endpoint.getTransactionConfig().isConfigured();
+                   && !endpoint.getTransactionConfig().isConfigured();
         }
         else if (messageSource instanceof CompositeMessageSource)
         {
