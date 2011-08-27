@@ -25,6 +25,13 @@ import java.util.concurrent.TimeUnit;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
+/*
+EE-2430 - Check that JMS SubReceiver executes concurrently.
+This test that each SubReceiver is using a different Session since
+if they are using the same Session activeMQ won't execute them concurrently
+(since it will not do two onMessage invocations concurrently using the same session)
+One of the latch.await(..) will fail in that case.
+ */
 public class JmsConcurrentConsumerExecutionTestCase extends FunctionalTestCase
 {
 
