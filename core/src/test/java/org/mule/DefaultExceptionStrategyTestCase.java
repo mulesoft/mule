@@ -10,6 +10,8 @@
 
 package org.mule;
 
+import static org.junit.Assert.assertEquals;
+
 import org.mule.api.MuleContext;
 import org.mule.api.context.notification.ExceptionNotificationListener;
 import org.mule.api.context.notification.ServerNotification;
@@ -20,9 +22,8 @@ import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
-import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
+import org.junit.Test;
 
 public class DefaultExceptionStrategyTestCase extends AbstractMuleContextTestCase
 {
@@ -30,7 +31,7 @@ public class DefaultExceptionStrategyTestCase extends AbstractMuleContextTestCas
     @Test
     public void testExceptions() throws Exception
     {
-        InstrumentedExceptionStrategy strategy = new InstrumentedExceptionStrategy(muleContext, true);
+        InstrumentedExceptionStrategy strategy = new InstrumentedExceptionStrategy(muleContext);
         strategy.setMuleContext(muleContext);
         strategy.handleException(new IllegalArgumentException("boom"));
         assertEquals(1, strategy.getCount());
@@ -58,7 +59,7 @@ public class DefaultExceptionStrategyTestCase extends AbstractMuleContextTestCas
         });
 
         // throwing exception
-        InstrumentedExceptionStrategy strategy = new InstrumentedExceptionStrategy(muleContext, true);
+        InstrumentedExceptionStrategy strategy = new InstrumentedExceptionStrategy(muleContext);
         strategy.setMuleContext(muleContext);
         strategy.handleException(new IllegalArgumentException("boom"));
 
@@ -72,9 +73,9 @@ public class DefaultExceptionStrategyTestCase extends AbstractMuleContextTestCas
     {
         private volatile int count = 0;
 
-        public InstrumentedExceptionStrategy(MuleContext muleContext, boolean rollbackByDefault)
+        public InstrumentedExceptionStrategy(MuleContext muleContext)
         {
-            super(muleContext, rollbackByDefault);
+            super(muleContext);
         }
 
         @Override

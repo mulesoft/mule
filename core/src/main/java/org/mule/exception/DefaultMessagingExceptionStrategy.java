@@ -25,11 +25,11 @@ public class DefaultMessagingExceptionStrategy extends AbstractMessagingExceptio
     /** Called by MuleNamespaceHandler for <default-exception-strategy> element. */
     public DefaultMessagingExceptionStrategy()
     {
-        this(null, false);
+        this(null);
     }
 
-    public DefaultMessagingExceptionStrategy(MuleContext muleContext, boolean rollbackByDefault)
+    public DefaultMessagingExceptionStrategy(MuleContext muleContext)
     {
-        super(muleContext, rollbackByDefault);
+        super(muleContext);
     }
 }

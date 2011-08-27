@@ -81,7 +81,7 @@ public abstract class AbstractFlowConstruct implements FlowConstruct, Lifecycle,
         this.muleContext = muleContext;
         this.name = name;
         this.lifecycleManager = new FlowConstructLifecycleManager(this, muleContext);
-        this.exceptionListener = new DefaultMessagingExceptionStrategy(muleContext, true);
+        this.exceptionListener = new DefaultMessagingExceptionStrategy(muleContext);
     }
 
     public final void initialise() throws InitialisationException

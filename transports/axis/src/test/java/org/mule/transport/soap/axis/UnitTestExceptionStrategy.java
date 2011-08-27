@@ -28,7 +28,7 @@ public class UnitTestExceptionStrategy extends DefaultMessagingExceptionStrategy
     
     public UnitTestExceptionStrategy(MuleContext muleContext, boolean rollbackByDefault)
     {
-        super(muleContext, rollbackByDefault);
+        super(muleContext);
         messagingExceptions = new ArrayList<Throwable>();
     }
     

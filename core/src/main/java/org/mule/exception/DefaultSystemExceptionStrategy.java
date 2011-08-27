@@ -19,8 +19,8 @@ import org.mule.api.MuleContext;
  */
 public class DefaultSystemExceptionStrategy extends AbstractSystemExceptionStrategy
 {
-    public DefaultSystemExceptionStrategy(MuleContext muleContext, boolean rollbackByDefault)
+    public DefaultSystemExceptionStrategy(MuleContext muleContext)
     {
-        super(muleContext, rollbackByDefault);
+        super(muleContext);
     }
 }

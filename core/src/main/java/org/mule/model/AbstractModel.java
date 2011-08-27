@@ -46,7 +46,7 @@ public abstract class AbstractModel implements Model
     protected MuleContext muleContext;
     private EntryPointResolverSet entryPointResolverSet = null; // values are supplied below as required
     private LifecycleAdapterFactory lifecycleAdapterFactory = new DefaultComponentLifecycleAdapterFactory();
-    private MessagingExceptionHandler exceptionListener = new DefaultMessagingExceptionStrategy(muleContext, true);
+    private MessagingExceptionHandler exceptionListener = new DefaultMessagingExceptionStrategy(muleContext);
 
     protected transient Log logger = LogFactory.getLog(getClass());
 

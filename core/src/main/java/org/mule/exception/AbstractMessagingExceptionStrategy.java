@@ -35,9 +35,9 @@ public abstract class AbstractMessagingExceptionStrategy extends AbstractExcepti
      */
     private boolean stopMessageProcessing;
 
-    public AbstractMessagingExceptionStrategy(MuleContext muleContext, boolean rollbackByDefault)
+    public AbstractMessagingExceptionStrategy(MuleContext muleContext)
     {
-        super(muleContext, rollbackByDefault);
+        super(muleContext);
     }
 
     public MuleEvent handleException(Exception ex, MuleEvent event, RollbackSourceCallback rollbackMethod)
@@ -78,6 +78,9 @@ public abstract class AbstractMessagingExceptionStrategy extends AbstractExcepti
         {
             logger.debug("Rolling back transaction");
             rollback(rollbackMethod);
+
+            logger.debug("Routing exception message");
+            routeException(event, ex);
         }
         else
         {

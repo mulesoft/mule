@@ -10,6 +10,8 @@
 
 package org.mule.construct.builder;
 
+import static org.junit.Assert.assertEquals;
+
 import org.mule.component.AbstractJavaComponent;
 import org.mule.component.DefaultJavaComponent;
 import org.mule.component.SimpleCallableJavaComponent;
@@ -25,8 +27,6 @@ import org.mule.transformer.simple.StringAppendTransformer;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-
 public class SimpleServiceBuilderTestCase extends AbstractMuleContextTestCase
 {
     @Test
@@ -38,7 +38,7 @@ public class SimpleServiceBuilderTestCase extends AbstractMuleContextTestCase
             .responseTransformers(new ObjectToByteArray(), new GZipCompressTransformer())
             .component(EchoComponent.class)
             .type(Type.DIRECT)
-            .exceptionStrategy(new DefaultMessagingExceptionStrategy(muleContext, true))
+            .exceptionStrategy(new DefaultMessagingExceptionStrategy(muleContext))
             .build(muleContext);
 
         assertEquals("test-simple-service-full", simpleService.getName());

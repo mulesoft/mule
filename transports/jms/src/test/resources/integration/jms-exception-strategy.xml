@@ -18,10 +18,37 @@
         <outbound-endpoint ref="jmsOutTx"/>
     </flow>
 
-    <flow name="flowWithoutExceptionStrategyAndNoTx">
+    <flow name="flowWithoutExceptionStrategyAndNoTx" processingStrategy="synchronous">
         <inbound-endpoint ref="jmsInNoTx"/>
         <test:component throwException="true"/>
         <outbound-endpoint ref="jmsOutNoTx"/>
     </flow>
+
+    <flow name="flowWithDefaultStrategyConfigured" processingStrategy="synchronous">
+        <inbound-endpoint ref="jmsInDefaultStrategyConfigured"/>
+        <test:component throwException="true"/>
+        <outbound-endpoint ref="jmsOutDefaultStrategyConfigured" />
+        <default-exception-strategy/>
+    </flow>
+
+    <flow name="flowWithExceptionNotification" processingStrategy="synchronous">
+        <inbound-endpoint ref="jmsInSendExceptionNotification"/>
+        <test:component throwException="true"/>
+        <outbound-endpoint ref="jmsOutSendExceptionNotification" />
+        <default-exception-strategy>
+            <outbound-endpoint ref="jmsExceptionSendExceptionNotification"/>
+        </default-exception-strategy>
+    </flow>
+
+    <flow name="flowConfiguredForDeadLetterQueue" processingStrategy="synchronous">
+        <inbound-endpoint ref="jmsInDeadLetter"/>
+        <test:component throwException="true"/>
+        <outbound-endpoint ref="jmsOutDeadLetter" />
+        <default-exception-strategy>
+            <commit-transaction exception-pattern="*"/>
+            <outbound-endpoint ref="jmsDLQDeadLetter"/>
+        </default-exception-strategy>
+    </flow>
+
 
 </mule>

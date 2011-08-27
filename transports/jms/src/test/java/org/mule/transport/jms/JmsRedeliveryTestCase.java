@@ -11,17 +11,13 @@
 package org.mule.transport.jms;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import org.mule.api.MuleEventContext;
-import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.api.context.notification.ExceptionNotificationListener;
 import org.mule.context.notification.ExceptionNotification;
-import org.mule.message.ExceptionMessage;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
-import org.mule.tck.AbstractServiceAndFlowTestCase.ConfigVariant;
 import org.mule.tck.exceptions.FunctionalTestException;
 import org.mule.tck.functional.CounterCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
@@ -50,17 +46,16 @@ public class JmsRedeliveryTestCase extends AbstractServiceAndFlowTestCase
     @Parameters
     public static Collection<Object[]> parameters()
     {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "jms-redelivery-service.xml"},
-            {ConfigVariant.FLOW, "jms-redelivery-flow.xml"}
-        });
-    }      
-    
+        return Arrays.asList(new Object[][]{{ConfigVariant.SERVICE, "jms-redelivery-service.xml"},
+            {ConfigVariant.FLOW, "jms-redelivery-flow.xml"}});
+    }
+
     @Test
     public void testRedelivery() throws Exception
     {
         MuleClient client = muleContext.getClient();
-        // required if broker is not restarted with the test - it tries to deliver those messages to the client
+        // required if broker is not restarted with the test - it tries to deliver those messages to the
+        // client
         // purge the queue
         while (client.request(DESTINATION, 1000) != null)
         {
@@ -80,9 +75,14 @@ public class JmsRedeliveryTestCase extends AbstractServiceAndFlowTestCase
                 {
                     mrexFired.countDown();
                     // Test for MULE-4630
-                    assertEquals(DESTINATION, ((MessageRedeliveredException) notification.getException()).getEndpoint().getEndpointURI().toString());
-                    assertEquals(MAX_REDELIVERY, ((MessageRedeliveredException) notification.getException()).getMaxRedelivery());
-                    assertTrue(((MessageRedeliveredException) notification.getException()).getMuleMessage().getPayload() instanceof javax.jms.Message);
+                    assertEquals(DESTINATION,
+                        ((MessageRedeliveredException) notification.getException()).getEndpoint()
+                            .getEndpointURI()
+                            .toString());
+                    assertEquals(MAX_REDELIVERY,
+                        ((MessageRedeliveredException) notification.getException()).getMaxRedelivery());
+                    assertTrue(((MessageRedeliveredException) notification.getException()).getMuleMessage()
+                        .getPayload() instanceof javax.jms.Message);
                 }
             }
         });
@@ -94,7 +94,7 @@ public class JmsRedeliveryTestCase extends AbstractServiceAndFlowTestCase
             public void eventReceived(MuleEventContext context, Object Component) throws Exception
             {
                 final int count = incCallbackCount();
-                logger.info("Message Delivery Count is: " + count); 
+                logger.info("Message Delivery Count is: " + count);
                 throw new FunctionalTestException();
             }
         };
@@ -107,11 +107,5 @@ public class JmsRedeliveryTestCase extends AbstractServiceAndFlowTestCase
         assertEquals("MessageRedeliveredException never fired.", 0, mrexFired.getCount());
         assertEquals("Wrong number of delivery attempts", MAX_REDELIVERY + 1, callback.getCallbackCount());
 
-        MuleMessage dl = client.request("jms://dead.letter", 1000);
-        assertNotNull(dl);
-        assertTrue(dl.getPayload() instanceof ExceptionMessage);
-        ExceptionMessage em = (ExceptionMessage) dl.getPayload();
-        assertNotNull(em.getException());
-        assertTrue(em.getException() instanceof MessageRedeliveredException);
     }
 }

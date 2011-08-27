@@ -10,7 +10,6 @@
 
 package org.mule.tck.testmodels.mule;
 
-import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.exception.RollbackSourceCallback;
@@ -51,7 +50,7 @@ public class TestExceptionStrategy extends AbstractExceptionStrategy implements 
 
     public TestExceptionStrategy()
     {
-        super(null, true);
+        super(null);
     }
     
     public String getTestProperty()

@@ -10,6 +10,9 @@
 
 package org.mule.test.integration.exceptions;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.api.DefaultMuleException;
 import org.mule.api.transaction.Transaction;
 import org.mule.config.i18n.CoreMessages;
@@ -23,9 +26,6 @@ import java.io.FileNotFoundException;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
 public class ExceptionRollbackTestCase extends AbstractMuleContextTestCase
 {
     private DefaultSystemExceptionStrategy strategy;
@@ -34,7 +34,7 @@ public class ExceptionRollbackTestCase extends AbstractMuleContextTestCase
     @Override
     protected void doSetUp() throws Exception
     {
-        strategy = new DefaultSystemExceptionStrategy(muleContext, true);
+        strategy = new DefaultSystemExceptionStrategy(muleContext);
         strategy.setCommitTxFilter(new WildcardFilter("java.io.*"));
         strategy.setRollbackTxFilter(new WildcardFilter("org.mule.*, javax.*"));
 

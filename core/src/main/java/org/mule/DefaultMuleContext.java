@@ -144,7 +144,7 @@ public class DefaultMuleContext implements MuleContext
         registryBroker = createRegistryBroker();
         muleRegistryHelper = createRegistryHelper(registryBroker);
         localMuleClient = new DefaultLocalMuleClient(this);
-        exceptionListener = new DefaultSystemExceptionStrategy(this, true);
+        exceptionListener = new DefaultSystemExceptionStrategy(this);
     }
 
     protected DefaultRegistryBroker createRegistryBroker()

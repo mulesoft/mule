@@ -17,7 +17,7 @@ public class TestExceptionStrategy extends AbstractMessagingExceptionStrategy
 {
     public TestExceptionStrategy()
     {
-        super(null, true);
+        super(null);
     }
     
     @Override

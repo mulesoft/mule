@@ -10,6 +10,8 @@
 
 package org.mule.construct.builder;
 
+import static org.junit.Assert.assertEquals;
+
 import org.mule.MessageExchangePattern;
 import org.mule.construct.Bridge;
 import org.mule.exception.DefaultMessagingExceptionStrategy;
@@ -19,8 +21,6 @@ import org.mule.transformer.simple.ObjectToByteArray;
 import org.mule.transformer.simple.StringAppendTransformer;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
 
 public class BridgeBuilderTestCase extends AbstractMuleContextTestCase
 {
@@ -34,7 +34,7 @@ public class BridgeBuilderTestCase extends AbstractMuleContextTestCase
             .outboundAddress("test://foo.out")
             .exchangePattern(MessageExchangePattern.REQUEST_RESPONSE)
             .transacted(false)
-            .exceptionStrategy(new DefaultMessagingExceptionStrategy(muleContext, true))
+            .exceptionStrategy(new DefaultMessagingExceptionStrategy(muleContext))
             .build(muleContext);
 
         assertEquals("test-bridge-full", bridge.getName());

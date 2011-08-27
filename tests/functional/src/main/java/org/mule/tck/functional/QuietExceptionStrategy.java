@@ -26,7 +26,7 @@ public class QuietExceptionStrategy extends AbstractMessagingExceptionStrategy
 
     public QuietExceptionStrategy()
     {
-        super(null, true);
+        super(null);
     }
     
     @Override

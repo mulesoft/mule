@@ -94,7 +94,7 @@ public class ExceptionPropagationMule5737TestCase extends FunctionalTestCase
 
         public SensingExceptionStrategy()
         {
-            super(null, true);
+            super(null);
         }
 
         boolean caught;

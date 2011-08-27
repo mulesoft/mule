@@ -13,24 +13,11 @@
 
     <jms:activemq-connector name="jmsConnector" maxRedelivery="3" />
 
-        <flow name="Bouncer">
-            
-                <jms:inbound-endpoint queue="in">
-                    <jms:transaction action="ALWAYS_BEGIN" />
-                </jms:inbound-endpoint>
-            
-            <test:component/>
-            
-                    <jms:outbound-endpoint queue="out">
-                        <jms:transaction action="ALWAYS_JOIN" />
-                    </jms:outbound-endpoint>
-            
-            <default-exception-strategy>
-                <commit-transaction exception-pattern="org.mule.transport.jms.redelivery.MessageRedeliveredException"/>
-                <jms:outbound-endpoint queue="dead.letter">
-                    <jms:transaction action="JOIN_IF_POSSIBLE" />
-                </jms:outbound-endpoint>
-            </default-exception-strategy>
-        </flow>
+    <flow name="Bouncer">
+        <jms:inbound-endpoint queue="in">
+            <jms:transaction action="ALWAYS_BEGIN" />
+        </jms:inbound-endpoint>
+        <test:component />
+    </flow>
 
 </mule>

@@ -11,6 +11,11 @@
 package org.mule.test.integration.transport.jdbc;
 
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.api.MuleEventContext;
 import org.mule.api.context.notification.TransactionNotificationListener;
 import org.mule.api.endpoint.EndpointBuilder;
@@ -35,12 +40,8 @@ import org.mule.tck.functional.EventCallback;
 import org.mule.transaction.MuleTransactionConfig;
 
 import java.util.concurrent.atomic.AtomicBoolean;
-import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import org.junit.Test;
 
 public abstract class AbstractJdbcTransactionalFunctionalTestCase extends AbstractJdbcFunctionalTestCase  implements TransactionNotificationListener<TransactionNotification>
 {
@@ -113,7 +114,7 @@ public abstract class AbstractJdbcTransactionalFunctionalTestCase extends Abstra
     public Service initialiseService(byte txBeginAction, EventCallback callback) throws Exception
     {
         Service service = new SedaService(muleContext);
-        ((AbstractService) service).setExceptionListener(new DefaultMessagingExceptionStrategy(muleContext, true));
+        ((AbstractService) service).setExceptionListener(new DefaultMessagingExceptionStrategy(muleContext));
         service.setName("testComponent");
         service.setComponent(new DefaultJavaComponent(new PrototypeObjectFactory(JdbcFunctionalTestComponent.class)));
 

@@ -32,7 +32,7 @@ public class ${patternBuilderClassName}TestCase extends AbstractMuleContextTestC
 #if($patternType == "siso")
             .outboundAddress("test://foo.out")
 #end
-            .exceptionStrategy(new DefaultMessagingExceptionStrategy(muleContext, true))
+            .exceptionStrategy(new DefaultMessagingExceptionStrategy(muleContext))
             .build(muleContext);
 
         assertEquals(patternName, ${patternVariableName}.getName());

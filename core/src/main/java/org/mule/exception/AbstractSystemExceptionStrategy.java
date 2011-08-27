@@ -25,9 +25,9 @@ import org.mule.transport.ConnectException;
  */
 public class AbstractSystemExceptionStrategy extends AbstractExceptionStrategy implements SystemExceptionHandler
 {
-    public AbstractSystemExceptionStrategy(MuleContext muleContext, boolean rollbackByDefault)
+    public AbstractSystemExceptionStrategy(MuleContext muleContext)
     {
-        super(muleContext, rollbackByDefault);
+        super(muleContext);
     }
 
     public void handleException(Exception ex, RollbackSourceCallback rollbackMethod)
