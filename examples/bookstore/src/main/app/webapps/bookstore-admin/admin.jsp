@@ -40,7 +40,7 @@
 
 <hr/>
 <center><i>
-For more information about the Bookstore example go <a target="_blank" href="http://www.mulesoft.org/documentation/display/MULE3INTRO/Bookstore+Example">here</a>.
+For more information about the Bookstore example go <a target="_blank" href="http://www.mulesoft.org/documentation/display/MULE3EXAMPLES/Bookstore+Example">here</a>.
 </i></center>
 </body>
 </html>

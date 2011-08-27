@@ -6,7 +6,8 @@ to the example and the mule configuration file.  You can also interact with cert
 through the web page.
 
 For more information visit:
-http://www.mulesoft.org/documentation/display/MULE3INTRO/Examples
+- http://www.mulesoft.org/documentation/display/MULE3EXAMPLES/Home
+- http://www.mulesoft.org/documentation/display/MULE3EXAMPLES/Running+the+Examples+With+the+Example+Launcher
 
 +---------------------+
 | Running the example |

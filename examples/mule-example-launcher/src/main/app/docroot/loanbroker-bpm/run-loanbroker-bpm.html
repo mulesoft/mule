@@ -10,14 +10,18 @@ function doGetLoanBrokerBPM() {
 }
 
 function rpcGetLoanBrokerBPMResponse(message) {
-	$("#response-output").html(getJsonResponse(message.data));
-
+	var resp = getJsonResponse(message.data);
+	if(!resp || resp == '')
+	{
+		resp = 'Check Mule ESB log file $MULE_HOME/logs/mule-app-mule-example-loanbroker-bpm-{version}.log';
+	}
+    $("#response-output").html(resp);
 }
 
 </script>
 <p class="example-title">Running the example</p>
 <p class="example-strong-text">Instructions:</p>
-<p class="example-text">Enter the preferred amount and press <b>Execute</b>. You will be able to check the returned rate in Mule ESB log file <i>$MULE_HOME/logs/mule.log</i></p>
+<p class="example-text">Enter the preferred amount and press <b>Execute</b>. You will be able to check the returned rate in Mule ESB log file <i>$MULE_HOME/logs/mule-app-mule-example-loanbroker-bpm-{version}.log</i></p>
 
 <form name="loanBrokerBPMForm" id="loanBrokerBPMForm" action="">
 	<table cellspacing="2px" cellpadding="1px" border="0">
@@ -46,6 +50,6 @@ You can also consume this service by directly calling the HTTP endpoint:
 </p>
 <p class="example-text">    
     Complete documentation for this example can be found <a
-    href="http://www.mulesoft.org/documentation/display/MULE3INTRO/Loan+Broker+BPM+Example"
+    href="http://www.mulesoft.org/documentation/display/MULE3EXAMPLES/Loan+Broker+BPM+Example"
     target="_blank">here</a>.
 </p>

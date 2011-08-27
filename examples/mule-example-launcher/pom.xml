@@ -27,6 +27,16 @@
             <artifactId>mule-transport-ajax</artifactId>
             <version>${version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-rss</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+        	<groupId>net.htmlparser.jericho</groupId>
+        	<artifactId>jericho-html</artifactId>
+        	<version>3.2</version>
+        </dependency>        
         <!-- test dependencies -->
         <dependency>
             <groupId>org.mule.tests</groupId>
