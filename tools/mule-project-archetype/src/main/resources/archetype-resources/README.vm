@@ -70,10 +70,10 @@ Defines the Mule configuration for the ${ModuleName}TestCase.java.
 ADDITIONAL RESOURCES
 ====================
 Everything you need to know about getting started with Mule can be found here:
-http://www.mulesoft.org/documentation/display/MULE3INTRO/Home
+http://www.mulesoft.org/documentation/display/MULE3INSTALL/Hello,+Mule!
 
 For information about working with Mule inside and IDE with maven can be found here:
-http://www.mulesoft.org/documentation/display/MULE3INTRO/Setting+Up+Eclipse
+http://www.mulesoft.org/documentation/display/MULE3INSTALL/Setting+Up+Eclipse+for+Use+with+Maven
 
 Remember if you get stuck you can try getting help on the Mule user list:
 http://www.mulesoft.org/email-lists

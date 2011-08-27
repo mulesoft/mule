@@ -254,7 +254,7 @@ The configuration file for the ${ModuleName}NamespaceHandlerTestCase.java testca
 ADDITIONAL RESOURCES
 ====================
 Everything you need to know about getting started with Mule can be found here:
-http://www.mulesoft.org/documentation/display/MULE3INTRO/Home
+http://www.mulesoft.org/documentation/display/MULE3INSTALL/Hello,+Mule!
 
 There further useful information about extending Mule here:
 http://www.mulesoft.org/documentation/display/MULE3USER/Introduction+to+Extending+Mule
@@ -266,7 +266,7 @@ There is also detailed information about creating Mule configuration schemas her
 ${NamespaceDocumentationUrl}
 
 For information about working with Mule inside and IDE with maven can be found here:
-http://www.mulesoft.org/documentation/display/MULE3INTRO/Setting+Up+Eclipse+for+Use+with+Maven
+http://www.mulesoft.org/documentation/display/MULE3INSTALL/Setting+Up+Eclipse+for+Use+with+Maven
 
 Remember if you get stuck you can try getting help on the Mule user list:
 http://www.mulesoft.org/email-lists

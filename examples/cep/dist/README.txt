@@ -5,7 +5,7 @@ This example demonstrates how to add CEP (Complex Event Processing)
 capabilities to Mule using Drools.
 
 For more information, refer to 
-http://www.mulesoft.org/documentation/display/MULE3INTRO/CEP+Example
+http://www.mulesoft.org/documentation/display/MULE3EXAMPLES/CEP+Example
 
 +---------------------+
 | Running the example |

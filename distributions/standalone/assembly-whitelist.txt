@@ -574,6 +574,13 @@
 /mule-standalone-${productVersion}/examples/mule-example-launcher/src/test/java/org/mule/example/launcher
 /mule-standalone-${productVersion}/examples/mule-example-launcher/src/test/resources
 /mule-standalone-${productVersion}/examples/mule-example-launcher/src/test/resources/log4j.properties
+/mule-standalone-${productVersion}/examples/mule-example-launcher/src/test/resources/log4j.properties
+/mule-standalone-${productVersion}/examples/mule-example-launcher/src/main/app/docroot/js/launcher.js
+/mule-standalone-${productVersion}/examples/mule-example-launcher/src/main/app/docroot/more_examples.html
+/mule-standalone-${productVersion}/examples/mule-example-launcher/src/main/app/mf-xml-to-html.xslt
+/mule-standalone-${productVersion}/examples/mule-example-launcher/src/main/java/org/mule/example/launcher/rss
+/mule-standalone-${productVersion}/examples/mule-example-launcher/src/main/java/org/mule/example/launcher/rss/EntryReceiver.java
+/mule-standalone-${productVersion}/examples/mule-example-launcher/src/main/java/org/mule/example/launcher/SimpleDownloadManager.java
 
 
 #
