@@ -290,6 +290,15 @@
             <version>${jettyVersion}</version>
             <scope>provided</scope>
         </dependency>
+        <!--
+            Exclude the transitive dependencies of the mule example launcher
+         -->
+        <dependency>
+            <groupId>net.htmlparser.jericho</groupId>
+            <artifactId>jericho-html</artifactId>
+            <version>3.2</version>
+            <scope>provided</scope>
+        </dependency>
         <!-- re-add our ant dependency as it gets transitively excluded by jetty's jsp support -->
         <dependency>
             <groupId>ant</groupId>
