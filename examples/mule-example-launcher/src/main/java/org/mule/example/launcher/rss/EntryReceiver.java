@@ -25,7 +25,7 @@ import com.sun.syndication.feed.synd.SyndEnclosure;
 import com.sun.syndication.feed.synd.SyndEntry;
 import com.sun.syndication.feed.synd.SyndFeed;
 
-public class EntryReceiver 
+public class EntryReceiver
 {
     @SuppressWarnings("rawtypes")
     public String processFeed(@Payload SyndFeed feed) throws Exception
@@ -33,7 +33,7 @@ public class EntryReceiver
         StringBuilder feedXml = new StringBuilder();
         feedXml.append("<muleforge-extensions>");
 
-        for (Iterator it = feed.getEntries().iterator(); it.hasNext(); ) 
+        for (Iterator it = feed.getEntries().iterator(); it.hasNext();)
         {
             SyndEntry entry = (SyndEntry) it.next();
             processItem(feedXml, entry);
@@ -48,9 +48,11 @@ public class EntryReceiver
         feedXml.append("<muleforge-extension>");
         feedXml.append("<title>" + StringEscapeUtils.escapeXml(entry.getTitle()) + "</title>");
         feedXml.append("<link>" + StringEscapeUtils.escapeXml(entry.getLink()) + "</link>");
-        if(!entry.getEnclosures().isEmpty())
+        if (!entry.getEnclosures().isEmpty())
         {
-            feedXml.append("<image-url>" + StringEscapeUtils.escapeXml(((SyndEnclosure)entry.getEnclosures().get(0)).getUrl()) +"</image-url>");
+            feedXml.append("<image-url>"
+                           + StringEscapeUtils.escapeXml(((SyndEnclosure) entry.getEnclosures().get(0)).getUrl())
+                           + "</image-url>");
         }
         parseDescription(feedXml, entry);
         feedXml.append("</muleforge-extension>");
@@ -63,19 +65,24 @@ public class EntryReceiver
         List<Element> anchors = source.getAllElements(HTMLElementName.A);
         if (anchors != null)
         {
-            for(Element a : anchors)
+            for (Element a : anchors)
             {
                 if ("documentation-url".equalsIgnoreCase(a.getAttributeValue("id")))
                 {
-                    feedXml.append("<documentation-url>" + StringEscapeUtils.escapeXml(a.getAttributeValue("href")) +"</documentation-url>");
+                    feedXml.append("<documentation-url>"
+                                   + StringEscapeUtils.escapeXml(a.getAttributeValue("href"))
+                                   + "</documentation-url>");
                 }
                 else if ("source-url".equalsIgnoreCase(a.getAttributeValue("id")))
                 {
-                    feedXml.append("<source-url>" + StringEscapeUtils.escapeXml(a.getAttributeValue("href")) +"</source-url>");
+                    feedXml.append("<source-url>" + StringEscapeUtils.escapeXml(a.getAttributeValue("href"))
+                                   + "</source-url>");
                 }
                 else if ("download-url".equalsIgnoreCase(a.getAttributeValue("id")))
                 {
-                    feedXml.append("<download-url>" + StringEscapeUtils.escapeXml(a.getAttributeValue("href")) +"</download-url>");
+                    feedXml.append("<download-url>"
+                                   + StringEscapeUtils.escapeXml(a.getAttributeValue("href"))
+                                   + "</download-url>");
                 }
             }
         }

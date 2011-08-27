@@ -15,13 +15,15 @@ import java.net.URLConnection;
 import java.util.HashMap;
 import java.util.Map;
 
-public class SimpleDownloadManager 
+public class SimpleDownloadManager
 {
     private final static String URL_KEY = "url";
 
     /**
      * Performs a HTTP GET or HTTP POST request and returns the contents.
-     * @param data <code>Map</code> instance containing the URL (should start with http://) and the method (GET or POST)
+     * 
+     * @param data <code>Map</code> instance containing the URL (should start with
+     *            http://) and the method (GET or POST)
      * @return The contents
      */
     public Object download(Object data)
@@ -49,7 +51,7 @@ public class SimpleDownloadManager
                 response.put("is", conn.getInputStream());
                 response.put("filename", getFilenameFromUrl(fileUrl));
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 response.put("error", "Error downloading " + fileUrl + " -> " + ex.getMessage());
             }

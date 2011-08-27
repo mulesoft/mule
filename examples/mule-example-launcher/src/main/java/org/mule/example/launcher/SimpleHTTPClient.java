@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.example.launcher;
 
 import java.io.BufferedReader;
@@ -17,7 +18,8 @@ import java.net.URLConnection;
 import java.util.Map;
 
 /**
- * <code>SimpleHTTPClient</code> is a simple class that handles GET and POST HTTP requests.
+ * <code>SimpleHTTPClient</code> is a simple class that handles GET and POST HTTP
+ * requests.
  */
 public class SimpleHTTPClient
 {
@@ -33,23 +35,25 @@ public class SimpleHTTPClient
 
     /**
      * Performs a HTTP GET or HTTP POST request and returns the contents.
-     * @param data <code>Map</code> instance containing the URL (should start with http://) and the method (GET or POST)
+     * 
+     * @param data <code>Map</code> instance containing the URL (should start with
+     *            http://) and the method (GET or POST)
      * @return The contents
      */
     public HTTPResponse httpClient(Object data)
     {
-        if(data instanceof Map<?, ?>)
+        if (data instanceof Map<?, ?>)
         {
             Map<?, ?> params = (Map<?, ?>) data;
 
             String url = String.valueOf(params.get(URL_KEY));
             String method = params.containsKey(METHOD_KEY) ? String.valueOf(params.get(METHOD_KEY)) : "GET";
 
-            if(method == null || method.equalsIgnoreCase("GET"))
+            if (method == null || method.equalsIgnoreCase("GET"))
             {
                 return buildResponse(doGet(url));
             }
-            else if(method.equalsIgnoreCase("POST"))
+            else if (method.equalsIgnoreCase("POST"))
             {
                 return buildResponse(doPost(url));
             }
@@ -67,7 +71,6 @@ public class SimpleHTTPClient
     }
 
     /**
-     *
      * @param response
      * @return
      */
@@ -77,7 +80,6 @@ public class SimpleHTTPClient
     }
 
     /**
-     *
      * @param strUrl
      * @return
      */
@@ -95,7 +97,8 @@ public class SimpleHTTPClient
             rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
             String line;
             StringBuffer contents = new StringBuffer();
-            while ((line = rd.readLine()) != null) {
+            while ((line = rd.readLine()) != null)
+            {
                 contents.append(line);
                 contents.append('\n');
             }
@@ -114,7 +117,6 @@ public class SimpleHTTPClient
     }
 
     /**
-     *
      * @param strUrl
      * @return
      */
@@ -141,7 +143,8 @@ public class SimpleHTTPClient
             rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
             String line;
             StringBuffer contents = new StringBuffer();
-            while ((line = rd.readLine()) != null) {
+            while ((line = rd.readLine()) != null)
+            {
                 contents.append(line);
                 contents.append('\n');
             }
@@ -161,6 +164,7 @@ public class SimpleHTTPClient
 
     /**
      * Silently closes a <code>OutputStreamWriter</code>
+     * 
      * @param wr
      */
     private void close(OutputStreamWriter wr)
@@ -169,7 +173,7 @@ public class SimpleHTTPClient
         {
             wr.close();
         }
-        catch(Exception e)
+        catch (Exception e)
         {
             // Do nothing
         }
@@ -177,6 +181,7 @@ public class SimpleHTTPClient
 
     /**
      * Silently closes a <code>BufferedReader</code>
+     * 
      * @param rd
      */
     private void close(BufferedReader rd)
@@ -185,7 +190,7 @@ public class SimpleHTTPClient
         {
             rd.close();
         }
-        catch(Exception e)
+        catch (Exception e)
         {
             // Do nothing
         }
