@@ -15,8 +15,11 @@ import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.transport.Connector;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.transport.AbstractMessageReceiver;
+import org.mule.transport.ConnectException;
 import org.mule.transport.tcp.TcpMessageReceiver;
+import org.mule.util.StringUtils;
 
 import java.io.IOException;
 import java.net.Socket;
@@ -30,16 +33,14 @@ import javax.net.ssl.SSLPeerUnverifiedException;
 import javax.net.ssl.SSLSocket;
 import javax.resource.spi.work.Work;
 
-
 public class SslMessageReceiver extends TcpMessageReceiver implements HandshakeCompletedListener
 {
-
     // We must wait for handshake to complete before sending message, as the callback
     // sets important properties. The wait period is arbitrary, but the two threads
     // are approximately synchronized (handshake completes before/at same time as
     // message is received) so value should not be critical
     private CountDownLatch handshakeComplete = new CountDownLatch(1);
-    
+
     private Certificate[] peerCertificateChain;
     private Certificate[] localCertificateChain;
 
@@ -49,6 +50,24 @@ public class SslMessageReceiver extends TcpMessageReceiver implements HandshakeC
         super(connector, flowConstruct, endpoint);
     }
 
+    @Override
+    protected void doConnect() throws ConnectException
+    {
+        checkKeyStore();
+        super.doConnect();
+    }
+
+    protected void checkKeyStore() throws ConnectException
+    {
+        SslConnector sslConnector = (SslConnector) connector;
+        String keyStore = sslConnector.getKeyStore();
+        if (StringUtils.isBlank(keyStore))
+        {
+            throw new ConnectException(CoreMessages.objectIsNull("tls-key-store"), this);
+        }
+    }
+
+    @Override
     protected Work createWork(Socket socket) throws IOException
     {
         return new SslWorker(socket, this);
@@ -73,6 +92,7 @@ public class SslMessageReceiver extends TcpMessageReceiver implements HandshakeC
         }
     }
 
+    @Override
     public void handshakeCompleted(HandshakeCompletedEvent event)
     {
         try
@@ -115,5 +135,4 @@ public class SslMessageReceiver extends TcpMessageReceiver implements HandshakeC
             // SSL Sockets don't support shutdownSocket
         }
     }
-    
 }
