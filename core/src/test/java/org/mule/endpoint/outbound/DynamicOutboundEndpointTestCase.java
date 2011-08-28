@@ -16,33 +16,39 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.OutboundEndpoint;
-import org.mule.api.lifecycle.LifecycleException;
+import org.mule.api.registry.ServiceException;
+import org.mule.api.registry.ServiceType;
 import org.mule.api.routing.filter.Filter;
 import org.mule.api.security.SecurityFilter;
 import org.mule.api.transaction.TransactionConfig;
 import org.mule.api.transformer.Transformer;
-import org.mule.api.transport.Connector;
 import org.mule.api.transport.MessageDispatcher;
 import org.mule.context.notification.EndpointMessageNotification;
 import org.mule.context.notification.SecurityNotification;
 import org.mule.endpoint.AbstractMessageProcessorTestCase;
 import org.mule.endpoint.DynamicOutboundEndpoint;
+import org.mule.tck.probe.PollingProber;
+import org.mule.tck.probe.Probe;
+import org.mule.tck.probe.Prober;
 import org.mule.tck.security.TestSecurityFilter;
 import org.mule.tck.testmodels.mule.TestMessageDispatcher;
 import org.mule.tck.testmodels.mule.TestMessageDispatcherFactory;
 import org.mule.transformer.simple.OutboundAppendTransformer;
 import org.mule.transformer.simple.ResponseAppendTransformer;
-import org.mule.util.concurrent.Latch;
+import org.mule.transport.service.DefaultTransportServiceDescriptor;
+
+import java.util.Properties;
 
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+import org.junit.Before;
 import org.junit.Test;
 
+import static edu.emory.mathcs.backport.java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 /**
  * Tests flow of messages from {@link org.mule.endpoint.DynamicOutboundEndpoint#process(org.mule.api.MuleEvent)} down to
@@ -51,25 +57,25 @@ import static org.junit.Assert.fail;
  */
 public class DynamicOutboundEndpointTestCase extends AbstractMessageProcessorTestCase
 {
-    protected FakeMessageDispatcher dispacher;
-    protected MuleEvent testOutboundEvent;
+
+    private MuleEvent testOutboundEvent;
+
+    @Before
+    public void setCurrentTestInstance() throws ServiceException
+    {
+        overrideDispatcherInServiceDescriptor();
+        MyMessageDispatcherFactory.dispatcher = null;
+    }
 
     @Test
     public void testDefaultFlowRequestResponse() throws Exception
     {
-         OutboundEndpoint endpoint = createOutboundEndpoint(null, null, null,
-                null, MessageExchangePattern.REQUEST_RESPONSE, null);
-
-        assertTrue(endpoint instanceof DynamicOutboundEndpoint);
-
+        OutboundEndpoint endpoint = createOutboundEndpoint(null, null, null, null, MessageExchangePattern.REQUEST_RESPONSE, null);
         testOutboundEvent = createTestOutboundEvent(endpoint);
-        //First Request creates the real endpoint
-        endpoint.process(testOutboundEvent);
 
-        setUpFakeDispatcher(endpoint);
         MuleEvent result = endpoint.process(testOutboundEvent);
 
-        assertMessageSentEqual(true);
+        assertEventSent();
 
         // Response message is not the same because we rewrite the response event and
         // this change the properties
@@ -79,48 +85,33 @@ public class DynamicOutboundEndpointTestCase extends AbstractMessageProcessorTes
         // Everything else about the message apart from addition of encoding property
         // is the same though
         assertMessageEqualEncodingPropertyAdded(responseMessage, result.getMessage());
-
     }
 
     @Test
     public void testDefaultFlowOneWay() throws Exception
     {
-        OutboundEndpoint endpoint = createOutboundEndpoint( null, null, null,
-            null, MessageExchangePattern.ONE_WAY, null);
+        OutboundEndpoint endpoint = createOutboundEndpoint(null, null, null, null, MessageExchangePattern.ONE_WAY, null);
+        assertTrue(endpoint instanceof DynamicOutboundEndpoint);
 
         testOutboundEvent = createTestOutboundEvent(endpoint);
-        //First Request creates the real endpoint
-        endpoint.process(testOutboundEvent);
-        Thread.sleep(1000);
-
-        setUpFakeDispatcher(endpoint);
-
-        assertTrue(endpoint instanceof DynamicOutboundEndpoint);
 
         MuleEvent result = endpoint.process(testOutboundEvent);
 
-        dispacher.latch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS);
-        assertMessageSentEqual(false);
+        assertEventDispatched();
         assertNull(result);
+        assertMessageSentEqual(MyMessageDispatcherFactory.dispatcher.sensedDispatchEvent);
     }
 
     @Test
     public void testSecurityFilterAccept() throws Exception
     {
-
-        OutboundEndpoint endpoint = createOutboundEndpoint(null, new TestSecurityFilter(true), null,
-                null, MessageExchangePattern.REQUEST_RESPONSE, null);
-
-        assertTrue(endpoint instanceof DynamicOutboundEndpoint);
-
+        OutboundEndpoint endpoint = createOutboundEndpoint(null, new TestSecurityFilter(true), null, null, MessageExchangePattern.REQUEST_RESPONSE, null);
         testOutboundEvent = createTestOutboundEvent(endpoint);
-        //First Request creates the real endpoint
-        endpoint.process(testOutboundEvent);
 
-        setUpFakeDispatcher(endpoint);
         MuleEvent result = endpoint.process(testOutboundEvent);
 
-        assertMessageSentEqual(true);
+        assertEventSent();
+        assertMessageSentEqual(MyMessageDispatcherFactory.dispatcher.sensedSendEvent);
 
         // Response message is not the same because we rewrite the response event and
         // this change the properties
@@ -138,138 +129,96 @@ public class DynamicOutboundEndpointTestCase extends AbstractMessageProcessorTes
         TestSecurityNotificationListener securityNotificationListener = new TestSecurityNotificationListener();
         muleContext.registerListener(securityNotificationListener);
 
-        OutboundEndpoint endpoint = createOutboundEndpoint(null, new TestSecurityFilter(false), null,
-                null, MessageExchangePattern.REQUEST_RESPONSE, null);
-
-        assertTrue(endpoint instanceof DynamicOutboundEndpoint);
-
+        OutboundEndpoint endpoint = createOutboundEndpoint(null, new TestSecurityFilter(false), null, null, MessageExchangePattern.REQUEST_RESPONSE, null);
         testOutboundEvent = createTestOutboundEvent(endpoint);
-        //First Request creates the real endpoint
-        endpoint.process(testOutboundEvent);
 
-        setUpFakeDispatcher(endpoint);
         MuleEvent result = endpoint.process(testOutboundEvent);
 
-        assertMessageNotSent();
+        assertNull(MyMessageDispatcherFactory.dispatcher);
         assertNotNull(result);
         assertEquals(TestSecurityFilter.SECURITY_EXCEPTION_MESSAGE, result.getMessage().getPayloadAsString());
         assertNotNull(result.getMessage().getExceptionPayload());
         assertTrue(result.getMessage().getExceptionPayload().getException() instanceof TestSecurityFilter.StaticMessageUnauthorisedException);
 
-        assertTrue(securityNotificationListener.latch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS));
+        assertTrue(securityNotificationListener.latch.await(RECEIVE_TIMEOUT, MILLISECONDS));
         assertEquals(SecurityNotification.SECURITY_AUTHENTICATION_FAILED,
-            securityNotificationListener.securityNotification.getAction());
+                     securityNotificationListener.securityNotification.getAction());
         assertEquals(securityNotificationListener.securityNotification.getResourceIdentifier(),
-            TestSecurityFilter.StaticMessageUnauthorisedException.class.getName());
+                     TestSecurityFilter.StaticMessageUnauthorisedException.class.getName());
     }
 
     @Test
-    public void testSendNotfication() throws Exception
+    public void testSendNotification() throws Exception
     {
         TestEndpointMessageNotificationListener listener = new TestEndpointMessageNotificationListener();
         muleContext.registerListener(listener);
 
-        OutboundEndpoint endpoint = createOutboundEndpoint(null, null, null, null, 
-            MessageExchangePattern.REQUEST_RESPONSE, null);
+        OutboundEndpoint endpoint = createOutboundEndpoint(null, null, null, null, MessageExchangePattern.REQUEST_RESPONSE, null);
         MuleEvent outboundEvent = createTestOutboundEvent(endpoint);
+
         endpoint.process(outboundEvent);
 
+        assertEventSent();
         assertTrue(listener.latch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS));
         assertEquals(EndpointMessageNotification.MESSAGE_SENT, listener.messageNotification.getAction());
-        assertEquals(endpoint.getEndpointURI().getUri().toString(),
-            listener.messageNotification.getEndpoint());
         assertTrue(listener.messageNotification.getSource() instanceof MuleMessage);
-        assertEquals(outboundEvent.getMessage().getPayload(),
-            ((MuleMessage) listener.messageNotification.getSource()).getPayload());
+        assertEquals(outboundEvent.getMessage().getPayload(), listener.messageNotification.getSource().getPayload());
     }
 
     @Test
-    public void testDispatchNotfication() throws Exception
+    public void testDispatchNotification() throws Exception
     {
         TestEndpointMessageNotificationListener listener = new TestEndpointMessageNotificationListener();
         muleContext.registerListener(listener);
 
-        OutboundEndpoint endpoint = createOutboundEndpoint(null, null, null, null, 
-            MessageExchangePattern.ONE_WAY, null);
+        OutboundEndpoint endpoint = createOutboundEndpoint(null, null, null, null, MessageExchangePattern.ONE_WAY, null);
         MuleEvent outboundEvent = createTestOutboundEvent(endpoint);
+
         endpoint.process(outboundEvent);
 
+        assertEventDispatched();
         assertTrue(listener.latch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS));
         assertEquals(EndpointMessageNotification.MESSAGE_DISPATCHED, listener.messageNotification.getAction());
-        assertEquals(endpoint.getEndpointURI().getUri().toString(),
-            listener.messageNotification.getEndpoint());
         assertTrue(listener.messageNotification.getSource() instanceof MuleMessage);
-        assertEquals(outboundEvent.getMessage().getPayload(),
-            ((MuleMessage) listener.messageNotification.getSource()).getPayload());
+        assertEquals(outboundEvent.getMessage().getPayload(), listener.messageNotification.getSource().getPayload());
     }
 
     @Test
     public void testTransformers() throws Exception
     {
         OutboundEndpoint endpoint = createOutboundEndpoint(null, null, new OutboundAppendTransformer(),
-            new ResponseAppendTransformer(), MessageExchangePattern.REQUEST_RESPONSE, null);
-        
-         assertTrue(endpoint instanceof DynamicOutboundEndpoint);
+                                                           new ResponseAppendTransformer(), MessageExchangePattern.REQUEST_RESPONSE, null);
 
         testOutboundEvent = createTestOutboundEvent(endpoint);
-        //First Request creates the real endpoint
-        endpoint.process(testOutboundEvent);
 
-        setUpFakeDispatcher(endpoint);
         MuleEvent result = endpoint.process(testOutboundEvent);
 
-        assertMessageSent(true);
-
-        assertEquals(TEST_MESSAGE + OutboundAppendTransformer.APPEND_STRING,
-        dispacher.sensedSendEvent.getMessageAsString());
-
         assertNotNull(result);
+        assertEquals(TEST_MESSAGE + OutboundAppendTransformer.APPEND_STRING, MyMessageDispatcherFactory.dispatcher.sensedSendEvent.getMessageAsString());
         assertEquals(RESPONSE_MESSAGE + ResponseAppendTransformer.APPEND_STRING, result.getMessageAsString());
     }
 
-    @Test
-    public void testConnectorNotStarted() throws Exception
+    @Test(expected = UnsupportedOperationException.class)
+    public void testConnectorNotAvailableOnDynamicEndpoint() throws Exception
     {
-        OutboundEndpoint endpoint = createOutboundEndpoint(null, null, null, null, 
-            MessageExchangePattern.REQUEST_RESPONSE, null);
-        testOutboundEvent = createTestOutboundEvent(endpoint);
-        // Force the creation of the real endpoint
-        endpoint.process(testOutboundEvent);
-        endpoint.getConnector().stop();
+        OutboundEndpoint endpoint = createOutboundEndpoint(null, null, null, null, MessageExchangePattern.REQUEST_RESPONSE, null);
 
-        try
-        {
-            endpoint.process(testOutboundEvent);
-            fail("exception expected");
-        }
-        catch (LifecycleException e)
-        {
-            // expected
-        }
+        endpoint.getConnector();
     }
 
     @Test
     public void testTimeoutSetOnEvent() throws Exception
     {
-
         int testTimeout = 999;
 
-        OutboundEndpoint endpoint = createOutboundEndpoint(null, null, null, null, 
-            MessageExchangePattern.REQUEST_RESPONSE, null);
-
-        assertTrue(endpoint instanceof DynamicOutboundEndpoint);
+        OutboundEndpoint endpoint = createOutboundEndpoint(null, null, null, null, MessageExchangePattern.REQUEST_RESPONSE, null);
 
         testOutboundEvent = createTestOutboundEvent(endpoint);
-        testOutboundEvent.getMessage()
-            .setOutboundProperty(MuleProperties.MULE_EVENT_TIMEOUT_PROPERTY, testTimeout);
+        testOutboundEvent.getMessage().setOutboundProperty(MuleProperties.MULE_EVENT_TIMEOUT_PROPERTY, testTimeout);
 
-        //First Request creates the real endpoint
-        endpoint.process(testOutboundEvent);
+        MuleEvent response = endpoint.process(testOutboundEvent);
 
-        setUpFakeDispatcher(endpoint);
-        endpoint.process(testOutboundEvent);
-
-        assertEquals(testTimeout, dispacher.sensedSendEvent.getTimeout());
+        assertEquals(testTimeout, response.getTimeout());
     }
 
     @Test
@@ -284,37 +233,10 @@ public class DynamicOutboundEndpointTestCase extends AbstractMessageProcessorTes
         // TODO
     }
 
-    protected MuleEvent assertMessageSent(boolean sync) throws MuleException
+    protected void assertMessageSentEqual(MuleEvent event) throws MuleException
     {
-        MuleEvent event;
-        if (sync)
-        {
-            assertNull(dispacher.sensedDispatchEvent);
-            assertNotNull(dispacher.sensedSendEvent);
-            event = dispacher.sensedSendEvent;
-        }
-        else
-        {
-            assertNull(dispacher.sensedSendEvent);
-            assertNotNull(dispacher.sensedDispatchEvent);
-            event = dispacher.sensedDispatchEvent;
-        }
-        assertNotNull(event.getMessage());
-        return event;
-    }
-
-    protected MuleEvent assertMessageSentEqual(boolean sync) throws MuleException
-    {
-        MuleEvent event = assertMessageSent(sync);
         assertEquals(TEST_MESSAGE, event.getMessageAsString());
         assertEquals("value1", event.getMessage().getOutboundProperty("prop1"));
-        return event;
-    }
-
-    protected void assertMessageNotSent() throws MuleException
-    {
-        assertNull(dispacher.sensedSendEvent);
-        assertNull(dispacher.sensedDispatchEvent);
     }
 
     protected void assertMessageEqualEncodingPropertyAdded(MuleMessage expect, MuleMessage actual)
@@ -324,10 +246,61 @@ public class DynamicOutboundEndpointTestCase extends AbstractMessageProcessorTes
         assertEquals(expect.getUniqueId(), actual.getUniqueId());
         assertEquals(expect.getExceptionPayload(), actual.getExceptionPayload());
 
-        // Outbound endcodin property is added
         assertEquals(muleContext.getConfiguration().getDefaultEncoding(),
                      actual.getOutboundProperty(MuleProperties.MULE_ENCODING_PROPERTY));
 
+    }
+
+    private void assertEventDispatched()
+    {
+        Prober prober = new PollingProber();
+        prober.check(new Probe()
+        {
+            public boolean isSatisfied()
+            {
+                return MyMessageDispatcherFactory.dispatcher != null && MyMessageDispatcherFactory.dispatcher.dispatchedEvent;
+            }
+
+            public String describeFailure()
+            {
+                return "Expected dispatcher was not called";
+            }
+        });
+
+        assertNull(MyMessageDispatcherFactory.dispatcher.sensedSendEvent);
+        assertNotNull(MyMessageDispatcherFactory.dispatcher.sensedDispatchEvent);
+        assertNotNull(MyMessageDispatcherFactory.dispatcher.sensedDispatchEvent.getMessage());
+    }
+
+    private void assertEventSent()
+    {
+        Prober prober = new PollingProber();
+        prober.check(new Probe()
+        {
+            public boolean isSatisfied()
+            {
+                return MyMessageDispatcherFactory.dispatcher != null && MyMessageDispatcherFactory.dispatcher.sentEvent;
+            }
+
+            public String describeFailure()
+            {
+                return "Expected dispatcher was not called";
+            }
+        });
+
+        assertNull(MyMessageDispatcherFactory.dispatcher.sensedDispatchEvent);
+        assertNotNull(MyMessageDispatcherFactory.dispatcher.sensedSendEvent);
+        assertNotNull(MyMessageDispatcherFactory.dispatcher.sensedSendEvent.getMessage());
+    }
+
+    private void overrideDispatcherInServiceDescriptor() throws ServiceException
+    {
+        Properties props = new Properties();
+        props.put(MuleProperties.CONNECTOR_DISPATCHER_FACTORY, MyMessageDispatcherFactory.class.getName());
+        DefaultTransportServiceDescriptor serviceDescriptor = (DefaultTransportServiceDescriptor) muleContext.getRegistry().lookupServiceDescriptor(ServiceType.TRANSPORT, "test", null);
+        props.put(MuleProperties.CONNECTOR_INBOUND_EXCHANGE_PATTERNS, "ONE_WAY, REQUEST_RESPONSE");
+        props.put(MuleProperties.CONNECTOR_OUTBOUND_EXCHANGE_PATTERNS, "ONE_WAY, REQUEST_RESPONSE");
+        serviceDescriptor.setOverrides(props);
     }
 
     protected OutboundEndpoint createOutboundEndpoint(Filter filter,
@@ -339,14 +312,16 @@ public class DynamicOutboundEndpointTestCase extends AbstractMessageProcessorTes
     {
 
         return createTestOutboundEndpoint("test://localhost:#[header:port]", filter, securityFilter, in, response,
-            exchangePattern, txConfig);
+                                          exchangePattern, txConfig);
     }
 
-    static class FakeMessageDispatcher extends TestMessageDispatcher
+    private static class FakeMessageDispatcher extends TestMessageDispatcher
     {
-        Latch latch = new Latch();
-        MuleEvent sensedSendEvent;
-        MuleEvent sensedDispatchEvent;
+
+        private MuleEvent sensedSendEvent;
+        private MuleEvent sensedDispatchEvent;
+        private boolean sentEvent;
+        private boolean dispatchedEvent;
 
         public FakeMessageDispatcher(OutboundEndpoint endpoint)
         {
@@ -357,7 +332,7 @@ public class DynamicOutboundEndpointTestCase extends AbstractMessageProcessorTes
         protected MuleMessage doSend(MuleEvent event) throws Exception
         {
             sensedSendEvent = event;
-            latch.countDown();
+            sentEvent = true;
             return responseMessage;
         }
 
@@ -365,23 +340,25 @@ public class DynamicOutboundEndpointTestCase extends AbstractMessageProcessorTes
         protected void doDispatch(MuleEvent event) throws Exception
         {
             sensedDispatchEvent = event;
-            latch.countDown();
+            dispatchedEvent = true;
         }
     }
 
-    protected void setUpFakeDispatcher(OutboundEndpoint endpoint)
+    public static class MyMessageDispatcherFactory extends TestMessageDispatcherFactory
     {
-        dispacher = new DynamicOutboundEndpointTestCase.FakeMessageDispatcher(endpoint);
-        Connector connector = endpoint.getConnector();
-        connector.setDispatcherFactory(new TestMessageDispatcherFactory()
+
+        static FakeMessageDispatcher dispatcher;
+
+        @Override
+        public synchronized MessageDispatcher create(OutboundEndpoint ep) throws MuleException
         {
-            @Override
-            public MessageDispatcher create(OutboundEndpoint ep) throws MuleException
+            if (dispatcher != null)
             {
-                return dispacher;
+                throw new IllegalStateException("Dispatcher for this test was already created");
             }
 
-        });
+            dispatcher = new FakeMessageDispatcher(ep);
+            return dispatcher;
+        }
     }
-
 }
