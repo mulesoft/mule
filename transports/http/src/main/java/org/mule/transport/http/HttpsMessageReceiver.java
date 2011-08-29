@@ -16,10 +16,7 @@ import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.transport.Connector;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.transport.ConnectException;
 import org.mule.transport.http.i18n.HttpMessages;
-import org.mule.util.StringUtils;
 
 import java.io.IOException;
 import java.net.Socket;
@@ -35,27 +32,11 @@ import javax.resource.spi.work.Work;
 
 public class HttpsMessageReceiver extends HttpMessageReceiver
 {
+
     public HttpsMessageReceiver(Connector connector, FlowConstruct flow, InboundEndpoint endpoint)
             throws CreateException
     {
         super(connector, flow, endpoint);
-    }
-
-    @Override
-    protected void doConnect() throws ConnectException
-    {
-        checkKeyStore();
-        super.doConnect();
-    }
-
-    protected void checkKeyStore() throws ConnectException
-    {
-        HttpsConnector httpsConnector = (HttpsConnector) connector;
-        String keyStore = httpsConnector.getKeyStore();
-        if (StringUtils.isBlank(keyStore))
-        {
-            throw new ConnectException(CoreMessages.objectIsNull("tls-key-store"), this);
-        }
     }
 
     @Override
@@ -106,7 +87,6 @@ public class HttpsMessageReceiver extends HttpMessageReceiver
             }
         }
 
-        @Override
         public void handshakeCompleted(HandshakeCompletedEvent event)
         {
             try
@@ -127,4 +107,5 @@ public class HttpsMessageReceiver extends HttpMessageReceiver
             }
         }
     }
+
 }
