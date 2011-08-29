@@ -110,6 +110,7 @@ public class DynamicPort extends ExternalResource
         }
 
         freePortFinder.releasePort(number);
+        System.setProperty(name, null);
         initialized = false;
     }
 
