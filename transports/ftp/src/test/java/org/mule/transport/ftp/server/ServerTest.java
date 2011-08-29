@@ -10,38 +10,48 @@
 
 package org.mule.transport.ftp.server;
 
-import org.apache.commons.net.ftp.FTPClient;
+import org.mule.tck.junit4.rule.DynamicPort;
 
-import junit.framework.TestCase;
+import org.apache.commons.net.ftp.FTPClient;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
 
 /**
  * Tests for the embedded ftp server startup, log in, and shutdown.
  */
-public class ServerTest extends TestCase
+public class ServerTest
 {
+
     private Server ftpServer = null;
 
-    public void setUp() throws Exception
+    @Rule
+    public DynamicPort dynamicPort = new DynamicPort("port1");
+
+    @Before
+    public void setUpServer() throws Exception
     {
-        ftpServer = new Server(Server.DEFAULT_PORT);
+        ftpServer = new Server(dynamicPort.getNumber());
+    }
+
+    @After
+    public void tearDown()
+    {
+        ftpServer.stop();
     }
 
     /**
      * Sanity test that the embedded ftp server is working. Useful as a first step if
      * the ftp transport tests are failing.
-     * 
+     *
      * @throws Exception
      */
-    public void testServer() throws Exception
+    @Test
+    public void testServerLogin() throws Exception
     {
         FTPClient ftpClient = new FTPClient();
-        ftpClient.connect("localhost", Server.DEFAULT_PORT);
+        ftpClient.connect("localhost", dynamicPort.getNumber());
         ftpClient.login("admin", "admin");
-    }
-
-    public void tearDown()
-    {
-        ftpServer.stop();
-        ftpServer = null;
     }
 }
