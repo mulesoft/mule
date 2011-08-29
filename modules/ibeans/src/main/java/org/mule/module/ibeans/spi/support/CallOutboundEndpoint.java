@@ -67,7 +67,7 @@ public class CallOutboundEndpoint extends org.mule.endpoint.DynamicOutboundEndpo
 
     public CallOutboundEndpoint(MuleContext context, AnnotatedEndpointData epData) throws MalformedEndpointException
     {
-        super(context, createBuilder(context, epData), epData.getAddress());
+        super(createBuilder(context, epData), epData.getAddress());
     }
 
     private synchronized static EndpointBuilder createBuilder(MuleContext context, AnnotatedEndpointData epData)
@@ -164,7 +164,7 @@ public class CallOutboundEndpoint extends org.mule.endpoint.DynamicOutboundEndpo
         MuleEvent result = super.process(event);
         if (result != null)
         {
-            result.getMessage().setProperty(CHANNEL.CALL_URI_PROPERTY, getEndpointURI().toString(), PropertyScope.OUTBOUND);
+            result.getMessage().setProperty(CHANNEL.CALL_URI_PROPERTY, result.getMessageSourceURI().toString(), PropertyScope.OUTBOUND);
         }
         return result;
     }

@@ -10,47 +10,51 @@
 
 package org.mule.endpoint;
 
+import org.mule.DefaultMuleEvent;
 import org.mule.MessageExchangePattern;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.api.MuleRuntimeException;
-import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.EndpointBuilder;
+import org.mule.api.endpoint.EndpointException;
+import org.mule.api.endpoint.EndpointMessageProcessorChainFactory;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.MalformedEndpointException;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.expression.ExpressionManager;
 import org.mule.api.expression.ExpressionRuntimeException;
+import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.api.retry.RetryPolicyTemplate;
+import org.mule.api.routing.filter.Filter;
+import org.mule.api.security.EndpointSecurityFilter;
+import org.mule.api.transaction.TransactionConfig;
+import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.Connector;
 import org.mule.api.transport.DispatchException;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.transport.service.TransportFactory;
-import org.mule.transport.service.TransportFactoryException;
 
-import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * An Outbound endpoint who's URI will be constructed based on the current message.
- * This allows for the destination of a message to change based on the contents of
- * the message. Note that this endpoint ONLY substitutes the URI, but other config
- * elements such as the connector (and scheme), transformers, filters, etc do not
- * change. You cannot change an endpoint scheme dynamically so you can't switch
- * between HTTP and JMS for example using the same dynamic endpoint.
+ * An Outbound endpoint who's URI is a template used to created new non dynamic
+ * endpoints based on the current message.
+ * This allows for the destination of a message to change based on the contents
+ * of the message. Note that this endpoint ONLY substitutes the URI, but other
+ * config elements such as the transformers, filters, etc do not change. You
+ * cannot change an endpoint scheme dynamically so you can't switch between
+ * HTTP and JMS for example using the same dynamic endpoint.
  */
-public class DynamicOutboundEndpoint extends DynamicURIOutboundEndpoint
+public class DynamicOutboundEndpoint implements OutboundEndpoint
 {
+
     public static final String DYNAMIC_URI_PLACEHOLDER = "dynamic://endpoint";
 
-    /**
-     * logger used by this class
-     */
     protected transient final Log logger = LogFactory.getLog(DynamicOutboundEndpoint.class);
 
     private static final long serialVersionUID = 8861985949279708638L;
@@ -62,26 +66,22 @@ public class DynamicOutboundEndpoint extends DynamicURIOutboundEndpoint
 
     private final EndpointBuilder builder;
 
-    public DynamicOutboundEndpoint(MuleContext muleContext, EndpointBuilder builder, String uriTemplate)
-        throws MalformedEndpointException
+    private final OutboundEndpoint prototypeEndpoint;
+
+    public DynamicOutboundEndpoint(EndpointBuilder builder, String uriTemplate) throws MalformedEndpointException
     {
-        super(new NullOutboundEndpoint(muleContext, builder));
+        validateUriTemplate(uriTemplate);
+
         this.builder = builder;
         this.uriTemplate = uriTemplate;
-        validateUriTemplate(uriTemplate);
-    }
 
-    @Override
-    public String getAddress()
-    {
-        final EndpointURI uri = getEndpointURI();
-        if (uri != null)
+        try
         {
-            return uri.getUri().toString();
+            prototypeEndpoint = builder.buildOutboundEndpoint();
         }
-        else
+        catch (Exception e)
         {
-            return uriTemplate;
+            throw new RuntimeException(e);
         }
     }
 
@@ -117,17 +117,15 @@ public class DynamicOutboundEndpoint extends DynamicURIOutboundEndpoint
 
         try
         {
-            final MuleEndpointURI uri = new MuleEndpointURI(newUriString, getMuleContext());
-            uri.initialise();
-            setEndpointURI(uri);
-            return getEndpointURI();
+            final MuleEndpointURI resultUri = new MuleEndpointURI(newUriString, getMuleContext());
+            resultUri.initialise();
+
+            return resultUri;
         }
         catch (final Exception e)
         {
-            throw new DispatchException(CoreMessages.templateCausedMalformedEndpoint(uriTemplate,
-                newUriString), event, this, e);
+            throw new DispatchException(CoreMessages.templateCausedMalformedEndpoint(uriTemplate, newUriString), event, this, e);
         }
-
     }
 
     protected String parseURIString(String uri, MuleMessage message)
@@ -135,17 +133,21 @@ public class DynamicOutboundEndpoint extends DynamicURIOutboundEndpoint
         return this.getMuleContext().getExpressionManager().parse(uri, message, true);
     }
 
-    @Override
     public MuleEvent process(MuleEvent event) throws MuleException
     {
-        final EndpointURI uri = getEndpointURIForMessage(event);
+        EndpointURI endpointURIForMessage = getEndpointURIForMessage(event);
+        OutboundEndpoint outboundEndpoint = createStaticEndpoint(endpointURIForMessage);
 
-        builder.setURIBuilder(new URIBuilder(uri));
-        endpoint = builder.buildOutboundEndpoint();
-
-        final OutboundEndpoint outboundEndpoint = new DynamicURIOutboundEndpoint(endpoint, uri);
+        event = new DefaultMuleEvent(event.getMessage(), endpointURIForMessage.getUri(), event.getExchangePattern(), event.getSession());
 
         return outboundEndpoint.process(event);
+    }
+
+    private synchronized OutboundEndpoint createStaticEndpoint(EndpointURI uri) throws DispatchException, EndpointException, InitialisationException
+    {
+        builder.setURIBuilder(new URIBuilder(uri));
+
+        return builder.buildOutboundEndpoint();
     }
 
     @Override
@@ -160,58 +162,143 @@ public class DynamicOutboundEndpoint extends DynamicURIOutboundEndpoint
         return System.identityHashCode(this);
     }
 
-    protected static class NullOutboundEndpoint extends AbstractEndpoint implements OutboundEndpoint
+    public Connector getConnector()
     {
-        private static final long serialVersionUID = 7927987219248986540L;
-
-        NullOutboundEndpoint(MuleContext muleContext, EndpointBuilder builder)
-        {
-            super(createDynamicConnector(muleContext), null, null, Collections.emptyMap(), null, true,
-                getMessageExchangePattern(builder), 0, "started", null, null, muleContext, null, null, null,
-                null, true, null);
-        }
-
-        @Override
-        protected MessageProcessor createMessageProcessorChain(FlowConstruct flowConstruct)
-            throws MuleException
-        {
-            throw new UnsupportedOperationException("createMessageProcessorChain");
-        }
-
-        public List<String> getResponseProperties()
-        {
-            return Collections.emptyList();
-        }
-
-        public MuleEvent process(MuleEvent event) throws MuleException
-        {
-            throw new UnsupportedOperationException("process");
-        }
-
-        static Connector createDynamicConnector(MuleContext muleContext)
-        {
-            try
-            {
-                return new TransportFactory(muleContext).createConnector(DYNAMIC_URI_PLACEHOLDER);
-            }
-            catch (final TransportFactoryException e)
-            {
-                // This should never happen
-                throw new MuleRuntimeException(e);
-            }
-        }
-
-        static MessageExchangePattern getMessageExchangePattern(EndpointBuilder builder)
-        {
-            if (!(builder instanceof AbstractEndpointBuilder))
-            {
-                return MessageExchangePattern.ONE_WAY;
-            }
-
-            return ((AbstractEndpointBuilder) builder).messageExchangePattern != null
-                                                                                     ? ((AbstractEndpointBuilder) builder).messageExchangePattern
-                                                                                     : MessageExchangePattern.ONE_WAY;
-        }
+        throw new UnsupportedOperationException("No connector available");
     }
 
+    public EndpointURI getEndpointURI()
+    {
+        return null;
+    }
+
+    public String getAddress()
+    {
+        return uriTemplate;
+    }
+
+    public RetryPolicyTemplate getRetryPolicyTemplate()
+    {
+        return prototypeEndpoint.getRetryPolicyTemplate();
+    }
+
+    public String getEncoding()
+    {
+        return prototypeEndpoint.getEncoding();
+    }
+
+    public String getMimeType()
+    {
+        return prototypeEndpoint.getMimeType();
+    }
+
+    public Filter getFilter()
+    {
+        return prototypeEndpoint.getFilter();
+    }
+
+    public String getInitialState()
+    {
+        return prototypeEndpoint.getInitialState();
+    }
+
+    public MuleContext getMuleContext()
+    {
+        return prototypeEndpoint.getMuleContext();
+    }
+
+    public String getName()
+    {
+        return prototypeEndpoint.getName();
+    }
+
+    public Map getProperties()
+    {
+        return prototypeEndpoint.getProperties();
+    }
+
+    public Object getProperty(Object key)
+    {
+        return prototypeEndpoint.getProperty(key);
+    }
+
+    public String getProtocol()
+    {
+        return prototypeEndpoint.getProtocol();
+    }
+
+    public int getResponseTimeout()
+    {
+        return prototypeEndpoint.getResponseTimeout();
+    }
+
+    public List<Transformer> getResponseTransformers()
+    {
+        return prototypeEndpoint.getResponseTransformers();
+    }
+
+    public EndpointMessageProcessorChainFactory getMessageProcessorsFactory()
+    {
+        return prototypeEndpoint.getMessageProcessorsFactory();
+    }
+
+    public List<MessageProcessor> getMessageProcessors()
+    {
+        return prototypeEndpoint.getMessageProcessors();
+    }
+
+    public List<MessageProcessor> getResponseMessageProcessors()
+    {
+        return prototypeEndpoint.getResponseMessageProcessors();
+    }
+
+    public EndpointSecurityFilter getSecurityFilter()
+    {
+        return prototypeEndpoint.getSecurityFilter();
+    }
+
+    public TransactionConfig getTransactionConfig()
+    {
+        return prototypeEndpoint.getTransactionConfig();
+    }
+
+    public List<Transformer> getTransformers()
+    {
+        return prototypeEndpoint.getTransformers();
+    }
+
+    public boolean isDeleteUnacceptedMessages()
+    {
+        return prototypeEndpoint.isDeleteUnacceptedMessages();
+    }
+
+    public boolean isReadOnly()
+    {
+        return prototypeEndpoint.isReadOnly();
+    }
+
+    public MessageExchangePattern getExchangePattern()
+    {
+        return prototypeEndpoint.getExchangePattern();
+    }
+
+    public List<String> getResponseProperties()
+    {
+        return prototypeEndpoint.getResponseProperties();
+    }
+
+    public String getEndpointBuilderName()
+    {
+        return prototypeEndpoint.getEndpointBuilderName();
+    }
+
+    public boolean isProtocolSupported(String protocol)
+    {
+        return prototypeEndpoint.isProtocolSupported(protocol);
+    }
+
+    public boolean isDisableTransportTransformer()
+    {
+        return prototypeEndpoint.isDisableTransportTransformer();
+    }
 }

@@ -10,8 +10,6 @@
 
 package org.mule.transport.http.construct;
 
-import java.util.List;
-
 import org.mule.MessageExchangePattern;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
@@ -36,6 +34,8 @@ import org.mule.transformer.TransformerTemplate.TransformerCallback;
 import org.mule.transformer.simple.MessagePropertiesTransformer;
 import org.mule.util.ObjectUtils;
 import org.mule.util.StringUtils;
+
+import java.util.List;
 
 /**
  * A simple HTTP proxy that supports transformation and caching.
@@ -119,11 +119,21 @@ public class HttpProxy extends AbstractConfigurationPattern
                 }
             }));
 
-            final String uriTemplate = outboundEndpoint.getEndpointURI().getUri().toString()
-                                       + "#[variable:http.path.extension]";
+            logger.error("Endpoint: " + outboundEndpoint);
+            final DynamicOutboundEndpoint dynamicOutboundEndpoint;
 
-            final DynamicOutboundEndpoint dynamicOutboundEndpoint = new DynamicOutboundEndpoint(muleContext,
-                new EndpointURIEndpointBuilder(outboundEndpoint), uriTemplate);
+            if (outboundEndpoint instanceof DynamicOutboundEndpoint)
+            {
+                dynamicOutboundEndpoint = (DynamicOutboundEndpoint) outboundEndpoint;
+            }
+            else
+            {
+                final String uriTemplate = outboundEndpoint.getEndpointURI().getUri().toString()
+                                           + "#[variable:http.path.extension]";
+
+                dynamicOutboundEndpoint = new DynamicOutboundEndpoint(
+                        new EndpointURIEndpointBuilder(outboundEndpoint), uriTemplate);
+            }
 
             builder.chain(dynamicOutboundEndpoint);
         }
