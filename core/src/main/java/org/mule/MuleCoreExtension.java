@@ -14,8 +14,10 @@ import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 
 /**
- * Allows Mule modules and transpornts to extend core functionality in an application-independent fashion
+ * Allows Mule modules and transports to extend core functionality in an
+ * application-independent fashion.
  */
 public interface MuleCoreExtension extends Initialisable, Disposable, NamedObject
 {
+    // no custom methods
 }
