@@ -27,6 +27,9 @@ public class ComponentMessageNotification extends ServerNotification
     public static final int COMPONENT_PRE_INVOKE = COMPONENT_EVENT_ACTION_START_RANGE + 1;
     public static final int COMPONENT_POST_INVOKE = COMPONENT_EVENT_ACTION_START_RANGE + 2;
 
+    protected transient FlowConstruct flowConstruct;
+    protected transient Component component;
+
     static
     {
         registerAction("component pre invoke", COMPONENT_PRE_INVOKE);
@@ -37,9 +40,14 @@ public class ComponentMessageNotification extends ServerNotification
      * @param message
      * @param action
      */
-    public ComponentMessageNotification(MuleMessage message, Component component, FlowConstruct flowConstruct, int action)
+    public ComponentMessageNotification(MuleMessage message,
+                                        Component component,
+                                        FlowConstruct flowConstruct,
+                                        int action)
     {
         super(cloneMessage(message), action);
+        this.flowConstruct = flowConstruct;
+        this.component = component;
         resourceIdentifier = flowConstruct.getName();
 
     }
@@ -47,7 +55,7 @@ public class ComponentMessageNotification extends ServerNotification
     @Override
     protected String getPayloadToString()
     {
-       return ((MuleMessage) source).getPayloadForLogging();
+        return ((MuleMessage) source).getPayloadForLogging();
     }
 
     /**
@@ -69,12 +77,22 @@ public class ComponentMessageNotification extends ServerNotification
     @Override
     public String getType()
     {
-        return "trace"; 
+        return "trace";
     }
 
     @Override
     public MuleMessage getSource()
     {
         return (MuleMessage) super.getSource();
+    }
+
+    public FlowConstruct getFlowConstruct()
+    {
+        return flowConstruct;
+    }
+
+    public Component getComponent()
+    {
+        return component;
     }
 }
