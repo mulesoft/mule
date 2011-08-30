@@ -1,5 +1,5 @@
 /*
- * $Id: Jms11SupportTestCase.java 22387 2011-07-12 03:53:36Z dirk.olmes $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  *
