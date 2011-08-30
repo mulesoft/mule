@@ -1,5 +1,5 @@
 /*
- * $Id: FileExceptionStrategyFunctionalTestCase.java 22431 2011-07-18 07:40:35Z dirk.olmes $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  *
