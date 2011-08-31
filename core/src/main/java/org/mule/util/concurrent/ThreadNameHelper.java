@@ -46,7 +46,7 @@ public class ThreadNameHelper
 
     public static String sedaService(MuleContext muleContext, String name)
     {
-        return String.format("%%.seda.", getPrefix(muleContext), name);
+        return String.format("%s%s.seda.", getPrefix(muleContext), name);
     }
 
     public static String flow(MuleContext muleContext, String name, int stage)
