@@ -492,10 +492,32 @@
         </xsd:annotation>
     </xsd:element>
 
-    <xsd:element name="sub-flow" type="messageProcessorChainType">
+    <xsd:element name="sub-flow">
         <xsd:annotation>
-            <xsd:documentation>A chain of message processors processed synchronously that can be referenced and reused.</xsd:documentation>
+            <xsd:documentation>
+                A chain of message processors processed synchronously that can be referenced and reused.
+            </xsd:documentation>
         </xsd:annotation>
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:element name="description" type="descriptionType" minOccurs="0">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            This can hold any kind of documentation related to the sub-flow. It is intended to be
+                            "human readable" only and  is not used by the system.
+                    </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:element>
+                <xsd:group ref="messageProcessorOrOutboundEndpoint" maxOccurs="unbounded" />
+            </xsd:sequence>
+            <xsd:attribute name="name" type="substitutableName" use="optional">
+                <xsd:annotation>
+                    <xsd:documentation>
+                        Identifies the message processor in the registry.
+                </xsd:documentation>
+                </xsd:annotation>
+            </xsd:attribute>
+        </xsd:complexType>
     </xsd:element>
 
     <xsd:complexType name="messageProcessorChainType">
@@ -505,7 +527,7 @@
                     <xsd:element name="description" type="descriptionType" minOccurs="0">
                         <xsd:annotation>
                             <xsd:documentation>
-                                This can hold any kind of documentation related to the compsite message processor. It is intended to be "human readable" only and
+                                This can hold any kind of documentation related to the processor chain. It is intended to be "human readable" only and
                                 is not used by the system.
                             </xsd:documentation>
                         </xsd:annotation>
