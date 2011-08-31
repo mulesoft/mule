@@ -29,6 +29,7 @@ import org.mule.management.stats.FlowConstructStatistics;
 import org.mule.processor.strategy.AsynchronousProcessingStrategy;
 import org.mule.routing.requestreply.ReplyToPropertyRequestReplyReplier;
 import org.mule.session.DefaultMuleSession;
+import org.mule.util.concurrent.ThreadNameHelper;
 
 /**
  * This implementation of {@link AbstractPipeline} adds the following functionality:
@@ -135,7 +136,7 @@ public class Flow extends AbstractPipeline implements MessageProcessor
                 @Override
                 public String getName()
                 {
-                    return Flow.this.getName() + "." + asyncProcessorCount++;
+                    return ThreadNameHelper.flow(muleContext, Flow.this.getName(), asyncProcessorCount++);
                 }
             }, builder, muleContext);
     }
@@ -147,7 +148,7 @@ public class Flow extends AbstractPipeline implements MessageProcessor
             @Override
             public String getName()
             {
-                return Flow.this.getName() + ".async." + asyncDelegateCount++;
+                return ThreadNameHelper.async(muleContext, Flow.this.getName(), asyncDelegateCount++);
             }
         };
     }

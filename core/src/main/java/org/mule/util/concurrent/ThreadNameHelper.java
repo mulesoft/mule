@@ -39,19 +39,19 @@ public class ThreadNameHelper
         return String.format("%s%s.requester", getPrefix(muleContext), connectorName);
     }
 
-    public static String asyncProcessor(MuleContext muleContext, String mpName)
+    public static String async(MuleContext muleContext, String name, int sequenceNumber )
     {
-        return String.format("%s%s.processor.async", getPrefix(muleContext), mpName);
+        return String.format("%s%s.async%s", getPrefix(muleContext), name, sequenceNumber);
     }
 
     public static String sedaService(MuleContext muleContext, String name)
     {
-        return String.format("%sseda.%s", getPrefix(muleContext), name);
+        return String.format("%%.seda.", getPrefix(muleContext), name);
     }
 
-    public static String flow(MuleContext muleContext, String name)
+    public static String flow(MuleContext muleContext, String name, int stage)
     {
-        return String.format("%sflow.%s", getPrefix(muleContext), name);
+        return String.format("%s%s.stage%s", getPrefix(muleContext), name, stage);
 
     }
 

@@ -28,6 +28,7 @@ import org.mule.processor.AbstractInterceptingMessageProcessor;
 import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.processor.strategy.AsynchronousProcessingStrategy;
 import org.mule.processor.strategy.SynchronousProcessingStrategy;
+import org.mule.util.concurrent.ThreadNameHelper;
 
 import java.util.Collections;
 import java.util.List;
@@ -154,7 +155,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
                 @Override
                 public String getName()
                 {
-                    return getName();
+                    return ThreadNameHelper.flow(muleContext, AbstractPipeline.this.getName(), 0);
                 }
             }, builder, muleContext);
     }
