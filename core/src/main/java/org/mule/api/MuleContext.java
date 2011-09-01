@@ -33,9 +33,12 @@ import org.mule.management.stats.AllStatistics;
 import org.mule.util.queue.QueueManager;
 
 import java.io.Serializable;
+import java.util.Map;
+import java.util.Set;
 
 import javax.resource.spi.work.WorkListener;
 import javax.transaction.TransactionManager;
+import javax.xml.namespace.QName;
 
 public interface MuleContext extends Lifecycle
 {
@@ -268,5 +271,10 @@ public interface MuleContext extends Lifecycle
      * dash, e.g. "3-XXXYYY"
      */
     String getUniqueIdString();
+
+    /**
+     * Return all annotations seen in the configuration
+     */
+    Map<QName, Set<Object>> getConfigurationAnnotations();
 }
 
