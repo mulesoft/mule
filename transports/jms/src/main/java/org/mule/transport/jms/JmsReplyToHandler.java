@@ -84,7 +84,7 @@ public class JmsReplyToHandler extends DefaultReplyToHandler
             }
 
             Class srcType = returnMessage.getPayload().getClass();
-            EndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder("jms://temporary", muleContext);
+            EndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(String.format("%s://temporary",connector.getProtocol()), muleContext);
             endpointBuilder.setConnector(jmsConnector);
             OutboundEndpoint tempEndpoint = muleContext.getEndpointFactory().getOutboundEndpoint(endpointBuilder);
             

@@ -595,13 +595,7 @@
     <xsd:group name="defaultEndpointElements">
         <xsd:sequence>
             <xsd:group ref="mule:endpointMessageProcessorElements" minOccurs="0" maxOccurs="unbounded"/>
-            <xsd:element name="response" minOccurs="0">
-                <xsd:complexType>
-                    <xsd:sequence>
-                        <xsd:group ref="mule:endpointMessageProcessorElements" minOccurs="0" maxOccurs="unbounded"/>
-                    </xsd:sequence>
-                </xsd:complexType>
-            </xsd:element>
+            <xsd:element ref="mule:response" minOccurs="0"/>
             <xsd:element ref="mule:abstract-transaction" minOccurs="0"/>
             <xsd:element ref="mule:abstract-xa-transaction" minOccurs="0"/>
             <xsd:choice>

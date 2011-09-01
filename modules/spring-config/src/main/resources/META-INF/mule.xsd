@@ -3163,18 +3163,20 @@
         </xsd:complexContent>
     </xsd:complexType>
 
+    <xsd:element name="response">
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:group ref="endpointMessageProcessorElements" minOccurs="0" maxOccurs="unbounded"/>
+            </xsd:sequence>
+        </xsd:complexType>
+    </xsd:element>
+
     <!-- these include option/repeats - should be embedded once -->
     <xsd:group name="defaultEndpointElements">
         <xsd:sequence>
             <xsd:sequence>
                 <xsd:group ref="endpointMessageProcessorElements" minOccurs="0" maxOccurs="unbounded"/>
-                <xsd:element name="response" minOccurs="0">
-                    <xsd:complexType>
-                        <xsd:sequence>
-                            <xsd:group ref="endpointMessageProcessorElements" minOccurs="0" maxOccurs="unbounded"/>
-                        </xsd:sequence>
-                    </xsd:complexType>
-                </xsd:element>
+                <xsd:element ref="response" minOccurs="0"/>
                 <xsd:element ref="abstract-transaction" minOccurs="0"/>
                 <xsd:element ref="abstract-reconnection-strategy" minOccurs="0"/>
                 <xsd:element ref="abstract-multi-transaction" minOccurs="0"/>
