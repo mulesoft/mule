@@ -10,27 +10,30 @@
         http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd">
 
     <flow name="inMemoryStore">
-        <redelivery-policy maxRedeliveryCount="12">
-            <process-failed-message>
+        <test:component/>
+        <idempotent-redelivery-policy maxRedeliveryCount="12">
+            <dead-letter-queue>
                 <outbound-endpoint address="test://dead-letter-queue"/>
-            </process-failed-message>
-        </redelivery-policy>
+            </dead-letter-queue>
+        </idempotent-redelivery-policy>
     </flow>
 
     <flow name="simpleTextFileStore">
-        <redelivery-policy useSecureHash="false" idExpression="#[message:id]">
-            <process-failed-message>
+        <test:component/>
+        <idempotent-redelivery-policy useSecureHash="false" idExpression="#[message:id]">
+            <dead-letter-queue>
                 <outbound-endpoint address="test://dead-letter-queue"/>
-            </process-failed-message>
-        </redelivery-policy>
+            </dead-letter-queue>
+        </idempotent-redelivery-policy>
     </flow>
 
     <flow name="customObjectStore">
-        <redelivery-policy>
-           <process-failed-message>
+        <test:component/>
+        <idempotent-redelivery-policy>
+           <dead-letter-queue>
                 <outbound-endpoint address="test://dead-letter-queue"/>
-            </process-failed-message>
-        </redelivery-policy>
+            </dead-letter-queue>
+        </idempotent-redelivery-policy>
     </flow>
 </mule>
 

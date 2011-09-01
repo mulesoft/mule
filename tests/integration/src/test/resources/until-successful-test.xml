@@ -14,6 +14,8 @@
     
     <vm:endpoint name="dlqChannel" path="dlq" />
 
+    <custom-processor name="dlq-mp" class="org.mule.test.routing.UntilSuccessfulTestCase$CustomMP"/>
+
     <flow name="minimal-config">
         <vm:inbound-endpoint path="input-1" exchange-pattern="one-way"/>
         <!-- with this configuration, the response from target MP won't be considered an error (no failureExpression) -->
@@ -29,7 +31,19 @@
                           failureExpression="#[regex:(?i).*error]"
                           maxRetries="2"
                           secondsBetweenRetries="1"
-                          dlqEndpoint-ref="dlqChannel">
+                          deadLetterQueue-ref="dlqChannel">
+            <flow-ref name="target-mp" />
+        </until-successful>
+    </flow>
+
+    <flow name="full-config-with-mp">
+        <vm:inbound-endpoint path="input-2MP" exchange-pattern="request-response"/>
+        <until-successful objectStore-ref="objectStore"
+                          ackExpression="#[string:ACK]"
+                          failureExpression="#[regex:(?i).*error]"
+                          maxRetries="2"
+                          secondsBetweenRetries="1"
+                          deadLetterQueue-ref="dlq-mp">
             <flow-ref name="target-mp" />
         </until-successful>
     </flow>

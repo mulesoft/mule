@@ -11,20 +11,12 @@ package org.mule.processor;
 
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
-import org.mule.api.construct.FlowConstruct;
-import org.mule.api.construct.FlowConstructAware;
-import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Disposable;
-import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.lifecycle.Lifecycle;
 import org.mule.api.lifecycle.Startable;
-import org.mule.api.lifecycle.Stoppable;
-import org.mule.api.processor.MessageProcessor;
 import org.mule.api.store.ObjectAlreadyExistsException;
 import org.mule.api.store.ObjectStoreException;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.routing.MessageProcessorFilterPair;
 import org.mule.transformer.simple.ByteArrayToHexString;
 import org.mule.transformer.simple.SerializableToByteArray;
 import org.mule.util.store.AbstractMonitoredObjectStore;
@@ -46,34 +38,22 @@ import javax.management.RuntimeErrorException;
  * fails too often, the message is sent to the failedMessageProcessor MP, whence success is force to be returned, to allow
  * the message to be considered "consumed".
  */
-public class RedeliveryPolicy extends AbstractInterceptingMessageProcessor implements MessageProcessor, Lifecycle, MuleContextAware, FlowConstructAware
+public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy
 {
     private final SerializableToByteArray objectToByteArray = new SerializableToByteArray();
     private final ByteArrayToHexString byteArrayToHexString = new ByteArrayToHexString();
 
     protected Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    private FlowConstruct flowConstruct;
     private boolean useSecureHash;
     private String messageDigestAlgorithm;
-    private int maxRedeliveryCount;
     private String idExpression;
-    private MessageProcessor failedMessageProcessor;
     private AbstractMonitoredObjectStore<AtomicInteger> store;
-
-    @Override
-    public void setFlowConstruct(FlowConstruct flowConstruct)
-    {
-        this.flowConstruct = flowConstruct;
-        if (failedMessageProcessor instanceof FlowConstructAware)
-        {
-            ((FlowConstructAware) failedMessageProcessor).setFlowConstruct(flowConstruct);
-        }
-    }
 
     @Override
     public void initialise() throws InitialisationException
     {
+        super.initialise();
         if (useSecureHash && idExpression != null)
         {
             throw new InitialisationException(
@@ -94,12 +74,6 @@ public class RedeliveryPolicy extends AbstractInterceptingMessageProcessor imple
                 CoreMessages.initialisationFailure(
                     "No method for identifying messages was specified"), this);
         }
-        if (maxRedeliveryCount < 1)
-        {
-            throw new InitialisationException(
-                CoreMessages.initialisationFailure(
-                    "maxRedeliveryCount must be positive"), this);
-        }
         if (useSecureHash)
         {
             if (messageDigestAlgorithm == null)
@@ -118,11 +92,8 @@ public class RedeliveryPolicy extends AbstractInterceptingMessageProcessor imple
 
             }
         }
+
         store = createStore();
-        if (failedMessageProcessor instanceof Initialisable)
-        {
-            ((Initialisable) failedMessageProcessor).initialise();
-        }
     }
 
     private AbstractMonitoredObjectStore<AtomicInteger> createStore() throws InitialisationException
@@ -136,12 +107,30 @@ public class RedeliveryPolicy extends AbstractInterceptingMessageProcessor imple
         return s;
     }
 
+
+    @Override
+    public void dispose()
+    {
+        super.dispose();
+
+        if (store != null)
+        {
+            store.dispose();
+            store = null;
+        }
+
+        if (deadLetterQueue instanceof Disposable)
+        {
+            ((Disposable) deadLetterQueue).dispose();
+        }
+    }
+
     @Override
     public void start() throws MuleException
     {
-        if (failedMessageProcessor instanceof Startable)
+        if (deadLetterQueue instanceof Startable)
         {
-            ((Startable) failedMessageProcessor).start();
+            ((Startable) deadLetterQueue).start();
         }
     }
 
@@ -173,7 +162,7 @@ public class RedeliveryPolicy extends AbstractInterceptingMessageProcessor imple
         {
             try
             {
-                return failedMessageProcessor.process(event);
+                return deadLetterQueue.process(event);
             }
             catch (Exception ex)
             {
@@ -255,30 +244,6 @@ public class RedeliveryPolicy extends AbstractInterceptingMessageProcessor imple
         }
     }
 
-    @Override
-    public void stop() throws MuleException
-    {
-        if (failedMessageProcessor instanceof Stoppable)
-        {
-            ((Stoppable) failedMessageProcessor).stop();
-        }
-    }
-
-    @Override
-    public void dispose()
-    {
-        if (store != null)
-        {
-            store.dispose();
-            store = null;
-        }
-
-        if (failedMessageProcessor instanceof Disposable)
-        {
-            ((Disposable) failedMessageProcessor).dispose();
-        }
-    }
-
     public boolean isUseSecureHash()
     {
         return useSecureHash;
@@ -299,16 +264,6 @@ public class RedeliveryPolicy extends AbstractInterceptingMessageProcessor imple
         this.messageDigestAlgorithm = messageDigestAlgorithm;
     }
 
-    public int getMaxRedeliveryCount()
-    {
-        return maxRedeliveryCount;
-    }
-
-    public void setMaxRedeliveryCount(int maxRedeliveryCount)
-    {
-        this.maxRedeliveryCount = maxRedeliveryCount;
-    }
-
     public String getIdExpression()
     {
         return idExpression;
@@ -317,15 +272,5 @@ public class RedeliveryPolicy extends AbstractInterceptingMessageProcessor imple
     public void setIdExpression(String idExpression)
     {
         this.idExpression = idExpression;
-    }
-
-    public MessageProcessor getTheFailedMessageProcessor()
-    {
-        return failedMessageProcessor;
-    }
-
-    public void setFailedMessageProcessor(MessageProcessorFilterPair failedMessageProcessorPair)
-    {
-        this.failedMessageProcessor = failedMessageProcessorPair.getMessageProcessor();
     }
 }

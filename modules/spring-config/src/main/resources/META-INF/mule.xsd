@@ -2094,6 +2094,7 @@
                             </xsd:complexType>
                         </xsd:element>
                     </xsd:choice>
+                    <xsd:element ref="abstract-redelivery-policy" minOccurs="0"/>
                     <xsd:element ref="abstract-exception-strategy" minOccurs="0"/>
                 </xsd:sequence>
                 <xsd:attribute name="name" type="nonBlankString" use="required">
@@ -4968,8 +4969,41 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-        <xsd:element name="redelivery-policy" type="redeliveryPolicyType"
-                 substitutionGroup="abstract-message-processor">
+    <xsd:element name="abstract-redelivery-policy" abstract="true" type="abstractRedeliveryPolicyType">
+            <xsd:annotation>
+                <xsd:documentation>
+                    A placeholder for a redelivery policy.  Redelivery policies determine what action to take when the same message
+                    is redelivered repeatedly.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:element>
+
+    <xsd:complexType name="abstractRedeliveryPolicyType">
+        <xsd:complexContent>
+            <xsd:extension base="annotatedType">
+                <xsd:sequence>
+                    <xsd:element name="dead-letter-queue" type="singleTarget">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Message processor to call if a message exceeds its redelivery count without being processed successfully
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                </xsd:sequence>
+                <xsd:attribute name="maxRedeliveryCount" type="xsd:integer" default="5">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The maximum number of times a message can be redelivered and processed unsuccessfully before triggering
+                            process-failed-message
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="idempotent-redelivery-policy" type="idempotentRedeliveryPolicyType"
+                 substitutionGroup="abstract-redelivery-policy">
         <xsd:annotation>
             <xsd:documentation>
                 Defines a policy for processing the redelivery of the same message
@@ -4987,26 +5021,9 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:complexType name="redeliveryPolicyType">
+    <xsd:complexType name="idempotentRedeliveryPolicyType">
         <xsd:complexContent>
-            <xsd:extension base="abstractMessageProcessorType">
-                <xsd:sequence>
-                    <xsd:element name="process-failed-message" type="singleTarget">
-                        <xsd:annotation>
-                            <xsd:documentation>
-                                Message processor to call if a message exceeds its redelivery count without being processed successfully
-                            </xsd:documentation>
-                        </xsd:annotation>
-                    </xsd:element>
-                </xsd:sequence>
-                <xsd:attribute name="maxRedeliveryCount" type="xsd:integer" default="5">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            The maximum number of times a message can be redelivered and processed unsuccessfully before triggering
-                            process-failed-message
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
+            <xsd:extension base="abstractRedeliveryPolicyType">
                 <xsd:attribute name="useSecureHash" type="xsd:boolean" default="true">
                     <xsd:annotation>
                         <xsd:documentation>
@@ -5499,10 +5516,10 @@
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:attribute>
-                    <xsd:attribute name="dlqEndpoint-ref" type="xsd:string" use="optional">
+                    <xsd:attribute name="deadLetterQueue-ref" type="xsd:string" use="optional">
                         <xsd:annotation>
                             <xsd:documentation>
-                                The endpoint to which undeliverable messages are sent after all retries have been attempted.
+                                The endpoint or message processor to which undeliverable messages are sent after all retries have been attempted.
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:attribute>
