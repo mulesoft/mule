@@ -151,7 +151,6 @@ public abstract class AbstractComponent implements Component, MuleContextAware, 
 
     public MuleEvent process(MuleEvent event) throws MuleException
     {
-        System.out.println("Java component " + event.getMessage().getMessageRootId());
         if (interceptorChain == null)
         {
             return invokeInternal(event);

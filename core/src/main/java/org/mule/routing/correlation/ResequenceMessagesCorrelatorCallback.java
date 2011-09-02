@@ -10,6 +10,9 @@
 
 package org.mule.routing.correlation;
 
+import java.util.Arrays;
+import java.util.Comparator;
+
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleContext;
@@ -19,9 +22,6 @@ import org.mule.api.store.ObjectStoreException;
 import org.mule.routing.AggregationException;
 import org.mule.routing.EventGroup;
 import org.mule.routing.Resequencer;
-
-import java.util.Arrays;
-import java.util.Comparator;
 
 /**
  * A Correlator that correlates messages based on Mule correlation settings Note that
@@ -66,10 +66,6 @@ public class ResequenceMessagesCorrelatorCallback extends CollectionCorrelatorCa
         catch (ObjectStoreException e)
         {
             throw new AggregationException(events, null, e);
-        }
-        for (MuleEvent event : results)
-        {
-            System.out.println(event.getMessage().getCorrelationSequence() + ", " + event.getMessage().getPayload());
         }
         Arrays.sort(results, eventComparator);
         // This is a bit of a hack since we return a collection of events on one
