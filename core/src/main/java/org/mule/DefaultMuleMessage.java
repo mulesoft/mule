@@ -563,8 +563,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         }
         catch (Exception e)
         {
-            // TODO Auto-generated catch block
-            return  "[Messaage could not be converted to string]";
+            return  "[Message could not be converted to string]";
         }
     }
 
@@ -580,8 +579,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         }
         catch (Exception e)
         {
-            // TODO Auto-generated catch block
-            return  "[Messaage could not be converted to string]";
+            return  "[Message could not be converted to string]";
         }
     }
 
