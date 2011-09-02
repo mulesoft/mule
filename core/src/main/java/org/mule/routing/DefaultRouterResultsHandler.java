@@ -52,6 +52,7 @@ public class DefaultRouterResultsHandler implements RouterResultsHandler
         else
         {
             MuleMessageCollection coll = new DefaultMessageCollection(muleContext);
+            coll.propagateRootId(previous.getMessage());
             for (MuleEvent event : results)
             {
                 MuleMessage muleMessage = event == null ? null : event.getMessage();
