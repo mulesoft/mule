@@ -36,6 +36,7 @@ import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.Connector;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.Message;
+import org.mule.processor.AbstractRedeliveryPolicy;
 import org.mule.processor.SecurityFilterMessageProcessor;
 import org.mule.routing.MessageFilter;
 import org.mule.routing.requestreply.ReplyToParameterProcessor;
@@ -101,6 +102,8 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder, Annota
     protected List<Transformer> responseTransformers = new LinkedList<Transformer>();
     protected Boolean disableTransportTransformer;
     protected String mimeType;
+    protected AbstractRedeliveryPolicy redeliveryPolicy;
+
     private final Map<QName, Object> annotations = new ConcurrentHashMap<QName, Object>();
 
     // not included in equality/hash
@@ -211,6 +214,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder, Annota
                 getDefaultDeleteUnacceptedMessages(connector),
                 messageExchangePattern, getResponseTimeout(connector), getInitialState(connector),
                 getEndpointEncoding(connector), name, muleContext, getRetryPolicyTemplate(connector),
+                getRedeliveryPolicy(),
                 getMessageProcessorsFactory(), mergedProcessors, mergedResponseProcessors,
                 isDisableTransportTransformer(), mimeType);
         inboundEndpoint.setAnnotations(getAnnotations());
@@ -256,6 +260,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder, Annota
                 getDefaultDeleteUnacceptedMessages(connector), 
                 messageExchangePattern, getResponseTimeout(connector), getInitialState(connector),
                 getEndpointEncoding(connector), name, muleContext, getRetryPolicyTemplate(connector),
+                getRedeliveryPolicy(),
                 responsePropertiesList,  getMessageProcessorsFactory(), mergedProcessors,
                 mergedResponseProcessors, isDisableTransportTransformer(), mimeType);
         outboundEndpoint.setAnnotations(getAnnotations());
@@ -383,6 +388,11 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder, Annota
         {
             throw new ServiceException(CoreMessages.noServiceTransportDescriptor(scheme));
         }
+    }
+
+    public AbstractRedeliveryPolicy getRedeliveryPolicy()
+    {
+        return redeliveryPolicy;
     }
 
     protected RetryPolicyTemplate getRetryPolicyTemplate(Connector conn)
@@ -804,6 +814,11 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder, Annota
     public void setCreateConnector(int createConnector)
     {
         this.createConnector = new Integer(createConnector);
+    }
+
+    public void setRedeliveryPolicy(AbstractRedeliveryPolicy redeliveryPolicy)
+    {
+        this.redeliveryPolicy = redeliveryPolicy;
     }
 
     public void setRegistryId(String registryId)

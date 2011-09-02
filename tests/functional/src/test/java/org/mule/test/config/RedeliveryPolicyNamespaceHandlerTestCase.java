@@ -11,7 +11,9 @@ package org.mule.test.config;
 
 import org.junit.Test;
 import org.mule.api.construct.FlowConstruct;
+import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.api.source.MessageSource;
 import org.mule.construct.Flow;
 import org.mule.processor.AbstractRedeliveryPolicy;
 import org.mule.processor.IdempotentRedeliveryPolicy;
@@ -76,7 +78,9 @@ public class RedeliveryPolicyNamespaceHandlerTestCase extends FunctionalTestCase
         FlowConstruct flow = getFlowConstruct(flowName);
         assertTrue(flow instanceof Flow);
 
-        AbstractRedeliveryPolicy redeliveryPolicy = ((Flow) flow).getRedeliveryPolicy();
+        MessageSource source = ((Flow) flow).getMessageSource();
+        assertTrue(source instanceof InboundEndpoint);
+        AbstractRedeliveryPolicy redeliveryPolicy = ((InboundEndpoint)source).getRedeliveryPolicy();
         assertTrue(redeliveryPolicy instanceof IdempotentRedeliveryPolicy);
         return (IdempotentRedeliveryPolicy) redeliveryPolicy;
     }

@@ -40,6 +40,7 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.mule.processor.AbstractRedeliveryPolicy;
 
 /**
  * An Outbound endpoint who's URI is a template used to created new non dynamic
@@ -172,6 +173,12 @@ public class DynamicOutboundEndpoint implements OutboundEndpoint
         return null;
     }
 
+    @Override
+    public AbstractRedeliveryPolicy getRedeliveryPolicy()
+    {
+        return prototypeEndpoint.getRedeliveryPolicy();
+    }
+
     public String getAddress()
     {
         return uriTemplate;
@@ -181,6 +188,7 @@ public class DynamicOutboundEndpoint implements OutboundEndpoint
     {
         return prototypeEndpoint.getRetryPolicyTemplate();
     }
+
 
     public String getEncoding()
     {

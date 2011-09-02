@@ -30,6 +30,7 @@ import org.mule.api.transaction.TransactionConfig;
 import org.mule.api.transport.Connector;
 import org.mule.config.MuleManifest;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.processor.AbstractRedeliveryPolicy;
 import org.mule.transport.ConnectException;
 import org.mule.transport.polling.MessageProcessorPollingMessageReceiver;
 
@@ -57,6 +58,7 @@ public class DefaultInboundEndpoint extends AbstractEndpoint implements InboundE
                                   String endpointBuilderName,
                                   MuleContext muleContext,
                                   RetryPolicyTemplate retryPolicyTemplate,
+                                  AbstractRedeliveryPolicy redeliveryPolicy,
                                   EndpointMessageProcessorChainFactory messageProcessorsFactory,
                                   List <MessageProcessor> messageProcessors,
                                   List <MessageProcessor> responseMessageProcessors,
@@ -66,7 +68,7 @@ public class DefaultInboundEndpoint extends AbstractEndpoint implements InboundE
         super(connector, endpointUri, name, properties, 
             transactionConfig, deleteUnacceptedMessage,
             messageExchangePattern, responseTimeout, initialState, endpointEncoding, 
-            endpointBuilderName, muleContext, retryPolicyTemplate,  messageProcessorsFactory, 
+            endpointBuilderName, muleContext, retryPolicyTemplate, redeliveryPolicy, messageProcessorsFactory,
             messageProcessors, responseMessageProcessors, disableTransportTransformer,
             mimeType);
     }

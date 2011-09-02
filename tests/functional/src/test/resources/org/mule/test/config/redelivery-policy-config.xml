@@ -9,31 +9,43 @@
         http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/3.2/mule-test.xsd
         http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd">
 
+    <test:connector name="testConnector"/>
+     <endpoint name="global" address="test://foo">
+         <string-to-byte-array-transformer/>
+     </endpoint>
+
+
     <flow name="inMemoryStore">
+        <inbound-endpoint ref="global">
+            <idempotent-redelivery-policy maxRedeliveryCount="12">
+                <dead-letter-queue>
+                    <outbound-endpoint address="test://dead-letter-queue"/>
+                </dead-letter-queue>
+            </idempotent-redelivery-policy>
+        </inbound-endpoint>
         <test:component/>
-        <idempotent-redelivery-policy maxRedeliveryCount="12">
-            <dead-letter-queue>
-                <outbound-endpoint address="test://dead-letter-queue"/>
-            </dead-letter-queue>
-        </idempotent-redelivery-policy>
     </flow>
 
     <flow name="simpleTextFileStore">
+        <inbound-endpoint address="test://foo">
+            <idempotent-redelivery-policy useSecureHash="false" idExpression="#[message:id]">
+                <dead-letter-queue>
+                    <outbound-endpoint address="test://dead-letter-queue"/>
+                </dead-letter-queue>
+            </idempotent-redelivery-policy>
+        </inbound-endpoint>
         <test:component/>
-        <idempotent-redelivery-policy useSecureHash="false" idExpression="#[message:id]">
-            <dead-letter-queue>
-                <outbound-endpoint address="test://dead-letter-queue"/>
-            </dead-letter-queue>
-        </idempotent-redelivery-policy>
     </flow>
 
     <flow name="customObjectStore">
+        <inbound-endpoint address="test://foo">
+            <idempotent-redelivery-policy>
+                <dead-letter-queue>
+                    <outbound-endpoint address="test://dead-letter-queue"/>
+                </dead-letter-queue>
+            </idempotent-redelivery-policy>
+        </inbound-endpoint>
         <test:component/>
-        <idempotent-redelivery-policy>
-           <dead-letter-queue>
-                <outbound-endpoint address="test://dead-letter-queue"/>
-            </dead-letter-queue>
-        </idempotent-redelivery-policy>
     </flow>
 </mule>
 

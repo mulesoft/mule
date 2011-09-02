@@ -199,7 +199,7 @@ public class DynamicRequestEndpoint extends DynamicURIInboundEndpoint
     {
         NullInboundEndpoint(MuleContext muleContext)
         {
-            super(createDynamicConnector(muleContext), null, null, new HashMap(), null, true, MessageExchangePattern.ONE_WAY, 0, "started", null, null, muleContext, null, null, null, null, true, null);
+            super(createDynamicConnector(muleContext), null, null, new HashMap(), null, true, MessageExchangePattern.ONE_WAY, 0, "started", null, null, muleContext, null, null, null, null, null, true, null);
         }
 
         @Override

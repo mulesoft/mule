@@ -77,10 +77,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
 
     protected void configurePreProcessors(MessageProcessorChainBuilder builder) throws MuleException
     {
-        if (redeliveryPolicy != null)
-        {
-            builder.chain(redeliveryPolicy);
-        }
+        // Template method
     }
 
     protected void configurePostProcessors(MessageProcessorChainBuilder builder) throws MuleException

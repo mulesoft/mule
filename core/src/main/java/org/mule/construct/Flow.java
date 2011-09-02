@@ -83,10 +83,10 @@ public class Flow extends AbstractPipeline implements MessageProcessor
     @Override
     protected void configurePreProcessors(MessageProcessorChainBuilder builder) throws MuleException
     {
+        super.configurePreProcessors(builder);
         builder.chain(new ProcessIfStartedMessageProcessor(this, getLifecycleState()));
         builder.chain(new ProcessingTimeInterceptor());
         builder.chain(new FlowConstructStatisticsMessageProcessor());
-        super.configurePreProcessors(builder);
     }
 
     @Override

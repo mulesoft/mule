@@ -594,9 +594,7 @@
          normal filter to be set -->
     <xsd:group name="defaultEndpointElements">
         <xsd:sequence>
-            <xsd:group ref="mule:endpointMessageProcessorElements" minOccurs="0" maxOccurs="unbounded"/>
-            <xsd:element ref="mule:response" minOccurs="0"/>
-            <xsd:element ref="mule:abstract-transaction" minOccurs="0"/>
+            <xsd:group ref="mule:commonDefaultEndpointElements"/>
             <xsd:element ref="mule:abstract-xa-transaction" minOccurs="0"/>
             <xsd:choice>
                 <!--xsd:element ref="mule:abstract-filter" minOccurs="0"/>    -->

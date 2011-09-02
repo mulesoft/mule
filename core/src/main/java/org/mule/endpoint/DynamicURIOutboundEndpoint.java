@@ -24,6 +24,7 @@ import org.mule.api.security.EndpointSecurityFilter;
 import org.mule.api.transaction.TransactionConfig;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.Connector;
+import org.mule.processor.AbstractRedeliveryPolicy;
 
 import java.util.List;
 import java.util.Map;
@@ -84,6 +85,12 @@ public class DynamicURIOutboundEndpoint implements OutboundEndpoint
     public RetryPolicyTemplate getRetryPolicyTemplate()
     {
         return endpoint.getRetryPolicyTemplate();
+    }
+
+    @Override
+    public AbstractRedeliveryPolicy getRedeliveryPolicy()
+    {
+        return endpoint.getRedeliveryPolicy();
     }
 
     public Connector getConnector()

@@ -23,6 +23,8 @@ import org.mule.api.security.EndpointSecurityFilter;
 import org.mule.api.transaction.TransactionConfig;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.Connector;
+import org.mule.processor.AbstractRedeliveryPolicy;
+import org.mule.processor.IdempotentRedeliveryPolicy;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.ArrayList;
@@ -74,6 +76,7 @@ public class EndpointTestCase extends AbstractMuleTestCase
         final String endpointBuilderName = "builderName1";
         final MuleContext muleContext = mock(MuleContext.class);
         final RetryPolicyTemplate retryPolicyTemplate = mock(RetryPolicyTemplate.class);
+        final AbstractRedeliveryPolicy redeliveryPolicy = mock(IdempotentRedeliveryPolicy.class);
         final EndpointMessageProcessorChainFactory messageProcessorsFactory = mock(EndpointMessageProcessorChainFactory.class);
         final List<MessageProcessor> messageProcessors = new ArrayList<MessageProcessor>();
         final List<MessageProcessor> responseMessageProcessors = new ArrayList<MessageProcessor>();
@@ -102,6 +105,7 @@ public class EndpointTestCase extends AbstractMuleTestCase
                 assertEquals(endpointBuilderName, endpoint.getEndpointBuilderName());
                 assertEquals(muleContext, endpoint.getMuleContext());
                 assertEquals(retryPolicyTemplate, endpoint.getRetryPolicyTemplate());
+                assertEquals(redeliveryPolicy, endpoint.getRedeliveryPolicy());
                 assertEquals(mimeType, endpoint.getMimeType());
                 assertEquals(disableTransportTransformer, endpoint.isDisableTransportTransformer());
 
@@ -117,7 +121,7 @@ public class EndpointTestCase extends AbstractMuleTestCase
         new AbstractEndpoint(mockConnector, uri, name, properties,
             mockTransactionConfig, deleteUnacceptedMessages, 
             messageExchangePattern, responseTimeout, initialState, endpointEncoding, 
-            endpointBuilderName, muleContext, retryPolicyTemplate, messageProcessorsFactory, 
+            endpointBuilderName, muleContext, retryPolicyTemplate, redeliveryPolicy, messageProcessorsFactory,
             messageProcessors, responseMessageProcessors, disableTransportTransformer,
             mimeType)
         {
