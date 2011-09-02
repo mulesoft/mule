@@ -10,6 +10,13 @@
 
 package org.mule.model.seda;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import org.mule.MessageExchangePattern;
 import org.mule.api.MuleEventContext;
 import org.mule.api.config.MuleProperties;
@@ -34,13 +41,6 @@ import java.util.concurrent.TimeUnit;
 import junit.framework.AssertionFailedError;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 public class SedaServiceTestCase extends AbstractServiceTestCase
 {
@@ -219,7 +219,8 @@ public class SedaServiceTestCase extends AbstractServiceTestCase
             @Override
             public Object onCall(MuleEventContext eventContext) throws Exception
             {
-                assertTrue(Thread.currentThread().getName().startsWith("seda." + serviceName));
+                System.out.println(Thread.currentThread().getName());
+                assertTrue(Thread.currentThread().getName().startsWith(serviceName + ".seda."));
                 latch.countDown();
                 return null;
             }
