@@ -217,11 +217,6 @@ public class TransactionalQueueManager extends AbstractXAResourceManager impleme
         return muleContext;
     }
 
-    public void setPersistentObjectStore(Object o)
-    {
-        System.out.println(o.getClass());   
-    }
-
     private void addStore(ListableObjectStore<?> store)
     {
         stores.add(store);

@@ -39,7 +39,6 @@ import org.mule.util.store.MuleObjectStoreManager
 
 // Set up defaults / system objects
 QueueManager queueManager = new TransactionalQueueManager();
-queueManager.persistentObjectStore = new SimpleMemoryObjectStore()
 muleContext.registry.registerObject(MuleProperties.OBJECT_QUEUE_MANAGER, queueManager);
 
 muleContext.registry.registerObject(MuleProperties.OBJECT_SECURITY_MANAGER, new MuleSecurityManager());
