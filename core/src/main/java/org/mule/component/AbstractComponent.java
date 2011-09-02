@@ -181,7 +181,9 @@ public abstract class AbstractComponent implements Component, MuleContextAware, 
         }
         else
         {
-            return new DefaultMuleEvent(new DefaultMuleMessage(NullPayload.getInstance(), muleContext), event);
+            DefaultMuleMessage emptyMessage = new DefaultMuleMessage(NullPayload.getInstance(), muleContext);
+            emptyMessage.propagateRootId(event.getMessage());
+            return new DefaultMuleEvent(emptyMessage, event);
         }
     }
 
