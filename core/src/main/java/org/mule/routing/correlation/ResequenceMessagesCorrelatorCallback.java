@@ -67,10 +67,6 @@ public class ResequenceMessagesCorrelatorCallback extends CollectionCorrelatorCa
         {
             throw new AggregationException(events, null, e);
         }
-        for (MuleEvent event : results)
-        {
-            System.out.println(event.getMessage().getCorrelationSequence() + ", " + event.getMessage().getPayload());
-        }
         Arrays.sort(results, eventComparator);
         // This is a bit of a hack since we return a collection of events on one
         // message
