@@ -30,8 +30,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.management.RuntimeErrorException;
-
 /**
  * Implement a retry policy for Mule.  This is similar to JMS retry policies that will redeliver a message a maximum
  * number of times.  If this maximum is exceeded, the message is sent to a dead letter queue,  Here, if the processing of the messages
@@ -186,7 +184,7 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy
             incrementCounter(messageId, counter);
             throw ex;
         }
-        catch (RuntimeErrorException ex)
+        catch (RuntimeException ex)
         {
             incrementCounter(messageId, counter);
             throw ex;
