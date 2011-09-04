@@ -1,35 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:spring="http://www.springframework.org/schema/beans"
-       xmlns:http="http://www.mulesoft.org/schema/mule/http"
        xmlns:jetty="http://www.mulesoft.org/schema/mule/jetty"
        xmlns:test="http://www.mulesoft.org/schema/mule/test"
     xsi:schemaLocation="
        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/3.2/mule-test.xsd
        http://www.mulesoft.org/schema/mule/jetty http://www.mulesoft.org/schema/mule/jetty/3.2/mule-jetty.xsd
-       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
-       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
-       http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/3.2/mule-http.xsd">
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd">
 
     <model name="main">
         <service name="httpIn">
             <inbound>
-                <jetty:inbound-endpoint address="http://localhost:60230/foo" exchange-pattern="request-response"/>
+                <jetty:inbound-endpoint address="http://localhost:${port1}/foo" exchange-pattern="request-response"/>
             </inbound>
             <test:component appendString=" World"/>
         </service>
 
         <service name="httpBestMatch">
             <inbound>
-                <jetty:inbound-endpoint address="http://localhost:60230/foo/bestmatch" exchange-pattern="request-response"/>
+                <jetty:inbound-endpoint address="http://localhost:${port1}/foo/bestmatch" exchange-pattern="request-response"/>
             </inbound>
             <test:component appendString=" World Best Match"/>
         </service>
         
         <service name="httpDifferentPort">
             <inbound>
-                <jetty:inbound-endpoint address="http://localhost:60231/foo/bestmatch" exchange-pattern="request-response"/>
+                <jetty:inbound-endpoint address="http://localhost:${port2}/foo/bestmatch" exchange-pattern="request-response"/>
             </inbound>
             <test:component appendString=" World Best Match 2"/>
         </service>
