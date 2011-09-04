@@ -25,12 +25,13 @@ public class FineGrainedControlClassLoader extends GoodCitizenClassLoader
 
     protected String appName;
 
+    // Finished with '.' so that we can use startsWith to verify
     protected String[] systemPackages = {
-            "java",
-            "javax",
-            "org.mule",
-            "com.mulesoft",
-            "com.mulesource"
+            "java.",
+            "javax.",
+            "org.mule.",
+            "com.mulesoft.",
+            "com.mulesource."
     };
 
     protected Set<String> overrides = new HashSet<String>();
@@ -137,7 +138,7 @@ public class FineGrainedControlClassLoader extends GoodCitizenClassLoader
         boolean overrideMatch = false;
         for (String override : overrides)
         {
-            if (name.startsWith(override))
+            if (name.equals(override) || name.startsWith(override + "."))
             {
                 overrideMatch = true;
                 break;
@@ -151,7 +152,7 @@ public class FineGrainedControlClassLoader extends GoodCitizenClassLoader
         boolean blockedMatch = false;
         for (String b : blocked)
         {
-            if (name.startsWith(b))
+            if (name.equals(b) || name.startsWith(b + "."))
             {
                 blockedMatch = true;
                 break;
