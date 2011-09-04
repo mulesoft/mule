@@ -13,6 +13,7 @@ package org.mule.util.queue;
 import org.mule.api.MuleContext;
 import org.mule.api.store.ListableObjectStore;
 import org.mule.api.store.ObjectStore;
+import org.mule.api.store.ObjectStoreException;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -85,7 +86,7 @@ public class QueueInfo
     }
 
     public boolean offer(Serializable o, int room, long timeout)
-        throws InterruptedException
+        throws InterruptedException, ObjectStoreException
     {
         return delegate.offer(o, room, timeout);
     }
@@ -103,7 +104,7 @@ public class QueueInfo
     }
 
     public void untake(Serializable item)
-        throws InterruptedException
+        throws InterruptedException, ObjectStoreException
     {
         delegate.untake(item);
     }
@@ -143,6 +144,16 @@ public class QueueInfo
         throw new UnsupportedOperationException("Method 'takeNextItemFromStore' is not supported for queue " + name);
     }
 
+    public void writeToObjectStore(Serializable data) throws InterruptedException, ObjectStoreException
+    {
+        if (canTakeFromStore())
+        {
+            ((TakingQueueInfoDelegate)delegate).writeToObjectStore(data);
+            return;
+        }
+
+        throw new UnsupportedOperationException("Method 'writeToObjectStore' is not supported for queue " + name);
+    }
     /**
      * A factory for creating object store-specific queue info delegates
      */

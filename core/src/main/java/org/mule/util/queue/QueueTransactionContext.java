@@ -32,12 +32,12 @@ public class QueueTransactionContext extends AbstractTransactionContext
         this.transactionalQueueManager = transactionalQueueManager;
     }
 
-    public boolean offer(QueueInfo queue, Serializable item, long offerTimeout) throws InterruptedException
+    public boolean offer(QueueInfo queue, Serializable item, long offerTimeout) throws InterruptedException, ObjectStoreException
     {
         readOnly = false;
         if (queue.canTakeFromStore())
         {
-            queue.putNow(item);
+            queue.writeToObjectStore(item);
             return true;
         }
 
@@ -56,12 +56,12 @@ public class QueueTransactionContext extends AbstractTransactionContext
         }
     }
 
-    public void untake(QueueInfo queue, Serializable item) throws InterruptedException
+    public void untake(QueueInfo queue, Serializable item) throws InterruptedException, ObjectStoreException
     {
         readOnly = false;
         if (queue.canTakeFromStore())
         {
-            queue.putNow(item);
+            queue.writeToObjectStore(item);
         }
 
         initializeAdded();

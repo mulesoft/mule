@@ -9,6 +9,8 @@
  */
 package org.mule.util.queue;
 
+import org.mule.api.store.ObjectStoreException;
+
 import java.io.Serializable;
 
 /**
@@ -21,4 +23,6 @@ public interface TakingQueueInfoDelegate extends QueueInfoDelegate
      * from the object store
      */
     Serializable takeFromObjectStore(long timeout) throws InterruptedException;
+
+    void writeToObjectStore(Serializable data) throws InterruptedException,ObjectStoreException;
 }

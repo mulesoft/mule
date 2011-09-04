@@ -155,7 +155,7 @@ public class SedaStageInterceptingMessageProcessor extends AsyncInterceptingMess
         {
             queue.untake(event);
         }
-        catch (InterruptedException e)
+        catch (Exception e)
         {
             logger.error(e);
         }

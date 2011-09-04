@@ -31,7 +31,7 @@ public class RollbackTestCase extends FunctionalTestCase
         return "org/mule/test/config/rollback-config.xml";
     }
 
-    static Latch latch = new Latch();
+    static Latch latch;
     static AtomicInteger totalSeen;
     static AtomicInteger totalAccepted;
 
@@ -40,6 +40,7 @@ public class RollbackTestCase extends FunctionalTestCase
     {
         totalSeen = new AtomicInteger(0);
         totalAccepted = new AtomicInteger(0);
+        latch = new Latch();
         MuleClient client = new MuleClient(muleContext);
         Map props = new HashMap();
         for (int i = 0; i < 100; i++)
@@ -47,7 +48,7 @@ public class RollbackTestCase extends FunctionalTestCase
             client.dispatch("vm://async", "Hello " + i, props);
         }
         latch.await();
-        Assert.assertEquals(totalAccepted.get(), 100);
+        Assert.assertEquals(100, totalAccepted.get());
         Assert.assertTrue(totalSeen.get() > 100);
     }
 

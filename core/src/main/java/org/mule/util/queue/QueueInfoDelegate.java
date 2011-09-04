@@ -9,6 +9,8 @@
  */
 package org.mule.util.queue;
 
+import org.mule.api.store.ObjectStoreException;
+
 import java.io.Serializable;
 
 /**
@@ -24,7 +26,7 @@ public interface QueueInfoDelegate
     /**
      * Offer to append a new member to the end of the queue
      */
-    boolean offer(Serializable o, int room, long timeout) throws InterruptedException;
+    boolean offer(Serializable o, int room, long timeout) throws InterruptedException, ObjectStoreException;
 
     /**
      * Poll the queue for its first member, and, if there is one, remove and return it
@@ -39,7 +41,7 @@ public interface QueueInfoDelegate
     /**
      * Restore a previously removed member to the front of the queue
      */
-    void untake(Serializable item) throws InterruptedException;
+    void untake(Serializable item) throws InterruptedException, ObjectStoreException;
 
     /**
      * Return the size of the queue
