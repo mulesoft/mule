@@ -318,18 +318,6 @@
 
     <xsd:group name="commonConfiguration">
         <xsd:sequence>
-            <xsd:element name="configuration-ref" minOccurs="0">
-                <xsd:annotation>
-                    <xsd:documentation>
-                        
-                    </xsd:documentation>
-                </xsd:annotation>
-                <xsd:complexType>
-                    <xsd:sequence>
-                        <xsd:element ref="configuration" minOccurs="0" maxOccurs="1"/>
-                    </xsd:sequence>
-                </xsd:complexType>
-            </xsd:element>
             <xsd:element name="databinding" type="databindingType" minOccurs="0">
                 <xsd:annotation>
                     <xsd:documentation>
