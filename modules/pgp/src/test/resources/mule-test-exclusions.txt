@@ -1,6 +1,3 @@
 #
 # Test cases listed in this file are not run.
 #
-
-# MULE-3672 / MULE-4720
-org.mule.module.pgp.PGPSecurityFilterTestCase

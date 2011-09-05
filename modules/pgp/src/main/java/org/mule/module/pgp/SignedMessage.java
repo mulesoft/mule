@@ -20,16 +20,16 @@ import org.bouncycastle.openpgp.PGPSecretKey;
 public class SignedMessage implements Message
 {
 
-    private LazyInputStream encryptedMessage;
+    private LazyTransformedInputStream encryptedMessage;
 
     public SignedMessage(InputStream toBeDecrypted,
                          PGPPublicKey publicKey,
                          PGPSecretKey secretKey,
                          String password) throws IOException
     {
-        OutputStreamWriter writer = new DecryptOutputStreamWriter(toBeDecrypted, publicKey, secretKey,
+        StreamTransformer transformer = new DecryptStreamTransformer(toBeDecrypted, publicKey, secretKey,
             password);
-        this.encryptedMessage = new LazyInputStream(writer);
+        this.encryptedMessage = new LazyTransformedInputStream(new TransformContinuouslyPolicy(), transformer);
     }
 
     public boolean verify()

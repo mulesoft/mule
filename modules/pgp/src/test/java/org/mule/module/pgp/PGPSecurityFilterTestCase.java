@@ -10,16 +10,14 @@
 
 package org.mule.module.pgp;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import org.mule.api.ExceptionPayload;
+import org.mule.api.MuleMessage;
+import org.mule.api.client.MuleClient;
+import org.mule.api.config.MuleProperties;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.util.IOUtils;
 
-import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Arrays;
@@ -29,19 +27,23 @@ import java.util.Map;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-import org.mule.api.ExceptionPayload;
-import org.mule.api.MuleMessage;
-import org.mule.api.config.MuleProperties;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
-import org.mule.util.FileUtils;
-import org.mule.util.IOUtils;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class PGPSecurityFilterTestCase extends AbstractServiceAndFlowTestCase
 {
     protected static final String TARGET = "/encrypted.txt";
     protected static final String DIRECTORY = "output";
-    protected static final String MESSAGE_EXCEPTION = "The required object/property \"UserId\" is null. Message payload is of type: String";
+    protected static final String MESSAGE_EXCEPTION = "Crypto Failure";
+
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "test-pgp-encrypt-config-service.xml"},
+            {ConfigVariant.FLOW, "test-pgp-encrypt-config-flow.xml"}});
+    }
 
     public PGPSecurityFilterTestCase(ConfigVariant variant, String configResources)
     {
@@ -54,56 +56,28 @@ public class PGPSecurityFilterTestCase extends AbstractServiceAndFlowTestCase
         return (AbstractEncryptionStrategyTestCase.isCryptographyExtensionInstalled() == false);
     }
 
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{{ConfigVariant.SERVICE, "test-pgp-encrypt-config-service.xml"},
-            {ConfigVariant.FLOW, "test-pgp-encrypt-config-flow.xml"}});
-    }
-
     @Test
     public void testAuthenticationAuthorised() throws Exception
     {
+        MuleClient client = muleContext.getClient();
+
         byte[] msg = loadEncryptedMessage();
+        Map<String, Object> props = createMessageProperties();
 
-        Map<String, String> props = new HashMap<String, String>();
-        props.put("TARGET_FILE", TARGET);
-        props.put(MuleProperties.MULE_USER_PROPERTY, "Mule server <mule_server@mule.com>");
+        client.dispatch("vm://echo", new String(msg), props);
 
-        MuleClient client = new MuleClient(muleContext);
-        MuleMessage reply = client.send("vm://echo", new String(msg), props);
-        assertNull(reply.getExceptionPayload());
+        MuleMessage message = client.request("vm://output", RECEIVE_TIMEOUT);
+        assertEquals("This is a test message.\r\nThis is another line.\r\n", message.getPayloadAsString());
+    }
 
-        // poll for the output file; wait for a max of 5 seconds
-        File pollingFile = null;
-        for (int i = 0; i < 5; i++)
-        {
-            pollingFile = new File(DIRECTORY + TARGET);
-            if (!pollingFile.exists())
-            {
-                Thread.sleep(1000);
-            }
-        }
-        pollingFile = null;
-
-        try
-        {
-            // check if file exists
-            FileReader outputFile = new FileReader(DIRECTORY + TARGET);
-            String fileContents = IOUtils.toString(outputFile);
-            outputFile.close();
-
-            // see the GenerateTestMessage class for the content of the message
-            assertTrue(fileContents.contains("This is a test message"));
-
-            // delete file not to be confused with tests to be performed later
-            File f = FileUtils.newFile(DIRECTORY + TARGET);
-            assertTrue("Deleting the output file failed", f.delete());
-        }
-        catch (FileNotFoundException fileNotFound)
-        {
-            fail("File not successfully created");
-        }
+    @Test
+    public void testAuthenticationNotAuthorised() throws Exception
+    {
+        Map<String, Object> props = createMessageProperties();
+        MuleMessage reply = muleContext.getClient().send("vm://echo", "An unsigned message", props);
+        assertNotNull(reply.getExceptionPayload());
+        ExceptionPayload excPayload = reply.getExceptionPayload();
+        assertEquals(MESSAGE_EXCEPTION, excPayload.getMessage());
     }
 
     private byte[] loadEncryptedMessage() throws IOException
@@ -117,16 +91,11 @@ public class PGPSecurityFilterTestCase extends AbstractServiceAndFlowTestCase
         return msg;
     }
 
-    // see MULE-3672
-    @Test
-    public void testAuthenticationNotAuthorised() throws Exception
+    private Map<String, Object> createMessageProperties()
     {
-        MuleClient client = new MuleClient(muleContext);
-
-        MuleMessage reply = client.send("vm://echo", "An unsigned message", null);
-
-        assertNotNull(reply.getExceptionPayload());
-        ExceptionPayload excPayload = reply.getExceptionPayload();
-        assertEquals(MESSAGE_EXCEPTION, excPayload.getMessage());
+        Map<String, Object> props = new HashMap<String, Object>();
+        props.put("TARGET_FILE", TARGET);
+        props.put(MuleProperties.MULE_USER_PROPERTY, "Mule server <mule_server@mule.com>");
+        return props;
     }
 }

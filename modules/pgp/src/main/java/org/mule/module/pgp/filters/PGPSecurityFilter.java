@@ -16,6 +16,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.security.Authentication;
 import org.mule.api.security.SecurityContext;
+import org.mule.api.security.SecurityException;
 import org.mule.api.security.UnauthorisedException;
 import org.mule.api.security.UnknownAuthenticationTypeException;
 import org.mule.config.i18n.CoreMessages;
@@ -29,17 +30,10 @@ import org.mule.module.pgp.SignedMessage;
 import org.mule.module.pgp.i18n.PGPMessages;
 import org.mule.security.AbstractEndpointSecurityFilter;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.bouncycastle.openpgp.PGPPublicKey;
 
 public class PGPSecurityFilter extends AbstractEndpointSecurityFilter
 {
-    /**
-     * logger used by this class
-     */
-    protected static final Log logger = LogFactory.getLog(PGPSecurityFilter.class);
-
     private EncryptionStrategy strategy;
 
     private String strategyName;
@@ -110,7 +104,7 @@ public class PGPSecurityFilter extends AbstractEndpointSecurityFilter
         }
         catch (Exception e2)
         {
-            throw new UnauthorisedException(event, context, endpoint.getEndpointURI().getUri(), this);
+            throw new UnauthorisedException(event, context, this);
         }
     }
 
@@ -170,7 +164,7 @@ public class PGPSecurityFilter extends AbstractEndpointSecurityFilter
     {
         if (strategyName != null)
         {
-            strategy = endpoint.getMuleContext().getSecurityManager().getEncryptionStrategy(strategyName);
+            strategy = muleContext.getSecurityManager().getEncryptionStrategy(strategyName);
         }
 
         if (strategy == null)
