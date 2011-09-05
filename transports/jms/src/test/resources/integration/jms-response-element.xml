@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xsi:schemaLocation="
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
+       http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/3.2/mule-test.xsd
+       http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/3.2/mule-jms.xsd
+       http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.2/mule-vm.xsd">
+
+    <!-- Reseponse tag in jms outbound endpoint -->
+    <flow name="vm-in-flow-case-1">
+        <vm:inbound-endpoint name="vm.in" path="vminbound" exchange-pattern="request-response"/>
+        <jms:outbound-endpoint queue="in" exchange-pattern="request-response">
+            <response>
+                <message-properties-transformer scope="outbound">
+                    <add-message-property key="test" value="test"/>
+                </message-properties-transformer>
+                <append-string-transformer message=" jms flow content" />
+            </response>
+        </jms:outbound-endpoint>
+    </flow>
+
+    <flow name="response-flow-case-1">
+        <jms:inbound-endpoint ref="in">
+        </jms:inbound-endpoint>
+        <test:component>
+            <test:return-data>A Message</test:return-data>
+        </test:component>
+    </flow>
+
+</mule>
