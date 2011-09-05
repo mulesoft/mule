@@ -44,7 +44,6 @@ import java.util.List;
 import javax.servlet.Servlet;
 import javax.servlet.http.HttpServlet;
 
-import org.apache.commons.logging.LogFactory;
 import org.mortbay.jetty.Connector;
 import org.mortbay.jetty.Handler;
 import org.mortbay.jetty.Server;
@@ -55,16 +54,12 @@ import org.mortbay.jetty.servlet.Context;
 import org.mortbay.jetty.servlet.ServletHolder;
 import org.mortbay.jetty.webapp.WebAppContext;
 import org.mortbay.jetty.webapp.WebInfConfiguration;
-import org.mortbay.log.Log;
-import org.mortbay.log.Logger;
 import org.mortbay.xml.XmlConfiguration;
-import org.slf4j.helpers.FormattingTuple;
-import org.slf4j.helpers.MessageFormatter;
 
 /**
- * The <code>JettyConnector</code> can be using to embed a Jetty server to receive requests on an http inound
- * endpoint. One server is created for each connector declared, many Jetty endpoints can share the same
- * connector.
+ * The <code>JettyConnector</code> can be using to embed a Jetty server to receive requests on an
+ * http inound endpoint. One server is created for each connector declared, many Jetty endpoints
+ * can share the same connector.
  */
 public class JettyHttpConnector extends AbstractConnector
 {
@@ -87,15 +82,6 @@ public class JettyHttpConnector extends AbstractConnector
     protected HashMap<String, ConnectorHolder> holders = new HashMap<String, ConnectorHolder>();
 
     private WebAppDeployer deployer;
-
-    protected static org.apache.commons.logging.Log logger = LogFactory.getLog(JettyHttpConnector.class);
-
-    static
-    {
-        // Set a custom logger that wraps uses of commons logging to avoid stack overflow when SlF4JLog is
-        // used (See MULE-5710)
-        Log.setLog(new JettyWrapperLogger());
-    }
 
     public JettyHttpConnector(MuleContext context)
     {
@@ -121,13 +107,14 @@ public class JettyHttpConnector extends AbstractConnector
                 final Connector c = getServer().getConnectors()[0];
                 if (handler instanceof WebAppContext)
                 {
-                    final WebAppContext webapp = (WebAppContext)handler;
-                    final String msg = String.format("Will deploy a web app at %s:/%s%s%s", "http",
-                        c.getHost(), c.getPort() == 80 ? StringUtils.EMPTY : ":" + c.getPort(),
-                        webapp.getContextPath());
+                    final WebAppContext webapp = (WebAppContext) handler;
+                    final String msg = String.format("Will deploy a web app at %s:/%s%s%s",
+                                                     "http", c.getHost(),
+                                                     c.getPort() == 80 ? StringUtils.EMPTY : ":" + c.getPort(),
+                                                     webapp.getContextPath());
 
                     final File workDir = new File(muleContext.getConfiguration().getWorkingDirectory(),
-                        "_exploded_wars" + webapp.getContextPath());
+                                                  "_exploded_wars" + webapp.getContextPath());
                     workDir.mkdirs();
                     webapp.setTempDirectory(workDir);
                     // TODO extract to a better constant
@@ -141,7 +128,7 @@ public class JettyHttpConnector extends AbstractConnector
                 super.addHandler(handler);
             }
         };
-
+        
         if (webappsConfiguration != null)
         {
             deployer = new WebAppDeployer();
@@ -149,8 +136,7 @@ public class JettyHttpConnector extends AbstractConnector
             if (StringUtils.isBlank(webAppDir))
             {
                 // if none specified, resolve defaults dynamically
-                final String appDir = muleContext.getRegistry().get(
-                    MuleProperties.APP_HOME_DIRECTORY_PROPERTY);
+                final String appDir = muleContext.getRegistry().get(MuleProperties.APP_HOME_DIRECTORY_PROPERTY);
                 webAppDir = appDir + "/webapps";
             }
 
@@ -158,8 +144,7 @@ public class JettyHttpConnector extends AbstractConnector
             {
                 // override only if user hasn't specified one (turn off file-mapped buffer for
                 // static files to avoid resource locking, makes webapp resources editable on the fly)
-                final URL muleDefaults = ClassUtils.getResource("org/mule/transport/jetty/webdefault.xml",
-                    getClass());
+                final URL muleDefaults = ClassUtils.getResource("org/mule/transport/jetty/webdefault.xml", getClass());
                 deployer.setDefaultsDescriptor(muleDefaults.toExternalForm());
             }
             deployer.setWebAppDir(webAppDir);
@@ -172,36 +157,35 @@ public class JettyHttpConnector extends AbstractConnector
             jettyConnector.setHost(webappsConfiguration.getHost());
             jettyConnector.setPort(webappsConfiguration.getPort());
             deployer.setContexts(httpServer);
-            String[] confClasses = new String[]{
+            String[] confClasses = new String[]
+            {
                 // configures webapp's classloader as a child of a Mule app classloader
                 WebInfConfiguration.class.getName(),
                 // just to get jetty going, we don't need java ee bindings. inherits annotation processing
-                DummyJndiConfiguration.class.getName()};
+                DummyJndiConfiguration.class.getName()
+            };
             deployer.setConfigurationClasses(confClasses);
 
             httpServer.addConnector(jettyConnector);
             httpServer.addLifeCycle(deployer);
         }
-
+        
         initialiseFromConfigFile();
 
         try
         {
-            muleContext.registerListener(new MuleContextNotificationListener<MuleContextNotification>()
-            {
+            muleContext.registerListener(new MuleContextNotificationListener<MuleContextNotification>(){
                 public void onNotification(MuleContextNotification notification)
                 {
                     if (notification.getAction() == MuleContextNotification.CONTEXT_STARTED)
                     {
-                        // We delay starting until the context has been started since we need the
-                        // MuleAjaxServlet to initialise first
+                        //We delay starting until the context has been started since we need the MuleAjaxServlet to initialise first
                         setInitialStateStopped(false);
                         try
                         {
                             start();
                             // update the agent displaying webapp urls to the user
-                            final JettyWebappServerAgent agent = (JettyWebappServerAgent)muleContext.getRegistry()
-                                .lookupAgent(JettyWebappServerAgent.NAME);
+                            final JettyWebappServerAgent agent = (JettyWebappServerAgent) muleContext.getRegistry().lookupAgent(JettyWebappServerAgent.NAME);
                             if (agent != null)
                             {
                                 agent.onJettyConnectorStarted(JettyHttpConnector.this);
@@ -233,8 +217,8 @@ public class JettyHttpConnector extends AbstractConnector
             InputStream is = IOUtils.getResourceAsStream(configFile, getClass());
             XmlConfiguration config = new XmlConfiguration(is);
 
-            String appHome = muleContext.getRegistry().lookupObject(
-                MuleProperties.APP_HOME_DIRECTORY_PROPERTY);
+            String appHome =
+                muleContext.getRegistry().lookupObject(MuleProperties.APP_HOME_DIRECTORY_PROPERTY);
             if (appHome == null)
             {
                 // Mule IDE sets app.home as part of the launch config it creates
@@ -255,8 +239,8 @@ public class JettyHttpConnector extends AbstractConnector
     }
 
     /**
-     * Template method to dispose any resources associated with this receiver. There is not need to dispose
-     * the connector as this is already done by the framework
+     * Template method to dispose any resources associated with this receiver. There
+     * is not need to dispose the connector as this is already done by the framework
      */
     @Override
     protected void doDispose()
@@ -270,12 +254,12 @@ public class JettyHttpConnector extends AbstractConnector
         try
         {
             httpServer.start();
-
+            
             if (deployer != null)
             {
                 deployer.start();
             }
-
+            
             for (ConnectorHolder<?, ?> contextHolder : holders.values())
             {
                 contextHolder.start();
@@ -293,12 +277,12 @@ public class JettyHttpConnector extends AbstractConnector
         try
         {
             httpServer.stop();
-
+            
             if (deployer != null)
             {
                 deployer.stop();
             }
-
+            
             for (ConnectorHolder<?, ?> connectorRef : holders.values())
             {
                 connectorRef.stop();
@@ -312,29 +296,29 @@ public class JettyHttpConnector extends AbstractConnector
 
     /**
      * Template method where any connections should be made for the connector
-     * 
+     *
      * @throws Exception
      */
     @Override
     protected void doConnect() throws Exception
     {
-        // do nothing
+        //do nothing
     }
 
     /**
-     * Template method where any connected resources used by the connector should be disconnected
-     * 
+     * Template method where any connected resources used by the connector should be
+     * disconnected
+     *
      * @throws Exception
      */
     @Override
     protected void doDisconnect() throws Exception
     {
-        // do nothing
+        //do nothing
     }
 
-    @Override
-    protected MessageReceiver createReceiver(FlowConstruct flowConstruct, InboundEndpoint endpoint)
-        throws Exception
+     @Override
+    protected MessageReceiver createReceiver(FlowConstruct flowConstruct, InboundEndpoint endpoint) throws Exception
     {
         MessageReceiver receiver = super.createReceiver(flowConstruct, endpoint);
         registerJettyEndpoint(receiver, endpoint);
@@ -410,9 +394,7 @@ public class JettyHttpConnector extends AbstractConnector
         this.useContinuations = useContinuations;
     }
 
-    ConnectorHolder<? extends MuleReceiverServlet, ? extends JettyHttpMessageReceiver> registerJettyEndpoint(MessageReceiver receiver,
-                                                                                                             InboundEndpoint endpoint)
-        throws MuleException
+    ConnectorHolder<? extends MuleReceiverServlet, ? extends JettyHttpMessageReceiver> registerJettyEndpoint(MessageReceiver receiver, InboundEndpoint endpoint) throws MuleException
     {
         // Make sure that there is a connector for the requested endpoint.
         String connectorKey = getHolderKey(endpoint);
@@ -430,8 +412,7 @@ public class JettyHttpConnector extends AbstractConnector
                 String host = endpoint.getEndpointURI().getHost();
                 if ("localhost".equalsIgnoreCase(host))
                 {
-                    // We default to binding the port on all local network interfaces if localhost is set.
-                    // This
+                    // We default to binding the port on all local network interfaces if localhost is set.  This
                     // is the same behaviour as all other socket connectors in Mule
                     host = "0.0.0.0";
                 }
@@ -440,7 +421,7 @@ public class JettyHttpConnector extends AbstractConnector
 
                 holder = createContextHolder(connector, receiver.getEndpoint(), receiver);
                 holders.put(connectorKey, holder);
-                if (isStarted())
+                if(isStarted())
                 {
                     holder.start();
                 }
@@ -453,12 +434,9 @@ public class JettyHttpConnector extends AbstractConnector
         return holder;
     }
 
-    protected ConnectorHolder createContextHolder(Connector connector,
-                                                  InboundEndpoint endpoint,
-                                                  MessageReceiver receiver)
+    protected ConnectorHolder createContextHolder(Connector connector, InboundEndpoint endpoint, MessageReceiver receiver)
     {
-        return new MuleReceiverConnectorHolder(connector, (JettyReceiverServlet)createServlet(connector,
-            endpoint), (JettyHttpMessageReceiver)receiver);
+        return new MuleReceiverConnectorHolder(connector, (JettyReceiverServlet) createServlet(connector, endpoint), (JettyHttpMessageReceiver)receiver);
     }
 
     protected Servlet createServlet(Connector connector, ImmutableEndpoint endpoint)
@@ -466,7 +444,7 @@ public class JettyHttpConnector extends AbstractConnector
         HttpServlet servlet;
         if (getReceiverServlet() == null)
         {
-            if (isUseContinuations())
+            if(isUseContinuations())
             {
                 servlet = new JettyContinuationsReceiverServlet();
             }
@@ -481,7 +459,7 @@ public class JettyHttpConnector extends AbstractConnector
         }
 
         String path = endpoint.getEndpointURI().getPath();
-        if (StringUtils.isBlank(path))
+        if(StringUtils.isBlank(path))
         {
             path = ROOT;
         }
@@ -508,72 +486,14 @@ public class JettyHttpConnector extends AbstractConnector
 
     protected String getHolderKey(ImmutableEndpoint endpoint)
     {
-        return endpoint.getProtocol() + ":" + endpoint.getEndpointURI().getHost() + ":"
-               + endpoint.getEndpointURI().getPort();
+        return endpoint.getProtocol() + ":" + endpoint.getEndpointURI().getHost() + ":" + endpoint.getEndpointURI().getPort();
     }
 
-    private static final class JettyWrapperLogger implements Logger
-    {
-        @Override
-        public void warn(String format, Object arg0, Object arg1)
-        {
-            FormattingTuple ft = MessageFormatter.format(format, arg0, arg1);
-            logger.warn(ft.getMessage(), ft.getThrowable());
-        }
-
-        @Override
-        public void warn(String msg, Throwable th)
-        {
-            logger.warn(msg, th);
-        }
-
-        @Override
-        public void setDebugEnabled(boolean enabled)
-        {
-            // no-op
-        }
-
-        @Override
-        public boolean isDebugEnabled()
-        {
-            return logger.isDebugEnabled();
-        }
-
-        @Override
-        public void info(String format, Object arg0, Object arg1)
-        {
-            FormattingTuple ft = MessageFormatter.format(format, arg0, arg1);
-            logger.info(ft.getMessage(), ft.getThrowable());
-        }
-
-        @Override
-        public Logger getLogger(String name)
-        {
-            return this;
-        }
-
-        @Override
-        public void debug(String format, Object arg0, Object arg1)
-        {
-            FormattingTuple ft = MessageFormatter.format(format, arg0, arg1);
-            logger.warn(ft.getMessage(), ft.getThrowable());
-        }
-
-        @Override
-        public void debug(String msg, Throwable th)
-        {
-            logger.debug(msg, th);
-        }
-    }
-
-    public class MuleReceiverConnectorHolder extends
-        AbstractConnectorHolder<JettyReceiverServlet, JettyHttpMessageReceiver>
+    public class MuleReceiverConnectorHolder extends AbstractConnectorHolder<JettyReceiverServlet, JettyHttpMessageReceiver>
     {
         List<MessageReceiver> messageReceivers = new ArrayList<MessageReceiver>();
 
-        public MuleReceiverConnectorHolder(Connector connector,
-                                           JettyReceiverServlet servlet,
-                                           JettyHttpMessageReceiver receiver)
+        public MuleReceiverConnectorHolder(Connector connector, JettyReceiverServlet servlet, JettyHttpMessageReceiver receiver)
         {
             super(connector, servlet, receiver);
             addReceiver(receiver);
@@ -587,7 +507,7 @@ public class JettyHttpConnector extends AbstractConnector
         public void addReceiver(JettyHttpMessageReceiver receiver)
         {
             messageReceivers.add(receiver);
-            if (started)
+            if(started)
             {
                 getServlet().addReceiver(receiver);
             }
@@ -603,7 +523,7 @@ public class JettyHttpConnector extends AbstractConnector
         public void start() throws MuleException
         {
             super.start();
-
+            
             for (MessageReceiver receiver : messageReceivers)
             {
                 servlet.addReceiver(receiver);
@@ -643,8 +563,7 @@ public class JettyHttpConnector extends AbstractConnector
     }
 
     /**
-     * A helper method to differentiate between jetty-based connectors which can host full wars and ones which
-     * can't.
+     * A helper method to differentiate between jetty-based connectors which can host full wars and ones which can't.
      */
     public boolean canHostFullWars()
     {
