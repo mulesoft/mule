@@ -19,6 +19,7 @@ import org.mule.management.stats.QueueStatistics;
 import org.mule.management.stats.QueueStatisticsAware;
 import org.mule.processor.AsyncInterceptingMessageProcessor;
 import org.mule.processor.SedaStageInterceptingMessageProcessor;
+import org.mule.util.concurrent.ThreadNameHelper;
 import org.mule.util.queue.QueueManager;
 
 import java.io.Serializable;
@@ -40,7 +41,7 @@ public class QueuedAsynchronousProcessingStrategy extends AsynchronousProcessing
     protected QueueStatistics queueStatistics;
 
     @Override
-    protected AsyncInterceptingMessageProcessor createAsyncMessageProcessor(ThreadNameSource nameSource,
+    protected AsyncInterceptingMessageProcessor createAsyncMessageProcessor(StageNameSource nameSource,
                                                                             MuleContext muleContext)
     {
         Integer timeout = queueTimeout != null ? queueTimeout : muleContext.getConfiguration()
@@ -50,8 +51,9 @@ public class QueuedAsynchronousProcessingStrategy extends AsynchronousProcessing
 
         QueueProfile queueProfile = new QueueProfile(maxQueueSize, queueStore);
         ThreadingProfile threadingProfile = createThreadingProfile(muleContext);
-        return new SedaStageInterceptingMessageProcessor(nameSource.getName(), queueProfile, timeout,
-            threadingProfile, queueStatistics, muleContext);
+        String stageName = nameSource.getName();
+        return new SedaStageInterceptingMessageProcessor(ThreadNameHelper.flow(muleContext, stageName),
+            stageName, queueProfile, timeout, threadingProfile, queueStatistics, muleContext);
     }
 
     protected void initQueueStore(MuleContext muleContext)

@@ -169,7 +169,7 @@ public class FlowProcessingStrategyConfigTestCase extends FunctionalTestCase
 
         @Override
         public void configureProcessors(List<MessageProcessor> processors,
-                                        ThreadNameSource nameSource,
+                                        StageNameSource nameSource,
                                         MessageProcessorChainBuilder chainBuilder,
                                         MuleContext muleContext)
         {

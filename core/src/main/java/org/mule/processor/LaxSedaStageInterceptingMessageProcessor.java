@@ -33,13 +33,14 @@ public class LaxSedaStageInterceptingMessageProcessor extends SedaStageIntercept
 {
 
     public LaxSedaStageInterceptingMessageProcessor(String name,
+                                                    String queueName,
                                                     QueueProfile queueProfile,
                                                     int queueTimeout,
                                                     ThreadingProfile threadingProfile,
                                                     QueueStatistics queueStatistics,
                                                     MuleContext muleContext)
     {
-        super(name, queueProfile, queueTimeout, threadingProfile, queueStatistics, muleContext);
+        super(name, queueName, queueProfile, queueTimeout, threadingProfile, queueStatistics, muleContext);
     }
 
     @Override

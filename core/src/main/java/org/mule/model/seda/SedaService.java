@@ -85,7 +85,8 @@ public class SedaService extends AbstractService
         if (getThreadingProfile().isDoThreading())
         {
             sedaStage = new LaxSedaStageInterceptingMessageProcessor(ThreadNameHelper.sedaService(
-                muleContext, getName()), queueProfile, queueTimeout, threadingProfile, stats, muleContext);
+                muleContext, getName()), getName(), queueProfile, queueTimeout, threadingProfile, stats,
+                muleContext);
             builder.chain(sedaStage);
         }
         builder.chain(new ServiceInternalMessageProcessor(this));

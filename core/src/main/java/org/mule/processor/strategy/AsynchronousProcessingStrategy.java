@@ -17,6 +17,7 @@ import org.mule.api.processor.MessageProcessorChainBuilder;
 import org.mule.api.processor.ProcessingStrategy;
 import org.mule.config.ChainedThreadingProfile;
 import org.mule.processor.AsyncInterceptingMessageProcessor;
+import org.mule.util.concurrent.ThreadNameHelper;
 
 import java.util.List;
 
@@ -39,22 +40,23 @@ public class AsynchronousProcessingStrategy implements ProcessingStrategy
 
     @Override
     public void configureProcessors(List<MessageProcessor> processors,
-                                    ThreadNameSource nameSource,
+                                    StageNameSource nameSource,
                                     MessageProcessorChainBuilder chainBuilder,
                                     MuleContext muleContext)
     {
         if (processors.size() > 0)
         {
             chainBuilder.chain(createAsyncMessageProcessor(nameSource, muleContext));
-            synchronousProcessingStrategy.configureProcessors(processors, nameSource, chainBuilder, muleContext);
+            synchronousProcessingStrategy.configureProcessors(processors, nameSource, chainBuilder,
+                muleContext);
         }
     }
 
-    protected AsyncInterceptingMessageProcessor createAsyncMessageProcessor(ThreadNameSource nameSource,
+    protected AsyncInterceptingMessageProcessor createAsyncMessageProcessor(StageNameSource nameSource,
                                                                             MuleContext muleContext)
     {
-        return new AsyncInterceptingMessageProcessor(createThreadingProfile(muleContext),
-            nameSource.getName(), muleContext.getConfiguration().getShutdownTimeout());
+        return new AsyncInterceptingMessageProcessor(createThreadingProfile(muleContext), getThreadPoolName(
+            nameSource.getName(), muleContext), muleContext.getConfiguration().getShutdownTimeout());
     }
 
     protected ThreadingProfile createThreadingProfile(MuleContext muleContext)
@@ -69,6 +71,11 @@ public class AsynchronousProcessingStrategy implements ProcessingStrategy
         if (poolExhaustedAction != null) threadingProfile.setPoolExhaustedAction(poolExhaustedAction);
         threadingProfile.setMuleContext(muleContext);
         return threadingProfile;
+    }
+
+    protected String getThreadPoolName(String stageName, MuleContext muleContext)
+    {
+        return ThreadNameHelper.flow(muleContext, stageName);
     }
 
     public Integer getMaxThreads()

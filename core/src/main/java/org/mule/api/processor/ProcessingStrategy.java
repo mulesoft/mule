@@ -21,11 +21,11 @@ public interface ProcessingStrategy
 {
 
     public void configureProcessors(List<MessageProcessor> processors,
-                                    ThreadNameSource nameSource,
+                                    StageNameSource nameSource,
                                     MessageProcessorChainBuilder chainBuilder,
                                     MuleContext muleContext);
 
-    public interface ThreadNameSource
+    public interface StageNameSource
     {
         String getName();
     }

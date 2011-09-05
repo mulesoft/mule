@@ -28,7 +28,7 @@ public class ThreadPerProcessorProcessingStrategy extends AsynchronousProcessing
 
     @Override
     public void configureProcessors(List<MessageProcessor> processors,
-                                    ThreadNameSource nameSource,
+                                    StageNameSource nameSource,
                                     MessageProcessorChainBuilder builder,
                                     MuleContext muleContext)
     {

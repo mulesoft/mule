@@ -46,8 +46,8 @@ import javax.resource.spi.work.Work;
 import javax.resource.spi.work.WorkException;
 
 /**
- * Processes {@link MuleEvent}'s asynchronously using a {@link MuleWorkManager} to
- * schedule asynchronous processing of the next {@link MessageProcessor}.
+ * Processes {@link MuleEvent}'s asynchronously using a {@link MuleWorkManager} to schedule asynchronous
+ * processing of the next {@link MessageProcessor}.
  */
 public class SedaStageInterceptingMessageProcessor extends AsyncInterceptingMessageProcessor
     implements Work, Lifecycle, Pausable, Resumable
@@ -57,26 +57,27 @@ public class SedaStageInterceptingMessageProcessor extends AsyncInterceptingMess
     protected QueueProfile queueProfile;
     protected int queueTimeout;
     protected QueueStatistics queueStatistics;
-    protected String name;
+    protected String queueName;
     protected Queue queue;
     protected QueueConfiguration queueConfiguration;
     private WaitableBoolean running = new WaitableBoolean(false);
     protected SedaStageLifecycleManager lifecycleManager;
 
-    public SedaStageInterceptingMessageProcessor(String name,
+    public SedaStageInterceptingMessageProcessor(String threadName,
+                                                 String queueName,
                                                  QueueProfile queueProfile,
                                                  int queueTimeout,
                                                  ThreadingProfile threadingProfile,
                                                  QueueStatistics queueStatistics,
                                                  MuleContext muleContext)
     {
-        super(threadingProfile, name, muleContext.getConfiguration().getShutdownTimeout());
-        this.name = name;
+        super(threadingProfile, threadName, muleContext.getConfiguration().getShutdownTimeout());
+        this.queueName = queueName;
         this.queueProfile = queueProfile;
         this.queueTimeout = queueTimeout;
         this.queueStatistics = queueStatistics;
         this.muleContext = muleContext;
-        lifecycleManager = new SedaStageLifecycleManager(name, this);
+        lifecycleManager = new SedaStageLifecycleManager(queueName, this);
     }
 
     @Override
@@ -129,7 +130,7 @@ public class SedaStageInterceptingMessageProcessor extends AsyncInterceptingMess
                 getStageDescription(), queueTimeout));
         }
 
-        MuleEvent event = (MuleEvent) queue.poll(queueTimeout);
+        MuleEvent event = (MuleEvent)queue.poll(queueTimeout);
         // If the service has been paused why the poll was waiting for an event to
         // arrive on the queue,
         // we put the object back on the queue
@@ -142,9 +143,10 @@ public class SedaStageInterceptingMessageProcessor extends AsyncInterceptingMess
     }
 
     /**
-     * Roll back the previous dequeue(), i.e., put the event at the front of the queue, not at the back which is what enqueue() does.
+     * Roll back the previous dequeue(), i.e., put the event at the front of the queue, not at the back which
+     * is what enqueue() does.
      */
-    protected void rollbackDequeue(MuleEvent event) 
+    protected void rollbackDequeue(MuleEvent event)
     {
         if (logger.isDebugEnabled())
         {
@@ -186,12 +188,13 @@ public class SedaStageInterceptingMessageProcessor extends AsyncInterceptingMess
                 }
                 else
                 {
-                    exceptionListener.handleException(new MessagingException(
-                        CoreMessages.eventProcessingFailedFor(getStageDescription()), event, e), event);
+                    exceptionListener.handleException(
+                        new MessagingException(CoreMessages.eventProcessingFailedFor(getStageDescription()),
+                            event, e), event);
                 }
             }
         }
-        
+
         public void doWork() throws MuleException
         {
             processNextTimed(event);
@@ -199,8 +202,7 @@ public class SedaStageInterceptingMessageProcessor extends AsyncInterceptingMess
     }
 
     /**
-     * While the service isn't stopped this runs a continuous loop checking for new
-     * events in the queue.
+     * While the service isn't stopped this runs a continuous loop checking for new events in the queue.
      */
     public void run()
     {
@@ -241,7 +243,7 @@ public class SedaStageInterceptingMessageProcessor extends AsyncInterceptingMess
                     }
                 }
 
-                event = (DefaultMuleEvent) dequeue();
+                event = (DefaultMuleEvent)dequeue();
             }
             catch (InterruptedException ie)
             {
@@ -254,55 +256,58 @@ public class SedaStageInterceptingMessageProcessor extends AsyncInterceptingMess
 
             if (event != null)
             {
-                    if (isStatsEnabled())
-                    {
-                        queueStatistics.decQueuedEvent();
-                    }
+                if (isStatsEnabled())
+                {
+                    queueStatistics.decQueuedEvent();
+                }
 
-                    if (logger.isDebugEnabled())
+                if (logger.isDebugEnabled())
+                {
+                    logger.debug(MessageFormat.format("{0}: Dequeued event from {1}", getStageDescription(),
+                        getQueueName()));
+                }
+                SedaStageWorker work = new SedaStageWorker(event);
+                if (doThreading)
+                {
+                    try
                     {
-                        logger.debug(MessageFormat.format("{0}: Dequeued event from {1}",
-                            getStageDescription(), getQueueName()));
+                        // TODO Remove this thread handoff to ensure Zero Message Loss
+                        workManagerSource.getWorkManager().scheduleWork(work, WorkManager.INDEFINITE, null,
+                            new AsyncWorkListener(next));
                     }
-                    SedaStageWorker work = new SedaStageWorker(event);
-                    if (doThreading)
+                    catch (Exception e)
                     {
-                        try
-                        {
-                            // TODO Remove this thread handoff to ensure Zero Message Loss
-                            workManagerSource.getWorkManager().scheduleWork(work, WorkManager.INDEFINITE, null,
-                                new AsyncWorkListener(next));
-                        }
-                        catch (Exception e)
-                        {
-                            // This is a work manager exception, not a Mule event-related exception
-                            event.getFlowConstruct().getExceptionListener().handleException(e, event);
-                        }
+                        // This is a work manager exception, not a Mule event-related exception
+                        event.getFlowConstruct().getExceptionListener().handleException(e, event);
                     }
-                    else
+                }
+                else
+                {
+                    try
                     {
-                        try
+                        work.doWork();
+                    }
+                    catch (MuleException e)
+                    {
+                        MessagingExceptionHandler exceptionListener = event.getFlowConstruct()
+                            .getExceptionListener();
+                        if (e instanceof MessagingException)
                         {
-                            work.doWork();
+                            exceptionListener.handleException(e, event);
                         }
-                        catch (MuleException e)
+                        else
                         {
-                            MessagingExceptionHandler exceptionListener = event.getFlowConstruct().getExceptionListener();
-                            if (e instanceof MessagingException)
-                            {
-                                exceptionListener.handleException(e, event);
-                            }
-                            else
-                            {
-                                exceptionListener.handleException(new MessagingException(
-                                    CoreMessages.eventProcessingFailedFor(getStageDescription()), event, e), event);
-                            }
+                            exceptionListener.handleException(
+                                new MessagingException(
+                                    CoreMessages.eventProcessingFailedFor(getStageDescription()), event, e),
+                                event);
+                        }
 
-                            // TODO Enable this to ensure Zero Message Loss 
-                            //      (although it will cause an infinite loop without some kind of redelivery policy)
-                            //rollbackDequeue(event);
-                        }
+                        // TODO Enable this to ensure Zero Message Loss
+                        // (although it will cause an infinite loop without some kind of redelivery policy)
+                        // rollbackDequeue(event);
                     }
+                }
             }
         }
         running.set(false);
@@ -326,13 +331,13 @@ public class SedaStageInterceptingMessageProcessor extends AsyncInterceptingMess
 
     protected String getStageName()
     {
-        if (name != null)
+        if (queueName != null)
         {
-            return name;
+            return queueName;
         }
         else if (next instanceof NameableObject)
         {
-            return ((NameableObject) next).getName();
+            return ((NameableObject)next).getName();
         }
         else
         {
@@ -376,7 +381,8 @@ public class SedaStageInterceptingMessageProcessor extends AsyncInterceptingMess
                         "Next message processor cannot be null with this InterceptingMessageProcessor");
                 }
                 // Setup event Queue
-                queueConfiguration = queueProfile.configureQueue(getMuleContext(), getQueueName(), muleContext.getQueueManager());
+                queueConfiguration = queueProfile.configureQueue(getMuleContext(), getQueueName(),
+                    muleContext.getQueueManager());
                 queue = muleContext.getQueueManager().getQueueSession().getQueue(getQueueName());
                 if (queue == null)
                 {

@@ -25,8 +25,8 @@ import org.mule.api.MuleException;
 import org.mule.api.context.WorkManager;
 import org.mule.api.context.WorkManagerSource;
 import org.mule.api.processor.MessageProcessor;
-import org.mule.api.processor.ProcessingStrategy.ThreadNameSource;
 import org.mule.api.transaction.Transaction;
+import org.mule.construct.Flow;
 import org.mule.processor.strategy.AsynchronousProcessingStrategy;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.mule.TestTransaction;
@@ -174,15 +174,9 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractMuleContextTe
         throws Exception
     {
         AsyncDelegateMessageProcessor mp = new AsyncDelegateMessageProcessor(listener,
-            new AsynchronousProcessingStrategy(), new ThreadNameSource()
-            {
-                @Override
-                public String getName()
-                {
-                    return "thread";
-                }
-            });
+            new AsynchronousProcessingStrategy(), "thread");
         mp.setMuleContext(muleContext);
+        mp.setFlowConstruct(new Flow("flow", muleContext));
         mp.initialise();
         return mp;
     }
