@@ -17,6 +17,7 @@ import java.security.SecureRandom;
 import java.util.Date;
 import java.util.concurrent.atomic.AtomicLong;
 
+import org.apache.commons.lang.Validate;
 import org.bouncycastle.bcpg.ArmoredOutputStream;
 import org.bouncycastle.openpgp.PGPCompressedData;
 import org.bouncycastle.openpgp.PGPCompressedDataGenerator;
@@ -26,10 +27,10 @@ import org.bouncycastle.openpgp.PGPLiteralData;
 import org.bouncycastle.openpgp.PGPLiteralDataGenerator;
 import org.bouncycastle.openpgp.PGPPublicKey;
 
-public class EncryptOutputStreamWriter implements OutputStreamWriter
+public class EncryptStreamTransformer implements StreamTransformer
 {
     private static final long offset = 1 << 24;
-    
+
     private InputStream toBeEncrypted;
     private PGPPublicKey publicKey;
 
@@ -39,8 +40,11 @@ public class EncryptOutputStreamWriter implements OutputStreamWriter
     private OutputStream armoredOut;
     private long bytesWrote;
 
-    public EncryptOutputStreamWriter(InputStream toBeEncrypted, PGPPublicKey publicKey) throws IOException
+    public EncryptStreamTransformer(InputStream toBeEncrypted, PGPPublicKey publicKey) throws IOException
     {
+        Validate.notNull(toBeEncrypted, "The toBeEncrypted should not be null");
+        Validate.notNull(publicKey, "The publicKey should not be null");
+
         this.toBeEncrypted = toBeEncrypted;
         this.publicKey = publicKey;
         this.bytesWrote = 0;
@@ -49,6 +53,7 @@ public class EncryptOutputStreamWriter implements OutputStreamWriter
     /**
      * {@inheritDoc}
      */
+    @Override
     public void initialize(OutputStream out) throws Exception
     {
         armoredOut = new ArmoredOutputStream(out);
@@ -68,12 +73,13 @@ public class EncryptOutputStreamWriter implements OutputStreamWriter
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean write(OutputStream out, AtomicLong bytesRequested) throws Exception
     {
         int len = 0;
         byte[] buf = new byte[1 << 16];
         boolean wroteSomething = false;
-        
+
         while (bytesRequested.get() + offset > bytesWrote && (len = this.toBeEncrypted.read(buf)) > 0)
         {
             pgpOutputStream.write(buf, 0, len);
