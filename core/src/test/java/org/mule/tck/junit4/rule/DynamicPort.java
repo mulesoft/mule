@@ -27,20 +27,8 @@ import org.junit.rules.ExternalResource;
  * In order to use static dynamic ports:
  * <p/>
  * <pre>
- *     private static DynamicPort dynamicPort;
- *
- *     @BeforeClass
- *     public static void createDynamicPort() throws Throwable
- *     {
- *         dynamicPort = new DynamicPort("port1");
- *         dynamicPort.before();
- *     }
- *
- *     @AfterClass
- *     public static void releaseDynamicPort()
- *     {
- *         dynamicPort.after();
- *     }
+ *     @ClassRule
+ *     public static DynamicPort dynamicPort;
  * </pre>
  */
 public class DynamicPort extends ExternalResource

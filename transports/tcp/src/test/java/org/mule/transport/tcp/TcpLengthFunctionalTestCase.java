@@ -15,7 +15,7 @@ import org.mule.module.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
-import org.junit.Rule;
+import org.junit.ClassRule;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -26,14 +26,14 @@ public class TcpLengthFunctionalTestCase extends FunctionalTestCase
     protected static String TEST_MESSAGE = "Test TCP Request";
     private int timeout = 60 * 1000 / 20;
 
-    @Rule
-    public DynamicPort dynamicPort1 = new DynamicPort("port1");
+    @ClassRule
+    public static DynamicPort dynamicPort1 = new DynamicPort("port1");
 
-    @Rule
-    public DynamicPort dynamicPort2 = new DynamicPort("port2");
+    @ClassRule
+    public static DynamicPort dynamicPort2 = new DynamicPort("port2");
 
-    @Rule
-    public DynamicPort dynamicPort3 = new DynamicPort("port3");
+    @ClassRule
+    public static DynamicPort dynamicPort3 = new DynamicPort("port3");
     
     public TcpLengthFunctionalTestCase()
     {

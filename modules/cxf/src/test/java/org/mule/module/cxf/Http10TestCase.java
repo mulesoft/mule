@@ -19,8 +19,7 @@ import org.mule.transport.http.HttpConstants;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
+import org.junit.ClassRule;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -28,8 +27,9 @@ import static org.junit.Assert.assertFalse;
 
 public class Http10TestCase extends FunctionalTestCase
 {
-    // Dynamic ports is static because test is using setDisposeContextPerClass(true);
-    private static DynamicPort dynamicPort;
+
+    @ClassRule
+    public static DynamicPort dynamicPort = new DynamicPort("port1");
 
     public Http10TestCase()
     {
@@ -40,19 +40,6 @@ public class Http10TestCase extends FunctionalTestCase
     protected String getConfigResources()
     {
         return "http-10-conf.xml";
-    }
-
-    @BeforeClass
-    public static void createDynamicPort() throws Throwable
-    {
-        dynamicPort = new DynamicPort("port1");
-        dynamicPort.before();
-    }
-
-    @AfterClass
-    public static void releaseDynamicPort()
-    {
-        dynamicPort.after();
     }
 
     @Test

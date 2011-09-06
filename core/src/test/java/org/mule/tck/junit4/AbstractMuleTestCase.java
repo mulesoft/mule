@@ -36,8 +36,8 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.Rule;
-import org.junit.rules.MethodRule;
 import org.junit.rules.TestName;
+import org.junit.rules.TestRule;
 import org.junit.rules.Timeout;
 
 import static org.junit.Assume.assumeThat;
@@ -97,7 +97,7 @@ public abstract class AbstractMuleTestCase
     public TestName name = new TestName();
 
     @Rule
-    public MethodRule globalTimeout = createTestTimeoutRule();
+    public TestRule globalTimeout = createTestTimeoutRule();
 
     public AbstractMuleTestCase()
     {
@@ -112,7 +112,7 @@ public abstract class AbstractMuleTestCase
      *
      * @return the rule used to check for test execution timeouts.
      */
-    protected MethodRule createTestTimeoutRule()
+    protected TestRule createTestTimeoutRule()
     {
         int millisecondsTimeout = getTestTimeoutSecs() * 1000;
 

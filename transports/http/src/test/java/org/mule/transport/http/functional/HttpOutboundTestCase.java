@@ -20,8 +20,7 @@ import java.util.StringTokenizer;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
+import org.junit.ClassRule;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -30,8 +29,8 @@ import static org.junit.Assert.assertTrue;
 public class HttpOutboundTestCase extends AbstractMockHttpServerTestCase
 {
 
-    // Dynamic port is static because test is using setDisposeContextPerClass(true);
-    private static DynamicPort dynamicPort = new DynamicPort("port1");
+    @ClassRule
+    public static DynamicPort dynamicPort = new DynamicPort("port1");
 
     private Latch testLatch = new Latch();
     private String httpMethod;
@@ -45,19 +44,6 @@ public class HttpOutboundTestCase extends AbstractMockHttpServerTestCase
     protected String getConfigResources()
     {
         return "http-outbound-config.xml";
-    }
-
-    @BeforeClass
-    public static void createDynamicPort() throws Throwable
-    {
-        dynamicPort = new DynamicPort("port1");
-        dynamicPort.before();
-    }
-
-    @AfterClass
-    public static void releaseDynamicPort()
-    {
-        dynamicPort.after();
     }
 
     @Override
