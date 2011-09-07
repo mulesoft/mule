@@ -443,7 +443,6 @@
 # /examples/mule-example-launcher
 #
 /mule-standalone-${productVersion}/examples/mule-example-launcher
-/mule-standalone-${productVersion}/examples/mule-example-launcher/build.xml
 /mule-standalone-${productVersion}/examples/mule-example-launcher/mule-example-launcher-${productVersion}.zip
 /mule-standalone-${productVersion}/examples/mule-example-launcher/pom.xml
 /mule-standalone-${productVersion}/examples/mule-example-launcher/README.txt
