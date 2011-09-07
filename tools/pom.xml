@@ -14,7 +14,6 @@
 
     <modules>
         <module>bobberplus</module>
-        <module>ibean-archetype</module>
         <module>mule-transport-archetype</module>
         <module>mule-project-archetype</module>
         <module>mule-module-archetype</module>
