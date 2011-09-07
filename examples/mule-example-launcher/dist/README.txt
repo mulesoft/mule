@@ -26,10 +26,9 @@ http://localhost:18082/examples/
 +----------------------+
 | Building the example |
 +----------------------+
-The Ant and Maven build files are provided, but it is not necessary to build the example in order to run it.
+The Maven build files are provided, but it is not necessary to build the example in order to run it.
 
-Depending on the build tool you are using (Ant or Maven), you can build the example
-by simply running "ant" or "mvn".  This will compile the example classes and produce
+You can build the example by simply running "mvn".  This will compile the example classes and produce
 an application archive file.
 
 ** IMPORTANT **
