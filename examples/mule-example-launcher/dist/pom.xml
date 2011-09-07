@@ -103,6 +103,11 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-rss</artifactId>
+            <version>${muleVersion}</version>
+        </dependency>
+        <dependency>
         	<groupId>net.htmlparser.jericho</groupId>
         	<artifactId>jericho-html</artifactId>
         	<version>3.2</version>
