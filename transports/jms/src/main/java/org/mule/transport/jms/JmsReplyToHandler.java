@@ -21,6 +21,7 @@ import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.DispatchException;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.management.stats.ServiceStatistics;
+import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transport.DefaultReplyToHandler;
 import org.mule.transport.jms.i18n.JmsMessages;
 import org.mule.transport.jms.transformers.ObjectToJMSMessage;
@@ -84,14 +85,14 @@ public class JmsReplyToHandler extends DefaultReplyToHandler
             }
 
             Class srcType = returnMessage.getPayload().getClass();
-            EndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder("jms://temporary", muleContext);
+
+            EndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(String.format("%s://temporary",connector.getProtocol()), muleContext);
             endpointBuilder.setConnector(jmsConnector);
             OutboundEndpoint tempEndpoint = muleContext.getEndpointFactory().getOutboundEndpoint(endpointBuilder);
             
             List<Transformer> defaultTransportTransformers =  ((org.mule.transport.AbstractConnector) jmsConnector).getDefaultOutboundTransformers(tempEndpoint);
             
             returnMessage.applyTransformers(event, defaultTransportTransformers);
-            
             Object payload = returnMessage.getPayload();
 
             if (replyToDestination instanceof Topic && replyToDestination instanceof Queue
