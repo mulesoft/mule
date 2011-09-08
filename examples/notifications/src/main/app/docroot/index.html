@@ -56,7 +56,7 @@
         }
 
         function rpcEchoResponse(message) {
-            document.getElementById("response").innerHTML = "<b>Response:&nbsp;</b>" + message.data + "\n";
+            document.getElementById("response").innerHTML = "<b>Response:&nbsp;</b>" + message.data.user + ": " + message.data.phrase + "\n";
         }
     </script>
 </head>

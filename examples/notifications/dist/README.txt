@@ -19,7 +19,5 @@ URI in your browser:
 +----------------------+
 | Building the example |
 +----------------------+
-Depending on the build tool you are using (Ant or Maven), you can  build the 
-example by simply running "ant" or "mvn".  This will compile the example classes
-and produce a zip file that can be copied into the application folder 
-($MULE_HOME/apps).
+You can  build the example by simply running  "mvn".  This will compile the example classes
+and produce a zip file that can be copied into the application folder ($MULE_HOME/apps).
