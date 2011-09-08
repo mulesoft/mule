@@ -100,6 +100,7 @@ public class FunctionalTestComponent implements Callable, Initialisable, Disposa
     @Override
     public Object onCall(MuleEventContext context) throws Exception
     {
+
         if (isThrowException())
         {
             throwException();
