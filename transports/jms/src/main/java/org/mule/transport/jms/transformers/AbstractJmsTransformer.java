@@ -166,25 +166,30 @@ public abstract class AbstractJmsTransformer extends AbstractMessageTransformer 
             // using JMSReplyTo
             if (!(MuleProperties.MULE_REPLY_TO_PROPERTY.equals(key) && value instanceof Destination))
             {
-                // sanitize key as JMS header
-                key = JmsMessageUtils.encodeHeader(key);
+                setJmsPropertySanitizeKeyIfNecessary(msg, key, value);
+            }
+        }
+    }
 
-                try
-                {
-                    msg.setObjectProperty(key, value);
-                }
-                catch (JMSException e)
-                {
-                    // Various JMS servers have slightly different rules to what
-                    // can be set as an object property on the message; therefore
-                    // we have to take a hit n' hope approach
-                    if (logger.isDebugEnabled())
-                    {
-                        logger.debug("Unable to set property '" + key + "' of type "
-                                     + ClassUtils.getSimpleName(value.getClass())
-                                     + "': " + e.getMessage());
-                    }
-                }
+    protected void setJmsPropertySanitizeKeyIfNecessary(Message msg, String key, Object value)
+    {
+        // sanitize key as JMS header
+        key = JmsMessageUtils.encodeHeader(key);
+
+        try
+        {
+            msg.setObjectProperty(key, value);
+        }
+        catch (JMSException e)
+        {
+            // Various JMS servers have slightly different rules to what
+            // can be set as an object property on the message; therefore
+            // we have to take a hit n' hope approach
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Unable to set property '" + key + "' of type "
+                             + ClassUtils.getSimpleName(value.getClass())
+                             + "': " + e.getMessage());
             }
         }
     }
