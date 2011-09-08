@@ -3150,7 +3150,7 @@
     <xsd:element name="response">
         <xsd:complexType>
             <xsd:sequence>
-                <xsd:group ref="endpointMessageProcessorElements" minOccurs="0" maxOccurs="unbounded"/>
+                <xsd:group ref="endpointMessageProcessorElements" minOccurs="1" maxOccurs="unbounded"/>
             </xsd:sequence>
         </xsd:complexType>
     </xsd:element>
