@@ -85,8 +85,7 @@ public class JmsReplyToHandler extends DefaultReplyToHandler
                 {
                     if (t.getEndpoint() == null)
                     {
-                        t.setEndpoint(getEndpoint(event, "jms://temporary"));
-                        break;
+                        t.setEndpoint(getEndpoint(event, String.format("%s://temporary",connector.getProtocol())));
                     }
                 }
             }
