@@ -77,6 +77,8 @@
                         <xsd:group ref="muleRootElements"/>
                     </xsd:choice>
                 </xsd:sequence>
+                <xsd:attribute name="version" type ="xsd:string"/>
+
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
