@@ -88,7 +88,76 @@ public class JmsExceptionStrategyTestCase extends AbstractJmsFunctionalTestCase
         //Check message was consumed
         MuleMessage muleMessage = muleClient.request("jms://in2", TIMEOUT);
         assertThat(muleMessage, IsNull.<Object>nullValue());
+
+        //Check outbound-endpoint was not executed
+        MuleMessage outboundMessage = muleClient.request("jms://out2", SHORT_TIMEOUT);
+        assertThat(outboundMessage, IsNull.<Object>nullValue());
     }
+    
+    @Test
+    public void testDefaultStrategyConfigured() throws Exception
+    {
+        muleClient = new MuleClient(muleContext);
+        muleClient.dispatch("jms://in3", MESSAGE, null);
+        latch.await(LATCH_AWAIT_TIMEOUT, TimeUnit.MILLISECONDS);
+        //Stop flow to not consume message again
+        SimpleFlowConstruct flow = muleContext.getRegistry().get("flowWithDefaultStrategyConfigured");
+        flow.stop();
+        //Check message was no consumed
+        MuleMessage muleMessage = muleClient.request("jms://in3", TIMEOUT);
+        assertThat(muleMessage, IsNull.<Object>nullValue());
+        
+        //Check outbound-endpoint was not executed
+        MuleMessage outboundMessage = muleClient.request("jms://out3", SHORT_TIMEOUT);
+        assertThat(outboundMessage, IsNull.<Object>nullValue());
+    }
+    
+    @Test
+    public void testSendExceptionNofication() throws Exception
+    {
+        muleClient = new MuleClient(muleContext);
+        muleClient.dispatch("jms://in4", MESSAGE, null);
+        latch.await(LATCH_AWAIT_TIMEOUT, TimeUnit.MILLISECONDS);
+        //Stop flow to not consume message again
+        SimpleFlowConstruct flow = muleContext.getRegistry().get("flowWithExceptionNotification");
+        flow.stop();
+        //Check message was no consumed
+        MuleMessage muleMessage = muleClient.request("jms://in4", TIMEOUT);
+        assertThat(muleMessage, IsNull.<Object>nullValue());
+
+        // Check exception notification was sent
+        MuleMessage exceptionMessage = muleClient.request("jms://exception4", TIMEOUT);
+        assertThat(exceptionMessage, IsNull.<Object> notNullValue());
+        assertThat(exceptionMessage.getPayload(), IsNull.<Object> notNullValue());
+        
+        //Check outbound-endpoint was not executed
+        MuleMessage outboundMessage = muleClient.request("jms://out4", SHORT_TIMEOUT);
+        assertThat(outboundMessage, IsNull.<Object>nullValue());
+    }
+
+    @Test
+    public void testFlowConfiguredForDeadLetterQueue() throws Exception
+    {
+        muleClient = new MuleClient(muleContext);
+        muleClient.dispatch("jms://in5", MESSAGE, null);
+        latch.await(LATCH_AWAIT_TIMEOUT, TimeUnit.MILLISECONDS);
+        //Stop flow to not consume message again
+        SimpleFlowConstruct flow = muleContext.getRegistry().get("flowConfiguredForDeadLetterQueue");
+        flow.stop();
+        //Check message was no consumed
+        MuleMessage muleMessage = muleClient.request("jms://in5", TIMEOUT);
+        assertThat(muleMessage, IsNull.<Object>nullValue());
+
+        // Check exception notification was sent
+        MuleMessage deadLetter = muleClient.request("jms://DLQ5", TIMEOUT);
+        assertThat(deadLetter, IsNull.<Object> notNullValue());
+        assertThat(deadLetter.getPayload(), IsNull.<Object> notNullValue());
+        
+        //Check outbound-endpoint was not executed
+        MuleMessage outboundMessage = muleClient.request("jms://out5", SHORT_TIMEOUT);
+        assertThat(outboundMessage, IsNull.<Object>nullValue());
+    }
+
 
 }
 

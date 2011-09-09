@@ -24,4 +24,30 @@
         <outbound-endpoint ref="jmsOutNoTx"/>
     </flow>
 
+    <flow name="flowWithDefaultStrategyConfigured">
+        <inbound-endpoint ref="jmsInDefaultStrategyConfigured"/>
+        <test:component throwException="true"/>
+        <outbound-endpoint ref="jmsOutDefaultStrategyConfigured" />
+        <default-exception-strategy/>
+    </flow>
+
+    <flow name="flowWithExceptionNotification">
+        <inbound-endpoint ref="jmsInSendExceptionNotification"/>
+        <test:component throwException="true"/>
+        <outbound-endpoint ref="jmsOutSendExceptionNotification" />
+        <default-exception-strategy>
+            <outbound-endpoint ref="jmsExceptionSendExceptionNotification"/>
+        </default-exception-strategy>
+    </flow>
+
+    <flow name="flowConfiguredForDeadLetterQueue">
+        <inbound-endpoint ref="jmsInDeadLetter"/>
+        <test:component throwException="true"/>
+        <outbound-endpoint ref="jmsOutDeadLetter" />
+        <default-exception-strategy>
+            <outbound-endpoint ref="jmsDLQDeadLetter"/>
+        </default-exception-strategy>
+    </flow>
+
+
 </mule>

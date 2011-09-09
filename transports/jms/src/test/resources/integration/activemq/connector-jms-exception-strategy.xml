@@ -6,7 +6,7 @@
        http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/3.1/mule-jms.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.1/mule.xsd">
 
-    <jms:activemq-connector name="jmsConnector" />
+    <jms:activemq-connector name="jmsConnector" maxRedelivery="10"/>
 
     <jms:endpoint name="jmsInTx" queue="in">
         <jms:transaction action="ALWAYS_BEGIN"/>
@@ -17,7 +17,17 @@
     </jms:endpoint>
 
     <jms:endpoint name="jmsInNoTx" queue="in2"/>
-
     <jms:endpoint name="jmsOutNoTx" queue="out2"/>
+    
+    <jms:endpoint name="jmsInDefaultStrategyConfigured" queue="in3"/>
+    <jms:endpoint name="jmsOutDefaultStrategyConfigured" queue="out3"/>
+    
+    <jms:endpoint name="jmsInSendExceptionNotification" queue="in4"/>
+    <jms:endpoint name="jmsOutSendExceptionNotification" queue="out4"/>
+    <jms:endpoint name="jmsExceptionSendExceptionNotification" queue="exception4"/>
+
+    <jms:endpoint name="jmsInDeadLetter" queue="in5"/>
+    <jms:endpoint name="jmsOutDeadLetter" queue="out5"/>
+    <jms:endpoint name="jmsDLQDeadLetter" queue="DLQ5"/>
     
 </mule>
