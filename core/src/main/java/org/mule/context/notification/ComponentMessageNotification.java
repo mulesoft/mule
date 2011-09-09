@@ -10,6 +10,7 @@
 
 package org.mule.context.notification;
 
+import org.codehaus.jackson.annotate.JsonIgnore;
 import org.mule.api.MuleMessage;
 import org.mule.api.component.Component;
 import org.mule.api.construct.FlowConstruct;
@@ -86,11 +87,13 @@ public class ComponentMessageNotification extends ServerNotification
         return (MuleMessage) super.getSource();
     }
 
+    @JsonIgnore
     public FlowConstruct getFlowConstruct()
     {
         return flowConstruct;
     }
 
+    @JsonIgnore
     public Component getComponent()
     {
         return component;
