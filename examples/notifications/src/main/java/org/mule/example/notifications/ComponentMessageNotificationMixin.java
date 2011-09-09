@@ -10,12 +10,20 @@
 
 package org.mule.example.notifications;
 
+import org.mule.api.component.Component;
+import org.mule.api.construct.FlowConstruct;
+
 import org.codehaus.jackson.annotate.JsonIgnore;
 
 public interface ComponentMessageNotificationMixin
 {
     @JsonIgnore
     Object getSource();
+
+    @JsonIgnore
+    Component getComponent();
+
+    @JsonIgnore
+    FlowConstruct getFlowConstruct();
+
 }
-
-
