@@ -158,6 +158,29 @@ public class JmsExceptionStrategyTestCase extends AbstractJmsFunctionalTestCase
         assertThat(outboundMessage, IsNull.<Object>nullValue());
     }
 
+    @Test
+    public void testFlowConfiguredForDeadLetterQueueTx() throws Exception
+    {
+        muleClient = new MuleClient(muleContext);
+        muleClient.dispatch("jms://in6", MESSAGE, null);
+        latch.await(LATCH_AWAIT_TIMEOUT, TimeUnit.MILLISECONDS);
+        //Stop flow to not consume message again
+        SimpleFlowConstruct flow = muleContext.getRegistry().get("flowConfiguredForDeadLetterQueueTx");
+        flow.stop();
+        //Check message was no consumed
+        MuleMessage muleMessage = muleClient.request("jms://in6", TIMEOUT);
+        assertThat(muleMessage, IsNull.<Object>nullValue());
+
+        // Check exception notification was sent
+        MuleMessage deadLetter = muleClient.request("jms://DLQ6", TIMEOUT);
+        assertThat(deadLetter, IsNull.<Object> notNullValue());
+        assertThat(deadLetter.getPayload(), IsNull.<Object> notNullValue());
+
+        //Check outbound-endpoint was not executed
+        MuleMessage outboundMessage = muleClient.request("jms://out6", SHORT_TIMEOUT);
+        assertThat(outboundMessage, IsNull.<Object>nullValue());
+    }
+
 
 }
 

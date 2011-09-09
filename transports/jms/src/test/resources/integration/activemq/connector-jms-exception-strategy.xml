@@ -29,5 +29,9 @@
     <jms:endpoint name="jmsInDeadLetter" queue="in5"/>
     <jms:endpoint name="jmsOutDeadLetter" queue="out5"/>
     <jms:endpoint name="jmsDLQDeadLetter" queue="DLQ5"/>
+
+    <jms:endpoint name="jmsInDeadLetterTx" queue="in6"/>
+    <jms:endpoint name="jmsOutDeadLetterTx" queue="out6"/>
+    <jms:endpoint name="jmsDLQDeadLetterTx" queue="DLQ6"/>
     
 </mule>
