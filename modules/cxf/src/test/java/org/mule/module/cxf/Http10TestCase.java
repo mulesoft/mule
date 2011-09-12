@@ -24,16 +24,16 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
+import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
 public class Http10TestCase extends AbstractServiceAndFlowTestCase
 {
-    // Dynamic ports is static because test is using setDisposeContextPerClass(true);
-    private static DynamicPort dynamicPort;    
-    
+
+    @ClassRule
+    public static DynamicPort dynamicPort = new DynamicPort("port1");
+
     public Http10TestCase(ConfigVariant variant, String configResources)
     {
         super(variant, configResources);
@@ -48,19 +48,6 @@ public class Http10TestCase extends AbstractServiceAndFlowTestCase
             {ConfigVariant.FLOW, "http-10-conf-flow.xml"}
         });
     }      
-
-    @BeforeClass
-    public static void createDynamicPort() throws Throwable
-    {
-        dynamicPort = new DynamicPort("port1");
-        dynamicPort.before();
-    }
-
-    @AfterClass
-    public static void releaseDynamicPort()
-    {
-        dynamicPort.after();
-    }
 
     @Test
     public void testHttp10TransformerNotOnProtocol() throws Exception

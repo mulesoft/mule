@@ -20,8 +20,7 @@ import java.util.StringTokenizer;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
+import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 import org.mule.module.client.MuleClient;
@@ -32,8 +31,8 @@ import org.mule.util.concurrent.Latch;
 public class HttpOutboundTestCase extends AbstractMockHttpServerTestCase
 {
 
-    // Dynamic port is static because test is using setDisposeContextPerClass(true);
-    private static DynamicPort dynamicPort = new DynamicPort("port1");
+    @ClassRule
+    public static DynamicPort dynamicPort = new DynamicPort("port1");
 
     private Latch testLatch = new Latch();
     private String httpMethod;
@@ -49,18 +48,6 @@ public class HttpOutboundTestCase extends AbstractMockHttpServerTestCase
     {
         return Arrays.asList(new Object[][]{{ConfigVariant.SERVICE, "http-outbound-config-service.xml"},
             {ConfigVariant.FLOW, "http-outbound-config-flow.xml"}});
-    }
-
-    @BeforeClass
-    public static void createDynamicPort() throws Throwable
-    {
-        dynamicPort.before();
-    }
-
-    @AfterClass
-    public static void releaseDynamicPort()
-    {
-        dynamicPort.after();
     }
 
     @Override
