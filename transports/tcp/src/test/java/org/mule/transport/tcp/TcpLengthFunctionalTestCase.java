@@ -10,33 +10,34 @@
 
 package org.mule.transport.tcp;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-
-import java.util.Arrays;
-import java.util.Collection;
-
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
+
+import java.util.Arrays;
+import java.util.Collection;
+
+import org.junit.ClassRule;
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 public class TcpLengthFunctionalTestCase extends AbstractServiceAndFlowTestCase
 {
     protected static String TEST_MESSAGE = "Test TCP Request";
     private int timeout = 60 * 1000 / 20;
 
-    @Rule
-    public DynamicPort dynamicPort1 = new DynamicPort("port1");
+    @ClassRule
+    public static DynamicPort dynamicPort1 = new DynamicPort("port1");
 
-    @Rule
-    public DynamicPort dynamicPort2 = new DynamicPort("port2");
+    @ClassRule
+    public static DynamicPort dynamicPort2 = new DynamicPort("port2");
 
-    @Rule
-    public DynamicPort dynamicPort3 = new DynamicPort("port3");
+    @ClassRule
+    public static DynamicPort dynamicPort3 = new DynamicPort("port3");
         
     public TcpLengthFunctionalTestCase(ConfigVariant variant, String configResources)
     {

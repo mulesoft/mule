@@ -17,7 +17,7 @@ import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.NullPayload;
 
-import org.junit.Rule;
+import org.junit.ClassRule;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -33,11 +33,11 @@ public class ReplyToTestCase extends FunctionalTestCase
     
     private static final long RECEIVE_DELAY = 3000;
 
-    @Rule
-    public DynamicPort dynamicPort1 = new DynamicPort("port1");
+    @ClassRule
+    public static DynamicPort dynamicPort1 = new DynamicPort("port1");
 
-    @Rule
-    public DynamicPort dynamicPort2 = new DynamicPort("port2");
+    @ClassRule
+    public static DynamicPort dynamicPort2 = new DynamicPort("port2");
 
     public ReplyToTestCase()
     {
