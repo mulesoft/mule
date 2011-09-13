@@ -10,15 +10,15 @@
 
 package org.mule.transport.servlet;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 public class RESTTestCase extends FunctionalTestCase
 {
@@ -52,7 +52,7 @@ public class RESTTestCase extends FunctionalTestCase
     public void testRest2ParamsPost() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
-        MuleMessage reply  = client.send("vm://in2", new DefaultMuleMessage(new Object[]{"MTL","MTL"}, muleContext));
+        MuleMessage reply  = client.send("vm://in2", new DefaultMuleMessage(new Object[]{"ARS","ARS"}, muleContext));
         
         assertNotNull(reply.getPayloadAsString());
         assertTrue(reply.getPayloadAsString().indexOf(">1</double>") > -1);
@@ -74,7 +74,7 @@ public class RESTTestCase extends FunctionalTestCase
     public void testRest2ParamsGet() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
-        MuleMessage reply  = client.send("vm://in4", new DefaultMuleMessage(new Object[]{"MTL","MTL"}, muleContext));
+        MuleMessage reply  = client.send("vm://in4", new DefaultMuleMessage(new Object[]{"ARS","ARS"}, muleContext));
         
         String replyStr = reply.getPayloadAsString();
         assertNotNull(replyStr);
