@@ -17,6 +17,7 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.util.WebServiceOnlineCheck;
 
 import org.junit.Test;
 
@@ -35,6 +36,19 @@ public class RESTTestCase extends FunctionalTestCase
         // Do not fail test case upon timeout because this probably just means
         // that the 3rd-party web service is off-line.
         return false;
+    }
+    
+    /**
+     * If a simple call to the web service indicates that it is not responding properly,
+     * we disable the test case so as to not report a test failure which has nothing to do
+     * with Mule.
+     *
+     * see EE-947
+     */
+    @Override
+    protected boolean isDisabledInThisEnvironment()
+    {
+        return (WebServiceOnlineCheck.isWebServiceOnline() == false);
     }
     
     @Test
