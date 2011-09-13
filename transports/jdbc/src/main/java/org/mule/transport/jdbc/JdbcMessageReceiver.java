@@ -165,19 +165,11 @@ public class JdbcMessageReceiver extends TransactedPollingMessageReceiver
         }
         finally
         {
-            if (tx == null || tx.isXA())
+            if (tx == null)
             {
-                // We are running in an XA transaction.
-                // This call is required here for compatibility with strict XA
-                // DataSources
-                // implementations, as is the case for WebSphere AS and Weblogic.
-                // Failure to do it here may result in a connection leak.
-                // The close() call will NOT close the connection, neither will it
-                // return it to the pool.
-                // It will notify the XA driver's ConnectionEventListener that the XA
-                // connection
-                // is no longer used by the application and is ready for the 2PC
-                // commit.
+                //Only close connection when there's no transaction.
+                //If there's a transaction available, then the transaction
+                //will be the one doing close after commit or rollback
                 JdbcUtils.close(con);
             }
         }
