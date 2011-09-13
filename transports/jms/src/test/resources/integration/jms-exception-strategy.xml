@@ -50,5 +50,20 @@
         </default-exception-strategy>
     </flow>
 
+    <flow name="flowConfiguredForDeadLetterQueueTx" processingStrategy="synchronous">
+        <inbound-endpoint ref="jmsInDeadLetterTx">
+            <jms:transaction action="ALWAYS_BEGIN"/>
+        </inbound-endpoint>
+        <test:component throwException="true"/>
+        <outbound-endpoint ref="jmsOutDeadLetterTx" >
+            <jms:transaction action="ALWAYS_JOIN"/>
+        </outbound-endpoint>
+        <default-exception-strategy>
+            <commit-transaction exception-pattern="*"/>
+            <outbound-endpoint ref="jmsDLQDeadLetterTx">
+                <jms:transaction action="ALWAYS_JOIN"/>
+            </outbound-endpoint>
+        </default-exception-strategy>
+    </flow>
 
 </mule>
