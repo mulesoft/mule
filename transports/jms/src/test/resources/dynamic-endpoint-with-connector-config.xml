@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
+      xsi:schemaLocation="
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.1/mule.xsd
+       http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/3.1/mule-jms.xsd
+       http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.1/mule-vm.xsd"
+        >
+
+    <jms:activemq-connector name="jmsConnector"/>
+
+    <model name="Synchronous_Message_Pattern">
+        <service name="SynchronousService">
+            <inbound>
+                <vm:inbound-endpoint path="input" exchange-pattern="request-response"/>
+            </inbound>
+
+            <outbound>
+                <pass-through-router>
+                    <jms:outbound-endpoint connector-ref="jmsConnector" queue="#[header:INBOUND:queueName]" exchange-pattern="request-response"/>
+                </pass-through-router>
+            </outbound>
+        </service>
+    </model>
+</mule>
