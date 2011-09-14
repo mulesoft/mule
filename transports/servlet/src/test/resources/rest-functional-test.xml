@@ -14,7 +14,7 @@
 
         <service name="RESTServiceWrapper1">
             <inbound>
-                <inbound-endpoint address="vm://in1" exchange-pattern="one-way"/>
+                <inbound-endpoint address="vm://in1" exchange-pattern="request-response"/>
             </inbound>
             <http:rest-service-component
                     serviceUrl="http://www.webservicex.net/stockquote.asmx/GetQuote"
@@ -25,7 +25,7 @@
 
         <service name="RESTServiceWrapper2">
             <inbound>
-                <inbound-endpoint address="vm://in2" exchange-pattern="one-way"/>
+                <inbound-endpoint address="vm://in2" exchange-pattern="request-response"/>
             </inbound>
             <http:rest-service-component
                     serviceUrl="http://www.webservicex.net/CurrencyConvertor.asmx/ConversionRate"
@@ -37,7 +37,7 @@
 
         <service name="RESTServiceWrapper3">
             <inbound>
-                <inbound-endpoint address="vm://in3" exchange-pattern="one-way"/>
+                <inbound-endpoint address="vm://in3" exchange-pattern="request-response"/>
             </inbound>
             <http:rest-service-component
                     serviceUrl="http://www.webservicex.net/stockquote.asmx/GetQuote"
@@ -48,7 +48,7 @@
 
         <service name="RESTServiceWrapper4">
             <inbound>
-                <inbound-endpoint address="vm://in4" exchange-pattern="one-way"/>
+                <inbound-endpoint address="vm://in4" exchange-pattern="request-response"/>
             </inbound>
             <http:rest-service-component
                     serviceUrl="http://www.webservicex.net/CurrencyConvertor.asmx/ConversionRate"
