@@ -225,7 +225,9 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder, Annota
         {
             if(muleContext.getExpressionManager().isValidExpression(uriBuilder.getConstructor()))
             {
-                uriBuilder = new URIBuilder(DynamicOutboundEndpoint.DYNAMIC_URI_PLACEHOLDER, muleContext);
+                String dynamicAddress = getDynamicUriFrom(uri);
+                uriBuilder = new URIBuilder(dynamicAddress, muleContext);
+
                 return new DynamicOutboundEndpoint(this, uri);
             }
             else
@@ -261,6 +263,18 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder, Annota
         outboundEndpoint.setAnnotations(getAnnotations());
         return outboundEndpoint;
     }
+
+    private String getDynamicUriFrom(String uri)
+    {
+        int index = uri.indexOf(":");
+        if (index == -1)
+        {
+            throw new IllegalArgumentException("Cannot obtain protocol from uri:" + uri);
+        }
+        String dynamicProtocol = uri.substring(0, index);
+        return dynamicProtocol + "://dynamic";
+    }
+
     
     protected List<MessageProcessor> addTransformerProcessors(EndpointURI endpointURI)
         throws TransportFactoryException
