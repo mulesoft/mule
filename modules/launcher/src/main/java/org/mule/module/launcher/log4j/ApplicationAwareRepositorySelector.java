@@ -12,6 +12,7 @@ package org.mule.module.launcher.log4j;
 
 import org.mule.module.launcher.MuleApplicationClassLoader;
 import org.mule.module.reboot.MuleContainerBootstrapUtils;
+import org.mule.module.reboot.MuleContainerSystemClassLoader;
 
 import java.io.File;
 import java.io.IOException;
@@ -97,15 +98,21 @@ public class ApplicationAwareRepositorySelector implements RepositorySelector
                 }
                 else
                 {
-                    // this is not an app init, but a Mule container, use the top-level defaults
+                    // this is not an app init, use the top-level defaults
                     File defaultSystemLog = new File(MuleContainerBootstrapUtils.getMuleHome(), "conf/log4j.xml");
                     if (!defaultSystemLog.exists() && !defaultSystemLog.canRead())
                     {
                         defaultSystemLog = new File(MuleContainerBootstrapUtils.getMuleHome(), "conf/log4j.properties");
                     }
                     configureFrom(defaultSystemLog.toURL(), repository);
-                    configWatchDog = new ConfigWatchDog(ccl, defaultSystemLog.getAbsolutePath(), repository);
-                    configWatchDog.setName("Mule.system.log4j.config.monitor");
+
+                    // only start a watchdog for the Mule container class loader. Other class loaders
+                    // (e.g. Jetty's WebAppClassLoader) should not start a watchdog
+                    if (ccl instanceof MuleContainerSystemClassLoader)
+                    {
+                        configWatchDog = new ConfigWatchDog(ccl, defaultSystemLog.getAbsolutePath(), repository);
+                        configWatchDog.setName("Mule.system.log4j.config.monitor");
+                    }
                 }
 
                 final LoggerRepository previous = this.repository.putIfAbsent(ccl == null ? NO_CCL_CLASSLOADER : ccl.hashCode(), repository);
