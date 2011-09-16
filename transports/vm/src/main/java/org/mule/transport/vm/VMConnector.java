@@ -25,9 +25,11 @@ import org.mule.endpoint.DynamicURIInboundEndpoint;
 import org.mule.endpoint.MuleEndpointURI;
 import org.mule.routing.filters.WildcardFilter;
 import org.mule.transaction.TransactionCoordination;
+import org.mule.transaction.XaTransaction;
 import org.mule.transport.AbstractConnector;
 import org.mule.util.queue.QueueManager;
 import org.mule.util.queue.QueueSession;
+import org.mule.util.xa.XAResourceFactory;
 
 import java.util.Iterator;
 
@@ -44,7 +46,8 @@ public class VMConnector extends AbstractConnector
     private Integer queueTimeout;
     /** The queue manager to use for vm queues only */
     private QueueManager queueManager;
-    
+    private static XAResourceFactory xaResourceFactory;
+
     public VMConnector(MuleContext context)
     {
         super(context);
@@ -127,6 +130,11 @@ public class VMConnector extends AbstractConnector
         this.queueProfile = queueProfile;
     }
 
+    public static void setXaResourceFactory(XAResourceFactory xaResourceFactory)
+    {
+        VMConnector.xaResourceFactory = xaResourceFactory;
+    }
+
     VMMessageReceiver getReceiver(EndpointURI endpointUri) throws EndpointException
     {
         return (VMMessageReceiver)getReceiverByEndpoint(endpointUri);
@@ -165,6 +173,10 @@ public class VMConnector extends AbstractConnector
             try
             {
                 tx.bindResource(queueManager, session);
+                if (xaResourceFactory != null && tx instanceof XaTransaction)
+                {
+                    tx.bindResource(this, xaResourceFactory.create());
+                }
             }
             catch (TransactionException e)
             {

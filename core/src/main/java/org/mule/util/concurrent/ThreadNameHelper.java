@@ -46,13 +46,12 @@ public class ThreadNameHelper
 
     public static String sedaService(MuleContext muleContext, String name)
     {
-        return String.format("%s%s.seda", getPrefix(muleContext), name);
+        return String.format("%s%s", getPrefix(muleContext), name);
     }
 
-    public static String flow(MuleContext muleContext, String name, int stage)
+    public static String flow(MuleContext muleContext, String name)
     {
-        return String.format("%s%s.stage%s", getPrefix(muleContext), name, stage);
-
+        return String.format("%s%s", getPrefix(muleContext), name);
     }
 
     /**

@@ -18,19 +18,19 @@ import org.mule.api.store.ObjectAlreadyExistsException;
 import org.mule.api.store.ObjectStoreException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.transformer.simple.ByteArrayToHexString;
+import org.mule.transformer.simple.ObjectToByteArray;
 import org.mule.transformer.simple.SerializableToByteArray;
 import org.mule.util.store.AbstractMonitoredObjectStore;
 import org.mule.util.store.InMemoryObjectStore;
 
 
+import java.io.InputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.management.RuntimeErrorException;
 
 /**
  * Implement a retry policy for Mule.  This is similar to JMS retry policies that will redeliver a message a maximum
@@ -40,7 +40,7 @@ import javax.management.RuntimeErrorException;
  */
 public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy
 {
-    private final SerializableToByteArray objectToByteArray = new SerializableToByteArray();
+    private final ObjectToByteArray objectToByteArray = new ObjectToByteArray();
     private final ByteArrayToHexString byteArrayToHexString = new ByteArrayToHexString();
 
     protected Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -186,7 +186,7 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy
             incrementCounter(messageId, counter);
             throw ex;
         }
-        catch (RuntimeErrorException ex)
+        catch (RuntimeException ex)
         {
             incrementCounter(messageId, counter);
             throw ex;
@@ -234,6 +234,11 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy
         {
             Object payload = event.getMessage().getPayload();
             byte[] bytes = (byte[]) objectToByteArray.transform(payload);
+            if (payload instanceof InputStream)
+            {
+                // We've consumed the stream.
+                event.getMessage().setPayload(bytes);
+            }
             MessageDigest md = MessageDigest.getInstance(messageDigestAlgorithm);
             byte[] digestedBytes = md.digest(bytes);
             return (String)byteArrayToHexString.transform(digestedBytes);

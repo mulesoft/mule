@@ -30,7 +30,7 @@ public class QueuedThreadPerProcessorProcessingStrategy extends QueuedAsynchrono
 
     @Override
     public void configureProcessors(List<MessageProcessor> processors,
-                                    ThreadNameSource nameSource,
+                                    StageNameSource nameSource,
                                     MessageProcessorChainBuilder builder,
                                     MuleContext muleContext)
     {

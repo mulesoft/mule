@@ -53,13 +53,13 @@ class TransactionalQueueSession extends DefaultXASession implements QueueSession
         }
 
         @Override
-        public void put(Serializable item) throws InterruptedException
+        public void put(Serializable item) throws InterruptedException, ObjectStoreException
         {
             offer(item, Long.MAX_VALUE);
         }
 
         @Override
-        public boolean offer(Serializable item, long timeout) throws InterruptedException
+        public boolean offer(Serializable item, long timeout) throws InterruptedException, ObjectStoreException
         {
             if (localContext != null)
             {
@@ -102,7 +102,7 @@ class TransactionalQueueSession extends DefaultXASession implements QueueSession
         }
 
         @Override
-        public void untake(Serializable item) throws InterruptedException
+        public void untake(Serializable item) throws InterruptedException, ObjectStoreException
         {
             if (localContext != null)
             {
@@ -110,15 +110,8 @@ class TransactionalQueueSession extends DefaultXASession implements QueueSession
             }
             else
             {
-                try
-                {
-                    Serializable id = queueManager.doStore(queue, item);
-                    queue.untake(id);
-                }
-                catch (ObjectStoreException e)
-                {
-                    throw new RuntimeException(e);
-                }
+                Serializable id = queueManager.doStore(queue, item);
+                queue.untake(id);
             }
         }
 

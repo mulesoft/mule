@@ -20,7 +20,7 @@ import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorChainBuilder;
 import org.mule.api.processor.ProcessingStrategy;
-import org.mule.api.processor.ProcessingStrategy.ThreadNameSource;
+import org.mule.api.processor.ProcessingStrategy.StageNameSource;
 import org.mule.construct.flow.DefaultFlowProcessingStrategy;
 import org.mule.construct.processor.FlowConstructStatisticsMessageProcessor;
 import org.mule.interceptor.ProcessingTimeInterceptor;
@@ -29,7 +29,6 @@ import org.mule.management.stats.FlowConstructStatistics;
 import org.mule.processor.strategy.AsynchronousProcessingStrategy;
 import org.mule.routing.requestreply.ReplyToPropertyRequestReplyReplier;
 import org.mule.session.DefaultMuleSession;
-import org.mule.util.concurrent.ThreadNameHelper;
 
 /**
  * This implementation of {@link AbstractPipeline} adds the following functionality:
@@ -45,8 +44,8 @@ import org.mule.util.concurrent.ThreadNameHelper;
  */
 public class Flow extends AbstractPipeline implements MessageProcessor
 {
-    private int asyncProcessorCount = 0;
-    private int asyncDelegateCount = 0;
+    private int stageCount = 0;
+    private int asyncCount = 0;
 
     public Flow(String name, MuleContext muleContext)
     {
@@ -131,25 +130,38 @@ public class Flow extends AbstractPipeline implements MessageProcessor
     protected void configureMessageProcessors(MessageProcessorChainBuilder builder) throws MuleException
     {
         getProcessingStrategy().configureProcessors(getMessageProcessors(),
-            new ProcessingStrategy.ThreadNameSource()
+            new ProcessingStrategy.StageNameSource()
             {
                 @Override
                 public String getName()
                 {
-                    return ThreadNameHelper.flow(muleContext, Flow.this.getName(), asyncProcessorCount++);
+                    return String.format("%s.stage%s", Flow.this.getName(), ++stageCount);
                 }
             }, builder, muleContext);
     }
 
-    public ThreadNameSource getAsyncThreadNameSource()
+    public StageNameSource getAsyncStageNameSource()
     {
-        return new ProcessingStrategy.ThreadNameSource()
+        return new ProcessingStrategy.StageNameSource()
         {
             @Override
             public String getName()
             {
-                return ThreadNameHelper.async(muleContext, Flow.this.getName(), asyncDelegateCount++);
+                return String.format("%s.async%s", Flow.this.getName(), ++asyncCount);
             }
         };
     }
+
+    public StageNameSource getAsyncStageNameSource(final String asyncName)
+    {
+        return new ProcessingStrategy.StageNameSource()
+        {
+            @Override
+            public String getName()
+            {
+                return String.format("%s.%s", Flow.this.getName(), asyncName);
+            }
+        };
+    }
+
 }

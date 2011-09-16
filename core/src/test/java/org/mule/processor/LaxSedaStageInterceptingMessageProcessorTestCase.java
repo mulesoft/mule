@@ -81,7 +81,7 @@ public class LaxSedaStageInterceptingMessageProcessorTestCase extends
         throws Exception
     {
         LaxSedaStageInterceptingMessageProcessor mp = new LaxSedaStageInterceptingMessageProcessor("name",
-            queueProfile, queueTimeout, muleContext.getDefaultThreadingProfile(), queueStatistics,
+            "name", queueProfile, queueTimeout, muleContext.getDefaultThreadingProfile(), queueStatistics,
             muleContext);
         mp.setListener(listener);
         return mp;

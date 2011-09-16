@@ -220,7 +220,7 @@ public class SedaServiceTestCase extends AbstractServiceTestCase
             public Object onCall(MuleEventContext eventContext) throws Exception
             {
                 System.out.println(Thread.currentThread().getName());
-                assertTrue(Thread.currentThread().getName().startsWith(serviceName + ".seda."));
+                assertTrue(Thread.currentThread().getName().startsWith(serviceName));
                 latch.countDown();
                 return null;
             }

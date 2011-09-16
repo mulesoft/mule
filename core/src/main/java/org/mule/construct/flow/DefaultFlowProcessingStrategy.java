@@ -25,7 +25,7 @@ public class DefaultFlowProcessingStrategy extends QueuedAsynchronousProcessingS
 {
 
     @Override
-    protected AsyncInterceptingMessageProcessor createAsyncMessageProcessor(ThreadNameSource nameSource,
+    protected AsyncInterceptingMessageProcessor createAsyncMessageProcessor(StageNameSource nameSource,
                                                                             MuleContext muleContext)
     {
         Integer timeout = queueTimeout != null ? queueTimeout : muleContext.getConfiguration()
@@ -35,10 +35,9 @@ public class DefaultFlowProcessingStrategy extends QueuedAsynchronousProcessingS
 
         QueueProfile queueProfile = new QueueProfile(maxQueueSize, queueStore);
         ThreadingProfile threadingProfile = createThreadingProfile(muleContext);
-        return new LaxSedaStageInterceptingMessageProcessor(nameSource.getName(), queueProfile, timeout,
-            threadingProfile, queueStatistics, muleContext);
+        String stageName = nameSource.getName();
+        return new LaxSedaStageInterceptingMessageProcessor(getThreadPoolName(stageName, muleContext),
+            stageName, queueProfile, timeout, threadingProfile, queueStatistics, muleContext);
     }
-
-
 
 }

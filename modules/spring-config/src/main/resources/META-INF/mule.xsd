@@ -77,6 +77,8 @@
                         <xsd:group ref="muleRootElements"/>
                     </xsd:choice>
                 </xsd:sequence>
+                <xsd:attribute name="version" type ="xsd:string"/>
+
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
@@ -2094,7 +2096,6 @@
                             </xsd:complexType>
                         </xsd:element>
                     </xsd:choice>
-                    <xsd:element ref="abstract-redelivery-policy" minOccurs="0"/>
                     <xsd:element ref="abstract-exception-strategy" minOccurs="0"/>
                     <xsd:element ref="abstract-message-info-mapping" minOccurs="0">
                         <xsd:annotation>

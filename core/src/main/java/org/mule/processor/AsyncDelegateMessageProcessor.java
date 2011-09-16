@@ -23,7 +23,7 @@ import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorChainBuilder;
 import org.mule.api.processor.ProcessingStrategy;
-import org.mule.api.processor.ProcessingStrategy.ThreadNameSource;
+import org.mule.api.processor.ProcessingStrategy.StageNameSource;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.construct.Flow;
 import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
@@ -51,17 +51,17 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
 
     protected List<MessageProcessor> processors;
     protected ProcessingStrategy processingStrategy;
-    protected ThreadNameSource threadNameSource;
+    protected String name;
 
     private MessageProcessor target;
 
     public AsyncDelegateMessageProcessor(MessageProcessor delegate,
                                          ProcessingStrategy processingStrategy,
-                                         ThreadNameSource threadNameSource)
+                                         String name)
     {
         this.delegate = delegate;
         this.processingStrategy = processingStrategy;
-        this.threadNameSource = threadNameSource;
+        this.name = name;
     }
 
     @Override
@@ -75,14 +75,19 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
         {
             throw new InitialisationException(CoreMessages.objectIsNull("processingStrategy"), this);
         }
-        if (threadNameSource == null)
+        StageNameSource nameSource = null;
+        if (name != null)
         {
-            threadNameSource = ((Flow) flowConstruct).getAsyncThreadNameSource();
+            nameSource = ((Flow)flowConstruct).getAsyncStageNameSource(name);
+        }
+        else
+        {
+            nameSource = ((Flow)flowConstruct).getAsyncStageNameSource();
         }
 
         MessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder(flowConstruct);
-        processingStrategy.configureProcessors(Collections.singletonList(delegate), threadNameSource,
-            builder, muleContext);
+        processingStrategy.configureProcessors(Collections.singletonList(delegate), nameSource, builder,
+            muleContext);
         try
         {
             target = builder.build();
@@ -105,7 +110,7 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
         {
             // Clone event and make it async
             MuleEvent newEvent = new DefaultMuleEvent(
-                (MuleMessage) ((ThreadSafeAccess) event.getMessage()).newThreadCopy(), event, false);
+                (MuleMessage)((ThreadSafeAccess)event.getMessage()).newThreadCopy(), event, false);
             target.process(newEvent);
         }
         return event;

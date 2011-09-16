@@ -70,15 +70,8 @@ public class AsyncMessageProcessorsFactoryBean implements FactoryBean, MuleConte
                     "MessageProcessorBuilder should only have MessageProcessor's or MessageProcessorBuilder's configured");
             }
         }
-        AsyncDelegateMessageProcessor delegate = new AsyncDelegateMessageProcessor(builder.build(), processingStrategy,
-                new ProcessingStrategy.ThreadNameSource()
-                {
-                    @Override
-                    public String getName()
-                    {
-                        return name;
-                    }
-                });
+        AsyncDelegateMessageProcessor delegate = new AsyncDelegateMessageProcessor(builder.build(),
+            processingStrategy, name);
         delegate.setAnnotations(getAnnotations());
         return delegate;
     }

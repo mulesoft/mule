@@ -54,6 +54,7 @@ import org.mortbay.jetty.servlet.Context;
 import org.mortbay.jetty.servlet.ServletHolder;
 import org.mortbay.jetty.webapp.WebAppContext;
 import org.mortbay.jetty.webapp.WebInfConfiguration;
+import org.mortbay.log.Log;
 import org.mortbay.xml.XmlConfiguration;
 
 /**
@@ -86,11 +87,21 @@ public class JettyHttpConnector extends AbstractConnector
     public JettyHttpConnector(MuleContext context)
     {
         super(context);
+        setupJettyLogging();
         registerSupportedProtocol("http");
         registerSupportedProtocol(JETTY);
         setInitialStateStopped(true);
     }
 
+    protected void setupJettyLogging()
+    {
+        if ((Log.getLog() instanceof JettyLogger) == false)
+        {
+            Log.setLog(new JettyLogger());
+        }
+    }
+
+    @Override
     public String getProtocol()
     {
         return JETTY;
@@ -128,7 +139,7 @@ public class JettyHttpConnector extends AbstractConnector
                 super.addHandler(handler);
             }
         };
-        
+
         if (webappsConfiguration != null)
         {
             deployer = new WebAppDeployer();
@@ -169,12 +180,13 @@ public class JettyHttpConnector extends AbstractConnector
             httpServer.addConnector(jettyConnector);
             httpServer.addLifeCycle(deployer);
         }
-        
+
         initialiseFromConfigFile();
 
         try
         {
             muleContext.registerListener(new MuleContextNotificationListener<MuleContextNotification>(){
+                @Override
                 public void onNotification(MuleContextNotification notification)
                 {
                     if (notification.getAction() == MuleContextNotification.CONTEXT_STARTED)
@@ -254,12 +266,12 @@ public class JettyHttpConnector extends AbstractConnector
         try
         {
             httpServer.start();
-            
+
             if (deployer != null)
             {
                 deployer.start();
             }
-            
+
             for (ConnectorHolder<?, ?> contextHolder : holders.values())
             {
                 contextHolder.start();
@@ -277,12 +289,12 @@ public class JettyHttpConnector extends AbstractConnector
         try
         {
             httpServer.stop();
-            
+
             if (deployer != null)
             {
                 deployer.stop();
             }
-            
+
             for (ConnectorHolder<?, ?> connectorRef : holders.values())
             {
                 connectorRef.stop();
@@ -499,11 +511,13 @@ public class JettyHttpConnector extends AbstractConnector
             addReceiver(receiver);
         }
 
+        @Override
         public boolean isReferenced()
         {
             return messageReceivers.size() > 0;
         }
 
+        @Override
         public void addReceiver(JettyHttpMessageReceiver receiver)
         {
             messageReceivers.add(receiver);
@@ -513,6 +527,7 @@ public class JettyHttpConnector extends AbstractConnector
             }
         }
 
+        @Override
         public void removeReceiver(JettyHttpMessageReceiver receiver)
         {
             messageReceivers.remove(receiver);
@@ -523,7 +538,7 @@ public class JettyHttpConnector extends AbstractConnector
         public void start() throws MuleException
         {
             super.start();
-            
+
             for (MessageReceiver receiver : messageReceivers)
             {
                 servlet.addReceiver(receiver);
