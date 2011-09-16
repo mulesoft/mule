@@ -16,6 +16,7 @@ import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.registry.ServiceType;
 import org.mule.endpoint.AbstractEndpoint;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
+import org.mule.processor.AbstractRedeliveryPolicy;
 import org.mule.transport.service.TransportServiceDescriptor;
 
 /**
@@ -54,4 +55,9 @@ public class OutboundEndpointFactoryBean extends AbstractEndpointFactoryBean
         return outboundEndpoint;
     }
 
+    @Override
+    public void setRedeliveryPolicy(AbstractRedeliveryPolicy redeliveryPolicy)
+    {
+        throw new IllegalStateException("A redelivery policy cannot be specified for an outbound endpoint.");
+    }
 }

@@ -56,6 +56,7 @@ public class EndpointURIEndpointBuilder extends AbstractEndpointBuilder
         disableTransportTransformer = global.disableTransportTransformer;
         transformers = global.transformers;
         responseTransformers = global.responseTransformers;
+        redeliveryPolicy = global.redeliveryPolicy;
         setAnnotations(global.getAnnotations());
 
     }
@@ -95,5 +96,6 @@ public class EndpointURIEndpointBuilder extends AbstractEndpointBuilder
         setResponseMessageProcessors(source.getResponseMessageProcessors().isEmpty() ? Collections.<MessageProcessor>emptyList() : source.getResponseMessageProcessors());
         setDisableTransportTransformer(source.isDisableTransportTransformer());
         setMimeType(source.getMimeType());
+        setRedeliveryPolicy(source.getRedeliveryPolicy());
     }
 }

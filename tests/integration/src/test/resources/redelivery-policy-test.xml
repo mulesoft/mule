@@ -12,34 +12,36 @@
         http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd">
 
     <flow name="success">
-        <vm:inbound-endpoint path="success" exchange-pattern="request-response"/>
+        <vm:inbound-endpoint path="success" exchange-pattern="request-response">
+            <idempotent-redelivery-policy>
+                <dead-letter-queue>
+                    <outbound-endpoint address="vm://dead-letter-queue"/>
+                </dead-letter-queue>
+            </idempotent-redelivery-policy>
+        </vm:inbound-endpoint>
         <test:component/>
-        <idempotent-redelivery-policy>
-            <dead-letter-queue>
-                <outbound-endpoint address="vm://dead-letter-queue"/>
-            </dead-letter-queue>
-        </idempotent-redelivery-policy>
     </flow>
 
     <flow name="limitedFailures">
-        <vm:inbound-endpoint path="limitedFailures" exchange-pattern="request-response"/>
-        <component class="org.mule.test.routing.RedeliveryPolicyTestCase$FailThree">
-        </component>
-        <idempotent-redelivery-policy>
-            <dead-letter-queue>
-                <outbound-endpoint address="vm://dead-letter-queue"/>
-            </dead-letter-queue>
-        </idempotent-redelivery-policy>
+        <vm:inbound-endpoint path="limitedFailures" exchange-pattern="request-response">
+            <idempotent-redelivery-policy>
+                <dead-letter-queue>
+                    <outbound-endpoint address="vm://dead-letter-queue"/>
+                </dead-letter-queue>
+            </idempotent-redelivery-policy>
+        </vm:inbound-endpoint>
+        <component class="org.mule.test.routing.RedeliveryPolicyTestCase$FailThree"/>
+
     </flow>
 
     <flow name="manyRealFailures">
-        <vm:inbound-endpoint path="manyRealFailures" exchange-pattern="request-response"/>
-        <component class="org.mule.test.routing.RedeliveryPolicyTestCase$FailThreeOrSeven">
-        </component>
-        <idempotent-redelivery-policy>
-            <dead-letter-queue>
-                <outbound-endpoint address="vm://dead-letter-queue"/>
-            </dead-letter-queue>
-        </idempotent-redelivery-policy>
+        <vm:inbound-endpoint path="manyRealFailures" exchange-pattern="request-response">
+            <idempotent-redelivery-policy>
+                <dead-letter-queue>
+                    <outbound-endpoint address="vm://dead-letter-queue"/>
+                </dead-letter-queue>
+            </idempotent-redelivery-policy>
+        </vm:inbound-endpoint>
+        <component class="org.mule.test.routing.RedeliveryPolicyTestCase$FailThreeOrSeven"/>
     </flow>
 </mule>

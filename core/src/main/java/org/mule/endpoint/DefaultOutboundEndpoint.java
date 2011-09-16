@@ -26,6 +26,7 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.api.retry.RetryPolicyTemplate;
 import org.mule.api.transaction.TransactionConfig;
 import org.mule.api.transport.Connector;
+import org.mule.processor.AbstractRedeliveryPolicy;
 import org.mule.transport.AbstractConnector;
 import org.mule.util.StringUtils;
 
@@ -53,6 +54,7 @@ public class DefaultOutboundEndpoint extends AbstractEndpoint implements Outboun
                                    String endpointBuilderName,
                                    MuleContext muleContext,
                                    RetryPolicyTemplate retryPolicyTemplate,
+                                   AbstractRedeliveryPolicy redeliveryPolicy,
                                    String responsePropertiesList,
                                    EndpointMessageProcessorChainFactory messageProcessorsFactory,
                                    List <MessageProcessor> messageProcessors,
@@ -62,9 +64,13 @@ public class DefaultOutboundEndpoint extends AbstractEndpoint implements Outboun
     {
         super(connector, endpointUri, name, properties, transactionConfig, 
                 deleteUnacceptedMessage, messageExchangePattern, responseTimeout, initialState,
-                endpointEncoding, endpointBuilderName, muleContext, retryPolicyTemplate, 
+                endpointEncoding, endpointBuilderName, muleContext, retryPolicyTemplate, null,
                 messageProcessorsFactory, messageProcessors, responseMessageProcessors, disableTransportTransformer, endpointMimeType);
 
+        if (redeliveryPolicy != null)
+        {
+            logger.warn("Ignoring redelivery policy set on outbound endpoint " + endpointUri);
+        }
         responseProperties = new ArrayList<String>();
         // Propagate the Correlation-related properties from the previous message by default (see EE-1613).
         responseProperties.add(MuleProperties.MULE_CORRELATION_ID_PROPERTY);

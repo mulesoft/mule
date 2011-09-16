@@ -3179,18 +3179,25 @@
     </xsd:element>
 
     <!-- these include option/repeats - should be embedded once -->
-    <xsd:group name="defaultEndpointElements">
+        <!-- these include option/repeats - should be embedded once -->
+    <xsd:group name="commonDefaultEndpointElements">
         <xsd:sequence>
-            <xsd:sequence>
-                <xsd:group ref="endpointMessageProcessorElements" minOccurs="0" maxOccurs="unbounded"/>
-                <xsd:element ref="response" minOccurs="0"/>
-                <xsd:element ref="abstract-transaction" minOccurs="0"/>
-                <xsd:element ref="abstract-reconnection-strategy" minOccurs="0"/>
-                <xsd:element ref="abstract-multi-transaction" minOccurs="0"/>
-                <xsd:group ref="propertiesGroup"/>
-            </xsd:sequence>
+            <xsd:group ref="endpointMessageProcessorElements" minOccurs="0" maxOccurs="unbounded"/>
+            <xsd:element ref="response" minOccurs="0"/>
+            <xsd:element ref="abstract-redelivery-policy" minOccurs="0"/>
+            <xsd:element ref="abstract-transaction" minOccurs="0"/>
         </xsd:sequence>
     </xsd:group>
+
+    <xsd:group name="defaultEndpointElements">
+        <xsd:sequence>
+            <xsd:group ref="commonDefaultEndpointElements"/>
+            <xsd:element ref="abstract-reconnection-strategy" minOccurs="0"/>
+            <xsd:element ref="abstract-multi-transaction" minOccurs="0"/>
+            <xsd:group ref="propertiesGroup"/>
+        </xsd:sequence>
+    </xsd:group>
+
     <xsd:group name="defaultXaEndpointElements">
         <xsd:sequence>
             <xsd:group ref="endpointMessageProcessorElements" minOccurs="0" maxOccurs="unbounded"/>

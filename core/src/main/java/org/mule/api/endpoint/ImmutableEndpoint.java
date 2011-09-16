@@ -20,6 +20,7 @@ import org.mule.api.security.EndpointSecurityFilter;
 import org.mule.api.transaction.TransactionConfig;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.Connector;
+import org.mule.processor.AbstractRedeliveryPolicy;
 
 import java.io.Serializable;
 import java.util.List;
@@ -217,6 +218,11 @@ public interface ImmutableEndpoint extends Serializable, NamedObject
      * Return the mime type defined for the endpoint, if any
      */
     String getMimeType();
-    
+
+    /**
+     * Return the endpoint's redelivery policy, if any
+     */
+    AbstractRedeliveryPolicy getRedeliveryPolicy();
+
     boolean isDisableTransportTransformer();
 }

@@ -105,6 +105,10 @@ public class DefaultEndpointMessageProcessorChainFactory implements EndpointMess
         // Default MPs
         requestChainBuilder.chain(createInboundMessageProcessors(endpoint));
         // Configured MPs (if any)
+        if (endpoint.getRedeliveryPolicy() != null)
+        {
+            requestChainBuilder.chain(endpoint.getRedeliveryPolicy());
+        }
         requestChainBuilder.chain(endpoint.getMessageProcessors());
         
         // -- INVOKE SERVICE --

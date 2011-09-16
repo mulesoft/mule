@@ -28,6 +28,7 @@ import org.mule.api.security.SecurityFilter;
 import org.mule.api.transaction.TransactionConfig;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.Connector;
+import org.mule.processor.AbstractRedeliveryPolicy;
 import org.mule.processor.SecurityFilterMessageProcessor;
 import org.mule.routing.MessageFilter;
 import org.mule.util.ClassUtils;
@@ -129,6 +130,8 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint, Disposable,
 
     private final String endpointMimeType;
 
+    private AbstractRedeliveryPolicy redeliveryPolicy;
+
     private boolean disableTransportTransformer = false;
     private final Map<QName, Object> annotations = new ConcurrentHashMap<QName, Object>();
 
@@ -145,6 +148,7 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint, Disposable,
                             String endpointBuilderName,
                             MuleContext muleContext,
                             RetryPolicyTemplate retryPolicyTemplate,
+                            AbstractRedeliveryPolicy redeliveryPolicy,
                             EndpointMessageProcessorChainFactory messageProcessorsFactory,
                             List <MessageProcessor> messageProcessors,
                             List <MessageProcessor> responseMessageProcessors,
@@ -166,6 +170,7 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint, Disposable,
         this.endpointBuilderName = endpointBuilderName;
         this.muleContext = muleContext;
         this.retryPolicyTemplate = retryPolicyTemplate;
+        this.redeliveryPolicy = redeliveryPolicy;
         this.endpointMimeType = endpointMimeType;
         this.disableTransportTransformer = disableTransportTransformer;
         this.messageExchangePattern = messageExchangePattern;
@@ -474,6 +479,11 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint, Disposable,
     public RetryPolicyTemplate getRetryPolicyTemplate()
     {
         return retryPolicyTemplate;
+    }
+
+    public AbstractRedeliveryPolicy getRedeliveryPolicy()
+    {
+        return redeliveryPolicy;
     }
 
     public String getEndpointBuilderName()
