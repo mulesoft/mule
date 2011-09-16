@@ -13,7 +13,8 @@ import org.junit.Test;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.construct.Flow;
-import org.mule.processor.RedeliveryPolicy;
+import org.mule.processor.AbstractRedeliveryPolicy;
+import org.mule.processor.IdempotentRedeliveryPolicy;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.util.store.SimpleMemoryObjectStore;
 
@@ -45,7 +46,7 @@ public class RedeliveryPolicyNamespaceHandlerTestCase extends FunctionalTestCase
     @Test
     public void testInMemoryObjectStore() throws Exception
     {
-        RedeliveryPolicy filter = redeliveryPolicyFromFlow("inMemoryStore");
+        IdempotentRedeliveryPolicy filter = redeliveryPolicyFromFlow("inMemoryStore");
 
         assertNotNull(filter.getTheFailedMessageProcessor());
         assertEquals(12, filter.getMaxRedeliveryCount());
@@ -55,7 +56,7 @@ public class RedeliveryPolicyNamespaceHandlerTestCase extends FunctionalTestCase
     @Test
     public void testSimpleTextFileStore() throws Exception
     {
-        RedeliveryPolicy filter = redeliveryPolicyFromFlow("simpleTextFileStore");
+        IdempotentRedeliveryPolicy filter = redeliveryPolicyFromFlow("simpleTextFileStore");
         assertEquals("#[message:id]", filter.getIdExpression());
         assertNotNull(filter.getTheFailedMessageProcessor());
         assertEquals(5, filter.getMaxRedeliveryCount());
@@ -64,25 +65,20 @@ public class RedeliveryPolicyNamespaceHandlerTestCase extends FunctionalTestCase
     @Test
     public void testCustomObjectStore() throws Exception
     {
-        RedeliveryPolicy filter = redeliveryPolicyFromFlow("customObjectStore");
+        IdempotentRedeliveryPolicy filter = redeliveryPolicyFromFlow("customObjectStore");
         assertNotNull(filter.getTheFailedMessageProcessor());
         assertEquals(5, filter.getMaxRedeliveryCount());
         assertNull(filter.getIdExpression());
     }
 
-    private RedeliveryPolicy redeliveryPolicyFromFlow(String flowName) throws Exception
+    private IdempotentRedeliveryPolicy redeliveryPolicyFromFlow(String flowName) throws Exception
     {
         FlowConstruct flow = getFlowConstruct(flowName);
         assertTrue(flow instanceof Flow);
 
-        Flow simpleFlow = (Flow) flow;
-        List<MessageProcessor> processors = simpleFlow.getMessageProcessors();
-        assertEquals(1, processors.size());
-
-        MessageProcessor firstMP = processors.get(0);
-        assertEquals(RedeliveryPolicy.class, firstMP.getClass());
-
-        return (RedeliveryPolicy) firstMP;
+        AbstractRedeliveryPolicy redeliveryPolicy = ((Flow) flow).getRedeliveryPolicy();
+        assertTrue(redeliveryPolicy instanceof IdempotentRedeliveryPolicy);
+        return (IdempotentRedeliveryPolicy) redeliveryPolicy;
     }
 
     public static class CustomObjectStore extends SimpleMemoryObjectStore<Serializable>

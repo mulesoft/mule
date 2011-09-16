@@ -173,7 +173,7 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase
         EndpointBuilder dlqEndpointBuilder = mock(EndpointBuilder.class);
         OutboundEndpoint dlqEndpoint = mock(OutboundEndpoint.class);
         when(dlqEndpointBuilder.buildOutboundEndpoint()).thenReturn(dlqEndpoint);
-        untilSuccessful.setDlqEndpoint(dlqEndpointBuilder);
+        untilSuccessful.setDeadLetterQueue(dlqEndpointBuilder);
         untilSuccessful.initialise();
         untilSuccessful.start();
 

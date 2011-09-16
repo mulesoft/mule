@@ -31,6 +31,7 @@ import org.mule.api.routing.MessageInfoMapping;
 import org.mule.api.source.MessageSource;
 import org.mule.exception.DefaultMessagingExceptionStrategy;
 import org.mule.management.stats.FlowConstructStatistics;
+import org.mule.processor.AbstractRedeliveryPolicy;
 import org.mule.routing.MuleMessageInfoMapping;
 import org.mule.util.ClassUtils;
 
@@ -70,6 +71,7 @@ public abstract class AbstractFlowConstruct implements FlowConstruct, Lifecycle,
 
     protected String name;
     protected MessagingExceptionHandler exceptionListener;
+    protected AbstractRedeliveryPolicy redeliveryPolicy;
     protected final FlowConstructLifecycleManager lifecycleManager;
     protected final MuleContext muleContext;
     protected FlowConstructStatistics statistics;
@@ -93,7 +95,9 @@ public abstract class AbstractFlowConstruct implements FlowConstruct, Lifecycle,
                 public void onTransition(String phaseName, FlowConstruct object) throws MuleException
                 {
                     injectFlowConstructMuleContext(exceptionListener);
+                    injectFlowConstructMuleContext(redeliveryPolicy);
                     initialiseIfInitialisable(exceptionListener);
+                    initialiseIfInitialisable(redeliveryPolicy);
 
                     doInitialise();
 
@@ -119,6 +123,7 @@ public abstract class AbstractFlowConstruct implements FlowConstruct, Lifecycle,
             public void onTransition(String phaseName, FlowConstruct object) throws MuleException
             {
                 startIfStartable(exceptionListener);
+                startIfStartable(redeliveryPolicy);
                 doStart();
             }
         });
@@ -132,6 +137,7 @@ public abstract class AbstractFlowConstruct implements FlowConstruct, Lifecycle,
             {
                 doStop();
                 stopIfStoppable(exceptionListener);
+                stopIfStoppable(redeliveryPolicy);
             }
         });
     }
@@ -151,6 +157,7 @@ public abstract class AbstractFlowConstruct implements FlowConstruct, Lifecycle,
                 {
                     doDispose();
                     disposeIfDisposable(exceptionListener);
+                    disposeIfDisposable(redeliveryPolicy);
                 }
             });
         }
@@ -188,6 +195,16 @@ public abstract class AbstractFlowConstruct implements FlowConstruct, Lifecycle,
     public void setExceptionListener(MessagingExceptionHandler exceptionListener)
     {
         this.exceptionListener = exceptionListener;
+    }
+
+    public AbstractRedeliveryPolicy getRedeliveryPolicy()
+    {
+        return redeliveryPolicy;
+    }
+
+    public void setRedeliveryPolicy(AbstractRedeliveryPolicy redeliveryPolicy)
+    {
+        this.redeliveryPolicy = redeliveryPolicy;
     }
 
     public LifecycleState getLifecycleState()

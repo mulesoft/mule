@@ -11,15 +11,12 @@
 package org.mule.context.notification;
 
 import org.mule.api.MuleEvent;
-import org.mule.api.MuleRuntimeException;
 import org.mule.api.NameableObject;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.context.notification.BlockingServerEvent;
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.util.ObjectUtils;
-
-import java.lang.reflect.Method;
 
 public class MessageProcessorNotification extends ServerNotification implements BlockingServerEvent
 {
@@ -30,7 +27,6 @@ public class MessageProcessorNotification extends ServerNotification implements 
     public static final int MESSAGE_PROCESSOR_POST_INVOKE = MESSAGE_PROCESSOR_EVENT_ACTION_START_RANGE + 2;
 
     private final transient MessageProcessor processor;
-    private String messageProcessorName;
 
     static
     {
@@ -38,34 +34,14 @@ public class MessageProcessorNotification extends ServerNotification implements 
         registerAction("message processor post invoke", MESSAGE_PROCESSOR_POST_INVOKE);
     }
 
-
-    public MessageProcessorNotification(FlowConstruct flowConstruct, MuleEvent event, MessageProcessor processor, int action)
+    public MessageProcessorNotification(FlowConstruct flowConstruct,
+                                        MuleEvent event,
+                                        MessageProcessor processor,
+                                        int action)
     {
         super(event, action, flowConstruct != null ? flowConstruct.getName() : null);
 
         this.processor = processor;
-
-        // can't extract it to a method and still kepp the field final, have to leave it inline
-        try
-        {
-            // TODO would love to see MP.getName() in the API. Avoid BeanUtils.getProperty() overhead here
-            
-            try
-            {
-                final Method method = processor.getClass().getMethod("getName");
-                // invoke existing getName(), but provide same fallback if it returned nothing
-                messageProcessorName = ObjectUtils.toString(method.invoke(processor), toString(processor));
-            }
-            catch (NoSuchMethodException e)
-            {
-                // no such method, fallback to MP class name + NameableObject
-                messageProcessorName = toString(processor);
-            }
-        }
-        catch (Exception e)
-        {
-            throw new MuleRuntimeException(e);
-        }
     }
 
     @Override
@@ -81,11 +57,6 @@ public class MessageProcessorNotification extends ServerNotification implements 
     public MessageProcessor getProcessor()
     {
         return processor;
-    }
-
-    public String getFriendlyProcessorName()
-    {
-        return messageProcessorName;
     }
 
     protected String toString(Object obj)

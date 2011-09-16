@@ -26,7 +26,8 @@
 
     <flow name="testService">
         <vm:inbound-endpoint path="entry" connector-ref="vm-normal" exchange-pattern="one-way"/>
-        <test:component appendString=" Received"/>
+        <test:component appendString=" Received" jbossts:foo="bar" jbossts:baz="goo"/>
+        <test:component appendString="" jbossts:foo="joo"/>
         <outbound-endpoint ref="queue"/>
     </flow>
     

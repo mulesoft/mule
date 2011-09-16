@@ -37,7 +37,7 @@ public class MuleApplicationContext extends AbstractXmlApplicationContext
 {
     private MuleContext muleContext;
     private Resource[] springResources;
-
+    private static final ThreadLocal<MuleContext> currentMuleContext = new ThreadLocal<MuleContext>();
     /**
      * Parses configuration files creating a spring ApplicationContext which is used
      * as a parent registry using the SpringRegistry registry implementation to wraps
@@ -104,7 +104,17 @@ public class MuleApplicationContext extends AbstractXmlApplicationContext
         beanDefinitionReader.setDocumentReaderClass(MuleBeanDefinitionDocumentReader.class);
         //add error reporting
         beanDefinitionReader.setProblemReporter(new MissingParserProblemReporter());
-        beanDefinitionReader.loadBeanDefinitions(springResources);
+
+        // Communicate mule context to parsers
+        try
+        {
+            currentMuleContext.set(muleContext);
+            beanDefinitionReader.loadBeanDefinitions(springResources);
+        }
+        finally
+        {
+            currentMuleContext.remove();
+        }
     }
 
     @Override
@@ -124,5 +134,10 @@ public class MuleApplicationContext extends AbstractXmlApplicationContext
     public MuleContext getMuleContext()
     {
         return muleContext;
+    }
+
+    public static ThreadLocal<MuleContext> getCurrentMuleContext()
+    {
+        return currentMuleContext;
     }
 }

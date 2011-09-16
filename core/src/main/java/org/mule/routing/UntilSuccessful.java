@@ -24,6 +24,7 @@ import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.EndpointException;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.api.retry.RetryCallback;
 import org.mule.api.retry.RetryContext;
 import org.mule.api.retry.RetryNotifier;
@@ -99,8 +100,8 @@ public class UntilSuccessful extends AbstractOutboundRouter
     private String ackExpression;
     private ExpressionFilter failureExpressionFilter;
     private String eventKeyPrefix;
-    private EndpointBuilder dlqEndpointBuilder;
-    private OutboundEndpoint dlqEndpoint;
+    private Object deadLetterQueue;
+    private MessageProcessor dlqMP;
 
     @Override
     public void initialise() throws InitialisationException
@@ -129,17 +130,31 @@ public class UntilSuccessful extends AbstractOutboundRouter
 
         super.initialise();
 
-        if (dlqEndpointBuilder != null)
+        if (deadLetterQueue != null)
         {
-            try
+            if (deadLetterQueue instanceof EndpointBuilder)
             {
-                dlqEndpoint = dlqEndpointBuilder.buildOutboundEndpoint();
+                try
+                {
+
+                    dlqMP = ((EndpointBuilder)deadLetterQueue).buildOutboundEndpoint();
+                }
+                catch (EndpointException ee)
+                {
+                    throw new InitialisationException(
+                        MessageFactory.createStaticMessage("deadLetterQueue-ref is not a valid endpoint builder: " + deadLetterQueue),
+                        ee, this);
+                }
             }
-            catch (EndpointException ee)
+            else if (deadLetterQueue instanceof MessageProcessor)
+            {
+                dlqMP = (MessageProcessor) deadLetterQueue;
+            }
+            else
             {
                 throw new InitialisationException(
-                    MessageFactory.createStaticMessage("Invalid DQL endpoint builder: " + dlqEndpointBuilder),
-                    ee, this);
+                        MessageFactory.createStaticMessage("deadLetterQueue-ref is not a valid mesage processor: " + deadLetterQueue),
+                        null, this);
             }
         }
 
@@ -315,20 +330,20 @@ public class UntilSuccessful extends AbstractOutboundRouter
 
     private void abandonRetries(MuleEvent event, MuleEvent mutableEvent)
     {
-        if (dlqEndpoint == null)
+        if (dlqMP == null)
         {
-            logger.info("Retry attempts exhausted and no DLQ endpoint defined, dropping message: " + event);
+            logger.info("Retry attempts exhausted and no DLQ defined, dropping message: " + event);
             return;
         }
 
         try
         {
-            logger.info("Retry attempts exhausted, routing message to DLQ endpoint: " + dlqEndpoint);
-            dlqEndpoint.process(mutableEvent);
+            logger.info("Retry attempts exhausted, routing message to DLQ: " + dlqMP);
+            dlqMP.process(mutableEvent);
         }
         catch (MuleException me)
         {
-            logger.error("Failed to route message to DLQ endpoint: " + dlqEndpoint + ", dropping message: "
+            logger.error("Failed to route message to DLQ: " + dlqMP + ", dropping message: "
                          + event, me);
         }
     }
@@ -462,14 +477,14 @@ public class UntilSuccessful extends AbstractOutboundRouter
         this.ackExpression = ackExpression;
     }
 
-    public void setDlqEndpoint(EndpointBuilder dlqEndpointBuilder)
+    public void setDeadLetterQueue(Object deadLetterQueue)
     {
-        this.dlqEndpointBuilder = dlqEndpointBuilder;
+        this.deadLetterQueue = deadLetterQueue;
     }
 
-    public EndpointBuilder getDlqEndpoint()
+    public Object getDeadLetterQueue()
     {
-        return dlqEndpointBuilder;
+        return deadLetterQueue;
     }
 
     public String getEventKeyPrefix()

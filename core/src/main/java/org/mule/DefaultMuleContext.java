@@ -62,9 +62,13 @@ import org.mule.util.queue.QueueManager;
 
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 import javax.resource.spi.work.WorkListener;
 import javax.transaction.TransactionManager;
+import javax.xml.namespace.QName;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -125,6 +129,8 @@ public class DefaultMuleContext implements MuleContext
 
     private PollingController pollingController = new DefaultPollingController();
 
+    private Map<QName, Set<Object>> configurationAnnotations;
+
     public DefaultMuleContext(MuleConfiguration config,
                               WorkManager workManager,
                               WorkListener workListener,
@@ -145,6 +151,7 @@ public class DefaultMuleContext implements MuleContext
         muleRegistryHelper = createRegistryHelper(registryBroker);
         localMuleClient = new DefaultLocalMuleClient(this);
         exceptionListener = new DefaultSystemExceptionStrategy(this);
+        configurationAnnotations = new HashMap<QName, Set<Object>>();
     }
 
     protected DefaultRegistryBroker createRegistryBroker()
@@ -726,5 +733,11 @@ public class DefaultMuleContext implements MuleContext
     public String getUniqueIdString()
     {
         return clusterNodeId + "-" + UUID.getUUID();
+    }
+
+    @Override
+    public Map<QName, Set<Object>> getConfigurationAnnotations()
+    {
+        return configurationAnnotations;
     }
 }

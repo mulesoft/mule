@@ -11,6 +11,8 @@
 package org.mule.config.spring.parsers.assembly;
 
 import org.mule.api.AnnotatedObject;
+import org.mule.api.MuleContext;
+import org.mule.config.spring.MuleApplicationContext;
 import org.mule.config.spring.MuleHierarchicalBeanDefinitionParserDelegate;
 import org.mule.config.spring.parsers.assembly.configuration.PropertyConfiguration;
 import org.mule.config.spring.parsers.assembly.configuration.SingleProperty;
@@ -25,8 +27,10 @@ import org.mule.util.MapCombiner;
 import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.StringTokenizer;
 
 import javax.xml.namespace.QName;
@@ -127,7 +131,20 @@ public class DefaultBeanAssembler implements BeanAssembler
             {
                 name = new QName(attribute.getNamespaceURI(), attribute.getLocalName());
             }
-            addAnnotationValue(beanDefinition.getPropertyValues(), name, beanConfig.translateValue(oldName, oldValue));
+            Object value = beanConfig.translateValue(oldName, oldValue);
+            addAnnotationValue(beanDefinition.getPropertyValues(), name, value);
+            MuleContext muleContext = MuleApplicationContext.getCurrentMuleContext().get();
+            if (muleContext != null)
+            {
+                Map<QName, Set<Object>> annotations = muleContext.getConfigurationAnnotations();
+                Set<Object> values = annotations.get(name);
+                if (values == null)
+                {
+                    values = new HashSet<Object>();
+                    annotations.put(name, values);
+                }
+                values.add(value);
+            }
         }
         else
         {

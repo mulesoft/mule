@@ -130,7 +130,7 @@ import org.mule.object.PrototypeObjectFactory;
 import org.mule.object.SingletonObjectFactory;
 import org.mule.processor.InvokerMessageProcessor;
 import org.mule.processor.NullMessageProcessor;
-import org.mule.processor.RedeliveryPolicy;
+import org.mule.processor.IdempotentRedeliveryPolicy;
 import org.mule.processor.strategy.AsynchronousProcessingStrategy;
 import org.mule.processor.strategy.QueuedAsynchronousProcessingStrategy;
 import org.mule.processor.strategy.QueuedThreadPerProcessorProcessingStrategy;
@@ -242,6 +242,8 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("default-exception-strategy", new ChildDefinitionParser("exceptionListener", DefaultMessagingExceptionStrategy.class));
         registerDeprecatedBeanDefinitionParser("default-service-exception-strategy", new ChildDefinitionParser("exceptionListener", DefaultMessagingExceptionStrategy.class), "Use default-exception-strategy instead.");
         registerBeanDefinitionParser("custom-exception-strategy", new ChildDefinitionParser("exceptionListener", null));
+        registerBeanDefinitionParser("idempotent-redelivery-policy",
+            new ChildDefinitionParser("redeliveryPolicy", IdempotentRedeliveryPolicy.class));
         registerBeanDefinitionParser("commit-transaction", new ExceptionTXFilterDefinitionParser("commitTxFilter"));
         registerBeanDefinitionParser("rollback-transaction", new ExceptionTXFilterDefinitionParser("rollbackTxFilter"));
 
@@ -517,8 +519,7 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("first-successful", new ChildDefinitionParser("messageProcessor", FirstSuccessful.class));
         registerBeanDefinitionParser("until-successful", new ChildDefinitionParser("messageProcessor", UntilSuccessful.class));
         registerBeanDefinitionParser("round-robin", new ChildDefinitionParser("messageProcessor", RoundRobin.class));
-        registerBeanDefinitionParser("redelivery-policy", new ChildDefinitionParser("messageProcessor", RedeliveryPolicy.class));
-        registerBeanDefinitionParser("process-failed-message", new ChildDefinitionParser("failedMessageProcessor", MessageProcessorFilterPairFactoryBean.class));
+        registerBeanDefinitionParser("dead-letter-queue", new ChildDefinitionParser("deadLetterQueue", MessageProcessorFilterPairFactoryBean.class));
 
         registerBeanDefinitionParser("custom-router", new ChildDefinitionParser("messageProcessor"));
 

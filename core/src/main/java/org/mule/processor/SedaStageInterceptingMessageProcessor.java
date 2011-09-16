@@ -70,7 +70,7 @@ public class SedaStageInterceptingMessageProcessor extends AsyncInterceptingMess
                                                  QueueStatistics queueStatistics,
                                                  MuleContext muleContext)
     {
-        super(threadingProfile, "seda." + name, muleContext.getConfiguration().getShutdownTimeout());
+        super(threadingProfile, name, muleContext.getConfiguration().getShutdownTimeout());
         this.name = name;
         this.queueProfile = queueProfile;
         this.queueTimeout = queueTimeout;

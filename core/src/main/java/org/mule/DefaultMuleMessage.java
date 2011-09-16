@@ -720,7 +720,10 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     public void propagateRootId(MuleMessage parent)
     {
         assertAccess(WRITE);
-        rootId = parent.getMessageRootId();
+        if (parent != null)
+        {
+            rootId = parent.getMessageRootId();
+        }
     }
 
     /**

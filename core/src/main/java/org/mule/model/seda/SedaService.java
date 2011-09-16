@@ -32,6 +32,7 @@ import org.mule.service.processor.ServiceOutboundMessageProcessor;
 import org.mule.service.processor.ServiceOutboundStatisticsMessageProcessor;
 import org.mule.service.processor.ServiceSetEventRequestContextMessageProcessor;
 import org.mule.service.processor.ServiceStatisticsMessageProcessor;
+import org.mule.util.concurrent.ThreadNameHelper;
 
 /**
  * A Seda service runs inside a Seda Model and is responsible for managing a Seda
@@ -83,8 +84,8 @@ public class SedaService extends AbstractService
         builder.chain(new ServiceSetEventRequestContextMessageProcessor());
         if (getThreadingProfile().isDoThreading())
         {
-            sedaStage = new LaxSedaStageInterceptingMessageProcessor(getName(), queueProfile, queueTimeout,
-                threadingProfile, stats, muleContext);
+            sedaStage = new LaxSedaStageInterceptingMessageProcessor(ThreadNameHelper.sedaService(
+                muleContext, getName()), queueProfile, queueTimeout, threadingProfile, stats, muleContext);
             builder.chain(sedaStage);
         }
         builder.chain(new ServiceInternalMessageProcessor(this));

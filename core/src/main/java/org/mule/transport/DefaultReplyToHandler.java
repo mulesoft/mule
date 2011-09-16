@@ -57,7 +57,7 @@ public class DefaultReplyToHandler implements ReplyToHandler, Serializable, Dese
     /**
      * logger used by this class
      */
-    protected transient final Log logger = LogFactory.getLog(getClass());
+    protected transient Log logger = LogFactory.getLog(getClass());
 
     private transient Map<String, ImmutableEndpoint> endpointCache = new HashMap<String, ImmutableEndpoint>();
     protected transient MuleContext muleContext;
@@ -153,6 +153,7 @@ public class DefaultReplyToHandler implements ReplyToHandler, Serializable, Dese
             return;
         }
         this.muleContext = muleContext;
+        logger = LogFactory.getLog(getClass());
         endpointCache = new HashMap<String, ImmutableEndpoint>();
         connector = findConnector();
         serializedData = null;
