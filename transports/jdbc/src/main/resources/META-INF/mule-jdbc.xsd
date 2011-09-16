@@ -114,6 +114,11 @@
                     <xsd:element ref="abstract-query" minOccurs="0" maxOccurs="unbounded"/>
                 </xsd:sequence>
                 <xsd:attributeGroup ref="addressAttributes"/>
+                <xsd:attribute name="pollingFrequency" type="mule:substitutableLong">
+                        <xsd:annotation>
+                                <xsd:documentation>The delay in milliseconds that will be used during two subsequent polls to the database.</xsd:documentation>
+                        </xsd:annotation>
+                </xsd:attribute>
                 <xsd:attribute name="queryTimeout" type="xsd:int" default="-1">
                     <xsd:annotation>
                         <xsd:documentation>
@@ -160,6 +165,11 @@
                     <xsd:element ref="abstract-query" minOccurs="0" maxOccurs="unbounded"/>
                 </xsd:sequence>
                 <xsd:attributeGroup ref="addressAttributes"/>
+                <xsd:attribute name="pollingFrequency" type="mule:substitutableLong">
+                        <xsd:annotation>
+                                <xsd:documentation>The delay in milliseconds that will be used during two subsequent polls to the database.</xsd:documentation>
+                        </xsd:annotation>
+                </xsd:attribute>
                 <xsd:attribute name="queryTimeout" type="xsd:int" default="-1">
                     <xsd:annotation>
                         <xsd:documentation>
@@ -198,11 +208,6 @@
         <xsd:attribute name="queryKey" type="xsd:string">
                 <xsd:annotation>
                         <xsd:documentation>The key of the query to use.</xsd:documentation>
-                </xsd:annotation>
-        </xsd:attribute>
-        <xsd:attribute name="pollingFrequency" type="mule:substitutableLong">
-                <xsd:annotation>
-                        <xsd:documentation>The delay in milliseconds that will be used during two subsequent polls to the database.</xsd:documentation>
                 </xsd:annotation>
         </xsd:attribute>
     </xsd:attributeGroup>

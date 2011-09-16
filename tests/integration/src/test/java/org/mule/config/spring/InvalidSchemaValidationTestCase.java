@@ -16,6 +16,7 @@ import org.junit.Test;
 import org.junit.After;
 import org.xml.sax.SAXException;
 import org.apache.commons.collections.map.HashedMap;
+import static org.junit.Assert.assertTrue;
 
 public class InvalidSchemaValidationTestCase extends AbstractSchemaValidationTestCase
 {
@@ -62,6 +63,21 @@ public class InvalidSchemaValidationTestCase extends AbstractSchemaValidationTes
         doTest("org/mule/config/spring/schema-validation-not-transacted-ftp-connector-test.xml");
     }
 
+    @Test
+    public void testJdbcInvalidPollingFrequencyInOutboundEndpoint() throws SAXException, IOException
+    {
+        addSchema("http://www.mulesoft.org/schema/mule/jdbc","META-INF/mule-jdbc.xsd");
+        addSchema("http://www.mulesoft.org/schema/mule/test", "http://www.mulesoft.org/schema/mule/test/3.2/mule-test.xsd");
+        try
+        {
+            doTest("org/mule/config/spring/schema-validation-jdbc-invalid-polling-frequency.xml");
+        }
+        catch(SAXException e)
+        {
+            // Check that the pollingFrequency exception is because of the outbound endpoint and not the inbound
+            assertTrue(e.getMessage() != null && e.getMessage().contains("jdbc:outbound-endpoint"));
+        }
+    }
 
 
 }
