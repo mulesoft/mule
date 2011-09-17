@@ -1,5 +1,5 @@
 /*
- * $Id: JdbcMessageReceiver.java 22229 2011-06-21 06:49:29Z dirk.olmes $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  *
