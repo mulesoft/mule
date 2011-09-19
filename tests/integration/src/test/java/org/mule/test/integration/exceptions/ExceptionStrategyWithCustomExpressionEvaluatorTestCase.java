@@ -35,7 +35,7 @@ public class ExceptionStrategyWithCustomExpressionEvaluatorTestCase extends Func
     {
         MuleClient client = muleContext.getClient();
         client.dispatch("vm://in", TEST_MESSAGE, null);
-        MuleMessage message = client.request("vm://out", DEFAULT_TEST_TIMEOUT_SECS);
+        MuleMessage message = client.request("vm://out", RECEIVE_TIMEOUT);
 
         assertNotNull("request returned no message", message);
         assertTrue(message.getPayload() instanceof ExceptionMessage);
