@@ -26,7 +26,6 @@ import static org.junit.Assert.assertTrue;
 
 public class ExceptionStrategyWithCustomExpressionEvaluatorTestCase extends FunctionalTestCase
 {
-
     @Override
     protected String getConfigResources()
     {
@@ -37,15 +36,15 @@ public class ExceptionStrategyWithCustomExpressionEvaluatorTestCase extends Func
     public void testCustomExpressionEvaluatorExceptionStrategy() throws MuleException
     {
         MuleClient client = muleContext.getClient();
-        client.send("vm://in", TEST_MESSAGE, null);
-        MuleMessage message = client.request("vm://out", DEFAULT_TEST_TIMEOUT_SECS);
-        assertNotNull(message);
+        client.dispatch("vm://in", TEST_MESSAGE, null);
+        MuleMessage message = client.request("vm://out", RECEIVE_TIMEOUT);
+
+        assertNotNull("request returned no message", message);
         assertTrue(message.getPayload() instanceof ExceptionMessage);
     }
 
     public static class FooExpressionEvaluator implements ExpressionEvaluator
     {
-
         public Object evaluate(String expression, MuleMessage message)
         {
             throw new UnsupportedOperationException("evaluate");
@@ -61,5 +60,4 @@ public class ExceptionStrategyWithCustomExpressionEvaluatorTestCase extends Func
             return "Foo";
         }
     }
-
 }
