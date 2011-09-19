@@ -106,7 +106,6 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
      */
     private transient Map<String, DataHandler> outboundAttachments = new ConcurrentHashMap<String, DataHandler>();
 
-    private transient List<Integer> appliedTransformerHashCodes;
     private transient byte[] cache;
     protected transient MuleContext muleContext;
 
@@ -158,7 +157,6 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
                               MuleContext muleContext)
     {
         setMuleContext(muleContext);
-        initAppliedTransformerHashCodes();
 
         if (message instanceof MuleMessage)
         {
@@ -188,7 +186,6 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         id = previous.getUniqueId();
         rootId = previous.getMessageRootId();
         setMuleContext(muleContext);
-        initAppliedTransformerHashCodes();
         setEncoding(previous.getEncoding());
 
         if (message instanceof MuleMessage)
@@ -286,11 +283,6 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
             throw new IllegalArgumentException(CoreMessages.objectIsNull("muleContext").getMessage());
         }
         muleContext = context;
-    }
-
-    private void initAppliedTransformerHashCodes()
-    {
-        appliedTransformerHashCodes = new CopyOnWriteArrayList<Integer>();
     }
 
     /**
@@ -1328,7 +1320,6 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     public void release()
     {
         cache = null;
-        appliedTransformerHashCodes.clear();
     }
 
     /**
@@ -1352,10 +1343,9 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     @Override
     public void applyTransformers(MuleEvent event, List<? extends Transformer> transformers, Class<?> outputType) throws MuleException
     {
-        if (!transformers.isEmpty() && !appliedTransformerHashCodes.contains(transformers.hashCode()))
+        if (!transformers.isEmpty())
         {
             applyAllTransformers(event, transformers);
-            appliedTransformerHashCodes.add(transformers.hashCode());
         }
 
         if (null != outputType && !getPayload().getClass().isAssignableFrom(outputType))
@@ -1742,7 +1732,6 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     public void initAfterDeserialisation(MuleContext context) throws MuleException
     {
         this.muleContext = context;
-        initAppliedTransformerHashCodes();
     }
 
     @Override
