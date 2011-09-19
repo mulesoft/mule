@@ -115,12 +115,21 @@ public abstract class AbstractXPathExpressionEvaluator implements ExpressionEval
             }
 
             XPath xpath = getXPath(expression, payload);
-            if(namespaceManager!=null)
+            List<?> result;
+
+            /*  XPath context state is not thread safe so synchronization must be enforce when adding a new namespace and
+                on evaluation when the context is read
+             */
+            synchronized (xpath)
             {
-                addNamespaces(namespaceManager, xpath);
+                if(namespaceManager!=null)
+                {
+                    addNamespaces(namespaceManager, xpath);
+                }
+
+                result = xpath.selectNodes(payload);
             }
 
-            List<?> result = xpath.selectNodes(payload);
             result = extractResultsFromNodes(result);
             if(result.size()==1)
             {
@@ -148,10 +157,7 @@ public abstract class AbstractXPathExpressionEvaluator implements ExpressionEval
             Map.Entry<?, ?> entry = (Map.Entry<?, ?>)iterator.next();
             try
             {
-                synchronized (xpath)
-                {
-                    xpath.addNamespace(entry.getKey().toString(), entry.getValue().toString());
-                }
+                xpath.addNamespace(entry.getKey().toString(), entry.getValue().toString());
             }
             catch (JaxenException e)
             {
