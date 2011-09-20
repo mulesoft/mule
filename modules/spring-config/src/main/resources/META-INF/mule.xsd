@@ -3201,9 +3201,7 @@
 
     <xsd:group name="defaultXaEndpointElements">
         <xsd:sequence>
-            <xsd:group ref="endpointMessageProcessorElements" minOccurs="0" maxOccurs="unbounded"/>
-            <xsd:element ref="response" minOccurs="0"/>
-            <xsd:element ref="abstract-transaction" minOccurs="0"/>
+            <xsd:group ref="commonDefaultEndpointElements"/>
             <xsd:element ref="abstract-xa-transaction" minOccurs="0"/>
             <xsd:group ref="propertiesGroup"/>
         </xsd:sequence>
