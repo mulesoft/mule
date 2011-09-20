@@ -106,7 +106,10 @@
                     <copyToAppsDirectory>true</copyToAppsDirectory>
                 </configuration>
             </plugin>
-            <!-- Run mvn war:war to build the bookstore-admin webapp as a deployable .WAR archive -->
+            <!--
+                Run 'mvn compile war:war' to build the bookstore-admin webapp as a deployable
+                .WAR archive
+            -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-war-plugin</artifactId>
@@ -114,6 +117,16 @@
                 <configuration>
                     <warName>bookstore-admin</warName>
                     <warSourceDirectory>src/main/app/webapps/bookstore-admin</warSourceDirectory>
+                    <webResources>
+                        <resource>
+                            <directory>src/main/resources</directory>
+                            <targetPath>WEB-INF/classes</targetPath>
+                            <includes>
+                                <include>bookstore-config.xml</include>
+                                <include>email.properties</include>
+                            </includes>
+                        </resource>
+                    </webResources>
                 </configuration>
             </plugin>
         </plugins>

@@ -28,7 +28,7 @@
         <init-param>
             <param-name>org.mule.servlet.default.content.type</param-name>
             <param-value>text/html</param-value>
-        </init-param>                
+        </init-param>
     </servlet>
 
     <servlet-mapping>
