@@ -25,6 +25,7 @@ import org.mule.api.source.MessageSource;
 import org.mule.api.transport.Connector;
 import org.mule.lifecycle.LifecycleObject;
 import org.mule.lifecycle.NotificationLifecycleObject;
+import org.mule.util.queue.TransactionalQueueManager;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -42,7 +43,7 @@ import java.util.Set;
  * {@link org.mule.api.transport.Connector}, {@link org.mule.api.agent.Agent}, {@link org.mule.api.model.Model}, {@link org.mule.api.service.Service}, followed
  * by any other object that implements {@link org.mule.api.lifecycle.Startable}.
  *
- * @see org.mule.api.MuleContext
+ * @see org.mule.api.MuleContext                                       N
  * @see org.mule.api.lifecycle.LifecycleManager
  * @see org.mule.api.lifecycle.Startable
  *
@@ -60,6 +61,7 @@ public class MuleContextStartPhase extends DefaultLifecyclePhase
         super(Startable.PHASE_NAME, Startable.class, Stoppable.PHASE_NAME);
 
         Set<LifecycleObject> startOrderedObjects = new LinkedHashSet<LifecycleObject>();
+        startOrderedObjects.add(new NotificationLifecycleObject(TransactionalQueueManager.class));
         startOrderedObjects.add(new NotificationLifecycleObject(Connector.class));
         startOrderedObjects.add(new NotificationLifecycleObject(Agent.class));
         startOrderedObjects.add(new NotificationLifecycleObject(Model.class));
