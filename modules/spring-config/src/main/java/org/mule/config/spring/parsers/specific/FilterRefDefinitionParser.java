@@ -34,15 +34,7 @@ import org.w3c.dom.Element;
  */
 public class FilterRefDefinitionParser extends ParentDefinitionParser
 {
-
     public static final String FILTER = "filter";
-
-    private String ref;
-
-    public FilterRefDefinitionParser()
-    {
-        super();
-    }
 
     @Override
     protected void preProcess(Element element)
@@ -67,12 +59,12 @@ public class FilterRefDefinitionParser extends ParentDefinitionParser
 
         return !("message-filter".equals(parentName) || "and-filter".equals(parentName)
                  || "or-filter".equals(parentName) || "not-filter".equals(parentName)
-                 || "outbound".equals(grandParentName) || "selective-consumer-router".equals(parentName) || "error-filter".equals(parentName));
+                 || "outbound".equals(grandParentName) || "selective-consumer-router".equals(parentName)
+                 || "error-filter".equals(parentName) || "when".equals(parentName));
     }
 
     private static class MessageProcessorWrappingBeanAssemblerFactory implements BeanAssemblerFactory
     {
-
         public BeanAssembler newBeanAssembler(PropertyConfiguration beanConfig,
                                               BeanDefinitionBuilder bean,
                                               PropertyConfiguration targetConfig,
@@ -84,7 +76,6 @@ public class FilterRefDefinitionParser extends ParentDefinitionParser
 
     private static class MessageProcessorWrappingBeanAssembler extends DefaultBeanAssembler
     {
-
         public MessageProcessorWrappingBeanAssembler(PropertyConfiguration beanConfig,
                                                      BeanDefinitionBuilder bean,
                                                      PropertyConfiguration targetConfig,
@@ -101,8 +92,8 @@ public class FilterRefDefinitionParser extends ParentDefinitionParser
             String newName = bestGuessName(targetConfig, oldName, target.getBeanClassName());
             MutablePropertyValues targetProperties = target.getPropertyValues();
             MutablePropertyValues beanProperties = bean.getBeanDefinition().getPropertyValues();
-            RuntimeBeanReference ref = (RuntimeBeanReference) ((ManagedList) beanProperties.getPropertyValue(
-                newName).getValue()).get(0);
+            Object value = beanProperties.getPropertyValue(newName).getValue();
+            RuntimeBeanReference ref = (RuntimeBeanReference) ((ManagedList<?>) value).get(0);
 
             BeanDefinitionBuilder messageFilter = BeanDefinitionBuilder.genericBeanDefinition(MessageFilter.class);
             messageFilter.addPropertyValue(FILTER, ref);
@@ -112,7 +103,7 @@ public class FilterRefDefinitionParser extends ParentDefinitionParser
 
             if (oldValue == null)
             {
-                oldValue = new ManagedList();
+                oldValue = new ManagedList<Object>();
                 pv = new PropertyValue(newName, oldValue);
                 targetProperties.addPropertyValue(pv);
             }
