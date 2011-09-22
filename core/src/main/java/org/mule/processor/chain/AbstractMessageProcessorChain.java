@@ -15,6 +15,7 @@ import org.mule.api.MuleException;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.construct.FlowConstructAware;
 import org.mule.api.context.MuleContextAware;
+import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
@@ -26,6 +27,7 @@ import org.mule.api.processor.MessageProcessorChain;
 import org.mule.api.processor.policy.AroundPolicy;
 import org.mule.api.processor.policy.Policies;
 import org.mule.api.processor.policy.PolicyInvocation;
+import org.mule.endpoint.EndpointAware;
 import org.mule.processor.AbstractInterceptingMessageProcessor;
 import org.mule.util.StringUtils;
 
@@ -41,7 +43,7 @@ import org.apache.commons.logging.LogFactory;
  * the first in the nested chain.
  */
 public abstract class AbstractMessageProcessorChain extends AbstractInterceptingMessageProcessor
-                                                    implements MessageProcessorChain, Lifecycle, FlowConstructAware, MuleContextAware
+                                                    implements MessageProcessorChain, Lifecycle, FlowConstructAware, MuleContextAware, EndpointAware
 {
     protected final transient Log log = LogFactory.getLog(getClass());
     protected String name;
@@ -192,6 +194,17 @@ public abstract class AbstractMessageProcessorChain extends AbstractIntercepting
         }
 
         return string.toString();
+    }
+
+    public void setEndpoint(ImmutableEndpoint endpoint)
+    {
+        for (MessageProcessor processor : processors)
+        {
+            if (processor instanceof EndpointAware)
+            {
+                 ((EndpointAware) processor).setEndpoint(endpoint);
+            }
+        }
     }
 
     public List<MessageProcessor> getMessageProcessors()
