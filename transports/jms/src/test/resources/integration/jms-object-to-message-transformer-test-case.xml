@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+      xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xsi:schemaLocation="
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
+       http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/3.2/mule-test.xsd
+       http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/3.2/mule-jms.xsd">
+
+    <jms:activemq-connector name="activeMQConnector"/>
+
+    <flow name="object-to-message-flow">
+        <jms:inbound-endpoint queue="in" disableTransportTransformer="true" exchange-pattern="request-response">
+            <jms:jmsmessage-to-object-transformer/>
+            <response>
+                <jms:object-to-jmsmessage-transformer/>
+            </response>
+        </jms:inbound-endpoint>
+        <test:component appendString=" with something more"/>
+    </flow>
+
+</mule>
