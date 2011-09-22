@@ -18,8 +18,7 @@ import org.mule.api.registry.ServiceException;
  * creating a model from a service descriptor. A service descriptor should be
  * located at META-INF/services/org/mule/models/<type> where type is the
  * type of the model to be created.  The service descriptor is in the form of
- * string key value pairs and supports a number of properties, descriptions of which
- * can be found here: http://www.muledocs.org/Model+Service+Descriptors.
+ * string key value pairs.
  */
 public interface ModelServiceDescriptor extends ServiceDescriptor
 {
@@ -27,5 +26,3 @@ public interface ModelServiceDescriptor extends ServiceDescriptor
 
     Class<Model> getModelClass() throws ServiceException;
 }
-
-
