@@ -114,19 +114,14 @@ public abstract class AbstractXPathExpressionEvaluator implements ExpressionEval
                 payload = message.getPayload(DataTypeFactory.create(Document.class));
             }
 
-            XPath xpath = getXPath(expression, payload);
             List<?> result;
 
             /*  XPath context state is not thread safe so synchronization must be enforce when adding a new namespace and
                 on evaluation when the context is read
              */
+            XPath xpath = getXPath(expression, payload);
             synchronized (xpath)
             {
-                if(namespaceManager!=null)
-                {
-                    addNamespaces(namespaceManager, xpath);
-                }
-
                 result = xpath.selectNodes(payload);
             }
 
@@ -178,6 +173,13 @@ public abstract class AbstractXPathExpressionEvaluator implements ExpressionEval
         if(xpath==null)
         {
             xpath = createXPath(expression, object);
+            synchronized (xpath)
+            {
+                if(namespaceManager!=null)
+                {
+                    addNamespaces(namespaceManager, xpath);
+                }
+            }
             cache.put(expression + getClass().getName(), xpath);
         }
         return xpath;
