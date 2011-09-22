@@ -25,7 +25,8 @@ import java.util.List;
 
 import org.springframework.beans.factory.FactoryBean;
 
-public class MessageProcessorFilterPairFactoryBean implements FactoryBean, MuleContextAware
+public class MessageProcessorFilterPairFactoryBean implements FactoryBean<MessageProcessorFilterPair>,
+    MuleContextAware
 {
     private List<MessageProcessor> messageProcessors;
     private Filter filter = new ExpressionFilter();
@@ -55,7 +56,8 @@ public class MessageProcessorFilterPairFactoryBean implements FactoryBean, MuleC
         ((ExpressionFilter) filter).setCustomEvaluator(customEvaluator);
     }
 
-    public Object getObject() throws Exception
+    @Override
+    public MessageProcessorFilterPair getObject() throws Exception
     {
         MessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
         for (Object processor : messageProcessors)
@@ -71,24 +73,38 @@ public class MessageProcessorFilterPairFactoryBean implements FactoryBean, MuleC
             else
             {
                 throw new IllegalArgumentException(
-                    "MessageProcessorBuilder should only have MessageProcessor's or MessageProcessorBuilder's configured");
+                    "MessageProcessorBuilder should only have MessageProcessors or MessageProcessorBuilders configured");
             }
         }
-        return filter == null
-                             ? new MessageProcessorFilterPair(builder.build(), AcceptAllFilter.INSTANCE)
-                             : new MessageProcessorFilterPair(builder.build(), filter);
+
+        return createFilterPair(builder);
     }
 
-    public Class<?> getObjectType()
+    private MessageProcessorFilterPair createFilterPair(MessageProcessorChainBuilder builder) throws Exception
+    {
+        if (filter == null)
+        {
+            return new MessageProcessorFilterPair(builder.build(), AcceptAllFilter.INSTANCE);
+        }
+        else
+        {
+            return new MessageProcessorFilterPair(builder.build(), filter);
+        }
+    }
+
+    @Override
+    public Class<MessageProcessorFilterPair> getObjectType()
     {
         return MessageProcessorFilterPair.class;
     }
 
+    @Override
     public boolean isSingleton()
     {
         return true;
     }
 
+    @Override
     public void setMuleContext(MuleContext context)
     {
         if (filter != null && filter instanceof MuleContextAware)
@@ -96,5 +112,4 @@ public class MessageProcessorFilterPairFactoryBean implements FactoryBean, MuleC
             ((MuleContextAware) filter).setMuleContext(context);
         }
     }
-
 }

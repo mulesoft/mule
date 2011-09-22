@@ -313,7 +313,7 @@ public abstract class AbstractSelectiveRouter
         }
     }
 
-    protected List<MessageProcessorFilterPair> getConditionalMessageProcessors()
+    public List<MessageProcessorFilterPair> getConditionalMessageProcessors()
     {
         return Collections.unmodifiableList(conditionalMessageProcessors);
     }
