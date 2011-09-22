@@ -116,8 +116,8 @@ public abstract class AbstractXPathExpressionEvaluator implements ExpressionEval
 
             List<?> result;
 
-            /*  XPath context state is not thread safe so synchronization must be enforce when adding a new namespace and
-                on evaluation when the context is read
+            /*  XPath context state is not thread safe so synchronization must be enforced when adding a new namespace and
+                on evaluation when the context is read.
              */
             XPath xpath = getXPath(expression, payload);
             synchronized (xpath)
@@ -167,6 +167,11 @@ public abstract class AbstractXPathExpressionEvaluator implements ExpressionEval
         throw new UnsupportedOperationException("setName");
     }
 
+    /*
+        The cache is not thread safe, more than one instance of the same xpath can be created, it wouldn't be an
+        issue in this case since one will eventually be selected for GC
+        A ReadWriteLock could be used to guard the cache but it would add unnecessary complexity
+     */
     protected XPath getXPath(String expression, Object object) throws JaxenException
     {
         XPath xpath = cache.get(expression + getClass().getName());
