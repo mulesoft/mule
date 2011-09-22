@@ -38,14 +38,14 @@ import java.util.Properties;
  * located at META-INF/services/org/mule/providers/<protocol> where protocol is the
  * protocol of the connector to be created The service descriptor is in the form of
  * string key value pairs and supports a number of properties, descriptions of which
- * can be found here: http://www.muledocs.org/Transport+Service+Descriptors.
+ * can be found here: http://www.mulesoft.org/documentation/display/MULE3USER/Transport+Service+Descriptors
  */
 public interface TransportServiceDescriptor extends ServiceDescriptor, MuleContextAware
 {
     public static final String OSGI_HEADER_TRANSPORT = "Mule-Transport";
 
     MuleMessageFactory createMuleMessageFactory() throws TransportServiceException;
-    
+
     SessionHandler createSessionHandler() throws TransportServiceException;
 
     MessageReceiver createMessageReceiver(Connector connector,
@@ -84,6 +84,6 @@ public interface TransportServiceDescriptor extends ServiceDescriptor, MuleConte
     List<MessageExchangePattern> getInboundExchangePatterns() throws TransportServiceException;
 
     List<MessageExchangePattern> getOutboundExchangePatterns() throws TransportServiceException;
-    
+
     MessageExchangePattern getDefaultExchangePattern() throws TransportServiceException;
 }
