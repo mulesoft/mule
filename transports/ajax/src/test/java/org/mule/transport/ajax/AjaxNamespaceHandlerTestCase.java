@@ -56,6 +56,8 @@ public class AjaxNamespaceHandlerTestCase extends FunctionalTestCase
         assertEquals(50000, connector.getTimeout());
         assertEquals(new URL("http://0.0.0.0:" + dynamicPort1.getNumber() + "/service"), connector.getServerUrl());
         assertEquals("/foo/bar", connector.getResourceBase());
+        // Test a abstract connector property (MULE-5776)
+        assertTrue(connector.isValidateConnections());
     }
 
     @Test

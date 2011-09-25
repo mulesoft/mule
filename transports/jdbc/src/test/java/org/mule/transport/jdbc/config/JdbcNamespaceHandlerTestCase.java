@@ -73,6 +73,8 @@ public class JdbcNamespaceHandlerTestCase extends FunctionalTestCase
 
         assertTrue(c.isConnected());
         assertTrue(c.isStarted());
+        // Test a abstract connector property (MULE-5776)
+        assertTrue(c.isValidateConnections());
     }
 
     @Test
