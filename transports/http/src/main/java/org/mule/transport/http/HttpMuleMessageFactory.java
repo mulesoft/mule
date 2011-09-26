@@ -16,9 +16,6 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.transport.MessageTypeNotSupportedException;
 import org.mule.transport.AbstractMuleMessageFactory;
-import org.mule.transport.http.multipart.MultiPartInputStream;
-import org.mule.transport.http.multipart.Part;
-import org.mule.transport.http.multipart.PartDataSource;
 import org.mule.util.CaseInsensitiveHashMap;
 import org.mule.util.IOUtils;
 import org.mule.util.PropertiesUtils;
@@ -28,11 +25,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-
-import javax.activation.DataHandler;
 
 import org.apache.commons.httpclient.Cookie;
 import org.apache.commons.httpclient.Header;
@@ -51,7 +45,6 @@ public class HttpMuleMessageFactory extends AbstractMuleMessageFactory
     private boolean enableCookies = false;
     private String cookieSpec;
     private MessageExchangePattern exchangePattern = MessageExchangePattern.REQUEST_RESPONSE;
-    private Collection<Part> parts;
 
     public HttpMuleMessageFactory(MuleContext context)
     {
@@ -84,76 +77,27 @@ public class HttpMuleMessageFactory extends AbstractMuleMessageFactory
 
     protected Object extractPayloadFromHttpRequest(HttpRequest httpRequest) throws IOException
     {
-        Object body = null;
+        Object body = httpRequest.getBody();
 
-        if (httpRequest.getContentType().contains("multipart/form-data"))
+        // If http method is GET we use the request uri as the payload.
+        if (body == null)
         {
-            MultiPartInputStream in = new MultiPartInputStream(httpRequest.getBody(), httpRequest.getContentType(), null);
-
-            //We need to store this so that the headers for the part can be read
-            parts = in.getParts();
-            for (Part part : parts)
-            {
-                if (part.getName().equals("payload"))
-                {
-                    body = part.getInputStream();
-                    break;
-                }
-            }
-            if (body == null)
-            {
-                throw new IllegalArgumentException("todo");
-            }
+            body = httpRequest.getRequestLine().getUri();
         }
         else
         {
-
-            body = httpRequest.getBody();
-
-            // If http method is GET we use the request uri as the payload.
-            if (body == null)
+            // If we are running async we need to read stream into a byte[].
+            // Passing along the InputStream doesn't work because the
+            // HttpConnection gets closed and closes the InputStream, often
+            // before it can be read.
+            if (!exchangePattern.hasResponse())
             {
-                body = httpRequest.getRequestLine().getUri();
-            }
-            else
-            {
-                // If we are running async we need to read stream into a byte[].
-                // Passing along the InputStream doesn't work because the
-                // HttpConnection gets closed and closes the InputStream, often
-                // before it can be read.
-                if (!exchangePattern.hasResponse())
-                {
-                    log.debug("Reading HTTP POST InputStream into byte[] for asynchronous messaging.");
-                    body = IOUtils.toByteArray((InputStream) body);
-                }
+                log.debug("Reading HTTP POST InputStream into byte[] for asynchronous messaging.");
+                body = IOUtils.toByteArray((InputStream) body);
             }
         }
 
         return body;
-    }
-
-    @Override
-    protected void addAttachments(DefaultMuleMessage message, Object transportMessage) throws Exception
-    {
-        if (parts != null)
-        {
-            try
-            {
-                for (Part part : parts)
-                {
-                    if (!part.getName().equals("payload"))
-                    {
-                        message.addInboundAttachment(part.getName(), new DataHandler(new PartDataSource(part)));
-                    }
-                }
-            }
-            finally
-            {
-                //Attachments are the last thing to get processed
-                parts.clear();
-                parts = null;
-            }
-        }
     }
 
     protected Object extractPayloadFromHttpMethod(HttpMethod httpMethod) throws IOException
@@ -388,24 +332,9 @@ public class HttpMuleMessageFactory extends AbstractMuleMessageFactory
         }
     }
 
-    protected void convertMultiPartHeaders(Map headers)
+    protected void convertMultiPartHeaders(Map<String, Object> headers)
     {
-        if (parts != null)
-        {
-            for (Part part : parts)
-            {
-                if (part.getName().equals("payload"))
-                {
-                    for (String name : part.getHeaderNames())
-                    {
-                        headers.put(name, part.getHeader(name));
-                    }
-                    break;
-                }
-            }
-
-        }
-
+        // template method
     }
 
     public void setEnableCookies(boolean enableCookies)
