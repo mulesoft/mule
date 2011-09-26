@@ -30,12 +30,15 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.processor.AbstractFilteringMessageProcessor;
 
 /**
- * Implementation of {@link InterceptingMessageProcessor} that filters message flow using a {@link Filter}. Is
- * the filter accepts the message then message flow continues to the next message processor. If the filter
- * does not accept the message processor and a message processor is configured for handling unaccepted message
+ * Implementation of {@link InterceptingMessageProcessor} that filters message flow
+ * using a {@link Filter}. Is the filter accepts the message then message flow
+ * continues to the next message processor. If the filter does not accept the message
+ * processor and a message processor is configured for handling unaccepted message
  * then this will be invoked, otherwise <code>null</code> will be returned.
  * <p/>
- * <b>EIP Reference:</b> <a href="http://www.eaipatterns.com/Filter.html">http://www.eaipatterns.com/Filter.html<a/>
+ * <b>EIP Reference:</b> <a
+ * href="http://www.eaipatterns.com/Filter.html">http://www.eaipatterns
+ * .com/Filter.html<a/>
  */
 public class MessageFilter extends AbstractFilteringMessageProcessor implements FlowConstructAware, Lifecycle
 {
@@ -43,6 +46,7 @@ public class MessageFilter extends AbstractFilteringMessageProcessor implements 
 
     /**
      * For IoC only
+     * 
      * @deprecated Use MessageFilter(Filter filter)
      */
     @Deprecated
@@ -59,7 +63,8 @@ public class MessageFilter extends AbstractFilteringMessageProcessor implements 
 
     /**
      * @param filter
-     * @param throwExceptionOnUnaccepted throw a FilterUnacceptedException when a message is rejected by the filter?
+     * @param throwExceptionOnUnaccepted throw a FilterUnacceptedException when a
+     *            message is rejected by the filter?
      * @param messageProcessor used to handler unaccepted messages
      */
     public MessageFilter(Filter filter, boolean throwExceptionOnUnaccepted, MessageProcessor messageProcessor)
@@ -67,6 +72,7 @@ public class MessageFilter extends AbstractFilteringMessageProcessor implements 
         this.filter = filter;
         this.throwOnUnaccepted = throwExceptionOnUnaccepted;
         this.unacceptedMessageProcessor = messageProcessor;
+        setUnacceptedMessageProcessor(unacceptedMessageProcessor);
     }
 
     @Override
@@ -106,56 +112,57 @@ public class MessageFilter extends AbstractFilteringMessageProcessor implements 
     @Override
     public String toString()
     {
-        return (filter == null ? "null filter" : filter.getClass().getName()) + " (wrapped by " + this.getClass().getSimpleName() + ")";
+        return (filter == null ? "null filter" : filter.getClass().getName()) + " (wrapped by "
+               + this.getClass().getSimpleName() + ")";
     }
 
     @Override
     public void setMuleContext(MuleContext context)
     {
         super.setMuleContext(context);
-        if (unacceptedMessageProcessor instanceof MuleContextAware)
+        if (!onUnacceptedFlowConstruct && unacceptedMessageProcessor instanceof MuleContextAware)
         {
-            ((MuleContextAware)unacceptedMessageProcessor).setMuleContext(context);
+            ((MuleContextAware) unacceptedMessageProcessor).setMuleContext(context);
         }
     }
 
     public void setFlowConstruct(FlowConstruct flowConstruct)
     {
-        if (unacceptedMessageProcessor instanceof FlowConstructAware)
+        if (!onUnacceptedFlowConstruct && unacceptedMessageProcessor instanceof FlowConstructAware)
         {
-            ((FlowConstructAware)unacceptedMessageProcessor).setFlowConstruct(flowConstruct);
+            ((FlowConstructAware) unacceptedMessageProcessor).setFlowConstruct(flowConstruct);
         }
     }
 
     public void initialise() throws InitialisationException
     {
-        if (unacceptedMessageProcessor instanceof Initialisable)
+        if (!onUnacceptedFlowConstruct && unacceptedMessageProcessor instanceof Initialisable)
         {
-            ((Initialisable)unacceptedMessageProcessor).initialise();
+            ((Initialisable) unacceptedMessageProcessor).initialise();
         }
     }
 
     public void start() throws MuleException
     {
-        if (unacceptedMessageProcessor instanceof Startable)
+        if (!onUnacceptedFlowConstruct && unacceptedMessageProcessor instanceof Startable)
         {
-            ((Startable)unacceptedMessageProcessor).start();
+            ((Startable) unacceptedMessageProcessor).start();
         }
     }
 
     public void stop() throws MuleException
     {
-        if (unacceptedMessageProcessor instanceof Stoppable)
+        if (!onUnacceptedFlowConstruct && unacceptedMessageProcessor instanceof Stoppable)
         {
-            ((Stoppable)unacceptedMessageProcessor).stop();
+            ((Stoppable) unacceptedMessageProcessor).stop();
         }
     }
 
     public void dispose()
     {
-        if (unacceptedMessageProcessor instanceof Disposable)
+        if (!onUnacceptedFlowConstruct && unacceptedMessageProcessor instanceof Disposable)
         {
-            ((Disposable)unacceptedMessageProcessor).dispose();
+            ((Disposable) unacceptedMessageProcessor).dispose();
         }
     }
 }

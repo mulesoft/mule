@@ -28,6 +28,13 @@
         <regex-filter pattern=".*DEF.*"/>
     </message-filter>
 
+    <message-filter name="thirdMf" onUnaccepted="rejectFlow">
+        <filter ref="globalMf"/>
+    </message-filter>
+
+    <flow name="rejectFlow">
+        <custom-processor class="org.mule.transport.vm.functional.transactions.MessageFilterTestCase$Reject1"/>
+    </flow>
 
     <model name="main">
         <service name="Order Validation">
@@ -36,6 +43,7 @@
                     <processor ref="acceptAll"/>
                     <processor ref="firstMf"/>
                     <processor ref="secondMf"/>
+                    <processor ref="thirdMf"/>
                     <!-- uncomment this to see the bug: Spring will try to call setUnacceptedMessageProcessor
                          on the endpoint
                     <message-filter>

@@ -12,6 +12,7 @@ package org.mule.processor;
 
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
+import org.mule.api.construct.FlowConstruct;
 import org.mule.api.processor.InterceptingMessageProcessor;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.filter.FilterUnacceptedException;
@@ -28,6 +29,8 @@ public abstract class AbstractFilteringMessageProcessor extends AbstractIntercep
      * Throw a FilterUnacceptedException when a message is rejected by the filter? 
      */
     protected boolean throwOnUnaccepted = false;
+    protected boolean onUnacceptedFlowConstruct;
+
     
     /** 
      * The <code>MessageProcessor</code> that should be used to handle messages that are not accepted by the filter.
@@ -77,6 +80,10 @@ public abstract class AbstractFilteringMessageProcessor extends AbstractIntercep
     public void setUnacceptedMessageProcessor(MessageProcessor unacceptedMessageProcessor)
     {
         this.unacceptedMessageProcessor = unacceptedMessageProcessor;
+        if (unacceptedMessageProcessor instanceof FlowConstruct)
+        {
+            onUnacceptedFlowConstruct = true;
+        }
     }
 
     public boolean isThrowOnUnaccepted()
