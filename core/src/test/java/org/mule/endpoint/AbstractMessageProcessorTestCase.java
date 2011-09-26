@@ -46,9 +46,12 @@ import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.transport.NullPayload;
 import org.mule.util.concurrent.Latch;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CountDownLatch;
 
 public abstract class AbstractMessageProcessorTestCase extends AbstractMuleContextTestCase
 {
@@ -263,12 +266,25 @@ public abstract class AbstractMessageProcessorTestCase extends AbstractMuleConte
 
     public static class TestEndpointMessageNotificationListener implements EndpointMessageNotificationListener<EndpointMessageNotification>
     {
+        public TestEndpointMessageNotificationListener()
+        {
+            latch = new CountDownLatch(1);
+        }
+
+        public TestEndpointMessageNotificationListener(int numExpected)
+        {
+            latch = new CountDownLatch(numExpected);
+        }
+
         public EndpointMessageNotification messageNotification;
-        public Latch latch = new Latch();
+        public List<EndpointMessageNotification> messageNotificationList = new ArrayList<EndpointMessageNotification>();
+
+        public CountDownLatch latch;
 
         public void onNotification(EndpointMessageNotification notification)
         {
             messageNotification = notification;
+            messageNotificationList.add(notification);
             latch.countDown();
         }
     }

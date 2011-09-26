@@ -35,18 +35,36 @@ public class EndpointMessageNotification extends ServerNotification
     protected static final Log logger = LogFactory.getLog(EndpointMessageNotification.class);
 
     public static final int MESSAGE_RECEIVED = MESSAGE_EVENT_ACTION_START_RANGE + 1;
-    public static final int MESSAGE_DISPATCHED = MESSAGE_EVENT_ACTION_START_RANGE + 2;
-    public static final int MESSAGE_SENT = MESSAGE_EVENT_ACTION_START_RANGE + 3;
-    public static final int MESSAGE_REQUESTED = MESSAGE_EVENT_ACTION_START_RANGE + 4;
+    public static final int MESSAGE_DISPATCH_BEGIN = MESSAGE_EVENT_ACTION_START_RANGE + 2;
+    public static final int MESSAGE_SEND_BEGIN = MESSAGE_EVENT_ACTION_START_RANGE + 3;
+    public static final int MESSAGE_REQUEST_BEGIN = MESSAGE_EVENT_ACTION_START_RANGE + 4;
     public static final int MESSAGE_RESPONSE = MESSAGE_EVENT_ACTION_START_RANGE + 5;
+
+    public static final int MESSAGE_DISPATCH_END = MESSAGE_EVENT_END_ACTION_START_RANGE + 1;
+    public static final int MESSAGE_SEND_END = MESSAGE_EVENT_END_ACTION_START_RANGE + 2;
+    public static final int MESSAGE_REQUEST_END = MESSAGE_EVENT_END_ACTION_START_RANGE + 3;
+
+    /**
+     * For backwards compatibility.  BEGIN is chosen where it contains the message sent, and END where it contains the message
+     * received, again for backwards compatibility.
+     */
+    public static final int MESSAGE_DISPATCHED = MESSAGE_DISPATCH_BEGIN;
+    public static final int MESSAGE_SENT = MESSAGE_SEND_BEGIN;
+    public static final int MESSAGE_REQUESTED = MESSAGE_REQUEST_END;
+
 
     static
     {
-        registerAction("received", MESSAGE_RECEIVED);
-        registerAction("dispatched", MESSAGE_DISPATCHED);
-        registerAction("sent", MESSAGE_SENT);
-        registerAction("requested", MESSAGE_REQUESTED);
+        registerAction("receive", MESSAGE_RECEIVED);
         registerAction("response", MESSAGE_RESPONSE);
+
+        registerAction("begin dispatch", MESSAGE_DISPATCH_BEGIN);
+        registerAction("begin send", MESSAGE_SEND_BEGIN);
+        registerAction("begin request", MESSAGE_REQUEST_BEGIN);
+
+        registerAction("end dispatch", MESSAGE_DISPATCH_END);
+        registerAction("end send", MESSAGE_SEND_END);
+        registerAction("end request", MESSAGE_REQUEST_END);
     }
 
     private String endpoint;

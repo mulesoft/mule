@@ -41,7 +41,7 @@ public class OutboundNotificationMessageProcessorTestCase extends AbstractMessag
         mp.process(event);
 
         assertTrue(listener.latch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS));
-        assertEquals(EndpointMessageNotification.MESSAGE_DISPATCHED, listener.messageNotification.getAction());
+        assertEquals(EndpointMessageNotification.MESSAGE_DISPATCH_END, listener.messageNotification.getAction());
         assertEquals(endpoint.getEndpointURI().getUri().toString(),
             listener.messageNotification.getEndpoint());
         assertTrue(listener.messageNotification.getSource() instanceof MuleMessage);
@@ -62,7 +62,7 @@ public class OutboundNotificationMessageProcessorTestCase extends AbstractMessag
         mp.process(event);
 
         assertTrue(listener.latch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS));
-        assertEquals(EndpointMessageNotification.MESSAGE_SENT, listener.messageNotification.getAction());
+        assertEquals(EndpointMessageNotification.MESSAGE_SEND_END, listener.messageNotification.getAction());
         assertEquals(endpoint.getEndpointURI().getUri().toString(),
             listener.messageNotification.getEndpoint());
         assertTrue(listener.messageNotification.getSource() instanceof MuleMessage);

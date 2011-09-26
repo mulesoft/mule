@@ -16,6 +16,7 @@ import org.mule.util.SystemUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -39,6 +40,16 @@ public class MuleApplicationClassLoader extends FineGrainedControlClassLoader
      * Classes and resources directory in Mule application.
      */
     public static final String PATH_CLASSES = "classes";
+
+    /**
+     * Directory for standard mule modules and transports
+     */
+    public static final String PATH_MULE = "mule";
+
+    /**
+     * Sub-directory for per-application mule modules and transports
+     */
+    public static final String PATH_PER_APP = "per-app";
 
     protected static final URL[] CLASSPATH_EMPTY = new URL[0];
     protected final transient Log logger = LogFactory.getLog(getClass());
@@ -66,40 +77,59 @@ public class MuleApplicationClassLoader extends FineGrainedControlClassLoader
             addURL(classesDir.toURI().toURL());
 
             File libDir = new File(parentFile, PATH_LIBRARY);
+            addJars(appName, libDir, true);
 
-            if (libDir.exists() && libDir.canRead())
-            {
-                @SuppressWarnings("unchecked")
-                Collection<File> jars = FileUtils.listFiles(libDir, new String[] {"jar"}, false);
-
-                if (!jars.isEmpty() && logger.isInfoEnabled())
-                {
-                    StringBuilder sb = new StringBuilder();
-                    sb.append(String.format("[%s] Loading the following jars:%n", appName));
-                    sb.append("=============================").append(SystemUtils.LINE_SEPARATOR);
-
-                    for (File jar : jars)
-                    {
-                        sb.append(jar.toURI().toURL()).append(SystemUtils.LINE_SEPARATOR);
-                    }
-
-                    sb.append("=============================").append(SystemUtils.LINE_SEPARATOR);
-
-                    logger.info(sb.toString());
-                }
-
-                for (File jar : jars)
-                {
-                    addURL(jar.toURI().toURL());
-                }
-            }
-
+            // Add per-app mule modules (if any)
+            File libs = new File(muleHome, PATH_LIBRARY);
+            File muleLibs = new File(libs, PATH_MULE);
+            File perAppLibs = new File(muleLibs, PATH_PER_APP);
+            addJars(appName, perAppLibs, false);
         }
         catch (IOException e)
         {
             if (logger.isDebugEnabled())
             {
                 logger.debug(String.format("[%s]", appName), e);
+            }
+        }
+    }
+
+    /**
+     * Add jars from the supplied directory to the class path
+     */
+    private void addJars(String appName, File dir, boolean verbose) throws MalformedURLException
+    {
+        if (dir.exists() && dir.canRead())
+        {
+            @SuppressWarnings("unchecked")
+            Collection<File> jars = FileUtils.listFiles(dir, new String[]{"jar"}, false);
+
+            if (!jars.isEmpty() && logger.isInfoEnabled())
+            {
+                StringBuilder sb = new StringBuilder();
+                sb.append(String.format("[%s] Loading the following jars:%n", appName));
+                sb.append("=============================").append(SystemUtils.LINE_SEPARATOR);
+
+                for (File jar : jars)
+                {
+                    sb.append(jar.toURI().toURL()).append(SystemUtils.LINE_SEPARATOR);
+                }
+
+                sb.append("=============================").append(SystemUtils.LINE_SEPARATOR);
+
+                if (verbose)
+                {
+                    logger.info(sb.toString());
+                }
+                else
+                {
+                    logger.debug(sb.toString());
+                }
+            }
+
+            for (File jar : jars)
+            {
+                addURL(jar.toURI().toURL());
             }
         }
     }

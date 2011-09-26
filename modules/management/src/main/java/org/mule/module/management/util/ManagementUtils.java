@@ -44,6 +44,18 @@ public class ManagementUtils
     }
 
 
+    public static void stop(int exitCode) throws Exception
+    {
+        WrapperManagerMBean proxy = getProxy();
+        if (proxy != null) {
+            proxy.stop(exitCode);
+        }
+        else
+        {
+            throw new RuntimeException("The wrapper is not enabled.");
+        }
+    }
+
     protected synchronized static WrapperManagerMBean getProxy() throws MalformedObjectNameException, MBeanRegistrationException, InstanceAlreadyExistsException, NotCompliantMBeanException
     {
         if (jmxSupport == null)

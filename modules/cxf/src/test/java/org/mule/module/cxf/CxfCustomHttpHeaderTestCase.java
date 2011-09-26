@@ -25,9 +25,11 @@ import org.mule.module.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
 import org.junit.Rule;
@@ -37,7 +39,7 @@ import org.junit.runners.Parameterized.Parameters;
 public class CxfCustomHttpHeaderTestCase extends AbstractServiceAndFlowTestCase implements EndpointMessageNotificationListener
 {
     protected String endpointAddress = null;
-    private MuleMessage notificationMsg = null;
+    private List<MuleMessage> notificationMsgList = new ArrayList<MuleMessage>();
     private CountDownLatch latch = null;
 
     @Rule
@@ -60,7 +62,7 @@ public class CxfCustomHttpHeaderTestCase extends AbstractServiceAndFlowTestCase 
     @Override
     protected void doSetUp() throws Exception
     {
-        latch = new CountDownLatch(1);
+        latch = new CountDownLatch(2);
         muleContext.registerListener(this);
         MuleClient client = new MuleClient(muleContext);
         endpointAddress = ((InboundEndpoint) client.getMuleContext().getRegistry()
@@ -94,17 +96,17 @@ public class CxfCustomHttpHeaderTestCase extends AbstractServiceAndFlowTestCase 
         // make sure all notifications have trickled in
         Thread.sleep(3000);
 
-        // make sure we received a notification on cxf
-        assertNotNull(notificationMsg);
+        // make sure we received the notifications on cxf
+        assertEquals(2, notificationMsgList.size());
 
         // MULE_USER should be allowed in
-        assertEquals("alan", notificationMsg.getOutboundProperty(MuleProperties.MULE_USER_PROPERTY));
+        assertEquals("alan", notificationMsgList.get(0).getOutboundProperty(MuleProperties.MULE_USER_PROPERTY));
 
         // mule properties should be removed
-        assertNull(notificationMsg.getOutboundProperty(MuleProperties.MULE_IGNORE_METHOD_PROPERTY));
+        assertNull(notificationMsgList.get(0).getOutboundProperty(MuleProperties.MULE_IGNORE_METHOD_PROPERTY));
 
         // custom properties should be allowed in
-        assertEquals(myProperty, notificationMsg.getOutboundProperty(myProperty));
+        assertEquals(myProperty, notificationMsgList.get(0).getOutboundProperty(myProperty));
     }
 
     public void onNotification(ServerNotification notification)
@@ -114,7 +116,7 @@ public class CxfCustomHttpHeaderTestCase extends AbstractServiceAndFlowTestCase 
             String uri = ((EndpointMessageNotification) notification).getEndpoint();
             if (endpointAddress.equals(uri))
             {
-                notificationMsg = (MuleMessage) notification.getSource();
+                notificationMsgList.add((MuleMessage) notification.getSource());
                 latch.countDown();
             }
         }
