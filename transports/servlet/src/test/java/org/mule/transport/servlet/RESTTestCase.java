@@ -23,7 +23,6 @@ import static org.junit.Assert.assertTrue;
 
 public class RESTTestCase extends FunctionalTestCase
 {
-
     @Override
     protected String getConfigResources()
     {
@@ -91,11 +90,7 @@ public class RESTTestCase extends FunctionalTestCase
         MuleMessage reply  = client.send("vm://in4", new DefaultMuleMessage(new Object[]{"ARS","ARS"}, muleContext));
 
         String replyStr = reply.getPayloadAsString();
-        assertNotNull(replyStr);
         System.out.println(replyStr);
         assertTrue("'>0</double>' not found in reply: " + replyStr, replyStr.indexOf(">0</double>") > -1);
     }
-
 }
-
-
