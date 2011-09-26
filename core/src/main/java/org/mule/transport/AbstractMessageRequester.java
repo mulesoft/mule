@@ -10,6 +10,7 @@
 
 package org.mule.transport;
 
+import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.context.WorkManager;
@@ -83,19 +84,32 @@ public abstract class AbstractMessageRequester extends AbstractTransportMessageH
     {
         try
         {
+            EndpointMessageNotification beginNotification = null;
+            if (connector.isEnableMessageEvents())
+            {
+                MuleMessage dummyMessage = new DefaultMuleMessage(NullPayload.getInstance(), connector.getMuleContext());
+                beginNotification = new EndpointMessageNotification(dummyMessage, endpoint, null, EndpointMessageNotification.MESSAGE_REQUEST_BEGIN);
+            }
             // Make sure we are connected
             connect();
             MuleMessage result = null;
             result = doRequest(timeout);
-            if (result != null && !endpoint.isDisableTransportTransformer())
+            if (result != null)
             {
-                applyInboundTransformers(result);
-            }
-
-            if (result != null && connector.isEnableMessageEvents())
-            {
-                connector.fireNotification(new EndpointMessageNotification(result, endpoint, null,
-                    EndpointMessageNotification.MESSAGE_REQUESTED));
+                if (beginNotification != null)
+                {
+                    result.propagateRootId(beginNotification.getSource());
+                }
+                if (!endpoint.isDisableTransportTransformer())
+                {
+                    applyInboundTransformers(result);
+                }
+                if (beginNotification != null)
+                {
+                    connector.fireNotification(beginNotification);
+                    connector.fireNotification(new EndpointMessageNotification(result, endpoint, null,
+                        EndpointMessageNotification.MESSAGE_REQUEST_END));
+                }
             }
             return result;
         }

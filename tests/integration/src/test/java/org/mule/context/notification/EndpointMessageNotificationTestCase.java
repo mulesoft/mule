@@ -53,7 +53,9 @@ public class EndpointMessageNotificationTestCase extends AbstractNotificationTes
     public RestrictedNode getSpecification()
     {
         return new Node().parallel(
-            new Node(EndpointMessageNotification.class, EndpointMessageNotification.MESSAGE_SENT, CLIENT_ID))
+            new Node(EndpointMessageNotification.class, EndpointMessageNotification.MESSAGE_SEND_BEGIN, CLIENT_ID))
+            .parallel(
+                new Node(EndpointMessageNotification.class, EndpointMessageNotification.MESSAGE_SEND_END, CLIENT_ID))
             .parallel(
                 new Node(EndpointMessageNotification.class, EndpointMessageNotification.MESSAGE_RECEIVED,
                     SERVICE_1_ID))
@@ -61,23 +63,31 @@ public class EndpointMessageNotificationTestCase extends AbstractNotificationTes
                 new Node(EndpointMessageNotification.class, EndpointMessageNotification.MESSAGE_RESPONSE,
                     SERVICE_1_ID))
             .parallel(
-                new Node(EndpointMessageNotification.class, EndpointMessageNotification.MESSAGE_DISPATCHED,
+                new Node(EndpointMessageNotification.class, EndpointMessageNotification.MESSAGE_DISPATCH_BEGIN,
                     CLIENT_ID))
+            .parallel(
+                new Node(EndpointMessageNotification.class, EndpointMessageNotification.MESSAGE_DISPATCH_END,
+                    CLIENT_ID)
             .parallel(
                 new Node(EndpointMessageNotification.class, EndpointMessageNotification.MESSAGE_RECEIVED,
                     SERVICE_2_ID))
-            .parallel(
-                new Node(EndpointMessageNotification.class, EndpointMessageNotification.MESSAGE_DISPATCHED,
+             .parallel(
+                new Node(EndpointMessageNotification.class, EndpointMessageNotification.MESSAGE_DISPATCH_BEGIN,
                     SERVICE_2_ID))
             .parallel(
-                new Node(EndpointMessageNotification.class, EndpointMessageNotification.MESSAGE_REQUESTED,
-                    NO_ID)); // a request notification bears no resource ID
+                new Node(EndpointMessageNotification.class, EndpointMessageNotification.MESSAGE_DISPATCH_END,
+                    SERVICE_2_ID))
+            .parallel(
+                new Node(EndpointMessageNotification.class, EndpointMessageNotification.MESSAGE_REQUEST_END,
+                    NO_ID))
+            .parallel(
+                new Node(EndpointMessageNotification.class, EndpointMessageNotification.MESSAGE_REQUEST_BEGIN,
+                    NO_ID))); // a request notification bears no resource ID
     }
 
     @Override
     public void validateSpecification(RestrictedNode spec) throws Exception
     {
-        verifyAllNotifications(spec, EndpointMessageNotification.class,
-            EndpointMessageNotification.MESSAGE_RECEIVED, EndpointMessageNotification.MESSAGE_REQUESTED);
+        // A
     }
 }

@@ -147,7 +147,7 @@ public class OutboundEndpointTestCase extends AbstractMessageProcessorTestCase
     @Test
     public void testSendNotfication() throws Exception
     {
-        TestEndpointMessageNotificationListener listener = new TestEndpointMessageNotificationListener();
+        TestEndpointMessageNotificationListener listener = new TestEndpointMessageNotificationListener(2);
         muleContext.registerListener(listener);
 
         OutboundEndpoint endpoint = createOutboundEndpoint(null, null, null, null, 
@@ -156,18 +156,25 @@ public class OutboundEndpointTestCase extends AbstractMessageProcessorTestCase
         endpoint.process(outboundEvent);
 
         assertTrue(listener.latch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS));
-        assertEquals(EndpointMessageNotification.MESSAGE_SENT, listener.messageNotification.getAction());
+        assertEquals(2, listener.messageNotificationList.size());
+        assertEquals(EndpointMessageNotification.MESSAGE_SEND_BEGIN, listener.messageNotificationList.get(0).getAction());
+        assertEquals(EndpointMessageNotification.MESSAGE_SEND_END, listener.messageNotificationList.get(1).getAction());
         assertEquals(endpoint.getEndpointURI().getUri().toString(),
-            listener.messageNotification.getEndpoint());
-        assertTrue(listener.messageNotification.getSource() instanceof MuleMessage);
+            listener.messageNotificationList.get(0).getEndpoint());
+                assertEquals(endpoint.getEndpointURI().getUri().toString(),
+            listener.messageNotificationList.get(1).getEndpoint());
+        assertTrue(listener.messageNotificationList.get(0).getSource() instanceof MuleMessage);
+        assertTrue(listener.messageNotificationList.get(1).getSource() instanceof MuleMessage);
         assertEquals(outboundEvent.getMessage().getPayload(),
-            listener.messageNotification.getSource().getPayload());
+            listener.messageNotificationList.get(0).getSource().getPayload());
+        assertEquals(RESPONSE_MESSAGE,
+            listener.messageNotificationList.get(1).getSource().getPayload());
     }
 
     @Test
     public void testDispatchNotfication() throws Exception
     {
-        TestEndpointMessageNotificationListener listener = new TestEndpointMessageNotificationListener();
+        TestEndpointMessageNotificationListener listener = new TestEndpointMessageNotificationListener(2);
         muleContext.registerListener(listener);
 
         OutboundEndpoint endpoint = createOutboundEndpoint(null, null, null, null, 
@@ -176,12 +183,19 @@ public class OutboundEndpointTestCase extends AbstractMessageProcessorTestCase
         endpoint.process(outboundEvent);
 
         assertTrue(listener.latch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS));
-        assertEquals(EndpointMessageNotification.MESSAGE_DISPATCHED, listener.messageNotification.getAction());
+        assertEquals(2, listener.messageNotificationList.size());
+        assertEquals(EndpointMessageNotification.MESSAGE_DISPATCH_BEGIN, listener.messageNotificationList.get(0).getAction());
+        assertEquals(EndpointMessageNotification.MESSAGE_DISPATCH_END, listener.messageNotificationList.get(1).getAction());
         assertEquals(endpoint.getEndpointURI().getUri().toString(),
-            listener.messageNotification.getEndpoint());
-        assertTrue(listener.messageNotification.getSource() instanceof MuleMessage);
+            listener.messageNotificationList.get(0).getEndpoint());
+                assertEquals(endpoint.getEndpointURI().getUri().toString(),
+            listener.messageNotificationList.get(1).getEndpoint());
+        assertTrue(listener.messageNotificationList.get(0).getSource() instanceof MuleMessage);
+        assertTrue(listener.messageNotificationList.get(1).getSource() instanceof MuleMessage);
         assertEquals(outboundEvent.getMessage().getPayload(),
-            (listener.messageNotification.getSource()).getPayload());
+            listener.messageNotificationList.get(0).getSource().getPayload());
+        assertEquals(outboundEvent.getMessage().getPayload(),
+            listener.messageNotificationList.get(1).getSource().getPayload());
     }
 
     @Test

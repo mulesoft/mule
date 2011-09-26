@@ -2530,7 +2530,7 @@ public abstract class AbstractConnector implements Connector, WorkListener
 
     class DispatcherMessageProcessor implements MessageProcessor
     {
-        private MessageProcessor notificationMessageProcessor;
+        private OutboundNotificationMessageProcessor notificationMessageProcessor;
         private OutboundEndpoint endpoint;
 
         public DispatcherMessageProcessor(OutboundEndpoint endpoint)
@@ -2545,14 +2545,16 @@ public abstract class AbstractConnector implements Connector, WorkListener
             try
             {
                 dispatcher = getDispatcher(endpoint);
-                MuleEvent result = dispatcher.process(event);
-                // We need to invoke notification message processor with request
-                // message only after successful send/dispatch
                 if (notificationMessageProcessor == null)
                 {
                     notificationMessageProcessor = new OutboundNotificationMessageProcessor(endpoint);
                 }
-                notificationMessageProcessor.process(event);
+                EndpointMessageNotification beginNotification = notificationMessageProcessor.createBeginNotification(event);
+                MuleEvent result = dispatcher.process(event);
+                // We need to invoke notification message processor with request
+                // message only after successful send/dispatch
+                notificationMessageProcessor.dispatchNotification(beginNotification);
+                notificationMessageProcessor.process(result != null ? result : event);
                 return result;
 
             }

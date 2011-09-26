@@ -40,17 +40,46 @@ public class OutboundNotificationMessageProcessor implements MessageProcessor
             int notificationAction;
             if (endpoint.getExchangePattern().hasResponse())
             {
-                notificationAction = EndpointMessageNotification.MESSAGE_SENT;
+                notificationAction = EndpointMessageNotification.MESSAGE_SEND_END;
             }
             else
             {
-                notificationAction = EndpointMessageNotification.MESSAGE_DISPATCHED;
+                notificationAction = EndpointMessageNotification.MESSAGE_DISPATCH_END;
             }
-            connector.fireNotification(new EndpointMessageNotification(event.getMessage(), endpoint,
+            dispatchNotification(new EndpointMessageNotification(event.getMessage(), endpoint,
                     event.getFlowConstruct(), notificationAction));
         }
 
         return event;
+    }
+
+    public void dispatchNotification(EndpointMessageNotification notification)
+    {
+        AbstractConnector connector = (AbstractConnector) endpoint.getConnector();
+        if (notification != null && connector.isEnableMessageEvents())
+        {
+            connector.fireNotification(notification);
+        }
+    }
+
+    public EndpointMessageNotification createBeginNotification(MuleEvent event)
+    {
+        AbstractConnector connector = (AbstractConnector) endpoint.getConnector();
+        if (connector.isEnableMessageEvents())
+        {
+            int notificationAction;
+            if (endpoint.getExchangePattern().hasResponse())
+            {
+                notificationAction = EndpointMessageNotification.MESSAGE_SEND_BEGIN;
+            }
+            else
+            {
+                notificationAction = EndpointMessageNotification.MESSAGE_DISPATCH_BEGIN;
+            }
+            return new EndpointMessageNotification(event.getMessage(), endpoint, event.getFlowConstruct(), notificationAction);
+        }
+
+        return null;
     }
 
     @Override
