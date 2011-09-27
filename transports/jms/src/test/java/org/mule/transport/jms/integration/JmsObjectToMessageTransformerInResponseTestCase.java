@@ -1,5 +1,5 @@
 /*
- * $Id: AbstractMessageProcessorChain.java 21284 2011-02-15 18:47:04Z dfeist $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  *
