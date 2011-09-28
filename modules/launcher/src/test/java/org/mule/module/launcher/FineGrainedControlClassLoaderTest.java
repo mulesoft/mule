@@ -11,6 +11,7 @@
 package org.mule.module.launcher;
 
 import org.junit.Test;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.net.URL;
 import java.util.HashSet;
@@ -19,7 +20,7 @@ import java.util.Set;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-public class FineGrainedControlClassLoaderTest
+public class FineGrainedControlClassLoaderTest extends AbstractMuleTestCase
 {
     @Test
     public void isBlockedFQClassName() throws Exception
