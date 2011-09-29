@@ -27,13 +27,16 @@ import org.mule.config.spring.parsers.specific.endpoint.support.AddressedEndpoin
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 
 import javax.xml.namespace.QName;
+import java.io.InputStream;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.mule.util.IOUtils;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.xml.BeanDefinitionParser;
@@ -67,7 +70,12 @@ public abstract class AbstractMuleNamespaceHandler extends NamespaceHandlerSuppo
     {
         registerBeanDefinitionParser(name, new IgnoredDefinitionParser());
     }
-    
+
+    protected MuleDefinitionParserConfiguration registerConnectorDefinitionParser(Class connectorClass, String transportName)
+    {
+        return registerConnectorDefinitionParser(findConnectorClass(connectorClass, transportName));
+    }
+
     protected MuleDefinitionParserConfiguration registerConnectorDefinitionParser(Class connectorClass)
     {
         return registerConnectorDefinitionParser( new MuleOrphanDefinitionParser(connectorClass, true));
@@ -322,5 +330,37 @@ public abstract class AbstractMuleNamespaceHandler extends NamespaceHandlerSuppo
                 }
             }
         }
+    }
+
+    /**
+     * See if there's a preferred connector class
+     */
+    protected Class findConnectorClass(Class basicConnector, String transportName)
+    {
+        String preferredPropertiesURL = "META-INF/services/org/mule/transport/preferred-" +transportName + ".properties";
+        InputStream stream = AbstractMuleNamespaceHandler.class.getClassLoader().getResourceAsStream(preferredPropertiesURL);
+        if (stream != null)
+        {
+            try
+            {
+                Properties preferredProperties = new Properties();
+                preferredProperties.load(stream);
+                String preferredConnectorName = preferredProperties.getProperty("connector");
+                if (preferredConnectorName != null)
+                {
+                    logger.debug("Found preferred connector class " + preferredConnectorName);
+                    return Class.forName(preferredConnectorName);
+                }
+            }
+            catch (Exception e)
+            {
+                logger.debug("Error processing preferred properties", e);
+            }
+            finally
+            {
+                IOUtils.closeQuietly(stream);
+            }
+        }
+        return basicConnector;
     }
 }
