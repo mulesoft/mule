@@ -24,7 +24,7 @@ public class FtpNamespaceHandler extends AbstractMuleNamespaceHandler
     public void init()
     {
         registerStandardTransportEndpoints(FtpConnector.FTP, URIBuilder.SOCKET_ATTRIBUTES);
-        registerConnectorDefinitionParser(FtpConnector.class);
+        registerConnectorDefinitionParser(FtpConnector.class, FtpConnector.FTP);
         
         registerBeanDefinitionParser("custom-filename-parser", new ChildDefinitionParser("filenameParser", null, FilenameParser.class));
         registerBeanDefinitionParser("expression-filename-parser", new ChildDefinitionParser("filenameParser", ExpressionFilenameParser.class));
