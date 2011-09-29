@@ -236,7 +236,7 @@ public class TransactedSingleResourceJmsMessageReceiver extends AbstractMessageR
                             Transaction tx = TransactionCoordination.getInstance().getTransaction();
                             if (tx != null)
                             {
-                                tx.bindResource(connector.getConnection(), session);
+                                tx.bindResource(connector.getConnection(),  ReusableSessionWrapperFactory.createWrapper(session));
                             }
                             if (tx instanceof JmsClientAcknowledgeTransaction)
                             {

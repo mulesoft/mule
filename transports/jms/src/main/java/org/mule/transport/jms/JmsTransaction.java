@@ -70,14 +70,25 @@ public class JmsTransaction extends AbstractSingleResourceTransaction
             logger.warn(CoreMessages.commitTxButNoResource(this));
             return;
         }
-        
+
         try
         {
-            ((Session)resource).commit();
+            ((Session) resource).commit();
         }
         catch (JMSException e)
         {
             throw new TransactionException(CoreMessages.transactionCommitFailed(), e);
+        }
+        finally
+        {
+            try
+            {
+                ((Session) resource).close();
+            }
+            catch (JMSException e)
+            {
+                logger.warn("could not close jms session", e);
+            }
         }
     }
 
@@ -95,12 +106,23 @@ public class JmsTransaction extends AbstractSingleResourceTransaction
             {
                 logger.debug("Rolling back transaction: " + getId());
             }
-            ((Session)resource).rollback();
+            ((Session) resource).rollback();
         }
         catch (JMSException e)
         {
             throw new TransactionException(CoreMessages.transactionRollbackFailed(), e);
-        }    
+        }
+        finally
+        {
+            try
+            {
+                ((Session) resource).close();
+            }
+            catch (JMSException e)
+            {
+                logger.warn("could not close jms session", e);
+            }
+        }
     }
-    
+
 }
