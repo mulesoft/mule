@@ -239,8 +239,8 @@
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
-    
-    
+
+
     <xsd:element name="basic-security-filter" type="basicSecurityFilterType" substitutionGroup="mule:abstract-security-filter">
         <xsd:annotation>
             <xsd:documentation>
@@ -357,7 +357,7 @@
         </xsd:attribute>
         <xsd:attribute name="path" type="xsd:string">
             <xsd:annotation>
-                <xsd:documentation>The path for the HTTP URL.</xsd:documentation>
+                <xsd:documentation>The path for the HTTP URL. It must not start with a slash.</xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
     </xsd:attributeGroup>
@@ -395,7 +395,7 @@
             <xsd:enumeration value="DELETE"/>
         </xsd:restriction>
     </xsd:simpleType>
-    
+
     <xsd:element name="request-wildcard-filter" type="mule:wildcardFilterType"
                  substitutionGroup="mule:abstract-filter">
         <xsd:annotation>
