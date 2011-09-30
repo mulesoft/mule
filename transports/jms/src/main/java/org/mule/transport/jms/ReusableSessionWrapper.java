@@ -1,3 +1,12 @@
+/*
+ * $Id: SingleJmsMessageReceiver.java 20321 2010-11-24 15:21:24Z dfeist $
+ * --------------------------------------------------------------------------------------
+ * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ *
+ * The software in this package is published under the terms of the CPAL v1.0
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ */
 package org.mule.transport.jms;
 
 import org.apache.commons.logging.Log;
@@ -6,25 +15,15 @@ import org.apache.commons.logging.LogFactory;
 import javax.jms.*;
 import java.io.Serializable;
 
-public class ReusableSessionWrapper implements QueueSession, TopicSession
+public class ReusableSessionWrapper implements Session
 {
     protected transient Log logger = LogFactory.getLog(getClass());
 
     private Session delegateSession;
-    private QueueSession queueSession;
-    private TopicSession topicSession;
 
     public ReusableSessionWrapper(Session delegateSession)
     {
         this.delegateSession = delegateSession;
-        if (delegateSession instanceof QueueSession)
-        {
-            this.queueSession = (QueueSession) delegateSession;
-        }
-        if (delegateSession instanceof TopicSession)
-        {
-            this.topicSession = (TopicSession) delegateSession;
-        }
     }
 
     public BytesMessage createBytesMessage() throws JMSException
@@ -89,7 +88,7 @@ public class ReusableSessionWrapper implements QueueSession, TopicSession
 
     public void close() throws JMSException
     {
-        //Do Nothing
+        //Do nothing, reuse it
     }
 
     public void recover() throws JMSException
@@ -137,27 +136,10 @@ public class ReusableSessionWrapper implements QueueSession, TopicSession
         return delegateSession.createQueue(queueName);
     }
 
-    public QueueReceiver createReceiver(Queue queue) throws JMSException
-    {
-        return queueSession.createReceiver(queue);
-    }
-
-    public QueueReceiver createReceiver(Queue queue, String messageSelector) throws JMSException
-    {
-        return queueSession.createReceiver(queue,messageSelector);
-    }
-
-    public QueueSender createSender(Queue queue) throws JMSException
-    {
-        return queueSession.createSender(queue);
-    }
-
     public Topic createTopic(String topicName) throws JMSException
     {
         return delegateSession.createTopic(topicName);
     }
-
-
 
     public TopicSubscriber createDurableSubscriber(Topic topic, String name) throws JMSException
     {
@@ -167,21 +149,6 @@ public class ReusableSessionWrapper implements QueueSession, TopicSession
     public TopicSubscriber createDurableSubscriber(Topic topic, String name, String messageSelector, boolean noLocal) throws JMSException
     {
         return delegateSession.createDurableSubscriber(topic, name, messageSelector, noLocal);
-    }
-
-    public TopicSubscriber createSubscriber(Topic topic) throws JMSException
-    {
-        return topicSession.createSubscriber(topic);
-    }
-
-    public TopicSubscriber createSubscriber(Topic topic, String messageSelector, boolean noLocal) throws JMSException
-    {
-        return topicSession.createSubscriber(topic, messageSelector, noLocal);
-    }
-
-    public TopicPublisher createPublisher(Topic topic) throws JMSException
-    {
-        return topicSession.createPublisher(topic);
     }
 
     public QueueBrowser createBrowser(Queue queue) throws JMSException
