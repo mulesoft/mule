@@ -26,7 +26,7 @@ import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
 /**
- * @see MULE-4512
+ * see MULE-4512
  */
 public class SynchronousResponseExceptionTestCase extends AbstractServiceAndFlowTestCase
 {

@@ -15,12 +15,12 @@ import org.mule.api.MuleException;
 
 /**
  * Cache endpoints in order to prevent memory leaks.
- * 
- * @see MULE-5422
+ *
+ * see MULE-5422
  */
 public interface EndpointCache
 {
     public InboundEndpoint getInboundEndpoint(String uri, MessageExchangePattern mep) throws MuleException;
-    
+
     public OutboundEndpoint getOutboundEndpoint(String uri, MessageExchangePattern mep, Long responseTimeout) throws MuleException;
 }

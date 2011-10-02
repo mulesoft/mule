@@ -14,12 +14,8 @@ import java.util.Map;
 
 import javax.xml.namespace.QName;
 
-/**
- * Adds {@link #getName} method to an object
- */
 public interface AnnotatedObject
 {
-
     public static final String PROPERTY_NAME = "annotations";
 
     /**
@@ -37,7 +33,7 @@ public interface AnnotatedObject
     Map<QName, Object> getAnnotations();
 
     /**
-     * Sets annotations to the object. 
+     * Sets annotations to the object.
      */
     void setAnnotations(Map<QName, Object> annotations);
 }

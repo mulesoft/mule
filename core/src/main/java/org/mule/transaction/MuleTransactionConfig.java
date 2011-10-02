@@ -164,7 +164,6 @@ public class MuleTransactionConfig implements TransactionConfig, MuleContextAwar
 
     /**
      * Will the result, at the end of running the transaction template, be an active transaction?
-     * @return
      */
     public boolean isTransacted()
     {

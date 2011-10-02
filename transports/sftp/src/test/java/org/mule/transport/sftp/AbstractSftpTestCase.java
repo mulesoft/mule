@@ -214,11 +214,6 @@ public abstract class AbstractSftpTestCase extends AbstractServiceAndFlowTestCas
     /**
      * Returns a SftpClient that is logged in to the sftp server that the endpoint is
      * configured against.
-     *
-     * @param muleClient
-     * @param endpointName
-     * @return
-     * @throws IOException
      */
     protected SftpClient getSftpClient(MuleClient muleClient, String endpointName) throws IOException
     {
@@ -718,7 +713,6 @@ public abstract class AbstractSftpTestCase extends AbstractServiceAndFlowTestCas
      *
      * @param p where sftpConnector and inboundEndpoint are mandatory, @see
      *            DispatchParameters for details.
-     * @return
      */
     protected Exception dispatchAndWaitForException(final DispatchParameters p,
                                                     String expectedFailingConnector,

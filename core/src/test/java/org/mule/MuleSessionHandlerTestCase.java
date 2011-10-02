@@ -39,7 +39,7 @@ import static org.junit.Assert.fail;
 
 public class MuleSessionHandlerTestCase extends AbstractMuleContextTestCase
 {
-    /** @see EE-1705/MULE-4567 */
+    /** see EE-1705/MULE-4567 */
     @Test
     public void testSessionProperties() throws Exception 
     {
@@ -76,7 +76,7 @@ public class MuleSessionHandlerTestCase extends AbstractMuleContextTestCase
         assertEquals(list, obj);
     }
 
-    /** @see EE-1774 */
+    /** see EE-1774 */
     @Test
     public void testNonSerializableSessionProperties() throws Exception 
     {
@@ -96,7 +96,7 @@ public class MuleSessionHandlerTestCase extends AbstractMuleContextTestCase
         assertNull(session.getProperty("foo"));
     }    
 
-    /** @see EE-1820 */
+    /** see EE-1820 */
     @Test
     public void testBackwardsCompatibility() throws Exception 
     {
@@ -126,7 +126,7 @@ public class MuleSessionHandlerTestCase extends AbstractMuleContextTestCase
         session = legacyHandler.retrieveSessionInfoFromMessage(message);
     }    
     
-    /** @see EE-1820 */
+    /** see EE-1820 */
     @Test
     public void testSessionPropertiesLegacyFormat() throws Exception 
     {
@@ -161,9 +161,9 @@ public class MuleSessionHandlerTestCase extends AbstractMuleContextTestCase
         obj = session.getProperty("fooList");
         // MULE-4567 / EE-1705 
         assertTrue(obj instanceof String);
-    }    
+    }
 
-    /** @see MULE-4720 */
+    /** see MULE-4720 */
     @Test
     public void testSecurityContext() throws Exception 
     {
@@ -184,9 +184,9 @@ public class MuleSessionHandlerTestCase extends AbstractMuleContextTestCase
 
         sc = session.getSecurityContext();
         assertEquals("joe", sc.getAuthentication().getPrincipal());
-    }    
+    }
     
-    /** @see EE-1774 */
+    /** see EE-1774 */
     @Test
     public void testNotSerializableSecurityContext() throws Exception 
     {
@@ -205,7 +205,7 @@ public class MuleSessionHandlerTestCase extends AbstractMuleContextTestCase
         {
             // expected
         }
-    }    
+    }
 
     private List<String> createList()
     {
@@ -213,7 +213,7 @@ public class MuleSessionHandlerTestCase extends AbstractMuleContextTestCase
         list.add("bar1");
         list.add("bar2");
         return list;
-    }    
+    }
 
     private class NotSerializableClass
     {
@@ -231,12 +231,12 @@ public class MuleSessionHandlerTestCase extends AbstractMuleContextTestCase
         }
         
         public void setAuthentication(Authentication authentication)
-        { 
+        {
             // nothing to do
         }
 
         public Authentication getAuthentication() 
-        { 
+        {
             return null;
         }
     }

@@ -437,8 +437,6 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase
     /**
      * Determines if the test case should perform graceful shutdown or not.
      * Default is false so that tests run more quickly.
-     *
-     * @return
      */
     protected boolean isGracefulShutdown()
     {

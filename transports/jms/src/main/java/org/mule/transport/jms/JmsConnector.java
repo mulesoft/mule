@@ -1167,7 +1167,7 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
     }
 
     /**
-     * @Deprecated use a {@link JndiNameResolver} instead of access this property
+     * @deprecated use a {@link JndiNameResolver} instead of access this property
      */
     @Deprecated
     public String getJndiInitialFactory()
@@ -1176,7 +1176,7 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
     }
 
     /**
-     * @Deprecated use a {@link JndiNameResolver} instead of access this property
+     * @deprecated use a {@link JndiNameResolver} instead of access this property
      */
     @Deprecated
     public void setJndiInitialFactory(String jndiInitialFactory)
@@ -1185,7 +1185,7 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
     }
 
     /**
-     * @Deprecated use a {@link JndiNameResolver} instead of access this property
+     * @deprecated use a {@link JndiNameResolver} instead of access this property
      */
     @Deprecated
     public String getJndiProviderUrl()
@@ -1194,7 +1194,7 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
     }
 
     /**
-     * @Deprecated use a {@link JndiNameResolver} instead of access this property
+     * @deprecated use a {@link JndiNameResolver} instead of access this property
      */
     @Deprecated
     public void setJndiProviderUrl(String jndiProviderUrl)
@@ -1203,7 +1203,7 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
     }
 
     /**
-     * @Deprecated use a {@link JndiNameResolver} instead of access this property
+     * @deprecated use a {@link JndiNameResolver} instead of access this property
      */
     @Deprecated
     public Map getJndiProviderProperties()
@@ -1212,7 +1212,7 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
     }
 
     /**
-     * @Deprecated use a {@link JndiNameResolver} instead of access this property
+     * @deprecated use a {@link JndiNameResolver} instead of access this property
      */
     @Deprecated
     public void setJndiProviderProperties(Map jndiProviderProperties)

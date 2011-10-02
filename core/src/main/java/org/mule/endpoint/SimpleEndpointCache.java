@@ -24,7 +24,7 @@ import java.util.concurrent.ConcurrentMap;
 /**
  * Cache endpoints in order to prevent memory leaks.
  *
- * @see MULE-5422
+ * see MULE-5422
  */
 public class SimpleEndpointCache implements EndpointCache
 {

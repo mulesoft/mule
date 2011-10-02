@@ -950,8 +950,6 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
     /**
      * Determines if the test case should perform graceful shutdown or not.
      * Default is false so that tests run more quickly.
-     *
-     * @return
      */
     protected boolean isGracefulShutdown()
     {
