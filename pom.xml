@@ -1347,7 +1347,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-dependency-plugin</artifactId>
-                    <version>2.1</version>
+                    <version>2.3</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -1363,58 +1363,6 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-jar-plugin</artifactId>
                     <version>2.3.1</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>${javadocPluginVersion}</version>
-                    <configuration>
-                        <minmemory>128m</minmemory>
-                        <maxmemory>512m</maxmemory>
-                        <charset>ISO-8859-1</charset>
-                        <encoding>ISO-8859-1</encoding>
-                        <source>1.6</source>
-                        <!-- Link to the external online JavaDoc -->
-                        <links>
-                            <link>http://java.sun.com/j2se/1.6.0/docs/api/</link>
-                            <link>http://java.sun.com/j2ee/sdk_1.3/techdocs/api/</link>
-                            <link>http://jakarta.apache.org/commons/beanutils/commons-beanutils-1.7.0/docs/api/</link>
-                            <link>http://jakarta.apache.org/commons/collections/api-3.2/</link>
-                            <link>http://jakarta.apache.org/httpcomponents/httpclient-3.x/apidocs/</link>
-                            <link>http://jakarta.apache.org/commons/io/api-1.2/</link>
-                            <link>http://jakarta.apache.org/commons/lang/api-2.1/</link>
-                            <link>http://jakarta.apache.org/commons/pool/apidocs/</link>
-                            <link>http://logging.apache.org/log4j/1.2/apidocs/</link>
-                            <link>http://www.slf4j.org/api/</link>
-                            <link>http://junit.sourceforge.net/javadoc/</link>
-                        </links>
-                        <groups>
-                            <group>
-                                <title>Mule Core</title>
-                                <packages>org.mule*</packages>
-                            </group>
-                            <group>
-                                <title>Modules (not part of the Mule core)</title>
-                                <packages>org.mule.module.*:org.mule.components.*</packages>
-                            </group>
-                            <group>
-                                <title>Transports</title>
-                                <packages>org.mule.transport.*</packages>
-                            </group>
-                            <group>
-                                <title>Testing Framework</title>
-                                <packages>org.mule.tck*</packages>
-                            </group>
-                            <group>
-                                <title>Tools</title>
-                                <packages>org.mule.tools.*</packages>
-                            </group>
-                            <group>
-                                <title>Examples</title>
-                                <packages>org.mule.example.*</packages>
-                            </group>
-                        </groups>
-                    </configuration>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -1449,7 +1397,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-site-plugin</artifactId>
-                    <version>3.0-beta-3</version>
+                    <version>3.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -1685,7 +1633,14 @@
                 <extensions>true</extensions>
             </plugin>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-site-plugin</artifactId>
+                <!--
+                    Do not inherit the site config to child modules. This is the only approach that works
+                    to generate aggregated javadocs (which is the main purpose of the site) and that does
+                    not fork the complete lifecycle for each child module.
+                -->
+                <inherited>false</inherited>
                 <configuration>
                     <reportPlugins>
                         <reportPlugin>
@@ -1716,35 +1671,59 @@
                         <reportPlugin>
                             <groupId>org.apache.maven.plugins</groupId>
                             <artifactId>maven-javadoc-plugin</artifactId>
-                            <reportSets>
-                                <!--
-                                    Aggregated javadocs currently don't work as part
-                                    of the site build. The plugin forks the complete
-                                    lifecycle for each and every module.
-
-                                <reportSet>
-                                    <id>aggregate</id>
-                                    <reports>
-                                        <report>aggregate</report>
-                                    </reports>
-                                </reportSet>
-                                -->
-                                <reportSet>
-                                    <id>non-aggregate</id>
-                                    <reports>
-                                        <report>javadoc</report>
-                                    </reports>
-                                </reportSet>
-                            </reportSets>
+                            <version>${javadocPluginVersion}</version>
+                            <configuration>
+                                <minmemory>128m</minmemory>
+                                <maxmemory>512m</maxmemory>
+                                <charset>ISO-8859-1</charset>
+                                <encoding>ISO-8859-1</encoding>
+                                <source>1.6</source>
+                                <!-- Link to the external online JavaDoc -->
+                                <links>
+                                    <link>http://java.sun.com/j2se/1.6.0/docs/api/</link>
+                                    <link>http://java.sun.com/j2ee/sdk_1.3/techdocs/api/</link>
+                                    <link>http://jakarta.apache.org/commons/beanutils/commons-beanutils-1.7.0/docs/api/</link>
+                                    <link>http://jakarta.apache.org/commons/collections/api-3.2/</link>
+                                    <link>http://jakarta.apache.org/httpcomponents/httpclient-3.x/apidocs/</link>
+                                    <link>http://jakarta.apache.org/commons/io/api-1.2/</link>
+                                    <link>http://jakarta.apache.org/commons/lang/api-2.1/</link>
+                                    <link>http://jakarta.apache.org/commons/pool/apidocs/</link>
+                                    <link>http://logging.apache.org/log4j/1.2/apidocs/</link>
+                                    <link>http://www.slf4j.org/api/</link>
+                                    <link>http://junit.sourceforge.net/javadoc/</link>
+                                </links>
+                                <groups>
+                                    <group>
+                                        <title>Mule Core</title>
+                                        <packages>org.mule*</packages>
+                                    </group>
+                                    <group>
+                                        <title>Modules (not part of the Mule core)</title>
+                                        <packages>org.mule.module.*:org.mule.components.*</packages>
+                                    </group>
+                                    <group>
+                                        <title>Transports</title>
+                                        <packages>org.mule.transport.*</packages>
+                                    </group>
+                                    <group>
+                                        <title>Testing Framework</title>
+                                        <packages>org.mule.tck*</packages>
+                                    </group>
+                                    <group>
+                                        <title>Tools</title>
+                                        <packages>org.mule.tools.*</packages>
+                                    </group>
+                                    <group>
+                                        <title>Examples</title>
+                                        <packages>org.mule.example.*</packages>
+                                    </group>
+                                </groups>
+                            </configuration>
                         </reportPlugin>
                         <!--
                             When there is JXR cross-refernce output available,
                             it will be linked to in case of test failures
                         -->
-                        <!--
-                            This plugin is currently disabled, it causes trouble with
-                            the dependency unpack goal in the catalog archetype
-
                         <reportPlugin>
                             <groupId>org.apache.maven.plugins</groupId>
                             <artifactId>maven-surefire-report-plugin</artifactId>
@@ -1754,7 +1733,6 @@
                                 <showSuccess>false</showSuccess>
                             </configuration>
                         </reportPlugin>
-                        -->
                         <reportPlugin>
                             <groupId>org.apache.maven.plugins</groupId>
                             <artifactId>maven-checkstyle-plugin</artifactId>
