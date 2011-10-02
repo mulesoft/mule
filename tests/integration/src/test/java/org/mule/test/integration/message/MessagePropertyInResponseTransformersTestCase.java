@@ -20,7 +20,7 @@ import static org.junit.Assert.assertEquals;
 
 
 /**
- * @see EE-1794
+ * see EE-1794
  */
 public class MessagePropertyInResponseTransformersTestCase extends FunctionalTestCase
 {

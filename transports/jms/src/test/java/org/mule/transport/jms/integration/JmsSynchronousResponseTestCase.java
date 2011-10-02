@@ -24,7 +24,7 @@ import static org.junit.Assert.assertTrue;
 
 
 /**
- * @see EE-1688/MULE-3059
+ * see EE-1688/MULE-3059
  */
 public class JmsSynchronousResponseTestCase extends AbstractJmsFunctionalTestCase
 {

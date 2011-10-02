@@ -268,16 +268,12 @@ public interface MuleEvent extends Serializable
 
     /**
      * Returns the {@link URI} of the MessageSource that recieved or generated the message being processed.
-     * 
-     * @return
      */
     URI getMessageSourceURI();
 
     /**
      * Returns the message source name if it has one, otherwise returns toString() of the URI returned be
      * getMessageSourceURI()
-     * 
-     * @return
      */
     String getMessageSourceName();
 

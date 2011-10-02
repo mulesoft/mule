@@ -175,11 +175,7 @@ public abstract class AbstractExceptionStrategy extends AbstractMessageProcessor
      * <code>ExceptionMessage</code> which contains the exception thrown the
      * MuleMessage and any context information.
      * 
-     * @param message the MuleMessage being processed when the exception occurred
-     * @param target optional; the endpoint being dispatched or received on
-     *            when the error occurred. This is NOT the endpoint that the message
-     *            will be disptched on and is only supplied to this method for
-     *            logging purposes
+     * @param event the MuleEvent being processed when the exception occurred
      * @param t the exception thrown. This will be sent with the ExceptionMessage
      * @see ExceptionMessage
      */
@@ -322,7 +318,7 @@ public abstract class AbstractExceptionStrategy extends AbstractMessageProcessor
      * if an error occurs in the exception listener itself. This implementation logs
      * the the message itself to the logs if it is not null
      * 
-     * @param message The MuleMessage currently being processed
+     * @param event The MuleEvent currently being processed
      * @param t the fatal exception to log
      */
     protected void logFatal(MuleEvent event, Throwable t)

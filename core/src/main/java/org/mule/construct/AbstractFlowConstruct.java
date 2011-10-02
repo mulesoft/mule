@@ -55,10 +55,8 @@ import org.apache.commons.logging.LogFactory;
  *  <li>Allows an {@link ExceptionListener} to be set.
  * </ul>
  * Implementations of <code>AbstractFlowConstuct</code> should implement
- * {@link #configureMessageProcessors(org.mule.api.processor.MessageProcessorChainBuilder)} and
- * {@link #validateConstruct()} to construct the processing chain required and
- * validate the resulting construct. Validation may include validation of the type of
- * attributes of the {@link MessageSource}.
+ * {@link #validateConstruct()} validate the resulting construct. Validation may 
+ * include validation of the type of attributes of the {@link MessageSource}.
  * <p/>
  * Implementations may also implement {@link #doInitialise()}, {@link #doStart()},
  * {@link #doStop()} and {@link #doDispose()} if they need to perform any action on

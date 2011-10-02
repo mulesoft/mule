@@ -20,7 +20,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 /**
- * @see EE-1734
+ * see EE-1734
  */
 public class TemplateParserTestCase extends AbstractMuleContextTestCase
 {
