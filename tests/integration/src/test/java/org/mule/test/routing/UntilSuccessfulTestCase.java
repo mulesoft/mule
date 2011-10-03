@@ -10,6 +10,11 @@
 
 package org.mule.test.routing;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.commons.lang.RandomStringUtils;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
@@ -17,9 +22,11 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.functional.FunctionalTestComponent;
+import org.mule.util.store.AbstractPartitionedObjectStore;
 
 public class UntilSuccessfulTestCase extends FunctionalTestCase
 {
+    private MuleClient client;
     private FunctionalTestComponent targetMessageProcessor;
     private FunctionalTestComponent deadLetterQueueProcessor;
 
@@ -33,62 +40,103 @@ public class UntilSuccessfulTestCase extends FunctionalTestCase
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
+
+        client = new MuleClient(muleContext);
+
         targetMessageProcessor = getFunctionalTestComponent("target-mp");
         deadLetterQueueProcessor = getFunctionalTestComponent("dlq-processor");
+
+        final AbstractPartitionedObjectStore<Serializable> objectStore = muleContext.getRegistry()
+            .lookupObject("objectStore");
+        objectStore.disposePartition("DEFAULT_PARTITION");
     }
 
     public void testDefaultConfiguration() throws Exception
     {
-        final MuleClient client = new MuleClient(muleContext);
-        client.dispatch("vm://input-1", "XYZ", null);
-        ponderUntilMessageCountReceivedByTargetMessageProcessor(1);
+        final String payload = RandomStringUtils.randomAlphanumeric(20);
+        client.dispatch("vm://input-1", payload, null);
+
+        final List<Object> receivedPayloads = ponderUntilMessageCountReceivedByTargetMessageProcessor(1);
+        assertEquals(1, receivedPayloads.size());
+        assertEquals(payload, receivedPayloads.get(0));
     }
 
     public void testFullConfiguration() throws Exception
     {
-        final MuleClient client = new MuleClient(muleContext);
-        final MuleMessage response = client.send("vm://input-2", "XYZ", null);
+        final String payload = RandomStringUtils.randomAlphanumeric(20);
+        final MuleMessage response = client.send("vm://input-2", payload, null);
         assertEquals("ACK", response.getPayloadAsString());
-        ponderUntilMessageCountReceivedByTargetMessageProcessor(2);
-        ponderUntilMessageCountReceivedByDlqProcessor(1);
+
+        List<Object> receivedPayloads = ponderUntilMessageCountReceivedByTargetMessageProcessor(3);
+        assertEquals(3, receivedPayloads.size());
+        for (int i = 0; i <= 2; i++)
+        {
+            assertEquals(payload, receivedPayloads.get(i));
+        }
+
+        receivedPayloads = ponderUntilMessageCountReceivedByDlqProcessor(1);
+        assertEquals(1, receivedPayloads.size());
+        assertEquals(payload, receivedPayloads.get(0));
     }
 
     public void testFullConfigurationMP() throws Exception
     {
-        final MuleClient client = new MuleClient(muleContext);
-        final MuleMessage response = client.send("vm://input-2MP", "XYZ", null);
+        final String payload = RandomStringUtils.randomAlphanumeric(20);
+        final MuleMessage response = client.send("vm://input-2MP", payload, null);
         assertEquals("ACK", response.getPayloadAsString());
-        ponderUntilMessageCountReceivedByTargetMessageProcessor(2);
+
+        final List<Object> receivedPayloads = ponderUntilMessageCountReceivedByTargetMessageProcessor(3);
+        assertEquals(3, receivedPayloads.size());
+        for (int i = 0; i <= 2; i++)
+        {
+            assertEquals(payload, receivedPayloads.get(i));
+        }
+
         ponderUntilMessageCountReceivedByCustomMP(1);
     }
 
     public void testRetryOnEndpoint() throws Exception
     {
-        final MuleClient client = new MuleClient(muleContext);
-        client.dispatch("vm://input-3", "XYZ", null);
-        ponderUntilMessageCountReceivedByTargetMessageProcessor(2);
+        final String payload = RandomStringUtils.randomAlphanumeric(20);
+        client.dispatch("vm://input-3", payload, null);
+
+        final List<Object> receivedPayloads = ponderUntilMessageCountReceivedByTargetMessageProcessor(3);
+        assertEquals(3, receivedPayloads.size());
+        for (int i = 0; i <= 2; i++)
+        {
+            assertEquals(payload, receivedPayloads.get(i));
+        }
     }
 
-    private void ponderUntilMessageCountReceivedByTargetMessageProcessor(final int expectedCount)
+    private List<Object> ponderUntilMessageCountReceivedByTargetMessageProcessor(final int expectedCount)
         throws InterruptedException
     {
-        ponderUntilMessageCountReceived(expectedCount, targetMessageProcessor);
+        return ponderUntilMessageCountReceived(expectedCount, targetMessageProcessor);
     }
 
-    private void ponderUntilMessageCountReceivedByDlqProcessor(final int expectedCount)
+    private List<Object> ponderUntilMessageCountReceivedByDlqProcessor(final int expectedCount)
         throws InterruptedException
     {
-        ponderUntilMessageCountReceived(expectedCount, deadLetterQueueProcessor);
+        return ponderUntilMessageCountReceived(expectedCount, deadLetterQueueProcessor);
     }
 
-    private void ponderUntilMessageCountReceived(final int expectedCount, final FunctionalTestComponent ftc)
+    private List<Object> ponderUntilMessageCountReceived(final int expectedCount,
+                                                         final FunctionalTestComponent ftc)
         throws InterruptedException
     {
+        final List<Object> results = new ArrayList<Object>();
+
         while (ftc.getReceivedMessagesCount() < expectedCount)
         {
             Thread.yield();
             Thread.sleep(100L);
         }
+
+        for (int i = 0; i < ftc.getReceivedMessagesCount(); i++)
+        {
+            results.add(ftc.getReceivedMessage(1 + i));
+        }
+        return results;
     }
 
     private void ponderUntilMessageCountReceivedByCustomMP(final int expectedCount)
@@ -116,7 +164,7 @@ public class UntilSuccessfulTestCase extends FunctionalTestCase
         }
 
         @Override
-        public MuleEvent process(MuleEvent event) throws MuleException
+        public MuleEvent process(final MuleEvent event) throws MuleException
         {
             count++;
             return null;

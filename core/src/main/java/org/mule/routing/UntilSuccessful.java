@@ -22,7 +22,6 @@ import org.mule.api.MuleMessage;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.EndpointException;
-import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.retry.RetryCallback;
@@ -51,18 +50,17 @@ public class UntilSuccessful extends AbstractOutboundRouter
         private static final long serialVersionUID = 1L;
         private final String value;
 
-        private EventStoreKey(String value)
+        private EventStoreKey(final String value)
         {
             this.value = value;
         }
 
-        public static EventStoreKey buildFor(MuleEvent muleEvent)
+        public static EventStoreKey buildFor(final MuleEvent muleEvent)
         {
             // the key is built in way to prevent UntilSuccessful workers across a cluster to compete for the same
             // events over a shared object store
             return new EventStoreKey(muleEvent.getFlowConstruct() + "@"
-                                     + muleEvent.getMuleContext().getClusterId() + ":"
-                                     + muleEvent.getId());
+                                     + muleEvent.getMuleContext().getClusterId() + ":" + muleEvent.getId());
         }
 
         @Override
@@ -78,7 +76,7 @@ public class UntilSuccessful extends AbstractOutboundRouter
         }
 
         @Override
-        public boolean equals(Object obj)
+        public boolean equals(final Object obj)
         {
             if (!(obj instanceof EventStoreKey))
             {
@@ -137,13 +135,13 @@ public class UntilSuccessful extends AbstractOutboundRouter
                 try
                 {
 
-                    dlqMP = ((EndpointBuilder)deadLetterQueue).buildOutboundEndpoint();
+                    dlqMP = ((EndpointBuilder) deadLetterQueue).buildOutboundEndpoint();
                 }
-                catch (EndpointException ee)
+                catch (final EndpointException ee)
                 {
                     throw new InitialisationException(
-                        MessageFactory.createStaticMessage("deadLetterQueue-ref is not a valid endpoint builder: " + deadLetterQueue),
-                        ee, this);
+                        MessageFactory.createStaticMessage("deadLetterQueue-ref is not a valid endpoint builder: "
+                                                           + deadLetterQueue), ee, this);
                 }
             }
             else if (deadLetterQueue instanceof MessageProcessor)
@@ -153,8 +151,8 @@ public class UntilSuccessful extends AbstractOutboundRouter
             else
             {
                 throw new InitialisationException(
-                        MessageFactory.createStaticMessage("deadLetterQueue-ref is not a valid mesage processor: " + deadLetterQueue),
-                        null, this);
+                    MessageFactory.createStaticMessage("deadLetterQueue-ref is not a valid mesage processor: "
+                                                       + deadLetterQueue), null, this);
             }
         }
 
@@ -185,7 +183,7 @@ public class UntilSuccessful extends AbstractOutboundRouter
     }
 
     @Override
-    public boolean isMatch(MuleMessage message) throws MuleException
+    public boolean isMatch(final MuleMessage message) throws MuleException
     {
         return true;
     }
@@ -205,7 +203,7 @@ public class UntilSuccessful extends AbstractOutboundRouter
 
         try
         {
-            EventStoreKey eventStoreKey = storeEvent(event);
+            final EventStoreKey eventStoreKey = storeEvent(event);
             scheduleForProcessing(eventStoreKey);
 
             if (ackExpression == null)
@@ -213,13 +211,13 @@ public class UntilSuccessful extends AbstractOutboundRouter
                 return null;
             }
 
-            Object ackResponsePayload = muleContext.getExpressionManager().evaluate(ackExpression,
+            final Object ackResponsePayload = muleContext.getExpressionManager().evaluate(ackExpression,
                 event.getMessage());
 
             return new DefaultMuleEvent(new DefaultMuleMessage(ackResponsePayload, event.getMessage(),
                 muleContext), event);
         }
-        catch (Exception e)
+        catch (final Exception e)
         {
             throw new MessagingException(
                 MessageFactory.createStaticMessage("Failed to schedule the event for processing"), event, e);
@@ -228,13 +226,13 @@ public class UntilSuccessful extends AbstractOutboundRouter
 
     private void scheduleAllPendingEventsForProcessing() throws ObjectStoreException
     {
-        for (Serializable eventStoreKey : objectStore.allKeys())
+        for (final Serializable eventStoreKey : objectStore.allKeys())
         {
             try
             {
                 scheduleForProcessing((EventStoreKey) eventStoreKey);
             }
-            catch (Exception e)
+            catch (final Exception e)
             {
                 logger.error(
                     MessageFactory.createStaticMessage("Failed to schedule for processing event stored with key: "
@@ -245,7 +243,7 @@ public class UntilSuccessful extends AbstractOutboundRouter
 
     private void scheduleForProcessing(final EventStoreKey eventStoreKey) throws Exception
     {
-        RetryCallback callback = new RetryCallback()
+        final RetryCallback callback = new RetryCallback()
         {
             @Override
             public String getWorkDescription()
@@ -254,26 +252,27 @@ public class UntilSuccessful extends AbstractOutboundRouter
             }
 
             @Override
-            public void doWork(RetryContext context) throws Exception
+            public void doWork(final RetryContext context) throws Exception
             {
                 retrieveAndProcessEvent(eventStoreKey);
             }
         };
 
-        SimpleRetryPolicyTemplate simpleRetryPolicyTemplate = new SimpleRetryPolicyTemplate(
+        final SimpleRetryPolicyTemplate simpleRetryPolicyTemplate = new SimpleRetryPolicyTemplate(
             TimeUnit.SECONDS.toMillis(secondsBetweenRetries), maxRetries);
 
-        RetryPolicyTemplate retryPolicyTemplate = new AsynchronousRetryTemplate(simpleRetryPolicyTemplate);
+        final RetryPolicyTemplate retryPolicyTemplate = new AsynchronousRetryTemplate(
+            simpleRetryPolicyTemplate);
         retryPolicyTemplate.setNotifier(new RetryNotifier()
         {
             @Override
-            public void onSuccess(RetryContext context)
+            public void onSuccess(final RetryContext context)
             {
                 removeFromStore(eventStoreKey);
             }
 
             @Override
-            public void onFailure(RetryContext context, Throwable e)
+            public void onFailure(final RetryContext context, final Throwable e)
             {
                 incrementProcessAttemptCountOrRemoveFromStore(eventStoreKey);
             }
@@ -284,18 +283,18 @@ public class UntilSuccessful extends AbstractOutboundRouter
 
     private EventStoreKey storeEvent(final MuleEvent event) throws ObjectStoreException
     {
-        MuleMessage message = event.getMessage();
-        Integer deliveryAttemptCount = message.getInvocationProperty(PROCESS_ATTEMPT_COUNT_PROPERTY_NAME,
-            DEFAULT_PROCESS_ATTEMPT_COUNT_PROPERTY_VALUE);
+        final MuleMessage message = event.getMessage();
+        final Integer deliveryAttemptCount = message.getInvocationProperty(
+            PROCESS_ATTEMPT_COUNT_PROPERTY_NAME, DEFAULT_PROCESS_ATTEMPT_COUNT_PROPERTY_VALUE);
         return storeEvent(event, deliveryAttemptCount);
     }
 
-    private EventStoreKey storeEvent(final MuleEvent event, int deliveryAttemptCount)
+    private EventStoreKey storeEvent(final MuleEvent event, final int deliveryAttemptCount)
         throws ObjectStoreException
     {
         final MuleMessage message = event.getMessage();
         message.setInvocationProperty(PROCESS_ATTEMPT_COUNT_PROPERTY_NAME, deliveryAttemptCount);
-        EventStoreKey eventStoreKey = EventStoreKey.buildFor(event);
+        final EventStoreKey eventStoreKey = EventStoreKey.buildFor(event);
         objectStore.store(eventStoreKey, event);
         return eventStoreKey;
     }
@@ -304,8 +303,8 @@ public class UntilSuccessful extends AbstractOutboundRouter
     {
         try
         {
-            MuleEvent event = objectStore.remove(eventStoreKey);
-            MuleEvent mutableEvent = threadSafeCopy(event);
+            final MuleEvent event = objectStore.remove(eventStoreKey);
+            final MuleEvent mutableEvent = threadSafeCopy(event);
 
             final MuleMessage message = mutableEvent.getMessage();
             final Integer deliveryAttemptCount = message.getInvocationProperty(
@@ -322,13 +321,13 @@ public class UntilSuccessful extends AbstractOutboundRouter
                 abandonRetries(event, mutableEvent);
             }
         }
-        catch (ObjectStoreException ose)
+        catch (final ObjectStoreException ose)
         {
             logger.error("Failed to increment failure count for event stored with key: " + eventStoreKey);
         }
     }
 
-    private void abandonRetries(MuleEvent event, MuleEvent mutableEvent)
+    private void abandonRetries(final MuleEvent event, final MuleEvent mutableEvent)
     {
         if (dlqMP == null)
         {
@@ -341,10 +340,9 @@ public class UntilSuccessful extends AbstractOutboundRouter
             logger.info("Retry attempts exhausted, routing message to DLQ: " + dlqMP);
             dlqMP.process(mutableEvent);
         }
-        catch (MuleException me)
+        catch (final MuleException me)
         {
-            logger.error("Failed to route message to DLQ: " + dlqMP + ", dropping message: "
-                         + event, me);
+            logger.error("Failed to route message to DLQ: " + dlqMP + ", dropping message: " + event, me);
         }
     }
 
@@ -354,20 +352,20 @@ public class UntilSuccessful extends AbstractOutboundRouter
         {
             objectStore.remove(eventStoreKey);
         }
-        catch (ObjectStoreException ose)
+        catch (final ObjectStoreException ose)
         {
             logger.warn("Failed to remove following event from store with key: " + eventStoreKey);
         }
     }
 
-    private void retrieveAndProcessEvent(EventStoreKey eventStoreKey) throws ObjectStoreException
+    private void retrieveAndProcessEvent(final EventStoreKey eventStoreKey) throws ObjectStoreException
     {
-        MuleEvent persistedEvent = objectStore.retrieve(eventStoreKey);
-        MuleEvent mutableEvent = threadSafeCopy(persistedEvent);
+        final MuleEvent persistedEvent = objectStore.retrieve(eventStoreKey);
+        final MuleEvent mutableEvent = threadSafeCopy(persistedEvent);
         processEvent(mutableEvent);
     }
 
-    private void processEvent(MuleEvent event)
+    private void processEvent(final MuleEvent event)
     {
         if (routes.isEmpty())
         {
@@ -379,7 +377,7 @@ public class UntilSuccessful extends AbstractOutboundRouter
         {
             returnEvent = routes.get(0).process(event);
         }
-        catch (MuleException me)
+        catch (final MuleException me)
         {
             throw new MuleRuntimeException(me);
         }
@@ -389,7 +387,7 @@ public class UntilSuccessful extends AbstractOutboundRouter
             return;
         }
 
-        MuleMessage msg = returnEvent.getMessage();
+        final MuleMessage msg = returnEvent.getMessage();
         if (msg == null)
         {
             throw new MuleRuntimeException(
@@ -397,7 +395,7 @@ public class UntilSuccessful extends AbstractOutboundRouter
                                                    + event));
         }
 
-        boolean errorDetected = failureExpressionFilter.accept(msg);
+        final boolean errorDetected = failureExpressionFilter.accept(msg);
         if (errorDetected)
         {
             throw new MuleRuntimeException(
@@ -406,9 +404,12 @@ public class UntilSuccessful extends AbstractOutboundRouter
         }
     }
 
-    private DefaultMuleEvent threadSafeCopy(MuleEvent event)
+    private DefaultMuleEvent threadSafeCopy(final MuleEvent event)
     {
-        return new DefaultMuleEvent(new DefaultMuleMessage(event.getMessage()), event);
+        final DefaultMuleMessage message = new DefaultMuleMessage(event.getMessage().getPayload(),
+            event.getMessage(), muleContext);
+
+        return new DefaultMuleEvent(message, event);
     }
 
     private void ensurePayloadSerializable(final MuleEvent event) throws Exception
@@ -442,7 +443,7 @@ public class UntilSuccessful extends AbstractOutboundRouter
         return maxRetries;
     }
 
-    public void setMaxRetries(int maxRetries)
+    public void setMaxRetries(final int maxRetries)
     {
         this.maxRetries = maxRetries;
     }
@@ -452,7 +453,7 @@ public class UntilSuccessful extends AbstractOutboundRouter
         return secondsBetweenRetries;
     }
 
-    public void setSecondsBetweenRetries(long secondsBetweenRetries)
+    public void setSecondsBetweenRetries(final long secondsBetweenRetries)
     {
         this.secondsBetweenRetries = secondsBetweenRetries;
     }
@@ -462,7 +463,7 @@ public class UntilSuccessful extends AbstractOutboundRouter
         return failureExpression;
     }
 
-    public void setFailureExpression(String failureExpression)
+    public void setFailureExpression(final String failureExpression)
     {
         this.failureExpression = failureExpression;
     }
@@ -472,12 +473,12 @@ public class UntilSuccessful extends AbstractOutboundRouter
         return ackExpression;
     }
 
-    public void setAckExpression(String ackExpression)
+    public void setAckExpression(final String ackExpression)
     {
         this.ackExpression = ackExpression;
     }
 
-    public void setDeadLetterQueue(Object deadLetterQueue)
+    public void setDeadLetterQueue(final Object deadLetterQueue)
     {
         this.deadLetterQueue = deadLetterQueue;
     }
