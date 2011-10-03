@@ -10,7 +10,8 @@
                http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.2/mule-vm.xsd
                http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/3.2/mule-test.xsd">
 
-    <spring:bean id="objectStore" class="org.mule.util.store.SimpleMemoryObjectStore" />
+    <!-- use a persistent object store to pinpoint any MuleEvent de/serialization issue -->
+    <spring:bean id="objectStore" class="org.mule.util.store.PartitionedPersistentObjectStore" />
     
     <vm:endpoint name="dlqChannel" path="dlq" />
 
