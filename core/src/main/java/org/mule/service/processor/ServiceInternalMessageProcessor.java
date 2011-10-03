@@ -14,7 +14,6 @@ import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.config.MuleProperties;
-import org.mule.api.processor.MessageProcessor;
 import org.mule.api.service.Service;
 import org.mule.api.transport.ReplyToHandler;
 import org.mule.processor.AbstractInterceptingMessageProcessor;
@@ -25,8 +24,7 @@ public class ServiceInternalMessageProcessor extends AbstractInterceptingMessage
 {
 
     protected Service service;
-    protected MessageProcessor receiveAsyncReplyMessageProcessor;
-    
+
     public ServiceInternalMessageProcessor(Service service)
     {
         this.service = service;
@@ -41,20 +39,25 @@ public class ServiceInternalMessageProcessor extends AbstractInterceptingMessage
         MuleEvent resultEvent;
         try
         {
-            Object replyTo = event.getReplyToDestination();
-            ReplyToHandler replyToHandler = event.getReplyToHandler();
 
             resultEvent = service.getComponent().process(event);
             resultEvent = processNext(resultEvent);
 
-            // Allow components to stop processing of the ReplyTo property (e.g.
-            // CXF)
-            if (resultEvent != null && replyTo != null)
+            if (!event.getExchangePattern().hasResponse())
             {
-                String replyToStop = resultEvent.getMessage().getInvocationProperty(MuleProperties.MULE_REPLY_TO_STOP_PROPERTY);
-                if (!event.getExchangePattern().hasResponse() || !BooleanUtils.toBoolean(replyToStop))
+
+                Object replyTo = event.getReplyToDestination();
+                ReplyToHandler replyToHandler = event.getReplyToHandler();
+
+                // Allow components to stop processing of the ReplyTo property (e.g.
+                // CXF)
+                if (resultEvent != null && replyTo != null)
                 {
-                    processReplyTo(event, resultEvent, replyToHandler, replyTo);
+                    String replyToStop = resultEvent.getMessage().getInvocationProperty(MuleProperties.MULE_REPLY_TO_STOP_PROPERTY);
+                    if (!event.getExchangePattern().hasResponse() || !BooleanUtils.toBoolean(replyToStop))
+                    {
+                        processReplyTo(event, resultEvent, replyToHandler, replyTo);
+                    }
                 }
             }
             return resultEvent;

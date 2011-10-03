@@ -27,7 +27,7 @@ import org.mule.interceptor.ProcessingTimeInterceptor;
 import org.mule.lifecycle.processor.ProcessIfStartedMessageProcessor;
 import org.mule.management.stats.FlowConstructStatistics;
 import org.mule.processor.strategy.AsynchronousProcessingStrategy;
-import org.mule.routing.requestreply.ReplyToPropertyRequestReplyReplier;
+import org.mule.routing.requestreply.AsyncReplyToPropertyRequestReplyReplier;
 import org.mule.session.DefaultMuleSession;
 
 /**
@@ -92,7 +92,7 @@ public class Flow extends AbstractPipeline implements MessageProcessor
     protected void configurePostProcessors(MessageProcessorChainBuilder builder) throws MuleException
     {
         super.configurePostProcessors(builder);
-        builder.chain(new ReplyToPropertyRequestReplyReplier());
+        builder.chain(new AsyncReplyToPropertyRequestReplyReplier());
     }
 
     /**

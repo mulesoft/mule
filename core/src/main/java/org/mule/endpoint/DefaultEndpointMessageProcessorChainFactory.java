@@ -34,6 +34,7 @@ import org.mule.endpoint.outbound.OutboundSessionHandlerMessageProcessor;
 import org.mule.lifecycle.processor.ProcessIfStartedMessageProcessor;
 import org.mule.processor.TransactionalInterceptingMessageProcessor;
 import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
+import org.mule.routing.requestreply.ReplyToPropertyRequestReplyReplier;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -59,6 +60,7 @@ public class DefaultEndpointMessageProcessorChainFactory implements EndpointMess
         List<MessageProcessor> list = new ArrayList<MessageProcessor>();
 
         list.add(new InboundExceptionDetailsMessageProcessor(endpoint.getConnector()));
+        list.add(new ReplyToPropertyRequestReplyReplier());
         
         return list;
     }
