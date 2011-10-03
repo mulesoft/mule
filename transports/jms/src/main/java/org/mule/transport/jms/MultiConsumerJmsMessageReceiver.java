@@ -412,7 +412,7 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
                 {
                     logger.debug("Binding " + subReceiver.session + " to " + jmsConnector.getConnection());
                 }
-                tx.bindResource(jmsConnector.getConnection(), subReceiver.session);
+                tx.bindResource(jmsConnector.getConnection(), ReusableSessionWrapperFactory.createWrapper(subReceiver.session));
             }
             else
             {
