@@ -90,18 +90,14 @@
                         <id>src-dependencies</id>
                         <phase>initialize</phase>
                         <goals>
-                            <goal>unpack</goal>
+                            <goal>unpack-dependencies</goal>
                         </goals>
                         <configuration>
+                            <classifier>sources</classifier>
+                            <failOnMissingClassifierArtifact>false</failOnMissingClassifierArtifact>
                             <outputDirectory>${project.build.directory}/src-other</outputDirectory>
-                            <artifactItems>
-                                <artifactItem>
-                                    <groupId>org.mule.tools</groupId>
-                                    <artifactId>mule-module-archetype</artifactId>
-                                    <version>${project.version}</version>
-                                    <classifier>sources</classifier>
-                                </artifactItem>
-                            </artifactItems>
+                            <includeGroupIds>${project.groupId}</includeGroupIds>
+                            <includeArtifactIds>mule-module-archetype</includeArtifactIds>
                         </configuration>
                     </execution>
                 </executions>
