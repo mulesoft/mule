@@ -41,8 +41,7 @@ public class ValueExtractorTransformer extends AbstractMessageTransformer
 
         for (ValueExtractorTemplate valueExtractorTemplate : valueExtractorTemplates)
         {
-            Pattern pattern = Pattern.compile(valueExtractorTemplate.getPattern());
-            Matcher matcher = pattern.matcher(valueToMatch);
+            Matcher matcher = valueExtractorTemplate.compiledPattern.matcher(valueToMatch);
 
             if (matcher.matches())
             {
@@ -110,6 +109,7 @@ public class ValueExtractorTransformer extends AbstractMessageTransformer
         private String pattern;
         private String target;
         private boolean failIfNoMatch;
+        private Pattern compiledPattern;
 
         @SuppressWarnings({"UnusedDeclaration"})
         public ValueExtractorTemplate()
@@ -119,7 +119,7 @@ public class ValueExtractorTransformer extends AbstractMessageTransformer
 
         public ValueExtractorTemplate(String pattern, String target, boolean failIfNoMatch)
         {
-            this.pattern = pattern;
+            setPattern(pattern);
             this.target = target;
             this.failIfNoMatch = failIfNoMatch;
         }
@@ -132,6 +132,7 @@ public class ValueExtractorTransformer extends AbstractMessageTransformer
         public void setPattern(String pattern)
         {
             this.pattern = pattern;
+            compiledPattern = Pattern.compile(pattern);
         }
 
         public String getTarget()
