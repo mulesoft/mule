@@ -27,6 +27,7 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.session.DefaultMuleSession;
 import org.mule.transport.AbstractConnector;
 import org.mule.transport.AbstractPollingMessageReceiver;
+import org.mule.transport.NullPayload;
 import org.mule.util.StringUtils;
 
 import java.util.Map;
@@ -82,7 +83,7 @@ public class MessageProcessorPollingMessageReceiver extends AbstractPollingMessa
             flowConstruct, connector.getMuleContext()));
 
         MuleEvent sourceEvent = sourceMessageProcessor.process(event);
-        if (sourceEvent != null)
+        if (isNewMessage(sourceEvent))
         {
             routeMessage(sourceEvent.getMessage());
         }
@@ -98,5 +99,24 @@ public class MessageProcessorPollingMessageReceiver extends AbstractPollingMessa
     protected boolean pollOnPrimaryInstanceOnly()
     {
         return true;
+    }
+    
+    // Only consider response for source message processor a new message if it is not
+    // null and payload is not NullPayload
+    protected boolean isNewMessage(MuleEvent sourceEvent)
+    {
+        if (sourceEvent != null && sourceEvent.getMessage() != null)
+        {
+            MuleMessage message = sourceEvent.getMessage();
+            if (message.getPayload().equals(NullPayload.getInstance()))
+            {
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+        }
+        return false;
     }
 }
