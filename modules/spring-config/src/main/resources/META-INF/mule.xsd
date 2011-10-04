@@ -3080,7 +3080,7 @@
                 <xsd:attribute name="pattern" type="xsd:string" use="required">
                     <xsd:annotation>
                         <xsd:documentation>
-                            The property name and optionally a value to use when matching. If the expression is just a property name, the filter will check that the property exists. Users can also use '=' and '!=' to determine a specific value for a property.
+                            The pattern should be expressed as a key/value pair, such as "propertyName=value". If you want to compare more than one property, you can use the logic filters for And, Or, and Not expressions.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
