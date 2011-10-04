@@ -151,13 +151,14 @@ public class JmsMessageReceiver extends AbstractMessageReceiver implements Messa
         {
             if(tx instanceof JmsTransaction)
             {
-                tx.bindResource(connector.getConnection(), session);
+                tx.bindResource(connector.getConnection(), ReusableSessionWrapperFactory.createWrapper(session));
             }
             else if(tx instanceof JmsClientAcknowledgeTransaction)
             {
                 //We should still bind the session to the transaction, but we also need the message itself
                 //since that is the object that gets Acknowledged
-                tx.bindResource(connector.getConnection(), session);
+
+                tx.bindResource(connector.getConnection(), ReusableSessionWrapperFactory.createWrapper(session));
                 ((JmsClientAcknowledgeTransaction)tx).setMessage((Message)messages.get(0));
             }
         }
