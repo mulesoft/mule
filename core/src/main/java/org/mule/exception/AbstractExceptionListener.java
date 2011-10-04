@@ -165,6 +165,19 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
         }
     }
 
+    protected boolean isRollback(Throwable t)
+    {
+        if (rollbackTxFilter == null && commitTxFilter == null)
+        {
+            return true;
+        }
+        else
+        {
+            return (rollbackTxFilter != null && rollbackTxFilter.accept(t.getClass().getName()))
+                   || (commitTxFilter != null && !commitTxFilter.accept(t.getClass().getName()));
+        }
+    }
+
     protected void rollbackTransaction()
     {
         Transaction tx = TransactionCoordination.getInstance().getTransaction();

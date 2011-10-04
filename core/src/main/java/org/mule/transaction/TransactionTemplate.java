@@ -10,22 +10,11 @@
 
 package org.mule.transaction;
 
-import org.mule.api.MessagingException;
-import org.mule.api.MuleContext;
-import org.mule.api.exception.MessagingExceptionHandler;
-import org.mule.api.exception.SystemExceptionHandler;
-import org.mule.api.transaction.ExternalTransactionAwareTransactionFactory;
-import org.mule.api.transaction.Transaction;
-import org.mule.api.transaction.TransactionCallback;
-import org.mule.api.transaction.TransactionConfig;
-import org.mule.api.transaction.TransactionException;
-import org.mule.api.transaction.TransactionFactory;
-import org.mule.config.ExceptionHelper;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.routing.filters.WildcardFilter;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.mule.api.MuleContext;
+import org.mule.api.transaction.*;
+import org.mule.config.i18n.CoreMessages;
 
 public class TransactionTemplate<T>
 {
@@ -111,89 +100,26 @@ public class TransactionTemplate<T>
             tx = null;
         }
 
-        try
+        T result = callback.doInTransaction();
+        if (tx != null)
         {
-            T result = callback.doInTransaction();
-            if (tx != null)
-            {
-                //verify that transaction is still active
-                tx = TransactionCoordination.getInstance().getTransaction();
-            }
-            if (tx != null)
-            {
-                resolveTransaction(tx);
-            }
-            if (suspendedXATx != null)
-            {
-                resumeXATransaction(suspendedXATx);
-                tx = suspendedXATx;
-            }
-            return result;
-        }
-        catch (Exception e)
-        {
+            //verify that transaction is still active
             tx = TransactionCoordination.getInstance().getTransaction();
-            if (tx != null)
-            {
-                resolveTransaction(tx, e);
-            }
-            if (suspendedXATx != null)
-            {
-                resumeXATransaction(suspendedXATx);
-                // we've handled this exception above. just return null now, this way we isolate
-                // the context delimited by XA's ALWAYS_BEGIN
-                return null;
-            }
-            throw e;
         }
-        catch (Error e)
+        if (tx != null)
         {
-            if (tx != null)
-            {
-                logger.info("Error caught, rolling back TX " + tx, e);
-                tx.rollback();
-            }
-            throw e;
+            resolveTransaction(tx);
         }
-        finally
+        if (suspendedXATx != null)
         {
-            if (joinedExternal != null)
-            {
-                TransactionCoordination.getInstance().unbindTransaction(joinedExternal);
-            }
+            resumeXATransaction(suspendedXATx);
+            tx = suspendedXATx;
         }
-    }
-
-    protected void resolveTransaction(Transaction tx, Exception e) throws TransactionException
-    {
-        if (e instanceof MessagingException)
+        if (joinedExternal != null)
         {
-            MessagingExceptionHandler exceptionListener = ((MessagingException) e).getEvent().getFlowConstruct().getExceptionListener();
-
-            applyFiltersToTransaction(e, tx, exceptionListener.getCommitTxFilter(), exceptionListener.getRollbackTxFilter());
+            TransactionCoordination.getInstance().unbindTransaction(joinedExternal);
         }
-        else
-        {
-            SystemExceptionHandler exceptionListener = context.getExceptionListener();
-
-            applyFiltersToTransaction(e, tx, exceptionListener.getCommitTxFilter(), exceptionListener.getRollbackTxFilter());
-        }
-
-        resolveTransaction(tx);
-    }
-
-    protected void applyFiltersToTransaction(Exception e, Transaction tx, WildcardFilter commitTxFilter, WildcardFilter rollbackTxFilter) throws TransactionException
-    {
-        // Work with the root exception, not anything that wraps it
-        Throwable t = ExceptionHelper.getRootException(e);
-
-        boolean rollbackFilterApplies = rollbackTxFilter != null && rollbackTxFilter.accept(t.getClass().getName());
-        boolean commitFilterApplies = commitTxFilter != null && commitTxFilter.accept(t.getClass().getName());
-
-        // Only commits when the rollback filter did not apply and the commit filter applied
-        if (rollbackFilterApplies || !commitFilterApplies){
-            tx.setRollbackOnly();
-        }
+        return result;
     }
 
     protected void resolveTransaction(Transaction tx) throws TransactionException
@@ -205,8 +131,7 @@ public class TransactionTemplate<T>
                 logger.debug("Transaction has been marked rollbackOnly, rolling it back: " + tx);
             }
             tx.rollback();
-        }
-        else
+        } else
         {
             if (logger.isDebugEnabled())
             {

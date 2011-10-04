@@ -16,8 +16,12 @@ import org.mule.api.MuleEvent;
 import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.RoutingException;
+import org.mule.api.transaction.Transaction;
+import org.mule.api.transaction.TransactionException;
 import org.mule.context.notification.ExceptionNotification;
+import org.mule.management.stats.FlowConstructStatistics;
 import org.mule.message.DefaultExceptionPayload;
+import org.mule.transaction.TransactionCoordination;
 import org.mule.transport.NullPayload;
 
 /**
@@ -39,7 +43,6 @@ public abstract class AbstractMessagingExceptionStrategy extends AbstractExcepti
 
         logException(e);
         doHandleException(e, event);
-        handleTransaction(e);
         closeStream(event.getMessage());
 
         event.getMessage().setPayload(NullPayload.getInstance());
@@ -51,18 +54,64 @@ public abstract class AbstractMessagingExceptionStrategy extends AbstractExcepti
         }
         return event;
     }
-    
-    protected void doHandleException(Exception e, MuleEvent event)
+
+    protected void doHandleException(Exception ex, MuleEvent event)
     {
         // Left this here for backwards-compatibility, remove in the next major version.
-        defaultHandler(e);
-        
+        defaultHandler(ex);
+
         MessageProcessor target = null;
-        if (e instanceof RoutingException)
+        if (ex instanceof RoutingException)
         {
-            target = ((RoutingException) e).getRoute();
+            target = ((RoutingException) ex).getRoute();
         }
-        routeException(event, target, e);
+        if (isRollback(ex))
+        {
+            rollback();
+
+            logger.debug("Routing exception message");
+            routeException(event, target, ex);
+        }
+        else
+        {
+            logger.debug("Routing exception message");
+            routeException(event, target, ex);
+
+            logger.debug("Committing transaction");
+            commit();
+        }
+    }
+
+    protected void commit()
+    {
+        Transaction tx = TransactionCoordination.getInstance().getTransaction();
+        if (tx != null)
+        {
+            try
+            {
+                tx.commit();
+            }
+            catch (TransactionException e)
+            {
+                logger.error(e);
+            }
+        }
+    }
+
+    protected void rollback()
+    {
+        Transaction tx = TransactionCoordination.getInstance().getTransaction();
+        if (tx != null)
+        {
+            try
+            {
+                tx.rollback();
+            }
+            catch (TransactionException e)
+            {
+                logger.error(e);
+            }
+        }
     }
     
     /**
