@@ -3602,7 +3602,7 @@
                 <xsd:attribute name="pattern" type="xsd:string" use="required">
                     <xsd:annotation>
                         <xsd:documentation>
-                            The pattern should be expressed as a key/value pair, such as "propertyName=value". If you want to compare more than one property, you can use the logic filters for And, Or, and Not expressions.
+                            The property name and optionally a value to use when matching. If the expression is just a property name, the filter will check that the property exists. Users can also use '=' and '!=' to determine a specific value for a property.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -4345,6 +4345,58 @@
         <xsd:attribute name="custom-evaluator" type="substitutableName">
             <xsd:annotation>
                 <xsd:documentation>The name of the custom evaluator to use. This attribute is only used when the 'evaluator' attribute is set to "custom". You can plug in your own expression evaluators by registering them with the ExpressionEvaluatorManager.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+    </xsd:attributeGroup>
+
+    <xsd:element name="value-extractor" type="valueExtractorTransformerType" substitutionGroup="abstract-transformer">
+        <xsd:annotation>
+            <xsd:documentation>
+                Extracts values from a given source using regular expressions and uses that values to enrich the mule message.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:complexType name="valueExtractorTransformerType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractTransformerType">
+                <xsd:sequence>
+                    <xsd:element name="extract" type="extractValueExtractorTemplateType" minOccurs="1" maxOccurs="unbounded"/>
+                </xsd:sequence>
+                <xsd:attribute name="source" type="xsd:string" use="required">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            An evaluator expression used to extract the value that will be matched against each regular expression.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="extractValueExtractorTemplateType">
+        <xsd:attributeGroup ref="valueExtractorTemplateAttributes"/>
+    </xsd:complexType>
+
+    <xsd:attributeGroup name="valueExtractorTemplateAttributes">
+        <xsd:attribute name="pattern" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>
+                    A regular expression used to match against a source value. The regular expression should contain a capture group which value will be returned.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="target" type="xsd:string" use="required">
+            <xsd:annotation>
+                <xsd:documentation>
+                    The enricher expression used to enrich the current message with the result the processing of the regular expression.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="failIfNoMatch" type="substitutableBoolean" default="true">
+            <xsd:annotation>
+                <xsd:documentation>
+                    Determines if there should be an error in case the pattern is not matched by the source value.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>

@@ -128,9 +128,9 @@ import org.mule.model.seda.SedaModel;
 import org.mule.model.seda.SedaService;
 import org.mule.object.PrototypeObjectFactory;
 import org.mule.object.SingletonObjectFactory;
+import org.mule.processor.IdempotentRedeliveryPolicy;
 import org.mule.processor.InvokerMessageProcessor;
 import org.mule.processor.NullMessageProcessor;
-import org.mule.processor.IdempotentRedeliveryPolicy;
 import org.mule.processor.strategy.AsynchronousProcessingStrategy;
 import org.mule.processor.strategy.QueuedAsynchronousProcessingStrategy;
 import org.mule.processor.strategy.QueuedThreadPerProcessorProcessingStrategy;
@@ -212,9 +212,12 @@ import org.mule.transformer.simple.ObjectToByteArray;
 import org.mule.transformer.simple.ObjectToString;
 import org.mule.transformer.simple.SerializableToByteArray;
 import org.mule.transformer.simple.StringAppendTransformer;
+import org.mule.transformer.simple.ValueExtractorTransformer;
 import org.mule.util.store.InMemoryObjectStore;
 import org.mule.util.store.ManagedObjectStore;
 import org.mule.util.store.TextFileObjectStore;
+
+import static org.mule.transformer.simple.ValueExtractorTransformer.ValueExtractorTemplate;
 
 /**
  * This is the core namespace handler for Mule and configures all Mule configuration elements under the
@@ -359,6 +362,10 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
             .addCollection("enrichExpressionPairs");
         registerMuleBeanDefinitionParser("enrich", new ChildDefinitionParser("enrichExpressionPair",
             EnrichExpressionPair.class));
+
+        registerBeanDefinitionParser("value-extractor", new MessageProcessorDefinitionParser(ValueExtractorTransformer.class));
+        registerMuleBeanDefinitionParser("extract", new ChildDefinitionParser("valueExtractorTemplate",
+                                                                             ValueExtractorTemplate.class));
 
         registerBeanDefinitionParser("async", new AsyncMessageProcessorsDefinitionParser());
         registerBeanDefinitionParser("transactional", new ChildDefinitionParser("messageProcessor",
