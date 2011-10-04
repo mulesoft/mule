@@ -10,6 +10,9 @@
 
 package org.mule.mule.enricher;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+
 import org.mule.RequestContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -21,9 +24,6 @@ import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.transformer.simple.StringAppendTransformer;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 
 public class MessageEnricherTestCase extends AbstractMuleContextTestCase
 {
@@ -121,4 +121,23 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase
             "myHeader"));
     }
 
+    @Test
+    public void testEnrichWithNullResponse() throws Exception
+    {
+        MessageEnricher enricher = new MessageEnricher();
+        enricher.addEnrichExpressionPair(new EnrichExpressionPair("#[header:myHeader]"));
+        enricher.setEnrichmentMessageProcessor(new MessageProcessor()
+        {
+
+            public MuleEvent process(MuleEvent event) throws MuleException
+            {
+                return null;
+            }
+        });
+        
+        MuleMessage result = enricher.process(getTestEvent("")).getMessage();
+        assertNull(result.getOutboundProperty("myHeader"));
+        assertEquals("", result.getPayload());
+    }
+    
 }
