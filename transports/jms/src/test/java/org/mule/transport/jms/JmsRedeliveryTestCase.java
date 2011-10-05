@@ -26,9 +26,7 @@ import org.mule.util.concurrent.Latch;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class JmsRedeliveryTestCase extends FunctionalTestCase
 {
@@ -57,14 +55,14 @@ public class JmsRedeliveryTestCase extends FunctionalTestCase
         FunctionalTestComponent ftc = getFunctionalTestComponent("Bouncer");
 
         // whether a MessageRedeliverdException has been fired
-        final Latch mrexFired = new Latch();
+        final Latch messageRedeliveryExceptionFired = new Latch();
         muleContext.registerListener(new ExceptionNotificationListener<ExceptionNotification>()
         {
             public void onNotification(ExceptionNotification notification)
             {
                 if (notification.getException() instanceof MessageRedeliveredException)
                 {
-                    mrexFired.countDown();
+                    messageRedeliveryExceptionFired.countDown();
                     // Test for MULE-4630
                     assertEquals(DESTINATION, ((MessageRedeliveredException) notification.getException()).getEndpoint().getEndpointURI().toString());
                     assertEquals(MAX_REDELIVERY, ((MessageRedeliveredException) notification.getException()).getMaxRedelivery());
@@ -89,8 +87,11 @@ public class JmsRedeliveryTestCase extends FunctionalTestCase
         client.dispatch(DESTINATION, TEST_MESSAGE, null);
 
         Thread.sleep(2000);
-        mrexFired.await(timeout, TimeUnit.MILLISECONDS);
-        assertEquals("MessageRedeliveredException never fired.", 0, mrexFired.getCount());
+        if (!messageRedeliveryExceptionFired.await(timeout, TimeUnit.MILLISECONDS))
+        {
+            fail("Exception from FunctionalTestComponent was not triggered three times");
+        }
+        assertEquals("MessageRedeliveredException never fired.", 0, messageRedeliveryExceptionFired.getCount());
         assertEquals("Wrong number of delivery attempts", MAX_REDELIVERY + 1, callback.getCallbackCount());
 
         MuleMessage dl = client.request("jms://dead.letter", 1000);
