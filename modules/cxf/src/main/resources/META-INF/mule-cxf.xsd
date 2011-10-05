@@ -318,10 +318,10 @@
 
     <xsd:group name="commonConfiguration">
         <xsd:sequence>
-            <xsd:element name="databinding" type="databindingType" minOccurs="0">
+            <xsd:element ref="abstract-databinding"  minOccurs="0">
                 <xsd:annotation>
                     <xsd:documentation>
-                        The databinding implementation that should be used. By default, this is JAXB for the JAX-WS frontend and Aegis for the simple frontend. This should be specified in the form of a Spring bean.
+                        The databinding implementation that should be used. By default, this is JAXB for the JAX-WS frontend and Aegis for the simple frontend.
                     </xsd:documentation>
                 </xsd:annotation>
             </xsd:element>
@@ -392,11 +392,71 @@
          -->
     </xsd:attributeGroup>
 
-    <xsd:complexType name="databindingType">
+    <xsd:element name="abstract-databinding" abstract="true" type="baseDataBinding">
+        <xsd:annotation>
+            <xsd:documentation>
+                A placeholder for arbitrary extensions as children of the 'mule' element. Other transports and modules can extend this if they need to add global elements to the configuration (but consider the more specific elements like abstract-connector first).
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:complexType name="baseDataBinding">
         <xsd:sequence>
-            <xsd:any minOccurs="0" maxOccurs="1" namespace="##any" processContents="lax"/>
+            <xsd:element ref="beans:property" minOccurs="0" maxOccurs="unbounded">
+                <xsd:annotation>
+                    <xsd:documentation>
+                        Spring property element for custom configuration.
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
         </xsd:sequence>
     </xsd:complexType>
+
+    <xsd:element name="aegis-databinding" substitutionGroup="abstract-databinding" type="baseDataBinding">
+        <xsd:annotation>
+            <xsd:documentation>
+                Configures the Aegis data binding. See http://cxf.apache.org/docs/aegis-21.html
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:element name="source-databinding" substitutionGroup="abstract-databinding" type="baseDataBinding">
+        <xsd:annotation>
+            <xsd:documentation>
+                Configures the Source data binding. See http://stackoverflow.com/questions/4212608/getting-raw-xml-parameter-in-jax-ws-webservice-method
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:element name="jaxb-databinding" substitutionGroup="abstract-databinding" type="baseDataBinding">
+        <xsd:annotation>
+            <xsd:documentation>
+                Configures the JAXB data binding. See http://cxf.apache.org/docs/jaxb.html
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:element name="stax-databinding" substitutionGroup="abstract-databinding" type="baseDataBinding">
+        <xsd:annotation>
+            <xsd:documentation>
+                Configures the Stax data binding.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:element name="custom-databinding" substitutionGroup="abstract-databinding">
+        <xsd:annotation>
+            <xsd:documentation>
+                Configures a custom data binding.
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexType>
+            <xsd:complexContent>
+                <xsd:extension base="baseDataBinding">
+                    <xsd:attribute name="class" type="xsd:NMTOKEN" use="required"/>
+                </xsd:extension>
+            </xsd:complexContent>
+        </xsd:complexType>
+    </xsd:element>
 
     <xsd:complexType name="schemasType">
         <xsd:sequence>

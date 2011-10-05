@@ -12,6 +12,7 @@ package org.mule.module.cxf.config;
 
 import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
 import org.mule.config.spring.parsers.collection.ChildListDefinitionParser;
+import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
 import org.mule.config.spring.parsers.generic.OrphanDefinitionParser;
 import org.mule.config.spring.parsers.processors.AddAttribute;
@@ -23,8 +24,12 @@ import org.mule.module.cxf.component.WebServiceWrapperComponent;
 import org.mule.module.cxf.support.MuleSecurityManagerCallbackHandler;
 import org.mule.module.cxf.support.StaxFeature;
 
+import org.apache.cxf.aegis.databinding.AegisDatabinding;
 import org.apache.cxf.configuration.spring.SimpleBeanDefinitionParser;
 import org.apache.cxf.configuration.spring.StringBeanDefinitionParser;
+import org.apache.cxf.databinding.source.SourceDataBinding;
+import org.apache.cxf.databinding.stax.StaxDataBinding;
+import org.apache.cxf.jaxb.JAXBDataBinding;
 import org.springframework.beans.factory.BeanDefinitionStoreException;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.xml.ParserContext;
@@ -67,7 +72,11 @@ public class CxfNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("schemaLocations", new ChildListDefinitionParser("schemaLocations"));
         registerBeanDefinitionParser("schemaLocation", new StringBeanDefinitionParser());
         
-//        registerBeanDefinitionParser(CxfConstants.DATA_BINDING, new GrandchildDefinitionParser(CxfConstants.DATA_BINDING));
+        registerBeanDefinitionParser("jaxb-databinding", new ChildDefinitionParser(CxfConstants.DATA_BINDING, JAXBDataBinding.class));
+        registerBeanDefinitionParser("stax-databinding", new ChildDefinitionParser(CxfConstants.DATA_BINDING, StaxDataBinding.class));
+        registerBeanDefinitionParser("source-databinding", new ChildDefinitionParser(CxfConstants.DATA_BINDING, SourceDataBinding.class));
+        registerBeanDefinitionParser("aegis-databinding", new ChildDefinitionParser(CxfConstants.DATA_BINDING, AegisDatabinding.class));
+        registerBeanDefinitionParser("custom-databinding", new ChildDefinitionParser(CxfConstants.DATA_BINDING));
         
         registerBeanDefinitionParser(CxfConstants.IN_INTERCEPTORS, new ChildListDefinitionParser(CxfConstants.IN_INTERCEPTORS));
         registerBeanDefinitionParser(CxfConstants.IN_FAULT_INTERCEPTORS, new ChildListDefinitionParser(CxfConstants.IN_FAULT_INTERCEPTORS));
