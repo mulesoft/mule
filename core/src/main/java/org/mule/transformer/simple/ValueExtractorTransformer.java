@@ -26,7 +26,10 @@ import java.util.regex.Pattern;
 public class ValueExtractorTransformer extends AbstractMessageTransformer
 {
 
-    private String source;
+    // MULE-5815: default should be #[payload] but that value is not a valid expression
+    public static final String DEFAULT_SOURCE_EXPRESSION = "#[payload:]";
+
+    private String source = DEFAULT_SOURCE_EXPRESSION;
     private List<ValueExtractorTemplate> valueExtractorTemplates;
 
     public ValueExtractorTransformer()

@@ -14,16 +14,22 @@ import org.mule.api.transformer.Transformer;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transformer.simple.ValueExtractorTransformer;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class ValueExtractorTransformerConfigTestCase extends FunctionalTestCase
 {
+
+    private List<ValueExtractorTransformer.ValueExtractorTemplate> expectedTemplates;
+    private ValueExtractorTransformer.ValueExtractorTemplate template1;
+    private ValueExtractorTransformer.ValueExtractorTemplate template2;
+    private String expectedSource;
 
     @Override
     protected String getConfigResources()
@@ -31,26 +37,71 @@ public class ValueExtractorTransformerConfigTestCase extends FunctionalTestCase
         return "value-extractor-transformer-config.xml";
     }
 
+    @Before
+    public void setUp()
+    {
+        expectedTemplates = new ArrayList<ValueExtractorTransformer.ValueExtractorTemplate>();
+
+        template1 = new ValueExtractorTransformer.ValueExtractorTemplate();
+        template1.setPattern("TEST(\\w+)TEST");
+        template1.setTarget("#[header:INVOCATION:propName1]");
+        template1.setFailIfNoMatch(false);
+
+        template2 = new ValueExtractorTransformer.ValueExtractorTemplate();
+        template2.setPattern("test(\\w+)test");
+        template2.setTarget("#[header:OUTBOUND:propName2]");
+        template2.setFailIfNoMatch(true);
+    }
+
     @Test
     public void testConfiguresValueExtractor() throws Exception
     {
-        Transformer transformer = muleContext.getRegistry().lookupTransformer("valueExtractor");
+        expectedSource = "#[payload]";
+        expectedTemplates.add(template1);
+        expectedTemplates.add(template2);
 
-        assertTrue(transformer instanceof ValueExtractorTransformer);
-        ValueExtractorTransformer valueExtractorTransformer = (ValueExtractorTransformer) transformer;
+        ValueExtractorTransformer valueExtractorTransformer = getValueExtractor("valueExtractor1");
 
-        assertEquals("#[payload]", valueExtractorTransformer.getSource());
-        List<ValueExtractorTransformer.ValueExtractorTemplate> valueExtractorTemplates = valueExtractorTransformer.getValueExtractorTemplates();
-        assertEquals(2, valueExtractorTemplates.size());
-
-        ValueExtractorTransformer.ValueExtractorTemplate valueExtractorTemplate = valueExtractorTemplates.get(0);
-        assertEquals("TEST(\\w+)TEST", valueExtractorTemplate.getPattern());
-        assertEquals("#[header:INVOCATION:propName1]", valueExtractorTemplate.getTarget());
-        assertFalse(valueExtractorTemplate.isFailIfNoMatch());
-
-        valueExtractorTemplate = valueExtractorTemplates.get(1);
-        assertEquals("test(\\w+)test", valueExtractorTemplate.getPattern());
-        assertEquals("#[header:OUTBOUND:propName2]", valueExtractorTemplate.getTarget());
-        assertTrue(valueExtractorTemplate.isFailIfNoMatch());
+        assertExpectedValueExtractor(valueExtractorTransformer);
     }
+
+    @Test
+    public void testDefaultExpression() throws Exception
+    {
+        expectedSource = "#[payload:]";
+        expectedTemplates.add(template1);
+
+        ValueExtractorTransformer valueExtractorTransformer = getValueExtractor("valueExtractor2");
+
+        assertExpectedValueExtractor(valueExtractorTransformer);
+    }
+
+    private ValueExtractorTransformer getValueExtractor(String valueExtractor)
+    {
+        Transformer transformer = muleContext.getRegistry().lookupTransformer(valueExtractor);
+        assertTrue(transformer instanceof ValueExtractorTransformer);
+        return (ValueExtractorTransformer) transformer;
+    }
+
+    private void assertEqualTemplateList(List<ValueExtractorTransformer.ValueExtractorTemplate> templates, List<ValueExtractorTransformer.ValueExtractorTemplate> actualExtractorTemplates)
+    {
+        assertEquals(templates.size(), actualExtractorTemplates.size());
+
+        int i = 0;
+        for (ValueExtractorTransformer.ValueExtractorTemplate expectedTemplate: templates)
+        {
+            ValueExtractorTransformer.ValueExtractorTemplate actualTemplate =  actualExtractorTemplates.get(i++);
+
+            assertEquals(expectedTemplate.getPattern(), actualTemplate.getPattern());
+            assertEquals(expectedTemplate.getTarget(), actualTemplate.getTarget());
+            assertEquals(expectedTemplate.isFailIfNoMatch(), actualTemplate.isFailIfNoMatch());
+        }
+    }
+
+    private void assertExpectedValueExtractor(ValueExtractorTransformer valueExtractorTransformer)
+    {
+        assertEquals(expectedSource, valueExtractorTransformer.getSource());
+        assertEqualTemplateList(expectedTemplates, valueExtractorTransformer.getValueExtractorTemplates());
+    }
+
 }

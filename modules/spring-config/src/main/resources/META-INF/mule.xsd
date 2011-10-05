@@ -619,7 +619,7 @@
                         <xsd:documentation>
                             An evaluator expression used to extract a value from the result of the
                             enrichment message processor. If an
-                            expression is not specificed then the payload of the
+                            expression is not specified then the payload of the
                             message is used.
                         </xsd:documentation>
                     </xsd:annotation>
@@ -628,7 +628,7 @@
                     <xsd:annotation>
                         <xsd:documentation>
                             The enricher expression used to enrich the current message with the result
-                            the processing of the enrichement message processor specificed.
+                            the processing of the enrichement message processor specified.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -645,7 +645,7 @@
                 <xsd:documentation>
                     An evaluator expression used to extract a value from the result of the
                     enrichment message processor. If an
-                    expression is not specificed then the payload of the
+                    expression is not specified then the payload of the
                     message is used.
                 </xsd:documentation>
             </xsd:annotation>
@@ -654,7 +654,7 @@
             <xsd:annotation>
                 <xsd:documentation>
                     The enricher expression used to enrich the current message with the result
-                    the processing of the enrichement message processor specificed.
+                    the processing of the enrichement message processor specified.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
@@ -4363,10 +4363,10 @@
                 <xsd:sequence>
                     <xsd:element name="extract" type="extractValueExtractorTemplateType" minOccurs="1" maxOccurs="unbounded"/>
                 </xsd:sequence>
-                <xsd:attribute name="source" type="xsd:string" use="required">
+                <xsd:attribute name="source" type="xsd:string" use="optional">
                     <xsd:annotation>
                         <xsd:documentation>
-                            An evaluator expression used to extract the value that will be matched against each regular expression.
+                            An evaluator expression used to extract the value that will be matched against each regular expression. If an expression is not specified then the payload of the message is used.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
