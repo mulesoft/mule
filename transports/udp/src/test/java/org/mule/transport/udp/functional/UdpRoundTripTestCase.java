@@ -11,6 +11,7 @@
 package org.mule.transport.udp.functional;
 
 import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -22,12 +23,19 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 
 import edu.emory.mathcs.backport.java.util.Arrays;
+import org.junit.Rule;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
 public class UdpRoundTripTestCase extends FunctionalTestCase
 {
+
+    @Rule
+    public DynamicPort outPort = new DynamicPort("outPort");
+
+    @Rule
+    public DynamicPort inPort = new DynamicPort("inPort");
 
     @Override
     protected String getConfigResources()
@@ -38,11 +46,8 @@ public class UdpRoundTripTestCase extends FunctionalTestCase
     @Test
     public void testSendAndReceiveUDP() throws IOException
     {
-        int outPort = 61000;
-        int inPort = 61001;
-
         // the socket we talk to
-        DatagramSocket socket = new DatagramSocket(inPort, InetAddress.getLocalHost());
+        DatagramSocket socket = new DatagramSocket(inPort.getNumber(), InetAddress.getLocalHost());
 
         // prepare outgoing packet
         ByteArrayOutputStream bytesOut = new ByteArrayOutputStream();
@@ -52,7 +57,7 @@ public class UdpRoundTripTestCase extends FunctionalTestCase
         byte[] bytesToSend = bytesOut.toByteArray();
 
         DatagramPacket outboundPacket = new DatagramPacket(bytesToSend, bytesToSend.length,
-            InetAddress.getLocalHost(), outPort);
+            InetAddress.getLocalHost(), outPort.getNumber());
         socket.send(outboundPacket);
 
         // receive whatever came back
