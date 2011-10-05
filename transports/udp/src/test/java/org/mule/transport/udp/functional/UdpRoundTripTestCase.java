@@ -10,7 +10,8 @@
 
 package org.mule.transport.udp.functional;
 
-import static org.junit.Assert.assertEquals;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -23,12 +24,21 @@ import java.net.InetAddress;
 import java.util.Arrays;
 import java.util.Collection;
 
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+
+import static org.junit.Assert.assertEquals;
 
 public class UdpRoundTripTestCase extends AbstractServiceAndFlowTestCase
 {
+
+    @Rule
+    public DynamicPort outPort = new DynamicPort("outPort");
+
+    @Rule
+    public DynamicPort inPort = new DynamicPort("inPort");
+
     public UdpRoundTripTestCase(ConfigVariant variant, String configResources)
     {
         super(variant, configResources);
@@ -46,11 +56,8 @@ public class UdpRoundTripTestCase extends AbstractServiceAndFlowTestCase
     @Test
     public void testSendAndReceiveUDP() throws IOException
     {
-        int outPort = 61000;
-        int inPort = 61001;
-
         // the socket we talk to
-        DatagramSocket socket = new DatagramSocket(inPort, InetAddress.getLocalHost());
+        DatagramSocket socket = new DatagramSocket(inPort.getNumber(), InetAddress.getLocalHost());
 
         // prepare outgoing packet
         ByteArrayOutputStream bytesOut = new ByteArrayOutputStream();
@@ -60,7 +67,7 @@ public class UdpRoundTripTestCase extends AbstractServiceAndFlowTestCase
         byte[] bytesToSend = bytesOut.toByteArray();
 
         DatagramPacket outboundPacket = new DatagramPacket(bytesToSend, bytesToSend.length,
-            InetAddress.getLocalHost(), outPort);
+            InetAddress.getLocalHost(), outPort.getNumber());
         socket.send(outboundPacket);
 
         // receive whatever came back
