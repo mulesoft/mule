@@ -11,20 +11,65 @@
     <model name="BasicCxfTest">
         <service name="echoService">
             <inbound>
-                <inbound-endpoint address="http://localhost:${port1}/services/Echo" exchange-pattern="request-response" name="httpInbound">
+                <inbound-endpoint address="http://localhost:${port1}/services/Echo"
+                    exchange-pattern="request-response" name="httpInbound">
                     <cxf:simple-service>
-                        <cxf:databinding>
-                            <spring:bean class="org.apache.cxf.aegis.databinding.AegisDatabinding">
-                                <spring:property name="configuration">
-                                    <spring:bean class="org.apache.cxf.aegis.type.TypeCreationOptions" />
-                                </spring:property>
-                            </spring:bean>
-                        </cxf:databinding>
+                        <cxf:aegis-databinding>
+                            <spring:property name="configuration">
+                                <spring:bean class="org.apache.cxf.aegis.type.TypeCreationOptions" />
+                            </spring:property>
+                        </cxf:aegis-databinding>
                     </cxf:simple-service>
                 </inbound-endpoint>
             </inbound>
             <component class="org.mule.component.simple.EchoComponent" />
         </service>
     </model>
+    
+    <flow name="aegis">
+        <inbound-endpoint address="http://localhost:${port1}/services/aegis" name="httpInboundAegis">
+            <cxf:simple-service serviceClass="org.mule.component.simple.EchoComponent">
+                <cxf:aegis-databinding/>
+            </cxf:simple-service>      
+        </inbound-endpoint>
+        <component class="org.mule.component.simple.EchoComponent" />
+    </flow>
+
+    <flow name="jaxb">
+        <inbound-endpoint address="http://localhost:${port1}/services/jaxb" name="httpInboundJaxb">
+            <cxf:simple-service serviceClass="org.mule.component.simple.EchoComponent">
+                <cxf:jaxb-databinding/>
+            </cxf:simple-service>      
+        </inbound-endpoint>
+        <component class="org.mule.component.simple.EchoComponent" />
+    </flow>
+
+    <flow name="source">
+        <inbound-endpoint address="http://localhost:${port1}/services/source" name="httpInboundSource">
+            <cxf:simple-service serviceClass="org.mule.component.simple.EchoComponent">
+                <cxf:source-databinding/>
+            </cxf:simple-service>      
+        </inbound-endpoint>
+        <component class="org.mule.component.simple.EchoComponent" />
+    </flow>
+
+    <flow name="stax">
+        <inbound-endpoint address="http://localhost:${port1}/services/stax" name="httpInboundStax">
+            <cxf:simple-service serviceClass="org.mule.component.simple.EchoComponent">
+                <cxf:stax-databinding/>
+            </cxf:simple-service>      
+        </inbound-endpoint>
+        <component class="org.mule.component.simple.EchoComponent" />
+    </flow>
+    
+    <flow name="custom">
+        <inbound-endpoint address="http://localhost:${port1}/services/custom" name="httpInboundCustom">
+            <cxf:simple-service serviceClass="org.mule.component.simple.EchoComponent">
+                <cxf:custom-databinding class="org.apache.cxf.aegis.databinding.AegisDatabinding"/>
+            </cxf:simple-service>      
+        </inbound-endpoint>
+        <component class="org.mule.component.simple.EchoComponent" />
+    </flow>
+
 </mule>
 
