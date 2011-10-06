@@ -10,6 +10,10 @@
 
 package org.mule.processor;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.api.MuleException;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.lifecycle.Initialisable;
@@ -30,11 +34,8 @@ import javax.resource.spi.work.WorkEvent;
 import javax.resource.spi.work.WorkException;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
-import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import org.junit.Test;
 
 public class SedaStageInterceptingMessageProcessorTestCase extends
     OptionalAsyncInterceptingMessageProcessorTestCase implements ExceptionListener
@@ -88,7 +89,7 @@ public class SedaStageInterceptingMessageProcessorTestCase extends
     {
         try
         {
-            new AsyncWorkListener(getSensingNullMessageProcessor()).handleWorkException(
+            createAsyncInterceptingMessageProcessor(getSensingNullMessageProcessor()).handleWorkException(
                 getTestWorkEvent(), "workRejected");
         }
         catch (MuleRuntimeException mrex)

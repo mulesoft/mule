@@ -18,7 +18,6 @@ import org.mule.api.MuleException;
 import org.mule.api.NamedObject;
 import org.mule.api.config.ThreadingProfile;
 import org.mule.api.context.WorkManager;
-import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.exception.SystemExceptionHandler;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Lifecycle;
@@ -36,7 +35,6 @@ import org.mule.service.Resumable;
 import org.mule.util.concurrent.WaitableBoolean;
 import org.mule.util.queue.Queue;
 import org.mule.util.queue.QueueSession;
-import org.mule.work.AbstractMuleEventWork;
 import org.mule.work.MuleWorkManager;
 
 import java.text.MessageFormat;
@@ -140,37 +138,6 @@ public class SedaStageInterceptingMessageProcessor extends OptionalAsyncIntercep
         return event;
     }
 
-    private class SedaStageWorker extends AbstractMuleEventWork
-    {
-        public SedaStageWorker(MuleEvent event)
-        {
-            super(event);
-        }
-
-        @Override
-        protected void doRun()
-        {
-            try
-            {
-                processNextTimed(event);
-            }
-            catch (Exception e)
-            {
-                event.getSession().setValid(false);
-                MessagingExceptionHandler exceptionListener = event.getFlowConstruct().getExceptionListener();
-                if (e instanceof MessagingException)
-                {
-                    exceptionListener.handleException(e, event);
-                }
-                else
-                {
-                    exceptionListener.handleException(new MessagingException(
-                        CoreMessages.eventProcessingFailedFor(getStageDescription()), event, e), event);
-                }
-            }
-        }
-    }
-
     /**
      * While the service isn't stopped this runs a continuous loop checking for new
      * events in the queue.
@@ -248,11 +215,11 @@ public class SedaStageInterceptingMessageProcessor extends OptionalAsyncIntercep
                         logger.debug(MessageFormat.format("{0}: Dequeued event from {1}",
                             getStageDescription(), getQueueName()));
                     }
-                    Work work = new SedaStageWorker(event);
+                    Work work = new AsyncMessageProcessorWork(event);
                     if (doThreading)
                     {
                         workManagerSource.getWorkManager().scheduleWork(work, WorkManager.INDEFINITE, null,
-                            new AsyncWorkListener(next));
+                            this);
                     }
                     else
                     {
@@ -365,7 +332,7 @@ public class SedaStageInterceptingMessageProcessor extends OptionalAsyncIntercep
                 {
                     workManagerSource.getWorkManager().scheduleWork(
                         SedaStageInterceptingMessageProcessor.this, WorkManager.INDEFINITE, null,
-                        new AsyncWorkListener(next));
+                        SedaStageInterceptingMessageProcessor.this);
                 }
                 catch (WorkException e)
                 {
@@ -419,4 +386,10 @@ public class SedaStageInterceptingMessageProcessor extends OptionalAsyncIntercep
         lifecycleManager.fireResumePhase(new EmptyLifecycleCallback<SedaStageInterceptingMessageProcessor>());
     }
 
+    
+    @Override
+    public String toString()
+    {
+        return getStageDescription();
+    }
 }

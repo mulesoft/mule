@@ -16,6 +16,7 @@ import org.mule.api.MuleException;
 import org.mule.api.config.ThreadingProfile;
 import org.mule.api.context.WorkManager;
 import org.mule.api.context.WorkManagerSource;
+import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.processor.MessageProcessor;
@@ -25,6 +26,9 @@ import org.mule.work.MuleWorkManager;
 
 import java.util.Collections;
 import java.util.List;
+
+import javax.resource.spi.work.WorkEvent;
+import javax.resource.spi.work.WorkListener;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -36,7 +40,7 @@ import org.apache.commons.logging.LogFactory;
  * transaction is present then an exception is thrown.
  */
 public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
-    implements MessageProcessor, Startable, Stoppable
+    implements MessageProcessor, Startable, Stoppable, WorkListener
 {
     protected Log logger = LogFactory.getLog(getClass());
 
@@ -83,8 +87,8 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
         {
             try
             {
-                workManagerSource.getWorkManager().scheduleWork(new AsyncMessageProcessorWorker(event),
-                    WorkManager.INDEFINITE, null, new AsyncWorkListener(delegate));
+                workManagerSource.getWorkManager().scheduleWork(new AsyncMessageProcessorWork(event),
+                    WorkManager.INDEFINITE, null, this);
             }
             catch (Exception e)
             {
@@ -106,9 +110,9 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
         return Collections.singletonList(delegate);
     }
 
-    class AsyncMessageProcessorWorker extends AbstractMuleEventWork
+    class AsyncMessageProcessorWork extends AbstractMuleEventWork
     {
-        public AsyncMessageProcessorWorker(MuleEvent event)
+        public AsyncMessageProcessorWork(MuleEvent event)
         {
             super(event);
         }
@@ -120,10 +124,75 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
             {
                 delegate.process(event);
             }
-            catch (MuleException e)
+            catch (Exception e)
             {
-                event.getFlowConstruct().getExceptionListener().handleException(e, event);
+                MessagingExceptionHandler exceptionListener = event.getFlowConstruct().getExceptionListener();
+                if (e instanceof MessagingException)
+                {
+                    exceptionListener.handleException(e, event);
+                }
+                else
+                {
+                    exceptionListener.handleException(
+                        new MessagingException(CoreMessages.eventProcessingFailedFor(this.toString()), event,
+                            e), event);
+                }
             }
+        }
+    }
+    
+    public void workAccepted(WorkEvent event)
+    {
+        this.handleWorkException(event, "workAccepted");
+    }
+
+    public void workRejected(WorkEvent event)
+    {
+        this.handleWorkException(event, "workRejected");
+    }
+
+    public void workStarted(WorkEvent event)
+    {
+        this.handleWorkException(event, "workStarted");
+    }
+
+    public void workCompleted(WorkEvent event)
+    {
+        this.handleWorkException(event, "workCompleted");
+    }
+
+    protected void handleWorkException(WorkEvent event, String type)
+    {
+        if (event == null)
+        {
+            return;
+        }
+
+        Throwable e = event.getException();
+
+        if (e == null)
+        {
+            return;
+        }
+
+        if (e.getCause() != null)
+        {
+            e = e.getCause();
+        }
+
+        if (e instanceof MessagingException)
+        {
+            MuleEvent muleEvent = ((MessagingException)e).getEvent();
+            muleEvent.getFlowConstruct().getExceptionListener().handleException((Exception)e, muleEvent);
+        }
+        else if (e instanceof Exception)
+        {
+            muleContext.getExceptionListener().handleException((Exception)e);
+        }
+        else
+        {
+            logger.error("Work caused exception " + e + "on '" + type + "'. Work being executed was: "
+                         + event.getWork().toString());
         }
     }
 
