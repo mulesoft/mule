@@ -38,4 +38,8 @@
                 targetClass="org.mule.tck.testmodels.fruit.Orange"/>
     </json:object-to-json-transformer>
 
+    <json:json-to-xml-transformer name="jToX"/>
+
+    <json:xml-to-json-transformer name="xToJ"/>
+
 </mule>

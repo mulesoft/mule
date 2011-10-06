@@ -16,8 +16,10 @@ import org.mule.config.spring.parsers.specific.FilterDefinitionParser;
 import org.mule.config.spring.parsers.specific.MessageProcessorDefinitionParser;
 import org.mule.module.json.filters.IsJsonFilter;
 import org.mule.module.json.transformers.JsonToObject;
+import org.mule.module.json.transformers.JsonToXml;
 import org.mule.module.json.transformers.ObjectToJson;
 
+import org.mule.module.json.transformers.XmlToJson;
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
 
 /**
@@ -34,5 +36,7 @@ public class JsonNamespaceHandler extends NamespaceHandlerSupport
         registerBeanDefinitionParser("deserialization-mixin", new ChildMapEntryDefinitionParser("deserializationMixins", "targetClass", "mixinClass"));
         registerBeanDefinitionParser("mixin", new ChildMapEntryDefinitionParser("mixins", "targetClass", "mixinClass"));
         registerBeanDefinitionParser("mapper", new OrphanDefinitionParser(MapperFactoryBean.class, true));
+        registerBeanDefinitionParser("json-to-xml-transformer", new FilterDefinitionParser(JsonToXml.class));
+        registerBeanDefinitionParser("xml-to-json-transformer", new FilterDefinitionParser(XmlToJson.class));
     }
 }

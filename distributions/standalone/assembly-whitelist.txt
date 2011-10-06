@@ -964,8 +964,10 @@
 /mule-standalone-${productVersion}/lib/opt/spring-security-web-3.0.3.RELEASE.jar
 /mule-standalone-${productVersion}/lib/opt/spring-tx-3.0.3.RELEASE.jar
 /mule-standalone-${productVersion}/lib/opt/spring-web-3.0.3.RELEASE.jar
+/mule-standalone-${productVersion}/lib/opt/stax-api-1.0-2.jar
 /mule-standalone-${productVersion}/lib/opt/stax-utils-20080702-osgi.jar
 /mule-standalone-${productVersion}/lib/opt/stax2-api-3.0.2.jar
+/mule-standalone-${productVersion}/lib/opt/staxon-0.7.0.jar
 /mule-standalone-${productVersion}/lib/opt/sxc-core-0.7.3-osgi.jar
 /mule-standalone-${productVersion}/lib/opt/sxc-runtime-0.7.3-osgi.jar
 /mule-standalone-${productVersion}/lib/opt/sxc-xpath-0.7.3-osgi.jar

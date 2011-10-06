@@ -14,7 +14,9 @@ import org.mule.module.json.filters.IsJsonFilter;
 import org.mule.module.json.transformers.FruitCollection;
 import org.mule.module.json.transformers.JsonBeanRoundTripTestCase;
 import org.mule.module.json.transformers.JsonToObject;
+import org.mule.module.json.transformers.JsonToXml;
 import org.mule.module.json.transformers.ObjectToJson;
+import org.mule.module.json.transformers.XmlToJson;
 import org.mule.tck.junit4.FunctionalTestCase;
 
 import org.junit.Test;
@@ -68,6 +70,12 @@ public class JsonNamespaceHandlerTestCase extends FunctionalTestCase
         FruitCollection result2 = (FruitCollection)deserializer.transform(result);
         assertNotNull(result2);
         assertEquals(fc, result2);
+
+        JsonToXml jToX = (JsonToXml)muleContext.getRegistry().lookupObject("jToX");
+        assertNotNull(jToX);
+
+        XmlToJson xToJ = (XmlToJson)muleContext.getRegistry().lookupObject("XtoJ");
+        assertNotNull(xToJ);
     }
 
 }

@@ -51,5 +51,34 @@
             <artifactId>jackson-mapper-asl</artifactId>
             <version>${jacksonVersion}</version>
         </dependency>
+
+        <dependency>
+            <groupId>de.odysseus.staxon</groupId>
+            <artifactId>staxon</artifactId>
+            <version>${staxonVersion}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.codehaus.woodstox</groupId>
+            <artifactId>stax2-api</artifactId>
+            <version>${staxApiVersion}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-xml</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
+
+
+    <repositories>
+        <repository>
+            <id>staxon</id>
+            <url>http://beckchr.github.com/staxon/maven/releases</url>
+        </repository>
+    </repositories>
+
 </project>

@@ -69,6 +69,24 @@
         </xsd:annotation>
     </xsd:element>
 
+    <xsd:element name="json-to-xml-transformer" type="mule:abstractTransformerType"
+        substitutionGroup="mule:abstract-transformer">
+        <xsd:annotation>
+            <xsd:documentation>
+                Converts a JSON string to an XML string
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:element name="xml-to-json-transformer" type="mule:abstractTransformerType"
+                 substitutionGroup="mule:abstract-transformer">
+        <xsd:annotation>
+            <xsd:documentation>
+                Converts an XML string to a JSON string
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
     <xsd:element name="object-to-json-transformer" type="objectToJsonTransformerType"
                  substitutionGroup="mule:abstract-transformer">
         <xsd:annotation>
