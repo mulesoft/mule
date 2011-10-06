@@ -19,7 +19,7 @@ import org.mule.tck.junit4.FunctionalTestCase;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
-public class JmsObjectToMessageTransformerInResponseTestCase extends FunctionalTestCase
+public class JmsObjectToMessageTransformerInResponseTestCase extends AbstractJmsFunctionalTestCase
 {
 
     public static final int TIMEOUT = 3000;
@@ -34,7 +34,7 @@ public class JmsObjectToMessageTransformerInResponseTestCase extends FunctionalT
     public void testObjectToMessageDoesntFail() throws Exception
     {
         MuleClient muleClient = new MuleClient(muleContext);
-        MuleMessage response = muleClient.send("jms://in", "A message", null, TIMEOUT);
+        MuleMessage response = muleClient.send("inWithTransformers", "A message", null, TIMEOUT);
         assertThat(response, IsNull.<Object>notNullValue());
         assertThat(response.getPayloadAsString(), is("A message with something more"));
     }

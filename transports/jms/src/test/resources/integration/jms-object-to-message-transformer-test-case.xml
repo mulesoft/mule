@@ -9,10 +9,8 @@
        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/3.2/mule-test.xsd
        http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/3.2/mule-jms.xsd">
 
-    <jms:activemq-connector name="activeMQConnector"/>
-
     <flow name="object-to-message-flow">
-        <jms:inbound-endpoint queue="in" disableTransportTransformer="true" exchange-pattern="request-response">
+        <jms:inbound-endpoint ref="in">
             <jms:jmsmessage-to-object-transformer/>
             <response>
                 <jms:object-to-jmsmessage-transformer/>
