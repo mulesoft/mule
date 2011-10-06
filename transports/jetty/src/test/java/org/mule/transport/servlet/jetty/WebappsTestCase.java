@@ -10,17 +10,7 @@
 
 package org.mule.transport.servlet.jetty;
 
-import org.mule.DefaultMuleMessage;
-import org.mule.api.MuleMessage;
-import org.mule.client.DefaultLocalMuleClient;
-import org.mule.transport.http.HttpConnector;
-
-import java.util.HashMap;
-import java.util.Map;
-
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
 
 public class WebappsTestCase extends AbstractWebappsTestCase
 {
@@ -31,16 +21,8 @@ public class WebappsTestCase extends AbstractWebappsTestCase
     }
 
     @Test
-    public void testWebapps() throws Exception
+    public void webappShouldBeDeployed() throws Exception
     {
-        Map<String,Object> props = new HashMap<String,Object>();
-        props.put(HttpConnector.HTTP_METHOD_PROPERTY, "GET");
-
-        DefaultLocalMuleClient client = new DefaultLocalMuleClient(muleContext);
-        MuleMessage result = client.send("http://localhost:63081/test/hello",
-            new DefaultMuleMessage("", muleContext),
-            props);
-
-        assertEquals("Hello", result.getPayloadAsString());
+        sendRequestAndAssertCorrectResponse("http://localhost:63081/test/hello");
     }
 }
