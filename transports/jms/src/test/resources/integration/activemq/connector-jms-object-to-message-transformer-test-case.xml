@@ -9,14 +9,9 @@
        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/3.1/mule-test.xsd
        http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/3.1/mule-jms.xsd">
 
-    <flow name="object-to-message-flow">
-        <jms:inbound-endpoint ref="in">
-            <jms:jmsmessage-to-object-transformer/>
-            <response>
-                <jms:object-to-jmsmessage-transformer/>
-            </response>
-        </jms:inbound-endpoint>
-        <test:component appendString=" with something more"/>
-    </flow>
+    <jms:activemq-connector name="activeMQConnector"/>
+
+    <jms:endpoint name="in" queue="in" disableTransportTransformer="true" exchange-pattern="request-response"/>
+    <jms:endpoint name="inWithTransformers" queue="in" exchange-pattern="request-response"/>
 
 </mule>
