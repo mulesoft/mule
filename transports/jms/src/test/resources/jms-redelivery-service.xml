@@ -17,7 +17,27 @@
                     <jms:transaction action="ALWAYS_BEGIN" />
                 </jms:inbound-endpoint>
             </inbound>
-            <test:component />
+            <test:component/>
+            <outbound>
+                <pass-through-router>
+                    <jms:outbound-endpoint queue="out">
+                        <jms:transaction action="ALWAYS_JOIN" />
+                    </jms:outbound-endpoint>
+                </pass-through-router>
+            </outbound>
+            <default-exception-strategy>
+                <commit-transaction exception-pattern="org.mule.transport.jms.redelivery.MessageRedeliveredException"/>
+                <choice>
+                    <when evaluator="groovy" expression='payload.getException().getClass().getName().equals("org.mule.transport.jms.redelivery.MessageRedeliveredException")'>
+                        <jms:outbound-endpoint queue="dead.letter">
+                            <jms:transaction action="ALWAYS_JOIN" />
+                        </jms:outbound-endpoint>
+                    </when>
+                    <otherwise>
+                        <logger/>
+                    </otherwise>
+                </choice>
+            </default-exception-strategy>
         </service>
     </model>
 </mule>

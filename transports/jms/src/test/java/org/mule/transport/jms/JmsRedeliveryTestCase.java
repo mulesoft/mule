@@ -10,9 +10,9 @@
 
 package org.mule.transport.jms;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
+import org.junit.Assert;
 import org.mule.api.MuleEventContext;
 import org.mule.api.client.MuleClient;
 import org.mule.api.context.notification.ExceptionNotificationListener;
@@ -65,7 +65,7 @@ public class JmsRedeliveryTestCase extends AbstractServiceAndFlowTestCase
         FunctionalTestComponent ftc = getFunctionalTestComponent("Bouncer");
 
         // whether a MessageRedeliverdException has been fired
-        final Latch mrexFired = new Latch();
+        final Latch messageRedeliveryExceptionFired = new Latch();
         muleContext.registerListener(new ExceptionNotificationListener<ExceptionNotification>()
         {
             public void onNotification(ExceptionNotification notification)
@@ -73,7 +73,7 @@ public class JmsRedeliveryTestCase extends AbstractServiceAndFlowTestCase
                 logger.debug("onNotification() = " + notification.getException().getClass().getName());
                 if (notification.getException() instanceof MessageRedeliveredException)
                 {
-                    mrexFired.countDown();
+                    messageRedeliveryExceptionFired.countDown();
                     // Test for MULE-4630
                     assertEquals(DESTINATION,
                         ((MessageRedeliveredException) notification.getException()).getEndpoint()
@@ -103,8 +103,11 @@ public class JmsRedeliveryTestCase extends AbstractServiceAndFlowTestCase
         client.dispatch(DESTINATION, TEST_MESSAGE, null);
 
         Thread.sleep(2000);
-        mrexFired.await(timeout, TimeUnit.MILLISECONDS);
-        assertEquals("MessageRedeliveredException never fired.", 0, mrexFired.getCount());
+        if (!messageRedeliveryExceptionFired.await(timeout, TimeUnit.MILLISECONDS))
+        {
+            fail("Exception from FunctionalTestComponent was not triggered three times");
+        }
+        assertEquals("MessageRedeliveredException never fired.", 0, messageRedeliveryExceptionFired.getCount());
         assertEquals("Wrong number of delivery attempts", MAX_REDELIVERY + 1, callback.getCallbackCount());
 
     }
