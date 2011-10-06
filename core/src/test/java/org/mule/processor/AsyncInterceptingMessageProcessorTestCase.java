@@ -15,6 +15,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import org.mule.MessageExchangePattern;
@@ -22,8 +23,15 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.context.WorkManager;
 import org.mule.api.context.WorkManagerSource;
+import org.mule.api.exception.MessagingExceptionHandler;
+import org.mule.api.exception.RollbackSourceCallback;
+import org.mule.api.lifecycle.Initialisable;
+import org.mule.api.lifecycle.Startable;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transaction.Transaction;
+import org.mule.config.i18n.CoreMessages;
+import org.mule.construct.Flow;
+import org.mule.routing.filters.WildcardFilter;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.mule.TestTransaction;
 import org.mule.transaction.TransactionCoordination;
@@ -123,6 +131,43 @@ public class AsyncInterceptingMessageProcessorTestCase extends AbstractMuleConte
         }
     }
 
+    @Test
+    public void testWorkException() throws Exception
+    {
+
+        Flow flow = new Flow("flow", muleContext);
+        LatchedExceptionListener exceptionListener = new LatchedExceptionListener();
+        flow.setExceptionListener(exceptionListener);
+        initialiseObject(flow);
+
+        MuleEvent event = getTestEvent(TEST_MESSAGE, flow, MessageExchangePattern.ONE_WAY);
+
+        MessageProcessor next = new MessageProcessor()
+        {
+            public MuleEvent process(MuleEvent event) throws MuleException
+            {
+                throw new org.mule.api.expression.RequiredValueException(CoreMessages.createStaticMessage(""));
+            }
+        };
+
+        messageProcessor = createAsyncInterceptingMessageProcessor(next);
+
+        if (messageProcessor instanceof Initialisable)
+        {
+            ((Initialisable)messageProcessor).initialise();
+
+        }
+        if (messageProcessor instanceof Startable)
+        {
+            ((Startable)messageProcessor).start();
+        }
+
+        messageProcessor.process(event);
+
+        assertTrue(exceptionListener.latch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS));
+
+    }
+
     protected void assertSync(MessageProcessor processor, MuleEvent event) throws MuleException
     {
         MuleEvent result = processor.process(event);
@@ -188,4 +233,36 @@ public class AsyncInterceptingMessageProcessorTestCase extends AbstractMuleConte
         }
     }
 
+    private static class LatchedExceptionListener implements MessagingExceptionHandler
+    {
+
+        Latch latch = new Latch();
+
+        public WildcardFilter getCommitTxFilter()
+        {
+            return null;
+        }
+
+        public WildcardFilter getRollbackTxFilter()
+        {
+            return null;
+        }
+
+        @Override
+        public MuleEvent handleException(Exception exception,
+                                         MuleEvent event,
+                                         RollbackSourceCallback rollbackMethod)
+        {
+            latch.countDown();
+            return null;
+        }
+
+        @Override
+        public MuleEvent handleException(Exception exception, MuleEvent event)
+        {
+            latch.countDown();
+            return null;
+        }
+
+    }
 }

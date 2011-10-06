@@ -16,6 +16,7 @@ import org.mule.api.MuleException;
 import org.mule.api.config.ThreadingProfile;
 import org.mule.api.context.WorkManager;
 import org.mule.api.context.WorkManagerSource;
+import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.processor.MessageProcessor;
@@ -24,15 +25,17 @@ import org.mule.interceptor.ProcessingTimeInterceptor;
 import org.mule.work.AbstractMuleEventWork;
 import org.mule.work.MuleWorkManager;
 
+import javax.resource.spi.work.WorkEvent;
+import javax.resource.spi.work.WorkListener;
+
 /**
- * Processes {@link MuleEvent}'s asynchronously using a {@link MuleWorkManager} to
- * schedule asynchronous processing of the next {@link MessageProcessor}. The next
- * {@link MessageProcessor} is therefore be executed in a different thread regardless
- * of the exchange-pattern configured on the inbound endpoint. If a transaction is
- * present then an exception is thrown.
+ * Processes {@link MuleEvent}'s asynchronously using a {@link MuleWorkManager} to schedule asynchronous
+ * processing of the next {@link MessageProcessor}. The next {@link MessageProcessor} is therefore be executed
+ * in a different thread regardless of the exchange-pattern configured on the inbound endpoint. If a
+ * transaction is present then an exception is thrown.
  */
 public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessageProcessor
-    implements Startable, Stoppable
+    implements Startable, Stoppable, WorkListener
 {
     protected WorkManagerSource workManagerSource;
     protected boolean doThreading = true;
@@ -133,8 +136,8 @@ public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessa
     {
         try
         {
-            workManagerSource.getWorkManager().scheduleWork(new AsyncMessageProcessorWorker(event),
-                WorkManager.INDEFINITE, null, new AsyncWorkListener(next));
+            workManagerSource.getWorkManager().scheduleWork(new AsyncMessageProcessorWork(event),
+                WorkManager.INDEFINITE, null, this);
         }
         catch (Exception e)
         {
@@ -143,9 +146,9 @@ public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessa
         }
     }
 
-    class AsyncMessageProcessorWorker extends AbstractMuleEventWork
+    class AsyncMessageProcessorWork extends AbstractMuleEventWork
     {
-        public AsyncMessageProcessorWorker(MuleEvent event)
+        public AsyncMessageProcessorWork(MuleEvent event)
         {
             super(event);
         }
@@ -159,8 +162,73 @@ public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessa
             }
             catch (Exception e)
             {
-                event.getFlowConstruct().getExceptionListener().handleException(e, event);
+                MessagingExceptionHandler exceptionListener = event.getFlowConstruct().getExceptionListener();
+                if (e instanceof MessagingException)
+                {
+                    exceptionListener.handleException(e, event);
+                }
+                else
+                {
+                    exceptionListener.handleException(
+                        new MessagingException(CoreMessages.eventProcessingFailedFor(this.toString()), event,
+                            e), event);
+                }
             }
+        }
+    }
+
+    public void workAccepted(WorkEvent event)
+    {
+        this.handleWorkException(event, "workAccepted");
+    }
+
+    public void workRejected(WorkEvent event)
+    {
+        this.handleWorkException(event, "workRejected");
+    }
+
+    public void workStarted(WorkEvent event)
+    {
+        this.handleWorkException(event, "workStarted");
+    }
+
+    public void workCompleted(WorkEvent event)
+    {
+        this.handleWorkException(event, "workCompleted");
+    }
+
+    protected void handleWorkException(WorkEvent event, String type)
+    {
+        if (event == null)
+        {
+            return;
+        }
+
+        Throwable e = event.getException();
+
+        if (e == null)
+        {
+            return;
+        }
+
+        if (e.getCause() != null)
+        {
+            e = e.getCause();
+        }
+
+        if (e instanceof MessagingException)
+        {
+            MuleEvent muleEvent = ((MessagingException)e).getEvent();
+            muleEvent.getFlowConstruct().getExceptionListener().handleException((Exception)e, muleEvent);
+        }
+        else if (e instanceof Exception)
+        {
+            muleContext.getExceptionListener().handleException((Exception)e);
+        }
+        else
+        {
+            logger.error("Work caused exception " + e + "on '" + type + "'. Work being executed was: "
+                         + event.getWork().toString());
         }
     }
 
