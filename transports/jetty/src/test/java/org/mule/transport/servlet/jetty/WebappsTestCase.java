@@ -10,67 +10,19 @@
 
 package org.mule.transport.servlet.jetty;
 
-import org.mule.DefaultMuleMessage;
-import org.mule.api.MuleMessage;
-import org.mule.client.DefaultLocalMuleClient;
-import org.mule.tck.junit4.FunctionalTestCase;
-import org.mule.transport.http.HttpConnector;
-import org.mule.util.ClassUtils;
-
-import java.io.File;
-import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
-
-import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-
-public class WebappsTestCase extends FunctionalTestCase
+public class WebappsTestCase extends AbstractWebappsTestCase
 {
-
     @Override
     protected String getConfigResources()
     {
         return "jetty-webapps.xml";
     }
 
-    @Override
-    protected boolean isStartContext()
-    {
-        // prepare the test webapp before starting Mule
-        return false;
-    }
-
-    @Override
-    protected void doSetUp() throws Exception
-    {
-        super.doSetUp();
-
-        final URL url = ClassUtils.getClassPathRoot(getClass());
-        File webapps = new File(url.getFile(), "../webapps");
-        FileUtils.deleteDirectory(webapps);
-        webapps.mkdir();
-
-        FileUtils.copyFile(new File(url.getFile(), "../../src/test/resources/test.war"),
-                           new File(webapps, "test.war"));
-
-        muleContext.start();
-    }
-
     @Test
-    public void testWebapps() throws Exception
+    public void webappShouldBeDeployed() throws Exception
     {
-        Map<String,Object> props = new HashMap<String,Object>();
-        props.put(HttpConnector.HTTP_METHOD_PROPERTY, "GET");
-
-        DefaultLocalMuleClient client = new DefaultLocalMuleClient(muleContext);
-        MuleMessage result = client.send("http://localhost:63081/test/hello",
-            new DefaultMuleMessage("", muleContext),
-            props);
-
-        assertEquals("Hello", result.getPayloadAsString());
+        sendRequestAndAssertCorrectResponse("http://localhost:63081/test/hello");
     }
-
 }

@@ -12,17 +12,17 @@ package org.mule.transport.servlet.jetty;
 
 import org.junit.Test;
 
-public class WebappsDefaultsTestCase extends AbstractWebappsTestCase
+public class SslWebappsTestCase extends AbstractWebappsTestCase
 {
     @Override
     protected String getConfigResources()
     {
-        return "jetty-webapps-with-defaults.xml";
+        return "jetty-ssl-webapps.xml";
     }
 
     @Test
-    public void webappWithDefaultsShouldBeDeployed() throws Exception
+    public void webappShouldBeDeployed() throws Exception
     {
-        sendRequestAndAssertCorrectResponse("http://localhost:8585/test/hello");
+        sendRequestAndAssertCorrectResponse("https://localhost:63083/test/hello");
     }
 }

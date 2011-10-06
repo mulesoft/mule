@@ -3,6 +3,7 @@
             xmlns:xsd="http://www.w3.org/2001/XMLSchema"
             xmlns:mule="http://www.mulesoft.org/schema/mule/core"
             xmlns:http="http://www.mulesoft.org/schema/mule/http"
+            xmlns:jetty="http://www.mulesoft.org/schema/mule/jetty"
             xmlns:schemadoc="http://www.mulesoft.org/schema/mule/schemadoc"
             targetNamespace="http://www.mulesoft.org/schema/mule/jetty-ssl"
             elementFormDefault="qualified"
@@ -13,6 +14,8 @@
                 schemaLocation="http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd"/>
     <xsd:import namespace="http://www.mulesoft.org/schema/mule/http"
                 schemaLocation="http://www.mulesoft.org/schema/mule/http/3.2/mule-http.xsd"/>
+    <xsd:import namespace="http://www.mulesoft.org/schema/mule/jetty"
+                schemaLocation="http://www.mulesoft.org/schema/mule/jetty/3.2/mule-jetty.xsd"/>
     <xsd:import namespace = "http://www.mulesoft.org/schema/mule/schemadoc"
                 schemaLocation = "http://www.mulesoft.org/schema/mule/schemadoc/3.2/mule-schemadoc.xsd"/>
 
@@ -31,14 +34,14 @@
         </xsd:appinfo>
     </xsd:annotation>
 
-    <xsd:element name="connector" type="jettyConnectorType" substitutionGroup="mule:abstract-connector">
+    <xsd:element name="connector" type="jettySslConnectorType" substitutionGroup="mule:abstract-connector">
         <xsd:annotation>
             <xsd:documentation>
                 Allows Mule to expose Mule Services over HTTPS using a Jetty HTTP server. A single Jetty server is created for each connector instance. One connector can serve many endpoints. Users should rarely need to have more than one Jetty connector. The Jetty connector can be configured using a Jetty XML config file, but the default configuration is sufficient for most scenarios.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
-    <xsd:complexType name="jettyConnectorType">
+    <xsd:complexType name="jettySslConnectorType">
         <xsd:complexContent>
             <xsd:extension base="mule:abstractConnectorType">
                 <xsd:sequence minOccurs="1" maxOccurs="1">
@@ -46,6 +49,13 @@
                     <xsd:element minOccurs="0" maxOccurs="1" name="tls-key-store" type="mule:tlsKeyStoreType"/>
                     <xsd:element minOccurs="0" maxOccurs="1" name="tls-server" type="mule:tlsServerTrustStoreType"/>
                     <xsd:element minOccurs="0" maxOccurs="1" name="tls-protocol-handler" type="mule:tlsProtocolHandler"/>
+                    <xsd:element minOccurs="0" maxOccurs="1" name="webapps" type="jetty:webappsType">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Allows configuring of a directory which contains WAR files to be served out by Jetty.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
                 </xsd:sequence>
                 <xsd:attribute name="configFile" type="xsd:string">
                     <xsd:annotation>
