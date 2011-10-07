@@ -11,15 +11,12 @@
 package org.mule.processor;
 
 import org.mule.DefaultMuleEvent;
-import org.mule.RequestContext;
-import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.NameableObject;
 import org.mule.api.config.ThreadingProfile;
 import org.mule.api.context.WorkManager;
-import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Lifecycle;
 import org.mule.api.lifecycle.LifecycleCallback;
@@ -37,7 +34,6 @@ import org.mule.util.concurrent.WaitableBoolean;
 import org.mule.util.queue.Queue;
 import org.mule.util.queue.QueueConfiguration;
 import org.mule.util.queue.QueueSession;
-import org.mule.work.AbstractMuleEventWork;
 import org.mule.work.MuleWorkManager;
 
 import java.text.MessageFormat;
@@ -163,44 +159,6 @@ public class SedaStageInterceptingMessageProcessor extends AsyncInterceptingMess
         }
     }
 
-    private class SedaStageWorker extends AbstractMuleEventWork
-    {
-        public SedaStageWorker(MuleEvent event)
-        {
-            super(event);
-        }
-
-        @Override
-        protected void doRun()
-        {
-            try
-            {
-                // Create a copy of the event for the new thread
-                event = RequestContext.setEvent(event);
-                doWork();
-            }
-            catch (MuleException e)
-            {
-                MessagingExceptionHandler exceptionListener = event.getFlowConstruct().getExceptionListener();
-                if (e instanceof MessagingException)
-                {
-                    exceptionListener.handleException(e, event);
-                }
-                else
-                {
-                    exceptionListener.handleException(
-                        new MessagingException(CoreMessages.eventProcessingFailedFor(getStageDescription()),
-                            event, e), event);
-                }
-            }
-        }
-
-        public void doWork() throws MuleException
-        {
-            processNextTimed(event);
-        }
-    }
-
     /**
      * While the service isn't stopped this runs a continuous loop checking for new events in the queue.
      */
@@ -266,7 +224,7 @@ public class SedaStageInterceptingMessageProcessor extends AsyncInterceptingMess
                     logger.debug(MessageFormat.format("{0}: Dequeued event from {1}", getStageDescription(),
                         getQueueName()));
                 }
-                SedaStageWorker work = new SedaStageWorker(event);
+                AsyncMessageProcessorWorker work = new AsyncMessageProcessorWorker(event);
                 if (doThreading)
                 {
                     try
@@ -283,30 +241,7 @@ public class SedaStageInterceptingMessageProcessor extends AsyncInterceptingMess
                 }
                 else
                 {
-                    try
-                    {
-                        work.doWork();
-                    }
-                    catch (MuleException e)
-                    {
-                        MessagingExceptionHandler exceptionListener = event.getFlowConstruct()
-                            .getExceptionListener();
-                        if (e instanceof MessagingException)
-                        {
-                            exceptionListener.handleException(e, event);
-                        }
-                        else
-                        {
-                            exceptionListener.handleException(
-                                new MessagingException(
-                                    CoreMessages.eventProcessingFailedFor(getStageDescription()), event, e),
-                                event);
-                        }
-
-                        // TODO Enable this to ensure Zero Message Loss
-                        // (although it will cause an infinite loop without some kind of redelivery policy)
-                        // rollbackDequeue(event);
-                    }
+                    work.doRun();
                 }
             }
         }
