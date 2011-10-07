@@ -17,7 +17,6 @@ import org.mule.api.MuleEventContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleSession;
 import org.mule.api.config.ConfigurationBuilder;
-import org.mule.api.construct.FlowConstruct;
 import org.mule.api.context.MuleContextBuilder;
 import org.mule.api.context.MuleContextFactory;
 import org.mule.api.context.notification.MuleContextNotificationListener;
@@ -342,12 +341,12 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase
         return MuleTestUtils.getTestOutboundEndpoint(name, muleContext, uri, transformers, filter, properties, connector);
     }
 
-    public static MuleEvent getTestEvent(Object data, FlowConstruct service) throws Exception
+    public static MuleEvent getTestEvent(Object data, Service service) throws Exception
     {
         return MuleTestUtils.getTestEvent(data, service, MessageExchangePattern.REQUEST_RESPONSE, muleContext);
     }
 
-    public static MuleEvent getTestEvent(Object data, FlowConstruct service, MessageExchangePattern mep) throws Exception
+    public static MuleEvent getTestEvent(Object data, Service service, MessageExchangePattern mep) throws Exception
     {
         return MuleTestUtils.getTestEvent(data, service, mep, muleContext);
     }
