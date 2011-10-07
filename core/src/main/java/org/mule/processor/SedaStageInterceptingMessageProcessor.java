@@ -11,6 +11,7 @@
 package org.mule.processor;
 
 import org.mule.DefaultMuleEvent;
+import org.mule.RequestContext;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
@@ -36,6 +37,7 @@ import org.mule.util.concurrent.WaitableBoolean;
 import org.mule.util.queue.Queue;
 import org.mule.util.queue.QueueConfiguration;
 import org.mule.util.queue.QueueSession;
+import org.mule.work.AbstractMuleEventWork;
 import org.mule.work.MuleWorkManager;
 
 import java.text.MessageFormat;
@@ -161,6 +163,44 @@ public class SedaStageInterceptingMessageProcessor extends AsyncInterceptingMess
         }
     }
 
+    private class SedaStageWorker extends AbstractMuleEventWork
+    {
+        public SedaStageWorker(MuleEvent event)
+        {
+            super(event);
+        }
+
+        @Override
+        protected void doRun()
+        {
+            try
+            {
+                // Create a copy of the event for the new thread
+                event = RequestContext.setEvent(event);
+                doWork();
+            }
+            catch (MuleException e)
+            {
+                MessagingExceptionHandler exceptionListener = event.getFlowConstruct().getExceptionListener();
+                if (e instanceof MessagingException)
+                {
+                    exceptionListener.handleException(e, event);
+                }
+                else
+                {
+                    exceptionListener.handleException(
+                        new MessagingException(CoreMessages.eventProcessingFailedFor(getStageDescription()),
+                            event, e), event);
+                }
+            }
+        }
+
+        public void doWork() throws MuleException
+        {
+            processNextTimed(event);
+        }
+    }
+
     /**
      * While the service isn't stopped this runs a continuous loop checking for new events in the queue.
      */
@@ -226,43 +266,46 @@ public class SedaStageInterceptingMessageProcessor extends AsyncInterceptingMess
                     logger.debug(MessageFormat.format("{0}: Dequeued event from {1}", getStageDescription(),
                         getQueueName()));
                 }
-                AsyncMessageProcessorWork work = new AsyncMessageProcessorWork(event);
-                try
+                SedaStageWorker work = new SedaStageWorker(event);
+                if (doThreading)
                 {
-                    if (isStatsEnabled())
+                    try
                     {
-                        queueStatistics.decQueuedEvent();
-                    }
-
-                    if (logger.isDebugEnabled())
-                    {
-                        logger.debug(MessageFormat.format("{0}: Dequeued event from {1}",
-                            getStageDescription(), getQueueName()));
-                    }
-                    if (doThreading)
-                    {
+                        // TODO Remove this thread handoff to ensure Zero Message Loss
                         workManagerSource.getWorkManager().scheduleWork(work, WorkManager.INDEFINITE, null,
-                            this);
+                            new AsyncWorkListener(next));
                     }
-                    else
+                    catch (Exception e)
                     {
-                        work.run();
+                        // This is a work manager exception, not a Mule event-related exception
+                        event.getFlowConstruct().getExceptionListener().handleException(e, event);
                     }
                 }
-                catch (Exception e)
+                else
                 {
-                    MessagingExceptionHandler exceptionListener = event.getFlowConstruct()
-                        .getExceptionListener();
-                    if (e instanceof MessagingException)
+                    try
                     {
-                        exceptionListener.handleException(e, event);
+                        work.doWork();
                     }
-                    else
+                    catch (MuleException e)
                     {
-                        exceptionListener.handleException(
-                            new MessagingException(
-                                CoreMessages.eventProcessingFailedFor(getStageDescription()), event, e),
-                            event);
+                        MessagingExceptionHandler exceptionListener = event.getFlowConstruct()
+                            .getExceptionListener();
+                        if (e instanceof MessagingException)
+                        {
+                            exceptionListener.handleException(e, event);
+                        }
+                        else
+                        {
+                            exceptionListener.handleException(
+                                new MessagingException(
+                                    CoreMessages.eventProcessingFailedFor(getStageDescription()), event, e),
+                                event);
+                        }
+
+                        // TODO Enable this to ensure Zero Message Loss
+                        // (although it will cause an infinite loop without some kind of redelivery policy)
+                        // rollbackDequeue(event);
                     }
                 }
             }
@@ -368,7 +411,7 @@ public class SedaStageInterceptingMessageProcessor extends AsyncInterceptingMess
                 {
                     workManagerSource.getWorkManager().scheduleWork(
                         SedaStageInterceptingMessageProcessor.this, WorkManager.INDEFINITE, null,
-                        SedaStageInterceptingMessageProcessor.this);
+                        new AsyncWorkListener(next));
                 }
                 catch (WorkException e)
                 {
@@ -422,9 +465,4 @@ public class SedaStageInterceptingMessageProcessor extends AsyncInterceptingMess
         lifecycleManager.fireResumePhase(new EmptyLifecycleCallback<SedaStageInterceptingMessageProcessor>());
     }
 
-    @Override
-    public String toString()
-    {
-        return getStageDescription();
-    }
 }

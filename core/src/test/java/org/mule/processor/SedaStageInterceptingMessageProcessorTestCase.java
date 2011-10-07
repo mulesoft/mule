@@ -90,8 +90,8 @@ public class SedaStageInterceptingMessageProcessorTestCase extends AsyncIntercep
     {
         try
         {
-            createAsyncInterceptingMessageProcessor(getSensingNullMessageProcessor()).handleWorkException(
-                getTestWorkEvent(), "workRejected");
+            new AsyncWorkListener(getSensingNullMessageProcessor()).handleWorkException(getTestWorkEvent(),
+                "workRejected");
         }
         catch (MuleRuntimeException mrex)
         {

@@ -27,6 +27,7 @@ import org.mule.api.processor.ProcessingStrategy.StageNameSource;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.construct.Flow;
 import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
+import org.mule.work.AbstractMuleEventWork;
 import org.mule.work.MuleWorkManager;
 
 import java.util.Collections;
@@ -129,6 +130,27 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
     public ProcessingStrategy getProcessingStrategy()
     {
         return processingStrategy;
+    }
+
+    class AsyncMessageProcessorWorker extends AbstractMuleEventWork
+    {
+        public AsyncMessageProcessorWorker(MuleEvent event)
+        {
+            super(event);
+        }
+
+        @Override
+        protected void doRun()
+        {
+            try
+            {
+                delegate.process(event);
+            }
+            catch (MuleException e)
+            {
+                event.getFlowConstruct().getExceptionListener().handleException(e, event);
+            }
+        }
     }
 
 }
