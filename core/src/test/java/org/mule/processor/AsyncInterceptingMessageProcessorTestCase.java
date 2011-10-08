@@ -25,8 +25,6 @@ import org.mule.api.MuleException;
 import org.mule.api.context.WorkManager;
 import org.mule.api.context.WorkManagerSource;
 import org.mule.api.exception.MessagingExceptionHandler;
-import org.mule.api.lifecycle.Initialisable;
-import org.mule.api.lifecycle.Startable;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transaction.Transaction;
 import org.mule.config.i18n.CoreMessages;
@@ -47,7 +45,7 @@ public class AsyncInterceptingMessageProcessorTestCase extends AbstractMuleConte
     implements ExceptionListener
 {
 
-    protected MessageProcessor messageProcessor;
+    protected AsyncInterceptingMessageProcessor messageProcessor;
     protected TestListener target = new TestListener();
     protected Exception exceptionThrown;
     protected Latch latch = new Latch();
@@ -157,22 +155,11 @@ public class AsyncInterceptingMessageProcessorTestCase extends AbstractMuleConte
             }
         };
 
-        messageProcessor = createAsyncInterceptingMessageProcessor(next);
-
-        if (messageProcessor instanceof Initialisable)
-        {
-            ((Initialisable)messageProcessor).initialise();
-
-        }
-        if (messageProcessor instanceof Startable)
-        {
-            ((Startable)messageProcessor).start();
-        }
+        messageProcessor.setListener(next);
 
         messageProcessor.process(event);
 
-        assertTrue(exceptionListener.latch.await(RECEIVE_TIMEOUT*5, TimeUnit.MILLISECONDS));
-
+        assertTrue(exceptionListener.latch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS));
     }
 
     protected void assertSync(MessageProcessor processor, MuleEvent event) throws MuleException
@@ -232,7 +219,7 @@ public class AsyncInterceptingMessageProcessorTestCase extends AbstractMuleConte
             return muleContext.getWorkManager();
         }
     }
-    
+
     private static class LatchedExceptionListener implements MessagingExceptionHandler
     {
 
