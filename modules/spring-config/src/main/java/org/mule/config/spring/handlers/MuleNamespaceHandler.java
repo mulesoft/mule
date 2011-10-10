@@ -213,11 +213,11 @@ import org.mule.transformer.simple.ObjectToString;
 import org.mule.transformer.simple.SerializableToByteArray;
 import org.mule.transformer.simple.StringAppendTransformer;
 import org.mule.transformer.simple.ValueExtractorTransformer;
+import org.mule.transformer.simple.ValueExtractorTransformer.ValueExtractorTemplate;
 import org.mule.util.store.InMemoryObjectStore;
 import org.mule.util.store.ManagedObjectStore;
 import org.mule.util.store.TextFileObjectStore;
-
-import static org.mule.transformer.simple.ValueExtractorTransformer.ValueExtractorTemplate;
+import org.springframework.beans.factory.xml.BeanDefinitionParser;
 
 /**
  * This is the core namespace handler for Mule and configures all Mule configuration elements under the
@@ -453,7 +453,8 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         //Stores
         registerBeanDefinitionParser("in-memory-store", new ChildDefinitionParser("store", InMemoryObjectStore.class));
         registerBeanDefinitionParser("simple-text-file-store", new ChildDefinitionParser("store", TextFileObjectStore.class));
-        registerBeanDefinitionParser("custom-object-store", new ChildDefinitionParser("store", null));
+        registerBeanDefinitionParser("custom-object-store",new ChildDefinitionParser("store", null));
+        registerBeanDefinitionParser("spring-object-store",(BeanDefinitionParser)new ParentDefinitionParser().addAlias("ref", "store"));
         registerBeanDefinitionParser("managed-store", new ChildDefinitionParser("store",ManagedObjectStore.class));
 
         //Routers

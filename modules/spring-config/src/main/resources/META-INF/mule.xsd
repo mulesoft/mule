@@ -4923,6 +4923,29 @@
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
+    
+    <xsd:element name="spring-object-store" type="springObjectStoreType"
+                 substitutionGroup="abstract-object-store">
+        <xsd:annotation>
+            <xsd:documentation>
+                A Spring bean that implements the ObjectStore interface.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="springObjectStoreType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractObjectStoreType">
+                <xsd:attribute name="ref" type="xsd:string" use="required">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The name of the ObjectStore bean to use.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
 
     <!--==============================================================-->
     <!--  Routing                                                     -->

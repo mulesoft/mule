@@ -6,8 +6,8 @@
       xmlns:test="http://www.mulesoft.org/schema/mule/test"
       xsi:schemaLocation="
         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
-        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/3.2/mule-test.xsd
-        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd">
+        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
+        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
     <flow name="inMemoryStore">
         <idempotent-message-filter idExpression="#[message:id]">
@@ -25,8 +25,18 @@
     <flow name="customObjectStore">
         <idempotent-message-filter>
             <custom-object-store class="org.mule.test.config.IdempotentMessageFilterNamespaceHandlerTestCase$CustomObjectStore">
-                <spring:property name="customProperty" value="the-value"/>
+                <spring:property name="customProperty" value="the-value:customObjectStore"/>
             </custom-object-store>
         </idempotent-message-filter>
     </flow>
-</mule>
+    
+    <spring:bean id="objectStore" class="org.mule.test.config.IdempotentMessageFilterNamespaceHandlerTestCase$CustomObjectStore">
+        <spring:property name="customProperty" value="the-value:beanObjectStore"/>
+    </spring:bean>
+
+    <flow name="beanObjectStore">
+        <idempotent-message-filter>
+            <spring-object-store ref="objectStore" />
+        </idempotent-message-filter>
+    </flow>
+ </mule>

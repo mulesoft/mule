@@ -10,6 +10,10 @@
 
 package org.mule.test.config;
 
+import java.io.File;
+import java.io.Serializable;
+import java.util.List;
+
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.store.ObjectStore;
@@ -20,10 +24,6 @@ import org.mule.util.SystemUtils;
 import org.mule.util.store.InMemoryObjectStore;
 import org.mule.util.store.SimpleMemoryObjectStore;
 import org.mule.util.store.TextFileObjectStore;
-
-import java.io.File;
-import java.io.Serializable;
-import java.util.List;
 
 /**
  * Tests for all object stores that can be configured on an {@link IdempotentMessageFilter}.
@@ -44,12 +44,12 @@ public class IdempotentMessageFilterNamespaceHandlerTestCase extends FunctionalT
 
     public void testInMemoryObjectStore() throws Exception
     {
-        IdempotentMessageFilter filter = idempotentMessageFilterFromFlow("inMemoryStore");
+        final IdempotentMessageFilter filter = idempotentMessageFilterFromFlow("inMemoryStore");
 
-        ObjectStore<?> store = filter.getStore();
+        final ObjectStore<?> store = filter.getStore();
         assertEquals(InMemoryObjectStore.class, store.getClass());
 
-        InMemoryObjectStore<?> memoryStore = (InMemoryObjectStore<?>) store;
+        final InMemoryObjectStore<?> memoryStore = (InMemoryObjectStore<?>) store;
         assertEquals(1000, memoryStore.getEntryTTL());
         assertEquals(2000, memoryStore.getExpirationInterval());
         assertEquals(3000, memoryStore.getMaxEntries());
@@ -57,15 +57,15 @@ public class IdempotentMessageFilterNamespaceHandlerTestCase extends FunctionalT
 
     public void testSimpleTextFileStore() throws Exception
     {
-        IdempotentMessageFilter filter = idempotentMessageFilterFromFlow("simpleTextFileStore");
+        final IdempotentMessageFilter filter = idempotentMessageFilterFromFlow("simpleTextFileStore");
 
-        ObjectStore<?> store = filter.getStore();
+        final ObjectStore<?> store = filter.getStore();
         assertEquals(TextFileObjectStore.class, store.getClass());
 
-        TextFileObjectStore fileStore = (TextFileObjectStore) store;
+        final TextFileObjectStore fileStore = (TextFileObjectStore) store;
         assertEquals("the-store", fileStore.getName());
 
-        File tmpDir = SystemUtils.getJavaIoTmpDir();
+        final File tmpDir = SystemUtils.getJavaIoTmpDir();
         assertEquals(tmpDir.getCanonicalPath(), new File(fileStore.getDirectory()).getCanonicalPath());
 
         assertEquals(1000, fileStore.getEntryTTL());
@@ -75,25 +75,35 @@ public class IdempotentMessageFilterNamespaceHandlerTestCase extends FunctionalT
 
     public void testCustomObjectStore() throws Exception
     {
-        IdempotentMessageFilter filter = idempotentMessageFilterFromFlow("customObjectStore");
-
-        ObjectStore<?> store = filter.getStore();
-        assertEquals(CustomObjectStore.class, store.getClass());
-
-        CustomObjectStore customStore = (CustomObjectStore) store;
-        assertEquals("the-value", customStore.getCustomProperty());
+        testPojoObjectStore("customObjectStore");
     }
 
-    private IdempotentMessageFilter idempotentMessageFilterFromFlow(String flowName) throws Exception
+    public void testBeanObjectStore() throws Exception
     {
-        FlowConstruct flow = getFlowConstruct(flowName);
+        testPojoObjectStore("beanObjectStore");
+    }
+
+    private void testPojoObjectStore(final String flowName) throws Exception
+    {
+        final IdempotentMessageFilter filter = idempotentMessageFilterFromFlow(flowName);
+
+        final ObjectStore<?> store = filter.getStore();
+        assertEquals(CustomObjectStore.class, store.getClass());
+
+        final CustomObjectStore customStore = (CustomObjectStore) store;
+        assertEquals("the-value:" + flowName, customStore.getCustomProperty());
+    }
+
+    private IdempotentMessageFilter idempotentMessageFilterFromFlow(final String flowName) throws Exception
+    {
+        final FlowConstruct flow = getFlowConstruct(flowName);
         assertTrue(flow instanceof Flow);
 
-        Flow simpleFlow = (Flow) flow;
-        List<MessageProcessor> processors = simpleFlow.getMessageProcessors();
+        final Flow simpleFlow = (Flow) flow;
+        final List<MessageProcessor> processors = simpleFlow.getMessageProcessors();
         assertEquals(1, processors.size());
 
-        MessageProcessor firstMP = processors.get(0);
+        final MessageProcessor firstMP = processors.get(0);
         assertEquals(IdempotentMessageFilter.class, firstMP.getClass());
 
         return (IdempotentMessageFilter) firstMP;
@@ -108,7 +118,7 @@ public class IdempotentMessageFilterNamespaceHandlerTestCase extends FunctionalT
             return customProperty;
         }
 
-        public void setCustomProperty(String value)
+        public void setCustomProperty(final String value)
         {
             customProperty = value;
         }
