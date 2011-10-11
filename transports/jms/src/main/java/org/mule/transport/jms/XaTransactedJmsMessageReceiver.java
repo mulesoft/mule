@@ -183,6 +183,10 @@ public class XaTransactedJmsMessageReceiver extends TransactedPollingMessageRece
                     // There is not a need to close resources here,
                     // they will be close by XaTransaction,
                     JmsThreadContext ctx = context.getContext();
+                    if (ctx.consumer != null)
+                    {
+                        connector.closeQuietly(ctx.consumer);
+                    }
                     ctx.consumer = null;
                     Transaction tx = TransactionCoordination.getInstance().getTransaction();
                     if (ctx.session != null && tx instanceof XaTransaction.MuleXaObject)
@@ -271,6 +275,7 @@ public class XaTransactedJmsMessageReceiver extends TransactedPollingMessageRece
 
         MuleMessage messageToRoute = createMuleMessage(message, endpoint.getEncoding());
         routeMessage(messageToRoute);
+        connector.closeQuietly(consumer);
         return null;
     }
 
