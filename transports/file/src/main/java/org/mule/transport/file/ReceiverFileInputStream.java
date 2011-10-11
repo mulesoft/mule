@@ -28,6 +28,7 @@ class ReceiverFileInputStream extends FileInputStream
     private File currentFile;
     private boolean deleteOnClose;
     private File moveToOnClose;
+    private boolean streamProcessingError;
 
     public ReceiverFileInputStream(File currentFile, boolean deleteOnClose, File moveToOnClose)
         throws FileNotFoundException
@@ -43,23 +44,26 @@ class ReceiverFileInputStream extends FileInputStream
     {
         super.close();
 
-        if (moveToOnClose != null)
+        if (!streamProcessingError)
         {
-            FileUtils.moveFileWithCopyFallback(currentFile, moveToOnClose);
-        }
-        else if (deleteOnClose)
-        {
-            if (!currentFile.delete())
+            if (moveToOnClose != null)
             {
-                try
+                FileUtils.moveFileWithCopyFallback(currentFile, moveToOnClose);
+            }
+            else if (deleteOnClose)
+            {
+                if (!currentFile.delete())
                 {
-                    throw new DefaultMuleException(FileMessages.failedToDeleteFile(currentFile));
-                }
-                catch (DefaultMuleException e)
-                {
-                    IOException e2 = new IOException();
-                    e2.initCause(e);
-                    throw e2;
+                    try
+                    {
+                        throw new DefaultMuleException(FileMessages.failedToDeleteFile(currentFile));
+                    }
+                    catch (DefaultMuleException e)
+                    {
+                        IOException e2 = new IOException();
+                        e2.initCause(e);
+                        throw e2;
+                    }
                 }
             }
         }
@@ -68,5 +72,15 @@ class ReceiverFileInputStream extends FileInputStream
     public File getCurrentFile()
     {
         return currentFile;
+    }
+
+    public boolean isStreamProcessingError()
+    {
+        return streamProcessingError;
+    }
+
+    public void setStreamProcessingError(boolean streamProcessingError)
+    {
+        this.streamProcessingError = streamProcessingError;
     }
 }

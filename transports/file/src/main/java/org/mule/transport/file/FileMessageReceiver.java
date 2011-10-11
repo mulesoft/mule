@@ -325,10 +325,23 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
         catch (Exception e)
         {
             RollbackSourceCallback rollbackMethod;
-            if (!sourceFile.getAbsolutePath().equals(originalSourceFile))
+
+            if (((FileConnector) connector).isStreaming())
+            {
+                final ReceiverFileInputStream receiverFileInputStream = (ReceiverFileInputStream) message.getPayload();
+                rollbackMethod = new RollbackSourceCallback()
+                {
+                    @Override
+                    public void rollback()
+                    {
+                        receiverFileInputStream.setStreamProcessingError(true);
+                    }
+                };
+            }
+            else if (!sourceFile.getAbsolutePath().equals(originalSourceFile))
             {
                 rollbackMethod = new RollbackSourceCallback()
-                {                
+                {
                     @Override
                     public void rollback()
                     {
