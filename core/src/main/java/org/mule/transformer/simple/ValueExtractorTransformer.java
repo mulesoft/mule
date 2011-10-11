@@ -48,9 +48,9 @@ public class ValueExtractorTransformer extends AbstractMessageTransformer
 
             if (matcher.matches())
             {
-                if (matcher.groupCount() < 1)
+                if (matcher.groupCount() != 1)
                 {
-                    throw new IllegalStateException("Matched regular expression does not contain the expected capture group");
+                    throw new IllegalStateException("Matched regular expression must contain one capture group but contains " + matcher.groupCount());
                 }
 
                 //TODO: there should be a way to decide which group/groups values should be used to enrich the message

@@ -53,6 +53,17 @@ public class ValueExtractorTransformerTestCase extends AbstractMuleContextTestCa
         transformer.transform(testMessage);
     }
 
+    @Test(expected = IllegalStateException.class)
+    public void testFailsIfExpressionMatchesMultipleValues() throws Exception
+    {
+        List<ValueExtractorTransformer.ValueExtractorTemplate> enrichExpressionPairs = new ArrayList<ValueExtractorTransformer.ValueExtractorTemplate>();
+        enrichExpressionPairs.add(new ValueExtractorTransformer.ValueExtractorTemplate("TEST(\\w+)TEST(\\w+)", "#[header:INVOCATION:propName]", true));
+        ValueExtractorTransformer transformer = createPropertyGeneratorTransformer("TESTfooTESTbar", enrichExpressionPairs);
+        DefaultMuleMessage testMessage = new DefaultMuleMessage("TEST", muleContext);
+
+        transformer.transform(testMessage);
+    }
+
     @Test
     public void testAddsSingleValue() throws Exception
     {
