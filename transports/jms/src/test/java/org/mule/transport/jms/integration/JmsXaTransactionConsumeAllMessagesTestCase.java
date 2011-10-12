@@ -1,5 +1,5 @@
 /*
- * $Id: JmsMuleSideDurableTopicXATxTestCase.java 22428 2011-07-15 20:47:47Z pablo.kraan $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  *

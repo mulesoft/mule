@@ -1,5 +1,5 @@
 /*
- * $Id: AbstractMessagingExceptionStrategy.java 21333 2011-02-21 20:54:39Z tcarlson $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  *
