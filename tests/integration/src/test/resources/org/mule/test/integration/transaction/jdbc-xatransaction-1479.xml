@@ -53,7 +53,6 @@
                     <xa-transaction action="ALWAYS_BEGIN"/>
                 </multicasting-router>
             </outbound>
-            <custom-exception-strategy class="org.mule.test.integration.transaction.RollbackRoutingExceptionStrategy"/>
         </service>
         
         <service name="TestJms">
@@ -71,7 +70,6 @@
                     <xa-transaction action="ALWAYS_BEGIN"/>
                 </multicasting-router>
             </outbound>
-            <custom-exception-strategy class="org.mule.test.integration.transaction.RollbackRoutingExceptionStrategy"/>
         </service>
     </model>
 </mule>
