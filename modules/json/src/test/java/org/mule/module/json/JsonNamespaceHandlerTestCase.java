@@ -37,6 +37,12 @@ public class JsonNamespaceHandlerTestCase extends FunctionalTestCase
     @Test
     public void testJsonConfig() throws Exception
     {
+
+        JsonToXml jToX = (JsonToXml)muleContext.getRegistry().lookupObject("jToX");
+        assertNotNull(jToX);
+
+        XmlToJson xToJ = (XmlToJson)muleContext.getRegistry().lookupObject("xToJ");
+        assertNotNull(xToJ);
         // This test fails under Java 1.6 on Windows, because the Java fields are serialized in a different order.
         String javaVersion = System.getProperty("java.specification.version", "<None>");
         String osName = System.getProperty("os.name", "<None>");
@@ -70,12 +76,6 @@ public class JsonNamespaceHandlerTestCase extends FunctionalTestCase
         FruitCollection result2 = (FruitCollection)deserializer.transform(result);
         assertNotNull(result2);
         assertEquals(fc, result2);
-
-        JsonToXml jToX = (JsonToXml)muleContext.getRegistry().lookupObject("jToX");
-        assertNotNull(jToX);
-
-        XmlToJson xToJ = (XmlToJson)muleContext.getRegistry().lookupObject("XtoJ");
-        assertNotNull(xToJ);
     }
 
 }
