@@ -38,6 +38,9 @@ public class HttpMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTe
 {
     private static final Header[] HEADERS = new Header[] { new Header("foo-header", "foo-value") };
     private static final String REQUEST_LINE = "GET /services/Echo HTTP/1.1";
+    private static final String MULTIPART_BOUNDARY = "------------------------------2eab2c5d5c7e";
+    private static final String MULTIPART_MESSAGE = MULTIPART_BOUNDARY + "\n" + "Content-Disposition: form-data; name=\"payload\"\n" + TEST_MESSAGE
+                                                    + "\n" + MULTIPART_BOUNDARY + "--";
 
     @Override
     protected MuleMessageFactory doCreateMuleMessageFactory()
@@ -102,6 +105,29 @@ public class HttpMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTe
         return new HttpRequest(requestLine, HEADERS, stream, encoding);
     }
     
+    @Test
+    public void testHttpRequestMultiPartPayload() throws Exception
+    {
+        HttpMuleMessageFactory factory = (HttpMuleMessageFactory) createMuleMessageFactory();
+        factory.setExchangePattern(MessageExchangePattern.ONE_WAY);
+
+        HttpRequest request = createMultiPartHttpRequest();
+        MuleMessage message = factory.create(request, encoding);
+        assertNotNull(message);
+        assertEquals(byte[].class, message.getPayload().getClass());
+        byte[] payload = (byte[]) message.getPayload();
+        assertTrue(Arrays.equals(MULTIPART_MESSAGE.getBytes(), payload));
+    }
+
+    private HttpRequest createMultiPartHttpRequest() throws Exception
+    {
+        String line = REQUEST_LINE.replace(HttpConstants.METHOD_GET, HttpConstants.METHOD_POST);
+        RequestLine requestLine = RequestLine.parseLine(line);
+        InputStream stream = new ByteArrayInputStream(MULTIPART_MESSAGE.getBytes());
+        Header[] headers = new Header[]{new Header("Content-Type", "multipart/form-data; boundary=" + MULTIPART_BOUNDARY.substring(2))};
+        return new HttpRequest(requestLine, headers, stream, encoding);
+    }
+
     @Test
     public void testHttpMethodGet() throws Exception
     {
