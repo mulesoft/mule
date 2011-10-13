@@ -13,8 +13,10 @@ package org.mule.module.json;
 import org.mule.module.json.filters.IsJsonFilter;
 import org.mule.module.json.transformers.FruitCollection;
 import org.mule.module.json.transformers.JsonBeanRoundTripTestCase;
+import org.mule.module.json.transformers.JsonSchemaValidationFilter;
 import org.mule.module.json.transformers.JsonToObject;
 import org.mule.module.json.transformers.JsonToXml;
+import org.mule.module.json.transformers.JsonXsltTransformer;
 import org.mule.module.json.transformers.ObjectToJson;
 import org.mule.module.json.transformers.XmlToJson;
 import org.mule.tck.junit4.FunctionalTestCase;
@@ -37,12 +39,20 @@ public class JsonNamespaceHandlerTestCase extends FunctionalTestCase
     @Test
     public void testJsonConfig() throws Exception
     {
-
         JsonToXml jToX = (JsonToXml)muleContext.getRegistry().lookupObject("jToX");
         assertNotNull(jToX);
 
         XmlToJson xToJ = (XmlToJson)muleContext.getRegistry().lookupObject("xToJ");
         assertNotNull(xToJ);
+
+        JsonXsltTransformer jToJ = (JsonXsltTransformer)muleContext.getRegistry().lookupObject("jToJ");
+        assertNotNull(jToJ);
+        assertNotNull(jToJ.getXslt());
+
+        JsonSchemaValidationFilter jvf = (JsonSchemaValidationFilter)muleContext.getRegistry().lookupObject("jvf");
+        assertNotNull(jvf);
+        assertNotNull(jvf.getSchemaLocations());
+
         // This test fails under Java 1.6 on Windows, because the Java fields are serialized in a different order.
         String javaVersion = System.getProperty("java.specification.version", "<None>");
         String osName = System.getProperty("os.name", "<None>");

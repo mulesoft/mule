@@ -2,11 +2,13 @@
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:json="http://www.mulesoft.org/schema/mule/json"
+      xmlns:mxml="http://www.mulesoft.org/schema/mule/xml"
       xmlns:spring="http://www.springframework.org/schema/beans"
       xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
-       http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/3.2/mule-json.xsd">
+       http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/3.2/mule-json.xsd
+       http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/3.2/mule-xml.xsd">
 
     <json:is-json-filter name="jsonFilter" validateParsing="true"/>
 
@@ -41,5 +43,19 @@
     <json:json-to-xml-transformer name="jToX"/>
 
     <json:xml-to-json-transformer name="xToJ"/>
+
+    <json:json-xslt-transformer name="jToJ">
+        <mxml:xslt-text>
+            <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+                <xsl:template match="@*|node()">
+                    <xsl:copy>
+                        <xsl:apply-templates select="@*|node()"/>
+                    </xsl:copy>
+                </xsl:template>
+            </xsl:stylesheet>
+        </mxml:xslt-text>
+    </json:json-xslt-transformer>
+
+    <json:json-schema-validation-filter name="jvf" schemaLocations="customer.xsd"/>
 
 </mule>

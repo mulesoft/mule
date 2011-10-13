@@ -32,17 +32,7 @@ public abstract class AbstractToFromXmlTransformer extends AbstractTransformer
 
     protected AbstractToFromXmlTransformer()
     {
-        try
-        {
-            // Create a factory we know to be STAX-compliant
-            transformerFactory = (TransformerFactory) Class.forName(
-                "com.sun.org.apache.xalan.internal.xsltc.trax.TransformerFactoryImpl").newInstance();
-        }
-        catch (Exception ex)
-        {
-            // Fall back to default factory
-            transformerFactory = TransformerFactory.newInstance();
-        }
+        transformerFactory = TransformerInputs.createTransformerFactory();
     }
 
     /**

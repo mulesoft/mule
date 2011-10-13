@@ -9,27 +9,33 @@
  */
 package org.mule.module.json.transformers;
 
+import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;
+import org.mule.module.xml.transformer.XsltTransformer;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.IOUtils;
 
+import de.odysseus.staxon.json.JsonXMLInputFactory;
+import de.odysseus.staxon.json.JsonXMLOutputFactory;
+
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamWriter;
+import javax.xml.transform.Result;
 import javax.xml.transform.Source;
+import javax.xml.transform.stax.StAXResult;
 import javax.xml.transform.stax.StAXSource;
 import java.io.File;
 import java.io.Reader;
 import java.io.StringWriter;
 import java.net.URL;
 
-import de.odysseus.staxon.json.JsonXMLInputFactory;
-
 /**
- * Convert JSON to an XML document string
+ * Convert Json to Json using XSLT
  */
-public class JsonToXml extends AbstractToFromXmlTransformer
+public class JsonXsltTransformer extends XsltTransformer
 {
-    public JsonToXml()
+    public JsonXsltTransformer()
     {
         this.registerSourceType(DataTypeFactory.STRING);
         this.registerSourceType(DataTypeFactory.INPUT_STREAM);
@@ -38,18 +44,19 @@ public class JsonToXml extends AbstractToFromXmlTransformer
         this.registerSourceType(DataTypeFactory.create(URL.class));
         this.registerSourceType(DataTypeFactory.create(File.class));
         setReturnDataType(DataTypeFactory.XML_STRING);
+
+        setXslTransformerFactory(TransformerInputs.getPreferredTransactionFactoryClassname());
     }
 
-
     /**
-     * Use Staxon to convert JSON to an XML string
+     * run a JSON to JSON XSLT transformationn XML string
      */
     @Override
-    protected Object doTransform(Object src, String enc) throws TransformerException
+    public Object transformMessage(MuleMessage message, String enc) throws TransformerException
     {
         XMLInputFactory inputFactory = new JsonXMLInputFactory();
         inputFactory.setProperty(JsonXMLInputFactory.PROP_MULTIPLE_PI, false);
-        TransformerInputs inputs = new TransformerInputs(this,src);
+        TransformerInputs inputs = new TransformerInputs(this, message.getPayload());
         Source source;
         try
         {
@@ -62,8 +69,15 @@ public class JsonToXml extends AbstractToFromXmlTransformer
                 source = new StAXSource(inputFactory.createXMLStreamReader(inputs.getReader()));
             }
 
-            XMLOutputFactory outputFactory = XMLOutputFactory.newInstance();
-            return convert(source, outputFactory);
+            XMLOutputFactory outputFactory = new JsonXMLOutputFactory();
+            outputFactory.setProperty(JsonXMLOutputFactory.PROP_AUTO_ARRAY, true);
+            outputFactory.setProperty(JsonXMLOutputFactory.PROP_PRETTY_PRINT, true);
+            StringWriter writer = new StringWriter();
+            XMLStreamWriter output = outputFactory.createXMLStreamWriter(writer);
+            Result result = new StAXResult(output);
+
+            doTransform(message, enc, source, result);
+            return writer.toString();
         }
         catch (Exception ex)
         {
@@ -75,4 +89,5 @@ public class JsonToXml extends AbstractToFromXmlTransformer
             IOUtils.closeQuietly(inputs.getReader());
         }
     }
+
 }
