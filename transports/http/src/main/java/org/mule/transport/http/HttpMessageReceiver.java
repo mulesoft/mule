@@ -43,7 +43,9 @@ import org.mule.util.monitor.Expirable;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.SocketAddress;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import javax.resource.spi.work.Work;
@@ -158,7 +160,8 @@ public class HttpMessageReceiver extends TcpMessageReceiver
 
                     try
                     {
-                        conn.writeResponse(processRequest(request));
+                        HttpResponse response = processRequest(request);
+                        conn.writeResponse(response);
                     }
                     catch (Exception e)
                     {
@@ -171,14 +174,15 @@ public class HttpMessageReceiver extends TcpMessageReceiver
                         String temp = ExceptionHelper.getErrorMapping(connector.getProtocol(), e.getClass());
                         int httpStatus = Integer.valueOf(temp);
 
-                        conn.writeResponse(buildFailureResponse(request.getRequestLine().getHttpVersion(), httpStatus, e.getMessage()));
                         if (e instanceof MessagingException)
                         {
                             MuleEvent event = ((MessagingException) e).getEvent();
+                            conn.writeResponse(buildFailureResponse(event, e.getMessage(),httpStatus));
                             event.getFlowConstruct().getExceptionListener().handleException(e, event);
                         }
                         else
                         {
+                            conn.writeResponse(buildFailureResponse(request.getRequestLine().getHttpVersion(), httpStatus, e.getMessage()));
                             getConnector().getMuleContext().getExceptionListener().handleException(e);
                         }
                         break;
@@ -211,6 +215,8 @@ public class HttpMessageReceiver extends TcpMessageReceiver
                 }
             }
         }
+
+
 
         protected HttpResponse processRequest(HttpRequest request) throws MuleException, IOException
         {
@@ -390,6 +396,13 @@ public class HttpMessageReceiver extends TcpMessageReceiver
                     }
                 }
             }
+        }
+
+        private HttpResponse buildFailureResponse(MuleEvent event, String description, int httpStatusCode) throws MuleException
+        {
+            event.getMessage().setOutboundProperty(HttpConnector.HTTP_STATUS_PROPERTY,httpStatusCode);
+            event.getMessage().setPayload(description);
+            return transformResponse(event.getMessage(), event);
         }
 
         protected HttpResponse buildFailureResponse(HttpVersion version, int statusCode, String description) throws MuleException
