@@ -9,4 +9,9 @@
     <custom-transformer name="lifecycle" class="org.mule.transformers.simple.RegistryTransformerLifecycleTestCase$TransformerLifecycleTracker">
        <spring:property name="property" value="foo"/>
     </custom-transformer>
+    
+    <flow name="flow">
+        <transformer ref="lifecycle"/>
+    </flow>
+    
 </mule>

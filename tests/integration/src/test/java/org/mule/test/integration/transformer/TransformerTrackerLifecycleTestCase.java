@@ -9,13 +9,13 @@
  */
 package org.mule.test.integration.transformer;
 
+import static org.junit.Assert.assertEquals;
+
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
 
 public class TransformerTrackerLifecycleTestCase extends FunctionalTestCase
 {
@@ -39,7 +39,7 @@ public class TransformerTrackerLifecycleTestCase extends FunctionalTestCase
         muleContext.dispose();
 
         //TODO MULE-5002 initialise called twice
-        assertEquals("[setProperty, setMuleContext, initialise, setMuleContext, initialise, start, stop]", 
+        assertEquals("[setProperty, setMuleContext, setMuleContext, initialise, start, stop]", 
             ltt.getTracker().toString());
     }
 }

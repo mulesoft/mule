@@ -15,7 +15,6 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
-import org.mule.api.context.notification.MuleContextNotificationListener;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transformer.DataType;
@@ -24,8 +23,6 @@ import org.mule.api.transformer.TransformerException;
 import org.mule.api.transformer.TransformerMessagingException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.Message;
-import org.mule.context.notification.MuleContextNotification;
-import org.mule.context.notification.NotificationException;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transformer.types.SimpleDataType;
 import org.mule.transport.NullPayload;
@@ -52,7 +49,7 @@ import org.apache.commons.logging.LogFactory;
  * Transformations transform one object into another.
  */
 
-public abstract class AbstractTransformer implements Transformer, MuleContextNotificationListener<MuleContextNotification>
+public abstract class AbstractTransformer implements Transformer
 {
     public static final DataType<MuleMessage> MULE_MESSAGE_DATA_TYPE = new SimpleDataType<MuleMessage>(MuleMessage.class);
 
@@ -556,21 +553,5 @@ public abstract class AbstractTransformer implements Transformer, MuleContextNot
     public void setMuleContext(MuleContext context)
     {
         this.muleContext = context;
-        try
-        {
-            muleContext.registerListener(this);
-        }
-        catch (NotificationException e)
-        {
-            logger.error("failed to register context listener", e);
-        }
-    }
-
-    public void onNotification(MuleContextNotification notification)
-    {
-        if (notification.getAction() == MuleContextNotification.CONTEXT_DISPOSING)
-        {
-            this.dispose();
-        }
     }
 }

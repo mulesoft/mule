@@ -7,25 +7,29 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.transformers.simple;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transformer.TransformerException;
+import org.mule.construct.SimpleFlowConstruct;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transformer.AbstractTransformer;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import edu.emory.mathcs.backport.java.util.Collections;
+
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
 /**
- * Highlights the issue: MULE-4599 where dispose cannot be called on a transformer since it is a 
- * prototype in Spring, so spring does not manage the object.
+ * Highlights the issue: MULE-4599 where dispose cannot be called on a transformer
+ * since it is a prototype in Spring, so spring does not manage the object.
  */
 public class RegistryTransformerLifecycleTestCase extends FunctionalTestCase
 {
@@ -38,10 +42,22 @@ public class RegistryTransformerLifecycleTestCase extends FunctionalTestCase
     @Test
     public void testLifecycleInSpring() throws Exception
     {
-        TransformerLifecycleTracker transformer = 
-            (TransformerLifecycleTracker) muleContext.getRegistry().lookupTransformer("lifecycle");
+        TransformerLifecycleTracker transformer = (TransformerLifecycleTracker) muleContext.getRegistry()
+            .lookupTransformer("lifecycle");
         assertNotNull(transformer);
-        
+        muleContext.dispose();
+        assertNoLifecycle(transformer);
+    }
+
+    @Test
+    public void testLifecycleInFlowInSpring() throws Exception
+    {
+        SimpleFlowConstruct flow = (SimpleFlowConstruct) muleContext.getRegistry()
+            .lookupFlowConstruct("flow");
+        TransformerLifecycleTracker transformer = (TransformerLifecycleTracker) flow.getMessageProcessors()
+            .get(0);
+        assertNotNull(transformer);
+
         muleContext.dispose();
         assertLifecycle(transformer);
     }
@@ -52,7 +68,20 @@ public class RegistryTransformerLifecycleTestCase extends FunctionalTestCase
         TransformerLifecycleTracker transformer = new TransformerLifecycleTracker();
         transformer.setProperty("foo");
         muleContext.getRegistry().registerTransformer(transformer);
-        
+        muleContext.dispose();
+        // MULE-5829 Artifacts excluded from lifecycle in MuleContextLifecyclePhases
+        // gets lifecycle when an object is registered.
+        // assertNoLifecycle(transformer);
+    }
+
+    @Test
+    public void testLifecycleInFlowTransientRegistry() throws Exception
+    {
+        SimpleFlowConstruct flow = new SimpleFlowConstruct("flow", muleContext);
+        TransformerLifecycleTracker transformer = new TransformerLifecycleTracker();
+        transformer.setProperty("foo");
+        flow.setMessageProcessors(Collections.singletonList(transformer));
+        muleContext.getRegistry().registerFlowConstruct(flow);
         muleContext.dispose();
         assertLifecycle(transformer);
     }
@@ -60,6 +89,11 @@ public class RegistryTransformerLifecycleTestCase extends FunctionalTestCase
     private void assertLifecycle(TransformerLifecycleTracker transformer)
     {
         assertEquals("[setProperty, initialise, dispose]", transformer.getTracker().toString());
+    }
+
+    private void assertNoLifecycle(TransformerLifecycleTracker transformer)
+    {
+        assertEquals("[setProperty]", transformer.getTracker().toString());
     }
 
     public static class TransformerLifecycleTracker extends AbstractTransformer implements Disposable
