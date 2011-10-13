@@ -14,7 +14,7 @@
         <ssl:server path="trustStore" storePassword="mulepassword"/>
     </ssl:connector>
 
-    <ssl:endpoint name="in" host="localhost" port="60195" exchange-pattern="request-response"/>
+    <ssl:endpoint name="in" host="localhost" port="${port1}" exchange-pattern="request-response"/>
 
     <model name="main">
         <custom-service name="service" class="org.mule.tck.testmodels.mule.TestSedaService">
