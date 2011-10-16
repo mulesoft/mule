@@ -43,9 +43,6 @@ public class ObjectStoreCachingStrategyTestCase extends AbstractMuleTestCase
         KeyGenerator keyGenerator = mock(KeyGenerator.class);
         when(keyGenerator.generateKey(mockEvent)).thenReturn(OBJECT_KEY);
 
-        ResponseGenerator responseGenerator = mock(ResponseGenerator.class);
-        when(responseGenerator.create(mockEvent, mockResponse)).thenReturn(mockResponse);
-
         ObjectStore<MuleEvent> objectStore = mock(ObjectStore.class);
         when(objectStore.retrieve(OBJECT_KEY)).thenReturn(null);
 
@@ -53,7 +50,6 @@ public class ObjectStoreCachingStrategyTestCase extends AbstractMuleTestCase
         when(consumablePayloadFilter.accept(Mockito.<MuleMessage>any())).thenReturn(true);
 
         ObjectStoreCachingStrategy cachingStrategy = new ObjectStoreCachingStrategy();
-        cachingStrategy.setResponseGenerator(responseGenerator);
         cachingStrategy.setKeyGenerator(keyGenerator);
         cachingStrategy.setStore(objectStore);
         cachingStrategy.setConsumableFilter(consumablePayloadFilter);

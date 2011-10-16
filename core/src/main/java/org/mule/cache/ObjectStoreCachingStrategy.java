@@ -13,6 +13,7 @@ package org.mule.cache;
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
+import org.mule.api.ThreadSafeAccess;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.filter.Filter;
 import org.mule.api.store.ObjectAlreadyExistsException;
@@ -89,20 +90,23 @@ public class ObjectStoreCachingStrategy implements CachingStrategy
         }
         else
         {
-            MuleEvent result;
             try
             {
-                result = messageProcessor.process(request);
+                response = messageProcessor.process(request);
             }
             catch (Exception e)
             {
                 throw new DefaultMuleException(e);
             }
-            response = result;
 
             if (response == null || consumableFilter.accept(response.getMessage()))
             {
-                store(key, responseGenerator.create(request, response));
+                MuleEvent responseCopy = response;
+                if (response instanceof ThreadSafeAccess)
+                {
+                    responseCopy = (MuleEvent) ((ThreadSafeAccess) response).newThreadCopy();
+                }
+                store(key, responseCopy);
             }
         }
 
