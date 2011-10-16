@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
       xsi:schemaLocation="
-            http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.1/mule.xsd">
+            http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
+            http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/3.2/mule-test.xsd">
 
     <flow name="CacheRouterRequestResponse">
         <inbound-endpoint address="vm://testRequestResponse" exchange-pattern="request-response"/>
@@ -12,6 +14,8 @@
                 <singleton-object class="org.mule.cache.integration.IncreasingNumberComponent"/>
             </component>
         </cache>
+
+        <test:component appendString=" Processed"/>
     </flow>
 
     <flow name="CacheRouterOneWay">
@@ -22,6 +26,8 @@
                 <singleton-object class="org.mule.cache.integration.IncreasingNumberComponent"/>
             </component>
         </cache>
+
+        <test:component appendString=" Processed"/>
 
         <outbound-endpoint address="vm://output" exchange-pattern="one-way"/>
     </flow>

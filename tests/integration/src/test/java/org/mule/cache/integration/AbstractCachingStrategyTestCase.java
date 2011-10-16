@@ -51,14 +51,14 @@ public abstract class AbstractCachingStrategyTestCase extends FunctionalTestCase
         DefaultMuleMessage message2 = new DefaultMuleMessage("test2", (Map) null, muleContext);
 
         MuleMessage msg = client.send("vm://testRequestResponse", message1);
-        assertEquals(0, msg.getPayload());
+        assertEquals("0 Processed", msg.getPayload());
 
         msg = client.send("vm://testRequestResponse", message2);
-        assertEquals(1, msg.getPayload());
+        assertEquals("1 Processed", msg.getPayload());
 
         // Checks that resending message 1 gets the response form the cache
         msg = client.send("vm://testRequestResponse", message1);
-        assertEquals(0, msg.getPayload());
+        assertEquals("0 Processed", msg.getPayload());
     }
 
     @Test
@@ -71,15 +71,15 @@ public abstract class AbstractCachingStrategyTestCase extends FunctionalTestCase
 
         client.dispatch("vm://testOneWay", message1);
         MuleMessage msg = client.request("vm://output", 5000);
-        assertEquals(0, msg.getPayload());
+        assertEquals("0 Processed", msg.getPayload());
 
         client.dispatch("vm://testOneWay", message2);
         msg = client.request("vm://output", 5000);
-        assertEquals(1, msg.getPayload());
+        assertEquals("1 Processed", msg.getPayload());
 
         // Checks that resending message 1 gets the response form the cache
         client.dispatch("vm://testOneWay", message1);
         msg = client.request("vm://output", 5000);
-        assertEquals(0, msg.getPayload());
+        assertEquals("0 Processed", msg.getPayload());
     }
 }
