@@ -10,12 +10,9 @@
 
 package org.mule.cache;
 
-import org.mule.DefaultMuleEvent;
-import org.mule.DefaultMuleMessage;
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.filter.Filter;
 import org.mule.api.store.ObjectAlreadyExistsException;
@@ -105,18 +102,11 @@ public class ObjectStoreCachingStrategy implements CachingStrategy
 
             if (response == null || consumableFilter.accept(response.getMessage()))
             {
-                store(key, cloneResponse(request, response));
+                store(key, responseGenerator.create(request, response));
             }
         }
 
         return response;
-    }
-
-    private MuleEvent cloneResponse(MuleEvent requestedEvent, MuleEvent cachedResponseEvent)
-    {
-        MuleMessage clonedMessage = new DefaultMuleMessage(cachedResponseEvent.getMessage().getPayload(), cachedResponseEvent.getMuleContext());
-
-        return new DefaultMuleEvent(clonedMessage, cachedResponseEvent.getEndpoint(), requestedEvent, requestedEvent.getSession());
     }
 
     private Serializable generateKey(MuleEvent request) throws DefaultMuleException

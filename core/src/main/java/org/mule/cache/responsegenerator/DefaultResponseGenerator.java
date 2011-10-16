@@ -24,7 +24,7 @@ public class DefaultResponseGenerator implements ResponseGenerator
 
     public MuleEvent create(MuleEvent requestedEvent, MuleEvent cachedResponseEvent)
     {
-        MuleMessage clonedMessage = new DefaultMuleMessage(cachedResponseEvent.getMessage().getPayload(), cachedResponseEvent.getMuleContext());
+        MuleMessage clonedMessage = new DefaultMuleMessage(cachedResponseEvent.getMessage());
 
         return new DefaultMuleEvent(clonedMessage, cachedResponseEvent.getEndpoint(), requestedEvent, requestedEvent.getSession());
     }
