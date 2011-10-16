@@ -11,7 +11,9 @@
 package org.mule.cache.responsegenerator;
 
 import org.mule.DefaultMuleEvent;
+import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
+import org.mule.api.MuleMessage;
 
 /**
  * Implements {@link ResponseGenerator} creating a new {@link MuleEvent}
@@ -22,7 +24,9 @@ public class DefaultResponseGenerator implements ResponseGenerator
 
     public MuleEvent create(MuleEvent requestedEvent, MuleEvent cachedResponseEvent)
     {
-        return new DefaultMuleEvent(cachedResponseEvent.getMessage(), requestedEvent, requestedEvent.getSession());
+        MuleMessage clonedMessage = new DefaultMuleMessage(cachedResponseEvent.getMessage());
+
+        return new DefaultMuleEvent(clonedMessage, requestedEvent, requestedEvent.getSession());
     }
 }
 
