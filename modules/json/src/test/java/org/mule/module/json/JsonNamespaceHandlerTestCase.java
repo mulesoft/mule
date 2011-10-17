@@ -66,6 +66,7 @@ public class JsonNamespaceHandlerTestCase extends FunctionalTestCase
         assertTrue(filter.isValidateParsing());
 
         ObjectToJson serializer = (ObjectToJson) muleContext.getRegistry().lookupObject("fruitCollectionToJson");
+        serializer.initialise();
         assertNotNull(serializer);
         assertEquals(String.class, serializer.getReturnClass());
         assertEquals(FruitCollection.class, serializer.getSourceClass());

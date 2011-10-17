@@ -348,6 +348,14 @@
             <enrich target="#[header:OUTBOUND:helloHeader2]" source="#[payload]" />
         </enricher>
     </flow>
+    
+    <!-- MULE-5544 -->
+    <flow name="enrichUsingComponent">
+        <vm:inbound-endpoint path="enrichcomponent-in" exchange-pattern="request-response" />
+        <enricher target="#[header:OUTBOUND:echoHeader]" source="#[payload]">
+            <echo-component/>
+        </enricher>
+    </flow>
 
     <invoke name="invokeme" object-ref="pojo" method="method" methodArguments="#[string:Account] ,    #[groovy:message.payload]" methodArgumentTypes="java.lang.String, java.lang.String"/>
 

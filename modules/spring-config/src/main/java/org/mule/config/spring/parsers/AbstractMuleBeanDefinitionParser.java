@@ -17,6 +17,7 @@ import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.routing.OutboundRouter;
 import org.mule.api.routing.OutboundRouterCollection;
 import org.mule.api.source.MessageSource;
+import org.mule.api.transformer.Transformer;
 import org.mule.config.spring.MuleHierarchicalBeanDefinitionParserDelegate;
 import org.mule.config.spring.parsers.assembly.BeanAssembler;
 import org.mule.config.spring.parsers.assembly.BeanAssemblerFactory;
@@ -24,6 +25,7 @@ import org.mule.config.spring.parsers.assembly.DefaultBeanAssemblerFactory;
 import org.mule.config.spring.parsers.assembly.configuration.ReusablePropertyConfiguration;
 import org.mule.config.spring.parsers.assembly.configuration.ValueMap;
 import org.mule.config.spring.parsers.generic.AutoIdUtils;
+import org.mule.enricher.MessageEnricher;
 import org.mule.exception.AbstractExceptionStrategy;
 import org.mule.util.ClassUtils;
 import org.mule.util.StringUtils;
@@ -270,7 +272,9 @@ public abstract class AbstractMuleBeanDefinitionParser extends AbstractBeanDefin
         if (!Component.class.isAssignableFrom(beanClass) && !MessageSource.class.isAssignableFrom(beanClass)
             && !OutboundRouterCollection.class.isAssignableFrom(beanClass)
             && !OutboundRouter.class.isAssignableFrom(beanClass)
-            && !AbstractExceptionStrategy.class.isAssignableFrom(beanClass))
+            && !AbstractExceptionStrategy.class.isAssignableFrom(beanClass)
+            && !MessageEnricher.class.isAssignableFrom(beanClass)
+            && !Transformer.class.isAssignableFrom(beanClass))
         {
             if (Initialisable.class.isAssignableFrom(beanClass))
             {

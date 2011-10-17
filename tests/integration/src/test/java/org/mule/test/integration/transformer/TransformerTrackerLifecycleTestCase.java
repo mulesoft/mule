@@ -10,6 +10,8 @@
 
 package org.mule.test.integration.transformer;
 
+import static org.junit.Assert.assertEquals;
+
 import org.mule.api.MuleMessage;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 
@@ -18,8 +20,6 @@ import java.util.Collection;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-
-import static org.junit.Assert.assertEquals;
 
 public class TransformerTrackerLifecycleTestCase extends AbstractServiceAndFlowTestCase
 {
@@ -45,8 +45,7 @@ public class TransformerTrackerLifecycleTestCase extends AbstractServiceAndFlowT
 
         muleContext.dispose();
 
-        // TODO MULE-5002 initialise called twice
-        assertEquals("[setProperty, setMuleContext, initialise, setMuleContext, initialise, start, stop]",
+        assertEquals("[setProperty, setMuleContext, setMuleContext, initialise, start, stop]",
             ltt.getTracker().toString());
     }
 }

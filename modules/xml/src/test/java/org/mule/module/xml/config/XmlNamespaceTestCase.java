@@ -90,6 +90,7 @@ public class XmlNamespaceTestCase extends FunctionalTestCase
     public void testJXPathExtractor() throws Exception
     {
         JXPathExtractor transformer = (JXPathExtractor) lookupTransformer("jxpath-extractor");
+        transformer.initialise();
         assertNotNull(transformer.getNamespaces());
         assertEquals(6, transformer.getNamespaces().size());
         assertNotNull(transformer.getNamespaces().get("foo"));
