@@ -10,6 +10,13 @@
 
 package org.mule.test.construct;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
@@ -32,13 +39,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 
 public class FlowConfigurationFunctionalTestCase extends FunctionalTestCase
 {
@@ -449,6 +449,16 @@ public class FlowConfigurationFunctionalTestCase extends FunctionalTestCase
 
         assertEquals("0Hello", result.getProperty("helloHeader", PropertyScope.INBOUND));
         assertEquals("0Hello", result.getProperty("helloHeader2", PropertyScope.INBOUND));
+    }
+    
+    @Test
+    public void testEnrichUsingComponent() throws Exception
+    {
+        // MULE-5544
+        MuleMessage message = new DefaultMuleMessage("0", muleContext);
+        MuleMessage result = muleContext.getClient().send("vm://enrichcomponent-in", message);
+
+        assertEquals("0", result.getProperty("echoHeader", PropertyScope.INBOUND));
     }
     
     @Test
