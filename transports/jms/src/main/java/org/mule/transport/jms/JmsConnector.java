@@ -716,7 +716,7 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
         {
             close(producer);
         }
-        catch (JMSException e)
+        catch (Exception e)
         {
             logger.warn("Failed to close jms message producer: " + e.getMessage());
         }
@@ -756,7 +756,7 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
         {
             close(consumer);
         }
-        catch (JMSException e)
+        catch (Exception e)
         {
             logger.warn("Failed to close jms message consumer: " + e.getMessage());
         }
@@ -792,7 +792,7 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
         {
             close(session);
         }
-        catch (JMSException e)
+        catch (Exception e)
         {
             logger.warn("Failed to close jms session consumer: " + e.getMessage());
         }
@@ -824,7 +824,7 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
         {
             close(tempQueue);
         }
-        catch (JMSException e)
+        catch (Exception e)
         {
             if (logger.isWarnEnabled())
             {
@@ -870,7 +870,7 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
         {
             close(tempTopic);
         }
-        catch (JMSException e)
+        catch (Exception e)
         {
             if (logger.isWarnEnabled())
             {
