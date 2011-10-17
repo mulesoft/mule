@@ -363,7 +363,7 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerMuleBeanDefinitionParser("enrich", new ChildDefinitionParser("enrichExpressionPair",
             EnrichExpressionPair.class));
 
-        registerBeanDefinitionParser("value-extractor", new MessageProcessorDefinitionParser(ValueExtractorTransformer.class));
+        registerBeanDefinitionParser("value-extractor-transformer", new MessageProcessorDefinitionParser(ValueExtractorTransformer.class));
         registerMuleBeanDefinitionParser("extract", new ChildDefinitionParser("valueExtractorTemplate",
                                                                              ValueExtractorTemplate.class));
 

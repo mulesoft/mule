@@ -4350,7 +4350,7 @@
         </xsd:attribute>
     </xsd:attributeGroup>
 
-    <xsd:element name="value-extractor" type="valueExtractorTransformerType" substitutionGroup="abstract-transformer">
+    <xsd:element name="value-extractor-transformer" type="valueExtractorTransformerType" substitutionGroup="abstract-transformer">
         <xsd:annotation>
             <xsd:documentation>
                 Extracts values from a given source using regular expressions and uses that values to enrich the mule message.
