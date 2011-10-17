@@ -5,11 +5,11 @@
           http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd">
 
     <value-extractor-transformer name="valueExtractor1" source="#[payload]">
-        <extract pattern="TEST(\w+)TEST" target="#[header:INVOCATION:propName1]" failIfNoMatch="false"/>
+        <extract pattern="TEST(\w+)TEST" target="#[header:INVOCATION:propName1]" failIfNoMatch="false" defaultValue="foo"/>
         <extract pattern="test(\w+)test" target="#[header:OUTBOUND:propName2]"/>
     </value-extractor-transformer>
 
     <value-extractor-transformer name="valueExtractor2">
-        <extract pattern="TEST(\w+)TEST" target="#[header:INVOCATION:propName1]" failIfNoMatch="false"/>
+        <extract pattern="TEST(\w+)TEST" target="#[header:INVOCATION:propName1]" failIfNoMatch="false" defaultValue="foo"/>
     </value-extractor-transformer>
 </mule>

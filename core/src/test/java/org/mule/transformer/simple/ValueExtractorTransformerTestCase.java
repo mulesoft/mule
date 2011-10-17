@@ -28,10 +28,10 @@ public class ValueExtractorTransformerTestCase extends AbstractMuleContextTestCa
 {
 
     @Test
-    public void testDoesNotFailIfNoExpressionMatches() throws Exception
+    public void testDoesNotFailIfNoExpressionMatchesWithNoDefaultValue() throws Exception
     {
         List<ValueExtractorTransformer.ValueExtractorTemplate> enrichExpressionPairs = new ArrayList<ValueExtractorTransformer.ValueExtractorTemplate>();
-        enrichExpressionPairs.add(new ValueExtractorTransformer.ValueExtractorTemplate("TESTw+TEST", "#[header:INVOCATION:propName]", false));
+        enrichExpressionPairs.add(new ValueExtractorTransformer.ValueExtractorTemplate("TESTw+TEST", "#[header:INVOCATION:propName]", false, null));
         ValueExtractorTransformer transformer = createPropertyGeneratorTransformer("TEST", enrichExpressionPairs);
         DefaultMuleMessage testMessage = new DefaultMuleMessage("TEST", muleContext);
 
@@ -42,11 +42,24 @@ public class ValueExtractorTransformerTestCase extends AbstractMuleContextTestCa
         assertEquals("Should not match any property", 0, propertyNames.size());
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void testFailIfNoExpressionMatches() throws Exception
+    @Test
+    public void testUsesDefaultIfNoExpressionMatches() throws Exception
     {
         List<ValueExtractorTransformer.ValueExtractorTemplate> enrichExpressionPairs = new ArrayList<ValueExtractorTransformer.ValueExtractorTemplate>();
-        enrichExpressionPairs.add(new ValueExtractorTransformer.ValueExtractorTemplate("TESTw+TEST", "#[header:INVOCATION:propName]", true));
+        enrichExpressionPairs.add(new ValueExtractorTransformer.ValueExtractorTemplate("TESTw+TEST", "#[header:INVOCATION:propName]", false, "foo"));
+        ValueExtractorTransformer transformer = createPropertyGeneratorTransformer("TEST", enrichExpressionPairs);
+        DefaultMuleMessage testMessage = new DefaultMuleMessage("TEST", muleContext);
+
+        Object response = transformer.transform(testMessage);
+        DefaultMuleMessage responseMessage = (DefaultMuleMessage) response;
+        assertPropertyAddedToMessage(responseMessage, "propName", "foo", PropertyScope.INVOCATION);
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void testFailIfNoExpressionMatchesAndNoDefaultValueSpecified() throws Exception
+    {
+        List<ValueExtractorTransformer.ValueExtractorTemplate> enrichExpressionPairs = new ArrayList<ValueExtractorTransformer.ValueExtractorTemplate>();
+        enrichExpressionPairs.add(new ValueExtractorTransformer.ValueExtractorTemplate("TESTw+TEST", "#[header:INVOCATION:propName]", true, null));
         ValueExtractorTransformer transformer = createPropertyGeneratorTransformer("TEST", enrichExpressionPairs);
         DefaultMuleMessage testMessage = new DefaultMuleMessage("TEST", muleContext);
 
@@ -57,7 +70,7 @@ public class ValueExtractorTransformerTestCase extends AbstractMuleContextTestCa
     public void testFailsIfExpressionMatchesMultipleValues() throws Exception
     {
         List<ValueExtractorTransformer.ValueExtractorTemplate> enrichExpressionPairs = new ArrayList<ValueExtractorTransformer.ValueExtractorTemplate>();
-        enrichExpressionPairs.add(new ValueExtractorTransformer.ValueExtractorTemplate("TEST(\\w+)TEST(\\w+)", "#[header:INVOCATION:propName]", true));
+        enrichExpressionPairs.add(new ValueExtractorTransformer.ValueExtractorTemplate("TEST(\\w+)TEST(\\w+)", "#[header:INVOCATION:propName]", true, null));
         ValueExtractorTransformer transformer = createPropertyGeneratorTransformer("TESTfooTESTbar", enrichExpressionPairs);
         DefaultMuleMessage testMessage = new DefaultMuleMessage("TEST", muleContext);
 
@@ -68,7 +81,7 @@ public class ValueExtractorTransformerTestCase extends AbstractMuleContextTestCa
     public void testAddsSingleValue() throws Exception
     {
         List<ValueExtractorTransformer.ValueExtractorTemplate> enrichExpressionPairs = new ArrayList<ValueExtractorTransformer.ValueExtractorTemplate>();
-        enrichExpressionPairs.add(new ValueExtractorTransformer.ValueExtractorTemplate("TEST(\\w+)TEST", "#[header:INVOCATION:propName]", false));
+        enrichExpressionPairs.add(new ValueExtractorTransformer.ValueExtractorTemplate("TEST(\\w+)TEST", "#[header:INVOCATION:propName]", false, null));
         ValueExtractorTransformer transformer = createPropertyGeneratorTransformer("TESTfooTEST", enrichExpressionPairs);
 
         DefaultMuleMessage testMessage = new DefaultMuleMessage("TEST", muleContext);
@@ -82,8 +95,8 @@ public class ValueExtractorTransformerTestCase extends AbstractMuleContextTestCa
     public void testAddsMultipleValues() throws Exception
     {
         List<ValueExtractorTransformer.ValueExtractorTemplate> enrichExpressionPairs = new ArrayList<ValueExtractorTransformer.ValueExtractorTemplate>();
-        enrichExpressionPairs.add(new ValueExtractorTransformer.ValueExtractorTemplate("TEST(\\w+)TEST\\w+TEST", "#[header:INVOCATION:propName1]", false));
-        enrichExpressionPairs.add(new ValueExtractorTransformer.ValueExtractorTemplate("TEST\\w+TEST(\\w+)TEST", "#[header:INVOCATION:propName2]", false));
+        enrichExpressionPairs.add(new ValueExtractorTransformer.ValueExtractorTemplate("TEST(\\w+)TEST\\w+TEST", "#[header:INVOCATION:propName1]", false, null));
+        enrichExpressionPairs.add(new ValueExtractorTransformer.ValueExtractorTemplate("TEST\\w+TEST(\\w+)TEST", "#[header:INVOCATION:propName2]", false, null));
         ValueExtractorTransformer transformer = createPropertyGeneratorTransformer("TESTfooTESTbarTEST", enrichExpressionPairs);
 
         DefaultMuleMessage testMessage = new DefaultMuleMessage("TEST", muleContext);
@@ -99,7 +112,7 @@ public class ValueExtractorTransformerTestCase extends AbstractMuleContextTestCa
     public void testAddsSingleValueUsingSourceExpression() throws Exception
     {
         List<ValueExtractorTransformer.ValueExtractorTemplate> enrichExpressionPairs = new ArrayList<ValueExtractorTransformer.ValueExtractorTemplate>();
-        enrichExpressionPairs.add(new ValueExtractorTransformer.ValueExtractorTemplate("TEST(\\w+)TEST", "#[header:INVOCATION:propName]", false));
+        enrichExpressionPairs.add(new ValueExtractorTransformer.ValueExtractorTemplate("TEST(\\w+)TEST", "#[header:INVOCATION:propName]", false, null));
 
         ValueExtractorTransformer transformer = createPropertyGeneratorTransformer("#[payload:]", enrichExpressionPairs);
 
