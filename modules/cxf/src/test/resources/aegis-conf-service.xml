@@ -41,15 +41,11 @@
                                 resources/org/apache/hello_world_soap_http/Greeter.aegis.xml
                                 to configure the call to the webservice.
                             -->
-                            <cxf:databinding>
-                                <spring:bean
-                                    class="org.apache.cxf.aegis.databinding.AegisDatabinding">
-                                    <spring:property name="configuration">
-                                        <spring:bean
-                                            class="org.apache.cxf.aegis.type.TypeCreationOptions" />
-                                    </spring:property>
-                                </spring:bean>
-                            </cxf:databinding>
+                            <cxf:aegis-databinding>
+                                <spring:property name="configuration">
+                                    <spring:bean class="org.apache.cxf.aegis.type.TypeCreationOptions" />
+                                </spring:property>
+                            </cxf:aegis-databinding>
                         </cxf:simple-client>
                     </outbound-endpoint>
                 </pass-through-router>
