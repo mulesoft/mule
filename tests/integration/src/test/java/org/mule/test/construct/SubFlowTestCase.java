@@ -67,6 +67,13 @@ public class SubFlowTestCase extends FunctionalTestCase
     {
         MuleClient client = muleContext.getClient();
         assertEquals("1xyz2", client.send("vm://ServiceViaFlowRef", "", null).getPayloadAsString());
+    }
+
+    @Test
+    public void testFlowWithSubFlowWithComponent() throws Exception
+    {
+        MuleClient client = muleContext.getClient();
+        assertEquals("0", client.send("vm://flowWithsubFlowWithComponent", "0", null).getPayloadAsString());
 
     }
 

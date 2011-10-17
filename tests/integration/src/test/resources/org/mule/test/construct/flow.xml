@@ -315,6 +315,16 @@
         </enricher>
     </flow>
 
+    <flow name="enrichUsingComponent2">
+        <vm:inbound-endpoint path="enrichcomponent2-in" exchange-pattern="request-response" />
+        <enricher target="#[header:OUTBOUND:echoHeader]" source="#[payload]">
+            <processor-chain>
+                <echo-component/>
+            </processor-chain>
+        </enricher>
+    </flow>
+
+
     <invoke name="invokeme" object-ref="pojo" method="method" methodArguments="#[string:Account] ,    #[groovy:message.payload]" methodArgumentTypes="java.lang.String, java.lang.String"/>
 
     <invoke name="invokeme-noargs" object-ref="pojo" method="method"/>
