@@ -8,7 +8,7 @@
 
     <ajax:connector name="connector1" interval="1000" jsonCommented="true" logLevel="1"
                     maxInterval="10000" multiFrameInterval="3000" refsThreshold="4000" timeout="50000"
-                    serverUrl="http://0.0.0.0:${port1}/service" resourceBase="/foo/bar"/>
+                    serverUrl="http://0.0.0.0:${port1}/service" resourceBase="/foo/bar" validateConnections="true"/>
 
     <ajax:connector name="connector2" interval="1000" jsonCommented="true" logLevel="1"
                     maxInterval="10000" multiFrameInterval="3000" refsThreshold="4000" timeout="50000"
