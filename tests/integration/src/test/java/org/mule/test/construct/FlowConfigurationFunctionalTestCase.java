@@ -558,7 +558,17 @@ public class FlowConfigurationFunctionalTestCase extends FunctionalTestCase
 
         assertEquals("0", result.getProperty("echoHeader", PropertyScope.INBOUND));
     }
-    
+
+    @Test
+    public void testEnrichUsingComponent2() throws Exception
+    {
+        // MULE-5544
+        MuleMessage message = new DefaultMuleMessage("0", muleContext);
+        MuleMessage result = muleContext.getClient().send("vm://enrichcomponent2-in", message);
+
+        assertEquals("0", result.getProperty("echoHeader", PropertyScope.INBOUND));
+    }
+
     @Test
     public void testLoggerMessage() throws Exception
     {

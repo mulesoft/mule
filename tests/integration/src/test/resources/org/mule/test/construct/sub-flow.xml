@@ -50,7 +50,15 @@
         <flow-ref name="service" />
         <append-string-transformer message="2" />
     </flow>
-
+    
+    <flow name="flowWithsubFlowWithComponent">
+        <vm:inbound-endpoint path="flowWithsubFlowWithComponent" exchange-pattern="request-response" />
+        <flow-ref name="subFlowWithComponent"/>
+    </flow>
+    
+    <processor-chain name="subFlowWithComponent">
+        <echo-component/>
+    </processor-chain>
 
     <!-- Child flows/sub-flows -->
 
