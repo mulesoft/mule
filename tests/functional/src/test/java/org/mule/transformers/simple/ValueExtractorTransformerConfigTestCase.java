@@ -46,6 +46,7 @@ public class ValueExtractorTransformerConfigTestCase extends FunctionalTestCase
         template1.setPattern("TEST(\\w+)TEST");
         template1.setTarget("#[header:INVOCATION:propName1]");
         template1.setFailIfNoMatch(false);
+        template1.setDefaultValue("foo");
 
         template2 = new ValueExtractorTransformer.ValueExtractorTemplate();
         template2.setPattern("test(\\w+)test");
@@ -95,6 +96,7 @@ public class ValueExtractorTransformerConfigTestCase extends FunctionalTestCase
             assertEquals(expectedTemplate.getPattern(), actualTemplate.getPattern());
             assertEquals(expectedTemplate.getTarget(), actualTemplate.getTarget());
             assertEquals(expectedTemplate.isFailIfNoMatch(), actualTemplate.isFailIfNoMatch());
+            assertEquals(expectedTemplate.getDefaultValue(), actualTemplate.getDefaultValue());
         }
     }
 

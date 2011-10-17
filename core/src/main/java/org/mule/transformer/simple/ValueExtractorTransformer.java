@@ -56,9 +56,19 @@ public class ValueExtractorTransformer extends AbstractMessageTransformer
                 //TODO: there should be a way to decide which group/groups values should be used to enrich the message
                 muleContext.getExpressionManager().enrich(valueExtractorTemplate.getTarget(), message, matcher.group(1));
             }
-            else if (valueExtractorTemplate.failIfNoMatch)
+            else
             {
-                throw new IllegalStateException(String.format("Source value '%s' does not math pattern '%s'", valueToMatch, valueExtractorTemplate.getPattern()));
+                if (valueExtractorTemplate.failIfNoMatch)
+                {
+                    throw new IllegalStateException(String.format("Source value '%s' does not math pattern '%s'", valueToMatch, valueExtractorTemplate.getPattern()));
+                }
+                else
+                {
+                    if (valueExtractorTemplate.defaultValue != null)
+                    {
+                        muleContext.getExpressionManager().enrich(valueExtractorTemplate.getTarget(), message, valueExtractorTemplate.defaultValue);
+                    }
+                }
             }
         }
 
@@ -113,6 +123,7 @@ public class ValueExtractorTransformer extends AbstractMessageTransformer
         private String target;
         private boolean failIfNoMatch;
         private Pattern compiledPattern;
+        private String defaultValue;
 
         @SuppressWarnings({"UnusedDeclaration"})
         public ValueExtractorTemplate()
@@ -120,8 +131,9 @@ public class ValueExtractorTransformer extends AbstractMessageTransformer
             // Default constructor required by Spring
         }
 
-        public ValueExtractorTemplate(String pattern, String target, boolean failIfNoMatch)
+        public ValueExtractorTemplate(String pattern, String target, boolean failIfNoMatch, String defaultValue)
         {
+            this.defaultValue = defaultValue;
             setPattern(pattern);
             this.target = target;
             this.failIfNoMatch = failIfNoMatch;
@@ -156,6 +168,16 @@ public class ValueExtractorTransformer extends AbstractMessageTransformer
         public void setFailIfNoMatch(boolean failIfNoMatch)
         {
             this.failIfNoMatch = failIfNoMatch;
+        }
+
+        public String getDefaultValue()
+        {
+            return defaultValue;
+        }
+
+        public void setDefaultValue(String defaultValue)
+        {
+            this.defaultValue = defaultValue;
         }
     }
 }

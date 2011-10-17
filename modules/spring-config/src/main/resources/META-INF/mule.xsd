@@ -4400,6 +4400,13 @@
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
+        <xsd:attribute name="defaultValue" type="xsd:string" use="optional">
+            <xsd:annotation>
+                <xsd:documentation>
+                    The default value used to enrich the message when the source value does not match the pattern. Useful only when failIfNoMatch is false.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
     </xsd:attributeGroup>
 
     <!--==============================================================-->
