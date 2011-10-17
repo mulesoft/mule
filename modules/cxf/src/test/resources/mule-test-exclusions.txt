@@ -27,7 +27,6 @@ org.mule.module.cxf.payload.TreatNullPayloadAsVoidTestCase
 
 # Need to make work post refactoring
 org.mule.module.cxf.wsa.WSATest
-org.mule.module.cxf.ClientSimpleFrontendTestCase
 
 org.mule.module.cxf.StaxFeatureTestCase
 
