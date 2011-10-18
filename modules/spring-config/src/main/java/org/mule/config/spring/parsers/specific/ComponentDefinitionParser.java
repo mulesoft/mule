@@ -21,7 +21,7 @@ public class ComponentDefinitionParser extends ChildDefinitionParser
     public ComponentDefinitionParser(Class clazz)
     {
         super("messageProcessor", clazz);
-        this.singleton = true;
+        this.singleton = false;
         addIgnored(AbstractMuleBeanDefinitionParser.ATTRIBUTE_CLASS);
     }
 

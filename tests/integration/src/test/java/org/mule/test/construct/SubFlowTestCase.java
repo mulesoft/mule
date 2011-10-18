@@ -10,14 +10,14 @@
 
 package org.mule.test.construct;
 
-import static org.junit.Assert.assertEquals;
-
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.lifecycle.LifecycleTrackerProcessor;
 import org.mule.tck.junit4.FunctionalTestCase;
 
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 public class SubFlowTestCase extends FunctionalTestCase
 {
@@ -75,6 +75,13 @@ public class SubFlowTestCase extends FunctionalTestCase
         MuleClient client = muleContext.getClient();
         assertEquals("0", client.send("vm://flowWithsubFlowWithComponent", "0", null).getPayloadAsString());
 
+    }
+
+    @Test
+    public void testFlowWithSameGlobalChainTwice() throws Exception
+    {
+        MuleClient client = muleContext.getClient();
+        assertEquals("0xyzxyz", client.send("vm://flowWithSameSubFlowTwice", "0", null).getPayloadAsString());
     }
 
 }
