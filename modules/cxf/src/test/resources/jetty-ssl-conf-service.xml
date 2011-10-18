@@ -1,0 +1,45 @@
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
+  xmlns:https="http://www.mulesoft.org/schema/mule/https"
+  xmlns:jetty="http://www.mulesoft.org/schema/mule/jetty-ssl"
+  xsi:schemaLocation="
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
+       http://www.mulesoft.org/schema/mule/https http://www.mulesoft.org/schema/mule/https/3.2/mule-https.xsd
+       http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/3.2/mule-cxf.xsd
+       http://www.mulesoft.org/schema/mule/jetty-ssl http://www.mulesoft.org/schema/mule/jetty-ssl/3.2/mule-jetty-ssl.xsd">
+
+    <https:connector name="httpsConnector">
+        <https:tls-client path="clientKeystore" storePassword="mulepassword"/>
+        <https:tls-key-store path="serverKeystore" keyPassword="mulepassword" storePassword="mulepassword"/>
+        <https:tls-server path="trustStore" storePassword="mulepassword"/>
+    </https:connector>
+
+    <jetty:connector name="jettyConnector">
+        <jetty:tls-client path="clientKeystore" storePassword="mulepassword"/>
+        <jetty:tls-key-store path="serverKeystore" keyPassword="mulepassword" storePassword="mulepassword"/>
+        <jetty:tls-server path="trustStore" storePassword="mulepassword"/>
+    </jetty:connector>
+
+    <endpoint name="clientEndpoint" address="https://localhost:${port1}/services/greeter"
+        exchange-pattern="request-response" connector-ref="httpsConnector">
+        <cxf:jaxws-client
+            clientClass="org.apache.hello_world_soap_http.SOAPService"
+            port="SoapPort"
+            wsdlLocation="classpath:/wsdl/hello_world.wsdl" />
+    </endpoint>
+
+    <model name="TestCxfModel">
+        <service name="greeterService">
+            <inbound>
+                <inbound-endpoint address="jetty-ssl://localhost:${port1}/services/greeter"
+                    exchange-pattern="request-response" connector-ref="jettyConnector">
+                    <cxf:jaxws-service />
+                </inbound-endpoint>
+            </inbound>
+            <component>
+                <singleton-object class="org.apache.hello_world_soap_http.GreeterImpl" />
+            </component>
+        </service>
+    </model>
+</mule>
