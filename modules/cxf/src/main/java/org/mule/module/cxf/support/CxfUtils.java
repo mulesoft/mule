@@ -96,4 +96,16 @@ public final class CxfUtils
         throw new IllegalArgumentException("Invalid Soap version " + version);
     }
 
+    public static String mapUnsupportedSchemas(String url)
+    {
+        //hack for CXF to work correctly with servlet and jetty urls
+        if(url != null)
+        {
+            url = url.replace("servlet://", "http://");
+            url = url.replace("jetty://", "http://");
+            url = url.replace("jetty-ssl://", "https://");
+        }
+        return url;
+    }
+
 }

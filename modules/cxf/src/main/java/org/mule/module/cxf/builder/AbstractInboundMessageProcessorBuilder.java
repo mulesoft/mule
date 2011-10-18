@@ -156,9 +156,7 @@ public abstract class AbstractInboundMessageProcessorBuilder implements MuleCont
         }
 
         String address = getAddress();
-        //hack for CXF to work correctly with servlet and jetty urls
-        address = address.replace("servlet://", "http://localhost/");
-        address = address.replace("jetty://", "http://localhost/");
+        address = CxfUtils.mapUnsupportedSchemas(address);
         sfb.setAddress(address); // dummy URL for CXF
 
         if (wsdlLocation != null)
