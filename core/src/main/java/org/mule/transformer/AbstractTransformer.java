@@ -10,6 +10,7 @@
 
 package org.mule.transformer;
 
+import org.mule.api.AnnotatedObject;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -51,7 +52,7 @@ import org.apache.commons.logging.LogFactory;
  * Transformations transform one object into another.
  */
 
-public abstract class AbstractTransformer implements Transformer
+public abstract class AbstractTransformer implements Transformer, AnnotatedObject
 {
     public static final DataType<MuleMessage> MULE_MESSAGE_DATA_TYPE = new SimpleDataType<MuleMessage>(MuleMessage.class);
 
