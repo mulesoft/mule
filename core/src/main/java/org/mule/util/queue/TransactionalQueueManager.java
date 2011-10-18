@@ -75,6 +75,12 @@ public class TransactionalQueueManager extends AbstractXAResourceManager impleme
         return q;
     }
 
+    public synchronized QueueInfo getQueueInfo(String name)
+    {
+        QueueInfo q = queues.get(name);
+        return q == null ? q : new QueueInfo(q);
+    }
+
     @Override
     protected void doStart() throws ResourceManagerSystemException
     {
