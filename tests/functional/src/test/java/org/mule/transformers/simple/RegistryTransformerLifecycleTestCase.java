@@ -10,22 +10,22 @@
 
 package org.mule.transformers.simple;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transformer.TransformerException;
-import org.mule.construct.SimpleFlowConstruct;
+import org.mule.construct.Flow;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transformer.AbstractTransformer;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
-import edu.emory.mathcs.backport.java.util.Collections;
-
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * Highlights the issue: MULE-4599 where dispose cannot be called on a transformer
@@ -52,8 +52,7 @@ public class RegistryTransformerLifecycleTestCase extends FunctionalTestCase
     @Test
     public void testLifecycleInFlowInSpring() throws Exception
     {
-        SimpleFlowConstruct flow = (SimpleFlowConstruct) muleContext.getRegistry()
-            .lookupFlowConstruct("flow");
+        Flow flow = (Flow) muleContext.getRegistry().lookupFlowConstruct("flow");
         TransformerLifecycleTracker transformer = (TransformerLifecycleTracker) flow.getMessageProcessors()
             .get(0);
         assertNotNull(transformer);
@@ -77,10 +76,10 @@ public class RegistryTransformerLifecycleTestCase extends FunctionalTestCase
     @Test
     public void testLifecycleInFlowTransientRegistry() throws Exception
     {
-        SimpleFlowConstruct flow = new SimpleFlowConstruct("flow", muleContext);
+        Flow flow = new Flow("flow", muleContext);
         TransformerLifecycleTracker transformer = new TransformerLifecycleTracker();
         transformer.setProperty("foo");
-        flow.setMessageProcessors(Collections.singletonList(transformer));
+        flow.setMessageProcessors(Collections.<MessageProcessor>singletonList(transformer));
         muleContext.getRegistry().registerFlowConstruct(flow);
         muleContext.dispose();
         assertLifecycle(transformer);
