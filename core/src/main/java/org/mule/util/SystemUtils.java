@@ -388,4 +388,18 @@ public class SystemUtils extends org.apache.commons.lang.SystemUtils
         return result;
     }
 
+    /**
+     * Ensure a generated file name is legal.
+     */
+    public static String legalizeFileName(String name)
+    {
+        if (!SystemUtils.IS_OS_WINDOWS)
+        {
+            return name;
+        }
+
+        // Assume slashes are deliberate.  Change other illegal characters
+        return name.replaceAll("[:\\\\]", "_");
+    }
+
 }
