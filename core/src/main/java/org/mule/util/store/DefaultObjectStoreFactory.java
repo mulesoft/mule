@@ -16,7 +16,7 @@ import java.io.Serializable;
 /**
  * Create the default object stores
  */
-public interface DefaultObjectStoreCreator
+public interface DefaultObjectStoreFactory
 {
     ObjectStore<Serializable> createDefaultInMemoryObjectStore();
 

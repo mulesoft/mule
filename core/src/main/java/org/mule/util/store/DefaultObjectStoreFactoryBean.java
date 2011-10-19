@@ -18,7 +18,7 @@ import java.io.Serializable;
  */
 public class DefaultObjectStoreFactoryBean
 {
-    private static DefaultObjectStoreCreator delegate;
+    private static DefaultObjectStoreFactory delegate;
 
     /**
      * Do not instantiate
@@ -30,7 +30,7 @@ public class DefaultObjectStoreFactoryBean
     /**
      * Set a delegate to create the object stores in a non-default way
      */
-    public static void setDelegate(DefaultObjectStoreCreator theDelegate)
+    public static void setDelegate(DefaultObjectStoreFactory theDelegate)
     {
         delegate = theDelegate;
     }
