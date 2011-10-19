@@ -20,8 +20,10 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.hello_world_soap_http.GreeterImpl;
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
@@ -31,6 +33,8 @@ import static org.junit.Assert.assertEquals;
 
 public class JettySslTestCase extends AbstractServiceAndFlowTestCase
 {
+    private static final Bus defaultBus = BusFactory.getDefaultBus();
+
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
@@ -52,6 +56,12 @@ public class JettySslTestCase extends AbstractServiceAndFlowTestCase
     public static void setUpDefaultBus()
     {
         BusFactory.setDefaultBus(null);
+    }
+
+    @AfterClass
+    public static void restoreDefaultBus()
+    {
+        BusFactory.setDefaultBus(defaultBus);
     }
 
     @Test
