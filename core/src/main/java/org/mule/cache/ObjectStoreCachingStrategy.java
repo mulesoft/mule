@@ -10,7 +10,6 @@
 
 package org.mule.cache;
 
-import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.ThreadSafeAccess;
@@ -27,7 +26,6 @@ import org.mule.cache.responsegenerator.DefaultResponseGenerator;
 import org.mule.cache.responsegenerator.ResponseGenerator;
 import org.mule.util.store.InMemoryObjectStore;
 
-import java.io.NotSerializableException;
 import java.io.Serializable;
 
 import org.apache.commons.logging.Log;
@@ -61,25 +59,27 @@ public class ObjectStoreCachingStrategy implements CachingStrategy
     {
         if (consumableFilter.accept(request.getMessage()))
         {
-            return processMessageWithCache(request, messageProcessor);
-        }
-        else
-        {
+            Serializable key;
             try
             {
-                return messageProcessor.process(request);
+                key = keyGenerator.generateKey(request);
             }
             catch (Exception e)
             {
-                throw new DefaultMuleException(e);
+                logger.warn("Message will be processed without cache: key generation error", e);
+                return messageProcessor.process(request);
             }
+
+            return processMessageWithCache(key, request, messageProcessor);
+        }
+        else
+        {
+            return messageProcessor.process(request);
         }
     }
 
-    private MuleEvent processMessageWithCache(MuleEvent request, MessageProcessor messageProcessor) throws MuleException
+    private MuleEvent processMessageWithCache(Serializable key, MuleEvent request, MessageProcessor messageProcessor) throws MuleException
     {
-        Serializable key = generateKey(request);
-
         MuleEvent cachedResponse = lookupEventInCache(key);
 
         MuleEvent response;
@@ -90,14 +90,7 @@ public class ObjectStoreCachingStrategy implements CachingStrategy
         }
         else
         {
-            try
-            {
-                response = messageProcessor.process(request);
-            }
-            catch (Exception e)
-            {
-                throw new DefaultMuleException(e);
-            }
+            response = messageProcessor.process(request);
 
             if (response == null || consumableFilter.accept(response.getMessage()))
             {
@@ -111,22 +104,6 @@ public class ObjectStoreCachingStrategy implements CachingStrategy
         }
 
         return response;
-    }
-
-    private Serializable generateKey(MuleEvent request) throws DefaultMuleException
-    {
-        Serializable key;
-
-        try
-        {
-            key = keyGenerator.generateKey(request);
-        }
-        catch (NotSerializableException e)
-        {
-            throw new DefaultMuleException(e);
-        }
-
-        return key;
     }
 
     private MuleEvent lookupEventInCache(Serializable key)

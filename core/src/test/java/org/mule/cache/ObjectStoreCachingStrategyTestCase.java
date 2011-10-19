@@ -20,10 +20,14 @@ import org.mule.cache.responsegenerator.ResponseGenerator;
 import org.mule.routing.filters.AcceptAllFilter;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
+import java.io.Serializable;
+
 import org.junit.Test;
+import org.mockito.Matchers;
 import org.mockito.Mockito;
 
 import static org.junit.Assert.assertSame;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -144,5 +148,34 @@ public class ObjectStoreCachingStrategyTestCase extends AbstractMuleTestCase
 
         assertSame(mockResponse, response);
         Mockito.verify(objectStore, Mockito.times(0)).store(OBJECT_KEY, mockResponse);
+    }
+
+    @Test
+    public void testIgnoresKeyGeneratorError() throws Exception
+    {
+        MuleEvent mockEvent = mock(MuleEvent.class);
+        final MuleEvent mockResponse = mock(MuleEvent.class);
+
+        KeyGenerator keyGenerator = mock(KeyGenerator.class);
+        when(keyGenerator.generateKey(mockEvent)).thenThrow(new IllegalArgumentException());
+
+        Filter consumablePayloadFilter = mock(Filter.class);
+        when(consumablePayloadFilter.accept(Mockito.<MuleMessage>any())).thenReturn(true);
+
+        ObjectStore<MuleEvent> objectStore = mock(ObjectStore.class);
+
+        ObjectStoreCachingStrategy cachingStrategy = new ObjectStoreCachingStrategy();
+        cachingStrategy.setKeyGenerator(keyGenerator);
+        cachingStrategy.setStore(objectStore);
+        cachingStrategy.setConsumableFilter(consumablePayloadFilter);
+
+        MessageProcessor cachedMessageProcessor = mock(MessageProcessor.class);
+        when(cachedMessageProcessor.process(mockEvent)).thenReturn(mockResponse);
+        MuleEvent response = cachingStrategy.process(mockEvent, cachedMessageProcessor);
+
+        assertSame(mockResponse, response);
+        verify(cachedMessageProcessor, times(1)).process(mockEvent);
+        Mockito.verify(objectStore, Mockito.times(0)).retrieve(any(Serializable.class));
+        Mockito.verify(objectStore, Mockito.times(0)).store(any(Serializable.class), Matchers.<MuleEvent>any(MuleEvent.class));
     }
 }
