@@ -47,10 +47,17 @@
     </processor-chain>
 
     <flow name="flowWithSameGlobalChainTwice">
-        <vm:inbound-endpoint path="flowWithSameSubFlowTwice"
+        <vm:inbound-endpoint path="flowWithSameGlobalChainTwice"
            exchange-pattern="request-response" />
         <flow-ref name="chain" />
         <flow-ref name="chain" />
+    </flow>
+
+    <flow name="flowWithSameGlobalChainSingletonTwice">
+        <vm:inbound-endpoint path="flowWithSameGlobalChainSingletonTwice"
+           exchange-pattern="request-response" />
+        <flow-ref name="chain-singleton" />
+        <flow-ref name="chain-singleton" />
     </flow>
 
     <!-- Child flows/sub-flows -->
@@ -61,6 +68,16 @@
         <append-string-transformer message="y" />
         <append-string-transformer message="z" />
         <echo-component/>
+    </processor-chain>
+    
+    <processor-chain name="chain-singleton">
+        <custom-processor class="org.mule.lifecycle.LifecycleTrackerProcessor" />
+        <append-string-transformer message="x" />
+        <append-string-transformer message="y" />
+        <append-string-transformer message="z" />
+        <component>
+            <singleton-object class="org.mule.lifecycle.LifecycleTrackerCheckComponent"/>
+        </component>
     </processor-chain>
     
     <flow name="childFlow">

@@ -81,7 +81,14 @@ public class SubFlowTestCase extends FunctionalTestCase
     public void testFlowWithSameGlobalChainTwice() throws Exception
     {
         MuleClient client = muleContext.getClient();
-        assertEquals("0xyzxyz", client.send("vm://flowWithSameSubFlowTwice", "0", null).getPayloadAsString());
+        assertEquals("0xyzxyz", client.send("vm://flowWithSameGlobalChainTwice", "0", null).getPayloadAsString());
+    }
+
+    @Test
+    public void testFlowWithSameGlobalChainSingletonTwice() throws Exception
+    {
+        MuleClient client = muleContext.getClient();
+        assertEquals("0xyzxyz", client.send("vm://flowWithSameGlobalChainSingletonTwice", "0", null).getPayloadAsString());
     }
 
 }

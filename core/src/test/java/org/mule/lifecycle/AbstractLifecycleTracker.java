@@ -32,27 +32,27 @@ public abstract class AbstractLifecycleTracker implements Lifecycle,
     }
 
     public void setProperty(final String value) {
-        tracker.add("setProperty");
+        getTracker().add("setProperty");
     }
 
     public void setMuleContext(final MuleContext context) {
-        tracker.add("setMuleContext");
+        getTracker().add("setMuleContext");
     }
 
     public void initialise() throws InitialisationException {
-        tracker.add("initialise");
+        getTracker().add("initialise");
     }
 
     public void start() throws MuleException {
-        tracker.add("start");
+        getTracker().add("start");
     }
 
     public void stop() throws MuleException {
-        tracker.add("stop");
+        getTracker().add("stop");
     }
 
     public void dispose() {
-        tracker.add("dispose");
+        getTracker().add("dispose");
     }
 
 }

@@ -23,17 +23,16 @@ public class ObjectFactoryDefinitionParser extends AbstractChildDefinitionParser
     protected Class beanClass = null;
     protected String setterMethod = null;
 
-    public ObjectFactoryDefinitionParser(Class beanClass, String setterMethod, boolean singleton)
+    public ObjectFactoryDefinitionParser(Class beanClass, String setterMethod)
     {
-        this(beanClass, singleton);
+        this(beanClass);
         this.setterMethod = setterMethod;
     }                                                             
     
-    public ObjectFactoryDefinitionParser(Class beanClass, boolean singleton)
+    public ObjectFactoryDefinitionParser(Class beanClass)
     {
         super();
         this.beanClass = beanClass;
-        this.singleton = singleton;
         setAllowClassAttribute(false);
         addAlias(AbstractMuleBeanDefinitionParser.ATTRIBUTE_CLASS, AbstractObjectFactory.ATTRIBUTE_OBJECT_CLASS_NAME);
         addAlias(AbstractMuleBeanDefinitionParser.ATTRIBUTE_REF, "factoryBean");
