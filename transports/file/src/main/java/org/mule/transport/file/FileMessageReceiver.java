@@ -324,19 +324,22 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
         }
         catch (Exception e)
         {
-            RollbackSourceCallback rollbackMethod;
+            RollbackSourceCallback rollbackMethod = null;
 
             if (((FileConnector) connector).isStreaming())
             {
-                final ReceiverFileInputStream receiverFileInputStream = (ReceiverFileInputStream) message.getPayload();
-                rollbackMethod = new RollbackSourceCallback()
+                if (message.getPayload() instanceof ReceiverFileInputStream)
                 {
-                    @Override
-                    public void rollback()
+                    final ReceiverFileInputStream receiverFileInputStream = (ReceiverFileInputStream) message.getPayload();
+                    rollbackMethod = new RollbackSourceCallback()
                     {
-                        receiverFileInputStream.setStreamProcessingError(true);
-                    }
-                };
+                        @Override
+                        public void rollback()
+                        {
+                            receiverFileInputStream.setStreamProcessingError(true);
+                        }
+                    };
+                }
             }
             else if (!sourceFile.getAbsolutePath().equals(originalSourceFile))
             {
@@ -355,10 +358,6 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
                         }
                     }
                 };
-            }
-            else
-            {
-                rollbackMethod = null;
             }
 
             if (e instanceof MessagingException)
