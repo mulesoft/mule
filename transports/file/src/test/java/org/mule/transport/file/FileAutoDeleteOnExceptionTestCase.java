@@ -22,15 +22,17 @@ import java.io.IOException;
 import org.junit.Before;
 import org.junit.Test;
 
-public class DoesNotAutoDeleteOnExceptionTestCase extends FunctionalTestCase
+import static org.junit.Assert.assertFalse;
+
+public class FileAutoDeleteOnExceptionTestCase extends FunctionalTestCase
 {
 
-    public static final String TEST_FOLDER = ".mule/testData";
+    public static final String TEST_FOLDER1 = ".mule/testData1";
+    public static final String TEST_FOLDER2 = ".mule/testData2";
 
     private Prober prober;
-    private File target;
 
-    public DoesNotAutoDeleteOnExceptionTestCase()
+    public FileAutoDeleteOnExceptionTestCase()
     {
         setStartContext(false);
     }
@@ -38,26 +40,31 @@ public class DoesNotAutoDeleteOnExceptionTestCase extends FunctionalTestCase
     @Override
     protected String getConfigResources()
     {
-        return "does-not-auto-delete-on-exception-config.xml";
+        return "file-auto-delete-on-exception-config.xml";
     }
 
     @Before
     public void setUp() throws IOException
     {
         prober = new PollingProber(10000, 100);
+    }
 
-        File testFolder = new File(TEST_FOLDER);
+    private File createTestFile(String folder) throws IOException
+    {
+        File testFolder = new File(folder);
         testFolder.mkdirs();
         prober.check(new FileExists(testFolder));
 
-        target = File.createTempFile("mule-file-test-", ".txt", testFolder);
+        File target = File.createTempFile("mule-file-test-", ".txt", testFolder);
         target.deleteOnExit();
         prober.check(new FileExists(target));
+        return target;
     }
 
     @Test
     public void testDoesNotAutoDeleteFileOnException() throws Exception
     {
+        File target = createTestFile(TEST_FOLDER1);
         // Starts file endpoint polling
         muleContext.start();
 
@@ -67,6 +74,22 @@ public class DoesNotAutoDeleteOnExceptionTestCase extends FunctionalTestCase
 
         // Checks that the source file was not deleted after the exception processing
         prober.check(new FileExists(target));
+    }
+
+    @Test
+    public void testAutoDeletesFileOnExceptionIfFileWasTransformed() throws Exception
+    {
+        File target = createTestFile(TEST_FOLDER2);
+
+        // Starts file endpoint polling
+        muleContext.start();
+
+        // Exception strategy should be stopped after processing the file
+        final FlowConstruct fileFlow = muleContext.getRegistry().lookupFlowConstruct("fileTestWithTransformation");
+        prober.check(new FlowStopped(fileFlow));
+
+        // Checks that the source file was deleted after the exception processing
+        assertFalse(target.exists());
     }
 
     private static class FileExists implements Probe

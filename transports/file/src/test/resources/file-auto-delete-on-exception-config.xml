@@ -13,10 +13,20 @@
                     streaming="true"/>
 
     <flow name="fileTest" processingStrategy="synchronous">
-        <file:inbound-endpoint connector-ref="fileConnector" path=".mule/testData"/>
+        <file:inbound-endpoint connector-ref="fileConnector" path=".mule/testData1"/>
 
         <test:component throwException="true"/>
 
+        <!-- Stops flow after processing the exception (used in the test to check that the exception was processed)-->
+        <default-exception-strategy stopMessageProcessing="true"/>
+    </flow>
+
+    <flow name="fileTestWithTransformation" processingStrategy="synchronous">
+        <file:inbound-endpoint connector-ref="fileConnector" path=".mule/testData2">
+            <file:file-to-string-transformer/>
+        </file:inbound-endpoint>
+
+        <test:component throwException="true"/>
 
         <!-- Stops flow after processing the exception (used in the test to check that the exception was processed)-->
         <default-exception-strategy stopMessageProcessing="true"/>
