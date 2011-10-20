@@ -12,6 +12,7 @@ package org.mule.management.agents;
 
 import org.mule.module.management.agent.FixedHostRmiClientSocketFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -22,6 +23,7 @@ import java.nio.channels.ServerSocketChannel;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.ClassRule;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -29,7 +31,9 @@ import static org.junit.Assert.assertEquals;
 public class FixedHostRmiClienSocketFactoryTestCase extends AbstractMuleTestCase
 {
 
-    private static final int TEST_PORT = 60504;
+    @ClassRule
+    public static DynamicPort dynamicPort = new DynamicPort("port1");
+
     protected volatile ServerSocket serverSocket;
 
     @After
@@ -48,7 +52,7 @@ public class FixedHostRmiClienSocketFactoryTestCase extends AbstractMuleTestCase
         final FixedHostRmiClientSocketFactory factory = new FixedHostRmiClientSocketFactory(overrideHost);
         assertEquals(overrideHost, factory.getOverrideHost());
 
-        final Socket clientSocket = factory.createSocket("www.example.com", TEST_PORT);
+        final Socket clientSocket = factory.createSocket("www.example.com", dynamicPort.getNumber());
         final InetAddress address = clientSocket.getInetAddress();
         final String socketHost = address.getHostAddress();
         assertEquals(overrideHost, socketHost);
@@ -69,7 +73,7 @@ public class FixedHostRmiClienSocketFactoryTestCase extends AbstractMuleTestCase
         Socket clientSocket = null;
         try
         {
-            clientSocket = factory.createSocket("www.example.com", TEST_PORT);
+            clientSocket = factory.createSocket("www.example.com", dynamicPort.getNumber());
             final InetAddress address = clientSocket.getInetAddress();
             final String socketHost = address.getHostAddress();
             assertEquals(overrideHost, socketHost);
@@ -93,6 +97,6 @@ public class FixedHostRmiClienSocketFactoryTestCase extends AbstractMuleTestCase
         ServerSocketChannel ssChannel = ServerSocketChannel.open();
         ssChannel.configureBlocking(false);
         serverSocket = ssChannel.socket();
-        serverSocket.bind(new InetSocketAddress(TEST_PORT));
+        serverSocket.bind(new InetSocketAddress(dynamicPort.getNumber()));
     }
 }
