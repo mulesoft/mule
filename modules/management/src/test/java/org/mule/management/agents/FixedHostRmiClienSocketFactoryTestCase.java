@@ -23,7 +23,7 @@ import java.nio.channels.ServerSocketChannel;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -31,8 +31,8 @@ import static org.junit.Assert.assertEquals;
 public class FixedHostRmiClienSocketFactoryTestCase extends AbstractMuleTestCase
 {
 
-    @ClassRule
-    public static DynamicPort dynamicPort = new DynamicPort("port1");
+    @Rule
+    public DynamicPort dynamicPort = new DynamicPort("port1");
 
     protected volatile ServerSocket serverSocket;
 
