@@ -218,6 +218,7 @@ public class DefaultMessageCollection extends DefaultMuleMessage implements Mule
         {
             newMessage.addMessage(message.createInboundMessage());
         }
+        copyToInbound(newMessage);
         return newMessage;
     }
 }
