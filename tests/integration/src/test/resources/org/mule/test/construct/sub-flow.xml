@@ -60,6 +60,34 @@
         <echo-component/>
     </processor-chain>
 
+    <flow name="flowWithSameSubFlowTwice">
+        <vm:inbound-endpoint path="flowWithSameSubFlowTwice"
+           exchange-pattern="request-response" />
+        <flow-ref name="sub-flow" />
+        <flow-ref name="sub-flow" />
+    </flow>
+
+    <flow name="flowWithSameSubFlowSingletonTwice">
+        <vm:inbound-endpoint path="flowWithSameSubFlowSingletonTwice"
+           exchange-pattern="request-response" />
+        <flow-ref name="sub-flow-singleton" />
+        <flow-ref name="sub-flow-singleton" />
+    </flow>
+
+    <flow name="flowWithSameGlobalChainTwice">
+        <vm:inbound-endpoint path="flowWithSameGlobalChainTwice"
+           exchange-pattern="request-response" />
+        <flow-ref name="chain" />
+        <flow-ref name="chain" />
+    </flow>
+
+    <flow name="flowWithSameGlobalChainSingletonTwice">
+        <vm:inbound-endpoint path="flowWithSameGlobalChainSingletonTwice"
+           exchange-pattern="request-response" />
+        <flow-ref name="chain-singleton" />
+        <flow-ref name="chain-singleton" />
+    </flow>
+
     <!-- Child flows/sub-flows -->
 
     <processor-chain name="chain">
@@ -67,6 +95,17 @@
         <append-string-transformer message="x" />
         <append-string-transformer message="y" />
         <append-string-transformer message="z" />
+        <echo-component/>
+    </processor-chain>
+    
+    <processor-chain name="chain-singleton">
+        <custom-processor class="org.mule.lifecycle.LifecycleTrackerProcessor" />
+        <append-string-transformer message="x" />
+        <append-string-transformer message="y" />
+        <append-string-transformer message="z" />
+        <component>
+            <singleton-object class="org.mule.lifecycle.LifecycleTrackerCheckComponent"/>
+        </component>
     </processor-chain>
     
    <sub-flow name="sub-flow">
@@ -74,6 +113,7 @@
         <append-string-transformer message="x" />
         <append-string-transformer message="y" />
         <append-string-transformer message="z" />
+        <echo-component/>
     </sub-flow>
 
     <flow name="childFlow">
@@ -81,7 +121,18 @@
         <append-string-transformer message="x" />
         <append-string-transformer message="y" />
         <append-string-transformer message="z" />
+        <echo-component/>
     </flow>
+
+   <sub-flow name="sub-flow-singleton">
+        <custom-processor class="org.mule.lifecycle.LifecycleTrackerProcessor" />
+        <append-string-transformer message="x" />
+        <append-string-transformer message="y" />
+        <append-string-transformer message="z" />
+        <component>
+            <singleton-object class="org.mule.lifecycle.LifecycleTrackerCheckComponent"/>
+        </component>
+    </sub-flow>
 
     <model>
         <service name="service">
