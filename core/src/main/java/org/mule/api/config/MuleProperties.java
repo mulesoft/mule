@@ -40,6 +40,7 @@ public class MuleProperties
     // public static final String MULE_METHOD_PROPERTY = PROPERTY_PREFIX + "SERVICE_METHOD";
     public static final String MULE_IGNORE_METHOD_PROPERTY = PROPERTY_PREFIX + "IGNORE_METHOD";
     public static final String MULE_ENDPOINT_PROPERTY = PROPERTY_PREFIX + "ENDPOINT";
+    public static final String MULE_ROOT_MESSAGE_ID_PROPERTY = PROPERTY_PREFIX + "ROOT_MESSAGE_ID";
     public static final String MULE_ORIGINATING_ENDPOINT_PROPERTY = PROPERTY_PREFIX + "ORIGINATING_ENDPOINT";
     public static final String MULE_ERROR_CODE_PROPERTY = PROPERTY_PREFIX + "ERROR_CODE";
     public static final String MULE_REPLY_TO_PROPERTY = PROPERTY_PREFIX + "REPLYTO";

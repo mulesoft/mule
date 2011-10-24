@@ -13,11 +13,13 @@ package org.mule.transport;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
+import org.mule.api.config.MuleProperties;
 import org.mule.api.context.WorkManager;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.MessageRequester;
+import org.mule.api.transport.PropertyScope;
 import org.mule.api.transport.ReceiveException;
 import org.mule.context.notification.EndpointMessageNotification;
 
@@ -96,6 +98,12 @@ public abstract class AbstractMessageRequester extends AbstractTransportMessageH
             result = doRequest(timeout);
             if (result != null)
             {
+                String rootId = result.getInboundProperty(MuleProperties.MULE_ROOT_MESSAGE_ID_PROPERTY);
+                if (rootId != null)
+                {
+                    result.setMessageRootId(rootId);
+                    result.removeProperty(MuleProperties.MULE_ROOT_MESSAGE_ID_PROPERTY, PropertyScope.INBOUND);
+                }
                 if (beginNotification != null)
                 {
                     result.propagateRootId(beginNotification.getSource());

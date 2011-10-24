@@ -81,6 +81,7 @@ public abstract class AbstractMessageDispatcher extends AbstractTransportMessage
                 MuleMessage resultMessage = doSend(event);
                 if (resultMessage != null)
                 {
+                    resultMessage.setMessageRootId(event.getMessage().getMessageRootId());
                     MuleSession storedSession = connector.getSessionHandler().retrieveSessionInfoFromMessage(resultMessage);
                     event.getSession().merge(storedSession);
                     resultEvent = new DefaultMuleEvent(resultMessage, event);

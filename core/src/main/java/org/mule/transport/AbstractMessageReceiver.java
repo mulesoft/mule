@@ -179,7 +179,12 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
         }
 
         message.removeProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, PropertyScope.INBOUND);
-
+        String rootId = message.getInboundProperty(MuleProperties.MULE_ROOT_MESSAGE_ID_PROPERTY);
+        if (rootId != null)
+        {
+            message.setMessageRootId(rootId);
+            message.removeProperty(MuleProperties.MULE_ROOT_MESSAGE_ID_PROPERTY, PropertyScope.INBOUND);
+        }
         MuleEvent muleEvent = createMuleEvent(message, outputStream);
         muleEvent = OptimizedRequestContext.unsafeSetEvent(muleEvent);
 
