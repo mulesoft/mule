@@ -60,16 +60,17 @@ public class MuleHttpServletRequest implements HttpServletRequest
 
     public String getCharacterEncoding()
     {
-        return null;
+        return event.getEncoding();
     }
 
     public void setCharacterEncoding(String env) throws UnsupportedEncodingException
     {
+        message.setEncoding(env);
     }
 
     public int getContentLength()
     {
-        return 0;
+        return -1;
     }
 
     public String getContentType()
@@ -122,7 +123,7 @@ public class MuleHttpServletRequest implements HttpServletRequest
 
     public String getServerName()
     {
-        return null;
+        return message.getInboundProperty(HttpConstants.HEADER_HOST);
     }
 
     public int getServerPort()
@@ -248,12 +249,19 @@ public class MuleHttpServletRequest implements HttpServletRequest
 
     public String getMethod()
     {
-        return null;
+        return message.getInboundProperty(HttpConnector.HTTP_METHOD_PROPERTY);
     }
 
     public String getPathInfo()
     {
-        return null;
+        String req = message.getInboundProperty(HttpConnector.HTTP_REQUEST_PATH_PROPERTY);
+        String contextPath = message.getInboundProperty(HttpConnector.HTTP_CONTEXT_PATH_PROPERTY);
+
+        String pathInfo = req.substring(contextPath.length());
+        if (!pathInfo.startsWith("/")) {
+            pathInfo = "/" + pathInfo;
+        }
+        return pathInfo;
     }
 
     public String getPathTranslated()
@@ -263,11 +271,18 @@ public class MuleHttpServletRequest implements HttpServletRequest
 
     public String getContextPath()
     {
-        return null;
+        return message.getInboundProperty(HttpConnector.HTTP_CONTEXT_PATH_PROPERTY);
     }
 
     public String getQueryString()
     {
+        String req = message.getInboundProperty(HttpConnector.HTTP_REQUEST_PROPERTY);
+        if (req != null) {
+            int queryPath = req.indexOf('?');
+            if (queryPath > -1) {
+                return req.substring(queryPath+1);
+            }
+        }
         return null;
     }
 
@@ -293,7 +308,7 @@ public class MuleHttpServletRequest implements HttpServletRequest
 
     public String getRequestURI()
     {
-        return null;
+        return message.getInboundProperty(HttpConnector.HTTP_REQUEST_PATH_PROPERTY);
     }
 
     public StringBuffer getRequestURL()
@@ -303,7 +318,8 @@ public class MuleHttpServletRequest implements HttpServletRequest
 
     public String getServletPath()
     {
-        return null;
+        // assume contextpath as we have no servlet path
+        return message.getInboundProperty(HttpConnector.HTTP_CONTEXT_PATH_PROPERTY);
     }
 
     public HttpSession getSession(boolean create)
