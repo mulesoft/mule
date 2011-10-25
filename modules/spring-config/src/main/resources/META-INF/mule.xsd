@@ -35,7 +35,8 @@
         <xsd:anyAttribute namespace="##other" processContents="lax">
             <xsd:annotation>
                 <xsd:documentation>
-                    Allow any third-parties to annotate these elements with global attributes
+                    Allow any third-parties to annotate these elements with global attributes.  All types for
+                    top-level elements must extend this.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:anyAttribute>
@@ -494,33 +495,37 @@
         </xsd:annotation>
     </xsd:element>
 
-    <xsd:element name="sub-flow">
+    <xsd:element name="sub-flow" type="subFlowType">
         <xsd:annotation>
             <xsd:documentation>
                 A chain of message processors processed synchronously that can be referenced and reused.
             </xsd:documentation>
         </xsd:annotation>
-        <xsd:complexType>
-            <xsd:sequence>
-                <xsd:element name="description" type="descriptionType" minOccurs="0">
+    </xsd:element>
+    <xsd:complexType name="subFlowType">
+        <xsd:complexContent>
+            <xsd:extension base="annotatedType">
+                <xsd:sequence>
+                    <xsd:element name="description" type="descriptionType" minOccurs="0">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                This can hold any kind of documentation related to the sub-flow. It is intended to be
+                                "human readable" only and  is not used by the system.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                    <xsd:group ref="messageProcessorOrOutboundEndpoint" maxOccurs="unbounded" />
+                </xsd:sequence>
+                <xsd:attribute name="name" type="substitutableName" use="optional">
                     <xsd:annotation>
                         <xsd:documentation>
-                            This can hold any kind of documentation related to the sub-flow. It is intended to be
-                            "human readable" only and  is not used by the system.
-                    </xsd:documentation>
+                            Identifies the sub-flow in the registry.
+                        </xsd:documentation>
                     </xsd:annotation>
-                </xsd:element>
-                <xsd:group ref="messageProcessorOrOutboundEndpoint" maxOccurs="unbounded" />
-            </xsd:sequence>
-            <xsd:attribute name="name" type="substitutableName" use="optional">
-                <xsd:annotation>
-                    <xsd:documentation>
-                        Identifies the message processor in the registry.
-                </xsd:documentation>
-                </xsd:annotation>
-            </xsd:attribute>
-        </xsd:complexType>
-    </xsd:element>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
 
     <xsd:complexType name="messageProcessorChainType">
         <xsd:complexContent>
