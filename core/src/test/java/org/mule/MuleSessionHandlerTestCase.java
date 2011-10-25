@@ -10,6 +10,7 @@
 
 package org.mule;
 
+import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.config.MuleProperties;
@@ -23,50 +24,88 @@ import org.mule.security.MuleCredentials;
 import org.mule.session.DefaultMuleSession;
 import org.mule.session.LegacySessionHandler;
 import org.mule.session.SerializeAndEncodeSessionHandler;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang.SerializationException;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
+import org.mockito.Mockito;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-public class MuleSessionHandlerTestCase extends AbstractMuleContextTestCase
+public class MuleSessionHandlerTestCase extends AbstractMuleTestCase
 {
-    /** see EE-1705/MULE-4567 */
+
+    private static String originalEncoding;
+
+    private MuleContext muleContext;
+
+    @Before
+    public void setUp() throws Exception
+    {
+        muleContext = Mockito.mock(MuleContext.class);
+        Mockito.when(muleContext.getExecutionClassLoader()).thenReturn(Thread.currentThread().getContextClassLoader());
+    }
+
+    @BeforeClass
+    public static void setUpEncoding()
+    {
+        originalEncoding = System.getProperty(MuleProperties.MULE_ENCODING_SYSTEM_PROPERTY);
+        System.setProperty(MuleProperties.MULE_ENCODING_SYSTEM_PROPERTY, "UTF-8");
+    }
+
+    @AfterClass
+    public static void restoreEncoding()
+    {
+        if (originalEncoding == null)
+        {
+            System.clearProperty(MuleProperties.MULE_ENCODING_SYSTEM_PROPERTY);
+        }
+        else
+        {
+            System.setProperty(MuleProperties.MULE_ENCODING_SYSTEM_PROPERTY, originalEncoding);
+        }
+    }
+
+    /**
+     * see EE-1705/MULE-4567
+     */
     @Test
-    public void testSessionProperties() throws Exception 
+    public void testSessionProperties() throws Exception
     {
         DefaultMuleMessage message = new DefaultMuleMessage("Test Message", muleContext);
         SessionHandler handler = new SerializeAndEncodeSessionHandler();
         MuleSession session = new DefaultMuleSession(muleContext);
-        
+
         String string = "bar";
         session.setProperty("fooString", string);
 
         Date date = new Date(0);
         session.setProperty("fooDate", date);
-        
+
         List<String> list = createList();
         session.setProperty("fooList", list);
-        
+
         handler.storeSessionInfoToMessage(session, message);
         // store save session to outbound, move it to the inbound
         // for retrieve to deserialize
         Object s = message.removeProperty(MuleProperties.MULE_SESSION_PROPERTY);
         message.setInboundProperty(MuleProperties.MULE_SESSION_PROPERTY, s);
         session = handler.retrieveSessionInfoFromMessage(message);
-        
+
         Object obj = session.getProperty("fooString");
         assertTrue(obj instanceof String);
         assertEquals(string, obj);
-        
+
         obj = session.getProperty("fooDate");
         assertTrue("Object should be a Date but is " + obj.getClass().getName(), obj instanceof Date);
         assertEquals(date, obj);
@@ -76,14 +115,16 @@ public class MuleSessionHandlerTestCase extends AbstractMuleContextTestCase
         assertEquals(list, obj);
     }
 
-    /** see EE-1774 */
+    /**
+     * see EE-1774
+     */
     @Test
-    public void testNonSerializableSessionProperties() throws Exception 
+    public void testNonSerializableSessionProperties() throws Exception
     {
         DefaultMuleMessage message = new DefaultMuleMessage("Test Message", muleContext);
         MuleSession session = new DefaultMuleSession(muleContext);
         SessionHandler handler = new SerializeAndEncodeSessionHandler();
-        
+
         NotSerializableClass clazz = new NotSerializableClass();
         session.setProperty("foo", clazz);
         handler.storeSessionInfoToMessage(session, message);
@@ -94,25 +135,27 @@ public class MuleSessionHandlerTestCase extends AbstractMuleContextTestCase
         session = handler.retrieveSessionInfoFromMessage(message);
         // Property was removed because it could not be serialized
         assertNull(session.getProperty("foo"));
-    }    
+    }
 
-    /** see EE-1820 */
+    /**
+     * see EE-1820
+     */
     @Test
-    public void testBackwardsCompatibility() throws Exception 
+    public void testBackwardsCompatibility() throws Exception
     {
         MuleMessage message = new DefaultMuleMessage("Test Message", muleContext);
         SessionHandler legacyHandler = new LegacySessionHandler();
         MuleSession session = new DefaultMuleSession(muleContext);
-        
+
         String string = "bar";
         session.setProperty("fooString", string);
 
         Date date = new Date(0);
         session.setProperty("fooDate", date);
-        
+
         List<String> list = createList();
         session.setProperty("fooList", list);
-        
+
         legacyHandler.storeSessionInfoToMessage(session, message);
         try
         {
@@ -124,22 +167,24 @@ public class MuleSessionHandlerTestCase extends AbstractMuleContextTestCase
             // expected
         }
         session = legacyHandler.retrieveSessionInfoFromMessage(message);
-    }    
-    
-    /** see EE-1820 */
+    }
+
+    /**
+     * see EE-1820
+     */
     @Test
-    public void testSessionPropertiesLegacyFormat() throws Exception 
+    public void testSessionPropertiesLegacyFormat() throws Exception
     {
         DefaultMuleMessage message = new DefaultMuleMessage("Test Message", muleContext);
         SessionHandler handler = new LegacySessionHandler();
         MuleSession session = new DefaultMuleSession(muleContext);
-        
+
         String string = "bar";
         session.setProperty("fooString", string);
 
         Date date = new Date(0);
         session.setProperty("fooDate", date);
-        
+
         List<String> list = createList();
         session.setProperty("fooList", list);
 
@@ -149,11 +194,11 @@ public class MuleSessionHandlerTestCase extends AbstractMuleContextTestCase
         Object s = message.removeProperty(MuleProperties.MULE_SESSION_PROPERTY);
         message.setInboundProperty(MuleProperties.MULE_SESSION_PROPERTY, s);
         session = handler.retrieveSessionInfoFromMessage(message);
-        
+
         Object obj = session.getProperty("fooString");
         assertTrue(obj instanceof String);
         assertEquals(string, obj);
-        
+
         obj = session.getProperty("fooDate");
         // MULE-4567 / EE-1705 
         assertTrue(obj instanceof String);
@@ -163,14 +208,16 @@ public class MuleSessionHandlerTestCase extends AbstractMuleContextTestCase
         assertTrue(obj instanceof String);
     }
 
-    /** see MULE-4720 */
+    /**
+     * see MULE-4720
+     */
     @Test
-    public void testSecurityContext() throws Exception 
+    public void testSecurityContext() throws Exception
     {
         DefaultMuleMessage message = new DefaultMuleMessage("Test Message", muleContext);
         SessionHandler handler = new SerializeAndEncodeSessionHandler();
         MuleSession session = new DefaultMuleSession(muleContext);
-        
+
         Credentials credentials = new MuleCredentials("joe", "secret".toCharArray());
         SecurityContext sc = new DefaultSecurityContextFactory().create(new DefaultMuleAuthentication(credentials));
         session.setSecurityContext(sc);
@@ -185,17 +232,19 @@ public class MuleSessionHandlerTestCase extends AbstractMuleContextTestCase
         sc = session.getSecurityContext();
         assertEquals("joe", sc.getAuthentication().getPrincipal());
     }
-    
-    /** see EE-1774 */
+
+    /**
+     * see EE-1774
+     */
     @Test
-    public void testNotSerializableSecurityContext() throws Exception 
+    public void testNotSerializableSecurityContext() throws Exception
     {
         MuleMessage message = new DefaultMuleMessage("Test Message", muleContext);
         SessionHandler handler = new SerializeAndEncodeSessionHandler();
         MuleSession session = new DefaultMuleSession(muleContext);
-        
+
         session.setSecurityContext(new NotSerializableSecurityContext());
-        
+
         try
         {
             handler.storeSessionInfoToMessage(session, message);
@@ -217,28 +266,30 @@ public class MuleSessionHandlerTestCase extends AbstractMuleContextTestCase
 
     private class NotSerializableClass
     {
+
         public NotSerializableClass()
         {
             super();
         }
     }
-    
+
     private class NotSerializableSecurityContext implements SecurityContext
     {
+
         public NotSerializableSecurityContext()
         {
             super();
         }
-        
+
         public void setAuthentication(Authentication authentication)
         {
             // nothing to do
         }
 
-        public Authentication getAuthentication() 
+        public Authentication getAuthentication()
         {
             return null;
         }
     }
-    
+
 }

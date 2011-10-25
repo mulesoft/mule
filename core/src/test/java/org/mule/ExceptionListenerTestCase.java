@@ -10,28 +10,30 @@
 
 package org.mule;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.exception.AbstractExceptionStrategy;
 import org.mule.exception.DefaultMessagingExceptionStrategy;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Test;
+import org.mockito.Mockito;
 
-public class ExceptionListenerTestCase extends AbstractMuleContextTestCase
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+public class ExceptionListenerTestCase extends AbstractMuleTestCase
 {
+
     @Test
     public void testAddGoodEndpoint() throws Exception
     {
-        AbstractExceptionStrategy router = new DefaultMessagingExceptionStrategy(muleContext);
-        OutboundEndpoint endpoint = getTestOutboundEndpoint("test");
+        AbstractExceptionStrategy router = new DefaultMessagingExceptionStrategy(null);
+        OutboundEndpoint endpoint = Mockito.mock(OutboundEndpoint.class);
         router.addEndpoint(endpoint);
         assertNotNull(router.getMessageProcessors());
         assertTrue(router.getMessageProcessors().contains(endpoint));
@@ -41,16 +43,16 @@ public class ExceptionListenerTestCase extends AbstractMuleContextTestCase
     public void testSetGoodEndpoints() throws Exception
     {
         List<MessageProcessor> list = new ArrayList<MessageProcessor>();
-        list.add(getTestOutboundEndpoint("test"));
-        list.add(getTestOutboundEndpoint("test"));
-        
-        AbstractExceptionStrategy router = new DefaultMessagingExceptionStrategy(muleContext);
+        list.add(Mockito.mock(OutboundEndpoint.class));
+        list.add(Mockito.mock(OutboundEndpoint.class));
+
+        AbstractExceptionStrategy router = new DefaultMessagingExceptionStrategy(null);
         assertNotNull(router.getMessageProcessors());
         assertEquals(0, router.getMessageProcessors().size());
-        
-        router.addEndpoint(getTestOutboundEndpoint("test"));
+
+        router.addEndpoint(Mockito.mock(OutboundEndpoint.class));
         assertEquals(1, router.getMessageProcessors().size());
-        
+
         router.setMessageProcessors(list);
         assertNotNull(router.getMessageProcessors());
         assertEquals(2, router.getMessageProcessors().size());
