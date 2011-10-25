@@ -2200,13 +2200,17 @@
         </xsd:annotation>
     </xsd:element>
     <xsd:complexType name="processingStrategyType">
-        <xsd:attribute name="name" type="nonBlankString" use="required">
-            <xsd:annotation>
-                <xsd:documentation>
-                    The name used to identify the processing strategy.
-                </xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
+        <xsd:complexContent>
+            <xsd:extension base="annotatedType">
+                <xsd:attribute name="name" type="nonBlankString" use="required">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The name used to identify the processing strategy.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
     </xsd:complexType>
     
     <xsd:element name="asynchronous-processing-strategy" type="asynchronousProcessingStrategy" substitutionGroup="abstract-processing-strategy">
