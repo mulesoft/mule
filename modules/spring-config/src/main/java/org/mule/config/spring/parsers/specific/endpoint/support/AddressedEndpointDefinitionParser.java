@@ -22,9 +22,6 @@ import org.mule.config.spring.parsers.processors.CheckRequiredAttributes;
 import org.mule.endpoint.AbstractEndpointBuilder;
 import org.mule.endpoint.URIBuilder;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 /**
  * Combine a
  * {@link org.mule.config.spring.parsers.specific.endpoint.support.ChildAddressDefinitionParser} and
@@ -36,13 +33,11 @@ import org.apache.commons.logging.LogFactory;
  */
 public class AddressedEndpointDefinitionParser extends AbstractSingleParentFamilyDefinitionParser
 {
-
-    protected Log logger = LogFactory.getLog(getClass());
     public static final boolean META = ChildAddressDefinitionParser.META;
     public static final boolean PROTOCOL = ChildAddressDefinitionParser.PROTOCOL;
     public static final String PROPERTIES = "properties";
     public static final String[] RESTRICTED_ENDPOINT_ATTRIBUTES =
-            new String[]{MuleProperties.EXCHANGE_PATTERN, 
+            new String[]{MuleProperties.EXCHANGE_PATTERN,
                     AbstractEndpointBuilder.PROPERTY_RESPONSE_TIMEOUT, "encoding",
                     "connector", "createConnector", "transformer", "responseTransformer", "disableTransportTransformer", "mimeType"};
 
@@ -175,5 +170,4 @@ public class AddressedEndpointDefinitionParser extends AbstractSingleParentFamil
         }
 
     }
-
 }
