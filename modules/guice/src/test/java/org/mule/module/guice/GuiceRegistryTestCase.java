@@ -17,14 +17,16 @@ import com.google.inject.Guice;
 
 public class GuiceRegistryTestCase extends AbstractRegistryTestCase
 {
+
     @Override
     public Registry getRegistry()
     {
-        return new GuiceRegistry(Guice.createInjector(new EmptyModule()), muleContext);
+        return new GuiceRegistry(Guice.createInjector(new EmptyModule()), null);
     }
 
     class EmptyModule extends AbstractModule
     {
+
         @Override
         protected void configure()
         {

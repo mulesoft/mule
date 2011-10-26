@@ -16,6 +16,6 @@ public class CommonBehaviourTransientRegistryTestCase extends AbstractRegistryTe
     @Override
     public Registry getRegistry()
     {
-        return new TransientRegistry(muleContext);
+        return new TransientRegistry(null);
     }
 }
