@@ -16,7 +16,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertNotNull;
 
-public class MuleLogFactoryTest
+public class MuleLogFactoryTestCase
 {
 
     private MuleLogFactory mlf;

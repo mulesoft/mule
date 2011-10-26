@@ -16,7 +16,7 @@ import org.slf4j.Logger;
 
 import static org.junit.Assert.assertNotNull;
 
-public class MuleLoggerFactoryTest
+public class MuleLoggerFactoryTestCase
 {
 
     private MuleLoggerFactory mlf;

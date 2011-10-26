@@ -20,7 +20,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.stub;
 
-public class LoggerReferenceHandlerTest
+public class LoggerReferenceHandlerTestCase
 {
 
     private ReferenceQueue referenceQueue;
