@@ -41,7 +41,7 @@ public class XmppMultiUserChatConversation extends AbstractXmppConversation
         }
         else
         {
-            nickname = UUID.getUUID().toString();
+            nickname = UUID.getUUID();
         }
     }
 
