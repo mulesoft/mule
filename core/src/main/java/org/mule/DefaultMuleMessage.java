@@ -1910,17 +1910,17 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         newMessage.clearProperties(PropertyScope.INVOCATION);
         newMessage.clearProperties(PropertyScope.OUTBOUND);
 
-        for (String s : newInboundProperties.keySet())
+        for (Map.Entry<String, Object> s : newInboundProperties.entrySet())
         {
-            newMessage.setInboundProperty(s, newInboundProperties.get(s));
+            newMessage.setInboundProperty(s.getKey(), s.getValue());
         }
 
         newMessage.inboundAttachments.clear();
         newMessage.outboundAttachments.clear();
 
-        for (String s : attachments.keySet())
+        for (Map.Entry<String, DataHandler> s : attachments.entrySet())
         {
-            newMessage.addInboundAttachment(s, attachments.get(s));
+            newMessage.addInboundAttachment(s.getKey(), s.getValue());
         }
 
         newMessage.setCorrelationId(getCorrelationId());

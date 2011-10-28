@@ -312,11 +312,11 @@ public final class DefaultMuleSession implements MuleSession, DeserializationPos
         {
             this.properties.put(propertyKey, updatedSession.<Object>getProperty(propertyKey));
         }
-        for (String propertyKey : oldProperties.keySet())
+        for (Map.Entry<String, Object> property : oldProperties.entrySet())
         {
-            if (!this.properties.containsKey(propertyKey) && !(oldProperties.get(propertyKey) instanceof Serializable))
+            if (!this.properties.containsKey(property.getKey()) && !(oldProperties.get(property.getKey()) instanceof Serializable))
             {
-                this.properties.put(propertyKey, oldProperties.get(propertyKey));
+                this.properties.put(property.getKey(), oldProperties.get(property.getKey()));
             }
         }
     }

@@ -177,9 +177,9 @@ public class HttpMuleMessageFactory extends AbstractMuleMessageFactory
     {
         Map<String, Object> outHeaders = new HashMap<String, Object>();
 
-        for (String headerName : headers.keySet())
+        for (Map.Entry<String, Object> header : headers.entrySet())
         {
-            Object headerValue = headers.get(headerName);
+            String headerName = header.getKey();
 
             // fix Mule headers?
             if (headerName.startsWith("X-MULE"))
@@ -188,7 +188,7 @@ public class HttpMuleMessageFactory extends AbstractMuleMessageFactory
             }
 
             // accept header & value
-            outHeaders.put(headerName, headerValue);
+            outHeaders.put(headerName, header.getValue());
         }
 
         return outHeaders;
