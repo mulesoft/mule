@@ -56,10 +56,24 @@ public class MessageHeaderExpressionEvaluatorTestCase extends AbstractMuleContex
         assertEquals("foovalue", result);
     }
 
+    @Test
+    public void requiredHeaderWithExistingValueViaExpressionManagerShouldReturnValue()
+    {
+        Object result = muleContext.getExpressionManager().evaluate("#[header:foo]", message);
+        assertNotNull(result);
+        assertEquals("foovalue", result);
+    }
+
     @Test(expected = RequiredValueException.class)
     public void requiredHeaderWithMissingValueShouldFail()
     {
         evaluator.evaluate("nonexistent", message);
+    }
+
+    @Test(expected = RequiredValueException.class)
+    public void requiredHeaderWithMissingValueViaExpressionManagerShouldFail()
+    {
+        muleContext.getExpressionManager().evaluate("#[header:fool]", message);
     }
 
     @Test
@@ -79,9 +93,24 @@ public class MessageHeaderExpressionEvaluatorTestCase extends AbstractMuleContex
     }
 
     @Test
+    public void optionalHeaderWithExistingValueViaExpressionManagerShouldReturnValue()
+    {
+        Object result = muleContext.getExpressionManager().evaluate("#[header:foo?]", message);
+        assertNotNull(result);
+        assertEquals("foovalue", result);
+    }
+
+    @Test
     public void optionalHeaderWithMissingValueShouldReturnNull()
     {
-        Object result = evaluator.evaluate("fool?", message);
+        Object result = evaluator.evaluate("nonexistent?", message);
+        assertNull(result);
+    }
+
+    @Test
+    public void optionalHeaderWithMissingValueViaExpressionManagerShouldReturnNull()
+    {
+        Object result = muleContext.getExpressionManager().evaluate("#[header:nonexistent?]", message);
         assertNull(result);
     }
 

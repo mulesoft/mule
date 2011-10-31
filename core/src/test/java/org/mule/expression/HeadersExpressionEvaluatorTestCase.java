@@ -26,7 +26,6 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -47,38 +46,6 @@ public class HeadersExpressionEvaluatorTestCase extends AbstractMuleContextTestC
         props.put("foo", "foovalue");
         props.put("bar", "barvalue");
         props.put("baz", "bazvalue");
-    }
-
-    @Test
-    public void testSingleHeaderUsingManager() throws Exception
-    {
-        MuleMessage message = new DefaultMuleMessage("test", props, muleContext);
-
-        // Value required + found
-        Object result = muleContext.getExpressionManager().evaluate("#[header:foo]", message);
-        assertNotNull(result);
-        assertEquals("foovalue", result);
-
-        // Value not required + found
-        result = muleContext.getExpressionManager().evaluate("#[header:foo?]", message);
-        assertNotNull(result);
-        assertEquals("foovalue", result);
-
-        // Value not required + not found
-        result = muleContext.getExpressionManager().evaluate("#[header:fool?]", message);
-        assertNull(result);
-
-        // Value required + not found (throws exception)
-        try
-        {
-            muleContext.getExpressionManager().evaluate("#[header:fool]", message);
-            fail("Required value");
-        }
-        catch (ExpressionRuntimeException e)
-        {
-            //expected
-        }
-
     }
 
     @Test
