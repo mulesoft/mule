@@ -62,10 +62,29 @@ public class MessageHeadersListExpressionEvaluatorTestCase extends AbstractMuleC
         assertFalse(list.contains("barvalue"));
     }
 
+    @Test
+    public void requiredHeadersWithExistingValuesViaExpressionManagerShouldReturnValue()
+    {
+        Object result = muleContext.getExpressionManager().evaluate("#[headers-list:foo, baz]", message);
+        assertTrue(result instanceof List);
+
+        List<?> list = (List<?>) result;
+        assertEquals(2, list.size());
+        assertTrue(list.contains("foovalue"));
+        assertTrue(list.contains("bazvalue"));
+        assertFalse(list.contains("barvalue"));
+    }
+
     @Test(expected = RequiredValueException.class)
     public void requiredHeadersWithMissingValuesShouldFail()
     {
         evaluator.evaluate("nonexistent", message);
+    }
+
+    @Test(expected = RequiredValueException.class)
+    public void requiredHeadersWithMissingValuesViaExpressionManagerShouldFail()
+    {
+        muleContext.getExpressionManager().evaluate("#[headers-list:nonexistent]", message);
     }
 
     @Test
@@ -82,9 +101,33 @@ public class MessageHeadersListExpressionEvaluatorTestCase extends AbstractMuleC
     }
 
     @Test
+    public void optionalHeadersWithExistingValuesViaExpressionManagerShouldReturnValues()
+    {
+        Object result = muleContext.getExpressionManager().evaluate("#[headers-list:foo?, baz]", message);
+        assertTrue(result instanceof List);
+
+        List<?> list = (List<?>) result;
+        assertEquals(2, list.size());
+        assertTrue(list.contains("foovalue"));
+        assertTrue(list.contains("bazvalue"));
+        assertFalse(list.contains("barvalue"));
+
+    }
+
+    @Test
     public void optionalHeadersWithMissingValuesShouldReturnEmptyList() throws Exception
     {
         Object result = evaluator.evaluate("fool?", message);
+        assertTrue(result instanceof List);
+
+        List<?> list = (List<?>) result;
+        assertEquals(0, list.size());
+    }
+
+    @Test
+    public void optionalHeadersWithMissingValuesViaExpressionManagerShouldReturnEmptyList()
+    {
+        Object result = muleContext.getExpressionManager().evaluate("#[headers-list:nonexistent?]", message);
         assertTrue(result instanceof List);
 
         List<?> list = (List<?>) result;
@@ -147,6 +190,19 @@ public class MessageHeadersListExpressionEvaluatorTestCase extends AbstractMuleC
     }
 
     @Test
+    public void matchAllWildcardViaExpressionManagerShouldReturnAllHeaderValues()
+    {
+        Object result = muleContext.getExpressionManager().evaluate("#[headers-list:*]", message);
+        assertTrue(result instanceof List);
+
+        List<?> list = (List<?>) result;
+        assertEquals(3, list.size());
+        assertTrue(list.contains("foovalue"));
+        assertTrue(list.contains("bazvalue"));
+        assertTrue(list.contains("barvalue"));
+    }
+
+    @Test
     public void matchBeginningWildcardShouldReturnValues()
     {
         Object result = evaluator.evaluate("ba*", message);
@@ -156,6 +212,19 @@ public class MessageHeadersListExpressionEvaluatorTestCase extends AbstractMuleC
         assertEquals(2, list.size());
         assertTrue(list.contains("barvalue"));
         assertTrue(list.contains("bazvalue"));
+    }
+
+    @Test
+    public void matchBeginningWildcardViaExpressionManagerShouldReturnValues()
+    {
+        Object result = muleContext.getExpressionManager().evaluate("#[headers-list:ba*]", message);
+        assertTrue(result instanceof List);
+
+        List<?> list = (List<?>) result;
+        assertEquals(2, list.size());
+        assertFalse(list.contains("foovalue"));
+        assertTrue(list.contains("bazvalue"));
+        assertTrue(list.contains("barvalue"));
     }
 
     @Test
@@ -169,9 +238,32 @@ public class MessageHeadersListExpressionEvaluatorTestCase extends AbstractMuleC
     }
 
     @Test
+    public void wildcardWithNoMatchViaExpressionManagerShouldReturnEmptyList()
+    {
+        Object result = muleContext.getExpressionManager().evaluate("#[headers-list:x*]", message);
+        assertTrue(result instanceof List);
+
+        List<?> list = (List<?>) result;
+        assertEquals(0, list.size());
+    }
+
+    @Test
     public void multipleWildcardsShouldReturnValues() throws Exception
     {
         Object result = evaluator.evaluate("ba*, f*", message);
+        assertTrue(result instanceof List);
+
+        List<?> list = (List<?>) result;
+        assertEquals(3, list.size());
+        assertTrue(list.contains("foovalue"));
+        assertTrue(list.contains("bazvalue"));
+        assertTrue(list.contains("barvalue"));
+    }
+
+    @Test
+    public void multipleWildcardsViaExpressionManagerShouldReturnValues()
+    {
+        Object result = muleContext.getExpressionManager().evaluate("#[headers-list:ba*, f*]", message);
         assertTrue(result instanceof List);
 
         List<?> list = (List<?>) result;

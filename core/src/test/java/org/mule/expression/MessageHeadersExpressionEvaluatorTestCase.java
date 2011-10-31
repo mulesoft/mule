@@ -186,9 +186,35 @@ public class MessageHeadersExpressionEvaluatorTestCase extends AbstractMuleConte
     }
 
     @Test
+    public void matchAllWildcardViaExpressionManagerShouldReturnAllHeaderValues()
+    {
+        Object result = muleContext.getExpressionManager().evaluate("#[headers:*]", message);
+        assertTrue(result instanceof Map);
+
+        Map<?, ?> map = (Map<?, ?>)result;
+        assertEquals(3, map.size());
+        assertTrue(map.values().contains("foovalue"));
+        assertTrue(map.values().contains("bazvalue"));
+        assertTrue(map.values().contains("barvalue"));
+    }
+
+    @Test
     public void matchBeginningWildcardShouldReturnValues()
     {
         Object result = evaluator.evaluate("ba*", message);
+        assertTrue(result instanceof Map);
+
+        Map<?, ?> map = (Map<?, ?>)result;
+        assertEquals(2, map.size());
+        assertFalse(map.values().contains("foovalue"));
+        assertTrue(map.values().contains("bazvalue"));
+        assertTrue(map.values().contains("barvalue"));
+    }
+
+    @Test
+    public void matchBeginningWildcardViaExpressionManagerShouldReturnValues()
+    {
+        Object result = muleContext.getExpressionManager().evaluate("#[headers:ba*]", message);
         assertTrue(result instanceof Map);
 
         Map<?, ?> map = (Map<?, ?>)result;
@@ -209,9 +235,32 @@ public class MessageHeadersExpressionEvaluatorTestCase extends AbstractMuleConte
     }
 
     @Test
+    public void wildcardWithnoMatchViaExpressionManagerShouldReturnEmptyMap()
+    {
+        Object result = muleContext.getExpressionManager().evaluate("#[headers:x*]", message);
+        assertTrue(result instanceof Map);
+
+        Map<?, ?> map = (Map<?, ?>)result;
+        assertEquals(0, map.size());
+    }
+
+    @Test
     public void multipleWildcardsShouldReturnValues() throws Exception
     {
         Object result = evaluator.evaluate("ba*, f*", message);
+        assertTrue(result instanceof Map);
+
+        Map<?, ?> map = (Map<?, ?>)result;
+        assertEquals(3, map.size());
+        assertTrue(map.values().contains("foovalue"));
+        assertTrue(map.values().contains("bazvalue"));
+        assertTrue(map.values().contains("barvalue"));
+    }
+
+    @Test
+    public void multipleWildcardsViaExpressionManagerShouldReturnValues()
+    {
+        Object result = muleContext.getExpressionManager().evaluate("#[headers:ba*, f*]", message);
         assertTrue(result instanceof Map);
 
         Map<?, ?> map = (Map<?, ?>)result;

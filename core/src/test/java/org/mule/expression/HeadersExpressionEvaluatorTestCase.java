@@ -12,21 +12,17 @@ package org.mule.expression;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
-import org.mule.api.expression.ExpressionRuntimeException;
 import org.mule.routing.correlation.CorrelationPropertiesExpressionEvaluator;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.util.UUID;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 public class HeadersExpressionEvaluatorTestCase extends AbstractMuleContextTestCase
@@ -48,126 +44,7 @@ public class HeadersExpressionEvaluatorTestCase extends AbstractMuleContextTestC
         props.put("baz", "bazvalue");
     }
 
-    @Test
-    public void testMapHeadersWithWildcardsUsingManager() throws Exception
-    {
 
-        MuleMessage message = new DefaultMuleMessage("test", props, muleContext);
-
-        // All headers
-        Object result = muleContext.getExpressionManager().evaluate("#[headers:*]", message);
-        assertNotNull(result);
-        assertTrue(result instanceof Map);
-        assertEquals(3, ((Map)result).size());
-        assertTrue(((Map)result).values().contains("foovalue"));
-        assertTrue(((Map)result).values().contains("bazvalue"));
-        assertTrue(((Map)result).values().contains("barvalue"));
-
-        // Wildcard headers
-        result = muleContext.getExpressionManager().evaluate("#[headers:ba*]", message);
-        assertNotNull(result);
-        assertTrue(result instanceof Map);
-        assertEquals(2, ((Map)result).size());
-        assertFalse(((Map)result).values().contains("foovalue"));
-        assertTrue(((Map)result).values().contains("bazvalue"));
-        assertTrue(((Map)result).values().contains("barvalue"));
-
-        //Wildcard no match
-        result = muleContext.getExpressionManager().evaluate("#[headers:x*]", message);
-        assertNotNull(result);
-        assertTrue(result instanceof Map);
-        assertEquals(0, ((Map)result).size());
-
-        // comma-separated list of wildcards
-        result = muleContext.getExpressionManager().evaluate("#[headers:ba*, f*]", message);
-        assertNotNull(result);
-        assertTrue(result instanceof Map);
-        assertEquals(3, ((Map)result).size());
-        assertTrue(((Map)result).values().contains("foovalue"));
-        assertTrue(((Map)result).values().contains("bazvalue"));
-        assertTrue(((Map)result).values().contains("barvalue"));
-
-    }
-
-    @Test
-    public void testListHeadersUsingManager() throws Exception
-    {
-        MuleMessage message = new DefaultMuleMessage("test", props, muleContext);
-
-        // Value required + found
-        Object result = muleContext.getExpressionManager().evaluate("#[headers-list:foo, baz]", message);
-        assertNotNull(result);
-        assertTrue(result instanceof List);
-        assertEquals(2, ((List)result).size());
-        assertTrue(((List)result).contains("foovalue"));
-        assertTrue(((List)result).contains("bazvalue"));
-        assertFalse(((List)result).contains("barvalue"));
-
-        // Value not required + found
-        result = muleContext.getExpressionManager().evaluate("#[headers-list:foo?, baz]", message);
-        assertNotNull(result);
-        assertTrue(result instanceof List);
-        assertEquals(2, ((List)result).size());
-        assertTrue(((List)result).contains("foovalue"));
-        assertTrue(((List)result).contains("bazvalue"));
-        assertFalse(((List)result).contains("barvalue"));
-
-        // Value not required + not found
-        result = muleContext.getExpressionManager().evaluate("#[headers-list:fool?]", message);
-        assertNotNull(result);
-        assertTrue(result instanceof List);
-        assertEquals(0, ((List)result).size());
-
-        // Value required + not found (throws exception)
-        try
-        {
-            muleContext.getExpressionManager().evaluate("#[headers-list:fool]", message);
-            fail("Required value");
-        }
-        catch (ExpressionRuntimeException e)
-        {
-            //expected
-        }
-    }
-
-    @Test
-    public void testListHeadersWithWildCardsUsingManager() throws Exception
-    {
-        MuleMessage message = new DefaultMuleMessage("test", props, muleContext);
-
-        // All
-        Object result = muleContext.getExpressionManager().evaluate("#[headers-list:*]", message);
-        assertNotNull(result);
-        assertTrue(result instanceof List);
-        assertEquals(3, ((List)result).size());
-        assertTrue(((List)result).contains("foovalue"));
-        assertTrue(((List)result).contains("bazvalue"));
-        assertTrue(((List)result).contains("barvalue"));
-
-        // wildcard
-        result = muleContext.getExpressionManager().evaluate("#[headers-list:ba*]", message);
-        assertNotNull(result);
-        assertTrue(result instanceof List);
-        assertEquals(2, ((List)result).size());
-        assertFalse(((List)result).contains("foovalue"));
-        assertTrue(((List)result).contains("bazvalue"));
-        assertTrue(((List)result).contains("barvalue"));
-
-        // wildcard no match
-        result = muleContext.getExpressionManager().evaluate("#[headers-list:x*]", message);
-        assertNotNull(result);
-        assertTrue(result instanceof List);
-        assertEquals(0, ((List)result).size());
-
-        // Comma list of wildcards
-        result = muleContext.getExpressionManager().evaluate("#[headers-list:ba*, f*]", message);
-        assertNotNull(result);
-        assertTrue(result instanceof List);
-        assertEquals(3, ((List)result).size());
-        assertTrue(((List)result).contains("foovalue"));
-        assertTrue(((List)result).contains("bazvalue"));
-        assertTrue(((List)result).contains("barvalue"));
-    }
 
     @Test
     public void testCorrelationManagerCorrelationId()
