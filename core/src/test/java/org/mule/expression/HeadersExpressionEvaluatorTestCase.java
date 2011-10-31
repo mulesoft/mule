@@ -19,7 +19,6 @@ import org.mule.routing.correlation.CorrelationPropertiesExpressionEvaluator;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.util.UUID;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,6 +36,12 @@ public class HeadersExpressionEvaluatorTestCase extends AbstractMuleContextTestC
 {
     private Map<String, Object> props;
 
+    public HeadersExpressionEvaluatorTestCase()
+    {
+        super();
+        setDisposeContextPerClass(true);
+    }
+
     @Override
     public void doSetUp()
     {
@@ -46,98 +51,69 @@ public class HeadersExpressionEvaluatorTestCase extends AbstractMuleContextTestC
         props.put("baz", "bazvalue");
     }
 
-    @Test
-    public void testSingleHeader() throws Exception
-    {
-        MessageHeaderExpressionEvaluator eval = new MessageHeaderExpressionEvaluator();
-        MuleMessage message = new DefaultMuleMessage("test", props, muleContext);
-
-        // Value required + found
-        Object result = eval.evaluate("foo", message);
-        assertNotNull(result);
-        assertEquals("foovalue", result);
-
-        // Value not required + found
-        result = eval.evaluate("foo?", message);
-        assertNotNull(result);
-        assertEquals("foovalue", result);
-
-        // Value not required + not found
-        result = eval.evaluate("fool?", message);
-        assertNull(result);
-
-        // Value required + not found (throws exception)
-        try
-        {
-            eval.evaluate("fool", message);
-            fail("required value");
-        }
-        catch (Exception e)
-        {
-            //Expected
-        }
-
-        ((DefaultMuleMessage) message).addInboundProperties(Collections.singletonMap("testProp", (Object) "value"));
-        result = eval.evaluate("testProp?", message);
-        assertNull(result);
-
-        result = eval.evaluate("INBOUND:testProp", message);
-        assertEquals("value", result);
-    }
 
     @Test
-    public void testMapHeaders() throws Exception
+    public void requiredMapHeadersWithExitingValueShouldReturnValue()
     {
         MessageHeadersExpressionEvaluator eval = new MessageHeadersExpressionEvaluator();
+        MuleMessage message = new DefaultMuleMessage(TEST_MESSAGE, props, muleContext);
 
-        MuleMessage message = new DefaultMuleMessage("test", props, muleContext);
-
-        // Value required + found
         Object result = eval.evaluate("foo, baz", message);
-        assertNotNull(result);
         assertTrue(result instanceof Map);
-        assertEquals(2, ((Map)result).size());
-        assertTrue(((Map)result).values().contains("foovalue"));
-        assertTrue(((Map)result).values().contains("bazvalue"));
-        assertFalse(((Map)result).values().contains("barvalue"));
 
-        // Value not required + found
-        result = eval.evaluate("foo?, baz", message);
-        assertNotNull(result);        
-        assertTrue(result instanceof Map);
-        assertEquals(2, ((Map)result).size());
-        assertTrue(((Map)result).values().contains("foovalue"));
-        assertTrue(((Map)result).values().contains("bazvalue"));
-        assertFalse(((Map)result).values().contains("barvalue"));
-        
-        // Value not required + not found
-        result = eval.evaluate("fool?", message);
-        assertNotNull(result);
-        assertTrue(result instanceof Map);
-        assertEquals(0, ((Map)result).size());
-
-        // Value required + not found (throws exception)
-        try
-        {
-            eval.evaluate("fool", message);
-            fail("required value");
-        }
-        catch (Exception e)
-        {
-            //Expected
-        }
-
-        //Test all
-        result = eval.evaluate("*", message);
-        assertNotNull(result);
-        assertTrue(result instanceof Map);
-        assertEquals(3, ((Map)result).size());
-        assertTrue(((Map)result).values().contains("foovalue"));
-        assertTrue(((Map)result).values().contains("bazvalue"));
-        assertTrue(((Map)result).values().contains("barvalue"));
+        Map<?, ?> map = (Map<?, ?>)result;
+        assertEquals(2, map.size());
+        assertTrue(map.values().contains("foovalue"));
+        assertTrue(map.values().contains("bazvalue"));
+        assertFalse(map.values().contains("barvalue"));
     }
 
-@Test
+    @Test
+    public void optionalMapHeadersWithExistingValuesShouldReturnValues()
+    {
+        MessageHeadersExpressionEvaluator eval = new MessageHeadersExpressionEvaluator();
+        MuleMessage message = new DefaultMuleMessage(TEST_MESSAGE, props, muleContext);
+
+        Object result = eval.evaluate("foo?, baz", message);
+        assertTrue(result instanceof Map);
+
+        Map<?, ?> map = (Map<?, ?>)result;
+        assertEquals(2, map.size());
+        assertTrue(map.values().contains("foovalue"));
+        assertTrue(map.values().contains("bazvalue"));
+        assertFalse(map.values().contains("barvalue"));
+    }
+
+    @Test
+    public void optionalMapHeaderWithMissingValueShouldReturnEmptyMap()
+    {
+        MessageHeadersExpressionEvaluator eval = new MessageHeadersExpressionEvaluator();
+        MuleMessage message = new DefaultMuleMessage(TEST_MESSAGE, props, muleContext);
+
+        Object result = eval.evaluate("fool?", message);
+        assertTrue(result instanceof Map);
+
+        Map<?, ?> map = (Map<?, ?>)result;
+        assertEquals(0, map.size());
+    }
+
+    @Test
+    public void wildcardMapHeadersShouldReturnAllHeaderValues() throws Exception
+    {
+        MessageHeadersExpressionEvaluator eval = new MessageHeadersExpressionEvaluator();
+        MuleMessage message = new DefaultMuleMessage(TEST_MESSAGE, props, muleContext);
+
+        Object result = eval.evaluate("*", message);
+        assertTrue(result instanceof Map);
+
+        Map<?, ?> map = (Map<?, ?>)result;
+        assertEquals(3, map.size());
+        assertTrue(map.values().contains("foovalue"));
+        assertTrue(map.values().contains("bazvalue"));
+        assertTrue(map.values().contains("barvalue"));
+    }
+
+    @Test
     public void testHeadersWithScopes() throws Exception
     {
         MessageHeadersExpressionEvaluator eval = new MessageHeadersExpressionEvaluator();
@@ -229,7 +205,7 @@ public class HeadersExpressionEvaluatorTestCase extends AbstractMuleContextTestC
         assertTrue(((List)result).contains("foovalue"));
         assertTrue(((List)result).contains("bazvalue"));
         // redundant since we already know that the map is of size 2
-        assertFalse(((List)result).contains("barvalue"));        
+        assertFalse(((List)result).contains("barvalue"));
 
         // Value not required + not found
         result = eval.evaluate("fool?", message);
@@ -381,7 +357,7 @@ public class HeadersExpressionEvaluatorTestCase extends AbstractMuleContextTestC
         assertTrue(((Map)result).values().contains("bazvalue"));
         assertTrue(((Map)result).values().contains("barvalue"));
     }
-    
+
     @Test
     public void testSingleHeaderUsingManager() throws Exception
     {
@@ -437,7 +413,7 @@ public class HeadersExpressionEvaluatorTestCase extends AbstractMuleContextTestC
         assertTrue(((Map)result).values().contains("foovalue"));
         assertTrue(((Map)result).values().contains("bazvalue"));
         assertFalse(((Map)result).values().contains("barvalue"));
-        
+
         // Value not required + not found
         result = muleContext.getExpressionManager().evaluate("#[headers:fool?]", message);
         assertNotNull(result);
@@ -519,7 +495,7 @@ public class HeadersExpressionEvaluatorTestCase extends AbstractMuleContextTestC
         assertEquals(2, ((List)result).size());
         assertTrue(((List)result).contains("foovalue"));
         assertTrue(((List)result).contains("bazvalue"));
-        assertFalse(((List)result).contains("barvalue"));        
+        assertFalse(((List)result).contains("barvalue"));
 
         // Value not required + not found
         result = muleContext.getExpressionManager().evaluate("#[headers-list:fool?]", message);
@@ -577,29 +553,29 @@ public class HeadersExpressionEvaluatorTestCase extends AbstractMuleContextTestC
         assertTrue(((List)result).contains("bazvalue"));
         assertTrue(((List)result).contains("barvalue"));
     }
-    
+
     @Test
     public void testCorrelationManagerCorrelationId()
     {
         CorrelationPropertiesExpressionEvaluator evaluator = new CorrelationPropertiesExpressionEvaluator();
         String correlationId = UUID.getUUID();
-        
+
         MuleMessage message = new DefaultMuleMessage("test", props, muleContext);
         message.setCorrelationId(correlationId);
-        
+
         Object result = evaluator.evaluate(MuleProperties.MULE_CORRELATION_ID_PROPERTY, message);
         assertNotNull(result);
         assertEquals(correlationId, result);
     }
-    
+
     @Test
     public void testCorrelationManagerNullResult()
     {
         CorrelationPropertiesExpressionEvaluator evaluator = new CorrelationPropertiesExpressionEvaluator();
-        
+
         DefaultMuleMessage message = new DefaultMuleMessage("test", props, muleContext);
         message.setUniqueId(null);
-        
+
         try
         {
             evaluator.evaluate(MuleProperties.MULE_CORRELATION_ID_PROPERTY, message);
@@ -609,26 +585,26 @@ public class HeadersExpressionEvaluatorTestCase extends AbstractMuleContextTestC
         {
             // this one was expected
         }
-    }    
-    
+    }
+
     @Test
     public void testCorrelationManagerUniqueId()
     {
         CorrelationPropertiesExpressionEvaluator evaluator = new CorrelationPropertiesExpressionEvaluator();
-        
-        MuleMessage message = new DefaultMuleMessage("test", props, muleContext);        
+
+        MuleMessage message = new DefaultMuleMessage("test", props, muleContext);
         Object result = evaluator.evaluate(MuleProperties.MULE_MESSAGE_ID_PROPERTY, message);
         assertNotNull(result);
         assertEquals(message.getUniqueId(), result);
     }
-    
+
 //    @Test
 //    public void testCorrelationManagerNullInput()
 //    {
 //        CorrelationPropertiesExpressionEvaluator evaluator = new CorrelationPropertiesExpressionEvaluator();
 //        evaluator.evaluate(MuleProperties.MULE_CORRELATION_ID_PROPERTY, null);
 //    }
-    
+
     @Test
     public void testCorrelationManagerInvalidKey()
     {
