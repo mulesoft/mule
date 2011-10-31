@@ -61,6 +61,12 @@ public class MessageHeadersExpressionEvaluatorTestCase extends AbstractMuleConte
         assertFalse(map.values().contains("barvalue"));
     }
 
+    @Test(expected = RequiredValueException.class)
+    public void requiredHeadersWithMissingValuesShouldFail()
+    {
+        evaluator.evaluate("OUTBOUND:foo, baz, faz", message);
+    }
+
     @Test
     public void optionalHeadersWithExistingValuesShouldReturnValues()
     {
@@ -82,19 +88,6 @@ public class MessageHeadersExpressionEvaluatorTestCase extends AbstractMuleConte
 
         Map<?, ?> map = (Map<?, ?>)result;
         assertEquals(0, map.size());
-    }
-
-    @Test
-    public void wildcardMapHeadersShouldReturnAllHeaderValues() throws Exception
-    {
-        Object result = evaluator.evaluate("*", message);
-        assertTrue(result instanceof Map);
-
-        Map<?, ?> map = (Map<?, ?>)result;
-        assertEquals(3, map.size());
-        assertTrue(map.values().contains("foovalue"));
-        assertTrue(map.values().contains("bazvalue"));
-        assertTrue(map.values().contains("barvalue"));
     }
 
     @Test
@@ -137,9 +130,52 @@ public class MessageHeadersExpressionEvaluatorTestCase extends AbstractMuleConte
         assertTrue(map.values().contains("fazvalue"));
     }
 
-    @Test(expected = RequiredValueException.class)
-    public void requiredHeadersWithMissingValuesShouldFail()
+    @Test
+    public void matchAllWildcardShouldReturnAllHeaderValues() throws Exception
     {
-        evaluator.evaluate("OUTBOUND:foo, baz, faz", message);
+        Object result = evaluator.evaluate("*", message);
+        assertTrue(result instanceof Map);
+
+        Map<?, ?> map = (Map<?, ?>)result;
+        assertEquals(3, map.size());
+        assertTrue(map.values().contains("foovalue"));
+        assertTrue(map.values().contains("bazvalue"));
+        assertTrue(map.values().contains("barvalue"));
+    }
+
+    @Test
+    public void matchBeginningWildcardShouldReturnValues()
+    {
+        Object result = evaluator.evaluate("ba*", message);
+        assertTrue(result instanceof Map);
+
+        Map<?, ?> map = (Map<?, ?>)result;
+        assertEquals(2, map.size());
+        assertFalse(map.values().contains("foovalue"));
+        assertTrue(map.values().contains("bazvalue"));
+        assertTrue(map.values().contains("barvalue"));
+    }
+
+    @Test
+    public void wildcardWithNoMatchShouldReturnEmptyMap()
+    {
+        Object result = evaluator.evaluate("x*", message);
+        assertTrue(result instanceof Map);
+
+        Map<?, ?> map = (Map<?, ?>)result;
+        assertEquals(0, map.size());
+    }
+
+    @Test
+    public void multipleWildcardsShouldReturnValues() throws Exception
+    {
+        Object result = evaluator.evaluate("ba*, f*", message);
+        assertTrue(result instanceof Map);
+
+        Map<?, ?> map = (Map<?, ?>)result;
+        assertEquals(3, map.size());
+        assertTrue(map.values().contains("foovalue"));
+        assertTrue(map.values().contains("bazvalue"));
+        assertTrue(map.values().contains("barvalue"));
     }
 }

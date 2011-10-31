@@ -50,47 +50,6 @@ public class HeadersExpressionEvaluatorTestCase extends AbstractMuleContextTestC
     }
 
     @Test
-    public void testMapHeadersWithWildcards() throws Exception
-    {
-        MessageHeadersExpressionEvaluator eval = new MessageHeadersExpressionEvaluator();
-
-        MuleMessage message = new DefaultMuleMessage("test", props, muleContext);
-
-        //Test all
-        Object result = eval.evaluate("*", message);
-        assertNotNull(result);
-        assertTrue(result instanceof Map);
-        assertEquals(3, ((Map)result).size());
-        assertTrue(((Map)result).values().contains("foovalue"));
-        assertTrue(((Map)result).values().contains("bazvalue"));
-        assertTrue(((Map)result).values().contains("barvalue"));
-
-        // Wildcard
-        result = eval.evaluate("ba*", message);
-        assertNotNull(result);
-        assertTrue(result instanceof Map);
-        assertEquals(2, ((Map)result).size());
-        assertFalse(((Map)result).values().contains("foovalue"));
-        assertTrue(((Map)result).values().contains("bazvalue"));
-        assertTrue(((Map)result).values().contains("barvalue"));
-
-        // Wildcard no match
-        result = eval.evaluate("x*", message);
-        assertNotNull(result);
-        assertTrue(result instanceof Map);
-        assertEquals(0, ((Map)result).size());
-
-        //Test comma separated list of wildcards
-        result = eval.evaluate("ba*, f*", message);
-        assertNotNull(result);
-        assertTrue(result instanceof Map);
-        assertEquals(3, ((Map)result).size());
-        assertTrue(((Map)result).values().contains("foovalue"));
-        assertTrue(((Map)result).values().contains("bazvalue"));
-        assertTrue(((Map)result).values().contains("barvalue"));
-    }
-
-    @Test
     public void testSingleHeaderUsingManager() throws Exception
     {
         MuleMessage message = new DefaultMuleMessage("test", props, muleContext);
