@@ -49,49 +49,6 @@ public class HeadersExpressionEvaluatorTestCase extends AbstractMuleContextTestC
     }
 
     @Test
-    public void testMapHeadersUsingManager() throws Exception
-    {
-
-        MuleMessage message = new DefaultMuleMessage("test", props, muleContext);
-
-        // Value required + found
-        Object result = muleContext.getExpressionManager().evaluate("#[headers:foo, baz]", message);
-        assertNotNull(result);
-        assertTrue(result instanceof Map);
-        assertEquals(2, ((Map)result).size());
-        assertTrue(((Map)result).values().contains("foovalue"));
-        assertTrue(((Map)result).values().contains("bazvalue"));
-        assertFalse(((Map)result).values().contains("barvalue"));
-
-        // Value not required + found
-        result = muleContext.getExpressionManager().evaluate("#[headers:foo?, baz]", message);
-        assertNotNull(result);
-        assertTrue(result instanceof Map);
-        assertEquals(2, ((Map)result).size());
-        assertTrue(((Map)result).values().contains("foovalue"));
-        assertTrue(((Map)result).values().contains("bazvalue"));
-        assertFalse(((Map)result).values().contains("barvalue"));
-
-        // Value not required + not found
-        result = muleContext.getExpressionManager().evaluate("#[headers:fool?]", message);
-        assertNotNull(result);
-        assertTrue(result instanceof Map);
-        assertEquals(0, ((Map)result).size());
-
-        // Value required + not found (throws exception)
-        try
-        {
-            muleContext.getExpressionManager().evaluate("#[headers:fool]", message);
-            fail("Required value");
-        }
-        catch (ExpressionRuntimeException e)
-        {
-            //expected
-        }
-
-    }
-
-    @Test
     public void testMapHeadersWithWildcardsUsingManager() throws Exception
     {
 

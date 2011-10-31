@@ -61,10 +61,29 @@ public class MessageHeadersExpressionEvaluatorTestCase extends AbstractMuleConte
         assertFalse(map.values().contains("barvalue"));
     }
 
+    @Test
+    public void requiredHeadersWithExistingValuesViaExpressionManagerShouldReturnValues()
+    {
+        Object result = muleContext.getExpressionManager().evaluate("#[headers:foo, baz]", message);
+        assertTrue(result instanceof Map);
+
+        Map<?, ?> map = (Map<?, ?>)result;
+        assertEquals(2, map.size());
+        assertTrue(map.values().contains("foovalue"));
+        assertTrue(map.values().contains("bazvalue"));
+        assertFalse(map.values().contains("barvalue"));
+    }
+
     @Test(expected = RequiredValueException.class)
     public void requiredHeadersWithMissingValuesShouldFail()
     {
         evaluator.evaluate("OUTBOUND:foo, baz, faz", message);
+    }
+
+    @Test(expected = RequiredValueException.class)
+    public void requiredHeadersWithMissingValuesViaExpressionManagerShouldFail()
+    {
+        muleContext.getExpressionManager().evaluate("#[headers:nonexistent]", message);
     }
 
     @Test
@@ -81,9 +100,32 @@ public class MessageHeadersExpressionEvaluatorTestCase extends AbstractMuleConte
     }
 
     @Test
+    public void optionalHeadersWithExistingValuesViaExpressionManagerShouldReturnValues()
+    {
+        Object result = muleContext.getExpressionManager().evaluate("#[headers:foo?, baz]", message);
+        assertTrue(result instanceof Map);
+
+        Map<?, ?> map = (Map<?, ?>)result;
+        assertEquals(2, map.size());
+        assertTrue(map.values().contains("foovalue"));
+        assertTrue(map.values().contains("bazvalue"));
+        assertFalse(map.values().contains("barvalue"));
+    }
+
+    @Test
     public void optionalHeadersWithMissingValuesShouldReturnEmptyMap()
     {
         Object result = evaluator.evaluate("fool?", message);
+        assertTrue(result instanceof Map);
+
+        Map<?, ?> map = (Map<?, ?>)result;
+        assertEquals(0, map.size());
+    }
+
+    @Test
+    public void optionalHeadersWithMissingValuesViaExpressionManagerShouldReturnEmptyMap()
+    {
+        Object result = muleContext.getExpressionManager().evaluate("#[headers:nonexistent?]", message);
         assertTrue(result instanceof Map);
 
         Map<?, ?> map = (Map<?, ?>)result;
