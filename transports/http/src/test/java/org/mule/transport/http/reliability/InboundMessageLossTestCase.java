@@ -10,14 +10,43 @@
 
 package org.mule.transport.http.reliability;
 
+import org.mule.DefaultMuleEvent;
+import org.mule.DefaultMuleMessage;
+import org.mule.MessageExchangePattern;
+import org.mule.api.ExceptionPayload;
+import org.mule.api.MessagingException;
+import org.mule.api.MuleContext;
+import org.mule.api.MuleEvent;
+import org.mule.api.MuleException;
+import org.mule.api.MuleMessage;
+import org.mule.api.MuleSession;
+import org.mule.api.construct.FlowConstruct;
+import org.mule.api.exception.RollbackSourceCallback;
+import org.mule.api.security.Credentials;
+import org.mule.api.transformer.DataType;
+import org.mule.api.transformer.Transformer;
+import org.mule.api.transformer.TransformerException;
+import org.mule.api.transport.PropertyScope;
+import org.mule.api.transport.ReplyToHandler;
+import org.mule.exception.AbstractMessagingExceptionStrategy;
 import org.mule.exception.DefaultSystemExceptionStrategy;
+import org.mule.management.stats.ProcessingTime;
+import org.mule.message.DefaultExceptionPayload;
 import org.mule.routing.filters.WildcardFilter;
 import org.mule.tck.DynamicPortTestCase;
+import org.mule.transport.NullPayload;
 import org.mule.transport.http.HttpConstants;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethodBase;
 import org.apache.commons.httpclient.methods.GetMethod;
+
+import javax.activation.DataHandler;
+import java.io.OutputStream;
+import java.net.URI;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Verify that no inbound messages are lost when exceptions occur.  
@@ -61,7 +90,23 @@ public class InboundMessageLossTestCase extends DynamicPortTestCase
         assertEquals(HttpConstants.SC_INTERNAL_SERVER_ERROR, status);
         assertTrue(request.getResponseBodyAsString().contains("Failure"));
     }
-    
+
+    public void testHandledTransformerException() throws Exception
+    {
+        HttpMethodBase request = createRequest(getBaseUri() + "/handledTransformerException");
+        int status = httpClient.executeMethod(request);
+        assertEquals(HttpConstants.SC_OK, status);
+        assertTrue(request.getResponseBodyAsString().contains("Success"));
+    }
+
+    public void testNotHandledTransformerException() throws Exception
+    {
+        HttpMethodBase request = createRequest(getBaseUri() + "/notHandledTransformerException");
+        int status = httpClient.executeMethod(request);
+        assertEquals(HttpConstants.SC_INTERNAL_SERVER_ERROR, status);
+        assertTrue(request.getResponseBodyAsString().contains("Bad news"));
+    }
+
     public void testRouterException() throws Exception
     {
         HttpMethodBase request = createRequest(getBaseUri() + "/routerException");
@@ -94,5 +139,44 @@ public class InboundMessageLossTestCase extends DynamicPortTestCase
     protected int getNumPortsToFind()
     {
         return 1;
+    }
+
+    /**
+     * Custom Exception Handler that handles an exception
+     */
+    public static class Handler extends AbstractMessagingExceptionStrategy
+    {
+        public Handler(MuleContext muleContext)
+        {
+            super(muleContext);
+        }
+
+        @Override
+        public MuleEvent handleException(Exception ex, MuleEvent event, RollbackSourceCallback rollbackMethod)
+        {
+            doHandleException(ex, event, rollbackMethod);
+            return new DefaultMuleEvent(new DefaultMuleMessage("Success!", muleContext), event);
+        }
+    }
+
+    /**
+     * Custom Exception Handler that creates a different exception
+     */
+    public static class BadHandler extends AbstractMessagingExceptionStrategy
+    {
+        public BadHandler(MuleContext muleContext)
+        {
+            super(muleContext);
+        }
+
+        @Override
+        public MuleEvent handleException(Exception ex, MuleEvent event, RollbackSourceCallback rollbackMethod)
+        {
+            doHandleException(ex, event, rollbackMethod);
+            DefaultMuleMessage message = new DefaultMuleMessage(NullPayload.getInstance(), muleContext);
+            message.setExceptionPayload(
+                new DefaultExceptionPayload(new MessagingException(event, new RuntimeException("Bad news!"))));
+            return new DefaultMuleEvent(message, event);
+        }
     }
 }

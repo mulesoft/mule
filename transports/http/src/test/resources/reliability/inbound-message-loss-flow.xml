@@ -32,7 +32,26 @@
     <flow name="ComponentException">
         <http:inbound-endpoint address="http://localhost:${port1}/componentException" />
         <test:component throwException="true">
-        	<test:return-data>Here you go</test:return-data>
+            <test:return-data>Here you go</test:return-data>
         </test:component>
+    </flow>
+    <flow name="HandledTransformerException">
+        <http:inbound-endpoint address="http://localhost:${port1}/handledTransformerException" />
+        <custom-transformer class="org.mule.tck.testmodels.mule.FailingTransformer" />
+        <test:component>
+            <test:return-data>Here you go</test:return-data>
+        </test:component>
+        <custom-exception-strategy
+                class="org.mule.transport.http.reliability.InboundMessageLossTestCase$Handler"/>
+    </flow>
+
+    <flow name="FailToHandledTransformerException">
+        <http:inbound-endpoint address="http://localhost:${port1}/notHandledTransformerException" />
+        <custom-transformer class="org.mule.tck.testmodels.mule.FailingTransformer" />
+        <test:component>
+            <test:return-data>Here you go</test:return-data>
+        </test:component>
+        <custom-exception-strategy
+                class="org.mule.transport.http.reliability.InboundMessageLossTestCase$BadHandler"/>
     </flow>
 </mule>

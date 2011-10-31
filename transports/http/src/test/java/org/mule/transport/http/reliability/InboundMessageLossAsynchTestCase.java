@@ -37,7 +37,14 @@ public class InboundMessageLossAsynchTestCase extends InboundMessageLossTestCase
         int status = httpClient.executeMethod(request);
         assertEquals(HttpConstants.SC_OK, status);
     }
-    
+
+    @Override
+    public void testHandledTransformerException() throws Exception
+    {
+        HttpMethodBase request = createRequest(getBaseUri() + "/handledTransformerException");
+        int status = httpClient.executeMethod(request);
+        assertEquals(HttpConstants.SC_OK, status);    }
+
     public void testComponentException() throws Exception
     {
         HttpMethodBase request = createRequest(getBaseUri() + "/componentException");
