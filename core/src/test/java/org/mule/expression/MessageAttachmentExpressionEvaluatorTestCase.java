@@ -10,51 +10,15 @@
 
 package org.mule.expression;
 
-import org.mule.DefaultMuleMessage;
-import org.mule.api.MuleMessage;
 import org.mule.api.expression.RequiredValueException;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
-import org.mule.util.StringDataSource;
-
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.activation.DataHandler;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 
-public class MessageAttachmentExpressionEvaluatorTestCase extends AbstractMuleContextTestCase
+public class MessageAttachmentExpressionEvaluatorTestCase extends AbstractAttachmentsTestCase
 {
     private MessageAttachmentExpressionEvaluator evaluator = new MessageAttachmentExpressionEvaluator();
-    private MuleMessage message;
-
-    public MessageAttachmentExpressionEvaluatorTestCase()
-    {
-        super();
-        setDisposeContextPerClass(true);
-    }
-
-    @Override
-    protected void doSetUp() throws Exception
-    {
-        Map<String, DataHandler> attachments = createAttachmentsMap();
-        message = new DefaultMuleMessage(TEST_MESSAGE, null, attachments, muleContext);
-    }
-
-    private Map<String, DataHandler> createAttachmentsMap()
-    {
-        Map<String, DataHandler> attachments = new HashMap<String, DataHandler>();
-        attachments.put("foo", new DataHandler(new StringDataSource("foovalue")));
-        attachments.put("bar", new DataHandler(new StringDataSource("barvalue")));
-        attachments.put("baz", new DataHandler(new StringDataSource("bazvalue")));
-        return attachments;
-    }
 
     @Test
     public void requiredKeyWithExistingAttachmentShouldReturnAttachment() throws Exception
@@ -108,15 +72,5 @@ public class MessageAttachmentExpressionEvaluatorTestCase extends AbstractMuleCo
     {
         Object result = muleContext.getExpressionManager().evaluate("#[attachment:nonexistent?]", message);
         assertNull(result);
-    }
-
-    private void assertAttachmentValueEquals(String expected, Object attachment) throws IOException
-    {
-        assertTrue(attachment instanceof DataHandler);
-        DataHandler dataHandler = (DataHandler) attachment;
-
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        dataHandler.writeTo(baos);
-        assertEquals(expected, baos.toString());
     }
 }
