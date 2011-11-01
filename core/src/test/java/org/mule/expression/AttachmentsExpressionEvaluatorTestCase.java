@@ -26,7 +26,6 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -50,41 +49,6 @@ public class AttachmentsExpressionEvaluatorTestCase extends AbstractMuleContextT
         {
             e.printStackTrace();
             fail(e.getMessage());
-        }
-    }
-
-    @Test
-    public void testSingleAttachment() throws Exception
-    {
-        MessageAttachmentExpressionEvaluator eval = new MessageAttachmentExpressionEvaluator();
-
-        Object result = eval.evaluate("foo", message);
-        assertNotNull(result);
-        assertTrue(result instanceof DataHandler);
-        ByteArrayOutputStream baos = new ByteArrayOutputStream(4);
-        ((DataHandler)result).writeTo(baos);
-        assertEquals("foovalue", baos.toString());
-        
-        // Value not required + found
-        result = eval.evaluate("foo?", message);
-        assertNotNull(result);
-        assertTrue(result instanceof DataHandler);
-        baos = new ByteArrayOutputStream(4);
-        ((DataHandler)result).writeTo(baos);
-        assertEquals("foovalue", baos.toString());
-        
-        // Value not required + not found
-        result = eval.evaluate("fool?", message);
-        assertNull(result);
-
-        try
-        {
-            eval.evaluate("fool", message);
-            fail("required value");
-        }
-        catch (Exception e)
-        {
-            //Expected
         }
     }
 
@@ -240,30 +204,6 @@ public class AttachmentsExpressionEvaluatorTestCase extends AbstractMuleContextT
         assertNotNull(result);
         assertTrue(result instanceof List);
         assertEquals(3, ((List)result).size());
-    }
-
-    @Test
-    public void testSingleAttachmentUsingManager() throws Exception
-    {
-        Object result = muleContext.getExpressionManager().evaluate("#[attachment:foo]", message);
-        assertNotNull(result);
-        assertTrue(result instanceof DataHandler);
-        ByteArrayOutputStream baos = new ByteArrayOutputStream(4);
-        ((DataHandler)result).writeTo(baos);
-        assertEquals("foovalue", baos.toString());
-
-        result = muleContext.getExpressionManager().evaluate("#[attachment:fool?]", message);
-        assertNull(result);
-
-        try
-        {
-            muleContext.getExpressionManager().evaluate("#[attachment:fool]", message);
-            fail("Required value");
-        }
-        catch (ExpressionRuntimeException e)
-        {
-            //expected
-        }
     }
 
     @Test
