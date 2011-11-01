@@ -21,80 +21,76 @@ import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-import static org.mockito.Mockito.mock;
 
 public class MapPayloadExpressionEvaluatorTestCase extends AbstractMuleTestCase
 {
-
-    private Map<String, String> props = new HashMap<String, String>(3);
-    private MuleContext muleContext = mock(MuleContext.class);
+    private MuleContext muleContext = Mockito.mock(MuleContext.class);
+    private Map<String, String> messageProperties = new HashMap<String, String>(3);
+    private MapPayloadExpressionEvaluator evaluator = new MapPayloadExpressionEvaluator();
+    private MuleMessage message;
 
     @Before
-    public void setUpProperties()
+    public void createMessagePropertiesAndMuleMessage() throws Exception
     {
-        props.clear();
-        props.put("foo", "moo");
-        props.put("bar", "mar");
-        props.put("ba?z", "maz");
+        messageProperties.put("foo", "moo");
+        messageProperties.put("bar", "mar");
+        messageProperties.put("ba?z", "maz");
+
+        message = new DefaultMuleMessage(messageProperties, muleContext);
     }
 
     @Test
-    public void testExpressions() throws Exception
+    public void requiredKeyWithExistingValueShouldReturnValue()
     {
-        MapPayloadExpressionEvaluator eval = new MapPayloadExpressionEvaluator();
-        MuleMessage message = new DefaultMuleMessage(props, (Map) null, muleContext);
-
-        // direct match
-        Object result = eval.evaluate("foo", message);
+        Object result = evaluator.evaluate("foo", message);
         assertEquals("moo", result);
-
-        // direct match, optional
-        result = eval.evaluate("bar?", message);
-        assertEquals("mar", result);
-
-        // direct match with * inline
-        result = eval.evaluate("ba?z", message);
-        assertEquals("maz", result);
-
-        // no match, optional
-        result = eval.evaluate("fool?", message);
-        assertNull(result);
-
-        try
-        {
-            // no match, required
-            eval.evaluate("fool", message);
-            fail("Should've failed with an exception.");
-        }
-        catch (RequiredValueException rex)
-        {
-            // expected
-            assertTrue(rex.getMessage().contains("fool"));
-        }
     }
-    
+
     @Test
-    public void testMultipleExpressions() throws Exception
+    public void requiredKeyWithOptionalityMarkerInlineAndExistingValueShouldReturnValue()
     {
-        MapPayloadExpressionEvaluator eval = new MapPayloadExpressionEvaluator();
-        MuleMessage message = new DefaultMuleMessage(props, (Map) null, muleContext);
+        Object result = evaluator.evaluate("ba?z", message);
+        assertEquals("maz", result);
+    }
 
+    @Test(expected = RequiredValueException.class)
+    public void requireKeyWithMissingValueShouldFail()
+    {
+        evaluator.evaluate("nonexisting", message);
+    }
+
+    @Test
+    public void optionalKeyWithExistingValueShouldReturnValue()
+    {
+        Object result = evaluator.evaluate("bar?", message);
+        assertEquals("mar", result);
+    }
+
+    @Test
+    public void optionalKeyWithMissingValueShouldReturnNull()
+    {
+        Object result = evaluator.evaluate("nonexistent?", message);
+        assertNull(result);
+    }
+
+    @Test
+    public void multipleExpressionsShouldReturnMultipleValues() throws Exception
+    {
         // direct match
-        Object result = eval.evaluate("foo,bar?,ba?z,fool?", message);        
-        assertNotNull(result);
+        Object result = evaluator.evaluate("foo,bar?,ba?z,fool?", message);
         assertTrue(result instanceof Map);
-        assertEquals(3, ((Map)result).size());
 
-        assertEquals("moo", ((Map)result).get("foo"));
-        assertEquals("mar", ((Map)result).get("bar"));
-        assertEquals("maz", ((Map)result).get("ba?z"));
-        assertNull(((Map)result).get("fool?"));        
-    }    
+        Map<?, ?> map = (Map<?, ?>) result;
+        assertEquals(3, map.size());
 
+        assertEquals("moo", map.get("foo"));
+        assertEquals("mar", map.get("bar"));
+        assertEquals("maz", map.get("ba?z"));
+        assertNull(map.get("fool?"));
+    }
 }
