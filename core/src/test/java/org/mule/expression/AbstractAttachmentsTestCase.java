@@ -55,9 +55,14 @@ public abstract class AbstractAttachmentsTestCase extends AbstractMuleContextTes
     {
         assertTrue(attachment instanceof DataHandler);
         DataHandler dataHandler = (DataHandler) attachment;
+        String attachmentString = attachmentToString(dataHandler);
+        assertEquals(expected, attachmentString);
+    }
 
+    protected String attachmentToString(DataHandler dataHandler) throws IOException
+    {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         dataHandler.writeTo(baos);
-        assertEquals(expected, baos.toString());
+        return baos.toString();
     }
 }

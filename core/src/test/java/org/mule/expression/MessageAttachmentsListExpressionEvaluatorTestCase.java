@@ -11,9 +11,12 @@
 package org.mule.expression;
 
 import org.mule.api.expression.RequiredValueException;
+import org.mule.util.ArrayUtils;
 
 import java.io.IOException;
 import java.util.List;
+
+import javax.activation.DataHandler;
 
 import org.junit.Test;
 
@@ -113,9 +116,7 @@ public class MessageAttachmentsListExpressionEvaluatorTestCase extends AbstractA
 
         List<?> list = (List<?>) result;
         assertEquals(3, list.size());
-        assertAttachmentAtIndexHasValue(0, "foovalue", list);
-        assertAttachmentAtIndexHasValue(1, "bazvalue", list);
-        assertAttachmentAtIndexHasValue(2, "barvalue", list);
+        assertAttachmentsContain(list, "foovalue", "bazvalue", "barvalue");
     }
 
     @Test
@@ -126,9 +127,7 @@ public class MessageAttachmentsListExpressionEvaluatorTestCase extends AbstractA
 
         List<?> list = (List<?>) result;
         assertEquals(3, list.size());
-        assertAttachmentAtIndexHasValue(0, "foovalue", list);
-        assertAttachmentAtIndexHasValue(1, "bazvalue", list);
-        assertAttachmentAtIndexHasValue(2, "barvalue", list);
+        assertAttachmentsContain(list, "foovalue", "bazvalue", "barvalue");
     }
 
     @Test
@@ -139,8 +138,7 @@ public class MessageAttachmentsListExpressionEvaluatorTestCase extends AbstractA
 
         List<?> list = (List<?>) result;
         assertEquals(2, list.size());
-        assertAttachmentAtIndexHasValue(0, "bazvalue", list);
-        assertAttachmentAtIndexHasValue(1, "barvalue", list);
+        assertAttachmentsContain(list, "bazvalue", "barvalue");
     }
 
     @Test
@@ -151,8 +149,7 @@ public class MessageAttachmentsListExpressionEvaluatorTestCase extends AbstractA
 
         List<?> list = (List<?>) result;
         assertEquals(2, list.size());
-        assertAttachmentAtIndexHasValue(0, "bazvalue", list);
-        assertAttachmentAtIndexHasValue(1, "barvalue", list);
+        assertAttachmentsContain(list, "bazvalue", "barvalue");
     }
 
     @Test
@@ -183,9 +180,7 @@ public class MessageAttachmentsListExpressionEvaluatorTestCase extends AbstractA
 
         List<?> list = (List<?>) result;
         assertEquals(3, list.size());
-        assertAttachmentAtIndexHasValue(0, "foovalue", list);
-        assertAttachmentAtIndexHasValue(1, "bazvalue", list);
-        assertAttachmentAtIndexHasValue(2, "barvalue", list);
+        assertAttachmentsContain(list, "foovalue", "bazvalue", "barvalue");
     }
 
     @Test
@@ -196,9 +191,7 @@ public class MessageAttachmentsListExpressionEvaluatorTestCase extends AbstractA
 
         List<?> list = (List<?>) result;
         assertEquals(3, list.size());
-        assertAttachmentAtIndexHasValue(0, "foovalue", list);
-        assertAttachmentAtIndexHasValue(1, "bazvalue", list);
-        assertAttachmentAtIndexHasValue(2, "barvalue", list);
+        assertAttachmentsContain(list, "foovalue", "bazvalue", "barvalue");
     }
 
     private void assertAttachmentAtIndexHasValue(int index, String expectedValue, List<?> list) throws IOException
@@ -206,5 +199,14 @@ public class MessageAttachmentsListExpressionEvaluatorTestCase extends AbstractA
         Object attachment = list.get(index);
         assertNotNull(attachment);
         assertAttachmentValueEquals(expectedValue, attachment);
+    }
+
+    private void assertAttachmentsContain(List<?> list, String... expected) throws IOException
+    {
+        for (Object object : list)
+        {
+            String attachmentString = attachmentToString((DataHandler) object);
+            assertTrue(ArrayUtils.contains(expected, attachmentString));
+        }
     }
 }
