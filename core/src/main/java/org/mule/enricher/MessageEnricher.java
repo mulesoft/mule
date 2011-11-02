@@ -10,6 +10,7 @@
 
 package org.mule.enricher;
 
+import org.mule.DefaultMuleEvent;
 import org.mule.RequestContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -17,6 +18,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.expression.ExpressionManager;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.processor.AbstractMessageProcessorOwner;
+import org.mule.session.DefaultMuleSession;
 import org.mule.util.StringUtils;
 
 import java.util.ArrayList;
@@ -43,7 +45,8 @@ public class MessageEnricher extends AbstractMessageProcessorOwner implements Me
                     expressionManager);
             }
         }
-        return event;
+        event = new DefaultMuleEvent(event.getMessage(),event, new DefaultMuleSession(enrichmentEvent.getSession(),this.flowConstruct));
+        return RequestContext.setEvent(event);
     }
 
     protected void enrich(MuleMessage currentMessage,
