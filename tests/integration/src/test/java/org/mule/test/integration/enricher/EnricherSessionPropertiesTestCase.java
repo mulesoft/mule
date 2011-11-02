@@ -1,3 +1,12 @@
+/*
+ * $Id$
+ * --------------------------------------------------------------------------------------
+ * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ *
+ * The software in this package is published under the terms of the CPAL v1.0
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ */
 package org.mule.test.integration.enricher;
 
 import org.hamcrest.core.IsNull;
@@ -26,7 +35,7 @@ public class EnricherSessionPropertiesTestCase extends FunctionalTestCase
     }
 
     @Test
-    public void test() throws Exception
+    public void testCallingFlowUsingFlowRefInsideEnricher() throws Exception
     {
         LocalMuleClient client = muleContext.getClient();
         MuleMessage response = client.send("vm://in", "some message", null, 3000);
