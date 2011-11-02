@@ -101,8 +101,7 @@ public class AjaxRPCFunctionalTestCase extends AbstractServiceAndFlowTestCase
         client.subscribe("/response");
         //Simulates dispatching from the browser
         client.publish("/request", TEST_JSON_MESSAGE, null);
-        latch.await(10, TimeUnit.SECONDS);
-
+        latch.await(DEFAULT_TEST_TIMEOUT_SECS, TimeUnit.SECONDS);
         assertNotNull(data.get());
         assertEquals("{\"value1\":\"foo\",\"value2\":\"bar\"}", data.get());
     }

@@ -14,6 +14,9 @@ import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.tck.probe.PollingProber;
+import org.mule.tck.probe.Probe;
+import org.mule.tck.probe.Prober;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -30,6 +33,8 @@ public class ClientTestCase extends FunctionalTestCase
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
+    private Prober prober = new PollingProber(5000, 100);
+
     @Override
     protected String getConfigResources()
     {
@@ -39,9 +44,8 @@ public class ClientTestCase extends FunctionalTestCase
     @Test
     public void testGeneratedClientWithQuartz() throws Exception
     {
-        GreeterImpl impl = getGreeter();
-
-        Thread.sleep(5000);
+        final GreeterImpl impl = getGreeter();
+        prober.check(new GreeterNotNull(impl));
 
         assertEquals(1, impl.getInvocationCount());
     }
@@ -55,9 +59,8 @@ public class ClientTestCase extends FunctionalTestCase
         MuleMessage result = client.send("clientEndpoint", "Dan", props);
         assertEquals("Hello Dan", result.getPayload());
 
-        GreeterImpl impl = getGreeter();
-
-        Thread.sleep(5000);
+        final GreeterImpl impl = getGreeter();
+        prober.check(new GreeterNotNull(impl));
 
         assertEquals(2, impl.getInvocationCount());
     }

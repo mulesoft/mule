@@ -18,6 +18,9 @@ import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.tck.probe.PollingProber;
+import org.mule.tck.probe.Probe;
+import org.mule.tck.probe.Prober;
 import org.mule.util.concurrent.Latch;
 
 import java.util.Arrays;
@@ -155,8 +158,22 @@ public class AjaxFunctionalTestCase extends AbstractServiceAndFlowTestCase
         MuleClient muleClient = new MuleClient(muleContext);
 
         bayeuxClient.publish("/test2", "Ross", null);
-        MuleMessage msg = muleClient.request("vm://in2", RECEIVE_TIMEOUT * 2);
+        final MuleMessage msg = muleClient.request("vm://in2", RECEIVE_TIMEOUT * 2);
+        Prober prober = new PollingProber();
+        prober.check(new Probe()
+        {
+            @Override
+            public boolean isSatisfied()
+            {
+                return msg != null;
+            }
 
+            @Override
+            public String describeFailure()
+            {
+                return "No message was returned from request";
+            }
+        });
         assertNotNull(msg);
         assertEquals("Ross Received", msg.getPayloadAsString());
     }

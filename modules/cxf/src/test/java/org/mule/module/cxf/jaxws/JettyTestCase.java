@@ -16,6 +16,8 @@ import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.tck.probe.PollingProber;
+import org.mule.tck.probe.Prober;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -73,9 +75,10 @@ public class JettyTestCase extends AbstractServiceAndFlowTestCase
         MuleMessage result = client.send("clientEndpoint", "Dan", props);
         assertEquals("Hello Dan", result.getPayload());
 
-        GreeterImpl impl = getGreeter();
+        final GreeterImpl impl = getGreeter();
 
-        Thread.sleep(3000);
+        Prober prober = new PollingProber(5000, 100);
+        prober.check(new GreeterNotNull(impl));
 
         assertEquals(1, impl.getInvocationCount());
     }

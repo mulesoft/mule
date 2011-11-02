@@ -3,7 +3,7 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
     xmlns:spring="http://www.springframework.org/schema/beans"
     xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
-    xmlns:cxf-core="http://cxf.apache.org/core" 
+    xmlns:cxf-core="http://cxf.apache.org/core"
     xmlns:mule-xml="http://www.mulesoft.org/schema/mule/xml"
     xmlns:http="http://www.mulesoft.org/schema/mule/http"
     xmlns:simple="http://simple.component.mule.org/"
@@ -36,16 +36,16 @@
     <flow name="xmlReceiver">
     
         <composite-source>
-            <inbound-endpoint address="http://localhost:63081/xml-parse"
+            <inbound-endpoint address="http://localhost:${port1}/xml-parse"
                 exchange-pattern="request-response" transformer-refs="InputStreamToDOM">
                 <filter ref="XPathFilter" />
             </inbound-endpoint>
-            <inbound-endpoint address="http://localhost:63081/xml-xslt-parse"
+            <inbound-endpoint address="http://localhost:${port1}/xml-xslt-parse"
                 exchange-pattern="request-response" 
                 transformer-refs="InputStreamToDOM TestXslTransformer">
                 <filter ref="XPathFilter" />
             </inbound-endpoint>
-            <inbound-endpoint address="http://localhost:63081/validate" exchange-pattern="request-response" >
+            <inbound-endpoint address="http://localhost:${port1}/validate" exchange-pattern="request-response" >
                 <transformer ref="InputStreamToDOM"/>
                 <mule-xml:schema-validation-filter schemaLocations="org/mule/test/integration/xml/schema1.xsd, org/mule/test/integration/xml/schema2.xsd"/>
             </inbound-endpoint>
