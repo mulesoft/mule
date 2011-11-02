@@ -19,6 +19,6 @@ public class SpringRegistryTestCase extends AbstractRegistryTestCase
     @Override
     public Registry getRegistry()
     {
-        return new SpringRegistry(new StaticApplicationContext(), muleContext);
+        return new SpringRegistry(new StaticApplicationContext(), null);
     }
 }
