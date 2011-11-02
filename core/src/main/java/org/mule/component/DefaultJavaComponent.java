@@ -146,7 +146,6 @@ public class DefaultJavaComponent extends AbstractJavaComponent
         {
             lifecycleAdapter.stop();
             lifecycleAdapter.dispose();
-            lifecycleAdapter = null;
         }
     }
 

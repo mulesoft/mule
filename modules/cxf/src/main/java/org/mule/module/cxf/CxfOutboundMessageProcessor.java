@@ -227,21 +227,18 @@ public class CxfOutboundMessageProcessor extends AbstractInterceptingMessageProc
     public Method getMethod(MuleEvent event) throws Exception
     {
         Method method = null;
+        String opName = (String)event.getMessage().getProperty(CxfConstants.OPERATION);
+        if (opName != null)
+        {
+            method = getMethodFromOperation(opName);
+        }
+
         if (method == null)
         {
-            String opName = (String)event.getMessage().getProperty(CxfConstants.OPERATION);
+            opName = operation;
             if (opName != null)
             {
                 method = getMethodFromOperation(opName);
-            }
-
-            if (method == null)
-            {
-                opName = operation;
-                if (opName != null)
-                {
-                    method = getMethodFromOperation(opName);
-                }
             }
         }
 

@@ -635,13 +635,6 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder, Annota
             throw new TransportFactoryException(e);
         }
 
-        if (connector == null)
-        {
-            Message m = CoreMessages.failedToCreateObjectWith("Endpoint", "endpointURI: " + endpointURI);
-            m.setNextMessage(CoreMessages.objectIsNull("connector"));
-            throw new TransportFactoryException(m);
-
-        }
         return connector;
     }
 
@@ -812,7 +805,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder, Annota
 
     public void setResponseTimeout(int responseTimeout)
     {
-        this.responseTimeout = new Integer(responseTimeout);
+        this.responseTimeout = Integer.valueOf(responseTimeout);
     }
 
     public void setInitialState(String initialState)
@@ -827,7 +820,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder, Annota
 
     public void setCreateConnector(int createConnector)
     {
-        this.createConnector = new Integer(createConnector);
+        this.createConnector = Integer.valueOf(createConnector);
     }
 
     public void setRedeliveryPolicy(AbstractRedeliveryPolicy redeliveryPolicy)
