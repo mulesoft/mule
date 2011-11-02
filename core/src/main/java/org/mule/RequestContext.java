@@ -25,7 +25,12 @@ import org.mule.api.ThreadSafeAccess;
  * are not otherwise available in the scope.  so this is a good place to create a new
  * thread local copy - it will be read because supporting code is expecting mutation.</p>
  *
+ * @deprecated
+ *    If access to MuleEvent or MuleMessage is required,
+ *    then implement a {@link org.mule.api.processor.MessageProcessor}
+ *    or {@link org.mule.api.lifecycle.Callable} instead
  */
+@Deprecated
 public final class RequestContext
 {
     // to clarify "safe" in constructors
