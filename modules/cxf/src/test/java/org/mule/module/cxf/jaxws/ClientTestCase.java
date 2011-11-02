@@ -45,18 +45,7 @@ public class ClientTestCase extends FunctionalTestCase
     public void testGeneratedClientWithQuartz() throws Exception
     {
         final GreeterImpl impl = getGreeter();
-        prober.check(new Probe()
-        {
-            public boolean isSatisfied()
-            {
-                return impl != null;
-            }
-
-            public String describeFailure()
-            {
-                return "Expected Greeter implementation";
-            }
-        });
+        prober.check(new GreeterNotNull(impl));
 
         assertEquals(1, impl.getInvocationCount());
     }
@@ -71,18 +60,7 @@ public class ClientTestCase extends FunctionalTestCase
         assertEquals("Hello Dan", result.getPayload());
 
         final GreeterImpl impl = getGreeter();
-        prober.check(new Probe()
-        {
-            public boolean isSatisfied()
-            {
-                return impl != null;
-            }
-
-            public String describeFailure()
-            {
-                return "Expected Greeter implementation";
-            }
-        });
+        prober.check(new GreeterNotNull(impl));
 
         assertEquals(2, impl.getInvocationCount());
     }
