@@ -25,7 +25,13 @@ import org.apache.commons.logging.LogFactory;
  * copy - although this can be changed via {@link RequestContext#DEFAULT_ACTION});
  * unsafe (doesn't make a copy, use only where certain no threading); critical (safe,
  * documents that threading a known issue).</p>
+ *
+ * @deprecated
+ *    If access to MuleEvent or MuleMessage is required,
+ *    then implement a {@link org.mule.api.processor.MessageProcessor}
+ *    or {@link org.mule.api.lifecycle.Callable} instead
  */
+@Deprecated
 public final class OptimizedRequestContext
 {
 
