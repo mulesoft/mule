@@ -233,7 +233,7 @@ public class FileConnector extends AbstractConnector
         try
         {
             return serviceDescriptor.createMessageReceiver(this, flowConstruct, endpoint, new Object[]{readDir,
-                    moveTo, moveToPattern, new Long(polling)});
+                    moveTo, moveToPattern, Long.valueOf(polling)});
 
         }
         catch (Exception e)

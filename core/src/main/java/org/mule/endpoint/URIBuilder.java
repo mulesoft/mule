@@ -159,7 +159,7 @@ public class URIBuilder implements AnnotatedObject
     public void setPort(int port)
     {
         assertNotUsed();
-        this.port = new Integer(port);
+        this.port = Integer.valueOf(port);
     }
 
     public void setProtocol(String protocol)

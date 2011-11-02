@@ -82,7 +82,7 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy
             }
             try
             {
-                MessageDigest md = MessageDigest.getInstance(messageDigestAlgorithm);
+                MessageDigest.getInstance(messageDigestAlgorithm);
             }
             catch (NoSuchAlgorithmException e)
             {

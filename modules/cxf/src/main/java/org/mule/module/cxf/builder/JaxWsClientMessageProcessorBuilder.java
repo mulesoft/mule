@@ -144,17 +144,14 @@ public class JaxWsClientMessageProcessorBuilder extends AbstractClientMessagePro
         }
 
         clientProxy = null;
-        if (port != null)
+        for (Method m : clientCls.getMethods())
         {
-            for (Method m : clientCls.getMethods())
-            {
-                WebEndpoint we = m.getAnnotation(WebEndpoint.class);
+            WebEndpoint we = m.getAnnotation(WebEndpoint.class);
 
-                if (we != null && we.name().equals(port) && m.getParameterTypes().length == 0)
-                {
-                    clientProxy = (BindingProvider) m.invoke(s, new Object[0]);
-                    break;
-                }
+            if (we != null && we.name().equals(port) && m.getParameterTypes().length == 0)
+            {
+                clientProxy = (BindingProvider) m.invoke(s, new Object[0]);
+                break;
             }
         }
 

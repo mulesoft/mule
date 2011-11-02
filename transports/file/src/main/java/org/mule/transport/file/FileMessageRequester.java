@@ -212,11 +212,6 @@ public class FileMessageRequester extends AbstractMessageRequester
                     throw new DefaultMuleException(FileMessages.failedToDeleteFile(sourceFile));
                 }
             }
-            else
-            {
-                // nothing to do here since moveFile() should have deleted
-                // the source file for us
-            }
         }
 
     }

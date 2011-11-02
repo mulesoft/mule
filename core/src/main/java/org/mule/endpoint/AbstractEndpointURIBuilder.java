@@ -62,7 +62,7 @@ public abstract class AbstractEndpointURIBuilder implements EndpointURIBuilder
         connectorName = null;
         transformers = null;
         responseTransformers = null;
-        uri = null;
+        this.uri = null;
         return ep;
     }
 
