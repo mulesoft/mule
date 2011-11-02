@@ -34,7 +34,10 @@ import java.io.InputStream;
  * test case, ensure you have the mule-modules-builders JAR file on your classpath.
  * To use a different builder, just overload the <code>getBuilder()</code> method of
  * this class to return the type of builder you want to use with your test.
+ *
+ * @Deprecated Use {@link org.mule.tck.junit4.FunctionalTestCase}
  */
+@Deprecated
 public abstract class FunctionalTestCase extends AbstractMuleTestCase
 {
     public FunctionalTestCase()
