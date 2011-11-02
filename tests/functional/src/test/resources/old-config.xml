@@ -8,7 +8,7 @@
     <mule-environment-properties/>
 
     <global-endpoints>
-        <endpoint name="clientEndpoint" address="tcp://localhost:60198" synchronous="true"/>
+        <endpoint name="clientEndpoint" address="tcp://localhost:${port1}" synchronous="true"/>
     </global-endpoints>
 
     <model name="main">

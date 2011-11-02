@@ -194,10 +194,7 @@ public class FileReceiverMoveDeleteTestCase extends AbstractFileMoveDeleteTestCa
 
         assertRecevied(configureService(inFile, false, true));
 
-        // Don't call tear down until the file has been processed
-        Thread.sleep(2000);
-        //TODO MULE-3198
-        //assertFiles(inFile, moveToDir, false, true);
+        assertFiles(inFile, moveToDir, false, true);
     }
 
     @Test
@@ -206,8 +203,7 @@ public class FileReceiverMoveDeleteTestCase extends AbstractFileMoveDeleteTestCa
         File inFile = initForRequest();
 
         File moveToDir = configureConnector(inFile, false, false, false, FileMuleMessageFactory.class);
-        //TODO MULE-3198
-        //assertRecevied(configureService(inFile, false, true));
+        assertRecevied(configureService(inFile, false, true));
 
         assertFiles(inFile, moveToDir, false, false);
     }

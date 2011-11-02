@@ -15,6 +15,9 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.transport.Connector;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.tck.probe.PollingProber;
+import org.mule.tck.probe.Probe;
+import org.mule.tck.probe.Prober;
 import org.mule.util.FileUtils;
 
 import java.io.File;
@@ -70,7 +73,21 @@ public class AutoDeleteOnFileDispatcherReceiverTestCase extends AbstractMuleCont
         assertTrue(tempDir.listFiles().length > 0);
         ((InputStream) message.getPayload()).close();
         // Give file-system some time (annoying but necessary wait apparently due to OS caching?)
-        Thread.sleep(1000);
+        Prober prober = new PollingProber(1000, 100);
+        prober.check(new Probe()
+        {
+            @Override
+            public boolean isSatisfied()
+            {
+                return tempDir.listFiles().length == 0;
+            }
+
+            @Override
+            public String describeFailure()
+            {
+                return "File was not deleted from temp directory";
+            }
+        });
         assertTrue(tempDir.listFiles().length == 0);
         
         

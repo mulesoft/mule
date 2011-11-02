@@ -18,6 +18,7 @@ import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.module.xml.stax.StaxSource;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.io.InputStream;
 import java.util.Arrays;
@@ -29,6 +30,7 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.sax.SAXSource;
 
 import org.apache.cxf.helpers.DOMUtils;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 import org.w3c.dom.Document;
@@ -36,6 +38,9 @@ import org.xml.sax.InputSource;
 
 public class DirectXmlTestCase extends AbstractServiceAndFlowTestCase
 {
+    @Rule
+    public DynamicPort dynamicPort = new DynamicPort("port1");
+
     public DirectXmlTestCase(ConfigVariant variant, String configResources)
     {
         super(variant, configResources);

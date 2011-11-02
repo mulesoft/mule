@@ -10,13 +10,9 @@
 
 package org.mule.transport.ajax;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
+import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.util.concurrent.Latch;
@@ -37,6 +33,11 @@ import org.junit.runners.Parameterized.Parameters;
 import org.mortbay.cometd.client.BayeuxClient;
 import org.mortbay.jetty.client.Address;
 import org.mortbay.jetty.client.HttpClient;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class AjaxFunctionalJsonBindingsTestCase extends AbstractServiceAndFlowTestCase
 {
@@ -118,7 +119,8 @@ public class AjaxFunctionalJsonBindingsTestCase extends AbstractServiceAndFlowTe
 
         MuleClient muleClient = new MuleClient(muleContext);
         muleClient.dispatch("vm://in1", "Ross", null);
-        assertTrue("data did not arrive in 10 seconds", latch.await(10, TimeUnit.SECONDS));
+        assertTrue("data did not arrive on time", latch.await(DEFAULT_TEST_TIMEOUT_SECS,
+                                                                    TimeUnit.SECONDS));
 
         assertNotNull(data.get());
 

@@ -12,7 +12,9 @@ package org.mule.config.spring;
 
 import org.mule.api.MuleContext;
 import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 
+import org.junit.Rule;
 import org.junit.Test;
 
 import static org.junit.Assert.assertTrue;
@@ -20,6 +22,9 @@ import static org.junit.Assert.fail;
 
 public class RejectOldConfigTestCase extends FunctionalTestCase
 {
+
+    @Rule
+    public DynamicPort dynamicPort1 = new DynamicPort("port1");
 
     @Override
     protected String getConfigResources()
