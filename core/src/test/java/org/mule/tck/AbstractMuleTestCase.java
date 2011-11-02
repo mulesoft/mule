@@ -73,7 +73,9 @@ import org.apache.commons.logging.LogFactory;
 /**
  * <code>AbstractMuleTestCase</code> is a base class for Mule testcases. This
  * implementation provides services to test code for creating mock and test objects.
+ * @Deprecated Use {@link org.mule.tck.junit4.AbstractMuleTestCase}
  */
+@Deprecated
 public abstract class AbstractMuleTestCase extends TestCase implements TestCaseWatchdogTimeoutHandler
 {
 
