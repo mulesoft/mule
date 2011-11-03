@@ -36,8 +36,7 @@ public class JmsConcurrentConsumerExecutionTestCase extends FunctionalTestCase
 {
 
     public static final String MESSAGE = "some message";
-    public static final int TIMEOUT = 3000;
-    public static final int SHORT_TIMEOUT = 500;
+    public static final int TIMEOUT = 10000;
     private static final Latch messageSuccessfulReceived = new Latch();
     private static final Latch messageFailureReceived = new Latch();
 
@@ -51,8 +50,8 @@ public class JmsConcurrentConsumerExecutionTestCase extends FunctionalTestCase
     public void testTwoMessagesOneRollbackOneCommit() throws Exception
     {
         MuleClient muleClient = new MuleClient(muleContext);
-        muleClient.dispatch("jms://in", "failure", null);
         muleClient.dispatch("jms://in", "success", null);
+        muleClient.dispatch("jms://in", "failure", null);
         if (!messageSuccessfulReceived.await(TIMEOUT, TimeUnit.MILLISECONDS))
         {
             fail("JMS messages didn't execute concurrently, might be using only one Session for more than one transaction");
@@ -65,7 +64,7 @@ public class JmsConcurrentConsumerExecutionTestCase extends FunctionalTestCase
         flowWithTxConfigured.stop();
         MuleMessage muleMessage = muleClient.request("jms://in", TIMEOUT);
         assertThat(muleMessage, IsNull.<Object>notNullValue());
-        muleMessage = muleClient.request("jms://in", SHORT_TIMEOUT);
+        muleMessage = muleClient.request("jms://in", TIMEOUT);
         assertThat(muleMessage, IsNull.<Object>nullValue());
     }
 

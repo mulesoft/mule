@@ -49,12 +49,13 @@ public class RollbackTestCase extends FunctionalTestCase
         }
         latch.await();
         Assert.assertEquals(100, totalAccepted.get());
-        Assert.assertTrue(totalSeen.get() > 100);
+        Assert.assertTrue(totalSeen.get() >= 100);
     }
 
     public static class AggregatingComponent
     {
-        private Random r = new Random();
+
+        private Random r = new Random(System.currentTimeMillis());
 
         public void process(String s)
         {
