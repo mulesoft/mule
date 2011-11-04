@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+      xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xsi:schemaLocation="
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.1/mule.xsd
+       http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/3.1/mule-test.xsd
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+       http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/3.1/mule-jms.xsd">
+
+    <jms:activemq-connector name="jmsConnector" maxRedelivery="3" />
+
+    <flow name="Bouncer">
+        <jms:inbound-endpoint queue="in">
+            <jms:transaction action="ALWAYS_BEGIN" />
+        </jms:inbound-endpoint>
+        <test:component/>
+        <jms:outbound-endpoint queue="out">
+            <jms:transaction action="ALWAYS_JOIN" />
+        </jms:outbound-endpoint>
+        <default-exception-strategy>
+            <commit-transaction exception-pattern="org.mule.transport.jms.redelivery.MessageRedeliveredException"/>
+            <choice>
+                <when evaluator="groovy" expression='payload.getException().getClass().getName().equals("org.mule.transport.jms.redelivery.MessageRedeliveredException")'>
+                    <jms:outbound-endpoint queue="dead.letter">
+                        <jms:transaction action="ALWAYS_JOIN" />
+                    </jms:outbound-endpoint>
+                </when>
+                <otherwise>
+                    <logger/>
+                </otherwise>
+            </choice>
+        </default-exception-strategy>
+    </flow>
+
+</mule>

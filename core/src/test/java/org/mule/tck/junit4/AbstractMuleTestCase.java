@@ -274,8 +274,13 @@ public abstract class AbstractMuleTestCase
     {
         if (verbose)
         {
-            System.out.println(StringMessageUtils.getBoilerPlate("Testing: " + name.getMethodName(), '=', 80));
+            System.out.println(StringMessageUtils.getBoilerPlate(getTestHeader(), '=', 80));
         }
+    }
+
+    protected String getTestHeader()
+    {
+        return "Testing: " + name.getMethodName();
     }
 
     private void skipTestWhenExcluded()

@@ -10,35 +10,45 @@
 
 package org.mule.transport.jms;
 
+import org.junit.runners.Parameterized;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.api.context.notification.ExceptionNotificationListener;
 import org.mule.context.notification.ExceptionNotification;
 import org.mule.message.ExceptionMessage;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.exceptions.FunctionalTestException;
 import org.mule.tck.functional.CounterCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
-import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transport.jms.redelivery.MessageRedeliveredException;
 import org.mule.util.concurrent.Latch;
 
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 import org.junit.Test;
 
+import java.util.Arrays;
+import java.util.Collection;
+
 import static org.junit.Assert.*;
 
-public class JmsRedeliveryTestCase extends FunctionalTestCase
+public class JmsRedeliveryTestCase extends AbstractServiceAndFlowTestCase
 {
 
     private final int timeout = getTestTimeoutSecs() * 1000 / 4;
     private static final String DESTINATION = "jms://in";
     private static final int MAX_REDELIVERY = 3;
 
-    @Override
-    protected String getConfigResources()
+    public JmsRedeliveryTestCase(ConfigVariant variant, String configResources)
     {
-        return "jms-redelivery.xml";
+        super(variant, configResources);
+    }
+
+    @Parameterized.Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{{ConfigVariant.SERVICE, "jms-redelivery-service.xml"},
+                {ConfigVariant.FLOW, "jms-redelivery-flow.xml"}});
     }
 
     @Test
