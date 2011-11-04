@@ -12,7 +12,6 @@ package org.mule.util;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
@@ -113,7 +112,7 @@ public final class TemplateParser
      *                 is ${name}
      * @return the parsed String
      */
-    public String parse(Map props, String template)
+    public String parse(Map<?, ?> props, String template)
     {
         return parse(props, template, null);
     }
@@ -133,10 +132,10 @@ public final class TemplateParser
         return parse(null, template, callback);
     }
 
-    protected String parse(Map props, String template, TemplateCallback callback)
+    protected String parse(Map<?, ?> props, String template, TemplateCallback callback)
     {
         String result = template;
-        Map newProps = props;
+        Map<?, ?> newProps = props;
         if (props != null && !(props instanceof CaseInsensitiveHashMap))
         {
             newProps = new CaseInsensitiveHashMap(props);
@@ -202,16 +201,17 @@ public final class TemplateParser
      * @param templates A List of templates
      * @return the parsed String
      */
-    public List parse(Map props, List templates)
+    public List<?> parse(Map<?, ?> props, List<?> templates)
     {
         if (templates == null)
         {
-            return new ArrayList();
+            return new ArrayList<Object>();
         }
-        List list = new ArrayList(templates.size());
-        for (Iterator iterator = templates.iterator(); iterator.hasNext();)
+
+        List<String> list = new ArrayList<String>(templates.size());
+        for (Object tmpl : templates)
         {
-            list.add(parse(props, iterator.next().toString()));
+            list.add(parse(props, tmpl.toString()));
         }
         return list;
     }
@@ -226,7 +226,7 @@ public final class TemplateParser
      *                  parsed
      * @return the parsed String
      */
-    public Map parse(final Map props, Map templates)
+    public Map<?, ?> parse(final Map<?, ?> props, Map<?, ?> templates)
     {
         return parse(new TemplateCallback()
         {
@@ -237,17 +237,16 @@ public final class TemplateParser
         }, templates);
     }
 
-    public Map parse(TemplateCallback callback, Map templates)
+    public Map<?, ?> parse(TemplateCallback callback, Map<?, ?> templates)
     {
         if (templates == null)
         {
-            return new HashMap();
+            return new HashMap<Object, Object>();
         }
-        Map map = new HashMap(templates.size());
-        Map.Entry entry;
-        for (Iterator iterator = templates.entrySet().iterator(); iterator.hasNext();)
+
+        Map<Object, String> map = new HashMap<Object, String>(templates.size());
+        for (Map.Entry<?, ?> entry : templates.entrySet())
         {
-            entry = (Map.Entry) iterator.next();
             map.put(entry.getKey(), parse(callback, entry.getValue().toString()));
         }
         return map;
