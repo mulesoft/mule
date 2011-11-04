@@ -13,6 +13,7 @@ package org.mule.util;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,28 +27,41 @@ import static org.junit.Assert.assertTrue;
 
 public class TemplateParserTestCase extends AbstractMuleTestCase
 {
-
     @Test
-    public void testStringParserSquareBraces()
+    public void squareBracesParserDefaultConfiguration()
     {
         TemplateParser tp = TemplateParser.createSquareBracesStyleParser();
         assertNotNull(tp.getStyle());
         assertEquals("[", tp.getStyle().getPrefix());
         assertEquals("]", tp.getStyle().getSuffix());
+    }
 
-        Map props = new HashMap();
-        props.put("fromAddress", "ross.mason@symphonysoft.com");
-        String string = "smtp://[fromAddress]";
+    @Test
+    public void squareBracesParserShouldReplaceKnownTokens()
+    {
+        TemplateParser tp = TemplateParser.createSquareBracesStyleParser();
 
-        String result = tp.parse(props, string);
+        Map<String, String> map = Collections.singletonMap("fromAddress", "ross.mason@symphonysoft.com");
+        String template = "smtp://[fromAddress]";
+
+        String result = tp.parse(map, template);
         assertEquals("smtp://ross.mason@symphonysoft.com", result);
-        string = "smtp://[toAddress]";
-        result = tp.parse(props, string);
+    }
+
+    @Test
+    public void squareBracesParserShouldNotReplaceUnknownTokens()
+    {
+        TemplateParser tp = TemplateParser.createSquareBracesStyleParser();
+
+        Map<String, String> map = Collections.emptyMap();
+        String template = "smtp://[toAddress]";
+
+        String result = tp.parse(map, template);
         assertEquals("smtp://[toAddress]", result);
     }
 
     @Test
-    public void testParserValidationSquareBraces()
+    public void squareBracesParserShouldValidateExpressionDelimiters()
     {
         TemplateParser tp = TemplateParser.createSquareBracesStyleParser();
         assertTrue(tp.isValid("[][]"));
@@ -56,7 +70,16 @@ public class TemplateParserTestCase extends AbstractMuleTestCase
     }
 
     @Test
-    public void testParserValidationAntStyle()
+    public void antParserDefaultConfiguration()
+    {
+        TemplateParser tp = TemplateParser.createAntStyleParser();
+        assertNotNull(tp.getStyle());
+        assertEquals("${", tp.getStyle().getPrefix());
+        assertEquals("}", tp.getStyle().getSuffix());
+    }
+
+    @Test
+    public void antParserShouldValidateExpressionDelimiters()
     {
         TemplateParser tp = TemplateParser.createAntStyleParser();
         assertTrue(tp.isValid("${}"));
@@ -66,13 +89,116 @@ public class TemplateParserTestCase extends AbstractMuleTestCase
         assertTrue(tp.isValid("${$}${}"));
         assertFalse(tp.isValid("${${}}${}"));
         assertFalse(tp.isValid("$ {}"));
-
     }
 
     @Test
-    public void testParserValidationMuleStyle()
+    public void antParserShouldReplaceKnownTokens()
+    {
+        TemplateParser tp = TemplateParser.createAntStyleParser();
+
+        Map<String, Object> map = buildMap();
+        String template = "Some String with ${prop1} and ${prop2} in it";
+
+        String result = tp.parse(map, template);
+        assertEquals("Some String with value1 and value2 in it", result);
+    }
+
+
+    @Test
+    public void antParserShouldNotReplaceUnknownTokens()
+    {
+        TemplateParser tp = TemplateParser.createAntStyleParser();
+
+        Map<String, String> map = Collections.emptyMap();
+        String template = "Some String with ${prop1} in it";
+
+        String result = tp.parse(map, template);
+        assertEquals("Some String with ${prop1} in it", result);
+    }
+
+    @Test
+    public void antParserShouldHandleWhitespaceAndBackslashesCorrectly()
+    {
+        TemplateParser tp = TemplateParser.createAntStyleParser();
+
+        String dir = "C:\\Documents and Settings\\";
+        Map<String, String> map = Collections.singletonMap("dir", dir);
+        String template = "start${dir}end";
+
+        String result = tp.parse(map, template);
+        assertEquals("startC:\\Documents and Settings\\end", result);
+    }
+
+    @Test
+    public void antParserWithListInputShouldReplaceKnownTokens()
+    {
+        TemplateParser tp = TemplateParser.createAntStyleParser();
+
+        Map<String, Object> map = buildMap();
+
+        List<String> templates = new ArrayList<String>();
+        templates.add("Some String with ${prop1} and ${prop2} in it");
+        templates.add("Some String with ${prop1} in it");
+
+        List<?> result = tp.parse(map, templates);
+        assertEquals("Some String with value1 and value2 in it", result.get(0));
+        assertEquals("Some String with value1 in it", result.get(1));
+    }
+
+    @Test
+    public void antParserWithNullListInputShouldNotReplaceTokens()
+    {
+        TemplateParser tp = TemplateParser.createAntStyleParser();
+
+        Map<String, Object> map = buildMap();
+        List<?> result = tp.parse(map, (List<?>)null);
+        assertNotNull(result);
+        assertEquals(0, result.size());
+    }
+
+    @Test
+    public void antParserWithSimilarTokensShouldNotBeConfused()
+    {
+        TemplateParser tp = TemplateParser.createAntStyleParser();
+
+        Map<String, Object> map = buildMap();
+        map.put("prop1-2", "value2");
+
+        String template = "Some String with ${prop1} and ${prop1-2} in it";
+
+        String result = tp.parse(map, template);
+        assertEquals("Some String with value1 and value2 in it", result);
+    }
+
+    @Test
+    public void antParserWithOptionalTokenShouldReplaceKnownTokens()
+    {
+        TemplateParser tp = TemplateParser.createAntStyleParser();
+
+        Map<String, Object> props = new HashMap<String, Object>();
+        props.put("prop1?", "value1");
+        props.put("prop1-2", "value2");
+
+        String template = "Some String with ${prop1?} and ${prop1-2} in it";
+
+        String result = tp.parse(props, template);
+        assertEquals("Some String with value1 and value2 in it", result);
+    }
+
+    @Test
+    public void muleParserDefaultConfiguration()
     {
         TemplateParser tp = TemplateParser.createMuleStyleParser();
+        assertNotNull(tp.getStyle());
+        assertEquals("#[", tp.getStyle().getPrefix());
+        assertEquals("]", tp.getStyle().getSuffix());
+    }
+
+    @Test
+    public void muleParserShouldValidateExpressionDelimiters()
+    {
+        TemplateParser tp = TemplateParser.createMuleStyleParser();
+
         assertTrue(tp.isValid("#[]"));
         assertTrue(tp.isValid("#[]   #[]"));
         assertFalse(tp.isValid("#[]&[]"));
@@ -86,100 +212,13 @@ public class TemplateParserTestCase extends AbstractMuleTestCase
         assertFalse(tp.isValid("#[foo:blah4] = '#foo']"));
         //Can't have embedded
         assertFalse(tp.isValid("#[foo:blah = '#[foo]']"));
-
-
     }
 
-    @Test
-    public void testStringParserAntBraces()
+    private Map<String, Object> buildMap()
     {
-        TemplateParser tp = TemplateParser.createAntStyleParser();
-        assertNotNull(tp.getStyle());
-        assertEquals("${", tp.getStyle().getPrefix());
-        assertEquals("}", tp.getStyle().getSuffix());
-
-        Map props = new HashMap();
+        Map<String, Object> props = new HashMap<String, Object>();
         props.put("prop1", "value1");
         props.put("prop2", "value2");
-
-        String string = "Some String with ${prop1} and ${prop2} in it";
-        String result = tp.parse(props, string);
-        assertEquals("Some String with value1 and value2 in it", result);
-
-        string = "${prop1}${prop1}${prop2}";
-        result = tp.parse(props, string);
-        assertEquals("value1value1value2", result);
-
-        // MULE-978: a property with backslashes (on Windows)
-        String homeDir = System.getProperty("user.home");
-        props.put("homeDir", homeDir);
-        string = "${homeDir}/foo";
-        result = tp.parse(props, string);
-        assertEquals(homeDir + "/foo", result);
-
-        // whitespace is really popular too
-        String whitespaceValue = "C:\\Documents and Settings\\";
-        props.put("whitespaceValue", whitespaceValue);
-        string = "start${whitespaceValue}end";
-        result = tp.parse(props, string);
-        assertEquals("start" + whitespaceValue + "end", result);
+        return props;
     }
-
-    @Test
-    public void testListParserAntBraces()
-    {
-        TemplateParser tp = TemplateParser.createAntStyleParser();
-
-        Map props = new HashMap();
-        props.put("prop1", "value1");
-        props.put("prop2", "value2");
-        List list = new ArrayList();
-        list.add("Some String with ${prop1} and ${prop2} in it");
-        list.add("Some String with ${prop1} in it");
-
-        List result = tp.parse(props, list);
-        assertEquals("Some String with value1 and value2 in it", result.get(0));
-        assertEquals("Some String with value1 in it", result.get(1));
-
-        result = tp.parse(props, (List)null);
-        assertNotNull(result);
-        assertEquals(0, result.size());
-    }
-
-    @Test
-    public void testMapParserAntBraces()
-    {
-        TemplateParser tp = TemplateParser.createAntStyleParser();
-        Map props = new HashMap();
-        props.put("prop1", "value1");
-        props.put("prop2", "value2");
-        Map map = new HashMap();
-        map.put("value1", "Some String with ${prop1} and ${prop2} in it");
-        map.put("value2", "Some String with ${prop1} in it");
-
-        Map result = tp.parse(props, map);
-        assertEquals("Some String with value1 and value2 in it", result.get("value1"));
-        assertEquals("Some String with value1 in it", result.get("value2"));
-
-        result = tp.parse(props, (Map)null);
-        assertNotNull(result);
-        assertEquals(0, result.size());
-    }
-
-    @Test
-    public void testStringParserAntBracesWithSimilarNames()
-    {
-        TemplateParser tp = TemplateParser.createAntStyleParser();
-        Map props = new HashMap();
-        props.put("prop1", "value1");
-        props.put("prop1-2", "value2");
-        String string = "Some String with ${prop1} and ${prop1-2} in it";
-
-        String result = tp.parse(props, string);
-        assertEquals("Some String with value1 and value2 in it", result);
-        string = "A${prop1-2}B${prop1}C${prop2}";
-        result = tp.parse(props, string);
-        assertEquals("Avalue2Bvalue1C${prop2}", result);
-    }
-
 }
