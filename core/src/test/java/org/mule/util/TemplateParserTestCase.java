@@ -171,6 +171,21 @@ public class TemplateParserTestCase extends AbstractMuleTestCase
     }
 
     @Test
+    public void antParserWithOptionalTokenShouldReplaceKnownTokens()
+    {
+        TemplateParser tp = TemplateParser.createAntStyleParser();
+
+        Map<String, Object> props = new HashMap<String, Object>();
+        props.put("prop1?", "value1");
+        props.put("prop1-2", "value2");
+
+        String template = "Some String with ${prop1?} and ${prop1-2} in it";
+
+        String result = tp.parse(props, template);
+        assertEquals("Some String with value1 and value2 in it", result);
+    }
+
+    @Test
     public void muleParserDefaultConfiguration()
     {
         TemplateParser tp = TemplateParser.createMuleStyleParser();
