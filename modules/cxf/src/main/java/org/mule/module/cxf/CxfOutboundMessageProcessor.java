@@ -138,6 +138,10 @@ public class CxfOutboundMessageProcessor extends AbstractInterceptingMessageProc
         {
             throw new DefaultMuleException(e);
         }
+        finally
+        {
+            cleanup();
+        }
     }
 
     /**

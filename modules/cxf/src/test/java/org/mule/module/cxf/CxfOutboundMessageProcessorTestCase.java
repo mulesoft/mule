@@ -10,6 +10,8 @@
 
 package org.mule.module.cxf;
 
+import org.hamcrest.core.Is;
+import org.hamcrest.core.IsInstanceOf;
 import org.mule.MessageExchangePattern;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -21,6 +23,7 @@ import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 public class CxfOutboundMessageProcessorTestCase extends AbstractMuleContextTestCase
@@ -74,11 +77,12 @@ public class CxfOutboundMessageProcessorTestCase extends AbstractMuleContextTest
         
         MuleEvent event = getTestEvent("hello", getTestInboundEndpoint(MessageExchangePattern.REQUEST_RESPONSE));
         MuleEvent response = processor.process(event);
-        
+        assertThat(processor.getClient().getRequestContext().isEmpty(), Is.is(true));
+        assertThat(processor.getClient().getResponseContext().isEmpty(), Is.is(true));
         Object payload = response.getMessage().getPayload();
-        assertTrue(payload instanceof String);
-        assertEquals("hello", payload);
-        assertTrue(gotEvent);
+        assertThat(payload, IsInstanceOf.instanceOf(String.class));
+        assertThat((String) payload,Is.is("hello"));
+        assertThat(gotEvent,Is.is(true));
     }
 
 }
