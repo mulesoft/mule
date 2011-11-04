@@ -25,14 +25,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+
 /**
  * Implements strategy for handling individual insert, update, and delete statements
- *
  */
 public  class SimpleUpdateSqlStatementStrategy implements SqlStatementStrategy
 {
     protected transient Logger logger = Logger.getLogger(getClass());
-    
+
+    @Override
     public MuleMessage executeStatement(JdbcConnector connector,
             ImmutableEndpoint endpoint, MuleEvent event,long timeout) throws Exception
     {
@@ -40,14 +41,14 @@ public  class SimpleUpdateSqlStatementStrategy implements SqlStatementStrategy
         String statement = connector.getStatement(endpoint);
 
         //Storage for parameters
-        List paramNames = new ArrayList();
-        
+        List<?> paramNames = new ArrayList<Object>();
+
         //Parsed SQL statement (with ? placeholders instead of #[foo] params)
         String sql = connector.parseStatement(statement, paramNames);
-        
+
         //Optionally escape or further manipulate SQL statement.  Used in subclasses.
         sql = escapeStatement(sql);
-        
+
         //Get parameter values from message
         MuleMessage message = event.getMessage();
         Object[] paramValues = connector.getParams(endpoint, paramNames, new DefaultMuleMessage(
@@ -55,25 +56,25 @@ public  class SimpleUpdateSqlStatementStrategy implements SqlStatementStrategy
 
         Transaction tx = TransactionCoordination.getInstance().getTransaction();
         Connection con = null;
-            
+
         try
         {
             con = connector.getConnection();
-            
-            
+
+
             if (logger.isDebugEnabled())
             {
                 logger.debug("SQL UPDATE: " + sql + ", params = " + ArrayUtils.toString(paramValues));
             }
-            
+
             int nbRows = connector.getQueryRunnerFor(endpoint).update(con, sql, paramValues);
             if (logger.isInfoEnabled())
             {
                 logger.info("Executing SQL statement: " + nbRows + " row(s) updated");
             }
-            
+
             // TODO Why should it always be 1?  Can't we update more than one row at a time with
-            // an update statement?  Or no rows depending on the contents of the table and/or 
+            // an update statement?  Or no rows depending on the contents of the table and/or
             // parameters?
             //if (nbRows != 1)
             //{
@@ -94,10 +95,10 @@ public  class SimpleUpdateSqlStatementStrategy implements SqlStatementStrategy
             }
             throw e;
         }
-        
+
         return event.getMessage();
     }
-    
+
     protected String escapeStatement(String statement)
     {
         //no escaping needed for normal SQL statement

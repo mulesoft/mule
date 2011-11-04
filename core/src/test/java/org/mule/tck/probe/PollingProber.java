@@ -12,14 +12,14 @@ package org.mule.tck.probe;
 
 public class PollingProber implements Prober
 {
-
     public static final long DEFAULT_TIMEOUT = 1000;
     public static final long DEFAULT_POLLING_INTERVAL = 100;
 
     private final long timeoutMillis;
     private final long pollDelayMillis;
 
-    public PollingProber() {
+    public PollingProber()
+    {
         this(DEFAULT_TIMEOUT, DEFAULT_POLLING_INTERVAL);
     }
 
@@ -29,6 +29,7 @@ public class PollingProber implements Prober
         this.pollDelayMillis = pollDelayMillis;
     }
 
+    @Override
     public void check(Probe probe)
     {
         if (!poll(probe))
