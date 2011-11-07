@@ -28,7 +28,7 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.context.notification.ConnectionNotification;
 import org.mule.context.notification.NotificationException;
-import org.mule.endpoint.AbstractEndpoint;
+import org.mule.routing.MessageFilter;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.transport.AbstractConnector;
 import org.mule.transport.ConnectException;
@@ -1345,6 +1345,14 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
             if (mp instanceof JmsSelectorFilter)
             {
                 return (JmsSelectorFilter) mp;
+            }
+            else if (mp instanceof MessageFilter)
+            {
+                MessageFilter mf = (MessageFilter) mp;
+                if (mf.getFilter() instanceof JmsSelectorFilter)
+                {
+                    return (JmsSelectorFilter) mf.getFilter();
+                }
             }
         }
 
