@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:spring="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns="http://www.mulesoft.org/schema/mule/core"
+       xmlns:jersey="http://www.mulesoft.org/schema/mule/jersey"
+       xsi:schemaLocation="
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
+        http://www.mulesoft.org/schema/mule/jersey http://www.mulesoft.org/schema/mule/jersey/3.2/mule-jersey.xsd">
+
+    <model name="BasicJerseyTest">
+        <service name="helloWorldResource">
+            <inbound>
+                <inbound-endpoint address="http://localhost:63081/" exchange-pattern="request-response"/>
+            </inbound>
+            <jersey:resources>
+                <component class="org.mule.module.jersey.HelloWorldResource"/>
+                <jersey:context-resolver class="org.mule.module.jersey.contextresolver.JaxbCustomContextResolver" />
+            </jersey:resources>
+        </service>
+    </model>
+</mule>
+

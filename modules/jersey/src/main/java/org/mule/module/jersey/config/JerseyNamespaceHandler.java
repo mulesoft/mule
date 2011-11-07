@@ -17,11 +17,16 @@ import org.mule.module.jersey.JerseyResourcesComponent;
 
 public class JerseyNamespaceHandler extends AbstractMuleNamespaceHandler
 {
+    @Override
     public void init()
     {
         ChildDefinitionParser exceptionMapperParser = new ChildDefinitionParser("exceptionMapper",
             null, null, true);
         registerBeanDefinitionParser("exception-mapper", exceptionMapperParser);
+
+        ChildDefinitionParser contextResolverParser = new ChildDefinitionParser("contextResolver",
+            null, null, true);
+        registerBeanDefinitionParser("context-resolver", contextResolverParser);
 
         ComponentDefinitionParser parser = new ComponentDefinitionParser(JerseyResourcesComponent.class);
         registerBeanDefinitionParser("resources", parser);

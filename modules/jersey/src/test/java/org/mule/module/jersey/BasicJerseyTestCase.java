@@ -11,6 +11,7 @@
 package org.mule.module.jersey;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
@@ -79,7 +80,7 @@ public class BasicJerseyTestCase extends AbstractServiceAndFlowTestCase
 
         result = client.send("http://localhost:63081/helloworld/sayHelloWithJson/Dan", "", props);
         assertEquals((Integer)200, result.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0));
-        assertEquals("{\"message\":\"Hello Dan\"}", result.getPayloadAsString());
+        assertEquals(getJsonHelloBean(), result.getPayloadAsString());
 
         result = client.send("http://localhost:63081/helloworld/sayHelloWithQuery?name=Dan", "", props);
         assertEquals((Integer)200, result.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0));
@@ -106,7 +107,12 @@ public class BasicJerseyTestCase extends AbstractServiceAndFlowTestCase
         props.put(HttpConnector.HTTP_METHOD_PROPERTY, HttpConstants.METHOD_GET);
         MuleMessage result = client.send("http://localhost:63081/helloworld/throwException", "", props);
         assertEquals(expectedErrorCode, result.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0));
-        assertEquals(expectedData, result.getPayloadAsString());
+        assertTrue(result.getPayloadAsString().contains(expectedData));
+    }
+    
+    protected String getJsonHelloBean()
+    {
+        return "{\"message\":\"Hello Dan\",\"number\":\"0\"}";
     }
 
 }

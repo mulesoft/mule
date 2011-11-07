@@ -85,6 +85,17 @@
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
+        
+        <!-- 
+            for using json with natural configuration, we need at least jaxb 2.1.12 
+            this is used in the context resolver test case
+        -->
+        <dependency>
+            <groupId>com.sun.xml.bind</groupId>
+            <artifactId>jaxb-impl</artifactId>
+            <version>2.1.12</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <repositories>

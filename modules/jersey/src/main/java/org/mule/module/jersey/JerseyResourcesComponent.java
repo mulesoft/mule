@@ -35,10 +35,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.ExceptionMapper;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * Wraps a set of components which can get invoked by Jersey. This component will
@@ -49,13 +47,13 @@ public class JerseyResourcesComponent extends AbstractComponent
 {
     public static String JERSEY_RESPONSE = "jersey_response";
 
-    protected final Log logger = LogFactory.getLog(this.getClass());
-
     private List<JavaComponent> components;
 
     private WebApplication application;
 
     private List<ExceptionMapper<?>> exceptionMappers = new ArrayList<ExceptionMapper<?>>();
+
+    private List<ContextResolver<?>> contextResolvers = new ArrayList<ContextResolver<?>>();
 
     @Override
     protected void doInitialise() throws InitialisationException
@@ -70,7 +68,8 @@ public class JerseyResourcesComponent extends AbstractComponent
         }
 
         initializeResources(resources);
-        initializeExceptionMappers(resources);
+        initializeOtherResources(exceptionMappers, resources);
+        initializeOtherResources(contextResolvers, resources);
 
         DefaultResourceConfig resourceConfig = createConfiguration(resources);
 
@@ -96,12 +95,11 @@ public class JerseyResourcesComponent extends AbstractComponent
         }
     }
 
-    protected void initializeExceptionMappers(final Set<Class<?>> resources)
+    protected void initializeOtherResources(List<?> newResources, final Set<Class<?>> resources)
     {
-        // Initialise Exception Mappers
-        for (ExceptionMapper<?> exceptionMapper : exceptionMappers)
+        for (Object resource : newResources)
         {
-            resources.add(exceptionMapper.getClass());
+            resources.add(resource.getClass());
         }
     }
 
@@ -233,5 +231,10 @@ public class JerseyResourcesComponent extends AbstractComponent
     public void setExceptionMapper(ExceptionMapper<?> exceptionMapper)
     {
         exceptionMappers.add(exceptionMapper);
+    }
+
+    public void setContextResolver(ContextResolver<?> contextResolver)
+    {
+       contextResolvers.add(contextResolver);
     }
 }
