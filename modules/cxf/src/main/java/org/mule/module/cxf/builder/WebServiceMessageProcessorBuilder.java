@@ -29,6 +29,8 @@ import org.mule.service.ServiceCompositeMessageSource;
 
 import java.util.List;
 
+import javax.xml.namespace.QName;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.cxf.aegis.databinding.AegisDatabinding;
@@ -95,6 +97,12 @@ public class WebServiceMessageProcessorBuilder
         {
             sfb.setServiceBean(((JavaComponent) muleService.getComponent()).getObjectFactory().getInstance(muleContext));
         }
+
+        if(getService() != null && getNamespace() != null)
+        {
+            sfb.setServiceName(new QName(getNamespace(), getService()));
+        }
+
         return sfb;
     }
 
