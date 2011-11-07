@@ -54,7 +54,7 @@ public class WebServiceMessageProcessorBuilder
 {
     protected transient Log logger = LogFactory.getLog(getClass());
 
-    private List<DataBinding> databinding;
+    private DataBinding databinding;
     private String frontend = CxfConstants.JAX_WS_FRONTEND;
     private FlowConstruct flowConstruct;
     private Service muleService;
@@ -87,10 +87,9 @@ public class WebServiceMessageProcessorBuilder
         logger.info("Built CXF Inbound MessageProcessor for service class " + serviceClass.getName());
 
         // Configure Databinding
-        if (databinding != null && databinding.size() > 0)
+        if (databinding != null)
         {
-            // TODO: find a way to make this not a list
-            sfb.setDataBinding(databinding.get(0));
+            sfb.setDataBinding(databinding);
         }
 
         if (muleService != null && muleService.getComponent() instanceof JavaComponent)
@@ -221,12 +220,12 @@ public class WebServiceMessageProcessorBuilder
         this.frontend = frontend;
     }
 
-    public List<DataBinding> getDatabinding()
+    public DataBinding getDatabinding()
     {
         return databinding;
     }
 
-    public void setDatabinding(List<DataBinding> databinding)
+    public void setDatabinding(DataBinding databinding)
     {
         this.databinding = databinding;
     }
