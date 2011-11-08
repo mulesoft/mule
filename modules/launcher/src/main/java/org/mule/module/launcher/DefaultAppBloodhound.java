@@ -44,6 +44,7 @@ public class DefaultAppBloodhound implements AppBloodhound
 
     // file extension -> parser implementation
     protected Map<String, DescriptorParser> parserRegistry = new HashMap<String, DescriptorParser>();
+    public static final String SYSTEM_PROPERTY_OVERRIDE = "-O";
 
     public DefaultAppBloodhound()
     {
@@ -111,20 +112,36 @@ public class DefaultAppBloodhound implements AppBloodhound
 
         // get a ref to an optional app props file (right next to the descriptor)
         final File appPropsFile = new File(appDir, ApplicationDescriptor.DEFAULT_APP_PROPERTIES_RESOURCE);
+        setApplicationProperties(desc, appPropsFile);
+        return desc;
+
+    }
+
+    public void setApplicationProperties(ApplicationDescriptor desc, File appPropsFile) throws IOException
+    {
+        // ugh, no straightforward way to convert a HashTable to a map
+        Map<String, String> m = new HashMap<String, String>();
+
         if (appPropsFile.exists() && appPropsFile.canRead())
         {
             final Properties props = PropertiesUtils.loadProperties(appPropsFile.toURI().toURL());
-            // ugh, no straightforward way to convert to a map
-            Map<String, String> m = new HashMap<String, String>(props.size());
             for (Object key : props.keySet())
             {
                 m.put(key.toString(), props.getProperty(key.toString()));
             }
-            desc.setAppProperties(m);
         }
 
-        return desc;
-
+        // Override with any system properties prepended with "-O" for ("override"))
+        Properties sysProps = System.getProperties();
+        for (Map.Entry<Object, Object> entry : sysProps.entrySet())
+        {
+            String key = entry.getKey().toString();
+            if (key.startsWith(SYSTEM_PROPERTY_OVERRIDE))
+            {
+                m.put(key.substring(SYSTEM_PROPERTY_OVERRIDE.length()), entry.getValue().toString());
+            }
+        }
+        desc.setAppProperties(m);
     }
 
     /**
