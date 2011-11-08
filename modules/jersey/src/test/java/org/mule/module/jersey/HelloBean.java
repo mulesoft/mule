@@ -16,6 +16,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class HelloBean
 {
     private String message;
+    private int number;
 
     public String getMessage()
     {
@@ -25,5 +26,15 @@ public class HelloBean
     public void setMessage(String message)
     {
         this.message = message;
+    }
+
+    public int getNumber()
+    {
+        return number;
+    }
+
+    public void setNumber(int number)
+    {
+        this.number = number;
     }
 }
