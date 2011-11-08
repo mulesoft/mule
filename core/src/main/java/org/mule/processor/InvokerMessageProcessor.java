@@ -77,6 +77,10 @@ public class InvokerMessageProcessor implements MessageProcessor, Initialisable,
     protected MuleContext muleContext;
     private final Map<QName, Object> annotations = new ConcurrentHashMap<QName, Object>();
 
+    public InvokerMessageProcessor()
+    {
+    }
+
     @Override
     public void initialise() throws InitialisationException
     {

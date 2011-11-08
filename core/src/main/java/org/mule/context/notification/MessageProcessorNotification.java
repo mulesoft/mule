@@ -10,17 +10,12 @@
 
 package org.mule.context.notification;
 
-import org.mule.DefaultMuleEvent;
-import org.mule.DefaultMuleMessage;
-import org.mule.MessageExchangePattern;
 import org.mule.api.MuleEvent;
 import org.mule.api.NameableObject;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.context.notification.BlockingServerEvent;
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.api.processor.MessageProcessor;
-import org.mule.session.DefaultMuleSession;
-import org.mule.transport.NullPayload;
 import org.mule.util.ObjectUtils;
 
 public class MessageProcessorNotification extends ServerNotification implements BlockingServerEvent
@@ -39,14 +34,12 @@ public class MessageProcessorNotification extends ServerNotification implements 
         registerAction("message processor post invoke", MESSAGE_PROCESSOR_POST_INVOKE);
     }
 
-    private static ThreadLocal<String> lastRootMessageId = new ThreadLocal<String>();
-
     public MessageProcessorNotification(FlowConstruct flowConstruct,
                                         MuleEvent event,
                                         MessageProcessor processor,
                                         int action)
     {
-        super(produceEvent(event, flowConstruct), action, flowConstruct != null ? flowConstruct.getName() : null);
+        super(event, action, flowConstruct != null ? flowConstruct.getName() : null);
 
         this.processor = processor;
     }
@@ -83,30 +76,5 @@ public class MessageProcessorNotification extends ServerNotification implements 
             name = ObjectUtils.identityToString(obj);
         }
         return name;
-    }
-
-    /**
-     * If event is null, produce and event with the proper message root ID, to allow it to be correlated
-     * with others in the thread
-     */
-    private static MuleEvent produceEvent(MuleEvent sourceEvent, FlowConstruct flowConstruct)
-    {
-        String rootId = lastRootMessageId.get();
-        if (sourceEvent != null)
-        {
-            lastRootMessageId.set(sourceEvent.getMessage().getMessageRootId());
-            return sourceEvent;
-        }
-        else if (rootId != null && flowConstruct != null)
-        {
-            DefaultMuleMessage msg = new DefaultMuleMessage(NullPayload.getInstance(), flowConstruct.getMuleContext());
-            DefaultMuleSession session = new DefaultMuleSession(flowConstruct, flowConstruct.getMuleContext());
-            msg.setMessageRootId(rootId);
-            return new DefaultMuleEvent(msg, MessageExchangePattern.REQUEST_RESPONSE, session);
-        }
-        else
-        {
-            return null;
-        }
     }
 }
