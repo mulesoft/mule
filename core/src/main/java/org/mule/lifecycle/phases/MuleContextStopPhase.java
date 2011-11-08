@@ -25,6 +25,7 @@ import org.mule.api.transport.Connector;
 import org.mule.context.notification.MuleContextNotification;
 import org.mule.lifecycle.LifecycleObject;
 import org.mule.lifecycle.NotificationLifecycleObject;
+import org.mule.util.queue.TransactionalQueueManager;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -65,6 +66,7 @@ public class MuleContextStopPhase extends DefaultLifecyclePhase
         stopOrderedObjects.add(new NotificationLifecycleObject(Model.class, MuleContextNotification.class));
         stopOrderedObjects.add(new NotificationLifecycleObject(Agent.class));
         stopOrderedObjects.add(new NotificationLifecycleObject(Connector.class));
+        stopOrderedObjects.add(new NotificationLifecycleObject(TransactionalQueueManager.class));
         stopOrderedObjects.add(new NotificationLifecycleObject(Stoppable.class));
 
         setIgnoredObjectTypes(ignorredObjects);
