@@ -54,6 +54,7 @@ import org.mortbay.jetty.servlet.Context;
 import org.mortbay.jetty.servlet.ServletHolder;
 import org.mortbay.jetty.webapp.WebAppContext;
 import org.mortbay.jetty.webapp.WebInfConfiguration;
+import org.mortbay.log.Log;
 import org.mortbay.xml.XmlConfiguration;
 
 /**
@@ -86,9 +87,18 @@ public class JettyHttpConnector extends AbstractConnector
     public JettyHttpConnector(MuleContext context)
     {
         super(context);
+        setupJettyLogging();
         registerSupportedProtocol("http");
         registerSupportedProtocol(JETTY);
         setInitialStateStopped(true);
+    }
+
+    protected void setupJettyLogging()
+    {
+        if ((Log.getLog() instanceof JettyLogger) == false)
+        {
+            Log.setLog(new JettyLogger());
+        }
     }
 
     public String getProtocol()
