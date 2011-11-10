@@ -43,7 +43,7 @@ public class DefaultMessageCollection extends DefaultMuleMessage implements Mule
     public DefaultMessageCollection(MuleContext muleContext)
     {
         //This will be a collection of payloads
-        super(new CopyOnWriteArrayList(), muleContext);
+        super(new CopyOnWriteArrayList(),muleContext);
     }
 
     /**
@@ -56,6 +56,7 @@ public class DefaultMessageCollection extends DefaultMuleMessage implements Mule
         this(muleContext);
         setUniqueId(msg.getUniqueId());
         setMessageRootId(msg.getMessageRootId());
+        copyMessageProperties(msg);
         for (int i = 0; i < msg.getMessagesAsArray().length; i++)
         {
             addMessage(msg.getMessagesAsArray()[i]);
