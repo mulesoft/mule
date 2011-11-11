@@ -30,6 +30,7 @@ import org.mule.transport.servlet.jetty.JettyHttpsConnector;
 import org.mule.util.StringUtils;
 
 import java.net.URL;
+import java.util.EventListener;
 import java.util.Map;
 
 import javax.servlet.Servlet;
@@ -274,7 +275,8 @@ public class AjaxConnector extends JettyHttpsConnector implements BayeuxAware
     {
         context.addServlet(DefaultServlet.class, ROOT);
         context.addServlet(JarResourceServlet.class, JarResourceServlet.DEFAULT_PATH_SPEC);
-
+        EventListener[] listeners = context.getEventListeners();
+        context.addEventListener(new MuleServletContextListener(muleContext, getName()));
         String base = getResourceBase();
         if (base != null)
         {
