@@ -15,6 +15,7 @@ import java.util.List;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
+import org.mule.RequestContext;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -85,20 +86,21 @@ public abstract class AbstractMessageSequenceSplitter extends AbstractIntercepti
      */
     protected abstract MessageSequence<?> splitMessageIntoSequence(MuleEvent event) throws MuleException;
 
-    protected List<MuleEvent> processParts(MessageSequence<?> seq, MuleEvent event) throws MuleException
+    protected List<MuleEvent> processParts(MessageSequence<?> seq, MuleEvent originalEvent) throws MuleException
     {
         if (messageInfoMapping == null)
         {
-            messageInfoMapping = event.getFlowConstruct().getMessageInfoMapping();
+            messageInfoMapping = originalEvent.getFlowConstruct().getMessageInfoMapping();
         }
-        String correlationId = messageInfoMapping.getCorrelationId(event.getMessage());
+        String correlationId = messageInfoMapping.getCorrelationId(originalEvent.getMessage());
         List<MuleEvent> resultEvents = new ArrayList<MuleEvent>();
         int correlationSequence = 0;
         int count = seq.size();
+        MuleEvent currentEvent = originalEvent;
         for (; seq.hasNext();)
         {
             Object payload = seq.next();
-            MuleMessage message = createMessage(payload, event.getMessage());
+            MuleMessage message = createMessage(payload, originalEvent.getMessage());
             correlationSequence++;
 
             if (enableCorrelation != CorrelationMode.NEVER)
@@ -116,8 +118,13 @@ public abstract class AbstractMessageSequenceSplitter extends AbstractIntercepti
                 message.setCorrelationGroupSize(count);
                 message.setCorrelationSequence(correlationSequence);
             }
-            message.propagateRootId(event.getMessage());
-            resultEvents.add(processNext(new DefaultMuleEvent(message, event)));
+            message.propagateRootId(originalEvent.getMessage());
+            MuleEvent resultEvent = processNext(RequestContext.setEvent(new DefaultMuleEvent(message, originalEvent, currentEvent.getSession())));
+            if (resultEvent != null)
+            {
+                currentEvent = resultEvent;
+                resultEvents.add(resultEvent);
+            }
         }
         if (correlationSequence == 1)
         {

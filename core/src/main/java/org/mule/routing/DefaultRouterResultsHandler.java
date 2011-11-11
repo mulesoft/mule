@@ -11,6 +11,7 @@ package org.mule.routing;
 
 import org.mule.DefaultMessageCollection;
 import org.mule.DefaultMuleEvent;
+import org.mule.RequestContext;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
@@ -64,6 +65,6 @@ public class DefaultRouterResultsHandler implements RouterResultsHandler
             aggregate = coll;
         }
 
-        return aggregate == null ? null : new DefaultMuleEvent(aggregate, previous);
+        return aggregate == null ? null : RequestContext.setEvent(new DefaultMuleEvent(aggregate, previous, results.get(results.size()-1).getSession()));
     }
 }
