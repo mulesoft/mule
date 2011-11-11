@@ -39,6 +39,11 @@ public class QueueInfo
         setConfigAndDelegate(config);
     }
 
+    public QueueInfo(QueueInfo other)
+    {
+       this(other.name, other.muleContext, other.config);
+    }
+
     public void setConfig(QueueConfiguration config)
     {
         setConfigAndDelegate(config);

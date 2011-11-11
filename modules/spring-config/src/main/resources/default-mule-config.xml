@@ -46,9 +46,9 @@
 
     </mule:mule>
 
-    <bean name="_defaultInMemoryQueueStore,_simpleMemoryQueueStore" class="org.mule.util.store.SimpleMemoryObjectStore"/>
+    <bean name="_defaultInMemoryQueueStore,_simpleMemoryQueueStore" class="org.mule.util.store.DefaultObjectStoreFactoryBean" factory-method="createDefaultInMemoryObjectStore"/>
 
-    <bean name="_defaultPersistentQueueStore,_fileQueueStore" class="org.mule.util.store.QueuePersistenceObjectStore"/>
+    <bean name="_defaultPersistentQueueStore,_fileQueueStore" class="org.mule.util.store.DefaultObjectStoreFactoryBean" factory-method="createDefaultPersistentObjectStore"/>
 
     <bean name="_muleQueueManager" class="org.mule.util.queue.TransactionalQueueManager"/>
     

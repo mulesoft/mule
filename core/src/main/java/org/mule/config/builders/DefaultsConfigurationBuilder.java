@@ -27,11 +27,8 @@ import org.mule.security.MuleSecurityManager;
 import org.mule.util.DefaultStreamCloserService;
 import org.mule.util.queue.QueueManager;
 import org.mule.util.queue.TransactionalQueueManager;
+import org.mule.util.store.DefaultObjectStoreFactoryBean;
 import org.mule.util.store.MuleObjectStoreManager;
-import org.mule.util.store.QueuePersistenceObjectStore;
-import org.mule.util.store.SimpleMemoryObjectStore;
-
-import java.io.Serializable;
 
 /**
  * Configures defaults required by Mule. This configuration builder is used to
@@ -68,9 +65,8 @@ public class DefaultsConfigurationBuilder extends AbstractConfigurationBuilder
 
         registry.registerObject(MuleProperties.OBJECT_SECURITY_MANAGER, new MuleSecurityManager());
 
-        SimpleMemoryObjectStore<Serializable> memoryStore = new SimpleMemoryObjectStore<Serializable>();
-        registry.registerObject(MuleProperties.OBJECT_STORE_DEFAULT_IN_MEMORY_NAME, memoryStore);
-        registry.registerObject(MuleProperties.OBJECT_STORE_DEFAULT_PERSISTENT_NAME, new QueuePersistenceObjectStore<Serializable>());
+        registry.registerObject(MuleProperties.OBJECT_STORE_DEFAULT_IN_MEMORY_NAME, DefaultObjectStoreFactoryBean.createDefaultInMemoryObjectStore());
+        registry.registerObject(MuleProperties.OBJECT_STORE_DEFAULT_PERSISTENT_NAME, DefaultObjectStoreFactoryBean.createDefaultPersistentObjectStore());
         registry.registerObject(MuleProperties.OBJECT_STORE_MANAGER, new MuleObjectStoreManager());
 
         registry.registerObject(MuleProperties.OBJECT_MULE_ENDPOINT_FACTORY, new DefaultEndpointFactory());
