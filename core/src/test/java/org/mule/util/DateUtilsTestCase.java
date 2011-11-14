@@ -11,6 +11,7 @@
 package org.mule.util;
 
 import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.size.SmallTest;
 
 import java.util.Date;
 
@@ -19,6 +20,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+@SmallTest
 public class DateUtilsTestCase extends AbstractMuleTestCase
 {
     private final String TEST_DATE_FORMAT = "dd/MM/yyyy hh:mm:ss";
