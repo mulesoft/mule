@@ -12,6 +12,7 @@ package org.mule.service.processor;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
+import org.mule.RequestContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.routing.OutboundRouterCollection;
@@ -88,6 +89,7 @@ public class ServiceOutboundMessageProcessor extends AbstractInterceptingMessage
                 logger.debug("Outbound router on service '" + service.getName()
                              + "' doesn't have any targets configured.");
             }
+            event = RequestContext.setEvent(new DefaultMuleEvent(event.getMessage(),event));
         }
         return event;
     }
