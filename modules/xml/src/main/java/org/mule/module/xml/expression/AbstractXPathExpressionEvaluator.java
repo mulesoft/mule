@@ -174,7 +174,8 @@ public abstract class AbstractXPathExpressionEvaluator implements ExpressionEval
      */
     protected XPath getXPath(String expression, Object object) throws JaxenException
     {
-        XPath xpath = cache.get(expression + getClass().getName());
+        String xPathCacheKey = expression + getXPathClassName(object);
+        XPath xpath = cache.get(xPathCacheKey);
         if(xpath==null)
         {
             xpath = createXPath(expression, object);
@@ -185,9 +186,14 @@ public abstract class AbstractXPathExpressionEvaluator implements ExpressionEval
                     addNamespaces(namespaceManager, xpath);
                 }
             }
-            cache.put(expression + getClass().getName(), xpath);
+            cache.put(xPathCacheKey, xpath);
         }
         return xpath;
+    }
+
+    protected String getXPathClassName(Object object)
+    {
+        return getClass().getName();
     }
 
     protected abstract XPath createXPath(String expression, Object object) throws JaxenException;

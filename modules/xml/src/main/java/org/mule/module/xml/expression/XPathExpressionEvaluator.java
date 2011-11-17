@@ -12,13 +12,11 @@ package org.mule.module.xml.expression;
 
 import org.mule.module.xml.i18n.XmlMessages;
 
-import org.dom4j.Element;
 import org.dom4j.Node;
 import org.jaxen.JaxenException;
 import org.jaxen.XPath;
 import org.jaxen.dom.DOMXPath;
 import org.jaxen.dom4j.Dom4jXPath;
-import org.w3c.dom.Document;
 
 /**
  * Will select the text of a single node based on the property name
@@ -27,28 +25,45 @@ public class XPathExpressionEvaluator extends AbstractXPathExpressionEvaluator
 {
     public static final String NAME = "xpath";
 
+    @Override
     protected XPath createXPath(String expression, Object object) throws JaxenException
     {
-        if(object instanceof Document || object instanceof Element)
+        if(createDOMXPath(object))
         {
             return new DOMXPath(expression);
         }
-        else if (object instanceof org.dom4j.Document || object instanceof org.dom4j.Element)
+        else if (createDom4jXPath(object))
         {
             return new Dom4jXPath(expression);
         }
-//        else if (object instanceof nu.xom.Document)
-//        {
-//            return new XOMXPath(expression);
-//        }
-//        else if (object instanceof org.jdom.Document)
-//        {
-//            return new JDOMXPath(expression);
-//        }
         else
         {
             throw new IllegalArgumentException(XmlMessages.domTypeNotSupported(object.getClass()).getMessage());
         }
+    }
+
+    @Override
+    protected String getXPathClassName(Object object)
+    {
+        if(createDOMXPath(object))
+        {
+            return DOMXPath.class.getName();
+        }
+        if(createDom4jXPath(object))
+        {
+            return Dom4jXPath.class.getName();
+        }
+        return super.getXPathClassName(object);
+    }
+
+    private boolean createDOMXPath(Object object)
+    {
+        return object instanceof org.w3c.dom.Document || object instanceof org.w3c.dom.Element;
+    }
+
+    private boolean createDom4jXPath(Object object)
+    {
+        return object instanceof org.dom4j.Document || object instanceof org.dom4j.Element;
     }
 
     protected Object extractResultFromNode(Object result)
@@ -61,14 +76,6 @@ public class XPathExpressionEvaluator extends AbstractXPathExpressionEvaluator
         {
             return ((org.w3c.dom.Node)result).getFirstChild().getNodeValue();
         }
-//        else if(result instanceof nu.xom.Node)
-//        {
-//            return ((nu.xom.Node)result).getText();
-//        }
-//        else if(result instanceof org.jdom.Node)
-//        {
-//            return ((org.jdom.Node)result).getText();
-//        }
         else
         {
             return result;
