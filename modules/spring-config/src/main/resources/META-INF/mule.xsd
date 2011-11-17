@@ -35,7 +35,8 @@
         <xsd:anyAttribute namespace="##other" processContents="lax">
             <xsd:annotation>
                 <xsd:documentation>
-                    Allow any third-parties to annotate these elements with global attributes
+                    Allow any third-parties to annotate these elements with global attributes.  All types for
+                    top-level elements must extend this.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:anyAttribute>
@@ -494,33 +495,37 @@
         </xsd:annotation>
     </xsd:element>
 
-    <xsd:element name="sub-flow">
+    <xsd:element name="sub-flow" type="subFlowType">
         <xsd:annotation>
             <xsd:documentation>
                 A chain of message processors processed synchronously that can be referenced and reused.
             </xsd:documentation>
         </xsd:annotation>
-        <xsd:complexType>
-            <xsd:sequence>
-                <xsd:element name="description" type="descriptionType" minOccurs="0">
+    </xsd:element>
+    <xsd:complexType name="subFlowType">
+        <xsd:complexContent>
+            <xsd:extension base="annotatedType">
+                <xsd:sequence>
+                    <xsd:element name="description" type="descriptionType" minOccurs="0">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                This can hold any kind of documentation related to the sub-flow. It is intended to be
+                                "human readable" only and  is not used by the system.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                    <xsd:group ref="messageProcessorOrOutboundEndpoint" maxOccurs="unbounded" />
+                </xsd:sequence>
+                <xsd:attribute name="name" type="substitutableName" use="optional">
                     <xsd:annotation>
                         <xsd:documentation>
-                            This can hold any kind of documentation related to the sub-flow. It is intended to be
-                            "human readable" only and  is not used by the system.
-                    </xsd:documentation>
+                            Identifies the sub-flow in the registry.
+                        </xsd:documentation>
                     </xsd:annotation>
-                </xsd:element>
-                <xsd:group ref="messageProcessorOrOutboundEndpoint" maxOccurs="unbounded" />
-            </xsd:sequence>
-            <xsd:attribute name="name" type="substitutableName" use="optional">
-                <xsd:annotation>
-                    <xsd:documentation>
-                        Identifies the message processor in the registry.
-                </xsd:documentation>
-                </xsd:annotation>
-            </xsd:attribute>
-        </xsd:complexType>
-    </xsd:element>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
 
     <xsd:complexType name="messageProcessorChainType">
         <xsd:complexContent>
@@ -967,20 +972,24 @@
     </xsd:complexType>
 
     <xsd:complexType name="globalPropertyType">
-        <xsd:attribute name="name" type="substitutableName" use="required">
-            <xsd:annotation>
-                <xsd:documentation>
-                    The name of the property. This is used inside Spring placeholders.
-                </xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
-        <xsd:attribute name="value" type="xsd:string" use="required">
-            <xsd:annotation>
-                <xsd:documentation>
-                    The value of the property. This replaces each occurence of a Spring placeholder.
-                </xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
+        <xsd:complexContent>
+            <xsd:extension base="annotatedType">
+                <xsd:attribute name="name" type="substitutableName" use="required">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The name of the property. This is used inside Spring placeholders.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="value" type="xsd:string" use="required">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The value of the property. This replaces each occurence of a Spring placeholder.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
     </xsd:complexType>
 
     <!-- seemed pointless making these simple container types abstract -->
@@ -1084,116 +1093,128 @@
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
-    <xsd:complexType name="abstractTransactionManagerType"/>
+    <xsd:complexType name="abstractTransactionManagerType">
+        <xsd:complexContent>
+            <xsd:extension base="annotatedType"/>
+        </xsd:complexContent>
+    </xsd:complexType>
 
     <xsd:complexType name="configurationType">
-        <xsd:sequence>
-            <xsd:element name="default-threading-profile" type="threadingProfileType" minOccurs="0">
-                <xsd:annotation>
-                    <xsd:documentation>
-                        The default threading profile, used by components and by endpoints for dispatching and receiving if no more specific configuration is given.
-                    </xsd:documentation>
-                </xsd:annotation>
-            </xsd:element>
-            <xsd:element name="default-dispatcher-threading-profile" type="threadingProfileType" minOccurs="0">
-                <xsd:annotation>
-                    <xsd:documentation>
-                        The default dispatching threading profile, which modifies the default-threading-profile values and is used by endpoints for dispatching messages. This can also be configured on connectors, in which case the connector configuration is used instead of this default.
-                    </xsd:documentation>
-                </xsd:annotation>
-            </xsd:element>
-            <xsd:element name="default-receiver-threading-profile" type="threadingProfileType" minOccurs="0">
-                <xsd:annotation>
-                    <xsd:documentation>
-                        The default receiving threading profile, which modifies the default-threading-profile values and is used by endpoints for receiving messages. This can also be configured on connectors, in which case the connector configuration is used instead of this default.
-                    </xsd:documentation>
-                </xsd:annotation>
-            </xsd:element>
-            <xsd:element name="default-service-threading-profile" type="threadingProfileType" minOccurs="0">
-                <xsd:annotation>
-                    <xsd:documentation>
-                        The default service threading profile, which modifies the default-threading-profile and is used by services for processing messages. This can also be configured on models or services, in which case these configurations will be used instead of this default.
-                    </xsd:documentation>
-                </xsd:annotation>
-            </xsd:element>
-            <xsd:element ref="abstract-reconnection-strategy" minOccurs="0">
-                <xsd:annotation>
-                    <xsd:documentation>
-                        The default reconnection strategy, used by connectors and endpoints. This can also be configured on connectors, in which case the connector configuration is used instead of this default.
-                    </xsd:documentation>
-                </xsd:annotation>
-            </xsd:element>
-        </xsd:sequence>
-        <xsd:attribute name="defaultResponseTimeout" type="xsd:string" default="10000">
-            <xsd:annotation>
-                <xsd:documentation>
-                    The default period (ms) to wait for a synchronous response.
-                </xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
-        <xsd:attribute name="defaultTransactionTimeout" type="xsd:string" default="30000">
-            <xsd:annotation>
-                <xsd:documentation>
-                    The default timeout (ms) for transactions. This can also be configured on transactions, in which case the transaction configuration is used instead of this default.
-                </xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
-        <xsd:attribute name="shutdownTimeout" type="substitutableInt" default="5000">
-            <xsd:annotation>
-                <xsd:documentation>
-                    (As of Mule 2.2.2) The time in milliseconds to wait for any in-progress messages to finish processing before Mule shuts down. After this threshold has been reached, Mule starts interrupting threads, and messages can be lost. If you have a very large number of services in the same Mule instance, if you have components that take more than a couple seconds to process, or if you are using large payloads and/or slower transports, you should increase this value to allow more time for graceful shutdown. The value you specify is applied to services and separately to dispatchers, so the default value of 5000 milliseconds specifies that Mule has ten seconds to process and dispatch messages gracefully after shutdown is initiated.
-                </xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
+        <xsd:complexContent>
+            <xsd:extension base="annotatedType">
+                <xsd:sequence>
+                    <xsd:element name="default-threading-profile" type="threadingProfileType" minOccurs="0">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                The default threading profile, used by components and by endpoints for dispatching and receiving if no more specific configuration is given.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                    <xsd:element name="default-dispatcher-threading-profile" type="threadingProfileType" minOccurs="0">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                The default dispatching threading profile, which modifies the default-threading-profile values and is used by endpoints for dispatching messages. This can also be configured on connectors, in which case the connector configuration is used instead of this default.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                    <xsd:element name="default-receiver-threading-profile" type="threadingProfileType" minOccurs="0">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                The default receiving threading profile, which modifies the default-threading-profile values and is used by endpoints for receiving messages. This can also be configured on connectors, in which case the connector configuration is used instead of this default.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                    <xsd:element name="default-service-threading-profile" type="threadingProfileType" minOccurs="0">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                The default service threading profile, which modifies the default-threading-profile and is used by services for processing messages. This can also be configured on models or services, in which case these configurations will be used instead of this default.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                    <xsd:element ref="abstract-reconnection-strategy" minOccurs="0">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                The default reconnection strategy, used by connectors and endpoints. This can also be configured on connectors, in which case the connector configuration is used instead of this default.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                </xsd:sequence>
+                <xsd:attribute name="defaultResponseTimeout" type="xsd:string" default="10000">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The default period (ms) to wait for a synchronous response.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="defaultTransactionTimeout" type="xsd:string" default="30000">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The default timeout (ms) for transactions. This can also be configured on transactions, in which case the transaction configuration is used instead of this default.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="shutdownTimeout" type="substitutableInt" default="5000">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            (As of Mule 2.2.2) The time in milliseconds to wait for any in-progress messages to finish processing before Mule shuts down. After this threshold has been reached, Mule starts interrupting threads, and messages can be lost. If you have a very large number of services in the same Mule instance, if you have components that take more than a couple seconds to process, or if you are using large payloads and/or slower transports, you should increase this value to allow more time for graceful shutdown. The value you specify is applied to services and separately to dispatchers, so the default value of 5000 milliseconds specifies that Mule has ten seconds to process and dispatch messages gracefully after shutdown is initiated.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
     </xsd:complexType>
 
     <xsd:complexType name="notificationManagerType">
-        <xsd:sequence>
-            <xsd:element name="notification" type="defineNotificationType" minOccurs="0" maxOccurs="unbounded">
-                <xsd:annotation>
-                    <xsd:documentation>
-                        Associates an event with an interface. Listeners that implement the interface will receive instances of the event.
-                    </xsd:documentation>
-                </xsd:annotation>
-            </xsd:element>
-            <xsd:element name="disable-notification" type="disableNotificationType" minOccurs="0" maxOccurs="unbounded">
-                <xsd:annotation>
-                    <xsd:documentation>
-                        Blocks the association of an event with a particular interface. This filters events after the association with a particular interface (and so takes precedence).
-                    </xsd:documentation>
-                </xsd:annotation>
-            </xsd:element>
-            <xsd:element name="notification-listener" minOccurs="0" maxOccurs="unbounded">
-                <xsd:annotation>
-                    <xsd:documentation>
-                        Registers a bean as a listener with the notification system. Events are dispatched by reflection - the listener will receive all events associated with any interfaces it implements. The relationship between interfaces and events is configured by the notification and disable-notification elements.
-                    </xsd:documentation>
-                </xsd:annotation>
-                <xsd:complexType>
-                    <xsd:attribute name="ref" type="xsd:string" use="required">
+        <xsd:complexContent >
+            <xsd:extension base="annotatedType">
+                <xsd:sequence>
+                    <xsd:element name="notification" type="defineNotificationType" minOccurs="0" maxOccurs="unbounded">
                         <xsd:annotation>
                             <xsd:documentation>
-                                The bean that will receive notifications.
+                                Associates an event with an interface. Listeners that implement the interface will receive instances of the event.
                             </xsd:documentation>
                         </xsd:annotation>
-                    </xsd:attribute>
-                    <xsd:attribute name="subscription" type="xsd:string">
+                    </xsd:element>
+                    <xsd:element name="disable-notification" type="disableNotificationType" minOccurs="0" maxOccurs="unbounded">
                         <xsd:annotation>
                             <xsd:documentation>
-                                An optional string that is compared with the event resource identifier. Only events with matching identifiers will be sent. If no value is given, all events are sent.
+                                Blocks the association of an event with a particular interface. This filters events after the association with a particular interface (and so takes precedence).
                             </xsd:documentation>
                         </xsd:annotation>
-                    </xsd:attribute>
-                </xsd:complexType>
-            </xsd:element>
-        </xsd:sequence>
-        <xsd:attribute name="dynamic" type="substitutableBoolean">
-            <xsd:annotation>
-                <xsd:documentation>
-                    If the notification manager is dynamic, listeners can be registered dynamically at runtime via the MuleContext, and the configured notification can be changed. Otherwise, some parts of Mule will cache notification configuration for efficiency and will not generate events for newly enabled notifications or listeners. The default value is false.
-                </xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
+                    </xsd:element>
+                    <xsd:element name="notification-listener" minOccurs="0" maxOccurs="unbounded">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Registers a bean as a listener with the notification system. Events are dispatched by reflection - the listener will receive all events associated with any interfaces it implements. The relationship between interfaces and events is configured by the notification and disable-notification elements.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                        <xsd:complexType>
+                            <xsd:attribute name="ref" type="xsd:string" use="required">
+                                <xsd:annotation>
+                                    <xsd:documentation>
+                                        The bean that will receive notifications.
+                                    </xsd:documentation>
+                                </xsd:annotation>
+                            </xsd:attribute>
+                            <xsd:attribute name="subscription" type="xsd:string">
+                                <xsd:annotation>
+                                    <xsd:documentation>
+                                        An optional string that is compared with the event resource identifier. Only events with matching identifiers will be sent. If no value is given, all events are sent.
+                                    </xsd:documentation>
+                                </xsd:annotation>
+                            </xsd:attribute>
+                        </xsd:complexType>
+                    </xsd:element>
+                </xsd:sequence>
+                <xsd:attribute name="dynamic" type="substitutableBoolean">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            If the notification manager is dynamic, listeners can be registered dynamically at runtime via the MuleContext, and the configured notification can be changed. Otherwise, some parts of Mule will cache notification configuration for efficiency and will not generate events for newly enabled notifications or listeners. The default value is false.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
     </xsd:complexType>
 
     <xsd:complexType name="defineNotificationType">
@@ -3727,16 +3748,20 @@
         </xsd:annotation>
     </xsd:element>
     <xsd:complexType name="abstractInterceptorStackType">
-        <xsd:sequence maxOccurs="unbounded">
-            <xsd:element ref="abstract-interceptor"/>
-        </xsd:sequence>
-        <xsd:attribute name="name" type="nonBlankString" use="required">
-            <xsd:annotation>
-                <xsd:documentation>
-                    The name used to identify this interceptor stack.
-                </xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
+        <xsd:complexContent>
+            <xsd:extension base="annotatedType">
+                <xsd:sequence maxOccurs="unbounded">
+                    <xsd:element ref="abstract-interceptor"/>
+                </xsd:sequence>
+                <xsd:attribute name="name" type="nonBlankString" use="required">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The name used to identify this interceptor stack.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
     </xsd:complexType>
     <xsd:element name="interceptor-stack" type="abstractInterceptorStackType" substitutionGroup="abstract-interceptor-stack"/>
 
@@ -4456,13 +4481,17 @@
     </xsd:element>
 
     <xsd:complexType name="abstractSecurityManagerType">
-        <xsd:annotation>
-            <xsd:documentation>
-                An empty holder that can be extended by modules that want to provide security managers. Typically it will contain elements called 'module:type-security-provider', which extend securityProviderType where "module" might be "spring-security" and "type" might de "delegate", for example. It can also contain encryption strategies, which should follow a similar scheme and extend encryptionStrategyType.
-            </xsd:documentation>
-        </xsd:annotation>
-        <xsd:attribute name="id" fixed="_muleSecurityManager"/>
-        <xsd:attribute name="name" fixed="_muleSecurityManager"/>
+        <xsd:complexContent>
+            <xsd:extension base="annotatedType">
+                <xsd:annotation>
+                    <xsd:documentation>
+                        An empty holder that can be extended by modules that want to provide security managers. Typically it will contain elements called 'module:type-security-provider', which extend securityProviderType where "module" might be "spring-security" and "type" might de "delegate", for example. It can also contain encryption strategies, which should follow a similar scheme and extend encryptionStrategyType.
+                    </xsd:documentation>
+                </xsd:annotation>
+                <xsd:attribute name="id" fixed="_muleSecurityManager"/>
+                <xsd:attribute name="name" fixed="_muleSecurityManager"/>
+            </xsd:extension>
+        </xsd:complexContent>
     </xsd:complexType>
 
     <xsd:element name="security-manager" type="securityManagerType" substitutionGroup="abstract-security-manager">

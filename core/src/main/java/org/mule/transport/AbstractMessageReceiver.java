@@ -179,7 +179,12 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
         }
 
         message.removeProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, PropertyScope.INBOUND);
-
+        String rootId = message.getInboundProperty(MuleProperties.MULE_ROOT_MESSAGE_ID_PROPERTY);
+        if (rootId != null)
+        {
+            message.setMessageRootId(rootId);
+            message.removeProperty(MuleProperties.MULE_ROOT_MESSAGE_ID_PROPERTY, PropertyScope.INBOUND);
+        }
         MuleEvent muleEvent = createMuleEvent(message, outputStream);
         muleEvent = OptimizedRequestContext.unsafeSetEvent(muleEvent);
 
@@ -198,7 +203,10 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
 
         if (resultEvent != null)
         {
-            connector.getSessionHandler().storeSessionInfoToMessage(resultEvent.getSession(), resultEvent.getMessage());
+            // Do  not propagate security context back to caller
+            MuleSession resultSession = new DefaultMuleSession(resultEvent.getSession(), resultEvent.getMuleContext());
+            resultSession.setSecurityContext(null);
+            connector.getSessionHandler().storeSessionInfoToMessage(resultSession, resultEvent.getMessage());
         }
 
         if (endpoint.getExchangePattern()== MessageExchangePattern.REQUEST_RESPONSE && resultEvent != null && resultEvent.getMessage() != null && !endpoint.isDisableTransportTransformer())
@@ -206,7 +214,7 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
             applyResponseTransformers(resultEvent);
         }
 
-        if (connector.isEnableMessageEvents() && endpoint.getExchangePattern().hasResponse())
+        if (connector.isEnableMessageEvents() && endpoint.getExchangePattern().hasResponse() && resultEvent != null)
         {
             connector.fireNotification(new EndpointMessageNotification(
                     resultEvent.getMessage(), endpoint, resultEvent

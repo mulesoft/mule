@@ -165,25 +165,48 @@ public class HttpMessageReceiver extends TcpMessageReceiver
                     }
                     catch (Exception e)
                     {
-                        //MULE-5656 There was custom code here for mapping status codes to exceptions
-                        //I have removed this code and now make an explicit call to the Exception helper,
-                        //but the real fix is to make sure Mule handles this automatically through the
-                        //InboundExceptionDetailsMessageProcessor
-
-                        //Response code mappings are loaded from META-INF/services/org/mule/config/http-exception-mappings.properties
-                        String temp = ExceptionHelper.getErrorMapping(connector.getProtocol(), e.getClass());
-                        int httpStatus = Integer.valueOf(temp);
-
+                        MuleEvent response = null;
                         if (e instanceof MessagingException)
                         {
                             MuleEvent event = ((MessagingException) e).getEvent();
-                            conn.writeResponse(buildFailureResponse(event, e.getMessage(),httpStatus));
-                            event.getFlowConstruct().getExceptionListener().handleException(e, event);
+                            response = event.getFlowConstruct().getExceptionListener().handleException(e, event);
                         }
                         else
                         {
-                            conn.writeResponse(buildFailureResponse(request.getRequestLine().getHttpVersion(), httpStatus, e.getMessage()));
                             getConnector().getMuleContext().getExceptionListener().handleException(e);
+                        }
+
+
+                        if (response != null &&
+                            response.getMessage().getExceptionPayload() != null &&
+                            response.getMessage().getExceptionPayload().getException() instanceof MessagingException)
+                        {
+                            e = (Exception) response.getMessage().getExceptionPayload().getException();
+                        }
+                        if (response != null && response.getMessage().getExceptionPayload() == null)
+                        {
+                            conn.writeResponse(transformResponse(response.getMessage(), response));
+                        }
+                        else
+                        {
+                            //MULE-5656 There was custom code here for mapping status codes to exceptions
+                            //I have removed this code and now make an explicit call to the Exception helper,
+                            //but the real fix is to make sure Mule handles this automatically through the
+                            //InboundExceptionDetailsMessageProcessor
+
+                            //Response code mappings are loaded from META-INF/services/org/mule/config/http-exception-mappings.properties
+                            String temp = ExceptionHelper.getErrorMapping(connector.getProtocol(), e.getClass());
+                            int httpStatus = Integer.valueOf(temp);
+
+                            if (e instanceof MessagingException)
+                            {
+                                MuleEvent event = ((MessagingException) e).getEvent();
+                                conn.writeResponse(buildFailureResponse(event, e.getMessage(),httpStatus));
+                            }
+                            else
+                            {
+                                conn.writeResponse(buildFailureResponse(request.getRequestLine().getHttpVersion(), httpStatus, e.getMessage()));
+                            }
                         }
                         break;
                     }

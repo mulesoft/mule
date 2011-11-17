@@ -35,6 +35,7 @@ import org.mule.retry.async.AsynchronousRetryTemplate;
 import org.mule.retry.policies.SimpleRetryPolicyTemplate;
 import org.mule.routing.filters.ExpressionFilter;
 import org.mule.routing.outbound.AbstractOutboundRouter;
+import org.mule.util.SystemUtils;
 
 /**
  * UntilSuccessful attempts to route a message to the message processor it contains in an asynchronous manner. Routing
@@ -59,8 +60,9 @@ public class UntilSuccessful extends AbstractOutboundRouter
         {
             // the key is built in way to prevent UntilSuccessful workers across a cluster to compete for the same
             // events over a shared object store
-            return new EventStoreKey(muleEvent.getFlowConstruct() + "@"
-                                     + muleEvent.getMuleContext().getClusterId() + ":" + muleEvent.getId());
+            String key = muleEvent.getFlowConstruct() + "@"
+                + muleEvent.getMuleContext().getClusterId() + ":" + muleEvent.getId();
+            return new EventStoreKey(SystemUtils.legalizeFileName(key));
         }
 
         @Override

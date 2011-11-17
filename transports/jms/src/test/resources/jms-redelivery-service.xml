@@ -39,5 +39,14 @@
                 </choice>
             </default-exception-strategy>
         </service>
+
+        <service name="TestSelector">
+            <inbound>
+                <jms:inbound-endpoint queue="selectorQueue">
+                    <jms:selector expression="JMSPriority=4"/>
+                </jms:inbound-endpoint>
+            </inbound>
+            <echo-component/>
+        </service>
     </model>
 </mule>

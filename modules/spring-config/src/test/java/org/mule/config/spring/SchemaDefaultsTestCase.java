@@ -45,13 +45,13 @@ public class SchemaDefaultsTestCase extends AbstractMuleContextTestCase
         Element configurationType = (Element) schema.selectSingleNode("/xsd:schema/xsd:complexType[@name='configurationType']");
 
         assertEquals(muleContext.getConfiguration().getDefaultResponseTimeout(),
-            configurationType.numberValueOf("xsd:attribute[@name='defaultResponseTimeout']/@default")
+            configurationType.numberValueOf("xsd:complexContent/xsd:extension/xsd:attribute[@name='defaultResponseTimeout']/@default")
                 .intValue());
         assertEquals(muleContext.getConfiguration().getDefaultTransactionTimeout(),
-            configurationType.numberValueOf("xsd:attribute[@name='defaultTransactionTimeout']/@default")
+            configurationType.numberValueOf("xsd:complexContent/xsd:extension/xsd:attribute[@name='defaultTransactionTimeout']/@default")
                 .intValue());
         assertEquals(muleContext.getConfiguration().getShutdownTimeout(),
-            configurationType.numberValueOf("xsd:attribute[@name='shutdownTimeout']/@default")
+            configurationType.numberValueOf("xsd:complexContent/xsd:extension/xsd:attribute[@name='shutdownTimeout']/@default")
                 .intValue());
     }
 }
