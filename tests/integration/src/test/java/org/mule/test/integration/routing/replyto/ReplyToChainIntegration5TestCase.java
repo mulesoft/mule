@@ -13,25 +13,36 @@ package org.mule.test.integration.routing.replyto;
 import org.hamcrest.core.Is;
 import org.hamcrest.core.IsNull;
 import org.junit.Test;
+import org.junit.runners.Parameterized;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
-import org.mule.tck.junit4.FunctionalTestCase;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertThat;
 
-public class ReplyToChainIntegration5TestCase extends FunctionalTestCase
+public class ReplyToChainIntegration5TestCase extends AbstractServiceAndFlowTestCase
 {
 
     public static final String TEST_PAYLOAD = "test payload";
     public static final String EXPECTED_PAYLOAD = TEST_PAYLOAD + " modified";
     public static final int TIMEOUT = 5000;
 
-    @Override
-    protected String getConfigResources()
+    public ReplyToChainIntegration5TestCase(ConfigVariant variant, String configResources)
     {
-        return "org/mule/test/integration/routing/replyto/replyto-chain-integration-test-5.xml";
+        super(variant, configResources);
+    }
+
+    @Parameterized.Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+                {ConfigVariant.SERVICE, "org/mule/test/integration/routing/replyto/replyto-chain-integration-test-5-service.xml"},
+                {ConfigVariant.FLOW, "org/mule/test/integration/routing/replyto/replyto-chain-integration-test-5-flow.xml"}
+        });
     }
 
     @Test
