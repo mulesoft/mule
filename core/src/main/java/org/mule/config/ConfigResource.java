@@ -12,8 +12,8 @@ package org.mule.config;
 import org.mule.util.IOUtils;
 
 import java.io.FileNotFoundException;
-import java.io.InputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 
 /**
@@ -95,9 +95,8 @@ public class ConfigResource
 
     public int hashCode()
     {
-        int result;
-        result = (resourceName != null ? resourceName.hashCode() : 0);
-        result = 31 * result + (url != null ? url.hashCode() : 0);
+        int result = 17;
+        result = 31 * result + (resourceName != null ? resourceName.hashCode() : 0);
         return result;
     }
 
