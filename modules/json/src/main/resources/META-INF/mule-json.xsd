@@ -14,7 +14,7 @@
     <xsd:import namespace="http://www.mulesoft.org/schema/mule/xml"
                 schemaLocation="http://www.mulesoft.org/schema/mule/xml/3.2/mule-xml.xsd"/>
     <xsd:import namespace="http://www.mulesoft.org/schema/mule/schemadoc"
-                schemaLocation="http://www.mulesoft.org/schema/mule/schemadoc/3.1/mule-schemadoc.xsd"/>
+                schemaLocation="http://www.mulesoft.org/schema/mule/schemadoc/3.2/mule-schemadoc.xsd"/>
 
     <xsd:annotation>
         <xsd:documentation>
