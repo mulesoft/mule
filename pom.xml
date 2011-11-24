@@ -1366,6 +1366,7 @@
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>native2ascii-maven-plugin</artifactId>
+                    <version>1.0-alpha-1</version>
                     <executions>
                         <execution>
                             <phase>generate-test-resources</phase>
