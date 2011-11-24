@@ -15,7 +15,10 @@ package org.mule.tck;
  * Extend this class instead of FunctionalTestCase to add dynamic port support to
  * your tests. The test will need to only implement 'getNumPortsToFind' to tell this
  * class how many free test ports to find.
+ *
+ * @Deprecated: use {@link org.mule.tck.junit4.rule.DynamicPort} in a JUnit 4 test.
  */
+@Deprecated
 public abstract class DynamicPortTestCase extends FunctionalTestCase
 {
     protected abstract int getNumPortsToFind();
