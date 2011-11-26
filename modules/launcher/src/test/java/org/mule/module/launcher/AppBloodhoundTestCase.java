@@ -14,7 +14,7 @@ import org.mule.api.config.MuleProperties;
 import org.mule.module.launcher.descriptor.ApplicationDescriptor;
 import org.mule.module.launcher.plugin.PluginClasspath;
 import org.mule.module.launcher.plugin.PluginDescriptor;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.util.IOUtils;
 
 import java.io.File;
@@ -22,12 +22,19 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.util.Set;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 public class AppBloodhoundTestCase extends AbstractMuleTestCase
 {
 
     private File muleHome;
     private File appsDir;
 
+    @Test
     public void testPlugin() throws Exception
     {
         // set up some mule home structure

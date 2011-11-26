@@ -14,15 +14,24 @@ import org.mule.api.config.MuleProperties;
 import org.mule.api.retry.RetryPolicyTemplate;
 import org.mule.api.transport.Connector;
 import org.mule.retry.policies.SimpleRetryPolicyTemplate;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class DefaultRetryPolicyTestCase extends FunctionalTestCase
 {
+
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/config/spring/handlers/default-retry-policy.xml";
     }
 
+    @Test
     public void testPolicyRegistration() throws Exception
     {
         Object obj = muleContext.getRegistry().lookupObject(MuleProperties.OBJECT_DEFAULT_RETRY_POLICY_TEMPLATE);
@@ -30,7 +39,8 @@ public class DefaultRetryPolicyTestCase extends FunctionalTestCase
         assertTrue(obj.getClass().getName(), obj instanceof SimpleRetryPolicyTemplate);
         assertEquals(3, ((SimpleRetryPolicyTemplate) obj).getCount());
     }
-    
+
+    @Test
     public void testConnectorPolicy() throws Exception
     {
         Connector c = muleContext.getRegistry().lookupConnector("testConnector");

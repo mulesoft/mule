@@ -10,19 +10,23 @@
 
 package org.mule.test.routing;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.apache.commons.lang.RandomStringUtils;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.functional.FunctionalTestComponent;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.util.store.AbstractPartitionedObjectStore;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.commons.lang.RandomStringUtils;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 public class UntilSuccessfulTestCase extends FunctionalTestCase
 {
@@ -51,6 +55,7 @@ public class UntilSuccessfulTestCase extends FunctionalTestCase
         objectStore.disposePartition("DEFAULT_PARTITION");
     }
 
+    @Test
     public void testDefaultConfiguration() throws Exception
     {
         final String payload = RandomStringUtils.randomAlphanumeric(20);
@@ -61,6 +66,7 @@ public class UntilSuccessfulTestCase extends FunctionalTestCase
         assertEquals(payload, receivedPayloads.get(0));
     }
 
+    @Test
     public void testFullConfiguration() throws Exception
     {
         final String payload = RandomStringUtils.randomAlphanumeric(20);
@@ -79,6 +85,7 @@ public class UntilSuccessfulTestCase extends FunctionalTestCase
         assertEquals(payload, receivedPayloads.get(0));
     }
 
+    @Test
     public void testFullConfigurationMP() throws Exception
     {
         final String payload = RandomStringUtils.randomAlphanumeric(20);
@@ -95,6 +102,7 @@ public class UntilSuccessfulTestCase extends FunctionalTestCase
         ponderUntilMessageCountReceivedByCustomMP(1);
     }
 
+    @Test
     public void testRetryOnEndpoint() throws Exception
     {
         final String payload = RandomStringUtils.randomAlphanumeric(20);

@@ -14,6 +14,13 @@ import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.transaction.TransactionCoordination;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 public class FlowAynchronousProcessingStrategyTestCase extends FlowDefaultProcessingStrategyTestCase
 {
 
@@ -32,6 +39,7 @@ public class FlowAynchronousProcessingStrategyTestCase extends FlowDefaultProces
         assertNotNull(result);
     }
 
+    @Override
     public void testDispatchToOneWayTx() throws Exception
     {
         MuleClient client = muleContext.getClient();
@@ -43,6 +51,7 @@ public class FlowAynchronousProcessingStrategyTestCase extends FlowDefaultProces
 
     }
 
+    @Override
     public void testSendToOneWayTx() throws Exception
     {
         MuleClient client = muleContext.getClient();
@@ -58,6 +67,7 @@ public class FlowAynchronousProcessingStrategyTestCase extends FlowDefaultProces
         }
     }
 
+    @Override
     public void testSendRequestResponseInbound() throws Exception
     {
         MuleClient client = muleContext.getClient();
@@ -71,6 +81,7 @@ public class FlowAynchronousProcessingStrategyTestCase extends FlowDefaultProces
         }
     }
 
+    @Override
     public void testDispatchToRequestResponseInboundOneWayOutbound() throws Exception
     {
         MuleClient client = muleContext.getClient();
@@ -84,6 +95,7 @@ public class FlowAynchronousProcessingStrategyTestCase extends FlowDefaultProces
 
     }
 
+    @Override
     public void testSendToRequestResponseInboundOneWayOutbound() throws Exception
     {
         MuleClient client = muleContext.getClient();
@@ -136,13 +148,14 @@ public class FlowAynchronousProcessingStrategyTestCase extends FlowDefaultProces
         assertFalse(receiverThread.equals(dispatcherThread));
     }
 
+    @Override
     public void testRequestResponseInboundFailingOneWayOutbound() throws Exception
     {
         MuleClient client = muleContext.getClient();
 
         try
         {
-            MuleMessage response = client.send("vm://requestresponse-failingoneway-in", "a", null);
+            client.send("vm://requestresponse-failingoneway-in", "a", null);
             fail("exception expected");
         }
         catch (Exception e)
