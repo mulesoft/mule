@@ -10,7 +10,9 @@
 
 package org.mule.example.cep;
 
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+
+import org.junit.Test;
 
 public class BrokerTestCase extends FunctionalTestCase
 {
@@ -20,6 +22,7 @@ public class BrokerTestCase extends FunctionalTestCase
         return "mule-config.xml";
     }
 
+    @Test
     public void testBroker() throws Exception
     {       
         Thread.sleep(20000); //don't set this too high without adjusting the test timeout first

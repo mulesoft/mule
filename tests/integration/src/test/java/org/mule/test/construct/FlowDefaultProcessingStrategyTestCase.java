@@ -22,10 +22,19 @@ import org.mule.api.lifecycle.CreateException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transport.Connector;
 import org.mule.api.transport.MessageDispatcher;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transport.vm.VMMessageDispatcher;
 import org.mule.transport.vm.VMMessageDispatcherFactory;
 import org.mule.transport.vm.VMMessageReceiver;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class FlowDefaultProcessingStrategyTestCase extends FunctionalTestCase
 {
@@ -36,6 +45,7 @@ public class FlowDefaultProcessingStrategyTestCase extends FunctionalTestCase
         return "org/mule/test/construct/flow-default-processing-strategy-config.xml";
     }
 
+    @Test
     public void testDispatchToOneWayInbound() throws Exception
     {
         MuleClient client = muleContext.getClient();
@@ -46,6 +56,7 @@ public class FlowDefaultProcessingStrategyTestCase extends FunctionalTestCase
         assertAllProcessingAsync(result);
     }
 
+    @Test
     public void testSendToOneWayInbound() throws Exception
     {
         MuleClient client = muleContext.getClient();
@@ -66,6 +77,7 @@ public class FlowDefaultProcessingStrategyTestCase extends FunctionalTestCase
         assertFalse(flowThread.equals(dispatcherThread));
     }
 
+    @Test
     public void testDispatchToOneWayTx() throws Exception
     {
         MuleClient client = muleContext.getClient();
@@ -76,6 +88,7 @@ public class FlowDefaultProcessingStrategyTestCase extends FunctionalTestCase
         assertAllProcessingInRecieverThread(result);
     }
 
+    @Test
     public void testSendToOneWayTx() throws Exception
     {
         MuleClient client = muleContext.getClient();
@@ -88,6 +101,7 @@ public class FlowDefaultProcessingStrategyTestCase extends FunctionalTestCase
     }
 
 
+    @Test
     public void testDispatchToOneWayInboundTxOnly() throws Exception
     {
         MuleClient client = muleContext.getClient();
@@ -98,6 +112,7 @@ public class FlowDefaultProcessingStrategyTestCase extends FunctionalTestCase
         assertAllProcessingInRecieverThread(result);
     }
 
+    @Test
     public void testDispatchToOneWayOutboundTxOnly() throws Exception
     {
         MuleClient client = muleContext.getClient();
@@ -108,6 +123,7 @@ public class FlowDefaultProcessingStrategyTestCase extends FunctionalTestCase
         assertAllProcessingAsync(result);
     }
 
+    @Test
     public void testSendRequestResponseInbound() throws Exception
     {
         MuleClient client = muleContext.getClient();
@@ -116,6 +132,7 @@ public class FlowDefaultProcessingStrategyTestCase extends FunctionalTestCase
         assertAllProcessingInClientThread(response);
     }
 
+    @Test
     public void testDispatchToRequestResponseInboundOneWayOutbound() throws Exception
     {
         MuleClient client = muleContext.getClient();
@@ -126,6 +143,7 @@ public class FlowDefaultProcessingStrategyTestCase extends FunctionalTestCase
         assertNull(client.request("vm://requestresponse-oneway-out", RECEIVE_TIMEOUT));
     }
 
+    @Test
     public void testSendToRequestResponseInboundOneWayOutbound() throws Exception
     {
         MuleClient client = muleContext.getClient();
@@ -176,6 +194,7 @@ public class FlowDefaultProcessingStrategyTestCase extends FunctionalTestCase
         assertFalse(receiverThread.equals(dispatcherThread));
     }
 
+    @Test
     public void testRequestResponseInboundFailingOneWayOutbound() throws Exception
     {
         MuleClient client = muleContext.getClient();

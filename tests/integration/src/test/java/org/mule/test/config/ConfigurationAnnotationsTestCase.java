@@ -17,25 +17,24 @@ import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.transformer.Transformer;
 import org.mule.component.DefaultJavaComponent;
-import org.mule.component.simple.EchoComponent;
 import org.mule.construct.Flow;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
+import javax.xml.namespace.QName;
 
 import org.junit.Test;
 
-import javax.xml.namespace.QName;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Test that configuration-based annotations are propagated to the appropriate runtime objects
  */
 public class ConfigurationAnnotationsTestCase extends FunctionalTestCase
 {
+
     @Override
     protected String getConfigResources()
     {

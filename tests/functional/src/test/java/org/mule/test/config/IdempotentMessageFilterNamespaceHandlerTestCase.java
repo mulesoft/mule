@@ -15,7 +15,7 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.api.store.ObjectStore;
 import org.mule.construct.Flow;
 import org.mule.routing.IdempotentMessageFilter;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.util.SystemUtils;
 import org.mule.util.store.InMemoryObjectStore;
 import org.mule.util.store.SimpleMemoryObjectStore;
@@ -25,11 +25,17 @@ import java.io.File;
 import java.io.Serializable;
 import java.util.List;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 /**
  * Tests for all object stores that can be configured on an {@link IdempotentMessageFilter}.
  */
 public class IdempotentMessageFilterNamespaceHandlerTestCase extends FunctionalTestCase
 {
+
     public IdempotentMessageFilterNamespaceHandlerTestCase()
     {
         // we just test the wiring of the objects, no need to start the MuleContext
@@ -42,6 +48,7 @@ public class IdempotentMessageFilterNamespaceHandlerTestCase extends FunctionalT
         return "org/mule/test/config/idempotent-message-filter-config.xml";
     }
 
+    @Test
     public void testInMemoryObjectStore() throws Exception
     {
         IdempotentMessageFilter filter = idempotentMessageFilterFromFlow("inMemoryStore");
@@ -55,6 +62,7 @@ public class IdempotentMessageFilterNamespaceHandlerTestCase extends FunctionalT
         assertEquals(3000, memoryStore.getMaxEntries());
     }
 
+    @Test
     public void testSimpleTextFileStore() throws Exception
     {
         IdempotentMessageFilter filter = idempotentMessageFilterFromFlow("simpleTextFileStore");
@@ -73,6 +81,7 @@ public class IdempotentMessageFilterNamespaceHandlerTestCase extends FunctionalT
         assertEquals(3000, fileStore.getMaxEntries());
     }
 
+    @Test
     public void testCustomObjectStore() throws Exception
     {
         IdempotentMessageFilter filter = idempotentMessageFilterFromFlow("customObjectStore");

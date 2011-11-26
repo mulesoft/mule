@@ -13,7 +13,11 @@ package org.mule.test.integration.routing.outbound;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
 
 /**
  * Make sure to run an external amq broker, otherwise the test isn't possible.
@@ -27,6 +31,7 @@ public class MulticastWithXaTestCase extends FunctionalTestCase
         return "org/mule/test/integration/routing/outbound/multicasting-router-xa-config.xml";
     }
 
+    @Test
     public void testName() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);

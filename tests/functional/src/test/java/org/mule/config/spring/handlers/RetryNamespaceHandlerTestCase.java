@@ -18,15 +18,24 @@ import org.mule.retry.notifiers.ConnectNotifier;
 import org.mule.retry.policies.NoRetryPolicyTemplate;
 import org.mule.retry.policies.RetryForeverPolicyTemplate;
 import org.mule.retry.policies.SimpleRetryPolicyTemplate;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class RetryNamespaceHandlerTestCase extends FunctionalTestCase
 {
+
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/config/spring/handlers/retry-namespace-config.xml";
     }
 
+    @Test
     public void testDefaultConfig() throws Exception
     {
         Connector c = muleContext.getRegistry().lookupConnector("testConnector1");
@@ -43,6 +52,7 @@ public class RetryNamespaceHandlerTestCase extends FunctionalTestCase
         assertTrue(c.isStarted());
     }
 
+    @Test
     public void testSimpleDefaults() throws Exception
     {
         Connector c = muleContext.getRegistry().lookupConnector("testConnector2");
@@ -58,6 +68,7 @@ public class RetryNamespaceHandlerTestCase extends FunctionalTestCase
         assertTrue(c.isStarted());
     }
 
+    @Test
     public void testSimpleConfig() throws Exception
     {
         Connector c = muleContext.getRegistry().lookupConnector("testConnector3");
@@ -73,6 +84,7 @@ public class RetryNamespaceHandlerTestCase extends FunctionalTestCase
         assertTrue(c.isStarted());
     }
 
+    @Test
     public void testForeverConfig() throws Exception
     {
         Connector c = muleContext.getRegistry().lookupConnector("testConnector4");
@@ -87,6 +99,7 @@ public class RetryNamespaceHandlerTestCase extends FunctionalTestCase
         assertTrue(c.isStarted());
     }
 
+    @Test
     public void testCustomConfig() throws Exception
     {
         Connector c = muleContext.getRegistry().lookupConnector("testConnector5");
@@ -102,6 +115,7 @@ public class RetryNamespaceHandlerTestCase extends FunctionalTestCase
         assertTrue(c.isStarted());
     }
 
+    @Test
     public void testConnectNotifierConfig() throws Exception
     {
         Connector c = muleContext.getRegistry().lookupConnector("testConnector6");
@@ -117,6 +131,7 @@ public class RetryNamespaceHandlerTestCase extends FunctionalTestCase
         assertTrue(c.isStarted());
     }
 
+    @Test
     public void testCustomNotifierConfig() throws Exception
     {
         Connector c = muleContext.getRegistry().lookupConnector("testConnector7");
@@ -133,6 +148,7 @@ public class RetryNamespaceHandlerTestCase extends FunctionalTestCase
         assertTrue(c.isStarted());
     }
 
+    @Test
     public void testAsynchronousRetryConfig() throws Exception
     {
         Connector c = muleContext.getRegistry().lookupConnector("testConnector8");

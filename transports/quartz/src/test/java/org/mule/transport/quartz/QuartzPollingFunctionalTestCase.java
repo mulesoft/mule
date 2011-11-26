@@ -13,19 +13,27 @@ package org.mule.transport.quartz;
 import org.mule.DefaultMuleContext;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.functional.CountdownCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transport.PollingController;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class QuartzPollingFunctionalTestCase extends FunctionalTestCase
 {
+
     @Override
     protected String getConfigResources()
     {
         return "quartz-polling-functional-test.xml";
     }
 
+    @Test
     public void testMuleReceiverJob() throws Exception
     {
         ((DefaultMuleContext) muleContext).setPollingController(new PollingController()
@@ -63,6 +71,7 @@ public class QuartzPollingFunctionalTestCase extends FunctionalTestCase
         assertTrue(count2.getCount() < 1000);
     }
 
+    @Test
     public void testMuleSenderJob() throws Exception
     {
         ((DefaultMuleContext) muleContext).setPollingController(new PollingController()

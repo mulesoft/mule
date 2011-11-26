@@ -18,14 +18,23 @@ import org.mule.api.store.ObjectDoesNotExistException;
 import org.mule.api.store.ObjectStore;
 import org.mule.api.store.ObjectStoreException;
 import org.mule.api.store.ObjectStoreManager;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
-public class ManagedStoresTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+
+public class ManagedStoresTestCase extends AbstractMuleContextTestCase
 {
 
     public ManagedStoresTestCase()
     {
-        setDisposeManagerPerSuite(true);
+        setDisposeContextPerClass(true);
     }
 
     @Override
@@ -37,6 +46,7 @@ public class ManagedStoresTestCase extends AbstractMuleTestCase
         manager.clearStoreCache();
     }
 
+    @Test
     public void testInMemoryStore() throws ObjectStoreException, InterruptedException, RegistrationException
     {
         muleContext.getRegistry().registerObject(MuleProperties.OBJECT_STORE_DEFAULT_IN_MEMORY_NAME,
@@ -55,6 +65,7 @@ public class ManagedStoresTestCase extends AbstractMuleTestCase
             10000, 200));
     }
 
+    @Test
     public void testPersistentStore()
         throws ObjectStoreException, InterruptedException, RegistrationException
     {
@@ -76,6 +87,7 @@ public class ManagedStoresTestCase extends AbstractMuleTestCase
             10, 10000, 200));
     }
 
+    @Test
     public void testPartitionableInMemoryStore()
         throws ObjectStoreException, RegistrationException, InterruptedException
     {
@@ -95,6 +107,7 @@ public class ManagedStoresTestCase extends AbstractMuleTestCase
             10000, 200));
     }
 
+    @Test
     public void testPartitionablePersistenceStore()
         throws ObjectStoreException, RegistrationException, InterruptedException
     {

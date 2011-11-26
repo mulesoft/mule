@@ -13,6 +13,8 @@ package org.mule.test.construct;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 
+import static org.junit.Assert.assertNull;
+
 public class FlowSynchronousProcessingStrategyTestCase extends FlowDefaultProcessingStrategyTestCase
 {
 
@@ -22,6 +24,7 @@ public class FlowSynchronousProcessingStrategyTestCase extends FlowDefaultProces
         return "org/mule/test/construct/flow-synchronous-processing-strategy-config.xml";
     }
 
+    @Override
     public void testDispatchToOneWayInbound() throws Exception
     {
         MuleClient client = muleContext.getClient();
@@ -32,6 +35,7 @@ public class FlowSynchronousProcessingStrategyTestCase extends FlowDefaultProces
         assertAllProcessingInRecieverThread(result);
     }
 
+    @Override
     public void testSendToOneWayInbound() throws Exception
     {
         MuleClient client = muleContext.getClient();

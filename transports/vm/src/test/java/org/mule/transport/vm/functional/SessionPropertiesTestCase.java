@@ -12,9 +12,14 @@ package org.mule.transport.vm.functional;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import java.util.Collections;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
 
 public class SessionPropertiesTestCase extends FunctionalTestCase
 {
@@ -25,6 +30,7 @@ public class SessionPropertiesTestCase extends FunctionalTestCase
         return "vm/session-properties.xml";
     }
 
+    @Test
     public void testVmToVmSessionPropertiesTestCase() throws Exception
     {
         final MuleClient client = new MuleClient(muleContext);
@@ -32,6 +38,7 @@ public class SessionPropertiesTestCase extends FunctionalTestCase
         assertNotNullAndNotExceptionResponse(response);
     }
 
+    @Test
     public void testVm1ToVm2ThenVm1ToVm2SessionPropertiesTestCase() throws Exception
     {
         final MuleClient client = new MuleClient(muleContext);
@@ -47,6 +54,5 @@ public class SessionPropertiesTestCase extends FunctionalTestCase
             fail(response.getExceptionPayload().getException().getCause().toString());
         }
     }
-
 
 }

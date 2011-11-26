@@ -18,19 +18,26 @@ import org.mule.construct.Flow;
 import org.mule.construct.flow.DefaultFlowProcessingStrategy;
 import org.mule.model.seda.SedaService;
 import org.mule.processor.strategy.QueuedAsynchronousProcessingStrategy;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.util.store.SimpleMemoryObjectStore;
 
 import java.io.Serializable;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 public class QueueStoreConfigurationTestCase extends FunctionalTestCase
 {
+    
     @Override
     protected String getConfigResources()
     {
         return "org/mule/test/spring/queue-store-configs.xml";
     }
 
+    @Test
     public void testServiceDefaults()
     {
         SedaService service = lookupService("serviceDefault");
@@ -39,6 +46,7 @@ public class QueueStoreConfigurationTestCase extends FunctionalTestCase
         assertObjectStoreIsDefaultMemoryObjectStore(queueProfile.getObjectStore());
     }
     
+    @Test
     public void testServiceOnlyNumberOfOutstandingMessagesConfigured()
     {
         SedaService service = lookupService("serviceNoObjectStore");
@@ -47,6 +55,7 @@ public class QueueStoreConfigurationTestCase extends FunctionalTestCase
         assertObjectStoreIsDefaultMemoryObjectStore(queueProfile.getObjectStore());
     }
     
+    @Test
     public void testServiceExplicitDefaultMemoryObjectStoreConfigured()
     {
         SedaService service = lookupService("serviceExplicitDefaultMemoryObjectStore");
@@ -54,6 +63,7 @@ public class QueueStoreConfigurationTestCase extends FunctionalTestCase
         assertObjectStoreIsDefaultMemoryObjectStore(queueProfile.getObjectStore());
     }
     
+    @Test
     public void testServiceExplicitDefaultPersistentObjectStoreConfigured()
     {
         SedaService service = lookupService("serviceExplicitDefaultPersistentObjectStore");
@@ -61,6 +71,7 @@ public class QueueStoreConfigurationTestCase extends FunctionalTestCase
         assertObjectStoreIsDefaultPersistentObjectStore(queueProfile.getObjectStore());
     }
 
+    @Test
     public void testServiceExplicitObjectStoreConfigured()
     {
         SedaService service = lookupService("serviceExplicitObjectStore");
@@ -68,6 +79,7 @@ public class QueueStoreConfigurationTestCase extends FunctionalTestCase
         assertTrue(queueProfile.getObjectStore() instanceof TestObjectStore);
     }
 
+    @Test
     public void testFlowDefaults()
     {
         Flow flow = lookupFlow("flowDefault");
@@ -76,11 +88,11 @@ public class QueueStoreConfigurationTestCase extends FunctionalTestCase
         assertTrue(flow.getProcessingStrategy() instanceof DefaultFlowProcessingStrategy);
     }
     
+    @Test
     public void testFlowQueuedAsync()
     {
         Flow flow = lookupFlow("flowQueuedAsync");
-        
-        
+
         ProcessingStrategy pipeline = flow.getProcessingStrategy();
         assertTrue(pipeline instanceof QueuedAsynchronousProcessingStrategy);
         
