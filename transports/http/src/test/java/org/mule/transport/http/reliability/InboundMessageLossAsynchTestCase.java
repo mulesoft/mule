@@ -15,6 +15,8 @@ import org.mule.transport.http.HttpConstants;
 import org.apache.commons.httpclient.HttpMethodBase;
 import org.apache.commons.httpclient.methods.PostMethod;
 
+import static org.junit.Assert.assertEquals;
+
 /**
  * Verify that no inbound messages are lost when exceptions occur.  
  * The message must either make it all the way to the SEDA queue (in the case of 
@@ -31,6 +33,7 @@ public class InboundMessageLossAsynchTestCase extends InboundMessageLossTestCase
         return "reliability/inbound-message-loss-asynch.xml";
     }
 
+    @Override
     public void testNoException() throws Exception
     {
         HttpMethodBase request = createRequest(getBaseUri() + "/noException");
@@ -45,6 +48,7 @@ public class InboundMessageLossAsynchTestCase extends InboundMessageLossTestCase
         int status = httpClient.executeMethod(request);
         assertEquals(HttpConstants.SC_OK, status);    }
 
+    @Override
     public void testComponentException() throws Exception
     {
         HttpMethodBase request = createRequest(getBaseUri() + "/componentException");

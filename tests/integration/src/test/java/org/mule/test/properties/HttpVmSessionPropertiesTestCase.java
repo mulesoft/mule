@@ -10,21 +10,28 @@
 
 package org.mule.test.properties;
 
-import org.hamcrest.core.IsNull;
-import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
-import org.mule.api.lifecycle.Callable;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.DynamicPortTestCase;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.util.Collections;
 
-import static org.hamcrest.core.Is.is;
+import org.hamcrest.core.IsNull;
+import org.junit.Rule;
+import org.junit.Test;
+
 import static org.junit.Assert.assertThat;
 
-public class HttpVmSessionPropertiesTestCase extends DynamicPortTestCase
+public class HttpVmSessionPropertiesTestCase extends FunctionalTestCase
 {
+
+    @Rule
+    public DynamicPort dynamicPort1 = new DynamicPort("port1");
+
+    @Rule
+    public DynamicPort dynamicPort2 = new DynamicPort("port2");
+
     @Override
     protected String getConfigResources()
     {
@@ -35,10 +42,11 @@ public class HttpVmSessionPropertiesTestCase extends DynamicPortTestCase
      * Test that the Session property are copied correctly from Http flow to VM flows transport
      * correctly copies outbound to inbound property both for requests amd responses
      */
+    @Test
     public void testPropertiesFromHttpToVm() throws Exception
     {
         final MuleClient client = new MuleClient(muleContext);
-        MuleMessage message = client.send("http://localhost:" + getPorts().get(0) + "/http-inbound-flow", "some message", Collections.emptyMap());
+        MuleMessage message = client.send("http://localhost:" + dynamicPort1.getNumber() + "/http-inbound-flow", "some message", Collections.emptyMap());
         assertThat(message, IsNull.<Object>notNullValue());
         assertThat(message.getExceptionPayload(), IsNull.<Object>nullValue());
     }
@@ -46,17 +54,12 @@ public class HttpVmSessionPropertiesTestCase extends DynamicPortTestCase
     /**
      * Test that the Session property are copied correctly from VM flow to Http flows transport correctly copies outbound to inbound property both for requests amd responses
      */
+    @Test
     public void testPropertiesFromVmToHttp() throws Exception
     {
         final MuleClient client = new MuleClient(muleContext);
         MuleMessage message = client.send("vm://vm-inbound-flow", "some message", Collections.emptyMap());
         assertThat(message, IsNull.<Object>notNullValue());
         assertThat(message.getExceptionPayload(), IsNull.<Object>nullValue());
-    }
-
-    @Override
-    protected int getNumPortsToFind()
-    {
-        return 2;
     }
 }

@@ -11,11 +11,16 @@
 package org.mule.transport.http.construct.builder;
 
 import org.mule.api.MuleException;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.transport.http.construct.HttpProxy;
 
-public class HttpProxyBuilderTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+
+public class HttpProxyBuilderTestCase extends AbstractMuleContextTestCase
 {
+    @Test
     public void testConfigurationNoCache() throws MuleException
     {
         final HttpProxy httpProxy = new HttpProxyBuilder().name("test-http-proxy-no-cache")

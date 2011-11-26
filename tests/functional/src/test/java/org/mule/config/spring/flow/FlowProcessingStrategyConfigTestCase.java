@@ -20,9 +20,13 @@ import org.mule.processor.AsyncDelegateMessageProcessor;
 import org.mule.processor.strategy.AsynchronousProcessingStrategy;
 import org.mule.processor.strategy.QueuedAsynchronousProcessingStrategy;
 import org.mule.processor.strategy.SynchronousProcessingStrategy;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import java.util.List;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 public class FlowProcessingStrategyConfigTestCase extends FunctionalTestCase
 {
@@ -33,30 +37,35 @@ public class FlowProcessingStrategyConfigTestCase extends FunctionalTestCase
         return "org/mule/test/config/spring/flow/flow-processing-strategies.xml";
     }
 
+    @Test
     public void testDefault() throws Exception
     {
         assertEquals(DefaultFlowProcessingStrategy.class,
             getFlowProcessingStrategy("defaultFlow").getClass());
     }
 
+    @Test
     public void testSynchronous() throws Exception
     {
         assertEquals(SynchronousProcessingStrategy.class,
             getFlowProcessingStrategy("synchronousFlow").getClass());
     }
 
+    @Test
     public void testAsynchronous() throws Exception
     {
         assertEquals(AsynchronousProcessingStrategy.class,
             getFlowProcessingStrategy("asynchronousFlow").getClass());
     }
 
+    @Test
     public void testQueuedAsynchronous() throws Exception
     {
         assertEquals(QueuedAsynchronousProcessingStrategy.class,
             getFlowProcessingStrategy("queuedAsynchronousFlow").getClass());
     }
 
+    @Test
     public void testCustomAsynchronous() throws Exception
     {
         ProcessingStrategy processingStrategy = getFlowProcessingStrategy("customAsynchronousFlow");
@@ -66,6 +75,7 @@ public class FlowProcessingStrategyConfigTestCase extends FunctionalTestCase
         assertAsynchronousStrategyConfig((AsynchronousProcessingStrategy) processingStrategy);
     }
 
+    @Test
     public void testCustomQueuedAsynchronous() throws Exception
     {
         ProcessingStrategy processingStrategy = getFlowProcessingStrategy("customQueuedAsynchronousFlow");
@@ -81,6 +91,7 @@ public class FlowProcessingStrategyConfigTestCase extends FunctionalTestCase
 
     }
 
+    @Test
     public void testCustom() throws Exception
     {
         ProcessingStrategy processingStrategy = getFlowProcessingStrategy("customProcessingStrategyFlow");
@@ -89,24 +100,28 @@ public class FlowProcessingStrategyConfigTestCase extends FunctionalTestCase
         assertEquals("bar", (((CustomProcessingStrategy) processingStrategy).foo));
     }
 
+    @Test
     public void testDefaultAsync() throws Exception
     {
         assertEquals(QueuedAsynchronousProcessingStrategy.class,
             getAsyncProcessingStrategy("defaultAsync").getClass());
     }
 
+    @Test
     public void testAsynchronousAsync() throws Exception
     {
         assertEquals(AsynchronousProcessingStrategy.class,
             getAsyncProcessingStrategy("asynchronousAsync").getClass());
     }
 
+    @Test
     public void testQueuedAsynchronousAsync() throws Exception
     {
         assertEquals(QueuedAsynchronousProcessingStrategy.class,
             getAsyncProcessingStrategy("queuedAsynchronousAsync").getClass());
     }
 
+    @Test
     public void testCustomAsynchronousAsync() throws Exception
     {
         ProcessingStrategy processingStrategy = getAsyncProcessingStrategy("customAsynchronousAsync");
@@ -116,6 +131,7 @@ public class FlowProcessingStrategyConfigTestCase extends FunctionalTestCase
         assertAsynchronousStrategyConfig((AsynchronousProcessingStrategy) processingStrategy);
     }
 
+    @Test
     public void testCustomQueuedAsynchronousAsync() throws Exception
     {
         ProcessingStrategy processingStrategy = getAsyncProcessingStrategy("customQueuedAsynchronousAsync");
@@ -128,9 +144,9 @@ public class FlowProcessingStrategyConfigTestCase extends FunctionalTestCase
             .intValue());
         assertEquals(10, ((QueuedAsynchronousProcessingStrategy) processingStrategy).getMaxQueueSize()
             .intValue());
-
     }
 
+    @Test
     public void testCustomAsync() throws Exception
     {
         ProcessingStrategy processingStrategy = getAsyncProcessingStrategy("customProcessingStrategyAsync");
