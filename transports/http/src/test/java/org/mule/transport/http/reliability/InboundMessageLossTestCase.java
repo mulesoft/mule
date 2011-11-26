@@ -12,41 +12,27 @@ package org.mule.transport.http.reliability;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
-import org.mule.MessageExchangePattern;
-import org.mule.api.ExceptionPayload;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
-import org.mule.api.MuleSession;
-import org.mule.api.construct.FlowConstruct;
 import org.mule.api.exception.RollbackSourceCallback;
-import org.mule.api.security.Credentials;
-import org.mule.api.transformer.DataType;
-import org.mule.api.transformer.Transformer;
-import org.mule.api.transformer.TransformerException;
-import org.mule.api.transport.PropertyScope;
-import org.mule.api.transport.ReplyToHandler;
 import org.mule.exception.AbstractMessagingExceptionStrategy;
 import org.mule.exception.DefaultSystemExceptionStrategy;
-import org.mule.management.stats.ProcessingTime;
 import org.mule.message.DefaultExceptionPayload;
 import org.mule.routing.filters.WildcardFilter;
-import org.mule.tck.DynamicPortTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.NullPayload;
 import org.mule.transport.http.HttpConstants;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethodBase;
 import org.apache.commons.httpclient.methods.GetMethod;
+import org.junit.Rule;
+import org.junit.Test;
 
-import javax.activation.DataHandler;
-import java.io.OutputStream;
-import java.net.URI;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Verify that no inbound messages are lost when exceptions occur.  
@@ -56,9 +42,12 @@ import java.util.Set;
  * In the case of the HTTP transport, there is no way to restore the source message
  * so an exception is simply returned to the client.
  */
-public class InboundMessageLossTestCase extends DynamicPortTestCase
+public class InboundMessageLossTestCase extends FunctionalTestCase
 {
     protected HttpClient httpClient = new HttpClient();
+    
+    @Rule
+    public DynamicPort dynamicPort = new DynamicPort("port1");
     
     @Override
     protected String getConfigResources()
@@ -75,6 +64,7 @@ public class InboundMessageLossTestCase extends DynamicPortTestCase
         ((DefaultSystemExceptionStrategy) muleContext.getExceptionListener()).setRollbackTxFilter(new WildcardFilter("*"));
     }
 
+    @Test
     public void testNoException() throws Exception
     {
         HttpMethodBase request = createRequest(getBaseUri() + "/noException");
@@ -83,6 +73,7 @@ public class InboundMessageLossTestCase extends DynamicPortTestCase
         assertEquals("Here you go", request.getResponseBodyAsString());
     }
     
+    @Test
     public void testTransformerException() throws Exception
     {
         HttpMethodBase request = createRequest(getBaseUri() + "/transformerException");
@@ -91,6 +82,7 @@ public class InboundMessageLossTestCase extends DynamicPortTestCase
         assertTrue(request.getResponseBodyAsString().contains("Failure"));
     }
 
+    @Test
     public void testHandledTransformerException() throws Exception
     {
         HttpMethodBase request = createRequest(getBaseUri() + "/handledTransformerException");
@@ -99,6 +91,7 @@ public class InboundMessageLossTestCase extends DynamicPortTestCase
         assertTrue(request.getResponseBodyAsString().contains("Success"));
     }
 
+    @Test
     public void testNotHandledTransformerException() throws Exception
     {
         HttpMethodBase request = createRequest(getBaseUri() + "/notHandledTransformerException");
@@ -107,6 +100,7 @@ public class InboundMessageLossTestCase extends DynamicPortTestCase
         assertTrue(request.getResponseBodyAsString().contains("Bad news"));
     }
 
+    @Test
     public void testRouterException() throws Exception
     {
         HttpMethodBase request = createRequest(getBaseUri() + "/routerException");
@@ -115,6 +109,7 @@ public class InboundMessageLossTestCase extends DynamicPortTestCase
         assertTrue(request.getResponseBodyAsString().contains("Failure"));
     }
     
+    @Test
     public void testComponentException() throws Exception
     {
         HttpMethodBase request = createRequest(getBaseUri() + "/componentException");
@@ -132,13 +127,7 @@ public class InboundMessageLossTestCase extends DynamicPortTestCase
     
     protected String getBaseUri()
     {
-        return "http://localhost:" + getPorts().get(0);
-    }
-    
-    @Override
-    protected int getNumPortsToFind()
-    {
-        return 1;
+        return "http://localhost:" + dynamicPort.getNumber();
     }
 
     /**
