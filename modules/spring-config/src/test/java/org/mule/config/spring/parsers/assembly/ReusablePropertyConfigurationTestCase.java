@@ -12,12 +12,15 @@ package org.mule.config.spring.parsers.assembly;
 
 import org.mule.config.spring.parsers.assembly.configuration.ReusablePropertyConfiguration;
 
+import org.junit.Test;
+
 public class ReusablePropertyConfigurationTestCase extends AbstractBasePropertyConfigurationTestCase
 {
 
     public static final String REFERENCE = "reference";
     public static final String WRAPPER = "wrapper";
 
+    @Test
     public void testReusable()
     {
         ReusablePropertyConfiguration config = new ReusablePropertyConfiguration();

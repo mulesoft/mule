@@ -10,14 +10,18 @@
 
 package org.mule.config.spring.parsers;
 
+import org.junit.Test;
+
 public class EndpointServiceConflictTestCase extends AbstractBadConfigTestCase
 {
 
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/config/spring/parsers/endpoint-service-conflict-test.xml";
     }
 
+    @Test
     public void testBeanError() throws Exception
     {
         assertErrorContains("A service named LenderService already exists");

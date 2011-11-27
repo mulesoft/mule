@@ -10,14 +10,18 @@
 
 package org.mule.config.spring.parsers;
 
+import org.junit.Test;
+
 public class MuleElementRequiredTestCase extends AbstractBadConfigTestCase
 {
 
+    @Override
     protected String getConfigResources()
     {
         return "mule-element-required-test.xml";
     }
 
+    @Test
     public void testHelpfulErrorMessage() throws Exception
     {
         assertErrorContains("This element should be embedded");

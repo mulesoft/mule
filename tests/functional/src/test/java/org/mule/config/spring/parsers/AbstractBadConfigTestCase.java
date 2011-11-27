@@ -13,16 +13,18 @@ package org.mule.config.spring.parsers;
 import org.mule.api.config.ConfigurationBuilder;
 import org.mule.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.context.DefaultMuleContextFactory;
-
-import junit.framework.TestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 /**
  * A stripped-down version of FunctionalTestCase that allows us to test the parsing of a bad configuration. 
  */
-public abstract class AbstractBadConfigTestCase extends TestCase
+public abstract class AbstractBadConfigTestCase extends AbstractMuleTestCase
 {
     protected final transient Log logger = LogFactory.getLog(getClass());
 

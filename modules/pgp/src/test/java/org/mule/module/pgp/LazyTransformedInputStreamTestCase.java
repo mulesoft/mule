@@ -10,37 +10,41 @@
 
 package org.mule.module.pgp;
 
+import org.mule.tck.junit4.AbstractMuleTestCase;
+
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import junit.framework.TestCase;
-
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicLong;
-
 import org.apache.commons.io.IOUtils;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
-public class LazyTransformedInputStreamTestCase extends TestCase
+import static org.junit.Assert.assertEquals;
+
+public class LazyTransformedInputStreamTestCase extends AbstractMuleTestCase
 {
     private static String message = "abcdefghij";
     private ByteArrayInputStream inputStream;
     private LazyTransformedInputStream transformedInputStream;
     private AddOneStreamTransformer simpleTransformer;
 
-    protected void setUp() throws Exception
+    @Before
+    public void setUp() throws Exception
     {
-        super.setUp();
         inputStream = new ByteArrayInputStream(message.getBytes());
         simpleTransformer = new AddOneStreamTransformer(inputStream);
     }
 
-    @Override
-    protected void tearDown() throws Exception
+    @After
+    public void tearDown() throws Exception
     {
-        super.tearDown();
         IOUtils.closeQuietly(inputStream);
     }
 
+    @Test
     public void testTransformPerRequestPolicy() throws Exception
     {
         transformedInputStream = new LazyTransformedInputStream(new TransformPerRequestPolicy(),
@@ -57,6 +61,7 @@ public class LazyTransformedInputStreamTestCase extends TestCase
         }
     }
 
+    @Test
     public void testTransformPerRequestInChunksPolicy() throws Exception
     {
         int chunkSize = 4;
@@ -76,6 +81,7 @@ public class LazyTransformedInputStreamTestCase extends TestCase
         }
     }
 
+    @Test
     public void testTransformContinuouslyPolicy() throws Exception
     {
         LazyTransformedInputStream transformedInputStream = new LazyTransformedInputStream(

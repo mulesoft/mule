@@ -9,17 +9,24 @@
  */
 package org.mule.util.scan.annotations;
 
+import org.mule.tck.junit4.AbstractMuleTestCase;
+
 import java.io.IOException;
 import java.util.List;
 
-import junit.framework.TestCase;
+import org.junit.Before;
+import org.junit.Test;
 import org.objectweb.asm.ClassReader;
 
-public class AnnotationsScannerTestCase extends TestCase
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+public class AnnotationsScannerTestCase extends AbstractMuleTestCase
 {
     protected AnnotationsScanner scanner;
 
-    protected void setUp() throws IOException
+    @Before
+    public void setUp() throws IOException
     {
         ClassReader r = new ClosableClassReader(SampleClassWithAnnotations.class.getName());
         scanner = new AnnotationsScanner();
@@ -27,6 +34,7 @@ public class AnnotationsScannerTestCase extends TestCase
         r.accept(scanner, 0);
     }
 
+    @Test
     public void testParamAnnotations() throws Exception
     {
         final List<AnnotationInfo> paramAnnotations = scanner.getParamAnnotations();
@@ -55,6 +63,7 @@ public class AnnotationsScannerTestCase extends TestCase
         assertEquals(new AnnotationInfo.NameValue("param2", "abc"), annValues.get(2));
     }
 
+    @Test
     public void testFieldAnnotations() throws Exception
     {
         final List<AnnotationInfo> fieldAnnotations = scanner.getFieldAnnotations();
@@ -73,6 +82,7 @@ public class AnnotationsScannerTestCase extends TestCase
         assertEquals(new AnnotationInfo.NameValue("value", "FieldLevel"), annValues.get(0));
     }
 
+    @Test
     public void testClassAnnotations() throws Exception
     {
         final List<AnnotationInfo> classAnnotations = scanner.getClassAnnotations();
@@ -91,6 +101,7 @@ public class AnnotationsScannerTestCase extends TestCase
         assertEquals(new AnnotationInfo.NameValue("value", "ClassLevel"), annValues.get(0));
     }
 
+    @Test
     public void testMethodAnnotations() throws Exception
     {
         final List<AnnotationInfo> methodAnnotations = scanner.getMethodAnnotations();
@@ -115,8 +126,6 @@ public class AnnotationsScannerTestCase extends TestCase
         assertNotNull(annValues);
         assertEquals(1, annValues.size());
         assertEquals(new AnnotationInfo.NameValue("value", "MethodLevel / toString"), annValues.get(0));
-
-
     }
 
 }

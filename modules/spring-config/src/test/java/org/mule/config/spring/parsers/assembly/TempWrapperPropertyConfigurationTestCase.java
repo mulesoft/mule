@@ -14,12 +14,15 @@ import org.mule.config.spring.parsers.assembly.configuration.PropertyConfigurati
 import org.mule.config.spring.parsers.assembly.configuration.SimplePropertyConfiguration;
 import org.mule.config.spring.parsers.assembly.configuration.TempWrapperPropertyConfiguration;
 
+import org.junit.Test;
+
 public class TempWrapperPropertyConfigurationTestCase extends AbstractBasePropertyConfigurationTestCase
 {
 
     public static final String REFERENCE = "reference";
     public static final String WRAPPER = "wrapper";
 
+    @Test
     public void testTempWrapper()
     {
         PropertyConfiguration reference = new SimplePropertyConfiguration();

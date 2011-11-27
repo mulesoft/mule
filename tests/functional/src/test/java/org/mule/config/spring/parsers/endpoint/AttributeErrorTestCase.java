@@ -12,14 +12,18 @@ package org.mule.config.spring.parsers.endpoint;
 
 import org.mule.config.spring.parsers.AbstractBadConfigTestCase;
 
+import org.junit.Test;
+
 public class AttributeErrorTestCase extends AbstractBadConfigTestCase
 {
 
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/config/spring/parsers/endpoint/attribute-error-test.xml";
     }
 
+    @Test
     public void testError() throws Exception
     {
         assertErrorContains("do not match the exclusive groups [address] [ref]");

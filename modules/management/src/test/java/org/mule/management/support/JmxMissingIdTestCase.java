@@ -15,20 +15,18 @@ import org.mule.config.DefaultMuleConfiguration;
 import org.mule.context.DefaultMuleContextBuilder;
 import org.mule.context.DefaultMuleContextFactory;
 import org.mule.module.management.agent.JmxAgent;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
-import junit.framework.TestCase;
+import org.junit.Test;
 
-public class JmxMissingIdTestCase extends TestCase
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+public class JmxMissingIdTestCase extends AbstractMuleTestCase
 {
-    MuleContext muleContext;
-    
-    @Override
-    protected void tearDown() throws Exception
-    {
-        super.tearDown();
-        muleContext = null;
-    }
+    private MuleContext muleContext;
 
+    @Test
     public void testContextIdAndJmxAgentIsOk() throws Exception
     {
         DefaultMuleConfiguration config = new DefaultMuleConfiguration();
@@ -39,7 +37,8 @@ public class JmxMissingIdTestCase extends TestCase
 
         muleContext.start();
     }
-    
+
+    @Test
     public void testNoContextIdAndJmxAgentMustFail() throws Exception
     {
         try

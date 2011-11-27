@@ -18,36 +18,41 @@ import org.mule.api.context.MuleContextBuilder;
 import org.mule.config.DefaultMuleConfiguration;
 import org.mule.context.DefaultMuleContextBuilder;
 import org.mule.context.DefaultMuleContextFactory;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
-import junit.framework.TestCase;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
-public class MuleConfigurationTestCase extends TestCase
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+public class MuleConfigurationTestCase extends AbstractMuleTestCase
 {
-    
+
     private boolean failOnMessageScribbling;
     protected String workingDirectory = "target";
-        
-    @Override
-    protected void setUp() throws Exception
+    private MuleContext muleContext;
+
+    @Before
+    public void setUp() throws Exception
     {
-        super.setUp();
-        
         // fiddling with ThreadSafeAccess must not have side effects on later tests. Store
         // the current state here and restore it in tearDown
         failOnMessageScribbling = ThreadSafeAccess.AccessControl.isFailOnMessageScribbling();
     }
-
-    @Override
-    protected void tearDown() throws Exception
+    
+    @After
+    public void tearDown() throws Exception
     {
         muleContext.dispose();
         muleContext = null;
         ThreadSafeAccess.AccessControl.setFailOnMessageScribbling(failOnMessageScribbling);
     } 
     
-    private MuleContext muleContext;
-    
     /** Test for MULE-3092 */
+    @Test
     public void testConfigureProgramatically() throws Exception
     {
         DefaultMuleConfiguration config = new DefaultMuleConfiguration();
@@ -78,6 +83,7 @@ public class MuleConfigurationTestCase extends TestCase
     }
 
     /** Test for MULE-3092 */
+    @Test
     public void testConfigureWithSystemProperties() throws Exception
     {
         System.setProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "encoding", "UTF-16");
@@ -130,6 +136,7 @@ public class MuleConfigurationTestCase extends TestCase
     }
 
     /** Test for MULE-3110 */
+    @Test
     public void testConfigureAfterInitFails() throws Exception
     {
         muleContext = new DefaultMuleContextFactory().createMuleContext();        
@@ -167,6 +174,7 @@ public class MuleConfigurationTestCase extends TestCase
     }
 
     /** Test for MULE-3110 */
+    @Test
     public void testConfigureAfterStartFails() throws Exception
     {
         muleContext = new DefaultMuleContextFactory().createMuleContext();        

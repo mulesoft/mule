@@ -10,14 +10,18 @@
 
 package org.mule.config.spring.parsers;
 
+import org.junit.Test;
+
 public class MissingParserTestCase extends AbstractBadConfigTestCase
 {
 
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/config/spring/parsers/missing-parser-test.xml";
     }
 
+    @Test
     public void testHelpfulErrorMessage() throws Exception
     {
         assertErrorContains("Is the module or transport");
