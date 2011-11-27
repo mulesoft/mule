@@ -10,23 +10,28 @@
 
 package org.mule.module.xml.stax;
 
+import org.mule.tck.junit4.AbstractMuleTestCase;
+
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
-import junit.framework.TestCase;
+import org.junit.Before;
+import org.junit.Test;
 
-public class ReversibleXMLStreamReaderTest extends TestCase
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
+public class ReversibleXMLStreamReaderTest extends AbstractMuleTestCase
 {
+
     private JaxpStreamReaderAsserter asserter = null;
     
-    @Override
-    protected void setUp() throws Exception
+    @Before
+    public void setUp() throws Exception
     {
-        super.setUp();
-        
         String factoryName = XMLInputFactory.newInstance().getClass().getName();
         if (factoryName.equals("com.sun.xml.internal.stream.XMLInputFactoryImpl"))
         {
@@ -42,6 +47,7 @@ public class ReversibleXMLStreamReaderTest extends TestCase
         }
     }
 
+    @Test
     public void testReverse() throws Exception
     {        
         ReversibleXMLStreamReader xsr = createReader();
@@ -73,6 +79,7 @@ public class ReversibleXMLStreamReaderTest extends TestCase
         assertEquals(XMLStreamConstants.END_DOCUMENT, xsr.next());
     }
     
+    @Test
     public void testFullReverse() throws Exception
     {
         ReversibleXMLStreamReader xsr = createReader();

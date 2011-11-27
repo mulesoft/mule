@@ -10,11 +10,14 @@
 
 package org.mule.tools.schemadocs;
 
-import junit.framework.TestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
-public class PathTestCase extends TestCase
+import org.junit.Test;
+
+public class PathTestCase extends AbstractMuleTestCase
 {
 
+    @Test
     public void testTagFromFileName()
     {
         assertEquals("quartz",

@@ -10,18 +10,26 @@
 
 package org.mule.util;
 
+import org.mule.tck.junit4.AbstractMuleTestCase;
+
 import java.io.File;
 
-import junit.framework.TestCase;
+import org.junit.Test;
 
-public class FilenameUtilsTestCase extends TestCase
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+
+public class FilenameUtilsTestCase extends AbstractMuleTestCase
 {
+
+    @Test
     public void testFileWithPathComponentsNullParameter()
     {
         File result = FilenameUtils.fileWithPathComponents(null);
         assertNull(result);
     }
 
+    @Test
     public void testFileWithNullElements()
     {
         File tempDir = getBuidDirectory();
@@ -34,6 +42,7 @@ public class FilenameUtilsTestCase extends TestCase
         assertEquals(excpected, resultNormalized);
     }
 
+    @Test
     public void testFileWithPathComponents()
     {
         String tempDirPath = getBuidDirectory().getAbsolutePath();

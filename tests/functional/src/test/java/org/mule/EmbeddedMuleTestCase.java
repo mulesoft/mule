@@ -11,15 +11,22 @@
 package org.mule;
 
 import org.mule.api.MuleContext;
-import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.context.MuleContextFactory;
+import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.context.DefaultMuleContextFactory;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
-import junit.framework.TestCase;
+import org.junit.Test;
 
-public class EmbeddedMuleTestCase extends TestCase
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+public class EmbeddedMuleTestCase extends AbstractMuleTestCase
 {
+    @Test
     public void testStartup() throws Exception
     {
         SpringXmlConfigurationBuilder builder = new SpringXmlConfigurationBuilder(
