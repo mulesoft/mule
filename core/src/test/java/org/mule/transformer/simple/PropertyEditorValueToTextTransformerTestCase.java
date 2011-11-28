@@ -14,10 +14,10 @@ import org.mule.api.transformer.Transformer;
 import org.mule.transformer.AbstractTransformerTestCase;
 
 import java.beans.PropertyEditor;
+import java.beans.PropertyEditorManager;
 
 public class PropertyEditorValueToTextTransformerTestCase extends AbstractTransformerTestCase
 {
-
     @Override
     public Object getResultData()
     {
@@ -27,7 +27,7 @@ public class PropertyEditorValueToTextTransformerTestCase extends AbstractTransf
     @Override
     public Transformer getRoundTripTransformer() throws Exception
     {
-        return new PropertyEditorTextToValueTransformer((PropertyEditor) Class.forName("sun.beans.editors.BoolEditor").newInstance(), Boolean.class);
+        return new PropertyEditorTextToValueTransformer(createBooleanPropertyEditor(), Boolean.class);
     }
 
     @Override
@@ -39,7 +39,11 @@ public class PropertyEditorValueToTextTransformerTestCase extends AbstractTransf
     @Override
     public Transformer getTransformer() throws Exception
     {
-        return new PropertyEditorValueToTextTransformer((PropertyEditor) Class.forName("sun.beans.editors.BoolEditor").newInstance(), Boolean.class);
+        return new PropertyEditorValueToTextTransformer(createBooleanPropertyEditor(), Boolean.class);
     }
 
+    private PropertyEditor createBooleanPropertyEditor() throws Exception
+    {
+        return PropertyEditorManager.findEditor(boolean.class);
+    }
 }
