@@ -204,8 +204,6 @@ public abstract class AbstractReceiverServlet extends HttpServlet
 
     protected HttpServletResponse setHttpHeadersOnServletResponse(HttpResponse httpResponse, HttpServletResponse servletResponse)
     {
-        handleContentTypeHeader(servletResponse, httpResponse);
-
         // Remove any Transfer-Encoding headers that were set (e.g. by MuleMessageToHttpResponse)
         // earlier. Mule's default HTTP transformer is used in both cases: when the reply
         // MuleMessage is generated for our standalone HTTP server and for the servlet case. The
@@ -218,10 +216,13 @@ public abstract class AbstractReceiverServlet extends HttpServlet
         {
             servletResponse.addHeader(header.getName(), header.getValue());
         }
+
+        ensureContentTypeHeaderIsSet(servletResponse, httpResponse);
+
         return servletResponse;
     }
 
-    protected void handleContentTypeHeader(HttpServletResponse servletResponse, HttpResponse httpResponse)
+    protected void ensureContentTypeHeaderIsSet(HttpServletResponse servletResponse, HttpResponse httpResponse)
     {
         Header contentTypeHeader = httpResponse.getFirstHeader(HttpConstants.HEADER_CONTENT_TYPE);
         String contentType = defaultContentType;
