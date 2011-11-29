@@ -52,10 +52,10 @@ public class Scriptable implements Initialisable, MuleContextAware
 {
     /** The actual body of the script */
     private String scriptText;
-    
+
     /** A file from which the script will be loaded */
     private String scriptFile;
-    
+
     /** Parameters to be made available to the script as variables */
     private Properties properties;
 
@@ -68,17 +68,17 @@ public class Scriptable implements Initialisable, MuleContextAware
 
     /** A compiled version of the script, if the scripting engine supports it */
     private CompiledScript compiledScript;
-    
+
     private ScriptEngine scriptEngine;
     private ScriptEngineManager scriptEngineManager;
 
     private MuleContext muleContext;
-    
+
     protected transient Log logger = LogFactory.getLog(getClass());
 
     public Scriptable()
     {
-        //For Stpring
+        //For Spring
     }
 
     public Scriptable(MuleContext muleContext)
@@ -86,7 +86,6 @@ public class Scriptable implements Initialisable, MuleContextAware
         this.muleContext = muleContext;
     }
 
-    //For Spring
     public void setMuleContext(MuleContext context)
     {
         this.muleContext = context;
@@ -190,7 +189,7 @@ public class Scriptable implements Initialisable, MuleContextAware
         //src maps with the argument passed into the transformer
         bindings.put("src", payload);
     }
-    
+
     public void populateBindings(Bindings bindings, MuleMessage message)
     {
         populateDefaultBindings(bindings);
@@ -219,7 +218,7 @@ public class Scriptable implements Initialisable, MuleContextAware
             bindings.put("service", event.getFlowConstruct());
         }
     }
-    
+
     public Object runScript(Bindings bindings) throws ScriptException
     {
         Object result;
@@ -301,7 +300,7 @@ public class Scriptable implements Initialisable, MuleContextAware
     {
         return scriptEngineName;
     }
-    
+
     public Properties getProperties()
     {
         return properties;
@@ -311,7 +310,7 @@ public class Scriptable implements Initialisable, MuleContextAware
     {
         this.properties = properties;
     }
-    
+
     public ScriptEngine getScriptEngine()
     {
         return scriptEngine;
