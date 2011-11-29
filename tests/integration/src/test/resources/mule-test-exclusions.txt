@@ -97,3 +97,6 @@ org.mule.test.integration.transport.jms.scripting.JmsRequestFromScriptWithXaTran
 
 # Disable temporarily.  This tests needs updating to assert that the flow insitialisation fails. 
 org.mule.test.construct.FlowAynchronousProcessingStrategyTestCase
+
+# EE-2518
+org.mule.test.usecases.ReplyToTestCase

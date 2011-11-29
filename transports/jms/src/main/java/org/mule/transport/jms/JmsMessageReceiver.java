@@ -277,25 +277,5 @@ public class JmsMessageReceiver extends AbstractMessageReceiver implements Messa
             throw new ConnectException(e, this);
         }
     }
-    
-    @Override
-    protected ReplyToHandler getReplyToHandler()
-    {
-        ReplyToHandler replyToHandler = super.getReplyToHandler();
-        if (replyToHandler != null)
-        {
-            if (MessageExchangePattern.REQUEST_RESPONSE.equals(endpoint.getExchangePattern()))
-            {
-                logger.warn("JMS request-response inbound endpoints are deprecated and will no longer be supported as from Mule 3.3");
-
-                if (endpoint.getResponseMessageProcessors().size() > 0)
-                {
-                    logger.error("Response message processors (including transformers) configured on JMS request-response inbound endpoints are ignored and will have no effect.");
-                }
-
-            }
-        }
-        return replyToHandler;
-    }
 
 }

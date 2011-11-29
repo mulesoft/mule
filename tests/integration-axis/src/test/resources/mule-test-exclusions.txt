@@ -6,3 +6,7 @@ org.mule.transport.soap.cxf.ServiceUsingAxisEndpointTestCase
 
 # contains no test cases
 org.mule.test.integration.transformer.response.ResponseTransformerScenariosTestCase
+
+# EE-2518
+org.mule.test.usecases.ReplyToTestCase
+

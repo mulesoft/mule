@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xsi:schemaLocation="
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
+       http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/3.2/mule-test.xsd
+       http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/3.2/mule-jms.xsd
+       http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.2/mule-vm.xsd">
+
+    <jms:activemq-connector name="jmsConnector"/>
+
+    <jms:endpoint name="in" queue="in" />
+    <jms:endpoint name="out" queue="out" />
+
+    <model>
+        <service name="vm-in-flow-case-1">
+            <inbound>
+                <vm:inbound-endpoint name="vm.in" path="vminbound" exchange-pattern="request-response"/>
+            </inbound>
+            <outbound>
+                <pass-through-router>
+                    <outbound-endpoint ref="in" exchange-pattern="request-response">
+                        <response>
+                            <message-properties-transformer scope="outbound">
+                                <add-message-property key="test" value="test"/>
+                            </message-properties-transformer>
+                            <append-string-transformer message=" jms flow content"/>
+                        </response>
+                    </outbound-endpoint>
+                </pass-through-router>
+            </outbound>
+        </service>
+
+        <service name="response-flow-case-1">
+            <inbound>
+                <jms:inbound-endpoint ref="in"/>
+            </inbound>
+            <test:component>
+                <test:return-data>A Message</test:return-data>
+            </test:component>
+        </service>
+
+        <service name="vm-in-flow-case-2">
+            <inbound>
+                <vm:inbound-endpoint name="vm.in2" path="vminbound2" exchange-pattern="request-response"/>
+            </inbound>
+            <outbound>
+                <pass-through-router>
+                    <jms:outbound-endpoint ref="out" exchange-pattern="request-response"/>
+                </pass-through-router>
+            </outbound>
+        </service>
+
+        <service name="response-flow-case-2">
+            <inbound>
+                <jms:inbound-endpoint ref="out" exchange-pattern="request-response">
+                    <response>
+                        <append-string-transformer message=" jms flow content"/>
+                    </response>
+                </jms:inbound-endpoint>
+            </inbound>
+            <test:component/>
+        </service>
+
+        <service name="response-flow-case-3">
+            <inbound>
+                <jms:inbound-endpoint queue="in3" exchange-pattern="one-way"/>
+            </inbound>
+            <test:component appendString=" jms flow content"/>
+        </service>
+
+    </model>
+
+</mule>
