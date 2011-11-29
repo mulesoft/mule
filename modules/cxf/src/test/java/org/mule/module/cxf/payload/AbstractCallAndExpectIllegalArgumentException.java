@@ -16,7 +16,9 @@ import org.mule.api.transport.DispatchException;
 import org.mule.module.client.MuleClient;
 import org.mule.module.cxf.CxfOutboundMessageProcessor;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * This is an abstract utility class that helps the testing of
@@ -46,18 +48,18 @@ abstract class AbstractCallAndExpectIllegalArgumentException implements CallAndE
         try
         {
             client.send(outputEndpointName, payload, null);
-            TestCase.fail(here() + " should have thrown an exception");
+            fail(here() + " should have thrown an exception");
         }
         catch (MuleException e)
         {
             e.printStackTrace();
-            TestCase.assertTrue(here() + ", exception {" + e + "} must be a "
+            assertTrue(here() + ", exception {" + e + "} must be a "
                        + DispatchException.class.getSimpleName(), e instanceof DispatchException);
-            TestCase.assertTrue(here() + ", exception.getCause() {" + e + "} must be a "
+            assertTrue(here() + ", exception.getCause() {" + e + "} must be a "
                        + IllegalArgumentException.class.getName(),
-                e.getCause() instanceof IllegalArgumentException);
-            TestCase.assertEquals(here(), expectedIllegalArgumentExceptionMessage(), e.getCause()
-                .getMessage());
+                       e.getCause() instanceof IllegalArgumentException);
+            assertEquals(here(), expectedIllegalArgumentExceptionMessage(), e.getCause()
+                    .getMessage());
         }
     }
 

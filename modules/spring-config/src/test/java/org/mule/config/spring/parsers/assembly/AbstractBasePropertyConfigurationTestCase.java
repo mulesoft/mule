@@ -12,13 +12,14 @@ package org.mule.config.spring.parsers.assembly;
 
 import org.mule.config.spring.parsers.assembly.configuration.PrefixValueMap;
 import org.mule.config.spring.parsers.assembly.configuration.PropertyConfiguration;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertEquals;
 
-public abstract class AbstractBasePropertyConfigurationTestCase extends TestCase
+public abstract class AbstractBasePropertyConfigurationTestCase extends AbstractMuleTestCase
 {
 
     public static final String ALIAS = "Alias";

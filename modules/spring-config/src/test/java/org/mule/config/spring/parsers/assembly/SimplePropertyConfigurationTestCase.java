@@ -13,11 +13,14 @@ package org.mule.config.spring.parsers.assembly;
 import org.mule.config.spring.parsers.assembly.configuration.PropertyConfiguration;
 import org.mule.config.spring.parsers.assembly.configuration.SimplePropertyConfiguration;
 
+import org.junit.Test;
+
 public class SimplePropertyConfigurationTestCase extends AbstractBasePropertyConfigurationTestCase
 {
 
     public static final String SIMPLE = "simple";
 
+    @Test
     public void testSimple()
     {
         PropertyConfiguration config = new SimplePropertyConfiguration();

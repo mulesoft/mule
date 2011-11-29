@@ -10,7 +10,8 @@
 
 package org.mule.module.xml.expression;
 
-import junit.framework.TestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
+
 import org.dom4j.dom.DOMDocument;
 import org.dom4j.tree.DefaultDocument;
 import org.jaxen.JaxenException;
@@ -19,11 +20,12 @@ import org.jaxen.dom.DOMXPath;
 import org.jaxen.dom4j.Dom4jXPath;
 import org.junit.Test;
 
-public class XPathExpressionEvaluatorTestCase extends TestCase
+import static org.junit.Assert.assertTrue;
+
+public class XPathExpressionEvaluatorTestCase extends AbstractMuleTestCase
 {
     private static final String EXPRESSION = "//isTest[test() = 'true']";
     private static final String OTHER_EXPRESSION = "//isNotTest[test = 'false']";
-
 
     @Test
     public void testXPathCache() throws JaxenException

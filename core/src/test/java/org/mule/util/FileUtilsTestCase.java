@@ -16,7 +16,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 
-import junit.framework.TestCase;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -151,7 +150,7 @@ public class FileUtilsTestCase extends AbstractMuleTestCase
             assertTrue("Failed to create output dirs.", outputDir.mkdirs());
         }
         String res = "META-INF/MANIFEST.MF";
-        FileUtils.extractResources(res, TestCase.class, outputDir, true);
+        FileUtils.extractResources(res, getClass(), outputDir, true);
         File result = FileUtils.newFile(testDir, res);
         assertNotNull(result);
         assertTrue(result.exists());
@@ -171,7 +170,7 @@ public class FileUtilsTestCase extends AbstractMuleTestCase
             outputDir.mkdirs();
         }
         String res = "META-INF/";
-        FileUtils.extractResources(res, TestCase.class, outputDir, true);
+        FileUtils.extractResources(res, getClass(), outputDir, true);
         File result = FileUtils.newFile(testDir, res);
         assertNotNull(result);
         assertTrue(result.exists());
@@ -230,7 +229,7 @@ public class FileUtilsTestCase extends AbstractMuleTestCase
         }
         String fileName = "MANIFEST.MF";
         String res = "META-INF/" + fileName;
-        FileUtils.extractResources(res, TestCase.class, outputDir, false);
+        FileUtils.extractResources(res, getClass(), outputDir, false);
         File result = FileUtils.newFile(testDir, fileName);
         assertNotNull(result);
         assertTrue(result.exists());

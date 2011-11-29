@@ -15,11 +15,8 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertEquals;
 
-/**
- *
- */
 class CallAndExpectPayloadResult implements CallAndExpect
 {
     private Object expectedPayloadResult;
@@ -43,7 +40,7 @@ class CallAndExpectPayloadResult implements CallAndExpect
         MuleClient client = new MuleClient(muleContext);
         MuleMessage result = client.send(outputEndpointName, payload, null);
 
-        TestCase.assertEquals(here(), expectedPayloadResult, result.getPayload());
+        assertEquals(here(), expectedPayloadResult, result.getPayload());
     }
 
     private String here()

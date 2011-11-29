@@ -9,11 +9,17 @@
  */
 package org.mule.util.scan.annotations;
 
-import junit.framework.TestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
+
+import org.junit.Test;
 import org.objectweb.asm.ClassReader;
 
-public class ClasspathAnnotationsScannerTestCase extends TestCase
+import static org.junit.Assert.assertEquals;
+
+public class ClasspathAnnotationsScannerTestCase extends AbstractMuleTestCase
 {
+
+    @Test
     public void testScanAnnotationsWithFilter() throws Exception
     {
         ClassReader r = new ClosableClassReader(SampleClassWithAnnotations.class.getName());
@@ -24,6 +30,7 @@ public class ClasspathAnnotationsScannerTestCase extends TestCase
         assertEquals(1, scanner.getAllAnnotations().size());
     }
 
+    @Test
     public void testScanMetaAnnotations() throws Exception
     {
         ClassReader r = new ClosableClassReader(SampleBeanWithAnnotations.class.getName());

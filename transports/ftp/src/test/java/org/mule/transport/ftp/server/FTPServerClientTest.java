@@ -10,45 +10,54 @@
 
 package org.mule.transport.ftp.server;
 
-import org.mule.tck.PortUtils;
+import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.ftp.AbstractFtpServerTestCase;
 
 import java.io.File;
 import java.io.IOException;
 
-import junit.framework.TestCase;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Various tests against the FTPClient/Server we use in Mule ftp transport tests.
  * This is to make sure basic ftp functionality works with our current ftp
  * client/server before we throw Mule into the mix.
  */
-public class FTPServerClientTest extends TestCase
+public class FTPServerClientTest extends AbstractMuleTestCase
 {
-    Server ftpServer = null;
-    FTPTestClient ftpClient = null;
-    public int port = -1;
+
     private static final String adminUser = "admin";
     private static final String adminPassword = "admin";
-    
-    /**
-     * Initialize the ftp server
-     */
+
+    private Server ftpServer = null;
+    private FTPTestClient ftpClient = null;
+
+    @Rule
+    public DynamicPort dynamicPort = new DynamicPort("port1");
+
+    @Before
     public void setUp() throws Exception
     {
         new File(AbstractFtpServerTestCase.FTP_SERVER_BASE_DIR).mkdirs();
-        port = PortUtils.findFreePorts(1).get(0).intValue();
-        ftpServer = new Server(port);
-        System.out.println("using port : " + port);
+        ftpServer = new Server(dynamicPort.getNumber());
     }
     
     /**
      * Create a directory and delete it
      * @throws IOException
      */
+    @Test
     public void testCreateDeleteDir() throws IOException
     {
-        ftpClient = new FTPTestClient("localhost", port, adminUser, adminPassword);
+        ftpClient = new FTPTestClient("localhost", dynamicPort.getNumber(), adminUser, adminPassword);
         String dir = "/foo/";
         assertTrue("unable to create directory: " + dir, ftpClient.makeDir(dir));
         //verify directory was created
@@ -61,9 +70,10 @@ public class FTPServerClientTest extends TestCase
      * Create a file and delete it
      * @throws IOException
      */    
+    @Test
     public void testCreateDeleteFile() throws IOException
     {
-        ftpClient = new FTPTestClient("localhost", port, adminUser, adminPassword);
+        ftpClient = new FTPTestClient("localhost", dynamicPort.getNumber(), adminUser, adminPassword);
         File testFile = File.createTempFile("fake", "file");
         ftpClient.putFile(testFile.getAbsolutePath(),"/");
         assertTrue("Could not find file :" + testFile.getName(), ftpClient.fileExists(testFile.getName()));
@@ -75,9 +85,10 @@ public class FTPServerClientTest extends TestCase
      * Create a bunch of files/dirs then recursively delete them
      * @throws IOException
      */
+    @Test
     public void testRecursiveDelete() throws IOException
     {                        
-        ftpClient = new FTPTestClient("localhost", port, adminUser, adminPassword);
+        ftpClient = new FTPTestClient("localhost", dynamicPort.getNumber(), adminUser, adminPassword);
         
         assertTrue(ftpClient.makeDir("dir1/"));
         ftpClient.dirExists("dir1/");
@@ -125,9 +136,7 @@ public class FTPServerClientTest extends TestCase
         assertEquals("there are still files left over", 0, ftpClient.getFileList("/").length);
     }
         
-    /**
-     * Stop the ftp server and disconnect the client
-     */
+    @After
     public void tearDown()
     {
         if(ftpServer != null)
