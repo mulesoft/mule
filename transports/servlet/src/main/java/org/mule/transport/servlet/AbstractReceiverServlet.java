@@ -15,6 +15,7 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.OutputHandler;
 import org.mule.config.ExceptionHelper;
 import org.mule.transport.http.HttpConstants;
@@ -38,7 +39,6 @@ import org.apache.commons.logging.LogFactory;
 
 public abstract class AbstractReceiverServlet extends HttpServlet
 {
-
     /**
      * logger used by this class
      */
@@ -116,7 +116,24 @@ public abstract class AbstractReceiverServlet extends HttpServlet
         }
 
         muleContext = setupMuleContext();
+        setupResponseTransformer();
+        doInit();
+    }
+
+    protected MuleContext setupMuleContext() throws ServletException
+    {
+        MuleContext context = (MuleContext) getServletContext().getAttribute(MuleProperties.MULE_CONTEXT_PROPERTY);
+        if (context == null)
+        {
+            throw new ServletException("Property " + MuleProperties.MULE_CONTEXT_PROPERTY + " not set on ServletContext");
+        }
+        return context;
+    }
+
+    protected void setupResponseTransformer() throws ServletException
+    {
         responseTransformer.setMuleContext(muleContext);
+
         try
         {
             responseTransformer.initialise();
@@ -125,17 +142,6 @@ public abstract class AbstractReceiverServlet extends HttpServlet
         {
             throw new ServletException(e);
         }
-        doInit();
-    }
-
-    protected MuleContext setupMuleContext() throws ServletException
-    {
-        MuleContext muleContext = (MuleContext) getServletContext().getAttribute(MuleProperties.MULE_CONTEXT_PROPERTY);
-        if (muleContext == null)
-        {
-            throw new ServletException("Property " + MuleProperties.MULE_CONTEXT_PROPERTY + " not set on ServletContext");
-        }
-        return muleContext;
     }
 
     protected void doInit() throws ServletException
@@ -147,72 +153,93 @@ public abstract class AbstractReceiverServlet extends HttpServlet
     {
         if (message == null)
         {
-            servletResponse.setStatus(HttpServletResponse.SC_NO_CONTENT);
-            if (feedback)
-            {
-                servletResponse.setStatus(HttpServletResponse.SC_OK);
-                servletResponse.getWriter().write("Action was processed successfully. There was no result");
-            }
+            writeEmptyResponse(servletResponse);
         }
         else
         {
-            HttpResponse httpResponse;
-
-            if (message.getPayload() instanceof HttpResponse)
-            {
-                httpResponse = (HttpResponse) message.getPayload();
-
-            }
-            else
-            {
-                httpResponse = (HttpResponse) responseTransformer.transform(message);
-            }
-
-            // Map the HttpResponse to the ServletResponse
-            Header contentTypeHeader = httpResponse.getFirstHeader(HttpConstants.HEADER_CONTENT_TYPE);
-            String contentType = defaultContentType;
-            if (contentTypeHeader != null && contentTypeHeader.getValue() != null)
-            {
-                if (logger.isDebugEnabled())
-                {
-                    logger.debug("Using Content-Type from message header = " + contentTypeHeader.getValue());
-                }
-                contentType = contentTypeHeader.getValue();
-            }
-
-            servletResponse.setContentType(contentType);
-
-            servletResponse = setHttpHeadersOnServletResponse(httpResponse, servletResponse);
-
-            if (!servletResponse.isCommitted())
-            {
-                servletResponse.setStatus(httpResponse.getStatusCode());
-            }
-
-            if (httpResponse.hasBody())
-            {
-                OutputHandler outputHandler = httpResponse.getBody();
-                outputHandler.write(RequestContext.getEvent(), servletResponse.getOutputStream());
-            }
+            writeResponseFromMessage(servletResponse, message);
         }
         servletResponse.flushBuffer();
+    }
+
+    protected void writeEmptyResponse(HttpServletResponse servletResponse) throws IOException
+    {
+        servletResponse.setStatus(HttpServletResponse.SC_NO_CONTENT);
+        if (feedback)
+        {
+            servletResponse.setStatus(HttpServletResponse.SC_OK);
+            servletResponse.getWriter().write("Action was processed successfully. There was no result");
+        }
+    }
+
+    protected void writeResponseFromMessage(HttpServletResponse servletResponse, MuleMessage message) throws Exception
+    {
+        HttpResponse httpResponse = convertToHttpResponse(message);
+        setHttpHeadersOnServletResponse(httpResponse, servletResponse);
+
+        if (!servletResponse.isCommitted())
+        {
+            servletResponse.setStatus(httpResponse.getStatusCode());
+        }
+
+        if (httpResponse.hasBody())
+        {
+            OutputHandler outputHandler = httpResponse.getBody();
+            outputHandler.write(RequestContext.getEvent(), servletResponse.getOutputStream());
+        }
+    }
+
+    protected HttpResponse convertToHttpResponse(MuleMessage message) throws TransformerException
+    {
+        if (message.getPayload() instanceof HttpResponse)
+        {
+            return (HttpResponse) message.getPayload();
+
+        }
+        else
+        {
+            return (HttpResponse) responseTransformer.transform(message);
+        }
     }
 
     protected HttpServletResponse setHttpHeadersOnServletResponse(HttpResponse httpResponse, HttpServletResponse servletResponse)
     {
         // Remove any Transfer-Encoding headers that were set (e.g. by MuleMessageToHttpResponse)
-        // earlier. Mule's default HTTP transformer is used in both cases: when the reply 
-        // MuleMessage is generated for our standalone HTTP server and for the servlet case. The 
-        // servlet container should be able to figure out the Transfer-Encoding itself and some 
-        // get confused by 
+        // earlier. Mule's default HTTP transformer is used in both cases: when the reply
+        // MuleMessage is generated for our standalone HTTP server and for the servlet case. The
+        // servlet container should be able to figure out the Transfer-Encoding itself and some
+        // get confused by an existing header.
         httpResponse.removeHeaders(HttpConstants.HEADER_TRANSFER_ENCODING);
 
         Header[] headers = httpResponse.getHeaders();
         for (Header header : headers)
         {
-            servletResponse.setHeader(header.getName(), header.getValue());
+            servletResponse.addHeader(header.getName(), header.getValue());
         }
+
+        ensureContentTypeHeaderIsSet(servletResponse, httpResponse);
+
         return servletResponse;
+    }
+
+    protected void ensureContentTypeHeaderIsSet(HttpServletResponse servletResponse, HttpResponse httpResponse)
+    {
+        Header contentTypeHeader = httpResponse.getFirstHeader(HttpConstants.HEADER_CONTENT_TYPE);
+        String contentType = defaultContentType;
+        if (contentTypeHeaderIsValid(contentTypeHeader))
+        {
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Using Content-Type from message header = " + contentTypeHeader.getValue());
+            }
+            contentType = contentTypeHeader.getValue();
+        }
+        servletResponse.setContentType(contentType);
+    }
+
+    protected boolean contentTypeHeaderIsValid(Header header)
+    {
+        return (header != null) && (header.getValue() != null);
     }
 
     protected void handleException(Throwable exception, String message, HttpServletResponse response)
