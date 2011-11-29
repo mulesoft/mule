@@ -38,7 +38,6 @@ import org.apache.commons.logging.LogFactory;
 
 public abstract class AbstractReceiverServlet extends HttpServlet
 {
-
     /**
      * logger used by this class
      */
@@ -201,16 +200,16 @@ public abstract class AbstractReceiverServlet extends HttpServlet
     protected HttpServletResponse setHttpHeadersOnServletResponse(HttpResponse httpResponse, HttpServletResponse servletResponse)
     {
         // Remove any Transfer-Encoding headers that were set (e.g. by MuleMessageToHttpResponse)
-        // earlier. Mule's default HTTP transformer is used in both cases: when the reply 
-        // MuleMessage is generated for our standalone HTTP server and for the servlet case. The 
-        // servlet container should be able to figure out the Transfer-Encoding itself and some 
-        // get confused by 
+        // earlier. Mule's default HTTP transformer is used in both cases: when the reply
+        // MuleMessage is generated for our standalone HTTP server and for the servlet case. The
+        // servlet container should be able to figure out the Transfer-Encoding itself and some
+        // get confused by an existing header.
         httpResponse.removeHeaders(HttpConstants.HEADER_TRANSFER_ENCODING);
 
         Header[] headers = httpResponse.getHeaders();
         for (Header header : headers)
         {
-            servletResponse.setHeader(header.getName(), header.getValue());
+            servletResponse.addHeader(header.getName(), header.getValue());
         }
         return servletResponse;
     }
