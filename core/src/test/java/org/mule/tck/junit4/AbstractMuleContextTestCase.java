@@ -17,6 +17,7 @@ import org.mule.api.MuleEventContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleSession;
 import org.mule.api.config.ConfigurationBuilder;
+import org.mule.api.config.MuleConfiguration;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.context.MuleContextBuilder;
 import org.mule.api.context.MuleContextFactory;
@@ -259,10 +260,15 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase
             {
                 muleContext.dispose();
 
-                final String workingDir = muleContext.getConfiguration().getWorkingDirectory();
-                // do not delete TM recovery object store, everything else is good to
-                // go
-                FileUtils.deleteTree(FileUtils.newFile(workingDir), IGNORED_DOT_MULE_DIRS);
+                MuleConfiguration configuration = muleContext.getConfiguration();
+
+                if (configuration != null)
+                {
+                    final String workingDir = configuration.getWorkingDirectory();
+                    // do not delete TM recovery object store, everything else is good to
+                    // go
+                    FileUtils.deleteTree(FileUtils.newFile(workingDir), IGNORED_DOT_MULE_DIRS);
+                }
             }
             FileUtils.deleteTree(FileUtils.newFile("./ActiveMQ"));
         }
