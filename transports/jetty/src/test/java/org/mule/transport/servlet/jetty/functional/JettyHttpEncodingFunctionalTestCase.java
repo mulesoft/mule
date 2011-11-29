@@ -30,7 +30,7 @@ import org.junit.runners.Parameterized.Parameters;
 public class JettyHttpEncodingFunctionalTestCase extends HttpFunctionalTestCase
 {
     protected static String TEST_MESSAGE = "Test Http Request (R�dgr�d), 57 = \u06f7\u06f5 in Arabic";
-   
+
     public JettyHttpEncodingFunctionalTestCase(ConfigVariant variant, String configResources)
     {
         super(variant, configResources);
@@ -43,8 +43,8 @@ public class JettyHttpEncodingFunctionalTestCase extends HttpFunctionalTestCase
             {ConfigVariant.SERVICE, "jetty-http-encoding-test-service.xml"},
             {ConfigVariant.FLOW, "jetty-http-encoding-test-flow.xml"}
         });
-    }      
-    
+    }
+
     @Test
     public void testSendWithProperResponseContentType() throws Exception
     {
@@ -58,7 +58,7 @@ public class JettyHttpEncodingFunctionalTestCase extends HttpFunctionalTestCase
         assertEquals("UTF-16BE", reply.getEncoding());
         assertEquals(TEST_MESSAGE + " Received", reply.getPayloadAsString());
     }
-    
+
     /**
      * MULE-4031 - ensure the content type isn't copied
      */
@@ -71,8 +71,8 @@ public class JettyHttpEncodingFunctionalTestCase extends HttpFunctionalTestCase
         MuleMessage reply = client.send("clientEndpoint2", TEST_MESSAGE, messageProperties);
         assertNotNull(reply);
         assertEquals("200", reply.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY));
-        assertEquals("text/plain;charset=UTF-8", reply.getInboundProperty(HttpConstants.HEADER_CONTENT_TYPE));
-        assertEquals("UTF-8", reply.getEncoding());
+        assertEquals("text/plain; charset=utf-8", reply.getInboundProperty(HttpConstants.HEADER_CONTENT_TYPE));
+        assertEquals("utf-8", reply.getEncoding());
     }
 
     protected String getSendEncoding()
