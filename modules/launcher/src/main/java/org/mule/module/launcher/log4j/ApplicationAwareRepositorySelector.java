@@ -37,16 +37,18 @@ public class ApplicationAwareRepositorySelector implements RepositorySelector
     protected static final String PATTERN_LAYOUT = "%-5p %d [%t] %c: %m%n";
 
     protected static final Integer NO_CCL_CLASSLOADER = 0;
-    protected ConcurrentMap<Integer, LoggerRepository> repository = new ConcurrentHashMap<Integer, LoggerRepository>();
+
+    protected LoggerRepositoryCache cache = new LoggerRepositoryCache();
 
     // note that this is a direct log4j logger declaration, not a clogging one
     protected Logger logger = Logger.getLogger(getClass());
 
+    @Override
     public LoggerRepository getLoggerRepository()
     {
         final ClassLoader ccl = Thread.currentThread().getContextClassLoader();
 
-        LoggerRepository repository = this.repository.get(ccl == null ? NO_CCL_CLASSLOADER : ccl.hashCode());
+        LoggerRepository repository = cache.getLoggerRepository(ccl);
         if (repository == null)
         {
             final RootLogger root = new RootLogger(Level.INFO);
@@ -115,7 +117,7 @@ public class ApplicationAwareRepositorySelector implements RepositorySelector
                     }
                 }
 
-                final LoggerRepository previous = this.repository.putIfAbsent(ccl == null ? NO_CCL_CLASSLOADER : ccl.hashCode(), repository);
+                final LoggerRepository previous = cache.storeLoggerRepository(ccl, repository);
                 if (previous != null)
                 {
                     repository = previous;
@@ -147,11 +149,35 @@ public class ApplicationAwareRepositorySelector implements RepositorySelector
         }
     }
 
+    protected static class LoggerRepositoryCache
+    {
+        protected ConcurrentMap<Integer, LoggerRepository> repositories = new ConcurrentHashMap<Integer, LoggerRepository>();
+
+        public LoggerRepository getLoggerRepository(ClassLoader classLoader)
+        {
+            return repositories.get(computeKey(classLoader));
+        }
+
+        public LoggerRepository storeLoggerRepository(ClassLoader classLoader, LoggerRepository repository)
+        {
+            return repositories.putIfAbsent(computeKey(classLoader), repository);
+        }
+
+        public void remove(ClassLoader classLoader)
+        {
+            repositories.remove(computeKey(classLoader));
+        }
+
+        protected Integer computeKey(ClassLoader classLoader)
+        {
+            return classLoader == null ? NO_CCL_CLASSLOADER : classLoader.hashCode();
+        }
+    }
+
     // TODO rewrite using a single-threaded scheduled executor and terminate on undeploy/redeploy
     // this is a modified and unified version from log4j to better fit Mule's app lifecycle
     protected class ConfigWatchDog extends Thread
     {
-
         protected LoggerRepository repository;
         protected File file;
         protected long lastModif = 0;
@@ -180,10 +206,11 @@ public class ApplicationAwareRepositorySelector implements RepositorySelector
             {
                 ((MuleApplicationClassLoader) classLoader).addShutdownListener(new MuleApplicationClassLoader.ShutdownListener()
                 {
+                    @Override
                     public void execute()
                     {
                         final ClassLoader ccl = Thread.currentThread().getContextClassLoader();
-                        ApplicationAwareRepositorySelector.this.repository.remove(ccl == null ? NO_CCL_CLASSLOADER : ccl.hashCode());
+                        ApplicationAwareRepositorySelector.this.cache.remove(ccl);
                         interrupted = true;
                     }
                 });
@@ -254,6 +281,7 @@ public class ApplicationAwareRepositorySelector implements RepositorySelector
             }
         }
 
+        @Override
         public void run()
         {
             while (!interrupted)
