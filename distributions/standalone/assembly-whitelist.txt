@@ -105,7 +105,7 @@ jetty-util5-6.1.26
 jetty-annotations-6.1.26
 jetty-plus-6.1.26
 joda-time-1.6
-jsch-0.1.44
+jsch-0.1.44-1
 jsr181-api-1.0-MR1
 jsr250-api-1.0
 juel-engine-2.1.0
