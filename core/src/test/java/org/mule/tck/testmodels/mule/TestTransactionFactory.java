@@ -25,10 +25,33 @@ public class TestTransactionFactory implements TransactionFactory
 
     // for testsing properties
     private String value;
+    private Transaction mockTransaction;
+
+    public TestTransactionFactory()
+    {
+    }
+
+    public TestTransactionFactory(Transaction mockTransaction)
+    {
+        this.mockTransaction = mockTransaction;
+    }
+
+
 
     public Transaction beginTransaction(MuleContext muleContext) throws TransactionException
     {
-        return new TestTransaction(muleContext);
+        Transaction testTransaction;
+        if (mockTransaction != null)
+        {
+            testTransaction = mockTransaction;
+        }
+        else
+        {
+            testTransaction = new TestTransaction(muleContext);
+        }
+
+        testTransaction.begin();
+        return testTransaction;
     }
 
     public boolean isTransacted()

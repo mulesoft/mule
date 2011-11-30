@@ -13,6 +13,7 @@ import org.mule.api.MuleContext;
 import org.mule.api.transaction.TransactionException;
 import org.mule.transaction.AbstractSingleResourceTransaction;
 
+import javax.transaction.Transaction;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -25,6 +26,7 @@ public class TestTransaction extends AbstractSingleResourceTransaction
     private AtomicBoolean rolledBack = new AtomicBoolean(false);
 
     private String testProperty;
+    private boolean isXA;
 
     public TestTransaction(MuleContext muleContext)
     {
@@ -72,5 +74,37 @@ public class TestTransaction extends AbstractSingleResourceTransaction
     public void setTestProperty(String testProperty)
     {
         this.testProperty = testProperty;
+    }
+
+    @Override
+    public boolean isXA()
+    {
+        return isXA;
+    }
+
+
+    public void setXA(boolean xa)
+    {
+        isXA = xa;
+    }
+
+    @Override
+    public Transaction suspend() throws TransactionException
+    {
+        if (isXA)
+        {
+            return null;
+        }
+        return super.suspend();
+    }
+
+    @Override
+    public void resume() throws TransactionException
+    {
+        if (isXA)
+        {
+            return;
+        }
+        super.suspend();
     }
 }
