@@ -11,6 +11,7 @@
 package org.mule.transport.email;
 
 import com.icegreen.greenmail.user.GreenMailUser;
+import com.icegreen.greenmail.user.UserException;
 import com.icegreen.greenmail.user.UserManager;
 import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.ServerSetup;
@@ -51,6 +52,13 @@ public abstract class AbstractGreenMailSupport
         // whether users are identified by email or name alone)
         // in which case try retrieving by EMAIL rather than USER
         logger.debug("Creating mail user " + user + "/" + email + "/" + password);
+        GreenMailUser target = createUser(email, user, password);
+        target.deliver((MimeMessage) message);
+        Thread.sleep(STARTUP_PERIOD_MS);
+    }
+
+    public GreenMailUser createUser(String email, String user, String password) throws UserException
+    {
         UserManager userManager = servers.getManagers().getUserManager();
         userManager.createUser(email, user, password);
         GreenMailUser target = userManager.getUser(user);
@@ -58,21 +66,20 @@ public abstract class AbstractGreenMailSupport
         {
             throw new IllegalStateException("Failure in greenmail - see comments in test code.");
         }
-        target.deliver((MimeMessage) message);
-        Thread.sleep(STARTUP_PERIOD_MS);
+        return target;
     }
 
-    protected void createBobAndStoreEmail(Object message) throws Exception
+    public void createBobAndStoreEmail(Object message) throws Exception
     {
         createUserAndStoreEmail(BOB_EMAIL, BOB, PASSWORD, message);
     }
 
-    protected void createAliceAndStoreEmail(Object message) throws Exception
+    public void createAliceAndStoreEmail(Object message) throws Exception
     {
         createUserAndStoreEmail(ALICE_EMAIL, ALICE, PASSWORD, message);
     }
 
-    protected void startServers(List<Integer> list) throws Exception
+    public void startServers(List<Integer> list) throws Exception
     {
         logger.info("Starting mail servers");
         servers = new GreenMail(getSetups(list));
@@ -114,7 +121,7 @@ public abstract class AbstractGreenMailSupport
         }
     }
 
-    protected GreenMail getServers()
+    public GreenMail getServers()
     {
         return servers;
     }
