@@ -12,15 +12,18 @@ package org.mule.transport.http;
 
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.apache.commons.httpclient.Cookie;
+import org.apache.commons.httpclient.cookie.MalformedCookieException;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -34,6 +37,7 @@ public class CookieHelperTestCase extends AbstractMuleTestCase
     private static final String COOKIE_1_NEW_VALUE = "newValue1 That Overrides Previous One";
 
     @Test
+    @SuppressWarnings("unchecked")
     public void testPutAndMergeCookieObjectMapOfStringString_CookiesInMap_NewCookiesInMap()
     {
         Map<String, String> cookiesObject = new HashMap<String, String>();
@@ -81,8 +85,8 @@ public class CookieHelperTestCase extends AbstractMuleTestCase
         assertEquals(2, cookiesObject.length);
     }
 
-    @SuppressWarnings("unchecked")
     @Test
+    @SuppressWarnings("unchecked")
     public void testPutAndMergeCookieObjectCookieArray_CookiesInMap_NewCookiesInArray()
     {
         Map<String, String> cookiesObject = new HashMap<String, String>();
@@ -182,5 +186,39 @@ public class CookieHelperTestCase extends AbstractMuleTestCase
         {
             assertTrue(e.getMessage().contains("Invalid cookiesObject"));
         }
+    }
+
+    @Test
+    public void formattingCookieWithExpiresHeaderShouldPreserveExpireDate() throws Exception
+    {
+        // The expire date, when parsed from the cookie, will have lost the millisecond precision.
+        // Make sure we start with a date that is comparable.
+        long timestampRoundedToSecond = System.currentTimeMillis() / 1000 * 1000;
+        Date expireDate = new Date(timestampRoundedToSecond);
+
+        Cookie cookie = new Cookie(null, COOKIE_1_NAME, COOKIE_1_ORIGINAL_VALUE, null, expireDate, false);
+        String cookieString = CookieHelper.formatCookieForASetCookieHeader(cookie);
+        assertTrue(cookieString.contains("Expires="));
+
+        assertExpireDateEquals(expireDate, cookieString);
+    }
+
+    private void assertExpireDateEquals(Date expireDate, String cookieString) throws MalformedCookieException
+    {
+        Cookie[] cookies = CookieHelper.parseCookiesAsAClient(cookieString, null);
+        assertEquals(1, cookies.length);
+
+        Date dateFromCookie = cookies[0].getExpiryDate();
+        assertEquals(expireDate, dateFromCookie);
+    }
+
+    @Test
+    public void formattingCookieWithoutExpiresHeaderShouldNotHaveExpireDateSet() throws Exception
+    {
+        Cookie cookie = new Cookie(null, COOKIE_1_NAME, COOKIE_1_ORIGINAL_VALUE, null, -1, false);
+        String cookieStr = CookieHelper.formatCookieForASetCookieHeader(cookie);
+
+        Cookie[] cookies = CookieHelper.parseCookiesAsAClient(cookieStr, null);
+        assertNull(cookies[0].getExpiryDate());
     }
 }

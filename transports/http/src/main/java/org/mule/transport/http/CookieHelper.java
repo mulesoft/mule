@@ -16,12 +16,16 @@ import org.mule.api.expression.ExpressionManager;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.TimeZone;
 
 import org.apache.commons.httpclient.Cookie;
 import org.apache.commons.httpclient.Header;
@@ -110,6 +114,15 @@ public class CookieHelper
      * logger used by this class
      */
     protected static final Log logger = LogFactory.getLog(CookieHelper.class);
+
+	private static final String EXPIRE_PATTERN = "EEE, d-MMM-yyyy HH:mm:ss z";
+    private static final SimpleDateFormat EXPIRE_FORMATTER;
+
+    static
+    {
+        EXPIRE_FORMATTER = new SimpleDateFormat(EXPIRE_PATTERN, Locale.US);
+        EXPIRE_FORMATTER.setTimeZone(TimeZone.getTimeZone("GMT"));
+    }
 
     /**
      * Do not instantiate.
@@ -309,8 +322,15 @@ public class CookieHelper
         StringBuffer sb = new StringBuffer();
         ServerCookie.appendCookieValue(sb, cookie.getVersion(), cookie.getName(), cookie.getValue(),
             cookie.getPath(), cookie.getDomain(), cookie.getComment(), -1, cookie.getSecure());
-        String cookieForASetCookieHeader = sb.toString();
-        return cookieForASetCookieHeader;
+
+        Date expiryDate = cookie.getExpiryDate();
+        if (expiryDate != null)
+        {
+            sb.append("; Expires=");
+            sb.append(EXPIRE_FORMATTER.format(expiryDate));
+        }
+
+        return sb.toString();
     }
 
     /**
@@ -611,6 +631,7 @@ enum CookieStorageType
     MAP_STRING_STRING
     {
         @Override
+        @SuppressWarnings("unchecked")
         public Object putAndMergeCookie(Object preExistentCookies, String cookieName, String cookieValue)
         {
             final Map<String, String> cookieMap = (Map<String, String>) preExistentCookies;
@@ -620,12 +641,14 @@ enum CookieStorageType
         }
 
         @Override
+        @SuppressWarnings("unchecked")
         public String getCookieValueFromCookies(Object cookiesObject, String cookieName)
         {
             return ((Map<String, String>) cookiesObject).get(cookieName);
         }
 
         @Override
+        @SuppressWarnings("unchecked")
         public void addCookiesToClient(HttpClient client,
                                        Object cookiesObject,
                                        String policy,
@@ -693,6 +716,7 @@ enum CookieStorageType
         }
 
         @Override
+        @SuppressWarnings("unchecked")
         public Cookie[] asArrayOfCookies(Object cookiesObject)
         {
             Map<String, String> cookieMap = (Map<String, String>) cookiesObject;
