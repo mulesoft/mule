@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xmlns:script="http://www.mulesoft.org/schema/mule/scripting"
+      xmlns:smtp="http://www.mulesoft.org/schema/mule/smtp"
+      xsi:schemaLocation="
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
+       http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/3.2/mule-test.xsd
+       http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/3.2/mule-jms.xsd
+       http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.2/mule-vm.xsd
+       http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/3.2/mule-scripting.xsd
+       http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/3.2/mule-http.xsd
+       http://www.mulesoft.org/schema/mule/smtp http://www.mulesoft.org/schema/mule/smtp/3.2/mule-smtp.xsd">
+
+    <jms:activemq-connector name="jmsConnector" maxRedelivery="3" />
+
+    <jms:activemq-connector name="jmsConnectorNoRedelivery" maxRedelivery="0" />
+
+    <smtp:gmail-connector name="emailConnector"  />
+
+    <flow name="LastMessageStateRouting">
+        <jms:inbound-endpoint queue="in1" connector-ref="jmsConnector">
+            <jms:transaction action="ALWAYS_BEGIN" />
+        </jms:inbound-endpoint>
+        <append-string-transformer message=" with some text added"/>
+        <test:component/>
+        <jms:outbound-endpoint queue="out" connector-ref="jmsConnector">
+            <jms:transaction action="ALWAYS_JOIN" />
+        </jms:outbound-endpoint>
+        <default-exception-strategy>
+            <commit-transaction exception-pattern="*"/>
+            <processor-chain>
+                <expression-transformer evaluator="groovy" expression="payload.getPayload()"/>
+                <jms:outbound-endpoint queue="dead.letter1" connector-ref="jmsConnector">
+                    <jms:transaction action="ALWAYS_JOIN" />
+                </jms:outbound-endpoint>
+            </processor-chain>
+        </default-exception-strategy>
+    </flow>
+
+    <flow name="OriginalMessageRouting">
+        <jms:inbound-endpoint queue="in2" connector-ref="jmsConnector">
+            <jms:transaction action="ALWAYS_BEGIN" />
+        </jms:inbound-endpoint>
+        <message-properties-transformer scope="session">
+            <add-message-property key="originalMessage" value="#[message:payload]"/>
+        </message-properties-transformer>
+        <append-string-transformer message=" with some text added"/>
+        <test:component/>
+        <jms:outbound-endpoint queue="out" connector-ref="jmsConnector">
+            <jms:transaction action="ALWAYS_JOIN" />
+        </jms:outbound-endpoint>
+        <default-exception-strategy>
+            <commit-transaction exception-pattern="*"/>
+            <processor-chain>
+                <expression-transformer evaluator="header"  expression="SESSION:originalMessage"/>
+                <message-properties-transformer scope="session">
+                    <delete-message-property key="originalMessage"/>
+                </message-properties-transformer>
+                <jms:outbound-endpoint queue="dead.letter2" connector-ref="jmsConnector">
+                    <jms:transaction action="ALWAYS_JOIN" />
+                </jms:outbound-endpoint>
+            </processor-chain>
+        </default-exception-strategy>
+    </flow>
+
+
+
+    <flow name="RouteByExceptionType">
+        <jms:inbound-endpoint queue="in3" connector-ref="jmsConnector">
+            <jms:transaction action="ALWAYS_BEGIN" />
+        </jms:inbound-endpoint>
+        <test:component/>
+        <jms:outbound-endpoint queue="out" connector-ref="jmsConnector">
+            <jms:transaction action="ALWAYS_JOIN" />
+        </jms:outbound-endpoint>
+        <default-exception-strategy>
+            <commit-transaction exception-pattern="org.mule.transport.jms.redelivery.MessageRedeliveredException"/>
+            <choice>
+                <when evaluator="groovy" expression='payload.getException() instanceof org.mule.transport.jms.redelivery.MessageRedeliveredException'>
+                    <expression-transformer evaluator="groovy" expression="payload.getPayload()"/>
+                    <jms:outbound-endpoint queue="dead.letter3" connector-ref="jmsConnector">
+                        <jms:transaction action="ALWAYS_JOIN" />
+                    </jms:outbound-endpoint>
+                </when>
+                <when evaluator="groovy" expression="payload.getException() instanceof org.mule.component.ComponentException">
+                    <jms:outbound-endpoint queue="exceptions" connector-ref="jmsConnector">
+                        <jms:transaction action="NONE"/>
+                    </jms:outbound-endpoint>
+                </when>
+                <otherwise>
+                    <logger/>
+                </otherwise>
+            </choice>
+        </default-exception-strategy>
+    </flow>
+
+    <flow name="PreservePayloadExceptionStrategy">
+        <vm:inbound-endpoint path="in4" exchange-pattern="request-response"/>
+        <append-string-transformer message=" with some text added"/>
+        <test:component throwException="true"/>
+        <custom-exception-strategy class="org.mule.test.integration.exceptions.ExceptionStrategyCommonScenariosTestCase$PreservePayloadExceptionStrategy">
+            <logger/>
+        </custom-exception-strategy>
+    </flow>
+
+    <flow name="StopFlowBasedOnExceptionType">
+        <vm:inbound-endpoint path="in5" exchange-pattern="request-response"/>
+        <http:outbound-endpoint host="localhost" port="808" responseTimeout="5"/>
+        <default-exception-strategy>
+            <choice>
+                <when evaluator="groovy" expression="payload.getException().getCause() instanceof java.net.ConnectException">
+                    <script:component>
+                        <script:script engine="groovy">
+                            flowConstruct.stop();
+                        </script:script>
+                    </script:component>
+                </when>
+                <otherwise>
+                    <logger/>
+                </otherwise>
+            </choice>
+        </default-exception-strategy>
+    </flow>
+
+    <flow name="RollbackTransactionAndSendEmail">
+        <jms:inbound-endpoint queue="in6" connector-ref="jmsConnectorNoRedelivery">
+            <jms:transaction action="ALWAYS_BEGIN"/>
+        </jms:inbound-endpoint>
+        <test:component throwException="true"/>
+        <default-exception-strategy>
+            <rollback-transaction exception-pattern="*"/>
+            <processor-chain>
+                <expression-transformer evaluator="groovy" expression='"Failed to process message: " + payload.getPayload() + " due to: " + payload.getException().getMessage()'/>
+                <smtp:outbound-endpoint user="alice" password="secret" host="127.0.0.1" port="${port2}" from="alice@example.com" to="bob@example.com" subject="Message Failure"/>
+                <custom-processor
+                        class="org.mule.test.integration.exceptions.ExceptionStrategyCommonScenariosTestCase$EndMessageProcessor"/>
+            </processor-chain>
+        </default-exception-strategy>
+    </flow>
+
+</mule>
