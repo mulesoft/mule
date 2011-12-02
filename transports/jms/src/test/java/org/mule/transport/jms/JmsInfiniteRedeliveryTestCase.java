@@ -14,15 +14,15 @@ import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-public class JmsRedeliveryTestCase extends AbstractJmsRedeliveryTestCase
+public class JmsInfiniteRedeliveryTestCase extends AbstractJmsRedeliveryTestCase
 {
 
-    private static final int MAX_REDELIVERY = 3;
+    public static final int DEFAULT_REDELIVERY = 6;
 
-    public JmsRedeliveryTestCase(ConfigVariant variant, String configResources)
+    public JmsInfiniteRedeliveryTestCase(ConfigVariant variant, String configResources)
     {
         super(variant, configResources);
     }
@@ -30,18 +30,16 @@ public class JmsRedeliveryTestCase extends AbstractJmsRedeliveryTestCase
     @Override
     protected int getMaxRedelivery()
     {
-        return MAX_REDELIVERY;
+        return JmsConnector.REDELIVERY_IGNORE;
     }
 
     @Test
-    public void testRedelivery() throws Exception
+    public void testInfiniteRedelivery() throws Exception
     {
         client.dispatch(JMS_INPUT_QUEUE, TEST_MESSAGE, null);
 
-        assertTrue(messageRedeliveryExceptionFired.await(timeout, TimeUnit.MILLISECONDS));
-        assertEquals("MessageRedeliveredException never fired.", 0, messageRedeliveryExceptionFired.getCount());
-        assertEquals("Wrong number of delivery attempts", MAX_REDELIVERY + 1, callback.getCallbackCount());
-
-        assertMessageInDlq();
+        assertFalse(messageRedeliveryExceptionFired.await(timeout, TimeUnit.MILLISECONDS));
+        assertTrue(callback.getCallbackCount() > DEFAULT_REDELIVERY + 1);
+        assertNoMessageInDlq("jms://dead.letter");
     }
 }

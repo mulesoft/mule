@@ -17,12 +17,10 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-public class JmsRedeliveryTestCase extends AbstractJmsRedeliveryTestCase
+public class JmsNoRedeliveryTestCase extends AbstractJmsRedeliveryTestCase
 {
 
-    private static final int MAX_REDELIVERY = 3;
-
-    public JmsRedeliveryTestCase(ConfigVariant variant, String configResources)
+    public JmsNoRedeliveryTestCase(ConfigVariant variant, String configResources)
     {
         super(variant, configResources);
     }
@@ -30,18 +28,19 @@ public class JmsRedeliveryTestCase extends AbstractJmsRedeliveryTestCase
     @Override
     protected int getMaxRedelivery()
     {
-        return MAX_REDELIVERY;
+        return JmsConnector.REDELIVERY_FAIL_ON_FIRST;
     }
 
     @Test
-    public void testRedelivery() throws Exception
+    public void testNoRedelivery() throws Exception
     {
         client.dispatch(JMS_INPUT_QUEUE, TEST_MESSAGE, null);
 
         assertTrue(messageRedeliveryExceptionFired.await(timeout, TimeUnit.MILLISECONDS));
         assertEquals("MessageRedeliveredException never fired.", 0, messageRedeliveryExceptionFired.getCount());
-        assertEquals("Wrong number of delivery attempts", MAX_REDELIVERY + 1, callback.getCallbackCount());
+        assertEquals("Wrong number of delivery attempts", 1, callback.getCallbackCount());
 
         assertMessageInDlq();
     }
+
 }

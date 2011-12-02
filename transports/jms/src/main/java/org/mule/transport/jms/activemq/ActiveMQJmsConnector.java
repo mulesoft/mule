@@ -59,8 +59,13 @@ public class ActiveMQJmsConnector extends JmsConnector
             Method getRedeliveryPolicyMethod = connectionFactory.getClass().getMethod("getRedeliveryPolicy");
             Object redeliveryPolicy = getRedeliveryPolicyMethod.invoke(connectionFactory);
             Method setMaximumRedeliveriesMethod = redeliveryPolicy.getClass().getMethod("setMaximumRedeliveries", Integer.TYPE);
-            // redelivery = deliveryCount - 1, but AMQ is considering the first delivery attempt as a redelivery (wrong!). adjust for it
-            setMaximumRedeliveriesMethod.invoke(redeliveryPolicy, getMaxRedelivery() + 1);
+            int maxRedelivery = getMaxRedelivery();
+            if (maxRedelivery != REDELIVERY_IGNORE )
+            {
+                // redelivery = deliveryCount - 1, but AMQ is considering the first delivery attempt as a redelivery (wrong!). adjust for it
+                maxRedelivery++;
+            }
+            setMaximumRedeliveriesMethod.invoke(redeliveryPolicy, maxRedelivery);
         }
         catch (Exception e)
         {
