@@ -10,24 +10,14 @@
 
 package org.mule.transport.jms;
 
-import static org.junit.Assert.*;
-
-import org.apache.activemq.protobuf.Message;
-import org.junit.Assert;
 import org.mule.api.MuleEventContext;
 import org.mule.api.client.MuleClient;
 import org.mule.api.context.notification.ExceptionNotificationListener;
-import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.api.service.Service;
-import org.mule.api.source.MessageSource;
-import org.mule.construct.Flow;
 import org.mule.context.notification.ExceptionNotification;
-import org.mule.service.ServiceCompositeMessageSource;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.exceptions.FunctionalTestException;
 import org.mule.tck.functional.CounterCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
-import org.mule.transport.jms.filters.JmsSelectorFilter;
 import org.mule.transport.jms.redelivery.MessageRedeliveredException;
 import org.mule.util.concurrent.Latch;
 
@@ -37,6 +27,10 @@ import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class JmsRedeliveryTestCase extends AbstractServiceAndFlowTestCase
 {
@@ -60,33 +54,6 @@ public class JmsRedeliveryTestCase extends AbstractServiceAndFlowTestCase
     @Test
     public void testRedelivery() throws Exception
     {
-        MessageSource source = null;
-        Object flowOrService = muleContext.getRegistry().lookupObject("TestSelector");
-        assertNotNull(flowOrService);
-        if (flowOrService instanceof Service)
-        {
-            Service svc = (Service) flowOrService;
-            source = svc.getMessageSource();
-        }
-        else
-        {
-            Flow flow = (Flow)flowOrService;
-            source = flow.getMessageSource();
-        }
-        InboundEndpoint ep = null;
-        if (source instanceof InboundEndpoint)
-        {
-            ep = (InboundEndpoint) source;
-        }
-        else if (source instanceof ServiceCompositeMessageSource)
-        {
-            ep = ((ServiceCompositeMessageSource)source).getEndpoints().get(0);
-        }
-        assertNotNull(ep);
-
-        JmsConnector cnctr = (JmsConnector) muleContext.getRegistry().lookupConnector("jmsConnector");
-        assertTrue(cnctr.getSelector(ep) instanceof JmsSelectorFilter);
-
         MuleClient client = muleContext.getClient();
         // required if broker is not restarted with the test - it tries to deliver those messages to the
         // client

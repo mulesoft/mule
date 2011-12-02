@@ -35,12 +35,4 @@
             </choice>
         </default-exception-strategy>
     </flow>
-
-    <flow name="TestSelector">
-        <jms:inbound-endpoint queue="selectorQueue">
-            <jms:selector expression="JMSPriority=4"/>
-        </jms:inbound-endpoint>
-        <echo-component/>
-    </flow>
-
 </mule>
