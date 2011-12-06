@@ -11,6 +11,7 @@
 package org.mule.util;
 
 import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.size.SmallTest;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -23,6 +24,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 
+@SmallTest
 public class SystemUtilsTestCase extends AbstractMuleTestCase
 {
 

@@ -11,6 +11,7 @@
 package org.mule.util;
 
 import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.size.SmallTest;
 
 import java.util.Calendar;
 
@@ -19,6 +20,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
+@SmallTest
 public class NumberUtilsTestCase extends AbstractMuleTestCase
 {
     static final long l = 1000000000;

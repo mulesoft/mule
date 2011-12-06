@@ -11,6 +11,7 @@
 package org.mule.util;
 
 import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.size.SmallTest;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -21,6 +22,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+@SmallTest
 public class StringMessageUtilsTestCase extends AbstractMuleTestCase
 {
 

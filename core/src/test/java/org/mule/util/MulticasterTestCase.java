@@ -11,6 +11,7 @@
 package org.mule.util;
 
 import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.size.SmallTest;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Banana;
 import org.mule.tck.testmodels.fruit.Fruit;
@@ -23,6 +24,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertTrue;
 
+@SmallTest
 public class MulticasterTestCase extends AbstractMuleTestCase
 {
 

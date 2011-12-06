@@ -11,6 +11,7 @@
 package org.mule.routing.filters;
 
 import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.size.SmallTest;
 
 import org.junit.Test;
 
@@ -19,6 +20,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+@SmallTest
 public class EqualsFilterTestCase extends AbstractMuleTestCase
 {
 

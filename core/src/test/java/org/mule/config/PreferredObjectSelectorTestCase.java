@@ -11,6 +11,7 @@
 package org.mule.config;
 
 import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.size.SmallTest;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +20,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertNotNull;
 
+@SmallTest
 public class PreferredObjectSelectorTestCase extends AbstractMuleTestCase
 {
 

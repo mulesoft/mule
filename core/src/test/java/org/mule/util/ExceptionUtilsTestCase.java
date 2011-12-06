@@ -11,6 +11,7 @@
 package org.mule.util;
 
 import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.size.SmallTest;
 
 import java.io.IOException;
 
@@ -23,6 +24,7 @@ import static org.junit.Assert.assertTrue;
 import static org.mule.util.ExceptionUtils.containsType;
 import static org.mule.util.ExceptionUtils.getDeepestOccurenceOfType;
 
+@SmallTest
 public class ExceptionUtilsTestCase extends AbstractMuleTestCase
 {
     @Test

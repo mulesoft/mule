@@ -11,11 +11,13 @@
 package org.mule.transport;
 
 import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.size.SmallTest;
 
 import org.junit.Test;
 
 import static org.junit.Assert.fail;
 
+@SmallTest
 public class KeyedPoolMessageDispatcherFactoryAdapterTestCase extends AbstractMuleTestCase
 {
 

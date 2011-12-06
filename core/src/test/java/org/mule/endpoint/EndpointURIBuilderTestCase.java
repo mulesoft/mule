@@ -15,6 +15,7 @@ import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.EndpointURIBuilder;
 import org.mule.api.endpoint.MalformedEndpointException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.size.SmallTest;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -23,6 +24,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
+@SmallTest
 public class EndpointURIBuilderTestCase extends AbstractMuleTestCase
 {
     private static final String PLAIN_USERNAME_URI = "test://user:secret@theHost:42/path?key=value#fragment";

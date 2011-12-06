@@ -10,6 +10,7 @@
 package org.mule.util;
 
 import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.size.SmallTest;
 
 import java.text.NumberFormat;
 import java.util.HashMap;
@@ -23,6 +24,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+@SmallTest
 public class PropertiesUtilsTestCase extends AbstractMuleTestCase
 {
 

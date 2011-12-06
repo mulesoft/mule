@@ -11,6 +11,7 @@
 package org.mule;
 
 import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.size.SmallTest;
 
 import org.apache.commons.lang.SerializationUtils;
 import org.junit.Test;
@@ -19,6 +20,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 
+@SmallTest
 public class VoidResultTestCase extends AbstractMuleTestCase
 {
 

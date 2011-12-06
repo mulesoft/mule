@@ -13,6 +13,7 @@ package org.mule.endpoint;
 import org.mule.api.MuleContext;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.size.SmallTest;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -21,6 +22,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
+@SmallTest
 public class URIBuilderTestCase extends AbstractMuleTestCase
 {
 
