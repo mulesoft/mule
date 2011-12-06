@@ -135,7 +135,11 @@ public class TransactionalQueueManager extends AbstractXAResourceManager impleme
                 for (Serializable key : keys)
                 {
                     QueueKey queueKey = (QueueKey) key;
-                    getQueue(queueKey.queueName).putNow(queueKey.id);
+                    QueueInfo queue = getQueue(queueKey.queueName);
+                    if (queue.isQueueTransient())
+                    {
+                        queue.putNow(queueKey.id);
+                    }
                 }
             }
             catch (Exception e)

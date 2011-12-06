@@ -159,6 +159,16 @@ public class QueueInfo
 
         throw new UnsupportedOperationException("Method 'writeToObjectStore' is not supported for queue " + name);
     }
+
+    public boolean isQueueTransient()
+    {
+        return delegate instanceof TransientQueueInfoDelegate;
+    }
+
+    public boolean isQueueTransactional()
+    {
+        return delegate instanceof TransactionalQueueInfoDelegate;
+    }
     /**
      * A factory for creating object store-specific queue info delegates
      */

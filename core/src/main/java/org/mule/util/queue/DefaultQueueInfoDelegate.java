@@ -15,7 +15,7 @@ import java.util.LinkedList;
 /**
  * The default QueueInfoDelegate. This uses a LinkedList to store the members of the queue.
  */
-public class DefaultQueueInfoDelegate implements QueueInfoDelegate
+public class DefaultQueueInfoDelegate implements TransientQueueInfoDelegate
 {
     protected final int capacity;
     protected final LinkedList<Serializable> list;

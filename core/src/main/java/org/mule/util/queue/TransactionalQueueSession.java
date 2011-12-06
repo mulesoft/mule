@@ -61,7 +61,7 @@ class TransactionalQueueSession extends DefaultXASession implements QueueSession
         @Override
         public boolean offer(Serializable item, long timeout) throws InterruptedException, ObjectStoreException
         {
-            if (localContext != null)
+            if (localContext != null  && !queue.isQueueTransactional())
             {
                 return ((QueueTransactionContext) localContext).offer(queue, item, timeout);
             }
@@ -104,7 +104,7 @@ class TransactionalQueueSession extends DefaultXASession implements QueueSession
         @Override
         public void untake(Serializable item) throws InterruptedException, ObjectStoreException
         {
-            if (localContext != null)
+            if (localContext != null && !queue.isQueueTransactional())
             {
                 ((QueueTransactionContext) localContext).untake(queue, item);
             }
@@ -120,7 +120,7 @@ class TransactionalQueueSession extends DefaultXASession implements QueueSession
         {
             try
             {
-                if (localContext != null)
+                if (localContext != null && !queue.isQueueTransactional())
                 {
                     Serializable item = ((QueueTransactionContext) localContext).poll(queue, timeout);
                     return postProcessIfNeeded(item);
@@ -165,7 +165,7 @@ class TransactionalQueueSession extends DefaultXASession implements QueueSession
         {
             try
             {
-                if (localContext != null)
+                if (localContext != null && !queue.isQueueTransactional())
                 {
                     Serializable item = ((QueueTransactionContext) localContext).peek(queue);
                     return postProcessIfNeeded(item);
@@ -190,7 +190,7 @@ class TransactionalQueueSession extends DefaultXASession implements QueueSession
         @Override
         public int size()
         {
-            if (localContext != null)
+            if (localContext != null && !queue.isQueueTransactional())
             {
                 return ((QueueTransactionContext) localContext).size(queue);
             }

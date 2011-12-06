@@ -224,6 +224,7 @@ import org.springframework.beans.factory.xml.BeanDefinitionParser;
  * <code>http://www.mulesoft.org/schema/mule/core/${version}</code> Namespace.
  */
 public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
+public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
 {
     @Override
     public void init()
