@@ -140,7 +140,7 @@ public class HttpProxyTestCase extends AbstractServiceAndFlowTestCase
 
         final MuleMessage result = muleClient.send("http://localhost:" + port1.getNumber() + "/http-proxy/"
                                                    + proxyId + pathExtension, "foo", headers,
-            getTestTimeoutSecs() * 1000);
+            getTestTimeoutMillis());
         assertEquals(expectedResult, result.getPayloadAsString());
 
         final int contentLength = getContentLength(result);

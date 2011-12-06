@@ -140,7 +140,7 @@ public class BridgeTestCase extends FunctionalTestCase
 
         final String payload = RandomStringUtils.randomAlphabetic(10);
         muleClient.dispatch(jmsDestinationUri, payload, null);
-        latch.await(getTestTimeoutSecs(), TimeUnit.SECONDS);
+        latch.await(getTestTimeoutMillis(), TimeUnit.MILLISECONDS);
         assertEquals(1, ftc.getReceivedMessagesCount());
         assertEquals(payload, byteArrayOrStringtoString(ftc.getReceivedMessage(1)));
     }

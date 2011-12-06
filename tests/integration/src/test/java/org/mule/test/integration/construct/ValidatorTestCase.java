@@ -10,9 +10,6 @@
 
 package org.mule.test.integration.construct;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
@@ -26,6 +23,9 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang.math.RandomUtils;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class ValidatorTestCase extends FunctionalTestCase
 {
@@ -113,7 +113,7 @@ public class ValidatorTestCase extends FunctionalTestCase
 
         final Object validPayload = doTestValidMessageAck(serviceName);
 
-        latch.await(getTestTimeoutSecs(), TimeUnit.SECONDS);
+        latch.await(getTestTimeoutMillis(), TimeUnit.MILLISECONDS);
         assertEquals(1, ftc.getReceivedMessagesCount());
         assertEquals(validPayload, ftc.getLastReceivedMessage());
         ftc.initialise();

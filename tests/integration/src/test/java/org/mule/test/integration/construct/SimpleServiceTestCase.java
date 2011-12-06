@@ -10,11 +10,6 @@
 
 package org.mule.test.integration.construct;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertTrue;
-
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.LocalMuleClient;
@@ -32,6 +27,11 @@ import org.apache.commons.lang.math.RandomUtils;
 import org.junit.Rule;
 import org.junit.Test;
 import org.springframework.util.FileCopyUtils;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertTrue;
 
 public class SimpleServiceTestCase extends FunctionalTestCase
 {
@@ -209,14 +209,14 @@ public class SimpleServiceTestCase extends FunctionalTestCase
 
         String url = String.format("http://localhost:%d/weather-forecast?wsdl", port);
         String wsdl =  new String(
-            FileCopyUtils.copyToByteArray((InputStream) muleClient.request(url, getTestTimeoutSecs() * 1000L)
+            FileCopyUtils.copyToByteArray((InputStream) muleClient.request(url, getTestTimeoutMillis())
                 .getPayload()));
 
         assertTrue(wsdl.contains("GetWeatherByZipCode"));
 
         final String weatherForecast = muleClient.send(
             "wsdl-cxf:http://localhost:" + port + "/weather-forecast?wsdl&method=GetWeatherByZipCode",
-            "95050", null, getTestTimeoutSecs() * 1000).getPayloadAsString();
+            "95050", null, getTestTimeoutMillis()).getPayloadAsString();
 
         assertEquals(new WeatherForecaster().getByZipCode("95050"), weatherForecast);
     }

@@ -41,7 +41,7 @@ public abstract class AbstractJmsRedeliveryTestCase extends AbstractServiceAndFl
 
     protected static final String JMS_INPUT_QUEUE = "jms://in";
     protected static final String JMS_DEAD_LETTER = "jms://dead.letter";
-    protected final int timeout = getTestTimeoutSecs() * 1000 / 4;
+    protected final int timeout = getTestTimeoutMillis() / 4;
 
     protected MuleClient client;
     protected Latch messageRedeliveryExceptionFired;

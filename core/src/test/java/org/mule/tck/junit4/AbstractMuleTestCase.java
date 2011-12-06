@@ -52,7 +52,18 @@ public abstract class AbstractMuleTestCase
 
     public static final int DEFAULT_TEST_TIMEOUT_SECS = 60;
 
+    /**
+     * Defines the test timeout in seconds.
+     * @Deprecated: use TEST_MILLISECONDS_TIMEOUT instead
+     */
+    @Deprecated
     public static final String TEST_TIMEOUT_SYSTEM_PROPERTY = "mule.test.timeoutSecs";
+
+    /**
+     * Defines the test timeout in milliseconds. This property is prevalence
+     * over the TEST_TIMEOUT_SYSTEM_PROPERTY property.
+     */
+    public static final String TEST_MILLISECONDS_TIMEOUT = "mule.test.timeoutMillis";
 
     /**
      * Indicates whether the text boxes will be logged when starting each test case.
@@ -91,7 +102,9 @@ public abstract class AbstractMuleTestCase
      */
     private boolean offline = "true".equalsIgnoreCase(System.getProperty("org.mule.offline"));
 
-    private int testTimeoutSecs = getTimeoutSystemProperty();
+    private int testTimeoutSecs = getTimeoutSystemProperty(TEST_TIMEOUT_SYSTEM_PROPERTY, DEFAULT_TEST_TIMEOUT_SECS);
+
+    private int testTimeoutMillis = getTimeoutSystemProperty(TEST_MILLISECONDS_TIMEOUT, testTimeoutSecs * 1000);
 
     @Rule
     public TestName name = new TestName();
@@ -114,15 +127,13 @@ public abstract class AbstractMuleTestCase
      */
     protected TestRule createTestTimeoutRule()
     {
-        int millisecondsTimeout = getTestTimeoutSecs() * 1000;
-
         if (isFailOnTimeout())
         {
-            return new Timeout(millisecondsTimeout);
+            return new Timeout(testTimeoutMillis);
         }
         else
         {
-            return new WarningTimeout(millisecondsTimeout);
+            return new WarningTimeout(testTimeoutMillis);
         }
     }
 
@@ -178,23 +189,23 @@ public abstract class AbstractMuleTestCase
     }
 
     /**
-     * Defines the number of seconds that a test has in order to run before
-     * throwing a timeout. If the property if not defined then uses the
-     * <code>DEFAULT_MULE_TEST_TIMEOUT_SECS</code> constant.
+     * Reads an integer System property value.
      *
-     * @return the timeout value expressed in seconds
+     * @param property property name
+     * @param defaultValue default property value
+     * @return the property value or the default value if the property does not have value.
      */
-    protected int getTimeoutSystemProperty()
+    protected int getTimeoutSystemProperty(String property, int defaultValue)
     {
-        String timeoutString = System.getProperty(TEST_TIMEOUT_SYSTEM_PROPERTY, null);
+        String timeoutString = System.getProperty(property, null);
         if (timeoutString == null)
         {
-            // unix style: MULE_TEST_TIMEOUTSECS
-            String variableName = TEST_TIMEOUT_SYSTEM_PROPERTY.toUpperCase().replace(".", "_");
+            // Unix style property name
+            String variableName = property.toUpperCase().replace(".", "_");
             timeoutString = System.getenv(variableName);
         }
 
-        int result = DEFAULT_TEST_TIMEOUT_SECS;
+        int result = defaultValue;
         if (timeoutString != null)
         {
             try
@@ -257,10 +268,22 @@ public abstract class AbstractMuleTestCase
      * Defines the timeout in seconds that will be used to run the test.
      *
      * @return the timeout in seconds
+     * @Deprecated use {@link #getTestTimeoutMillis()} instead
      */
+    @Deprecated
     public int getTestTimeoutSecs()
     {
         return testTimeoutSecs;
+    }
+
+    /**
+     * Defines the timeout in milliseconds that will be used to run the test
+     *
+     * @return the the timeout in milliseconds
+     */
+    public int getTestTimeoutMillis()
+    {
+        return testTimeoutMillis;
     }
 
     @Before
