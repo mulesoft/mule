@@ -11,12 +11,14 @@
 package org.mule.transport.tcp.protocols;
 
 import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.size.SmallTest;
 import org.mule.transport.tcp.TcpProtocol;
 
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
+@SmallTest
 public class DefaultProtocolTestCase extends AbstractMuleTestCase
 {
 

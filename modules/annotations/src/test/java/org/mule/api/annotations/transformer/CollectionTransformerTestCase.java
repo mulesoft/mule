@@ -14,6 +14,7 @@ import org.mule.api.annotations.Transformer;
 import org.mule.api.transformer.DataType;
 import org.mule.config.transformer.AnnotatedTransformerProxy;
 import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.size.SmallTest;
 import org.mule.transformer.types.CollectionDataType;
 import org.mule.transformer.types.DataTypeFactory;
 
@@ -27,6 +28,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 @ContainsTransformerMethods
+@SmallTest
 public class CollectionTransformerTestCase extends AbstractMuleTestCase
 {
     @Test

@@ -12,6 +12,7 @@ package org.mule.config.spring.parsers.specific;
 
 import org.mule.config.spring.parsers.specific.RegExFilterDefinitionParser.FlagsMapping;
 import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.size.SmallTest;
 
 import java.util.regex.Pattern;
 
@@ -20,6 +21,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
+@SmallTest
 public class FlagsMappingTestCase extends AbstractMuleTestCase
 {
     private FlagsMapping flagsMapping;

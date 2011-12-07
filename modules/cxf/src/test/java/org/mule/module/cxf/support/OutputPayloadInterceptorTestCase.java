@@ -11,6 +11,7 @@
 package org.mule.module.cxf.support;
 
 import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.size.SmallTest;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -27,6 +28,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
+@SmallTest
 public class OutputPayloadInterceptorTestCase extends AbstractMuleTestCase
 {
 

@@ -14,6 +14,7 @@ import org.mule.config.Preferred;
 import org.mule.module.launcher.descriptor.ApplicationDescriptor;
 import org.mule.module.launcher.descriptor.DescriptorParser;
 import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.size.SmallTest;
 
 import java.io.File;
 import java.io.IOException;
@@ -26,6 +27,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+@SmallTest
 public class DescriptorParserTestCase extends AbstractMuleTestCase
 {
 

@@ -11,6 +11,7 @@
 package org.mule.module.boot;
 
 import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.size.SmallTest;
 import org.mule.util.FileUtils;
 import org.mule.util.SystemUtils;
 
@@ -25,6 +26,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+@SmallTest
 public class DefaultMuleClassPathConfigTestCase extends AbstractMuleTestCase
 {
 

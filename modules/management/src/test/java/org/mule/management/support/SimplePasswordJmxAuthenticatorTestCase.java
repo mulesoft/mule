@@ -12,6 +12,7 @@ package org.mule.management.support;
 
 import org.mule.module.management.support.SimplePasswordJmxAuthenticator;
 import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.size.SmallTest;
 
 import java.security.Principal;
 import java.util.Collections;
@@ -30,6 +31,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+@SmallTest
 public class SimplePasswordJmxAuthenticatorTestCase extends AbstractMuleTestCase
 {
     private static final String[] VALID_AUTH_TOKEN = {"mule", "mulepassword"};

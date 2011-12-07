@@ -11,6 +11,7 @@
 package org.mule.util.compression;
 
 import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.size.SmallTest;
 
 import java.util.Arrays;
 
@@ -21,6 +22,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+@SmallTest
 public class CompressionTestCase extends AbstractMuleTestCase
 {
 

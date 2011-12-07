@@ -11,9 +11,11 @@
 package org.mule.config.spring.parsers.assembly;
 
 import org.mule.config.spring.parsers.assembly.configuration.ReusablePropertyConfiguration;
+import org.mule.tck.size.SmallTest;
 
 import org.junit.Test;
 
+@SmallTest
 public class ReusablePropertyConfigurationTestCase extends AbstractBasePropertyConfigurationTestCase
 {
 

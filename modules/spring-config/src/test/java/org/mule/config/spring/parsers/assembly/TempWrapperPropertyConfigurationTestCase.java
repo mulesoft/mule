@@ -13,9 +13,11 @@ package org.mule.config.spring.parsers.assembly;
 import org.mule.config.spring.parsers.assembly.configuration.PropertyConfiguration;
 import org.mule.config.spring.parsers.assembly.configuration.SimplePropertyConfiguration;
 import org.mule.config.spring.parsers.assembly.configuration.TempWrapperPropertyConfiguration;
+import org.mule.tck.size.SmallTest;
 
 import org.junit.Test;
 
+@SmallTest
 public class TempWrapperPropertyConfigurationTestCase extends AbstractBasePropertyConfigurationTestCase
 {
 

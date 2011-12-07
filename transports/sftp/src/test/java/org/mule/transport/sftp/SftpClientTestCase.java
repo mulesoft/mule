@@ -11,6 +11,7 @@
 package org.mule.transport.sftp;
 
 import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.size.SmallTest;
 
 import org.junit.Test;
 
@@ -21,6 +22,7 @@ import static org.junit.Assert.assertEquals;
  * 
  * @author Lennart Häggkvist
  */
+@SmallTest
 public class SftpClientTestCase extends AbstractMuleTestCase
 {
 

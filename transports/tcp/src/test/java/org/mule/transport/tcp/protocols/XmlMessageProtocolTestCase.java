@@ -11,6 +11,7 @@
 package org.mule.transport.tcp.protocols;
 
 import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.size.SmallTest;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -26,6 +27,7 @@ import static org.junit.Assert.assertNull;
 /**
  * Test by reading characters from a fixed StringBuffer instead of a TCP port.
  */
+@SmallTest
 public class XmlMessageProtocolTestCase extends AbstractMuleTestCase
 {
     private XmlMessageProtocol xmp;

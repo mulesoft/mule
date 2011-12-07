@@ -10,12 +10,14 @@
 package org.mule.util.scan.annotations;
 
 import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.size.SmallTest;
 
 import org.junit.Test;
 import org.objectweb.asm.ClassReader;
 
 import static org.junit.Assert.assertEquals;
 
+@SmallTest
 public class ClasspathAnnotationsScannerTestCase extends AbstractMuleTestCase
 {
 
