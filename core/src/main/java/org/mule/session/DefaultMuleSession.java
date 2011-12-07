@@ -99,23 +99,6 @@ public final class DefaultMuleSession implements MuleSession, DeserializationPos
     }
 
     /**
-     * @deprecated Use DefaultMuleSession(Service service, MuleContext muleContext) instead
-     */
-    @Deprecated
-    public DefaultMuleSession(MuleMessage message,
-                              SessionHandler requestSessionHandler,
-                              FlowConstruct flowConstruct,
-                              MuleContext muleContext) throws MuleException
-    {
-        this(message, requestSessionHandler, muleContext);
-        if (flowConstruct == null)
-        {
-            throw new IllegalArgumentException(CoreMessages.propertiesNotSet("flowConstruct").toString());
-        }
-        this.flowConstruct = flowConstruct;
-    }
-
-    /**
      * @deprecated Use DefaultMuleSession(MuleContext muleContext) instead
      */
     @Deprecated
