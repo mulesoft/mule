@@ -101,7 +101,7 @@ public final class DefaultMuleSession implements MuleSession, DeserializationPos
         this.flowConstruct = session.getFlowConstruct();
         this.valid = session.isValid();
 
-        this.properties = new HashMap<String, Object>();
+        this.properties = Collections.synchronizedMap(new CaseInsensitiveHashMap/*<String, Object>*/());
         for (String key : session.getPropertyNamesAsSet())
         {
             this.properties.put(key, session.getProperty(key));
