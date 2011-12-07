@@ -16,13 +16,22 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import org.mule.api.MuleContext;
+import org.mule.api.MuleException;
 import org.mule.api.construct.FlowConstruct;
+import org.mule.api.registry.MuleRegistry;
+import org.mule.api.security.Authentication;
 import org.mule.api.security.SecurityContext;
+import org.mule.construct.SimpleFlowConstruct;
+import org.mule.security.DefaultMuleAuthentication;
+import org.mule.security.DefaultSecurityContextFactory;
+import org.mule.security.MuleCredentials;
 import org.mule.util.SerializationUtils;
 
-import org.junit.Ignore;
+import java.util.Collections;
+
 import org.junit.Test;
 import org.mockito.Mockito;
 
@@ -182,21 +191,68 @@ public class DefaultMuleSessionTestCase
     }
 
     @Test
-    @Ignore
-    public void serialization()
+    public void serialization() throws MuleException
     {
-        DefaultMuleSession before = new DefaultMuleSession(Mockito.mock(FlowConstruct.class),
-            Mockito.mock(MuleContext.class));
+        SimpleFlowConstruct flow = new SimpleFlowConstruct("flow", Mockito.mock(MuleContext.class));
+        DefaultMuleSession before = new DefaultMuleSession(flow, Mockito.mock(MuleContext.class));
         before.setValid(false);
-        before.setSecurityContext(Mockito.mock(SecurityContext.class));
+        before.setSecurityContext(createTestAuthentication());
         before.setProperty("foo", "bar");
-        before.setProperty("notSerializableValue", new Object());
 
+        // Create mock muleContext
+        MuleContext muleContext = Mockito.mock(MuleContext.class);
+        MuleRegistry registry = Mockito.mock(MuleRegistry.class);
+        Mockito.when(muleContext.getRegistry()).thenReturn(registry);
+        Mockito.when(muleContext.getExecutionClassLoader()).thenReturn(getClass().getClassLoader());
+        Mockito.when(registry.lookupFlowConstruct("flow")).thenReturn(flow);
+
+        // Serialize and then deserialize
         DefaultMuleSession after = (DefaultMuleSession) SerializationUtils.deserialize(
-            SerializationUtils.serialize(before), getClass().getClassLoader());
+            SerializationUtils.serialize(before), muleContext);
 
+        // assertions
         assertEquals(before.getId(), after.getId());
+        assertEquals(before.isValid(), after.isValid());
+        assertEquals(before.getFlowConstruct(), after.getFlowConstruct());
+        assertEquals(before.getProperty("foo"), after.getProperty("foo"));
+        assertEquals(before.getSecurityContext().getAuthentication().getPrincipal(),
+            after.getSecurityContext().getAuthentication().getPrincipal());
+        assertEquals(before.getSecurityContext().getAuthentication().getProperties().get("key1"),
+            after.getSecurityContext().getAuthentication().getProperties().get("key1"));
+        assertEquals(before.getSecurityContext().getAuthentication().getCredentials(),
+            after.getSecurityContext().getAuthentication().getCredentials());
+        // assertEquals(before.getSecurityContext().getAuthentication().getEvent().getId(),
+        // after.getSecurityContext().getAuthentication().getEvent().getId());
+
+        after.setProperty("new", "value");
+        assertNull(before.getProperty("new"));
 
     }
 
+    @Test
+    @SuppressWarnings(value = {"deprecation"})
+    public void serializationWithNonSerializableProperty() throws MuleException
+    {
+        DefaultMuleSession before = new DefaultMuleSession(Mockito.mock(MuleContext.class));
+        before.setProperty("foo", new Object());
+
+        try
+        {
+            // Serialize and then deserialize
+            SerializationUtils.deserialize(SerializationUtils.serialize(before), getClass().getClassLoader());
+
+            fail("Exception expected");
+        }
+        catch (RuntimeException e)
+        {
+        }
+    }
+
+    private SecurityContext createTestAuthentication()
+    {
+        Authentication auth = new DefaultMuleAuthentication(new MuleCredentials("dan", new char[]{'d', 'f'}));
+        auth.setProperties(Collections.singletonMap("key1", "value1"));
+        SecurityContext securityContext = new DefaultSecurityContextFactory().create(auth);
+        return securityContext;
+    }
 }
