@@ -57,7 +57,7 @@ public class AxisMuleSession implements org.apache.axis.session.Session
     {
         synchronized(lock)
         {
-            return new IteratorEnumeration(session.getPropertyNames());
+            return new IteratorEnumeration(session.getPropertyNamesAsSet().iterator());
         }
     }
 

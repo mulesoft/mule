@@ -26,7 +26,6 @@ import java.io.OptionalDataException;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -218,21 +217,6 @@ public final class DefaultMuleSession implements MuleSession, DeserializationPos
     public Object removeProperty(Object key)
     {
         return properties.remove(key);
-    }
-
-    /**
-     * Returns an iterater of property keys for the session properties on this
-     * session
-     *
-     * @return an iterater of property keys for the session properties on this
-     *         session
-     * @deprecated Use getPropertyNamesAsSet() instead
-     */
-    @Override
-    @Deprecated
-    public Iterator<String> getPropertyNames()
-    {
-        return properties.keySet().iterator();
     }
 
     @Override
