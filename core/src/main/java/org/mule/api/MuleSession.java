@@ -20,10 +20,12 @@ import java.util.Set;
 /**
  * <code>MuleSession</code> is the context in which a request is processed by Mule. The scope of the
  * MuleSession context includes all Mule Flows and Services that the request is routed through on the same or
- * different Mule instances. In order for the session to be propagated from one Flow or Service to the next a
- * transports that support message properties needs to be used. A {@link SessionHandler} is used to store the
- * session in an outbound message property and then retrieve it from an inbound property using a specific
- * strategy.
+ * different Mule instances. A MuleSession instance has a unique id, session scope properties and an optional
+ * security context.
+ * <p>
+ * In order for the session to be propagated from one Flow or Service to the next a transports that support
+ * message properties needs to be used. A {@link SessionHandler} is used to store the session in an outbound
+ * message property and then retrieve it from an inbound property using a specific strategy.
  * 
  * @See {@link SessionHandler}
  */
