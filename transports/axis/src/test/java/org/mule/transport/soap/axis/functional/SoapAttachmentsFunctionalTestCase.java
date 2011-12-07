@@ -10,6 +10,9 @@
 
 package org.mule.transport.soap.axis.functional;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
@@ -18,16 +21,12 @@ import org.mule.message.ds.StringDataSource;
 import org.mule.session.DefaultMuleSession;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
-import org.mule.transport.AbstractConnector;
 import org.mule.transport.soap.axis.AxisMessageDispatcher;
 
 import javax.activation.DataHandler;
 
 import org.junit.Rule;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 public class SoapAttachmentsFunctionalTestCase extends FunctionalTestCase
 {
@@ -61,7 +60,7 @@ public class SoapAttachmentsFunctionalTestCase extends FunctionalTestCase
         {
             MuleMessage msg = new DefaultMuleMessage("testPayload", muleContext);
             msg.addOutboundAttachment("testAttachment", new DataHandler(new StringDataSource("foo")));
-            DefaultMuleSession session = new DefaultMuleSession(msg, ((AbstractConnector) ep.getConnector()).getSessionHandler(), muleContext);
+            DefaultMuleSession session = new DefaultMuleSession(muleContext);
             DefaultMuleEvent event = new DefaultMuleEvent(msg, getTestInboundEndpoint("test://test"), session);
             MuleMessage result = client.process(event).getMessage();
             assertNotNull(result);

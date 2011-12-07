@@ -28,7 +28,6 @@ import org.mule.module.client.i18n.ClientMessages;
 import org.mule.module.jca.i18n.JcaMessages;
 import org.mule.security.MuleCredentials;
 import org.mule.session.DefaultMuleSession;
-import org.mule.transport.AbstractConnector;
 
 import java.util.Map;
 
@@ -165,7 +164,7 @@ public class DefaultMuleConnection implements MuleConnection
     protected MuleEvent getEvent(MuleMessage message, OutboundEndpoint endpoint)
         throws MuleException
     {
-        MuleSession session = new DefaultMuleSession(message, ((AbstractConnector)endpoint.getConnector()).getSessionHandler(), muleContext);
+        MuleSession session = new DefaultMuleSession(muleContext);
 
         if (credentials != null)
         {
