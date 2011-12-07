@@ -12,49 +12,50 @@ package org.mule.api;
 
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.security.SecurityContext;
+import org.mule.api.transport.SessionHandler;
 
 import java.io.Serializable;
 import java.util.Set;
 
 /**
- * <code>MuleSession</code> is the context in which a request is executed. The
- * session manages the marshalling of events to and from components This object is
- * not usually referenced by client code directly. If needed Components should manage
- * events via the <code>MuleEventContext</code> which is obtainable via the
- * <code>UMOManager</code> or by implementing
- * <code>org.mule.api.lifecycle.Callable</code>.
+ * <code>MuleSession</code> is the context in which a request is processed by Mule. The scope of the
+ * MuleSession context includes all Mule Flows and Services that the request is routed through on the same or
+ * different Mule instances. In order for the session to be propagated from one Flow or Service to the next a
+ * transports that support message properties needs to be used. A {@link SessionHandler} is used to store the
+ * session in an outbound message property and then retrieve it from an inbound property using a specific
+ * strategy.
+ * 
+ * @See {@link SessionHandler}
  */
 
 public interface MuleSession extends Serializable
 {
     /**
-     * Returns the Service associated with the session in its current execution
+     * Returns the FlowConstuct associated with the session in its current execution
      * 
-     * @return the Service associated with the session in its current execution
+     * @return the FlowConstuct associated with the session in its current execution
      * @see FlowConstruct
      */
     FlowConstruct getFlowConstruct();
 
     /**
-     * Sets the Service associated with the session in its current execution
+     * Sets the FlowConstuct associated with the session in its current execution
      * 
      * @see FlowConstruct
      */
     void setFlowConstruct(FlowConstruct flowConstruct);
 
     /**
-     * Determines if this session is valid. A session becomes invalid if an exception
-     * occurs while processing
+     * Determines if this session is valid. A session becomes invalid if an exception occurs while processing
      * 
-     * @return true if the service is functioning properly, false otherwise
+     * @return true if the session is valid, false otherwise
      */
     boolean isValid();
 
     /**
-     * Determines if this session is valid. A session becomes invalid if an exception
-     * occurs while processing
+     * Determines if this session is valid. A session becomes invalid if an exception occurs while processing
      * 
-     * @param value true if the service is functioning properly, false otherwise
+     * @param value true if the session is valid, false otherwise
      */
     void setValid(boolean value);
 
@@ -66,25 +67,23 @@ public interface MuleSession extends Serializable
     String getId();
 
     /**
-     * The security context for this session. If not null outbound, inbound and/or
-     * method invocations will be authenticated using this context
+     * The security context for this session. If not null outbound, inbound and/or method invocations will be
+     * authenticated using this context
      * 
-     * @param context the context for this session or null if the request is not
-     *            secure.
+     * @param context the context for this session or null if the request is not secure.
      */
     void setSecurityContext(SecurityContext context);
 
     /**
-     * The security context for this session. If not null outbound, inbound and/or
-     * method invocations will be authenticated using this context
+     * The security context for this session. If not null outbound, inbound and/or method invocations will be
+     * authenticated using this context
      * 
      * @return the context for this session or null if the request is not secure.
      */
     SecurityContext getSecurityContext();
 
     /**
-     * Will set a session level property. These will either be stored and retrieved
-     * using the underlying transport mechanism of stored using a default mechanism
+     * Will set a session scope property.
      * 
      * @param key the key for the object data being stored on the session
      * @param value the value of the session data
@@ -92,7 +91,7 @@ public interface MuleSession extends Serializable
     void setProperty(String key, Object value);
 
     /**
-     * Will retrieve a session level property.
+     * Will retrieve a session scope property.
      * 
      * @param key the key for the object data being stored on the session
      * @return the value of the session data or null if the property does not exist
@@ -100,7 +99,7 @@ public interface MuleSession extends Serializable
     <T> T getProperty(Object key);
 
     /**
-     * Will retrieve a session level property and remove it from the session
+     * Will retrieve a session scope property and remove it from the session
      * 
      * @param key the key for the object data being stored on the session
      * @return the value of the session data or null if the property does not exist
@@ -113,11 +112,10 @@ public interface MuleSession extends Serializable
     Set<String> getPropertyNamesAsSet();
 
     /**
-     * Merge current session with an updated version
-     * Result session will contain all the properties from updatedSession
-     * plus those properties in the current session that couldn't be serialized
-     * In case updatedSession is null, then no change will be applied.
-     *
+     * Merge current session with an updated version Result session will contain all the properties from
+     * updatedSession plus those properties in the current session that couldn't be serialized In case
+     * updatedSession is null, then no change will be applied.
+     * 
      * @param updatedSession mule session with updated properties
      */
     void merge(MuleSession updatedSession);
