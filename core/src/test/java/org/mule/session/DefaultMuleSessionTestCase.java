@@ -42,6 +42,7 @@ public class DefaultMuleSessionTestCase
     public void create()
     {
         DefaultMuleSession session = new DefaultMuleSession(Mockito.mock(MuleContext.class));
+        assertCreate(session);
         assertNull(session.getFlowConstruct());
     }
 
@@ -50,6 +51,7 @@ public class DefaultMuleSessionTestCase
     {
         FlowConstruct flowConstruct = Mockito.mock(FlowConstruct.class);
         DefaultMuleSession session = new DefaultMuleSession(flowConstruct, Mockito.mock(MuleContext.class));
+        assertCreate(session);
         assertSame(flowConstruct, session.getFlowConstruct());
     }
 
