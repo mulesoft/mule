@@ -14,13 +14,11 @@ import org.mule.MuleCoreExtension;
 import org.mule.api.registry.RegistrationException;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.module.launcher.DeploymentInitException;
+import org.mule.module.launcher.DeploymentService;
 import org.mule.module.launcher.descriptor.ApplicationDescriptor;
 
 import java.util.Map;
 
-/**
- *
- */
 public class PriviledgedMuleApplication extends DefaultMuleApplication
 {
 
@@ -28,6 +26,8 @@ public class PriviledgedMuleApplication extends DefaultMuleApplication
     public static final String REGISTRY_KEY_CORE_EXTENSIONS = "_coreExtensions";
 
     protected Map<Class<? extends MuleCoreExtension>, MuleCoreExtension> coreExtensions;
+
+    protected DeploymentService deploymentService;
 
     protected PriviledgedMuleApplication(ApplicationDescriptor appDescriptor)
     {
@@ -57,6 +57,11 @@ public class PriviledgedMuleApplication extends DefaultMuleApplication
             final String msg = String.format("Failed to init a privileged app: [%s]", getDescriptor().getAppName());
             throw new DeploymentInitException(MessageFactory.createStaticMessage(msg), e);
         }
+    }
+
+    public void setDeploymentService(DeploymentService deploymentService)
+    {
+        this.deploymentService = deploymentService;
     }
 
     public void setCoreExtensions(Map<Class<? extends MuleCoreExtension>, MuleCoreExtension> coreExtensions)

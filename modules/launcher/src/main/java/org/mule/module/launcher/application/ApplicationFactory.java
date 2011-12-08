@@ -13,6 +13,7 @@ package org.mule.module.launcher.application;
 import org.mule.MuleCoreExtension;
 import org.mule.module.launcher.AppBloodhound;
 import org.mule.module.launcher.DefaultAppBloodhound;
+import org.mule.module.launcher.DeploymentListener;
 import org.mule.module.launcher.DeploymentService;
 import org.mule.module.launcher.descriptor.ApplicationDescriptor;
 
@@ -27,11 +28,13 @@ public class ApplicationFactory
 {
     protected DeploymentService deploymentService;
     protected Map<Class<? extends MuleCoreExtension>, MuleCoreExtension> coreExtensions;
+    protected DeploymentListener deploymentListener;
 
-    public ApplicationFactory(DeploymentService deploymentService, Map<Class<? extends MuleCoreExtension>, MuleCoreExtension> coreExtensions)
+    public ApplicationFactory(DeploymentService deploymentService, Map<Class<? extends MuleCoreExtension>, MuleCoreExtension> coreExtensions, DeploymentListener deploymentListener)
     {
         this.deploymentService = deploymentService;
         this.coreExtensions = coreExtensions;
+        this.deploymentListener = deploymentListener;
     }
 
     public Application createApp(String appName) throws IOException
@@ -41,6 +44,7 @@ public class ApplicationFactory
         if (descriptor.isPrivileged())
         {
             final PriviledgedMuleApplication delegate = new PriviledgedMuleApplication(descriptor);
+            delegate.setDeploymentListener(deploymentListener);
             delegate.setDeploymentService(deploymentService);
             delegate.setCoreExtensions(coreExtensions);
             return new ApplicationWrapper(delegate);
@@ -48,7 +52,7 @@ public class ApplicationFactory
         else
         {
             final DefaultMuleApplication delegate = new DefaultMuleApplication(descriptor);
-            delegate.setDeploymentService(deploymentService);
+            delegate.setDeploymentListener(deploymentListener);
             return new ApplicationWrapper(delegate);
         }
     }

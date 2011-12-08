@@ -28,6 +28,7 @@ import org.mule.module.launcher.ApplicationMuleContextBuilder;
 import org.mule.module.launcher.ConfigChangeMonitorThreadFactory;
 import org.mule.module.launcher.DefaultMuleSharedDomainClassLoader;
 import org.mule.module.launcher.DeploymentInitException;
+import org.mule.module.launcher.DeploymentListener;
 import org.mule.module.launcher.DeploymentService;
 import org.mule.module.launcher.DeploymentStartException;
 import org.mule.module.launcher.DeploymentStopException;
@@ -76,16 +77,22 @@ public class DefaultMuleApplication implements Application
 
     protected String[] absoluteResourcePaths;
 
-    protected DeploymentService deploymentService;
+    protected DeploymentListener deploymentListener;
 
     protected DefaultMuleApplication(ApplicationDescriptor appDesc)
     {
         this.descriptor = appDesc;
+        this.deploymentListener = new NullDeploymentListener();
     }
 
-    public void setDeploymentService(DeploymentService deploymentService)
+    public void setDeploymentListener(DeploymentListener deploymentListener)
     {
-        this.deploymentService = deploymentService;
+        if (deploymentListener == null)
+        {
+            throw new IllegalArgumentException("Deployment listener cannot be null");
+        }
+
+        this.deploymentListener = deploymentListener;
     }
 
     @Override
@@ -335,16 +342,16 @@ public class DefaultMuleApplication implements Application
 
         String appName = getAppName();
 
-        this.deploymentService.fireOnUndeploymentStart(appName);
+        deploymentListener.onDeploymentStart(appName);
         try
         {
             dispose();
 
-            this.deploymentService.fireOnUndeploymentSuccess(appName);
+            deploymentListener.onUndeploymentSuccess(appName);
         }
         catch (RuntimeException e)
         {
-            this.deploymentService.fireOnUndeploymentFailure(appName, e);
+            deploymentListener.onUndeploymentFailure(appName, e);
 
             throw e;
         }
@@ -355,17 +362,17 @@ public class DefaultMuleApplication implements Application
         final ClassLoader cl = getDeploymentClassLoader();
         Thread.currentThread().setContextClassLoader(cl);
 
-        this.deploymentService.fireOnDeploymentStart(appName);
+        deploymentListener.onDeploymentStart(appName);
         try
         {
             init();
             start();
 
-            this.deploymentService.fireOnDeploymentSuccess(appName);
+            deploymentListener.onDeploymentSuccess(appName);
         }
         catch(Throwable cause)
         {
-            this.deploymentService.fireOnDeploymentFailure(appName, cause);
+            deploymentListener.onDeploymentFailure(appName, cause);
         }
 
         // release the ref

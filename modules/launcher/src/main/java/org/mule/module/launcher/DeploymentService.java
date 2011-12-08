@@ -37,7 +37,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -70,12 +69,12 @@ public class DeploymentService
 
     private List<StartupListener> startupListeners = new ArrayList<StartupListener>();
 
-    private List<DeploymentListener> deploymentListeners = new CopyOnWriteArrayList<DeploymentListener>();
+    private CompositeDeploymentListener deploymentListener = new CompositeDeploymentListener();
 
     public DeploymentService(Map<Class<? extends MuleCoreExtension>, MuleCoreExtension> coreExtensions)
     {
         deployer = new DefaultMuleDeployer(this);
-        appFactory = new ApplicationFactory(this, coreExtensions);
+        appFactory = new ApplicationFactory(this, coreExtensions, deploymentListener);
     }
 
     public void start()
@@ -123,7 +122,7 @@ public class DeploymentService
                 {
                     logger.error(String.format("Failed to install app from archive '%s'", zip), t);
 
-                    fireOnDeploymentFailure(appName, t);
+                    deploymentListener.onDeploymentFailure(appName, t);
 
                     File appZip = new File(appsDir, zip);
                     addZombie(appZip);
@@ -160,7 +159,7 @@ public class DeploymentService
             }
             catch (Throwable t)
             {
-                fireOnDeploymentFailure(app, t);
+                deploymentListener.onDeploymentFailure(app, t);
                 addZombie(new File(appsDir, app));
                 logger.error(String.format("Failed to create application [%s]", app), t);
             }
@@ -171,13 +170,13 @@ public class DeploymentService
         {
             try
             {
-                fireOnDeploymentStart(application.getAppName());
+                deploymentListener.onDeploymentStart(application.getAppName());
                 deployer.deploy(application);
-                fireOnDeploymentSuccess(application.getAppName());
+                deploymentListener.onDeploymentSuccess(application.getAppName());
             }
             catch (Throwable t)
             {
-                fireOnDeploymentFailure(application.getAppName(), t);
+                deploymentListener.onDeploymentFailure(application.getAppName(), t);
 
                 // error text has been created by the deployer already
                 final String msg = miniSplash(String.format("Failed to deploy app '%s', see below", application.getAppName()));
@@ -309,15 +308,14 @@ public class DeploymentService
         }
 
         try {
-           fireOnUndeploymentStart(app.getAppName());
+           deploymentListener.onUndeploymentStart(app.getAppName());
 
            applications.remove(app);
            deployer.undeploy(app);
 
-           fireOnUndeploymentSuccess(app.getAppName());
+            deploymentListener.onUndeploymentSuccess(app.getAppName());
         } catch (RuntimeException e) {
-           fireOnUndeploymentFailure(app.getAppName(), e);
-
+           deploymentListener.onUndeploymentFailure(app.getAppName(), e);
            throw e;
         }
     }
@@ -338,13 +336,13 @@ public class DeploymentService
 
             try
             {
-                fireOnDeploymentStart(application.getAppName());
+                deploymentListener.onDeploymentStart(application.getAppName());
                 deployer.deploy(application);
-                fireOnDeploymentSuccess(application.getAppName());
+                deploymentListener.onDeploymentSuccess(application.getAppName());
             }
             catch (Throwable t)
             {
-                fireOnDeploymentFailure(application.getAppName(), t);
+                deploymentListener.onDeploymentFailure(application.getAppName(), t);
 
                 throw t;
             }
@@ -413,140 +411,12 @@ public class DeploymentService
 
     public void addDeploymentListener(DeploymentListener listener)
     {
-        this.deploymentListeners.add(listener);
+        deploymentListener.addDeploymentListener(listener);
     }
 
     public void removeDeploymentListener(DeploymentListener listener)
     {
-        this.deploymentListeners.remove(listener);
-    }
-
-    /**
-     * Notifies all deployment listeners that the deploy for a given application
-     * has just started.
-     *
-     * @param appName the name of the application being deployed.
-     */
-    public void fireOnDeploymentStart(String appName)
-    {
-        for (DeploymentListener listener : deploymentListeners)
-        {
-            try
-            {
-                listener.onDeploymentStart(appName);
-            }
-            catch (Throwable t)
-            {
-                logger.error("Listener failed to process onDeploymentStart notification", t);
-            }
-        }
-    }
-
-    /**
-     * Notifies all deployment listeners that the deploy for a given application
-     * has successfully finished.
-     *
-     * @param appName the name of the deployed application.
-     */
-    public void fireOnDeploymentSuccess(String appName)
-    {
-        for (DeploymentListener listener : deploymentListeners)
-        {
-            try
-            {
-                listener.onDeploymentSuccess(appName);
-            }
-            catch (Throwable t)
-            {
-                logger.error("Listener failed to process onDeploymentSuccess notification", t);
-            }
-        }
-    }
-
-    /**
-     * Notifies all deployment listeners that the deploy for a given application
-     * has finished with a failure.
-     *
-     * @param appName the name of the deployed application.
-     * @param cause the cause of the deployment failure.
-     */
-    public void fireOnDeploymentFailure(String appName, Throwable cause)
-    {
-        for (DeploymentListener listener : deploymentListeners)
-        {
-            try
-            {
-                listener.onDeploymentFailure(appName, cause);
-            }
-            catch (Throwable t)
-            {
-                logger.error("Listener failed to process onDeploymentFailure notification", t);
-            }
-        }
-    }
-
-    /**
-     * Notifies all deployment listeners that un-deployment for a given application
-     * has just started.
-     *
-     * @param appName the name of the application being un-deployed.
-     */
-    public void fireOnUndeploymentStart(String appName)
-    {
-        for (DeploymentListener listener : deploymentListeners)
-        {
-            try
-            {
-                listener.onUndeploymentStart(appName);
-            }
-            catch (Throwable t)
-            {
-                logger.error("Listener failed to process onUndeploymentStart notification", t);
-            }
-        }
-    }
-
-    /**
-     * Notifies all deployment listeners that un-deployment for a given application
-     * has successfully finished.
-     *
-     * @param appName the name of the un-deployed application.
-     */
-    public void fireOnUndeploymentSuccess(String appName)
-    {
-        for (DeploymentListener listener : deploymentListeners)
-        {
-            try
-            {
-                listener.onUndeploymentSuccess(appName);
-            }
-            catch (Throwable t)
-            {
-                logger.error("Listener failed to process onUndeploymentSuccess notification", t);
-            }
-        }
-    }
-
-    /**
-     * Notifies all deployment listeners that un-deployment for a given application
-     * has finished with a failure.
-     *
-     * @param appName the name of the un-deployed application.
-     * @param cause the cause of the deployment failure.
-     */
-    public void fireOnUndeploymentFailure(String appName, Throwable cause)
-    {
-        for (DeploymentListener listener : deploymentListeners)
-        {
-            try
-            {
-                listener.onUndeploymentFailure(appName, cause);
-            }
-            catch (Throwable t)
-            {
-                logger.error("Listener failed to process onUndeploymentFailure notification", t);
-            }
-        }
+        deploymentListener.removeDeploymentListener(listener);
     }
 
     public interface StartupListener
@@ -812,13 +682,13 @@ public class DeploymentService
 
             try
             {
-                fireOnDeploymentStart(a.getAppName());
+                deploymentListener.onDeploymentStart(a.getAppName());
                 deployer.deploy(a);
-                fireOnDeploymentSuccess(a.getAppName());
+                deploymentListener.onDeploymentSuccess(a.getAppName());
             }
             catch (Exception e)
             {
-                fireOnDeploymentFailure(a.getAppName(), e);
+                deploymentListener.onDeploymentFailure(a.getAppName(), e);
 
                 throw e;
             }
