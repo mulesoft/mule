@@ -67,7 +67,7 @@ public class CallInterfaceBinding implements InterfaceBinding, MessageProcessor
         //to know about the flow and create a session
         if(session==null)
         {
-            session = new DefaultMuleSession(flow, message.getMuleContext());
+            session = new DefaultMuleSession(flow);
         }
 
         MuleEvent result = process(new DefaultMuleEvent(message, endpoint.getExchangePattern(), session));

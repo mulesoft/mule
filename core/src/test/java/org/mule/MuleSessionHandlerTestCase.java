@@ -84,7 +84,7 @@ public class MuleSessionHandlerTestCase extends AbstractMuleTestCase
     {
         DefaultMuleMessage message = new DefaultMuleMessage("Test Message", muleContext);
         SessionHandler handler = new SerializeAndEncodeSessionHandler();
-        MuleSession session = new DefaultMuleSession(muleContext);
+        MuleSession session = new DefaultMuleSession();
 
         String string = "bar";
         session.setProperty("fooString", string);
@@ -122,7 +122,7 @@ public class MuleSessionHandlerTestCase extends AbstractMuleTestCase
     public void testNonSerializableSessionProperties() throws Exception
     {
         DefaultMuleMessage message = new DefaultMuleMessage("Test Message", muleContext);
-        MuleSession session = new DefaultMuleSession(muleContext);
+        MuleSession session = new DefaultMuleSession();
         SessionHandler handler = new SerializeAndEncodeSessionHandler();
 
         NotSerializableClass clazz = new NotSerializableClass();
@@ -145,7 +145,7 @@ public class MuleSessionHandlerTestCase extends AbstractMuleTestCase
     {
         MuleMessage message = new DefaultMuleMessage("Test Message", muleContext);
         SessionHandler legacyHandler = new LegacySessionHandler();
-        MuleSession session = new DefaultMuleSession(muleContext);
+        MuleSession session = new DefaultMuleSession();
 
         String string = "bar";
         session.setProperty("fooString", string);
@@ -177,7 +177,7 @@ public class MuleSessionHandlerTestCase extends AbstractMuleTestCase
     {
         DefaultMuleMessage message = new DefaultMuleMessage("Test Message", muleContext);
         SessionHandler handler = new LegacySessionHandler();
-        MuleSession session = new DefaultMuleSession(muleContext);
+        MuleSession session = new DefaultMuleSession();
 
         String string = "bar";
         session.setProperty("fooString", string);
@@ -216,7 +216,7 @@ public class MuleSessionHandlerTestCase extends AbstractMuleTestCase
     {
         DefaultMuleMessage message = new DefaultMuleMessage("Test Message", muleContext);
         SessionHandler handler = new SerializeAndEncodeSessionHandler();
-        MuleSession session = new DefaultMuleSession(muleContext);
+        MuleSession session = new DefaultMuleSession();
 
         Credentials credentials = new MuleCredentials("joe", "secret".toCharArray());
         SecurityContext sc = new DefaultSecurityContextFactory().create(new DefaultMuleAuthentication(credentials));
@@ -241,7 +241,7 @@ public class MuleSessionHandlerTestCase extends AbstractMuleTestCase
     {
         MuleMessage message = new DefaultMuleMessage("Test Message", muleContext);
         SessionHandler handler = new SerializeAndEncodeSessionHandler();
-        MuleSession session = new DefaultMuleSession(muleContext);
+        MuleSession session = new DefaultMuleSession();
 
         session.setSecurityContext(new NotSerializableSecurityContext());
 

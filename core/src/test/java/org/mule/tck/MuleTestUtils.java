@@ -537,7 +537,7 @@ public final class MuleTestUtils
 
     public static MuleSession getTestSession(FlowConstruct flowConstruct, MuleContext context)
     {
-        return new DefaultMuleSession(flowConstruct, context);
+        return new DefaultMuleSession(flowConstruct);
     }
 
     public static MuleSession getTestSession(MuleContext context)

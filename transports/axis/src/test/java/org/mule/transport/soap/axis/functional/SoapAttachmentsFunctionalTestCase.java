@@ -60,7 +60,7 @@ public class SoapAttachmentsFunctionalTestCase extends FunctionalTestCase
         {
             MuleMessage msg = new DefaultMuleMessage("testPayload", muleContext);
             msg.addOutboundAttachment("testAttachment", new DataHandler(new StringDataSource("foo")));
-            DefaultMuleSession session = new DefaultMuleSession(muleContext);
+            DefaultMuleSession session = new DefaultMuleSession();
             DefaultMuleEvent event = new DefaultMuleEvent(msg, getTestInboundEndpoint("test://test"), session);
             MuleMessage result = client.process(event).getMessage();
             assertNotNull(result);

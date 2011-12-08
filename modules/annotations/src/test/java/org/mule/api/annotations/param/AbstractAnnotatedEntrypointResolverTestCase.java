@@ -89,7 +89,7 @@ public abstract class AbstractAnnotatedEntrypointResolverTestCase extends Abstra
                 message.addOutboundAttachment(s, attachments.get(s));
             }
         }
-        return new DefaultMuleEventContext(new DefaultMuleEvent(message, getTestInboundEndpoint("null"), new DefaultMuleSession(muleContext)));
+        return new DefaultMuleEventContext(new DefaultMuleEvent(message, getTestInboundEndpoint("null"), new DefaultMuleSession()));
     }
 
     protected InvocationResult invokeResolver(String methodName, MuleEventContext eventContext) throws Exception

@@ -41,7 +41,17 @@ public class DefaultMuleSessionTestCase
     @Test
     public void create()
     {
-        DefaultMuleSession session = new DefaultMuleSession(Mockito.mock(MuleContext.class));
+        DefaultMuleSession session = new DefaultMuleSession();
+        assertCreate(session);
+        assertNull(session.getFlowConstruct());
+    }
+
+    @Test
+    @SuppressWarnings(value = "deprecation")
+    public void createDeprecated()
+    {
+        DefaultMuleSession session = new DefaultMuleSession();
+        assertCreate(session);
         assertNull(session.getFlowConstruct());
     }
 
@@ -49,7 +59,17 @@ public class DefaultMuleSessionTestCase
     public void createWithFlowConstuct()
     {
         FlowConstruct flowConstruct = Mockito.mock(FlowConstruct.class);
-        DefaultMuleSession session = new DefaultMuleSession(flowConstruct, Mockito.mock(MuleContext.class));
+        DefaultMuleSession session = new DefaultMuleSession(flowConstruct);
+        assertCreate(session);
+        assertSame(flowConstruct, session.getFlowConstruct());
+    }
+
+    @Test
+    @SuppressWarnings(value = "deprecation")
+    public void createWithFlowConstuctDeprecated()
+    {
+        FlowConstruct flowConstruct = Mockito.mock(FlowConstruct.class);
+        DefaultMuleSession session = new DefaultMuleSession(flowConstruct);
         assertSame(flowConstruct, session.getFlowConstruct());
     }
 
@@ -67,12 +87,12 @@ public class DefaultMuleSessionTestCase
         throws IllegalArgumentException, SecurityException, IllegalAccessException, NoSuchFieldException
     {
         FlowConstruct flowConstruct = Mockito.mock(FlowConstruct.class);
-        DefaultMuleSession original = new DefaultMuleSession(flowConstruct, Mockito.mock(MuleContext.class));
+        DefaultMuleSession original = new DefaultMuleSession(flowConstruct);
         original.setValid(false);
         original.setSecurityContext(Mockito.mock(SecurityContext.class));
         original.setProperty("foo", "bar");
 
-        DefaultMuleSession copy = new DefaultMuleSession(original, Mockito.mock(MuleContext.class));
+        DefaultMuleSession copy = new DefaultMuleSession(original);
 
         assertCopy(original, copy);
 
@@ -90,7 +110,7 @@ public class DefaultMuleSessionTestCase
     {
         FlowConstruct originalFlow = Mockito.mock(FlowConstruct.class);
         FlowConstruct newFlow = Mockito.mock(FlowConstruct.class);
-        DefaultMuleSession original = new DefaultMuleSession(originalFlow, Mockito.mock(MuleContext.class));
+        DefaultMuleSession original = new DefaultMuleSession(originalFlow);
         original.setValid(false);
         original.setSecurityContext(Mockito.mock(SecurityContext.class));
         original.setProperty("foo", "bar");
@@ -117,7 +137,7 @@ public class DefaultMuleSessionTestCase
     @Test
     public void valid()
     {
-        DefaultMuleSession session = new DefaultMuleSession(Mockito.mock(MuleContext.class));
+        DefaultMuleSession session = new DefaultMuleSession();
         assertTrue(session.isValid());
         session.setValid(false);
         assertFalse(session.isValid());
@@ -128,7 +148,7 @@ public class DefaultMuleSessionTestCase
     @Test
     public void propertiesCaseInsensitive()
     {
-        DefaultMuleSession session = new DefaultMuleSession(Mockito.mock(MuleContext.class));
+        DefaultMuleSession session = new DefaultMuleSession();
         session.setProperty("key1", "value1");
         assertSame("value1", session.getProperty("key1"));
 
@@ -140,8 +160,8 @@ public class DefaultMuleSessionTestCase
     @Test
     public void propertiesCaseInsensitiveAfterCopy()
     {
-        DefaultMuleSession original = new DefaultMuleSession(Mockito.mock(MuleContext.class));
-        DefaultMuleSession copy = new DefaultMuleSession(original, Mockito.mock(MuleContext.class));
+        DefaultMuleSession original = new DefaultMuleSession();
+        DefaultMuleSession copy = new DefaultMuleSession(original);
 
         copy.setProperty("key1", "value1");
         assertSame("value1", copy.getProperty("key1"));
@@ -154,8 +174,8 @@ public class DefaultMuleSessionTestCase
     @Test
     public void merge()
     {
-        DefaultMuleSession copy1 = new DefaultMuleSession(Mockito.mock(MuleContext.class));
-        DefaultMuleSession copy2 = new DefaultMuleSession(Mockito.mock(MuleContext.class));
+        DefaultMuleSession copy1 = new DefaultMuleSession();
+        DefaultMuleSession copy2 = new DefaultMuleSession();
 
         Object nonSerializableValue2 = new Object();
         Object nonSerializableValue3 = new Object();
@@ -194,7 +214,7 @@ public class DefaultMuleSessionTestCase
     public void serialization() throws MuleException
     {
         Flow flow = new Flow("flow", Mockito.mock(MuleContext.class));
-        DefaultMuleSession before = new DefaultMuleSession(flow, Mockito.mock(MuleContext.class));
+        DefaultMuleSession before = new DefaultMuleSession(flow);
         before.setValid(false);
         before.setSecurityContext(createTestAuthentication());
         before.setProperty("foo", "bar");
@@ -233,7 +253,7 @@ public class DefaultMuleSessionTestCase
     @SuppressWarnings(value = {"deprecation"})
     public void serializationWithNonSerializableProperty() throws MuleException
     {
-        DefaultMuleSession before = new DefaultMuleSession(Mockito.mock(MuleContext.class));
+        DefaultMuleSession before = new DefaultMuleSession();
         before.setProperty("foo", new Object());
 
         try

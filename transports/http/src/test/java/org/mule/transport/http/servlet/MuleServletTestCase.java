@@ -165,7 +165,7 @@ public class MuleServletTestCase extends Assert {
         when(ep.getTransactionConfig()).thenReturn(txConfig);
         when(ep.getExchangePattern()).thenReturn(MessageExchangePattern.REQUEST_RESPONSE);
         
-        DefaultMuleSession session = new DefaultMuleSession(muleContext);
+        DefaultMuleSession session = new DefaultMuleSession();
         
         DefaultMuleEvent event = new DefaultMuleEvent(message, ep, session);
         return event;

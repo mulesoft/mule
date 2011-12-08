@@ -80,7 +80,7 @@ public class MessageProcessorPollingMessageReceiver extends AbstractPollingMessa
         }
 
         MuleEvent event = new DefaultMuleEvent(request, ep.getExchangePattern(), new DefaultMuleSession(
-            flowConstruct, connector.getMuleContext()));
+            flowConstruct));
 
         MuleEvent sourceEvent = sourceMessageProcessor.process(event);
         if (isNewMessage(sourceEvent))

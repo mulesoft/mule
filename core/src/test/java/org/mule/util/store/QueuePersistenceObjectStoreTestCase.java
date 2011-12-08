@@ -180,7 +180,7 @@ public class QueuePersistenceObjectStoreTestCase extends AbstractObjectStoreCont
         String id = UUID.getUUID();
         QueueKey key = new QueueKey(QUEUE_NAME, id);
         MuleMessage msg = new DefaultMuleMessage("Hello", mockMuleContext);
-        MuleEvent event = new DefaultMuleEvent(msg, MessageExchangePattern.ONE_WAY, new DefaultMuleSession(mockMuleContext));
+        MuleEvent event = new DefaultMuleEvent(msg, MessageExchangePattern.ONE_WAY, new DefaultMuleSession());
 
         ListableObjectStore<Serializable> monitored = new MonitoredObjectStoreWrapper(store);
         monitored.store(key, event);

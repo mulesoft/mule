@@ -315,7 +315,7 @@ public class DefaultMuleMessageTestCase extends AbstractMuleContextTestCase
         RequestContext.setEvent(new DefaultMuleEvent(
                 message,
                 getTestInboundEndpoint("foo"),
-                new DefaultMuleSession(muleContext)));
+                new DefaultMuleSession()));
 
         message.setOutboundProperty("foo", "fooOutbound");
         message.setInvocationProperty("bar", "barInvocation");

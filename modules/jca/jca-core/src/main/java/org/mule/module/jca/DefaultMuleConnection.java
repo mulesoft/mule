@@ -164,7 +164,7 @@ public class DefaultMuleConnection implements MuleConnection
     protected MuleEvent getEvent(MuleMessage message, OutboundEndpoint endpoint)
         throws MuleException
     {
-        MuleSession session = new DefaultMuleSession(muleContext);
+        MuleSession session = new DefaultMuleSession();
 
         if (credentials != null)
         {

@@ -315,7 +315,7 @@ public class MuleClient implements Disposable
             trans = TransformerUtils.getTransformers(transformers, muleContext);
         }
 
-        MuleSession session = new DefaultMuleSession(service, muleContext);
+        MuleSession session = new DefaultMuleSession(service);
         InboundEndpoint endpoint = getDefaultClientEndpoint(service, message.getPayload(), true);
         MuleEvent event = new DefaultMuleEvent(message, endpoint, session);
 
@@ -369,7 +369,7 @@ public class MuleClient implements Disposable
         {
             throw new ServiceException(CoreMessages.objectNotRegistered("Service", componentName));
         }
-        MuleSession session = new DefaultMuleSession(service, muleContext);
+        MuleSession session = new DefaultMuleSession(service);
         InboundEndpoint endpoint = getDefaultClientEndpoint(service, message.getPayload(), false);
         MuleEvent event = new DefaultMuleEvent(message, endpoint, session);
 
@@ -695,7 +695,7 @@ public class MuleClient implements Disposable
 
     protected MuleEvent getEvent(MuleMessage message, MessageExchangePattern exchangePattern) throws MuleException
     {
-        DefaultMuleSession session = new DefaultMuleSession(new DefaultLocalMuleClient.MuleClientFlowConstruct(muleContext), muleContext);
+        DefaultMuleSession session = new DefaultMuleSession(new DefaultLocalMuleClient.MuleClientFlowConstruct(muleContext));
 
         if (user != null)
         {

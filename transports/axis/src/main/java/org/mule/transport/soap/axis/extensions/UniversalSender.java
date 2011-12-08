@@ -208,7 +208,7 @@ public class UniversalSender extends BasicHandler
             }
             else
             {
-                session = new DefaultMuleSession(muleContext);
+                session = new DefaultMuleSession();
             }
 
             logger.info("Making Axis soap request on: " + uri);

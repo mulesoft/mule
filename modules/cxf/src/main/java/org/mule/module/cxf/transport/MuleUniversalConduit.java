@@ -157,7 +157,7 @@ public class MuleUniversalConduit extends AbstractConduit
             // we've got an out of band WS-RM message or a message from a standalone client
             MuleContext muleContext = configuration.getMuleContext();
             MuleMessage muleMsg = new DefaultMuleMessage(handler, muleContext);
-            MuleSession session = new DefaultMuleSession(muleContext);
+            MuleSession session = new DefaultMuleSession();
             
             String url = setupURL(message);
             

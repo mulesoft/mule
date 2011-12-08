@@ -160,7 +160,7 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
                                           Transaction trans,
                                           OutputStream outputStream) throws MuleException
     {
-        return routeMessage(message, new DefaultMuleSession(connector.getMuleContext()), trans,
+        return routeMessage(message, new DefaultMuleSession(), trans,
             outputStream);
     }
 
@@ -286,7 +286,7 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
         }
         else
         {
-            session = new DefaultMuleSession(flowConstruct, connector.getMuleContext());
+            session = new DefaultMuleSession(flowConstruct);
         }
         if (message.getReplyTo() != null)
         {

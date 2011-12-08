@@ -520,7 +520,7 @@ public class MuleEventMulticaster
                 }
                 else
                 {
-                    MuleSession session = new DefaultMuleSession(service, muleContext);
+                    MuleSession session = new DefaultMuleSession(service);
                     DefaultMuleEvent event = new DefaultMuleEvent(message, endpoint.getExchangePattern(),
                         session);
                     RequestContext.setEvent(event);

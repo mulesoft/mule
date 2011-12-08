@@ -157,7 +157,7 @@ public class Rules implements Initialisable, Disposable, MessageService
         OutboundEndpoint ep = endpointBuilder.buildOutboundEndpoint();
        
         DefaultMuleEvent event = new DefaultMuleEvent(message, ep.getExchangePattern(),
-            new DefaultMuleSession(flowConstruct, muleContext));
+            new DefaultMuleSession(flowConstruct));
 
         RequestContext.setEvent(event);
         MuleEvent resultEvent = ep.process(event);

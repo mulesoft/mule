@@ -131,7 +131,7 @@ public class MuleCallAnnotationHandler implements ClientAnnotationHandler
 
         MuleEvent replyEvent = null;
         MuleMessage reply;
-        MuleSession session = new DefaultMuleSession(flow, muleContext);
+        MuleSession session = new DefaultMuleSession(flow);
 
         try
         {

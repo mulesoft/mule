@@ -45,7 +45,7 @@ public class LegacySessionHandler implements SessionHandler
 
     public MuleSession retrieveSessionInfoFromMessage(MuleMessage message) throws MuleException
     {
-         MuleSession session = new DefaultMuleSession(message.getMuleContext());
+         MuleSession session = new DefaultMuleSession();
 
          String sessionId = message.getInboundProperty(MuleProperties.MULE_SESSION_ID_PROPERTY);
          Object sessionHeader = message.getInboundProperty(MuleProperties.MULE_SESSION_PROPERTY);
