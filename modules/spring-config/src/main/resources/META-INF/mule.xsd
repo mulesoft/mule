@@ -157,7 +157,7 @@
             <xsd:element ref="processor-chain"/>
             <xsd:element ref="custom-processor"/>
             <xsd:element ref="invoke"/>
-            <xsd:element ref="message-filter"/>
+            <xsd:element ref="abstract-global-intercepting-message-processor"/>
             <xsd:element ref="custom-queue-store" minOccurs="0" maxOccurs="unbounded"/>
             <xsd:element ref="abstract-processing-strategy" minOccurs="0" maxOccurs="unbounded"/>
         </xsd:choice>
@@ -4985,7 +4985,29 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="message-filter" type="messageFilterType"  substitutionGroup="abstract-intercepting-message-processor">
+    <xsd:element name="abstract-global-intercepting-message-processor" abstract="true"
+                 type="abstractGlobalInterceptingMessageProcessorType" substitutionGroup="abstract-intercepting-message-processor">
+        <xsd:annotation>
+            <xsd:documentation>
+                A placeholder for intercepting router elements.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:complexType name="abstractGlobalInterceptingMessageProcessorType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractInterceptingMessageProcessorType">
+                <xsd:attribute name="name" type="substitutableName">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Identifies the processor so that other elements can reference it. Required if the processor is defined at the global level.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="message-filter" type="messageFilterType"  substitutionGroup="abstract-global-intercepting-message-processor">
         <xsd:annotation>
             <xsd:documentation>
                 A message processor that uses a filter to determine whether to process an event.
@@ -4994,7 +5016,7 @@
     </xsd:element>
     <xsd:complexType name="messageFilterType">
         <xsd:complexContent>
-            <xsd:extension base="abstractInterceptingMessageProcessorType">
+            <xsd:extension base="abstractGlobalInterceptingMessageProcessorType">
                 <xsd:sequence>
                     <xsd:element ref="abstract-filter">
                         <xsd:annotation>
@@ -5004,13 +5026,6 @@
                         </xsd:annotation>
                     </xsd:element>
                 </xsd:sequence>
-                <xsd:attribute name="name" type="substitutableName">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            Identifies the processor so that other elements can reference it. Required if the processor is defined at the global level.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
                 <xsd:attribute name="onUnaccepted" type="xsd:string">
                     <xsd:annotation>
                         <xsd:documentation>
@@ -5030,7 +5045,7 @@
     </xsd:complexType>
 
     <xsd:element name="idempotent-message-filter" type="idempotentMessageFilterType"
-                 substitutionGroup="abstract-intercepting-message-processor">
+                 substitutionGroup="abstract-global-intercepting-message-processor">
         <xsd:annotation>
             <xsd:documentation>
                 Ensures that only unique messages are received by a service by checking the unique ID of the incoming message. Note that the ID used can be generated from the message using an expression defined in the 'idExpression' attribute. By default, the expression used is '#[message:id]', which means the underlying endpoint must support unique message IDs for this to work. Otherwise, a UniqueIdNotSupportedException is thrown.
@@ -5040,7 +5055,7 @@
 
     <xsd:complexType name="idempotentMessageFilterType">
         <xsd:complexContent>
-            <xsd:extension base="abstractInterceptingMessageProcessorType">
+            <xsd:extension base="abstractGlobalInterceptingMessageProcessorType">
                 <xsd:sequence>
                     <xsd:element ref="abstract-object-store" maxOccurs="1" minOccurs="0"/>
                 </xsd:sequence>
@@ -5150,7 +5165,7 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="idempotent-secure-hash-message-filter" substitutionGroup="abstract-intercepting-message-processor">
+    <xsd:element name="idempotent-secure-hash-message-filter" substitutionGroup="abstract-global-intercepting-message-processor">
         <xsd:annotation>
             <xsd:documentation>
                 Ensures that only unique messages are received by a service by calculating the hash of the message itself using a message digest algorithm. This provides a value with an infinitesimally small chance of a collision. This can be used to filter message duplicates. Keep in mind that the hash is calculated over the entire byte array representing the message, so any leading or trailing spaces or extraneous bytes (like padding) can produce different hash values for the same semantic message content. Care should be taken to ensure that messages do not contain extraneous bytes. This class is useful when the message does not support unique identifiers.
@@ -5189,7 +5204,7 @@
         </xsd:complexType>
     </xsd:element>
 
-    <xsd:element name="combine-collections-transformer" substitutionGroup="abstract-intercepting-message-processor">
+    <xsd:element name="combine-collections-transformer" substitutionGroup="abstract-global-intercepting-message-processor">
         <xsd:annotation>
             <xsd:documentation>
             Takes a payload which is a Collection of Collections and turns into a single List. For example, if the payload is a Collection
@@ -5202,7 +5217,7 @@
         </xsd:annotation>
         <xsd:complexType>
             <xsd:complexContent>
-                <xsd:extension base="abstractInterceptingMessageProcessorType"/>
+                <xsd:extension base="abstractGlobalInterceptingMessageProcessorType"/>
             </xsd:complexContent>
         </xsd:complexType>
     </xsd:element>
