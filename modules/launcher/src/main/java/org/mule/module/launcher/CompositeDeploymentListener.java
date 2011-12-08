@@ -44,7 +44,7 @@ public class CompositeDeploymentListener implements DeploymentListener
             }
             catch (Throwable t)
             {
-                logger.error("Listener failed to process onDeploymentStart notification", t);
+                logNotificationProcessingError(appName, listener, "onDeploymentStart", t);
             }
         }
     }
@@ -60,7 +60,7 @@ public class CompositeDeploymentListener implements DeploymentListener
             }
             catch (Throwable t)
             {
-                logger.error("Listener failed to process onDeploymentSuccess notification", t);
+                logNotificationProcessingError(appName, listener, "onDeploymentSuccess", t);
             }
         }
     }
@@ -76,7 +76,7 @@ public class CompositeDeploymentListener implements DeploymentListener
             }
             catch (Throwable t)
             {
-                logger.error("Listener failed to process onDeploymentFailure notification", t);
+                logNotificationProcessingError(appName, listener, "onDeploymentFailure", t);
             }
         }
     }
@@ -92,8 +92,7 @@ public class CompositeDeploymentListener implements DeploymentListener
             }
             catch (Throwable t)
             {
-                logger.error("Listener failed to process onUndeploymentStart notification", t);
-
+                logNotificationProcessingError(appName, listener, "onUndeploymentStart", t);
             }
         }
     }
@@ -109,7 +108,7 @@ public class CompositeDeploymentListener implements DeploymentListener
             }
             catch (Throwable t)
             {
-                logger.error("Listener failed to process onUndeploymentSuccess notification", t);
+                logNotificationProcessingError(appName, listener, "onUndeploymentSuccess", t);
             }
         }
     }
@@ -125,8 +124,13 @@ public class CompositeDeploymentListener implements DeploymentListener
             }
             catch (Throwable t)
             {
-                logger.error("Listener failed to process onUndeploymentFailure notification", t);
+                logNotificationProcessingError(appName, listener, "onUndeploymentFailure", t);
             }
         }
+    }
+
+    private void logNotificationProcessingError(String appName, DeploymentListener listener, String notification, Throwable error)
+    {
+        logger.error(String.format("Listener '%s' failed to process notification '%s' for application '%s'", listener, notification, appName), error);
     }
 }
