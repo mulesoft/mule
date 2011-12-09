@@ -21,6 +21,7 @@ import org.mule.config.builders.DefaultsConfigurationBuilder;
 import org.mule.construct.Flow;
 import org.mule.context.DefaultMuleContextFactory;
 import org.mule.security.MuleSecurityManager;
+import org.mule.tck.size.SmallTest;
 import org.mule.util.xa.ResourceManagerSystemException;
 
 import java.util.ArrayList;
@@ -28,6 +29,7 @@ import java.util.List;
 
 import org.junit.Test;
 
+@SmallTest
 public class QueueManagerLifecycleOrderTestCase
 {
     List<Object> startStopOrder = new ArrayList<Object>();
