@@ -32,14 +32,13 @@ import org.junit.Test;
 @SmallTest
 public class QueueManagerLifecycleOrderTestCase
 {
-    List<Object> startStopOrder = new ArrayList<Object>();
+    private List<Object> startStopOrder = new ArrayList<Object>();
+    private RecordingTQM rtqm = new RecordingTQM();
 
     @Test
     public void testStartupOrder() throws Exception
     {
         MuleContext muleContext = new DefaultMuleContextFactory().createMuleContext(new QueueManagerOnlyConfigurationBuilder());
-        RecordingTQM rtqm = new RecordingTQM();
-        muleContext.getRegistry().registerObject(MuleProperties.OBJECT_QUEUE_MANAGER, rtqm);
         FlowConstruct fc = new RecordingFlow("dummy", muleContext);
         muleContext.getRegistry().registerFlowConstruct(fc);
         muleContext.start();
@@ -86,13 +85,12 @@ public class QueueManagerLifecycleOrderTestCase
         }
     }
 
-    private static class QueueManagerOnlyConfigurationBuilder extends DefaultsConfigurationBuilder
+    private class QueueManagerOnlyConfigurationBuilder extends DefaultsConfigurationBuilder
     {
         @Override
         protected void doConfigure(MuleContext muleContext) throws Exception
         {
-            muleContext.getRegistry().registerObject(MuleProperties.OBJECT_QUEUE_MANAGER,
-                new TransactionalQueueManager());
+            muleContext.getRegistry().registerObject(MuleProperties.OBJECT_QUEUE_MANAGER, rtqm);
             muleContext.getRegistry().registerObject(MuleProperties.OBJECT_SECURITY_MANAGER,
                 new MuleSecurityManager());
 
