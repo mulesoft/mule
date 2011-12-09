@@ -7,31 +7,35 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.test.config;
 
-import org.junit.Test;
+package org.mule.util.queue;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
 
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.construct.FlowConstruct;
+import org.mule.config.builders.DefaultsConfigurationBuilder;
 import org.mule.construct.Flow;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
-import org.mule.util.queue.TransactionalQueueManager;
+import org.mule.context.DefaultMuleContextFactory;
+import org.mule.security.MuleSecurityManager;
 import org.mule.util.xa.ResourceManagerSystemException;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
+import org.junit.Test;
 
-public class TQMStartupTestCase extends AbstractMuleContextTestCase
+public class QueueManagerLifecycleOrderTestCase
 {
     List<Object> startStopOrder = new ArrayList<Object>();
+
     @Test
     public void testStartupOrder() throws Exception
     {
+        MuleContext muleContext = new DefaultMuleContextFactory().createMuleContext(new QueueManagerOnlyConfigurationBuilder());
         RecordingTQM rtqm = new RecordingTQM();
         muleContext.getRegistry().registerObject(MuleProperties.OBJECT_QUEUE_MANAGER, rtqm);
         FlowConstruct fc = new RecordingFlow("dummy", muleContext);
@@ -77,6 +81,19 @@ public class TQMStartupTestCase extends AbstractMuleContextTestCase
         public void doStop() throws MuleException
         {
             startStopOrder.add(this);
+        }
+    }
+
+    private static class QueueManagerOnlyConfigurationBuilder extends DefaultsConfigurationBuilder
+    {
+        @Override
+        protected void doConfigure(MuleContext muleContext) throws Exception
+        {
+            muleContext.getRegistry().registerObject(MuleProperties.OBJECT_QUEUE_MANAGER,
+                new TransactionalQueueManager());
+            muleContext.getRegistry().registerObject(MuleProperties.OBJECT_SECURITY_MANAGER,
+                new MuleSecurityManager());
+
         }
     }
 }
