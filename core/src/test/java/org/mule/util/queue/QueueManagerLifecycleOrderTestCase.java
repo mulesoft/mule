@@ -7,42 +7,36 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.test.config;
 
-import org.junit.Test;
+package org.mule.util.queue;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
 
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
+import org.mule.api.config.MuleProperties;
 import org.mule.api.construct.FlowConstruct;
-import org.mule.api.exception.MessagingExceptionHandler;
-import org.mule.api.lifecycle.LifecycleException;
-import org.mule.api.lifecycle.LifecycleManager;
-import org.mule.api.lifecycle.LifecycleState;
-import org.mule.api.lifecycle.Startable;
-import org.mule.api.lifecycle.Stoppable;
-import org.mule.api.processor.MessageProcessorChain;
-import org.mule.api.routing.MessageInfoMapping;
+import org.mule.config.builders.DefaultsConfigurationBuilder;
 import org.mule.construct.SimpleFlowConstruct;
-import org.mule.lifecycle.DefaultLifecycleState;
-import org.mule.management.stats.FlowConstructStatistics;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
-import org.mule.util.queue.QueuePersistenceStrategy;
-import org.mule.util.queue.TransactionalQueueManager;
+import org.mule.context.DefaultMuleContextFactory;
+import org.mule.security.MuleSecurityManager;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
+import org.junit.Test;
 
-public class TQMStartupTestCase extends AbstractMuleContextTestCase
+public class QueueManagerLifecycleOrderTestCase
 {
     List<Object> startStopOrder = new ArrayList<Object>();
+
     @Test
     public void testStartupOrder() throws Exception
     {
-        TransactionalQueueManager tqm = (TransactionalQueueManager)muleContext.getQueueManager();
+        MuleContext muleContext = new DefaultMuleContextFactory().createMuleContext(new QueueManagerOnlyConfigurationBuilder());
+        TransactionalQueueManager tqm = (TransactionalQueueManager) muleContext.getQueueManager();
         PersistenceStrategy ps = new PersistenceStrategy();
         tqm.setPersistenceStrategy(ps);
         FlowConstruct fc = new RecordingFlowConstruct("dummy", muleContext);
@@ -56,27 +50,8 @@ public class TQMStartupTestCase extends AbstractMuleContextTestCase
         assertSame(ps, startStopOrder.get(3));
     }
 
-    private class PersistenceStrategy implements QueuePersistenceStrategy
+    private class PersistenceStrategy extends MemoryPersistenceStrategy
     {
-        public Object store(String queue, Object obj) throws IOException
-        {
-            return null;
-        }
-
-        public Object load(String queue, Object id) throws IOException
-        {
-            return null;
-        }
-
-        public void remove(String queue, Object id) throws IOException
-        {
-        }
-
-        public List restore() throws IOException
-        {
-            return new ArrayList();
-        }
-
         public void open() throws IOException
         {
             startStopOrder.add(this);
@@ -85,11 +60,6 @@ public class TQMStartupTestCase extends AbstractMuleContextTestCase
         public void close() throws IOException
         {
             startStopOrder.add(this);
-        }
-
-        public boolean isTransient()
-        {
-            return false;
         }
     }
 
@@ -108,6 +78,19 @@ public class TQMStartupTestCase extends AbstractMuleContextTestCase
         public void doStop() throws MuleException
         {
             startStopOrder.add(this);
+        }
+    }
+
+    private static class QueueManagerOnlyConfigurationBuilder extends DefaultsConfigurationBuilder
+    {
+        @Override
+        protected void doConfigure(MuleContext muleContext) throws Exception
+        {
+            muleContext.getRegistry().registerObject(MuleProperties.OBJECT_QUEUE_MANAGER,
+                new TransactionalQueueManager());
+            muleContext.getRegistry().registerObject(MuleProperties.OBJECT_SECURITY_MANAGER,
+                new MuleSecurityManager());
+
         }
     }
 }
