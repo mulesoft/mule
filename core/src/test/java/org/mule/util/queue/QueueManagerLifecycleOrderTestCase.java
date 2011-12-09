@@ -18,11 +18,11 @@ import org.mule.api.MuleException;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.config.builders.DefaultsConfigurationBuilder;
-import org.mule.construct.SimpleFlowConstruct;
+import org.mule.construct.Flow;
 import org.mule.context.DefaultMuleContextFactory;
 import org.mule.security.MuleSecurityManager;
+import org.mule.util.xa.ResourceManagerSystemException;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,36 +36,39 @@ public class QueueManagerLifecycleOrderTestCase
     public void testStartupOrder() throws Exception
     {
         MuleContext muleContext = new DefaultMuleContextFactory().createMuleContext(new QueueManagerOnlyConfigurationBuilder());
-        TransactionalQueueManager tqm = (TransactionalQueueManager) muleContext.getQueueManager();
-        PersistenceStrategy ps = new PersistenceStrategy();
-        tqm.setPersistenceStrategy(ps);
-        FlowConstruct fc = new RecordingFlowConstruct("dummy", muleContext);
+        RecordingTQM rtqm = new RecordingTQM();
+        muleContext.getRegistry().registerObject(MuleProperties.OBJECT_QUEUE_MANAGER, rtqm);
+        FlowConstruct fc = new RecordingFlow("dummy", muleContext);
         muleContext.getRegistry().registerFlowConstruct(fc);
         muleContext.start();
         muleContext.stop();
         assertEquals(4, startStopOrder.size());
-        assertSame(ps, startStopOrder.get(0));
+        assertSame(rtqm, startStopOrder.get(0));
         assertSame(fc, startStopOrder.get(1));
         assertSame(fc, startStopOrder.get(2));
-        assertSame(ps, startStopOrder.get(3));
+        assertSame(rtqm, startStopOrder.get(3));
     }
 
-    private class PersistenceStrategy extends MemoryPersistenceStrategy
+    private class RecordingTQM extends TransactionalQueueManager
     {
-        public void open() throws IOException
+        @Override
+        public void start() throws ResourceManagerSystemException
         {
             startStopOrder.add(this);
+            super.start();
         }
 
-        public void close() throws IOException
+        @Override
+        public void stop() throws ResourceManagerSystemException
         {
             startStopOrder.add(this);
+            super.stop();
         }
     }
 
-    private class RecordingFlowConstruct extends SimpleFlowConstruct
+    private class RecordingFlow extends Flow
     {
-        public RecordingFlowConstruct(String name, MuleContext muleContext)
+        public RecordingFlow(String name, MuleContext muleContext)
         {
             super(name, muleContext);
         }
