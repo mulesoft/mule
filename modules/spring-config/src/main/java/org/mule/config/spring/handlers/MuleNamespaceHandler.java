@@ -320,7 +320,7 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("map-to-bean-transformer", new MessageProcessorDefinitionParser(MapToBean.class));
         registerBeanDefinitionParser("bean-to-map-transformer", new MessageProcessorDefinitionParser(BeanToMap.class));
 
-        registerBeanDefinitionParser("combine-collections-transformer", new MessageProcessorDefinitionParser(CombineCollectionsTransformer.class));
+        registerMuleBeanDefinitionParser("combine-collections-transformer", new MessageProcessorDefinitionParser(CombineCollectionsTransformer.class)).addIgnored("name");
         
         //Transaction Managers
         registerBeanDefinitionParser("custom-transaction-manager", new TransactionManagerDefinitionParser());
@@ -498,8 +498,8 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("collection-async-reply-router", new InboundRouterDefinitionParser(SimpleCollectionAggregator.class));
 
         // Routing: Intercepting Message Processors
-        registerBeanDefinitionParser("idempotent-message-filter", new InboundRouterDefinitionParser(IdempotentMessageFilter.class));
-        registerBeanDefinitionParser("idempotent-secure-hash-message-filter", new InboundRouterDefinitionParser(IdempotentSecureHashMessageFilter.class));
+        registerMuleBeanDefinitionParser("idempotent-message-filter", new MessageProcessorDefinitionParser(IdempotentMessageFilter.class)).addIgnored("name");
+        registerMuleBeanDefinitionParser("idempotent-secure-hash-message-filter", new MessageProcessorDefinitionParser(IdempotentSecureHashMessageFilter.class)).addIgnored("name");
         registerBeanDefinitionParser("wire-tap", new InboundRouterDefinitionParser(WireTap.class));
         registerBeanDefinitionParser("custom-aggregator", new AggregatorDefinitionParser());
         registerBeanDefinitionParser("collection-aggregator", new AggregatorDefinitionParser(SimpleCollectionAggregator.class));
