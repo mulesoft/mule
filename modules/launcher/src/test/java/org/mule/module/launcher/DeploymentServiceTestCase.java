@@ -301,7 +301,14 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
     private class TestDeployer implements MuleDeployer
     {
-        MuleDeployer delegate = new DefaultMuleDeployer(deploymentService);
+
+        final DefaultMuleDeployer delegate;
+
+        public TestDeployer()
+        {
+            delegate = new DefaultMuleDeployer();
+            delegate.setApplicationFactory(deploymentService.getAppFactory());
+        }
 
         @Override
         public void deploy(Application app)

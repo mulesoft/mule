@@ -10,50 +10,22 @@
 
 package org.mule.module.launcher.application;
 
-import org.mule.MuleCoreExtension;
-import org.mule.module.launcher.AppBloodhound;
-import org.mule.module.launcher.DefaultAppBloodhound;
-import org.mule.module.launcher.DeploymentListener;
-import org.mule.module.launcher.DeploymentService;
-import org.mule.module.launcher.descriptor.ApplicationDescriptor;
-
 import java.io.IOException;
-import java.util.Map;
 
 /**
- * Responsible for creating application objects. E.g. handles the default/priviledged app,
- * wrapper objects, etc.
+ * Creates {@link Application} instances
  */
-public class ApplicationFactory
+public interface ApplicationFactory
 {
-    protected DeploymentService deploymentService;
-    protected Map<Class<? extends MuleCoreExtension>, MuleCoreExtension> coreExtensions;
-    protected DeploymentListener deploymentListener;
 
-    public ApplicationFactory(DeploymentService deploymentService, Map<Class<? extends MuleCoreExtension>, MuleCoreExtension> coreExtensions, DeploymentListener deploymentListener)
-    {
-        this.deploymentService = deploymentService;
-        this.coreExtensions = coreExtensions;
-        this.deploymentListener = deploymentListener;
-    }
-
-    public Application createApp(String appName) throws IOException
-    {
-        AppBloodhound bh = new DefaultAppBloodhound();
-        final ApplicationDescriptor descriptor = bh.fetch(appName);
-        if (descriptor.isPrivileged())
-        {
-            final PriviledgedMuleApplication delegate = new PriviledgedMuleApplication(descriptor);
-            delegate.setDeploymentListener(deploymentListener);
-            delegate.setDeploymentService(deploymentService);
-            delegate.setCoreExtensions(coreExtensions);
-            return new ApplicationWrapper(delegate);
-        }
-        else
-        {
-            final DefaultMuleApplication delegate = new DefaultMuleApplication(descriptor);
-            delegate.setDeploymentListener(deploymentListener);
-            return new ApplicationWrapper(delegate);
-        }
-    }
+    /**
+     * Creates an application
+     *
+     * @param appName the name of the application to create
+     * @return the application instance that corresponds to the given name
+     * @throws IOException
+     */
+    //TODO(pablo.kraan): createApp should throw an Exception class more related
+    //to the domain instead of a low level IOException
+    public Application createApp(String appName) throws IOException;
 }

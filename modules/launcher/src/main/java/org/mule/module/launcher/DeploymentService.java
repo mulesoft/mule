@@ -15,6 +15,7 @@ import org.mule.config.StartupContext;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.module.launcher.application.Application;
 import org.mule.module.launcher.application.ApplicationFactory;
+import org.mule.module.launcher.application.PrivilegedApplicationFactory;
 import org.mule.module.launcher.util.DebuggableReentrantLock;
 import org.mule.module.launcher.util.ElementAddedEvent;
 import org.mule.module.launcher.util.ElementRemovedEvent;
@@ -54,6 +55,9 @@ import static org.mule.util.SplashScreen.miniSplash;
 public class DeploymentService
 {
     public static final String APP_ANCHOR_SUFFIX = "-anchor.txt";
+    public static final String ANOTHER_DEPLOYMENT_OPERATION_IS_IN_PROGRESS = "Another deployment operation is in progress";
+    public static final String INSTALL_OPERATION_HAS_BEEN_INTERRUPTED = "Install operation has been interrupted";
+
     protected static final int DEFAULT_CHANGES_CHECK_INTERVAL_MS = 5000;
 
     protected ScheduledExecutorService appDirMonitorTimer;
@@ -73,8 +77,13 @@ public class DeploymentService
 
     public DeploymentService(Map<Class<? extends MuleCoreExtension>, MuleCoreExtension> coreExtensions)
     {
-        deployer = new DefaultMuleDeployer(this);
-        appFactory = new ApplicationFactory(this, coreExtensions, deploymentListener);
+        PrivilegedApplicationFactory appFactory = new PrivilegedApplicationFactory(this, coreExtensions);
+        appFactory.setDeploymentListener(deploymentListener);
+        this.appFactory = appFactory;
+
+        DefaultMuleDeployer deployer = new DefaultMuleDeployer();
+        deployer.setApplicationFactory(this.appFactory);
+        this.deployer = deployer;
     }
 
     public void start()
@@ -116,7 +125,7 @@ public class DeploymentService
                 try
                 {
                     // we don't care about the returned app object on startup
-                    deployer.installFromAppDir(zip);
+                    guardedInstallFromAppDir(zip);
                 }
                 catch (Throwable t)
                 {
@@ -148,7 +157,7 @@ public class DeploymentService
                 final File appZip = new File(appsDir, app + ".zip");
                 if (appZip.exists())
                 {
-                    a = deployer.installFromAppDir(appZip.getName());
+                    a = guardedInstallFromAppDir(appZip.getName());
                 }
                 else
                 {
@@ -165,13 +174,12 @@ public class DeploymentService
             }
         }
 
-
         for (Application application : applications)
         {
             try
             {
                 deploymentListener.onDeploymentStart(application.getAppName());
-                deployer.deploy(application);
+                guardedDeploy(application);
                 deploymentListener.onDeploymentSuccess(application.getAppName());
             }
             catch (Throwable t)
@@ -307,16 +315,19 @@ public class DeploymentService
             logger.info("================== Request to Undeploy Application: " + app.getAppName());
         }
 
-        try {
-           deploymentListener.onUndeploymentStart(app.getAppName());
+        try
+        {
+            deploymentListener.onUndeploymentStart(app.getAppName());
 
-           applications.remove(app);
-           deployer.undeploy(app);
+            applications.remove(app);
+            guardedUndeploy(app);
 
             deploymentListener.onUndeploymentSuccess(app.getAppName());
-        } catch (RuntimeException e) {
-           deploymentListener.onUndeploymentFailure(app.getAppName(), e);
-           throw e;
+        }
+        catch (RuntimeException e)
+        {
+            deploymentListener.onUndeploymentFailure(app.getAppName(), e);
+            throw e;
         }
     }
 
@@ -331,13 +342,13 @@ public class DeploymentService
         final Application application;
         try
         {
-            application = deployer.installFrom(appArchiveUrl);
+            application = guardedInstallFrom(appArchiveUrl);
             applications.add(application);
 
             try
             {
                 deploymentListener.onDeploymentStart(application.getAppName());
-                deployer.deploy(application);
+                guardedDeploy(application);
                 deploymentListener.onDeploymentSuccess(application.getAppName());
             }
             catch (Throwable t)
@@ -358,6 +369,106 @@ public class DeploymentService
 
             final String msg = "Failed to deploy from URL: " + appArchiveUrl;
             throw new DeploymentException(MessageFactory.createStaticMessage(msg), t);
+        }
+    }
+
+    private void guardedDeploy(Application application)
+    {
+        try
+        {
+            if (!lock.tryLock(0, TimeUnit.SECONDS))
+            {
+                return;
+            }
+
+            deployer.deploy(application);
+        }
+        catch (InterruptedException e)
+        {
+            Thread.currentThread().interrupt();
+            return;
+        }
+        finally
+        {
+            if (lock.isHeldByCurrentThread())
+            {
+                lock.unlock();
+            }
+        }
+    }
+
+    private Application guardedInstallFromAppDir(String zipFileName) throws IOException
+    {
+        try
+        {
+            if (!lock.tryLock(0, TimeUnit.SECONDS))
+            {
+                throw new IOException(ANOTHER_DEPLOYMENT_OPERATION_IS_IN_PROGRESS);
+            }
+
+            return deployer.installFromAppDir(zipFileName);
+        }
+        catch (InterruptedException e)
+        {
+            Thread.currentThread().interrupt();
+            throw new IOException(INSTALL_OPERATION_HAS_BEEN_INTERRUPTED);
+        }
+        finally
+        {
+            if (lock.isHeldByCurrentThread())
+            {
+                lock.unlock();
+            }
+        }
+    }
+
+    private void guardedUndeploy(Application app)
+    {
+        try
+        {
+            if (!lock.tryLock(0, TimeUnit.SECONDS))
+            {
+                return;
+            }
+
+            deployer.undeploy(app);
+        }
+        catch (InterruptedException e)
+        {
+            Thread.currentThread().interrupt();
+            return;
+        }
+        finally
+        {
+            if (lock.isHeldByCurrentThread())
+            {
+                lock.unlock();
+            }
+        }
+    }
+
+    private Application guardedInstallFrom(URL appArchiveUrl) throws IOException
+    {
+        try
+        {
+            if (!lock.tryLock(0, TimeUnit.SECONDS))
+            {
+                throw new IOException(ANOTHER_DEPLOYMENT_OPERATION_IS_IN_PROGRESS);
+            }
+
+            return deployer.installFrom(appArchiveUrl);
+        }
+        catch (InterruptedException e)
+        {
+            Thread.currentThread().interrupt();
+            throw new IOException(INSTALL_OPERATION_HAS_BEEN_INTERRUPTED);
+        }
+        finally
+        {
+            if (lock.isHeldByCurrentThread())
+            {
+                lock.unlock();
+            }
         }
     }
 
@@ -683,7 +794,7 @@ public class DeploymentService
             try
             {
                 deploymentListener.onDeploymentStart(a.getAppName());
-                deployer.deploy(a);
+                guardedDeploy(a);
                 deploymentListener.onDeploymentSuccess(a.getAppName());
             }
             catch (Exception e)

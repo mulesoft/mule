@@ -12,6 +12,7 @@ package org.mule.module.launcher;
 
 import org.mule.config.i18n.MessageFactory;
 import org.mule.module.launcher.application.Application;
+import org.mule.module.launcher.application.ApplicationFactory;
 import org.mule.module.reboot.MuleContainerBootstrapUtils;
 import org.mule.util.FileUtils;
 import org.mule.util.FilenameUtils;
@@ -21,8 +22,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -31,30 +30,21 @@ public class DefaultMuleDeployer implements MuleDeployer
 {
 
     protected transient final Log logger = LogFactory.getLog(getClass());
-    protected DeploymentService deploymentService;
 
-    public DefaultMuleDeployer(DeploymentService deploymentService)
+    protected ApplicationFactory applicationFactory;
+
+    public void setApplicationFactory(ApplicationFactory applicationFactory)
     {
-        this.deploymentService = deploymentService;
+        this.applicationFactory = applicationFactory;
     }
 
     public void deploy(Application app)
     {
-        final ReentrantLock lock = deploymentService.getLock();
         try
         {
-            if (!lock.tryLock(0, TimeUnit.SECONDS))
-            {
-                return;
-            }
             app.install();
             app.init();
             app.start();
-        }
-        catch (InterruptedException e)
-        {
-            Thread.currentThread().interrupt();
-            return;
         }
         catch (Throwable t)
         {
@@ -67,25 +57,12 @@ public class DefaultMuleDeployer implements MuleDeployer
             final String msg = String.format("Failed to deploy application [%s]", app.getAppName());
             throw new DeploymentException(MessageFactory.createStaticMessage(msg), t);
         }
-        finally
-        {
-            if (lock.isHeldByCurrentThread())
-            {
-                lock.unlock();
-            }
-        }
     }
 
     public void undeploy(Application app)
     {
-        final ReentrantLock lock = deploymentService.getLock();
         try
         {
-            if (!lock.tryLock(0, TimeUnit.SECONDS))
-            {
-                return;
-            }
-
             app.stop();
             app.dispose();
             final File appDir = new File(MuleContainerBootstrapUtils.getMuleAppsDir(), app.getAppName());
@@ -94,11 +71,6 @@ public class DefaultMuleDeployer implements MuleDeployer
             File marker = new File(MuleContainerBootstrapUtils.getMuleAppsDir(), String.format("%s-anchor.txt", app.getAppName()));
             marker.delete();
             Introspector.flushCaches();
-        }
-        catch (InterruptedException e)
-        {
-            Thread.currentThread().interrupt();
-            return;
         }
         catch (Throwable t)
         {
@@ -111,51 +83,30 @@ public class DefaultMuleDeployer implements MuleDeployer
             final String msg = String.format("Failed to undeploy application [%s]", app.getAppName());
             throw new DeploymentException(MessageFactory.createStaticMessage(msg), t);
         }
-        finally
-        {
-            if (lock.isHeldByCurrentThread())
-            {
-                lock.unlock();
-            }
-        }
     }
 
     public Application installFromAppDir(String packedMuleAppFileName) throws IOException
     {
-        final ReentrantLock lock = deploymentService.getLock();
-        try
-        {
-            if (!lock.tryLock(0, TimeUnit.SECONDS))
-            {
-                throw new IOException("Another deployment operation is in progress");
-            }
+        final File appsDir = MuleContainerBootstrapUtils.getMuleAppsDir();
+        File appFile = new File(appsDir, packedMuleAppFileName);
 
-            final File appsDir = MuleContainerBootstrapUtils.getMuleAppsDir();
-            File appFile = new File(appsDir, packedMuleAppFileName);
-            // basic security measure: outside apps dir use installFrom(url) and go through any
-            // restrictions applied to it
-            if (!appFile.getParentFile().equals(appsDir))
-            {
-                throw new SecurityException("installFromAppDir() can only deploy from $MULE_HOME/apps. Use installFrom(url) instead.");
-            }
-            return installFrom(appFile.toURL());
-        }
-        catch (InterruptedException e)
+        // basic security measure: outside apps dir use installFrom(url) and go through any
+        // restrictions applied to it
+        if (!appFile.getParentFile().equals(appsDir))
         {
-            Thread.currentThread().interrupt();
-            throw new IOException("Install operation has been interrupted");
+            throw new SecurityException("installFromAppDir() can only deploy from $MULE_HOME/apps. Use installFrom(url) instead.");
         }
-        finally
-        {
-            if (lock.isHeldByCurrentThread())
-            {
-                lock.unlock();
-            }
-        }
+
+        return installFrom(appFile.toURL());
     }
 
     public Application installFrom(URL url) throws IOException
     {
+        if (applicationFactory == null)
+        {
+           throw new IllegalStateException("There is no application factory");
+        }
+
         // TODO plug in app-bloodhound/validator here?
         if (!url.toString().endsWith(".zip"))
         {
@@ -169,18 +120,11 @@ public class DefaultMuleDeployer implements MuleDeployer
                     MessageFactory.createStaticMessage("Mule application name may not contain spaces: " + baseName));
         }
 
-        final ReentrantLock lock = deploymentService.getLock();
-
         String appName;
         File appDir = null;
         boolean errorEncountered = false;
         try
         {
-            if (!lock.tryLock(0, TimeUnit.SECONDS))
-            {
-                throw new IOException("Another deployment operation is in progress");
-            }
-
             final File appsDir = MuleContainerBootstrapUtils.getMuleAppsDir();
 
             final String fullPath = url.toURI().toString();
@@ -194,7 +138,7 @@ public class DefaultMuleDeployer implements MuleDeployer
             appDir = new File(appsDir, appName);
             // normalize the full path + protocol to make unzip happy
             final File source = new File(url.toURI());
-            
+
             FileUtils.unzip(source, appDir);
             if ("file".equals(url.getProtocol()))
             {
@@ -208,12 +152,6 @@ public class DefaultMuleDeployer implements MuleDeployer
             ex.fillInStackTrace();
             throw ex;
         }
-        catch (InterruptedException e)
-        {
-            errorEncountered = true;
-            Thread.currentThread().interrupt();
-            throw new IOException("Install operation has been interrupted");
-        }
         catch (IOException e)
         {
             errorEncountered = true;
@@ -226,7 +164,8 @@ public class DefaultMuleDeployer implements MuleDeployer
             final String msg = "Failed to install app from URL: " + url;
             throw new DeploymentInitException(MessageFactory.createStaticMessage(msg), t);
         }
-        finally {
+        finally
+        {
             // delete an app dir, as it's broken
             if (errorEncountered && appDir != null && appDir.exists())
             {
@@ -239,13 +178,9 @@ public class DefaultMuleDeployer implements MuleDeployer
                 }
                 */
             }
-            if (lock.isHeldByCurrentThread())
-            {
-                lock.unlock();
-            }
         }
 
         // appname is never null by now
-        return deploymentService.getAppFactory().createApp(appName);
+        return applicationFactory.createApp(appName);
     }
 }
