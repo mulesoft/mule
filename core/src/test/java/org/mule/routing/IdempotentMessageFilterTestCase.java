@@ -10,6 +10,9 @@
 
 package org.mule.routing;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
@@ -19,14 +22,11 @@ import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.service.Service;
 import org.mule.tck.MuleTestUtils;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.util.store.InMemoryObjectStore;
 
 import com.mockobjects.dynamic.Mock;
 
 import org.junit.Test;
-import org.mule.util.store.InMemoryObjectStore;
-
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 
 
 public class IdempotentMessageFilterTestCase extends AbstractMuleContextTestCase
@@ -50,7 +50,7 @@ public class IdempotentMessageFilterTestCase extends AbstractMuleContextTestCase
 
         MuleMessage okMessage = new DefaultMuleMessage("OK", muleContext);
         okMessage.setOutboundProperty("id", "1");
-        MuleEvent event = new DefaultMuleEvent(okMessage, endpoint1, (MuleSession) session.proxy());
+        MuleEvent event = new DefaultMuleEvent(okMessage, endpoint1, getTestService(), (MuleSession) session.proxy());
 
         // This one will process the event on the target endpoint
         event = ir.process(event);
@@ -59,7 +59,7 @@ public class IdempotentMessageFilterTestCase extends AbstractMuleContextTestCase
          // This will not process, because the ID is a duplicate
         okMessage = new DefaultMuleMessage("OK", muleContext);
         okMessage.setOutboundProperty("id", "1");
-        event = new DefaultMuleEvent(okMessage, endpoint1, (MuleSession) session.proxy());
+        event = new DefaultMuleEvent(okMessage, endpoint1, getTestService(), (MuleSession) session.proxy());
         event = ir.process(event);
         assertNull(event);
     }

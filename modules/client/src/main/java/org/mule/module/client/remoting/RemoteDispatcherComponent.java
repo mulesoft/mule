@@ -190,7 +190,8 @@ public class RemoteDispatcherComponent implements Callable, Initialisable
             // TODO - is this correct? it stops any other transformer from being set
             builder.setTransformers(new LinkedList());
             InboundEndpoint ep = muleContext.getEndpointFactory().getInboundEndpoint(builder);
-            MuleEvent event = new DefaultMuleEvent(action.getMessage(), ep, context.getSession());
+            MuleEvent event = new DefaultMuleEvent(action.getMessage(), ep, context.getFlowConstruct(),
+                context.getSession());
             event = RequestContext.setEvent(event);
 
             if (context.getExchangePattern().hasResponse())

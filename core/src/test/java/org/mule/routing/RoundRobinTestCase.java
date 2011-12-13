@@ -10,6 +10,8 @@
 
 package org.mule.routing;
 
+import static org.junit.Assert.assertEquals;
+
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.MessageExchangePattern;
@@ -18,6 +20,7 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
+import org.mule.api.construct.FlowConstruct;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
@@ -26,8 +29,6 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
 
 public class RoundRobinTestCase extends AbstractMuleContextTestCase
 {
@@ -44,7 +45,7 @@ public class RoundRobinTestCase extends AbstractMuleContextTestCase
     public void testRoundRobin() throws Exception
     {
         RoundRobin rr = new RoundRobin();
-        MuleSession session = getTestSession(getTestService(), muleContext);
+        MuleSession session = getTestSession(null, muleContext);
         List<TestProcessor> routes = new ArrayList<TestProcessor>(NUMBER_OF_ROUTES);
         for (int i = 0; i < NUMBER_OF_ROUTES; i++)
         {
@@ -54,7 +55,7 @@ public class RoundRobinTestCase extends AbstractMuleContextTestCase
         List<Thread> threads = new ArrayList<Thread>(NUMBER_OF_ROUTES);
         for (int i = 0; i < NUMBER_OF_ROUTES; i++)
         {
-            threads.add(new Thread(new TestDriver(session, rr, NUMBER_OF_MESSAGES)));
+            threads.add(new Thread(new TestDriver(session, rr, NUMBER_OF_MESSAGES, getTestService())));
         }
         for (Thread t : threads)
         {
@@ -75,12 +76,14 @@ public class RoundRobinTestCase extends AbstractMuleContextTestCase
         private MessageProcessor target;
         private int numMessages;
         private MuleSession session;
+        private FlowConstruct flowConstruct;
 
-        TestDriver(MuleSession session, MessageProcessor target, int numMessages)
+        TestDriver(MuleSession session, MessageProcessor target, int numMessages, FlowConstruct flowConstruct)
         {
             this.target = target;
             this.numMessages = numMessages;
             this.session = session;
+            this.flowConstruct = flowConstruct;
         }
 
         @Override
@@ -88,8 +91,10 @@ public class RoundRobinTestCase extends AbstractMuleContextTestCase
         {
             for (int i = 0; i < numMessages; i++)
             {
-                MuleMessage msg = new DefaultMuleMessage(TEST_MESSAGE + messageNumber.getAndIncrement(), muleContext);
-                MuleEvent event = new DefaultMuleEvent(msg, MessageExchangePattern.REQUEST_RESPONSE, session);
+                MuleMessage msg = new DefaultMuleMessage(TEST_MESSAGE + messageNumber.getAndIncrement(),
+                    muleContext);
+                MuleEvent event = new DefaultMuleEvent(msg, MessageExchangePattern.REQUEST_RESPONSE,
+                    flowConstruct, session);
                 try
                 {
                     target.process(event);

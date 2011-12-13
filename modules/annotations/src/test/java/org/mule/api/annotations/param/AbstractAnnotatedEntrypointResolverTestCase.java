@@ -9,6 +9,12 @@
  */
 package org.mule.api.annotations.param;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
+
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleEventContext;
 import org.mule.DefaultMuleMessage;
@@ -28,12 +34,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.activation.DataHandler;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.fail;
 
 public abstract class AbstractAnnotatedEntrypointResolverTestCase extends AbstractMuleContextTestCase
 {
@@ -89,7 +89,7 @@ public abstract class AbstractAnnotatedEntrypointResolverTestCase extends Abstra
                 message.addOutboundAttachment(s, attachments.get(s));
             }
         }
-        return new DefaultMuleEventContext(new DefaultMuleEvent(message, getTestInboundEndpoint("null"), new DefaultMuleSession()));
+        return new DefaultMuleEventContext(new DefaultMuleEvent(message, getTestInboundEndpoint("null"), null, new DefaultMuleSession()));
     }
 
     protected InvocationResult invokeResolver(String methodName, MuleEventContext eventContext) throws Exception

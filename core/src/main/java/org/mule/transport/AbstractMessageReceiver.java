@@ -290,12 +290,12 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
         }
         if (message.getReplyTo() != null)
         {
-            return new DefaultMuleEvent(message, getEndpoint(),session, replyToHandler, ros);
+            return new DefaultMuleEvent(message, getEndpoint(),flowConstruct, session, replyToHandler, ros);
 
         }
         else
         {
-            return new DefaultMuleEvent(message, getEndpoint(), session, null, ros);
+            return new DefaultMuleEvent(message, getEndpoint(), flowConstruct, session, null, ros);
         }
     }
 

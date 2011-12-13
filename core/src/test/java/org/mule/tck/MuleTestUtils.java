@@ -498,7 +498,7 @@ public final class MuleTestUtils
         final MuleMessageFactory factory = endpoint.getConnector().createMuleMessageFactory();
         final MuleMessage message = factory.create(data, endpoint.getEncoding());
 
-        return new DefaultMuleEvent(message, endpoint, session);
+        return new DefaultMuleEvent(message, endpoint, flowConstruct, session);
     }
 
     public static MuleEvent getTestEvent(Object data, MuleSession session, MuleContext context)
@@ -509,7 +509,7 @@ public final class MuleTestUtils
         final MuleMessageFactory factory = endpoint.getConnector().createMuleMessageFactory();
         final MuleMessage message = factory.create(data, endpoint.getEncoding());
 
-        return new DefaultMuleEvent(message, endpoint, session);
+        return new DefaultMuleEvent(message, endpoint, getTestService(context), session);
     }
 
     public static MuleEventContext getTestEventContext(Object data,

@@ -138,8 +138,9 @@ public class DefaultLocalMuleClient implements LocalMuleClient
 
     protected MuleEvent createMuleEvent(MuleMessage message, OutboundEndpoint endpoint) throws EndpointException
     {
-        DefaultMuleSession session = new DefaultMuleSession(new MuleClientFlowConstruct(muleContext));
-        return new DefaultMuleEvent(message, endpoint.getExchangePattern(), session);
+        DefaultMuleSession session = new DefaultMuleSession();
+        return new DefaultMuleEvent(message, endpoint.getExchangePattern(), new MuleClientFlowConstruct(
+            muleContext), session);
     }
 
     protected MuleMessage returnMessage(MuleEvent event)

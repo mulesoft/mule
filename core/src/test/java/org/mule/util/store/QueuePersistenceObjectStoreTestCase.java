@@ -10,6 +10,14 @@
 
 package org.mule.util.store;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.MessageExchangePattern;
@@ -36,14 +44,6 @@ import java.util.List;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 public class QueuePersistenceObjectStoreTestCase extends AbstractObjectStoreContractTestCase
 {
@@ -180,7 +180,7 @@ public class QueuePersistenceObjectStoreTestCase extends AbstractObjectStoreCont
         String id = UUID.getUUID();
         QueueKey key = new QueueKey(QUEUE_NAME, id);
         MuleMessage msg = new DefaultMuleMessage("Hello", mockMuleContext);
-        MuleEvent event = new DefaultMuleEvent(msg, MessageExchangePattern.ONE_WAY, new DefaultMuleSession());
+        MuleEvent event = new DefaultMuleEvent(msg, MessageExchangePattern.ONE_WAY, null, new DefaultMuleSession());
 
         ListableObjectStore<Serializable> monitored = new MonitoredObjectStoreWrapper(store);
         monitored.store(key, event);

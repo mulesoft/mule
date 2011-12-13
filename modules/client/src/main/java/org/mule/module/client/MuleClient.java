@@ -317,7 +317,7 @@ public class MuleClient implements Disposable
 
         MuleSession session = new DefaultMuleSession(service);
         InboundEndpoint endpoint = getDefaultClientEndpoint(service, message.getPayload(), true);
-        MuleEvent event = new DefaultMuleEvent(message, endpoint, session);
+        MuleEvent event = new DefaultMuleEvent(message, endpoint, service, session);
 
         if (logger.isDebugEnabled())
         {
@@ -371,7 +371,7 @@ public class MuleClient implements Disposable
         }
         MuleSession session = new DefaultMuleSession(service);
         InboundEndpoint endpoint = getDefaultClientEndpoint(service, message.getPayload(), false);
-        MuleEvent event = new DefaultMuleEvent(message, endpoint, session);
+        MuleEvent event = new DefaultMuleEvent(message, endpoint, service, session);
 
         if (logger.isDebugEnabled())
         {
@@ -693,15 +693,18 @@ public class MuleClient implements Disposable
         return request(url, timeout);
     }
 
-    protected MuleEvent getEvent(MuleMessage message, MessageExchangePattern exchangePattern) throws MuleException
+    protected MuleEvent getEvent(MuleMessage message, MessageExchangePattern exchangePattern)
+        throws MuleException
     {
-        DefaultMuleSession session = new DefaultMuleSession(new DefaultLocalMuleClient.MuleClientFlowConstruct(muleContext));
+        DefaultMuleSession session = new DefaultMuleSession();
 
         if (user != null)
         {
-            message.setOutboundProperty(MuleProperties.MULE_USER_PROPERTY, MuleCredentials.createHeader(user.getUsername(), user.getPassword()));
+            message.setOutboundProperty(MuleProperties.MULE_USER_PROPERTY,
+                MuleCredentials.createHeader(user.getUsername(), user.getPassword()));
         }
-        return new DefaultMuleEvent(message, exchangePattern, session);
+        return new DefaultMuleEvent(message, exchangePattern,
+            new DefaultLocalMuleClient.MuleClientFlowConstruct(muleContext), session);
     }
 
     protected InboundEndpoint getInboundEndpoint(String uri) throws MuleException

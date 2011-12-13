@@ -134,7 +134,7 @@ public abstract class AbstractMessageProcessorTestCase extends AbstractMuleConte
         Map<String, Object> props = new HashMap<String, Object>();
         props.put("prop1", "value1");
         return new DefaultMuleEvent(new DefaultMuleMessage(TEST_MESSAGE, props, muleContext), endpoint,
-            getTestSession(getTestService(), muleContext));
+            getTestService(), getTestSession(null, muleContext));
     }
 
     protected OutboundEndpoint createTestOutboundEndpoint(Transformer transformer,
@@ -218,7 +218,9 @@ public abstract class AbstractMessageProcessorTestCase extends AbstractMuleConte
         {
             svc.setExceptionListener(exceptionListener);
         }
-        return new DefaultMuleEvent(new DefaultMuleMessage(TEST_MESSAGE, props, muleContext), getTestInboundEndpoint(MessageExchangePattern.REQUEST_RESPONSE), getTestSession(svc, muleContext));
+        return new DefaultMuleEvent(new DefaultMuleMessage(TEST_MESSAGE, props, muleContext),
+            getTestInboundEndpoint(MessageExchangePattern.REQUEST_RESPONSE), svc, getTestSession(null,
+                muleContext));
     }
 
     protected MuleMessage createTestResponseMuleMessage()

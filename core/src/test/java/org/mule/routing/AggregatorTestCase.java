@@ -60,9 +60,9 @@ public class AggregatorTestCase extends AbstractMuleContextTestCase
         message3.setCorrelationId(message1.getUniqueId());
 
         InboundEndpoint endpoint = MuleTestUtils.getTestInboundEndpoint(MessageExchangePattern.ONE_WAY, muleContext);
-        MuleEvent event1 = new DefaultMuleEvent(message1, endpoint, session);
-        MuleEvent event2 = new DefaultMuleEvent(message2, endpoint, session);
-        MuleEvent event3 = new DefaultMuleEvent(message3, endpoint, session);
+        MuleEvent event1 = new DefaultMuleEvent(message1, endpoint, testService, session);
+        MuleEvent event2 = new DefaultMuleEvent(message2, endpoint, testService, session);
+        MuleEvent event3 = new DefaultMuleEvent(message3, endpoint, testService, session);
 
         assertNull(router.process(event1));
         assertNull(router.process(event2));

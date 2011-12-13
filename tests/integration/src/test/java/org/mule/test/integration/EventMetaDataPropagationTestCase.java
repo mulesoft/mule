@@ -10,6 +10,10 @@
 
 package org.mule.test.integration;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
@@ -41,10 +45,6 @@ import javax.activation.DataSource;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 public class EventMetaDataPropagationTestCase extends AbstractServiceAndFlowTestCase
 {
     @Parameters
@@ -68,7 +68,7 @@ public class EventMetaDataPropagationTestCase extends AbstractServiceAndFlowTest
             Flow flow = muleContext.getRegistry().lookupObject("component1");
             MuleSession session = new DefaultMuleSession(flow);
             MuleEvent event = new DefaultMuleEvent(new DefaultMuleMessage("Test MuleEvent", muleContext),
-                ((InboundEndpoint) flow.getMessageSource()), session);
+                ((InboundEndpoint) flow.getMessageSource()), flow, session);
             flow.process(event);
         }
         else
@@ -76,7 +76,7 @@ public class EventMetaDataPropagationTestCase extends AbstractServiceAndFlowTest
             Service service = muleContext.getRegistry().lookupService("component1");
             MuleSession session = new DefaultMuleSession(service);
             MuleEvent event = new DefaultMuleEvent(new DefaultMuleMessage("Test MuleEvent", muleContext),
-                ((ServiceCompositeMessageSource) service.getMessageSource()).getEndpoints().get(0), session);
+                ((ServiceCompositeMessageSource) service.getMessageSource()).getEndpoints().get(0), service, session);
             service.sendEvent(event);
         }
     }

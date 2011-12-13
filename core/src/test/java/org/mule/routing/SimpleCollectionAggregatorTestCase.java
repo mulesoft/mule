@@ -10,6 +10,10 @@
 
 package org.mule.routing;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.MessageExchangePattern;
@@ -23,14 +27,9 @@ import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 
 public class SimpleCollectionAggregatorTestCase extends AbstractMuleContextTestCase
 {
@@ -61,9 +60,9 @@ public class SimpleCollectionAggregatorTestCase extends AbstractMuleContextTestC
         message1.setCorrelationGroupSize(3);
 
         InboundEndpoint endpoint = MuleTestUtils.getTestInboundEndpoint(MessageExchangePattern.ONE_WAY, muleContext);
-        MuleEvent event1 = new DefaultMuleEvent(message1, endpoint, session);
-        MuleEvent event2 = new DefaultMuleEvent(message2, endpoint, session);
-        MuleEvent event3 = new DefaultMuleEvent(message3, endpoint, session);
+        MuleEvent event1 = new DefaultMuleEvent(message1, endpoint, testService, session);
+        MuleEvent event2 = new DefaultMuleEvent(message2, endpoint, testService, session);
+        MuleEvent event3 = new DefaultMuleEvent(message3, endpoint, testService, session);
 
         assertNull(router.process(event1));
         assertNull(router.process(event2));

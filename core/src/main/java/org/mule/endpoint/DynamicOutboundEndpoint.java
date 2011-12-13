@@ -34,13 +34,13 @@ import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.Connector;
 import org.mule.api.transport.DispatchException;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.processor.AbstractRedeliveryPolicy;
 
 import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mule.processor.AbstractRedeliveryPolicy;
 
 /**
  * An Outbound endpoint who's URI is a template used to created new non dynamic
@@ -139,7 +139,8 @@ public class DynamicOutboundEndpoint implements OutboundEndpoint
         EndpointURI endpointURIForMessage = getEndpointURIForMessage(event);
         OutboundEndpoint outboundEndpoint = createStaticEndpoint(endpointURIForMessage);
 
-        event = new DefaultMuleEvent(event.getMessage(), endpointURIForMessage.getUri(), event.getExchangePattern(), event.getSession());
+        event = new DefaultMuleEvent(event.getMessage(), endpointURIForMessage.getUri(),
+            event.getExchangePattern(), event.getFlowConstruct(), event.getSession());
 
         return outboundEndpoint.process(event);
     }

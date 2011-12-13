@@ -111,8 +111,8 @@ public class RemoteDispatcher implements Disposable
         MuleMessage result = null;
 
         MuleEvent resultEvent = syncServerEndpoint.process(new DefaultMuleEvent(msg,
-            MessageExchangePattern.REQUEST_RESPONSE, new DefaultMuleSession(new MuleClientFlowConstruct(
-                muleContext))));
+            MessageExchangePattern.REQUEST_RESPONSE, new MuleClientFlowConstruct(muleContext),
+            new DefaultMuleSession()));
         if (resultEvent != null)
         {
             result = resultEvent.getMessage();
@@ -372,7 +372,7 @@ public class RemoteDispatcher implements Disposable
         message.addProperties(action.getProperties());
         MuleSession session = new DefaultMuleSession();
 
-        MuleEvent event = new DefaultMuleEvent(message, serverEndpoint.getExchangePattern(), session);
+        MuleEvent event = new DefaultMuleEvent(message, serverEndpoint.getExchangePattern(), null, session);
         event.setTimeout(timeout);
         if (logger.isDebugEnabled())
         {
@@ -461,6 +461,6 @@ public class RemoteDispatcher implements Disposable
         throws MuleException
     {
         RequestContext.setEvent(new DefaultMuleEvent(message, endpoint.getExchangePattern(),
-            new DefaultMuleSession()));
+            null, new DefaultMuleSession()));
     }
 }

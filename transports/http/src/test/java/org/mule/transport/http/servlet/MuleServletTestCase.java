@@ -167,7 +167,7 @@ public class MuleServletTestCase extends Assert {
         
         DefaultMuleSession session = new DefaultMuleSession();
         
-        DefaultMuleEvent event = new DefaultMuleEvent(message, ep, session);
+        DefaultMuleEvent event = new DefaultMuleEvent(message, ep, null, session);
         return event;
     }
 }

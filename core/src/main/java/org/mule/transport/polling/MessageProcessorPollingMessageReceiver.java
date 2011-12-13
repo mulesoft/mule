@@ -79,8 +79,8 @@ public class MessageProcessorPollingMessageReceiver extends AbstractPollingMessa
             ep = (ImmutableEndpoint) sourceMessageProcessor;
         }
 
-        MuleEvent event = new DefaultMuleEvent(request, ep.getExchangePattern(), new DefaultMuleSession(
-            flowConstruct));
+        MuleEvent event = new DefaultMuleEvent(request, ep.getExchangePattern(), flowConstruct,
+            new DefaultMuleSession());
 
         MuleEvent sourceEvent = sourceMessageProcessor.process(event);
         if (isNewMessage(sourceEvent))

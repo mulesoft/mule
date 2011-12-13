@@ -102,7 +102,7 @@ public class MessageProcessorNotification extends ServerNotification implements 
             DefaultMuleMessage msg = new DefaultMuleMessage(NullPayload.getInstance(), flowConstruct.getMuleContext());
             DefaultMuleSession session = new DefaultMuleSession(flowConstruct);
             msg.setMessageRootId(rootId);
-            return new DefaultMuleEvent(msg, MessageExchangePattern.REQUEST_RESPONSE, session);
+            return new DefaultMuleEvent(msg, MessageExchangePattern.REQUEST_RESPONSE, flowConstruct, session);
         }
         else
         {

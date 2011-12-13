@@ -39,7 +39,7 @@ public class MessageChunkAggregatorTestCase extends AbstractMuleContextTestCase
     @Test
     public void testMessageProcessor() throws Exception
     {
-        MuleSession session = getTestSession(getTestService(), muleContext);
+        MuleSession session = getTestSession(null, muleContext);
         Service testService = getTestService("test", Apple.class);
         assertNotNull(testService);
 
@@ -58,9 +58,9 @@ public class MessageChunkAggregatorTestCase extends AbstractMuleContextTestCase
 
         InboundEndpoint endpoint = MuleTestUtils.getTestInboundEndpoint(MessageExchangePattern.ONE_WAY,
             muleContext);
-        MuleEvent event1 = new DefaultMuleEvent(message1, endpoint, session);
-        MuleEvent event2 = new DefaultMuleEvent(message2, endpoint, session);
-        MuleEvent event3 = new DefaultMuleEvent(message3, endpoint, session);
+        MuleEvent event1 = new DefaultMuleEvent(message1, endpoint, getTestService(), session);
+        MuleEvent event2 = new DefaultMuleEvent(message2, endpoint, getTestService(), session);
+        MuleEvent event3 = new DefaultMuleEvent(message3, endpoint, getTestService(), session);
 
         assertNull(router.process(event1));
         assertNull(router.process(event2));

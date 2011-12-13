@@ -10,6 +10,11 @@
 
 package org.mule.test.integration;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.MessageExchangePattern;
@@ -28,11 +33,6 @@ import org.mule.transport.tcp.TcpConnector;
 import org.mule.transport.vm.VMConnector;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 /**
  * Test the creation of various targets from the service descriptor
@@ -148,14 +148,14 @@ public class MuleEndpointConfigurationServiceTestCase extends FunctionalTestCase
 
         // Test MuleEvent timeout proporgation
         MuleEvent event = new DefaultMuleEvent(new DefaultMuleMessage("hello", muleContext),
-            (InboundEndpoint) ep, MuleTestUtils.getTestSession(muleContext));
+            (InboundEndpoint) ep, getTestService(), MuleTestUtils.getTestSession(muleContext));
         assertEquals(2002, event.getTimeout());
 
         ImmutableEndpoint ep2 = muleContext.getEndpointFactory().getInboundEndpoint(
             "test://hello?connector=testConnector1");
 
         event = new DefaultMuleEvent(new DefaultMuleMessage("hello", muleContext), (InboundEndpoint) ep2,
-            MuleTestUtils.getTestSession(muleContext));
+            getTestService(), MuleTestUtils.getTestSession(muleContext));
         // default event timeout set in the test config file
         assertEquals(1001, event.getTimeout());
     }

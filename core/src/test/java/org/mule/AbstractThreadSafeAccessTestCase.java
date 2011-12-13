@@ -26,9 +26,9 @@ public abstract class AbstractThreadSafeAccessTestCase extends AbstractMuleConte
     protected ThreadSafeAccess dummyEvent() throws Exception
     {
         MuleMessage message = new DefaultMuleMessage(new Object(), (Map) null, muleContext);
-        return new DefaultMuleEvent(message,
-                MuleTestUtils.getTestInboundEndpoint("test", MessageExchangePattern.ONE_WAY, muleContext, null),
-                new DefaultMuleSession(new SedaService(muleContext)));
+        return new DefaultMuleEvent(message, MuleTestUtils.getTestInboundEndpoint("test",
+            MessageExchangePattern.ONE_WAY, muleContext, null), new SedaService(muleContext),
+            new DefaultMuleSession());
     }
 
     protected void resetAccessControl(ThreadSafeAccess target) throws InterruptedException

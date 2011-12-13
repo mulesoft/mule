@@ -35,7 +35,7 @@ public class MessageRedeliveredException extends MessagingException
     public MessageRedeliveredException(String messageId, int redeliveryCount, int maxRedelivery, InboundEndpoint endpoint, FlowConstruct flow, MuleMessage muleMessage)
     {        
         super(JmsMessages.tooManyRedeliveries(messageId, redeliveryCount, maxRedelivery, endpoint), 
-            new DefaultMuleEvent(muleMessage, endpoint, new DefaultMuleSession(flow)));
+            new DefaultMuleEvent(muleMessage, endpoint, flow, new DefaultMuleSession(flow)));
         this.messageId = messageId;
         this.redeliveryCount = redeliveryCount;
         this.maxRedelivery = maxRedelivery;

@@ -10,6 +10,11 @@
 
 package org.mule;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import org.mule.api.MuleMessage;
 import org.mule.api.transport.PropertyScope;
 import org.mule.session.DefaultMuleSession;
@@ -30,11 +35,6 @@ import java.util.Map;
 import javax.activation.DataHandler;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 public class DefaultMuleMessageTestCase extends AbstractMuleContextTestCase
 {
@@ -315,7 +315,7 @@ public class DefaultMuleMessageTestCase extends AbstractMuleContextTestCase
         RequestContext.setEvent(new DefaultMuleEvent(
                 message,
                 getTestInboundEndpoint("foo"),
-                new DefaultMuleSession()));
+                getTestService(), new DefaultMuleSession()));
 
         message.setOutboundProperty("foo", "fooOutbound");
         message.setInvocationProperty("bar", "barInvocation");

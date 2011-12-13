@@ -101,7 +101,7 @@ public class EndpointNotificationLoggerAgent extends AbstractNotificationLoggerA
                     return;
                 }
 
-                MuleEvent event = new DefaultMuleEvent(msg, endpoint.getExchangePattern(), session);
+                MuleEvent event = new DefaultMuleEvent(msg, endpoint.getExchangePattern(), null, session);
                 endpoint.process(event);
             }
             catch (Exception e1)

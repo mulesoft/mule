@@ -10,6 +10,14 @@
 
 package org.mule.routing;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
@@ -32,14 +40,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 public class CollectionMessageSplitterTestCase extends AbstractMuleContextTestCase
 {
@@ -102,7 +102,7 @@ public class CollectionMessageSplitterTestCase extends AbstractMuleContextTestCa
         MuleMessage toSplit = new DefaultMuleMessage(payload, new HashMap<String, Object>(), new HashMap<String, Object>(), null, muleContext);
         CollectionSplitter splitter = new CollectionSplitter();
         splitter.setMuleContext(muleContext);
-        DefaultMuleEvent event = new DefaultMuleEvent(toSplit, getTestInboundEndpoint("ep"), session);
+        DefaultMuleEvent event = new DefaultMuleEvent(toSplit, getTestInboundEndpoint("ep"), fc, session);
         assertNull(splitter.process(event));
     }
 
@@ -141,7 +141,7 @@ public class CollectionMessageSplitterTestCase extends AbstractMuleContextTestCa
         splitter.setMuleContext(muleContext);
         Grabber grabber = new Grabber();
         splitter.setListener(grabber);
-        DefaultMuleEvent event = new DefaultMuleEvent(toSplit, getTestInboundEndpoint("ep"), session);
+        DefaultMuleEvent event = new DefaultMuleEvent(toSplit, getTestInboundEndpoint("ep"), fc, session);
         splitter.process(event);
         List<MuleMessage> splits =  grabber.getMessages();
         assertEquals(count, splits.size());

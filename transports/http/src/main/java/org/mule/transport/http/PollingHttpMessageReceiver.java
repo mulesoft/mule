@@ -122,7 +122,7 @@ public class PollingHttpMessageReceiver extends AbstractPollingMessageReceiver
         MuleSession session = new DefaultMuleSession(flowConstruct);
 
 
-        MuleEvent event = new DefaultMuleEvent(request, outboundEndpoint.getExchangePattern(), session);
+        MuleEvent event = new DefaultMuleEvent(request, outboundEndpoint.getExchangePattern(), flowConstruct, session);
 
         MuleEvent result = outboundEndpoint.process(event);
         MuleMessage message = null;

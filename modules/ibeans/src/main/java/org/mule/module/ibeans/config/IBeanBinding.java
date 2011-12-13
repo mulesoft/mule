@@ -92,7 +92,7 @@ public class IBeanBinding implements InterfaceBinding
         try
         {
             return endpoint.process(new DefaultMuleEvent(event.getMessage(), endpoint.getExchangePattern(),
-                event.getSession()));
+                flow, event.getSession()));
         }
         catch (MessagingException e)
         {

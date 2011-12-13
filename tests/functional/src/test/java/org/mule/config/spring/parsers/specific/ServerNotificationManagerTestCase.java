@@ -213,7 +213,7 @@ public class ServerNotificationManagerTestCase extends FunctionalTestCase
             super(
                 new UnauthorisedException(CoreMessages.createStaticMessage("dummy"), new DefaultMuleEvent(
                     new DefaultMuleMessage(NullPayload.getInstance(), muleContext), MessageExchangePattern.REQUEST_RESPONSE,
-                    getTestSession(getTestService(), muleContext))), 0);
+                    getTestService(), getTestSession(null, muleContext))), 0);
         }
 
     }

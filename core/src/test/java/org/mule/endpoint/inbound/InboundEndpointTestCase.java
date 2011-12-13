@@ -10,6 +10,13 @@
 
 package org.mule.endpoint.inbound;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.MessageExchangePattern;
@@ -38,13 +45,6 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 public class InboundEndpointTestCase extends AbstractMessageProcessorTestCase
 {
@@ -339,13 +339,13 @@ public class InboundEndpointTestCase extends AbstractMessageProcessorTestCase
 
     protected MuleEvent createTestRequestEvent(InboundEndpoint ep) throws Exception
     {
-        return new DefaultMuleEvent(inMessage, ep, getTestSession(getTestService(), muleContext));
+        return new DefaultMuleEvent(inMessage, ep, getTestService(), getTestSession(null, muleContext));
     }
 
     protected MuleEvent createTestResponseEvent(InboundEndpoint ep) throws Exception
     {
         return new DefaultMuleEvent(new DefaultMuleMessage(RESPONSE_MESSAGE, muleContext),
-            ep, getTestSession(getTestService(), muleContext));
+            ep, getTestService(), getTestSession(null, muleContext));
     }
 
     protected MuleEvent assertMessageSent(boolean sync) throws MuleException

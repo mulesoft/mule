@@ -10,6 +10,13 @@
 
 package org.mule.transformers.simple;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
@@ -30,13 +37,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 public class ExpressionTransformerTestCase extends FunctionalTestCase
 {
@@ -197,7 +197,7 @@ public class ExpressionTransformerTestCase extends FunctionalTestCase
             muleContext);
 
         MuleEvent resultEvent = flow.process(new DefaultMuleEvent(message, getTestInboundEndpoint(""),
-            getTestSession(getTestService(), muleContext)));
+            getTestService(), getTestSession(null, muleContext)));
         assertNotNull(resultEvent);
         assertNotNull(resultEvent.getMessage().getPayload());
         Object payload = resultEvent.getMessage().getPayload();

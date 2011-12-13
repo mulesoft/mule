@@ -46,7 +46,7 @@ public class FirstSuccessfulTestCase extends AbstractMuleContextTestCase
     @Test
     public void testFirstSuccessful() throws Exception
     {
-        MuleSession session = getTestSession(getTestService(), muleContext);
+        MuleSession session = getTestSession(null, muleContext);
 
         FirstSuccessful fs = createFirstSuccessfulRouter(new TestProcessor("abc"),
             new TestProcessor("def"), new TestProcessor("ghi"));
@@ -159,7 +159,8 @@ public class FirstSuccessfulTestCase extends AbstractMuleContextTestCase
         MuleMessage msg = new DefaultMuleMessage(message, muleContext);
         try
         {
-            MuleEvent event = mp.process(new DefaultMuleEvent(msg, MessageExchangePattern.REQUEST_RESPONSE, session));
+            MuleEvent event = mp.process(new DefaultMuleEvent(msg, MessageExchangePattern.REQUEST_RESPONSE,
+                getTestService(), session));
             MuleMessage returnedMessage = event.getMessage();
             if (returnedMessage.getExceptionPayload() != null)
             {
@@ -205,7 +206,8 @@ public class FirstSuccessfulTestCase extends AbstractMuleContextTestCase
                 {
                     msg = new DefaultMuleMessage("No " + rejectIfMatches, muleContext);
                 }
-                return new DefaultMuleEvent(msg, MessageExchangePattern.ONE_WAY, event.getSession());
+                return new DefaultMuleEvent(msg, MessageExchangePattern.ONE_WAY, event.getFlowConstruct(),
+                    event.getSession());
             }
             catch (Exception e)
             {

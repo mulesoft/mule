@@ -10,6 +10,8 @@
 
 package org.mule.endpoint.inbound;
 
+import static org.junit.Assert.assertEquals;
+
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.MessageExchangePattern;
@@ -25,8 +27,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * Unit test for configuring message processors on an inbound endpoint.
@@ -80,6 +80,6 @@ public class InboundEndpointMessageProcessorsTestCase extends AbstractMessagePro
 
     protected MuleEvent createTestRequestEvent(InboundEndpoint endpoint) throws Exception
     {
-        return new DefaultMuleEvent(inMessage, endpoint, getTestSession(getTestService(), muleContext));
+        return new DefaultMuleEvent(inMessage, endpoint, getTestService(), getTestSession(null, muleContext));
     }    
 }

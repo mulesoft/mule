@@ -35,10 +35,16 @@ import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transport.DefaultReplyToHandler;
 import org.mule.util.store.DeserializationPostInitialisable;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.OptionalDataException;
 import java.io.OutputStream;
 import java.net.URI;
 import java.util.EventObject;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -65,6 +71,7 @@ public class DefaultMuleEvent extends EventObject
     private final String id;
     private final MuleMessage message;
     private final MuleSession session;
+    private transient FlowConstruct flowConstruct;
 
     private final Credentials credentials;
     private final String encoding;
@@ -84,14 +91,21 @@ public class DefaultMuleEvent extends EventObject
 
     protected String[] ignoredPropertyOverrides = new String[]{MuleProperties.MULE_METHOD_PROPERTY};
 
+    private transient Map<String, Object> serializedData = null;
+
     // Constructors
 
     /**
      * Constructor used to create a message with no message source with minimal arguments
+     * 
+     * @param flowConstruct TODO
      */
-    public DefaultMuleEvent(MuleMessage message, MessageExchangePattern exchangePattern, MuleSession session)
+    public DefaultMuleEvent(MuleMessage message,
+                            MessageExchangePattern exchangePattern,
+                            FlowConstruct flowConstruct,
+                            MuleSession session)
     {
-        this(message, exchangePattern, session, message.getMuleContext()
+        this(message, exchangePattern, flowConstruct, session, message.getMuleContext()
             .getConfiguration()
             .getDefaultResponseTimeout(), null, null);
     }
@@ -99,40 +113,50 @@ public class DefaultMuleEvent extends EventObject
     /**
      * Constructor used to create a message with no message source with minimal arguments and
      * ResponseOutputStream
+     * 
+     * @param flowConstruct TODO
      */
     public DefaultMuleEvent(MuleMessage message,
                             MessageExchangePattern exchangePattern,
+                            FlowConstruct flowConstruct,
                             MuleSession session,
                             ResponseOutputStream outputStream)
     {
-        this(message, exchangePattern, session, message.getMuleContext()
+        this(message, exchangePattern, flowConstruct, session, message.getMuleContext()
             .getConfiguration()
             .getDefaultResponseTimeout(), null, outputStream);
     }
 
     /**
      * Constructor used to create a message with no message source with all additional arguments
+     * 
+     * @param flowConstruct TODO
      */
     public DefaultMuleEvent(MuleMessage message,
                             MessageExchangePattern exchangePattern,
+                            FlowConstruct flowConstruct,
                             MuleSession session,
                             int timeout,
                             Credentials credentials,
                             ResponseOutputStream outputStream)
     {
-        this(message, URI.create("none"), exchangePattern, session, timeout, credentials, outputStream);
+        this(message, URI.create("none"), exchangePattern, flowConstruct, session, timeout, credentials,
+            outputStream);
     }
 
     /**
      * Constructor used to create a message with a uri that idendifies the message source with minimal
      * arguments
+     * 
+     * @param flowConstruct TODO
      */
     public DefaultMuleEvent(MuleMessage message,
                             URI messageSourceURI,
                             MessageExchangePattern exchangePattern,
+                            FlowConstruct flowConstruct,
                             MuleSession session)
     {
-        this(message, messageSourceURI, exchangePattern, session, message.getMuleContext()
+        this(message, messageSourceURI, exchangePattern, flowConstruct, session, message.getMuleContext()
             .getConfiguration()
             .getDefaultResponseTimeout(), null, null);
     }
@@ -140,24 +164,30 @@ public class DefaultMuleEvent extends EventObject
     /**
      * Constructor used to create a message with a uri that idendifies the message source with minimal
      * arguments and ResponseOutputStream
+     * 
+     * @param flowConstruct TODO
      */
     public DefaultMuleEvent(MuleMessage message,
                             URI messageSourceURI,
                             MessageExchangePattern exchangePattern,
+                            FlowConstruct flowConstruct,
                             MuleSession session,
                             ResponseOutputStream outputStream)
     {
-        this(message, messageSourceURI, exchangePattern, session, message.getMuleContext()
+        this(message, messageSourceURI, exchangePattern, flowConstruct, session, message.getMuleContext()
             .getConfiguration()
             .getDefaultResponseTimeout(), null, outputStream);
     }
 
     /**
      * Constructor used to create a message with a identifiable message source with all additional arguments
+     * 
+     * @param flowConstruct TODO
      */
     public DefaultMuleEvent(MuleMessage message,
                             URI messageSourceURI,
                             MessageExchangePattern exchangePattern,
+                            FlowConstruct flowConstruct,
                             MuleSession session,
                             int timeout,
                             Credentials credentials,
@@ -166,6 +196,7 @@ public class DefaultMuleEvent extends EventObject
         super(message.getPayload());
         this.id = generateEventId(message.getMuleContext());
         this.message = message;
+        this.flowConstruct = flowConstruct;
         this.session = session;
         this.exchangePattern = exchangePattern;
         this.outputStream = outputStream;
@@ -183,13 +214,17 @@ public class DefaultMuleEvent extends EventObject
 
     // Constructors for inbound endpoint
 
-    public DefaultMuleEvent(MuleMessage message, InboundEndpoint endpoint, MuleSession session)
+    public DefaultMuleEvent(MuleMessage message,
+                            InboundEndpoint endpoint,
+                            FlowConstruct flowConstruct,
+                            MuleSession session)
     {
-        this(message, endpoint, session, null, null);
+        this(message, endpoint, flowConstruct, session, null, null);
     }
 
     public DefaultMuleEvent(MuleMessage message,
                             InboundEndpoint endpoint,
+                            FlowConstruct flowConstruct,
                             MuleSession session,
                             ReplyToHandler replyToHandler,
                             ResponseOutputStream outputStream)
@@ -197,6 +232,7 @@ public class DefaultMuleEvent extends EventObject
         super(message.getPayload());
         this.id = generateEventId(message.getMuleContext());
         this.message = message;
+        this.flowConstruct = flowConstruct;
         this.session = session;
 
         this.outputStream = outputStream;
@@ -250,6 +286,7 @@ public class DefaultMuleEvent extends EventObject
         super(message.getPayload());
         this.id = rewriteEvent.getId();
         this.message = message;
+        this.flowConstruct = rewriteEvent.getFlowConstruct();
         this.session = session;
 
         this.credentials = rewriteEvent.getCredentials();
@@ -279,6 +316,7 @@ public class DefaultMuleEvent extends EventObject
                             URI messageSourceURI,
                             String messageSourceName,
                             MessageExchangePattern exchangePattern,
+                            FlowConstruct flowConstruct,
                             MuleSession session,
                             int timeout,
                             Credentials credentials,
@@ -292,6 +330,7 @@ public class DefaultMuleEvent extends EventObject
         super(message.getPayload());
         this.id = generateEventId(message.getMuleContext());
         this.message = message;
+        this.flowConstruct = flowConstruct;
         this.session = session;
         this.credentials = credentials;
         this.encoding = encoding;
@@ -552,7 +591,7 @@ public class DefaultMuleEvent extends EventObject
     @Override
     public FlowConstruct getFlowConstruct()
     {
-        return session.getFlowConstruct();
+        return flowConstruct;
     }
 
     /**
@@ -680,6 +719,20 @@ public class DefaultMuleEvent extends EventObject
             }
 
         }
+        // this method can be called even on objects that were not serialized. In this case,
+        // the temporary holder for serialized data is not initialized and we can just return
+        if (serializedData == null)
+        {
+            return;
+        }
+
+        String serviceName = (String) serializedData.get("serviceName");
+        // Can be null if service call originates from MuleClient
+        if (serviceName != null)
+        {
+            flowConstruct = muleContext.getRegistry().lookupFlowConstruct(serviceName);
+        }
+        serializedData = null;
     }
 
     /**
@@ -806,5 +859,46 @@ public class DefaultMuleEvent extends EventObject
     public boolean isSynchronous()
     {
         return synchronous;
+    }
+    
+    // //////////////////////////
+    // Serialization methods
+    // //////////////////////////
+
+    private void writeObject(ObjectOutputStream out) throws IOException
+    {
+        out.defaultWriteObject();
+        // Can be null if service call originates from MuleClient
+        if (serializedData != null)
+        {
+            Object serviceName = serializedData.get("serviceName");
+            if (serviceName != null)
+            {
+                out.writeObject(serviceName);
+            }
+        }
+        else
+        {
+            if (getFlowConstruct() != null)
+            {
+                out.writeObject(getFlowConstruct() != null ? getFlowConstruct().getName() : "null");
+            }
+        }
+    }
+
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException
+    {
+        in.defaultReadObject();
+        serializedData = new HashMap<String, Object>();
+
+        try
+        {
+            // Optional
+            serializedData.put("serviceName", in.readObject());
+        }
+        catch (OptionalDataException e)
+        {
+            // ignore
+        }
     }
 }

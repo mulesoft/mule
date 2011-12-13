@@ -136,7 +136,7 @@ public class MuleCallAnnotationHandler implements ClientAnnotationHandler
         try
         {
             replyEvent = router.process(new DefaultMuleEvent(message, router.getEndpoint()
-                .getExchangePattern(), session));
+                .getExchangePattern(), flow, session));
        }
         catch (Throwable e)
         {

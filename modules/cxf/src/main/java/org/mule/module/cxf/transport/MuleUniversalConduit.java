@@ -164,7 +164,7 @@ public class MuleUniversalConduit extends AbstractConduit
             try
             {
                 ep = getEndpoint(muleContext, url);
-                event = new DefaultMuleEvent(muleMsg, ep.getExchangePattern(), session);
+                event = new DefaultMuleEvent(muleMsg, ep.getExchangePattern(), null, session);
             }
             catch (Exception e)
             {
