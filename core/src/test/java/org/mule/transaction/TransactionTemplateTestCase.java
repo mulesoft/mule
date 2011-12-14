@@ -13,6 +13,7 @@ package org.mule.transaction;
 import org.hamcrest.core.Is;
 import org.hamcrest.core.IsNull;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -32,9 +33,10 @@ import org.mule.tck.testmodels.mule.TestTransaction;
 import org.mule.tck.testmodels.mule.TestTransactionFactory;
 
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.junit.Assert.assertThat;
 
 //SUT = TransactionTemplate - MuleTransactionConfig - partial AbstractSingleResourceTransaction
 @RunWith(MockitoJUnitRunner.class)
@@ -114,8 +116,8 @@ public class TransactionTemplateTestCase
         TransactionTemplate transactionTemplate = new TransactionTemplate(config, mockMuleContext);
         Object result = transactionTemplate.execute(getEmptyTransactionCallback(RETURN_VALUE));
         assertThat(result, is(RETURN_VALUE));
-        Mockito.verify(mockTransaction).commit();
-        Mockito.verify(mockTransaction,VerificationModeFactory.times(0)).rollback();
+        verify(mockTransaction).commit();
+        verify(mockTransaction, VerificationModeFactory.times(0)).rollback();
     }
 
 
@@ -128,8 +130,8 @@ public class TransactionTemplateTestCase
         TransactionTemplate transactionTemplate = new TransactionTemplate(config, mockMuleContext);
         Object result = transactionTemplate.execute(getEmptyTransactionCallback(RETURN_VALUE));
         assertThat(result, is(RETURN_VALUE));
-        Mockito.verify(mockTransaction).rollback();
-        Mockito.verify(mockTransaction,VerificationModeFactory.times(0)).commit();
+        verify(mockTransaction).rollback();
+        verify(mockTransaction, VerificationModeFactory.times(0)).commit();
     }
 
     @Test
@@ -141,10 +143,10 @@ public class TransactionTemplateTestCase
         TransactionTemplate transactionTemplate = new TransactionTemplate(config, mockMuleContext);
         Object result = transactionTemplate.execute(getEmptyTransactionCallback(RETURN_VALUE));
         assertThat(result, is(RETURN_VALUE));
-        Mockito.verify(mockTransaction).suspend();
-        Mockito.verify(mockTransaction).resume();
-        Mockito.verify(mockTransaction,VerificationModeFactory.times(0)).commit();
-        Mockito.verify(mockTransaction,VerificationModeFactory.times(0)).rollback();
+        verify(mockTransaction).suspend();
+        verify(mockTransaction).resume();
+        verify(mockTransaction, VerificationModeFactory.times(0)).commit();
+        verify(mockTransaction, VerificationModeFactory.times(0)).rollback();
     }
 
     @Test
@@ -159,9 +161,9 @@ public class TransactionTemplateTestCase
             transactionTemplate.execute(getFailureTransactionCallback());
         }
         catch (MessagingException e){}
-        Mockito.verify(mockTransaction).suspend();
-        Mockito.verify(mockTransaction,VerificationModeFactory.times(0)).commit();
-        Mockito.verify(mockTransaction,VerificationModeFactory.times(0)).rollback();
+        verify(mockTransaction).suspend();
+        verify(mockTransaction,VerificationModeFactory.times(0)).commit();
+        verify(mockTransaction,VerificationModeFactory.times(0)).rollback();
         //TODO fix this issue. resume should be called despite exception
         //Mockito.verify(mockTransaction).resume();
     }
@@ -173,12 +175,23 @@ public class TransactionTemplateTestCase
         config.setInteractWithExternal(true);
         mockExternalTransactionFactory = mock(ExternalTransactionAwareTransactionFactory.class);
         config.setFactory(mockExternalTransactionFactory);
-        when(mockExternalTransactionFactory.joinExternalTransaction(mockMuleContext)).thenReturn(mockTransaction);
+        when(mockExternalTransactionFactory.joinExternalTransaction(mockMuleContext)).thenAnswer(new Answer<Object>()
+        {
+            @Override
+            public Object answer(InvocationOnMock invocationOnMock) throws Throwable
+            {
+                TransactionCoordination.getInstance().bindTransaction(mockTransaction);
+                return mockTransaction;
+            }
+        });
+        mockTransaction.setXA(true);
         TransactionTemplate transactionTemplate = new TransactionTemplate(config, mockMuleContext);
         Object result = transactionTemplate.execute(getEmptyTransactionCallback(RETURN_VALUE));
         assertThat(result, is(RETURN_VALUE));
-        Mockito.verify(mockTransaction).commit();
-        Mockito.verify(mockTransaction,VerificationModeFactory.times(0)).rollback();
+        verify(mockTransaction).suspend();
+        verify(mockTransaction).resume();
+        verify(mockTransaction, VerificationModeFactory.times(0)).commit();
+        verify(mockTransaction, VerificationModeFactory.times(0)).rollback();
         assertThat(TransactionCoordination.getInstance().getTransaction(), IsNull.<Object>nullValue());
     }
 
@@ -195,8 +208,8 @@ public class TransactionTemplateTestCase
         TransactionTemplate transactionTemplate = new TransactionTemplate(config, mockMuleContext);
         Object result = transactionTemplate.execute(getEmptyTransactionCallback(RETURN_VALUE));
         assertThat(result, is(RETURN_VALUE));
-        Mockito.verify(mockTransaction).commit();
-        Mockito.verify(mockTransaction,VerificationModeFactory.times(0)).rollback();
+        verify(mockTransaction).commit();
+        verify(mockTransaction, VerificationModeFactory.times(0)).rollback();
         assertThat(TransactionCoordination.getInstance().getTransaction(), IsNull.<Object>nullValue());
     }
 
@@ -208,8 +221,8 @@ public class TransactionTemplateTestCase
         config.setFactory(new TestTransactionFactory(mockTransaction));
         Object result = transactionTemplate.execute(getEmptyTransactionCallback(RETURN_VALUE));
         assertThat(result, is(RETURN_VALUE));
-        Mockito.verify(mockTransaction).commit();
-        Mockito.verify(mockTransaction,VerificationModeFactory.times(0)).rollback();
+        verify(mockTransaction).commit();
+        verify(mockTransaction, VerificationModeFactory.times(0)).rollback();
         assertThat(TransactionCoordination.getInstance().getTransaction(), IsNull.<Object>nullValue());
     }
 
@@ -222,10 +235,10 @@ public class TransactionTemplateTestCase
         config.setFactory(new TestTransactionFactory(mockNewTransaction));
         Object result = transactionTemplate.execute(getEmptyTransactionCallback(RETURN_VALUE));
         assertThat(result, is(RETURN_VALUE));
-        Mockito.verify(mockTransaction).commit();
-        Mockito.verify(mockNewTransaction).commit();
-        Mockito.verify(mockTransaction,VerificationModeFactory.times(0)).rollback();
-        Mockito.verify(mockNewTransaction,VerificationModeFactory.times(0)).rollback();
+        verify(mockTransaction).commit();
+        verify(mockNewTransaction).commit();
+        verify(mockTransaction, VerificationModeFactory.times(0)).rollback();
+        verify(mockNewTransaction, VerificationModeFactory.times(0)).rollback();
         assertThat(TransactionCoordination.getInstance().getTransaction(), IsNull.<Object>nullValue());
     }
 
@@ -239,10 +252,10 @@ public class TransactionTemplateTestCase
         config.setFactory(new TestTransactionFactory(mockNewTransaction));
         Object result = transactionTemplate.execute(getEmptyTransactionCallback(RETURN_VALUE));
         assertThat(result, is(RETURN_VALUE));
-        Mockito.verify(mockTransaction).rollback();
-        Mockito.verify(mockNewTransaction).commit();
-        Mockito.verify(mockTransaction,VerificationModeFactory.times(0)).commit();
-        Mockito.verify(mockNewTransaction,VerificationModeFactory.times(0)).rollback();
+        verify(mockTransaction).rollback();
+        verify(mockNewTransaction).commit();
+        verify(mockTransaction, VerificationModeFactory.times(0)).commit();
+        verify(mockNewTransaction, VerificationModeFactory.times(0)).rollback();
         assertThat(TransactionCoordination.getInstance().getTransaction(), IsNull.<Object>nullValue());
     }
 
@@ -256,10 +269,10 @@ public class TransactionTemplateTestCase
         config.setFactory(new TestTransactionFactory(mockNewTransaction));
         Object result = transactionTemplate.execute(getRollbackTransactionCallback(RETURN_VALUE));
         assertThat(result, is(RETURN_VALUE));
-        Mockito.verify(mockTransaction).rollback();
-        Mockito.verify(mockNewTransaction).rollback();
-        Mockito.verify(mockTransaction,VerificationModeFactory.times(0)).commit();
-        Mockito.verify(mockNewTransaction,VerificationModeFactory.times(0)).commit();
+        verify(mockTransaction).rollback();
+        verify(mockNewTransaction).rollback();
+        verify(mockTransaction, VerificationModeFactory.times(0)).commit();
+        verify(mockNewTransaction, VerificationModeFactory.times(0)).commit();
         assertThat(TransactionCoordination.getInstance().getTransaction(), IsNull.<Object>nullValue());
     }
 
@@ -273,12 +286,12 @@ public class TransactionTemplateTestCase
         config.setFactory(new TestTransactionFactory(mockNewTransaction));
         Object result = transactionTemplate.execute(getEmptyTransactionCallback(RETURN_VALUE));
         assertThat(result, is(RETURN_VALUE));
-        Mockito.verify(mockNewTransaction).commit();
-        Mockito.verify(mockNewTransaction,VerificationModeFactory.times(0)).rollback();
-        Mockito.verify(mockTransaction).suspend();
-        Mockito.verify(mockTransaction).resume();
-        Mockito.verify(mockTransaction,VerificationModeFactory.times(0)).commit();
-        Mockito.verify(mockTransaction,VerificationModeFactory.times(0)).rollback();
+        verify(mockNewTransaction).commit();
+        verify(mockNewTransaction, VerificationModeFactory.times(0)).rollback();
+        verify(mockTransaction).suspend();
+        verify(mockTransaction).resume();
+        verify(mockTransaction, VerificationModeFactory.times(0)).commit();
+        verify(mockTransaction, VerificationModeFactory.times(0)).rollback();
         assertThat((TestTransaction) TransactionCoordination.getInstance().getTransaction(), is(mockTransaction));
     }
 
@@ -293,12 +306,12 @@ public class TransactionTemplateTestCase
         config.setFactory(new TestTransactionFactory(mockNewTransaction));
         Object result = transactionTemplate.execute(getRollbackTransactionCallback(RETURN_VALUE));
         assertThat(result, is(RETURN_VALUE));
-        Mockito.verify(mockNewTransaction).rollback();
-        Mockito.verify(mockNewTransaction,VerificationModeFactory.times(0)).commit();
-        Mockito.verify(mockTransaction).suspend();
-        Mockito.verify(mockTransaction).resume();
-        Mockito.verify(mockTransaction,VerificationModeFactory.times(0)).commit();
-        Mockito.verify(mockTransaction,VerificationModeFactory.times(0)).rollback();
+        verify(mockNewTransaction).rollback();
+        verify(mockNewTransaction, VerificationModeFactory.times(0)).commit();
+        verify(mockTransaction).suspend();
+        verify(mockTransaction).resume();
+        verify(mockTransaction, VerificationModeFactory.times(0)).commit();
+        verify(mockTransaction, VerificationModeFactory.times(0)).rollback();
         assertThat((TestTransaction)TransactionCoordination.getInstance().getTransaction(), is(mockTransaction));
     }
 
@@ -314,9 +327,9 @@ public class TransactionTemplateTestCase
         {
             transactionTemplate.execute(getFailureTransactionCallback());
         } catch (MessagingException e) {}
-        Mockito.verify(mockTransaction).suspend();
-        Mockito.verify(mockTransaction,VerificationModeFactory.times(0)).commit();
-        Mockito.verify(mockTransaction,VerificationModeFactory.times(0)).rollback();
+        verify(mockTransaction).suspend();
+        verify(mockTransaction,VerificationModeFactory.times(0)).commit();
+        verify(mockTransaction,VerificationModeFactory.times(0)).rollback();
         //TODO fix this issue. New transaction should be resolved - Xa transaction should be resumed - Xa transaction should be in TransactionCoordinator
         //Mockito.verify(mockNewTransaction).rollback();
         //Mockito.verify(mockTransaction).resume();
@@ -339,8 +352,8 @@ public class TransactionTemplateTestCase
         TransactionTemplate transactionTemplate = new TransactionTemplate(config, mockMuleContext);
         Object result = transactionTemplate.execute(getRollbackTransactionCallback(RETURN_VALUE));
         assertThat(result, is(RETURN_VALUE));
-        Mockito.verify(mockTransaction,VerificationModeFactory.times(0)).commit();
-        Mockito.verify(mockTransaction,VerificationModeFactory.times(0)).rollback();
+        verify(mockTransaction, VerificationModeFactory.times(0)).commit();
+        verify(mockTransaction, VerificationModeFactory.times(0)).rollback();
         assertThat((TestTransaction) TransactionCoordination.getInstance().getTransaction(), is(mockTransaction));
     }
 
@@ -365,10 +378,9 @@ public class TransactionTemplateTestCase
         {
             transactionTemplate.execute(getFailureTransactionCallback());
         } catch (MessagingException e) {}
-        Mockito.verify(mockTransaction,VerificationModeFactory.times(0)).commit();
-        Mockito.verify(mockTransaction,VerificationModeFactory.times(0)).rollback();
-        //TODO fix this, transaction should be unbinded
-        //assertThat( TransactionCoordination.getInstance().getTransaction(), IsNull.<Object>nullValue());
+        verify(mockTransaction, VerificationModeFactory.times(0)).commit();
+        verify(mockTransaction, VerificationModeFactory.times(0)).rollback();
+        assertThat( TransactionCoordination.getInstance().getTransaction(), IsNull.<Object>nullValue());
     }
 
     @Test
@@ -379,8 +391,8 @@ public class TransactionTemplateTestCase
         config.setFactory(new TestTransactionFactory(mockTransaction));
         Object result = transactionTemplate.execute(getEmptyTransactionCallback(RETURN_VALUE));
         assertThat(result, is(RETURN_VALUE));
-        Mockito.verify(mockTransaction).commit();
-        Mockito.verify(mockTransaction,VerificationModeFactory.times(0)).rollback();
+        verify(mockTransaction).commit();
+        verify(mockTransaction, VerificationModeFactory.times(0)).rollback();
         assertThat(TransactionCoordination.getInstance().getTransaction(), IsNull.<Object>nullValue());
     }
 
@@ -393,8 +405,8 @@ public class TransactionTemplateTestCase
         config.setFactory(new TestTransactionFactory(mockTransaction));
         Object result = transactionTemplate.execute(getEmptyTransactionCallback(RETURN_VALUE));
         assertThat(result, is(RETURN_VALUE));
-        Mockito.verify(mockTransaction,VerificationModeFactory.times(0)).commit();
-        Mockito.verify(mockTransaction,VerificationModeFactory.times(0)).rollback();
+        verify(mockTransaction, VerificationModeFactory.times(0)).commit();
+        verify(mockTransaction, VerificationModeFactory.times(0)).rollback();
         assertThat((TestTransaction)TransactionCoordination.getInstance().getTransaction(), is(mockTransaction));
     }
 
@@ -416,8 +428,8 @@ public class TransactionTemplateTestCase
         TransactionTemplate transactionTemplate = new TransactionTemplate(config, mockMuleContext);
         Object result = transactionTemplate.execute(getEmptyTransactionCallback(RETURN_VALUE));
         assertThat(result, is(RETURN_VALUE));
-        Mockito.verify(mockTransaction,VerificationModeFactory.times(0)).commit();
-        Mockito.verify(mockTransaction,VerificationModeFactory.times(0)).rollback();
+        verify(mockTransaction, VerificationModeFactory.times(0)).commit();
+        verify(mockTransaction, VerificationModeFactory.times(0)).rollback();
         assertThat((TestTransaction) TransactionCoordination.getInstance().getTransaction(), Is.is(mockTransaction));
     }
 

@@ -10,122 +10,261 @@
 
 package org.mule.transaction;
 
-import org.mule.api.MuleContext;
-import org.mule.api.transaction.ExternalTransactionAwareTransactionFactory;
-import org.mule.api.transaction.Transaction;
-import org.mule.api.transaction.TransactionCallback;
-import org.mule.api.transaction.TransactionConfig;
-import org.mule.api.transaction.TransactionException;
-import org.mule.api.transaction.TransactionFactory;
-import org.mule.config.i18n.CoreMessages;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.mule.api.MessagingException;
+import org.mule.api.MuleContext;
+import org.mule.api.transaction.*;
+import org.mule.config.i18n.CoreMessages;
 
 public class TransactionTemplate<T>
 {
     private static final Log logger = LogFactory.getLog(TransactionTemplate.class);
-
     private final TransactionConfig config;
     private final MuleContext context;
+    private TransactionInterceptor<T> transactionInterceptor;
 
     public TransactionTemplate(TransactionConfig config, MuleContext context)
     {
+        this(config, context, false);
+    }
+
+    public TransactionTemplate(TransactionConfig config, MuleContext context, boolean manageExceptions)
+    {
         this.config = config;
         this.context = context;
+        this.transactionInterceptor = new ExecuteCallbackInterceptor();
+        if (manageExceptions)
+        {
+            this.transactionInterceptor = new HandleExceptionInterceptor(transactionInterceptor);
+        }
+        if (config != null && config.getAction() != TransactionConfig.ACTION_INDIFFERENT)
+        {
+            this.transactionInterceptor = new ExternalTransactionInterceptor(
+                        new ValidateTransactionalStateInterceptor(
+                                new SuspendXaTransactionInterceptor(
+                                        new ResolveTransactionInterceptor(
+                                                new BeginTransactionInterceptor(this.transactionInterceptor)))));
+        }
     }
 
     public T execute(TransactionCallback<T> callback) throws Exception
     {
-        byte action;
+        return transactionInterceptor.execute(callback);
+    }
 
-        // if we want to skip TT
-        if (config == null || (action  = config.getAction()) == TransactionConfig.ACTION_INDIFFERENT)
+    public class HandleExceptionInterceptor implements TransactionInterceptor<T>
+    {
+        public TransactionInterceptor<T> next;
+
+        public HandleExceptionInterceptor(TransactionInterceptor next)
+        {
+            this.next = next;
+        }
+
+        @Override
+        public T execute(TransactionCallback<T> callback) throws Exception
+        {
+            try
+            {
+                return next.execute(callback);
+            }
+            catch (MessagingException e)
+            {
+                //TODO verify that always we get a MessagingException. In case of any other type of execution should the tx be mark as rollback?
+                return (T) e.getEvent().getFlowConstruct().getExceptionListener().handleException(e,e.getEvent());
+            }
+        }
+    }
+
+    public class ExternalTransactionInterceptor implements TransactionInterceptor<T>
+    {
+        public TransactionInterceptor<T> next;
+
+        public ExternalTransactionInterceptor(TransactionInterceptor next)
+        {
+            this.next = next;
+        }
+
+        @Override
+        public T execute(TransactionCallback<T> callback) throws Exception
+        {
+            Transaction joinedExternal = null;
+            Transaction tx = TransactionCoordination.getInstance().getTransaction();
+            try
+            {
+                if (tx == null && context != null && config != null && config.isInteractWithExternal())
+                {
+
+                    TransactionFactory tmFactory = config.getFactory();
+                    if (tmFactory instanceof ExternalTransactionAwareTransactionFactory)
+                    {
+                        ExternalTransactionAwareTransactionFactory externalTransactionFactory =
+                            (ExternalTransactionAwareTransactionFactory) tmFactory;
+                        joinedExternal = tx = externalTransactionFactory.joinExternalTransaction(context);
+                    }
+                }
+                return next.execute(callback);
+            }
+            finally
+            {
+                if (joinedExternal != null)
+                {
+                    TransactionCoordination.getInstance().unbindTransaction(joinedExternal);
+                }
+            }
+        }
+    }
+
+    public class SuspendXaTransactionInterceptor implements TransactionInterceptor<T>
+    {
+        public TransactionInterceptor<T> next;
+
+        public SuspendXaTransactionInterceptor(TransactionInterceptor next)
+        {
+            this.next = next;
+        }
+
+        @Override
+        public T execute(TransactionCallback<T> callback) throws Exception
+        {
+            Transaction suspendedXATx = null;
+            Transaction tx = TransactionCoordination.getInstance().getTransaction();
+            //TODO Uncomment try-finally once TransactionTemplate starts handling exceptions
+            //try
+            //{
+                byte action = config.getAction();
+                if ((action == TransactionConfig.ACTION_NONE || action == TransactionConfig.ACTION_ALWAYS_BEGIN)
+                       && tx != null && tx.isXA())
+                {
+                    if (logger.isDebugEnabled())
+                    {
+                        logger.debug("suspending XA tx " + action + ", " + "current TX: " + tx);
+                    }
+                    suspendedXATx = tx;
+                    suspendXATransaction(suspendedXATx);
+                }
+                T result = next.execute(callback);
+            //}
+            //finally
+            //{
+                //TODO rethink were it should be resumed - after resolve current tx maybe?
+                if (suspendedXATx != null)
+                {
+                    resumeXATransaction(suspendedXATx);
+                }
+                return result;
+            //}
+        }
+    }
+
+    public class ValidateTransactionalStateInterceptor implements TransactionInterceptor<T>
+    {
+        public TransactionInterceptor<T> next;
+
+        public ValidateTransactionalStateInterceptor(TransactionInterceptor next)
+        {
+            this.next = next;
+        }
+
+        @Override
+        public T execute(TransactionCallback<T> callback) throws Exception
+        {
+            Transaction tx = TransactionCoordination.getInstance().getTransaction();
+            if (config.getAction() == TransactionConfig.ACTION_NEVER && tx != null)
+            {
+                throw new IllegalTransactionStateException(
+                    CoreMessages.transactionAvailableButActionIs("Never"));
+            }
+            else if (config.getAction() == TransactionConfig.ACTION_ALWAYS_JOIN && tx == null)
+            {
+                throw new IllegalTransactionStateException(
+                    CoreMessages.transactionNotAvailableButActionIs("Always Join"));
+            }
+            return this.next.execute(callback);
+        }
+    }
+
+    public class ResolveTransactionInterceptor implements TransactionInterceptor<T>
+    {
+        public TransactionInterceptor<T> next;
+
+        public ResolveTransactionInterceptor(TransactionInterceptor next)
+        {
+            this.next = next;
+        }
+
+        @Override
+        public T execute(TransactionCallback<T> callback) throws Exception
+        {
+            byte action = config.getAction();
+            Transaction transactionBeforeTemplate = TransactionCoordination.getInstance().getTransaction();
+            if ((action == TransactionConfig.ACTION_NONE || action == TransactionConfig.ACTION_ALWAYS_BEGIN)
+                       && transactionBeforeTemplate != null)
+            {
+                if (logger.isDebugEnabled())
+                {
+                    logger.debug(action + ", " + "current TX: " + transactionBeforeTemplate);
+                }
+
+                resolveTransaction(transactionBeforeTemplate);
+            }
+            T result = next.execute(callback);
+            Transaction currentTransaction = TransactionCoordination.getInstance().getTransaction();
+            if (currentTransaction != null && (config.getAction() == TransactionConfig.ACTION_ALWAYS_BEGIN || (config.getAction() == TransactionConfig.ACTION_BEGIN_OR_JOIN && transactionBeforeTemplate == null)))
+            {
+                resolveTransaction(currentTransaction);
+            }
+            return result;
+        }
+    }
+
+    public class BeginTransactionInterceptor implements TransactionInterceptor<T>
+    {
+        public TransactionInterceptor<T> next;
+
+        public BeginTransactionInterceptor(TransactionInterceptor next)
+        {
+            this.next = next;
+        }
+
+        @Override
+        public T execute(TransactionCallback<T> callback) throws Exception
+        {
+            byte action = config.getAction();
+            boolean transactionStarted = false;
+            Transaction tx = TransactionCoordination.getInstance().getTransaction();
+            if (action == TransactionConfig.ACTION_ALWAYS_BEGIN
+                || (action == TransactionConfig.ACTION_BEGIN_OR_JOIN && tx == null))
+            {
+                logger.debug("Beginning transaction");
+                tx = config.getFactory().beginTransaction(context);
+                transactionStarted = true;
+                logger.debug("Transaction successfully started: " + tx);
+            }
+            T result = next.execute(callback);
+            Transaction transaction = TransactionCoordination.getInstance().getTransaction();
+            if (transactionStarted && transaction != null)
+            {
+                resolveTransaction(transaction);
+            }
+            return result;
+        }
+    }
+
+    public class ExecuteCallbackInterceptor implements TransactionInterceptor<T>
+    {
+
+        @Override
+        public T execute(TransactionCallback<T> callback) throws Exception
         {
             return callback.doInTransaction();
         }
+    }
 
-        Transaction joinedExternal = null;
-        Transaction tx = TransactionCoordination.getInstance().getTransaction();
-        if (tx == null && context != null && config != null && config.isInteractWithExternal())
-        {
-
-            TransactionFactory tmFactory = config.getFactory();
-            if (tmFactory instanceof ExternalTransactionAwareTransactionFactory)
-            {
-                ExternalTransactionAwareTransactionFactory extmFactory =
-                    (ExternalTransactionAwareTransactionFactory) tmFactory;
-                joinedExternal = tx = extmFactory.joinExternalTransaction(context);
-            }
-        }
-
-        Transaction suspendedXATx = null;
-        
-        if (action == TransactionConfig.ACTION_NEVER && tx != null)
-        {
-            throw new IllegalTransactionStateException(
-                CoreMessages.transactionAvailableButActionIs("Never"));
-        }
-        else if ((action == TransactionConfig.ACTION_NONE || action == TransactionConfig.ACTION_ALWAYS_BEGIN)
-                   && tx != null)
-        {
-            if (logger.isDebugEnabled())
-            {
-                logger.debug(action + ", " + "current TX: " + tx);
-            }
-
-            if (tx.isXA())
-            {
-                // suspend current transaction
-                suspendedXATx = tx;
-                suspendXATransaction(suspendedXATx);
-            }
-            else
-            {
-                // commit/rollback
-                resolveTransaction(tx);
-            }
-            //transaction will be started below
-            tx = null;
-        }
-        else if (action == TransactionConfig.ACTION_ALWAYS_JOIN && tx == null)
-        {
-            throw new IllegalTransactionStateException(
-                CoreMessages.transactionNotAvailableButActionIs("Always Join"));
-        }
-
-        if (action == TransactionConfig.ACTION_ALWAYS_BEGIN
-            || (action == TransactionConfig.ACTION_BEGIN_OR_JOIN && tx == null))
-        {
-            logger.debug("Beginning transaction");
-            tx = config.getFactory().beginTransaction(context);
-            logger.debug("Transaction successfully started: " + tx);
-        }
-        else
-        {
-            tx = null;
-        }
-
-        T result = callback.doInTransaction();
-        if (tx != null)
-        {
-            //verify that transaction is still active
-            tx = TransactionCoordination.getInstance().getTransaction();
-        }
-        if (tx != null)
-        {
-            resolveTransaction(tx);
-        }
-        if (suspendedXATx != null)
-        {
-            resumeXATransaction(suspendedXATx);
-            tx = suspendedXATx;
-        }
-        if (joinedExternal != null)
-        {
-            TransactionCoordination.getInstance().unbindTransaction(joinedExternal);
-        }
-        return result;
+    public interface TransactionInterceptor<T>
+    {
+        T execute(TransactionCallback<T> callback) throws Exception;
     }
 
     protected void resolveTransaction(Transaction tx) throws TransactionException
