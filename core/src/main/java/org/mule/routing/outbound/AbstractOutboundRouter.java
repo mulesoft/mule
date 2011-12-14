@@ -129,7 +129,7 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
             awaitResponse = false;
         }
 
-        setMessageProperties(routedEvent.getSession().getFlowConstruct(), message, route);
+        setMessageProperties(routedEvent.getFlowConstruct(), message, route);
 
         if (logger.isDebugEnabled())
         {

@@ -10,22 +10,13 @@
 
 package org.mule.session;
 
-import org.mule.api.MuleContext;
-import org.mule.api.MuleException;
 import org.mule.api.MuleSession;
-import org.mule.api.construct.FlowConstruct;
 import org.mule.api.security.SecurityContext;
 import org.mule.util.CaseInsensitiveHashMap;
 import org.mule.util.UUID;
-import org.mule.util.store.DeserializationPostInitialisable;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.OptionalDataException;
 import java.io.Serializable;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -36,7 +27,7 @@ import org.apache.commons.logging.LogFactory;
  * <code>DefaultMuleSession</code> manages the interaction and distribution of events for Mule Services.
  */
 
-public final class DefaultMuleSession implements MuleSession, DeserializationPostInitialisable
+public final class DefaultMuleSession implements MuleSession
 {
     /**
      * Serial version
@@ -47,13 +38,6 @@ public final class DefaultMuleSession implements MuleSession, DeserializationPos
      * logger used by this class
      */
     private static Log logger = LogFactory.getLog(DefaultMuleSession.class);
-
-    /**
-     * The Mule service associated with the session
-     * <p/>
-     * Note: This object uses custom serialization via the writeObject()/readObject() methods.
-     */
-    private transient FlowConstruct flowConstruct = null;
 
     /**
      * Determines if the service is valid
@@ -70,37 +54,16 @@ public final class DefaultMuleSession implements MuleSession, DeserializationPos
 
     private Map<String, Object> properties = null;
 
-    private transient Map<String, Object> serializedData = null;
-
     public DefaultMuleSession()
     {
         id = UUID.getUUID();
         properties = Collections.synchronizedMap(new CaseInsensitiveHashMap/* <String, Object> */());
     }
 
-    @Deprecated
-    public DefaultMuleSession(MuleContext context)
-    {
-        this();
-    }
-
-    public DefaultMuleSession(FlowConstruct flowConstruct)
-    {
-        this();
-        this.flowConstruct = flowConstruct;
-    }
-
-    @Deprecated
-    public DefaultMuleSession(FlowConstruct flowConstruct, MuleContext muleContext)
-    {
-        this(flowConstruct);
-    }
-
     public DefaultMuleSession(MuleSession session)
     {
         this.id = session.getId();
         this.securityContext = session.getSecurityContext();
-        this.flowConstruct = session.getFlowConstruct();
         this.valid = session.isValid();
 
         this.properties = Collections.synchronizedMap(new CaseInsensitiveHashMap/* <String, Object> */());
@@ -108,26 +71,6 @@ public final class DefaultMuleSession implements MuleSession, DeserializationPos
         {
             this.properties.put(key, session.getProperty(key));
         }
-    }
-
-    @Deprecated
-    public DefaultMuleSession(MuleSession session, MuleContext muleContext)
-    {
-        this(session);
-    }
-
-    /**
-     * Copy the session, changing only the flow construct. This can be used for synchronous calls from one
-     * flow construct to another.
-     */
-    public DefaultMuleSession(MuleSession source, FlowConstruct flowConstruct)
-    {
-        this.flowConstruct = flowConstruct;
-        DefaultMuleSession session = (DefaultMuleSession) source;
-        this.id = session.id;
-        this.properties = session.properties;
-        this.securityContext = session.securityContext;
-        this.valid = session.valid;
     }
 
     @Override
@@ -146,21 +89,6 @@ public final class DefaultMuleSession implements MuleSession, DeserializationPos
     public void setValid(boolean value)
     {
         valid = value;
-    }
-
-    /**
-     * @return Returns the service.
-     */
-    @Override
-    public FlowConstruct getFlowConstruct()
-    {
-        return flowConstruct;
-    }
-
-    @Override
-    public void setFlowConstruct(FlowConstruct flowConstruct)
-    {
-        this.flowConstruct = flowConstruct;
     }
 
     /**
@@ -253,73 +181,4 @@ public final class DefaultMuleSession implements MuleSession, DeserializationPos
         }
     }
 
-    // //////////////////////////
-    // Serialization methods
-    // //////////////////////////
-
-    private void writeObject(ObjectOutputStream out) throws IOException
-    {
-        out.defaultWriteObject();
-        // Can be null if service call originates from MuleClient
-        if (serializedData != null)
-        {
-            Object serviceName = serializedData.get("serviceName");
-            if (serviceName != null)
-            {
-                out.writeObject(serviceName);
-            }
-        }
-        else
-        {
-            if (getFlowConstruct() != null)
-            {
-                out.writeObject(getFlowConstruct() != null ? getFlowConstruct().getName() : "null");
-            }
-        }
-    }
-
-    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException
-    {
-        in.defaultReadObject();
-        serializedData = new HashMap<String, Object>();
-
-        try
-        {
-            // Optional
-            serializedData.put("serviceName", in.readObject());
-        }
-        catch (OptionalDataException e)
-        {
-            // ignore
-        }
-    }
-
-    /**
-     * Invoked after deserialization. This is called when the marker interface
-     * {@link org.mule.util.store.DeserializationPostInitialisable} is used. This will get invoked after the
-     * object has been deserialized passing in the current mulecontext when using either
-     * {@link org.mule.transformer.wire.SerializationWireFormat},
-     * {@link org.mule.transformer.wire.SerializedMuleMessageWireFormat}, or the
-     * {@link org.mule.transformer.simple.ByteArrayToSerializable} transformer.
-     * 
-     * @param context the current muleContext instance
-     * @throws MuleException if there is an error initializing
-     */
-    public void initAfterDeserialisation(MuleContext context) throws MuleException
-    {
-        // this method can be called even on objects that were not serialized. In this case,
-        // the temporary holder for serialized data is not initialized and we can just return
-        if (serializedData == null)
-        {
-            return;
-        }
-
-        String serviceName = (String) serializedData.get("serviceName");
-        // Can be null if service call originates from MuleClient
-        if (serviceName != null)
-        {
-            flowConstruct = context.getRegistry().lookupFlowConstruct(serviceName);
-        }
-        serializedData = null;
-    }
 }

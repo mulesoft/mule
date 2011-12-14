@@ -122,7 +122,7 @@ public class DefaultOutboundRouterCollection implements OutboundRouterCollection
         {
             if (logger.isDebugEnabled())
             {
-                logger.debug("Message did not match any routers on: " + session.getFlowConstruct().getName()
+                logger.debug("Message did not match any routers on: " + event.getFlowConstruct().getName()
                              + " invoking catch all strategy");
             }
             return catchAll(event);
@@ -130,7 +130,7 @@ public class DefaultOutboundRouterCollection implements OutboundRouterCollection
         else if (!matchfound)
         {
             logger.warn("Message did not match any routers on: "
-                        + session.getFlowConstruct().getName()
+                        + event.getFlowConstruct().getName()
                         + " and there is no catch all strategy configured on this router.  Disposing message "
                         + message);
         }

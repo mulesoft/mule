@@ -10,7 +10,6 @@
 
 package org.mule.api;
 
-import org.mule.api.construct.FlowConstruct;
 import org.mule.api.security.SecurityContext;
 import org.mule.api.transport.SessionHandler;
 
@@ -32,20 +31,6 @@ import java.util.Set;
 
 public interface MuleSession extends Serializable
 {
-    /**
-     * Returns the FlowConstuct associated with the session in its current execution
-     * 
-     * @return the FlowConstuct associated with the session in its current execution
-     * @see FlowConstruct
-     */
-    FlowConstruct getFlowConstruct();
-
-    /**
-     * Sets the FlowConstuct associated with the session in its current execution
-     * 
-     * @see FlowConstruct
-     */
-    void setFlowConstruct(FlowConstruct flowConstruct);
 
     /**
      * Determines if this session is valid. A session becomes invalid if an exception occurs while processing

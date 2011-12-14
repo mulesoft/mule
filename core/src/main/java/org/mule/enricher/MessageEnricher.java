@@ -44,7 +44,8 @@ public class MessageEnricher extends AbstractMessageProcessorOwner implements Me
                 enrich(event.getMessage(), enrichmentEvent.getMessage(), pair.getSource(), pair.getTarget(),
                     expressionManager);
             }
-            event = new DefaultMuleEvent(event.getMessage(),event, new DefaultMuleSession(enrichmentEvent.getSession(),this.flowConstruct));
+            event = new DefaultMuleEvent(event.getMessage(), event, new DefaultMuleSession(
+                enrichmentEvent.getSession()));
             event = RequestContext.setEvent(event);
         }
         return event;

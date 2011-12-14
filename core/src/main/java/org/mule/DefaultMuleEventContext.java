@@ -475,7 +475,7 @@ public class DefaultMuleEventContext implements MuleEventContext
      */
     public void dispatchEvent(MuleMessage message) throws MuleException
     {
-        FlowConstruct flowConstruct = session.getFlowConstruct();
+        FlowConstruct flowConstruct = event.getFlowConstruct();
         if (flowConstruct == null)
         {
             throw new IllegalStateException(CoreMessages.objectIsNull("flowConstruct").getMessage());

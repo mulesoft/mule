@@ -11,7 +11,7 @@
 package org.mule.management.stats;
 
 import org.mule.api.MuleContext;
-import org.mule.api.MuleSession;
+import org.mule.api.MuleEvent;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.util.concurrent.ThreadNameHelper;
 
@@ -48,22 +48,20 @@ public class ProcessingTime implements Serializable
      * Create a ProcessingTime for the specified MuleSession.
      * @return ProcessingTime if the session has an enabled FlowConstructStatistics or null otherwise
      */
-    public static ProcessingTime newInstance(MuleSession session, MuleContext muleContext)
+    public static ProcessingTime newInstance(MuleEvent event)
     {
-        if (session != null)
+        if (event != null)
         {
-            FlowConstruct fc = session.getFlowConstruct();
+            FlowConstruct fc = event.getFlowConstruct();
             if (fc != null)
             {
                 FlowConstructStatistics stats = fc.getStatistics();
                 if (stats != null && fc.getStatistics().isEnabled())
                 {
-                    return new ProcessingTime(stats, muleContext);
+                    return new ProcessingTime(stats, event.getMuleContext());
                 }
             }
-
         }
-
         return null;
     }
 

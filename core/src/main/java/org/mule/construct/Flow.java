@@ -15,7 +15,6 @@ import org.mule.RequestContext;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
-import org.mule.api.MuleSession;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorChainBuilder;
@@ -28,7 +27,6 @@ import org.mule.lifecycle.processor.ProcessIfStartedMessageProcessor;
 import org.mule.management.stats.FlowConstructStatistics;
 import org.mule.processor.strategy.AsynchronousProcessingStrategy;
 import org.mule.routing.requestreply.AsyncReplyToPropertyRequestReplyReplier;
-import org.mule.session.DefaultMuleSession;
 
 /**
  * This implementation of {@link AbstractPipeline} adds the following functionality:
@@ -56,8 +54,7 @@ public class Flow extends AbstractPipeline implements MessageProcessor
     @Override
     public MuleEvent process(MuleEvent event) throws MuleException
     {
-        MuleSession calledSession = new DefaultMuleSession(event.getSession(), this);
-        MuleEvent newEvent = new DefaultMuleEvent(event.getMessage(), event, calledSession);
+        MuleEvent newEvent = new DefaultMuleEvent(event.getMessage(), event, event.getSession());
         RequestContext.setEvent(newEvent);
         try
         {

@@ -66,7 +66,7 @@ public class EventMetaDataPropagationTestCase extends AbstractServiceAndFlowTest
         if (variant.equals(ConfigVariant.FLOW))
         {
             Flow flow = muleContext.getRegistry().lookupObject("component1");
-            MuleSession session = new DefaultMuleSession(flow);
+            MuleSession session = new DefaultMuleSession();
             MuleEvent event = new DefaultMuleEvent(new DefaultMuleMessage("Test MuleEvent", muleContext),
                 ((InboundEndpoint) flow.getMessageSource()), flow, session);
             flow.process(event);
@@ -74,7 +74,7 @@ public class EventMetaDataPropagationTestCase extends AbstractServiceAndFlowTest
         else
         {
             Service service = muleContext.getRegistry().lookupService("component1");
-            MuleSession session = new DefaultMuleSession(service);
+            MuleSession session = new DefaultMuleSession();
             MuleEvent event = new DefaultMuleEvent(new DefaultMuleMessage("Test MuleEvent", muleContext),
                 ((ServiceCompositeMessageSource) service.getMessageSource()).getEndpoints().get(0), service, session);
             service.sendEvent(event);

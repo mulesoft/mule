@@ -10,6 +10,9 @@
 
 package org.mule.routing.outbound;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
@@ -30,9 +33,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 public class OutboundMessageRouterTestCase extends AbstractMuleContextTestCase
 {
@@ -193,10 +193,9 @@ public class OutboundMessageRouterTestCase extends AbstractMuleContextTestCase
     public void testCorrelation() throws Exception
     {
         FilteringOutboundRouter filterRouter = new FilteringOutboundRouter();
-        MuleSession session = getTestSession(getTestService(), muleContext);
         MuleMessage message = new DefaultMuleMessage(new StringBuffer(), muleContext);
         OutboundEndpoint endpoint = getTestOutboundEndpoint("test");
-        filterRouter.setMessageProperties(session.getFlowConstruct(), message, endpoint);
+        filterRouter.setMessageProperties(getTestService(), message, endpoint);
         assertNotNull(message.getCorrelationId());
     }
 }

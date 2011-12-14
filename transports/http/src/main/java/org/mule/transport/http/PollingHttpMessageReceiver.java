@@ -119,7 +119,7 @@ public class PollingHttpMessageReceiver extends AbstractPollingMessageReceiver
         }
         request.setOutboundProperty(HttpConnector.HTTP_METHOD_PROPERTY, "GET");
 
-        MuleSession session = new DefaultMuleSession(flowConstruct);
+        MuleSession session = new DefaultMuleSession();
 
 
         MuleEvent event = new DefaultMuleEvent(request, outboundEndpoint.getExchangePattern(), flowConstruct, session);

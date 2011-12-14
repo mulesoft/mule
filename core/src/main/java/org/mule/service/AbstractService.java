@@ -17,7 +17,6 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleRuntimeException;
-import org.mule.api.MuleSession;
 import org.mule.api.component.Component;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.construct.FlowConstructAware;
@@ -51,7 +50,6 @@ import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.routing.MuleMessageInfoMapping;
 import org.mule.routing.outbound.DefaultOutboundRouterCollection;
 import org.mule.service.processor.ServiceAsyncRequestReplyRequestor;
-import org.mule.session.DefaultMuleSession;
 import org.mule.util.ClassUtils;
 
 import java.util.Collections;
@@ -658,8 +656,7 @@ public abstract class AbstractService implements Service, MessageProcessor, Anno
     
     public MuleEvent process(MuleEvent event) throws MuleException
     {
-        MuleSession calledSession = new DefaultMuleSession(event.getSession(), this);
-        MuleEvent newEvent = new DefaultMuleEvent(event.getMessage(), event, calledSession);
+        MuleEvent newEvent = new DefaultMuleEvent(event.getMessage(), event, event.getSession());
         RequestContext.setEvent(newEvent);
         try
         {

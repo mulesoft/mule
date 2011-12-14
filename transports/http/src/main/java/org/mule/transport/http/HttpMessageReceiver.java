@@ -43,9 +43,7 @@ import org.mule.util.monitor.Expirable;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.SocketAddress;
-import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import javax.resource.spi.work.Work;
@@ -412,7 +410,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
                         HttpResponse expected = new HttpResponse();
                         expected.setStatusLine(requestLine.getHttpVersion(), HttpConstants.SC_CONTINUE);
                         final DefaultMuleEvent event = new DefaultMuleEvent(new DefaultMuleMessage(expected,
-                            connector.getMuleContext()), (InboundEndpoint) endpoint, flowConstruct, new DefaultMuleSession(flowConstruct));
+                            connector.getMuleContext()), (InboundEndpoint) endpoint, flowConstruct, new DefaultMuleSession());
                         RequestContext.setEvent(event);
                         conn.writeResponse(transformResponse(expected, event));
                     }
@@ -433,7 +431,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
             response.setStatusLine(version, statusCode);
             response.setBody(description);
             DefaultMuleEvent event = new DefaultMuleEvent(new DefaultMuleMessage(response, connector.getMuleContext()), (InboundEndpoint) endpoint,
-                flowConstruct, new DefaultMuleSession(flowConstruct));
+                flowConstruct, new DefaultMuleSession());
             RequestContext.setEvent(event);
             // The DefaultResponseTransformer will set the necessary headers
             return transformResponse(response, event);

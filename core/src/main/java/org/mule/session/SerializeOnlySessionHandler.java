@@ -66,7 +66,7 @@ public class SerializeOnlySessionHandler implements SessionHandler
     
     protected MuleSession removeNonSerializableProperties(final MuleSession session, final MuleContext muleContext)
     {
-        MuleSession copy = new DefaultMuleSession(session, muleContext);
+        MuleSession copy = new DefaultMuleSession(session);
         for (String key : copy.getPropertyNamesAsSet())
         {
             final Object value = copy.getProperty(key);

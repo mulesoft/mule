@@ -30,7 +30,6 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.management.stats.ProcessingTime;
 import org.mule.processor.strategy.SynchronousProcessingStrategy;
 import org.mule.security.MuleCredentials;
-import org.mule.session.DefaultMuleSession;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transport.DefaultReplyToHandler;
 import org.mule.util.store.DeserializationPostInitialisable;
@@ -204,7 +203,7 @@ public class DefaultMuleEvent extends EventObject
         this.encoding = message.getMuleContext().getConfiguration().getDefaultEncoding();
         this.messageSourceName = messageSourceURI.toString();
         this.messageSourceURI = messageSourceURI;
-        this.processingTime = ProcessingTime.newInstance(this.session, message.getMuleContext());
+        this.processingTime = ProcessingTime.newInstance(this);
         this.replyToHandler = null;
         this.replyToDestination = null;
         this.timeout = timeout;
@@ -236,7 +235,7 @@ public class DefaultMuleEvent extends EventObject
         this.session = session;
 
         this.outputStream = outputStream;
-        this.processingTime = ProcessingTime.newInstance(this.session, message.getMuleContext());
+        this.processingTime = ProcessingTime.newInstance(this);
         this.replyToHandler = replyToHandler;
         this.credentials = extractCredentials(endpoint);
         this.encoding = endpoint.getEncoding();
@@ -301,7 +300,7 @@ public class DefaultMuleEvent extends EventObject
         }
         else
         {
-            this.processingTime = ProcessingTime.newInstance(this.session, message.getMuleContext());
+            this.processingTime = ProcessingTime.newInstance(this);
         }
         this.replyToHandler = rewriteEvent.getReplyToHandler();
         this.replyToDestination = rewriteEvent.getReplyToDestination();
@@ -337,7 +336,7 @@ public class DefaultMuleEvent extends EventObject
         this.exchangePattern = exchangePattern;
         this.messageSourceURI = messageSourceURI;
         this.messageSourceName = messageSourceName;
-        this.processingTime = ProcessingTime.newInstance(this.session, message.getMuleContext());
+        this.processingTime = ProcessingTime.newInstance(this);
         this.replyToHandler = replyToHandler;
         this.transacted = transacted;
         this.synchronous = synchronous;
@@ -349,9 +348,9 @@ public class DefaultMuleEvent extends EventObject
     protected boolean resolveEventSynchronicity()
     {
         boolean syncProcessingStrategy = false;
-        if (session.getFlowConstruct() != null && session.getFlowConstruct() instanceof Pipeline)
+        if (flowConstruct != null && flowConstruct instanceof Pipeline)
         {
-            syncProcessingStrategy = ((Pipeline) session.getFlowConstruct()).getProcessingStrategy()
+            syncProcessingStrategy = ((Pipeline) flowConstruct).getProcessingStrategy()
                 .getClass()
                 .equals(SynchronousProcessingStrategy.class);
         }
@@ -695,10 +694,6 @@ public class DefaultMuleEvent extends EventObject
     @SuppressWarnings({"unused", "unchecked"})
     private void initAfterDeserialisation(MuleContext muleContext) throws MuleException
     {
-        if (session instanceof DefaultMuleSession)
-        {
-            ((DefaultMuleSession) session).initAfterDeserialisation(muleContext);
-        }
         if (message instanceof DefaultMuleMessage)
         {
             ((DefaultMuleMessage) message).initAfterDeserialisation(muleContext);

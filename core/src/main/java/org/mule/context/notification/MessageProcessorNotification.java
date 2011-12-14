@@ -100,7 +100,7 @@ public class MessageProcessorNotification extends ServerNotification implements 
         else if (rootId != null && flowConstruct != null)
         {
             DefaultMuleMessage msg = new DefaultMuleMessage(NullPayload.getInstance(), flowConstruct.getMuleContext());
-            DefaultMuleSession session = new DefaultMuleSession(flowConstruct);
+            DefaultMuleSession session = new DefaultMuleSession();
             msg.setMessageRootId(rootId);
             return new DefaultMuleEvent(msg, MessageExchangePattern.REQUEST_RESPONSE, flowConstruct, session);
         }

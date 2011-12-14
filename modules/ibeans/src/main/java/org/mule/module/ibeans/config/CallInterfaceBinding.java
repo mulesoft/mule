@@ -65,9 +65,9 @@ public class CallInterfaceBinding implements InterfaceBinding, MessageProcessor
     {
         //Work around for allowing the MuleCallAnnotationHandler to invoke the binding directly without having
         //to know about the flow and create a session
-        if(session==null)
+        if (session == null)
         {
-            session = new DefaultMuleSession(flow);
+            session = new DefaultMuleSession();
         }
 
         MuleEvent result = process(new DefaultMuleEvent(message, endpoint.getExchangePattern(), flow, session));

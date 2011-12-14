@@ -181,7 +181,7 @@ public class RemoteDispatcherComponent implements Callable, Initialisable
             {
                 return handleException(null, new DefaultMuleException(ClientMessages.noSuchFlowConstruct(destComponent)));
             }
-            MuleSession session = new DefaultMuleSession((FlowConstruct) flowConstruct);
+            MuleSession session = new DefaultMuleSession();
             // Need to do this otherise when the event is invoked the
             // transformer associated with the Mule Admin queue will be invoked, but
             // the message will not be of expected type

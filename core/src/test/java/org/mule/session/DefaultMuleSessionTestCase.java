@@ -43,34 +43,6 @@ public class DefaultMuleSessionTestCase
     {
         DefaultMuleSession session = new DefaultMuleSession();
         assertCreate(session);
-        assertNull(session.getFlowConstruct());
-    }
-
-    @Test
-    @SuppressWarnings(value = "deprecation")
-    public void createDeprecated()
-    {
-        DefaultMuleSession session = new DefaultMuleSession();
-        assertCreate(session);
-        assertNull(session.getFlowConstruct());
-    }
-
-    @Test
-    public void createWithFlowConstuct()
-    {
-        FlowConstruct flowConstruct = Mockito.mock(FlowConstruct.class);
-        DefaultMuleSession session = new DefaultMuleSession(flowConstruct);
-        assertCreate(session);
-        assertSame(flowConstruct, session.getFlowConstruct());
-    }
-
-    @Test
-    @SuppressWarnings(value = "deprecation")
-    public void createWithFlowConstuctDeprecated()
-    {
-        FlowConstruct flowConstruct = Mockito.mock(FlowConstruct.class);
-        DefaultMuleSession session = new DefaultMuleSession(flowConstruct);
-        assertSame(flowConstruct, session.getFlowConstruct());
     }
 
     protected void assertCreate(DefaultMuleSession session)
@@ -87,7 +59,7 @@ public class DefaultMuleSessionTestCase
         throws IllegalArgumentException, SecurityException, IllegalAccessException, NoSuchFieldException
     {
         FlowConstruct flowConstruct = Mockito.mock(FlowConstruct.class);
-        DefaultMuleSession original = new DefaultMuleSession(flowConstruct);
+        DefaultMuleSession original = new DefaultMuleSession();
         original.setValid(false);
         original.setSecurityContext(Mockito.mock(SecurityContext.class));
         original.setProperty("foo", "bar");
@@ -96,35 +68,10 @@ public class DefaultMuleSessionTestCase
 
         assertCopy(original, copy);
 
-        assertSame(copy.getFlowConstruct(), original.getFlowConstruct());
-
         // properties are copied but a new map instance is used
         assertSame(original.getProperty("foo"), copy.getProperty("foo"));
         copy.setProperty("new", "bar");
         assertNull(original.getProperty("new"));
-    }
-
-    @Test
-    public void copyWithFlowConstruct()
-        throws IllegalArgumentException, SecurityException, IllegalAccessException, NoSuchFieldException
-    {
-        FlowConstruct originalFlow = Mockito.mock(FlowConstruct.class);
-        FlowConstruct newFlow = Mockito.mock(FlowConstruct.class);
-        DefaultMuleSession original = new DefaultMuleSession(originalFlow);
-        original.setValid(false);
-        original.setSecurityContext(Mockito.mock(SecurityContext.class));
-        original.setProperty("foo", "bar");
-
-        DefaultMuleSession copy = new DefaultMuleSession(original, newFlow);
-
-        assertCopy(original, copy);
-
-        assertSame(copy.getFlowConstruct(), newFlow);
-
-        // properties map is copied
-        assertSame(original.getProperty("foo"), copy.getProperty("foo"));
-        copy.setProperty("new", "bar");
-        assertNotNull(original.getProperty("new"));
     }
 
     protected void assertCopy(DefaultMuleSession original, DefaultMuleSession copy)
@@ -214,7 +161,7 @@ public class DefaultMuleSessionTestCase
     public void serialization() throws MuleException
     {
         Flow flow = new Flow("flow", Mockito.mock(MuleContext.class));
-        DefaultMuleSession before = new DefaultMuleSession(flow);
+        DefaultMuleSession before = new DefaultMuleSession();
         before.setValid(false);
         before.setSecurityContext(createTestAuthentication());
         before.setProperty("foo", "bar");
@@ -233,7 +180,6 @@ public class DefaultMuleSessionTestCase
         // assertions
         assertEquals(before.getId(), after.getId());
         assertEquals(before.isValid(), after.isValid());
-        assertEquals(before.getFlowConstruct(), after.getFlowConstruct());
         assertEquals(before.getProperty("foo"), after.getProperty("foo"));
         assertEquals(before.getSecurityContext().getAuthentication().getPrincipal(),
             after.getSecurityContext().getAuthentication().getPrincipal());

@@ -204,7 +204,7 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
         if (resultEvent != null)
         {
             // Do  not propagate security context back to caller
-            MuleSession resultSession = new DefaultMuleSession(resultEvent.getSession(), resultEvent.getMuleContext());
+            MuleSession resultSession = new DefaultMuleSession(resultEvent.getSession());
             resultSession.setSecurityContext(null);
             connector.getSessionHandler().storeSessionInfoToMessage(resultSession, resultEvent.getMessage());
         }
@@ -280,18 +280,13 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
                 throw se;
             }
         }
-        if (session != null)
+        if (session == null)
         {
-            session.setFlowConstruct(flowConstruct);
-        }
-        else
-        {
-            session = new DefaultMuleSession(flowConstruct);
+            session = new DefaultMuleSession();
         }
         if (message.getReplyTo() != null)
         {
             return new DefaultMuleEvent(message, getEndpoint(),flowConstruct, session, replyToHandler, ros);
-
         }
         else
         {
