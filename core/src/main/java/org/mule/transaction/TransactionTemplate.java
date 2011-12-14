@@ -16,6 +16,7 @@ import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.transaction.*;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.exception.AlreadyHandledMessagingException;
 
 public class TransactionTemplate<T>
 {
@@ -24,11 +25,25 @@ public class TransactionTemplate<T>
     private final MuleContext context;
     private TransactionInterceptor<T> transactionInterceptor;
 
+    TransactionTemplate(MuleContext context, TransactionConfig config)
+    {
+        this.config = config;
+        this.context = context;
+    }
+
+    /**
+     * Use {@link org.mule.transaction.TransactionTemplateFactory} instead
+     */
+    @Deprecated
     public TransactionTemplate(TransactionConfig config, MuleContext context)
     {
         this(config, context, false);
     }
 
+    /**
+     * Use {@link org.mule.transaction.TransactionTemplateFactory} instead
+     */
+    @Deprecated
     public TransactionTemplate(TransactionConfig config, MuleContext context, boolean manageExceptions)
     {
         this.config = config;
@@ -46,6 +61,17 @@ public class TransactionTemplate<T>
                                         new ResolveTransactionInterceptor(
                                                 new BeginTransactionInterceptor(this.transactionInterceptor)))));
         }
+    }
+
+    TransactionTemplate(MuleContext muleContext)
+    {
+        this.context = muleContext;
+        this.config = null;
+    }
+
+    void setTransactionInterceptor(TransactionInterceptor<T> transactionInterceptor)
+    {
+        this.transactionInterceptor = transactionInterceptor;
     }
 
     public T execute(TransactionCallback<T> callback) throws Exception
@@ -69,10 +95,45 @@ public class TransactionTemplate<T>
             {
                 return next.execute(callback);
             }
+            catch (AlreadyHandledMessagingException e)
+            {
+                throw e;
+            }
             catch (MessagingException e)
             {
                 //TODO verify that always we get a MessagingException. In case of any other type of execution should the tx be mark as rollback?
-                return (T) e.getEvent().getFlowConstruct().getExceptionListener().handleException(e,e.getEvent());
+                T result = (T) e.getEvent().getFlowConstruct().getExceptionListener().handleException(e, e.getEvent());
+                //TODO uncomment this lines once exception re-thrown is in place
+                /*MuleEvent exceptionListenerResult = (MuleEvent) result;
+                if (exceptionListenerResult.getMessage().getExceptionPayload() != null)
+                {
+                    throw new AlreadyHandledMessagingException((MessagingException) exceptionListenerResult.getMessage().getExceptionPayload().getException());
+                }*/
+                return result;
+            }
+        }
+    }
+
+    public class UnwrapManagedExceptionInterceptor implements TransactionInterceptor<T>
+    {
+        public TransactionInterceptor<T> next;
+
+        public UnwrapManagedExceptionInterceptor(TransactionInterceptor next)
+        {
+            this.next = next;
+        }
+
+
+        @Override
+        public T execute(TransactionCallback<T> callback) throws Exception
+        {
+            try
+            {
+                return next.execute(callback);
+            }
+            catch (AlreadyHandledMessagingException messagingException)
+            {
+                throw (MessagingException)messagingException.getCause();
             }
         }
     }
