@@ -54,7 +54,7 @@ public class Flow extends AbstractPipeline implements MessageProcessor
     @Override
     public MuleEvent process(MuleEvent event) throws MuleException
     {
-        MuleEvent newEvent = new DefaultMuleEvent(event, this);
+        MuleEvent newEvent = new DefaultMuleEvent(event.getMessage(), event, event.getSession());
         RequestContext.setEvent(newEvent);
         try
         {
@@ -63,12 +63,11 @@ public class Flow extends AbstractPipeline implements MessageProcessor
             {
                 result.getMessage().release();
             }
-            return new DefaultMuleEvent(newEvent, event.getFlowConstruct());
+            return result;
         }
         catch (Exception e)
         {
-            return new DefaultMuleEvent(getExceptionListener().handleException(e, newEvent),
-                event.getFlowConstruct());
+            return getExceptionListener().handleException(e, newEvent);
         }
         finally
         {

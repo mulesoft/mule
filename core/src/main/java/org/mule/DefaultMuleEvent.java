@@ -261,15 +261,9 @@ public class DefaultMuleEvent extends EventObject
         this(message, rewriteEvent, rewriteEvent.getSession());
     }
 
-    public DefaultMuleEvent(MuleEvent rewriteEvent, FlowConstruct flowConstruct)
-    {
-        this(rewriteEvent.getMessage(), rewriteEvent, flowConstruct, rewriteEvent.getSession(),
-            rewriteEvent.isSynchronous());
-    }
-    
     public DefaultMuleEvent(MuleMessage message, MuleEvent rewriteEvent, boolean synchronus)
     {
-        this(message, rewriteEvent, rewriteEvent.getFlowConstruct(), rewriteEvent.getSession(), synchronus);
+        this(message, rewriteEvent, rewriteEvent.getSession(), synchronus);
     }
 
     /**
@@ -280,19 +274,18 @@ public class DefaultMuleEvent extends EventObject
      */
     public DefaultMuleEvent(MuleMessage message, MuleEvent rewriteEvent, MuleSession session)
     {
-        this(message, rewriteEvent, rewriteEvent.getFlowConstruct(), session, rewriteEvent.isSynchronous());
+        this(message, rewriteEvent, session, rewriteEvent.isSynchronous());
     }
 
     protected DefaultMuleEvent(MuleMessage message,
                             MuleEvent rewriteEvent,
-                            FlowConstruct flowConstruct,
                             MuleSession session,
                             boolean synchronous)
     {
         super(message.getPayload());
         this.id = rewriteEvent.getId();
         this.message = message;
-        this.flowConstruct = flowConstruct;
+        this.flowConstruct = rewriteEvent.getFlowConstruct();
         this.session = session;
 
         this.credentials = rewriteEvent.getCredentials();
