@@ -656,7 +656,7 @@ public abstract class AbstractService implements Service, MessageProcessor, Anno
     
     public MuleEvent process(MuleEvent event) throws MuleException
     {
-        MuleEvent newEvent = new DefaultMuleEvent(event.getMessage(), event, event.getSession());
+        MuleEvent newEvent = new DefaultMuleEvent(event, this);
         RequestContext.setEvent(newEvent);
         try
         {
@@ -665,11 +665,12 @@ public abstract class AbstractService implements Service, MessageProcessor, Anno
             {
                 result.getMessage().release();
             }
-            return result;
+            return new DefaultMuleEvent(newEvent, event.getFlowConstruct());
         }
         catch (Exception e)
         {
-            return getExceptionListener().handleException(e, newEvent);
+            return new DefaultMuleEvent(getExceptionListener().handleException(e, newEvent),
+                event.getFlowConstruct());
         }
         finally
         {
