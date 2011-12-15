@@ -18,7 +18,6 @@ import org.mule.api.MuleMessage;
 import org.mule.api.expression.ExpressionManager;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.processor.AbstractMessageProcessorOwner;
-import org.mule.session.DefaultMuleSession;
 import org.mule.util.StringUtils;
 
 import java.util.ArrayList;
@@ -44,8 +43,7 @@ public class MessageEnricher extends AbstractMessageProcessorOwner implements Me
                 enrich(event.getMessage(), enrichmentEvent.getMessage(), pair.getSource(), pair.getTarget(),
                     expressionManager);
             }
-            event = new DefaultMuleEvent(event.getMessage(), event, new DefaultMuleSession(
-                enrichmentEvent.getSession()));
+            event = new DefaultMuleEvent(event.getMessage(), event, enrichmentEvent.getSession());
             event = RequestContext.setEvent(event);
         }
         return event;
