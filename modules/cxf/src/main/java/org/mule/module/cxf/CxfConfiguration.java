@@ -20,6 +20,7 @@ import org.mule.config.spring.SpringRegistry;
 import org.mule.module.cxf.support.MuleHeadersInInterceptor;
 import org.mule.module.cxf.support.MuleHeadersOutInterceptor;
 import org.mule.module.cxf.support.MuleProtocolHeadersOutInterceptor;
+import org.mule.module.cxf.support.WSDLQueryHandler;
 import org.mule.module.cxf.transport.MuleUniversalTransport;
 
 import java.lang.reflect.Field;
@@ -32,9 +33,10 @@ import org.apache.cxf.BusException;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.common.util.ASMHelper;
-import org.apache.cxf.jaxb.JAXBDataBinding;
+import org.apache.cxf.jaxb.JAXBContextCache;
 import org.apache.cxf.transport.ConduitInitiatorManager;
 import org.apache.cxf.transport.DestinationFactoryManager;
+import org.apache.cxf.transports.http.QueryHandlerRegistry;
 import org.springframework.context.ApplicationContext;
 
 /**
@@ -55,7 +57,7 @@ public class CxfConfiguration implements Initialisable, Disposable, MuleContextA
     private boolean initializeStaticBusInstance;
     private MuleContext muleContext;
     private boolean enableMuleSoapHeaders = true;
-    
+
     public void initialise() throws InitialisationException
     {
         BusFactory.setDefaultBus(null);
@@ -68,6 +70,9 @@ public class CxfConfiguration implements Initialisable, Disposable, MuleContextA
         else
         {
             bus = new SpringBusFactory().createBus((String) null, true);
+
+            // Register query handler to generate WSDL or XSD that was removed in cxf 2.5
+            bus.getExtension(QueryHandlerRegistry.class).registerHandler(new WSDLQueryHandler(bus));
         }
 
         if (!initializeStaticBusInstance)
@@ -84,7 +89,7 @@ public class CxfConfiguration implements Initialisable, Disposable, MuleContextA
         dfm.registerDestinationFactory("http://www.w3.org/2003/05/soap/bindings/HTTP/", transport);
         dfm.registerDestinationFactory("http://cxf.apache.org/transports/jms", transport);
         dfm.registerDestinationFactory("http://cxf.apache.org/transports/http", transport);
-        
+
         dfm.registerDestinationFactory(MuleUniversalTransport.TRANSPORT_ID, transport);
 
         ConduitInitiatorManager extension = bus.getExtension(ConduitInitiatorManager.class);
@@ -109,7 +114,7 @@ public class CxfConfiguration implements Initialisable, Disposable, MuleContextA
         extension.registerConduitInitiator("http://cxf.apache.org/bindings/xformat", transport);
         extension.registerConduitInitiator("http://cxf.apache.org/transports/jms", transport);
         extension.registerConduitInitiator(MuleUniversalTransport.TRANSPORT_ID, transport);
-        
+
         bus.getOutInterceptors().add(new MuleProtocolHeadersOutInterceptor());
         bus.getOutFaultInterceptors().add(new MuleProtocolHeadersOutInterceptor());
 
@@ -127,7 +132,7 @@ public class CxfConfiguration implements Initialisable, Disposable, MuleContextA
         bus.shutdown(true);
         // clear static caches preventing memory leaks on redeploy
         // needed because cxf core classes are loaded by the Mule system classloader, not app's
-        JAXBDataBinding.clearCaches();
+        JAXBContextCache.clearCaches();
         try
         {
             // ASMHelper.LOADER_MAP is a protected static field

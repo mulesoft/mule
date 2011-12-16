@@ -9,8 +9,7 @@
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
        http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/3.2/mule-cxf.xsd">
 
-    <!-- This bean must be present in the registry to allow for @Resource injection -->
-    <spring:bean class="org.apache.cxf.bus.spring.Jsr250BeanPostProcessor" />
+    <cxf:configuration configurationLocation="META-INF/cxf/jsr250-config.xml"/>
 
     <spring:bean id="echo" class="org.mule.module.cxf.testmodels.Echo" />
 
@@ -19,7 +18,7 @@
             <inbound>
                 <inbound-endpoint address="http://localhost:${port1}/services/Echo"
                     exchange-pattern="request-response">
-                    <cxf:jaxws-service>
+                    <cxf:jaxws-service >
                         <cxf:features>
                             <cxf-core:logging />
                         </cxf:features>

@@ -167,11 +167,10 @@ public class MuleUniversalTransport extends AbstractTransportFactory
     }
 
     @Override
-    public EndpointInfo createEndpointInfo(ServiceInfo serviceInfo, BindingInfo b, Port port)
+    public EndpointInfo createEndpointInfo(ServiceInfo serviceInfo, BindingInfo b, List<?> ees)
     {
-        if (port != null)
+        if (ees != null)
         {
-            List<?> ees = port.getExtensibilityElements();
             for (Iterator<?> itr = ees.iterator(); itr.hasNext();)
             {
                 Object extensor = itr.next();

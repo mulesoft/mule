@@ -31,9 +31,7 @@
             <spring:property name="sourceMap">
                 <spring:map>
                     <spring:entry key="action" value="UsernameToken" />
-                    <spring:entry key="passwordCallbackRef">
-                        <cxf:security-manager-callback id="serverCallback"/>
-                  </spring:entry>
+                    <spring:entry key="passwordCallbackClass" value="org.mule.module.cxf.wssec.ServerPasswordCallback"/>
                 </spring:map>
             </spring:property>
         </spring:bean>

@@ -25,6 +25,7 @@ import org.mule.module.cxf.CxfOutboundMessageProcessor;
 import org.mule.module.cxf.CxfPayloadToArguments;
 import org.mule.module.cxf.support.MuleHeadersInInterceptor;
 import org.mule.module.cxf.support.MuleHeadersOutInterceptor;
+import org.mule.module.cxf.support.MuleSecurityManagerValidator;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -38,6 +39,7 @@ import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.ws.security.SecurityConstants;
 
 public abstract class AbstractOutboundMessageProcessorBuilder 
     implements MessageProcessorBuilder, MuleContextAware
@@ -63,7 +65,9 @@ public abstract class AbstractOutboundMessageProcessorBuilder
     protected String address;
     protected String operation;
     protected String decoupledEndpoint;
-    
+    private MuleSecurityManagerValidator securityManager;
+
+
     @Override
     public CxfOutboundMessageProcessor build() throws MuleException
     {
@@ -80,7 +84,12 @@ public abstract class AbstractOutboundMessageProcessorBuilder
         // set the thread default bus so the JAX-WS Service implementation (or other bits of CXF code
         // which I don't know about, but may depend on it) can use it when creating a Client -- DD
         BusFactory.setThreadDefaultBus(getBus());
-        
+
+        if(securityManager != null)
+        {
+            properties.put(SecurityConstants.USERNAME_TOKEN_VALIDATOR, securityManager);
+        }
+
         try
         {
             client = createClient();
@@ -89,7 +98,7 @@ public abstract class AbstractOutboundMessageProcessorBuilder
         {
             throw new DefaultMuleException(e);
         }
-        
+
         addInterceptors(client.getInInterceptors(), inInterceptors);
         addInterceptors(client.getInFaultInterceptors(), inFaultInterceptors);
         addInterceptors(client.getOutInterceptors(), outInterceptors);
@@ -348,6 +357,11 @@ public abstract class AbstractOutboundMessageProcessorBuilder
         this.properties = properties;
     }
 
+    public void setAddProperties(Map<String, Object> properties)
+    {
+        this.properties.putAll(properties);
+    }
+
     public String getDecoupledEndpoint()
     {
         return decoupledEndpoint;
@@ -363,4 +377,10 @@ public abstract class AbstractOutboundMessageProcessorBuilder
     {
         muleContext = context;
     }
+
+    public void setSecurityManager(MuleSecurityManagerValidator securityManager)
+    {
+        this.securityManager = securityManager;
+    }
+
 }

@@ -12,6 +12,7 @@ package org.mule.module.cxf.config;
 
 import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
 import org.mule.config.spring.parsers.collection.ChildListDefinitionParser;
+import org.mule.config.spring.parsers.collection.ChildMapDefinitionParser;
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
 import org.mule.config.spring.parsers.generic.OrphanDefinitionParser;
@@ -21,7 +22,7 @@ import org.mule.config.spring.parsers.specific.MessageProcessorDefinitionParser;
 import org.mule.module.cxf.CxfConfiguration;
 import org.mule.module.cxf.CxfConstants;
 import org.mule.module.cxf.component.WebServiceWrapperComponent;
-import org.mule.module.cxf.support.MuleSecurityManagerCallbackHandler;
+import org.mule.module.cxf.support.MuleSecurityManagerValidator;
 import org.mule.module.cxf.support.StaxFeature;
 
 import org.apache.cxf.aegis.databinding.AegisDatabinding;
@@ -84,12 +85,13 @@ public class CxfNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser(CxfConstants.OUT_FAULT_INTERCEPTORS, new ChildListDefinitionParser(CxfConstants.OUT_FAULT_INTERCEPTORS));
         
         registerBeanDefinitionParser("stax", new SimpleBeanDefinitionParser(StaxFeature.class));
-        
+
         registerBeanDefinitionParser("wrapper-component", new ComponentDefinitionParser(WebServiceWrapperComponent.class));
         
-        OrphanDefinitionParser parser = new OrphanDefinitionParser(MuleSecurityManagerCallbackHandler.class, true);
-        parser.registerPreProcessor(new AddAttribute("securityManager-ref", "_muleSecurityManager"));
-        registerBeanDefinitionParser("security-manager-callback", parser);
-        
+        ChildDefinitionParser msmvParser = new ChildDefinitionParser("securityManager", MuleSecurityManagerValidator.class);
+        msmvParser.registerPreProcessor(new AddAttribute("securityManager-ref", "_muleSecurityManager"));
+        registerBeanDefinitionParser("mule-security-manager", msmvParser);
+
+        registerMuleBeanDefinitionParser("properties", new ChildMapDefinitionParser("addProperties")).addCollection("addProperties");
     }
 }

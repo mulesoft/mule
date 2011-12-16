@@ -26,8 +26,8 @@ public class SpringSecurityTestCase extends UsernameTokenTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "org/mule/module/cxf/wssec/cxf-secure-service-service.xml, org/mule/module/cxf/wssec/spring-security-conf.xml"},
-            {ConfigVariant.FLOW, "org/mule/module/cxf/wssec/cxf-secure-service-flow.xml, org/mule/module/cxf/wssec/spring-security-conf.xml"}
+            {ConfigVariant.SERVICE, "org/mule/module/cxf/wssec/cxf-secure-service-security-manager-service.xml, org/mule/module/cxf/wssec/spring-security-conf.xml"},
+            {ConfigVariant.FLOW, "org/mule/module/cxf/wssec/cxf-secure-service-security-manager-flow.xml, org/mule/module/cxf/wssec/spring-security-conf.xml"}
         });
     }      
 }

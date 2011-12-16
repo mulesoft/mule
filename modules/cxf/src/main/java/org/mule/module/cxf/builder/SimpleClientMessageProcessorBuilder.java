@@ -15,15 +15,14 @@ import org.mule.module.cxf.support.CxfUtils;
 
 import org.apache.cxf.aegis.databinding.AegisDatabinding;
 import org.apache.cxf.endpoint.Client;
-import org.apache.cxf.frontend.ClientProxy;
-import org.apache.cxf.frontend.ClientProxyFactoryBean;
+import org.apache.cxf.frontend.ClientFactoryBean;
 
 public class SimpleClientMessageProcessorBuilder extends AbstractClientMessageProcessorBuilder
 {
     @Override
     protected Client createClient() throws CreateException, Exception
     {
-        ClientProxyFactoryBean cpf = new ClientProxyFactoryBean();
+        ClientFactoryBean cpf = new ClientFactoryBean();
         cpf.setServiceClass(serviceClass);
         if (databinding == null) 
         {
@@ -39,7 +38,7 @@ public class SimpleClientMessageProcessorBuilder extends AbstractClientMessagePr
 
         if (wsdlLocation != null)
         {
-            cpf.setWsdlLocation(wsdlLocation);
+            cpf.setWsdlURL(wsdlLocation);
         }
 
         // If there's a soapVersion defined then the corresponding bindingId will be set
@@ -48,6 +47,6 @@ public class SimpleClientMessageProcessorBuilder extends AbstractClientMessagePr
             cpf.setBindingId(CxfUtils.getBindingIdForSoapVersion(soapVersion));
         }
 
-        return ClientProxy.getClient(cpf.create());
+        return cpf.create();
     }
 }

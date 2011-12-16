@@ -27,6 +27,7 @@ import org.mule.module.cxf.MuleInvoker;
 import org.mule.module.cxf.support.CxfUtils;
 import org.mule.module.cxf.support.MuleHeadersInInterceptor;
 import org.mule.module.cxf.support.MuleHeadersOutInterceptor;
+import org.mule.module.cxf.support.MuleSecurityManagerValidator;
 import org.mule.module.cxf.support.MuleServiceConfiguration;
 import org.mule.util.ClassUtils;
 
@@ -51,6 +52,7 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.service.factory.AbstractServiceConfiguration;
 import org.apache.cxf.service.factory.ReflectionServiceFactoryBean;
 import org.apache.cxf.service.invoker.Invoker;
+import org.apache.cxf.ws.security.SecurityConstants;
 
 /**
  * An abstract builder for CXF services. It handles all common operations such
@@ -81,6 +83,7 @@ public abstract class AbstractInboundMessageProcessorBuilder implements MuleCont
     private List<String> schemaLocations;
     private String onException = CxfConstants.CREATE_SOAP_FAULT;
     private final Map<QName, Object> annotations = new ConcurrentHashMap<QName, Object>();
+    private MuleSecurityManagerValidator securityManager;
 
     @Override
     public CxfInboundMessageProcessor build() throws MuleException
@@ -155,6 +158,11 @@ public abstract class AbstractInboundMessageProcessorBuilder implements MuleCont
             sfb.getOutFaultInterceptors().add(new MuleHeadersOutInterceptor());
         }
 
+        if(securityManager != null)
+        {
+            properties.put(SecurityConstants.USERNAME_TOKEN_VALIDATOR, securityManager);
+        }
+
         String address = getAddress();
         address = CxfUtils.mapUnsupportedSchemas(address);
         sfb.setAddress(address); // dummy URL for CXF
@@ -198,9 +206,9 @@ public abstract class AbstractInboundMessageProcessorBuilder implements MuleCont
         
         sfb.setProperties(properties);
         sfb.setInvoker(createInvoker(processor));
-        
+
         server = sfb.create();
-        
+
         CxfUtils.removeInterceptor(server.getEndpoint().getService().getInInterceptors(), OneWayProcessorInterceptor.class.getName());
         configureServer(server);
 
@@ -433,6 +441,11 @@ public abstract class AbstractInboundMessageProcessorBuilder implements MuleCont
         this.properties = properties;
     }
 
+    public void setAddProperties(Map<String, Object> properties)
+    {
+        this.properties.putAll(properties);
+    }
+
     public boolean isValidationEnabled()
     {
         return validationEnabled;
@@ -478,4 +491,10 @@ public abstract class AbstractInboundMessageProcessorBuilder implements MuleCont
         annotations.clear();
         annotations.putAll(newAnnotations);
     }
+
+    public void setSecurityManager(MuleSecurityManagerValidator securityManager)
+    {
+        this.securityManager = securityManager;
+    }
+
 }

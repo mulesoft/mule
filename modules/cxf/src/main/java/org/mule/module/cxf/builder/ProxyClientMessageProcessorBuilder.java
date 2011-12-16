@@ -31,8 +31,7 @@ import org.apache.cxf.binding.soap.interceptor.SoapOutInterceptor;
 import org.apache.cxf.databinding.stax.StaxDataBinding;
 import org.apache.cxf.databinding.stax.StaxDataBindingFeature;
 import org.apache.cxf.endpoint.Client;
-import org.apache.cxf.frontend.ClientProxy;
-import org.apache.cxf.frontend.ClientProxyFactoryBean;
+import org.apache.cxf.frontend.ClientFactoryBean;
 import org.apache.cxf.interceptor.WrappedOutInterceptor;
 
 /**
@@ -77,7 +76,7 @@ public class ProxyClientMessageProcessorBuilder extends AbstractOutboundMessageP
     @Override
     protected Client createClient() throws CreateException, Exception
     {
-        ClientProxyFactoryBean cpf = new ClientProxyFactoryBean();
+        ClientFactoryBean cpf = new ClientFactoryBean();
         cpf.setServiceClass(ProxyService.class);
         cpf.setDataBinding(new StaxDataBinding());
         cpf.getFeatures().add(new StaxDataBindingFeature());
@@ -93,10 +92,10 @@ public class ProxyClientMessageProcessorBuilder extends AbstractOutboundMessageP
         
         if (wsdlLocation != null) 
         {
-            cpf.setWsdlLocation(wsdlLocation);
+            cpf.setWsdlURL(wsdlLocation);
         }
-        
-        Client client = ClientProxy.getClient(cpf.create());
+
+        Client client = cpf.create();
 
         Binding binding = client.getEndpoint().getBinding();
         CxfUtils.removeInterceptor(binding.getOutInterceptors(), WrappedOutInterceptor.class.getName());
@@ -110,7 +109,7 @@ public class ProxyClientMessageProcessorBuilder extends AbstractOutboundMessageP
             client.getInInterceptors().add(new ReversibleStaxInInterceptor());
             client.getInInterceptors().add(new ResetStaxInterceptor());
         }
-        
+
         return client;
     }
 

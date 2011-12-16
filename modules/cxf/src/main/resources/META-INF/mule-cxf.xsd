@@ -318,20 +318,34 @@
 
     <xsd:group name="commonConfiguration">
         <xsd:sequence>
+            <xsd:element ref="mule-security-manager" minOccurs="0">
+                <xsd:annotation>
+                    <xsd:documentation>
+                        Bridges together the Mule security manager and WSS4J through a Validator object.
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+            <xsd:element ref="properties" minOccurs="0">
+                <xsd:annotation>
+                    <xsd:documentation>
+                        Additional properties for this service.
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
             <xsd:element ref="abstract-databinding"  minOccurs="0">
                 <xsd:annotation>
                     <xsd:documentation>
                         The databinding implementation that should be used. By default, this is JAXB for the JAX-WS frontend and Aegis for the simple frontend.
                     </xsd:documentation>
                 </xsd:annotation>
-            </xsd:element>
+            </xsd:element>       
             <xsd:element ref="features" minOccurs="0">
                 <xsd:annotation>
                     <xsd:documentation>
                         Any CXF features you want to apply to the client/server. See the CXF documentation for more information on features.
                     </xsd:documentation>
                 </xsd:annotation>
-            </xsd:element>
+            </xsd:element>         
             <xsd:element name="inInterceptors" type="interceptors" minOccurs="0">
                 <xsd:annotation>
                     <xsd:documentation>
@@ -470,6 +484,15 @@
         </xsd:sequence>
     </xsd:complexType>
 
+    <xsd:element name="properties">
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:any minOccurs="0" maxOccurs="unbounded"/>
+            </xsd:sequence>
+        </xsd:complexType>
+    </xsd:element>
+
+
     <xsd:element name="features">
         <xsd:complexType>
             <xsd:sequence>
@@ -543,11 +566,11 @@
             </xsd:complexContent>
         </xsd:complexType>
     </xsd:element>
-    
-    <xsd:element name="security-manager-callback">
+
+   <xsd:element name="mule-security-manager">
         <xsd:annotation>
             <xsd:documentation>
-                A WSS4J Password callback which verifies username/password combinations
+                A WSS4J Password validator which verifies username/password combinations
                 against the Mule security manager.
             </xsd:documentation>
         </xsd:annotation>
@@ -557,7 +580,7 @@
                     <xsd:attribute name="securityManager-ref">
                         <xsd:annotation>
                             <xsd:documentation>
-                                The security manager instance to use for the password callback. (Optional)
+                                The security manager instance to use for the password validator. (Optional)
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:attribute>
@@ -565,5 +588,5 @@
             </xsd:complexContent>
         </xsd:complexType>
     </xsd:element>
-    
+
 </xsd:schema>
