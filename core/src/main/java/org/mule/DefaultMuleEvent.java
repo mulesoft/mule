@@ -96,8 +96,6 @@ public class DefaultMuleEvent extends EventObject
 
     /**
      * Constructor used to create a message with no message source with minimal arguments
-     * 
-     * @param flowConstruct TODO
      */
     public DefaultMuleEvent(MuleMessage message,
                             MessageExchangePattern exchangePattern,
@@ -112,8 +110,6 @@ public class DefaultMuleEvent extends EventObject
     /**
      * Constructor used to create a message with no message source with minimal arguments and
      * ResponseOutputStream
-     * 
-     * @param flowConstruct TODO
      */
     public DefaultMuleEvent(MuleMessage message,
                             MessageExchangePattern exchangePattern,
@@ -128,8 +124,6 @@ public class DefaultMuleEvent extends EventObject
 
     /**
      * Constructor used to create a message with no message source with all additional arguments
-     * 
-     * @param flowConstruct TODO
      */
     public DefaultMuleEvent(MuleMessage message,
                             MessageExchangePattern exchangePattern,
@@ -146,8 +140,6 @@ public class DefaultMuleEvent extends EventObject
     /**
      * Constructor used to create a message with a uri that idendifies the message source with minimal
      * arguments
-     * 
-     * @param flowConstruct TODO
      */
     public DefaultMuleEvent(MuleMessage message,
                             URI messageSourceURI,
@@ -163,8 +155,6 @@ public class DefaultMuleEvent extends EventObject
     /**
      * Constructor used to create a message with a uri that idendifies the message source with minimal
      * arguments and ResponseOutputStream
-     * 
-     * @param flowConstruct TODO
      */
     public DefaultMuleEvent(MuleMessage message,
                             URI messageSourceURI,
@@ -180,8 +170,6 @@ public class DefaultMuleEvent extends EventObject
 
     /**
      * Constructor used to create a message with a identifiable message source with all additional arguments
-     * 
-     * @param flowConstruct TODO
      */
     public DefaultMuleEvent(MuleMessage message,
                             URI messageSourceURI,
