@@ -528,7 +528,7 @@ public class MuleEventMulticaster
                             applicationEvent.getProperties(), muleContext);
                         message.applyTransformers(event, endpoint.getTransformers());
                     }
-                    endpoint.process(new DefaultMuleEvent(message, endpoint.getExchangePattern(), service, session));
+                    endpoint.process(new DefaultMuleEvent(message, endpoint.getExchangePattern(), service));
                 }
             }
             catch (Exception e1)
