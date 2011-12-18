@@ -29,7 +29,6 @@ import org.mule.api.transport.DispatchException;
 import org.mule.api.transport.PropertyScope;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.endpoint.SimpleEndpointCache;
-import org.mule.session.DefaultMuleSession;
 import org.mule.transport.NullPayload;
 import org.mule.util.StringUtils;
 
@@ -277,8 +276,7 @@ public class Process implements Initialisable, Disposable, MessageService
 
         // Use an endpoint cache to prevent memory leaks (see MULE-5422)
         OutboundEndpoint ep = endpointCache.getOutboundEndpoint(endpoint, exchangePattern, null);
-        DefaultMuleEvent event = new DefaultMuleEvent(message, ep.getExchangePattern(), flowConstruct,
-            new DefaultMuleSession());
+        DefaultMuleEvent event = new DefaultMuleEvent(message, ep.getExchangePattern(), flowConstruct);
         RequestContext.setEvent(event);
 
         // Set correlation properties in SESSION scope so that they get propagated to response messages.

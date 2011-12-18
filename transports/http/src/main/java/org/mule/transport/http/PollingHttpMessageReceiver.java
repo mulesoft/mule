@@ -16,7 +16,6 @@ import org.mule.MessageExchangePattern;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.MuleSession;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.InboundEndpoint;
@@ -25,7 +24,6 @@ import org.mule.api.lifecycle.CreateException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transport.Connector;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
-import org.mule.session.DefaultMuleSession;
 import org.mule.transport.AbstractPollingMessageReceiver;
 import org.mule.transport.http.i18n.HttpMessages;
 import org.mule.util.MapUtils;
@@ -119,10 +117,7 @@ public class PollingHttpMessageReceiver extends AbstractPollingMessageReceiver
         }
         request.setOutboundProperty(HttpConnector.HTTP_METHOD_PROPERTY, "GET");
 
-        MuleSession session = new DefaultMuleSession();
-
-
-        MuleEvent event = new DefaultMuleEvent(request, outboundEndpoint.getExchangePattern(), flowConstruct, session);
+        MuleEvent event = new DefaultMuleEvent(request, outboundEndpoint.getExchangePattern(), flowConstruct);
 
         MuleEvent result = outboundEndpoint.process(event);
         MuleMessage message = null;

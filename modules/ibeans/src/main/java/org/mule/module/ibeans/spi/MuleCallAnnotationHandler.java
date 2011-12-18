@@ -14,14 +14,12 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.MuleSession;
 import org.mule.api.component.InterfaceBinding;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.message.DefaultExceptionPayload;
 import org.mule.module.ibeans.config.IBeanFlowConstruct;
-import org.mule.session.DefaultMuleSession;
 import org.mule.transport.NullPayload;
 import org.mule.util.StringMessageUtils;
 
@@ -131,12 +129,11 @@ public class MuleCallAnnotationHandler implements ClientAnnotationHandler
 
         MuleEvent replyEvent = null;
         MuleMessage reply;
-        MuleSession session = new DefaultMuleSession();
 
         try
         {
             replyEvent = router.process(new DefaultMuleEvent(message, router.getEndpoint()
-                .getExchangePattern(), flow, session));
+                .getExchangePattern(), flow));
        }
         catch (Throwable e)
         {

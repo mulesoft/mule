@@ -17,7 +17,6 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.api.MuleSession;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.InboundEndpoint;
@@ -27,7 +26,6 @@ import org.mule.api.transport.ReceiveException;
 import org.mule.module.client.i18n.ClientMessages;
 import org.mule.module.jca.i18n.JcaMessages;
 import org.mule.security.MuleCredentials;
-import org.mule.session.DefaultMuleSession;
 
 import java.util.Map;
 
@@ -164,14 +162,12 @@ public class DefaultMuleConnection implements MuleConnection
     protected MuleEvent getEvent(MuleMessage message, OutboundEndpoint endpoint)
         throws MuleException
     {
-        MuleSession session = new DefaultMuleSession();
-
         if (credentials != null)
         {
             message.setOutboundProperty(MuleProperties.MULE_USER_PROPERTY, "Plain " + credentials.getToken());
         }
 
-        return new DefaultMuleEvent(message, endpoint.getExchangePattern(), null, session);
+        return new DefaultMuleEvent(message, endpoint.getExchangePattern(), null);
     }
 
     /**

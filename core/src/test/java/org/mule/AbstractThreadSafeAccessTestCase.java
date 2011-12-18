@@ -10,16 +10,15 @@
 
 package org.mule;
 
+import static org.junit.Assert.assertEquals;
+
 import org.mule.api.MuleMessage;
 import org.mule.api.ThreadSafeAccess;
 import org.mule.model.seda.SedaService;
-import org.mule.session.DefaultMuleSession;
 import org.mule.tck.MuleTestUtils;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.Map;
-
-import static org.junit.Assert.assertEquals;
 
 public abstract class AbstractThreadSafeAccessTestCase extends AbstractMuleContextTestCase
 {
@@ -27,8 +26,7 @@ public abstract class AbstractThreadSafeAccessTestCase extends AbstractMuleConte
     {
         MuleMessage message = new DefaultMuleMessage(new Object(), (Map) null, muleContext);
         return new DefaultMuleEvent(message, MuleTestUtils.getTestInboundEndpoint("test",
-            MessageExchangePattern.ONE_WAY, muleContext, null), new SedaService(muleContext),
-            new DefaultMuleSession());
+            MessageExchangePattern.ONE_WAY, muleContext, null), new SedaService(muleContext));
     }
 
     protected void resetAccessControl(ThreadSafeAccess target) throws InterruptedException

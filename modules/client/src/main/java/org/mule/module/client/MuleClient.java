@@ -18,7 +18,6 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.api.MuleSession;
 import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.config.ConfigurationException;
 import org.mule.api.config.MuleConfiguration;
@@ -45,7 +44,6 @@ import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.endpoint.MuleEndpointURI;
 import org.mule.security.MuleCredentials;
 import org.mule.service.ServiceCompositeMessageSource;
-import org.mule.session.DefaultMuleSession;
 import org.mule.transformer.TransformerUtils;
 import org.mule.transport.NullPayload;
 import org.mule.util.StringUtils;
@@ -315,9 +313,8 @@ public class MuleClient implements Disposable
             trans = TransformerUtils.getTransformers(transformers, muleContext);
         }
 
-        MuleSession session = new DefaultMuleSession();
         InboundEndpoint endpoint = getDefaultClientEndpoint(service, message.getPayload(), true);
-        MuleEvent event = new DefaultMuleEvent(message, endpoint, service, session);
+        MuleEvent event = new DefaultMuleEvent(message, endpoint, service);
 
         if (logger.isDebugEnabled())
         {
@@ -369,9 +366,8 @@ public class MuleClient implements Disposable
         {
             throw new ServiceException(CoreMessages.objectNotRegistered("Service", componentName));
         }
-        MuleSession session = new DefaultMuleSession();
         InboundEndpoint endpoint = getDefaultClientEndpoint(service, message.getPayload(), false);
-        MuleEvent event = new DefaultMuleEvent(message, endpoint, service, session);
+        MuleEvent event = new DefaultMuleEvent(message, endpoint, service);
 
         if (logger.isDebugEnabled())
         {
@@ -696,15 +692,13 @@ public class MuleClient implements Disposable
     protected MuleEvent getEvent(MuleMessage message, MessageExchangePattern exchangePattern)
         throws MuleException
     {
-        DefaultMuleSession session = new DefaultMuleSession();
-
         if (user != null)
         {
             message.setOutboundProperty(MuleProperties.MULE_USER_PROPERTY,
                 MuleCredentials.createHeader(user.getUsername(), user.getPassword()));
         }
         return new DefaultMuleEvent(message, exchangePattern,
-            new DefaultLocalMuleClient.MuleClientFlowConstruct(muleContext), session);
+            new DefaultLocalMuleClient.MuleClientFlowConstruct(muleContext));
     }
 
     protected InboundEndpoint getInboundEndpoint(String uri) throws MuleException

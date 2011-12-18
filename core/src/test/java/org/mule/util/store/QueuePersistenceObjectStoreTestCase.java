@@ -29,7 +29,6 @@ import org.mule.api.config.MuleConfiguration;
 import org.mule.api.store.ListableObjectStore;
 import org.mule.api.store.ObjectStoreException;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.session.DefaultMuleSession;
 import org.mule.util.FileUtils;
 import org.mule.util.SerializationUtils;
 import org.mule.util.UUID;
@@ -180,7 +179,7 @@ public class QueuePersistenceObjectStoreTestCase extends AbstractObjectStoreCont
         String id = UUID.getUUID();
         QueueKey key = new QueueKey(QUEUE_NAME, id);
         MuleMessage msg = new DefaultMuleMessage("Hello", mockMuleContext);
-        MuleEvent event = new DefaultMuleEvent(msg, MessageExchangePattern.ONE_WAY, null, new DefaultMuleSession());
+        MuleEvent event = new DefaultMuleEvent(msg, MessageExchangePattern.ONE_WAY, null);
 
         ListableObjectStore<Serializable> monitored = new MonitoredObjectStoreWrapper(store);
         monitored.store(key, event);

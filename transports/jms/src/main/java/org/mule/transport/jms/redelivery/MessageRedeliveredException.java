@@ -16,7 +16,6 @@ import org.mule.api.MuleMessage;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.session.DefaultMuleSession;
 import org.mule.transport.jms.i18n.JmsMessages;
 
 public class MessageRedeliveredException extends MessagingException
@@ -34,8 +33,8 @@ public class MessageRedeliveredException extends MessagingException
 
     public MessageRedeliveredException(String messageId, int redeliveryCount, int maxRedelivery, InboundEndpoint endpoint, FlowConstruct flow, MuleMessage muleMessage)
     {        
-        super(JmsMessages.tooManyRedeliveries(messageId, redeliveryCount, maxRedelivery, endpoint), 
-            new DefaultMuleEvent(muleMessage, endpoint, flow, new DefaultMuleSession()));
+        super(JmsMessages.tooManyRedeliveries(messageId, redeliveryCount, maxRedelivery, endpoint),
+            new DefaultMuleEvent(muleMessage, endpoint, flow));
         this.messageId = messageId;
         this.redeliveryCount = redeliveryCount;
         this.maxRedelivery = maxRedelivery;

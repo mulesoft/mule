@@ -31,7 +31,6 @@ import org.mule.api.transport.ReceiveException;
 import org.mule.endpoint.SimpleEndpointCache;
 import org.mule.exception.DefaultMessagingExceptionStrategy;
 import org.mule.management.stats.FlowConstructStatistics;
-import org.mule.session.DefaultMuleSession;
 
 import java.util.Map;
 
@@ -136,11 +135,11 @@ public class DefaultLocalMuleClient implements LocalMuleClient
         return returnMessage(endpoint.process(createMuleEvent(message, endpoint)));
     }
 
-    protected MuleEvent createMuleEvent(MuleMessage message, OutboundEndpoint endpoint) throws EndpointException
+    protected MuleEvent createMuleEvent(MuleMessage message, OutboundEndpoint endpoint)
+        throws EndpointException
     {
-        DefaultMuleSession session = new DefaultMuleSession();
         return new DefaultMuleEvent(message, endpoint.getExchangePattern(), new MuleClientFlowConstruct(
-            muleContext), session);
+            muleContext));
     }
 
     protected MuleMessage returnMessage(MuleEvent event)

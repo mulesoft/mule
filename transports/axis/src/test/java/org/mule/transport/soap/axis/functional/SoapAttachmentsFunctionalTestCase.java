@@ -18,7 +18,6 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.message.ds.StringDataSource;
-import org.mule.session.DefaultMuleSession;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.soap.axis.AxisMessageDispatcher;
@@ -60,8 +59,7 @@ public class SoapAttachmentsFunctionalTestCase extends FunctionalTestCase
         {
             MuleMessage msg = new DefaultMuleMessage("testPayload", muleContext);
             msg.addOutboundAttachment("testAttachment", new DataHandler(new StringDataSource("foo")));
-            DefaultMuleSession session = new DefaultMuleSession();
-            DefaultMuleEvent event = new DefaultMuleEvent(msg, getTestInboundEndpoint("test://test"), null, session);
+            DefaultMuleEvent event = new DefaultMuleEvent(msg, getTestInboundEndpoint("test://test"), null);
             MuleMessage result = client.process(event).getMessage();
             assertNotNull(result);
             assertNotNull(result.getPayload());

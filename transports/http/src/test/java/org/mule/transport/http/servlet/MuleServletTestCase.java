@@ -22,7 +22,6 @@ import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.registry.MuleRegistry;
 import org.mule.api.transaction.TransactionConfig;
 import org.mule.endpoint.MuleEndpointURI;
-import org.mule.session.DefaultMuleSession;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
 
@@ -165,9 +164,7 @@ public class MuleServletTestCase extends Assert {
         when(ep.getTransactionConfig()).thenReturn(txConfig);
         when(ep.getExchangePattern()).thenReturn(MessageExchangePattern.REQUEST_RESPONSE);
         
-        DefaultMuleSession session = new DefaultMuleSession();
-        
-        DefaultMuleEvent event = new DefaultMuleEvent(message, ep, null, session);
+        DefaultMuleEvent event = new DefaultMuleEvent(message, ep, null);
         return event;
     }
 }

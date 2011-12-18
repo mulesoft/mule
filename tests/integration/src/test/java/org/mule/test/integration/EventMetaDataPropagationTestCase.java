@@ -20,13 +20,11 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.api.MuleSession;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.Callable;
 import org.mule.api.service.Service;
 import org.mule.construct.Flow;
 import org.mule.service.ServiceCompositeMessageSource;
-import org.mule.session.DefaultMuleSession;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.transformer.AbstractMessageAwareTransformer;
@@ -66,17 +64,15 @@ public class EventMetaDataPropagationTestCase extends AbstractServiceAndFlowTest
         if (variant.equals(ConfigVariant.FLOW))
         {
             Flow flow = muleContext.getRegistry().lookupObject("component1");
-            MuleSession session = new DefaultMuleSession();
             MuleEvent event = new DefaultMuleEvent(new DefaultMuleMessage("Test MuleEvent", muleContext),
-                ((InboundEndpoint) flow.getMessageSource()), flow, session);
+                ((InboundEndpoint) flow.getMessageSource()), flow);
             flow.process(event);
         }
         else
         {
             Service service = muleContext.getRegistry().lookupService("component1");
-            MuleSession session = new DefaultMuleSession();
             MuleEvent event = new DefaultMuleEvent(new DefaultMuleMessage("Test MuleEvent", muleContext),
-                ((ServiceCompositeMessageSource) service.getMessageSource()).getEndpoints().get(0), service, session);
+                ((ServiceCompositeMessageSource) service.getMessageSource()).getEndpoints().get(0), service);
             service.sendEvent(event);
         }
     }

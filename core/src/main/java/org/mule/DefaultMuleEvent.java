@@ -30,6 +30,7 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.management.stats.ProcessingTime;
 import org.mule.processor.strategy.SynchronousProcessingStrategy;
 import org.mule.security.MuleCredentials;
+import org.mule.session.DefaultMuleSession;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transport.DefaultReplyToHandler;
 import org.mule.util.store.DeserializationPostInitialisable;
@@ -103,6 +104,15 @@ public class DefaultMuleEvent extends EventObject
                             MuleSession session)
     {
         this(message, exchangePattern, flowConstruct, session, message.getMuleContext()
+            .getConfiguration()
+            .getDefaultResponseTimeout(), null, null);
+    }
+
+    public DefaultMuleEvent(MuleMessage message,
+                            MessageExchangePattern exchangePattern,
+                            FlowConstruct flowConstruct)
+    {
+        this(message, exchangePattern, flowConstruct, new DefaultMuleSession(), message.getMuleContext()
             .getConfiguration()
             .getDefaultResponseTimeout(), null, null);
     }
@@ -207,6 +217,13 @@ public class DefaultMuleEvent extends EventObject
                             MuleSession session)
     {
         this(message, endpoint, flowConstruct, session, null, null);
+    }
+
+    public DefaultMuleEvent(MuleMessage message,
+                            InboundEndpoint endpoint,
+                            FlowConstruct flowConstruct)
+    {
+        this(message, endpoint, flowConstruct, new DefaultMuleSession(), null, null);
     }
 
     public DefaultMuleEvent(MuleMessage message,

@@ -18,7 +18,6 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleRuntimeException;
-import org.mule.api.MuleSession;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.config.ThreadingProfile;
 import org.mule.api.context.MuleContextAware;
@@ -47,7 +46,6 @@ import org.mule.module.spring.i18n.SpringMessages;
 import org.mule.object.SingletonObjectFactory;
 import org.mule.routing.filters.WildcardFilter;
 import org.mule.service.ServiceCompositeMessageSource;
-import org.mule.session.DefaultMuleSession;
 import org.mule.util.ClassUtils;
 
 import java.beans.ExceptionListener;
@@ -520,9 +518,8 @@ public class MuleEventMulticaster
                 }
                 else
                 {
-                    MuleSession session = new DefaultMuleSession();
                     DefaultMuleEvent event = new DefaultMuleEvent(message, endpoint.getExchangePattern(),
-                        service, session);
+                        service);
                     RequestContext.setEvent(event);
                     // transform if necessary
                     if (endpoint.getTransformers() != null)

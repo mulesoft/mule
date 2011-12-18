@@ -311,11 +311,8 @@ public class DefaultMuleMessageTestCase extends AbstractMuleContextTestCase
         //Not sure why this test adds this property
         message.removeProperty("MuleMessage", PropertyScope.OUTBOUND);
 
-        //We need a session and current event for this test
-        RequestContext.setEvent(new DefaultMuleEvent(
-                message,
-                getTestInboundEndpoint("foo"),
-                getTestService(), new DefaultMuleSession()));
+        // We need a session and current event for this test
+        RequestContext.setEvent(new DefaultMuleEvent(message, getTestInboundEndpoint("foo"), getTestService()));
 
         message.setOutboundProperty("foo", "fooOutbound");
         message.setInvocationProperty("bar", "barInvocation");

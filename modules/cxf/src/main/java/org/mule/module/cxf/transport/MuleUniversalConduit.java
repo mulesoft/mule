@@ -18,7 +18,6 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.api.MuleSession;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.OutputHandler;
@@ -26,7 +25,6 @@ import org.mule.module.cxf.CxfConfiguration;
 import org.mule.module.cxf.CxfConstants;
 import org.mule.module.cxf.CxfOutboundMessageProcessor;
 import org.mule.module.cxf.support.DelegatingOutputStream;
-import org.mule.session.DefaultMuleSession;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transport.NullPayload;
 import org.mule.transport.http.HttpConnector;
@@ -157,14 +155,13 @@ public class MuleUniversalConduit extends AbstractConduit
             // we've got an out of band WS-RM message or a message from a standalone client
             MuleContext muleContext = configuration.getMuleContext();
             MuleMessage muleMsg = new DefaultMuleMessage(handler, muleContext);
-            MuleSession session = new DefaultMuleSession();
             
             String url = setupURL(message);
             
             try
             {
                 ep = getEndpoint(muleContext, url);
-                event = new DefaultMuleEvent(muleMsg, ep.getExchangePattern(), null, session);
+                event = new DefaultMuleEvent(muleMsg, ep.getExchangePattern(), null);
             }
             catch (Exception e)
             {

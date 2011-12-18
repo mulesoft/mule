@@ -20,7 +20,6 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.api.MuleSession;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.EndpointBuilder;
@@ -45,7 +44,6 @@ import org.mule.model.seda.SedaService;
 import org.mule.module.client.i18n.ClientMessages;
 import org.mule.module.client.remoting.notification.RemoteDispatcherNotification;
 import org.mule.object.SingletonObjectFactory;
-import org.mule.session.DefaultMuleSession;
 import org.mule.transport.AbstractConnector;
 import org.mule.transport.NullPayload;
 import org.mule.util.MapUtils;
@@ -181,11 +179,10 @@ public class RemoteDispatcherComponent implements Callable, Initialisable
             {
                 return handleException(null, new DefaultMuleException(ClientMessages.noSuchFlowConstruct(destComponent)));
             }
-            MuleSession session = new DefaultMuleSession();
+
             // Need to do this otherise when the event is invoked the
             // transformer associated with the Mule Admin queue will be invoked, but
             // the message will not be of expected type
-
             EndpointBuilder builder = new EndpointURIEndpointBuilder(inboundEndpoint);
             // TODO - is this correct? it stops any other transformer from being set
             builder.setTransformers(new LinkedList());

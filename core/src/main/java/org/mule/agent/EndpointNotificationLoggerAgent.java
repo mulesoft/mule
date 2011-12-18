@@ -14,7 +14,6 @@ import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.MuleSession;
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
@@ -22,7 +21,6 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.context.notification.ConnectionNotification;
 import org.mule.context.notification.ModelNotification;
 import org.mule.context.notification.MuleContextNotification;
-import org.mule.session.DefaultMuleSession;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +33,6 @@ public class EndpointNotificationLoggerAgent extends AbstractNotificationLoggerA
 {
 
     private OutboundEndpoint endpoint = null;
-    private MuleSession session;
     private List<Integer> ignoredNotifications = new ArrayList<Integer>();
 
 
@@ -61,8 +58,6 @@ public class EndpointNotificationLoggerAgent extends AbstractNotificationLoggerA
             {
                 throw new InitialisationException(CoreMessages.propertiesNotSet("endpoint"), this);
             }
-            // Create a session for sending notifications
-            session = new DefaultMuleSession();
         }
         catch (Exception e)
         {
@@ -101,7 +96,7 @@ public class EndpointNotificationLoggerAgent extends AbstractNotificationLoggerA
                     return;
                 }
 
-                MuleEvent event = new DefaultMuleEvent(msg, endpoint.getExchangePattern(), null, session);
+                MuleEvent event = new DefaultMuleEvent(msg, endpoint.getExchangePattern(), null);
                 endpoint.process(event);
             }
             catch (Exception e1)

@@ -27,7 +27,6 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transport.DispatchException;
 import org.mule.api.transport.PropertyScope;
 import org.mule.config.i18n.MessageFactory;
-import org.mule.session.DefaultMuleSession;
 
 import java.util.Collection;
 import java.util.Map;
@@ -156,8 +155,7 @@ public class Rules implements Initialisable, Disposable, MessageService
         endpointBuilder.setExchangePattern(exchangePattern);
         OutboundEndpoint ep = endpointBuilder.buildOutboundEndpoint();
        
-        DefaultMuleEvent event = new DefaultMuleEvent(message, ep.getExchangePattern(), flowConstruct,
-            new DefaultMuleSession());
+        DefaultMuleEvent event = new DefaultMuleEvent(message, ep.getExchangePattern(), flowConstruct);
 
         RequestContext.setEvent(event);
         MuleEvent resultEvent = ep.process(event);

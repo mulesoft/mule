@@ -23,7 +23,6 @@ import org.mule.api.config.MuleProperties;
 import org.mule.api.model.EntryPointResolver;
 import org.mule.api.model.InvocationResult;
 import org.mule.impl.model.resolvers.AnnotatedEntryPointResolver;
-import org.mule.session.DefaultMuleSession;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.util.IOUtils;
 import org.mule.util.StringDataSource;
@@ -89,7 +88,7 @@ public abstract class AbstractAnnotatedEntrypointResolverTestCase extends Abstra
                 message.addOutboundAttachment(s, attachments.get(s));
             }
         }
-        return new DefaultMuleEventContext(new DefaultMuleEvent(message, getTestInboundEndpoint("null"), null, new DefaultMuleSession()));
+        return new DefaultMuleEventContext(new DefaultMuleEvent(message, getTestInboundEndpoint("null"), null));
     }
 
     protected InvocationResult invokeResolver(String methodName, MuleEventContext eventContext) throws Exception

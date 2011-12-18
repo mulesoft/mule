@@ -19,7 +19,6 @@ import org.mule.api.construct.FlowConstruct;
 import org.mule.api.context.notification.BlockingServerEvent;
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.api.processor.MessageProcessor;
-import org.mule.session.DefaultMuleSession;
 import org.mule.transport.NullPayload;
 import org.mule.util.ObjectUtils;
 
@@ -100,9 +99,8 @@ public class MessageProcessorNotification extends ServerNotification implements 
         else if (rootId != null && flowConstruct != null)
         {
             DefaultMuleMessage msg = new DefaultMuleMessage(NullPayload.getInstance(), flowConstruct.getMuleContext());
-            DefaultMuleSession session = new DefaultMuleSession();
             msg.setMessageRootId(rootId);
-            return new DefaultMuleEvent(msg, MessageExchangePattern.REQUEST_RESPONSE, flowConstruct, session);
+            return new DefaultMuleEvent(msg, MessageExchangePattern.REQUEST_RESPONSE, flowConstruct);
         }
         else
         {

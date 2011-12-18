@@ -16,12 +16,10 @@ import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.MuleSession;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.module.client.MuleClient;
-import org.mule.session.DefaultMuleSession;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import org.custommonkey.xmlunit.XMLAssert;
@@ -65,8 +63,7 @@ public class CxfWsdlTestCase extends AbstractMuleContextTestCase
             muleContext.getEndpointFactory().getOutboundEndpoint(endpointBuilder);
 
         MuleMessage message = new DefaultMuleMessage("test1", muleContext);
-        MuleSession session = new DefaultMuleSession();
-        MuleEvent event = new DefaultMuleEvent(message, endpoint.getExchangePattern(), null, session);
+        MuleEvent event = new DefaultMuleEvent(message, endpoint.getExchangePattern(), null);
         MuleMessage reply = endpoint.process(event).getMessage();
 
         assertNotNull(reply);

@@ -19,7 +19,6 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.api.MuleSession;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.EndpointFactory;
@@ -36,7 +35,6 @@ import org.mule.module.client.remoting.ServerHandshake;
 import org.mule.module.client.remoting.UnsupportedWireFormatException;
 import org.mule.module.client.remoting.notification.RemoteDispatcherNotification;
 import org.mule.security.MuleCredentials;
-import org.mule.session.DefaultMuleSession;
 import org.mule.transformer.TransformerUtils;
 import org.mule.transport.NullPayload;
 import org.mule.util.ClassUtils;
@@ -111,8 +109,7 @@ public class RemoteDispatcher implements Disposable
         MuleMessage result = null;
 
         MuleEvent resultEvent = syncServerEndpoint.process(new DefaultMuleEvent(msg,
-            MessageExchangePattern.REQUEST_RESPONSE, new MuleClientFlowConstruct(muleContext),
-            new DefaultMuleSession()));
+            MessageExchangePattern.REQUEST_RESPONSE, new MuleClientFlowConstruct(muleContext)));
         if (resultEvent != null)
         {
             result = resultEvent.getMessage();
@@ -370,9 +367,8 @@ public class RemoteDispatcher implements Disposable
         }
 
         message.addProperties(action.getProperties());
-        MuleSession session = new DefaultMuleSession();
 
-        MuleEvent event = new DefaultMuleEvent(message, serverEndpoint.getExchangePattern(), null, session);
+        MuleEvent event = new DefaultMuleEvent(message, serverEndpoint.getExchangePattern(), null);
         event.setTimeout(timeout);
         if (logger.isDebugEnabled())
         {
@@ -460,7 +456,6 @@ public class RemoteDispatcher implements Disposable
     protected void updateContext(MuleMessage message, ImmutableEndpoint endpoint, boolean synchronous)
         throws MuleException
     {
-        RequestContext.setEvent(new DefaultMuleEvent(message, endpoint.getExchangePattern(),
-            null, new DefaultMuleSession()));
+        RequestContext.setEvent(new DefaultMuleEvent(message, endpoint.getExchangePattern(), null));
     }
 }
