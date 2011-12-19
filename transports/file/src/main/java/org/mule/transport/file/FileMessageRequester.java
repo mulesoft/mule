@@ -32,16 +32,21 @@ import java.io.IOException;
  */
 public class FileMessageRequester extends AbstractMessageRequester
 {
-    private final FileConnector connector;
+    private final FileConnector fileConnector;
 
+    private String workDir = null;
+    private String workFileNamePattern = null;
     private FilenameFilter filenameFilter = null;
     private FileFilter fileFilter = null;
-    
+
     public FileMessageRequester(InboundEndpoint endpoint) throws MuleException
     {
         super(endpoint);
-        this.connector = (FileConnector) endpoint.getConnector();
-        
+        this.fileConnector = (FileConnector) endpoint.getConnector();
+
+        this.workDir = fileConnector.getWorkDirectory();
+        this.workFileNamePattern = fileConnector.getWorkFileNamePattern();
+
         Filter filter = endpoint.getFilter();
         if (filter instanceof FilenameFilter)
         {
@@ -59,7 +64,7 @@ public class FileMessageRequester extends AbstractMessageRequester
 
     /**
      * There is no associated session for a file connector
-     * 
+     *
      * @throws org.mule.api.MuleException
      */
     public Object getDelegateSession() throws MuleException
@@ -71,7 +76,7 @@ public class FileMessageRequester extends AbstractMessageRequester
      * Will attempt to do a receive from a directory, if the endpointUri resolves to
      * a file name the file will be returned, otherwise the first file in the
      * directory according to the filename filter configured on the connector.
-     * 
+     *
      * @param timeout this is ignored when doing a receive on this dispatcher
      * @return a message containing file contents or null if there was notthing to
      *         receive
@@ -102,13 +107,13 @@ public class FileMessageRequester extends AbstractMessageRequester
                         endpoint.getEndpointURI().getAddress(), filenameFilter);
                 }
             }
-            
+
             if (result != null)
             {
-                boolean checkFileAge = connector.getCheckFileAge();
+                boolean checkFileAge = fileConnector.getCheckFileAge();
                 if (checkFileAge)
                 {
-                    long fileAge = connector.getFileAge();
+                    long fileAge = fileConnector.getFileAge();
                     long lastMod = result.lastModified();
                     long now = System.currentTimeMillis();
                     long thisFileAge = now - lastMod;
@@ -126,6 +131,20 @@ public class FileMessageRequester extends AbstractMessageRequester
                 // Don't we need to try to obtain a file lock as we do with receiver
                 String sourceFileOriginalName = result.getName();
 
+                File workFile = null;
+                if (workDir != null)
+                {
+                    String workFileName = formatUsingFilenameParser(sourceFileOriginalName, workFileNamePattern);
+
+                    // don't use new File() directly, see MULE-1112
+                    workFile = FileUtils.newFile(workDir, workFileName);
+
+                    fileConnector.move(result, workFile);
+
+                    // Now the Work File is the Source file
+                    result = workFile;
+                }
+
                 // set up destination file
                 File destinationFile = null;
                 String movDir = getMoveDirectory();
@@ -135,14 +154,7 @@ public class FileMessageRequester extends AbstractMessageRequester
                     String moveToPattern = getMoveToPattern();
                     if (moveToPattern != null)
                     {
-                        // This isn't nice but is needed as MuleMessage is required to
-                        // resolve the destination file name
-                        DefaultMuleMessage parserMesssage = new DefaultMuleMessage(null,
-                            connector.getMuleContext());
-                        parserMesssage.setOutboundProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, sourceFileOriginalName);
-
-                        destinationFileName =
-                            connector.getFilenameParser().getFilename(parserMesssage, moveToPattern);
+                        destinationFileName = formatUsingFilenameParser(sourceFileOriginalName, moveToPattern);
                     }
                     // don't use new File() directly, see MULE-1112
                     destinationFile = FileUtils.newFile(movDir, destinationFileName);
@@ -152,10 +164,10 @@ public class FileMessageRequester extends AbstractMessageRequester
                 String encoding = endpoint.getEncoding();
                 try
                 {
-                    if (connector.isStreaming())
+                    if (fileConnector.isStreaming())
                     {
                         ReceiverFileInputStream receiverStream = new ReceiverFileInputStream(result,
-                            connector.isAutoDelete(), destinationFile);
+                            fileConnector.isAutoDelete(), destinationFile);
                         returnMessage = createMuleMessage(receiverStream, encoding);
                     }
                     else
@@ -172,7 +184,7 @@ public class FileMessageRequester extends AbstractMessageRequester
                 }
                 returnMessage.setOutboundProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, sourceFileOriginalName);
 
-                if (!connector.isStreaming())
+                if (!fileConnector.isStreaming())
                 {
                     moveOrDelete(result, destinationFile);
                 }
@@ -183,6 +195,17 @@ public class FileMessageRequester extends AbstractMessageRequester
             }
         }
         return null;
+    }
+
+    protected String formatUsingFilenameParser(String originalName, String pattern)
+    {
+        // This isn't nice but is needed as MuleMessage is required to resolve
+        // destination file name
+        DefaultMuleMessage fileParserMessasge = new DefaultMuleMessage(null, fileConnector.getMuleContext());
+        fileParserMessasge.setOutboundProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME,
+            originalName);
+
+        return fileConnector.getFilenameParser().getFilename(fileParserMessasge, pattern);
     }
 
     private void moveOrDelete(final File sourceFile, File destinationFile) throws DefaultMuleException
@@ -201,7 +224,7 @@ public class FileMessageRequester extends AbstractMessageRequester
                     destinationFile.getAbsolutePath()));
             }
         }
-        if (connector.isAutoDelete())
+        if (fileConnector.isAutoDelete())
         {
             // no moveTo directory
             if (destinationFile == null)
@@ -213,7 +236,6 @@ public class FileMessageRequester extends AbstractMessageRequester
                 }
             }
         }
-
     }
 
     @Override
@@ -239,7 +261,7 @@ public class FileMessageRequester extends AbstractMessageRequester
         String moveDirectory = (String) endpoint.getProperty(FileConnector.PROPERTY_MOVE_TO_DIRECTORY);
         if (moveDirectory == null)
         {
-            moveDirectory = connector.getMoveToDirectory();
+            moveDirectory = fileConnector.getMoveToDirectory();
         }
         return moveDirectory;
     }
@@ -249,9 +271,8 @@ public class FileMessageRequester extends AbstractMessageRequester
         String pattern = (String) endpoint.getProperty(FileConnector.PROPERTY_MOVE_TO_PATTERN);
         if (pattern == null)
         {
-            pattern = connector.getMoveToPattern();
+            pattern = fileConnector.getMoveToPattern();
         }
         return pattern;
     }
-
 }
