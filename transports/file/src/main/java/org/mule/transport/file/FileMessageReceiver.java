@@ -94,14 +94,14 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
         {
             throw new CreateException(FileMessages.invalidFileFilter(endpoint.getEndpointURI()), this);
         }
-        
+
         checkMustForceSync(endpoint);
     }
 
     /**
      * If we will be autodeleting File objects, events must be processed synchronously to avoid a race
      */
-    private void checkMustForceSync(InboundEndpoint endpoint) throws CreateException
+    private void checkMustForceSync(InboundEndpoint ep) throws CreateException
     {
         boolean connectorIsAutoDelete = false;
         boolean isStreaming = false;
@@ -112,7 +112,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
         }
 
         boolean messageFactoryConsumes = (createMuleMessageFactory() instanceof FileContentsMuleMessageFactory);
-        
+
         forceSync = connectorIsAutoDelete && !messageFactoryConsumes && !isStreaming;
     }
 
@@ -191,7 +191,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
     public void processFile(File sourceFile) throws MuleException
     {
         FileConnector fileConnector = (FileConnector) connector;
-        
+
         //TODO RM*: This can be put in a Filter. Also we can add an AndFileFilter/OrFileFilter to allow users to
         //combine file filters (since we can only pass a single filter to File.listFiles, we would need to wrap
         //the current And/Or filters to extend {@link FilenameFilter}
@@ -242,22 +242,22 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
         // destination file name
         DefaultMuleMessage fileParserMessasge = new DefaultMuleMessage(null, connector.getMuleContext());
         fileParserMessasge.setOutboundProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, sourceFileOriginalName);
-        
+
         File workFile = null;
         if (workDir != null)
         {
             String workFileName = sourceFileOriginalName;
-            
+
             workFileName = fileConnector.getFilenameParser().getFilename(fileParserMessasge,
                     workFileNamePattern);
             // don't use new File() directly, see MULE-1112
             workFile = FileUtils.newFile(workDir, workFileName);
-            
-            move(sourceFile, workFile);
+
+            fileConnector.move(sourceFile, workFile);
             // Now the Work File is the Source file
             sourceFile = workFile;
         }
-        
+
         // set up destination file
         File destinationFile = null;
         if (moveDir != null)
@@ -394,7 +394,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
      * Try to acquire a lock on a file and release it immediately. Usually used as a
      * quick check to see if another process is still holding onto the file, e.g. a
      * large file (more than 100MB) is still being written to.
-     * 
+     *
      * @param sourceFile file to check
      * @return <code>true</code> if the file can be locked
      */
@@ -461,7 +461,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
 
     /**
      * Get a list of files to be processed.
-     * 
+     *
      * @return an array of files to be processed.
      * @throws org.mule.api.MuleException which will wrap any other exceptions or
      *             errors.
@@ -491,7 +491,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
         {
             files = currentDirectory.listFiles(filenameFilter);
         }
-        
+
         // the listFiles calls above may actually return null (check the JDK code).
         if (files == null)
         {
@@ -516,7 +516,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
 
     /**
      * Exception tolerant roll back method
-     * 
+     *
      * @throws Throwable
      */
     protected void rollbackFileMove(File sourceFile, String destinationFilePath) throws IOException
@@ -532,6 +532,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
         }
     }
 
+    @SuppressWarnings("unchecked")
     protected Comparator<File> getComparator() throws Exception
     {
         Object comparatorClassName = getEndpoint().getProperty(COMPARATOR_CLASS_NAME_PROPERTY);
@@ -543,30 +544,11 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
             {
                 reverse = Boolean.valueOf((String) reverseProperty);
             }
-            
+
             Class<?> clazz = Class.forName(comparatorClassName.toString());
             Comparator<?> comparator = (Comparator<?>)clazz.newInstance();
             return reverse ? new ReverseComparator(comparator) : comparator;
         }
         return null;
     }
-    
-    private void move(final File sourceFile,File destinationFile) throws DefaultMuleException
-    {
-        if (destinationFile != null)
-        {
-            // move sourceFile to new destination. Do not use FileUtils here as it ultimately
-            // falls back to copying the file which will cause problems on large files again -
-            // which is what we're trying to avoid in the first place
-            boolean fileWasMoved = sourceFile.renameTo(destinationFile);
-
-            // move didn't work - bail out
-            if (!fileWasMoved)
-            {
-                throw new DefaultMuleException(FileMessages.failedToMoveFile(sourceFile.getAbsolutePath(),
-                    destinationFile.getAbsolutePath()));
-            }
-        }
-    }
-    
 }

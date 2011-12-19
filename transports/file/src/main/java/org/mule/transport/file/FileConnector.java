@@ -10,6 +10,7 @@
 
 package org.mule.transport.file;
 
+import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -28,6 +29,7 @@ import org.mule.transformer.simple.ByteArrayToSerializable;
 import org.mule.transformer.simple.SerializableToByteArray;
 import org.mule.transport.AbstractConnector;
 import org.mule.transport.file.filters.FilenameWildcardFilter;
+import org.mule.transport.file.i18n.FileMessages;
 import org.mule.util.FileUtils;
 
 import java.io.File;
@@ -565,6 +567,24 @@ public class FileConnector extends AbstractConnector
         catch (IOException e)
         {
             throw new DispatchException(CoreMessages.streamingFailedNoStream(), event, endpoint, e);
+        }
+    }
+
+    protected void move(final File sourceFile, File destinationFile) throws DefaultMuleException
+    {
+        if (destinationFile != null)
+        {
+            // move sourceFile to new destination. Do not use FileUtils here as it ultimately
+            // falls back to copying the file which will cause problems on large files again -
+            // which is what we're trying to avoid in the first place
+            boolean fileWasMoved = sourceFile.renameTo(destinationFile);
+
+            // move didn't work - bail out
+            if (!fileWasMoved)
+            {
+                throw new DefaultMuleException(FileMessages.failedToMoveFile(sourceFile.getAbsolutePath(),
+                    destinationFile.getAbsolutePath()));
+            }
         }
     }
 
