@@ -53,7 +53,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -635,21 +634,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     public Set<String> getPropertyNames(PropertyScope scope)
     {
         assertAccess(READ);
-        if (PropertyScope.SESSION.equals(scope))
-        {
-            if (RequestContext.getEvent() != null)
-            {
-                return RequestContext.getEvent().getSession().getPropertyNamesAsSet();
-            }
-            else
-            {
-                return Collections.emptySet();
-            }
-        }
-        else
-        {
-            return properties.getScopedProperties(scope).keySet();
-        }
+        return properties.getScopedProperties(scope).keySet();
     }
 
     @Override
@@ -1926,5 +1911,10 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         newMessage.setCorrelationSequence(getCorrelationSequence());
         newMessage.setReplyTo(getReplyTo());
         newMessage.setEncoding(getEncoding());
+    }
+    
+    void setSessionProperties(Map<String, Object> sessionProperties)
+    {
+        properties.scopedMap.put(PropertyScope.SESSION, sessionProperties);
     }
 }

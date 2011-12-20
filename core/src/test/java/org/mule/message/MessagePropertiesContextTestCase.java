@@ -9,9 +9,14 @@
  */
 package org.mule.message;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.MessagePropertiesContext;
-import org.mule.RequestContext;
 import org.mule.api.MuleEvent;
+import org.mule.api.MuleMessage;
 import org.mule.api.transport.PropertyScope;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
@@ -20,19 +25,8 @@ import java.util.Set;
 import org.apache.commons.lang.SerializationUtils;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-
 public class MessagePropertiesContextTestCase extends AbstractMuleContextTestCase
 {
-    @Override
-    public void doTearDown()
-    {
-        RequestContext.clear();
-    }
-    
     @Test
     public void testPropertiesCase() throws Exception
     {
@@ -49,14 +43,13 @@ public class MessagePropertiesContextTestCase extends AbstractMuleContextTestCas
     {
         MuleEvent e = getTestEvent("testing");
         e.getSession().setProperty("SESSION_PROP", "Value1");
-        RequestContext.setEvent(e);
 
-        MessagePropertiesContext mpc = new MessagePropertiesContext();
+        MuleMessage message = e.getMessage();
 
-        assertEquals("Value1", mpc.getProperty("SESSION_PROP", PropertyScope.SESSION));
-        //test case insensitivity
-        assertEquals("Value1", mpc.getProperty("SESSION_prop", PropertyScope.SESSION));
-        assertNull(mpc.getProperty("SESSION_X", PropertyScope.SESSION));
+        assertEquals("Value1", message.getProperty("SESSION_PROP", PropertyScope.SESSION));
+        // test case insensitivity
+        assertEquals("Value1", message.getProperty("SESSION_prop", PropertyScope.SESSION));
+        assertNull(message.getProperty("SESSION_X", PropertyScope.SESSION));
     }
 
     @Test
@@ -64,23 +57,22 @@ public class MessagePropertiesContextTestCase extends AbstractMuleContextTestCas
     {
         MuleEvent e = getTestEvent("testing");
         e.getSession().setProperty("Prop", "session");
-        RequestContext.setEvent(e);
 
-        MessagePropertiesContext mpc = new MessagePropertiesContext();
+        MuleMessage message = e.getMessage();
         //Note that we cannot write to the Inbound scope, its read only
-        mpc.setProperty("Prop", "invocation", PropertyScope.INVOCATION);
-        mpc.setProperty("Prop", "outbound", PropertyScope.OUTBOUND);
+        message.setProperty("Prop", "invocation", PropertyScope.INVOCATION);
+        message.setProperty("Prop", "outbound", PropertyScope.OUTBOUND);
 
-        assertEquals("outbound", mpc.getProperty("Prop", PropertyScope.OUTBOUND));
-        mpc.removeProperty("Prop", PropertyScope.OUTBOUND);
+        assertEquals("outbound", message.getProperty("Prop", PropertyScope.OUTBOUND));
+        message.removeProperty("Prop", PropertyScope.OUTBOUND);
 
-        assertEquals("invocation", mpc.getProperty("Prop", PropertyScope.INVOCATION));
-        mpc.removeProperty("Prop", PropertyScope.INVOCATION);
+        assertEquals("invocation", message.getProperty("Prop", PropertyScope.INVOCATION));
+        message.removeProperty("Prop", PropertyScope.INVOCATION);
 
-        assertEquals("session", mpc.getProperty("Prop", PropertyScope.SESSION));
-        assertNull(mpc.getProperty("Prop", PropertyScope.INBOUND));
-        assertNull(mpc.getProperty("Prop", PropertyScope.INVOCATION));
-        assertNull(mpc.getProperty("Prop", PropertyScope.OUTBOUND));
+        assertEquals("session", message.getProperty("Prop", PropertyScope.SESSION));
+        assertNull(message.getProperty("Prop", PropertyScope.INBOUND));
+        assertNull(message.getProperty("Prop", PropertyScope.INVOCATION));
+        assertNull(message.getProperty("Prop", PropertyScope.OUTBOUND));
     }
 
     @Test

@@ -10,9 +10,12 @@
 
 package org.mule.routing.filters;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.DefaultMuleMessage;
 import org.mule.MessageExchangePattern;
-import org.mule.RequestContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.transport.PropertyScope;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -21,10 +24,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 public class MessagePropertyFilterTestCase extends AbstractMuleContextTestCase
 {
@@ -42,7 +41,6 @@ public class MessagePropertyFilterTestCase extends AbstractMuleContextTestCase
     public void testMessagePropertyFilterSessionScope() throws Exception
     {
         MuleMessage message = new DefaultMuleMessage("blah", muleContext);
-        RequestContext.setEvent(getTestEvent(message));
         MessagePropertyFilter filter = new MessagePropertyFilter("foo=bar");
         filter.setScope(PropertyScope.SESSION_NAME);
         assertFalse(filter.accept(message));
@@ -54,7 +52,6 @@ public class MessagePropertyFilterTestCase extends AbstractMuleContextTestCase
     public void testMessagePropertyFilterInboundScope() throws Exception
     {
         DefaultMuleMessage message = new DefaultMuleMessage("blah", muleContext);
-        RequestContext.setEvent(getTestEvent(message));
         MessagePropertyFilter filter = new MessagePropertyFilter("inbound:foo=bar");
         assertEquals("inbound", filter.getScope());
 
@@ -67,7 +64,6 @@ public class MessagePropertyFilterTestCase extends AbstractMuleContextTestCase
     public void testMessagePropertyFilterWithURL() throws Exception
     {
         DefaultMuleMessage message = new DefaultMuleMessage("blah", muleContext);
-        RequestContext.setEvent(getTestEvent(message));
         MessagePropertyFilter filter = new MessagePropertyFilter("inbound:foo=http://foo.com");
         assertEquals("inbound", filter.getScope());
 

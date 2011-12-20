@@ -14,6 +14,7 @@ import org.mule.api.security.SecurityContext;
 import org.mule.api.transport.SessionHandler;
 
 import java.io.Serializable;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -106,4 +107,6 @@ public interface MuleSession extends Serializable
      * @param updatedSession mule session with updated properties
      */
     void merge(MuleSession updatedSession);
+    
+    Map<String, Object> getProperties();
 }

@@ -626,7 +626,10 @@ public final class MuleTestUtils
 
     public static Mock getMockSession()
     {
-        return new Mock(MuleSession.class, "umoSession");
+        Mock session = new Mock(MuleSession.class, "umoSession");
+        session.matchAndReturn("getProperties", new HashMap<String, Object>());
+        return session;
+
     }
 
     public static Mock getMockMessageDispatcher()

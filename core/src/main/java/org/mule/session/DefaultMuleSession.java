@@ -181,4 +181,10 @@ public final class DefaultMuleSession implements MuleSession
         }
     }
 
+    @Override
+    public Map<String, Object> getProperties()
+    {
+        return properties;
+    }
+
 }

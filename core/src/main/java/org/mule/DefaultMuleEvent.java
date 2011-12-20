@@ -207,6 +207,10 @@ public class DefaultMuleEvent extends EventObject
         this.timeout = timeout;
         this.transacted = false;
         this.synchronous = resolveEventSynchronicity();
+        if (message instanceof DefaultMuleMessage)
+        {
+            ((DefaultMuleMessage) message).setSessionProperties(session.getProperties());
+        }
     }
 
     // Constructors for inbound endpoint
@@ -251,6 +255,10 @@ public class DefaultMuleEvent extends EventObject
         this.transacted = endpoint.getTransactionConfig().isTransacted();
         fillProperties(endpoint);
         this.synchronous = resolveEventSynchronicity();
+        if (message instanceof DefaultMuleMessage)
+        {
+            ((DefaultMuleMessage) message).setSessionProperties(session.getProperties());
+        }
     }
 
     // Constructors to copy MuleEvent
@@ -319,6 +327,11 @@ public class DefaultMuleEvent extends EventObject
         this.timeout = rewriteEvent.getTimeout();
         this.transacted = rewriteEvent.isTransacted();
         this.synchronous = synchronous;
+        if (message instanceof DefaultMuleMessage)
+        {
+            ((DefaultMuleMessage) message).setSessionProperties(session.getProperties());
+        }
+
     }
 
     // Constructor with everything just in case
@@ -355,6 +368,10 @@ public class DefaultMuleEvent extends EventObject
         this.timeout = timeout;
         this.outputStream = outputStream;
         this.replyToDestination = replyToDestination;
+        if (message instanceof DefaultMuleMessage)
+        {
+            ((DefaultMuleMessage) message).setSessionProperties(session.getProperties());
+        }
     }
 
     protected boolean resolveEventSynchronicity()

@@ -65,6 +65,6 @@ public class DefaultRouterResultsHandler implements RouterResultsHandler
             aggregate = coll;
         }
 
-        return aggregate == null ? null : RequestContext.setEvent(new DefaultMuleEvent(aggregate, previous, results.get(results.size()-1).getSession()));
+        return aggregate == null ? null : RequestContext.setEvent(new DefaultMuleEvent(aggregate, previous, previous.getSession()));
     }
 }

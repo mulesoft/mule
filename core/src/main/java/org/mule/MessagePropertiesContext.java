@@ -10,7 +10,6 @@
 package org.mule;
 
 import org.mule.api.MuleEvent;
-import org.mule.api.MuleSession;
 import org.mule.api.transport.PropertyScope;
 import org.mule.util.CaseInsensitiveHashMap;
 import org.mule.util.MapUtils;
@@ -71,6 +70,7 @@ public class MessagePropertiesContext implements Serializable
         scopedMap.put(PropertyScope.INVOCATION, new CaseInsensitiveHashMap/*<String, Object>*/(6));
         scopedMap.put(PropertyScope.INBOUND, new CaseInsensitiveHashMap/*<String, Object>*/(6));
         scopedMap.put(PropertyScope.OUTBOUND, new CaseInsensitiveHashMap/*<String, Object>*/(6));
+        scopedMap.put(PropertyScope.SESSION, new CaseInsensitiveHashMap/*<String, Object>*/(6));
     }
 
     protected Map<String, Object> getScopedProperties(PropertyScope scope)
@@ -121,19 +121,7 @@ public class MessagePropertiesContext implements Serializable
             scope = PropertyScope.OUTBOUND;
         }
 
-        T value = null;
-        if (PropertyScope.SESSION.equals(scope))
-        {
-            if (RequestContext.getEvent() != null)
-            {
-                value = (T) RequestContext.getEvent().getSession().getProperty(key);
-            }
-        }
-        else
-        {
-            value = (T) scopedMap.get(scope).get(key);
-        }
-        return value;
+        return (T) scopedMap.get(scope).get(key);
     }
 
     /**
@@ -158,24 +146,9 @@ public class MessagePropertiesContext implements Serializable
             return;
         }
 
-        //checkScopeForWriteAccess(scope);
-        if (PropertyScope.SESSION.equals(scope))
-        {
-            if (RequestContext.getEvent() != null)
-            {
-                MuleSession session = RequestContext.getEvent().getSession();
-                for (Object key : session.getPropertyNamesAsSet())
-                {
-                    session.removeProperty(key);
-                }
-            }
-        }
-        else
-        {
-            Map<String, Object> props = getScopedProperties(scope);
-            keySet.removeAll(props.keySet());
-            props.clear();
-        }
+        Map<String, Object> props = getScopedProperties(scope);
+        keySet.removeAll(props.keySet());
+        props.clear();
     }
 
     /**
@@ -213,23 +186,12 @@ public class MessagePropertiesContext implements Serializable
             return removeProperty(key);
         }
 
-        Object value = null;
-        if (PropertyScope.SESSION.equals(scope))
-        {
-            if (RequestContext.getEvent() != null)
-            {
-                value = RequestContext.getEvent().getSession().removeProperty(key);
-            }
-        }
-        else
-        {
-            value = getScopedProperties(scope).remove(key);
-        }
+        Object value = getScopedProperties(scope).remove(key);
 
         // Only remove the property from the keySet if it does not exist in any other scope besides this one.
         if (getProperty(key, PropertyScope.OUTBOUND) == null
-                && getProperty(key, PropertyScope.INVOCATION) == null
-                && getProperty(key, PropertyScope.INBOUND) == null)
+            && getProperty(key, PropertyScope.INVOCATION) == null
+            && getProperty(key, PropertyScope.INBOUND) == null)
         {
             keySet.remove(key);
         }
@@ -261,25 +223,8 @@ public class MessagePropertiesContext implements Serializable
      */
     public void setProperty(String key, Object value, PropertyScope scope)
     {
-        //checkScopeForWriteAccess(scope);
-        if (PropertyScope.SESSION.equals(scope))
-        {
-            if (RequestContext.getEvent() != null)
-            {
-                RequestContext.getEvent().getSession().setProperty(key, value);
-            }
-            else
-            {
-                logger.warn(String.format("Detected an attempt to set a session property, " +
-                                          "but MuleEvent isn't available in this thread. Key/value: %s=%s %s",
-                                          key, value, Thread.currentThread()));
-            }
-        }
-        else
-        {
-            getScopedProperties(scope).put(key, value);
-            keySet.add(key);
-        }
+        getScopedProperties(scope).put(key, value);
+        keySet.add(key);
     }
 
     /**
@@ -290,10 +235,6 @@ public class MessagePropertiesContext implements Serializable
     {
         Set<String> allProps = new HashSet<String>();
         allProps.addAll(keySet);
-        if (RequestContext.getEvent() != null)
-        {
-            allProps.addAll(RequestContext.getEvent().getSession().getPropertyNamesAsSet());
-        }
         return allProps;
     }
 
@@ -302,21 +243,7 @@ public class MessagePropertiesContext implements Serializable
      */
     public Set<String> getPropertyNames(PropertyScope scope)
     {
-        if (PropertyScope.SESSION.equals(scope))
-        {
-            if (RequestContext.getEvent() != null)
-            {
-                return RequestContext.getEvent().getSession().getPropertyNamesAsSet();
-            }
-            else
-            {
-                return Collections.emptySet();
-            }
-        }
-        else
-        {
-            return Collections.unmodifiableSet(getScopedProperties(scope).keySet());
-        }
+        return Collections.unmodifiableSet(getScopedProperties(scope).keySet());
     }
 
     protected void checkScopeForWriteAccess(PropertyScope scope)
