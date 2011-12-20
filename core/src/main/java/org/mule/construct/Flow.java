@@ -63,7 +63,14 @@ public class Flow extends AbstractPipeline implements MessageProcessor
             {
                 result.getMessage().release();
             }
-            return new DefaultMuleEvent(result, event.getFlowConstruct());
+            if (result != null)
+            {
+                return new DefaultMuleEvent(result, event.getFlowConstruct());
+            }
+            else
+            {
+                return null;
+            }
         }
         catch (Exception e)
         {
