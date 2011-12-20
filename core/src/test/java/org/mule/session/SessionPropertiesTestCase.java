@@ -20,7 +20,6 @@ import static org.junit.Assert.fail;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.MessageExchangePattern;
-import org.mule.RequestContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
@@ -52,8 +51,6 @@ public class SessionPropertiesTestCase extends AbstractMuleContextTestCase
 
         MuleEvent event = new DefaultMuleEvent(message, MessageExchangePattern.ONE_WAY, getTestService());
 
-        RequestContext.setEvent(event);
-
         assertNull(message.getProperty("key", PropertyScope.SESSION));
         assertNull(event.getSession().getProperty("key"));
 
@@ -68,8 +65,6 @@ public class SessionPropertiesTestCase extends AbstractMuleContextTestCase
     {
         MuleMessage message = new DefaultMuleMessage("data", muleContext);
         MuleEvent event = new DefaultMuleEvent(message, MessageExchangePattern.ONE_WAY, getTestService());
-
-        RequestContext.setEvent(event);
 
         Object nonSerializable = new Object();
         message.setProperty("key", "value", PropertyScope.SESSION);
@@ -92,8 +87,6 @@ public class SessionPropertiesTestCase extends AbstractMuleContextTestCase
     {
         MuleMessage message = new DefaultMuleMessage("data", muleContext);
         MuleEvent event = new DefaultMuleEvent(message, MessageExchangePattern.ONE_WAY, getTestService());
-
-        RequestContext.setEvent(event);
 
         Object nonSerializable = new Object();
         event.getSession().setProperty("key", "value");
