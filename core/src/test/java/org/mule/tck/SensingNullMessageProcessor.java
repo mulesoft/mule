@@ -15,12 +15,14 @@ import org.mule.api.MuleException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.source.MessageSource;
 import org.mule.util.ObjectUtils;
+import org.mule.util.concurrent.Latch;
 
 public class SensingNullMessageProcessor implements MessageProcessor
 {
     public MuleEvent event;
     protected InternalMessageSource source = new InternalMessageSource();
     private long waitTime = 0;
+    public Latch latch = new Latch();
 
     public MuleEvent process(MuleEvent event) throws MuleException
     {
@@ -36,6 +38,7 @@ public class SensingNullMessageProcessor implements MessageProcessor
             }
         }
         this.event = event;
+        latch.countDown();
         if (source.listener != null)
         {
             return source.listener.process(event);
