@@ -50,7 +50,6 @@ import javax.xml.namespace.QName;
  */
 public class URIBuilder implements AnnotatedObject
 {
-
     private static final String DOTS = ":";
     private static final String DOTS_SLASHES = DOTS + "//";
     private static final String QUERY = "?";
@@ -83,7 +82,7 @@ public class URIBuilder implements AnnotatedObject
     private String user;
     private String password;
     private String host;
-    private Integer port;
+    private String port;
     private String path;
     private Map queryMap;
     private MuleContext muleContext;
@@ -156,10 +155,22 @@ public class URIBuilder implements AnnotatedObject
         assertAddressConsistent();
     }
 
+    /**
+     * For backwards compatibility
+     */
     public void setPort(int port)
     {
         assertNotUsed();
-        this.port = Integer.valueOf(port);
+        this.port = Integer.toString(port);
+    }
+
+    /**
+     * Allows ports to be Mule expressions
+     */
+    public void setPort(String port)
+    {
+        assertNotUsed();
+        this.port = port;
     }
 
     public void setProtocol(String protocol)

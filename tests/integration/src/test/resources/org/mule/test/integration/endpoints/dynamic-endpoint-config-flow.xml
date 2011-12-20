@@ -28,7 +28,10 @@
 
     <flow name="service1C">
         <vm:inbound-endpoint path="in3" exchange-pattern="request-response"/>
-        <http:outbound-endpoint host="localhost" port="62346" path="xxx#[header:INBOUND:testProp]"
+        <message-properties-transformer scope="invocation">
+            <add-message-property key="testPort" value="62346"/>
+        </message-properties-transformer>
+        <http:outbound-endpoint host="localhost" port="#[header:INVOCATION:testPort]" path="xxx#[header:INBOUND:testProp]"
             exchange-pattern="request-response"/>
     </flow>
 

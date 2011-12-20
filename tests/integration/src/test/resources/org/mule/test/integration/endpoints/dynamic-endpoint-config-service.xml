@@ -44,12 +44,17 @@
 
         <service name="service1C">
             <inbound>
-                <vm:inbound-endpoint path="in3" exchange-pattern="request-response"/>
+                <vm:inbound-endpoint path="in3" exchange-pattern="request-response">
+                    <message-properties-transformer scope="invocation">
+                        <add-message-property key="testPort" value="62346"/>
+                    </message-properties-transformer>
+                </vm:inbound-endpoint>
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <http:outbound-endpoint host="localhost" port="62346" path="xxx#[header:INBOUND:testProp]"
-                                            exchange-pattern="request-response"/>
+                    <http:outbound-endpoint host="localhost" port="#[header:INVOCATION:testPort]" path="xxx#[header:INBOUND:testProp]"
+                                            exchange-pattern="request-response">
+                    </http:outbound-endpoint>
                 </pass-through-router>
             </outbound>
         </service>
