@@ -1,7 +1,5 @@
-package org.mule.endpoint;
-
 /*
- * $Id$
+ * $Id: URIBuilder.java 23505 2011-12-20 08:20:49Z mike.schilling $
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  *
@@ -9,6 +7,8 @@ package org.mule.endpoint;
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
+package org.mule.endpoint;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
