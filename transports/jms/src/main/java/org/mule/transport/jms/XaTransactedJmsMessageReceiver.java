@@ -20,6 +20,7 @@ import org.mule.api.transport.Connector;
 import org.mule.retry.policies.NoRetryPolicyTemplate;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.transaction.TransactionTemplate;
+import org.mule.transaction.TransactionTemplateFactory;
 import org.mule.transaction.XaTransaction;
 import org.mule.transport.ConnectException;
 import org.mule.transport.TransactedPollingMessageReceiver;
@@ -38,7 +39,7 @@ import javax.jms.Message;
 import javax.jms.MessageConsumer;
 import javax.jms.Session;
 
-public class XaTransactedJmsMessageReceiver extends TransactedPollingMessageReceiver
+public class    XaTransactedJmsMessageReceiver extends TransactedPollingMessageReceiver
 {
     public static final long DEFAULT_JMS_POLL_FREQUENCY = 100;
     public static final TimeUnit DEFAULT_JMS_POLL_TIMEUNIT = TimeUnit.MILLISECONDS;
@@ -158,9 +159,7 @@ public class XaTransactedJmsMessageReceiver extends TransactedPollingMessageRece
     {
         logger.debug("Polling...");
 
-        TransactionTemplate<Void> tt = new TransactionTemplate<Void>(
-                                                endpoint.getTransactionConfig(),
-                                                connector.getMuleContext());
+        TransactionTemplate<Void> tt = TransactionTemplateFactory.<Void>createMainTransactionTemplate(endpoint.getTransactionConfig(),connector.getMuleContext());
         TransactionCallback<Void> cb = new TransactionCallback<Void>()
         {
             @Override

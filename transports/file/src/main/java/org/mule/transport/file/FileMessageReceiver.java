@@ -21,8 +21,11 @@ import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.exception.RollbackSourceCallback;
 import org.mule.api.lifecycle.CreateException;
+import org.mule.api.transaction.TransactionCallback;
 import org.mule.api.transport.Connector;
 import org.mule.api.transport.PropertyScope;
+import org.mule.transaction.TransactionTemplate;
+import org.mule.transaction.TransactionTemplateFactory;
 import org.mule.transport.AbstractPollingMessageReceiver;
 import org.mule.transport.ConnectException;
 import org.mule.transport.file.i18n.FileMessages;
@@ -311,8 +314,42 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
             message.setProperty(MuleProperties.MULE_FORCE_SYNC_PROPERTY, Boolean.TRUE, PropertyScope.INBOUND);
         }
 
+        final Object originalPayload = message.getPayload();
+
         try
         {
+            TransactionTemplate<Void> mainTransactionTemplate = TransactionTemplateFactory.<Void>createMainTransactionTemplate(endpoint.getTransactionConfig(), connector.getMuleContext());
+            final File finalDestinationFile = destinationFile;
+            final MuleMessage finalMessage = message;
+            mainTransactionTemplate.execute(new TransactionCallback<Void>() {
+                @Override
+                public Void doInTransaction() throws Exception
+                {
+                    if (!fileConnector.isStreaming())
+                    {
+                        moveAndDelete(sourceFile, finalDestinationFile, originalSourceFileName, finalMessage);
+                    }
+                    else
+                    {
+                        try
+                        {
+                            // If we are streaming no need to move/delete now, that will be done when
+                            // stream is closed
+                            finalMessage.setOutboundProperty(FileConnector.PROPERTY_FILENAME, sourceFile.getName());
+                            FileMessageReceiver.this.routeMessage(finalMessage);
+                        }
+                        catch (Exception e)
+                        {
+                            if (originalPayload instanceof ReceiverFileInputStream)
+                            {
+                                ((ReceiverFileInputStream)originalPayload).setStreamProcessingError(true);
+                            }
+                            throw e;
+                        }
+                    }
+                    return null;
+                }
+            });
             if (!fileConnector.isStreaming())
             {
                 moveAndDelete(sourceFile, destinationFile, originalSourceFileName, message);
@@ -331,9 +368,9 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
 
             if (fileConnector.isStreaming())
             {
-                if (message.getPayload() instanceof ReceiverFileInputStream)
+                if (originalPayload instanceof ReceiverFileInputStream)
                 {
-                    final ReceiverFileInputStream receiverFileInputStream = (ReceiverFileInputStream) message.getPayload();
+                    final ReceiverFileInputStream receiverFileInputStream = (ReceiverFileInputStream) originalPayload;
                     rollbackMethod = new RollbackSourceCallback()
                     {
                         @Override
@@ -365,8 +402,11 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
 
             if (e instanceof MessagingException)
             {
-                MuleEvent event = ((MessagingException) e).getEvent();
-                event.getFlowConstruct().getExceptionListener().handleException(e, event, rollbackMethod);
+                if (((MessagingException) e).getEvent().getMessage().getExceptionPayload() != null && rollbackMethod != null)
+                {
+                    //Exception not handled
+                    rollbackMethod.rollback();
+                }
             }
             else
             {

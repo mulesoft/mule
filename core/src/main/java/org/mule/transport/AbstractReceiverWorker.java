@@ -30,6 +30,7 @@ import java.util.List;
 import javax.resource.spi.work.Work;
 
 import org.apache.commons.lang.SerializationException;
+import org.mule.transaction.TransactionTemplateFactory;
 
 /**
  * A base Worker used by Transport {@link org.mule.api.transport.MessageReceiver} implementations.
@@ -72,7 +73,7 @@ public abstract class AbstractReceiverWorker implements Work
         }
         catch (MessagingException e)
         {
-            receiver.getFlowConstruct().getExceptionListener().handleException(e, e.getEvent());
+            //already managed by TransactionTemplate
         }
         catch (Exception e)
         {
@@ -87,7 +88,7 @@ public abstract class AbstractReceiverWorker implements Work
      */
     public void processMessages() throws Exception
     {
-        TransactionTemplate tt = new TransactionTemplate(endpoint.getTransactionConfig(), receiver.getConnector().getMuleContext());
+        TransactionTemplate tt = TransactionTemplateFactory.createMainTransactionTemplate(endpoint.getTransactionConfig(), receiver.getConnector().getMuleContext());
 
         // Receive messages and process them in a single transaction
         // Do not enable threading here, but serveral workers

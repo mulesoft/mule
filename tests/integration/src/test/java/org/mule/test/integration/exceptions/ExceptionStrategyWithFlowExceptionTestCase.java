@@ -13,6 +13,7 @@ package org.mule.test.integration.exceptions;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
@@ -46,7 +47,7 @@ public class ExceptionStrategyWithFlowExceptionTestCase extends FunctionalTestCa
     {
         public MuleEvent process(MuleEvent event) throws MuleException
         {
-            throw new RuntimeException();
+            throw new MessagingException(event,null);
         }
     }
 }

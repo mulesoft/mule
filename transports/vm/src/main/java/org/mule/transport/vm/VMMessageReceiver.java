@@ -11,14 +11,15 @@
 package org.mule.transport.vm;
 
 import org.mule.DefaultMuleMessage;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
-import org.mule.api.ThreadSafeAccess;
+import org.mule.api.*;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
+import org.mule.api.transaction.TransactionCallback;
 import org.mule.api.transport.Connector;
+import org.mule.config.i18n.CoreMessages;
+import org.mule.transaction.TransactionTemplate;
+import org.mule.transaction.TransactionTemplateFactory;
 import org.mule.transport.ContinuousPollingReceiverWorker;
 import org.mule.transport.PollingReceiverWorker;
 import org.mule.transport.TransactedPollingMessageReceiver;
@@ -95,26 +96,42 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
         routeMessage(newMessage);
     }
 
-    public MuleMessage onCall(MuleMessage message) throws MuleException
+    public MuleMessage onCall(final MuleMessage message) throws MuleException
     {
-        MuleEvent event = null;
+
         try
         {
-            event = routeMessage(message);
-            MuleMessage returnedMessage = event == null ? null : event.getMessage();
-            if (returnedMessage != null)
+            TransactionTemplate<MuleMessage> mainTransactionTemplate = TransactionTemplateFactory.<MuleMessage>createMainTransactionTemplate(endpoint.getTransactionConfig(), connector.getMuleContext());
+            return mainTransactionTemplate.execute(new TransactionCallback<MuleMessage>()
             {
-                returnedMessage.release();
-            }
-            return returnedMessage;
+                @Override
+                public MuleMessage doInTransaction() throws Exception
+                {
+                    MuleEvent event = routeMessage(message);
+                    MuleMessage returnedMessage = event == null ? null : event.getMessage();
+                    if (returnedMessage != null)
+                    {
+                        returnedMessage.release();
+                    }
+                    return returnedMessage;
+                }
+            });
+
+        }
+        catch (MessagingException e)
+        {
+            //Already handled by TransactionTemplate, return ES result
+            return e.getMuleMessage();
+        }
+        catch (MuleException e)
+        {
+            endpoint.getMuleContext().getExceptionListener().handleException(e);
+            throw e;
         }
         catch (Exception e)
         {
-            if (event == null)
-            {
-                event = createMuleEvent(message, null);
-            }
-            return flowConstruct.getExceptionListener().handleException(e, event).getMessage();
+            endpoint.getMuleContext().getExceptionListener().handleException(e);
+            throw new DefaultMuleException(e);
         }
         finally
         {

@@ -10,6 +10,7 @@
 package org.mule.transaction;
 
 import org.hamcrest.core.Is;
+import org.hamcrest.core.IsInstanceOf;
 import org.hamcrest.core.IsNull;
 import org.junit.Before;
 import org.junit.Test;
@@ -27,12 +28,12 @@ import org.mule.api.MuleEvent;
 import org.mule.api.transaction.ExternalTransactionAwareTransactionFactory;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionConfig;
-import org.mule.exception.AlreadyHandledMessagingException;
 import org.mule.tck.testmodels.mule.TestTransaction;
 import org.mule.tck.testmodels.mule.TestTransactionFactory;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 import static org.mockito.Mockito.*;
 import static org.mule.transaction.TransactionTemplateFactory.createNestedTransactionTemplate;
 import static org.mule.transaction.TransactionTemplateTestUtils.*;
@@ -52,9 +53,6 @@ public class NestedTransactionTemplateTestCase
     protected MessagingException mockMessagingException;
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     protected MuleEvent mockEvent;
-    @Mock
-    protected AlreadyHandledMessagingException mockAlreadyHandledMessagingException;
-
 
     @Before
     public void unbindTransaction() throws Exception
@@ -64,12 +62,6 @@ public class NestedTransactionTemplateTestCase
         {
             TransactionCoordination.getInstance().unbindTransaction(currentTransaction);
         }
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void testValidateNullTransactionConfig()
-    {
-        createTransactionalTemplate(null);
     }
 
     @Test
@@ -150,22 +142,6 @@ public class NestedTransactionTemplateTestCase
         verify(mockTransaction, VerificationModeFactory.times(0)).rollback();
     }
 
-    @Test
-    public void testActionNoneAndXaTxAndFailureInCallback() throws Exception
-    {
-        mockTransaction.setXA(true);
-        TransactionCoordination.getInstance().bindTransaction(mockTransaction);
-        MuleTransactionConfig config = new MuleTransactionConfig(TransactionConfig.ACTION_NONE);
-        TransactionTemplate transactionTemplate = createTransactionalTemplate(config);
-        MuleEvent exceptionListenerResult = configureExceptionListenerCall();
-        Object result = transactionTemplate.execute(getFailureTransactionCallback(mockMessagingException));
-        org.junit.Assert.assertThat((MuleEvent) result, Is.is(exceptionListenerResult));
-        verify(mockTransaction).suspend();
-        verify(mockTransaction,VerificationModeFactory.times(0)).commit();
-        verify(mockTransaction,VerificationModeFactory.times(0)).rollback();
-        //TODO fix this issue. resume should be called despite exception
-        //Mockito.verify(mockTransaction).resume();
-    }
 
     @Test
     public void testActionNoneAndWithExternalTransactionWithNoTx() throws Exception
@@ -314,25 +290,7 @@ public class NestedTransactionTemplateTestCase
         assertThat((TestTransaction)TransactionCoordination.getInstance().getTransaction(), is(mockTransaction));
     }
 
-    @Test
-    public void testActionAlwaysBeginAndSuspendXaTxAndFailureCallback() throws Exception
-    {
-        TransactionCoordination.getInstance().bindTransaction(mockTransaction);
-        mockTransaction.setXA(true);
-        MuleTransactionConfig config = new MuleTransactionConfig(TransactionConfig.ACTION_ALWAYS_BEGIN);
-        TransactionTemplate transactionTemplate = createTransactionalTemplate(config);
-        config.setFactory(new TestTransactionFactory(mockNewTransaction));
-        MuleEvent exceptionListenerResult = configureExceptionListenerCall();
-        Object result = transactionTemplate.execute(getFailureTransactionCallback(mockMessagingException));
-        org.junit.Assert.assertThat((MuleEvent) result, Is.is(exceptionListenerResult));
-        verify(mockTransaction).suspend();
-        verify(mockTransaction,VerificationModeFactory.times(0)).commit();
-        verify(mockTransaction,VerificationModeFactory.times(0)).rollback();
-        //TODO fix this issue. New transaction should be resolved - Xa transaction should be resumed - Xa transaction should be in TransactionCoordinator
-        //Mockito.verify(mockNewTransaction).rollback();
-        //Mockito.verify(mockTransaction).resume();
-        //assertThat((TestTransaction) TransactionCoordination.getInstance().getTransaction(), is(mockTransaction));
-    }
+
 
     @Test(expected = IllegalTransactionStateException.class)
     public void testActionAlwaysJoinAndNoTx() throws Exception
@@ -355,30 +313,7 @@ public class NestedTransactionTemplateTestCase
         assertThat((TestTransaction) TransactionCoordination.getInstance().getTransaction(), is(mockTransaction));
     }
 
-    @Test
-    public void testActionAlwaysJoinAndExternalTxAndFailureCallback() throws Exception
-    {
-        MuleTransactionConfig config = new MuleTransactionConfig(TransactionConfig.ACTION_ALWAYS_JOIN);
-        config.setInteractWithExternal(true);
-        mockExternalTransactionFactory = mock(ExternalTransactionAwareTransactionFactory.class);
-        config.setFactory(mockExternalTransactionFactory);
-        when(mockExternalTransactionFactory.joinExternalTransaction(mockMuleContext)).thenAnswer(new Answer<Transaction>()
-        {
-            @Override
-            public Transaction answer(InvocationOnMock invocationOnMock) throws Throwable
-            {
-                TransactionCoordination.getInstance().bindTransaction(mockTransaction);
-                return mockTransaction;
-            }
-        });
-        TransactionTemplate transactionTemplate = createTransactionalTemplate(config);
-        MuleEvent exceptionListenerResult = configureExceptionListenerCall();
-        Object result = transactionTemplate.execute(getFailureTransactionCallback(mockMessagingException));
-        org.junit.Assert.assertThat((MuleEvent) result, Is.is(exceptionListenerResult));
-        verify(mockTransaction, VerificationModeFactory.times(0)).commit();
-        verify(mockTransaction, VerificationModeFactory.times(0)).rollback();
-        assertThat( TransactionCoordination.getInstance().getTransaction(), IsNull.<Object>nullValue());
-    }
+
 
     @Test
     public void testActionBeginOrJoinAndNoTx() throws Exception
@@ -430,25 +365,9 @@ public class NestedTransactionTemplateTestCase
         assertThat((TestTransaction) TransactionCoordination.getInstance().getTransaction(), Is.is(mockTransaction));
     }
 
-    @Test(expected = AlreadyHandledMessagingException.class)
-    public void testAlreadyHandledExceptionIsCatch() throws Exception
-    {
-        MuleTransactionConfig config = new MuleTransactionConfig(TransactionConfig.ACTION_INDIFFERENT);
-        TransactionTemplate transactionTemplate = createTransactionalTemplate(config);
-        transactionTemplate.execute(getFailureTransactionCallback(mockAlreadyHandledMessagingException));
-    }
-
     protected TransactionTemplate createTransactionalTemplate(MuleTransactionConfig config)
     {
         return createNestedTransactionTemplate(config, mockMuleContext);
-    }
-
-    private MuleEvent configureExceptionListenerCall()
-    {
-        when(mockMessagingException.getEvent()).thenReturn(mockEvent);
-        MuleEvent mockResultEvent = mock(MuleEvent.class);
-        when(mockEvent.getFlowConstruct().getExceptionListener().handleException(mockMessagingException, mockEvent)).thenReturn(mockResultEvent);
-        return mockResultEvent;
     }
 
 }

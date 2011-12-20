@@ -25,13 +25,15 @@ import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.transaction.TransactionCallback;
 import org.mule.api.transport.Connector;
 import org.mule.api.transport.MessageReceiver;
 import org.mule.api.transport.PropertyScope;
 import org.mule.config.ExceptionHelper;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.MessageFactory;
-import org.mule.session.DefaultMuleSession;
+import org.mule.transaction.TransactionTemplate;
+import org.mule.transaction.TransactionTemplateFactory;
 import org.mule.transport.ConnectException;
 import org.mule.transport.NullPayload;
 import org.mule.transport.http.i18n.HttpMessages;
@@ -150,7 +152,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
                             keepAliveTimeout, TimeUnit.MILLISECONDS, this);
                     }
 
-                    HttpRequest request = conn.readRequest();
+                    final HttpRequest request = conn.readRequest();
                     if (request == null)
                     {
                         break;
@@ -158,7 +160,15 @@ public class HttpMessageReceiver extends TcpMessageReceiver
 
                     try
                     {
-                        HttpResponse response = processRequest(request);
+                        TransactionTemplate<HttpResponse> exceptionHandlingTransactionTemplate = TransactionTemplateFactory.<HttpResponse>createExceptionHandlingTransactionTemplate(getConnector().getMuleContext());
+                        HttpResponse response = exceptionHandlingTransactionTemplate.execute(new TransactionCallback<HttpResponse>()
+                        {
+                            @Override
+                            public HttpResponse doInTransaction() throws Exception
+                            {
+                                return  processRequest(request);
+                            }
+                        });
                         conn.writeResponse(response);
                     }
                     catch (Exception e)
@@ -166,14 +176,17 @@ public class HttpMessageReceiver extends TcpMessageReceiver
                         MuleEvent response = null;
                         if (e instanceof MessagingException)
                         {
-                            MuleEvent event = ((MessagingException) e).getEvent();
-                            response = event.getFlowConstruct().getExceptionListener().handleException(e, event);
+                            response = ((MessagingException) e).getEvent();
+                            if (response.getMessage().getExceptionPayload() == null)
+                            {
+                                conn.writeResponse(transformResponse(response.getMessage(),response));
+                                break;
+                            }
                         }
                         else
                         {
                             getConnector().getMuleContext().getExceptionListener().handleException(e);
                         }
-
 
                         if (response != null &&
                             response.getMessage().getExceptionPayload() != null &&
@@ -181,30 +194,23 @@ public class HttpMessageReceiver extends TcpMessageReceiver
                         {
                             e = (Exception) response.getMessage().getExceptionPayload().getException();
                         }
-                        if (response != null && response.getMessage().getExceptionPayload() == null)
+                        //MULE-5656 There was custom code here for mapping status codes to exceptions
+                        //I have removed this code and now make an explicit call to the Exception helper,
+                        //but the real fix is to make sure Mule handles this automatically through the
+                        //InboundExceptionDetailsMessageProcessor
+
+                        //Response code mappings are loaded from META-INF/services/org/mule/config/http-exception-mappings.properties
+                        String temp = ExceptionHelper.getErrorMapping(connector.getProtocol(), e.getClass());
+                        int httpStatus = Integer.valueOf(temp);
+
+                        if (e instanceof MessagingException)
                         {
-                            conn.writeResponse(transformResponse(response.getMessage(), response));
+                            MuleEvent event = ((MessagingException) e).getEvent();
+                            conn.writeResponse(buildFailureResponse(event, e.getMessage(),httpStatus));
                         }
                         else
                         {
-                            //MULE-5656 There was custom code here for mapping status codes to exceptions
-                            //I have removed this code and now make an explicit call to the Exception helper,
-                            //but the real fix is to make sure Mule handles this automatically through the
-                            //InboundExceptionDetailsMessageProcessor
-
-                            //Response code mappings are loaded from META-INF/services/org/mule/config/http-exception-mappings.properties
-                            String temp = ExceptionHelper.getErrorMapping(connector.getProtocol(), e.getClass());
-                            int httpStatus = Integer.valueOf(temp);
-
-                            if (e instanceof MessagingException)
-                            {
-                                MuleEvent event = ((MessagingException) e).getEvent();
-                                conn.writeResponse(buildFailureResponse(event, e.getMessage(),httpStatus));
-                            }
-                            else
-                            {
-                                conn.writeResponse(buildFailureResponse(request.getRequestLine().getHttpVersion(), httpStatus, e.getMessage()));
-                            }
+                            conn.writeResponse(buildFailureResponse(request.getRequestLine().getHttpVersion(), httpStatus, e.getMessage()));
                         }
                         break;
                     }

@@ -20,6 +20,7 @@ import org.mule.api.transport.DispatchException;
 import org.mule.api.transport.NoReceiverForEndpointException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.transaction.TransactionTemplate;
+import org.mule.transaction.TransactionTemplateFactory;
 import org.mule.transport.AbstractMessageDispatcher;
 import org.mule.transport.vm.i18n.VMMessages;
 import org.mule.util.queue.Queue;
@@ -79,7 +80,7 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher
         }
 
         final MuleMessage message = event.getMessage().createInboundMessage();
-        TransactionTemplate<MuleMessage> tt = new TransactionTemplate<MuleMessage>(
+        TransactionTemplate<MuleMessage> tt = TransactionTemplateFactory.<MuleMessage>createNestedTransactionTemplate(
                                                             receiver.getEndpoint().getTransactionConfig(),
                                                             event.getMuleContext());
 

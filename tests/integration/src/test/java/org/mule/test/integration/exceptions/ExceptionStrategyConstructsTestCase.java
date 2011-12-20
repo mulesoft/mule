@@ -10,6 +10,7 @@
 
 package org.mule.test.integration.exceptions;
 
+import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
@@ -97,15 +98,8 @@ public class ExceptionStrategyConstructsTestCase extends AbstractServiceAndFlowT
         @Override
         public MuleEvent process(MuleEvent event) throws MuleException
         {
-            throw new FunctionalTestException();
+            throw new MessagingException(event,new FunctionalTestException());
         }
     }
 
-    public static class ExceptionThrowingComponent
-    {
-        public byte[] process(byte[] msg) throws MuleException
-        {
-            throw new FunctionalTestException();
-        }
-    }
 }

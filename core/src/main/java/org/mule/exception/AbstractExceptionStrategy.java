@@ -210,7 +210,7 @@ public abstract class AbstractExceptionStrategy extends AbstractMessageProcessor
                 router.setMuleContext(muleContext);
                 
                 // Route the ExceptionMessage to the new router
-                router.process(new DefaultMuleEvent(exceptionMessage, event));
+                router.route(new DefaultMuleEvent(exceptionMessage, event));
             }
             catch (Exception e)
             {

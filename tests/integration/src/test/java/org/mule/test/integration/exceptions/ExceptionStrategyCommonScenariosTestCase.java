@@ -70,7 +70,6 @@ public class ExceptionStrategyCommonScenariosTestCase extends AbstractServiceAnd
     public ExceptionStrategyCommonScenariosTestCase(AbstractServiceAndFlowTestCase.ConfigVariant variant, String configResources)
     {
         super(variant, configResources);
-        setDisposeContextPerClass(false);
     }
 
     @Parameterized.Parameters

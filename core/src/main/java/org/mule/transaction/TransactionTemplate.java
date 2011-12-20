@@ -14,9 +14,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
+import org.mule.api.MuleEvent;
 import org.mule.api.transaction.*;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.exception.AlreadyHandledMessagingException;
 
 public class TransactionTemplate<T>
 {
@@ -95,45 +95,15 @@ public class TransactionTemplate<T>
             {
                 return next.execute(callback);
             }
-            catch (AlreadyHandledMessagingException e)
-            {
-                throw e;
-            }
             catch (MessagingException e)
             {
-                //TODO verify that always we get a MessagingException. In case of any other type of execution should the tx be mark as rollback?
                 T result = (T) e.getEvent().getFlowConstruct().getExceptionListener().handleException(e, e.getEvent());
-                //TODO uncomment this lines once exception re-thrown is in place
-                /*MuleEvent exceptionListenerResult = (MuleEvent) result;
-                if (exceptionListenerResult.getMessage().getExceptionPayload() != null)
-                {
-                    throw new AlreadyHandledMessagingException((MessagingException) exceptionListenerResult.getMessage().getExceptionPayload().getException());
-                }*/
-                return result;
+                e.setProcessedEvent((MuleEvent) result);
+                throw e;
             }
-        }
-    }
-
-    public class UnwrapManagedExceptionInterceptor implements TransactionInterceptor<T>
-    {
-        public TransactionInterceptor<T> next;
-
-        public UnwrapManagedExceptionInterceptor(TransactionInterceptor next)
-        {
-            this.next = next;
-        }
-
-
-        @Override
-        public T execute(TransactionCallback<T> callback) throws Exception
-        {
-            try
+            catch (Exception e)
             {
-                return next.execute(callback);
-            }
-            catch (AlreadyHandledMessagingException messagingException)
-            {
-                throw (MessagingException)messagingException.getCause();
+                throw e;
             }
         }
     }

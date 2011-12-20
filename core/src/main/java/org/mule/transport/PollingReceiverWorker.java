@@ -66,8 +66,7 @@ public class PollingReceiverWorker implements Work
             }
             catch (MessagingException e)
             {
-                MuleEvent event = (e).getEvent();
-                event.getFlowConstruct().getExceptionListener().handleException(e, event);
+                //Already handled by TransactionTemplate
             }
             catch (Exception e)
             {

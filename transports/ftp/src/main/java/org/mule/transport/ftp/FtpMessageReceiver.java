@@ -18,7 +18,10 @@ import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.retry.RetryContext;
+import org.mule.api.transaction.TransactionCallback;
 import org.mule.api.transport.Connector;
+import org.mule.transaction.TransactionTemplate;
+import org.mule.transaction.TransactionTemplateFactory;
 import org.mule.transport.AbstractPollingMessageReceiver;
 
 import java.io.FilenameFilter;
@@ -289,20 +292,25 @@ public class FtpMessageReceiver extends AbstractPollingMessageReceiver
         {
             try
             {
-                currentFiles.add(name);
-                processFile(file);
+                TransactionTemplate<Void> exceptionHandlingTransactionTemplate = TransactionTemplateFactory.<Void>createExceptionHandlingTransactionTemplate(getConnector().getMuleContext());
+                exceptionHandlingTransactionTemplate.execute(new TransactionCallback<Void>()
+                {
+                    @Override
+                    public Void doInTransaction() throws Exception
+                    {
+                        currentFiles.add(name);
+                        processFile(file);
+                        return null;
+                    }
+                });
+            }
+            catch (MessagingException e)
+            {
+                //Already handled by TransactionTemplate
             }
             catch (Exception e)
             {
-                if (e instanceof MessagingException)
-                {
-                    MuleEvent event = ((MessagingException) e).getEvent();
-                    event.getFlowConstruct().getExceptionListener().handleException(e, event);
-                }
-                else
-                {
-                    getConnector().getMuleContext().getExceptionListener().handleException(e);
-                }
+                getConnector().getMuleContext().getExceptionListener().handleException(e);
             }
             finally
             {

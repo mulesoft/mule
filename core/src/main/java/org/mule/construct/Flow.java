@@ -12,14 +12,14 @@ package org.mule.construct;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.RequestContext;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
+import org.mule.api.*;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorChainBuilder;
 import org.mule.api.processor.ProcessingStrategy;
 import org.mule.api.processor.ProcessingStrategy.StageNameSource;
+import org.mule.api.transaction.TransactionCallback;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.construct.flow.DefaultFlowProcessingStrategy;
 import org.mule.construct.processor.FlowConstructStatisticsMessageProcessor;
 import org.mule.interceptor.ProcessingTimeInterceptor;
@@ -27,6 +27,8 @@ import org.mule.lifecycle.processor.ProcessIfStartedMessageProcessor;
 import org.mule.management.stats.FlowConstructStatistics;
 import org.mule.processor.strategy.AsynchronousProcessingStrategy;
 import org.mule.routing.requestreply.AsyncReplyToPropertyRequestReplyReplier;
+import org.mule.transaction.TransactionTemplate;
+import org.mule.transaction.TransactionTemplateFactory;
 
 /**
  * This implementation of {@link AbstractPipeline} adds the following functionality:
@@ -52,30 +54,41 @@ public class Flow extends AbstractPipeline implements MessageProcessor
     }
 
     @Override
-    public MuleEvent process(MuleEvent event) throws MuleException
+    public MuleEvent process(final MuleEvent event) throws MuleException
     {
-        MuleEvent newEvent = new DefaultMuleEvent(event, this);
+        final MuleEvent newEvent = new DefaultMuleEvent(event, this);
         RequestContext.setEvent(newEvent);
         try
         {
-            MuleEvent result = pipeline.process(newEvent);
-            if (result != null)
-            {
-                result.getMessage().release();
-            }
-            if (result != null)
-            {
-                return new DefaultMuleEvent(result, event.getFlowConstruct());
-            }
-            else
-            {
-                return null;
-            }
+            TransactionTemplate<MuleEvent> exceptionHandlingTransactionTemplate = TransactionTemplateFactory.<MuleEvent>createExceptionHandlingTransactionTemplate(muleContext);
+            return exceptionHandlingTransactionTemplate.execute(new TransactionCallback<MuleEvent>(){
+
+                @Override
+                public MuleEvent doInTransaction() throws Exception
+                {
+                    MuleEvent result = pipeline.process(newEvent);
+                    if (result != null)
+                    {
+                        result.getMessage().release();
+                    }
+                    if (result != null)
+                    {
+                        return new DefaultMuleEvent(result, event.getFlowConstruct());
+                    }
+                    else
+                    {
+                        return null;
+                    }
+                }
+            });
+        }
+        catch (MessagingException e)
+        {
+            throw e;
         }
         catch (Exception e)
         {
-            return new DefaultMuleEvent(getExceptionListener().handleException(e, newEvent),
-                event.getFlowConstruct());
+            throw new DefaultMuleException(CoreMessages.createStaticMessage("Flow execution exception"),e);
         }
         finally
         {

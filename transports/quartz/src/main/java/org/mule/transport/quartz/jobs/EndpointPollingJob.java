@@ -23,6 +23,7 @@ import org.mule.module.client.MuleClient;
 import org.mule.transaction.MuleTransactionConfig;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.transaction.TransactionTemplate;
+import org.mule.transaction.TransactionTemplateFactory;
 import org.mule.transport.AbstractMessageReceiver;
 import org.mule.transport.quartz.QuartzConnector;
 import org.mule.transport.quartz.QuartzMessageReceiver;
@@ -106,17 +107,17 @@ public class EndpointPollingJob extends AbstractJob
 
                     //TODO MULE-5050 work around because the builder is no longer idempotent, we now cache the endpoint instance
                     muleContext.getRegistry().registerObject(jobConfig.getEndpointRef() + ".quartz-job", endpoint);
-                    tt = new TransactionTemplate<Void>(endpoint.getTransactionConfig(), muleContext);
+                    tt = TransactionTemplateFactory.<Void>createMainTransactionTemplate(endpoint.getTransactionConfig(), muleContext);
                 }
                 else
                 {
                     // a simple inline endpoint
-                    tt = new TransactionTemplate<Void>(new MuleTransactionConfig(), muleContext);
+                    tt = TransactionTemplateFactory.<Void>createMainTransactionTemplate(new MuleTransactionConfig(), muleContext);
                 }
             }
             else
             {
-                tt = new TransactionTemplate<Void>(endpoint.getTransactionConfig(), muleContext);
+                tt = TransactionTemplateFactory.<Void>createMainTransactionTemplate(endpoint.getTransactionConfig(), muleContext);
             }
 
 

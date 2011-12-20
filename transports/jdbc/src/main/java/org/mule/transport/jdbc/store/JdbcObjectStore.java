@@ -15,6 +15,7 @@ import java.sql.SQLException;
 
 import org.apache.commons.dbutils.ResultSetHandler;
 import org.apache.commons.dbutils.handlers.ArrayHandler;
+import org.mule.api.MuleEvent;
 import org.mule.api.store.ObjectAlreadyExistsException;
 import org.mule.api.store.ObjectDoesNotExistException;
 import org.mule.api.store.ObjectStoreException;
@@ -22,6 +23,7 @@ import org.mule.api.transaction.TransactionCallback;
 import org.mule.api.transaction.TransactionConfig;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.transaction.TransactionTemplate;
+import org.mule.transaction.TransactionTemplateFactory;
 import org.mule.transport.jdbc.JdbcConnector;
 import org.mule.util.store.AbstractMonitoredObjectStore;
 
@@ -154,18 +156,14 @@ public class JdbcObjectStore<T extends Serializable> extends AbstractMonitoredOb
     {
         try
         {
-            TransactionTemplate<Object> tt = new TransactionTemplate<Object>(this.transactionConfig,
-                this.jdbcConnector.getMuleContext());
-
-            Object result = tt.execute(new TransactionCallback<Object>()
+            TransactionCallback<Object> transactionCallback = new TransactionCallback<Object>()
             {
                 public Object doInTransaction() throws Exception
                 {
                     return jdbcConnector.getQueryRunner().query(sql, handler, arguments);
                 }
-            });
-
-            return result;
+            };
+            return executeInTransactionTemplate(transactionCallback);
         }
         catch (SQLException e)
         {
@@ -189,18 +187,14 @@ public class JdbcObjectStore<T extends Serializable> extends AbstractMonitoredOb
     {
         try
         {
-            TransactionTemplate<Object> tt = new TransactionTemplate<Object>(this.transactionConfig,
-                this.jdbcConnector.getMuleContext());
-
-            Object result = tt.execute(new TransactionCallback<Object>()
+            TransactionCallback<Object> transactionCallback = new TransactionCallback<Object>()
             {
                 public Object doInTransaction() throws Exception
                 {
                     return jdbcConnector.getQueryRunner().update(sql, arguments);
                 }
-            });
-
-            return result;
+            };
+            return executeInTransactionTemplate(transactionCallback);
         }
         catch (SQLException e)
         {
@@ -210,6 +204,12 @@ public class JdbcObjectStore<T extends Serializable> extends AbstractMonitoredOb
         {
             throw new ObjectStoreException(e);
         }
+    }
+
+    private Object executeInTransactionTemplate(TransactionCallback<Object> transactionCallback) throws Exception
+    {
+        TransactionTemplate transactionTemplate = TransactionTemplateFactory.<MuleEvent>createNestedTransactionTemplate(this.transactionConfig, this.jdbcConnector.getMuleContext());
+        return transactionTemplate.execute(transactionCallback);
     }
 
     public JdbcConnector getJdbcConnector()

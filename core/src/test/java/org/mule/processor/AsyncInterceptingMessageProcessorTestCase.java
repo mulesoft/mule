@@ -19,15 +19,17 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import org.mule.MessageExchangePattern;
+import org.mule.api.DefaultMuleException;
+import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.context.WorkManager;
 import org.mule.api.context.WorkManagerSource;
 import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.exception.RollbackSourceCallback;
+import org.mule.api.exception.SystemExceptionHandler;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transaction.Transaction;
-import org.mule.config.i18n.CoreMessages;
 import org.mule.construct.Flow;
 import org.mule.routing.filters.WildcardFilter;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -130,7 +132,7 @@ public class AsyncInterceptingMessageProcessorTestCase extends AbstractMuleConte
     }
 
     @Test
-    public void testWorkException() throws Exception
+    public void testWorkMessagingException() throws Exception
     {
 
         Flow flow = new Flow("flow", muleContext);
@@ -144,7 +146,7 @@ public class AsyncInterceptingMessageProcessorTestCase extends AbstractMuleConte
         {
             public MuleEvent process(MuleEvent event) throws MuleException
             {
-                throw new org.mule.api.expression.RequiredValueException(CoreMessages.createStaticMessage(""));
+                throw new MessagingException(event, null);
             }
         };
 
@@ -153,6 +155,32 @@ public class AsyncInterceptingMessageProcessorTestCase extends AbstractMuleConte
         messageProcessor.process(event);
 
         assertTrue(exceptionListener.latch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS));
+    }
+
+    @Test
+    public void testWorkException() throws Exception
+    {
+
+        Flow flow = new Flow("flow", muleContext);
+        LatchedSystemExceptionHandler exceptionListener = new LatchedSystemExceptionHandler();
+        muleContext.setExceptionListener(exceptionListener);
+        initialiseObject(flow);
+
+        MuleEvent event = getTestEvent(TEST_MESSAGE, flow, MessageExchangePattern.ONE_WAY);
+
+        MessageProcessor next = new MessageProcessor()
+        {
+            public MuleEvent process(MuleEvent event) throws MuleException
+            {
+                throw new DefaultMuleException("failure");
+            }
+        };
+
+        messageProcessor.setListener(next);
+        messageProcessor.setMuleContext(muleContext);
+        messageProcessor.process(event);
+
+        assertTrue(exceptionListener.latch .await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS));
     }
 
     protected void assertSync(MessageProcessor processor, MuleEvent event) throws MuleException
@@ -251,6 +279,24 @@ public class AsyncInterceptingMessageProcessorTestCase extends AbstractMuleConte
             return null;
         }
 
+    }
+
+    private static class LatchedSystemExceptionHandler implements SystemExceptionHandler
+    {
+
+        Latch latch = new Latch();
+
+        @Override
+        public void handleException(Exception exception, RollbackSourceCallback rollbackMethod)
+        {
+            latch.countDown();
+        }
+
+        @Override
+        public void handleException(Exception exception)
+        {
+            latch.countDown();
+        }
     }
 
 }

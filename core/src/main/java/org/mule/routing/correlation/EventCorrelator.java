@@ -29,10 +29,13 @@ import org.mule.api.store.ObjectDoesNotExistException;
 import org.mule.api.store.ObjectStore;
 import org.mule.api.store.ObjectStoreException;
 import org.mule.api.store.ObjectStoreManager;
+import org.mule.api.transaction.TransactionCallback;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.context.notification.RoutingNotification;
 import org.mule.routing.EventGroup;
 import org.mule.routing.EventProcessingThread;
+import org.mule.transaction.TransactionTemplate;
+import org.mule.transaction.TransactionTemplateFactory;
 import org.mule.util.StringMessageUtils;
 import org.mule.util.concurrent.ThreadNameHelper;
 import org.mule.util.monitor.Expirable;
@@ -546,17 +549,27 @@ public class EventCorrelator implements Startable, Stoppable
             {
                 for (Object anExpired : expired)
                 {
-                    EventGroup group = (EventGroup) anExpired;
+                    final EventGroup group = (EventGroup) anExpired;
+                    TransactionTemplate<Void> exceptionHandlingTransactionTemplate = TransactionTemplateFactory.<Void>createExceptionHandlingTransactionTemplate(muleContext);
                     try
                     {
-                        handleGroupExpiry(group);
+                        exceptionHandlingTransactionTemplate.execute(new TransactionCallback<Void>()
+                        {
+                            @Override
+                            public Void doInTransaction() throws Exception
+                            {
+                                handleGroupExpiry(group);
+                                return null;
+                            }
+                        });
                     }
                     catch (MessagingException e)
                     {
-                        e.getEvent()
-                            .getFlowConstruct()
-                            .getExceptionListener()
-                            .handleException(e, e.getEvent());
+                        //Already handled by TransactionTemplate
+                    }
+                    catch (Exception e)
+                    {
+                        muleContext.getExceptionListener().handleException(e);
                     }
                 }
             }

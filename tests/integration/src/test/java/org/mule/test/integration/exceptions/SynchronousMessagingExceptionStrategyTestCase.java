@@ -12,7 +12,9 @@ package org.mule.test.integration.exceptions;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
 
+import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 
 import java.util.concurrent.TimeUnit;
@@ -80,10 +82,15 @@ public class SynchronousMessagingExceptionStrategyTestCase extends AbstractExcep
     @Test
     public void testInboundRouter() throws Exception
     {
-        client.send("vm://in6", TEST_MESSAGE, null);
+        try
+        {
+            client.send("vm://in6", TEST_MESSAGE, null);
+            fail("Must throw an exception");
+        }
+        catch (MuleException e) {}
         latch.await(LATCH_AWAIT_TIMEOUT, TimeUnit.MILLISECONDS);
-        assertEquals(1, serviceExceptionCounter.get());
-        assertEquals(0, systemExceptionCounter.get());
+        assertEquals(0, serviceExceptionCounter.get());
+        assertEquals(1, systemExceptionCounter.get());
     }
 
     @Test

@@ -12,11 +12,7 @@ package org.mule.service;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.RequestContext;
-import org.mule.api.AnnotatedObject;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.MuleRuntimeException;
+import org.mule.api.*;
 import org.mule.api.component.Component;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.construct.FlowConstructAware;
@@ -39,6 +35,7 @@ import org.mule.api.routing.OutboundRouterCollection;
 import org.mule.api.routing.RouterStatisticsRecorder;
 import org.mule.api.service.Service;
 import org.mule.api.source.MessageSource;
+import org.mule.api.transaction.TransactionCallback;
 import org.mule.component.simple.PassThroughComponent;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.lifecycle.EmptyLifecycleCallback;
@@ -50,6 +47,8 @@ import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.routing.MuleMessageInfoMapping;
 import org.mule.routing.outbound.DefaultOutboundRouterCollection;
 import org.mule.service.processor.ServiceAsyncRequestReplyRequestor;
+import org.mule.transaction.TransactionTemplate;
+import org.mule.transaction.TransactionTemplateFactory;
 import org.mule.util.ClassUtils;
 
 import java.util.Collections;
@@ -654,23 +653,35 @@ public abstract class AbstractService implements Service, MessageProcessor, Anno
         return asyncReplyMessageProcessor;
     }
     
-    public MuleEvent process(MuleEvent event) throws MuleException
+    public MuleEvent process(final MuleEvent event) throws MuleException
     {
-        MuleEvent newEvent = new DefaultMuleEvent(event, this);
+        final MuleEvent newEvent = new DefaultMuleEvent(event, this);
         RequestContext.setEvent(newEvent);
         try
         {
-            MuleEvent result = messageProcessorChain.process(newEvent);
-            if (result != null)
-            {
-                result.getMessage().release();
-            }
-            return new DefaultMuleEvent(result, event.getFlowConstruct());
+            TransactionTemplate<MuleEvent> exceptionHandlingTransactionTemplate = TransactionTemplateFactory.<MuleEvent>createExceptionHandlingTransactionTemplate(muleContext);
+            return exceptionHandlingTransactionTemplate.execute(new TransactionCallback<MuleEvent>() {
+
+                @Override
+                public MuleEvent doInTransaction() throws Exception
+                {
+                    MuleEvent result = messageProcessorChain.process(newEvent);
+                    if (result != null)
+                    {
+                        result.getMessage().release();
+                        return new DefaultMuleEvent(result, event.getFlowConstruct());
+                    }
+                    return null;
+                }
+            });
+        }
+        catch (MessagingException e)
+        {
+            throw e;
         }
         catch (Exception e)
         {
-            return new DefaultMuleEvent(getExceptionListener().handleException(e, newEvent),
-                event.getFlowConstruct());
+            throw new DefaultMuleException(CoreMessages.createStaticMessage("Flow execution exception"),e);
         }
         finally
         {

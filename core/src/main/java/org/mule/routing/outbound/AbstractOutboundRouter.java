@@ -12,11 +12,7 @@ package org.mule.routing.outbound;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
-import org.mule.api.MessagingException;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
+import org.mule.api.*;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.construct.FlowConstructAware;
@@ -40,6 +36,7 @@ import org.mule.processor.AbstractMessageProcessorOwner;
 import org.mule.routing.CorrelationMode;
 import org.mule.routing.DefaultRouterResultsHandler;
 import org.mule.transaction.TransactionTemplate;
+import org.mule.transaction.TransactionTemplateFactory;
 import org.mule.util.StringMessageUtils;
 import org.mule.util.SystemUtils;
 
@@ -92,27 +89,36 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
 
     public MuleEvent process(final MuleEvent event) throws MuleException
     {
-        TransactionTemplate<MuleEvent> tt = new TransactionTemplate<MuleEvent>(getTransactionConfig(),
-            muleContext);
-
+        TransactionTemplate<MuleEvent> tt = TransactionTemplateFactory.<MuleEvent>createNestedTransactionTemplate(getTransactionConfig(), muleContext);
         TransactionCallback<MuleEvent> cb = new TransactionCallback<MuleEvent>()
         {
             public MuleEvent doInTransaction() throws Exception
             {
-                return route(event);
+                try
+                {
+                    return route(event);
+                }
+                catch (RoutingException e)
+                {
+                    throw e;
+                }
+                catch (Exception e)
+                {
+                    throw new RoutingException(event, AbstractOutboundRouter.this, e);
+                }
             }
         };
         try
         {
             return tt.execute(cb);
         }
-        catch (RoutingException e)
+        catch (MuleException e)
         {
             throw e;
         }
         catch (Exception e)
         {
-            throw new RoutingException(event, this, e);
+            throw new DefaultMuleException(e);
         }
     }
 
@@ -480,7 +486,7 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
     /**
      * Propagates a number of internal system properties to handle correlation, session, etc. Note that in and
      * out params can be the same message object when not dealing with replies.
-     * 
+     *
      * @see #magicProperties
      */
     protected void propagateMagicProperties(MuleMessage in, MuleMessage out)

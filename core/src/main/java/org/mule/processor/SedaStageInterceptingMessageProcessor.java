@@ -235,8 +235,7 @@ public class SedaStageInterceptingMessageProcessor extends AsyncInterceptingMess
                     }
                     catch (Exception e)
                     {
-                        // This is a work manager exception, not a Mule event-related exception
-                        event.getFlowConstruct().getExceptionListener().handleException(e, event);
+                        muleContext.getExceptionListener().handleException(e);
                     }
                 }
                 else

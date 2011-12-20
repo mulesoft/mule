@@ -11,7 +11,6 @@
 package org.mule.module.jca;
 
 import org.mule.RequestContext;
-import org.mule.api.DefaultMuleException;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -19,10 +18,13 @@ import org.mule.api.component.LifecycleAdapter;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.model.EntryPointResolverSet;
+import org.mule.api.transaction.TransactionCallback;
 import org.mule.component.AbstractJavaComponent;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.Message;
 import org.mule.module.jca.i18n.JcaMessages;
+import org.mule.transaction.TransactionTemplate;
+import org.mule.transaction.TransactionTemplateFactory;
 import org.mule.work.AbstractMuleEventWork;
 
 import javax.resource.spi.UnavailableException;
@@ -115,27 +117,34 @@ public class JcaComponent extends AbstractJavaComponent implements WorkListener
             }
             try
             {
-                // Invoke method
-                entryPointResolverSet.invoke(getManagedInstance(), RequestContext.getEventContext());
+                TransactionTemplate exceptionHandlingTransactionTemplate = TransactionTemplateFactory.<Void>createExceptionHandlingTransactionTemplate(muleContext);
+
+                exceptionHandlingTransactionTemplate.execute(new TransactionCallback<Void>(){
+                    @Override
+                    public Void doInTransaction() throws Exception
+                    {
+                        try
+                        {
+                            // Invoke method
+                            entryPointResolverSet.invoke(getManagedInstance(), RequestContext.getEventContext());
+                        }
+                        catch (UnavailableException e)
+                        {
+                            Message message = JcaMessages.cannotAllocateManagedInstance();
+                            logger.error(message);
+                            throw new MessagingException(event,e);
+                        }
+                        return null;
+                    }
+                });
+            }
+            catch (MessagingException e)
+            {
+                //Already handled by TransactionTemplate
             }
             catch (Exception e)
             {
-                if (e instanceof UnavailableException)
-                {
-                    Message message = JcaMessages.cannotAllocateManagedInstance();
-                    logger.error(message);
-                    flowConstruct.getExceptionListener().handleException(new DefaultMuleException(message, e), event);
-                }
-                else if (e instanceof MessagingException)
-                {
-                    logger.error("Failed to execute  JCAEndPoint " + e.getMessage(), e);
-                    flowConstruct.getExceptionListener().handleException(e, event);
-                }
-                else
-                {
-                    flowConstruct.getExceptionListener().handleException(
-                        new DefaultMuleException(CoreMessages.eventProcessingFailedFor(flowConstruct.getName()), e), event);
-                }
+                muleContext.getExceptionListener().handleException(e);
             }
         }
     }

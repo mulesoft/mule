@@ -12,6 +12,7 @@ package org.mule.module.cxf;
 
 import org.mule.api.MessagingException;
 import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.transport.DispatchException;
 import org.mule.module.client.MuleClient;
 import org.mule.module.cxf.testmodels.CustomFault;
 import org.mule.module.cxf.testmodels.CxfEnabledFaultMessage;
@@ -62,9 +63,9 @@ public class CxfComponentExceptionStrategyTestCase extends AbstractServiceAndFlo
                             .lookupObject("cxfDefaultInbound")).getAddress() + "?method=testCxfException", "TEST", null);
             fail("Exception expected");
         }
-        catch (MessagingException e)
+        catch (DispatchException e)
         {
-            assertTrue(e.getCause().getCause() instanceof CxfEnabledFaultMessage);
+            assertTrue(e.getCause() instanceof CxfEnabledFaultMessage);
         }
     }
 
@@ -80,7 +81,7 @@ public class CxfComponentExceptionStrategyTestCase extends AbstractServiceAndFlo
                             .lookupObject("cxfExceptionStrategyInbound")).getAddress() + "?method=testCxfException", "TEST", null);
             fail("Exception expected");
         }
-        catch (MessagingException e)
+        catch (DispatchException e)
         {
             Throwable t = e.getCause().getCause();
             assertTrue(t instanceof CxfEnabledFaultMessage);
@@ -100,9 +101,9 @@ public class CxfComponentExceptionStrategyTestCase extends AbstractServiceAndFlo
                             .lookupObject("cxfExceptionStrategyInbound")).getAddress() + "?method=testNonCxfException", "TEST", null);
             fail("Exception expected");
         }
-        catch (MessagingException e)
+        catch (DispatchException e)
         {
-            assertTrue(e.getCause().getCause() instanceof Fault);
+            assertTrue(e.getCause() instanceof Fault);
         }
     }
 

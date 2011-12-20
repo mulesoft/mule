@@ -26,7 +26,6 @@ public class TransactionTemplateFactory
      *  Start a transaction if required by TransactionConfig action
      *  Resolve transaction if was started by this TransactionTemplate
      *  Route any exception to exception strategy if it was not already routed to it
-     *  TODO - Unwrap exception thrown (if required) so previous TransactionTemplate in the chain can handle it - once exception re-throwing is in place
      *
      * @param transactionConfig transactional configuration
      * @param muleContext current MuleContext for the flow being executed
@@ -36,8 +35,7 @@ public class TransactionTemplateFactory
     public static <T> TransactionTemplate createMainTransactionTemplate(TransactionConfig transactionConfig, MuleContext muleContext)
     {
         TransactionTemplate<T> transactionTemplate = new TransactionTemplate<T>(transactionConfig, muleContext);
-        TransactionTemplate.TransactionInterceptor<T> transactionInterceptorChain = transactionTemplate.new UnwrapManagedExceptionInterceptor(
-                transactionTemplate.new HandleExceptionInterceptor(transactionTemplate.new ExecuteCallbackInterceptor()));
+        TransactionTemplate.TransactionInterceptor<T> transactionInterceptorChain = transactionTemplate.new HandleExceptionInterceptor(transactionTemplate.new ExecuteCallbackInterceptor());
         transactionInterceptorChain = addTransactionInterceptorsIfRequired(transactionConfig, transactionTemplate, transactionInterceptorChain);
         transactionTemplate.setTransactionInterceptor(transactionInterceptorChain);
         return transactionTemplate;
@@ -80,8 +78,6 @@ public class TransactionTemplateFactory
      *  Suspend-Resume xa transaction created before it if the TransactionConfig action requires it
      *  Start a transaction if required by TransactionConfig action
      *  Resolve transaction if was started by this TransactionTemplate
-     *  Route any exception to exception strategy if it was not already routed to it
-     *  TODO - wrap exception if not handled - once exception re-throwing is in place
      *
      *
      * @param transactionConfig
@@ -91,12 +87,8 @@ public class TransactionTemplateFactory
      */
     public static <T> TransactionTemplate createNestedTransactionTemplate(TransactionConfig transactionConfig, MuleContext muleContext)
     {
-        if (transactionConfig == null)
-        {
-            throw new IllegalArgumentException("TransactionConfig can't be null in NestedTransactionTemplate");
-        }
         TransactionTemplate<T> transactionTemplate = new TransactionTemplate<T>(transactionConfig, muleContext);
-        TransactionTemplate.TransactionInterceptor<T> transactionInterceptorChain = transactionTemplate.new HandleExceptionInterceptor(transactionTemplate.new ExecuteCallbackInterceptor());
+        TransactionTemplate.TransactionInterceptor<T> transactionInterceptorChain = transactionTemplate.new ExecuteCallbackInterceptor();
         transactionInterceptorChain = addTransactionInterceptorsIfRequired(transactionConfig, transactionTemplate, transactionInterceptorChain);
         transactionTemplate.setTransactionInterceptor(transactionInterceptorChain);
         return transactionTemplate;

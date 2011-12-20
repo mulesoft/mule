@@ -21,6 +21,7 @@ import org.mule.api.lifecycle.CreateException;
 import org.mule.api.transaction.TransactionCallback;
 import org.mule.api.transport.Connector;
 import org.mule.transaction.TransactionTemplate;
+import org.mule.transaction.TransactionTemplateFactory;
 
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -107,7 +108,7 @@ public abstract class TransactedPollingMessageReceiver extends AbstractPollingMe
     @Override
     public void poll() throws Exception
     {
-        TransactionTemplate<Object> tt = new TransactionTemplate<Object>(endpoint.getTransactionConfig(), connector.getMuleContext());
+        TransactionTemplate<Object> tt = TransactionTemplateFactory.<Object>createMainTransactionTemplate(endpoint.getTransactionConfig(), connector.getMuleContext());
 
         if (this.isReceiveMessagesInTransaction())
         {
@@ -198,8 +199,7 @@ public abstract class TransactedPollingMessageReceiver extends AbstractPollingMe
             }
             catch (MessagingException e)
             {
-                MuleEvent event = e.getEvent();
-                event.getFlowConstruct().getExceptionListener().handleException(e, event);
+                //already managed by TransactionTemplate
             }
             catch (Exception e)
             {

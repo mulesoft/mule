@@ -16,6 +16,8 @@ import org.mule.config.i18n.Message;
 import org.mule.transport.NullPayload;
 import org.mule.util.StringUtils;
 
+import javax.swing.*;
+
 /**
  * <code>MessagingException</code> is a general message exception thrown when
  * errors specific to Message processing occur..
@@ -37,6 +39,8 @@ public class MessagingException extends MuleException
      * The MuleEvent being processed when the error occurred
      */
     protected final transient MuleEvent event;
+
+    protected transient MuleEvent processedEvent;
 
     /**
      * @deprecated use MessagingException(Message, MuleEvent)
@@ -117,7 +121,7 @@ public class MessagingException extends MuleException
 
     public MuleMessage getMuleMessage()
     {
-        if ((event != null) && (muleMessage == null))
+        if ((getEvent() != null) && (muleMessage == null))
         {
             return event.getMessage();
         }
@@ -126,6 +130,11 @@ public class MessagingException extends MuleException
 
     public MuleEvent getEvent()
     {
-        return event;
+        return processedEvent != null ? processedEvent : event;
+    }
+
+    public void setProcessedEvent(MuleEvent processedEvent)
+    {
+        this.processedEvent = processedEvent;
     }
 }

@@ -25,6 +25,7 @@ import org.mule.api.transport.Connector;
 import org.mule.api.transport.MessageReceiver;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.transaction.TransactionTemplate;
+import org.mule.transaction.TransactionTemplateFactory;
 import org.mule.transport.AbstractMessageReceiver;
 import org.mule.transport.ConnectException;
 import org.mule.transport.jms.filters.JmsSelectorFilter;
@@ -204,9 +205,12 @@ public class TransactedSingleResourceJmsMessageReceiver extends AbstractMessageR
         }
         catch (MessagingException e)
         {
-            getFlowConstruct().getExceptionListener().handleException(e, e.getEvent());
+            //already handled by TransactionTemplate
             // This will cause a negative ack for JMS
-            throw new MuleRuntimeException(e);
+            if (e.getEvent().getMessage().getExceptionPayload() != null)
+            {
+                throw new MuleRuntimeException(e);
+            }
         }
         catch (Exception e)
         {
@@ -218,7 +222,7 @@ public class TransactedSingleResourceJmsMessageReceiver extends AbstractMessageR
 
     public void processMessages(final Message message, final MessageReceiver receiver) throws Exception
     {
-        TransactionTemplate<Void> tt = new TransactionTemplate<Void>(
+        TransactionTemplate<Void> tt = TransactionTemplateFactory.<Void>createMainTransactionTemplate(
                                                 endpoint.getTransactionConfig(),
                                                 connector.getMuleContext());
 

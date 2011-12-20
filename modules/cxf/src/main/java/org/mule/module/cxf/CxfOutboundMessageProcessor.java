@@ -130,13 +130,16 @@ public class CxfOutboundMessageProcessor extends AbstractInterceptingMessageProc
             }
             return res;
         }
+        catch (MessagingException e) {
+            throw e;
+        }
         catch (MuleException e)
         {
             throw e;
         }
         catch (Exception e)
         {
-            throw new DefaultMuleException(e);
+            throw new DispatchException(event,this,e);
         }
         finally
         {
