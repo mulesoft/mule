@@ -126,7 +126,7 @@ public class WSProxyTestCase extends AbstractServiceAndFlowTestCase
     {
         final String wsdl = muleClient.request(
             "http://localhost:" + port1.getNumber() + "/weather-forecast/" + proxyId + "?wsdl",
-            getTestTimeoutMillis()).getPayloadAsString();
+            getTestTimeoutSecs() * 1000L).getPayloadAsString();
         assertTrue(wsdl.contains("GetWeatherByZipCode"));
     }
 
@@ -134,7 +134,7 @@ public class WSProxyTestCase extends AbstractServiceAndFlowTestCase
     {
         final String weatherForecast = muleClient.send(
             "wsdl-cxf:http://localhost:" + port1.getNumber() + "/weather-forecast/" + proxyId
-                            + "?wsdl&method=GetWeatherByZipCode", "95050", null, getTestTimeoutMillis())
+                            + "?wsdl&method=GetWeatherByZipCode", "95050", null, getTestTimeoutSecs() * 1000)
             .getPayloadAsString();
 
         assertEquals(new WeatherForecaster().getByZipCode("95050"), weatherForecast);

@@ -28,7 +28,7 @@ public class VmXaTransactionsPersistentQueueTestCase extends AbstractServiceAndF
 {
     private static final String TEST_MESSAGE = "TEST_MESSAGE";
 
-    private final long timeout = getTestTimeoutMillis() / 30;
+    private final long timeout = getTestTimeoutSecs() * 1000 / 30;
 
     @Parameters
     public static Collection<Object[]> parameters()

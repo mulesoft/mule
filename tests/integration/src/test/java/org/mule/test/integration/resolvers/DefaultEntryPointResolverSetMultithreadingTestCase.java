@@ -37,9 +37,9 @@ public class DefaultEntryPointResolverSetMultithreadingTestCase extends Function
     }
     
     @Override
-    public int getTestTimeoutMillis()
+    public int getTestTimeoutSecs()
     {
-        return 120000;
+        return 120;
     }
 
     @Test
