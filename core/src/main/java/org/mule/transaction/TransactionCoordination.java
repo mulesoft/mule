@@ -10,12 +10,12 @@
 
 package org.mule.transaction;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.junit.Test;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionException;
 import org.mule.config.i18n.CoreMessages;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 public final class TransactionCoordination
 {
@@ -31,6 +31,7 @@ public final class TransactionCoordination
      * an instance variable.
      */
     private final ThreadLocal<Transaction> transactions = new ThreadLocal<Transaction>();
+    private final ThreadLocal<Transaction> suspendedTransaction = new ThreadLocal<Transaction>();
 
     /** Lock variable that is used to access {@link #txCounter}. */
     private final Object txCounterLock = new Object();
@@ -139,6 +140,107 @@ public final class TransactionCoordination
         {
             logger.debug("Binding new transaction (" + txCounter + ") " + transaction);
         }
+    }
+
+    public void resumeXaTransactionIfAvailable()
+    {
+        try
+        {
+            Transaction tx = suspendedTransaction.get();
+            if (tx != null)
+            {
+                resumeSuspendedTransaction();
+            }
+        }
+        catch (TransactionException e)
+        {
+            logger.error("Failure resuming suspended transaction",e);
+        }
+    }
+
+    public void commitCurrentTransaction()
+    {
+        Transaction tx = transactions.get();
+        if (tx != null)
+        {
+            try
+            {
+                tx.commit();
+            }
+            catch (TransactionException e)
+            {
+                logger.error(e);
+            }
+        }
+    }
+
+    public void rollbackCurrentTransaction()
+    {
+        Transaction tx = transactions.get();
+        if (tx != null)
+        {
+            try
+            {
+                tx.rollback();
+            }
+            catch (TransactionException e)
+            {
+                logger.error(e);
+            }
+        }
+    }
+
+    public void resolveTransaction() throws TransactionException
+    {
+        Transaction tx = TransactionCoordination.getInstance().getTransaction();
+        if (tx.isRollbackOnly())
+        {
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Transaction has been marked rollbackOnly, rolling it back: " + tx);
+            }
+            tx.rollback();
+        }
+        else
+        {
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Committing transaction " + tx);
+            }
+            tx.commit();
+        }
+    }
+
+    public void suspendCurrentTransaction() throws TransactionException
+    {
+        Transaction tx = TransactionCoordination.getInstance().getTransaction();
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("Suspending " + tx);
+        }
+
+        tx.suspend();
+
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("Successfully suspended " + tx);
+            logger.debug("Unbinding the following TX from the current context: " + tx);
+        }
+
+        TransactionCoordination.getInstance().unbindTransaction(tx);
+        suspendedTransaction.set(tx);
+    }
+
+    public void resumeSuspendedTransaction() throws TransactionException
+    {
+        Transaction tx = suspendedTransaction.get();
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("Re-binding and Resuming " + tx);
+        }
+        TransactionCoordination.getInstance().bindTransaction(tx);
+        suspendedTransaction.remove();
+        tx.resume();
     }
 
 }

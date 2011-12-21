@@ -23,8 +23,6 @@ import org.mule.api.exception.RollbackSourceCallback;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.security.SecurityException;
-import org.mule.api.transaction.Transaction;
-import org.mule.api.transaction.TransactionException;
 import org.mule.api.util.StreamCloserService;
 import org.mule.config.ExceptionHelper;
 import org.mule.context.notification.ExceptionNotification;
@@ -234,51 +232,16 @@ public abstract class AbstractExceptionStrategy extends AbstractMessageProcessor
 
     protected void commit()
     {
-        Transaction tx = TransactionCoordination.getInstance().getTransaction();
-        if (tx != null)
-        {
-            try
-            {
-                tx.commit();
-            }
-            catch (TransactionException e)
-            {
-                logger.error(e);
-            }
-        }
+        TransactionCoordination.getInstance().commitCurrentTransaction();
     }
 
     protected void rollback(RollbackSourceCallback rollbackMethod)
     {
-        Transaction tx = TransactionCoordination.getInstance().getTransaction();
-        if (tx != null)
-        {
-            try
-            {
-                tx.rollback();
-                
-                // TODO The following was in the catch clause of TransactionTemplate previously.  
-                // Do we need to do this here?  If so, where can we store these variables (suspendedXATx, joinedExternal)
-                // so that they are available to us in the exception handler?
-                //
-                //if (suspendedXATx != null)
-                //{
-                //  resumeXATransaction(suspendedXATx);
-                //}
-                //if (joinedExternal != null)
-                //{
-                //    TransactionCoordination.getInstance().unbindTransaction(joinedExternal);
-                //}
-            }
-            catch (TransactionException e)
-            {
-                logger.error(e);
-            }
-        }
-        else if (rollbackMethod != null)
+        if (TransactionCoordination.getInstance().getTransaction() == null && rollbackMethod != null)
         {
             rollbackMethod.rollback();
         }
+        TransactionCoordination.getInstance().rollbackCurrentTransaction();
     }
 
     protected void closeStream(MuleMessage message)
@@ -293,6 +256,11 @@ public abstract class AbstractExceptionStrategy extends AbstractMessageProcessor
             ((StreamCloserService) muleContext.getRegistry().lookupObject(
                     MuleProperties.OBJECT_MULE_STREAM_CLOSER_SERVICE)).closeStream(message.getPayload());
         }
+    }
+
+    protected void resumeSuspendedTransaction()
+    {
+        TransactionCoordination.getInstance().resumeXaTransactionIfAvailable();
     }
 
     /**

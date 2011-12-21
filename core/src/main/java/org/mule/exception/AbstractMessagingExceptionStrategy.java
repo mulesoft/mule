@@ -65,7 +65,7 @@ public abstract class AbstractMessagingExceptionStrategy extends AbstractExcepti
     {
         return handleException(ex, event, null);
     }
-    
+
     protected void doHandleException(Exception ex, MuleEvent event, RollbackSourceCallback rollbackMethod)
     {
         FlowConstructStatistics statistics = event.getFlowConstruct().getStatistics();
@@ -91,7 +91,8 @@ public abstract class AbstractMessagingExceptionStrategy extends AbstractExcepti
             commit();
         }
 
-        closeStream(event.getMessage());        
+        closeStream(event.getMessage());
+        resumeSuspendedTransaction();
 
         if (stopMessageProcessing)
         {

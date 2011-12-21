@@ -16,6 +16,7 @@ import org.mule.api.MuleContext;
 import org.mule.api.exception.RollbackSourceCallback;
 import org.mule.api.exception.SystemExceptionHandler;
 import org.mule.message.DefaultExceptionPayload;
+import org.mule.transaction.TransactionCoordination;
 import org.mule.transport.AbstractConnector;
 import org.mule.transport.ConnectException;
 

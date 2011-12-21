@@ -161,31 +161,23 @@ public class TransactionTemplate<T>
         {
             Transaction suspendedXATx = null;
             Transaction tx = TransactionCoordination.getInstance().getTransaction();
-            //TODO Uncomment try-finally once TransactionTemplate starts handling exceptions
-            //try
-            //{
-                byte action = config.getAction();
-                if ((action == TransactionConfig.ACTION_NONE || action == TransactionConfig.ACTION_ALWAYS_BEGIN)
-                       && tx != null && tx.isXA())
+            byte action = config.getAction();
+            if ((action == TransactionConfig.ACTION_NONE || action == TransactionConfig.ACTION_ALWAYS_BEGIN)
+                   && tx != null && tx.isXA())
+            {
+                if (logger.isDebugEnabled())
                 {
-                    if (logger.isDebugEnabled())
-                    {
-                        logger.debug("suspending XA tx " + action + ", " + "current TX: " + tx);
-                    }
-                    suspendedXATx = tx;
-                    suspendXATransaction(suspendedXATx);
+                    logger.debug("suspending XA tx " + action + ", " + "current TX: " + tx);
                 }
-                T result = next.execute(callback);
-            //}
-            //finally
-            //{
-                //TODO rethink were it should be resumed - after resolve current tx maybe?
-                if (suspendedXATx != null)
-                {
-                    resumeXATransaction(suspendedXATx);
-                }
-                return result;
-            //}
+                suspendedXATx = tx;
+                suspendXATransaction(suspendedXATx);
+            }
+            T result = next.execute(callback);
+            if (suspendedXATx != null)
+            {
+                resumeXATransaction(suspendedXATx);
+            }
+            return result;
         }
     }
 
@@ -300,51 +292,17 @@ public class TransactionTemplate<T>
 
     protected void resolveTransaction(Transaction tx) throws TransactionException
     {
-        if (tx.isRollbackOnly())
-        {
-            if (logger.isDebugEnabled())
-            {
-                logger.debug("Transaction has been marked rollbackOnly, rolling it back: " + tx);
-            }
-            tx.rollback();
-        }
-        else
-        {
-            if (logger.isDebugEnabled())
-            {
-                logger.debug("Committing transaction " + tx);
-            }
-            tx.commit();
-        }
+        TransactionCoordination.getInstance().resolveTransaction();
     }
 
     protected void suspendXATransaction(Transaction tx) throws TransactionException
     {
-        if (logger.isDebugEnabled())
-        {
-            logger.debug("Suspending " + tx);
-        }
-
-        tx.suspend();
-
-        if (logger.isDebugEnabled())
-        {
-            logger.debug("Successfully suspended " + tx);
-            logger.debug("Unbinding the following TX from the current context: " + tx);
-        }
-
-        TransactionCoordination.getInstance().unbindTransaction(tx);
+        TransactionCoordination.getInstance().suspendCurrentTransaction();
     }
 
     protected void resumeXATransaction(Transaction tx) throws TransactionException
     {
-        if (logger.isDebugEnabled())
-        {
-            logger.debug("Re-binding and Resuming " + tx);
-        }
-
-        TransactionCoordination.getInstance().bindTransaction(tx);
-        tx.resume();
+        TransactionCoordination.getInstance().resumeSuspendedTransaction();
     }
 
 }

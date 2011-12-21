@@ -143,32 +143,44 @@ public class RetrieveMessageReceiver extends AbstractPollingMessageReceiver impl
                         if (!messages[i].getFlags().contains(Flags.Flag.DELETED)
                             && !messages[i].getFlags().contains(Flags.Flag.SEEN))
                         {
-                            MimeMessage mimeMessage = new MimeMessage((MimeMessage) messages[i]);
-                            storeMessage(mimeMessage);
-                            message = createMuleMessage(mimeMessage, endpoint.getEncoding());
-    
-                            if (castConnector().isDeleteReadMessages())
+                            try
                             {
-                                // Mark as deleted
-                                messages[i].setFlag(Flags.Flag.DELETED, true);
-                            }
-                            else
-                            {
-                                if (this.getEndpoint().getFilter() != null && this.getEndpoint().getFilter().accept(message))
+                                MimeMessage mimeMessage = new MimeMessage((MimeMessage) messages[i]);
+                                storeMessage(mimeMessage);
+                                message = createMuleMessage(mimeMessage, endpoint.getEncoding());
+
+                                if (castConnector().isDeleteReadMessages())
                                 {
-                                    Flags.Flag flag = castConnector().getDefaultProcessMessageAction();
-                                    if (flag != null)
-                                    {
-                                        messages[i].setFlag(flag, true);
-                                    }
+                                    // Mark as deleted
+                                    messages[i].setFlag(Flags.Flag.DELETED, true);
                                 }
                                 else
                                 {
-                                    messages[i].setFlag(Flags.Flag.SEEN, false);
+                                    if (this.getEndpoint().getFilter() != null && this.getEndpoint().getFilter().accept(message))
+                                    {
+                                        Flags.Flag flag = castConnector().getDefaultProcessMessageAction();
+                                        if (flag != null)
+                                        {
+                                            messages[i].setFlag(flag, true);
+                                        }
+                                    }
+                                    else
+                                    {
+                                        messages[i].setFlag(Flags.Flag.SEEN, false);
+                                    }
                                 }
+
+                                routeMessage(message);
                             }
-    
-                            routeMessage(message);
+                            catch (org.mule.api.MessagingException e)
+                            {
+                                //Already handled by TransactionTemplate
+                            }
+                            catch (Exception e)
+                            {
+                                connector.getMuleContext().getExceptionListener().handleException(e);
+                                throw e;
+                            }
                         }
                     }
                     catch (MuleException e)

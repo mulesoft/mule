@@ -126,7 +126,14 @@ public class WildcardFilter implements Filter, ObjectFilter
                     try
                     {
                         Class<?> theClass = ClassUtils.loadClass(className, this.getClass());
-                        if (theClass.isInstance(object))
+                        if (!(object instanceof String))
+                        {
+                            if (theClass.isInstance(object))
+                            {
+                                return true;
+                            }
+                        }
+                        else if (theClass.isAssignableFrom(ClassUtils.loadClass(object.toString(),this.getClass())))
                         {
                             return true;
                         }

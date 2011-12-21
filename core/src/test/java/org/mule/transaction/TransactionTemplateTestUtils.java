@@ -12,6 +12,7 @@ package org.mule.transaction;
 import org.mockito.Answers;
 import org.mockito.Mockito;
 import org.mule.api.MessagingException;
+import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionCallback;
 
 public class TransactionTemplateTestUtils
@@ -59,6 +60,18 @@ public class TransactionTemplateTestUtils
                 throw mockMessagingException;
             }
         };
+    }
 
+    public static TransactionCallback getFailureTransactionCallbackStartsTransaction(final MessagingException mockMessagingException, final Transaction mockTransaction)
+    {
+        return new TransactionCallback() {
+
+            @Override
+            public Object doInTransaction() throws Exception
+            {
+                TransactionCoordination.getInstance().bindTransaction(mockTransaction);
+                throw mockMessagingException;
+            }
+        };
     }
 }

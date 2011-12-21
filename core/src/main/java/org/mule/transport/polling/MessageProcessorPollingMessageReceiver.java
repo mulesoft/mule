@@ -12,6 +12,7 @@ package org.mule.transport.polling;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
+import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
@@ -22,8 +23,11 @@ import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.api.transaction.TransactionCallback;
 import org.mule.api.transport.Connector;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.transaction.TransactionTemplate;
+import org.mule.transaction.TransactionTemplateFactory;
 import org.mule.transport.AbstractConnector;
 import org.mule.transport.AbstractPollingMessageReceiver;
 import org.mule.transport.NullPayload;
@@ -70,26 +74,46 @@ public class MessageProcessorPollingMessageReceiver extends AbstractPollingMessa
     @Override
     public void poll() throws Exception
     {
-        MuleMessage request = new DefaultMuleMessage(StringUtils.EMPTY, (Map<String, Object>) null,
-            connector.getMuleContext());
-        ImmutableEndpoint ep = endpoint;
-        if (sourceMessageProcessor instanceof ImmutableEndpoint)
+        TransactionTemplate<Void> mainTransactionTemplate = TransactionTemplateFactory.<Void>createMainTransactionTemplate(endpoint.getTransactionConfig(), connector.getMuleContext());
+        try
         {
-            ep = (ImmutableEndpoint) sourceMessageProcessor;
-        }
+            mainTransactionTemplate.execute(new TransactionCallback<Void>()
+            {
+                @Override
+                public Void doInTransaction() throws Exception
+                {
+                    MuleMessage request = new DefaultMuleMessage(StringUtils.EMPTY, (Map<String, Object>) null,
+                    connector.getMuleContext());
+                    ImmutableEndpoint ep = endpoint;
+                    if (sourceMessageProcessor instanceof ImmutableEndpoint)
+                    {
+                        ep = (ImmutableEndpoint) sourceMessageProcessor;
+                    }
 
-        MuleEvent event = new DefaultMuleEvent(request, ep.getExchangePattern(), flowConstruct);
+                    MuleEvent event = new DefaultMuleEvent(request, ep.getExchangePattern(), flowConstruct);
 
-        MuleEvent sourceEvent = sourceMessageProcessor.process(event);
-        if (isNewMessage(sourceEvent))
-        {
-            routeMessage(sourceEvent.getMessage());
+                    MuleEvent sourceEvent = sourceMessageProcessor.process(event);
+                    if (isNewMessage(sourceEvent))
+                    {
+                        routeMessage(sourceEvent.getMessage());
+                    }
+                    else
+                    {
+                        // TODO DF: i18n
+                        logger.info(String.format("Polling of '%s' returned null, the flow will not be invoked.",
+                            sourceMessageProcessor));
+                    }
+                    return null;
+                }
+            });
         }
-        else
+        catch (MessagingException e)
         {
-            // TODO DF: i18n
-            logger.info(String.format("Polling of '%s' returned null, the flow will not be invoked.",
-                sourceMessageProcessor));
+            //Already handled by TransactionTemplate
+        }
+        catch (Exception e)
+        {
+            connector.getMuleContext().getExceptionListener().handleException(e);
         }
     }
 

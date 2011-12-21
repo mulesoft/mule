@@ -10,10 +10,14 @@
 
 package org.mule.transport.sftp;
 
+import org.mule.api.MessagingException;
 import org.mule.api.MuleMessage;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
+import org.mule.api.transaction.TransactionCallback;
+import org.mule.transaction.TransactionTemplate;
+import org.mule.transaction.TransactionTemplateFactory;
 import org.mule.transport.AbstractPollingMessageReceiver;
 import org.mule.transport.sftp.notification.SftpNotifier;
 
@@ -88,9 +92,14 @@ public class SftpMessageReceiver extends AbstractPollingMessageReceiver
                 }
             }
         }
+        catch (MessagingException e)
+        {
+            //Already handled by TransactionTemplate
+        }
         catch (Exception e)
         {
             logger.error("Error in poll", e);
+            connector.getMuleContext().getExceptionListener().handleException(e);
             throw e;
         }
     }
@@ -101,33 +110,42 @@ public class SftpMessageReceiver extends AbstractPollingMessageReceiver
         return true;
     }
 
-    protected void routeFile(String path) throws Exception
+    protected void routeFile(final String path) throws Exception
     {
-        // A bit tricky initialization of the notifier in this case since we don't
-        // have access to the message yet...
-        SftpNotifier notifier = new SftpNotifier((SftpConnector) connector, createNullMuleMessage(),
-            endpoint, flowConstruct.getName());
-
-        InputStream inputStream = sftpRRUtil.retrieveFile(path, notifier);
-
-        if (logger.isDebugEnabled())
+        TransactionTemplate<Void> mainTransactionTemplate = TransactionTemplateFactory.<Void>createMainTransactionTemplate(endpoint.getTransactionConfig(), connector.getMuleContext());
+        mainTransactionTemplate.execute(new TransactionCallback<Void>()
         {
-            logger.debug("Routing file: " + path);
-        }
+            @Override
+            public Void doInTransaction() throws Exception
+            {
+                // A bit tricky initialization of the notifier in this case since we don't
+                // have access to the message yet...
+                SftpNotifier notifier = new SftpNotifier((SftpConnector) connector, createNullMuleMessage(),
+                    endpoint, flowConstruct.getName());
 
-        MuleMessage message = createMuleMessage(inputStream);
+                InputStream inputStream = sftpRRUtil.retrieveFile(path, notifier);
 
-        message.setOutboundProperty(SftpConnector.PROPERTY_FILENAME, path);
-        message.setOutboundProperty(SftpConnector.PROPERTY_ORIGINAL_FILENAME, path);
+                if (logger.isDebugEnabled())
+                {
+                    logger.debug("Routing file: " + path);
+                }
 
-        // Now we have access to the message, update the notifier with the message
-        notifier.setMessage(message);
-        routeMessage(message);
+                MuleMessage message = createMuleMessage(inputStream);
 
-        if (logger.isDebugEnabled())
-        {
-            logger.debug("Routed file: " + path);
-        }
+                message.setOutboundProperty(SftpConnector.PROPERTY_FILENAME, path);
+                message.setOutboundProperty(SftpConnector.PROPERTY_ORIGINAL_FILENAME, path);
+
+                // Now we have access to the message, update the notifier with the message
+                notifier.setMessage(message);
+                routeMessage(message);
+
+                if (logger.isDebugEnabled())
+                {
+                    logger.debug("Routed file: " + path);
+                }
+                return null;
+            }
+        });
     }
 
     /**
