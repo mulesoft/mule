@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:spring="http://www.springframework.org/schema/beans" xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+    xmlns:test="http://www.mulesoft.org/schema/mule/test" xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+    xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+       http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/3.2/mule-test.xsd
+       http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.2/mule-vm.xsd
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd">
+
+
+
+    <flow name="A" processingStrategy="synchronous">
+        <expression-transformer evaluator="header" expression="SESSION:key" />
+    </flow>
+
+    <flow name="B" processingStrategy="synchronous">
+        <message-properties-transformer scope="session">
+            <mule:add-message-property key="key" value="value" />
+        </message-properties-transformer>
+    </flow>
+
+    <flow name="RequestResponseSessionPropertySettingChain" processingStrategy="synchronous">
+        <response>
+            <message-properties-transformer scope="session">
+                <mule:add-message-property key="key5" value="value5" />
+            </message-properties-transformer>
+        </response>
+        <message-properties-transformer scope="session">
+            <mule:add-message-property key="key1" value="value1" />
+        </message-properties-transformer>
+        <vm:outbound-endpoint path="D-in" exchange-pattern="request-response"/>
+    </flow>
+    <flow name="D" processingStrategy="synchronous">
+        <vm:inbound-endpoint path="D-in" exchange-pattern="request-response"/>
+        <response>
+            <message-properties-transformer scope="session">
+                <mule:add-message-property key="key4" value="value4" />
+            </message-properties-transformer>
+        </response>
+        <message-properties-transformer scope="session">
+            <mule:add-message-property key="key2" value="value2" />
+        </message-properties-transformer>
+        <vm:outbound-endpoint path="E-in" exchange-pattern="request-response"/>
+    </flow>
+    <flow name="E">
+        <vm:inbound-endpoint path="E-in" exchange-pattern="request-response"/>
+        <message-properties-transformer scope="session">
+            <mule:add-message-property key="key3" value="value3" />
+        </message-properties-transformer>
+    </flow>
+
+    <flow name="PassthroughFlow">
+        <vm:outbound-endpoint path="passthrough-bridge" exchange-pattern="one-way"/>
+    </flow>
+    <flow name="PassthroughBFlow">
+        <vm:inbound-endpoint path="passthrough-bridge" exchange-pattern="one-way"/>
+        <vm:outbound-endpoint path="PassthroughFlow-out" exchange-pattern="one-way"/>
+    </flow>
+
+    <flow name="OneWaySessionPropertySettingChain">
+        <message-properties-transformer scope="session">
+            <mule:add-message-property key="key1" value="value1" />
+        </message-properties-transformer>
+        <vm:outbound-endpoint path="G-in" exchange-pattern="one-way"/>
+    </flow>
+    <flow name="G">
+        <vm:inbound-endpoint path="G-in" exchange-pattern="one-way"/>
+        <message-properties-transformer scope="session">
+            <mule:add-message-property key="key2" value="value2" />
+        </message-properties-transformer>
+        <vm:outbound-endpoint path="H-in" exchange-pattern="one-way"/>
+    </flow>
+    <flow name="H">
+        <vm:inbound-endpoint path="H-in" exchange-pattern="one-way"/>
+        <message-properties-transformer scope="session">
+            <mule:add-message-property key="key3" value="value3" />
+        </message-properties-transformer>
+        <vm:outbound-endpoint path="H-out" exchange-pattern="one-way"/>
+    </flow>
+
+    <flow name="FlowRefWithSessionProperties" processingStrategy="synchronous">
+        <message-properties-transformer scope="session">
+            <mule:add-message-property key="key1" value="value1" />
+        </message-properties-transformer>
+        <flow-ref name="I"/>
+    </flow>
+    <flow name="I" processingStrategy="synchronous">
+        <message-properties-transformer scope="session">
+            <mule:add-message-property key="key2" value="value2" />
+        </message-properties-transformer>
+        <flow-ref name="J"/>
+    </flow>
+    <flow name="J" processingStrategy="synchronous">
+        <message-properties-transformer scope="session">
+            <mule:add-message-property key="key3" value="value3" />
+        </message-properties-transformer>
+    </flow>
+
+
+    <!-- <flow name"B"> </flow> <flow name"C"> </flow> <flow name"D"> </flow> -->
+
+</mule>
