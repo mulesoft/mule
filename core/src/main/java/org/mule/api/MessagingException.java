@@ -16,8 +16,6 @@ import org.mule.config.i18n.Message;
 import org.mule.transport.NullPayload;
 import org.mule.util.StringUtils;
 
-import javax.swing.*;
-
 /**
  * <code>MessagingException</code> is a general message exception thrown when
  * errors specific to Message processing occur..
