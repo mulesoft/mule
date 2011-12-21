@@ -6769,10 +6769,17 @@
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
-        <xsd:attribute name="class" type="substitutableClass">
+        <xsd:attribute name="class" type="xsd:string">
             <xsd:annotation>
                 <xsd:documentation>
-                    The type of keystore used (a Java class name).
+                    Deprecated.  use "type" instead
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="type" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>
+                    The type of keystore used (defaults to "jks").
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
@@ -6792,10 +6799,17 @@
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
-        <xsd:attribute name="class" type="substitutableClass">
+        <xsd:attribute name="class" type="xsd:string">
             <xsd:annotation>
                 <xsd:documentation>
-                    The type of keystore used (a Java class name).
+                    Deprecated.  use "type" instead
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="type" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>
+                    The type of keystore used (defaults to "jks").
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
@@ -6862,7 +6876,20 @@
         </xsd:annotation>
         <xsd:complexContent>
             <xsd:extension base="tlsTrustStoreType">
-                <xsd:attribute name="class" type="substitutableClass"/>
+                <xsd:attribute name="class" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Deprecated.  use "type" instead
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="type" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The type of keystore used (defaults to "jks").
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
                 <xsd:attribute name="algorithm" type="xsd:string">
                     <xsd:annotation>
                         <xsd:documentation>
