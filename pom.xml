@@ -1833,7 +1833,14 @@
         <profile>
             <id>mule-tests</id>
             <activation>
-                <activeByDefault>true</activeByDefault>
+                <property>
+                    <!--
+                        This profile is activated if NO system property
+                        'skipMuleTests' is found. Disable this profile
+                        by specifying -DskipMuleTests=true on the commandline
+                     -->
+                    <name>!skipMuleTests</name>
+                </property>
             </activation>
             <modules>
                 <module>tests</module>
