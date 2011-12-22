@@ -350,17 +350,6 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
                     return null;
                 }
             });
-            if (!fileConnector.isStreaming())
-            {
-                moveAndDelete(sourceFile, destinationFile, originalSourceFileName, message);
-            }
-            else
-            {
-                // If we are streaming no need to move/delete now, that will be done when
-                // stream is closed
-                message.setOutboundProperty(FileConnector.PROPERTY_FILENAME, sourceFile.getName());
-                this.routeMessage(message);
-            }
         }
         catch (Exception e)
         {
