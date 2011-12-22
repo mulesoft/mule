@@ -14,6 +14,7 @@ import org.mule.api.security.SecurityContext;
 import org.mule.api.transport.SessionHandler;
 
 import java.io.Serializable;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -93,6 +94,16 @@ public interface MuleSession extends Serializable
      * @return the value of the session data or null if the property does not exist
      */
     Object removeProperty(Object key);
+    
+    /**
+     * Returns an iterater of property keys for the session properties on this
+     * session
+     * 
+     * @return an iterater of property keys for the session properties on this
+     *         session
+     * @deprecated Use getPropertyNamesAsSet() instead  (Will be removed in 4.0)
+     */
+    Iterator getPropertyNames();
 
     /**
      * @return property keys for all session properties
