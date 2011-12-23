@@ -6769,17 +6769,17 @@
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
-        <xsd:attribute name="class" type="xsd:string">
+        <xsd:attribute name="class"  type="keystoreType">
             <xsd:annotation>
                 <xsd:documentation>
                     Deprecated.  use "type" instead
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
-        <xsd:attribute name="type" type="xsd:string">
+        <xsd:attribute name="type"  type="keystoreType">
             <xsd:annotation>
                 <xsd:documentation>
-                    The type of keystore used (defaults to "jks").
+                    The type of keystore used.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
@@ -6799,17 +6799,17 @@
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
-        <xsd:attribute name="class" type="xsd:string">
+        <xsd:attribute name="class" type="keystoreType">
             <xsd:annotation>
                 <xsd:documentation>
                     Deprecated.  use "type" instead
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
-        <xsd:attribute name="type" type="xsd:string">
+        <xsd:attribute name="type" type="keystoreType">
             <xsd:annotation>
                 <xsd:documentation>
-                    The type of keystore used (defaults to "jks").
+                    The type of keystore used.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
@@ -6876,17 +6876,17 @@
         </xsd:annotation>
         <xsd:complexContent>
             <xsd:extension base="tlsTrustStoreType">
-                <xsd:attribute name="class" type="xsd:string">
+                <xsd:attribute name="class"  type="keystoreType">
                     <xsd:annotation>
                         <xsd:documentation>
                             Deprecated.  use "type" instead
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="type" type="xsd:string">
+                <xsd:attribute name="type"  type="keystoreType">
                     <xsd:annotation>
                         <xsd:documentation>
-                            The type of keystore used (defaults to "jks").
+                            The type of keystore used.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -6922,6 +6922,32 @@
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
+
+    <xsd:simpleType name="keystoreType">
+        <xsd:annotation>
+            <xsd:documentation>
+                A type that defines a Java keystore.
+                The most common types are:
+                jks - The default Java KeyStore.
+                jceks - used by the Java Cryptography Extension
+                pkcs12 - A format commonly used to store private keys.
+                Others can be added as extensions to Java.
+                If no keystore type is specified, "jks" will be used.
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:union>
+            <xsd:simpleType>
+                <xsd:restriction base="xsd:string">
+                    <xsd:enumeration value="jks"/>
+                    <xsd:enumeration value="jceks"/>
+                    <xsd:enumeration value="pkcs12"/>
+                </xsd:restriction>
+            </xsd:simpleType>
+            <xsd:simpleType>
+                <xsd:restriction base="xsd:string"/>
+            </xsd:simpleType>
+        </xsd:union>
+    </xsd:simpleType>
 
     <!-- corresponds to TlsProtocolHandler, named as tls-protocol-handler -->
     <xsd:complexType name="tlsProtocolHandler">
