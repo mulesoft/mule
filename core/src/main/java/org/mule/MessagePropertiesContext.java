@@ -18,6 +18,7 @@ import org.mule.util.MapUtils;
 import org.mule.util.ObjectUtils;
 
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.util.AbstractMap;
 import java.util.Collections;
@@ -360,6 +361,12 @@ public class MessagePropertiesContext implements Serializable
         }
         out.defaultWriteObject();
     }
+    
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException
+    {
+        in.defaultReadObject();
+        sessionMap = new UndefinedSessionPropertiesMap();
+    }    
 
     private static class UndefinedSessionPropertiesMap extends AbstractMap<String, Object>
         implements Serializable
