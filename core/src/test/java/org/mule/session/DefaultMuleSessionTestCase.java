@@ -13,13 +13,14 @@ package org.mule.session;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
+import org.mule.api.MuleSession;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.registry.MuleRegistry;
 import org.mule.api.security.Authentication;
@@ -199,19 +200,18 @@ public class DefaultMuleSessionTestCase
     @SuppressWarnings(value = {"deprecation"})
     public void serializationWithNonSerializableProperty() throws MuleException
     {
-        DefaultMuleSession before = new DefaultMuleSession();
-        before.setProperty("foo", new Object());
+        MuleSession before = new DefaultMuleSession();
+        Object nonSerializable = new Object();
+        before.setProperty("foo", nonSerializable);
+        before.setProperty("foo2", "bar2");
 
-        try
-        {
-            // Serialize and then deserialize
-            SerializationUtils.deserialize(SerializationUtils.serialize(before), getClass().getClassLoader());
+        MuleSession after = (DefaultMuleSession) SerializationUtils.deserialize(
+            SerializationUtils.serialize(before), getClass().getClassLoader());
 
-            fail("Exception expected");
-        }
-        catch (RuntimeException e)
-        {
-        }
+        assertNotNull(after);
+        assertNotSame(after, before);
+        assertEquals("bar2", after.getProperty("foo2"));
+        assertNull(after.getProperty("foo"));
     }
 
     private SecurityContext createTestAuthentication()
