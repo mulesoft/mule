@@ -12,7 +12,6 @@ package org.mule.routing.requestreply;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.OptimizedRequestContext;
-import org.mule.RequestContext;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -30,19 +29,17 @@ import org.mule.api.processor.RequestReplyRequesterMessageProcessor;
 import org.mule.api.routing.ResponseTimeoutException;
 import org.mule.api.source.MessageSource;
 import org.mule.api.store.ListableObjectStore;
-import org.mule.api.store.ObjectStore;
 import org.mule.api.store.ObjectStoreException;
 import org.mule.api.store.ObjectStoreManager;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.context.notification.RoutingNotification;
-import org.mule.processor.AbstractInterceptingMessageProcessor;
 import org.mule.processor.AbstractInterceptingMessageProcessorBase;
 import org.mule.routing.EventProcessingThread;
 import org.mule.util.ObjectUtils;
 import org.mule.util.concurrent.Latch;
+import org.mule.util.concurrent.ThreadNameHelper;
 
 import java.io.Serializable;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -50,7 +47,6 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.collections.buffer.BoundedFifoBuffer;
-import org.mule.util.concurrent.ThreadNameHelper;
 
 public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterceptingMessageProcessorBase
     implements RequestReplyRequesterMessageProcessor, FlowConstructAware, Initialisable, Startable, Stoppable, Disposable
@@ -93,6 +89,9 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
             sendAsyncRequest(event);
 
             MuleEvent resultEvent = receiveAsyncReply(event);
+            
+            // Merge async-reply session properties with exiting session properties
+            event.getSession().merge(resultEvent.getSession());
 
             if (resultEvent != null)
             {

@@ -12,6 +12,7 @@ package org.mule.session;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 
@@ -19,8 +20,10 @@ import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
+import org.mule.api.transport.MessageDispatcher;
 import org.mule.api.transport.PropertyScope;
 import org.mule.construct.Flow;
+import org.mule.transport.vm.VMMessageDispatcher;
 
 import org.junit.Test;
 
@@ -142,7 +145,48 @@ public class SessionPropertiesTestCase extends org.mule.tck.junit4.FunctionalTes
         assertEquals("value2", result.getMessage().getProperty("key2", PropertyScope.SESSION));
         assertEquals(nonSerializable,
             result.getMessage().getProperty("keyNonSerializable", PropertyScope.SESSION));
+    }
 
+    @Test
+    public void outboundEndpointSessionMerge() throws Exception
+    {
+        MuleMessage message = new DefaultMuleMessage("data", muleContext);
+        MuleEvent event = new DefaultMuleEvent(message, getTestInboundEndpoint(""), getTestService());
+        Object nonSerializable = new Object();
+        message.setProperty("keyNonSerializable", nonSerializable, PropertyScope.SESSION);
+        message.setProperty("key", "value", PropertyScope.SESSION);
+        message.setProperty("key2", "value2", PropertyScope.SESSION);
+
+        MessageDispatcher dispatcher = new VMMessageDispatcher(muleContext.getEndpointFactory()
+            .getOutboundEndpoint("addSessionPropertiesFlowEndpoint"));
+        MuleEvent result = dispatcher.process(event);
+
+        assertNotNull(result);
+        assertNotSame(event, result);
+        assertEquals(nonSerializable, message.getProperty("keyNonSerializable", PropertyScope.SESSION));
+        assertEquals("value2NEW", result.getMessage().getProperty("key2", PropertyScope.SESSION));
+        assertEquals("value3", result.getMessage().getProperty("key3", PropertyScope.SESSION));
+        assertNull(result.getMessage().getProperty("nonSerializableBean", PropertyScope.SESSION));
+    }
+
+    @Test
+    public void requestReplySessionMerge() throws Exception
+    {
+        MuleMessage message = new DefaultMuleMessage("data", muleContext);
+        MuleEvent event = new DefaultMuleEvent(message, getTestInboundEndpoint(""), getTestService());
+        Object nonSerializable = new Object();
+        message.setProperty("keyNonSerializable", nonSerializable, PropertyScope.SESSION);
+        message.setProperty("key", "value", PropertyScope.SESSION);
+        message.setProperty("key2", "value2", PropertyScope.SESSION);
+
+        MuleEvent result = ((Flow)muleContext.getRegistry().lookupFlowConstruct("requestResponseFlow")).process(event);
+        
+        assertNotNull(result);
+        assertNotSame(event, result);
+        assertEquals(nonSerializable, message.getProperty("keyNonSerializable", PropertyScope.SESSION));
+        assertEquals("value2NEW", result.getMessage().getProperty("key2", PropertyScope.SESSION));
+        assertEquals("value3", result.getMessage().getProperty("key3", PropertyScope.SESSION));
+        assertNull(result.getMessage().getProperty("nonSerializableBean", PropertyScope.SESSION));
     }
 
     @Override
