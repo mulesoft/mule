@@ -14,6 +14,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.MessageExchangePattern;
 import org.mule.api.MuleMessage;
@@ -41,6 +42,9 @@ public class MessagePropertyFilterTestCase extends AbstractMuleContextTestCase
     public void testMessagePropertyFilterSessionScope() throws Exception
     {
         MuleMessage message = new DefaultMuleMessage("blah", muleContext);
+        // An event/session is needed otherwise the session properties set on the message go nowhere.
+        new DefaultMuleEvent(message, getTestInboundEndpoint(MessageExchangePattern.ONE_WAY),
+            getTestService());
         MessagePropertyFilter filter = new MessagePropertyFilter("foo=bar");
         filter.setScope(PropertyScope.SESSION_NAME);
         assertFalse(filter.accept(message));
@@ -74,9 +78,9 @@ public class MessagePropertyFilterTestCase extends AbstractMuleContextTestCase
         message = new DefaultMuleMessage("blah", inboundProps, null, null, muleContext);
         assertTrue("Filter didn't accept the message", filter.accept(message));
 
-        //Checking here that a ':' in the value doesn't throw things off
+        // Checking here that a ':' in the value doesn't throw things off
         filter = new MessagePropertyFilter("bar=http://bar.com");
-        //default scope
+        // default scope
         assertEquals("outbound", filter.getScope());
 
         assertFalse(filter.accept(message));
@@ -121,7 +125,6 @@ public class MessagePropertyFilterTestCase extends AbstractMuleContextTestCase
         assertTrue("Filter didn't accept the message", filter.accept(message));
     }
 
-
     @Test
     public void testMessagePropertyFilterWithWildcard() throws Exception
     {
@@ -158,7 +161,6 @@ public class MessagePropertyFilterTestCase extends AbstractMuleContextTestCase
         message.removeProperty("foo2");
         assertFalse(filter.accept(message));
     }
-
 
     @Test
     public void testMessagePropertyFilterPropertyExists() throws Exception
