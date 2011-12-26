@@ -1916,6 +1916,6 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     
     void setSessionProperties(Map<String, Object> sessionProperties)
     {
-        properties.scopedMap.put(PropertyScope.SESSION, sessionProperties);
+        properties.sessionMap = sessionProperties;
     }
 }

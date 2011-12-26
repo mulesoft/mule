@@ -15,10 +15,14 @@ import org.mule.api.security.SecurityContext;
 import org.mule.util.CaseInsensitiveHashMap;
 import org.mule.util.UUID;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.commons.logging.Log;
@@ -53,7 +57,7 @@ public final class DefaultMuleSession implements MuleSession
      */
     private SecurityContext securityContext;
 
-    private Map<String, Object> properties = null;
+    private transient Map<String, Object> properties = null;
 
     public DefaultMuleSession()
     {
@@ -201,6 +205,40 @@ public final class DefaultMuleSession implements MuleSession
     public Map<String, Object> getProperties()
     {
         return properties;
+    }
+    
+    void removeNonSerializableProperties()
+    {
+        Iterator<Entry<String, Object>> propertyIterator = getProperties().entrySet().iterator();
+        while (propertyIterator.hasNext())
+        {
+            final Entry<String, Object> entry = propertyIterator.next();
+            if (!(entry.getValue() instanceof Serializable))
+            {
+                logger.warn(String.format("Property %s is not serializable, it will not be preserved "
+                                          + "as part of the MuleSession", entry.getKey()));
+                propertyIterator.remove();
+            }
+        }
+    }
+
+    // //////////////////////////
+    // Serialization methods
+    // //////////////////////////
+
+    private void writeObject(ObjectOutputStream out) throws IOException
+    {
+        DefaultMuleSession copy = new DefaultMuleSession(this);
+        copy.removeNonSerializableProperties();
+        out.defaultWriteObject();
+        out.writeObject(copy.getProperties());
+    }
+
+    @SuppressWarnings("unchecked")
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException
+    {
+        in.defaultReadObject();
+        properties = (Map<String, Object>) in.readObject();
     }
 
 }

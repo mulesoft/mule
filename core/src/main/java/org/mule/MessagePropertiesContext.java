@@ -59,6 +59,8 @@ public class MessagePropertiesContext implements Serializable
      */
     protected Map<PropertyScope, Map<String, Object>> scopedMap;
 
+    protected transient Map<String, Object> sessionMap = new UndefinedSessionPropertiesMap();
+
     /**
      * The union of all property names from all scopes.
      */
@@ -74,17 +76,23 @@ public class MessagePropertiesContext implements Serializable
         scopedMap.put(PropertyScope.INVOCATION, new CaseInsensitiveHashMap/*<String, Object>*/(6));
         scopedMap.put(PropertyScope.INBOUND, new CaseInsensitiveHashMap/*<String, Object>*/(6));
         scopedMap.put(PropertyScope.OUTBOUND, new CaseInsensitiveHashMap/*<String, Object>*/(6));
-        scopedMap.put(PropertyScope.SESSION, new UndefinedSessionPropertiesMap());
     }
 
     protected Map<String, Object> getScopedProperties(PropertyScope scope)
     {
-        Map<String, Object> map = scopedMap.get(scope);
-        if (map == null)
+        if (PropertyScope.SESSION.equals(scope))
         {
-            throw new IllegalArgumentException("Scope not registered: " + scope);
+            return sessionMap;
         }
-        return map;
+        else
+        {
+            Map<String, Object> map = scopedMap.get(scope);
+            if (map == null)
+            {
+                throw new IllegalArgumentException("Scope not registered: " + scope);
+            }
+            return map;
+        }
     }
 
     public PropertyScope getDefaultScope()
@@ -125,7 +133,7 @@ public class MessagePropertiesContext implements Serializable
             scope = PropertyScope.OUTBOUND;
         }
 
-        return (T) scopedMap.get(scope).get(key);
+        return (T) getScopedProperties(scope).get(key);
     }
 
     /**
@@ -334,15 +342,17 @@ public class MessagePropertiesContext implements Serializable
      */
     private void writeObject(java.io.ObjectOutputStream out) throws IOException
     {
-        for (Map.Entry<PropertyScope, Map<String, Object>> context : scopedMap.entrySet())
+        for (PropertyScope scope : new PropertyScope[]{PropertyScope.INVOCATION, PropertyScope.INBOUND,
+            PropertyScope.OUTBOUND})
         {
-            for (Map.Entry<String, Object> entry : context.getValue().entrySet())
+            for (Map.Entry<String, Object> entry : scopedMap.get(scope).entrySet())
             {
                 Object value = entry.getValue();
                 if (value != null && !(value instanceof Serializable))
                 {
-                    String message = String.format("Unable to serialize the %s message property %s, which is of type %s ",
-                                                   context.getKey(), entry.getKey(), value);
+                    String message = String.format(
+                        "Unable to serialize the %s message property %s, which is of type %s ", scope,
+                        entry.getKey(), value);
                     logger.error(message);
                     throw new IOException(message);
                 }
