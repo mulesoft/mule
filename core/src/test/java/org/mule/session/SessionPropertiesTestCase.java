@@ -265,6 +265,7 @@ public class SessionPropertiesTestCase extends AbstractMuleContextTestCase
 
         Object nonSerializable = new Object();
         event.getSession().setProperty("key", nonSerializable);
+        event.getSession().setProperty("key2", "value2");
 
         // Serialize and deserialize session using default session handler
         new SerializeAndEncodeSessionHandler().storeSessionInfoToMessage(event.getSession(), message);
@@ -277,11 +278,14 @@ public class SessionPropertiesTestCase extends AbstractMuleContextTestCase
         // instance
         assertNotSame(newSession, event.getSession());
         assertFalse(newSession.equals(event.getSession()));
+        assertEquals(nonSerializable, event.getSession().getProperty("key"));
+        assertEquals("value2",newSession.getProperty("key2"));
 
         // Non-serilizable session properties available before serialization are not
         // available after too
-        assertEquals(0, newSession.getPropertyNamesAsSet().size());
+        assertEquals(1, newSession.getPropertyNamesAsSet().size());
         assertNull(newSession.getProperty("key"));
+        assertEquals("value2",newSession.getProperty("key2"));
     }
 
     /**

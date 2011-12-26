@@ -19,6 +19,8 @@ import org.mule.api.transport.SessionHandler;
 import org.mule.util.SerializationUtils;
 
 import java.io.Serializable;
+import java.util.Iterator;
+import java.util.Map.Entry;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -64,17 +66,19 @@ public class SerializeOnlySessionHandler implements SessionHandler
         message.setOutboundProperty(MuleProperties.MULE_SESSION_PROPERTY, serializedSession);
     }
     
-    protected MuleSession removeNonSerializableProperties(final MuleSession session, final MuleContext muleContext)
+    protected MuleSession removeNonSerializableProperties(final MuleSession session,
+                                                          final MuleContext muleContext)
     {
-        MuleSession copy = new DefaultMuleSession(session, muleContext);
-        for (String key : copy.getPropertyNamesAsSet())
+        DefaultMuleSession copy = new DefaultMuleSession(session, muleContext);
+        Iterator<Entry<String, Object>> propertyIterator = copy.getProperties().entrySet().iterator();
+        while (propertyIterator.hasNext())
         {
-            final Object value = copy.getProperty(key);
-            if (!(value instanceof Serializable))
+            final Entry<String, Object> entry = propertyIterator.next();
+            if (!(entry.getValue() instanceof Serializable))
             {
-                logger.warn(String.format("Property %s is not serializable, it will not be preserved " +
-                                          "as part of the MuleSession", key));
-                copy.removeProperty(key);
+                logger.warn(String.format("Property %s is not serializable, it will not be preserved "
+                                          + "as part of the MuleSession", entry.getKey()));
+                propertyIterator.remove();
             }
         }
         return copy;
