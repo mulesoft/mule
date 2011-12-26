@@ -10,6 +10,8 @@
 package org.mule;
 
 import org.mule.api.MuleEvent;
+import org.mule.api.MuleMessage;
+import org.mule.api.MuleSession;
 import org.mule.api.transport.PropertyScope;
 import org.mule.util.CaseInsensitiveHashMap;
 import org.mule.util.MapUtils;
@@ -17,6 +19,7 @@ import org.mule.util.ObjectUtils;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.AbstractMap;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -29,18 +32,19 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * This object maintains a scoped map of properties.  This means that certain properties will only be visible under some
- * scopes. The scopes supported by Mule are:
+ * This object maintains a scoped map of properties. This means that certain properties will only be visible
+ * under some scopes. The scopes supported by Mule are:
  * <ol>
- * <li> {@link org.mule.api.transport.PropertyScope#INBOUND} Contains properties that were on the message when it was
- * received by Mule.  This scope is read-only.</li>
- * <li>{@link org.mule.api.transport.PropertyScope#INVOCATION} Any properties set on the invocation scope will be
- * available to the current service but will not be attached to any outbound messages.</li>
- * <li>{@link org.mule.api.transport.PropertyScope#OUTBOUND} Any properties set in this scope will be attached to any
- * outbound messages resulting from this message.  This is the default scope.</li>
- * <li>{@link org.mule.api.transport.PropertyScope#SESSION} Any properties set on this scope will be added to the session.
- * Note that this is a convenience scope in that you cannot directly access session properties from this scope.  Session
- * properties can be accessed from the {@link MuleEvent}</li>
+ * <li> {@link org.mule.api.transport.PropertyScope#INBOUND} Contains properties that were on the message when
+ * it was received by Mule. This scope is read-only.</li>
+ * <li>{@link org.mule.api.transport.PropertyScope#INVOCATION} Any properties set on the invocation scope will
+ * be available to the current service but will not be attached to any outbound messages.</li>
+ * <li>{@link org.mule.api.transport.PropertyScope#OUTBOUND} Any properties set in this scope will be attached
+ * to any outbound messages resulting from this message. This is the default scope.</li>
+ * <li>{@link org.mule.api.transport.PropertyScope#SESSION} Any properties set on this scope will be added to
+ * the session. Note Session properties are not stored on the {@link MuleMessage}. This scope should only be
+ * used once a {@link MuleEvent} has been created as there is no {@link MuleSession} and therefore Session
+ * scope properties before this time</li>
  * </ol>
  */
 public class MessagePropertiesContext implements Serializable
@@ -70,7 +74,7 @@ public class MessagePropertiesContext implements Serializable
         scopedMap.put(PropertyScope.INVOCATION, new CaseInsensitiveHashMap/*<String, Object>*/(6));
         scopedMap.put(PropertyScope.INBOUND, new CaseInsensitiveHashMap/*<String, Object>*/(6));
         scopedMap.put(PropertyScope.OUTBOUND, new CaseInsensitiveHashMap/*<String, Object>*/(6));
-        scopedMap.put(PropertyScope.SESSION, new CaseInsensitiveHashMap/*<String, Object>*/(6));
+        scopedMap.put(PropertyScope.SESSION, new UndefinedSessionPropertiesMap());
     }
 
     protected Map<String, Object> getScopedProperties(PropertyScope scope)
@@ -346,4 +350,37 @@ public class MessagePropertiesContext implements Serializable
         }
         out.defaultWriteObject();
     }
+
+    private static class UndefinedSessionPropertiesMap extends AbstractMap<String, Object>
+        implements Serializable
+    {
+
+        private static final long serialVersionUID = -7982608304570908737L;
+
+        @Override
+        public Set<java.util.Map.Entry<String, Object>> entrySet()
+        {
+            return Collections.emptySet();
+        }
+
+        @Override
+        public Object put(String key, Object value)
+        {
+            logger.warn(String.format(
+                "Detected an attempt to set a session property, "
+                                + "but a MuleEvent hasn't been created useing this message yet. Key/value: %s=%s",
+                key, value));
+            return value;
+        };
+
+        @Override
+        public Object get(Object key)
+        {
+            logger.warn(String.format(
+                "Detected an attempt to get a session property, "
+                                + "but a MuleEvent hasn't been created useing this message yet. Key: %s", key));
+            return super.get(key);
+        }
+    }
+
 }

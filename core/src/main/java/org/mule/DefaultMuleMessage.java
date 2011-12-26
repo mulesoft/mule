@@ -217,7 +217,8 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
                 ((DefaultMuleMessage) muleMessage).properties.getScopedProperties(PropertyScope.INBOUND);
         addInboundProperties(inboundProperties);
 
-        for (PropertyScope scope : PropertyScope.ALL_SCOPES)
+        for (PropertyScope scope : new PropertyScope[]{PropertyScope.INVOCATION, PropertyScope.INBOUND,
+            PropertyScope.OUTBOUND})
         {
             try
             {
