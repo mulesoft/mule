@@ -12,6 +12,7 @@ package org.mule.session;
 
 import org.mule.api.MuleSession;
 import org.mule.api.security.SecurityContext;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.util.CaseInsensitiveHashMap;
 import org.mule.util.UUID;
 
@@ -57,7 +58,7 @@ public final class DefaultMuleSession implements MuleSession
      */
     private SecurityContext securityContext;
 
-    private transient Map<String, Object> properties = null;
+    private transient Map<String, Object> properties;
 
     public DefaultMuleSession()
     {
@@ -206,7 +207,7 @@ public final class DefaultMuleSession implements MuleSession
     {
         return properties;
     }
-    
+
     void removeNonSerializableProperties()
     {
         Iterator<Entry<String, Object>> propertyIterator = getProperties().entrySet().iterator();
@@ -215,8 +216,7 @@ public final class DefaultMuleSession implements MuleSession
             final Entry<String, Object> entry = propertyIterator.next();
             if (!(entry.getValue() instanceof Serializable))
             {
-                logger.warn(String.format("Property %s is not serializable, it will not be preserved "
-                                          + "as part of the MuleSession", entry.getKey()));
+                logger.warn(CoreMessages.propertyNotSerializable(entry.getKey()));
                 propertyIterator.remove();
             }
         }

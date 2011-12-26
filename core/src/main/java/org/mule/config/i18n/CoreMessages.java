@@ -1343,4 +1343,10 @@ public class CoreMessages extends MessageFactory
     {
         return factory.createMessage(BUNDLE_PATH, 332, name);
     }
+
+    public static Message propertyNotSerializable(String key)
+    {
+        return factory.createMessage(BUNDLE_PATH, 333, key);
+    }
+
 }
