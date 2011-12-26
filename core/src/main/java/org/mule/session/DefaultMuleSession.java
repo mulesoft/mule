@@ -390,4 +390,10 @@ public final class DefaultMuleSession implements MuleSession, DeserializationPos
         }
         serializedData = null;
     }
+    
+    Map<String, Object> getProperties()
+    {
+        return properties;
+    }
+
 }
