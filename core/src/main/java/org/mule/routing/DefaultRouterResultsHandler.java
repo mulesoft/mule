@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.routing;
 
 import org.mule.DefaultMessageCollection;
@@ -21,16 +22,15 @@ import org.mule.api.routing.RouterResultsHandler;
 import java.util.List;
 
 /**
- * The default results handler for all outbound endpoint. Depending on the number of messages passed it
- * the returning message will be different.
- * If the 'results' param is null or empty, null is returned.
- * If the 'results' param contains a single {@link org.mule.api.MuleMessage}, than that message is returned.
- * If the 'results' param contains more than one message a {@link org.mule.api.MuleMessageCollection} instance
- * is returned.
+ * The default results handler for all outbound endpoint. Depending on the number of messages passed it the
+ * returning message will be different. If the 'results' param is null or empty, null is returned. If the
+ * 'results' param contains a single {@link org.mule.api.MuleMessage}, than that message is returned. If the
+ * 'results' param contains more than one message a {@link org.mule.api.MuleMessageCollection} instance is
+ * returned.
  * <p/>
  * Note that right now (as of Mule 2.0.1) this SPI is not pluggable and this implementation is the default and
  * only implementation.
- *
+ * 
  * @see org.mule.api.MuleMessageCollection
  * @see org.mule.api.MuleMessage
  * @see org.mule.DefaultMessageCollection
@@ -39,16 +39,14 @@ public class DefaultRouterResultsHandler implements RouterResultsHandler
 {
     public MuleEvent aggregateResults(List<MuleEvent> results, MuleEvent previous, MuleContext muleContext)
     {
-        MuleMessage aggregate;
-
         if (results == null || results.size() == 0)
         {
-            aggregate = null;
+            return null;
         }
         else if (results.size() == 1)
         {
             MuleEvent event = results.get(0);
-            aggregate = event == null ? null : event.getMessage();
+            return event == null ? null : event;
         }
         else
         {
@@ -57,14 +55,13 @@ public class DefaultRouterResultsHandler implements RouterResultsHandler
             for (MuleEvent event : results)
             {
                 MuleMessage muleMessage = event == null ? null : event.getMessage();
-                if(muleMessage!=null)
+                if (muleMessage != null)
                 {
                     coll.addMessage(muleMessage);
                 }
             }
-            aggregate = coll;
+            return coll == null ? null : RequestContext.setEvent(new DefaultMuleEvent(coll, previous,
+                previous.getSession()));
         }
-
-        return aggregate == null ? null : RequestContext.setEvent(new DefaultMuleEvent(aggregate, previous, previous.getSession()));
     }
 }
