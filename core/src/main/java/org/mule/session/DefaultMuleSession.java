@@ -235,7 +235,7 @@ public final class DefaultMuleSession implements MuleSession
     @Override
     public <T> T getProperty(String key)
     {
-        return getProperty((Object) key);
+        return this.<T> getProperty((Object) key);
     }
 
     @Override
