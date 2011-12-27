@@ -6926,25 +6926,42 @@
     <xsd:simpleType name="keystoreType">
         <xsd:annotation>
             <xsd:documentation>
-                A type that defines a Java keystore.
-                The most common types are:
-                jks - The default Java KeyStore.
-                jceks - used by the Java Cryptography Extension
-                pkcs12 - A format commonly used to store private keys.
-                Others can be added as extensions to Java.
-                If no keystore type is specified, "jks" will be used.
+                A type that defines a Java keystore..
             </xsd:documentation>
         </xsd:annotation>
         <xsd:union>
             <xsd:simpleType>
                 <xsd:restriction base="xsd:string">
-                    <xsd:enumeration value="jks"/>
-                    <xsd:enumeration value="jceks"/>
-                    <xsd:enumeration value="pkcs12"/>
+                    <xsd:enumeration value="jks">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                The default Java KeyStore.  If no keystore type is specified, "jks" will be used.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="jceks">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Used by the Java Cryptography Extension
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="pkcs12"><xsd:annotation>
+                        <xsd:documentation>
+                            A format commonly used to store private keys.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                    </xsd:enumeration>
                 </xsd:restriction>
             </xsd:simpleType>
             <xsd:simpleType>
-                <xsd:restriction base="xsd:string"/>
+                <xsd:restriction base="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Any other keystore type.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:restriction>
             </xsd:simpleType>
         </xsd:union>
     </xsd:simpleType>
