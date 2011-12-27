@@ -46,7 +46,14 @@ public class DefaultRouterResultsHandler implements RouterResultsHandler
         else if (results.size() == 1)
         {
             MuleEvent event = results.get(0);
-            return event == null ? null : event;
+            if (event != null && event.getMessage() != null)
+            {
+                return event;
+            }
+            else
+            {
+                return null;
+            }
         }
         else
         {
@@ -60,8 +67,7 @@ public class DefaultRouterResultsHandler implements RouterResultsHandler
                     coll.addMessage(muleMessage);
                 }
             }
-            return coll == null ? null : RequestContext.setEvent(new DefaultMuleEvent(coll, previous,
-                previous.getSession()));
+            return RequestContext.setEvent(new DefaultMuleEvent(coll, previous, previous.getSession()));
         }
     }
 }
