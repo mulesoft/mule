@@ -13,6 +13,7 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.transport.PropertyScope;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.util.CaseInsensitiveHashMap;
 import org.mule.util.MapUtils;
 import org.mule.util.ObjectUtils;
@@ -236,6 +237,11 @@ public class MessagePropertiesContext implements Serializable
      */
     public void setProperty(String key, Object value, PropertyScope scope)
     {
+        if (!(value instanceof Serializable) && PropertyScope.SESSION.equals(scope))
+        {
+            logger.warn(CoreMessages.sessionPropertyNotSerializableWarning(key));
+        }
+
         getScopedProperties(scope).put(key, value);
         keySet.add(key);
     }

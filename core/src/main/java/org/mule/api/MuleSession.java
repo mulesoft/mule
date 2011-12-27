@@ -77,14 +77,20 @@ public interface MuleSession extends Serializable
      * @param key the key for the object data being stored on the session
      * @param value the value of the session data
      */
+    void setProperty(String key, Serializable value);
+    
+    @Deprecated
     void setProperty(String key, Object value);
-
+    
     /**
      * Will retrieve a session scope property.
      * 
      * @param key the key for the object data being stored on the session
      * @return the value of the session data or null if the property does not exist
      */
+    <T> T getProperty(String key);
+
+    @Deprecated
     <T> T getProperty(Object key);
 
     /**
@@ -93,6 +99,9 @@ public interface MuleSession extends Serializable
      * @param key the key for the object data being stored on the session
      * @return the value of the session data or null if the property does not exist
      */
+    Object removeProperty(String key);
+
+    @Deprecated
     Object removeProperty(Object key);
     
     /**

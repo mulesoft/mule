@@ -131,6 +131,10 @@ public final class DefaultMuleSession implements MuleSession
     @Override
     public void setProperty(String key, Object value)
     {
+        if (!(value instanceof Serializable))
+        {
+            logger.warn(CoreMessages.sessionPropertyNotSerializableWarning(key));
+        }
         properties.put(key, value);
     }
 
@@ -216,10 +220,28 @@ public final class DefaultMuleSession implements MuleSession
             final Entry<String, Object> entry = propertyIterator.next();
             if (!(entry.getValue() instanceof Serializable))
             {
-                logger.warn(CoreMessages.propertyNotSerializable(entry.getKey()));
+                logger.warn(CoreMessages.propertyNotSerializableWasDropped(entry.getKey()));
                 propertyIterator.remove();
             }
         }
+    }
+
+    @Override
+    public void setProperty(String key, Serializable value)
+    {
+        setProperty(key, (Object) value);
+    }
+
+    @Override
+    public <T> T getProperty(String key)
+    {
+        return getProperty((Object) key);
+    }
+
+    @Override
+    public Object removeProperty(String key)
+    {
+        return removeProperty((Object) key);
     }
 
     // //////////////////////////
