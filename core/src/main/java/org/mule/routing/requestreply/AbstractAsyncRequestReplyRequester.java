@@ -10,7 +10,8 @@
 
 package org.mule.routing.requestreply;
 
-import org.mule.OptimizedRequestContext;
+import org.mule.DefaultMuleEvent;
+import org.mule.RequestContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessageCollection;
@@ -166,11 +167,19 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
                 // this should never happen, just using it as a safe guard for now
                 throw new IllegalStateException("Response MuleEvent is null");
             }
+
+            // Merge async-reply session properties with exiting session properties
+            event.getSession().merge(result.getSession());
+            
             // Copy event because the async-reply message was received by a different
             // receiver thread (or the senders dispatcher thread in case of vm
             // with queueEvents="false") and the current thread may need to mutate
             // the even. See MULE-4370
-            return OptimizedRequestContext.criticalSetEvent(result);
+            if (result != null)
+            {
+                result = RequestContext.setEvent(new DefaultMuleEvent(result.getMessage(), event));
+            }
+            return result;
         }
         else
         {

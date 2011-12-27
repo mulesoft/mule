@@ -8,7 +8,7 @@
        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.1/mule-vm.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.1/mule.xsd">
 
-
+    <vm:endpoint path="addSessionPropertiesFlowEndpoint" exchange-pattern="request-response" name="addSessionPropertiesFlowEndpoint" />
 
     <flow name="A">
         <expression-transformer evaluator="header" expression="SESSION:key" />
@@ -105,7 +105,37 @@
         <threading-profile doThreading="false"/>
     </flow>
 
+    <flow name="addSessionPropertiesFlow">
+        <inbound-endpoint ref="addSessionPropertiesFlowEndpoint"/>
+        <message-properties-transformer scope="session">
+            <add-message-property key="keyNonSerializable" value="val"/>
+            <add-message-property key="KEY2" value="value2NEW"/>
+            <add-message-property key="key3" value="value3"/>
+            <add-message-property key="nonSerializableBean" value-ref="nonSerializableBean"/>
+        </message-properties-transformer>
+        <threading-profile doThreading="false"/>
+    </flow>
 
-    <!-- <flow name"B"> </flow> <flow name"C"> </flow> <flow name"D"> </flow> -->
+    <flow name="requestResponseFlow">
+        <logger/>
+        <request-reply timeout="5000">
+            <vm:outbound-endpoint path="out" exchange-pattern="one-way"/>
+            <vm:inbound-endpoint path="in" exchange-pattern="one-way"/>
+        </request-reply>
+        <threading-profile doThreading="false"/>
+    </flow>
+    <flow name="addSessionPropertiesFlowOneWay">
+        <vm:inbound-endpoint path="out" exchange-pattern="one-way"/>
+        <message-properties-transformer scope="session">
+            <add-message-property key="keyNonSerializable" value="val"/>
+            <add-message-property key="KEY2" value="value2NEW"/>
+            <add-message-property key="key3" value="value3"/>
+            <add-message-property key="nonSerializableBean" value-ref="nonSerializableBean"/>
+        </message-properties-transformer>
+        <vm:outbound-endpoint path="in" exchange-pattern="one-way"/>
+        <threading-profile doThreading="false"/>
+    </flow>
+
+    <spring:bean name="nonSerializableBean" class="java.lang.Object"/>
 
 </mule>
