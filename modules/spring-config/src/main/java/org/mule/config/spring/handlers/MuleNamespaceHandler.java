@@ -110,6 +110,7 @@ import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.enricher.MessageEnricher;
 import org.mule.enricher.MessageEnricher.EnrichExpressionPair;
 import org.mule.exception.DefaultMessagingExceptionStrategy;
+import org.mule.exception.CatchMessagingExceptionStrategy;
 import org.mule.expression.ExpressionConfig;
 import org.mule.expression.transformers.BeanBuilderTransformer;
 import org.mule.expression.transformers.ExpressionArgument;
@@ -243,6 +244,7 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
 
         // Exception Strategies
         registerBeanDefinitionParser("default-exception-strategy", new ChildDefinitionParser("exceptionListener", DefaultMessagingExceptionStrategy.class));
+        registerBeanDefinitionParser("catch-exception-strategy", new ChildDefinitionParser("exceptionListener", CatchMessagingExceptionStrategy.class));
         registerDeprecatedBeanDefinitionParser("default-service-exception-strategy", new ChildDefinitionParser("exceptionListener", DefaultMessagingExceptionStrategy.class), "Use default-exception-strategy instead.");
         registerBeanDefinitionParser("custom-exception-strategy", new ChildDefinitionParser("exceptionListener", null));
         registerBeanDefinitionParser("commit-transaction", new ExceptionTXFilterDefinitionParser("commitTxFilter"));

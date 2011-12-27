@@ -1762,7 +1762,7 @@
                     </xsd:documentation>
                 </xsd:annotation>
             </xsd:element>
-            <xsd:group ref="messageProcessorOrOutboundEndpoint" minOccurs="0" maxOccurs="1">
+            <xsd:group ref="messageProcessorOrOutboundEndpoint" minOccurs="0" maxOccurs="unbounded">
                 <xsd:annotation>
                     <xsd:documentation>Destination to which an ExceptionMessage will be sent; this could be an outbound endpoint, a router, or other message processor.
                     </xsd:documentation>
@@ -4698,6 +4698,15 @@
     <!--==============================================================-->
 
     <xsd:element name="default-exception-strategy" type="serviceExceptionStrategyType"
+                 substitutionGroup="abstract-exception-strategy">
+        <xsd:annotation>
+            <xsd:documentation>
+                Provides default exception handling.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:element name="catch-exception-strategy" type="abstractExceptionStrategyType"
                  substitutionGroup="abstract-exception-strategy">
         <xsd:annotation>
             <xsd:documentation>

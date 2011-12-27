@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:https="http://www.mulesoft.org/schema/mule/https"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xmlns:script="http://www.mulesoft.org/schema/mule/scripting"
+      xmlns:smtp="http://www.mulesoft.org/schema/mule/smtp"
+      xmlns:tcp="http://www.mulesoft.org/schema/mule/tcp"
+      xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
+      xmlns:json="http://www.mulesoft.org/schema/mule/json"
+      xsi:schemaLocation="
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
+       http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/3.2/mule-test.xsd
+       http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/3.2/mule-jms.xsd
+       http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.2/mule-vm.xsd
+       http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/3.2/mule-scripting.xsd
+       http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/3.2/mule-http.xsd
+       http://www.mulesoft.org/schema/mule/https http://www.mulesoft.org/schema/mule/https/3.2/mule-https.xsd
+       http://www.mulesoft.org/schema/mule/smtp http://www.mulesoft.org/schema/mule/smtp/3.2/mule-smtp.xsd
+       http://www.mulesoft.org/schema/mule/tcp http://www.mulesoft.org/schema/mule/tcp/3.2/mule-tcp.xsd
+       http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/3.2/mule-cxf.xsd
+       http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/3.2/mule-json.xsd">
+
+    <https:connector name="httpsConnector">
+        <https:tls-client path="clientKeystore" storePassword="mulepassword"/>
+        <https:tls-key-store path="serverKeystore" keyPassword="mulepassword" storePassword="mulepassword"/>
+        <https:tls-server path="trustStore" storePassword="mulepassword"/>
+    </https:connector>
+
+    <jms:activemq-connector name="activeMq"/>
+
+    <flow name="httpContinueProcessingActualMessage">
+        <http:inbound-endpoint host="localhost" port="${port1}" path="service"/>
+        <json:json-to-object-transformer returnClass="org.mule.test.integration.exceptions.CatchExceptionStrategyTestCase$NewsRequest"/>
+        <custom-processor class="org.mule.test.integration.exceptions.CatchExceptionStrategyTestCase$LoadNewsProcessor"/>
+        <test:component throwException="true"/>
+        <catch-exception-strategy>
+            <custom-processor class="org.mule.test.integration.exceptions.CatchExceptionStrategyTestCase$NewsErrorProcessor"/>
+            <json:object-to-json-transformer/>
+        </catch-exception-strategy>
+    </flow>
+
+    <flow name="httpsContinueProcessingActualMessage">
+        <https:inbound-endpoint host="localhost" port="${port3}" path="httpsservice"/>
+        <json:json-to-object-transformer returnClass="org.mule.test.integration.exceptions.CatchExceptionStrategyTestCase$NewsRequest"/>
+        <custom-processor class="org.mule.test.integration.exceptions.CatchExceptionStrategyTestCase$LoadNewsProcessor"/>
+        <test:component throwException="true"/>
+        <catch-exception-strategy>
+            <custom-processor class="org.mule.test.integration.exceptions.CatchExceptionStrategyTestCase$NewsErrorProcessor"/>
+            <json:object-to-json-transformer/>
+        </catch-exception-strategy>
+    </flow>
+
+    <flow name="vmContinueProcessingActualMessage">
+        <vm:inbound-endpoint path="in" exchange-pattern="request-response"/>
+        <json:json-to-object-transformer returnClass="org.mule.test.integration.exceptions.CatchExceptionStrategyTestCase$NewsRequest"/>
+        <custom-processor class="org.mule.test.integration.exceptions.CatchExceptionStrategyTestCase$LoadNewsProcessor"/>
+        <test:component throwException="true"/>
+        <catch-exception-strategy>
+            <custom-processor class="org.mule.test.integration.exceptions.CatchExceptionStrategyTestCase$NewsErrorProcessor"/>
+            <json:object-to-json-transformer/>
+        </catch-exception-strategy>
+    </flow>
+
+
+    <flow name="jmsContinueProcessingActualMessage">
+        <jms:inbound-endpoint queue="in" exchange-pattern="request-response"/>
+        <json:json-to-object-transformer returnClass="org.mule.test.integration.exceptions.CatchExceptionStrategyTestCase$NewsRequest"/>
+        <custom-processor class="org.mule.test.integration.exceptions.CatchExceptionStrategyTestCase$LoadNewsProcessor"/>
+        <test:component throwException="true"/>
+        <catch-exception-strategy>
+            <custom-processor class="org.mule.test.integration.exceptions.CatchExceptionStrategyTestCase$NewsErrorProcessor"/>
+            <json:object-to-json-transformer/>
+        </catch-exception-strategy>
+    </flow>
+
+    <flow name="tcpContinueProcessingActualMessage">
+        <tcp:inbound-endpoint port="${port2}" host="localhost" exchange-pattern="request-response"/>
+        <json:json-to-object-transformer returnClass="org.mule.test.integration.exceptions.CatchExceptionStrategyTestCase$NewsRequest"/>
+        <custom-processor class="org.mule.test.integration.exceptions.CatchExceptionStrategyTestCase$LoadNewsProcessor"/>
+        <test:component throwException="true"/>
+        <catch-exception-strategy>
+            <custom-processor class="org.mule.test.integration.exceptions.CatchExceptionStrategyTestCase$NewsErrorProcessor"/>
+            <json:object-to-json-transformer/>
+        </catch-exception-strategy>
+    </flow>
+
+    <flow name="cxfContinueProcessingActualMessage">
+        <http:inbound-endpoint host="localhost" port="${port4}" path="cxfservice"/>
+        <cxf:jaxws-service serviceClass="org.mule.test.integration.exceptions.CatchExceptionStrategyTestCase$Echo" onException="INVOKE_EXCEPTION_STRATEGY"/>
+        <component>
+            <singleton-object class="org.mule.test.integration.exceptions.CatchExceptionStrategyTestCase$Echo" />
+        </component>
+        <test:component throwException="true"/>
+        <catch-exception-strategy>
+            <json:object-to-json-transformer/>
+        </catch-exception-strategy>
+    </flow>
+
+</mule>

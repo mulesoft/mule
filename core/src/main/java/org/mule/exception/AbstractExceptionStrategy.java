@@ -10,6 +10,8 @@
 
 package org.mule.exception;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleContext;
@@ -17,12 +19,13 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
-import org.mule.api.construct.FlowConstruct;
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.api.exception.RollbackSourceCallback;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.api.processor.MessageProcessorBuilder;
 import org.mule.api.security.SecurityException;
+import org.mule.api.transaction.TransactionException;
 import org.mule.api.util.StreamCloserService;
 import org.mule.config.ExceptionHelper;
 import org.mule.context.notification.ExceptionNotification;
@@ -31,8 +34,8 @@ import org.mule.management.stats.FlowConstructStatistics;
 import org.mule.management.stats.ServiceStatistics;
 import org.mule.message.ExceptionMessage;
 import org.mule.processor.AbstractMessageProcessorOwner;
+import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.routing.filters.WildcardFilter;
-import org.mule.routing.outbound.MulticastingRouter;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.util.CollectionUtils;
 
@@ -40,9 +43,6 @@ import java.net.URI;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * This is the base class for exception strategies which contains several helper methods.  However, you should 
@@ -195,27 +195,37 @@ public abstract class AbstractExceptionStrategy extends AbstractMessageProcessor
                 ExceptionMessage msg = new ExceptionMessage(event, t, component, endpointUri);
                 MuleMessage exceptionMessage = new DefaultMuleMessage(msg, event.getMessage(), muleContext);
 
-                // Create an outbound router with all endpoints configured on the exception strategy
-                MulticastingRouter router = new MulticastingRouter()
+                DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder(event.getFlowConstruct());
+                for (Object processor : messageProcessors)
                 {
-                    @Override
-                    protected void setMessageProperties(FlowConstruct session, MuleMessage message, MessageProcessor target)
+                    if (processor instanceof MessageProcessor)
                     {
-                        // No reply-to or correlation for exception targets, at least for now anyway.
+                        builder.chain((MessageProcessor) processor);
                     }
-                };
-                router.setRoutes(getMessageProcessors());
-                router.setMuleContext(muleContext);
-                
-                // Route the ExceptionMessage to the new router
-                router.route(new DefaultMuleEvent(exceptionMessage, event));
+                    else if (processor instanceof MessageProcessorBuilder)
+                    {
+                        builder.chain((MessageProcessorBuilder) processor);
+                    }
+                    else
+                    {
+                        throw new IllegalArgumentException(
+                            "MessageProcessorBuilder should only have MessageProcessor's or MessageProcessorBuilder's configured");
+                    }
+                }
+                MessageProcessor messageProcessor = builder.build();
+                messageProcessor.process(new DefaultMuleEvent(exceptionMessage, event));
             }
             catch (Exception e)
             {
                 logFatal(event, e);
             }
         }
-        
+
+        processOutboundRouterStatistics(event);
+    }
+
+    protected void processOutboundRouterStatistics(MuleEvent event)
+    {
         List<MessageProcessor> processors = getMessageProcessors();
         FlowConstructStatistics statistics = event.getFlowConstruct().getStatistics();
         if (CollectionUtils.isNotEmpty(processors) && statistics instanceof ServiceStatistics)
@@ -233,6 +243,26 @@ public abstract class AbstractExceptionStrategy extends AbstractMessageProcessor
     protected void commit()
     {
         TransactionCoordination.getInstance().commitCurrentTransaction();
+    }
+
+    protected void resolveTransactionIfAny()
+    {
+        try
+        {
+            if (TransactionCoordination.getInstance().getTransaction() != null)
+            {
+                TransactionCoordination.getInstance().resolveTransaction();
+            }
+        }
+        catch (TransactionException e)
+        {
+            logger.error(e);
+        }
+    }
+
+    protected void resumeSuspendedTransactionIfAny()
+    {
+        TransactionCoordination.getInstance().resumeXaTransactionIfAvailable();
     }
 
     protected void rollback(RollbackSourceCallback rollbackMethod)
@@ -256,11 +286,6 @@ public abstract class AbstractExceptionStrategy extends AbstractMessageProcessor
             ((StreamCloserService) muleContext.getRegistry().lookupObject(
                     MuleProperties.OBJECT_MULE_STREAM_CLOSER_SERVICE)).closeStream(message.getPayload());
         }
-    }
-
-    protected void resumeSuspendedTransaction()
-    {
-        TransactionCoordination.getInstance().resumeXaTransactionIfAvailable();
     }
 
     /**

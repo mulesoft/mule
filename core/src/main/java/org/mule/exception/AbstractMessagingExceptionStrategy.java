@@ -92,7 +92,7 @@ public abstract class AbstractMessagingExceptionStrategy extends AbstractExcepti
         }
 
         closeStream(event.getMessage());
-        resumeSuspendedTransaction();
+        resumeSuspendedTransactionIfAny();
 
         if (stopMessageProcessing)
         {

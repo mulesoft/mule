@@ -33,6 +33,12 @@ public class TestTransaction extends AbstractSingleResourceTransaction
         super(muleContext);
     }
 
+    public TestTransaction(MuleContext mockMuleContext, boolean isXa)
+    {
+        super(mockMuleContext);
+        this.isXA = isXa;
+    }
+
     /**
      * Really begin the transaction. Note that resources are enlisted yet.
      *
