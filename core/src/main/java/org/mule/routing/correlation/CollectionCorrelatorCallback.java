@@ -13,8 +13,10 @@ package org.mule.routing.correlation;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
+import org.mule.api.MuleSession;
 import org.mule.routing.AggregationException;
 import org.mule.routing.EventGroup;
+import org.mule.session.DefaultMuleSession;
 
 import java.text.MessageFormat;
 
@@ -58,6 +60,16 @@ public class CollectionCorrelatorCallback implements EventCorrelatorCallback
         return events.getMessageCollectionEvent();
     }
 
+    protected MuleSession getMergedSession(MuleEvent[] events)
+    {
+        MuleSession session = new DefaultMuleSession(events[0].getSession());
+        for (int i = 1; i < events.length; i++)
+        {
+            session.getProperties().putAll(events[i].getSession().getProperties());
+        }
+        return session;
+    }
+    
     /**
      * Creates a new EventGroup that will expect the number of events as returned by
      * {@link MuleMessage#getCorrelationGroupSize()}.

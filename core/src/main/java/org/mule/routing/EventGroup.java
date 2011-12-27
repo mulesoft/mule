@@ -16,12 +16,13 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessageCollection;
+import org.mule.api.MuleSession;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.store.ListableObjectStore;
 import org.mule.api.store.ObjectStoreException;
 import org.mule.api.store.ObjectStoreManager;
+import org.mule.session.DefaultMuleSession;
 import org.mule.util.ClassUtils;
-import org.mule.util.MuleLogger;
 import org.mule.util.store.DeserializationPostInitialisable;
 
 import java.io.Serializable;
@@ -382,7 +383,7 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
             {
 
                 DefaultMuleEvent muleEvent = new DefaultMuleEvent(toMessageCollection(),
-                    events.retrieve(events.allKeys().get(0)));
+                    events.retrieve(events.allKeys().get(0)), getMergedSession());
                 if (getCommonRootId() != null)
                 {
                     muleEvent.getMessage().setMessageRootId(commonRootId);
@@ -401,6 +402,18 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
         }
     }
 
+    protected MuleSession getMergedSession() throws ObjectStoreException
+    {
+        MuleSession session = new DefaultMuleSession(
+            ((MuleEvent) events.retrieve(events.allKeys().get(0))).getSession());
+        for (int i = 1; i < events.allKeys().size(); i++)
+        {
+            session.getProperties().putAll(
+                ((MuleEvent) events.retrieve(events.allKeys().get(i))).getSession().getProperties());
+        }
+        return session;
+    }
+    
     private ObjectStoreManager getObjectStoreManager()
     {
         if (objectStoreManager == null)
@@ -418,4 +431,5 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
         String storeKey = storePrefix + ".eventGroup." + groupId;
         this.events = getObjectStoreManager().getObjectStore(storeKey, true);
     }
+    
 }

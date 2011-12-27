@@ -16,6 +16,7 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleMessageCollection;
+import org.mule.api.MuleSession;
 import org.mule.api.routing.RouterResultsHandler;
 
 import java.util.List;
@@ -65,6 +66,17 @@ public class DefaultRouterResultsHandler implements RouterResultsHandler
             aggregate = coll;
         }
 
-        return aggregate == null ? null : RequestContext.setEvent(new DefaultMuleEvent(aggregate, previous, previous.getSession()));
+        return aggregate == null ? null : RequestContext.setEvent(new DefaultMuleEvent(aggregate, previous,
+            getMergedSession(results)));
+    }
+
+    private MuleSession getMergedSession(List<MuleEvent> events)
+    {
+        MuleSession session = events.get(0).getSession();
+        for (int i = 1; i < events.size(); i++)
+        {
+            session.merge(events.get(i).getSession());
+        }
+        return session;
     }
 }

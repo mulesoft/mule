@@ -188,7 +188,36 @@ public class EventGroupTestCase extends AbstractMuleContextTestCase
         assertTrue(es.contains(firstId));
         assertTrue(es.contains(secondId));
     }
+    
+    @Test
+    public void mergedSessions() throws Exception
+    {
+        EventGroup eg = new EventGroup(UUID.getUUID(),muleContext);
+        assertFalse(eg.iterator().hasNext());
 
+        MuleEvent event1 = getTestEvent("foo1"); 
+        MuleEvent event2 = getTestEvent("foo2"); 
+        MuleEvent event3 = getTestEvent("foo3"); 
+        
+        event1.getSession().setProperty("key1", "value1");
+        event1.getSession().setProperty("key2", "value2");
+        event2.getSession().setProperty("KEY2", "value2NEW");
+        event2.getSession().setProperty("key3", "value3");
+        event3.getSession().setProperty("key4", "value4");
+        
+        eg.addEvent(event1);
+        System.out.println(event1.getSession());
+        eg.addEvent(event2);
+        System.out.println(event2.getSession());
+        eg.addEvent(event3);
+        System.out.println(event3.getSession());
+        
+        MuleEvent result = eg.getMessageCollectionEvent();
+        assertEquals("value1", result.getSession().getProperty("key1"));
+        assertEquals("value2NEW", result.getSession().getProperty("key2"));
+        assertEquals("value3", result.getSession().getProperty("key3"));
+        assertEquals("value4", result.getSession().getProperty("key4"));
+    }
     private static class MyEventGroup extends EventGroup
     {
         private static final long serialVersionUID = 1L;

@@ -42,7 +42,15 @@ public class SimpleCollectionAggregatorTestCase extends AbstractMuleContextTestC
     @Test
     public void testMessageProcessor() throws Exception
     {
-        MuleSession session = getTestSession(getTestService(), muleContext);
+        MuleSession session1 = getTestSession(getTestService(), muleContext);
+        session1.setProperty("key1", "value1");
+        MuleSession session2 = getTestSession(getTestService(), muleContext);
+        session1.setProperty("key1", "value1NEW");
+        session1.setProperty("key2", "value2");
+        MuleSession session3 = getTestSession(getTestService(), muleContext);
+        session1.setProperty("key3", "value3");
+        
+        
         Service testService = getTestService("test", Apple.class);
         assertNotNull(testService);
 
@@ -60,9 +68,9 @@ public class SimpleCollectionAggregatorTestCase extends AbstractMuleContextTestC
         message1.setCorrelationGroupSize(3);
 
         InboundEndpoint endpoint = MuleTestUtils.getTestInboundEndpoint(MessageExchangePattern.ONE_WAY, muleContext);
-        MuleEvent event1 = new DefaultMuleEvent(message1, endpoint, testService, session);
-        MuleEvent event2 = new DefaultMuleEvent(message2, endpoint, testService, session);
-        MuleEvent event3 = new DefaultMuleEvent(message3, endpoint, testService, session);
+        MuleEvent event1 = new DefaultMuleEvent(message1, endpoint, testService, session1);
+        MuleEvent event2 = new DefaultMuleEvent(message2, endpoint, testService, session2);
+        MuleEvent event3 = new DefaultMuleEvent(message3, endpoint, testService, session3);
 
         assertNull(router.process(event1));
         assertNull(router.process(event2));
@@ -78,6 +86,12 @@ public class SimpleCollectionAggregatorTestCase extends AbstractMuleContextTestC
         assertEquals("test event A", results[0]);
         assertEquals("test event B", results[1]);
         assertEquals("test event C", results[2]);
+        
+        // Assert that session was merged correctly
+        assertEquals(3, resultEvent.getSession().getProperties().size());
+        assertEquals("value1NEW", resultEvent.getSession().getProperty("key1"));
+        assertEquals("value2", resultEvent.getSession().getProperty("key2"));
+        assertEquals("value3", resultEvent.getSession().getProperty("key3"));
     }
 
 }

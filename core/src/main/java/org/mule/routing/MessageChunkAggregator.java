@@ -101,7 +101,7 @@ public class MessageChunkAggregator extends AbstractAggregator
                     message.setCorrelationGroupSize(-1);
                     message.setCorrelationSequence(-1);
 
-                    return new DefaultMuleEvent(message, firstEvent);
+                    return new DefaultMuleEvent(message, firstEvent, getMergedSession(events.toArray()));
                 }
                 catch (Exception e)
                 {
