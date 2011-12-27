@@ -124,7 +124,7 @@ public class SessionPropertiesTestCase extends AbstractMuleContextTestCase
         // Event is copied, but session isn't
         assertNotSame(asyncEvent, event);
         assertFalse(asyncEvent.equals(event));
-        assertSame(asyncEvent.getSession(), event.getSession());
+        assertNotSame(asyncEvent.getSession(), event.getSession());
 
         // Session properties available before async are available after too
         assertEquals(1, asyncEvent.getSession().getPropertyNamesAsSet().size());
@@ -135,8 +135,8 @@ public class SessionPropertiesTestCase extends AbstractMuleContextTestCase
         asyncEvent.getSession().setProperty("newKey", "newValue");
         assertEquals(2, asyncEvent.getSession().getPropertyNamesAsSet().size());
         assertEquals("newValue", asyncEvent.getSession().getProperty("newKey"));
-        assertEquals(2, event.getSession().getPropertyNamesAsSet().size());
-        assertEquals("newValue", event.getSession().getProperty("newKey"));
+        assertEquals(1, event.getSession().getPropertyNamesAsSet().size());
+        assertNull(event.getSession().getProperty("newKey"));
 
         async.stop();
     }
@@ -280,7 +280,7 @@ public class SessionPropertiesTestCase extends AbstractMuleContextTestCase
     public void processFlowSessionPropertyPropagation() throws Exception
     {
         MuleMessage message = new DefaultMuleMessage("data", muleContext);
-        MuleEvent event = new DefaultMuleEvent(message, MessageExchangePattern.ONE_WAY, getTestService());
+        MuleEvent event = new DefaultMuleEvent(message, MessageExchangePattern.REQUEST_RESPONSE, getTestService());
 
         SensingNullMessageProcessor flowListener = new SensingNullMessageProcessor();
         Flow flow = new Flow("flow", muleContext);
@@ -299,7 +299,7 @@ public class SessionPropertiesTestCase extends AbstractMuleContextTestCase
 
         // Event is copied, but session isn't
         assertNotSame(processedEvent, event);
-        assertFalse(processedEvent.equals(event));
+        assertEquals(processedEvent, event);
         assertSame(processedEvent.getSession(), event.getSession());
 
         // Session properties available before new flow are available after too

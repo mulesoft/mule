@@ -10,9 +10,12 @@
 
 package org.mule.work;
 
+import org.mule.DefaultMuleEvent;
 import org.mule.OptimizedRequestContext;
 import org.mule.api.MuleEvent;
+import org.mule.api.MuleMessage;
 import org.mule.api.ThreadSafeAccess;
+import org.mule.session.DefaultMuleSession;
 
 import javax.resource.spi.work.Work;
 
@@ -33,7 +36,10 @@ public abstract class AbstractMuleEventWork implements Work
     {
         // Event must be copied here rather than once work is executed, so main flow can't mutate the message
         // before work execution
-        this.event = (MuleEvent) ((ThreadSafeAccess) event).newThreadCopy();
+        MuleMessage messageCopy = (MuleMessage) ((ThreadSafeAccess) event.getMessage()).newThreadCopy();
+        DefaultMuleEvent eventCopy = new DefaultMuleEvent(messageCopy, event, new DefaultMuleSession(event.getSession()));
+        eventCopy.resetAccessControl();
+        this.event = eventCopy;
     }
 
     public final void run()
