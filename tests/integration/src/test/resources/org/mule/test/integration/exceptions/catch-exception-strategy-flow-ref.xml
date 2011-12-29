@@ -17,12 +17,12 @@
     </flow>
 
     <flow name="blockWithOwnExceptionStrategy">
-        <json:json-to-object-transformer returnClass="org.mule.test.integration.exceptions.HandleExceptionStrategyTestCase$NewsRequest"/>
-        <custom-processor class="org.mule.test.integration.exceptions.HandleExceptionStrategyTestCase$LoadNewsProcessor"/>
+        <json:json-to-object-transformer returnClass="org.mule.test.integration.exceptions.CatchExceptionStrategyTestCase$NewsRequest"/>
+        <custom-processor class="org.mule.test.integration.exceptions.CatchExceptionStrategyTestCase$LoadNewsProcessor"/>
         <test:component throwException="true"/>
-        <handle-exception-strategy>
-            <custom-processor class="org.mule.test.integration.exceptions.HandleExceptionStrategyTestCase$NewsErrorProcessor"/>
-        </handle-exception-strategy>
+        <catch-exception-strategy>
+            <custom-processor class="org.mule.test.integration.exceptions.CatchExceptionStrategyTestCase$NewsErrorProcessor"/>
+        </catch-exception-strategy>
     </flow>
 
 </mule>

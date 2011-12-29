@@ -40,7 +40,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
-public class HandleMessagingExceptionStrategyTestCase
+public class CatchMessagingExceptionStrategyTestCase
 {
 
     private MuleContext mockMuleContext = mock(MuleContext.class, Answers.RETURNS_DEEP_STUBS.get());
@@ -58,7 +58,7 @@ public class HandleMessagingExceptionStrategyTestCase
     private TestTransaction mockXaTransaction = new TestTransaction(mockMuleContext, true);
 
 
-    private HandleMessagingExceptionStrategy handleMessagingExceptionStrategy;
+    private CatchMessagingExceptionStrategy catchMessagingExceptionStrategy;
 
     @Before
     public void before() throws Exception
@@ -68,7 +68,7 @@ public class HandleMessagingExceptionStrategyTestCase
         {
             TransactionCoordination.getInstance().unbindTransaction(currentTransaction);
         }
-        handleMessagingExceptionStrategy = new HandleMessagingExceptionStrategy(mockMuleContext);
+        catchMessagingExceptionStrategy = new CatchMessagingExceptionStrategy(mockMuleContext);
         when(mockMuleContext.getRegistry().lookupObject(
                 MuleProperties.OBJECT_MULE_STREAM_CLOSER_SERVICE)).thenReturn(mockStreamCloserService);
         when(mockMuleEvent.getMessage()).thenReturn(mockMuleMessage);
@@ -79,7 +79,7 @@ public class HandleMessagingExceptionStrategyTestCase
     {
         configureXaTransactionAndSingleResourceTransaction();
 
-        MuleEvent resultEvent = handleMessagingExceptionStrategy.handleException(mockException, mockMuleEvent, null);
+        MuleEvent resultEvent = catchMessagingExceptionStrategy.handleException(mockException, mockMuleEvent, null);
         assertThat(resultEvent, is(resultEvent));
 
         verify(mockMuleMessage).setExceptionPayload(Matchers.<ExceptionPayload>any(ExceptionPayload.class));
@@ -92,9 +92,9 @@ public class HandleMessagingExceptionStrategyTestCase
     @Test
     public void testHandleExceptionWithConfiguredMessageProcessors() throws Exception
     {
-        handleMessagingExceptionStrategy.setMessageProcessors(asList(createSetStringMessageProcessor("A"), createSetStringMessageProcessor("B")));
-        handleMessagingExceptionStrategy.initialise();
-        handleMessagingExceptionStrategy.handleException(mockException,mockMuleEvent);
+        catchMessagingExceptionStrategy.setMessageProcessors(asList(createSetStringMessageProcessor("A"), createSetStringMessageProcessor("B")));
+        catchMessagingExceptionStrategy.initialise();
+        catchMessagingExceptionStrategy.handleException(mockException,mockMuleEvent);
         verify(mockMuleEvent.getMessage(), times(1)).setPayload("A");
         verify(mockMuleEvent.getMessage(), times(1)).setPayload("B");
     }
@@ -103,9 +103,9 @@ public class HandleMessagingExceptionStrategyTestCase
     public void testHandleExceptionWithMessageProcessorsChangingEvent() throws Exception
     {
         MuleEvent lastEventCreated = mock(MuleEvent.class,Answers.RETURNS_DEEP_STUBS.get());
-        handleMessagingExceptionStrategy.setMessageProcessors(asList(createChagingEventMessageProcessor(mock(MuleEvent.class)), createChagingEventMessageProcessor(lastEventCreated)));
-        handleMessagingExceptionStrategy.initialise();
-        MuleEvent exceptionHandlingResult = handleMessagingExceptionStrategy.handleException(mockException, mockMuleEvent);
+        catchMessagingExceptionStrategy.setMessageProcessors(asList(createChagingEventMessageProcessor(mock(MuleEvent.class)), createChagingEventMessageProcessor(lastEventCreated)));
+        catchMessagingExceptionStrategy.initialise();
+        MuleEvent exceptionHandlingResult = catchMessagingExceptionStrategy.handleException(mockException, mockMuleEvent);
         assertThat(exceptionHandlingResult, Is.is(lastEventCreated));
     }
 

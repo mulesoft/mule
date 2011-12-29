@@ -31,7 +31,7 @@ import java.util.Collection;
 
 import static org.junit.Assert.assertThat;
 
-public class HandleExceptionStrategyTestCase extends AbstractServiceAndFlowTestCase
+public class CatchExceptionStrategyTestCase extends AbstractServiceAndFlowTestCase
 {
     public static final int TIMEOUT = 5000;
     public static final String ERROR_PROCESSING_NEWS = "error processing news";
@@ -47,7 +47,7 @@ public class HandleExceptionStrategyTestCase extends AbstractServiceAndFlowTestC
     @Rule
     public DynamicPort dynamicPort4 = new DynamicPort("port4");
 
-    public HandleExceptionStrategyTestCase(ConfigVariant variant, String configResources)
+    public CatchExceptionStrategyTestCase(ConfigVariant variant, String configResources)
     {
         super(variant, configResources);
     }
@@ -55,8 +55,8 @@ public class HandleExceptionStrategyTestCase extends AbstractServiceAndFlowTestC
     @Parameterized.Parameters
     public static Collection<Object[]> parameters()
     {
-        return Arrays.asList(new Object[][]{{AbstractServiceAndFlowTestCase.ConfigVariant.SERVICE, "org/mule/test/integration/exceptions/handle-exception-strategy-use-case-service.xml"},
-                {ConfigVariant.FLOW, "org/mule/test/integration/exceptions/handle-exception-strategy-use-case-flow.xml"}});
+        return Arrays.asList(new Object[][]{{AbstractServiceAndFlowTestCase.ConfigVariant.SERVICE, "org/mule/test/integration/exceptions/catch-exception-strategy-use-case-service.xml"},
+                {ConfigVariant.FLOW, "org/mule/test/integration/exceptions/catch-exception-strategy-use-case-flow.xml"}});
     }
 
     @Test

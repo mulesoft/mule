@@ -16,10 +16,10 @@ import org.mule.tck.junit4.FunctionalTestCase;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
-import static org.mule.test.integration.exceptions.HandleExceptionStrategyTestCase.JSON_REQUEST;
-import static org.mule.test.integration.exceptions.HandleExceptionStrategyTestCase.JSON_RESPONSE;
+import static org.mule.test.integration.exceptions.CatchExceptionStrategyTestCase.JSON_REQUEST;
+import static org.mule.test.integration.exceptions.CatchExceptionStrategyTestCase.JSON_RESPONSE;
 
-public class HandleExceptionStrategyFlowRefTestCase extends FunctionalTestCase
+public class CatchExceptionStrategyFlowRefTestCase extends FunctionalTestCase
 {
 
     public static final int TIMEOUT = 5000;
@@ -27,7 +27,7 @@ public class HandleExceptionStrategyFlowRefTestCase extends FunctionalTestCase
     @Override
     protected String getConfigResources()
     {
-        return "org/mule/test/integration/exceptions/handle-exception-strategy-flow-ref.xml";
+        return "org/mule/test/integration/exceptions/catch-exception-strategy-flow-ref.xml";
     }
 
     @Test

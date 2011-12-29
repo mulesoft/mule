@@ -24,7 +24,7 @@
             <jms:transaction action="ALWAYS_BEGIN"/>
         </jms:inbound-endpoint>
         <test:component throwException="true"/>
-        <handle-exception-strategy/>
+        <catch-exception-strategy/>
     </flow>
 
     <flow name="xaTransactionBehavior">
@@ -38,7 +38,7 @@
             <jms:transaction action="ALWAYS_BEGIN"/>
         </jms:outbound-endpoint>
         <test:component throwException="true"/>
-        <handle-exception-strategy/>
+        <catch-exception-strategy/>
     </flow>
 
 </mule>

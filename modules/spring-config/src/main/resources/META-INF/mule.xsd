@@ -4713,7 +4713,7 @@
         </xsd:annotation>
     </xsd:element>
 
-    <xsd:element name="handle-exception-strategy" type="handleExceptionStrategyType"
+    <xsd:element name="catch-exception-strategy" type="catchExceptionStrategyType"
                  substitutionGroup="abstract-exception-strategy">
         <xsd:annotation>
             <xsd:documentation>
@@ -4722,7 +4722,7 @@
         </xsd:annotation>
     </xsd:element>
 
-    <xsd:complexType name="handleExceptionStrategyType">
+    <xsd:complexType name="catchExceptionStrategyType">
         <xsd:complexContent>
             <xsd:extension base="exceptionStrategyType">
                 <xsd:sequence>

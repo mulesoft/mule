@@ -27,7 +27,7 @@
                 </jms:inbound-endpoint>
             </inbound>
             <test:component throwException="true"/>
-            <handle-exception-strategy/>
+            <catch-exception-strategy/>
         </service>
 
         <service name="xaTransactionBehavior">
@@ -48,7 +48,7 @@
                     <http:outbound-endpoint host="nonexistent.host" port="666" path="someFailingService"/>
                 </multicasting-router>
             </outbound>
-            <handle-exception-strategy/>
+            <catch-exception-strategy/>
         </service>
 
     </model>

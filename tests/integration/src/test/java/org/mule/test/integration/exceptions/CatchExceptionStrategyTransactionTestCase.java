@@ -26,7 +26,7 @@ import java.util.concurrent.TimeUnit;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
-public class HandleExceptionStrategyTransactionTestCase extends AbstractServiceAndFlowTestCase
+public class CatchExceptionStrategyTransactionTestCase extends AbstractServiceAndFlowTestCase
 {
 
     public static final int TIMEOUT = 5000;
@@ -34,7 +34,7 @@ public class HandleExceptionStrategyTransactionTestCase extends AbstractServiceA
     public static final int SHORT_TIMEOUT = 500;
     private Latch messageConsumed = new Latch();
 
-    public HandleExceptionStrategyTransactionTestCase(ConfigVariant variant, String configResources)
+    public CatchExceptionStrategyTransactionTestCase(ConfigVariant variant, String configResources)
     {
         super(variant, configResources);
     }
@@ -42,8 +42,8 @@ public class HandleExceptionStrategyTransactionTestCase extends AbstractServiceA
     @Parameterized.Parameters
     public static Collection<Object[]> parameters()
     {
-        return Arrays.asList(new Object[][]{{AbstractServiceAndFlowTestCase.ConfigVariant.SERVICE, "org/mule/test/integration/exceptions/handle-exception-strategy-transaction-service.xml"},
-                {ConfigVariant.FLOW, "org/mule/test/integration/exceptions/handle-exception-strategy-transaction-flow.xml"}});
+        return Arrays.asList(new Object[][]{{AbstractServiceAndFlowTestCase.ConfigVariant.SERVICE, "org/mule/test/integration/exceptions/catch-exception-strategy-transaction-service.xml"},
+                {ConfigVariant.FLOW, "org/mule/test/integration/exceptions/catch-exception-strategy-transaction-flow.xml"}});
     }
 
     @Test
