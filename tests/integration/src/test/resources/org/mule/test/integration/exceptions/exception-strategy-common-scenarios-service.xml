@@ -38,10 +38,12 @@
             </outbound>
             <default-exception-strategy>
                 <commit-transaction exception-pattern="*"/>
-                <expression-transformer evaluator="groovy" expression="payload.getPayload()"/>
-                <jms:outbound-endpoint queue="dead.letter1">
-                    <jms:transaction action="ALWAYS_JOIN"/>
-                </jms:outbound-endpoint>
+                <processor-chain>
+                    <expression-transformer evaluator="groovy" expression="payload.getPayload()"/>
+                    <jms:outbound-endpoint queue="dead.letter1">
+                        <jms:transaction action="ALWAYS_JOIN"/>
+                    </jms:outbound-endpoint>
+                </processor-chain>
             </default-exception-strategy>
         </service>
 
@@ -65,13 +67,15 @@
             </outbound>
             <default-exception-strategy>
                 <commit-transaction exception-pattern="*"/>
-                <expression-transformer evaluator="header" expression="SESSION:originalMessage"/>
-                <message-properties-transformer scope="session">
-                    <delete-message-property key="originalMessage"/>
-                </message-properties-transformer>
-                <jms:outbound-endpoint queue="dead.letter2">
-                    <jms:transaction action="ALWAYS_JOIN"/>
-                </jms:outbound-endpoint>
+                <processor-chain>
+                    <expression-transformer evaluator="header" expression="SESSION:originalMessage"/>
+                    <message-properties-transformer scope="session">
+                        <delete-message-property key="originalMessage"/>
+                    </message-properties-transformer>
+                    <jms:outbound-endpoint queue="dead.letter2">
+                        <jms:transaction action="ALWAYS_JOIN"/>
+                    </jms:outbound-endpoint>
+                </processor-chain>
             </default-exception-strategy>
         </service>
 
@@ -160,16 +164,18 @@
             <test:component throwException="true"/>
             <default-exception-strategy>
                 <rollback-transaction exception-pattern="*"/>
-                <message-properties-transformer >
-                    <add-message-property key="exception" value="#[groovy:payload.exception]"/>
-                </message-properties-transformer>
-                <expression-transformer evaluator="groovy"
-                                        expression='"Failed to process message: " + payload.getPayload() + " due to failure: " + '/>
-                <smtp:outbound-endpoint user="pablolagreca" password="Neruda10" host="smtp.gmail.com"
-                                        from="pablolagreca@gmail.com" to="pablolagreca@gmail.com"
-                                        subject="Message Failure"/>
-                <custom-processor
-                        class="org.mule.test.integration.exceptions.ExceptionStrategyCommonScenariosTestCase$EndMessageProcessor"/>
+                <processor-chain>
+                    <message-properties-transformer >
+                        <add-message-property key="exception" value="#[groovy:payload.exception]"/>
+                    </message-properties-transformer>
+                    <expression-transformer evaluator="groovy"
+                                            expression='"Failed to process message: " + payload.getPayload() + " due to failure: " + '/>
+                    <smtp:outbound-endpoint user="pablolagreca" password="Neruda10" host="smtp.gmail.com"
+                                            from="pablolagreca@gmail.com" to="pablolagreca@gmail.com"
+                                            subject="Message Failure"/>
+                    <custom-processor
+                            class="org.mule.test.integration.exceptions.ExceptionStrategyCommonScenariosTestCase$EndMessageProcessor"/>
+                </processor-chain>
             </default-exception-strategy>
         </service>
     </model>

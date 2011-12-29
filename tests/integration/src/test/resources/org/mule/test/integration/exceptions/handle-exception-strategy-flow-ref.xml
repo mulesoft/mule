@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xmlns:json="http://www.mulesoft.org/schema/mule/json"
+      xsi:schemaLocation="
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
+       http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/3.2/mule-test.xsd
+       http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.2/mule-vm.xsd
+       http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/3.2/mule-json.xsd">
+
+    <flow name="vmExceptionHandlingBlock">
+        <vm:inbound-endpoint path="inExceptionBlock" exchange-pattern="request-response"/>
+        <flow-ref name="blockWithOwnExceptionStrategy"/>
+        <json:object-to-json-transformer/>
+    </flow>
+
+    <flow name="blockWithOwnExceptionStrategy">
+        <json:json-to-object-transformer returnClass="org.mule.test.integration.exceptions.HandleExceptionStrategyTestCase$NewsRequest"/>
+        <custom-processor class="org.mule.test.integration.exceptions.HandleExceptionStrategyTestCase$LoadNewsProcessor"/>
+        <test:component throwException="true"/>
+        <handle-exception-strategy>
+            <custom-processor class="org.mule.test.integration.exceptions.HandleExceptionStrategyTestCase$NewsErrorProcessor"/>
+        </handle-exception-strategy>
+    </flow>
+
+</mule>

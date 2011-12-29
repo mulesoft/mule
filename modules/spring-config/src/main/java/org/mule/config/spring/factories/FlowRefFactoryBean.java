@@ -10,6 +10,7 @@
 
 package org.mule.config.spring.factories;
 
+import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.construct.FlowConstruct;
@@ -41,7 +42,18 @@ public class FlowRefFactoryBean implements FactoryBean<MessageProcessor>, Applic
             {
                 public MuleEvent process(MuleEvent event) throws MuleException
                 {
-                    return processor.process(event);
+                    try
+                    {
+                        return processor.process(event);
+                    }
+                    catch (MessagingException e)
+                    {
+                        if (e.getEvent().getMessage().getExceptionPayload() != null)
+                        {
+                            throw e;
+                        }
+                        return e.getEvent();
+                    }
                 }
             };
         }

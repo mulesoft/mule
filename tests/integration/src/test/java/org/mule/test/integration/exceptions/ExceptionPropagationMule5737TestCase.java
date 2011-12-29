@@ -103,7 +103,9 @@ public class ExceptionPropagationMule5737TestCase extends FunctionalTestCase
         public MuleEvent handleException(Exception e, MuleEvent event)
         {
             caught = true;
-            return super.handleException(e, event);
+            MuleEvent resultEvent = super.handleException(e, event);
+            resultEvent.getMessage().setExceptionPayload(null);
+            return resultEvent;
         }
 
     }

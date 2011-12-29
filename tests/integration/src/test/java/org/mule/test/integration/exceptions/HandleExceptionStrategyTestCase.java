@@ -31,10 +31,13 @@ import java.util.Collection;
 
 import static org.junit.Assert.assertThat;
 
-public class CatchExceptionStrategyTestCase extends AbstractServiceAndFlowTestCase
+public class HandleExceptionStrategyTestCase extends AbstractServiceAndFlowTestCase
 {
     public static final int TIMEOUT = 5000;
     public static final String ERROR_PROCESSING_NEWS = "error processing news";
+    public static final String JSON_RESPONSE = "{\"errorMessage\":\"error processing news\",\"userId\":15,\"title\":\"News title\"}";
+    public static final String JSON_REQUEST = "{\"userId\":\"15\"}";
+
     @Rule
     public DynamicPort dynamicPort1 = new DynamicPort("port1");
     @Rule
@@ -44,7 +47,7 @@ public class CatchExceptionStrategyTestCase extends AbstractServiceAndFlowTestCa
     @Rule
     public DynamicPort dynamicPort4 = new DynamicPort("port4");
 
-    public CatchExceptionStrategyTestCase(ConfigVariant variant, String configResources)
+    public HandleExceptionStrategyTestCase(ConfigVariant variant, String configResources)
     {
         super(variant, configResources);
     }
@@ -52,8 +55,8 @@ public class CatchExceptionStrategyTestCase extends AbstractServiceAndFlowTestCa
     @Parameterized.Parameters
     public static Collection<Object[]> parameters()
     {
-        return Arrays.asList(new Object[][]{/*{AbstractServiceAndFlowTestCase.ConfigVariant.SERVICE, "org/mule/test/exceptions/catch-exception-strategy-use-case-service.xml"},*/
-                {ConfigVariant.FLOW, "org/mule/test/integration/exceptions/catch-exception-strategy-use-case-flow.xml"}});
+        return Arrays.asList(new Object[][]{{AbstractServiceAndFlowTestCase.ConfigVariant.SERVICE, "org/mule/test/integration/exceptions/handle-exception-strategy-use-case-service.xml"},
+                {ConfigVariant.FLOW, "org/mule/test/integration/exceptions/handle-exception-strategy-use-case-flow.xml"}});
     }
 
     @Test
@@ -99,9 +102,9 @@ public class CatchExceptionStrategyTestCase extends AbstractServiceAndFlowTestCa
     private void testJsonErrorResponse(String endpointUri) throws Exception
     {
         LocalMuleClient client = muleContext.getClient();
-        MuleMessage response = client.send(endpointUri, "{\"userId\":\"15\"}", null, TIMEOUT);
+        MuleMessage response = client.send(endpointUri, JSON_REQUEST, null, TIMEOUT);
         assertThat(response, IsNull.<Object>notNullValue());
-        assertThat(response.getPayloadAsString(), Is.is("{\"errorMessage\":\"error processing news\",\"userId\":15,\"title\":\"News title\"}"));
+        assertThat(response.getPayloadAsString(), Is.is(JSON_RESPONSE));
     }
 
 
@@ -188,7 +191,7 @@ public class CatchExceptionStrategyTestCase extends AbstractServiceAndFlowTestCa
         @WebResult(name="text")
         public String echo(@WebParam(name="text") String string)
         {
-            return string;
+            throw new RuntimeException();
         }
     }
 

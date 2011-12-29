@@ -33,10 +33,12 @@
         </jms:outbound-endpoint>
         <default-exception-strategy>
             <commit-transaction exception-pattern="*"/>
-            <expression-transformer evaluator="groovy" expression="payload.getPayload()"/>
-            <jms:outbound-endpoint queue="dead.letter1" connector-ref="jmsConnector">
-                <jms:transaction action="ALWAYS_JOIN" />
-            </jms:outbound-endpoint>
+            <processor-chain>
+                <expression-transformer evaluator="groovy" expression="payload.getPayload()"/>
+                <jms:outbound-endpoint queue="dead.letter1" connector-ref="jmsConnector">
+                    <jms:transaction action="ALWAYS_JOIN" />
+                </jms:outbound-endpoint>
+            </processor-chain>
         </default-exception-strategy>
     </flow>
 
@@ -54,13 +56,15 @@
         </jms:outbound-endpoint>
         <default-exception-strategy>
             <commit-transaction exception-pattern="*"/>
-            <expression-transformer evaluator="header"  expression="SESSION:originalMessage"/>
-            <message-properties-transformer scope="session">
-                <delete-message-property key="originalMessage"/>
-            </message-properties-transformer>
-            <jms:outbound-endpoint queue="dead.letter2" connector-ref="jmsConnector">
-                <jms:transaction action="ALWAYS_JOIN" />
-            </jms:outbound-endpoint>
+            <processor-chain>
+                <expression-transformer evaluator="header"  expression="SESSION:originalMessage"/>
+                <message-properties-transformer scope="session">
+                    <delete-message-property key="originalMessage"/>
+                </message-properties-transformer>
+                <jms:outbound-endpoint queue="dead.letter2" connector-ref="jmsConnector">
+                    <jms:transaction action="ALWAYS_JOIN" />
+                </jms:outbound-endpoint>
+            </processor-chain>
         </default-exception-strategy>
     </flow>
 
@@ -130,10 +134,12 @@
         <test:component throwException="true"/>
         <default-exception-strategy>
             <rollback-transaction exception-pattern="*"/>
-            <expression-transformer evaluator="groovy" expression='"Failed to process message: " + payload.getPayload() + " due to: " + payload.getException().getMessage()'/>
-            <smtp:outbound-endpoint user="alice" password="secret" host="127.0.0.1" port="${port2}" from="alice@example.com" to="bob@example.com" subject="Message Failure"/>
-            <custom-processor
-                    class="org.mule.test.integration.exceptions.ExceptionStrategyCommonScenariosTestCase$EndMessageProcessor"/>
+            <processor-chain>
+                <expression-transformer evaluator="groovy" expression='"Failed to process message: " + payload.getPayload() + " due to: " + payload.getException().getMessage()'/>
+                <smtp:outbound-endpoint user="alice" password="secret" host="127.0.0.1" port="${port2}" from="alice@example.com" to="bob@example.com" subject="Message Failure"/>
+                <custom-processor
+                        class="org.mule.test.integration.exceptions.ExceptionStrategyCommonScenariosTestCase$EndMessageProcessor"/>
+            </processor-chain>
         </default-exception-strategy>
     </flow>
 

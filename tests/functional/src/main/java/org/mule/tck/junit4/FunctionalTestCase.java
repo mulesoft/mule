@@ -21,7 +21,9 @@ import org.mule.component.AbstractJavaComponent;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.construct.AbstractPipeline;
+import org.mule.construct.Flow;
 import org.mule.construct.SimpleService;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.util.IOUtils;
 
@@ -149,6 +151,21 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase
         {
             fail("Component is not a JavaComponent and therefore has no component object instance");
             return null;
+        }
+    }
+
+    protected void stopFlowConstruct(String flowName) throws Exception
+    {
+        FlowConstruct flowConstruct = getFlowConstruct(flowName);
+        if (flowConstruct instanceof Service)
+        {
+            Service service = (Service) flowConstruct;
+            service.stop();
+        }
+        else
+        {
+            Flow flow = (Flow) flowConstruct;
+            flow.stop();
         }
     }
 }

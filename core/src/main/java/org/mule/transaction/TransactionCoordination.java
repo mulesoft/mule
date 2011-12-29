@@ -243,4 +243,9 @@ public final class TransactionCoordination
         tx.resume();
     }
 
+    public void clear()
+    {
+        suspendedTransaction.remove();
+        transactions.remove();
+    }
 }

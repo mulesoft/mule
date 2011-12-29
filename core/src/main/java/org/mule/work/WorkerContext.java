@@ -28,6 +28,7 @@
 package org.mule.work;
 
 import org.mule.RequestContext;
+import org.mule.transaction.TransactionCoordination;
 import org.mule.util.concurrent.Latch;
 
 import javax.resource.spi.work.ExecutionContext;
@@ -371,6 +372,7 @@ public class WorkerContext implements Work
         finally
         {
             RequestContext.clear();
+            TransactionCoordination.getInstance().clear();
             endLatch.countDown();
         }
     }

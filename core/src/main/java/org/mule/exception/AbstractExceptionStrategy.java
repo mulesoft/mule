@@ -19,11 +19,11 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
+import org.mule.api.construct.FlowConstruct;
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.api.exception.RollbackSourceCallback;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.processor.MessageProcessor;
-import org.mule.api.processor.MessageProcessorBuilder;
 import org.mule.api.security.SecurityException;
 import org.mule.api.transaction.TransactionException;
 import org.mule.api.util.StreamCloserService;
@@ -34,8 +34,8 @@ import org.mule.management.stats.FlowConstructStatistics;
 import org.mule.management.stats.ServiceStatistics;
 import org.mule.message.ExceptionMessage;
 import org.mule.processor.AbstractMessageProcessorOwner;
-import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.routing.filters.WildcardFilter;
+import org.mule.routing.outbound.MulticastingRouter;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.util.CollectionUtils;
 
@@ -195,25 +195,20 @@ public abstract class AbstractExceptionStrategy extends AbstractMessageProcessor
                 ExceptionMessage msg = new ExceptionMessage(event, t, component, endpointUri);
                 MuleMessage exceptionMessage = new DefaultMuleMessage(msg, event.getMessage(), muleContext);
 
-                DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder(event.getFlowConstruct());
-                for (Object processor : messageProcessors)
+                // Create an outbound router with all endpoints configured on the exception strategy
+                MulticastingRouter router = new MulticastingRouter()
                 {
-                    if (processor instanceof MessageProcessor)
+                    @Override
+                    protected void setMessageProperties(FlowConstruct session, MuleMessage message, MessageProcessor target)
                     {
-                        builder.chain((MessageProcessor) processor);
+                        // No reply-to or correlation for exception targets, at least for now anyway.
                     }
-                    else if (processor instanceof MessageProcessorBuilder)
-                    {
-                        builder.chain((MessageProcessorBuilder) processor);
-                    }
-                    else
-                    {
-                        throw new IllegalArgumentException(
-                            "MessageProcessorBuilder should only have MessageProcessor's or MessageProcessorBuilder's configured");
-                    }
-                }
-                MessageProcessor messageProcessor = builder.build();
-                messageProcessor.process(new DefaultMuleEvent(exceptionMessage, event));
+                };
+                router.setRoutes(getMessageProcessors());
+                router.setMuleContext(muleContext);
+
+                // Route the ExceptionMessage to the new router
+                router.route(new DefaultMuleEvent(exceptionMessage, event));
             }
             catch (Exception e)
             {
