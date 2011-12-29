@@ -15,6 +15,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
+import static org.junit.Assert.fail;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
@@ -46,12 +47,22 @@ public class SessionPropertiesTestCase extends AbstractMuleContextTestCase
     public void setSessionPropertyNoEvent() throws Exception
     {
         MuleMessage message = new DefaultMuleMessage("data", muleContext);
-        message.setProperty("key", "value", PropertyScope.SESSION);
+        try
+        {
+            message.setProperty("key", "value", PropertyScope.SESSION);
+            fail("IllegalStateException excepted");
+        }
+        catch (IllegalStateException e)
+        {
+            // Expected
+        }
+        catch (Exception e)
+        {
+            fail("IllegalStateException excepted");
 
-        MuleEvent event = new DefaultMuleEvent(message, MessageExchangePattern.ONE_WAY, getTestService());
+        }
 
         assertNull(message.getProperty("key", PropertyScope.SESSION));
-        assertNull(event.getSession().getProperty("key"));
 
     }
 
@@ -280,7 +291,8 @@ public class SessionPropertiesTestCase extends AbstractMuleContextTestCase
     public void processFlowSessionPropertyPropagation() throws Exception
     {
         MuleMessage message = new DefaultMuleMessage("data", muleContext);
-        MuleEvent event = new DefaultMuleEvent(message, MessageExchangePattern.REQUEST_RESPONSE, getTestService());
+        MuleEvent event = new DefaultMuleEvent(message, MessageExchangePattern.REQUEST_RESPONSE,
+            getTestService());
 
         SensingNullMessageProcessor flowListener = new SensingNullMessageProcessor();
         Flow flow = new Flow("flow", muleContext);

@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule;
 
 import org.mule.api.MuleEvent;
@@ -68,16 +69,15 @@ public class MessagePropertiesContext implements Serializable
      */
     protected Set<String> keySet;
 
-
     @SuppressWarnings("unchecked")
     public MessagePropertiesContext()
     {
         keySet = new TreeSet<String>();
         scopedMap = new TreeMap<PropertyScope, Map<String, Object>>(new PropertyScope.ScopeComparator());
 
-        scopedMap.put(PropertyScope.INVOCATION, new CaseInsensitiveHashMap/*<String, Object>*/(6));
-        scopedMap.put(PropertyScope.INBOUND, new CaseInsensitiveHashMap/*<String, Object>*/(6));
-        scopedMap.put(PropertyScope.OUTBOUND, new CaseInsensitiveHashMap/*<String, Object>*/(6));
+        scopedMap.put(PropertyScope.INVOCATION, new CaseInsensitiveHashMap/* <String, Object> */(6));
+        scopedMap.put(PropertyScope.INBOUND, new CaseInsensitiveHashMap/* <String, Object> */(6));
+        scopedMap.put(PropertyScope.OUTBOUND, new CaseInsensitiveHashMap/* <String, Object> */(6));
     }
 
     protected Map<String, Object> getScopedProperties(PropertyScope scope)
@@ -117,9 +117,8 @@ public class MessagePropertiesContext implements Serializable
     }
 
     /**
-     *
-     * @deprecated use the overloaded version with an explicit lookup scope. This method will
-     * now use only the outbound scope.
+     * @deprecated use the overloaded version with an explicit lookup scope. This method will now use only the
+     *             outbound scope.
      */
     @Deprecated
     public Object getProperty(String key)
@@ -139,8 +138,8 @@ public class MessagePropertiesContext implements Serializable
     }
 
     /**
-     * Removes all properties from all scopes except for SESSION and INBOUND (which is read-only).
-     * You may explicitly clear the session properties by calling clearProperties(PropertyScope.SESSION)
+     * Removes all properties from all scopes except for SESSION and INBOUND (which is read-only). You may
+     * explicitly clear the session properties by calling clearProperties(PropertyScope.SESSION)
      */
     public void clearProperties()
     {
@@ -166,9 +165,9 @@ public class MessagePropertiesContext implements Serializable
     }
 
     /**
-     * Removes a property from all scopes except for SESSION and INBOUND (which is read-only).
-     * You may explicitly remove a session property by calling removeProperty(key, PropertyScope.SESSION)
-     *
+     * Removes a property from all scopes except for SESSION and INBOUND (which is read-only). You may
+     * explicitly remove a session property by calling removeProperty(key, PropertyScope.SESSION)
+     * 
      * @param key the property key to remove
      * @return the removed property value or null if the property did not exist
      */
@@ -189,7 +188,7 @@ public class MessagePropertiesContext implements Serializable
 
     /**
      * Removes a property from the specified property scope.
-     *
+     * 
      * @param key the property key to remove
      * @return the removed property value or null if the property did not exist
      */
@@ -215,8 +214,8 @@ public class MessagePropertiesContext implements Serializable
 
     /**
      * Set a property on the message
-     *
-     * @param key   the key on which to associate the value
+     * 
+     * @param key the key on which to associate the value
      * @param value the property value
      * @deprecated use {@link #setProperty(String, Object, org.mule.api.transport.PropertyScope)}
      */
@@ -229,8 +228,8 @@ public class MessagePropertiesContext implements Serializable
 
     /**
      * Set a property on the message
-     *
-     * @param key   the key on which to associate the value
+     * 
+     * @param key the key on which to associate the value
      * @param value the property value
      * @param scope the scope to se the property on
      * @see org.mule.api.transport.PropertyScope
@@ -367,12 +366,12 @@ public class MessagePropertiesContext implements Serializable
         }
         out.defaultWriteObject();
     }
-    
+
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException
     {
         in.defaultReadObject();
         sessionMap = new UndefinedSessionPropertiesMap();
-    }    
+    }
 
     private static class UndefinedSessionPropertiesMap extends AbstractMap<String, Object>
         implements Serializable
@@ -389,11 +388,11 @@ public class MessagePropertiesContext implements Serializable
         @Override
         public Object put(String key, Object value)
         {
-            logger.warn(String.format(
-                "Detected an attempt to set a session property, "
-                                + "but a MuleEvent hasn't been created useing this message yet. Key/value: %s=%s",
-                key, value));
-            return value;
+            throw new IllegalStateException(
+                String.format(
+                    "Detected an attempt to set a session property, "
+                                    + "but a MuleEvent hasn't been created useing this message yet. Key/value: %s=%s",
+                    key, value));
         };
 
         @Override
@@ -402,7 +401,7 @@ public class MessagePropertiesContext implements Serializable
             logger.warn(String.format(
                 "Detected an attempt to get a session property, "
                                 + "but a MuleEvent hasn't been created useing this message yet. Key: %s", key));
-            return super.get(key);
+            return null;
         }
     }
 

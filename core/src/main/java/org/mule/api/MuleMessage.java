@@ -156,6 +156,8 @@ public interface MuleMessage extends Serializable
     Set<String> getInvocationPropertyNames();
     Set<String> getInboundPropertyNames();
     Set<String> getOutboundPropertyNames();
+
+    @Deprecated
     Set<String> getSessionPropertyNames();
 
 
@@ -754,10 +756,19 @@ public interface MuleMessage extends Serializable
      */
     DataType<?> getDataType();
 
+    /**
+     * @Deprecated use {@link org.mule.api.MuleSession#getProperty(String)}
+     */
     <T> T getSessionProperty(String name, T defaultValue);
 
+    /**
+     * @Deprecated use {@link org.mule.api.MuleSession#getProperty(String)}
+     */
     <T> T getSessionProperty(String name);
 
+    /**
+     * @Deprecated use {@link org.mule.api.MuleSession#setProperty(String, Serializable)}
+     */
     void setSessionProperty(String key, Object value);
 
     /**
