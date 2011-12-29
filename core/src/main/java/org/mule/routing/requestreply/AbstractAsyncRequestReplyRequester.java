@@ -89,13 +89,13 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
             sendAsyncRequest(event);
 
             MuleEvent resultEvent = receiveAsyncReply(event);
-            
-            // Merge async-reply session properties with exiting session properties
-            event.getSession().merge(resultEvent.getSession());
 
             if (resultEvent != null)
             {
-                resultEvent = org.mule.RequestContext.setEvent(new DefaultMuleEvent(resultEvent.getMessage(), event));
+                // Merge async-reply session properties with exiting session properties
+                event.getSession().merge(resultEvent.getSession());
+                resultEvent = org.mule.RequestContext.setEvent(new DefaultMuleEvent(resultEvent.getMessage(),
+                    event));
             }
             return resultEvent;
         }
