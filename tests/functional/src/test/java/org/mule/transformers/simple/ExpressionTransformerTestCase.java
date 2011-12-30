@@ -10,13 +10,6 @@
 
 package org.mule.transformers.simple;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
@@ -38,6 +31,13 @@ import java.util.Map;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 public class ExpressionTransformerTestCase extends FunctionalTestCase
 {
 
@@ -47,10 +47,9 @@ public class ExpressionTransformerTestCase extends FunctionalTestCase
         return "org/mule/test/transformers/expression-transformers-test.xml";
     }
 
-    @Test
-    public void testTransformerConfig() throws Exception
+    private void testTransformerConfig(String name) throws Exception
     {
-        ExpressionTransformer transformer = (ExpressionTransformer) muleContext.getRegistry().lookupTransformer("testTransformer");
+        ExpressionTransformer transformer = (ExpressionTransformer) muleContext.getRegistry().lookupTransformer(name);
         assertNotNull(transformer);
         assertNotNull(transformer.getArguments());
         assertEquals(2, transformer.getArguments().size());
@@ -66,9 +65,32 @@ public class ExpressionTransformerTestCase extends FunctionalTestCase
     }
 
     @Test
+    public void testTransformerConfig() throws Exception
+    {
+        testTransformerConfig("testTransformer");
+    }
+
+    @Test
+    public void testTransformerConfigEvaluatorInline() throws Exception
+    {
+        testTransformerConfig("testTransformerInline");
+    }
+
+    @Test
     public void testBeanBuilderTransformerConfig() throws Exception
     {
-        BeanBuilderTransformer transformer = (BeanBuilderTransformer) muleContext.getRegistry().lookupTransformer("testTransformer3");
+        testBeanBuilderTransformerConfig("testTransformer3");
+    }
+
+    @Test
+    public void testBeanBuilderTransformerConfigEvaluatorInline() throws Exception
+    {
+        testBeanBuilderTransformerConfig("testTransformer3Inline");
+    }
+
+    private void testBeanBuilderTransformerConfig(String name) throws Exception
+    {
+        BeanBuilderTransformer transformer = (BeanBuilderTransformer) muleContext.getRegistry().lookupTransformer(name);
         assertNotNull(transformer);
         assertNotNull(transformer.getArguments());
         assertEquals(3, transformer.getArguments().size());
@@ -88,7 +110,18 @@ public class ExpressionTransformerTestCase extends FunctionalTestCase
     @Test
     public void testExecutionWithCorrectMessage() throws Exception
     {
-        ExpressionTransformer transformer = (ExpressionTransformer) muleContext.getRegistry().lookupTransformer("testTransformer");
+        testExecutionWithCorrectMessage("testTransformer");
+    }
+
+    @Test
+    public void testExecutionWithCorrectMessageEvaluatorInline() throws Exception
+    {
+        testExecutionWithCorrectMessage("testTransformerInline");
+    }
+
+    private void testExecutionWithCorrectMessage(String name) throws Exception
+    {
+        ExpressionTransformer transformer = (ExpressionTransformer) muleContext.getRegistry().lookupTransformer(name);
         Map<String, Object> props = new HashMap<String, Object>();
         props.put("foo", "moo");
         props.put("bar", "mar");
@@ -169,7 +202,18 @@ public class ExpressionTransformerTestCase extends FunctionalTestCase
     @Test
     public void testTransformerConfigWithSingleArgumentShortcutConfig() throws Exception
     {
-        ExpressionTransformer transformer = (ExpressionTransformer) muleContext.getRegistry().lookupTransformer("testTransformer4");
+        testTransformerConfigWithSingleArgumentShortcutConfig("testTransformer4");
+    }
+
+    @Test
+    public void testTransformerConfigWithSingleArgumentShortcutConfigEvaluatorInline() throws Exception
+    {
+        testTransformerConfigWithSingleArgumentShortcutConfig("testTransformer4Inline");
+    }
+
+    private void testTransformerConfigWithSingleArgumentShortcutConfig(String name) throws Exception
+    {
+        ExpressionTransformer transformer = (ExpressionTransformer) muleContext.getRegistry().lookupTransformer(name);
         Map<String, Object> props = new HashMap<String, Object>();
         props.put("foo", "moo");
         props.put("bar", "mar");

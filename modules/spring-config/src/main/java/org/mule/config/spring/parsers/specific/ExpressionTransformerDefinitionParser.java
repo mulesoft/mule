@@ -37,10 +37,9 @@ public class ExpressionTransformerDefinitionParser extends ParentContextDefiniti
             messageProcessor, false));
         otherwise(new ExpressionTransformerChildDefinitionParser("messageProcessor", messageProcessor));
 
-        registerPreProcessor(
-            new CheckRequiredAttributesWhenNoChildren(new String[][]{{"evaluator", "expression"}},
+        registerPreProcessor(new CheckRequiredAttributesWhenNoChildren(new String[][]{{"expression"}},
                 "return-argument")).registerPreProcessor(
-            new CheckExclusiveAttributesAndChildren(new String[]{"evaluator", "expression"},
+            new CheckExclusiveAttributesAndChildren(new String[]{"expression"},
                 new String[]{"return-argument"}))
             .addIgnored("evaluator")
             .addIgnored("expression")

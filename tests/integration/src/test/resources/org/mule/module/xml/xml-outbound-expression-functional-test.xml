@@ -40,10 +40,10 @@
             <outbound>
                 <expression-splitter-router evaluator="xpath" expression="/mule:mule/mule:model/mule:service" disableRoundRobin="true" failIfNoMatch="false">
                     <outbound-endpoint ref="service1">
-                        <expression-filter evaluator="xpath" expression="/mule:service/@name = 'service splitter'"/>
+                        <expression-filter expression="#[xpath:/mule:service/@name = 'service splitter']"/>
                     </outbound-endpoint>
                     <outbound-endpoint ref="service2">
-                        <expression-filter evaluator="xpath" expression="/mule:service/@name = 'round robin deterministic'"/>
+                        <expression-filter expression="#[xpath:/mule:service/@name = 'round robin deterministic']"/>
                     </outbound-endpoint>
                 </expression-splitter-router>
             </outbound>

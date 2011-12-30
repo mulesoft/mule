@@ -3562,7 +3562,7 @@
     <xsd:complexType name="expressionFilterType">
         <xsd:complexContent>
             <xsd:extension base="abstractFilterType">
-                <xsd:attribute name="evaluator" use="required">
+                <xsd:attribute name="evaluator" use="optional">
                     <xsd:annotation>
                         <xsd:documentation>The expression evaluator to use. The expression filter supports some types such as header, payload, exception, wildcard, and regex, that are built-in filters not registered with the ExpressionEvaluatorManager. All others are registered with the ExpressionEvaluatorManager. Where XPath, bean, and ONGL are used, the expression should be a boolean expression.
                         </xsd:documentation>
@@ -4284,6 +4284,8 @@
                         </xsd:annotation>
                         <xsd:complexType>
                             <xsd:attributeGroup ref="expressionAttributes"/>
+                        <!-- 
+                         -->
                             <xsd:attribute name="optional" type="substitutableBoolean" use="optional">
                                 <xsd:annotation>
                                     <xsd:documentation>If the expression evaluates to null, specifies whether to continue to the next expression without error.
@@ -4345,7 +4347,7 @@
     </xsd:simpleType>
 
     <xsd:attributeGroup name="expressionAttributes">
-        <xsd:attribute name="evaluator" use="required" type="standardExpressionEvaluators">
+        <xsd:attribute name="evaluator" use="optional" type="standardExpressionEvaluators">
             <xsd:annotation>
                 <xsd:documentation>The expression evaluator to use. Expression evaluators must be registered with the ExpressionEvaluatorManager before they can be used. Using the custom evaluator allows you to define your own evaluator with the 'custom-evaluator' attribute. Note that some evaluators such as xpath, groovy, and bean are loaded from other Mule modules (XML and Scripting, respectively). These modules must be on your classpath before the evaluator can be used.
                 </xsd:documentation>

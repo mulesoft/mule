@@ -11,12 +11,11 @@
 package org.mule.routing.outbound;
 
 import org.mule.api.MuleEvent;
-import org.mule.api.expression.ExpressionManager;
 import org.mule.api.routing.CouldNotRouteOutboundMessageException;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.expression.ExpressionConfig;
 import org.mule.util.StringUtils;
 
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -27,10 +26,12 @@ public class ExpressionRecipientList extends AbstractRecipientList
     public static final String DEFAULT_SELECTOR_EVALUATOR = "header";
     public static final String DEFAULT_SELECTOR_EXPRESSION = DEFAULT_SELECTOR_PROPERTY;
 
-    private String expression = DEFAULT_SELECTOR_EXPRESSION;
-    private String evaluator = DEFAULT_SELECTOR_EVALUATOR;
-    private String customEvaluator;
-    private String fullExpression;
+    private ExpressionConfig expressionConfig;
+
+    public ExpressionRecipientList()
+    {
+        expressionConfig = new ExpressionConfig(DEFAULT_SELECTOR_EXPRESSION, DEFAULT_SELECTOR_EVALUATOR, null);
+    }
 
     @Override
     protected List getRecipients(MuleEvent event) throws CouldNotRouteOutboundMessageException
@@ -66,48 +67,40 @@ public class ExpressionRecipientList extends AbstractRecipientList
 
     public String getFullExpression()
     {
-        if (fullExpression == null)
+        if (getEvaluator().equalsIgnoreCase("custom"))
         {
-            if (evaluator.equalsIgnoreCase("custom"))
-            {
-                evaluator = customEvaluator;
-            }
-            fullExpression = MessageFormat.format("{0}{1}:{2}{3}",
-                                                  ExpressionManager.DEFAULT_EXPRESSION_PREFIX,
-                                                  evaluator, expression,
-                                                  ExpressionManager.DEFAULT_EXPRESSION_POSTFIX);
-            logger.debug("Full expression for EndpointSelector is: " + fullExpression);
+            setEvaluator(getCustomEvaluator());
         }
-        return fullExpression;
+        return expressionConfig.getFullExpression(muleContext.getExpressionManager());
     }
 
     public String getExpression()
     {
-        return expression;
+        return expressionConfig.getExpression();
     }
 
     public void setExpression(String expression)
     {
-        this.expression = expression;
+        expressionConfig.setExpression(expression);
     }
 
     public String getCustomEvaluator()
     {
-        return customEvaluator;
+        return expressionConfig.getCustomEvaluator();
     }
 
     public void setCustomEvaluator(String customEvaluator)
     {
-        this.customEvaluator = customEvaluator;
+        expressionConfig.setCustomEvaluator(customEvaluator);
     }
 
     public String getEvaluator()
     {
-        return evaluator;
+        return expressionConfig.getEvaluator();
     }
 
     public void setEvaluator(String evaluator)
     {
-        this.evaluator = evaluator;
+        expressionConfig.setEvaluator(evaluator);
     }
 }

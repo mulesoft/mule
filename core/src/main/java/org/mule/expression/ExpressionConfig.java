@@ -139,7 +139,14 @@ public class ExpressionConfig
 
     public void setExpression(String expression)
     {
-        this.expression = StringUtils.trimToEmpty(expression);
+        if (expression.startsWith(expressionPrefix))
+        {
+            parse(expression);
+        }
+        else
+        {
+            this.expression = StringUtils.trimToEmpty(expression);
+        }
         fullExpression=null;
     }
 }

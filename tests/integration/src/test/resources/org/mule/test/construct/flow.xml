@@ -124,7 +124,7 @@
 
     <flow name="split-filter-aggregate">
         <vm:inbound-endpoint path="split-filter-aggregate-in" exchange-pattern="one-way" />
-        <splitter evaluator="bean" expression="fruit" enableCorrelation="ALWAYS" />
+        <splitter expression="#[bean:fruit]" enableCorrelation="ALWAYS" />
         <message-filter throwOnUnaccepted="false">
             <not-filter>
                 <or-filter>
@@ -297,7 +297,7 @@
                 <append-string-transformer message=" Hello" />
                 <append-string-transformer message=" foo" />
             </when>
-            <when expression="payload=='bar'" evaluator="groovy">
+            <when expression="#[groovy:payload=='bar']">
                 <append-string-transformer message=" Hello bar" />
             </when>
             <otherwise>
