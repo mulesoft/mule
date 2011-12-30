@@ -27,8 +27,8 @@ public class SpringSecurityProxyTestCase extends UsernameTokenProxyTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "org/mule/module/cxf/wssec/cxf-secure-proxy-service.xml, org/mule/module/cxf/wssec/spring-security-conf.xml"},
-            {ConfigVariant.FLOW, "org/mule/module/cxf/wssec/cxf-secure-proxy-flow.xml, org/mule/module/cxf/wssec/spring-security-conf.xml"}
+            {ConfigVariant.SERVICE, "org/mule/module/cxf/wssec/cxf-secure-proxy-security-manager-service.xml, org/mule/module/cxf/wssec/spring-security-conf.xml"},
+            {ConfigVariant.FLOW, "org/mule/module/cxf/wssec/cxf-secure-proxy-security-manager-flow.xml, org/mule/module/cxf/wssec/spring-security-conf.xml"}
         });
     }          
 }
