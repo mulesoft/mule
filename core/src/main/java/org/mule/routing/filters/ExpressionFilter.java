@@ -9,9 +9,6 @@
  */
 package org.mule.routing.filters;
 
-import static org.mule.util.ClassUtils.equal;
-import static org.mule.util.ClassUtils.hash;
-
 import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.context.MuleContextAware;
@@ -25,12 +22,14 @@ import java.text.MessageFormat;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import static org.mule.util.ClassUtils.equal;
+import static org.mule.util.ClassUtils.hash;
+
 /**
  * Allows boolean expressions to be executed on a message. Note that when using this filter you must be able to either specify
  * a boolean expression when using an expression filter or use one of the standard Mule filters.  These can be defined as follows -
  *
  * <ul>
- * <li>RegEx - 'regex:<pattern>': #[regex:'error' [0-9]]</li>
  * <li>Wildcard - 'wildcard:<pattern>': #[wildcard: *foo*</li>
  * <li>PayloadType - 'payload-type:<fully qualified class name>': #[payload:javax.jms.TextMessage]</li>
  * <li>ExceptionType - 'exception-type:<fully qualified class name>': #[exception-type:java.io.FileNotFoundException]</li>
@@ -145,10 +144,6 @@ public class ExpressionFilter implements Filter, MuleContextAware
             {
                 delegateFilter = new MessagePropertyFilter(PropertyScope.INVOCATION_NAME + ":"
                                                            + config.getExpression());
-            }
-            else if(config.getEvaluator().equals("regex"))
-            {
-                delegateFilter = new RegExFilter(config.getExpression());
             }
             else if(config.getEvaluator().equals("wildcard"))
             {

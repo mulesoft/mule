@@ -213,8 +213,6 @@ import org.mule.transformer.simple.ObjectToByteArray;
 import org.mule.transformer.simple.ObjectToString;
 import org.mule.transformer.simple.SerializableToByteArray;
 import org.mule.transformer.simple.StringAppendTransformer;
-import org.mule.transformer.simple.ValueExtractorTransformer;
-import org.mule.transformer.simple.ValueExtractorTransformer.ValueExtractorTemplate;
 import org.mule.util.store.InMemoryObjectStore;
 import org.mule.util.store.ManagedObjectStore;
 import org.mule.util.store.TextFileObjectStore;
@@ -364,10 +362,6 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
             .addCollection("enrichExpressionPairs");
         registerMuleBeanDefinitionParser("enrich", new ChildDefinitionParser("enrichExpressionPair",
             EnrichExpressionPair.class));
-
-        registerBeanDefinitionParser("value-extractor-transformer", new MessageProcessorDefinitionParser(ValueExtractorTransformer.class));
-        registerMuleBeanDefinitionParser("extract", new ChildDefinitionParser("valueExtractorTemplate",
-                                                                             ValueExtractorTemplate.class));
 
         registerBeanDefinitionParser("async", new AsyncMessageProcessorsDefinitionParser());
         registerBeanDefinitionParser("transactional", new ChildDefinitionParser("messageProcessor",
