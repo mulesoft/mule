@@ -14,6 +14,7 @@ import static org.apache.cxf.message.Message.DECOUPLED_CHANNEL_MESSAGE;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
+import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -21,6 +22,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.OutputHandler;
+import org.mule.config.i18n.MessageFactory;
 import org.mule.module.cxf.CxfConfiguration;
 import org.mule.module.cxf.CxfConstants;
 import org.mule.module.cxf.CxfOutboundMessageProcessor;
@@ -189,7 +191,7 @@ public class MuleUniversalConduit extends AbstractConduit
                 {
                     dispatchMuleMessage(m, finalEvent, finalEndpoint);
                 }
-                catch (IOException e)
+                catch (MuleException e)
                 {
                     throw new Fault(e);
                 }
@@ -239,9 +241,9 @@ public class MuleUniversalConduit extends AbstractConduit
         return result;
     }
     
-    protected void dispatchMuleMessage(Message m, MuleEvent reqEvent, OutboundEndpoint endpoint) throws IOException {
+    protected void dispatchMuleMessage(Message m, MuleEvent reqEvent, OutboundEndpoint endpoint) throws MuleException {
         try
-        {   
+        {
             MuleMessage req = reqEvent.getMessage();
             req.setOutboundProperty(HttpConnector.HTTP_DISABLE_STATUS_CODE_EXCEPTION_CHECK, Boolean.TRUE.toString());
 
@@ -276,16 +278,13 @@ public class MuleUniversalConduit extends AbstractConduit
                 getMessageObserver().onMessage(inMessage);
             }
         }
+        catch(MuleException me)
+        {
+            throw me;
+        }
         catch (Exception e)
         {
-            if (e instanceof IOException)
-            {
-                throw (IOException) e;
-            }
-
-            IOException ex = new IOException("Could not send message to Mule.");
-            ex.initCause(e);
-            throw ex;
+            throw new DefaultMuleException(MessageFactory.createStaticMessage("Could not send message to Mule."), e);
         }
     }
 

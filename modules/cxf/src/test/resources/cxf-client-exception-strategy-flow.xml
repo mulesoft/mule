@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:https="http://www.mulesoft.org/schema/mule/https"
+      xmlns:mulexml="http://www.mulesoft.org/schema/mule/xml"
+      xmlns:axis="http://www.mulesoft.org/schema/mule/axis"
+      xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
+      xsi:schemaLocation="
+           http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
+           http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+           http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/3.2/mule-http.xsd
+           http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.2/mule-vm.xsd
+           http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/3.2/mule-cxf.xsd">
+
+    <custom-transformer class="org.mule.module.cxf.functional.CxfClientExceptionStrategyTestCase$ThrowExceptionTransformer"
+                        name="throwException"/>
+
+    <flow name="helloService">
+        <inbound-endpoint address="http://localhost:${port1}/hello" />
+        <cxf:jaxws-service serviceClass="org.mule.module.cxf.example.HelloWorldImpl"/>
+        <component class="org.mule.module.cxf.example.HelloWorldImpl" />
+    </flow>
+
+    <flow name="helloServiceClient" processingStrategy="synchronous">
+        <inbound-endpoint address="vm://helloClient" />
+        <cxf:jaxws-client serviceClass="org.mule.module.cxf.example.HelloWorldImpl" operation="sayHi"/>
+        <outbound-endpoint address="http://localhost:${port1}/hello" />
+
+        <object-to-string-transformer/>
+        <append-string-transformer message="APPEND"/>
+        <transformer ref="throwException"/>
+
+        <default-exception-strategy>
+            <vm:outbound-endpoint path="out"/>
+        </default-exception-strategy>
+    </flow>
+
+</mule>

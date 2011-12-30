@@ -45,6 +45,7 @@ import org.apache.commons.httpclient.HttpException;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.frontend.MethodDispatcher;
+import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.ws.addressing.WSAContextUtils;
 
@@ -132,6 +133,16 @@ public class CxfOutboundMessageProcessor extends AbstractInterceptingMessageProc
         }
         catch (MessagingException e) {
             throw e;
+        }
+        // Because of CXF API, MuleExceptions can be wrapped in a Fault, in that case we should return the
+        // mule exception
+        catch(Fault f)
+        {
+            if(f.getCause() instanceof MuleException)
+            {
+                throw (MuleException) f.getCause();
+            }
+            throw new DispatchException(event,this,f);
         }
         catch (MuleException e)
         {
