@@ -39,7 +39,8 @@ public class HttpsPollingConnector extends HttpsConnector
     {
         super(context);
         serviceOverrides = new Properties();
-        serviceOverrides.setProperty(MuleProperties.CONNECTOR_MESSAGE_RECEIVER_CLASS, PollingHttpMessageReceiver.class.getName());
+        serviceOverrides.setProperty(MuleProperties.CONNECTOR_MESSAGE_RECEIVER_CLASS,
+            PollingHttpsMessageReceiver.class.getName());
     }
 
     public boolean isDiscardEmptyContent()

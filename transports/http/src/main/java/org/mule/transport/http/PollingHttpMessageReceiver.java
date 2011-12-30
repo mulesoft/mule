@@ -37,8 +37,9 @@ import java.util.Collections;
 public class PollingHttpMessageReceiver extends AbstractPollingMessageReceiver
 {
     protected String etag = null;
-    private boolean checkEtag;
-    private boolean discardEmptyContent;
+    protected boolean checkEtag;
+    protected boolean discardEmptyContent;
+
     //The outbound endpoint to poll
     private OutboundEndpoint outboundEndpoint;
 
@@ -46,25 +47,23 @@ public class PollingHttpMessageReceiver extends AbstractPollingMessageReceiver
                                       FlowConstruct flowConstruct,
                                       final InboundEndpoint endpoint) throws CreateException
     {
-
         super(connector, flowConstruct, endpoint);
+        setupFromConnector(connector);
+    }
 
-        HttpPollingConnector pollingConnector;
-
-        if (connector instanceof HttpPollingConnector)
-        {
-            pollingConnector = (HttpPollingConnector) connector;
-        }
-        else
+    protected void setupFromConnector(Connector connector) throws CreateException
+    {
+        if (!(connector instanceof HttpPollingConnector))
         {
             throw new CreateException(HttpMessages.pollingReciverCannotbeUsed(), this);
         }
 
+        HttpPollingConnector pollingConnector = (HttpPollingConnector) connector;
         long pollingFrequency = MapUtils.getLongValue(endpoint.getProperties(), "pollingFrequency",
                 pollingConnector.getPollingFrequency());
         if (pollingFrequency > 0)
         {
-            this.setFrequency(pollingFrequency);
+            setFrequency(pollingFrequency);
         }
 
         checkEtag = MapUtils.getBooleanValue(endpoint.getProperties(), "checkEtag", pollingConnector.isCheckEtag());
