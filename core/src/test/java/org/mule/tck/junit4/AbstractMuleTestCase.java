@@ -50,7 +50,7 @@ import static org.junit.Assume.assumeThat;
 public abstract class AbstractMuleTestCase
 {
 
-    public static final int DEFAULT_TEST_TIMEOUT_SECS = 60000;
+    public static final int DEFAULT_TEST_TIMEOUT_SECS = 60;
 
     public static final String TEST_TIMEOUT_SYSTEM_PROPERTY = "mule.test.timeoutSecs";
 
