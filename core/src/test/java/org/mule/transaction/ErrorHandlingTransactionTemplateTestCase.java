@@ -27,6 +27,7 @@ import org.mule.api.MuleEvent;
 import org.mule.api.transaction.Transaction;
 import org.mule.exception.DefaultMessagingExceptionStrategy;
 import org.mule.routing.filters.WildcardFilter;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.testmodels.mule.TestTransaction;
 
 import static org.hamcrest.core.Is.is;
@@ -38,7 +39,7 @@ import static org.mule.transaction.TransactionTemplateFactory.createExceptionHan
 import static org.mule.transaction.TransactionTemplateTestUtils.getEmptyTransactionCallback;
 
 @RunWith(MockitoJUnitRunner.class)
-public class ErrorHandlingTransactionTemplateTestCase
+public class ErrorHandlingTransactionTemplateTestCase extends AbstractMuleTestCase
 {
     private static final Object RETURN_VALUE = new Object();
     private MuleContext mockMuleContext = mock(MuleContext.class);

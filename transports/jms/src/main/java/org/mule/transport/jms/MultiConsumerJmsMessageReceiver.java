@@ -345,7 +345,7 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
                 if (e instanceof MessagingException)
                 {
                     MessagingException messagingException = (MessagingException) e;
-                    if (!messagingException.getEvent().isTransacted() && messagingException.getEvent().getMessage().getExceptionPayload() != null)
+                    if (!messagingException.getEvent().isTransacted() && messagingException.getEvent().getMessage().getExceptionPayload() != null && messagingException.isCauseRollback())
                     {
                         //Exception not handled
                         rollbackMethod.rollback();

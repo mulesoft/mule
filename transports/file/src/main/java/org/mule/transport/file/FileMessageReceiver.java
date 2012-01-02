@@ -391,7 +391,9 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
 
             if (e instanceof MessagingException)
             {
-                if (((MessagingException) e).getEvent().getMessage().getExceptionPayload() != null && rollbackMethod != null)
+                MessagingException messagingException = (MessagingException) e;
+                MuleEvent event = messagingException.getEvent();
+                if (event.getMessage().getExceptionPayload() != null && rollbackMethod != null && !event.isTransacted() && messagingException.isCauseRollback())
                 {
                     //Exception not handled
                     rollbackMethod.rollback();

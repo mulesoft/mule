@@ -17,6 +17,7 @@ import org.mule.tck.probe.Probe;
 import org.mule.tck.probe.Prober;
 import org.mule.transport.ftp.AbstractFtpServerTestCase;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.Collection;
 
@@ -62,6 +63,8 @@ public class InboundMessageLossTestCase extends AbstractFtpServerTestCase
         createFtpServerDir("transformerException");
         createFtpServerDir("routerException");
         createFtpServerDir("componentException");
+        createFtpServerDir("exceptionHandled");
+        createFtpServerDir("commitOnException");
     }
 
     @Test
@@ -139,6 +142,50 @@ public class InboundMessageLossTestCase extends AbstractFtpServerTestCase
                 // Component exception occurs after the SEDA queue for an asynchronous request, so from the client's
                 // perspective, the message has been delivered successfully.
                 return !fileExists("componentException/test1");
+            }
+
+            @Override
+            public String describeFailure()
+            {
+                return "File should be gone";
+            }
+        });
+    }
+
+    @Test
+    public void testCatchExceptionStrategyConsumesMessage() throws Exception
+    {
+        createFileOnFtpServer("exceptionHandled/test1");
+        prober.check(new Probe()
+        {
+            @Override
+            public boolean isSatisfied()
+            {
+                // Component exception occurs after the SEDA queue for an asynchronous request, so from the client's
+                // perspective, the message has been delivered successfully.
+                return !fileExists("exceptionHandled/test1");
+            }
+
+            @Override
+            public String describeFailure()
+            {
+                return "File should be gone";
+            }
+        });
+    }
+
+    @Test
+    public void testDefaultExceptionStrategyConsumesMessage() throws Exception
+    {
+        createFileOnFtpServer("commitOnException/test1");
+        prober.check(new Probe()
+        {
+            @Override
+            public boolean isSatisfied()
+            {
+                // Component exception occurs after the SEDA queue for an asynchronous request, so from the client's
+                // perspective, the message has been delivered successfully.
+                return !fileExists("commitOnException/test1");
             }
 
             @Override

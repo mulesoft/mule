@@ -108,7 +108,7 @@ public abstract class TransactedPollingMessageReceiver extends AbstractPollingMe
     @Override
     public void poll() throws Exception
     {
-        TransactionTemplate<Object> tt = TransactionTemplateFactory.<Object>createMainTransactionTemplate(endpoint.getTransactionConfig(), connector.getMuleContext());
+        TransactionTemplate<Void> tt = TransactionTemplateFactory.<Void>createMainTransactionTemplate(endpoint.getTransactionConfig(), connector.getMuleContext());
 
         if (this.isReceiveMessagesInTransaction())
         {
@@ -119,10 +119,10 @@ public abstract class TransactedPollingMessageReceiver extends AbstractPollingMe
             // Receive messages and process them in a single transaction
             // Do not enable threading here, but several workers
             // may have been started
-            TransactionCallback<Object> cb = new TransactionCallback<Object>()
+            TransactionCallback<Void> cb = new TransactionCallback<Void>()
             {
                 @Override
-                public Object doInTransaction() throws Exception
+                public Void doInTransaction() throws Exception
                 {
                     // this is not ideal, but jdbc receiver returns a list of maps, not List<MuleMessage>
                     List messages = getMessages();

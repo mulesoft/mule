@@ -40,6 +40,8 @@ public class MessagingException extends MuleException
 
     protected transient MuleEvent processedEvent;
 
+    private boolean causeRollback;
+
     /**
      * @deprecated use MessagingException(Message, MuleEvent)
      */
@@ -135,4 +137,15 @@ public class MessagingException extends MuleException
     {
         this.processedEvent = processedEvent;
     }
+
+    public boolean isCauseRollback()
+    {
+        return causeRollback;
+    }
+
+    public void setCauseRollback(boolean causeRollback)
+    {
+        this.causeRollback = causeRollback;
+    }
 }
+

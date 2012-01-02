@@ -12,6 +12,7 @@ package org.mule.exception;
 
 import org.mule.RequestContext;
 import org.mule.api.ExceptionPayload;
+import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -78,6 +79,10 @@ public abstract class AbstractMessagingExceptionStrategy extends AbstractExcepti
         {
             logger.debug("Rolling back transaction");
             rollback(rollbackMethod);
+            if (ex instanceof MessagingException)
+            {
+                ((MessagingException)ex).setCauseRollback(true);
+            }
 
             logger.debug("Routing exception message");
             routeException(event, ex);
@@ -86,7 +91,7 @@ public abstract class AbstractMessagingExceptionStrategy extends AbstractExcepti
         {
             logger.debug("Routing exception message");
             routeException(event, ex);
-            
+
             logger.debug("Committing transaction");
             commit();
         }

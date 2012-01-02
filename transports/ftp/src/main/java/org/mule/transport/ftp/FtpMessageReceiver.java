@@ -156,32 +156,6 @@ public class FtpMessageReceiver extends AbstractPollingMessageReceiver
         }
     }
 
-    protected void processFile(FTPFile file) throws Exception
-    {
-        FTPClient client = null;
-        try
-        {
-            if (!connector.validateFile(file))
-            {
-                return;
-            }
-
-            client = connector.createFtpClient(endpoint);
-            FtpMuleMessageFactory muleMessageFactory = createMuleMessageFactory(client);
-            MuleMessage message = muleMessageFactory.create(file, endpoint.getEncoding());
-
-            routeMessage(message);
-            postProcess(client, file, message);
-        }
-        finally
-        {
-            if (client != null)
-            {
-                connector.releaseFtp(endpoint.getEndpointURI(), client);
-            }
-        }
-    }
-
     @Override
     protected void initializeMessageFactory() throws InitialisationException
     {
@@ -199,7 +173,7 @@ public class FtpMessageReceiver extends AbstractPollingMessageReceiver
         return factory;
     }
 
-    protected void postProcess(FTPClient client, FTPFile file, MuleMessage message) throws Exception
+    protected void postProcess(FTPClient client, FTPFile file) throws Exception
     {
         if (!client.deleteFile(file.getName()))
         {
@@ -290,8 +264,11 @@ public class FtpMessageReceiver extends AbstractPollingMessageReceiver
 
         public void run()
         {
+            FTPClient client = null;
             try
             {
+                client = connector.createFtpClient(endpoint);
+                final FTPClient finalClient = client;
                 TransactionTemplate<Void> exceptionHandlingTransactionTemplate = TransactionTemplateFactory.<Void>createExceptionHandlingTransactionTemplate(getConnector().getMuleContext());
                 exceptionHandlingTransactionTemplate.execute(new TransactionCallback<Void>()
                 {
@@ -299,7 +276,17 @@ public class FtpMessageReceiver extends AbstractPollingMessageReceiver
                     public Void doInTransaction() throws Exception
                     {
                         currentFiles.add(name);
-                        processFile(file);
+
+                        MuleMessage message;
+                        if (!connector.validateFile(file))
+                        {
+                            return null;
+                        }
+
+                        FtpMuleMessageFactory muleMessageFactory = createMuleMessageFactory(finalClient);
+                        message = muleMessageFactory.create(file, endpoint.getEncoding());
+                        routeMessage(message);
+                        postProcess(finalClient, file);
                         return null;
                     }
                 });
@@ -307,6 +294,17 @@ public class FtpMessageReceiver extends AbstractPollingMessageReceiver
             catch (MessagingException e)
             {
                 //Already handled by TransactionTemplate
+                if (!e.isCauseRollback())
+                {
+                    try
+                    {
+                        postProcess(client,file);
+                    }
+                    catch (Exception e1)
+                    {
+                        logger.error(e);
+                    }
+                }
             }
             catch (Exception e)
             {
@@ -314,6 +312,17 @@ public class FtpMessageReceiver extends AbstractPollingMessageReceiver
             }
             finally
             {
+                if (client != null)
+                {
+                    try
+                    {
+                        connector.releaseFtp(endpoint.getEndpointURI(), client);
+                    }
+                    catch (Exception e)
+                    {
+                        logger.error(e);
+                    }
+                }
                 currentFiles.remove(name);
                 scheduledFiles.remove(name);
             }

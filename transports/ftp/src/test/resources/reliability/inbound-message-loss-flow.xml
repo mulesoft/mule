@@ -27,4 +27,16 @@
         <ftp:inbound-endpoint address="ftp://anonymous:password@localhost:${port1}/componentException" />                
         <test:component throwException="true" />
     </flow>
+    <flow name="CatchExceptionStrategy" processingStrategy="synchronous">
+        <ftp:inbound-endpoint address="ftp://anonymous:password@localhost:${port1}/exceptionHandled" />
+        <test:component throwException="true"/>
+        <catch-exception-strategy/>
+    </flow>
+    <flow name="DefaultExceptionStrategyCommit" processingStrategy="synchronous">
+        <ftp:inbound-endpoint address="ftp://anonymous:password@localhost:${port1}/commitOnException" />
+        <test:component throwException="true"/>
+        <default-exception-strategy>
+            <commit-transaction exception-pattern="*"/>
+        </default-exception-strategy>
+    </flow>
 </mule>

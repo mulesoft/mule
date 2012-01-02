@@ -149,7 +149,7 @@ public class JmsExceptionStrategyTestCase extends AbstractJmsFunctionalTestCase
         flow.stop();
         //Check message was no consumed
         MuleMessage muleMessage = muleClient.request("jms://in5", TIMEOUT);
-        assertThat(muleMessage, IsNull.<Object>notNullValue());
+        assertThat(muleMessage, IsNull.<Object>nullValue());
 
         // Check exception notification was sent
         MuleMessage deadLetter = muleClient.request("jms://DLQ5", TIMEOUT);

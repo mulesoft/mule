@@ -38,5 +38,23 @@
             </inbound>
             <test:component throwException="true" />
         </service>
+        <service name="CatchExceptionStrategy">
+            <inbound>
+                <file:inbound-endpoint path=".mule/exceptionHandled" />
+            </inbound>
+            <test:component throwException="true"/>
+            <catch-exception-strategy/>
+            <threading-profile doThreading="false"/>
+        </service>
+        <service name="DefaultExceptionStrategyCommit" >
+            <inbound>
+                <file:inbound-endpoint path=".mule/commitOnException" />
+            </inbound>
+            <test:component throwException="true"/>
+            <default-exception-strategy>
+                <commit-transaction exception-pattern="*"/>
+            </default-exception-strategy>
+            <threading-profile doThreading="false"/>
+        </service>
     </model>
 </mule>

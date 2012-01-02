@@ -106,4 +106,26 @@ public class InboundMessageLossTestCase extends AbstractJmsReliabilityTestCase
         assertFalse("Message should not have been redelivered",
             messageRedelivered.await(latchTimeout, TimeUnit.MILLISECONDS));
     }
+
+    @Test
+    public void testCatchExceptionStrategyConsumesMessage() throws Exception
+    {
+        putMessageOnQueue("exceptionHandled");
+
+        // Exception occurs using catch-exception-strategy that will always consume the message
+        assertFalse("Message should not have been redelivered",
+            messageRedelivered.await(latchTimeout, TimeUnit.MILLISECONDS));
+    }
+
+    @Test
+    public void testDefaultExceptionStrategyConsumesMessage() throws Exception
+    {
+        putMessageOnQueue("commitOnException");
+
+        // Exception occurs using catch-exception-strategy that will always consume the message
+        assertFalse("Message should not have been redelivered",
+            messageRedelivered.await(latchTimeout, TimeUnit.MILLISECONDS));
+    }
+
+
 }

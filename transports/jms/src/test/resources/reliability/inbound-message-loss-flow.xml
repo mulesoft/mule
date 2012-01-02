@@ -27,4 +27,16 @@
         <jms:inbound-endpoint queue="componentException" />
         <test:component throwException="true" />
     </flow>
+    <flow name="CatchExceptionStrategy" processingStrategy="synchronous">
+        <jms:inbound-endpoint queue="exceptionHandled"/>
+        <test:component throwException="true"/>
+        <catch-exception-strategy/>
+    </flow>
+    <flow name="DefaultExceptionStrategyCommit" processingStrategy="synchronous">
+        <jms:inbound-endpoint queue="commitOnException"/>
+        <test:component throwException="true"/>
+        <default-exception-strategy>
+            <commit-transaction exception-pattern="*"/>
+        </default-exception-strategy>
+    </flow>
 </mule>

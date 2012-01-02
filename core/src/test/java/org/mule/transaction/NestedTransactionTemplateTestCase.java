@@ -10,7 +10,6 @@
 package org.mule.transaction;
 
 import org.hamcrest.core.Is;
-import org.hamcrest.core.IsInstanceOf;
 import org.hamcrest.core.IsNull;
 import org.junit.Before;
 import org.junit.Test;
@@ -28,18 +27,18 @@ import org.mule.api.MuleEvent;
 import org.mule.api.transaction.ExternalTransactionAwareTransactionFactory;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionConfig;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.testmodels.mule.TestTransaction;
 import org.mule.tck.testmodels.mule.TestTransactionFactory;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
 import static org.mockito.Mockito.*;
 import static org.mule.transaction.TransactionTemplateFactory.createNestedTransactionTemplate;
 import static org.mule.transaction.TransactionTemplateTestUtils.*;
 
 @RunWith(MockitoJUnitRunner.class)
-public class NestedTransactionTemplateTestCase
+public class NestedTransactionTemplateTestCase extends AbstractMuleTestCase
 {
     private static final Object RETURN_VALUE = new Object();
     protected MuleContext mockMuleContext = mock(MuleContext.class);

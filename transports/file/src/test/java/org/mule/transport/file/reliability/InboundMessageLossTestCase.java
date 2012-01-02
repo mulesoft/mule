@@ -146,4 +146,52 @@ public class InboundMessageLossTestCase extends AbstractFileMoveDeleteTestCase
             }
         });
     }
+
+    @Test
+    public void testCatchExceptionStrategyConsumesMessage() throws Exception
+    {
+        tmpDir = createFolder(".mule/exceptionHandled");
+        final File file = createDataFile(tmpDir, "test1.txt");
+        prober.check(new Probe()
+        {
+            @Override
+            public boolean isSatisfied()
+            {
+                // Component exception occurs after the SEDA queue for an
+                // asynchronous request, so from the client's
+                // perspective, the message has been delivered successfully.
+                return !file.exists();
+            }
+
+            @Override
+            public String describeFailure()
+            {
+                return "File should be gone";
+            }
+        });
+    }
+
+    @Test
+    public void testDefaultExceptionStrategyConsumesMessage() throws Exception
+    {
+        tmpDir = createFolder(".mule/commitOnException");
+        final File file = createDataFile(tmpDir, "test1.txt");
+        prober.check(new Probe()
+        {
+            @Override
+            public boolean isSatisfied()
+            {
+                // Component exception occurs after the SEDA queue for an
+                // asynchronous request, so from the client's
+                // perspective, the message has been delivered successfully.
+                return !file.exists();
+            }
+
+            @Override
+            public String describeFailure()
+            {
+                return "File should be gone";
+            }
+        });
+    }
 }
