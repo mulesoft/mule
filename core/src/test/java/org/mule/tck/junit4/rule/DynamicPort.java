@@ -21,23 +21,52 @@ import org.junit.rules.ExternalResource;
  * To use an instance dynamic socket port:
  * <pre>
  *     @Rule
- *     public DynamicSocketPortNumber serverPort = new DynamicSocketPortNumber("server_port");
+ *     public DynamicPort serverPort = new DynamicPort("server_port");
  * </pre>
  * <p/>
  * In order to use static dynamic ports:
  * <p/>
  * <pre>
  *     @ClassRule
- *     public static DynamicPort dynamicPort;
+ *     public static DynamicPort dynamicPort = new DynamicPort("server_port");
  * </pre>
  */
 public class DynamicPort extends ExternalResource
 {
 
-    final static private int MIN_PORT = 5000;
-    final static private int MAX_PORT = 6000;
+    public static final String MIN_PORT_SYSTEM_PROPERTY = "mule.test.minPort";
+    public static final String MAX_PORT_SYSTEM_PROPERTY = "mule.test.maxPort";
 
-    protected static FreePortFinder freePortFinder = new FreePortFinder(MIN_PORT, MAX_PORT);
+    private static final int DEFAULT_MIN_PORT = 5000;
+    private static final int DEFAULT_MAX_PORT = 6000;
+
+    protected static FreePortFinder freePortFinder;
+
+    static
+    {
+        int minPort = DEFAULT_MIN_PORT;
+        int maxPort = DEFAULT_MAX_PORT;
+
+        String propertyValue = System.getProperty(MIN_PORT_SYSTEM_PROPERTY);
+        if (propertyValue != null)
+        {
+            minPort = Integer.parseInt(propertyValue);
+        }
+
+        propertyValue = System.getProperty(MAX_PORT_SYSTEM_PROPERTY);
+        if (propertyValue != null)
+        {
+            maxPort = Integer.parseInt(propertyValue);
+        }
+
+        if (minPort > maxPort)
+        {
+            throw new IllegalArgumentException(String.format("Min port '%s' must be less than max port '%s'", minPort, maxPort));
+        }
+
+        freePortFinder = new FreePortFinder(minPort, maxPort);
+    }
+
 
     protected Log logger = LogFactory.getLog(getClass());
 

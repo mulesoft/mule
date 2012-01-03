@@ -13,6 +13,7 @@ package org.mule.tck.junit4.rule;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.HashSet;
+import java.util.Random;
 import java.util.Set;
 
 import org.apache.commons.logging.Log;
@@ -26,21 +27,23 @@ public class FreePortFinder
 
     protected final Log logger = LogFactory.getLog(getClass());
 
-    protected final int minPortNumber;
-    protected final int maxPortNumber;
-
-    private Set<Integer> selectedPorts = new HashSet<Integer>();
+    private final int minPortNumber;
+    private final int portRange;
+    private final Set<Integer> selectedPorts = new HashSet<Integer>();
+    private final Random random  = new Random();
 
     public FreePortFinder(int minPortNumber, int maxPortNumber)
     {
         this.minPortNumber = minPortNumber;
-        this.maxPortNumber = maxPortNumber;
+        this.portRange = maxPortNumber - minPortNumber;
     }
 
     public synchronized Integer find()
     {
-        for (int port = minPortNumber; port < maxPortNumber; port++)
+        for (int i = 0; i < portRange; i++)
         {
+            int port = minPortNumber + random.nextInt(portRange);
+
             if (selectedPorts.contains(port))
             {
                 continue;
@@ -54,6 +57,7 @@ public class FreePortFinder
                 }
 
                 selectedPorts.add(port);
+
                 return port;
             }
         }
