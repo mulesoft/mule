@@ -173,7 +173,7 @@ public class FtpMessageReceiver extends AbstractPollingMessageReceiver
         return factory;
     }
 
-    protected void postProcess(FTPClient client, FTPFile file) throws Exception
+    protected void postProcess(FTPClient client, FTPFile file, MuleMessage message) throws Exception
     {
         if (!client.deleteFile(file.getName()))
         {
@@ -265,28 +265,27 @@ public class FtpMessageReceiver extends AbstractPollingMessageReceiver
         public void run()
         {
             FTPClient client = null;
+            MuleMessage muleMessage = null;
             try
             {
                 client = connector.createFtpClient(endpoint);
                 final FTPClient finalClient = client;
+                currentFiles.add(name);
+                if (!connector.validateFile(file))
+                {
+                    return;
+                }
+                FtpMuleMessageFactory muleMessageFactory = createMuleMessageFactory(finalClient);
+                final MuleMessage finalMessage = muleMessageFactory.create(file, endpoint.getEncoding());
+                muleMessage = finalMessage;
                 TransactionTemplate<Void> exceptionHandlingTransactionTemplate = TransactionTemplateFactory.<Void>createExceptionHandlingTransactionTemplate(getConnector().getMuleContext());
                 exceptionHandlingTransactionTemplate.execute(new TransactionCallback<Void>()
                 {
                     @Override
                     public Void doInTransaction() throws Exception
                     {
-                        currentFiles.add(name);
-
-                        MuleMessage message;
-                        if (!connector.validateFile(file))
-                        {
-                            return null;
-                        }
-
-                        FtpMuleMessageFactory muleMessageFactory = createMuleMessageFactory(finalClient);
-                        message = muleMessageFactory.create(file, endpoint.getEncoding());
-                        routeMessage(message);
-                        postProcess(finalClient, file);
+                        routeMessage(finalMessage);
+                        postProcess(finalClient, file, finalMessage);
                         return null;
                     }
                 });
@@ -298,7 +297,7 @@ public class FtpMessageReceiver extends AbstractPollingMessageReceiver
                 {
                     try
                     {
-                        postProcess(client,file);
+                        postProcess(client,file,muleMessage);
                     }
                     catch (Exception e1)
                     {
