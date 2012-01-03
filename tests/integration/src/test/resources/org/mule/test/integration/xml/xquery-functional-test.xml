@@ -13,8 +13,8 @@
 
 <!--// START SNIPPET: transformer-config -->
     <mxml:xquery-transformer name="xquery">
-        <mxml:context-property key="title" value="#[mule:message.header(INBOUND:ListTitle)]"/>
-        <mxml:context-property key="rating" value="#[mule:message.header(INBOUND:ListRating)]"/>
+        <mxml:context-property key="title" value="#[header:INBOUND:ListTitle]"/>
+        <mxml:context-property key="rating" value="#[header:INBOUND:ListRating]"/>
 
         <mxml:xquery-text>
            <![CDATA[

@@ -39,14 +39,14 @@
                     exchange-pattern="one-way"/>
                 <single-async-reply-router/>
             </async-reply>
-            <expression-message-info-mapping  messageIdExpression="#[header:INBOUND:customCorrelation]" correlationIdExpression="#[mule:message.correlationId]"/>
+            <expression-message-info-mapping  messageIdExpression="#[header:INBOUND:customCorrelation]" correlationIdExpression="#[message:correlationId]"/>
         </service>
 
         <service name="TestService1">
             <inbound>
                 <inbound-endpoint address="${outbound.destination}" connector-ref="jmsConnector1"/>
             </inbound>
-            <test:component appendString=" #[mule:context.serviceName]"/>
+            <test:component appendString=" #[context:serviceName]"/>
         </service>
 
     </model>

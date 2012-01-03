@@ -37,7 +37,7 @@
             exchange-pattern="request-response" />
 
         <test:component enableMessageHistory="false"
-            appendString=" received in #[mule:context.serviceName]" />
+            appendString=" received in #[context:serviceName]" />
     </flow>
 
     <flow name="testService4">

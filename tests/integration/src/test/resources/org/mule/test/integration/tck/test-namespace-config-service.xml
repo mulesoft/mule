@@ -33,7 +33,7 @@
             <inbound>
                 <inbound-endpoint address="vm://service3" exchange-pattern="request-response"/>
             </inbound>
-            <test:component enableMessageHistory="false" appendString=" received in #[mule:context.serviceName]"/>
+            <test:component enableMessageHistory="false" appendString=" received in #[context:serviceName]"/>
         </service>
 
         <service name="testService4">

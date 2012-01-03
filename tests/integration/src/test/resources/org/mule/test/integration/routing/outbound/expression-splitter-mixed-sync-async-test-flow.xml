@@ -33,7 +33,7 @@
         <vm:inbound-endpoint path="service1.queue" exchange-pattern="request-response"/>
         <logger message="ServiceOne" level="ERROR"/>
         <test:component>
-            <test:return-data>#[function:shortPayloadClass] Received in #[mule:context.serviceName]</test:return-data>
+            <test:return-data>#[function:shortPayloadClass] Received in #[context:serviceName]</test:return-data>
         </test:component>
     </flow>
 
@@ -41,7 +41,7 @@
         <vm:inbound-endpoint path="service2.queue" exchange-pattern="one-way"/>
         <logger message="ServiceTwo" level="ERROR"/>
         <test:component>
-            <test:return-data>#[function:shortPayloadClass] Received in #[mule:context.serviceName]</test:return-data>
+            <test:return-data>#[function:shortPayloadClass] Received in #[context:serviceName]</test:return-data>
         </test:component>
     </flow>
 
@@ -49,7 +49,7 @@
         <vm:inbound-endpoint path="service3.queue" exchange-pattern="request-response"/>
         <logger message="ServiceThree" level="ERROR"/>
         <test:component>
-            <test:return-data>#[function:shortPayloadClass] Received in #[mule:context.serviceName]</test:return-data>
+            <test:return-data>#[function:shortPayloadClass] Received in #[context:serviceName]</test:return-data>
         </test:component>
     </flow>
 

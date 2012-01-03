@@ -42,12 +42,12 @@
 
     <flow name="Callout1">
         <inbound-endpoint ref="callout_1" exchange-pattern="request-response"/>
-        <test:component appendString=" Received by #[mule:context.serviceName]"/>
+        <test:component appendString=" Received by #[context:serviceName]"/>
     </flow>
 
     <flow name="Callout2">
         <inbound-endpoint ref="callout_2" exchange-pattern="request-response"/>
-        <test:component appendString=" Received by #[mule:context.serviceName]"/>
+        <test:component appendString=" Received by #[context:serviceName]"/>
     </flow>
     <!--// END SNIPPET: binding-config -->
     

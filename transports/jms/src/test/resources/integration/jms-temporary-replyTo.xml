@@ -80,7 +80,7 @@
             <inbound>
                 <inbound-endpoint address="${outbound.destination}" exchange-pattern="request-response" connector-ref="jmsConnector1"/>
             </inbound>
-            <test:component appendString=" #[mule:context.serviceName]" logMessageDetails="true"/>
+            <test:component appendString=" #[context:serviceName]" logMessageDetails="true"/>
         </service>
     </model>
 </mule>

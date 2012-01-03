@@ -25,15 +25,15 @@
     </expression-transformer>
 
     <bean-builder-transformer name="testTransformer3" beanClass="org.mule.tck.testmodels.fruit.Orange">
-        <bean-property property-name="brand" evaluator="mule" expression="message.payload"/>
-        <bean-property property-name="segments" evaluator="mule" expression="message.header(SEGMENTS)" optional="true"/>
-        <bean-property property-name="radius" evaluator="mule" expression="message.header(RADIUS)"/>
+        <bean-property property-name="brand" evaluator="message" expression="payload"/>
+        <bean-property property-name="segments" evaluator="header" expression="SEGMENTS" optional="true"/>
+        <bean-property property-name="radius" evaluator="header" expression="RADIUS"/>
     </bean-builder-transformer>
     
     <bean-builder-transformer name="testTransformer3Inline" beanClass="org.mule.tck.testmodels.fruit.Orange">
-        <bean-property property-name="brand" expression="#[mule:message.payload]"/>
-        <bean-property property-name="segments" expression="#[mule:message.header(SEGMENTS)]" optional="true"/>
-        <bean-property property-name="radius" expression="#[mule:message.header(RADIUS)]"/>
+        <bean-property property-name="brand" expression="#[message:payload]"/>
+        <bean-property property-name="segments" expression="#[header:SEGMENTS]" optional="true"/>
+        <bean-property property-name="radius" expression="#[header:RADIUS]"/>
     </bean-builder-transformer>
     
     <expression-transformer name="testTransformer4" evaluator="headers-list" expression="foo,bar"/>

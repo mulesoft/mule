@@ -52,8 +52,8 @@ public class InlineXQueryTransformerWithParamsTestCase extends AbstractTransform
                 "} \n</cd-listings>");
         transformer.setReturnDataType(DataTypeFactory.STRING);
         Properties params = new Properties();
-        params.setProperty("title", "#[mule:message.header(ListTitle)]");
-        params.setProperty("rating", "#[mule:message.header(ListRating)]");
+        params.setProperty("title", "#[header:ListTitle]");
+        params.setProperty("rating", "#[header:ListRating]");
         transformer.setContextProperties(params);
         transformer.setMuleContext(muleContext);
         transformer.initialise();

@@ -97,7 +97,7 @@ public class MuleTestNamespaceTestCase extends AbstractServiceAndFlowTestCase
 
         assertFalse(ftc.isEnableMessageHistory());
         assertTrue(ftc.isEnableNotifications());
-        assertEquals(" #[mule:context.serviceName]", ftc.getAppendString());
+        assertEquals(" #[context:serviceName]", ftc.getAppendString());
         assertNull(ftc.getReturnData());
         assertNull(ftc.getEventCallback());
     }

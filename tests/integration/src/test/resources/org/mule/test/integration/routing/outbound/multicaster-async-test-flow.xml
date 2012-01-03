@@ -26,7 +26,7 @@
     <flow name="ServiceOne">
         <vm:inbound-endpoint path="service1.queue" exchange-pattern="one-way"/>
         <test:component>
-            <test:return-data>#[function:shortPayloadClass] Received in #[mule:context.serviceName]</test:return-data>
+            <test:return-data>#[function:shortPayloadClass] Received in #[context:serviceName]</test:return-data>
         </test:component>
         <vm:outbound-endpoint path="collector.queue" exchange-pattern="one-way"/>
     </flow>
@@ -34,7 +34,7 @@
     <flow name="ServiceTwo">
         <vm:inbound-endpoint path="service2.queue" exchange-pattern="one-way"/>
         <test:component>
-            <test:return-data>#[function:shortPayloadClass] Received in #[mule:context.serviceName]</test:return-data>
+            <test:return-data>#[function:shortPayloadClass] Received in #[context:serviceName]</test:return-data>
         </test:component>
         <vm:outbound-endpoint path="collector.queue" exchange-pattern="one-way"/>
     </flow>
@@ -42,7 +42,7 @@
     <flow name="ServiceThree">
         <vm:inbound-endpoint path="service3.queue" exchange-pattern="one-way"/>
         <test:component>
-            <test:return-data>#[function:shortPayloadClass] Received in #[mule:context.serviceName]</test:return-data>
+            <test:return-data>#[function:shortPayloadClass] Received in #[context:serviceName]</test:return-data>
         </test:component>
         <vm:outbound-endpoint path="collector.queue" exchange-pattern="one-way"/>
     </flow>

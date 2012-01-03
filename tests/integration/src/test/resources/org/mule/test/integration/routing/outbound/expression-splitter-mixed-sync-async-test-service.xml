@@ -39,7 +39,7 @@
                 <vm:inbound-endpoint path="service1.queue" exchange-pattern="request-response"/>
             </inbound>
             <test:component>
-                <test:return-data>#[function:shortPayloadClass] Received in #[mule:context.serviceName]</test:return-data>
+                <test:return-data>#[function:shortPayloadClass] Received in #[context:serviceName]</test:return-data>
             </test:component>
         </service>
 
@@ -48,7 +48,7 @@
                 <vm:inbound-endpoint path="service2.queue" exchange-pattern="one-way"/>
             </inbound>
             <test:component>
-                <test:return-data>#[function:shortPayloadClass] Received in #[mule:context.serviceName]</test:return-data>
+                <test:return-data>#[function:shortPayloadClass] Received in #[context:serviceName]</test:return-data>
             </test:component>
         </service>
 
@@ -57,7 +57,7 @@
                 <vm:inbound-endpoint path="service3.queue" exchange-pattern="request-response"/>
             </inbound>
             <test:component>
-                <test:return-data>#[function:shortPayloadClass] Received in #[mule:context.serviceName]</test:return-data>
+                <test:return-data>#[function:shortPayloadClass] Received in #[context:serviceName]</test:return-data>
             </test:component>
         </service>
     </model>

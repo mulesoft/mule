@@ -18,7 +18,7 @@
                             <add-message-property key="foo" value="bar"/>
                         </message-properties-transformer>
                         <mule-xml:xslt-transformer xsl-file="org/mule/test/integration/messaging/parameterized-transform.xslt" >
-                            <mule-xml:context-property key="prop" value="#[mule:message.header(foo)]"/>
+                            <mule-xml:context-property key="prop" value="#[header:foo]"/>
                         </mule-xml:xslt-transformer>
                     </response>
                 </cxf:inbound-endpoint>

@@ -47,7 +47,22 @@ import org.mule.api.expression.ExpressionEvaluator;
  *
  * #[mule.registry.apple.washed] - returns the property 'washed on an object called 'apple' in the registry
  *
+ * @deprecated MuleExpressionEvaluator is a wrapper of the default expression evaluators which ends up redirecting
+ * to the {@link org.mule.expression.DefaultExpressionManager} evaluate method. It has been deprecated since it
+ * only provides one more way to accomplish the same result.
+ * Instead use the default expression evaluators, for example:
+ *
+ * #[mule:message.headers(foo, bar)] - replaced by #[headers:foo,bar]
+ *
+ * #[mule:message.attachments-list(attach1, attach2*)] - replaced by #[attachments-list:attach1,attach2*]
+ *
+ * #[mule:context.serviceName] - replaced by #[context:serviceName]
+ *
+ * Check the <a href="http://www.mulesoft.org/documentation/display/MULE3USER/Expressions+Configuration+Reference">
+ * Expressions configuration reference</a> for more examples of the default expression evaluators syntax.
+ *
  */
+@Deprecated
 public class MuleExpressionEvaluator implements ExpressionEvaluator, MuleContextAware
 {
     public static final String NAME = "mule";

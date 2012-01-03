@@ -34,7 +34,7 @@
         </service>
 
         <service name="testService3">
-            <test:component enableMessageHistory="false" appendString=" #[mule:context.serviceName]"/>
+            <test:component enableMessageHistory="false" appendString=" #[context:serviceName]"/>
         </service>
     </model>
 </mule>
