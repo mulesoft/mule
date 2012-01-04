@@ -102,7 +102,7 @@
         but the PGP module would need some work in order to use it -->
         <cryptixJceVersion>20050328</cryptixJceVersion>
         <cryptixVersion>20050405</cryptixVersion>
-        <cxfVersion>2.5.0</cxfVersion>
+        <cxfVersion>2.5.1</cxfVersion>
         <derbyVersion>10.6.1.0</derbyVersion>
         <dom4jVersion>1.6.1</dom4jVersion>
         <flatpackVersion>3.1.1</flatpackVersion>
@@ -942,7 +942,7 @@
             <dependency>
                 <groupId>org.apache.ws.security</groupId>
                 <artifactId>wss4j</artifactId>
-                <version>1.6.1</version>
+                <version>1.6.3</version>
                 <exclusions>
                     <exclusion>
                         <groupId>axis</groupId>
