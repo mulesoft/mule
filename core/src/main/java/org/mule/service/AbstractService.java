@@ -660,7 +660,7 @@ public abstract class AbstractService implements Service, MessageProcessor, Anno
         RequestContext.setEvent(newEvent);
         try
         {
-            ProcessingTemplate<MuleEvent> processingTemplate = new ErrorHandlingProcessingTemplate(muleContext, event.getFlowConstruct().getExceptionListener());
+            ProcessingTemplate<MuleEvent> processingTemplate = new ErrorHandlingProcessingTemplate(muleContext, this.exceptionListener);
             return processingTemplate.execute(new ProcessingCallback<MuleEvent> () {
 
                 @Override
