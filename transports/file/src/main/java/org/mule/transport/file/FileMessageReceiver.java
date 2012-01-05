@@ -21,11 +21,10 @@ import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.exception.RollbackSourceCallback;
 import org.mule.api.lifecycle.CreateException;
-import org.mule.api.transaction.TransactionCallback;
 import org.mule.api.transport.Connector;
 import org.mule.api.transport.PropertyScope;
-import org.mule.transaction.TransactionTemplate;
-import org.mule.transaction.TransactionTemplateFactory;
+import org.mule.process.ProcessingCallback;
+import org.mule.process.ProcessingTemplate;
 import org.mule.transport.AbstractPollingMessageReceiver;
 import org.mule.transport.ConnectException;
 import org.mule.transport.file.i18n.FileMessages;
@@ -318,12 +317,12 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
 
         try
         {
-            TransactionTemplate<Void> mainTransactionTemplate = TransactionTemplateFactory.<Void>createMainTransactionTemplate(endpoint.getTransactionConfig(), connector.getMuleContext());
+            ProcessingTemplate<MuleEvent> processingTemplate = createProcessingTemplate();
             final File finalDestinationFile = destinationFile;
             final MuleMessage finalMessage = message;
-            mainTransactionTemplate.execute(new TransactionCallback<Void>() {
+            processingTemplate.execute(new ProcessingCallback<MuleEvent> () {
                 @Override
-                public Void doInTransaction() throws Exception
+                public MuleEvent process() throws Exception
                 {
                     if (!fileConnector.isStreaming())
                     {
@@ -392,8 +391,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
             if (e instanceof MessagingException)
             {
                 MessagingException messagingException = (MessagingException) e;
-                MuleEvent event = messagingException.getEvent();
-                if (event.getMessage().getExceptionPayload() != null && rollbackMethod != null && !event.isTransacted() && messagingException.isCauseRollback())
+                if (rollbackMethod != null && messagingException.isCauseRollback())
                 {
                     //Exception not handled
                     rollbackMethod.rollback();

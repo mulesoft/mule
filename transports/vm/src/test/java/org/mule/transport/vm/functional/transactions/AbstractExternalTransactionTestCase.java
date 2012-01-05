@@ -13,10 +13,11 @@ package org.mule.transport.vm.functional.transactions;
 import org.mule.api.MuleContext;
 import org.mule.api.transaction.TransactionConfig;
 import org.mule.api.transaction.TransactionException;
+import org.mule.process.ProcessingTemplate;
+import org.mule.process.TransactionalProcessingTemplate;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.transaction.MuleTransactionConfig;
 import org.mule.transaction.TransactionCoordination;
-import org.mule.transaction.TransactionTemplate;
 import org.mule.transaction.XaTransactionFactory;
 
 import java.io.PrintWriter;
@@ -91,13 +92,13 @@ public abstract class AbstractExternalTransactionTestCase extends AbstractServic
         tm = context.getTransactionManager();
     }
 
-    protected <T> TransactionTemplate<T> createTransactionTemplate(byte action, boolean considerExternal)
+    protected <T> ProcessingTemplate<T> createProcessingTemplate(byte action, boolean considerExternal)
     {
         TransactionConfig tc = new MuleTransactionConfig(action);
         tc.setFactory(new XaTransactionFactory());
         tc.setInteractWithExternal(considerExternal);
-        TransactionTemplate<T> tt = new TransactionTemplate<T>(tc, context);
-        return tt;
+        ProcessingTemplate<T> processingTemplate = new TransactionalProcessingTemplate<T>(context, tc);
+        return processingTemplate;
     }
 
     /** An XA resource that allows setting, committing, and rolling back the value of one resource */

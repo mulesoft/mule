@@ -40,7 +40,7 @@ public class AbstractSystemExceptionStrategy extends AbstractExceptionStrategy i
         if (isRollback(ex))
         {
             logger.debug("Rolling back transaction");
-            rollback(rollbackMethod);
+            rollback(ex, rollbackMethod);
         }
         else
         {
@@ -57,6 +57,18 @@ public class AbstractSystemExceptionStrategy extends AbstractExceptionStrategy i
         if (ex instanceof ConnectException)
         {
             handleReconnection((ConnectException) ex);
+        }
+    }
+
+    private void rollback(Exception ex, RollbackSourceCallback rollbackMethod)
+    {
+        if (TransactionCoordination.getInstance().getTransaction() != null)
+        {
+            rollback(ex);
+        }
+        if (rollbackMethod != null)
+        {
+            rollbackMethod.rollback();
         }
     }
 

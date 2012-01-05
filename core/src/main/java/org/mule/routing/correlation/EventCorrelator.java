@@ -32,10 +32,11 @@ import org.mule.api.store.ObjectStoreManager;
 import org.mule.api.transaction.TransactionCallback;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.context.notification.RoutingNotification;
+import org.mule.process.ErrorHandlingProcessingTemplate;
+import org.mule.process.ProcessingCallback;
+import org.mule.process.ProcessingTemplate;
 import org.mule.routing.EventGroup;
 import org.mule.routing.EventProcessingThread;
-import org.mule.transaction.TransactionTemplate;
-import org.mule.transaction.TransactionTemplateFactory;
 import org.mule.util.StringMessageUtils;
 import org.mule.util.concurrent.ThreadNameHelper;
 import org.mule.util.monitor.Expirable;
@@ -550,13 +551,13 @@ public class EventCorrelator implements Startable, Stoppable
                 for (Object anExpired : expired)
                 {
                     final EventGroup group = (EventGroup) anExpired;
-                    TransactionTemplate<Void> exceptionHandlingTransactionTemplate = TransactionTemplateFactory.<Void>createExceptionHandlingTransactionTemplate(muleContext);
+                    ProcessingTemplate<MuleEvent> processingTemplate = new ErrorHandlingProcessingTemplate(muleContext, group.getMessageCollectionEvent().getFlowConstruct().getExceptionListener());
                     try
                     {
-                        exceptionHandlingTransactionTemplate.execute(new TransactionCallback<Void>()
+                        processingTemplate.execute(new ProcessingCallback<MuleEvent>()
                         {
                             @Override
-                            public Void doInTransaction() throws Exception
+                            public MuleEvent process() throws Exception
                             {
                                 handleGroupExpiry(group);
                                 return null;

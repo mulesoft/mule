@@ -23,11 +23,10 @@ import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.processor.MessageProcessor;
-import org.mule.api.transaction.TransactionCallback;
 import org.mule.api.transport.Connector;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.transaction.TransactionTemplate;
-import org.mule.transaction.TransactionTemplateFactory;
+import org.mule.process.ProcessingCallback;
+import org.mule.process.ProcessingTemplate;
 import org.mule.transport.AbstractConnector;
 import org.mule.transport.AbstractPollingMessageReceiver;
 import org.mule.transport.NullPayload;
@@ -74,13 +73,13 @@ public class MessageProcessorPollingMessageReceiver extends AbstractPollingMessa
     @Override
     public void poll() throws Exception
     {
-        TransactionTemplate<Void> mainTransactionTemplate = TransactionTemplateFactory.<Void>createMainTransactionTemplate(endpoint.getTransactionConfig(), connector.getMuleContext());
+        ProcessingTemplate<MuleEvent> processingTemplate = createProcessingTemplate();
         try
         {
-            mainTransactionTemplate.execute(new TransactionCallback<Void>()
+            processingTemplate.execute(new ProcessingCallback<MuleEvent> ()
             {
                 @Override
-                public Void doInTransaction() throws Exception
+                public MuleEvent process() throws Exception
                 {
                     MuleMessage request = new DefaultMuleMessage(StringUtils.EMPTY, (Map<String, Object>) null,
                     connector.getMuleContext());

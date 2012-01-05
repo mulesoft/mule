@@ -10,6 +10,7 @@
 
 package org.mule.transport.http.reliability;
 
+import org.junit.Test;
 import org.mule.transport.http.HttpConstants;
 
 import org.apache.commons.httpclient.HttpMethodBase;
@@ -33,6 +34,7 @@ public class InboundMessageLossAsynchTestCase extends InboundMessageLossTestCase
         return "reliability/inbound-message-loss-asynch.xml";
     }
 
+    @Test
     @Override
     public void testNoException() throws Exception
     {
@@ -41,6 +43,7 @@ public class InboundMessageLossAsynchTestCase extends InboundMessageLossTestCase
         assertEquals(HttpConstants.SC_OK, status);
     }
 
+    @Test
     @Override
     public void testHandledTransformerException() throws Exception
     {
@@ -48,6 +51,7 @@ public class InboundMessageLossAsynchTestCase extends InboundMessageLossTestCase
         int status = httpClient.executeMethod(request);
         assertEquals(HttpConstants.SC_OK, status);    }
 
+    @Test
     @Override
     public void testComponentException() throws Exception
     {

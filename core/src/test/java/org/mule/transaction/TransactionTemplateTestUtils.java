@@ -12,27 +12,29 @@ package org.mule.transaction;
 import org.mockito.Answers;
 import org.mockito.Mockito;
 import org.mule.api.MessagingException;
+import org.mule.api.MuleEvent;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionCallback;
+import org.mule.process.ProcessingCallback;
 
 public class TransactionTemplateTestUtils
 {
-    public static TransactionCallback getEmptyTransactionCallback(final Object returnObject)
+    public static ProcessingCallback getEmptyTransactionCallback(final MuleEvent returnObject)
     {
-        return new TransactionCallback() {
+        return new ProcessingCallback<MuleEvent>() {
             @Override
-            public Object doInTransaction() throws Exception
+            public MuleEvent process() throws Exception
             {
                 return returnObject;
             }
         };
     }
 
-    public static TransactionCallback getRollbackTransactionCallback(final Object returnObject)
+    public static ProcessingCallback<MuleEvent> getRollbackTransactionCallback(final MuleEvent returnObject)
     {
-        return new TransactionCallback() {
+        return new ProcessingCallback() {
             @Override
-            public Object doInTransaction() throws Exception
+            public MuleEvent process() throws Exception
             {
                 TransactionCoordination.getInstance().getTransaction().setRollbackOnly();
                 return returnObject;
@@ -40,38 +42,39 @@ public class TransactionTemplateTestUtils
         };
     }
 
-    public static TransactionCallback getFailureTransactionCallback() throws Exception
+    public static ProcessingCallback<MuleEvent> getFailureTransactionCallback() throws Exception
     {
-        return new TransactionCallback() {
+        return new ProcessingCallback<MuleEvent>() {
             @Override
-            public Object doInTransaction() throws Exception
+            public MuleEvent process() throws Exception
             {
                 throw Mockito.mock(MessagingException.class, Answers.RETURNS_MOCKS.get());
             }
         };
     }
 
-    public static TransactionCallback getFailureTransactionCallback(final MessagingException mockMessagingException) throws Exception
+    public static ProcessingCallback<MuleEvent> getFailureTransactionCallback(final MessagingException mockMessagingException) throws Exception
     {
-        return new TransactionCallback() {
+        return new ProcessingCallback<MuleEvent>() {
             @Override
-            public Object doInTransaction() throws Exception
+            public MuleEvent process() throws Exception
             {
                 throw mockMessagingException;
             }
         };
     }
 
-    public static TransactionCallback getFailureTransactionCallbackStartsTransaction(final MessagingException mockMessagingException, final Transaction mockTransaction)
+    public static ProcessingCallback<MuleEvent> getFailureTransactionCallbackStartsTransaction(final MessagingException mockMessagingException, final Transaction mockTransaction)
     {
-        return new TransactionCallback() {
+        return new ProcessingCallback<MuleEvent>() {
 
             @Override
-            public Object doInTransaction() throws Exception
+            public MuleEvent process() throws Exception
             {
                 TransactionCoordination.getInstance().bindTransaction(mockTransaction);
                 throw mockMessagingException;
             }
         };
     }
+
 }

@@ -12,13 +12,11 @@ package org.mule.exception;
 
 import org.mule.RequestContext;
 import org.mule.api.ExceptionPayload;
-import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.exception.MessagingExceptionHandler;
-import org.mule.api.exception.RollbackSourceCallback;
 import org.mule.api.lifecycle.Lifecycle;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.management.stats.FlowConstructStatistics;
@@ -41,7 +39,7 @@ public abstract class AbstractMessagingExceptionStrategy extends AbstractExcepti
         super(muleContext);
     }
 
-    public MuleEvent handleException(Exception ex, MuleEvent event, RollbackSourceCallback rollbackMethod)
+    public MuleEvent handleException(Exception ex, MuleEvent event)
     {
         fireNotification(ex);
 
@@ -50,7 +48,7 @@ public abstract class AbstractMessagingExceptionStrategy extends AbstractExcepti
 
         logException(ex);
         
-        doHandleException(ex, event, rollbackMethod);
+        doHandleException(ex, event);
 
         ExceptionPayload exceptionPayload = new DefaultExceptionPayload(ex);
         if (RequestContext.getEvent() != null)
@@ -62,12 +60,7 @@ public abstract class AbstractMessagingExceptionStrategy extends AbstractExcepti
         return event;
     }
     
-    public MuleEvent handleException(Exception ex, MuleEvent event)
-    {
-        return handleException(ex, event, null);
-    }
-
-    protected void doHandleException(Exception ex, MuleEvent event, RollbackSourceCallback rollbackMethod)
+    protected void doHandleException(Exception ex, MuleEvent event)
     {
         FlowConstructStatistics statistics = event.getFlowConstruct().getStatistics();
         if (statistics != null && statistics.isEnabled())
@@ -78,11 +71,7 @@ public abstract class AbstractMessagingExceptionStrategy extends AbstractExcepti
         if (isRollback(ex))
         {
             logger.debug("Rolling back transaction");
-            rollback(rollbackMethod);
-            if (ex instanceof MessagingException)
-            {
-                ((MessagingException)ex).setCauseRollback(true);
-            }
+            rollback(ex);
 
             logger.debug("Routing exception message");
             routeException(event, ex);
@@ -91,13 +80,9 @@ public abstract class AbstractMessagingExceptionStrategy extends AbstractExcepti
         {
             logger.debug("Routing exception message");
             routeException(event, ex);
-
-            logger.debug("Committing transaction");
-            commit();
         }
 
         closeStream(event.getMessage());
-        resumeSuspendedTransactionIfAny();
 
         if (stopMessageProcessing)
         {

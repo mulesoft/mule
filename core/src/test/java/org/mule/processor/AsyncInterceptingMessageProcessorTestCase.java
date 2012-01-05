@@ -270,15 +270,6 @@ public class AsyncInterceptingMessageProcessorTestCase extends AbstractMuleConte
             return null;
         }
 
-        @Override
-        public MuleEvent handleException(Exception exception,
-                                         MuleEvent event,
-                                         RollbackSourceCallback rollbackMethod)
-        {
-            latch.countDown();
-            return null;
-        }
-
     }
 
     private static class LatchedSystemExceptionHandler implements SystemExceptionHandler

@@ -664,7 +664,7 @@ public class DefaultMuleContext implements MuleContext
         if (e instanceof MessagingException)
         {
             MuleEvent event = ((MessagingException) e).getEvent();
-            event.getFlowConstruct().getExceptionListener().handleException(e, event, rollbackMethod);
+            event.getFlowConstruct().getExceptionListener().handleException(e, event);
         }
         else
         {

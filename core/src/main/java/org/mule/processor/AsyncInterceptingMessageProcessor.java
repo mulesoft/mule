@@ -19,11 +19,12 @@ import org.mule.api.context.WorkManagerSource;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.processor.MessageProcessor;
-import org.mule.api.transaction.TransactionCallback;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.interceptor.ProcessingTimeInterceptor;
-import org.mule.transaction.TransactionTemplate;
-import org.mule.transaction.TransactionTemplateFactory;
+import org.mule.process.ProcessingCallback;
+import org.mule.process.ProcessingTemplate;
+import org.mule.process.TransactionalErrorHandlingProcessingTemplate;
+import org.mule.transaction.MuleTransactionConfig;
 import org.mule.work.AbstractMuleEventWork;
 import org.mule.work.MuleWorkManager;
 
@@ -156,12 +157,12 @@ public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessa
         @Override
         protected void doRun()
         {
-            TransactionTemplate exceptionHandlingTransactionTemplate = TransactionTemplateFactory.createExceptionHandlingTransactionTemplate(muleContext);
+            ProcessingTemplate<MuleEvent> processingTemplate = new TransactionalErrorHandlingProcessingTemplate(muleContext,new MuleTransactionConfig(),event.getFlowConstruct().getExceptionListener());
             try
             {
-                exceptionHandlingTransactionTemplate.execute(new TransactionCallback<Void>() {
+                processingTemplate.execute(new ProcessingCallback<MuleEvent>() {
                     @Override
-                    public Void doInTransaction() throws Exception
+                    public MuleEvent process() throws Exception
                     {
                         processNextTimed(event);
                         return null;

@@ -14,6 +14,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
+import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -21,11 +22,9 @@ import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.context.notification.ServerNotification;
-import org.mule.api.exception.RollbackSourceCallback;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.security.SecurityException;
-import org.mule.api.transaction.TransactionException;
 import org.mule.api.util.StreamCloserService;
 import org.mule.config.ExceptionHelper;
 import org.mule.context.notification.ExceptionNotification;
@@ -240,33 +239,17 @@ public abstract class AbstractExceptionStrategy extends AbstractMessageProcessor
         TransactionCoordination.getInstance().commitCurrentTransaction();
     }
 
-    protected void resolveTransactionIfAny()
+    protected void rollback(Exception ex)
     {
-        try
+        if (TransactionCoordination.getInstance().getTransaction() != null)
         {
-            if (TransactionCoordination.getInstance().getTransaction() != null)
-            {
-                TransactionCoordination.getInstance().resolveTransaction();
-            }
+            TransactionCoordination.getInstance().rollbackCurrentTransaction();
         }
-        catch (TransactionException e)
+        if (ex instanceof MessagingException)
         {
-            logger.error(e);
+            MessagingException messagingException = (MessagingException) ex;
+            messagingException.setCauseRollback(true);
         }
-    }
-
-    protected void resumeSuspendedTransactionIfAny()
-    {
-        TransactionCoordination.getInstance().resumeXaTransactionIfAvailable();
-    }
-
-    protected void rollback(RollbackSourceCallback rollbackMethod)
-    {
-        if (TransactionCoordination.getInstance().getTransaction() == null && rollbackMethod != null)
-        {
-            rollbackMethod.rollback();
-        }
-        TransactionCoordination.getInstance().rollbackCurrentTransaction();
     }
 
     protected void closeStream(MuleMessage message)

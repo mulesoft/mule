@@ -23,8 +23,10 @@ import org.mule.component.AbstractJavaComponent;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.Message;
 import org.mule.module.jca.i18n.JcaMessages;
-import org.mule.transaction.TransactionTemplate;
-import org.mule.transaction.TransactionTemplateFactory;
+import org.mule.process.ProcessingCallback;
+import org.mule.process.ProcessingTemplate;
+import org.mule.process.TransactionalErrorHandlingProcessingTemplate;
+import org.mule.transaction.MuleTransactionConfig;
 import org.mule.work.AbstractMuleEventWork;
 
 import javax.resource.spi.UnavailableException;
@@ -117,11 +119,10 @@ public class JcaComponent extends AbstractJavaComponent implements WorkListener
             }
             try
             {
-                TransactionTemplate exceptionHandlingTransactionTemplate = TransactionTemplateFactory.<Void>createExceptionHandlingTransactionTemplate(muleContext);
-
-                exceptionHandlingTransactionTemplate.execute(new TransactionCallback<Void>(){
+                ProcessingTemplate<MuleEvent> processingTemplate = new TransactionalErrorHandlingProcessingTemplate(muleContext, new MuleTransactionConfig(),event.getFlowConstruct().getExceptionListener());
+                processingTemplate.execute(new ProcessingCallback<MuleEvent> () {
                     @Override
-                    public Void doInTransaction() throws Exception
+                    public MuleEvent process() throws Exception
                     {
                         try
                         {

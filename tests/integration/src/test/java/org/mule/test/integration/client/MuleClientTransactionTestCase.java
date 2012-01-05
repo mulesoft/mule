@@ -20,10 +20,12 @@ import org.mule.api.transaction.TransactionConfig;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.endpoint.URIBuilder;
 import org.mule.module.client.MuleClient;
+import org.mule.process.ProcessingCallback;
+import org.mule.process.ProcessingTemplate;
+import org.mule.process.TransactionalProcessingTemplate;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transaction.MuleTransactionConfig;
 import org.mule.transaction.TransactionCoordination;
-import org.mule.transaction.TransactionTemplate;
 import org.mule.transport.jms.JmsTransactionFactory;
 
 import java.util.HashMap;
@@ -72,10 +74,10 @@ public class MuleClientTransactionTestCase extends FunctionalTestCase
                 .getOutboundEndpoint(endpointBuilder);
         client.getMuleContext().getRegistry().registerEndpoint(inboundEndpoint);
 
-        TransactionTemplate<Void> tt = new TransactionTemplate<Void>(tc, muleContext);
-        tt.execute(new TransactionCallback<Void>()
+        ProcessingTemplate<Void> processingTemplate = new TransactionalProcessingTemplate<Void>(muleContext, tc);
+        processingTemplate.execute(new ProcessingCallback<Void>()
         {
-            public Void doInTransaction() throws Exception
+            public Void process() throws Exception
             {
                 for (int i = 0; i < 100; i++)
                 {
@@ -120,12 +122,12 @@ public class MuleClientTransactionTestCase extends FunctionalTestCase
                 .getOutboundEndpoint(endpointBuilder);
         client.getMuleContext().getRegistry().registerEndpoint(inboundEndpoint);
 
-        TransactionTemplate<Void> tt = new TransactionTemplate<Void>(tc, muleContext);
+        ProcessingTemplate<Void> processingTemplate = new TransactionalProcessingTemplate<Void>(muleContext, tc);
         try
         {
-            tt.execute(new TransactionCallback<Void>()
+            processingTemplate.execute(new ProcessingCallback<Void>()
             {
-                public Void doInTransaction() throws Exception
+                public Void process() throws Exception
                 {
                     for (int i = 0; i < 100; i++)
                     {
@@ -174,10 +176,10 @@ public class MuleClientTransactionTestCase extends FunctionalTestCase
                 .getOutboundEndpoint(endpointBuilder);
         client.getMuleContext().getRegistry().registerEndpoint(inboundEndpoint);
 
-        TransactionTemplate<Void> tt = new TransactionTemplate<Void>(tc, muleContext);
-        tt.execute(new TransactionCallback<Void>()
+        ProcessingTemplate<Void> processingTemplate = new TransactionalProcessingTemplate<Void>(muleContext, tc);
+        processingTemplate.execute(new ProcessingCallback<Void>()
         {
-            public Void doInTransaction() throws Exception
+            public Void process() throws Exception
             {
                 for (int i = 0; i < 100; i++)
                 {
@@ -201,10 +203,10 @@ public class MuleClientTransactionTestCase extends FunctionalTestCase
         final MuleClient client = new MuleClient(muleContext);
         MuleTransactionConfig tc = new MuleTransactionConfig(TransactionConfig.ACTION_ALWAYS_BEGIN);
         tc.setFactory(new JmsTransactionFactory());
-        TransactionTemplate<Void> tt = new TransactionTemplate<Void>(tc, muleContext);
-        tt.execute(new TransactionCallback<Void>()
+        ProcessingTemplate<Void> processingTemplate = new TransactionalProcessingTemplate<Void>(muleContext, tc);
+        processingTemplate.execute(new ProcessingCallback<Void>()
         {
-            public Void doInTransaction() throws Exception
+            public Void process() throws Exception
             {
                 while (client.request("jms://replyTo.queue", 2000) != null)
                 {

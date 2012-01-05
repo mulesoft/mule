@@ -11,7 +11,6 @@
 package org.mule.tck.functional;
 
 import org.mule.api.MuleEvent;
-import org.mule.api.exception.RollbackSourceCallback;
 import org.mule.exception.AbstractMessagingExceptionStrategy;
 
 import org.apache.commons.logging.Log;
@@ -30,7 +29,7 @@ public class QuietExceptionStrategy extends AbstractMessagingExceptionStrategy
     }
     
     @Override
-    protected void doHandleException(Exception e, MuleEvent event, RollbackSourceCallback rollbackMethod)
+    protected void doHandleException(Exception e, MuleEvent event)
     {
         logger.debug("Ignoring", e);
     }

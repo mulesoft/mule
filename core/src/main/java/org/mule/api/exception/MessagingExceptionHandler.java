@@ -22,16 +22,6 @@ public interface MessagingExceptionHandler extends ExceptionHandler
      * 
      * @param exception which occurred
      * @param event which was being processed when the exception occurred
-     * @param rollbackMethod will be called if transactions are not used in order to achieve atomic message delivery 
-     * @return new event to route on to the rest of the flow, generally with ExceptionPayload set on the message
-     */
-    MuleEvent handleException(Exception exception, MuleEvent event, RollbackSourceCallback rollbackMethod);
-
-    /**
-     * Take some action when a messaging exception has occurred (i.e., there was a message in play when the exception occurred).
-     * 
-     * @param exception which occurred
-     * @param event which was being processed when the exception occurred
      * @return new event to route on to the rest of the flow, generally with ExceptionPayload set on the message
      */
     MuleEvent handleException(Exception exception, MuleEvent event);

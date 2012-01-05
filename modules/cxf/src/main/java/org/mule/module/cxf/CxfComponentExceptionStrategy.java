@@ -11,7 +11,6 @@
 package org.mule.module.cxf;
 
 import org.mule.api.MuleEvent;
-import org.mule.api.exception.RollbackSourceCallback;
 import org.mule.exception.DefaultMessagingExceptionStrategy;
 
 import org.apache.cxf.interceptor.Fault;
@@ -24,15 +23,15 @@ import org.apache.cxf.interceptor.Fault;
 public class CxfComponentExceptionStrategy extends DefaultMessagingExceptionStrategy
 {
     @Override
-    protected void doHandleException(Exception e, MuleEvent event, RollbackSourceCallback rollbackMethod)
+    protected void doHandleException(Exception e, MuleEvent event)
     {
         if (e.getCause() instanceof Fault)
         {
-            super.doHandleException((Exception) e.getCause(), event, rollbackMethod);
+            super.doHandleException((Exception) e.getCause(), event);
         }
         else
         {
-            super.doHandleException(e, event, rollbackMethod);
+            super.doHandleException(e, event);
         }
     }
 }

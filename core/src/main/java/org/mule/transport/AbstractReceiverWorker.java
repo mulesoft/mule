@@ -18,10 +18,15 @@ import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionCallback;
 import org.mule.api.transaction.TransactionException;
 import org.mule.api.transport.SessionHandler;
+import org.mule.process.ErrorHandlingProcessingTemplate;
+import org.mule.process.ProcessingCallback;
+import org.mule.process.ProcessingTemplate;
+import org.mule.process.TransactionalErrorHandlingProcessingTemplate;
+import org.mule.process.TransactionalProcessingTemplate;
 import org.mule.session.LegacySessionHandler;
 import org.mule.session.MuleSessionHandler;
+import org.mule.transaction.MuleTransactionConfig;
 import org.mule.transaction.TransactionCoordination;
-import org.mule.transaction.TransactionTemplate;
 
 import java.io.OutputStream;
 import java.util.ArrayList;
@@ -89,14 +94,14 @@ public abstract class AbstractReceiverWorker implements Work
     public void processMessages() throws Exception
     {
         //No need to do error handling. It will be done by inner TransactionTemplate per Message
-        TransactionTemplate<List<MuleEvent>> tt = TransactionTemplateFactory.<List<MuleEvent>>createNestedTransactionTemplate(endpoint.getTransactionConfig(), receiver.getConnector().getMuleContext());
+        ProcessingTemplate<List<MuleEvent>> processingTemplate = new TransactionalProcessingTemplate<List<MuleEvent>>(receiver.getConnector().getMuleContext(),endpoint.getTransactionConfig());
 
         // Receive messages and process them in a single transaction
         // Do not enable threading here, but serveral workers
         // may have been started
-        TransactionCallback<List<MuleEvent>> cb = new TransactionCallback<List<MuleEvent>>()
+        ProcessingCallback<List<MuleEvent>> processingCallback = new ProcessingCallback<List<MuleEvent>>()
         {
-            public List<MuleEvent> doInTransaction() throws Exception
+            public List<MuleEvent> process() throws Exception
             {
                 final Transaction tx = TransactionCoordination.getInstance().getTransaction();
                 if (tx != null)
@@ -107,14 +112,14 @@ public abstract class AbstractReceiverWorker implements Work
 
                 for (final Object payload : messages)
                 {
-                    TransactionTemplate<MuleEvent> exceptionHandlingTransactionTemplate = TransactionTemplateFactory.<MuleEvent>createExceptionHandlingTransactionTemplate(endpoint.getMuleContext());
-                    MuleEvent resultEvent = null;
+                    ProcessingTemplate<MuleEvent> processingTemplate = new TransactionalErrorHandlingProcessingTemplate(endpoint.getMuleContext(), receiver.flowConstruct.getExceptionListener());
+                    MuleEvent resultEvent;
                     try
                     {
-                        resultEvent = exceptionHandlingTransactionTemplate.execute(new TransactionCallback<MuleEvent>()
+                        resultEvent = processingTemplate.execute(new ProcessingCallback<MuleEvent>()
                         {
                             @Override
-                            public MuleEvent doInTransaction() throws Exception
+                            public MuleEvent process() throws Exception
                             {
                                 Object preProcessedPayload = preProcessMessage(payload);
                                 if (preProcessedPayload != null)
@@ -178,7 +183,7 @@ public abstract class AbstractReceiverWorker implements Work
 
         try
         {
-            List<MuleEvent> results = tt.execute(cb);
+            List<MuleEvent> results = processingTemplate.execute(processingCallback);
             handleResults(handleEventResults(results));
         }
         finally

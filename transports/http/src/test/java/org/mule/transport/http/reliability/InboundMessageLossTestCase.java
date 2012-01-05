@@ -15,7 +15,6 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
-import org.mule.api.exception.RollbackSourceCallback;
 import org.mule.exception.AbstractMessagingExceptionStrategy;
 import org.mule.exception.DefaultSystemExceptionStrategy;
 import org.mule.message.DefaultExceptionPayload;
@@ -141,9 +140,9 @@ public class InboundMessageLossTestCase extends FunctionalTestCase
         }
 
         @Override
-        public MuleEvent handleException(Exception ex, MuleEvent event, RollbackSourceCallback rollbackMethod)
+        public MuleEvent handleException(Exception ex, MuleEvent event)
         {
-            doHandleException(ex, event, rollbackMethod);
+            doHandleException(ex, event);
             return new DefaultMuleEvent(new DefaultMuleMessage("Success!", muleContext), event);
         }
     }
@@ -159,9 +158,9 @@ public class InboundMessageLossTestCase extends FunctionalTestCase
         }
 
         @Override
-        public MuleEvent handleException(Exception ex, MuleEvent event, RollbackSourceCallback rollbackMethod)
+        public MuleEvent handleException(Exception ex, MuleEvent event)
         {
-            doHandleException(ex, event, rollbackMethod);
+            doHandleException(ex, event);
             DefaultMuleMessage message = new DefaultMuleMessage(NullPayload.getInstance(), muleContext);
             message.setExceptionPayload(
                 new DefaultExceptionPayload(new MessagingException(event, new RuntimeException("Bad news!"))));

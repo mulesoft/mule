@@ -12,7 +12,6 @@ package org.mule.transport.soap.axis;
 
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
-import org.mule.api.exception.RollbackSourceCallback;
 import org.mule.exception.DefaultMessagingExceptionStrategy;
 
 import java.util.ArrayList;
@@ -26,7 +25,7 @@ public class UnitTestExceptionStrategy extends DefaultMessagingExceptionStrategy
      */
     private List<Throwable> messagingExceptions = null;
     
-    public UnitTestExceptionStrategy(MuleContext muleContext, boolean rollbackByDefault)
+    public UnitTestExceptionStrategy(MuleContext muleContext)
     {
         super(muleContext);
         messagingExceptions = new ArrayList<Throwable>();
@@ -45,10 +44,10 @@ public class UnitTestExceptionStrategy extends DefaultMessagingExceptionStrategy
     }
 
     @Override
-    protected void doHandleException(Exception e, MuleEvent event, RollbackSourceCallback rollbackMethod)
+    protected void doHandleException(Exception e, MuleEvent event)
     {
         messagingExceptions.add(e);
-        super.doHandleException(e, event, rollbackMethod);
+        super.doHandleException(e, event);
     }
     
     public List<Throwable> getMessagingExceptions()

@@ -10,15 +10,15 @@
 
 package org.mule.transport.jms;
 
-import org.mule.api.transaction.TransactionCallback;
+import org.mule.process.ProcessingCallback;
 
 import javax.jms.Message;
 
-public abstract class MessageTransactionCallback<T> implements TransactionCallback<T>
+public abstract class MessageProcessingCallback<T> implements ProcessingCallback<T>
 {
     protected final Message message;
 
-    public MessageTransactionCallback(Message message)
+    public MessageProcessingCallback(Message message)
     {
         this.message = message;
     }

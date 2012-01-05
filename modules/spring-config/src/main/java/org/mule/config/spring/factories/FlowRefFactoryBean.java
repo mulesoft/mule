@@ -42,18 +42,7 @@ public class FlowRefFactoryBean implements FactoryBean<MessageProcessor>, Applic
             {
                 public MuleEvent process(MuleEvent event) throws MuleException
                 {
-                    try
-                    {
-                        return processor.process(event);
-                    }
-                    catch (MessagingException e)
-                    {
-                        if (e.getEvent().getMessage().getExceptionPayload() != null)
-                        {
-                            throw e;
-                        }
-                        return e.getEvent();
-                    }
+                    return processor.process(event);
                 }
             };
         }

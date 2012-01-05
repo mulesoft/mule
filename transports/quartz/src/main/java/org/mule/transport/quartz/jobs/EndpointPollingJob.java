@@ -10,20 +10,19 @@
 
 package org.mule.transport.quartz.jobs;
 
-import org.mule.api.MuleContext;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.ThreadSafeAccess;
-import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.transaction.Transaction;
-import org.mule.api.transaction.TransactionCallback;
 import org.mule.api.transport.PropertyScope;
 import org.mule.module.client.MuleClient;
+import org.mule.process.ProcessingCallback;
+import org.mule.process.ProcessingTemplate;
+import org.mule.process.TransactionalErrorHandlingProcessingTemplate;
 import org.mule.transaction.MuleTransactionConfig;
 import org.mule.transaction.TransactionCoordination;
-import org.mule.transaction.TransactionTemplate;
-import org.mule.transaction.TransactionTemplateFactory;
 import org.mule.transport.AbstractMessageReceiver;
 import org.mule.transport.quartz.QuartzConnector;
 import org.mule.transport.quartz.QuartzMessageReceiver;
@@ -90,7 +89,7 @@ public class EndpointPollingJob extends AbstractJob
         try
         {
             logger.debug("Attempting to receive event on: " + jobConfig.getEndpointRef());
-            TransactionTemplate<Void> tt;
+            ProcessingTemplate<MuleEvent> processingTemplate;
             final AtomicBoolean pollGlobalEndpoint = new AtomicBoolean(false);
 
             //TODO MULE-5050 work around because the builder is no longer idempotent, we now cache the endpoint instance
@@ -107,24 +106,24 @@ public class EndpointPollingJob extends AbstractJob
 
                     //TODO MULE-5050 work around because the builder is no longer idempotent, we now cache the endpoint instance
                     muleContext.getRegistry().registerObject(jobConfig.getEndpointRef() + ".quartz-job", endpoint);
-                    tt = TransactionTemplateFactory.<Void>createMainTransactionTemplate(endpoint.getTransactionConfig(), muleContext);
+                    processingTemplate = new TransactionalErrorHandlingProcessingTemplate(muleContext, endpoint.getTransactionConfig(), receiver.getFlowConstruct().getExceptionListener());
                 }
                 else
                 {
                     // a simple inline endpoint
-                    tt = TransactionTemplateFactory.<Void>createMainTransactionTemplate(new MuleTransactionConfig(), muleContext);
+                    processingTemplate = new TransactionalErrorHandlingProcessingTemplate(muleContext, new MuleTransactionConfig(), receiver.getFlowConstruct().getExceptionListener());
                 }
             }
             else
             {
-                tt = TransactionTemplateFactory.<Void>createMainTransactionTemplate(endpoint.getTransactionConfig(), muleContext);
+                processingTemplate = new TransactionalErrorHandlingProcessingTemplate(muleContext, endpoint.getTransactionConfig(), receiver.getFlowConstruct().getExceptionListener());
             }
 
 
             final InboundEndpoint finalEndpoint = endpoint;
-            TransactionCallback<Void> cb = new TransactionCallback<Void>()
+            ProcessingCallback<MuleEvent> cb = new ProcessingCallback<MuleEvent>()
             {
-                public Void doInTransaction() throws Exception
+                public MuleEvent process() throws Exception
                 {
                     Transaction tx = TransactionCoordination.getInstance().getTransaction();
                     if (tx != null)
@@ -167,7 +166,7 @@ public class EndpointPollingJob extends AbstractJob
                 }
             };
 
-            tt.execute(cb);
+            processingTemplate.execute(cb);
         }
         catch (RuntimeException rex)
         {

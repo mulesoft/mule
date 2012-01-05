@@ -11,16 +11,15 @@
 package org.mule.transport.xmpp;
 
 import org.mule.api.DefaultMuleException;
-import org.mule.api.MessagingException;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
-import org.mule.api.transaction.TransactionCallback;
 import org.mule.api.transport.Connector;
-import org.mule.transaction.TransactionTemplate;
-import org.mule.transaction.TransactionTemplateFactory;
+import org.mule.process.ProcessingCallback;
+import org.mule.process.ProcessingTemplate;
 import org.mule.transport.AbstractPollingMessageReceiver;
 
 import org.jivesoftware.smack.packet.Message;
@@ -91,13 +90,13 @@ public class XmppPollingMessageReceiver extends AbstractPollingMessageReceiver
 
     protected void processMessage(final Message xmppMessage) throws MuleException
     {
-        TransactionTemplate<Void> mainTransactionTemplate = TransactionTemplateFactory.<Void>createMainTransactionTemplate(endpoint.getTransactionConfig(), connector.getMuleContext());
+        ProcessingTemplate<MuleEvent> processingTemplate = createProcessingTemplate();
         try
         {
-            mainTransactionTemplate.execute(new TransactionCallback<Void>()
+            processingTemplate.execute(new ProcessingCallback<MuleEvent>()
             {
                 @Override
-                public Void doInTransaction() throws Exception
+                public MuleEvent process() throws Exception
                 {
                     MuleMessage muleMessage = createMuleMessage(xmppMessage);
                     routeMessage(muleMessage);

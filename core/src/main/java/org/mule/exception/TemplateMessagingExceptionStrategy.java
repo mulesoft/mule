@@ -37,7 +37,7 @@ public abstract class TemplateMessagingExceptionStrategy extends AbstractExcepti
 
 
     @Override
-    final public MuleEvent handleException(Exception exception, MuleEvent event, RollbackSourceCallback rollbackMethod)
+    final public MuleEvent handleException(Exception exception, MuleEvent event)
     {
         fireNotification(exception);
         logException(exception);
@@ -48,7 +48,6 @@ public abstract class TemplateMessagingExceptionStrategy extends AbstractExcepti
         event = afterRouting(exception, event);
         processReplyTo(event);
         closeStream(event.getMessage());
-        manageTransaction();
         nullifyExceptionPayloadIfRequired(event);
         return event;
     }
@@ -67,12 +66,6 @@ public abstract class TemplateMessagingExceptionStrategy extends AbstractExcepti
 
     protected abstract void nullifyExceptionPayloadIfRequired(MuleEvent event);
 
-    protected void manageTransaction()
-    {
-        resolveTransactionIfAny();
-        resumeSuspendedTransactionIfAny();
-    }
-
     private void processStatistics(MuleEvent event)
     {
         FlowConstructStatistics statistics = event.getFlowConstruct().getStatistics();
@@ -80,12 +73,6 @@ public abstract class TemplateMessagingExceptionStrategy extends AbstractExcepti
         {
             statistics.incExecutionError();
         }
-    }
-
-    @Override
-    final public MuleEvent handleException(Exception exception, MuleEvent event)
-    {
-        return handleException(exception, event, null);
     }
 
     protected MuleEvent route(MuleEvent event, Throwable t)

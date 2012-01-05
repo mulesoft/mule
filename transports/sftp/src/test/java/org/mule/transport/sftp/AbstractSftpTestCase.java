@@ -384,18 +384,12 @@ public abstract class AbstractSftpTestCase extends AbstractServiceAndFlowTestCas
                     new MessagingExceptionHandler()
                     {
                         @Override
-                        public MuleEvent handleException(Exception e, MuleEvent event, RollbackSourceCallback rollbackMethod)
+                        public MuleEvent handleException(Exception e, MuleEvent event)
                         {
                             if (logger.isInfoEnabled()) logger.info("expected exception occurred: " + e, e);
                             exceptionHolder.value = e;
                             latch.countDown();
                             return event;
-                        }
-
-                        @Override
-                        public MuleEvent handleException(Exception exception, MuleEvent event)
-                        {
-                            return handleException(exception, event, null);
                         }
                     });
             }
@@ -757,7 +751,7 @@ public abstract class AbstractSftpTestCase extends AbstractServiceAndFlowTestCas
             messagingListener = new MessagingExceptionHandler()
             {
                 @Override
-                public MuleEvent handleException(Exception e, MuleEvent event, RollbackSourceCallback rollbackMethod)
+                public MuleEvent handleException(Exception e, MuleEvent event)
                 {
                     exceptionHolder.value = e;
                     if (logger.isDebugEnabled())
@@ -765,12 +759,6 @@ public abstract class AbstractSftpTestCase extends AbstractServiceAndFlowTestCas
                                      + ", time to countdown the latch");
                     latch.countDown();
                     return event;
-                }
-
-                @Override
-                public MuleEvent handleException(Exception exception, MuleEvent event)
-                {
-                    return handleException(exception, event, null);
                 }
             };
 

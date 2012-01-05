@@ -11,13 +11,13 @@
 package org.mule.transport.sftp;
 
 import org.mule.api.MessagingException;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
-import org.mule.api.transaction.TransactionCallback;
-import org.mule.transaction.TransactionTemplate;
-import org.mule.transaction.TransactionTemplateFactory;
+import org.mule.process.ProcessingCallback;
+import org.mule.process.ProcessingTemplate;
 import org.mule.transport.AbstractPollingMessageReceiver;
 import org.mule.transport.sftp.notification.SftpNotifier;
 
@@ -112,11 +112,11 @@ public class SftpMessageReceiver extends AbstractPollingMessageReceiver
 
     protected void routeFile(final String path) throws Exception
     {
-        TransactionTemplate<Void> mainTransactionTemplate = TransactionTemplateFactory.<Void>createMainTransactionTemplate(endpoint.getTransactionConfig(), connector.getMuleContext());
-        mainTransactionTemplate.execute(new TransactionCallback<Void>()
+        ProcessingTemplate<MuleEvent> processingTemplate = createProcessingTemplate();
+        processingTemplate.execute(new ProcessingCallback<MuleEvent> ()
         {
             @Override
-            public Void doInTransaction() throws Exception
+            public MuleEvent process() throws Exception
             {
                 // A bit tricky initialization of the notifier in this case since we don't
                 // have access to the message yet...

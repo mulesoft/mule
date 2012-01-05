@@ -32,11 +32,12 @@ import org.mule.api.transaction.TransactionConfig;
 import org.mule.api.transport.DispatchException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.management.stats.RouterStatistics;
+import org.mule.process.ProcessingCallback;
+import org.mule.process.ProcessingTemplate;
+import org.mule.process.TransactionalProcessingTemplate;
 import org.mule.processor.AbstractMessageProcessorOwner;
 import org.mule.routing.CorrelationMode;
 import org.mule.routing.DefaultRouterResultsHandler;
-import org.mule.transaction.TransactionTemplate;
-import org.mule.transaction.TransactionTemplateFactory;
 import org.mule.util.StringMessageUtils;
 import org.mule.util.SystemUtils;
 
@@ -89,10 +90,10 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
 
     public MuleEvent process(final MuleEvent event) throws MuleException
     {
-        TransactionTemplate<MuleEvent> tt = TransactionTemplateFactory.<MuleEvent>createNestedTransactionTemplate(getTransactionConfig(), muleContext);
-        TransactionCallback<MuleEvent> cb = new TransactionCallback<MuleEvent>()
+        ProcessingTemplate<MuleEvent> processingTemplate = new TransactionalProcessingTemplate<MuleEvent>(muleContext, getTransactionConfig());
+        ProcessingCallback<MuleEvent> processingCallback = new ProcessingCallback<MuleEvent>()
         {
-            public MuleEvent doInTransaction() throws Exception
+            public MuleEvent process() throws Exception
             {
                 try
                 {
@@ -110,7 +111,7 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
         };
         try
         {
-            return tt.execute(cb);
+            return processingTemplate.execute(processingCallback);
         }
         catch (MuleException e)
         {

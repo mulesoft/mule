@@ -13,9 +13,11 @@ package org.mule.tck;
 import org.mule.api.transaction.TransactionCallback;
 import org.mule.api.transaction.TransactionConfig;
 import org.mule.api.transaction.TransactionManagerFactory;
+import org.mule.process.ProcessingCallback;
+import org.mule.process.ProcessingTemplate;
+import org.mule.process.TransactionalProcessingTemplate;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.transaction.MuleTransactionConfig;
-import org.mule.transaction.TransactionTemplate;
 import org.mule.transaction.XaTransaction;
 import org.mule.transaction.XaTransactionFactory;
 
@@ -133,27 +135,26 @@ public abstract class AbstractTxThreadAssociationTestCase extends AbstractMuleCo
         // this is one component with a TX always begin
         TransactionConfig config = new MuleTransactionConfig(TransactionConfig.ACTION_ALWAYS_BEGIN);
         config.setFactory(new XaTransactionFactory());
-        TransactionTemplate template = new TransactionTemplate(config, muleContext);
+        ProcessingTemplate<Void> processingTemplate = new TransactionalProcessingTemplate(muleContext,config);
 
         // and the callee component which should begin new transaction, current must be suspended
         final TransactionConfig nestedConfig = new MuleTransactionConfig(TransactionConfig.ACTION_ALWAYS_BEGIN);
         nestedConfig.setFactory(new XaTransactionFactory());
 
         // start the call chain
-        template.execute(new TransactionCallback<Void>()
+        processingTemplate.execute(new ProcessingCallback<Void>()
         {
-            public Void doInTransaction() throws Exception
+            public Void process() throws Exception
             {
                 // the callee executes within its own TX template, but uses the same global XA transaction,
                 // bound to the current thread of execution via a ThreadLocal
-                TransactionTemplate<Void> nestedTemplate =
-                        new TransactionTemplate<Void>(nestedConfig, muleContext);
+                ProcessingTemplate<Void> processingTemplate = new TransactionalProcessingTemplate(muleContext,nestedConfig);
                 final Transaction firstTx = tm.getTransaction();
                 assertNotNull(firstTx);
                 assertEquals(firstTx.getStatus(), Status.STATUS_ACTIVE);
-                return nestedTemplate.execute(new TransactionCallback<Void>()
+                return processingTemplate.execute(new ProcessingCallback<Void>()
                 {
-                    public Void doInTransaction() throws Exception
+                    public Void process() throws Exception
                     {
                         Transaction secondTx = tm.getTransaction();
                         assertNotNull(secondTx);
@@ -215,27 +216,26 @@ public abstract class AbstractTxThreadAssociationTestCase extends AbstractMuleCo
         // this is one component with a TX always begin
         TransactionConfig config = new MuleTransactionConfig(TransactionConfig.ACTION_ALWAYS_BEGIN);
         config.setFactory(new XaTransactionFactory());
-        TransactionTemplate<Void> template = new TransactionTemplate<Void>(config, muleContext);
+        ProcessingTemplate<Void> processingTemplate = new TransactionalProcessingTemplate(muleContext,config);
 
         // and the callee component which should begin new transaction, current must be suspended
         final TransactionConfig nestedConfig = new MuleTransactionConfig(TransactionConfig.ACTION_NONE);
         nestedConfig.setFactory(new XaTransactionFactory());
 
         // start the call chain
-        template.execute(new TransactionCallback<Void>()
+        processingTemplate.execute(new ProcessingCallback<Void>()
         {
-            public Void doInTransaction() throws Exception
+            public Void process() throws Exception
             {
                 // the callee executes within its own TX template, but uses the same global XA transaction,
                 // bound to the current thread of execution via a ThreadLocal
-                TransactionTemplate<Void> nestedTemplate =
-                        new TransactionTemplate<Void>(nestedConfig, muleContext);
+                ProcessingTemplate<Void> nestedProcessingTemplate = new TransactionalProcessingTemplate<Void>(muleContext, nestedConfig);
                 final Transaction firstTx = tm.getTransaction();
                 assertNotNull(firstTx);
                 assertEquals(firstTx.getStatus(), Status.STATUS_ACTIVE);
-                return nestedTemplate.execute(new TransactionCallback<Void>()
+                return nestedProcessingTemplate.execute(new ProcessingCallback<Void>()
                 {
-                    public Void doInTransaction() throws Exception
+                    public Void process() throws Exception
                     {
                         Transaction secondTx = tm.getTransaction();
                         assertNull(secondTx);
@@ -309,24 +309,23 @@ public abstract class AbstractTxThreadAssociationTestCase extends AbstractMuleCo
         // this is one service with a TX always begin
         TransactionConfig config = new MuleTransactionConfig(TransactionConfig.ACTION_ALWAYS_BEGIN);
         config.setFactory(new XaTransactionFactory());
-        TransactionTemplate template = new TransactionTemplate(config, muleContext);
+        ProcessingTemplate<Void> processingTemplate = new TransactionalProcessingTemplate(muleContext,config);
 
         // and the callee service which should join the current XA transaction, not begin a nested one
         final TransactionConfig nestedConfig = new MuleTransactionConfig(TransactionConfig.ACTION_BEGIN_OR_JOIN);
         nestedConfig.setFactory(new XaTransactionFactory());
 
         // start the call chain
-        template.execute(new TransactionCallback<Void>()
+        processingTemplate.execute(new ProcessingCallback<Void>()
         {
-            public Void doInTransaction() throws Exception
+            public Void process() throws Exception
             {
                 // the callee executes within its own TX template, but uses the same global XA transaction,
                 // bound to the current thread of execution via a ThreadLocal
-                TransactionTemplate<Void> nestedTemplate =
-                        new TransactionTemplate<Void>(nestedConfig, muleContext);
-                return nestedTemplate.execute(new TransactionCallback<Void>()
+                ProcessingTemplate<Void> nestedProcessingTemplate = new TransactionalProcessingTemplate<Void>(muleContext, nestedConfig);
+                return nestedProcessingTemplate.execute(new ProcessingCallback<Void>()
                 {
-                    public Void doInTransaction() throws Exception
+                    public Void process() throws Exception
                     {
                         // do not care about the return really
                         return null;

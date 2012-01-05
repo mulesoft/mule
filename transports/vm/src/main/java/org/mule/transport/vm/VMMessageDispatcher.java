@@ -15,12 +15,12 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.OutboundEndpoint;
-import org.mule.api.transaction.TransactionCallback;
 import org.mule.api.transport.DispatchException;
 import org.mule.api.transport.NoReceiverForEndpointException;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.transaction.TransactionTemplate;
-import org.mule.transaction.TransactionTemplateFactory;
+import org.mule.process.ProcessingCallback;
+import org.mule.process.ProcessingTemplate;
+import org.mule.process.TransactionalProcessingTemplate;
 import org.mule.transport.AbstractMessageDispatcher;
 import org.mule.transport.vm.i18n.VMMessages;
 import org.mule.util.queue.Queue;
@@ -80,18 +80,15 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher
         }
 
         final MuleMessage message = event.getMessage().createInboundMessage();
-        TransactionTemplate<MuleMessage> tt = TransactionTemplateFactory.<MuleMessage>createNestedTransactionTemplate(
-                                                            receiver.getEndpoint().getTransactionConfig(),
-                                                            event.getMuleContext());
-
-        TransactionCallback<MuleMessage> cb = new TransactionCallback<MuleMessage>()
+        ProcessingTemplate<MuleMessage> processingTemplate = new TransactionalProcessingTemplate<MuleMessage>(event.getMuleContext(),receiver.getEndpoint().getTransactionConfig());
+        ProcessingCallback<MuleMessage> processingCallback = new ProcessingCallback<MuleMessage>()
         {
-            public MuleMessage doInTransaction() throws Exception
+            public MuleMessage process() throws Exception
             {
                 return receiver.onCall(message);
             }
         };
-        retMessage = tt.execute(cb);
+        retMessage = processingTemplate.execute(processingCallback);
         
         if (logger.isDebugEnabled())
         {

@@ -18,8 +18,9 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transaction.TransactionCallback;
 import org.mule.api.transaction.TransactionConfig;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.transaction.TransactionTemplate;
-import org.mule.transaction.TransactionTemplateFactory;
+import org.mule.process.ProcessingCallback;
+import org.mule.process.ProcessingTemplate;
+import org.mule.process.TransactionalProcessingTemplate;
 
 /**
  * Wraps the invocation of the next {@link MessageProcessor} with a transaction. If
@@ -43,10 +44,10 @@ public class TransactionalInterceptingMessageProcessor extends AbstractIntercept
         }
         else
         {
-            TransactionTemplate<MuleEvent> transactionTemplate = TransactionTemplateFactory.<MuleEvent>createNestedTransactionTemplate(transactionConfig, event.getMuleContext());
-            TransactionCallback<MuleEvent> cb = new TransactionCallback<MuleEvent>()
+            ProcessingTemplate<MuleEvent> processingTemplate = new TransactionalProcessingTemplate<MuleEvent>(muleContext,transactionConfig);
+            ProcessingCallback<MuleEvent> processingCallback = new ProcessingCallback<MuleEvent>()
             {
-                public MuleEvent doInTransaction() throws Exception
+                public MuleEvent process() throws Exception
                 {
                     return processNext(event);
                 }
@@ -54,7 +55,7 @@ public class TransactionalInterceptingMessageProcessor extends AbstractIntercept
 
             try
             {
-                return transactionTemplate.execute(cb);
+                return processingTemplate.execute(processingCallback);
             }
             catch (MuleException e)
             {

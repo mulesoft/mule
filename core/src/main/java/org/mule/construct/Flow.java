@@ -25,10 +25,11 @@ import org.mule.construct.processor.FlowConstructStatisticsMessageProcessor;
 import org.mule.interceptor.ProcessingTimeInterceptor;
 import org.mule.lifecycle.processor.ProcessIfStartedMessageProcessor;
 import org.mule.management.stats.FlowConstructStatistics;
+import org.mule.process.ErrorHandlingProcessingTemplate;
+import org.mule.process.ProcessingCallback;
+import org.mule.process.ProcessingTemplate;
 import org.mule.processor.strategy.AsynchronousProcessingStrategy;
 import org.mule.routing.requestreply.AsyncReplyToPropertyRequestReplyReplier;
-import org.mule.transaction.TransactionTemplate;
-import org.mule.transaction.TransactionTemplateFactory;
 
 /**
  * This implementation of {@link AbstractPipeline} adds the following functionality:
@@ -60,27 +61,26 @@ public class Flow extends AbstractPipeline implements MessageProcessor
         RequestContext.setEvent(newEvent);
         try
         {
-            TransactionTemplate<MuleEvent> exceptionHandlingTransactionTemplate = TransactionTemplateFactory.<MuleEvent>createExceptionHandlingTransactionTemplate(muleContext);
-            return exceptionHandlingTransactionTemplate.execute(new TransactionCallback<MuleEvent>(){
+            ProcessingTemplate<MuleEvent> exceptionHandlingProcessingTemplate = new ErrorHandlingProcessingTemplate(muleContext,getExceptionListener());
+            MuleEvent result = exceptionHandlingProcessingTemplate.execute(new ProcessingCallback<MuleEvent>()
+            {
 
                 @Override
-                public MuleEvent doInTransaction() throws Exception
+                public MuleEvent process() throws Exception
                 {
                     MuleEvent result = pipeline.process(newEvent);
                     if (result != null)
                     {
                         result.getMessage().release();
                     }
-                    if (result != null)
-                    {
-                        return new DefaultMuleEvent(result, event.getFlowConstruct());
-                    }
-                    else
-                    {
-                        return null;
-                    }
+                    return result;
                 }
             });
+            if (result != null)
+            {
+                result = new DefaultMuleEvent(result, event.getFlowConstruct());
+            }
+            return result;
         }
         catch (MessagingException e)
         {

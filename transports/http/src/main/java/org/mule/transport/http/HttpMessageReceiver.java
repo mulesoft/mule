@@ -14,6 +14,7 @@ import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.OptimizedRequestContext;
 import org.mule.RequestContext;
+import org.mule.api.DefaultMuleException;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -25,15 +26,14 @@ import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.transaction.TransactionCallback;
 import org.mule.api.transport.Connector;
 import org.mule.api.transport.MessageReceiver;
 import org.mule.api.transport.PropertyScope;
 import org.mule.config.ExceptionHelper;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.MessageFactory;
-import org.mule.transaction.TransactionTemplate;
-import org.mule.transaction.TransactionTemplateFactory;
+import org.mule.process.ProcessingCallback;
+import org.mule.process.ProcessingTemplate;
 import org.mule.transport.ConnectException;
 import org.mule.transport.NullPayload;
 import org.mule.transport.http.i18n.HttpMessages;
@@ -160,16 +160,8 @@ public class HttpMessageReceiver extends TcpMessageReceiver
 
                     try
                     {
-                        TransactionTemplate<HttpResponse> exceptionHandlingTransactionTemplate = TransactionTemplateFactory.<HttpResponse>createExceptionHandlingTransactionTemplate(getConnector().getMuleContext());
-                        HttpResponse response = exceptionHandlingTransactionTemplate.execute(new TransactionCallback<HttpResponse>()
-                        {
-                            @Override
-                            public HttpResponse doInTransaction() throws Exception
-                            {
-                                return  processRequest(request);
-                            }
-                        });
-                        conn.writeResponse(response);
+                        HttpResponse httpResponse = processRequest(request);
+                        conn.writeResponse(httpResponse);
                     }
                     catch (Exception e)
                     {
@@ -177,11 +169,6 @@ public class HttpMessageReceiver extends TcpMessageReceiver
                         if (e instanceof MessagingException)
                         {
                             response = ((MessagingException) e).getEvent();
-                            if (response.getMessage().getExceptionPayload() == null)
-                            {
-                                conn.writeResponse(transformResponse(response.getMessage(),response));
-                                break;
-                            }
                         }
                         else
                         {
@@ -271,7 +258,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
         {
             sendExpect100(request);
 
-            MuleMessage message = createMuleMessage(request);
+            final MuleMessage message = createMuleMessage(request);
 
             String path = message.getInboundProperty(HttpConnector.HTTP_REQUEST_PROPERTY);
             int i = path.indexOf('?');
@@ -288,7 +275,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
             }
 
             // determine if the request path on this request denotes a different receiver
-            MessageReceiver receiver = getTargetReceiver(message, endpoint);
+            final MessageReceiver receiver = getTargetReceiver(message, endpoint);
 
             HttpResponse response;
             // the response only needs to be transformed explicitly if
@@ -299,8 +286,34 @@ public class HttpMessageReceiver extends TcpMessageReceiver
                                            HttpConnector.normalizeUrl(receiver.getEndpointURI().getPath()),
                                            PropertyScope.INBOUND);
 
-                preRouteMessage(message);
-                MuleEvent returnEvent = receiver.routeMessage(message);
+                ProcessingTemplate<MuleEvent> processingTemplate = createProcessingTemplate();
+
+                MuleEvent returnEvent;
+                try
+                {
+                    returnEvent = processingTemplate.execute(new ProcessingCallback<MuleEvent>()
+                    {
+                        @Override
+                        public MuleEvent process() throws Exception
+                        {
+                            preRouteMessage(message);
+                            return receiver.routeMessage(message);
+                        }
+                    });
+                }
+                catch (MuleException e)
+                {
+                    throw e;
+                }
+                catch (IOException e)
+                {
+                    throw e;
+                }
+                catch (Exception e)
+                {
+                    throw new DefaultMuleException(e);
+                }
+
                 MuleMessage returnMessage = returnEvent == null ? null : returnEvent.getMessage();
 
                 Object tempResponse;

@@ -10,17 +10,17 @@
 
 package org.mule.transport.jms;
 
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.transaction.Transaction;
-import org.mule.api.transaction.TransactionCallback;
 import org.mule.api.transport.Connector;
+import org.mule.process.ProcessingCallback;
+import org.mule.process.ProcessingTemplate;
 import org.mule.retry.policies.NoRetryPolicyTemplate;
 import org.mule.transaction.TransactionCoordination;
-import org.mule.transaction.TransactionTemplate;
-import org.mule.transaction.TransactionTemplateFactory;
 import org.mule.transaction.XaTransaction;
 import org.mule.transport.ConnectException;
 import org.mule.transport.TransactedPollingMessageReceiver;
@@ -39,7 +39,7 @@ import javax.jms.Message;
 import javax.jms.MessageConsumer;
 import javax.jms.Session;
 
-public class    XaTransactedJmsMessageReceiver extends TransactedPollingMessageReceiver
+public class XaTransactedJmsMessageReceiver extends TransactedPollingMessageReceiver
 {
     public static final long DEFAULT_JMS_POLL_FREQUENCY = 100;
     public static final TimeUnit DEFAULT_JMS_POLL_TIMEUNIT = TimeUnit.MILLISECONDS;
@@ -159,11 +159,11 @@ public class    XaTransactedJmsMessageReceiver extends TransactedPollingMessageR
     {
         logger.debug("Polling...");
 
-        TransactionTemplate<Void> tt = TransactionTemplateFactory.<Void>createMainTransactionTemplate(endpoint.getTransactionConfig(),connector.getMuleContext());
-        TransactionCallback<Void> cb = new TransactionCallback<Void>()
+        ProcessingTemplate<MuleEvent> processingCallback = createProcessingTemplate();
+        ProcessingCallback<MuleEvent> cb = new ProcessingCallback<MuleEvent>()
         {
             @Override
-            public Void doInTransaction() throws Exception
+            public MuleEvent process() throws Exception
             {
                 try
                 {
@@ -205,7 +205,7 @@ public class    XaTransactedJmsMessageReceiver extends TransactedPollingMessageR
             }
         };
 
-        tt.execute(cb);
+        processingCallback.execute(cb);
     }
 
     @Override

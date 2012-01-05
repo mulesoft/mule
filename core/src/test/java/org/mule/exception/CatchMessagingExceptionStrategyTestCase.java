@@ -17,6 +17,7 @@ import org.mockito.Answers;
 import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.Spy;
+import org.mockito.internal.verification.VerificationModeFactory;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.mule.api.ExceptionPayload;
 import org.mule.api.MuleContext;
@@ -79,13 +80,14 @@ public class CatchMessagingExceptionStrategyTestCase
     {
         configureXaTransactionAndSingleResourceTransaction();
 
-        MuleEvent resultEvent = catchMessagingExceptionStrategy.handleException(mockException, mockMuleEvent, null);
+        MuleEvent resultEvent = catchMessagingExceptionStrategy.handleException(mockException, mockMuleEvent);
         assertThat(resultEvent, is(resultEvent));
 
         verify(mockMuleMessage).setExceptionPayload(Matchers.<ExceptionPayload>any(ExceptionPayload.class));
         verify(mockMuleMessage).setExceptionPayload(null);
-        verify(mockTransaction).commit();
-        verify(mockXaTransaction).resume();
+        verify(mockTransaction, VerificationModeFactory.times(0)).setRollbackOnly();
+        verify(mockTransaction, VerificationModeFactory.times(0)).commit();
+        verify(mockTransaction, VerificationModeFactory.times(0)).rollback();
         verify(mockStreamCloserService).closeStream(Matchers.<Object>any(Object.class));
     }
 

@@ -19,11 +19,11 @@ import org.mule.api.MuleEvent;
 import org.mule.api.store.ObjectAlreadyExistsException;
 import org.mule.api.store.ObjectDoesNotExistException;
 import org.mule.api.store.ObjectStoreException;
-import org.mule.api.transaction.TransactionCallback;
 import org.mule.api.transaction.TransactionConfig;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.transaction.TransactionTemplate;
-import org.mule.transaction.TransactionTemplateFactory;
+import org.mule.process.ProcessingCallback;
+import org.mule.process.ProcessingTemplate;
+import org.mule.process.TransactionalProcessingTemplate;
 import org.mule.transport.jdbc.JdbcConnector;
 import org.mule.util.store.AbstractMonitoredObjectStore;
 
@@ -156,14 +156,14 @@ public class JdbcObjectStore<T extends Serializable> extends AbstractMonitoredOb
     {
         try
         {
-            TransactionCallback<Object> transactionCallback = new TransactionCallback<Object>()
+            ProcessingCallback<Object> processingCallback = new ProcessingCallback<Object>()
             {
-                public Object doInTransaction() throws Exception
+                public Object process() throws Exception
                 {
                     return jdbcConnector.getQueryRunner().query(sql, handler, arguments);
                 }
             };
-            return executeInTransactionTemplate(transactionCallback);
+            return executeInTransactionTemplate(processingCallback);
         }
         catch (SQLException e)
         {
@@ -187,14 +187,14 @@ public class JdbcObjectStore<T extends Serializable> extends AbstractMonitoredOb
     {
         try
         {
-            TransactionCallback<Object> transactionCallback = new TransactionCallback<Object>()
+            ProcessingCallback<Object> processingCallback = new ProcessingCallback<Object>()
             {
-                public Object doInTransaction() throws Exception
+                public Object process() throws Exception
                 {
                     return jdbcConnector.getQueryRunner().update(sql, arguments);
                 }
             };
-            return executeInTransactionTemplate(transactionCallback);
+            return executeInTransactionTemplate(processingCallback);
         }
         catch (SQLException e)
         {
@@ -206,10 +206,10 @@ public class JdbcObjectStore<T extends Serializable> extends AbstractMonitoredOb
         }
     }
 
-    private Object executeInTransactionTemplate(TransactionCallback<Object> transactionCallback) throws Exception
+    private Object executeInTransactionTemplate(ProcessingCallback<Object> processingCallback) throws Exception
     {
-        TransactionTemplate transactionTemplate = TransactionTemplateFactory.<MuleEvent>createNestedTransactionTemplate(this.transactionConfig, this.jdbcConnector.getMuleContext());
-        return transactionTemplate.execute(transactionCallback);
+        ProcessingTemplate<Object> processingTemplate = new TransactionalProcessingTemplate<Object>(this.jdbcConnector.getMuleContext(), this.transactionConfig);
+        return processingTemplate.execute(processingCallback);
     }
 
     public JdbcConnector getJdbcConnector()

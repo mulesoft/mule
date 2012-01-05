@@ -2,13 +2,17 @@
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
       xmlns:test="http://www.mulesoft.org/schema/mule/test"
       xmlns:json="http://www.mulesoft.org/schema/mule/json"
       xsi:schemaLocation="
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/3.2/mule-test.xsd
        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.2/mule-vm.xsd
+       http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/3.2/mule-jms.xsd
        http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/3.2/mule-json.xsd">
+
+    <jms:activemq-connector name="activeMQ"/>
 
     <flow name="vmExceptionHandlingBlock">
         <vm:inbound-endpoint path="inExceptionBlock" exchange-pattern="request-response"/>
@@ -23,6 +27,16 @@
         <catch-exception-strategy>
             <custom-processor class="org.mule.test.integration.exceptions.CatchExceptionStrategyTestCase$NewsErrorProcessor"/>
         </catch-exception-strategy>
+    </flow>
+
+    <flow name="transactionNotResolvedAfterException">
+        <vm:inbound-endpoint path="inTxWithException" exchange-pattern="request-response">
+            <vm:transaction action="ALWAYS_BEGIN"/>
+        </vm:inbound-endpoint>
+        <flow-ref name="blockWithOwnExceptionStrategy"/>
+        <custom-processor
+                class="org.mule.test.integration.exceptions.CatchExceptionStrategyFlowRefTestCase$VerifyTransactionNotResolvedProcessor"/>
+        <json:object-to-json-transformer/>
     </flow>
 
 </mule>

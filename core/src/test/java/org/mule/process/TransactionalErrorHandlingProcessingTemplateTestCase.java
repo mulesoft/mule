@@ -7,14 +7,13 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.transaction;
+package org.mule.process;
 
 import org.hamcrest.core.Is;
-import org.hamcrest.core.IsInstanceOf;
-import org.hamcrest.core.IsNot;
 import org.hamcrest.core.IsNull;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Answers;
 import org.mockito.internal.verification.VerificationModeFactory;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.runners.MockitoJUnitRunner;
@@ -27,6 +26,9 @@ import org.mule.api.transaction.TransactionConfig;
 import org.mule.exception.DefaultMessagingExceptionStrategy;
 import org.mule.tck.testmodels.mule.TestTransaction;
 import org.mule.tck.testmodels.mule.TestTransactionFactory;
+import org.mule.transaction.MuleTransactionConfig;
+import org.mule.transaction.TransactionCoordination;
+import org.mule.transaction.TransactionTemplateTestUtils;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
@@ -34,11 +36,9 @@ import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.transaction.TransactionTemplateFactory.createMainTransactionTemplate;
-import static org.mule.transaction.TransactionTemplateTestUtils.getFailureTransactionCallback;
 
 @RunWith(MockitoJUnitRunner.class)
-public class MainTransactionalTemplateTestCase extends NestedTransactionTemplateTestCase
+public class TransactionalErrorHandlingProcessingTemplateTestCase extends TransactionalProcessingTemplateTestCase
 {
 
     @Test
@@ -47,11 +47,11 @@ public class MainTransactionalTemplateTestCase extends NestedTransactionTemplate
         mockTransaction.setXA(true);
         TransactionCoordination.getInstance().bindTransaction(mockTransaction);
         MuleTransactionConfig config = new MuleTransactionConfig(TransactionConfig.ACTION_NONE);
-        TransactionTemplate transactionTemplate = createTransactionalTemplate(config);
+        ProcessingTemplate processingTemplate = createProcessingTemplate(config);
         MuleEvent mockExceptionListenerResultEvent = configureExceptionListenerCall();
         try
         {
-            transactionTemplate.execute(getFailureTransactionCallback(mockMessagingException));
+            processingTemplate.execute(getFailureTransactionCallback());
             fail("MessagingException must be thrown");
         }
         catch (MessagingException e)
@@ -72,17 +72,17 @@ public class MainTransactionalTemplateTestCase extends NestedTransactionTemplate
         TransactionCoordination.getInstance().bindTransaction(mockTransaction);
         mockTransaction.setXA(true);
         MuleTransactionConfig config = new MuleTransactionConfig(TransactionConfig.ACTION_ALWAYS_BEGIN);
-        TransactionTemplate transactionTemplate = createTransactionalTemplate(config);
+        ProcessingTemplate processingTemplate = createProcessingTemplate(config);
         config.setFactory(new TestTransactionFactory(mockNewTransaction));
         MuleEvent exceptionListenerResult = configureExceptionListenerCall();
         try
         {
-            transactionTemplate.execute(getFailureTransactionCallback(mockMessagingException));
+            processingTemplate.execute(getFailureTransactionCallback());
         }
         catch (MessagingException e)
         {
-            assertThat(e, Is.is(mockMessagingException));
-            org.junit.Assert.assertThat(e.getEvent(), Is.is(exceptionListenerResult));
+            assertThat(e, is(mockMessagingException));
+            assertThat(e.getEvent(), is(exceptionListenerResult));
         }
         verify(mockTransaction).suspend();
         verify(mockTransaction,VerificationModeFactory.times(0)).commit();
@@ -108,11 +108,11 @@ public class MainTransactionalTemplateTestCase extends NestedTransactionTemplate
                 return mockTransaction;
             }
         });
-        TransactionTemplate transactionTemplate = createTransactionalTemplate(config);
+        ProcessingTemplate transactionTemplate = createProcessingTemplate(config);
         MuleEvent exceptionListenerResult = configureExceptionListenerCall();
         try
         {
-            transactionTemplate.execute(getFailureTransactionCallback(mockMessagingException));
+            transactionTemplate.execute(getFailureTransactionCallback());
         }
         catch (MessagingException e)
         {
@@ -126,16 +126,16 @@ public class MainTransactionalTemplateTestCase extends NestedTransactionTemplate
 
 
     @Override
-    protected TransactionTemplate createTransactionalTemplate(MuleTransactionConfig config)
+    protected ProcessingTemplate createProcessingTemplate(MuleTransactionConfig config)
     {
-        return createMainTransactionTemplate(config, mockMuleContext);
+        return new TransactionalErrorHandlingProcessingTemplate(mockMuleContext, config, mockMessagingExceptionHandler);
     }
 
     private MuleEvent configureExceptionListenerCall()
     {
-        final MuleEvent mockResultEvent = mock(MuleEvent.class);
-        when(mockMessagingException.getEvent()).thenReturn(mockEvent).thenReturn(mockEvent).thenReturn(mockResultEvent);
-        when(mockEvent.getFlowConstruct().getExceptionListener().handleException(mockMessagingException, mockEvent)).thenAnswer(new Answer<Object>()
+        final MuleEvent mockResultEvent = mock(MuleEvent.class, Answers.RETURNS_DEEP_STUBS.get());
+        when(mockMessagingException.getEvent()).thenReturn(mockEvent).thenReturn(mockResultEvent);
+        when(mockMessagingExceptionHandler.handleException(mockMessagingException, mockEvent)).thenAnswer(new Answer<Object>()
         {
             @Override
             public Object answer(InvocationOnMock invocationOnMock) throws Throwable
@@ -145,6 +145,11 @@ public class MainTransactionalTemplateTestCase extends NestedTransactionTemplate
             }
         });
         return mockResultEvent;
+    }
+
+    protected ProcessingCallback<MuleEvent> getFailureTransactionCallback() throws Exception
+    {
+        return TransactionTemplateTestUtils.getFailureTransactionCallback(mockMessagingException);
     }
 
 }

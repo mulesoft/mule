@@ -15,11 +15,9 @@ import org.mule.api.*;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
-import org.mule.api.transaction.TransactionCallback;
 import org.mule.api.transport.Connector;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.transaction.TransactionTemplate;
-import org.mule.transaction.TransactionTemplateFactory;
+import org.mule.process.ProcessingCallback;
+import org.mule.process.ProcessingTemplate;
 import org.mule.transport.ContinuousPollingReceiverWorker;
 import org.mule.transport.PollingReceiverWorker;
 import org.mule.transport.TransactedPollingMessageReceiver;
@@ -101,11 +99,11 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
 
         try
         {
-            TransactionTemplate<MuleMessage> mainTransactionTemplate = TransactionTemplateFactory.<MuleMessage>createMainTransactionTemplate(endpoint.getTransactionConfig(), connector.getMuleContext());
-            return mainTransactionTemplate.execute(new TransactionCallback<MuleMessage>()
+            ProcessingTemplate<MuleEvent> processingTemplate = createProcessingTemplate();
+            MuleEvent resultEvent = processingTemplate.execute(new ProcessingCallback<MuleEvent>()
             {
                 @Override
-                public MuleMessage doInTransaction() throws Exception
+                public MuleEvent process() throws Exception
                 {
                     MuleEvent event = routeMessage(message);
                     MuleMessage returnedMessage = event == null ? null : event.getMessage();
@@ -113,9 +111,10 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
                     {
                         returnedMessage.release();
                     }
-                    return returnedMessage;
+                    return event;
                 }
             });
+            return resultEvent != null ? resultEvent.getMessage() : null;
 
         }
         catch (MessagingException e)

@@ -11,6 +11,7 @@
 package org.mule.transport.jms;
 
 import org.mule.api.MessagingException;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleRuntimeException;
@@ -20,12 +21,11 @@ import org.mule.api.lifecycle.CreateException;
 import org.mule.api.lifecycle.StartException;
 import org.mule.api.lifecycle.StopException;
 import org.mule.api.transaction.Transaction;
-import org.mule.api.transaction.TransactionCallback;
 import org.mule.api.transport.Connector;
 import org.mule.api.transport.MessageReceiver;
+import org.mule.process.ProcessingCallback;
+import org.mule.process.ProcessingTemplate;
 import org.mule.transaction.TransactionCoordination;
-import org.mule.transaction.TransactionTemplate;
-import org.mule.transaction.TransactionTemplateFactory;
 import org.mule.transport.AbstractMessageReceiver;
 import org.mule.transport.ConnectException;
 import org.mule.transport.jms.filters.JmsSelectorFilter;
@@ -222,18 +222,16 @@ public class TransactedSingleResourceJmsMessageReceiver extends AbstractMessageR
 
     public void processMessages(final Message message, final MessageReceiver receiver) throws Exception
     {
-        TransactionTemplate<Void> tt = TransactionTemplateFactory.<Void>createMainTransactionTemplate(
-                                                endpoint.getTransactionConfig(),
-                                                connector.getMuleContext());
+        ProcessingTemplate<MuleEvent> processingTemplate = createProcessingTemplate();
 
         final String encoding = endpoint.getEncoding();
 
         if (receiveMessagesInTransaction)
         {
-            TransactionCallback<Void> cb = new MessageTransactionCallback<Void>(message)
+            ProcessingCallback<MuleEvent> processingCallback = new MessageProcessingCallback<MuleEvent>(message)
             {
 
-                public Void doInTransaction() throws Exception
+                public MuleEvent process() throws Exception
                 {
                     // Get Transaction & Bind MuleSession
                     Transaction tx = TransactionCoordination.getInstance().getTransaction();
@@ -279,7 +277,7 @@ public class TransactedSingleResourceJmsMessageReceiver extends AbstractMessageR
                     return null;
                 }
             };
-            tt.execute(cb);
+            processingTemplate.execute(processingCallback);
         }
         else
         {

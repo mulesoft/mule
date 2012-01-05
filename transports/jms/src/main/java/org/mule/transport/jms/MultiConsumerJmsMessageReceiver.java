@@ -10,7 +10,6 @@
 
 package org.mule.transport.jms;
 
-import org.mule.MessageExchangePattern;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleException;
 import org.mule.api.construct.FlowConstruct;
@@ -21,7 +20,6 @@ import org.mule.api.lifecycle.LifecycleException;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionException;
 import org.mule.api.transport.Connector;
-import org.mule.api.transport.ReplyToHandler;
 import org.mule.transaction.TransactionCollection;
 import org.mule.transport.AbstractMessageReceiver;
 import org.mule.transport.AbstractReceiverWorker;
@@ -345,9 +343,8 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
                 if (e instanceof MessagingException)
                 {
                     MessagingException messagingException = (MessagingException) e;
-                    if (!messagingException.getEvent().isTransacted() && messagingException.getEvent().getMessage().getExceptionPayload() != null && messagingException.isCauseRollback())
+                    if (!messagingException.getEvent().isTransacted() && messagingException.isCauseRollback())
                     {
-                        //Exception not handled
                         rollbackMethod.rollback();
                     }
                 }

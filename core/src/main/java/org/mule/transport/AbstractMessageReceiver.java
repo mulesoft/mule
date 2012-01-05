@@ -34,6 +34,8 @@ import org.mule.api.transport.MessageReceiver;
 import org.mule.api.transport.PropertyScope;
 import org.mule.api.transport.ReplyToHandler;
 import org.mule.context.notification.EndpointMessageNotification;
+import org.mule.process.ProcessingTemplate;
+import org.mule.process.TransactionalErrorHandlingProcessingTemplate;
 import org.mule.session.DefaultMuleSession;
 import org.mule.session.LegacySessionHandler;
 import org.mule.transaction.TransactionCoordination;
@@ -375,5 +377,10 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
     protected ReplyToHandler getReplyToHandler()
     {
         return ((AbstractConnector) endpoint.getConnector()).getReplyToHandler(endpoint);
+    }
+
+    protected ProcessingTemplate<MuleEvent> createProcessingTemplate()
+    {
+        return new TransactionalErrorHandlingProcessingTemplate(endpoint.getMuleContext(),endpoint.getTransactionConfig());
     }
 }

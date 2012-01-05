@@ -42,13 +42,14 @@ import org.mule.lifecycle.EmptyLifecycleCallback;
 import org.mule.lifecycle.processor.ProcessIfStartedWaitIfPausedMessageProcessor;
 import org.mule.management.stats.RouterStatistics;
 import org.mule.management.stats.ServiceStatistics;
+import org.mule.process.ErrorHandlingProcessingTemplate;
+import org.mule.process.ProcessingCallback;
+import org.mule.process.ProcessingTemplate;
 import org.mule.processor.AbstractInterceptingMessageProcessor;
 import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.routing.MuleMessageInfoMapping;
 import org.mule.routing.outbound.DefaultOutboundRouterCollection;
 import org.mule.service.processor.ServiceAsyncRequestReplyRequestor;
-import org.mule.transaction.TransactionTemplate;
-import org.mule.transaction.TransactionTemplateFactory;
 import org.mule.util.ClassUtils;
 
 import java.util.Collections;
@@ -659,11 +660,11 @@ public abstract class AbstractService implements Service, MessageProcessor, Anno
         RequestContext.setEvent(newEvent);
         try
         {
-            TransactionTemplate<MuleEvent> exceptionHandlingTransactionTemplate = TransactionTemplateFactory.<MuleEvent>createExceptionHandlingTransactionTemplate(muleContext);
-            return exceptionHandlingTransactionTemplate.execute(new TransactionCallback<MuleEvent>() {
+            ProcessingTemplate<MuleEvent> processingTemplate = new ErrorHandlingProcessingTemplate(muleContext, event.getFlowConstruct().getExceptionListener());
+            return processingTemplate.execute(new ProcessingCallback<MuleEvent> () {
 
                 @Override
-                public MuleEvent doInTransaction() throws Exception
+                public MuleEvent process() throws Exception
                 {
                     MuleEvent result = messageProcessorChain.process(newEvent);
                     if (result != null)

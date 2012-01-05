@@ -18,10 +18,9 @@ import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.retry.RetryContext;
-import org.mule.api.transaction.TransactionCallback;
 import org.mule.api.transport.Connector;
-import org.mule.transaction.TransactionTemplate;
-import org.mule.transaction.TransactionTemplateFactory;
+import org.mule.process.ProcessingCallback;
+import org.mule.process.ProcessingTemplate;
 import org.mule.transport.AbstractPollingMessageReceiver;
 
 import java.io.FilenameFilter;
@@ -278,17 +277,17 @@ public class FtpMessageReceiver extends AbstractPollingMessageReceiver
                 FtpMuleMessageFactory muleMessageFactory = createMuleMessageFactory(finalClient);
                 final MuleMessage finalMessage = muleMessageFactory.create(file, endpoint.getEncoding());
                 muleMessage = finalMessage;
-                TransactionTemplate<Void> exceptionHandlingTransactionTemplate = TransactionTemplateFactory.<Void>createExceptionHandlingTransactionTemplate(getConnector().getMuleContext());
-                exceptionHandlingTransactionTemplate.execute(new TransactionCallback<Void>()
+                ProcessingTemplate<MuleEvent> processingTemplate = createProcessingTemplate();
+                processingTemplate.execute(new ProcessingCallback<MuleEvent> ()
                 {
                     @Override
-                    public Void doInTransaction() throws Exception
+                    public MuleEvent process() throws Exception
                     {
                         routeMessage(finalMessage);
-                        postProcess(finalClient, file, finalMessage);
                         return null;
                     }
                 });
+                postProcess(finalClient, file, finalMessage);
             }
             catch (MessagingException e)
             {
