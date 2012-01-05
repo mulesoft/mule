@@ -26,7 +26,7 @@ import org.jivesoftware.smack.packet.Message;
 public class XmppChatConversation extends AbstractXmppConversation
 {
     private Chat chat;
-    
+
     public XmppChatConversation(ImmutableEndpoint endpoint)
     {
         super(endpoint);
@@ -43,7 +43,7 @@ public class XmppChatConversation extends AbstractXmppConversation
     {
         // The smack API provides Chat.createCollector to create a PacketCollector for a given chat.
         // We cannot reasonably use this, however because smack uses a ThreadFilter internally
-        // to match the chat's thread ID. While testing with some Jabber clients (Psi, Spark) 
+        // to match the chat's thread ID. While testing with some Jabber clients (Psi, Spark)
         // it became obvious that the thread ID is not always preserved. Filtering for a given
         // thread id would then prevent the PacketCollector to see incoming chat messages.
         // We create our own PacketFilter here which matches only our chat partner's JID and
@@ -59,6 +59,7 @@ public class XmppChatConversation extends AbstractXmppConversation
         chat = null;
     }
 
+    @Override
     public void dispatch(Message message) throws XMPPException
     {
         message.setType(Message.Type.chat);

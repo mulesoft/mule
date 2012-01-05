@@ -24,24 +24,25 @@ import org.jivesoftware.smack.packet.Message;
 public abstract class AbstractXmppConversation implements XmppConversation
 {
     protected final Log logger = LogFactory.getLog(getClass());
-    
+
     protected XMPPConnection connection;
     protected String recipient;
     protected PacketCollector packetCollector;
 
     public AbstractXmppConversation(ImmutableEndpoint endpoint)
     {
-        super();        
+        super();
         connection = ((XmppConnector) endpoint.getConnector()).getXmppConnection();
         recipient = XmppConnector.getRecipient(endpoint);
     }
 
+    @Override
     public void connect() throws ConnectException
     {
         doConnect();
         packetCollector = createPacketCollector();
     }
-    
+
     /**
      * Subclasses can override this method to create their conversation specific connection.
      */
@@ -51,7 +52,7 @@ public abstract class AbstractXmppConversation implements XmppConversation
     }
 
     /**
-     * @return a {@link PacketCollector} that can be used to retrieve messages for this 
+     * @return a {@link PacketCollector} that can be used to retrieve messages for this
      * conversation.
      */
     protected PacketCollector createPacketCollector()
@@ -59,7 +60,7 @@ public abstract class AbstractXmppConversation implements XmppConversation
         PacketFilter filter = createPacketFilter();
         return connection.createPacketCollector(filter);
     }
-    
+
     /**
      * @return a {@link PacketFilter} instance that matches the desired message type and recipient
      * for this conversation.
@@ -68,14 +69,15 @@ public abstract class AbstractXmppConversation implements XmppConversation
     {
         return null;
     }
-    
+
+    @Override
     public void disconnect()
     {
         if (packetCollector != null)
         {
             packetCollector.cancel();
         }
-        
+
         doDisconnect();
     }
 
@@ -86,14 +88,16 @@ public abstract class AbstractXmppConversation implements XmppConversation
     {
         // template method
     }
-    
+
+    @Override
     public Message receive(long timeout)
     {
         // The filter of our packetCollector should make sure that we receive only
         // Message instances here
         return (Message) packetCollector.nextResult(timeout);
     }
-    
+
+    @Override
     public Message receive()
     {
         // The filter of our packetCollector should make sure that we receive only
