@@ -25,14 +25,14 @@ import org.jivesoftware.smack.packet.Message;
  */
 public class XmppMessageDispatcher extends AbstractMessageDispatcher
 {
-    private final XmppConnector connector;
+    private final XmppConnector xmppConnector;
     private XmppConversation conversation;
 
     public XmppMessageDispatcher(OutboundEndpoint endpoint)
     {
         super(endpoint);
-        connector = (XmppConnector) endpoint.getConnector();
-        conversation = connector.getConversationFactory().create(endpoint);
+        xmppConnector = (XmppConnector) endpoint.getConnector();
+        conversation = xmppConnector.getConversationFactory().create(endpoint);
     }
 
     @Override
@@ -79,7 +79,7 @@ public class XmppMessageDispatcher extends AbstractMessageDispatcher
 //                return createMuleMessage(response);
 //            }
 //        }
-        return new DefaultMuleMessage(NullPayload.getInstance(), connector.getMuleContext());
+        return new DefaultMuleMessage(NullPayload.getInstance(), xmppConnector.getMuleContext());
     }
 
     protected void sendMessage(MuleEvent event) throws Exception
