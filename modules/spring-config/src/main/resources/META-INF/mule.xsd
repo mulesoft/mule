@@ -4332,7 +4332,6 @@
             <xsd:enumeration value="regex"/>
             <xsd:enumeration value="string"/>
             <xsd:enumeration value="variable"/>
-            <xsd:enumeration value="wildcard"/>
             <xsd:enumeration value="xpath"/>
             <xsd:enumeration value="xpath-node"/>
             <xsd:enumeration value="custom"/>
