@@ -39,12 +39,20 @@ public class OutboundRoutingTestEvent implements MuleEvent
     private MuleSession session;
     private String id = UUID.getUUID();
     private boolean stopFurtherProcessing;
+    private ImmutableEndpoint endpoint;
     int timeout = -1;
 
     public OutboundRoutingTestEvent(MuleMessage message, MuleSession session)
     {
         this.message = message;
         this.session = session;
+    }
+
+    public OutboundRoutingTestEvent(MuleMessage message, MuleSession session, ImmutableEndpoint endpoint)
+    {
+        this.message = message;
+        this.session = session;
+        this.endpoint = endpoint;
     }
 
     public MuleMessage getMessage()
@@ -148,7 +156,7 @@ public class OutboundRoutingTestEvent implements MuleEvent
 
     public ImmutableEndpoint getEndpoint()
     {
-        return null;
+        return endpoint;
     }
 
     public FlowConstruct getService()

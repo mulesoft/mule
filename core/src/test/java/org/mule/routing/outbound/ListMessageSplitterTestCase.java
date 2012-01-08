@@ -62,7 +62,7 @@ public class ListMessageSplitterTestCase extends AbstractMuleContextTestCase
 
         MuleMessage message = new DefaultMuleMessage(payload, muleContext);
 
-        MuleEvent result = router.route(new OutboundRoutingTestEvent(message, session));
+        MuleEvent result = router.route(new OutboundRoutingTestEvent(message, session, endpoint));
         assertNotNull(result);
         MuleMessage resultMessage = result.getMessage();
         assertNotNull(resultMessage);
