@@ -22,18 +22,22 @@ import org.apache.commons.logging.LogFactory;
  * <code>LogComponent</code> simply logs the content (or content length if it is a
  * large message)
  */
-public class LogComponent implements Callable, LogService
+public class LogComponent extends EchoComponent implements Callable, LogService
 {
     private static Log logger = LogFactory.getLog(LogComponent.class);
 
+    @Override
     public Object onCall(MuleEventContext context) throws Exception
     {
-        String contents = context.getMessageAsString();
-        String msg = "Message received in service: " + context.getFlowConstruct().getName();
-        msg = StringMessageUtils.getBoilerPlate(msg + ". Content is: '"
-                        + StringMessageUtils.truncate(contents, 100, true) + "'");
-        log(msg);
-        return context.getMessage();
+        if(logger.isInfoEnabled())
+        {
+            String contents = context.getMessageAsString();
+            String msg = "Message received in service: " + context.getFlowConstruct().getName();
+            msg = StringMessageUtils.getBoilerPlate(msg + ". Content is: '"
+                            + StringMessageUtils.truncate(contents, 100, true) + "'");
+            log(msg);
+        }
+        return super.onCall(context);
     }
 
     public void log(String message)
