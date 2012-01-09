@@ -22,10 +22,8 @@ import org.mule.api.MuleContext;
  */
 public class DefaultMessagingExceptionStrategy extends AbstractMessagingExceptionStrategy
 {
-    /** Called by MuleNamespaceHandler for <default-exception-strategy> element. */
     public DefaultMessagingExceptionStrategy()
     {
-        this(null);
     }
 
     public DefaultMessagingExceptionStrategy(MuleContext muleContext)

@@ -23,11 +23,11 @@ import org.mule.transport.ConnectException;
  * Fire a notification, log exception, clean up transaction if any, and trigger reconnection strategy 
  * if this is a <code>ConnectException</code>.
  */
-public class AbstractSystemExceptionStrategy extends AbstractExceptionStrategy implements SystemExceptionHandler
+public class AbstractSystemExceptionStrategy extends AbstractExceptionListener implements SystemExceptionHandler
 {
     public AbstractSystemExceptionStrategy(MuleContext muleContext)
     {
-        super(muleContext);
+        this.muleContext = muleContext;
     }
 
     public void handleException(Exception ex, RollbackSourceCallback rollbackMethod)

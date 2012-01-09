@@ -26,7 +26,7 @@ import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.Transformer;
 import org.mule.config.MuleManifest;
 import org.mule.context.notification.ListenerSubscriptionPair;
-import org.mule.exception.AbstractExceptionStrategy;
+import org.mule.exception.AbstractExceptionListener;
 import org.mule.util.ClassUtils;
 import org.mule.util.DateUtils;
 import org.mule.util.StringMessageUtils;
@@ -926,7 +926,7 @@ public class CoreMessages extends MessageFactory
         return factory.createMessage(BUNDLE_PATH, 233, endpoint, router);
     }
 
-    public static Message exceptionListenerMustUseOutboundEndpoint(AbstractExceptionStrategy exceptionListener,
+    public static Message exceptionListenerMustUseOutboundEndpoint(AbstractExceptionListener exceptionListener,
                                                                    ImmutableEndpoint endpoint)
     {
         return factory.createMessage(BUNDLE_PATH, 235, endpoint, exceptionListener);

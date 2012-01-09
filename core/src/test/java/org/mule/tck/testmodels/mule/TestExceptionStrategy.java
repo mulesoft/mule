@@ -14,7 +14,7 @@ import org.mule.api.MuleEvent;
 import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.exception.RollbackSourceCallback;
 import org.mule.api.exception.SystemExceptionHandler;
-import org.mule.exception.AbstractExceptionStrategy;
+import org.mule.exception.AbstractExceptionListener;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -28,7 +28,7 @@ import org.apache.commons.logging.LogFactory;
  * replacement of the {@link org.mule.exception.AbstractMessagingExceptionStrategy}.
  * This is used to test that overriding the default Exception strategy works.
  */
-public class TestExceptionStrategy extends AbstractExceptionStrategy implements MessagingExceptionHandler, SystemExceptionHandler
+public class TestExceptionStrategy extends AbstractExceptionListener implements MessagingExceptionHandler, SystemExceptionHandler
 {
     /**
      * logger used by this class
@@ -50,7 +50,6 @@ public class TestExceptionStrategy extends AbstractExceptionStrategy implements 
 
     public TestExceptionStrategy()
     {
-        super(null);
     }
     
     public String getTestProperty()
