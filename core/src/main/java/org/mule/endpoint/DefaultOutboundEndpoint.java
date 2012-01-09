@@ -97,7 +97,7 @@ public class DefaultOutboundEndpoint extends AbstractEndpoint implements Outboun
         // Avoid loss replyHandler, replyToDestination
         if (resultEvent != null)
         {
-            resultEvent = new DefaultMuleEvent(resultEvent.getMessage(),resultEvent);
+            resultEvent = new DefaultMuleEvent(resultEvent.getMessage(),event);
         }
         return resultEvent;
     }
