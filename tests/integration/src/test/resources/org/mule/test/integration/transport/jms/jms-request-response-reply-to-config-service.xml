@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
+      xsi:schemaLocation="
+          http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.1/mule.xsd
+          http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/3.1/mule-http.xsd
+          http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/3.1/mule-jms.xsd">
+
+    <jms:activemq-connector name="jmsConnector1" specification="1.1" persistentDelivery="true" maxRedelivery="0"
+                            clientId="fileQueue"/>
+
+    <model>
+        <service name="jmsServiceDymamic">
+            <inbound>
+                <jms:inbound-endpoint queue="jms.dynamic" exchange-pattern="request-response"/>
+            </inbound>
+            <outbound>
+                <pass-through-router>
+                    <http:outbound-endpoint address="http://#[groovy:payload]"
+                                            method="GET" exchange-pattern="request-response"/>
+                </pass-through-router>
+            </outbound>
+        </service>
+
+        <service name="jmsServiceStatic">
+            <inbound>
+                <jms:inbound-endpoint queue="jms.static" exchange-pattern="request-response"/>
+            </inbound>
+            <outbound>
+                <pass-through-router>
+                    <http:outbound-endpoint address="http://localhost:${port1}/test"
+                                            method="GET" exchange-pattern="request-response"/>
+                </pass-through-router>
+            </outbound>
+        </service>
+
+        <service name="HttpServer">
+            <inbound>
+                <http:inbound-endpoint address="http://localhost:${port1}/test"></http:inbound-endpoint>
+            </inbound>
+            <echo-component/>
+        </service>
+    </model>
+</mule>

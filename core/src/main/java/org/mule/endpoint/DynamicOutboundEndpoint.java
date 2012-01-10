@@ -138,7 +138,7 @@ public class DynamicOutboundEndpoint implements OutboundEndpoint
         EndpointURI endpointURIForMessage = getEndpointURIForMessage(event);
         OutboundEndpoint outboundEndpoint = createStaticEndpoint(endpointURIForMessage);
 
-        event = new DefaultMuleEvent(event.getMessage(), outboundEndpoint, event.getSession());
+        event = new DefaultMuleEvent(event.getMessage(), outboundEndpoint, event, event.getSession());
 
         return outboundEndpoint.process(event);
     }
