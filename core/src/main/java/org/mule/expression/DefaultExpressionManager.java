@@ -154,7 +154,7 @@ public class DefaultExpressionManager implements ExpressionManager, MuleContextA
 
     /**
      * Evaluates the given expression.  The expression should be a single expression definition with or without
-     * enclosing braces. i.e. "mule:serviceName" and "#[mule:serviceName]" are both valid. For situations where
+     * enclosing braces. i.e. "context:serviceName" and "#[context:serviceName]" are both valid. For situations where
      * one or more expressions need to be parsed within a single text, the {@link org.mule.api.expression.ExpressionManager#parse(String,org.mule.api.MuleMessage,boolean)}
      * method should be used since it will iterate through all expressions in a string.
      *
@@ -171,7 +171,7 @@ public class DefaultExpressionManager implements ExpressionManager, MuleContextA
 
     /**
      * Evaluates the given expression.  The expression should be a single expression definition with or without
-     * enclosing braces. i.e. "mule:serviceName" and "#[mule:serviceName]" are both valid. For situations where
+     * enclosing braces. i.e. "context:serviceName" and "#[context:serviceName]" are both valid. For situations where
      * one or more expressions need to be parsed within a single text, the {@link org.mule.api.expression.ExpressionManager#parse(String,org.mule.api.MuleMessage,boolean)}
      * method should be used since it will iterate through all expressions in a string.
      *
@@ -250,7 +250,7 @@ public class DefaultExpressionManager implements ExpressionManager, MuleContextA
 
     /**
      * Evaluates the given expression.  The expression should be a single expression definition with or without
-     * enclosing braces. i.e. "mule:serviceName" and "#[mule:serviceName]" are both valid. For situations where
+     * enclosing braces. i.e. "context:serviceName" and "#[context:serviceName]" are both valid. For situations where
      * one or more expressions need to be parsed within a single text, the {@link org.mule.api.expression.ExpressionManager#parse(String,org.mule.api.MuleMessage,boolean)}
      * method should be used since it will iterate through all expressions in a string.
      *

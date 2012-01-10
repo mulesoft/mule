@@ -60,7 +60,7 @@ public interface ExpressionManager
 
     /**
      * Evaluates the given expression.  The expression should be a single expression definition with or without
-     * enclosing braces. i.e. "mule:serviceName" and "#[mule:serviceName]" are both valid. For situations where
+     * enclosing braces. i.e. "context:serviceName" and "#[context:serviceName]" are both valid. For situations where
      * one or more expressions need to be parsed within a single text, the {@link #parse(String,org.mule.api.MuleMessage,boolean)}
      * method should be used since it will iterate through all expressions in a string.
      *
@@ -74,7 +74,7 @@ public interface ExpressionManager
 
     /**
      * Evaluates the given expression.  The expression should be a single expression definition with or without
-     * enclosing braces. i.e. "mule:serviceName" and "#[mule:serviceName]" are both valid. For situations where
+     * enclosing braces. i.e. "context:serviceName" and "#[context:serviceName]" are both valid. For situations where
      * one or more expressions need to be parsed within a single text, the {@link #parse(String,org.mule.api.MuleMessage,boolean)}
      * method should be used since it will iterate through all expressions in a string.
      *
@@ -90,7 +90,7 @@ public interface ExpressionManager
 
     /**
      * Evaluates the given expression.  The expression should be a single expression definition with or without
-     * enclosing braces. i.e. "mule:serviceName" and "#[mule:serviceName]" are both valid. For situations where
+     * enclosing braces. i.e. "context:serviceName" and "#[context:serviceName]" are both valid. For situations where
      * one or more expressions need to be parsed within a single text, the {@link #parse(String,org.mule.api.MuleMessage,boolean)}
      * method should be used since it will iterate through all expressions in a string.
      *
@@ -108,7 +108,7 @@ public interface ExpressionManager
     /**
      * Evaluates the given expression resolving the result of the evaluation to a
      * boolean. The expression should be a single expression definition with or
-     * without enclosing braces. i.e. "mule:serviceName" and "#[mule:serviceName]"
+     * without enclosing braces. i.e. "context:serviceName" and "#[context:serviceName]"
      * are both valid.
      *
      * @param expression a single expression i.e. header:foo=bar
@@ -120,7 +120,7 @@ public interface ExpressionManager
     /**
      * Evaluates the given expression resolving the result of the evaluation to a
      * boolean. The expression should be a single expression definition with or
-     * without enclosing braces. i.e. "mule:serviceName" and "#[mule:serviceName]"
+     * without enclosing braces. i.e. "context:serviceName" and "#[context:serviceName]"
      * are both valid.
      *
      * @param expression a single expression i.e. header:foo=bar
@@ -131,7 +131,7 @@ public interface ExpressionManager
     /**
      * Evaluates the given expression resolving the result of the evaluation to a
      * boolean. The expression should be a single expression definition with or
-     * without enclosing braces. i.e. "mule:serviceName" and "#[mule:serviceName]"
+     * without enclosing braces. i.e. "context:serviceName" and "#[context:serviceName]"
      * are both valid.
      *
      * @param expression a single expression i.e. header:foo=bar
@@ -147,7 +147,7 @@ public interface ExpressionManager
     /**
      * Evaluates the given expression resolving the result of the evaluation to a
      * boolean. The expression should be a single expression definition with or
-     * without enclosing braces. i.e. "mule:serviceName" and "#[mule:serviceName]"
+     * without enclosing braces. i.e. "context:serviceName" and "#[context:serviceName]"
      * are both valid.
      *
      * @param expression a single expression i.e. header:foo=bar
