@@ -14,11 +14,6 @@ import org.mule.api.MuleEvent;
 
 public class CatchMessagingExceptionStrategy extends TemplateMessagingExceptionStrategy
 {
-    public CatchMessagingExceptionStrategy(MuleContext muleContext)
-    {
-        super(muleContext);
-    }
-
     @Override
     protected void nullifyExceptionPayloadIfRequired(MuleEvent event)
     {

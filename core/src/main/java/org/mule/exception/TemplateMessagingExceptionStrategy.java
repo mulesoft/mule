@@ -24,17 +24,11 @@ import org.mule.routing.requestreply.ReplyToPropertyRequestReplyReplier;
 
 import java.net.URI;
 
-public abstract class TemplateMessagingExceptionStrategy extends AbstractExceptionStrategy implements MessagingExceptionHandler
+public abstract class TemplateMessagingExceptionStrategy extends AbstractExceptionListener implements MessagingExceptionHandler
 {
 
     private MessageProcessorChain configuredMessageProcessors;
     private MessageProcessor replyToMessageProcessor = new ReplyToPropertyRequestReplyReplier();
-
-    public TemplateMessagingExceptionStrategy(MuleContext muleContext)
-    {
-        super(muleContext);
-    }
-
 
     @Override
     final public MuleEvent handleException(Exception exception, MuleEvent event)

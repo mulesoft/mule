@@ -27,16 +27,20 @@ import org.mule.transport.NullPayload;
  * Fire a notification, log exception, increment statistics, route the problematic message to a destination 
  * if one is configured (DLQ pattern), commit or rollback transaction if one exists, close any open streams.
  */
-public abstract class AbstractMessagingExceptionStrategy extends AbstractExceptionStrategy implements MessagingExceptionHandler
+public abstract class AbstractMessagingExceptionStrategy extends AbstractExceptionListener implements MessagingExceptionHandler
 {
     /** 
      * Stop the flow/service when an exception occurs.  You will need to restart the flow/service manually after this (e.g, using JMX). 
      */
     private boolean stopMessageProcessing;
 
+    public AbstractMessagingExceptionStrategy()
+    {
+    }
+
     public AbstractMessagingExceptionStrategy(MuleContext muleContext)
     {
-        super(muleContext);
+        this.muleContext = muleContext;
     }
 
     public MuleEvent handleException(Exception ex, MuleEvent event)
@@ -59,7 +63,7 @@ public abstract class AbstractMessagingExceptionStrategy extends AbstractExcepti
         event.getMessage().setExceptionPayload(exceptionPayload);
         return event;
     }
-    
+
     protected void doHandleException(Exception ex, MuleEvent event)
     {
         FlowConstructStatistics statistics = event.getFlowConstruct().getStatistics();
@@ -68,18 +72,21 @@ public abstract class AbstractMessagingExceptionStrategy extends AbstractExcepti
             statistics.incExecutionError();
         }
 
+        // Left this here for backwards-compatibility, remove in the next major version.
+        defaultHandler(ex);
+
         if (isRollback(ex))
         {
             logger.debug("Rolling back transaction");
             rollback(ex);
 
             logger.debug("Routing exception message");
-            routeException(event, ex);
+            routeException(event, null, ex);
         }
         else
         {
             logger.debug("Routing exception message");
-            routeException(event, ex);
+            routeException(event, null, ex);
         }
 
         closeStream(event.getMessage());
@@ -119,5 +126,14 @@ public abstract class AbstractMessagingExceptionStrategy extends AbstractExcepti
     public void setStopMessageProcessing(boolean stopMessageProcessing)
     {
         this.stopMessageProcessing = stopMessageProcessing;
+    }
+
+    /**
+     * @deprecated Override doHandleException(Exception e, MuleEvent event) instead
+     */
+    // Left this here for backwards-compatibility, remove in the next major version.
+    protected void defaultHandler(Throwable t)
+    {
+        // empty
     }
 }

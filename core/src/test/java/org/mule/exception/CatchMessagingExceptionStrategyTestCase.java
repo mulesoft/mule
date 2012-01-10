@@ -69,7 +69,8 @@ public class CatchMessagingExceptionStrategyTestCase
         {
             TransactionCoordination.getInstance().unbindTransaction(currentTransaction);
         }
-        catchMessagingExceptionStrategy = new CatchMessagingExceptionStrategy(mockMuleContext);
+        catchMessagingExceptionStrategy = new CatchMessagingExceptionStrategy();
+        catchMessagingExceptionStrategy.setMuleContext(mockMuleContext);
         when(mockMuleContext.getRegistry().lookupObject(
                 MuleProperties.OBJECT_MULE_STREAM_CLOSER_SERVICE)).thenReturn(mockStreamCloserService);
         when(mockMuleEvent.getMessage()).thenReturn(mockMuleMessage);

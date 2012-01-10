@@ -12,7 +12,7 @@ package org.mule;
 
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
-import org.mule.exception.AbstractExceptionStrategy;
+import org.mule.exception.AbstractExceptionListener;
 import org.mule.exception.DefaultMessagingExceptionStrategy;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
@@ -32,7 +32,7 @@ public class ExceptionListenerTestCase extends AbstractMuleTestCase
     @Test
     public void testAddGoodEndpoint() throws Exception
     {
-        AbstractExceptionStrategy router = new DefaultMessagingExceptionStrategy(null);
+        AbstractExceptionListener router = new DefaultMessagingExceptionStrategy(null);
         OutboundEndpoint endpoint = Mockito.mock(OutboundEndpoint.class);
         router.addEndpoint(endpoint);
         assertNotNull(router.getMessageProcessors());
@@ -46,7 +46,7 @@ public class ExceptionListenerTestCase extends AbstractMuleTestCase
         list.add(Mockito.mock(OutboundEndpoint.class));
         list.add(Mockito.mock(OutboundEndpoint.class));
 
-        AbstractExceptionStrategy router = new DefaultMessagingExceptionStrategy(null);
+        AbstractExceptionListener router = new DefaultMessagingExceptionStrategy(null);
         assertNotNull(router.getMessageProcessors());
         assertEquals(0, router.getMessageProcessors().size());
 
