@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
+      xsi:schemaLocation="
+          http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
+          http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/3.2/mule-http.xsd
+          http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/3.2/mule-jms.xsd">
+
+    <jms:activemq-connector name="jmsConnector1" specification="1.1" persistentDelivery="true" maxRedelivery="0"
+                            clientId="fileQueue"/>
+
+    <flow name="jms2httpstatic">
+        <jms:inbound-endpoint queue="jms.static" connector-ref="jmsConnector1"
+                              exchange-pattern="request-response" />
+        <http:outbound-endpoint address="http://localhost:${port1}/test"
+                                method="GET" exchange-pattern="request-response">
+        </http:outbound-endpoint>
+    </flow>
+
+    <flow name="jms2httpdynamic">
+        <jms:inbound-endpoint queue="jms.dynamic" connector-ref="jmsConnector1"
+                              exchange-pattern="request-response" />
+        <http:outbound-endpoint address="http://#[groovy:payload]"
+                                method="GET" exchange-pattern="request-response">
+        </http:outbound-endpoint>
+    </flow>
+
+    <flow name="HttpServer">
+        <inbound-endpoint address="http://localhost:${port1}/test"/>
+        <echo-component/>
+    </flow>
+</mule>
