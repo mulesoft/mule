@@ -13,6 +13,7 @@ package org.mule.tck.config;
 import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
 import org.mule.config.spring.parsers.specific.MessageProcessorDefinitionParser;
 import org.mule.endpoint.URIBuilder;
+import org.mule.tck.functional.AssertionMessageProcessor;
 import org.mule.tck.testmodels.mule.TestConnector;
 import org.mule.tck.testmodels.services.TestServiceComponent;
 import org.mule.tck.transformer.NoActionTransformer;
@@ -31,5 +32,6 @@ public class TestNamespaceHandler extends AbstractMuleNamespaceHandler
         registerIgnoredElement("return-data");
         registerIgnoredElement("callback");
         registerBeanDefinitionParser("no-action-transformer", new MessageProcessorDefinitionParser(NoActionTransformer.class));
+        registerMuleBeanDefinitionParser("assert", new MessageProcessorDefinitionParser(AssertionMessageProcessor.class));
     }
 }
