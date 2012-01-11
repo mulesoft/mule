@@ -141,4 +141,19 @@
         </xsd:annotation>
     </xsd:element>
 
+    <xsd:element name="assert" substitutionGroup="mule:abstract-message-processor">
+        <xsd:annotation>
+            <xsd:documentation>
+                A transformer that has no effect.
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexType>
+            <xsd:complexContent>
+                <xsd:extension base="mule:abstractMessageProcessorType">
+                    <xsd:attribute name="expression" use="required" />
+                </xsd:extension>
+            </xsd:complexContent>
+        </xsd:complexType>
+    </xsd:element>
+
 </xsd:schema>
