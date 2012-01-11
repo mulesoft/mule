@@ -12,6 +12,7 @@ package org.mule.endpoint;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.MessageExchangePattern;
+import org.mule.ResponseOutputStream;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -139,8 +140,10 @@ public class DynamicOutboundEndpoint implements OutboundEndpoint
         EndpointURI endpointURIForMessage = getEndpointURIForMessage(event);
         OutboundEndpoint outboundEndpoint = createStaticEndpoint(endpointURIForMessage);
 
-        event = new DefaultMuleEvent(event.getMessage(), endpointURIForMessage.getUri(),
-            event.getExchangePattern(), event.getFlowConstruct(), event.getSession());
+        event = new DefaultMuleEvent(event.getMessage(), endpointURIForMessage.getUri(), event.getMessageSourceName(),
+                                     event.getExchangePattern(), event.getFlowConstruct(), event.getSession(), event.getTimeout(),
+                                     event.getCredentials(), (ResponseOutputStream) event.getOutputStream(), event.getEncoding(),
+                                     event.isTransacted(), event.isSynchronous(), event.getReplyToDestination(), event.getReplyToHandler());
 
         return outboundEndpoint.process(event);
     }
