@@ -5,7 +5,7 @@
        xmlns:axis="http://www.mulesoft.org/schema/mule/axis"
        xmlns:https="http://www.mulesoft.org/schema/mule/https"
     xsi:schemaLocation="
-       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
        http://www.mulesoft.org/schema/mule/axis http://www.mulesoft.org/schema/mule/axis/3.2/mule-axis.xsd
        http://www.mulesoft.org/schema/mule/https http://www.mulesoft.org/schema/mule/https/3.2/mule-https.xsd">

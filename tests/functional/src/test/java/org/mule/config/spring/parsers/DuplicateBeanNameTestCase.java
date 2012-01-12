@@ -35,7 +35,7 @@ public class DuplicateBeanNameTestCase extends AbstractBadConfigTestCase
     @Test
     public void testBeanError() throws Exception
     {
-        assertErrorContains("Bean name 'child1' is already used in this file");
+        assertErrorContains("Bean name 'child1' is already used in this <beans> element");
     }
 
 }

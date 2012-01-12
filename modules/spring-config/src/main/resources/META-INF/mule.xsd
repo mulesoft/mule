@@ -10,9 +10,9 @@
 
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
     <xsd:import namespace="http://www.springframework.org/schema/beans"
-                schemaLocation="http://www.springframework.org/schema/beans/spring-beans-3.0.xsd"/>
+                schemaLocation="http://www.springframework.org/schema/beans/spring-beans-3.1.xsd"/>
     <xsd:import namespace="http://www.springframework.org/schema/context"
-                schemaLocation="http://www.springframework.org/schema/context/spring-context-3.0.xsd"/>
+                schemaLocation="http://www.springframework.org/schema/context/spring-context-3.1.xsd"/>
 
     <!--==============================================================-->
     <!--   Structure                                                  -->
@@ -119,27 +119,9 @@
 
     <xsd:group name="muleRootElements">
         <xsd:choice>
-            <xsd:element name="global-property" type="globalPropertyType">
-                <xsd:annotation>
-                    <xsd:documentation>
-                        A global property is a named string. It can be inserted in most attribute values using standard (ant-style) Spring placeholders.
-                    </xsd:documentation>
-                </xsd:annotation>
-            </xsd:element>
-            <xsd:element name="configuration" type="configurationType">
-                <xsd:annotation>
-                    <xsd:documentation>
-                        Specifies defaults and general settings for the Mule instance.
-                    </xsd:documentation>
-                </xsd:annotation>
-            </xsd:element>
-            <xsd:element name="notifications" type="notificationManagerType">
-                <xsd:annotation>
-                    <xsd:documentation>
-                        Registers listeners for notifications and associates interfaces with particular events.
-                    </xsd:documentation>
-                </xsd:annotation>
-            </xsd:element>
+            <xsd:element ref="global-property"/>
+            <xsd:element ref="configuration"/>
+            <xsd:element ref="notifications"/>
             <xsd:element ref="abstract-extension"/>
             <xsd:element ref="abstract-mixed-content-extension"/>
             <xsd:element ref="abstract-agent"/>
@@ -168,6 +150,30 @@
             <xsd:extension base="xsd:anyType"/>
         </xsd:complexContent>
     </xsd:complexType>
+
+            <xsd:element name="global-property" type="globalPropertyType">
+                <xsd:annotation>
+                    <xsd:documentation>
+                        A global property is a named string. It can be inserted in most attribute values using standard (ant-style) Spring placeholders.
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+
+            <xsd:element name="configuration" type="configurationType">
+                <xsd:annotation>
+                    <xsd:documentation>
+                        Specifies defaults and general settings for the Mule instance.
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+
+            <xsd:element name="notifications" type="notificationManagerType">
+                <xsd:annotation>
+                    <xsd:documentation>
+                        Registers listeners for notifications and associates interfaces with particular events.
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
 
     <xsd:element name="abstract-extension" abstract="true" type="abstractExtensionType">
         <xsd:annotation>

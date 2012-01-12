@@ -10,13 +10,14 @@
 
 package org.mule.config.spring;
 
+import static org.junit.Assert.assertTrue;
+
 import java.io.IOException;
 
-import org.junit.Test;
-import org.junit.After;
-import org.xml.sax.SAXException;
 import org.apache.commons.collections.map.HashedMap;
-import static org.junit.Assert.assertTrue;
+import org.junit.After;
+import org.junit.Test;
+import org.xml.sax.SAXException;
 
 public class InvalidSchemaValidationTestCase extends AbstractSchemaValidationTestCase
 {
@@ -45,7 +46,7 @@ public class InvalidSchemaValidationTestCase extends AbstractSchemaValidationTes
     {
         addSchema("http://www.mulesoft.org/schema/mule/vm","META-INF/mule-vm.xsd");
         addSchema("http://www.mulesoft.org/schema/mule/jdbc","META-INF/mule-jdbc.xsd");
-        addSchema("http://www.springframework.org/schema/beans","http://www.springframework.org/schema/beans/spring-beans-3.0.xsd");
+        addSchema("http://www.springframework.org/schema/beans", "http://www.springframework.org/schema/beans/spring-beans-3.1.xsd");
         doTest("org/mule/config/spring/schema-validation-transacted-connectors-test.xml");
     }
 

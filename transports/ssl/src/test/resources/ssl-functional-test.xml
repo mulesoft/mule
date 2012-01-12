@@ -15,7 +15,7 @@
         <ssl:server path="trustStore" storePassword="mulepassword"/>
     </ssl:connector>
 
-    <endpoint name="sendEndpoint" address="ssl://localhost:${port3}" exchange-pattern="request-response"/>
+    <ssl:endpoint name="sendEndpoint" address="ssl://localhost:${port3}" exchange-pattern="request-response"/>
 
     <ssl:endpoint name="sendManyEndpoint" address="ssl://localhost:${port2}" exchange-pattern="request-response"/>
 

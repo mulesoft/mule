@@ -4,7 +4,7 @@
        xmlns:spring="http://www.springframework.org/schema/beans"
        xmlns:client="http://www.mulesoft.org/schema/mule/client"
        xsi:schemaLocation="
-       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
        http://www.mulesoft.org/schema/mule/client http://www.mulesoft.org/schema/mule/client/3.2/mule-client.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd">
 

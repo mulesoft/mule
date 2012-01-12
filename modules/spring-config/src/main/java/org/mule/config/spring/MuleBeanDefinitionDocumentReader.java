@@ -22,11 +22,11 @@ import org.w3c.dom.Element;
  */
 public class MuleBeanDefinitionDocumentReader extends DefaultBeanDefinitionDocumentReader
 {
-
-    protected BeanDefinitionParserDelegate createHelper(XmlReaderContext readerContext, Element root)
+    @Override
+    protected BeanDefinitionParserDelegate createHelper(XmlReaderContext readerContext, Element root, BeanDefinitionParserDelegate parentDelegate)
     {
         BeanDefinitionParserDelegate delegate = new MuleHierarchicalBeanDefinitionParserDelegate(readerContext, this);
-        delegate.initDefaults(root);
+        delegate.initDefaults(root, parentDelegate);
         return delegate;
     }
 
@@ -34,6 +34,7 @@ public class MuleBeanDefinitionDocumentReader extends DefaultBeanDefinitionDocum
      * Override to reject configuration files with no namespace, e.g. mule legacy
      * configuration file.
      */
+    @Override
     protected void parseBeanDefinitions(Element root, BeanDefinitionParserDelegate delegate)
     {
         if (!StringUtils.hasLength(root.getNamespaceURI()))

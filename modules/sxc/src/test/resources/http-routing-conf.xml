@@ -6,7 +6,7 @@
        xmlns:sxc="http://www.mulesoft.org/schema/mule/sxc"
        xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
        xsi:schemaLocation="
-               http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+               http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
                http://www.mulesoft.org/schema/mule/sxc http://www.mulesoft.org/schema/mule/sxc/3.2/mule-sxc.xsd
                http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/3.2/mule-xml.xsd

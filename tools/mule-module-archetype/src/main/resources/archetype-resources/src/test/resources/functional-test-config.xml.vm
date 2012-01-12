@@ -26,7 +26,7 @@
        http://www.mulesoft.org/schema/mule/${item} http://www.mulesoft.org/schema/mule/${item}/${MuleMajorMinorVersion}/mule-${item}.xsd
 #end
 #end
-       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd">
 
     <!--
     TODO: You can define a test configuration here then from the ${ModuleName}TestCase you can fire events into
