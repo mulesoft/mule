@@ -19,8 +19,8 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.tck.AbstractMuleTestCase;
-import org.mule.util.concurrent.Latch;
 
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Assert;
@@ -29,6 +29,8 @@ public class AssertionMessageProcessor implements MessageProcessor, FlowConstruc
 {
 
     private String expression;
+    private String message = "?";
+    private int count = 1;
 
     public void setExpression(String expression)
     {
@@ -38,16 +40,18 @@ public class AssertionMessageProcessor implements MessageProcessor, FlowConstruc
     private int timeout = AbstractMuleTestCase.RECEIVE_TIMEOUT;
 
     private MuleEvent event;
-    private Latch latch = new Latch();
+    private CountDownLatch latch;
 
     private FlowConstruct flowConstruct;
     private ExpressionManager expressionManager;
+    private boolean result = true;
 
     @Override
     public void start() throws InitialisationException
     {
         this.expressionManager = flowConstruct.getMuleContext().getExpressionManager();
         this.expressionManager.validateExpression(expression);
+        latch = new CountDownLatch(count);
         FlowAssert.addAssertion(flowConstruct.getName(), this);
     }
 
@@ -55,20 +59,22 @@ public class AssertionMessageProcessor implements MessageProcessor, FlowConstruc
     public MuleEvent process(MuleEvent event) throws MuleException
     {
         this.event = event;
+        result = result && expressionManager.evaluateBoolean(expression, event.getMessage(), false, true);
         latch.countDown();
         return event;
     }
 
     public void verify() throws InterruptedException
     {
-        latch.await(timeout, TimeUnit.MILLISECONDS);
-        if (event == null)
+        boolean didntTimeout = latch.await(timeout, TimeUnit.MILLISECONDS);
+        if (!didntTimeout || event == null)
         {
-            Assert.fail("event is null");
+            Assert.fail("Flow assertion '" + message + "' failed.  No message recieved.");
         }
-        else if (!expressionManager.evaluateBoolean(expression, event.getMessage(), false, true))
+        else if (!result)
         {
-            Assert.fail("Flow assertion failed: " + expression);
+            Assert.fail("Flow assertion '" + message + "' failed. Expression " + expression
+                        + " evaluated false.");
         }
     };
 
@@ -84,4 +90,13 @@ public class AssertionMessageProcessor implements MessageProcessor, FlowConstruc
         this.flowConstruct = flowConstruct;
     }
 
+    public void setMessage(String message)
+    {
+        this.message = message;
+    }
+
+    public void setCount(int count)
+    {
+        this.count = count;
+    }
 }

@@ -1,0 +1,266 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:spring="http://www.springframework.org/schema/beans" xmlns:test="http://www.mulesoft.org/schema/mule/test"
+    xmlns:vm="http://www.mulesoft.org/schema/mule/vm" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+    xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+       http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/3.2/mule-test.xsd
+       http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.2/mule-vm.xsd
+       http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/3.2/mule-http.xsd
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd">
+
+    <message-properties-transformer scope="invocation" name="addP1">
+        <add-message-property key="P1" value="P1_VALUE" />
+    </message-properties-transformer>
+    <message-properties-transformer scope="invocation" name="addP2">
+        <add-message-property key="P2" value="P2_VALUE" />
+    </message-properties-transformer>
+    <message-properties-transformer scope="invocation" name="addP3">
+        <add-message-property key="P3" value="P3_VALUE" />
+    </message-properties-transformer>
+    <message-properties-transformer scope="invocation" name="addP4">
+        <add-message-property key="P4" value="P4_VALUE" />
+    </message-properties-transformer>
+
+    <!-- Test Flows -->
+
+    <flow name="GetInvocationPropertyInFlow" processingStrategy="synchronous">
+        <test:assert expression="#[groovy:message.getInvocationProperty('P1').equals('P1_VALUE')]" />
+    </flow>
+
+    <flow name="SetInvocationPropertyInFlow" processingStrategy="synchronous">
+        <processor ref="addP1" />
+    </flow>
+
+    <flow name="SameFlow">
+        <processor ref="addP1" />
+        <response>
+            <test:assert expression="#[header:INVOCATION:P1]" />
+            <test:assert expression="#[header:INVOCATION:P2]" />
+        </response>
+        <test:assert expression="#[header:INVOCATION:P1]" />
+        <test:assert expression="#[groovy:message.getInvocationProperty('P2')==null]" />
+        <processor ref="addP2" />
+        <test:assert expression="#[header:INVOCATION:P1]" />
+        <test:assert expression="#[header:INVOCATION:P2]" />
+    </flow>
+
+    <flow name="DifferentFlowVMOW">
+        <processor ref="addP1" />
+        <test:assert expression="#[header:INVOCATION:P1]" />
+        <vm:outbound-endpoint path="DifferentFlowVMOW-2" exchange-pattern="one-way" />
+    </flow>
+    <flow name="DifferentFlowVMOW-2">
+        <vm:inbound-endpoint path="DifferentFlowVMOW-2" exchange-pattern="one-way" />
+        <test:assert expression="#[groovy:message.getInvocationProperty('P1')==null]" />
+    </flow>
+
+    <flow name="DifferentFlowVMRR">
+        <processor ref="addP1" />
+        <test:assert expression="#[header:INVOCATION:P1]" />
+        <vm:outbound-endpoint path="DifferentFlowVMRR-2" exchange-pattern="request-response" />
+    </flow>
+    <flow name="DifferentFlowVMRR-2">
+        <vm:inbound-endpoint path="DifferentFlowVMRR-2" exchange-pattern="request-response" />
+        <test:assert expression="#[groovy:message.getInvocationProperty('P1')==null]" />
+    </flow>
+
+    <flow name="DifferentFlowHTTP">
+        <processor ref="addP1" />
+        <test:assert expression="#[header:INVOCATION:P1]" />
+        <http:outbound-endpoint address="http://localhost:${port2}" />
+    </flow>
+    <flow name="DifferentFlowHTTP-2">
+        <http:inbound-endpoint address="http://localhost:${port2}" />
+        <test:assert expression="#[groovy:message.getInvocationProperty('P1')==null]" />
+    </flow>
+
+    <flow name="AsyncFlow">
+        <test:assert expression="#[groovy:!Thread.currentThread().equals(message.getInvocationProperty('testThread'))]" />
+        <processor ref="addP3" />
+        <test:assert expression="#[header:INVOCATION:P1]" />
+        <test:assert expression="#[header:INVOCATION:P2]" />
+        <test:assert expression="#[header:INVOCATION:P3]" />
+    </flow>
+
+    <flow name="VMRequestResponseEndpointFlowMidFlow">
+        <processor ref="addP1" />
+        <vm:outbound-endpoint path="echo" exchange-pattern="request-response" />
+        <test:assert expression="#[header:INVOCATION:P1]" />
+    </flow>
+    <flow name="VMEchoFlow">
+        <vm:inbound-endpoint path="echo" />
+        <echo-component />
+    </flow>
+
+    <flow name="HTTPRequestResponseEndpointFlowMidFlow">
+        <processor ref="addP1" />
+        <http:outbound-endpoint address="http://localhost:${port1}" />
+        <test:assert expression="#[header:INVOCATION:P1]" />
+    </flow>
+    <flow name="HTPPEchoFlow">
+        <http:inbound-endpoint address="http://localhost:${port1}" />
+        <echo-component />
+    </flow>
+
+    <flow name="FlowRef">
+        <processor ref="addP1" />
+        <test:assert expression="#[header:INVOCATION:P1]" />
+        <flow-ref name="FlowRef-1" />
+        <test:assert expression="#[header:INVOCATION:P1]" />
+        <test:assert expression="#[header:INVOCATION:P2]" />
+        <test:assert expression="#[header:INVOCATION:P4]" />
+        <flow-ref name="FlowRef-2" />
+        <test:assert expression="#[header:INVOCATION:P1]" />
+        <test:assert expression="#[header:INVOCATION:P2]" />
+        <test:assert expression="#[groovy:message.getInvocationProperty('P3')==null]" />
+        <test:assert expression="#[header:INVOCATION:P4]" message="I failed" />
+    </flow>
+    <flow name="FlowRef-1" processingStrategy="synchronous">
+        <test:assert expression="#[header:INVOCATION:P1]" />
+        <processor ref="addP2" />
+        <flow-ref name="FlowRef-3" />
+        <test:assert expression="#[header:INVOCATION:P4]" message="I failed" />
+    </flow>
+    <flow name="FlowRef-2" processingStrategy="queued-asynchronous">
+        <test:assert expression="#[header:INVOCATION:P1]" />
+        <test:assert expression="#[header:INVOCATION:P2]" />
+        <processor ref="addP3" />
+        <flow-ref name="FlowRef-3" />
+        <test:assert expression="#[header:INVOCATION:P4]" />
+    </flow>
+    <flow name="FlowRef-3" processingStrategy="synchronous">
+        <test:assert expression="#[header:INVOCATION:P1]" />
+        <test:assert expression="#[header:INVOCATION:P2]" />
+        <processor ref="addP4" />
+        <test:assert expression="#[header:INVOCATION:P4]" />
+    </flow>
+
+    <flow name="SubFlowRef">
+        <processor ref="addP1" />
+        <test:assert expression="#[header:INVOCATION:P1]" />
+        <flow-ref name="SubFlowRef-1" />
+        <test:assert expression="#[header:INVOCATION:P1]" />
+        <test:assert expression="#[header:INVOCATION:P2]" />
+        <flow-ref name="SubFlowRef-2" />
+        <test:assert expression="#[header:INVOCATION:P1]" />
+        <test:assert expression="#[header:INVOCATION:P2]" />
+        <test:assert expression="#[header:INVOCATION:P3]" />
+        <test:assert expression="#[header:INVOCATION:P4]" />
+    </flow>
+    <sub-flow name="SubFlowRef-1">
+        <test:assert expression="#[header:INVOCATION:P1]" />
+        <processor ref="addP2" />
+    </sub-flow>
+    <sub-flow name="SubFlowRef-2">
+        <test:assert expression="#[header:INVOCATION:P1]" />
+        <test:assert expression="#[header:INVOCATION:P2]" />
+        <processor ref="addP3" />
+        <flow-ref name="SubFlowRef-3" />
+        <test:assert expression="#[header:INVOCATION:P4]" />
+    </sub-flow>
+    <sub-flow name="SubFlowRef-3">
+        <test:assert expression="#[header:INVOCATION:P1]" />
+        <test:assert expression="#[header:INVOCATION:P2]" />
+        <test:assert expression="#[header:INVOCATION:P3]" />
+        <processor ref="addP4" />
+    </sub-flow>
+
+    <flow name="Async">
+        <processor ref="addP1" />
+        <test:assert expression="#[header:INVOCATION:P1]" />
+        <async>
+            <processor ref="addP2" />
+            <test:assert expression="#[header:INVOCATION:P1]" />
+            <test:assert expression="#[header:INVOCATION:P2]" />
+        </async>
+        <test:assert expression="#[header:INVOCATION:P1]" />
+        <test:assert expression="#[groovy:message.getInvocationProperty('P2')==null]" />
+    </flow>
+
+    <flow name="WireTap">
+        <processor ref="addP1" />
+        <test:assert expression="#[header:INVOCATION:P1]" />
+        <wire-tap>
+            <flow-ref name="WireTap-2" />
+        </wire-tap>
+        <test:assert expression="#[header:INVOCATION:P1]" />
+        <test:assert expression="#[groovy:message.getInvocationProperty('P2')==null]" />
+    </flow>
+    <sub-flow name="WireTap-2">
+        <processor ref="addP2" />
+        <test:assert expression="#[header:INVOCATION:P1]" />
+        <test:assert expression="#[header:INVOCATION:P2]" />
+    </sub-flow>
+
+    <flow name="Enricher">
+        <processor ref="addP1" />
+        <test:assert expression="#[header:INVOCATION:P1]" />
+        <enricher target="#[variable:test]">
+            <flow-ref name="Enricher-2" />
+        </enricher>
+        <test:assert expression="#[header:INVOCATION:P1]" />
+        <test:assert expression="#[groovy:message.getInvocationProperty('P2')==null]" />
+    </flow>
+    <sub-flow name="Enricher-2">
+        <processor ref="addP2" />
+        <test:assert expression="#[header:INVOCATION:P1]" />
+        <test:assert expression="#[header:INVOCATION:P2]" />
+    </sub-flow>
+
+    <flow name="All">
+        <processor ref="addP1" />
+        <test:assert expression="#[header:INVOCATION:P1]" />
+        <all>
+            <flow-ref name="All-1" />
+            <flow-ref name="All-2" />
+        </all>
+        <test:assert expression="#[header:INVOCATION:P1]" />
+        <test:assert expression="#[header:INVOCATION:P2]" />
+        <test:assert expression="#[header:INVOCATION:P3]" />
+    </flow>
+    <flow name="AllAsync">
+        <processor ref="addP1" />
+        <test:assert expression="#[header:INVOCATION:P1]" />
+        <all>
+            <async>
+                <flow-ref name="All-1" />
+            </async>
+            <async>
+                <flow-ref name="All-2" />
+            </async>
+        </all>
+        <test:assert expression="#[header:INVOCATION:P1]" />
+        <test:assert expression="#[groovy:message.getInvocationProperty('P2')==null]" />
+        <test:assert expression="#[groovy:message.getInvocationProperty('P3')==null]" />
+    </flow>
+    <sub-flow name="All-1">
+        <processor ref="addP2" />
+        <test:assert expression="#[header:INVOCATION:P1]" />
+        <test:assert expression="#[header:INVOCATION:P2]" />
+    </sub-flow>
+    <sub-flow name="All-2">
+        <processor ref="addP3" />
+        <test:assert expression="#[header:INVOCATION:P1]" />
+        <test:assert expression="#[groovy:message.getInvocationProperty('P2')==null]" />
+        <test:assert expression="#[header:INVOCATION:P3]" />
+    </sub-flow>
+
+    <flow name="Split" processingStrategy="synchronous">
+        <processor ref="addP1" />
+        <collection-splitter />
+        <test:assert expression="#[groovy:message.getPayload() instanceof org.mule.tck.testmodels.fruit.Fruit]" count="3" />
+        <test:assert expression="#[header:INVOCATION:P1]" />
+    </flow>
+
+    <flow name="Aggregate">
+        <flow-ref name="Split" />
+        <processor ref="addP2" />
+        <collection-aggregator />
+        <test:assert expression="#[groovy:message instanceof org.mule.api.MuleMessageCollection]" />
+        <test:assert expression="#[header:INVOCATION:P1]" />
+        <test:assert expression="#[header:INVOCATION:P2]" />
+    </flow>
+
+
+</mule>

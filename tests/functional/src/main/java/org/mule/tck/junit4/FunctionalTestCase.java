@@ -10,6 +10,10 @@
 
 package org.mule.tck.junit4;
 
+import static org.junit.Assert.fail;
+
+import org.mule.MessageExchangePattern;
+import org.mule.api.MuleEvent;
 import org.mule.api.component.Component;
 import org.mule.api.component.JavaComponent;
 import org.mule.api.config.ConfigurationBuilder;
@@ -23,14 +27,12 @@ import org.mule.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.construct.AbstractPipeline;
 import org.mule.construct.Flow;
 import org.mule.construct.SimpleService;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.functional.FlowAssert;
 import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.util.IOUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
-
-import static org.junit.Assert.fail;
 
 /**
  * A base test case for tests that initialize Mule using a configuration file. The
@@ -167,5 +169,17 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase
             Flow flow = (Flow) flowConstruct;
             flow.stop();
         }
+    }
+    
+    protected void testFlow(String flowName) throws Exception
+    {
+        testFlow(flowName, getTestEvent("data", MessageExchangePattern.ONE_WAY));
+    }
+
+    protected void testFlow(String flowName, MuleEvent event) throws Exception
+    {
+        Flow flow = (Flow) muleContext.getRegistry().lookupFlowConstruct(flowName);
+        flow.process(event);
+        FlowAssert.verify(flowName);
     }
 }

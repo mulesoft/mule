@@ -151,6 +151,8 @@
             <xsd:complexContent>
                 <xsd:extension base="mule:abstractMessageProcessorType">
                     <xsd:attribute name="expression" use="required" />
+                    <xsd:attribute name="message"/>
+                    <xsd:attribute name="count" type="xsd:string"/>
                 </xsd:extension>
             </xsd:complexContent>
         </xsd:complexType>

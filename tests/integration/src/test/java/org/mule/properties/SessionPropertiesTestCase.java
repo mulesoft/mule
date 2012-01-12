@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.session;
+package org.mule.properties;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;

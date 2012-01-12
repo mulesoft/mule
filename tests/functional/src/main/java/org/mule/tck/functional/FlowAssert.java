@@ -35,9 +35,12 @@ public class FlowAssert
     {
 
         List<AssertionMessageProcessor> flowAssertions = assertions.get(flowName);
-        for (AssertionMessageProcessor assertion : flowAssertions)
+        if (flowAssertions != null)
         {
-            assertion.verify();
+            for (AssertionMessageProcessor assertion : flowAssertions)
+            {
+                assertion.verify();
+            }
         }
     }
 
