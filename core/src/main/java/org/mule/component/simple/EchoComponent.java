@@ -12,17 +12,18 @@ package org.mule.component.simple;
 
 import org.mule.api.MuleEventContext;
 import org.mule.api.component.simple.EchoService;
-import org.mule.api.lifecycle.Callable;
 
 /**
  * <code>EchoComponent</code> will log the message and return the payload back as
  * the result.
  */
-public class EchoComponent implements EchoService, Callable
+public class EchoComponent extends LogComponent implements EchoService
 {
+
     @Override
     public Object onCall(MuleEventContext context) throws Exception
     {
+        super.onCall(context);
         return context.getMessage();
     }
 
