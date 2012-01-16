@@ -27,6 +27,7 @@
                             <goal>unpack</goal>
                         </goals>
                         <configuration>
+                            <excludes>**/spring.handlers,**/spring.schemas</excludes>
                             <artifactItems>
                                 <artifactItem>
                                     <groupId>org.mule</groupId>
