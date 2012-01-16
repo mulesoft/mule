@@ -10,7 +10,9 @@
 
 package org.mule.test.integration.routing.outbound;
 
+import org.hamcrest.core.IsNull;
 import org.mule.api.MuleMessage;
+import org.mule.api.client.LocalMuleClient;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
 
@@ -20,9 +22,12 @@ import java.util.List;
 import java.util.Map;
 
 import org.junit.Test;
+import org.mule.transport.NullPayload;
 
+import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 
 public class ExceptionBasedRouterTestCase extends FunctionalTestCase
 {
@@ -98,6 +103,21 @@ public class ExceptionBasedRouterTestCase extends FunctionalTestCase
         MuleMessage reply = client.send("vm://in3", "request", props);
         assertNotNull(reply);
         assertEquals("success", reply.getPayload());
+    }
+
+    /**
+     * Test failing endpoint do not cause transaction rollback
+     */
+    @Test
+    public void testTransactionIsNotRolledBack() throws Exception
+    {
+        LocalMuleClient client = muleContext.getClient();
+        MuleMessage result = client.send("jms://in", "some message", null, RECEIVE_TIMEOUT);
+        assertThat(result, IsNull.<Object>notNullValue());
+        assertThat((NullPayload) result.getPayload(), is(NullPayload.getInstance()));
+        MuleMessage outputMessage = client.request("jms://out",LOCK_TIMEOUT);
+        assertThat(outputMessage, IsNull.<Object>notNullValue());
+        assertThat(outputMessage.getPayloadAsString(), is("some message"));
     }
 }
 

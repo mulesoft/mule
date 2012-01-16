@@ -4,9 +4,13 @@
       xmlns:mule="http://www.mulesoft.org/schema/mule/core"
       xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
       xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
+      xmlns:ftp="http://www.mulesoft.org/schema/mule/tcp"
       xsi:schemaLocation="
        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/3.1/mule-test.xsd
        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.1/mule-vm.xsd
+       http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/3.1/mule-jms.xsd
+       http://www.mulesoft.org/schema/mule/tcp http://www.mulesoft.org/schema/mule/tcp/3.1/mule-tcp.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.1/mule.xsd">
 
     <endpoint name="service1" address="vm://service1" exchange-pattern="request-response" 
@@ -17,6 +21,8 @@
         responseTransformer-refs="validateResponse" />
 
     <custom-transformer name="validateResponse" class="org.mule.tck.transformer.ValidateResponse" />
+
+    <jms:activemq-connector name="activeMQ"/>
 
     <model>
         <service name="StaticEndpointsByName">
@@ -85,6 +91,24 @@
             <test:component>
                 <test:return-data>error</test:return-data>
             </test:component>
+        </service>
+
+        <service name="transactionNotRollback">
+            <inbound>
+                <jms:inbound-endpoint queue="in" exchange-pattern="request-response">
+                    <jms:transaction action="ALWAYS_BEGIN"/>
+                </jms:inbound-endpoint>
+            </inbound>
+            <outbound>
+                <exception-based-router>
+                    <ftp:outbound-endpoint host="1.2.3.4" port="523"/>
+                    <jms:outbound-endpoint queue="out" exchange-pattern="one-way">
+                        <jms:transaction action="ALWAYS_JOIN"/>
+                    </jms:outbound-endpoint>
+                    <outbound-endpoint address="vm://service5" exchange-pattern="request-response"
+                        responseTransformer-refs="validateResponse" />
+                </exception-based-router>
+            </outbound>
         </service>
     </model>
 </mule>
