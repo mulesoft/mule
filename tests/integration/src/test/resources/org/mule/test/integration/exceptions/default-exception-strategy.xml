@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xsi:schemaLocation="
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
+       http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.2/mule-vm.xsd">
+
+    <configuration>
+        <custom-exception-strategy class="org.mule.test.integration.exceptions.DefaultExceptionStrategyTestCase$CustomExceptionStrategy"/>
+    </configuration>
+
+    <flow name="flowNoExceptionStrategy">
+        <logger/>
+    </flow>
+
+    <flow name="flowExceptionStrategy">
+        <logger/>
+        <catch-exception-strategy/>
+    </flow>
+
+    <model>
+        <catch-exception-strategy/>
+
+        <service name="serviceNoExceptionStrategy">
+            <inbound>
+                <vm:inbound-endpoint path="in1"/>
+            </inbound>
+            <log-component/>
+        </service>
+
+        <service name="serviceExceptionStrategy">
+            <inbound>
+                <vm:inbound-endpoint path="in2"/>
+            </inbound>
+            <log-component/>
+            <default-exception-strategy/>
+        </service>
+    </model>
+
+    <model>
+        <service name="serviceNoExceptionStrategyInModel">
+            <inbound>
+                <vm:inbound-endpoint path="in3"/>
+            </inbound>
+            <log-component/>
+        </service>
+    </model>
+
+</mule>

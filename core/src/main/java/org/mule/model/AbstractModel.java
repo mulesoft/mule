@@ -21,7 +21,6 @@ import org.mule.api.model.EntryPointResolver;
 import org.mule.api.model.EntryPointResolverSet;
 import org.mule.api.model.Model;
 import org.mule.component.DefaultComponentLifecycleAdapterFactory;
-import org.mule.exception.DefaultMessagingExceptionStrategy;
 import org.mule.lifecycle.EmptyLifecycleCallback;
 import org.mule.model.resolvers.DefaultEntryPointResolverSet;
 import org.mule.model.resolvers.LegacyEntryPointResolverSet;
@@ -46,7 +45,7 @@ public abstract class AbstractModel implements Model
     protected MuleContext muleContext;
     private EntryPointResolverSet entryPointResolverSet = null; // values are supplied below as required
     private LifecycleAdapterFactory lifecycleAdapterFactory = new DefaultComponentLifecycleAdapterFactory();
-    private MessagingExceptionHandler exceptionListener = new DefaultMessagingExceptionStrategy(muleContext);
+    private MessagingExceptionHandler exceptionListener;
 
     protected transient Log logger = LogFactory.getLog(getClass());
 
@@ -187,6 +186,10 @@ public abstract class AbstractModel implements Model
         this.muleContext = context;
         //Because we allow a default Exception strategy for the model we need to inject the
         //muleContext when we get it
+        if (exceptionListener == null)
+        {
+            exceptionListener = muleContext.getDefaultExceptionStrategy();
+        }
         if (exceptionListener instanceof MuleContextAware)
         {
             ((MuleContextAware)exceptionListener).setMuleContext(muleContext);

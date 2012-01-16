@@ -23,6 +23,7 @@ import org.mule.api.context.WorkManager;
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.api.context.notification.ServerNotificationListener;
 import org.mule.api.endpoint.EndpointFactory;
+import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.exception.RollbackSourceCallback;
 import org.mule.api.exception.SystemExceptionHandler;
 import org.mule.api.expression.ExpressionManager;
@@ -44,6 +45,7 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.context.notification.MuleContextNotification;
 import org.mule.context.notification.NotificationException;
 import org.mule.context.notification.ServerNotificationManager;
+import org.mule.exception.DefaultMessagingExceptionStrategy;
 import org.mule.exception.DefaultSystemExceptionStrategy;
 import org.mule.expression.DefaultExpressionManager;
 import org.mule.lifecycle.MuleContextLifecycleManager;
@@ -671,12 +673,12 @@ public class DefaultMuleContext implements MuleContext
             getExceptionListener().handleException(e, rollbackMethod);
         }
     }
-    
+
     public void handleException(Exception e)
     {
         handleException(e, null);
     }
-    
+
     public SystemExceptionHandler getExceptionListener()
     {
         return exceptionListener;
@@ -739,5 +741,16 @@ public class DefaultMuleContext implements MuleContext
     public Map<QName, Set<Object>> getConfigurationAnnotations()
     {
         return configurationAnnotations;
+    }
+
+    @Override
+    public MessagingExceptionHandler getDefaultExceptionStrategy()
+    {
+        MessagingExceptionHandler messagingExceptionHandler = getRegistry().lookupObject(MuleProperties.OBJECT_DEFAULT_GLOBAL_EXCEPTION_STRATEGY);
+        if (messagingExceptionHandler == null)
+        {
+            messagingExceptionHandler = new DefaultMessagingExceptionStrategy(this);
+        }
+        return messagingExceptionHandler;
     }
 }

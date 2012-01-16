@@ -63,6 +63,7 @@ import org.mule.config.spring.parsers.specific.ComponentDelegatingDefinitionPars
 import org.mule.config.spring.parsers.specific.ConfigurationDefinitionParser;
 import org.mule.config.spring.parsers.specific.DefaultNameMuleOrphanDefinitionParser;
 import org.mule.config.spring.parsers.specific.DefaultThreadingProfileDefinitionParser;
+import org.mule.config.spring.parsers.specific.ExceptionStrategyDefinitionParser;
 import org.mule.config.spring.parsers.specific.ExceptionTXFilterDefinitionParser;
 import org.mule.config.spring.parsers.specific.ExpressionTransformerDefinitionParser;
 import org.mule.config.spring.parsers.specific.FilterDefinitionParser;
@@ -85,6 +86,7 @@ import org.mule.config.spring.parsers.specific.NotificationDisableDefinitionPars
 import org.mule.config.spring.parsers.specific.ObjectFactoryDefinitionParser;
 import org.mule.config.spring.parsers.specific.PoolingProfileDefinitionParser;
 import org.mule.config.spring.parsers.specific.QueueStoreDefinitionParser;
+import org.mule.config.spring.parsers.specific.ReferenceExceptionStrategyDefinitionParser;
 import org.mule.config.spring.parsers.specific.RegExFilterDefinitionParser;
 import org.mule.config.spring.parsers.specific.ResponseDefinitionParser;
 import org.mule.config.spring.parsers.specific.RetryNotifierDefinitionParser;
@@ -241,10 +243,11 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("custom-agent", new DefaultNameMuleOrphanDefinitionParser());
 
         // Exception Strategies
-        registerBeanDefinitionParser("default-exception-strategy", new ChildDefinitionParser("exceptionListener", DefaultMessagingExceptionStrategy.class));
-        registerBeanDefinitionParser("catch-exception-strategy", new ChildDefinitionParser("exceptionListener", CatchMessagingExceptionStrategy.class));
+        registerBeanDefinitionParser("default-exception-strategy", new ExceptionStrategyDefinitionParser(DefaultMessagingExceptionStrategy.class));
+        registerBeanDefinitionParser("catch-exception-strategy", new ExceptionStrategyDefinitionParser(CatchMessagingExceptionStrategy.class));
+        registerMuleBeanDefinitionParser("exception-strategy", new ReferenceExceptionStrategyDefinitionParser());
         registerDeprecatedBeanDefinitionParser("default-service-exception-strategy", new ChildDefinitionParser("exceptionListener", DefaultMessagingExceptionStrategy.class), "Use default-exception-strategy instead.");
-        registerBeanDefinitionParser("custom-exception-strategy", new ChildDefinitionParser("exceptionListener", null));
+        registerBeanDefinitionParser("custom-exception-strategy", new ExceptionStrategyDefinitionParser(null));
         registerBeanDefinitionParser("commit-transaction", new ExceptionTXFilterDefinitionParser("commitTxFilter"));
         registerBeanDefinitionParser("rollback-transaction", new ExceptionTXFilterDefinitionParser("rollbackTxFilter"));
 

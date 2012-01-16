@@ -57,7 +57,7 @@
                           </xsd:documentation>
                       </xsd:annotation>
                   </xsd:element>
-                  <xsd:element ref="mule:abstract-exception-strategy" minOccurs="0"/>
+                  <xsd:element ref="mule:legacy-abstract-exception-strategy" minOccurs="0"/>
                 </xsd:sequence>
                 <xsd:attribute name="inboundAddress" type="xsd:string">
                     <xsd:annotation>

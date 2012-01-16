@@ -16,6 +16,7 @@ import org.mule.api.context.WorkManager;
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.api.context.notification.ServerNotificationListener;
 import org.mule.api.endpoint.EndpointFactory;
+import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.exception.RollbackSourceCallback;
 import org.mule.api.exception.SystemExceptionHandler;
 import org.mule.api.expression.ExpressionManager;
@@ -276,5 +277,10 @@ public interface MuleContext extends Lifecycle
      * Return all annotations seen in the configuration
      */
     Map<QName, Set<Object>> getConfigurationAnnotations();
+
+    /**
+     * @return default exception strategy. If no default exception strategy was configured it returns {@link org.mule.exception.DefaultMessagingExceptionStrategy}
+     */
+    MessagingExceptionHandler getDefaultExceptionStrategy();
 }
 

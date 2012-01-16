@@ -92,7 +92,7 @@
                           </xsd:documentation>
                       </xsd:annotation>
                   </xsd:element>
-                  <xsd:element ref="mule:abstract-exception-strategy" minOccurs="0" maxOccurs="1"/>
+                  <xsd:element ref="mule:legacy-abstract-exception-strategy" minOccurs="0" maxOccurs="1"/>
                   <!-- TODO (DDO) allow only http cache element from mule-module-cache -->
                   <xsd:element ref="mule:abstract-message-processor" minOccurs="0" maxOccurs="1" />
                 </xsd:sequence>

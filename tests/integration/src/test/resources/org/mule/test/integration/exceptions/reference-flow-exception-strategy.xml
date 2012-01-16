@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xmlns:json="http://www.mulesoft.org/schema/mule/json"
+      xsi:schemaLocation="
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
+       http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/3.2/mule-test.xsd
+       http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.2/mule-vm.xsd
+       http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/3.2/mule-jms.xsd
+       http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/3.2/mule-json.xsd">
+
+    <jms:activemq-connector name="activeMQ"/>
+
+    <catch-exception-strategy name="referencedEs">
+        <custom-processor class="org.mule.test.integration.exceptions.CatchExceptionStrategyTestCase$NewsErrorProcessor"/>
+        <json:object-to-json-transformer/>
+    </catch-exception-strategy>
+
+    <catch-exception-strategy name="anotherGlobalEs">
+        <append-string-transformer message="something"/>
+    </catch-exception-strategy>
+
+    <flow name="referenceExceptionStrategyFlow">
+        <vm:inbound-endpoint path="in" exchange-pattern="request-response"/>
+        <json:json-to-object-transformer returnClass="org.mule.test.integration.exceptions.CatchExceptionStrategyTestCase$NewsRequest"/>
+        <custom-processor class="org.mule.test.integration.exceptions.CatchExceptionStrategyTestCase$LoadNewsProcessor"/>
+        <test:component throwException="true"/>
+        <json:object-to-json-transformer/>
+        <exception-strategy ref="referencedEs"/>
+    </flow>
+
+    <flow name="otherFlowWithSameReferencedExceptionStrategy">
+        <logger/>
+        <exception-strategy ref="referencedEs"/>
+    </flow>
+
+    <flow name="anotherFlowUsingDifferentExceptionStrategy">
+        <logger/>
+        <exception-strategy ref="anotherGlobalEs"/>
+    </flow>
+
+    <flow name="configuredExceptionStrategyFlow">
+        <vm:inbound-endpoint path="in2" exchange-pattern="request-response"/>
+        <json:json-to-object-transformer returnClass="org.mule.test.integration.exceptions.CatchExceptionStrategyTestCase$NewsRequest"/>
+        <custom-processor class="org.mule.test.integration.exceptions.CatchExceptionStrategyTestCase$LoadNewsProcessor"/>
+        <test:component throwException="true"/>
+        <json:object-to-json-transformer/>
+        <default-exception-strategy/>
+    </flow>
+
+</mule>

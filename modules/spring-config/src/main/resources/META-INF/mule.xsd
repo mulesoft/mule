@@ -129,6 +129,7 @@
             <xsd:element ref="abstract-transaction-manager"/>
             <xsd:element ref="abstract-connector"/>
             <xsd:element ref="abstract-global-endpoint"/>
+            <xsd:element ref="abstract-exception-strategy"/>
             <xsd:element ref="abstract-flow-construct" />
             <xsd:element ref="flow" />
             <xsd:element ref="sub-flow" />
@@ -1144,6 +1145,13 @@
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:element>
+                    <xsd:element ref="abstract-exception-strategy" minOccurs="0">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                The default exception strategy, used by flows and services.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
                 </xsd:sequence>
                 <xsd:attribute name="defaultResponseTimeout" type="xsd:string" default="10000">
                     <xsd:annotation>
@@ -1319,7 +1327,7 @@
         <xsd:complexContent>
             <xsd:extension base="annotatedType">
                 <xsd:sequence>
-                    <xsd:element ref="abstract-exception-strategy" minOccurs="0"/>
+                    <xsd:element ref="legacy-abstract-exception-strategy" minOccurs="0"/>
                     <xsd:group ref="entryPointResolvers"/>
                     <xsd:element ref="abstract-service" minOccurs="0" maxOccurs="unbounded"/>
                 </xsd:sequence>
@@ -1710,7 +1718,7 @@
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:element>
-                    <xsd:element ref="abstract-exception-strategy" minOccurs="0" />
+                    <xsd:element ref="legacy-abstract-exception-strategy" minOccurs="0" />
                     <xsd:element ref="abstract-message-info-mapping" minOccurs="0">
                         <xsd:annotation>
                             <xsd:documentation>
@@ -1741,7 +1749,16 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="abstract-exception-strategy" abstract="true" type="exceptionStrategyType">
+    <!-- This is left in for backwards-compatibility only, remove for next major version. -->
+    <xsd:element name="legacy-abstract-exception-strategy" abstract="true" type="exceptionStrategyType">
+        <xsd:annotation>
+            <xsd:documentation>
+                Legacy placeholder for an exception strategy element. Exception strategies define how Mule should react to errors.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:element name="abstract-exception-strategy" abstract="true" type="exceptionStrategyType" substitutionGroup="legacy-abstract-exception-strategy">
         <xsd:annotation>
             <xsd:documentation>
                 A placeholder for an exception strategy element. Exception strategies define how Mule should react to errors.
@@ -1750,17 +1767,59 @@
     </xsd:element>
 
     <xsd:complexType name="exceptionStrategyType">
-        <xsd:attribute name="enableNotifications" type="xsd:boolean">
-            <xsd:annotation>
-                <xsd:documentation>Determines whether ExceptionNotifications will be fired from this strategy when an exception occurs. Default is true.
-                </xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
+        <xsd:annotation>
+            <xsd:documentation>
+                Base type for every exception strategy.
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexContent>
+            <xsd:extension base="annotatedType"/>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="referenceExceptionStrategyType">
+        <xsd:annotation>
+            <xsd:documentation>
+                Used to reference another exception strategy within flow, service or global exception strategy.
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexContent>
+            <xsd:extension base="exceptionStrategyType">
+                <xsd:attribute name="ref" type="xsd:string" use="required">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The name of the filter to use.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="abstractNotificationExceptionStrategyType">
+        <xsd:complexContent>
+            <xsd:extension base="exceptionStrategyType">
+                <xsd:attribute name="enableNotifications" type="xsd:boolean">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Determines whether ExceptionNotifications will be fired from this strategy when an exception occurs. Default is true.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="name" type="substitutableName" use="optional">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Name of the exception strategy that will be used in ref attribute of 'exception-strategy' element
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
     </xsd:complexType>
 
     <xsd:complexType name="abstractExceptionStrategyType">
         <xsd:complexContent>
-            <xsd:extension base="exceptionStrategyType">
+            <xsd:extension base="abstractNotificationExceptionStrategyType">
                 <xsd:sequence>
                     <xsd:element name="commit-transaction" type="exceptionPatternType" maxOccurs="1" minOccurs="0">
                         <xsd:annotation>
@@ -2130,7 +2189,7 @@
                             </xsd:complexType>
                         </xsd:element>
                     </xsd:choice>
-                    <xsd:element ref="abstract-exception-strategy" minOccurs="0"/>
+                    <xsd:element ref="legacy-abstract-exception-strategy" minOccurs="0"/>
                     <xsd:element ref="abstract-message-info-mapping" minOccurs="0">
                         <xsd:annotation>
                             <xsd:documentation>
@@ -2423,7 +2482,7 @@
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:element>
-                    <xsd:element ref="abstract-exception-strategy" minOccurs="0"/>
+                    <xsd:element ref="legacy-abstract-exception-strategy" minOccurs="0"/>
                 </xsd:sequence>
                 <xsd:attribute name="address" type="xsd:string">
                     <xsd:annotation>
@@ -2502,7 +2561,7 @@
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:element>
-                    <xsd:element ref="abstract-exception-strategy" minOccurs="0"/>
+                    <xsd:element ref="legacy-abstract-exception-strategy" minOccurs="0"/>
                 </xsd:sequence>
                 <xsd:attribute name="inboundAddress" type="xsd:string">
                     <xsd:annotation>
@@ -2596,7 +2655,7 @@
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:element>
-                    <xsd:element ref="abstract-exception-strategy" minOccurs="0"/>
+                    <xsd:element ref="legacy-abstract-exception-strategy" minOccurs="0"/>
                 </xsd:sequence>
                 <xsd:attribute name="inboundAddress" type="xsd:string">
                     <xsd:annotation>
@@ -4712,7 +4771,7 @@
     <!--==============================================================-->
 
     <xsd:element name="default-exception-strategy" type="serviceExceptionStrategyType"
-                 substitutionGroup="abstract-exception-strategy">
+                 substitutionGroup="legacy-abstract-exception-strategy">
         <xsd:annotation>
             <xsd:documentation>
                 Provides default exception handling.
@@ -4729,9 +4788,18 @@
         </xsd:annotation>
     </xsd:element>
 
+    <xsd:element name="exception-strategy" type="referenceExceptionStrategyType"
+                 substitutionGroup="abstract-exception-strategy">
+        <xsd:annotation>
+            <xsd:documentation>
+                Exception strategy used to reference global exceptions within a flow or service.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
     <xsd:complexType name="catchExceptionStrategyType">
         <xsd:complexContent>
-            <xsd:extension base="exceptionStrategyType">
+            <xsd:extension base="abstractNotificationExceptionStrategyType">
                 <xsd:sequence>
                     <xsd:group ref="messageProcessorOrOutboundEndpoint" minOccurs="0" maxOccurs="unbounded">
                         <xsd:annotation>
@@ -4791,7 +4859,7 @@
 
     <!-- This is left in for backwards-compatibility only, remove for next major version. -->
     <xsd:element name="default-service-exception-strategy" type="serviceExceptionStrategyType"
-                 substitutionGroup="abstract-exception-strategy">
+                 substitutionGroup="legacy-abstract-exception-strategy">
         <xsd:annotation>
             <xsd:documentation>
                 Deprecated: Use default-exception-strategy instead.

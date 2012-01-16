@@ -142,6 +142,7 @@ public class MuleProperties
     public static final String OBJECT_DEFAULT_MESSAGE_REQUESTER_THREADING_PROFILE = "_defaultMessageRequesterThreadingProfile";
     public static final String OBJECT_DEFAULT_MESSAGE_RECEIVER_THREADING_PROFILE = "_defaultMessageReceiverThreadingProfile";
     public static final String OBJECT_DEFAULT_SERVICE_THREADING_PROFILE = "_defaultServiceThreadingProfile";
+    public static final String OBJECT_DEFAULT_GLOBAL_EXCEPTION_STRATEGY = "_defaultGlobalExceptionStrategy";
     public static final String OBJECT_DEFAULT_RETRY_POLICY_TEMPLATE = "_defaultRetryPolicyTemplate";
     public static final String OBJECT_MULE_CONFIGURATION = "_muleConfiguration";
     public static final String OBJECT_MULE_NAMESPACE_MANAGER = "_muleNamespaceManager";
