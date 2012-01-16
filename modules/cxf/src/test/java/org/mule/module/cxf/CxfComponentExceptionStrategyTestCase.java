@@ -12,6 +12,7 @@ package org.mule.module.cxf;
 
 import org.mule.api.MessagingException;
 import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.config.ExceptionHelper;
 import org.mule.module.client.MuleClient;
 import org.mule.module.cxf.testmodels.CustomFault;
 import org.mule.module.cxf.testmodels.CxfEnabledFaultMessage;
@@ -64,7 +65,7 @@ public class CxfComponentExceptionStrategyTestCase extends AbstractServiceAndFlo
         }
         catch (MessagingException e)
         {
-            assertTrue(e.getCause().getCause() instanceof CxfEnabledFaultMessage);
+            assertTrue(ExceptionHelper.getRootException(e) instanceof CxfEnabledFaultMessage);
         }
     }
 
@@ -102,7 +103,7 @@ public class CxfComponentExceptionStrategyTestCase extends AbstractServiceAndFlo
         }
         catch (MessagingException e)
         {
-            assertTrue(e.getCause().getCause() instanceof Fault);
+            assertTrue(ExceptionHelper.getRootException(e) instanceof Fault);
         }
     }
 
