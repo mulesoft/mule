@@ -25,6 +25,13 @@
         <custom-processor class="org.mule.tck.testmodels.mule.FailingRouter" />
         <test:component />
     </flow>
+    <flow name="FlowRefException" processingStrategy="synchronous">
+        <file:inbound-endpoint path=".mule/flowRefException" />
+        <flow-ref name="failingFlow"/>
+    </flow>
+    <flow name="failingFlow" processingStrategy="synchronous">
+        <test:component/>
+    </flow>
     <flow name="ComponentException">
         <file:inbound-endpoint path=".mule/componentException" />
         <test:component throwException="true" />

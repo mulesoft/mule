@@ -10,11 +10,17 @@
 
 package org.mule.transport.file.reliability;
 
+import org.mule.api.MuleEventContext;
+import org.mule.api.construct.FlowConstruct;
+import org.mule.construct.Flow;
+import org.mule.tck.functional.EventCallback;
+import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.tck.probe.Probe;
 
 import java.io.File;
 
 import org.junit.Test;
+import org.mule.util.concurrent.Latch;
 
 
 public class InboundMessageLossFlowTestCase extends InboundMessageLossTestCase
@@ -81,4 +87,44 @@ public class InboundMessageLossFlowTestCase extends InboundMessageLossTestCase
             }
         });
     }
+
+    @Test
+    public void testFlowRefException() throws Exception
+    {
+        if (variant.equals(ConfigVariant.SERVICE))
+        {
+            return;
+        }
+        final Latch exceptionThrownLatch = new Latch();
+        tmpDir = createFolder(".mule/flowRefException");
+        final File file = createDataFile(tmpDir, "test1.txt");
+        FunctionalTestComponent ftc = getFunctionalTestComponent("failingFlow");
+        ftc.setEventCallback(new EventCallback()
+        {
+            @Override
+            public void eventReceived(MuleEventContext context, Object component) throws Exception
+            {
+                exceptionThrownLatch.release();
+                throw new RuntimeException();
+            }
+        });
+        Flow flow = (Flow)getFlowConstruct("FlowRefException");
+        flow.stop();
+        prober.check(new Probe()
+        {
+            @Override
+            public boolean isSatisfied()
+            {
+                // Delivery failed so message should have been restored at the source
+                return file.exists();
+            }
+
+            @Override
+            public String describeFailure()
+            {
+                return "File should have been restored";
+            }
+        });
+    }
+
 }
