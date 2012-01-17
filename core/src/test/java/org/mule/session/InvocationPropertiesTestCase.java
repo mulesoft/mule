@@ -20,6 +20,7 @@ import static org.junit.Assert.fail;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
+import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transport.PropertyScope;
@@ -29,7 +30,8 @@ import org.mule.tck.SensingNullMessageProcessor;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.util.SerializationUtils;
 
-import java.util.Collections;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.commons.lang.SerializationException;
 import org.junit.Test;
@@ -147,8 +149,20 @@ public class InvocationPropertiesTestCase extends AbstractMuleContextTestCase
             getTestService(), muleContext));
 
         SensingNullMessageProcessor flowListener = new SensingNullMessageProcessor();
+        List<MessageProcessor> processors = new ArrayList<MessageProcessor>();
+        processors.add(new MessageProcessor()
+        {
+            
+            public MuleEvent process(MuleEvent event) throws MuleException
+            {
+                event.getMessage().setInvocationProperty("newKey", "newValue");
+                return event;
+            }
+        });
+        processors.add(flowListener);
+        
         SimpleFlowConstruct flow = new SimpleFlowConstruct("flow", muleContext);
-        flow.setMessageProcessors(Collections.<MessageProcessor> singletonList(flowListener));
+        flow.setMessageProcessors(processors);
         flow.initialise();
         flow.start();
 
@@ -173,9 +187,8 @@ public class InvocationPropertiesTestCase extends AbstractMuleContextTestCase
 
         // Session properties set after new flow are available in message processor
         // before new flow
-        processedEvent.getMessage().setInvocationProperty("newKey", "newValue");
-        assertEquals("newValue", processedEvent.getMessage().getInvocationProperty("newKey"));
         assertEquals("newValue", event.getMessage().getInvocationProperty("newKey"));
+        assertEquals("newValue", processedEvent.getMessage().getInvocationProperty("newKey"));
 
         flow.stop();
         flow.dispose();
