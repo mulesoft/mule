@@ -15,7 +15,7 @@ import org.junit.Test;
 import org.junit.runners.Parameterized;
 import org.mule.api.*;
 import org.mule.api.client.LocalMuleClient;
-import org.mule.api.lifecycle.Lifecycle;
+import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.exception.AbstractMessagingExceptionStrategy;
 import org.mule.message.ExceptionMessage;
@@ -24,9 +24,7 @@ import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.NullPayload;
-import org.mule.transport.email.AbstractGreenMailSupport;
 import org.mule.transport.email.FixedPortGreenMailSupport;
-import org.mule.transport.email.GreenMailUtilities;
 import org.mule.transport.email.functional.AbstractEmailFunctionalTestCase;
 import org.mule.util.concurrent.Latch;
 
@@ -206,7 +204,6 @@ public class ExceptionStrategyCommonScenariosTestCase extends AbstractServiceAnd
         LocalMuleClient client = muleContext.getClient();
         client.dispatch("jms://in6?connector=jmsConnectorNoRedelivery", MESSAGE_TO_SEND, null);
         endMessageProcessorExecuted.await(TIMEOUT, TimeUnit.MILLISECONDS);
-        ((Lifecycle) getFlowConstruct("RollbackTransactionAndSendEmail")).stop();
         MuleMessage response = client.request("jms://in6?connector=jmsConnectorNoRedelivery", TIMEOUT);
         assertThat(response, IsNull.<Object>notNullValue());
         assertThat(response.getPayloadAsString(), is(MESSAGE_TO_SEND));
@@ -222,6 +219,10 @@ public class ExceptionStrategyCommonScenariosTestCase extends AbstractServiceAnd
         public MuleEvent process(MuleEvent event) throws MuleException
         {
             endMessageProcessorExecuted.release();
+            if (event.getFlowConstruct() instanceof Stoppable)
+            {
+                ((Stoppable)event.getFlowConstruct()).stop();
+            }
             return event;
         }
     }
