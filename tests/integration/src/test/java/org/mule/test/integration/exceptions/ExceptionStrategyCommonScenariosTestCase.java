@@ -9,6 +9,13 @@
  */
 package org.mule.test.integration.exceptions;
 
+import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsInstanceOf.instanceOf;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertEquals;
+
 import org.hamcrest.core.IsNull;
 import org.junit.Rule;
 import org.junit.Test;
@@ -24,9 +31,7 @@ import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.NullPayload;
-import org.mule.transport.email.AbstractGreenMailSupport;
 import org.mule.transport.email.FixedPortGreenMailSupport;
-import org.mule.transport.email.GreenMailUtilities;
 import org.mule.transport.email.functional.AbstractEmailFunctionalTestCase;
 import org.mule.util.concurrent.Latch;
 
@@ -37,10 +42,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
-
-import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsInstanceOf.instanceOf;
-import static org.junit.Assert.*;
 
 public class ExceptionStrategyCommonScenariosTestCase extends AbstractServiceAndFlowTestCase
 {
