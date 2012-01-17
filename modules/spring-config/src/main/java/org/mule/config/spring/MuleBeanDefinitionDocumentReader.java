@@ -22,11 +22,20 @@ import org.w3c.dom.Element;
  */
 public class MuleBeanDefinitionDocumentReader extends DefaultBeanDefinitionDocumentReader
 {
+
     @Override
     protected BeanDefinitionParserDelegate createHelper(XmlReaderContext readerContext, Element root, BeanDefinitionParserDelegate parentDelegate)
     {
         BeanDefinitionParserDelegate delegate = new MuleHierarchicalBeanDefinitionParserDelegate(readerContext, this);
         delegate.initDefaults(root, parentDelegate);
+        return delegate;
+    }
+
+    /* Keep backward compatibility with spring 3.0 */
+    protected BeanDefinitionParserDelegate createHelper(XmlReaderContext readerContext, Element root)
+    {
+        BeanDefinitionParserDelegate delegate = new MuleHierarchicalBeanDefinitionParserDelegate(readerContext, this);
+        delegate.initDefaults(root);
         return delegate;
     }
 
