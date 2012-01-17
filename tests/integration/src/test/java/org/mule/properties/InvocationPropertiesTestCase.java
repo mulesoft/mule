@@ -11,6 +11,7 @@
 package org.mule.properties;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 import org.mule.DefaultMuleEvent;
@@ -73,34 +74,47 @@ public class InvocationPropertiesTestCase extends org.mule.tck.junit4.Functional
     }
 
     @Test
-    public void sameFlow() throws Exception
+    public void overwritePropertyValueInFlow() throws Exception
+    {
+        MuleMessage message = new DefaultMuleMessage("data", muleContext);
+        MuleEvent event = new DefaultMuleEvent(message, getTestInboundEndpoint(""), getTestService());
+
+        message.setProperty("P1", "P1_VALUE", PropertyScope.INVOCATION);
+
+        testFlow("OverwritePropertyValueInFlow", event);
+
+        assertEquals("P1_VALUE_NEW", event.getMessage().getProperty("P1", PropertyScope.INVOCATION));
+    }
+
+    @Test
+    public void propagationInSameFlow() throws Exception
     {
         testFlow("SameFlow");
     }
 
     @Test
-    public void differentFlowVMRR() throws Exception
+    public void noPropagationInDifferentFlowVMRequestResponse() throws Exception
     {
         testFlow("DifferentFlowVMRR");
         FlowAssert.verify("DifferentFlowVMRR-2");
     }
 
     @Test
-    public void differentFlowVMOW() throws Exception
+    public void noPropagationInDifferentFlowVMOneWay() throws Exception
     {
         testFlow("DifferentFlowVMOW");
         FlowAssert.verify("DifferentFlowVMOW-2");
     }
 
     @Test
-    public void differentFlowHTTP() throws Exception
+    public void noPropagationInDifferentFlowHttp() throws Exception
     {
         testFlow("DifferentFlowHTTP");
         FlowAssert.verify("DifferentFlowHTTP-2");
     }
 
     @Test
-    public void asyncOneWayFlow() throws Exception
+    public void propagationThroughOneWayFlowSedaQueue() throws Exception
     {
         MuleMessage message = new DefaultMuleMessage("data", muleContext);
         MuleEvent event = new DefaultMuleEvent(message, getTestInboundEndpoint(""), getTestService());
@@ -110,29 +124,28 @@ public class InvocationPropertiesTestCase extends org.mule.tck.junit4.Functional
         message.setInvocationProperty("P2", nonSerializable);
         message.setInvocationProperty("testThread", Thread.currentThread());
 
-        Flow flow = (Flow) muleContext.getRegistry().lookupFlowConstruct("AsyncFlow");
-        flow.process(event);
+        testFlow("AsyncFlow", event);
 
-        FlowAssert.verify("AsyncFlow");
-
+        assertNotNull(message.getInvocationProperty("P1"));
+        assertNotNull(message.getInvocationProperty("P2"));
         assertNull(message.getInvocationProperty("P3"));
     }
 
     @Test
-    public void vmRequestResponseOutboundEndpointMidFlow() throws Exception
+    public void propagationWithVMRequestResponseOutboundEndpointMidFlow() throws Exception
     {
         testFlow("VMRequestResponseEndpointFlowMidFlow");
     }
 
     @Test
     @Ignore
-    public void httpRequestResponseOutboundEndpointMidFlow() throws Exception
+    public void propagationWithHTTPRequestResponseOutboundEndpointMidFlow() throws Exception
     {
         testFlow("HTTPRequestResponseEndpointFlowMidFlow");
     }
 
     @Test
-    public void flowRef() throws Exception
+    public void propagationThroughFlowRefToFlow() throws Exception
     {
         testFlow("FlowRef");
         FlowAssert.verify("FlowRef-1");
@@ -141,37 +154,83 @@ public class InvocationPropertiesTestCase extends org.mule.tck.junit4.Functional
     }
 
     @Test
-    public void subFlowRef() throws Exception
+    public void overwritePropertyValueInFlowViaFlowRef() throws Exception
+    {
+        testFlow("OverwriteInFlowRef");
+    }
+
+    @Test
+    public void propagationThroughFlowRefToSubFlow() throws Exception
     {
         testFlow("SubFlowRef");
     }
 
     @Test
-    public void async() throws Exception
+    public void overwritePropertyValueInSubFlowViaFlowRef() throws Exception
+    {
+        testFlow("OverwriteInSubFlowRef");
+    }
+    
+    @Test
+    public void propagationThroughAsyncElement() throws Exception
     {
         testFlow("Async");
     }
 
     @Test
-    public void wireTap() throws Exception
+    public void propertyAddedInAsyncElementNotAddedinFlow() throws Exception
+    {
+        testFlow("Async2");
+    }
+
+    @Test
+    public void propagationThroughWireTap() throws Exception
     {
         testFlow("WireTap");
     }
 
     @Test
-    public void enricher() throws Exception
+    public void propertyAddedInWireTapNotAddedinFlow() throws Exception
+    {
+        testFlow("WireTap2");
+    }
+
+    @Test
+    public void propagationThroughEnricher() throws Exception
     {
         testFlow("Enricher");
     }
 
     @Test
-    @Ignore
+    public void propertyAddedInEnricherNotAddedinFlow() throws Exception
+    {
+        testFlow("Enricher2");
+    }
+
+    @Test
     /** Router drops invocation properties **/
-    public void all() throws Exception
+    public void propagateToRoutesInAll() throws Exception
     {
         testFlow("All");
     }
 
+    @Test
+    @Ignore
+    /** Router drops invocation properties **/
+    public void propagateThroughAllRouterWithResults() throws Exception
+    {
+        testFlow("All");
+    }
+
+    @Test
+    @Ignore
+    /** Router drops invocation properties **/
+    public void propagateThroughAllRouterWithNoResults() throws Exception
+    {
+        testFlow("All");
+    }
+
+    
     @Test
     @Ignore
     /** Router drops invocation properties **/
@@ -181,7 +240,7 @@ public class InvocationPropertiesTestCase extends org.mule.tck.junit4.Functional
     }
 
     @Test
-    public void split() throws Exception
+    public void propogationOfPropertiesInMessageSplitWithSplitter() throws Exception
     {
         List<Fruit> fruitList = new ArrayList<Fruit>();
         fruitList.add(new Apple());
@@ -193,7 +252,7 @@ public class InvocationPropertiesTestCase extends org.mule.tck.junit4.Functional
     @Test
     @Ignore
     /** Aggregator drops invocation properties **/
-    public void aggregate() throws Exception
+    public void aggregationOfPropertiesFromMultipleMessageWithAggregator() throws Exception
     {
         List<Fruit> fruitList = new ArrayList<Fruit>();
         fruitList.add(new Apple());
