@@ -11,6 +11,7 @@
 package org.mule.transport;
 
 import org.mule.DefaultMuleEvent;
+import org.mule.DefaultMuleMessage;
 import org.mule.RequestContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -86,6 +87,7 @@ public abstract class AbstractMessageDispatcher extends AbstractTransportMessage
                     event.getSession().merge(storedSession);
                     resultEvent = new DefaultMuleEvent(resultMessage, event);
                     RequestContext.setEvent(resultEvent);
+                    ((DefaultMuleMessage) resultEvent.getMessage()).copyInvocationProperties(event.getMessage());
                     // TODO It seems like this should go here but it causes unwanted behaviour and breaks test cases.
                     //if (!disableTransportTransformer)
                     //{

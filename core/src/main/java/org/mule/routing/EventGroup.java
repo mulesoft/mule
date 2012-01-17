@@ -12,16 +12,17 @@ package org.mule.routing;
 
 import org.mule.DefaultMessageCollection;
 import org.mule.DefaultMuleEvent;
+import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
+import org.mule.api.MuleMessage;
 import org.mule.api.MuleMessageCollection;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.store.ListableObjectStore;
 import org.mule.api.store.ObjectStoreException;
 import org.mule.api.store.ObjectStoreManager;
 import org.mule.util.ClassUtils;
-import org.mule.util.MuleLogger;
 import org.mule.util.store.DeserializationPostInitialisable;
 
 import java.io.Serializable;
@@ -363,7 +364,9 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
 
             for (Serializable id : events.allKeys())
             {
-                col.addMessage(events.retrieve(id).getMessage());
+                MuleMessage message = events.retrieve(id).getMessage(); 
+                col.addMessage(message);
+                ((DefaultMuleMessage)col).copyInvocationProperties(message);
             }
         }
         return col;
