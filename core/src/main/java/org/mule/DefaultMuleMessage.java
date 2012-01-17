@@ -57,7 +57,6 @@ import javax.activation.DataHandler;
 import javax.activation.FileDataSource;
 
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
-import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicReference;
 
@@ -239,6 +238,8 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         }
     }
 
+
+    
     private void copyAttachments(MuleMessage previous)
     {
         if (previous.getInboundAttachmentNames().size() > 0)
@@ -1726,4 +1727,18 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         newMessage.setReplyTo(getReplyTo());
         newMessage.setEncoding(getEncoding());
     }
+
+    /**
+     * This method has only be added to resolve a bug in 3.1/3.2. It will be removed
+     * in Mule 3.3.
+     * 
+     * @param existingMessage
+     */
+    @Deprecated
+    public void copyInvocationProperties(MuleMessage existingMessage)
+    {
+        Map<String, Object> invocationProperties = ((DefaultMuleMessage) existingMessage).properties.getScopedProperties(PropertyScope.INVOCATION);
+        addProperties(invocationProperties, PropertyScope.INVOCATION);
+    }
+
 }

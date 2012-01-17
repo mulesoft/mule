@@ -3,7 +3,7 @@
     xmlns:spring="http://www.springframework.org/schema/beans" xmlns:test="http://www.mulesoft.org/schema/mule/test"
     xmlns:vm="http://www.mulesoft.org/schema/mule/vm" xmlns:http="http://www.mulesoft.org/schema/mule/http"
     xsi:schemaLocation="
-       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/3.1/mule-test.xsd
        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.1/mule-vm.xsd
        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/3.1/mule-http.xsd
@@ -86,14 +86,10 @@
     </flow>
 
     <flow name="AsyncFlow">
-        <flow-ref name="AsyncFlow-2"/>
-    </flow>
-    <flow name="AsyncFlow-2">
-        <test:assert expression="#[groovy:!Thread.currentThread().equals(message.getInvocationProperty('testThread'))]" />
-        <processor ref="addP3" />
+        <vm:inbound-endpoint path="AsyncFlow">
+            <processor ref="addP1"/>
+        </vm:inbound-endpoint>
         <test:assert expression="#[header:INVOCATION:P1]" />
-        <test:assert expression="#[header:INVOCATION:P2]" />
-        <test:assert expression="#[header:INVOCATION:P3]" />
     </flow>
 
     <flow name="VMRequestResponseEndpointFlowMidFlow">
@@ -102,7 +98,7 @@
         <test:assert expression="#[header:INVOCATION:P1]" />
     </flow>
     <flow name="VMEchoFlow">
-        <vm:inbound-endpoint path="echo" />
+        <vm:inbound-endpoint path="echo" exchange-pattern="request-response" />
         <echo-component />
     </flow>
 
@@ -323,7 +319,6 @@
             count="3" />
         <test:assert expression="#[header:INVOCATION:P1]" />
         <threading-profile doThreading="false" />
-
     </flow>
 
     <flow name="Aggregate">
@@ -334,6 +329,5 @@
         <test:assert expression="#[header:INVOCATION:P1]" />
         <test:assert expression="#[header:INVOCATION:P2]" />
     </flow>
-
 
 </mule>

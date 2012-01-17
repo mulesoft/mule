@@ -11,12 +11,9 @@
 package org.mule.properties;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
-import org.mule.MessageExchangePattern;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.transport.PropertyScope;
@@ -31,9 +28,7 @@ import org.mule.tck.testmodels.fruit.Orange;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.ibeans.annotation.meta.MEP;
 import org.junit.After;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -120,35 +115,22 @@ public class InvocationPropertiesTestCase extends org.mule.tck.junit4.Functional
     }
 
     @Test
-    @Ignore /** Can't be tested in 3.1.x as flow.process() is always sync */
     public void propagationThroughOneWayFlowSedaQueue() throws Exception
     {
         MuleMessage message = new DefaultMuleMessage("data", muleContext);
-        MuleEvent event = new DefaultMuleEvent(message,
-            getTestInboundEndpoint(MessageExchangePattern.ONE_WAY), getTestSession(getTestService(),
-                muleContext));
 
-        Object nonSerializable = new Object();
-        message.setInvocationProperty("P1", "value");
-        message.setInvocationProperty("P2", nonSerializable);
-        message.setInvocationProperty("testThread", Thread.currentThread());
-
-        testFlow("AsyncFlow", event);
-
-        assertNotNull(message.getInvocationProperty("P1"));
-        assertNotNull(message.getInvocationProperty("P2"));
-        assertNull(message.getInvocationProperty("P3"));
+        muleContext.getClient().dispatch("vm://AsyncFlow", message);
+        
+        FlowAssert.verify("AsyncFlow");
     }
 
     @Test
-    @Ignore
     public void propagationWithVMRequestResponseOutboundEndpointMidFlow() throws Exception
     {
         testFlow("VMRequestResponseEndpointFlowMidFlow");
     }
 
     @Test
-    @Ignore
     public void propagationWithHTTPRequestResponseOutboundEndpointMidFlow() throws Exception
     {
         testFlow("HTTPRequestResponseEndpointFlowMidFlow");
@@ -218,31 +200,24 @@ public class InvocationPropertiesTestCase extends org.mule.tck.junit4.Functional
     }
 
     @Test
-    /** Router drops invocation properties **/
     public void propagateToRoutesInAll() throws Exception
     {
         testFlow("All");
     }
 
     @Test
-    @Ignore
-    /** Router drops invocation properties **/
     public void propagateThroughAllRouterWithResults() throws Exception
     {
-        testFlow("All");
+        testFlow("All2");
     }
 
     @Test
-    @Ignore
-    /** Router drops invocation properties **/
     public void propagateThroughAllRouterWithNoResults() throws Exception
     {
-        testFlow("All");
+        testFlow("All3");
     }
 
     @Test
-    @Ignore
-    /** Router drops invocation properties **/
     public void allAsync() throws Exception
     {
         testFlow("AllAsync");
@@ -259,8 +234,6 @@ public class InvocationPropertiesTestCase extends org.mule.tck.junit4.Functional
     }
 
     @Test
-    @Ignore
-    /** Aggregator drops invocation properties **/
     public void aggregationOfPropertiesFromMultipleMessageWithAggregator() throws Exception
     {
         List<Fruit> fruitList = new ArrayList<Fruit>();
