@@ -14,13 +14,13 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
 import static org.junit.Assert.fail;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.MessageExchangePattern;
 import org.mule.api.MuleEvent;
+import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transport.PropertyScope;
@@ -30,7 +30,8 @@ import org.mule.tck.SensingNullMessageProcessor;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.util.SerializationUtils;
 
-import java.util.Collections;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang.SerializationException;
@@ -213,16 +214,26 @@ public class InvocationPropertiesTestCase extends AbstractMuleContextTestCase
     /**
      * When invoking a Flow directly session properties are preserved
      */
-    @Test
     public void processFlowInvocationPropertyPropagation() throws Exception
     {
         MuleMessage message = new DefaultMuleMessage("data", muleContext);
-        MuleEvent event = new DefaultMuleEvent(message, MessageExchangePattern.REQUEST_RESPONSE,
-            getTestService());
-
+        MuleEvent event = new DefaultMuleEvent(message, getTestInboundEndpoint(""), getTestService());
         SensingNullMessageProcessor flowListener = new SensingNullMessageProcessor();
+
+        List<MessageProcessor> processors = new ArrayList<MessageProcessor>();
+        processors.add(new MessageProcessor()
+        {
+            
+            public MuleEvent process(MuleEvent event) throws MuleException
+            {
+                event.getMessage().setInvocationProperty("newKey", "newValue");
+                return event;
+            }
+        });
+        processors.add(flowListener);
+        
         Flow flow = new Flow("flow", muleContext);
-        flow.setMessageProcessors(Collections.<MessageProcessor> singletonList(flowListener));
+        flow.setMessageProcessors(processors);
         flow.initialise();
         flow.start();
 
@@ -237,8 +248,7 @@ public class InvocationPropertiesTestCase extends AbstractMuleContextTestCase
 
         // Event is copied, but session isn't
         assertNotSame(processedEvent, event);
-        assertEquals(processedEvent, event);
-        assertSame(processedEvent.getSession(), event.getSession());
+        assertNotSame(processedEvent.getSession(), event.getSession());
 
         // Session properties available before new flow are available after too
         assertEquals("value", processedEvent.getMessage().getInvocationProperty("key"));
@@ -246,12 +256,10 @@ public class InvocationPropertiesTestCase extends AbstractMuleContextTestCase
 
         // Session properties set after new flow are available in message processor
         // before new flow
-        processedEvent.getMessage().setInvocationProperty("newKey", "newValue");
         assertEquals("newValue", processedEvent.getMessage().getInvocationProperty("newKey"));
-        assertEquals("newValue", event.getMessage().getInvocationProperty("newKey"));
+        assertNull(event.getMessage().getInvocationProperty("newKey"));
 
         flow.stop();
         flow.dispose();
     }
-
 }
