@@ -24,6 +24,7 @@ import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Lifecycle;
 import org.mule.api.lifecycle.LifecycleCallback;
+import org.mule.api.lifecycle.LifecycleException;
 import org.mule.api.lifecycle.LifecycleState;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
@@ -33,8 +34,10 @@ import org.mule.api.processor.MessageProcessorChain;
 import org.mule.api.processor.MessageProcessorChainBuilder;
 import org.mule.api.routing.MessageInfoMapping;
 import org.mule.api.source.MessageSource;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.exception.DefaultServiceExceptionStrategy;
 import org.mule.management.stats.FlowConstructStatistics;
+import org.mule.processor.AbstractFilteringMessageProcessor;
 import org.mule.processor.AbstractInterceptingMessageProcessor;
 import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.routing.MuleMessageInfoMapping;
@@ -78,6 +81,7 @@ public abstract class AbstractFlowConstruct implements FlowConstruct, Lifecycle
     protected FlowConstructStatistics statistics;
     protected MessageInfoMapping messageInfoMapping = new MuleMessageInfoMapping();
     protected ThreadingProfile threadingProfile;
+    private boolean canProcessMessage = false;
 
     public AbstractFlowConstruct(String name, MuleContext muleContext)
     {
@@ -141,6 +145,7 @@ public abstract class AbstractFlowConstruct implements FlowConstruct, Lifecycle
             {
                 startIfStartable(messageProcessorChain);
                 startIfStartable(exceptionListener);
+                canProcessMessage = true;
                 startIfStartable(messageSource);
                 doStart();
             }
@@ -153,7 +158,14 @@ public abstract class AbstractFlowConstruct implements FlowConstruct, Lifecycle
         {
             public void onTransition(String phaseName, FlowConstruct object) throws MuleException
             {
-                stopIfStoppable(messageSource);
+                try
+                {
+                    stopIfStoppable(messageSource);
+                }
+                finally
+                {
+                    canProcessMessage = false;
+                }
                 stopIfStoppable(messageProcessorChain);
                 stopIfStoppable(exceptionListener);
                 doStop();
@@ -389,4 +401,20 @@ public abstract class AbstractFlowConstruct implements FlowConstruct, Lifecycle
      * @return the type of construct being created, e.g. "Flow"
      */
     public abstract String getConstructType();
+
+    public class ProcessIfPipelineStartedMessageProcessor extends AbstractFilteringMessageProcessor
+    {
+
+        @Override
+        protected boolean accept(MuleEvent event)
+        {
+            return canProcessMessage;
+        }
+
+        @Override
+        protected MuleEvent handleUnaccepted(MuleEvent event) throws LifecycleException
+        {
+            throw new LifecycleException(CoreMessages.isStopped(getName()), event.getMessage());
+        }
+    }
 }

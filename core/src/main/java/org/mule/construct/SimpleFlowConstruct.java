@@ -66,6 +66,7 @@ public class SimpleFlowConstruct extends AbstractFlowConstruct implements Messag
         final String threadPrefix = ThreadNameHelper.flow(muleContext, getName());
 
         builder.chain(new ProcessIfStartedMessageProcessor(this, getLifecycleState()));
+        //builder.chain(new ProcessIfPipelineStartedMessageProcessor());
         builder.chain(new ProcessingTimeInterceptor());
         builder.chain(new LoggingInterceptor());
         builder.chain(new FlowConstructStatisticsMessageProcessor());
