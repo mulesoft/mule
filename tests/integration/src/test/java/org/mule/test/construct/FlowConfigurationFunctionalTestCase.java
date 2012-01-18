@@ -233,6 +233,79 @@ public class FlowConfigurationFunctionalTestCase extends FunctionalTestCase
     }
 
     @Test
+    public void testSplitAggregateListFlowSingleItem() throws Exception
+    {
+        final Apple apple = new Apple();
+        final FruitBowl fruitBowl = new FruitBowl();
+        fruitBowl.addFruit(apple);
+
+        muleContext.getClient().send("vm://split-aggregate-singleton-list-in",
+            new DefaultMuleMessage(fruitBowl.getFruit(), muleContext));
+
+        final MuleMessage result = muleContext.getClient().request("vm://split-aggregate-singleton-list-out",
+            RECEIVE_TIMEOUT);
+
+        assertNotNull(result);
+        assertTrue(result instanceof MuleMessageCollection);
+        final MuleMessageCollection coll = (MuleMessageCollection) result;
+        assertEquals(1, coll.size());
+        final List<?> results = (List<?>) coll.getPayload();
+
+        assertTrue(apple.isBitten());
+
+        assertTrue(results.contains(apple));
+    }
+    
+    @Test
+    public void testSplitAggregateResponseListFlow() throws Exception
+    {
+        final Apple apple = new Apple();
+        final Banana banana = new Banana();
+        final Orange orange = new Orange();
+        final FruitBowl fruitBowl = new FruitBowl(apple, banana);
+        fruitBowl.addFruit(orange);
+
+        final MuleMessage result  = muleContext.getClient().send("vm://split-aggregate-response-list-in",
+            new DefaultMuleMessage(fruitBowl.getFruit(), muleContext));
+
+        assertNotNull(result);
+        assertTrue(result instanceof MuleMessageCollection);
+        final MuleMessageCollection coll = (MuleMessageCollection) result;
+        assertEquals(3, coll.size());
+        final List<?> results = (List<?>) coll.getPayload();
+        assertEquals(3, results.size());
+
+        assertTrue(apple.isBitten());
+        assertTrue(banana.isBitten());
+        assertTrue(orange.isBitten());
+
+        assertTrue(results.contains(apple));
+        assertTrue(results.contains(banana));
+        assertTrue(results.contains(orange));
+    }
+
+    @Test
+    public void testSplitAggregateResponseListFlowSingleItem() throws Exception
+    {
+        final Apple apple = new Apple();
+        final FruitBowl fruitBowl = new FruitBowl();
+        fruitBowl.addFruit(apple);
+
+        final MuleMessage result  = muleContext.getClient().send("vm://split-aggregate-response-singleton-list-in",
+            new DefaultMuleMessage(fruitBowl.getFruit(), muleContext));
+
+        assertNotNull(result);
+        assertTrue(result instanceof MuleMessageCollection);
+        final MuleMessageCollection coll = (MuleMessageCollection) result;
+        assertEquals(1, coll.size());
+        final List<?> results = (List<?>) coll.getPayload();
+        assertEquals(1, results.size());
+
+        assertTrue(apple.isBitten());
+        assertTrue(results.contains(apple));
+    }
+
+    @Test
     public void testSplitAggregateMapFlow() throws Exception
     {
         Map<String, Fruit> map = new HashMap<String, Fruit>();
