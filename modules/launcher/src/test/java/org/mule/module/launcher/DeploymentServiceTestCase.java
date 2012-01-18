@@ -10,34 +10,6 @@
 
 package org.mule.module.launcher;
 
-import org.mule.api.MuleContext;
-import org.mule.api.component.JavaComponent;
-import org.mule.api.config.MuleProperties;
-import org.mule.api.construct.FlowConstruct;
-import org.mule.api.registry.MuleRegistry;
-import org.mule.construct.SimpleService;
-import org.mule.module.launcher.application.Application;
-import org.mule.module.launcher.application.ApplicationWrapper;
-import org.mule.module.launcher.application.PriviledgedMuleApplication;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
-import org.mule.util.CollectionUtils;
-import org.mule.util.FileUtils;
-import org.mule.util.StringUtils;
-import org.mule.util.concurrent.Latch;
-
-import java.io.File;
-import java.io.IOException;
-import java.net.URL;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-
-import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
-import org.apache.commons.io.filefilter.DirectoryFileFilter;
-import org.apache.commons.io.filefilter.SuffixFileFilter;
-import org.junit.Test;
-
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -46,10 +18,44 @@ import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import org.mule.api.MuleContext;
+import org.mule.api.component.JavaComponent;
+import org.mule.api.config.MuleProperties;
+import org.mule.api.construct.FlowConstruct;
+import org.mule.api.registry.MuleRegistry;
+import org.mule.config.StartupContext;
+import org.mule.construct.SimpleService;
+import org.mule.module.launcher.application.Application;
+import org.mule.module.launcher.application.ApplicationWrapper;
+import org.mule.module.launcher.application.PriviledgedMuleApplication;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.tck.probe.PollingProber;
+import org.mule.tck.probe.Probe;
+import org.mule.tck.probe.Prober;
+import org.mule.util.CollectionUtils;
+import org.mule.util.FileUtils;
+import org.mule.util.StringUtils;
+import org.mule.util.concurrent.Latch;
+
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
+import java.net.URLDecoder;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+
+import org.apache.commons.io.filefilter.DirectoryFileFilter;
+import org.junit.Test;
+
 public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 {
 
-    protected static final int LATCH_TIMEOUT = 10000;
+    protected static final int LATCH_TIMEOUT = 40000;
     protected static final String[] NONE = new String[0];
 
     protected File muleHome;
@@ -201,7 +207,22 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     }
 
     @Test
-    public void testBrokenAppArchive() throws Exception
+    public void testBrokenAppArchiveWithoutArgument() throws Exception
+    {
+        doBrokenAppArchiveTest();
+    }
+
+    @Test
+    public void testBrokenAppArchiveAsArgument() throws Exception
+    {
+        Map<String, Object> startupOptions = new HashMap<String, Object>();
+        startupOptions.put("app", "broken-app");
+        StartupContext.get().setStartupOptions(startupOptions);
+
+        doBrokenAppArchiveTest();
+    }
+
+    public void doBrokenAppArchiveTest() throws Exception
     {
         final URL url = getClass().getResource("/broken-app.zip");
         assertNotNull("Test app file not found " + url, url);
@@ -235,9 +256,9 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     @Test
     public void testBrokenAppName() throws Exception
     {
-        final URL url = getClass().getResource("/app with spaces.zip");
+        final URL url = getClass().getResource("/empty-app.zip");
         assertNotNull("Test app file not found " + url, url);
-        addAppArchive(url);
+        addAppArchive(url, "app with spaces.zip");
 
         try
         {
@@ -250,11 +271,13 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
         // zip stays intact, no app dir created
         // %20 is returned by java file api :/
-        assertAppsDir(new String[] {"app%20with%20spaces.zip"}, NONE, true);
+        assertAppsDir(new String[] {"app with spaces.zip"}, NONE, true);
         final Map<URL, Long> zombieMap = deploymentService.getZombieMap();
         assertEquals("Wrong number of zombie apps registered.", 1, zombieMap.size());
         final Map.Entry<URL, Long> zombie = zombieMap.entrySet().iterator().next();
-        assertEquals("Wrong URL tagged as zombie.", "app%20with%20spaces.zip", new File(zombie.getKey().getFile()).getName());
+        // Spaces are converted to %20 is returned by java file api :/
+        String appName = URLDecoder.decode(new File(zombie.getKey().getFile()).getName(), "UTF-8");
+        assertEquals("Wrong URL tagged as zombie.", "app with spaces.zip",  appName);
         assertTrue("Invalid lastModified value for file URL.", zombie.getValue() != -1);
     }
     
@@ -295,6 +318,54 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         assertTrue(dummyApp.getMuleContext().getConfiguration().getWorkingDirectory().endsWith(".mule/dummy-app"));
     }
 
+    @Test
+    public void testDeployAppNameWithZipSuffix() throws Exception
+    {
+        final URL url = getClass().getResource("/empty-app.zip");
+        assertNotNull("Test app file not found " + url, url);
+        addAppArchive(url, "empty-app.zip.zip");
+
+        deploymentService.start();
+
+        assertTrue("Deployer never invoked", deployLatch.await(LATCH_TIMEOUT, TimeUnit.MILLISECONDS));
+        deployLatch = new Latch();
+        assertAppsDir(NONE, new String[] {"empty-app.zip"}, true);
+        assertEquals("Application has not been properly registered with Mule", 1, deploymentService.getApplications().size());
+
+        // Checks that the empty-app.zip folder is not processed as a zip file
+        assertNoDeploymentInvoked();
+    }
+
+    private void assertNoDeploymentInvoked()
+    {
+        //TODO(pablo.kraan): look for a better way to test this
+        boolean invoked;
+        Prober prober = new PollingProber(DeploymentService.DEFAULT_CHANGES_CHECK_INTERVAL_MS * 2, 100);
+        try
+        {
+            prober.check(new Probe()
+            {
+                public boolean isSatisfied()
+                {
+                    return deploymentService.getZombieMap().size() == 1;
+                }
+
+                public String describeFailure()
+                {
+                    return "App was never redeployed";
+                }
+            });
+
+            invoked = true;
+        }
+        catch (AssertionError e)
+        {
+           invoked = false;
+        }
+
+        assertFalse("Deployer was invoked", invoked);
+    }
+
     /**
      * Find a deployed app, performing some basic assertions.
      */
@@ -311,7 +382,8 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
     private void assertAppsDir(String[] expectedZips, String[] expectedApps, boolean performValidation)
     {
-        final String[] actualZips = appsDir.list(new SuffixFileFilter(".zip"));
+        //final String[] actualZips = appsDir.list(new SuffixFileFilter(".zip"));
+        final String[] actualZips = appsDir.list(DeploymentService.ZIP_APPS_FILTER);
         if (performValidation) {
             assertArrayEquals("Invalid Mule application archives set", expectedZips, actualZips);
         }
@@ -327,8 +399,16 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
      */
     private void addAppArchive(URL url) throws IOException
     {
+        addAppArchive(url, null);
+    }
+
+    /**
+     * Copies a given app archive with a given target name to the apps folder for deployment
+     */
+    private void addAppArchive(URL url, String targetFile) throws IOException
+    {
         // copy is not atomic, copy to a temp file and rename instead (rename is atomic)
-        final String tempFileName = new File(url.getFile() + ".part").getName();
+        final String tempFileName = new File((targetFile == null ? url.getFile() : targetFile) + ".part").getName();
         final File tempFile = new File(appsDir, tempFileName);
         FileUtils.copyURLToFile(url, tempFile);
         tempFile.renameTo(new File(StringUtils.removeEnd(tempFile.getAbsolutePath(), ".part")));
