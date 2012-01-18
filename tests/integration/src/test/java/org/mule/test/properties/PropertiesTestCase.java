@@ -21,6 +21,7 @@ import java.util.Map;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 public class PropertiesTestCase extends FunctionalTestCase
@@ -48,8 +49,8 @@ public class PropertiesTestCase extends FunctionalTestCase
         assertNull(response.getInboundProperty("outbound2"));
         assertNull(response.getOutboundProperty("outbound1"));
         assertNull(response.getOutboundProperty("outbound2"));
-        assertNull(response.<Object>getInvocationProperty("invocation1"));
-        assertNull(response.<Object>getInvocationProperty("invocation2"));
+        assertNotNull(response.<Object>getInvocationProperty("invocation1"));
+        assertNotNull(response.<Object>getInvocationProperty("invocation2"));
         assertEquals("123", response.getInboundProperty("outbound3"));
         assertEquals("456", response.getInboundProperty("outbound4"));
         assertNull(response.<Object>getInvocationProperty("invocation3"));
