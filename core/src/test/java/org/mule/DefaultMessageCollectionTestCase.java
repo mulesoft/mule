@@ -26,7 +26,6 @@ import org.mule.tck.testmodels.fruit.Orange;
 
 import java.util.List;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mockito;
 
@@ -65,7 +64,6 @@ public class DefaultMessageCollectionTestCase extends AbstractMuleTestCase
     }
 
     @Test
-    @Ignore
     public void addMuleMessageCollection()
     {
         MuleMessageCollection messageCollection1 = Mockito.mock(MuleMessageCollection.class);
@@ -77,22 +75,19 @@ public class DefaultMessageCollectionTestCase extends AbstractMuleTestCase
         messageCollectionUnderTest.addMessage(messageCollection1);
         messageCollectionUnderTest.addMessage(messageCollection2);
 
-        // Should there be 4 messages in collection or 2?
         assertEquals(2, messageCollectionUnderTest.getMessageList().size());
         assertSame(messageCollection1, messageCollectionUnderTest.getMessage(0));
         assertSame(messageCollection2, messageCollectionUnderTest.getMessage(1));
 
-        // Should there be 4 payloads in collection or 2?
-        assertEquals(4, messageCollectionUnderTest.getPayloadList().size());
+        assertEquals(2, messageCollectionUnderTest.getPayloadList().size());
         assertTrue(messageCollectionUnderTest.getPayload() instanceof List<?>);
-        assertSame(apple, ((List) messageCollectionUnderTest.getPayload()).get(0));
-        assertSame(banana, ((List) messageCollectionUnderTest.getPayload()).get(1));
-        assertSame(grapeFruit, ((List) messageCollectionUnderTest.getPayload()).get(2));
-        assertSame(orange, ((List) messageCollectionUnderTest.getPayload()).get(3));
+        assertSame(apple, ((Fruit[]) ((List) messageCollectionUnderTest.getPayload()).get(0))[0]);
+        assertSame(banana, ((Fruit[]) ((List) messageCollectionUnderTest.getPayload()).get(0))[1]);
+        assertSame(grapeFruit, ((Fruit[]) ((List) messageCollectionUnderTest.getPayload()).get(1))[0]);
+        assertSame(orange, ((Fruit[]) ((List) messageCollectionUnderTest.getPayload()).get(1))[1]);
     }
 
     @Test
-    @Ignore
     public void addMuleMessageAndMuleMessageCollection()
     {
         MuleMessage message3 = new DefaultMuleMessage(grapeFruit, muleContext);
@@ -106,19 +101,17 @@ public class DefaultMessageCollectionTestCase extends AbstractMuleTestCase
         messageCollectionUnderTest.addMessage(message3);
         messageCollectionUnderTest.addMessage(message4);
 
-        // Should there be 4 messages in collection or 3?
         assertEquals(3, messageCollectionUnderTest.getMessageList().size());
         assertSame(messageCollection1, messageCollectionUnderTest.getMessage(0));
         assertSame(message3, messageCollectionUnderTest.getMessage(1));
         assertSame(message4, messageCollectionUnderTest.getMessage(2));
 
-        // Should there be 4 payloads in collection or 3?
-        assertEquals(4, messageCollectionUnderTest.getPayloadList().size());
+        assertEquals(3, messageCollectionUnderTest.getPayloadList().size());
         assertTrue(messageCollectionUnderTest.getPayload() instanceof List<?>);
-        assertSame(apple, ((List) messageCollectionUnderTest.getPayload()).get(0));
-        assertSame(banana, ((List) messageCollectionUnderTest.getPayload()).get(1));
-        assertSame(grapeFruit, ((List) messageCollectionUnderTest.getPayload()).get(2));
-        assertSame(orange, ((List) messageCollectionUnderTest.getPayload()).get(3));
+        assertSame(apple, ((Fruit[]) ((List) messageCollectionUnderTest.getPayload()).get(0))[0]);
+        assertSame(banana, ((Fruit[]) ((List) messageCollectionUnderTest.getPayload()).get(0))[1]);
+        assertSame(grapeFruit, ((List) messageCollectionUnderTest.getPayload()).get(1));
+        assertSame(orange, ((List) messageCollectionUnderTest.getPayload()).get(2));
     }
 
 }

@@ -39,7 +39,7 @@ public class CollectionMessageSplitterTestCase extends AbstractMuleContextTestCa
     }
 
     @Test
-    public void testRouter() throws Exception
+    public void testSpliterMultipleParts() throws Exception
     {
         Service fc = getTestService();
         MuleSession session = getTestSession(fc, muleContext);
@@ -73,6 +73,47 @@ public class CollectionMessageSplitterTestCase extends AbstractMuleContextTestCa
         splitter.process(event);
         List<MuleMessage> splits =  grabber.getMessages();
         assertEquals(3, splits.size());
+        assertSplitPart(inboundProps, outboundProps, invocationProps, payload, splits);
+    }
+
+    @Test
+    public void testSpliterSinglePart() throws Exception
+    {
+        Service fc = getTestService();
+        MuleSession session = getTestSession(fc, muleContext);
+
+        Map<String, Object> inboundProps = new HashMap();
+        inboundProps.put("inbound1", "1");
+
+        Map<String, Object> outboundProps = new HashMap();
+        inboundProps.put("outbound1", "2");
+
+        Map<String, Object> invocationProps = new HashMap();
+        inboundProps.put("invoke1", "3");
+
+        List<String> payload = Arrays.asList("abc");
+        MuleMessage toSplit = new DefaultMuleMessage(payload, inboundProps, outboundProps, null, muleContext);
+        for (Map.Entry<String, Object> entry : invocationProps.entrySet())
+        {
+            toSplit.setInvocationProperty(entry.getKey(), entry.getValue());
+        }
+        CollectionSplitter splitter = new CollectionSplitter();
+        splitter.setMuleContext(muleContext);
+        Grabber grabber = new Grabber();
+        splitter.setListener(grabber);
+        DefaultMuleEvent event = new DefaultMuleEvent(toSplit, getTestOutboundEndpoint("ep"), session);
+        splitter.process(event);
+        List<MuleMessage> splits =  grabber.getMessages();
+        assertEquals(1, splits.size());
+        assertSplitPart(inboundProps, outboundProps, invocationProps, payload, splits);
+    }
+
+    protected void assertSplitPart(Map<String, Object> inboundProps,
+                                   Map<String, Object> outboundProps,
+                                   Map<String, Object> invocationProps,
+                                   List<String> payload,
+                                   List<MuleMessage> splits)
+    {
         for (MuleMessage msg : splits)
         {
             assertTrue(msg.getPayload() instanceof String);
@@ -93,6 +134,7 @@ public class CollectionMessageSplitterTestCase extends AbstractMuleContextTestCa
         }
     }
 
+    
     static class Grabber implements MessageProcessor
     {
         private List<MuleMessage> messages = new ArrayList();
