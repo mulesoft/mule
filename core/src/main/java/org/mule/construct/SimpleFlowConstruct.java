@@ -25,7 +25,6 @@ import org.mule.api.processor.MessageProcessorChainBuilder;
 import org.mule.construct.processor.FlowConstructStatisticsMessageProcessor;
 import org.mule.interceptor.LoggingInterceptor;
 import org.mule.interceptor.ProcessingTimeInterceptor;
-import org.mule.lifecycle.processor.ProcessIfStartedMessageProcessor;
 import org.mule.processor.OptionalAsyncInterceptingMessageProcessor;
 import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.routing.requestreply.ReplyToAsyncProcessor;
@@ -65,8 +64,7 @@ public class SimpleFlowConstruct extends AbstractFlowConstruct implements Messag
 
         final String threadPrefix = ThreadNameHelper.flow(muleContext, getName());
 
-        builder.chain(new ProcessIfStartedMessageProcessor(this, getLifecycleState()));
-        //builder.chain(new ProcessIfPipelineStartedMessageProcessor());
+        builder.chain(new ProcessIfPipelineStartedMessageProcessor());
         builder.chain(new ProcessingTimeInterceptor());
         builder.chain(new LoggingInterceptor());
         builder.chain(new FlowConstructStatisticsMessageProcessor());
