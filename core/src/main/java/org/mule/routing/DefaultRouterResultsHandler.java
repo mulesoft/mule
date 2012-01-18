@@ -18,8 +18,11 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleMessageCollection;
 import org.mule.api.routing.RouterResultsHandler;
+import org.mule.util.CollectionUtils;
 
 import java.util.List;
+
+import org.apache.commons.collections.Predicate;
 
 /**
  * The default results handler for all outbound endpoint. Depending on the number of messages passed it the
@@ -37,9 +40,12 @@ import java.util.List;
  */
 public class DefaultRouterResultsHandler implements RouterResultsHandler
 {
-    public MuleEvent aggregateResults(List<MuleEvent> results, MuleEvent previous, MuleContext muleContext)
+    @SuppressWarnings(value = {"unchecked"})
+    public MuleEvent aggregateResults(final List<MuleEvent> results,
+                                      final MuleEvent previous,
+                                      MuleContext muleContext)
     {
-        if (results == null || results.size() == 0)
+        if (results == null)
         {
             return null;
         }
@@ -57,17 +63,45 @@ public class DefaultRouterResultsHandler implements RouterResultsHandler
         }
         else
         {
-            MuleMessageCollection coll = new DefaultMessageCollection(muleContext);
-            coll.propagateRootId(previous.getMessage());
-            for (MuleEvent event : results)
-            {
-                MuleMessage muleMessage = event == null ? null : event.getMessage();
-                if (muleMessage != null)
+            List<MuleEvent> nonNullResults = (List<MuleEvent>) CollectionUtils.select(results,
+                new Predicate()
                 {
-                    coll.addMessage(muleMessage);
-                }
+                    public boolean evaluate(Object object)
+                    {
+                        return object != null;
+                    }
+                });
+
+            if (nonNullResults.size() == 0)
+            {
+                return null;
             }
-            return RequestContext.setEvent(new DefaultMuleEvent(coll, previous, previous.getSession()));
+            else if (nonNullResults.size() == 1)
+            {
+                return nonNullResults.get(0);
+            }
+            else
+            {
+                return createMessageCollection(nonNullResults, previous, muleContext);
+            }
         }
+    }
+
+    private MuleEvent createMessageCollection(final List<MuleEvent> nonNullResults,
+                                              final MuleEvent previous,
+                                              MuleContext muleContext)
+    {
+        MuleMessageCollection coll = new DefaultMessageCollection(muleContext);
+        for (MuleEvent event : nonNullResults)
+        {
+            MuleMessage muleMessage = event == null ? null : event.getMessage();
+            if (muleMessage != null)
+            {
+                coll.addMessage(muleMessage);
+            }
+        }
+        coll.propagateRootId(previous.getMessage());
+        // ((DefaultMuleMessage) coll).copyInvocationProperties(previous.getMessage());
+        return RequestContext.setEvent(new DefaultMuleEvent(coll, previous, previous.getSession()));
     }
 }
