@@ -15,7 +15,6 @@ import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
-import org.mule.api.MuleMessage;
 import org.mule.api.MuleMessageCollection;
 import org.mule.api.routing.RouterResultsHandler;
 import org.mule.util.CollectionUtils;
@@ -57,7 +56,7 @@ public class DefaultRouterResultsHandler implements RouterResultsHandler
                 {
                     public boolean evaluate(Object object)
                     {
-                        return object != null;
+                        return object != null && ((MuleEvent) object).getMessage() != null;
                     }
                 });
 
@@ -84,11 +83,7 @@ public class DefaultRouterResultsHandler implements RouterResultsHandler
         MuleMessageCollection coll = new DefaultMessageCollection(muleContext);
         for (MuleEvent event : nonNullResults)
         {
-            MuleMessage muleMessage = event == null ? null : event.getMessage();
-            if (muleMessage != null)
-            {
-                coll.addMessage(muleMessage);
-            }
+            coll.addMessage(event.getMessage());
         }
         ((DefaultMuleMessage) coll).copyInvocationProperties(previous.getMessage());
         return new DefaultMuleEvent(coll, previous);
