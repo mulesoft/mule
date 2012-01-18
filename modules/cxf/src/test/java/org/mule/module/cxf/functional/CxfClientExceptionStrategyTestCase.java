@@ -11,6 +11,9 @@
 
 package org.mule.module.cxf.functional;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
@@ -27,9 +30,6 @@ import java.util.Map;
 
 import org.junit.Rule;
 import org.junit.Test;
-
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 public class CxfClientExceptionStrategyTestCase extends FunctionalTestCase
 {
