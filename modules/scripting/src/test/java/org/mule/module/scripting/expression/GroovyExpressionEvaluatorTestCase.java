@@ -9,8 +9,16 @@
  */
 package org.mule.module.scripting.expression;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
+import org.mule.api.MuleRuntimeException;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Banana;
@@ -22,25 +30,13 @@ import groovyjarjarasm.asm.ClassWriter;
 import groovyjarjarasm.asm.Opcodes;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 public class GroovyExpressionEvaluatorTestCase extends AbstractMuleContextTestCase
 {
 
     @Test
     public void testWithExpressions()
     {
-        Apple apple = new Apple();
-        apple.wash();
-        Banana banana = new Banana();
-        banana.bite();
-        FruitBowl payload = new FruitBowl(apple, banana);
+        FruitBowl payload = createFruitBowl();
         DefaultMuleMessage msg = new DefaultMuleMessage(payload, muleContext);
         GroovyExpressionEvaluator e = new GroovyExpressionEvaluator();
         e.setMuleContext(muleContext);
@@ -53,9 +49,17 @@ public class GroovyExpressionEvaluatorTestCase extends AbstractMuleContextTestCa
         assertNotNull(value);
         assertTrue(value instanceof Boolean);
         assertTrue((Boolean) value);
+    }
 
-        value = e.evaluate("bar", msg);
-        assertNull(value);
+    @Test(expected = MuleRuntimeException.class)
+    public void testThrowsExceptionOnScriptError() throws Exception
+    {
+        FruitBowl payload = createFruitBowl();
+        DefaultMuleMessage msg = new DefaultMuleMessage(payload, muleContext);
+
+        GroovyExpressionEvaluator e = new GroovyExpressionEvaluator();
+        e.setMuleContext(muleContext);
+        e.evaluate("unexistent", msg);
     }
 
     @Test
@@ -124,6 +128,16 @@ public class GroovyExpressionEvaluatorTestCase extends AbstractMuleContextTestCa
         {
             Thread.currentThread().setContextClassLoader(originalClassLoader);
         }
+    }
+
+    private FruitBowl createFruitBowl()
+    {
+        Apple apple = new Apple();
+        apple.wash();
+        Banana banana = new Banana();
+        banana.bite();
+
+        return new FruitBowl(apple, banana);
     }
 
     class MyClassClassLoader extends ClassLoader
