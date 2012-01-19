@@ -16,6 +16,7 @@ import org.mule.api.MuleException;
 import org.mule.api.construct.FlowConstructInvalidException;
 import org.mule.api.construct.Pipeline;
 import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.lifecycle.LifecycleException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorBuilder;
 import org.mule.api.processor.MessageProcessorChainBuilder;
@@ -24,6 +25,7 @@ import org.mule.api.source.CompositeMessageSource;
 import org.mule.api.source.MessageSource;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.construct.flow.DefaultFlowProcessingStrategy;
+import org.mule.processor.AbstractFilteringMessageProcessor;
 import org.mule.processor.AbstractInterceptingMessageProcessor;
 import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.processor.strategy.AsynchronousProcessingStrategy;
@@ -47,6 +49,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     protected List<MessageProcessor> messageProcessors = Collections.emptyList();
 
     protected ProcessingStrategy processingStrategy;
+    private boolean canProcessMessage = false;
 
     public AbstractPipeline(String name, MuleContext muleContext)
     {
@@ -206,13 +209,38 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     {
         super.doStart();
         startIfStartable(pipeline);
+        canProcessMessage = true;
         startIfStartable(messageSource);
+    }
+
+    public class ProcessIfPipelineStartedMessageProcessor extends AbstractFilteringMessageProcessor
+    {
+
+        @Override
+        protected boolean accept(MuleEvent event)
+        {
+            return canProcessMessage;
+        }
+
+        @Override
+        protected MuleEvent handleUnaccepted(MuleEvent event) throws LifecycleException
+        {
+            throw new LifecycleException(CoreMessages.isStopped(getName()), event.getMessage());
+        }
     }
 
     @Override
     protected void doStop() throws MuleException
     {
-        stopIfStoppable(messageSource);
+        try
+        {
+            stopIfStoppable(messageSource);
+        }
+        finally
+        {
+            canProcessMessage = false;
+        }
+
         stopIfStoppable(pipeline);
         super.doStop();
     }

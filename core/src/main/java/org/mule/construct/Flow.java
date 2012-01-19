@@ -24,7 +24,6 @@ import org.mule.api.processor.ProcessingStrategy.StageNameSource;
 import org.mule.construct.flow.DefaultFlowProcessingStrategy;
 import org.mule.construct.processor.FlowConstructStatisticsMessageProcessor;
 import org.mule.interceptor.ProcessingTimeInterceptor;
-import org.mule.lifecycle.processor.ProcessIfStartedMessageProcessor;
 import org.mule.management.stats.FlowConstructStatistics;
 import org.mule.processor.strategy.AsynchronousProcessingStrategy;
 import org.mule.routing.requestreply.AsyncReplyToPropertyRequestReplyReplier;
@@ -83,7 +82,7 @@ public class Flow extends AbstractPipeline implements MessageProcessor
     protected void configurePreProcessors(MessageProcessorChainBuilder builder) throws MuleException
     {
         super.configurePreProcessors(builder);
-        builder.chain(new ProcessIfStartedMessageProcessor(this, getLifecycleState()));
+        builder.chain(new ProcessIfPipelineStartedMessageProcessor());
         builder.chain(new ProcessingTimeInterceptor());
         builder.chain(new FlowConstructStatisticsMessageProcessor());
     }
