@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xsi:schemaLocation="
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
+       http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.2/mule-vm.xsd
+       http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/3.2/mule-test.xsd">
+
+    <custom-transformer name="transformer1" class="org.mule.test.integration.CompositeSourceStartDelayTestCase$StuckTransformer" />
+
+    <endpoint name="sleepingTestIn" address="vm://sleepingTestIn" transformer-refs="transformer1"/>
+
+    <flow name="MainFlow">
+        <composite-source>
+            <vm:inbound-endpoint name="testInEndpoint" path="testIn" exchange-pattern="request-response"/>
+            <vm:inbound-endpoint ref="sleepingTestIn" exchange-pattern="request-response"/>
+        </composite-source>
+
+        <custom-processor class="org.mule.test.integration.CompositeSourceStartDelayTestCase$AwakeSourceMessageProcessor"/>
+
+        <test:component appendString=" received"/>
+    </flow>
+</mule>

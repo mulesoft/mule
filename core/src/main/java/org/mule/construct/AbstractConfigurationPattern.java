@@ -67,7 +67,7 @@ public abstract class AbstractConfigurationPattern extends AbstractPipeline
     protected void configurePreProcessors(MessageProcessorChainBuilder builder) throws MuleException
     {
         super.configurePreProcessors(builder);
-        builder.chain(new ProcessIfStartedMessageProcessor(this, getLifecycleState()));
+        builder.chain(new ProcessIfPipelineStartedMessageProcessor());
         builder.chain(new ProcessingTimeInterceptor());
         builder.chain(new FlowConstructStatisticsMessageProcessor());
     }
