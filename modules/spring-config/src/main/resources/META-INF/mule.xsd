@@ -523,7 +523,7 @@
                     </xsd:element>
                     <xsd:group ref="messageProcessorOrOutboundEndpoint" maxOccurs="unbounded" />
                 </xsd:sequence>
-                <xsd:attribute name="name" type="substitutableName" use="optional">
+                <xsd:attribute name="name" type="nonBlankString" use="required">
                     <xsd:annotation>
                         <xsd:documentation>
                             Identifies the sub-flow in the registry.
