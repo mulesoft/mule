@@ -336,6 +336,34 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         assertNoDeploymentInvoked();
     }
 
+    @Test
+    public void testDeployAsArgumentStartupOrder() throws Exception
+    {
+        final URL url = getClass().getResource("/empty-app.zip");
+        assertNotNull("Test app file not found " + url, url);
+        addAppArchive(url, "1.zip");
+        addAppArchive(url, "2.zip");
+        addAppArchive(url, "3.zip");
+
+        Map<String, Object> startupOptions = new HashMap<String, Object>();
+        startupOptions.put("app", "3:1:2");
+        StartupContext.get().setStartupOptions(startupOptions);
+
+        deploymentService.start();
+
+        assertTrue("Deployer never invoked", deployLatch.await(LATCH_TIMEOUT, TimeUnit.MILLISECONDS));
+
+        assertAppsDir(NONE, new String[] {"1", "2", "3"}, true);
+
+        // When apps are passed as -app app1:app2:app3 the startup order matters
+        List<Application> applications = deploymentService.getApplications();
+        assertNotNull(applications);
+        assertEquals(3, applications.size());
+        assertEquals("3", applications.get(0).getAppName());
+        assertEquals("1", applications.get(1).getAppName());
+        assertEquals("2", applications.get(2).getAppName());
+    }
+
     private void assertNoDeploymentInvoked()
     {
         //TODO(pablo.kraan): look for a better way to test this
