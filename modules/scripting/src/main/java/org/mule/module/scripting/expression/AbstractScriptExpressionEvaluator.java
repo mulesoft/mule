@@ -62,7 +62,7 @@ public abstract class AbstractScriptExpressionEvaluator implements ExpressionEva
         }
         catch (ScriptException e)
         {
-            throw new MuleRuntimeException(e);
+            return null;
         }
     }
 
