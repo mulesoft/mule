@@ -640,7 +640,7 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
             {
                 connection.stop();
             }
-            catch (JMSException e)
+            catch (Exception e)
             {
                 // this exception may be thrown when the broker is shut down, but the
                 // stop process should continue all the same
