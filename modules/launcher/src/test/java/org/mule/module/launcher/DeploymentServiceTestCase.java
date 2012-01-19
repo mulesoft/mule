@@ -55,7 +55,7 @@ import org.junit.Test;
 public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 {
 
-    protected static final int LATCH_TIMEOUT = 40000;
+    protected static final int LATCH_TIMEOUT = 20000;
     protected static final String[] NONE = new String[0];
 
     protected File muleHome;
