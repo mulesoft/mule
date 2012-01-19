@@ -45,7 +45,7 @@ public class CompositeSourceStartDelayTestCase extends FunctionalTestCase
     }
 
     @Test
-    public void testName() throws Exception
+    public void testProcessMessageWhenAnSourceIsNotStartedYet() throws Exception
     {
         Thread thread = new Thread(new Runnable()
         {
