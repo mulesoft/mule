@@ -24,6 +24,8 @@ import org.mule.api.transaction.Transaction;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.transaction.TransactionCoordination;
 
+import java.lang.reflect.UndeclaredThrowableException;
+
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
 import javax.jms.JMSException;
@@ -148,4 +150,18 @@ public class JmsConnectorTestCase extends AbstractMuleContextTestCase
         spy.doStop();
         verify(connection, times(1)).stop();
     }
+
+    @Test
+    public void ignoreAmqExceptionOnStop() throws Exception
+    {
+        Connection connection = mock(Connection.class);
+        doThrow(new UndeclaredThrowableException(new Exception("connection unavailable"))).when(connection).stop();
+        JmsConnector connector = new JmsConnector(muleContext);
+        JmsConnector spy = spy(connector);
+        doReturn(connection).when(spy).createConnection();
+        spy.doConnect();
+        spy.doStop();
+        verify(connection, times(1)).stop();
+    }
+
 }
