@@ -10,6 +10,8 @@
 
 package org.mule.module.launcher;
 
+import static org.mule.util.SplashScreen.miniSplash;
+
 import org.mule.MuleCoreExtension;
 import org.mule.config.StartupContext;
 import org.mule.config.i18n.MessageFactory;
@@ -21,6 +23,7 @@ import org.mule.module.launcher.util.ElementAddedEvent;
 import org.mule.module.launcher.util.ElementRemovedEvent;
 import org.mule.module.launcher.util.ObservableList;
 import org.mule.module.reboot.MuleContainerBootstrapUtils;
+import org.mule.util.ArrayUtils;
 import org.mule.util.CollectionUtils;
 import org.mule.util.FileUtils;
 import org.mule.util.StringUtils;
@@ -45,16 +48,20 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.commons.beanutils.BeanPropertyValueEqualsPredicate;
 import org.apache.commons.beanutils.BeanToPropertyValueTransformer;
+import org.apache.commons.io.filefilter.AndFileFilter;
 import org.apache.commons.io.filefilter.DirectoryFileFilter;
+import org.apache.commons.io.filefilter.FileFileFilter;
+import org.apache.commons.io.filefilter.IOFileFilter;
 import org.apache.commons.io.filefilter.SuffixFileFilter;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import static org.mule.util.SplashScreen.miniSplash;
-
 public class DeploymentService
 {
     public static final String APP_ANCHOR_SUFFIX = "-anchor.txt";
+    public static final String ZIP_FILE_SUFFIX = ".zip";
+    public static final IOFileFilter ZIP_APPS_FILTER = new AndFileFilter(new SuffixFileFilter(ZIP_FILE_SUFFIX), FileFileFilter.FILE);
+
     public static final String ANOTHER_DEPLOYMENT_OPERATION_IS_IN_PROGRESS = "Another deployment operation is in progress";
     public static final String INSTALL_OPERATION_HAS_BEEN_INTERRUPTED = "Install operation has been interrupted";
 
@@ -102,7 +109,7 @@ public class DeploymentService
             new File(appsDir, anchor).delete();
         }
 
-        String[] apps;
+        String[] apps = ArrayUtils.EMPTY_STRING_ARRAY;
 
         // mule -app app1:app2:app3 will restrict deployment only to those specified apps
         final boolean explicitAppSet = appString != null;
@@ -115,32 +122,18 @@ public class DeploymentService
 
         if (!explicitAppSet)
         {
-            // explode any app zips first
-            final String[] zips = appsDir.list(new SuffixFileFilter(".zip"));
-            Arrays.sort(zips);
-            for (String zip : zips)
+            String[] dirApps = appsDir.list(DirectoryFileFilter.DIRECTORY);
+            apps = (String[]) ArrayUtils.addAll(apps, dirApps);
+
+            String[] zipApps = appsDir.list(ZIP_APPS_FILTER);
+            for (int i = 0; i < zipApps.length; i++)
             {
-                String appName = StringUtils.removeEnd(zip, ".zip");
-
-                try
-                {
-                    // we don't care about the returned app object on startup
-                    guardedInstallFromAppDir(zip);
-                }
-                catch (Throwable t)
-                {
-                    logger.error(String.format("Failed to install app from archive '%s'", zip), t);
-
-                    deploymentListener.onDeploymentFailure(appName, t);
-
-                    File appZip = new File(appsDir, zip);
-                    addZombie(appZip);
-                }
+                zipApps[i] = StringUtils.removeEndIgnoreCase(zipApps[i], ZIP_FILE_SUFFIX);
             }
 
             // TODO this is a place to put a FQN of the custom sorter (use AND filter)
             // Add string shortcuts for bundled ones
-            apps = appsDir.list(DirectoryFileFilter.DIRECTORY);
+            apps = (String[]) ArrayUtils.addAll(dirApps, zipApps);
             Arrays.sort(apps);
         }
         else
@@ -151,26 +144,30 @@ public class DeploymentService
         for (String app : apps)
         {
             final Application a;
+            String appMarker = app;
+            File applicationFile = null;
             try
             {
                 // if there's a zip, explode and install it
-                final File appZip = new File(appsDir, app + ".zip");
-                if (appZip.exists())
+                applicationFile = new File(appsDir, app + ".zip");
+                if (applicationFile.exists() && applicationFile.isFile())
                 {
-                    a = guardedInstallFromAppDir(appZip.getName());
+                    appMarker = app + ZIP_FILE_SUFFIX;
+                    a = guardedInstallFromAppDir(applicationFile.getName());
                 }
                 else
                 {
                     // otherwise just create an app object from a deployed app
+                    applicationFile = new File(appsDir, appMarker);
                     a = appFactory.createApp(app);
                 }
                 applications.add(a);
             }
             catch (Throwable t)
             {
-                deploymentListener.onDeploymentFailure(app, t);
-                addZombie(new File(appsDir, app));
-                logger.error(String.format("Failed to create application [%s]", app), t);
+                deploymentListener.onDeploymentFailure(appMarker, t);
+                addZombie(applicationFile);
+                logger.error(String.format("Failed to create application [%s]", appMarker), t);
             }
         }
 
@@ -594,11 +591,9 @@ public class DeploymentService
                     return;
                 }
 
-
                 // list new apps
-                final String[] zips = appsDir.list(new SuffixFileFilter(".zip"));
+                final String[] zips = appsDir.list(ZIP_APPS_FILTER);
                 String[] apps = appsDir.list(DirectoryFileFilter.DIRECTORY);
-
 
                 // we care only about removed anchors
                 String[] currentAnchors = appsDir.list(new SuffixFileFilter(APP_ANCHOR_SUFFIX));
@@ -806,5 +801,4 @@ public class DeploymentService
         }
 
     }
-
 }
