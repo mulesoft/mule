@@ -236,12 +236,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer
             setupEntityMethod(src, outputEncoding, msg, postMethod);
         }
 
-        // if a content type was specified on the endpoint, use it
-        String outgoingContentType = msg.getInvocationProperty(HttpConstants.HEADER_CONTENT_TYPE);
-        if (outgoingContentType != null)
-        {
-            postMethod.setRequestHeader(HttpConstants.HEADER_CONTENT_TYPE, outgoingContentType);
-        }
+        setContentType(msg, postMethod);
 
         return postMethod;
     }
@@ -260,11 +255,22 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer
     {
         URI uri = getURI(msg);
         PutMethod putMethod = new PutMethod(uri.toString());
+        setContentType(msg, putMethod);
 
         Object payload = msg.getPayload();
         setupEntityMethod(payload, outputEncoding, msg, putMethod);
 
         return putMethod;
+    }
+
+    private void setContentType(MuleMessage msg, HttpMethod putMethod)
+    {
+        // if a content type was specified on the endpoint, use it
+        String outgoingContentType = msg.getInvocationProperty(HttpConstants.HEADER_CONTENT_TYPE);
+        if (outgoingContentType != null)
+        {
+            putMethod.setRequestHeader(HttpConstants.HEADER_CONTENT_TYPE, outgoingContentType);
+        }
     }
 
     protected HttpMethod createDeleteMethod(MuleMessage message) throws Exception
