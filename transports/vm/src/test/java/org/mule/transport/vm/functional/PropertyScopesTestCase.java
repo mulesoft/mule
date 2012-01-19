@@ -37,7 +37,7 @@ public class PropertyScopesTestCase extends FunctionalTestCase
     }
 
     @Test
-    public void testInboundScopeSynchronous() throws Exception
+    public void noPropagationOfInboundScopeSynchronous() throws Exception
     {
         MuleClient client = muleContext.getClient();
         MuleMessage message = new DefaultMuleMessage(TEST_MESSAGE, muleContext);
@@ -50,7 +50,7 @@ public class PropertyScopesTestCase extends FunctionalTestCase
     }
 
     @Test
-    public void testOutboundScopeSynchronous() throws Exception
+    public void noPropagationOfOutboundScopeSynchronous() throws Exception
     {
         MuleClient client = muleContext.getClient();
         MuleMessage message = new DefaultMuleMessage(TEST_MESSAGE, muleContext);
@@ -63,7 +63,7 @@ public class PropertyScopesTestCase extends FunctionalTestCase
     }
 
     @Test
-    public void testInvocationScopeSynchronous() throws Exception
+    public void propagationOfInvocationScopeSynchronous() throws Exception
     {
         MuleClient client = muleContext.getClient();
         MuleMessage message = new DefaultMuleMessage(TEST_MESSAGE, muleContext);
@@ -80,7 +80,7 @@ public class PropertyScopesTestCase extends FunctionalTestCase
     @Test
     @Ignore
     // MULE-5302
-    public void testSessionScopeSynchronous() throws Exception
+    public void propagationOfSessionScopeSynchronous() throws Exception
     {
         MuleClient client = muleContext.getClient();
         MuleMessage message = new DefaultMuleMessage(TEST_MESSAGE, muleContext);
@@ -92,7 +92,7 @@ public class PropertyScopesTestCase extends FunctionalTestCase
     }
 
     @Test
-    public void testInboundScopeAsynchronous() throws Exception
+    public void noPropagationOfInboundScopeAsynchronous() throws Exception
     {
         MuleClient client = muleContext.getClient();
         MuleMessage message = new DefaultMuleMessage(TEST_MESSAGE, muleContext);
@@ -105,7 +105,7 @@ public class PropertyScopesTestCase extends FunctionalTestCase
     }
 
     @Test
-    public void testOutboundScopeAsynchronous() throws Exception
+    public void noPropagationOfOutboundScopeAsynchronous() throws Exception
     {
         MuleClient client = muleContext.getClient();
         MuleMessage message = new DefaultMuleMessage(TEST_MESSAGE, muleContext);
@@ -118,7 +118,7 @@ public class PropertyScopesTestCase extends FunctionalTestCase
     }
 
     @Test
-    public void testInvocationScopeAsynchronous() throws Exception
+    public void noPropagationOfInvocationScopeAsynchronous() throws Exception
     {
         MuleClient client = muleContext.getClient();
         MuleMessage message = new DefaultMuleMessage(TEST_MESSAGE, muleContext);
@@ -133,7 +133,7 @@ public class PropertyScopesTestCase extends FunctionalTestCase
     @Test
     @Ignore
     // MULE-5302
-    public void testSessionScopeAsynchronous() throws Exception
+    public void propagationOfSessionScopeAsynchronous() throws Exception
     {
         MuleClient client = muleContext.getClient();
         MuleMessage message = new DefaultMuleMessage(TEST_MESSAGE, muleContext);
