@@ -6,4 +6,4 @@
 org.mule.transport.vm.functional.VmXATransactionTestCase
 
 # MULE-5056
-org.mule.transport.vm.functional.PropertyScopesTestCase
+#org.mule.transport.vm.functional.PropertyScopesTestCase

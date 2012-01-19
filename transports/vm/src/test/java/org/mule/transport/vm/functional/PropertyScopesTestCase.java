@@ -10,20 +10,22 @@
 
 package org.mule.transport.vm.functional;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.api.transport.PropertyScope;
 import org.mule.tck.junit4.FunctionalTestCase;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-
 /**
- * Test the propagation of a property in different scopes and in synchronous vs. asynchronous flows.
+ * Test the propagation of a property in different scopes and in synchronous vs.
+ * asynchronous flows.
  */
 public class PropertyScopesTestCase extends FunctionalTestCase
 {
@@ -33,17 +35,18 @@ public class PropertyScopesTestCase extends FunctionalTestCase
     {
         return "vm/property-scopes.xml";
     }
-    
+
     @Test
     public void testInboundScopeSynchronous() throws Exception
     {
         MuleClient client = muleContext.getClient();
         MuleMessage message = new DefaultMuleMessage(TEST_MESSAGE, muleContext);
         message.setProperty("foo", "bar", PropertyScope.INBOUND);
-        
+
         MuleMessage response = client.send("vm://in-synch", message);
         assertNotNull(response);
-        assertNull("Property should not have been propogated for this scope", response.getProperty("foo", PropertyScope.INBOUND));
+        assertNull("Property should not have been propogated for this scope",
+            response.getProperty("foo", PropertyScope.INBOUND));
     }
 
     @Test
@@ -55,7 +58,8 @@ public class PropertyScopesTestCase extends FunctionalTestCase
 
         MuleMessage response = client.send("vm://in-synch", message);
         assertNotNull(response);
-        assertNull("Property should not have been propogated for this scope", response.getProperty("foo", PropertyScope.OUTBOUND));
+        assertNull("Property should not have been propogated for this scope",
+            response.getProperty("foo", PropertyScope.OUTBOUND));
     }
 
     @Test
@@ -64,13 +68,18 @@ public class PropertyScopesTestCase extends FunctionalTestCase
         MuleClient client = muleContext.getClient();
         MuleMessage message = new DefaultMuleMessage(TEST_MESSAGE, muleContext);
         message.setProperty("foo", "bar", PropertyScope.INVOCATION);
-        
+
         MuleMessage response = client.send("vm://in-synch", message);
         assertNotNull(response);
+        // VM Transport does not propagate invocation properties. The properties
+        // available here have not been returned from services, but rather conserved
+        // in the message dispatcher
         assertEquals("bar", response.getProperty("foo", PropertyScope.INVOCATION));
     }
 
     @Test
+    @Ignore
+    // MULE-5302
     public void testSessionScopeSynchronous() throws Exception
     {
         MuleClient client = muleContext.getClient();
@@ -89,9 +98,10 @@ public class PropertyScopesTestCase extends FunctionalTestCase
         MuleMessage message = new DefaultMuleMessage(TEST_MESSAGE, muleContext);
         message.setProperty("foo", "bar", PropertyScope.INBOUND);
         client.dispatch("vm://in-asynch", message);
-        MuleMessage response = client.request("vm://out-asynch", 1000);
+        MuleMessage response = client.request("vm://out-asynch", RECEIVE_TIMEOUT);
         assertNotNull(response);
-        assertNull("Property should not have been propogated for this scope", response.getProperty("foo", PropertyScope.INBOUND));
+        assertNull("Property should not have been propogated for this scope",
+            response.getProperty("foo", PropertyScope.INBOUND));
     }
 
     @Test
@@ -101,9 +111,10 @@ public class PropertyScopesTestCase extends FunctionalTestCase
         MuleMessage message = new DefaultMuleMessage(TEST_MESSAGE, muleContext);
         message.setProperty("foo", "bar", PropertyScope.OUTBOUND);
         client.dispatch("vm://in-asynch", message);
-        MuleMessage response = client.request("vm://out-asynch", 1000);
+        MuleMessage response = client.request("vm://out-asynch", RECEIVE_TIMEOUT);
         assertNotNull(response);
-        assertNull("Property should not have been propogated for this scope", response.getProperty("foo", PropertyScope.OUTBOUND));
+        assertNull("Property should not have been propogated for this scope",
+            response.getProperty("foo", PropertyScope.OUTBOUND));
     }
 
     @Test
@@ -113,22 +124,23 @@ public class PropertyScopesTestCase extends FunctionalTestCase
         MuleMessage message = new DefaultMuleMessage(TEST_MESSAGE, muleContext);
         message.setProperty("foo", "bar", PropertyScope.INVOCATION);
         client.dispatch("vm://in-asynch", message);
-        MuleMessage response = client.request("vm://out-asynch", 1000);
+        MuleMessage response = client.request("vm://out-asynch", RECEIVE_TIMEOUT);
         assertNotNull(response);
-        assertEquals("bar", response.getProperty("foo", PropertyScope.INVOCATION));
+        // VM Transport does not propagate invocation properties
+        assertNull(response.getProperty("foo", PropertyScope.INVOCATION));
     }
 
     @Test
+    @Ignore
+    // MULE-5302
     public void testSessionScopeAsynchronous() throws Exception
     {
         MuleClient client = muleContext.getClient();
         MuleMessage message = new DefaultMuleMessage(TEST_MESSAGE, muleContext);
         message.setProperty("foo", "bar", PropertyScope.SESSION);
         client.dispatch("vm://in-asynch", message);
-        MuleMessage response = client.request("vm://out-asynch", 1000);
+        MuleMessage response = client.request("vm://out-asynch", RECEIVE_TIMEOUT);
         assertNotNull(response);
         assertEquals("bar", response.getProperty("foo", PropertyScope.SESSION));
     }
 }
-
-
