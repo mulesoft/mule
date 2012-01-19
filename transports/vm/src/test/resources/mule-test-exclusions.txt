@@ -5,8 +5,5 @@
 # MULE-2931
 org.mule.transport.vm.functional.VmXATransactionTestCase
 
-# MULE-5056
-org.mule.transport.vm.functional.PropertyScopesTestCase
-
 # MULE-6018
-org.mule.transport.vm.functional.transactions.XARollbackTestCase
+org.mule.transport.vm.functional.transactions.XARollbackTestCase=======
