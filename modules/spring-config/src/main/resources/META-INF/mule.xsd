@@ -4325,6 +4325,7 @@
             <xsd:enumeration value="variable"/>
             <xsd:enumeration value="wildcard"/>
             <xsd:enumeration value="xpath"/>
+            <xsd:enumeration value="xpath2"/>
             <xsd:enumeration value="xpath-node"/>
             <xsd:enumeration value="custom"/>
         </xsd:restriction>
@@ -5210,7 +5211,7 @@
             Takes a payload which is a Collection of Collections and turns into a single List. For example, if the payload is a Collection
             which contains a Collection with elements A and B and another Collection with elements C and D, this will turn them into
             a single Collection with elements A, B, C and D.
-            
+
             This transformer will also work on MuleMessageCollections. In this case, it will take the individual Collection
             payloads of each MuleMessage and merge them into a single Collection on a new MuleMessage.
             </xsd:documentation>
