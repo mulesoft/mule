@@ -23,6 +23,7 @@ import org.mule.context.notification.MuleContextNotification;
 import org.mule.module.xml.i18n.XmlMessages;
 import org.mule.module.xml.stax.MapNamespaceContext;
 import org.mule.module.xml.util.NamespaceManager;
+import org.mule.transformer.types.DataTypeFactory;
 
 import java.util.Map;
 import java.util.WeakHashMap;
@@ -34,25 +35,23 @@ import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
-import org.mule.transformer.types.DataTypeFactory;
 import org.w3c.dom.Node;
 
 /**
- * Uses JAXP XPath processing to evaluate xpath expressions against Xml fragments and documents
+ * Uses JAXP XPath processing to evaluate xpath expressions against Xml fragments and
+ * documents
  * <p/>
- * Note that the Jaxp Expression evaluator differs from the Mule XPATH evaluator slightly since you cna set the JaxP
- * return type as a prefix to the expression i.e.
+ * Note that the JAXP Expression evaluator differs from the Mule XPATH evaluator
+ * slightly since you can set the JAXP return type as a prefix to the expression i.e.
  * <code>
- * xpath2:[node]/foo/bar
+ * xpath2:[type]/foo/bar
  * </code>
  * <p/>
- * Where the type can either be boolean, string, number, node or nodeset.  iBeans will automatically convert numbers based on the
- * return type as well as convert node to Document if required.
+ * Where the type can either be boolean, string, number, node or nodeset.
  */
 public class JaxpXPathExpressionEvaluator implements ExpressionEvaluator, Initialisable, Disposable, MuleContextAware
 {
-
-    private Map cache = new WeakHashMap(8);
+    private Map<String, XPathExpression> cache = new WeakHashMap<String, XPathExpression>(8);
 
     private MuleContext muleContext;
     private NamespaceManager namespaceManager;
@@ -60,7 +59,7 @@ public class JaxpXPathExpressionEvaluator implements ExpressionEvaluator, Initia
 
     public JaxpXPathExpressionEvaluator()
     {
-
+        super();
     }
 
     public String getName()
@@ -155,7 +154,7 @@ public class JaxpXPathExpressionEvaluator implements ExpressionEvaluator, Initia
         }
         try
         {
-            Node payload = (Node) message.getPayload(DataTypeFactory.create(Node.class));
+            Node payload = message.getPayload(DataTypeFactory.create(Node.class));
 
             XPathExpression xpath = getXPath(expression);
 
@@ -177,11 +176,12 @@ public class JaxpXPathExpressionEvaluator implements ExpressionEvaluator, Initia
 
     protected XPathExpression getXPath(String expression) throws XPathExpressionException
     {
-        XPathExpression xpath = (XPathExpression) cache.get(expression + getClass().getName());
+        String key = expression + getClass().getName();
+        XPathExpression xpath = cache.get(key);
         if (xpath == null)
         {
             xpath = createXPath(expression);
-            cache.put(expression + getClass().getName(), xpath);
+            cache.put(key, xpath);
         }
         return xpath;
     }
