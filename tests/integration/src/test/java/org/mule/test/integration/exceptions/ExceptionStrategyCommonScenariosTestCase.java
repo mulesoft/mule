@@ -9,11 +9,18 @@
  */
 package org.mule.test.integration.exceptions;
 
-import org.hamcrest.core.IsNull;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runners.Parameterized;
-import org.mule.api.*;
+import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsInstanceOf.instanceOf;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
+
+import org.mule.api.MuleContext;
+import org.mule.api.MuleEvent;
+import org.mule.api.MuleEventContext;
+import org.mule.api.MuleException;
+import org.mule.api.MuleMessage;
 import org.mule.api.client.LocalMuleClient;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.processor.MessageProcessor;
@@ -28,7 +35,6 @@ import org.mule.transport.email.FixedPortGreenMailSupport;
 import org.mule.transport.email.functional.AbstractEmailFunctionalTestCase;
 import org.mule.util.concurrent.Latch;
 
-import javax.mail.internet.MimeMessage;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -36,9 +42,13 @@ import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsInstanceOf.instanceOf;
-import static org.junit.Assert.*;
+import javax.mail.internet.MimeMessage;
+
+import org.hamcrest.core.IsNull;
+import org.junit.Ignore;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runners.Parameterized;
 
 public class ExceptionStrategyCommonScenariosTestCase extends AbstractServiceAndFlowTestCase
 {
@@ -183,6 +193,7 @@ public class ExceptionStrategyCommonScenariosTestCase extends AbstractServiceAnd
     }
 
     @Test
+    @Ignore("See MULE-6030")
     public void testRollbackTransactionAndSendAnEmail() throws Exception
     {
         if (variant.equals(ConfigVariant.SERVICE))
