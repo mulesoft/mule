@@ -10,13 +10,14 @@
 
 package org.mule.transport.sftp;
 
-import org.mule.tck.junit4.FunctionalTestCase;
-
-import org.junit.Test;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+
+import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.tck.junit4.FunctionalTestCase;
+
+import org.junit.Test;
 
 public class SftpNamespaceHandlerTestCase extends FunctionalTestCase
 {
@@ -28,7 +29,7 @@ public class SftpNamespaceHandlerTestCase extends FunctionalTestCase
     }
 
     @Test
-    public void testSftpConfig() throws Exception
+    public void testSftpConnectorConfig() throws Exception
     {
         SftpConnector c = (SftpConnector) muleContext.getRegistry().lookupConnector("sftpConnector");
         assertNotNull(c);
@@ -39,5 +40,15 @@ public class SftpNamespaceHandlerTestCase extends FunctionalTestCase
         assertEquals(1234, c.getFileAge());
         assertEquals("uploading", c.getTempDirOutbound());
         assertEquals(42, c.getMaxConnectionPoolSize());
+    }
+
+    @Test
+    public void testSftpEndpointConfig() throws Exception
+    {
+        ImmutableEndpoint inboundEndpoint = (ImmutableEndpoint) muleContext.getRegistry().lookupObject("inboundEndpoint");
+        SftpConnector connector = (SftpConnector) inboundEndpoint.getConnector();
+        Object[] receivers = connector.getReceivers().values().toArray();
+        SftpMessageReceiver receiver = (SftpMessageReceiver) receivers[0];
+        assertEquals(10000, receiver.getFrequency());
     }
 }

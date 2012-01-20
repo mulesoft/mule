@@ -10,13 +10,6 @@
 
 package org.mule.transport.sftp;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.commons.pool.ObjectPool;
-import org.apache.commons.pool.impl.GenericObjectPool;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.construct.FlowConstruct;
@@ -27,11 +20,18 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transport.ConnectorException;
 import org.mule.api.transport.MessageReceiver;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.construct.SimpleFlowConstruct;
 import org.mule.transport.AbstractConnector;
-import org.mule.transport.file.FilenameParser;
 import org.mule.transport.file.ExpressionFilenameParser;
+import org.mule.transport.file.FilenameParser;
 import org.mule.transport.sftp.notification.SftpNotifier;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.commons.pool.ObjectPool;
+import org.apache.commons.pool.impl.GenericObjectPool;
 
 /**
  * <code>SftpConnector</code> sends and receives file messages over sftp using jsch
@@ -145,7 +145,8 @@ public class SftpConnector extends AbstractConnector
         return "sftp";
     }
 
-    public MessageReceiver createReceiver(SimpleFlowConstruct flow, InboundEndpoint endpoint) throws Exception
+    @Override
+    public MessageReceiver createReceiver(FlowConstruct flow, InboundEndpoint endpoint) throws Exception
     {
         long polling = pollingFrequency;
 
