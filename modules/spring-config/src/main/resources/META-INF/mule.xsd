@@ -4378,7 +4378,6 @@
             <xsd:enumeration value="attachments-list"/>
             <xsd:enumeration value="bean"/>
             <xsd:enumeration value="endpoint"/>
-            <xsd:enumeration value="exception-type"/>
             <xsd:enumeration value="function"/>
             <xsd:enumeration value="groovy"/>
             <xsd:enumeration value="header"/>
@@ -4392,8 +4391,7 @@
             <xsd:enumeration value="mule"/>
             <xsd:enumeration value="ognl"/>
             <xsd:enumeration value="payload"/>
-            <xsd:enumeration value="payload-type"/>
-            <xsd:enumeration value="processor"/>
+            <xsd:enumeration value="process"/>
             <xsd:enumeration value="regex"/>
             <xsd:enumeration value="string"/>
             <xsd:enumeration value="variable"/>
