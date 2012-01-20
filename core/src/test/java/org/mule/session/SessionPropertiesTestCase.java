@@ -40,7 +40,7 @@ import org.junit.Test;
 public class SessionPropertiesTestCase extends AbstractMuleContextTestCase
 {
 
-    /**         https://svn.codehaus.org/mule/branches/mule-3.2.x
+    /**
      * Session properties set via message API are lost and unavailable via both message and session API's.
      */
     @Test
