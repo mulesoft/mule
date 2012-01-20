@@ -38,21 +38,20 @@ import javax.xml.xpath.XPathFactory;
 import org.w3c.dom.Node;
 
 /**
- * Uses JAXP XPath processing to evaluate xpath expressions against Xml fragments and documents
+ * Uses JAXP XPath processing to evaluate xpath expressions against Xml fragments and
+ * documents
  * <p/>
- * Note that the Jaxp Expression evaluator differs from the Mule XPATH evaluator slightly since you cna set the JaxP
- * return type as a prefix to the expression i.e.
+ * Note that the JAXP Expression evaluator differs from the Mule XPATH evaluator
+ * slightly since you can set the JAXP return type as a prefix to the expression i.e.
  * <code>
- * xpath2:[node]/foo/bar
+ * xpath2:[type]/foo/bar
  * </code>
  * <p/>
- * Where the type can either be boolean, string, number, node or nodeset.  iBeans will automatically convert numbers based on the
- * return type as well as convert node to Document if required.
+ * Where the type can either be boolean, string, number, node or nodeset.
  */
 public class JaxpXPathExpressionEvaluator implements ExpressionEvaluator, Initialisable, Disposable, MuleContextAware
 {
-
-    private Map cache = new WeakHashMap(8);
+    private Map<String, XPathExpression> cache = new WeakHashMap<String, XPathExpression>(8);
 
     private MuleContext muleContext;
     private NamespaceManager namespaceManager;
@@ -180,11 +179,12 @@ public class JaxpXPathExpressionEvaluator implements ExpressionEvaluator, Initia
 
     protected XPathExpression getXPath(String expression) throws XPathExpressionException
     {
-        XPathExpression xpath = (XPathExpression) cache.get(expression + getClass().getName());
+        String key = expression + getClass().getName();
+        XPathExpression xpath = cache.get(key);
         if (xpath == null)
         {
             xpath = createXPath(expression);
-            cache.put(expression + getClass().getName(), xpath);
+            cache.put(key, xpath);
         }
         return xpath;
     }
