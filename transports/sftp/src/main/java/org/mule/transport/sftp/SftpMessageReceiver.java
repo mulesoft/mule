@@ -42,13 +42,6 @@ public class SftpMessageReceiver extends AbstractPollingMessageReceiver
         sftpRRUtil = new SftpReceiverRequesterUtil(endpoint);
     }
 
-    public SftpMessageReceiver(SftpConnector connector, FlowConstruct flow, InboundEndpoint endpoint)
-        throws CreateException
-    {
-        super(connector, flow, endpoint);
-        sftpRRUtil = new SftpReceiverRequesterUtil(endpoint);
-    }
-
     public void poll() throws Exception
     {
         if (logger.isDebugEnabled())
