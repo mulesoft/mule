@@ -3555,28 +3555,11 @@
     <xsd:complexType name="expressionFilterType">
         <xsd:complexContent>
             <xsd:extension base="abstractFilterType">
-                <xsd:attribute name="evaluator" use="required">
+                <xsd:attribute name="evaluator" type="expressionFilterEvaluators" use="required">
                     <xsd:annotation>
                         <xsd:documentation>The expression evaluator to use. The expression filter supports some types such as header, payload, exception, wildcard, and regex, that are built-in filters not registered with the ExpressionEvaluatorManager. All others are registered with the ExpressionEvaluatorManager. Where XPath, bean, and ONGL are used, the expression should be a boolean expression.
                         </xsd:documentation>
                     </xsd:annotation>
-                    <xsd:simpleType>
-                        <xsd:restriction base="substitutableName">
-                            <xsd:enumeration value="header"/>
-                            <xsd:enumeration value="payload-type"/>
-                            <xsd:enumeration value="exception-type"/>
-                            <xsd:enumeration value="wildcard"/>
-                            <xsd:enumeration value="regex"/>
-                            <xsd:enumeration value="ognl"/>
-                            <xsd:enumeration value="xpath"/>
-                            <xsd:enumeration value="jxpath"/>
-                            <xsd:enumeration value="groovy"/>
-                            <xsd:enumeration value="bean"/>
-                            <xsd:enumeration value="custom"/>
-                            <xsd:enumeration value="registry"/>
-                            <xsd:enumeration value="variable"/>
-                        </xsd:restriction>
-                    </xsd:simpleType>
                 </xsd:attribute>
                 <xsd:attribute name="expression" type="xsd:string" use="required">
                     <xsd:annotation>
@@ -4325,6 +4308,24 @@
             <xsd:enumeration value="xpath2"/>
             <xsd:enumeration value="xpath-node"/>
             <xsd:enumeration value="custom"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <xsd:simpleType  name="expressionFilterEvaluators">
+        <xsd:restriction base="substitutableName">
+            <xsd:enumeration value="header"/>
+            <xsd:enumeration value="payload-type"/>
+            <xsd:enumeration value="exception-type"/>
+            <xsd:enumeration value="wildcard"/>
+            <xsd:enumeration value="regex"/>
+            <xsd:enumeration value="ognl"/>
+            <xsd:enumeration value="xpath"/>
+            <xsd:enumeration value="jxpath"/>
+            <xsd:enumeration value="groovy"/>
+            <xsd:enumeration value="bean"/>
+            <xsd:enumeration value="custom"/>
+            <xsd:enumeration value="registry"/>
+            <xsd:enumeration value="variable"/>
         </xsd:restriction>
     </xsd:simpleType>
 
@@ -5432,7 +5433,7 @@
                  no expression is specified -->
             <xsd:group ref="messageProcessorOrOutboundEndpoint" minOccurs="1" maxOccurs="unbounded" />
           </xsd:sequence>
-          <xsd:attribute name="evaluator" use="optional" type="standardExpressionEvaluators">
+          <xsd:attribute name="evaluator" use="optional" type="expressionFilterEvaluators">
               <xsd:annotation>
                   <xsd:documentation>The expression evaluator to use. Expression evaluators must be registered with the ExpressionEvaluatorManager before they can be used. Using the custom evaluator allows you to define your own evaluator with the 'custom-evaluator' attribute. Note that some evaluators such as xpath, groovy, and bean are loaded from other Mule modules (XML and Scripting, respectively). These modules must be on your classpath before the evaluator can be used.
                   </xsd:documentation>
