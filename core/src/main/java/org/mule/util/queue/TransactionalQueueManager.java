@@ -134,11 +134,15 @@ public class TransactionalQueueManager extends AbstractXAResourceManager impleme
                 List<Serializable> keys = store.allKeys();
                 for (Serializable key : keys)
                 {
-                    QueueKey queueKey = (QueueKey) key;
-                    QueueInfo queue = getQueue(queueKey.queueName);
-                    if (queue.isQueueTransient())
+                    // It may contain events that aren't part of a queue MULE-6007
+                    if (key instanceof QueueKey)
                     {
-                        queue.putNow(queueKey.id);
+                        QueueKey queueKey = (QueueKey) key;
+                        QueueInfo queue = getQueue(queueKey.queueName);
+                        if (queue.isQueueTransient())
+                        {
+                            queue.putNow(queueKey.id);
+                        }
                     }
                 }
             }
