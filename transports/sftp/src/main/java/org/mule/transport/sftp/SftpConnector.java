@@ -145,6 +145,7 @@ public class SftpConnector extends AbstractConnector
         return "sftp";
     }
 
+    @Override
     public MessageReceiver createReceiver(FlowConstruct flow, InboundEndpoint endpoint) throws Exception
     {
         long polling = pollingFrequency;

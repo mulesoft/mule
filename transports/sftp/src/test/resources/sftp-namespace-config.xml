@@ -1,9 +1,7 @@
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:spring="http://www.springframework.org/schema/beans"
       xmlns:sftp="http://www.mulesoft.org/schema/mule/sftp"
       xsi:schemaLocation="
-        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
         http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
         http://www.mulesoft.org/schema/mule/sftp http://www.mulesoft.org/schema/mule/sftp/3.2/mule-sftp.xsd">
 
@@ -13,4 +11,11 @@
                     fileAge="1234"
                     tempDirOutbound="uploading"
                     maxConnectionPoolSize="42"/>
+
+    <flow name="receiving">
+        <sftp:inbound-endpoint name="inboundEndpoint" autoDelete="true"
+                               address="sftp://john.doe:foo@$localhost/~/data"
+                               pollingFrequency="10000"/>
+        <echo-component/>
+    </flow>
 </mule>
