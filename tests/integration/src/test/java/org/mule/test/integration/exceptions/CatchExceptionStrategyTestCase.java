@@ -44,8 +44,6 @@ public class CatchExceptionStrategyTestCase extends AbstractServiceAndFlowTestCa
     public DynamicPort dynamicPort2 = new DynamicPort("port2");
     @Rule
     public DynamicPort dynamicPort3 = new DynamicPort("port3");
-    @Rule
-    public DynamicPort dynamicPort4 = new DynamicPort("port4");
 
     public CatchExceptionStrategyTestCase(ConfigVariant variant, String configResources)
     {
@@ -87,16 +85,6 @@ public class CatchExceptionStrategyTestCase extends AbstractServiceAndFlowTestCa
     public void testTcpJsonErrorResponse() throws Exception
     {
         testJsonErrorResponse(String.format("tcp://localhost:%s",dynamicPort2.getNumber()));
-    }
-
-    @Test
-    @Ignore
-    public void testCxfHttpJsonErrorResponse() throws Exception
-    {
-        LocalMuleClient client = muleContext.getClient();
-        MuleMessage response = client.send(String.format("http://localhost:%s/cxfservice", dynamicPort4.getNumber()), "", null, TIMEOUT);
-        assertThat(response, IsNull.<Object>notNullValue());
-        assertThat(response.getPayloadAsString(), Is.is("{\"errorMessage\":\"error processing news\",\"userId\":15,\"title\":\"News title\"}"));
     }
 
     private void testJsonErrorResponse(String endpointUri) throws Exception

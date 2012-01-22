@@ -84,15 +84,4 @@
         </catch-exception-strategy>
     </flow>
 
-    <flow name="cxfContinueProcessingActualMessage">
-        <http:inbound-endpoint host="localhost" port="${port4}" path="cxfservice"/>
-        <cxf:jaxws-service serviceClass="org.mule.test.integration.exceptions.CatchExceptionStrategyTestCase$Echo" onException="INVOKE_EXCEPTION_STRATEGY"/>
-        <component>
-            <singleton-object class="org.mule.test.integration.exceptions.CatchExceptionStrategyTestCase$Echo" />
-        </component>
-        <catch-exception-strategy>
-            <json:object-to-json-transformer/>
-        </catch-exception-strategy>
-    </flow>
-
 </mule>

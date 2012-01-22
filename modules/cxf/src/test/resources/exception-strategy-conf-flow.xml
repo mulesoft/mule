@@ -17,12 +17,12 @@
         <custom-exception-strategy class="org.mule.module.cxf.CxfComponentExceptionStrategy"/>
     </flow>
 
-    <flow name="CxfDefault">
-        <inbound-endpoint address="http://localhost:${port1}/services/CxfDefault" name="cxfDefaultInbound"
+    <flow name="CxfWithDefaultExceptionStrategy">
+        <inbound-endpoint address="http://localhost:${port1}/services/CxfWithDefaultExceptionStrategy" name="cxfDefaultExceptionStrategyInbound"
             exchange-pattern="request-response">
             <cxf:simple-service serviceClass="org.mule.module.cxf.testmodels.TestCxfComponent"/>
         </inbound-endpoint>
         <component class="org.mule.module.cxf.testmodels.TestCxfComponent"/>
-    </flow> 
+    </flow>
 
 </mule>

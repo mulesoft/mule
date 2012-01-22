@@ -144,10 +144,6 @@ public class CxfOutboundMessageProcessor extends AbstractInterceptingMessageProc
             }
             throw new DispatchException(event,this,f);
         }
-        catch (MuleException e)
-        {
-            throw e;
-        }
         catch (Exception e)
         {
             throw new DispatchException(event,this,e);
@@ -402,24 +398,7 @@ public class CxfOutboundMessageProcessor extends AbstractInterceptingMessageProc
         }
 
         MuleMessage message = transportResponse.getMessage();
-        String statusCode = message.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY);
-        if (statusCode != null && Integer.parseInt(statusCode) != HttpConstants.SC_OK)
-        {
-            String exPayload;
-            try
-            {
-                exPayload = message.getPayloadAsString();
-            }
-            catch (Exception e)
-            {
-                exPayload = "Invalid status code: " + statusCode;
-            }
-            message.setExceptionPayload(new DefaultExceptionPayload(new HttpException(exPayload)));
-        }
-        else
-        {
-            message.setPayload(payload);
-        }
+        message.setPayload(payload);
 
         return transportResponse;
     }

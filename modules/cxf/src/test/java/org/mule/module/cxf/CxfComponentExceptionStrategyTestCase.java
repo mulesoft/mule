@@ -10,7 +10,6 @@
 
 package org.mule.module.cxf;
 
-import org.mule.api.MessagingException;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.transport.DispatchException;
 import org.mule.module.client.MuleClient;
@@ -52,29 +51,49 @@ public class CxfComponentExceptionStrategyTestCase extends AbstractServiceAndFlo
             {ConfigVariant.FLOW, "exception-strategy-conf-flow.xml"}
         });
     }      
-    
+
     @Test
-    public void testDefaultComponentExceptionStrategy() throws Exception
+    public void testDefaultComponentExceptionStrategyWithFault() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
         try
         {
             client.send("cxf:" + ((InboundEndpoint) client.getMuleContext().getRegistry()
-                            .lookupObject("cxfDefaultInbound")).getAddress() + "?method=testCxfException", "TEST", null);
+                            .lookupObject("cxfExceptionStrategyInbound")).getAddress() + "?method=testFault", "TEST", null);
             fail("Exception expected");
         }
         catch (DispatchException e)
         {
-            assertTrue(e.getCause() instanceof CxfEnabledFaultMessage);
+            assertTrue(e.getCause() instanceof Fault);
+            assertTrue(e.getCause().getMessage().contains("Invalid data argument"));
+        }
+    }
+
+
+    // Test to prove that the CxfComponentExceptionStrategy is not needed anymore to unwrap the Fault, the
+    // exception cause is the same with or without the custom exception strategy defined, it is only unwrapped inside of
+    // the exception block
+    @Test
+    public void testDefaultExceptionStrategyWithFault() throws Exception
+    {
+        MuleClient client = new MuleClient(muleContext);
+        try
+        {
+            client.send("cxf:" + ((InboundEndpoint) client.getMuleContext().getRegistry()
+                            .lookupObject("cxfDefaultExceptionStrategyInbound")).getAddress() + "?method=testFault", "TEST", null);
+            fail("Exception expected");
+        }
+        catch (DispatchException e)
+        {
+            assertTrue(e.getCause() instanceof Fault);
+            assertTrue(e.getCause().getMessage().contains("Invalid data argument"));
         }
     }
 
     @Test
-    @Ignore("This doesn't work because of a bug in the CXF client code :-(")
-    public void testHandledException() throws Exception
+    public void testDefaultComponentExceptionStrategyWithCxfException() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
-
         try
         {
             client.send("cxf:" + ((InboundEndpoint) client.getMuleContext().getRegistry()
@@ -83,7 +102,31 @@ public class CxfComponentExceptionStrategyTestCase extends AbstractServiceAndFlo
         }
         catch (DispatchException e)
         {
-            Throwable t = e.getCause().getCause();
+            Throwable t = e.getCause();
+            assertTrue(t instanceof CxfEnabledFaultMessage);
+            CustomFault fault = ((CxfEnabledFaultMessage) t).getFaultInfo();
+            assertNotNull(fault);
+            assertEquals("Custom Exception Message", fault.getDescription());
+        }
+    }
+
+
+    // Test to prove that the CxfComponentExceptionStrategy is not needed anymore to unwrap the Fault, the
+    // exception cause is the same with or without the custom exception strategy defined, it is only unwrapped inside of
+    // the exception block
+    @Test
+    public void testDefaultExceptionStrategyWithCxfException() throws Exception
+    {
+        MuleClient client = new MuleClient(muleContext);
+        try
+        {
+            client.send("cxf:" + ((InboundEndpoint) client.getMuleContext().getRegistry()
+                            .lookupObject("cxfDefaultExceptionStrategyInbound")).getAddress() + "?method=testCxfException", "TEST", null);
+            fail("Exception expected");
+        }
+        catch (DispatchException e)
+        {
+            Throwable t = e.getCause();
             assertTrue(t instanceof CxfEnabledFaultMessage);
             CustomFault fault = ((CxfEnabledFaultMessage) t).getFaultInfo();
             assertNotNull(fault);
@@ -92,7 +135,7 @@ public class CxfComponentExceptionStrategyTestCase extends AbstractServiceAndFlo
     }
 
     @Test
-    public void testUnhandledException() throws Exception
+    public void testDefaultComponentExceptionStrategyWithException() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
         try
@@ -106,5 +149,26 @@ public class CxfComponentExceptionStrategyTestCase extends AbstractServiceAndFlo
             assertTrue(e.getCause() instanceof Fault);
         }
     }
+
+    // Test to prove that the CxfComponentExceptionStrategy is not needed anymore to unwrap the Fault, the
+    // exception cause is the same with or without the custom exception strategy defined, it is only unwrapped inside of
+    // the exception block
+    @Test
+    public void testDefaultExceptionStrategyWithException() throws Exception
+    {
+        MuleClient client = new MuleClient(muleContext);
+        try
+        {
+            client.send("cxf:" + ((InboundEndpoint) client.getMuleContext().getRegistry()
+                            .lookupObject("cxfDefaultExceptionStrategyInbound")).getAddress() + "?method=testNonCxfException", "TEST", null);
+            fail("Exception expected");
+        }
+        catch (DispatchException e)
+        {
+            assertTrue(e.getCause() instanceof Fault);
+        }
+    }
+
+
 
 }

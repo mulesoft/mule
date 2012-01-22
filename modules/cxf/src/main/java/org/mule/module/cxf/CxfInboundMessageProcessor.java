@@ -82,8 +82,6 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
 
     private boolean proxy;
 
-    private boolean onFaultInvokeStrategy = false;
-    
     @Override
     public void initialise() throws InitialisationException
     {
@@ -321,16 +319,6 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
                 }
             }
 
-            //If SoapFault should trigger Mule ExceptionStrategy instead of handling it by CXF - intercept it here
-            if (isOnFaultInvokeStrategy())
-            {
-                Object o = exchange.get(Exception.class);
-                if (o != null && o instanceof Exception)
-                {
-                    throw new DefaultMuleException((Exception)o);
-                }
-            }
-
             return responseEvent;
         }
         catch (MuleException e)
@@ -490,15 +478,5 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
     public boolean isProxy()
     {
         return proxy;
-    }
-    
-    public void setOnFaultInvokeStrategy(boolean onFaultInvokeStrategy) 
-    {
-        this.onFaultInvokeStrategy = onFaultInvokeStrategy;
-    }
-    
-    public boolean isOnFaultInvokeStrategy() 
-    {
-        return onFaultInvokeStrategy;
     }
 }

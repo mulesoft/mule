@@ -8,33 +8,32 @@
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
        http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/3.2/mule-cxf.xsd">
 
-  <model name="BasicCxfTest">
-    <service name="CxfWithExceptionStrategy">
-      <inbound>
-        <inbound-endpoint
-          address="http://localhost:${port1}/services/CxfWithExceptionStrategy" 
-          name="cxfExceptionStrategyInbound"
-          exchange-pattern="request-response">
-          <cxf:simple-service/>
-        </inbound-endpoint>
-      </inbound>
-      <component
-        class="org.mule.module.cxf.testmodels.TestCxfComponent" />
-      <custom-exception-strategy class="org.mule.module.cxf.CxfComponentExceptionStrategy"/>
-    </service>
+    <model name="BasicCxfTest">
+        <service name="CxfWithExceptionStrategy">
+            <inbound>
+                <inbound-endpoint
+                    address="http://localhost:${port1}/services/CxfWithExceptionStrategy"
+                    name="cxfExceptionStrategyInbound"
+                    exchange-pattern="request-response">
+                    <cxf:simple-service/>
+                </inbound-endpoint>
+            </inbound>
+            <component class="org.mule.module.cxf.testmodels.TestCxfComponent" />
+            <custom-exception-strategy class="org.mule.module.cxf.CxfComponentExceptionStrategy"/>
+        </service>
 
-    <service name="CxfDefault">
-      <inbound>
-        <inbound-endpoint
-          address="http://localhost:${port1}/services/CxfDefault"
-          name="cxfDefaultInbound"
-          exchange-pattern="request-response">
-          <cxf:simple-service />
-        </inbound-endpoint>
-      </inbound>
-      <component
-        class="org.mule.module.cxf.testmodels.TestCxfComponent" />
-    </service>
-  </model>
+        <service name="CxfWithDefaultExceptionStrategy">
+            <inbound>
+                <inbound-endpoint
+                    address="http://localhost:${port1}/services/CxfWithDefaultExceptionStrategy"
+                    name="cxfDefaultExceptionStrategyInbound"
+                    exchange-pattern="request-response">
+                    <cxf:simple-service/>
+                </inbound-endpoint>
+            </inbound>
+            <component class="org.mule.module.cxf.testmodels.TestCxfComponent" />
+        </service>
+
+    </model>
 
 </mule>

@@ -584,6 +584,12 @@
             <artifactId>mule-transport-tcp</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-scripting</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
 
         <!--  We should reenable this as it makes CXF faster
         <dependency>

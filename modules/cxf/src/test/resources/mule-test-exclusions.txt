@@ -36,5 +36,3 @@ org.mule.module.cxf.issues.LargeProxyTestCase
 # Broken by MULE-3003 (DD to review/fix)
 org.mule.module.cxf.wsrm.WSRMTest
 
-#Temporarily broken, will fix soon
-org.mule.module.cxf.CxfExceptionHandlingTestCase

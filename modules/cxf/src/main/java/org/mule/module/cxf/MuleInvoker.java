@@ -16,6 +16,8 @@ import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.transport.PropertyScope;
 import org.mule.component.ComponentException;
+import org.mule.process.ErrorHandlingProcessingTemplate;
+import org.mule.process.ProcessingCallback;
 import org.mule.transport.NullPayload;
 
 import java.lang.reflect.Method;
@@ -50,7 +52,7 @@ public class MuleInvoker implements Invoker
     public Object invoke(Exchange exchange, Object o)
     {
         // this is the original request. Keep it to copy all the message properties from it
-        MuleEvent event = (MuleEvent) exchange.get(CxfConstants.MULE_EVENT);
+        final MuleEvent event = (MuleEvent) exchange.get(CxfConstants.MULE_EVENT);
         MuleEvent responseEvent = null;
         try
         {
@@ -76,8 +78,16 @@ public class MuleInvoker implements Invoker
                 reqMsg.setProperty(CxfConstants.INBOUND_OPERATION, bop.getOperationInfo().getName(), PropertyScope.INVOCATION);
                 reqMsg.setProperty(CxfConstants.INBOUND_SERVICE, svc.getName(), PropertyScope.INVOCATION);
             }
-            
-            responseEvent = cxfMmessageProcessor.processNext(event);
+
+            ErrorHandlingProcessingTemplate errorHandlingProcessingTemplate = new ErrorHandlingProcessingTemplate(event.getMuleContext(), event.getFlowConstruct().getExceptionListener());
+            responseEvent = errorHandlingProcessingTemplate.execute(new ProcessingCallback<MuleEvent>()
+            {
+                @Override
+                public MuleEvent process() throws Exception
+                {
+                    return cxfMmessageProcessor.processNext(event);
+                }
+            });
         }
         catch (MuleException e)
         {
@@ -89,18 +99,19 @@ public class MuleInvoker implements Invoker
             }
             throw new Fault(cause);
         }
-        catch (RuntimeException e)
+        catch (Exception e)
         {
             exchange.put(CxfConstants.MULE_EVENT, event);
             throw new Fault(e);
         }
+
 
         if (!event.getExchangePattern().hasResponse())
         {
             // weird response from AbstractInterceptingMessageProcessor
             responseEvent = null;
         }
-        
+
         if (responseEvent != null)
         {
             exchange.put(CxfConstants.MULE_EVENT, responseEvent);

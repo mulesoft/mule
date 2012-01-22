@@ -46,6 +46,7 @@ import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.frontend.ServerFactoryBean;
 import org.apache.cxf.interceptor.AttachmentOutInterceptor;
+import org.apache.cxf.interceptor.FaultOutInterceptor;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.interceptor.OneWayProcessorInterceptor;
 import org.apache.cxf.message.Message;
@@ -179,7 +180,6 @@ public abstract class AbstractInboundMessageProcessorBuilder implements MuleCont
 
         CxfInboundMessageProcessor processor = new CxfInboundMessageProcessor();
         processor.setMuleContext(muleContext);
-        processor.setOnFaultInvokeStrategy(CxfConstants.INVOKE_EXCEPTION_STRATEGY.equals(onException));
         configureMessageProcessor(sfb, processor);
         sfb.setStart(false);
 

@@ -8,26 +8,23 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.cxf.testmodels;
+package org.mule.module.cxf;
+
+import org.mule.module.cxf.testmodels.CustomFault;
+import org.mule.module.cxf.testmodels.CxfEnabledFaultMessage;
+
+import javax.jws.WebService;
 
 import org.apache.cxf.interceptor.Fault;
 
-public class TestCxfComponent
+@WebService(endpointInterface = "org.mule.module.cxf.TestServiceFault", serviceName = "TestServiceFault")
+public class TestServiceFaultImpl implements TestServiceFault
 {
-    public String testCxfException(String data) throws CxfEnabledFaultMessage
+    public String sayHi(String name) throws CxfEnabledFaultMessage
     {
         CustomFault fault = new CustomFault();
         fault.setDescription("Custom Exception Message");
         throw new CxfEnabledFaultMessage("Cxf Exception Message", fault);
     }
-
-    public String testFault(String data)
-    {
-        throw new Fault(new IllegalArgumentException("Invalid data argument"));
-    }
-
-    public String testNonCxfException(String data)
-    {
-        throw new UnsupportedOperationException("Non-Cxf Enabled Exception");
-    }
 }
+
