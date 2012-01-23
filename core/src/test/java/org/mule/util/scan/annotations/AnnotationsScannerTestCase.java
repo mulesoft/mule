@@ -9,7 +9,11 @@
  */
 package org.mule.util.scan.annotations;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.size.SmallTest;
 
 import java.io.IOException;
 import java.util.List;
@@ -18,9 +22,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.objectweb.asm.ClassReader;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
+@SmallTest
 public class AnnotationsScannerTestCase extends AbstractMuleTestCase
 {
     protected AnnotationsScanner scanner;

@@ -10,11 +10,16 @@
 
 package org.mule.expression;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.expression.RequiredValueException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.size.SmallTest;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -23,10 +28,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-
+@SmallTest
 public class MapPayloadExpressionEvaluatorTestCase extends AbstractMuleTestCase
 {
     private MuleContext muleContext = Mockito.mock(MuleContext.class);

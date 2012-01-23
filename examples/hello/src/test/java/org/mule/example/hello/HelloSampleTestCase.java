@@ -10,7 +10,13 @@
 
 package org.mule.example.hello;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.size.SmallTest;
 import org.mule.transformer.types.DataTypeFactory;
 
 import java.io.ByteArrayInputStream;
@@ -18,11 +24,7 @@ import java.io.InputStream;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-
+@SmallTest
 public class HelloSampleTestCase extends AbstractMuleTestCase
 {
 
