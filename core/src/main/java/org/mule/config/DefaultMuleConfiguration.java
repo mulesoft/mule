@@ -14,10 +14,12 @@ import org.mule.api.MuleContext;
 import org.mule.api.config.MuleConfiguration;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.context.MuleContextAware;
+import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.lifecycle.FatalException;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.Startable;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.exception.DefaultMessagingExceptionStrategy;
 import org.mule.util.FileUtils;
 import org.mule.util.NumberUtils;
 import org.mule.util.StringUtils;
@@ -90,7 +92,7 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
      * has been set on the transaction config
      */
     private int defaultTransactionTimeout = 30000;
-    
+
     /**
      * The default queue timeout value used when polling queues.
      */
@@ -126,7 +128,7 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
     private String domainId;
 
     // Debug options
-    
+
     private boolean cacheMessageAsBytes = true;
 
     private boolean cacheMessageOriginalPayload = true;
@@ -134,7 +136,7 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
     private boolean enableStreaming = true;
 
     private boolean autoWrapMessageAwareTransform = true;
-    
+
     protected transient Log logger = LogFactory.getLog(DefaultMuleConfiguration.class);
 
     private MuleContext muleContext;
@@ -154,18 +156,23 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
      */
     private Map<String, String> extendedProperties = new HashMap<String, String>();
 
+    /**
+     * Global exception strategy name to be used as default exception strategy for flows and services
+     */
+    private String defaultExceptionStrategyName;
+
     public DefaultMuleConfiguration()
     {
         this(false);
     }
 
-    public DefaultMuleConfiguration(boolean containerMode)  
+    public DefaultMuleConfiguration(boolean containerMode)
     {
         this.containerMode = containerMode;
-        
+
         // Apply any settings which come from the JVM system properties.
         applySystemProperties();
-        
+
         if (id == null)
         {
             id = UUID.getUUID();
@@ -183,7 +190,7 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
                 domainId = "org.mule";
             }
         }
-        
+
         try
         {
             validateEncoding();
@@ -220,10 +227,10 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
     /**
      * Apply any settings which come from the JVM system properties.
      */
-    protected void applySystemProperties() 
+    protected void applySystemProperties()
     {
         String p;
-        
+
         p = System.getProperty(MuleProperties.MULE_ENCODING_SYSTEM_PROPERTY);
         if (p != null)
         {
@@ -496,7 +503,7 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
     {
         return domainId + "." + clusterId + "." + id;
     }
-    
+
     public boolean isAutoWrapMessageAwareTransform()
     {
         return autoWrapMessageAwareTransform;
@@ -561,7 +568,7 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
             return true;
         }
     }
-    
+
     protected boolean verifyContextNotStarted()
     {
         if (muleContext != null && muleContext.getLifecycleManager().isPhaseComplete(Startable.PHASE_NAME))
@@ -641,6 +648,16 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
     public String getExtendedProperty(String name)
     {
         return this.extendedProperties.get(name);
+    }
+
+    public String getDefaultExceptionStrategyName()
+    {
+        return defaultExceptionStrategyName;
+    }
+
+    public void setDefaultExceptionStrategyName(String defaultExceptionStrategyName)
+    {
+        this.defaultExceptionStrategyName = defaultExceptionStrategyName;
     }
 
     @Override

@@ -15,6 +15,7 @@ import org.mule.config.spring.parsers.generic.NamedDefinitionParser;
 
 import org.springframework.beans.factory.BeanDefinitionStoreException;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
+import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 
@@ -26,15 +27,29 @@ import org.w3c.dom.Element;
  */
 public class ConfigurationDefinitionParser extends NamedDefinitionParser
 {
+
+    public static final String DEFAULT_EXCEPTION_STRATEGY_ATTRIBUTE = "defaultExceptionStrategy-ref";
+
     public ConfigurationDefinitionParser()
     {
         super(MuleProperties.OBJECT_MULE_CONFIGURATION);
+        addIgnored(DEFAULT_EXCEPTION_STRATEGY_ATTRIBUTE);
         singleton=true;
     }
 
     protected Class getBeanClass(Element element)
     {
         return MuleConfiguration.class;
+    }
+
+
+    @Override
+    protected void doParse(Element element, ParserContext context, BeanDefinitionBuilder builder)
+    {
+        if (element.hasAttribute(DEFAULT_EXCEPTION_STRATEGY_ATTRIBUTE))
+        {
+            builder.addPropertyValue("defaultExceptionStrategyName",element.getAttribute(DEFAULT_EXCEPTION_STRATEGY_ATTRIBUTE));
+        }
     }
 
     @Override

@@ -1145,13 +1145,6 @@
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:element>
-                    <xsd:element ref="abstract-exception-strategy" minOccurs="0">
-                        <xsd:annotation>
-                            <xsd:documentation>
-                                The default exception strategy, used by flows and services.
-                            </xsd:documentation>
-                        </xsd:annotation>
-                    </xsd:element>
                 </xsd:sequence>
                 <xsd:attribute name="defaultResponseTimeout" type="xsd:string" default="10000">
                     <xsd:annotation>
@@ -1164,6 +1157,13 @@
                     <xsd:annotation>
                         <xsd:documentation>
                             The default timeout (ms) for transactions. This can also be configured on transactions, in which case the transaction configuration is used instead of this default.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="defaultExceptionStrategy-ref" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The default exception strategy for every flow / service. This must be a reference to a global exception strategy.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>

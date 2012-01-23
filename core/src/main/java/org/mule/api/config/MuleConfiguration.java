@@ -10,6 +10,8 @@
 
 package org.mule.api.config;
 
+import org.mule.api.exception.MessagingExceptionHandler;
+
 /**
  * Configuration info. which can be set when creating the MuleContext but becomes
  * immutable after startup.
@@ -75,4 +77,10 @@ public interface MuleConfiguration
      * @see #isContainerMode()
      */
     boolean isStandalone();
+
+    /**
+     * @return default exception strategy to be used on flows and services if there's no exception strategy
+     * configured explicitly.
+     */
+    String getDefaultExceptionStrategyName();
 }

@@ -135,9 +135,9 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
      */
     public final synchronized void initialise() throws InitialisationException
     {
-        super.initialise();
         if (!initialised.get())
         {
+            super.initialise();
             doInitialise(muleContext);
             initialised.set(true);
         }

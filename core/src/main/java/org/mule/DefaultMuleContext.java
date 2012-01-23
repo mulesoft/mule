@@ -15,6 +15,7 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.client.LocalMuleClient;
+import org.mule.api.config.ConfigurationException;
 import org.mule.api.config.MuleConfiguration;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.config.ThreadingProfile;
@@ -746,11 +747,19 @@ public class DefaultMuleContext implements MuleContext
     @Override
     public MessagingExceptionHandler getDefaultExceptionStrategy()
     {
-        MessagingExceptionHandler messagingExceptionHandler = getRegistry().lookupObject(MuleProperties.OBJECT_DEFAULT_GLOBAL_EXCEPTION_STRATEGY);
-        if (messagingExceptionHandler == null)
+        MessagingExceptionHandler defaultExceptionStrategy;
+        if (config.getDefaultExceptionStrategyName() != null)
         {
-            messagingExceptionHandler = new DefaultMessagingExceptionStrategy(this);
+            defaultExceptionStrategy = getRegistry().lookupObject(config.getDefaultExceptionStrategyName());
+            if (defaultExceptionStrategy == null)
+            {
+                throw new MuleRuntimeException(CoreMessages.createStaticMessage(String.format("No global exception strategy named %s",config.getDefaultExceptionStrategyName())));
+            }
         }
-        return messagingExceptionHandler;
+        else
+        {
+            defaultExceptionStrategy = new DefaultMessagingExceptionStrategy(this);
+        }
+        return defaultExceptionStrategy;
     }
 }

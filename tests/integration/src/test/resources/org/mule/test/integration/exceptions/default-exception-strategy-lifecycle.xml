@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd">
+
+    <configuration defaultExceptionStrategy-ref="defaultEs"/>
+
+    <catch-exception-strategy name="esA">
+        <custom-processor class="org.mule.test.integration.exceptions.ExceptionStrategyLifecycleTestCase$LifecycleCheckerMessageProcessor"/>
+    </catch-exception-strategy>
+
+    <catch-exception-strategy name="esB">
+        <custom-processor class="org.mule.test.integration.exceptions.ExceptionStrategyLifecycleTestCase$LifecycleCheckerMessageProcessor"/>
+    </catch-exception-strategy>
+
+    <catch-exception-strategy name="defaultEs">
+        <custom-processor class="org.mule.test.integration.exceptions.ExceptionStrategyLifecycleTestCase$LifecycleCheckerMessageProcessor"/>
+    </catch-exception-strategy>
+
+    <flow name="flowA">
+        <logger/>
+        <exception-strategy ref="esA"/>
+    </flow>
+
+    <flow name="flowB">
+        <logger/>
+        <exception-strategy ref="esB"/>
+    </flow>
+
+    <flow name="flowC">
+        <logger/>
+    </flow>
+
+    <flow name="flowD">
+        <logger/>
+    </flow>
+
+</mule>

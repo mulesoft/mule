@@ -32,7 +32,6 @@ public class ExceptionStrategyDefinitionParser extends ParentContextDefinitionPa
     public ExceptionStrategyDefinitionParser(Class exceptionStrategyClass)
     {
         super(MuleOrphanDefinitionParser.ROOT_ELEMENT, createRootDefinitionParser(exceptionStrategyClass));
-        and("configuration", createConfigurationDefinitionParser(exceptionStrategyClass));
         otherwise(createInFlowServiceDefinitionParser(exceptionStrategyClass));
     }
 
@@ -56,39 +55,6 @@ public class ExceptionStrategyDefinitionParser extends ParentContextDefinitionPa
                 }
             }
         };
-    }
-
-    private MuleDefinitionParser createConfigurationDefinitionParser(Class exceptionStrategyClass)
-    {
-        OrphanDefinitionParser defaultExceptionStrategyDefinitionParser;
-        if (exceptionStrategyClass == null)
-        {
-            defaultExceptionStrategyDefinitionParser = new OrphanDefinitionParser(false) {
-                @Override
-                protected AbstractBeanDefinition parseInternal(Element element, ParserContext context)
-                {
-                    AbstractBeanDefinition abstractBeanDefinition = super.parseInternal(element, context);
-                    abstractBeanDefinition.setScope(BeanDefinition.SCOPE_PROTOTYPE);
-                    return abstractBeanDefinition;
-                }
-            };
-        }
-        else
-        {
-            defaultExceptionStrategyDefinitionParser = new OrphanDefinitionParser(exceptionStrategyClass, false){
-                @Override
-                protected AbstractBeanDefinition parseInternal(Element element, ParserContext context)
-                {
-                    AbstractBeanDefinition abstractBeanDefinition = super.parseInternal(element, context);
-                    abstractBeanDefinition.setScope(BeanDefinition.SCOPE_PROTOTYPE);
-                    return abstractBeanDefinition;
-                }
-            };
-        }
-        defaultExceptionStrategyDefinitionParser.registerPostProcessor(new IdAttribute(MuleProperties.OBJECT_DEFAULT_GLOBAL_EXCEPTION_STRATEGY));
-        defaultExceptionStrategyDefinitionParser.registerPostProcessor(new NameAttribute(MuleProperties.OBJECT_DEFAULT_GLOBAL_EXCEPTION_STRATEGY));
-        defaultExceptionStrategyDefinitionParser.registerPreProcessor(createNoNameAttributePreProcessor());
-        return defaultExceptionStrategyDefinitionParser;
     }
 
     public static MuleOrphanDefinitionParser createRootDefinitionParser(Class exceptionStrategyClass)

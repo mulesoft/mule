@@ -6,9 +6,9 @@
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.2/mule-vm.xsd">
 
-    <configuration>
-        <custom-exception-strategy class="org.mule.test.integration.exceptions.DefaultExceptionStrategyTestCase$CustomExceptionStrategy"/>
-    </configuration>
+    <configuration defaultExceptionStrategy-ref="defaultExceptionStrategy"/>
+
+    <custom-exception-strategy name="defaultExceptionStrategy" class="org.mule.test.integration.exceptions.DefaultExceptionStrategyTestCase$CustomExceptionStrategy"/>
 
     <flow name="flowNoExceptionStrategy">
         <logger/>

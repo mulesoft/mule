@@ -6,8 +6,6 @@
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.2/mule-vm.xsd">
 
-    <configuration>
-        <default-exception-strategy/>
-    </configuration>
+    <configuration defaultExceptionStrategy-ref="nonExistentEs"/>
 
 </mule>

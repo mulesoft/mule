@@ -84,6 +84,10 @@ public abstract class AbstractFlowConstruct implements FlowConstruct, Lifecycle,
     {
         try
         {
+            if (exceptionListener == null)
+            {
+                this.exceptionListener = muleContext.getDefaultExceptionStrategy();
+            }
             lifecycleManager.fireInitialisePhase(new LifecycleCallback<FlowConstruct>()
             {
                 public void onTransition(String phaseName, FlowConstruct object) throws MuleException
@@ -213,10 +217,6 @@ public abstract class AbstractFlowConstruct implements FlowConstruct, Lifecycle,
     
     protected void doInitialise() throws MuleException
     {
-        if (exceptionListener == null)
-        {
-            this.exceptionListener = muleContext.getDefaultExceptionStrategy();
-        }
         configureStatistics();
     }
 

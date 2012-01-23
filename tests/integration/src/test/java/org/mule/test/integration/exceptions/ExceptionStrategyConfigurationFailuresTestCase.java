@@ -33,12 +33,6 @@ public class ExceptionStrategyConfigurationFailuresTestCase extends AbstractMule
 {
 
     @Test(expected = ConfigurationException.class)
-    public void testNamedGlobalExceptionStrategyFails() throws Exception
-    {
-        loadConfiguration("org/mule/test/integration/exceptions/named-global-exception-strategy.xml");
-    }
-
-    @Test(expected = ConfigurationException.class)
     public void testNamedFlowExceptionStrategyFails() throws Exception
     {
         loadConfiguration("org/mule/test/integration/exceptions/named-flow-exception-strategy.xml");
@@ -57,15 +51,15 @@ public class ExceptionStrategyConfigurationFailuresTestCase extends AbstractMule
     }
 
     @Test(expected = ConfigurationException.class)
-    public void testDefaultEsFailsAsGlobalExceptionStrategy() throws Exception
-    {
-        loadConfiguration("org/mule/test/integration/exceptions/default-es-as-global-exception-strategy.xml");
-    }
-
-    @Test(expected = ConfigurationException.class)
     public void testDefaultEsFailsAsReferencedExceptionStrategy() throws Exception
     {
         loadConfiguration("org/mule/test/integration/exceptions/default-es-as-referenced-exception-strategy.xml");
+    }
+
+    @Test(expected = ConfigurationException.class)
+    public void testDefaultExceptionStrategyReferencesNonExistentExceptionStrategy() throws Exception
+    {
+        loadConfiguration("org/mule/test/integration/exceptions/default-exception-strategy-reference-non-existent-es.xml");
     }
 
     private void loadConfiguration(String configuration) throws MuleException, InterruptedException

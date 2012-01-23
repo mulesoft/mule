@@ -62,6 +62,7 @@ public class MuleConfigurationConfigurator implements MuleContextAware, SmartFac
             defaultConfig.setDefaultResponseTimeout(config.getDefaultResponseTimeout());
             defaultConfig.setDefaultTransactionTimeout(config.getDefaultTransactionTimeout());
             defaultConfig.setShutdownTimeout(config.getShutdownTimeout());
+            defaultConfig.setDefaultExceptionStrategyName(config.getDefaultExceptionStrategyName());
             return configuration;
         }
         else
@@ -101,4 +102,8 @@ public class MuleConfigurationConfigurator implements MuleContextAware, SmartFac
         config.setShutdownTimeout(shutdownTimeout);
     }
 
+    public void setDefaultExceptionStrategyName(String defaultExceptionStrategyName)
+    {
+        config.setDefaultExceptionStrategyName(defaultExceptionStrategyName);
+    }
 }
