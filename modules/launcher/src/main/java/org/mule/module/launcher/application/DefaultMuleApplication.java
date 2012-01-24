@@ -378,7 +378,10 @@ public class DefaultMuleApplication implements Application
         if (this.muleContext == null)
         {
             // app never started, maybe due to a previous error
-            logger.debug(String.format("Stopping app '%s' with no mule context", descriptor.getAppName()));
+            if (logger.isInfoEnabled())
+            {
+                logger.info(String.format("Stopping app '%s' with no mule context", descriptor.getAppName()));
+            }
             return;
         }
         if (logger.isInfoEnabled())
