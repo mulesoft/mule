@@ -50,6 +50,7 @@ public class ConfigurationDefinitionParser extends NamedDefinitionParser
         {
             builder.addPropertyValue("defaultExceptionStrategyName",element.getAttribute(DEFAULT_EXCEPTION_STRATEGY_ATTRIBUTE));
         }
+        super.doParse(element,context,builder);
     }
 
     @Override
