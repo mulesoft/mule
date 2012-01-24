@@ -14,26 +14,18 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import org.mule.DefaultMuleMessage;
-import org.mule.api.MessagingException;
 import org.mule.api.MuleMessage;
-import org.mule.api.context.notification.ExceptionNotificationListener;
-import org.mule.api.context.notification.ServerNotification;
-import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.module.client.MuleClient;
-import org.mule.module.cxf.testmodels.CxfEnabledFaultMessage;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.util.Map;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 
-import org.junit.Ignore;
+import org.apache.cxf.interceptor.Fault;
 import org.junit.Rule;
 import org.junit.Test;
 
-
-public class CxfExceptionHandlingTestCase extends FunctionalTestCase
+public class CxfErrorBehaviorTestCase extends FunctionalTestCase
 {
     private static final String requestFaultPayload =
         "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\"\n" +
@@ -45,14 +37,14 @@ public class CxfExceptionHandlingTestCase extends FunctionalTestCase
             "</soap:Body>\n" +
             "</soap:Envelope>";
 
+
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
-    private CountDownLatch latch;
 
     @Override
     protected String getConfigResources()
     {
-        return "onexception-conf.xml";
+        return "cxf-error-behavior-conf.xml";
     }
 
     @Test
@@ -66,40 +58,24 @@ public class CxfExceptionHandlingTestCase extends FunctionalTestCase
     }
 
     @Test
-    public void testFaultInCxfServiceInvokeExceptionStrategy() throws Exception
+    public void testClientWithSOAPFault() throws Exception
     {
-        MuleMessage request = new DefaultMuleMessage(requestFaultPayload, (Map<String,Object>)null, muleContext);
+        MuleMessage request = new DefaultMuleMessage("hello", (Map<String,Object>)null, muleContext);
         MuleClient client = new MuleClient(muleContext);
-        latch = new CountDownLatch(1);
-        muleContext.registerListener(new ExceptionNotificationListener() {
-            public void onNotification(ServerNotification notification)
-            {
-                latch.countDown();
-            }
-        });
-
-        MuleMessage response = client.send("http://localhost:" + dynamicPort.getNumber() + "/testServiceWithFaultInvokeStrategy", request);
+        MuleMessage response = client.send("vm://testClientSOAPFault", request);
         assertNotNull(response);
         assertNotNull(response.getExceptionPayload());
-        assertTrue(latch.await(3000, TimeUnit.MILLISECONDS));
+        assertTrue(response.getExceptionPayload().getException().getCause() instanceof Fault);
     }
 
     @Test
-    public void testFaultInCxfServiceInvokeComponentExceptionStrategy() throws Exception
+    public void testServerClientProxyWithFault() throws Exception
     {
-        MuleMessage request = new DefaultMuleMessage(requestFaultPayload, (Map<String,Object>)null, muleContext);
         MuleClient client = new MuleClient(muleContext);
-        latch = new CountDownLatch(1);
-        muleContext.registerListener(new ExceptionNotificationListener() {
-            public void onNotification(ServerNotification notification)
-            {
-                latch.countDown();
-            }
-        });
-        MuleMessage response = client.send("http://localhost:" + dynamicPort.getNumber() + "/testServiceWithFaultInvokeComponentStrategy", request);
-        assertNotNull(response);
-        assertNotNull(response.getExceptionPayload());
-        assertTrue(latch.await(3000, TimeUnit.MILLISECONDS));
+        MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/testProxyWithFault", requestFaultPayload, null);
+        String resString = result.getPayloadAsString();
+        assertTrue(resString.contains("<faultstring>Cxf Exception Message</faultstring>"));
     }
+
 
 }

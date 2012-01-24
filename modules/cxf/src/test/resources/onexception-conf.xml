@@ -12,31 +12,26 @@
        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.2/mule-vm.xsd
        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/3.2/mule-http.xsd">
 
-   <!-- Simple Service with exception handled as fault -->
-   <flow name="SimpleServiceFault">
-       <http:inbound-endpoint address="http://localhost:${port1}/services/CxfSimpleWithFault" exchange-pattern="request-response" name="cxfDefaultInbound">
-           <cxf:simple-service onException="CREATE_SOAP_FAULT" serviceClass="org.mule.module.cxf.testmodels.TestCxfComponent"/>
-       </http:inbound-endpoint>
-       <component class="org.mule.module.cxf.testmodels.TestCxfComponent" />
-   </flow>
 
-   <!-- Simple Service with exception handled by ES -->
-   <flow name="SimpleServiceES">
-       <http:inbound-endpoint address="http://localhost:${port1}/services/CxfSimpleES" exchange-pattern="request-response" name="cxfMuleESInbound">
-           <cxf:simple-service onException="INVOKE_EXCEPTION_STRATEGY" serviceClass="org.mule.module.cxf.testmodels.TestCxfComponent"/>
-       </http:inbound-endpoint>
-       <component class="org.mule.module.cxf.testmodels.TestCxfComponent" />
-       <default-exception-strategy>
-           <vm:outbound-endpoint path="fromES">
-               <expression-transformer>
-                   <return-argument expression="EXCEPTION STRATEGY INVOKED" evaluator="string"/>
-               </expression-transformer>       
-           </vm:outbound-endpoint>
-        </default-exception-strategy>
-   </flow>
-          
-   <!-- Jaxws Service with exception handled as fault -->
-   <!-- Jaxws Service with exception handled by ES -->
+    <flow name="FlowServiceFault">
+       <http:inbound-endpoint address="http://localhost:${port1}/testServiceWithFault"/>
+       <cxf:jaxws-service serviceClass="org.mule.module.cxf.TestServiceFaultImpl" onException="CREATE_SOAP_FAULT"/>
+       <component class="org.mule.module.cxf.TestServiceFaultImpl" />
+    </flow>
+
+    <flow name="FlowServiceFaultInvokeExceptionStrategy">
+       <http:inbound-endpoint address="http://localhost:${port1}/testServiceWithFaultInvokeStrategy"/>
+       <cxf:jaxws-service serviceClass="org.mule.module.cxf.TestServiceFaultImpl" onException="INVOKE_EXCEPTION_STRATEGY"/>
+       <component class="org.mule.module.cxf.TestServiceFaultImpl" />
+       <default-exception-strategy/>
+    </flow>
+
+    <flow name="FlowServiceFaultInvokeComponentExceptionStrategy">
+       <http:inbound-endpoint address="http://localhost:${port1}/testServiceWithFaultInvokeComponentStrategy"/>
+       <cxf:jaxws-service serviceClass="org.mule.module.cxf.TestServiceFaultImpl" onException="INVOKE_EXCEPTION_STRATEGY"/>
+       <component class="org.mule.module.cxf.TestServiceFaultImpl" />
+       <custom-exception-strategy class="org.mule.module.cxf.CxfComponentExceptionStrategy"/>
+    </flow>
 
 
 </mule>
