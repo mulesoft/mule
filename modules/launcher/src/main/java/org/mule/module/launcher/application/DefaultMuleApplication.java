@@ -10,6 +10,8 @@
 
 package org.mule.module.launcher.application;
 
+import static org.mule.util.SplashScreen.miniSplash;
+
 import org.mule.MuleServer;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
@@ -56,8 +58,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import static org.mule.util.SplashScreen.miniSplash;
 
 public class DefaultMuleApplication implements Application
 {
@@ -378,6 +378,7 @@ public class DefaultMuleApplication implements Application
         if (this.muleContext == null)
         {
             // app never started, maybe due to a previous error
+            logger.debug(String.format("Stopping app '%s' with no mule context", descriptor.getAppName()));
             return;
         }
         if (logger.isInfoEnabled())
