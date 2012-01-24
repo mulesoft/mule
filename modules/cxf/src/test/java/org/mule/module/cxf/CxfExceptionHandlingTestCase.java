@@ -57,7 +57,7 @@ public class CxfExceptionHandlingTestCase extends FunctionalTestCase
     }
 
 
-    @Ignore
+    @Test
     public void testFaultInCxfService() throws Exception
     {
         MuleMessage request = new DefaultMuleMessage(requestFaultPayload, (Map<String,Object>)null, muleContext);
@@ -67,7 +67,7 @@ public class CxfExceptionHandlingTestCase extends FunctionalTestCase
         assertTrue(response.getPayloadAsString().contains("<faultstring>"));
     }
 
-    @Ignore
+    @Test
     public void testFaultInCxfServiceInvokeExceptionStrategy() throws Exception
     {
         MuleMessage request = new DefaultMuleMessage(requestFaultPayload, (Map<String,Object>)null, muleContext);
