@@ -89,28 +89,28 @@ public class InvocationPropertiesTestCase extends org.mule.tck.junit4.Functional
     @Test
     public void propagationInSameFlow() throws Exception
     {
-        testFlow("SameFlow");
+        testFlow("propagationInSameFlow");
     }
 
     @Test
     public void noPropagationInDifferentFlowVMRequestResponse() throws Exception
     {
-        testFlow("DifferentFlowVMRR");
-        FlowAssert.verify("DifferentFlowVMRR-2");
+        testFlow("noPropagationInDifferentFlowVMRequestResponse");
+        FlowAssert.verify("noPropagationInDifferentFlowVMRequestResponse-2");
     }
 
     @Test
     public void noPropagationInDifferentFlowVMOneWay() throws Exception
     {
-        testFlow("DifferentFlowVMOW");
-        FlowAssert.verify("DifferentFlowVMOW-2");
+        testFlow("noPropagationInDifferentFlowVMOneWay");
+        FlowAssert.verify("noPropagationInDifferentFlowVMOneWay-2");
     }
 
     @Test
     public void noPropagationInDifferentFlowHttp() throws Exception
     {
-        testFlow("DifferentFlowHTTP");
-        FlowAssert.verify("DifferentFlowHTTP-2");
+        testFlow("noPropagationInDifferentFlowHttp");
+        FlowAssert.verify("noPropagationInDifferentFlowHttp-2");
     }
 
     @Test
@@ -147,7 +147,7 @@ public class InvocationPropertiesTestCase extends org.mule.tck.junit4.Functional
     @Test
     public void propagationThroughFlowRefToFlow() throws Exception
     {
-        testFlow("FlowRef");
+        testFlow("propagationThroughFlowRefToFlow");
         FlowAssert.verify("FlowRef-1");
         FlowAssert.verify("FlowRef-2");
         FlowAssert.verify("FlowRef-3");
@@ -162,7 +162,7 @@ public class InvocationPropertiesTestCase extends org.mule.tck.junit4.Functional
     @Test
     public void propagationThroughFlowRefToSubFlow() throws Exception
     {
-        testFlow("SubFlowRef");
+        testFlow("propagationThroughFlowRefToSubFlow");
     }
 
     @Test
@@ -174,44 +174,44 @@ public class InvocationPropertiesTestCase extends org.mule.tck.junit4.Functional
     @Test
     public void propagationThroughAsyncElement() throws Exception
     {
-        testFlow("Async");
+        testFlow("propagationThroughAsyncElement");
     }
 
     @Test
     public void propertyAddedInAsyncElementNotAddedinFlow() throws Exception
     {
-        testFlow("Async2");
+        testFlow("propertyAddedInAsyncElementNotAddedinFlow");
     }
 
     @Test
     public void propagationThroughWireTap() throws Exception
     {
-        testFlow("WireTap");
+        testFlow("propagationThroughWireTap");
     }
 
     @Test
     public void propertyAddedInWireTapNotAddedinFlow() throws Exception
     {
-        testFlow("WireTap2");
+        testFlow("propertyAddedInWireTapNotAddedinFlow");
     }
 
     @Test
     public void propagationThroughEnricher() throws Exception
     {
-        testFlow("Enricher");
+        testFlow("propagationThroughEnricher");
     }
 
     @Test
     public void propertyAddedInEnricherNotAddedinFlow() throws Exception
     {
-        testFlow("Enricher2");
+        testFlow("propertyAddedInEnricherNotAddedinFlow");
     }
 
     @Test
     /** Router drops invocation properties **/
     public void propagateToRoutesInAll() throws Exception
     {
-        testFlow("All");
+        testFlow("propagateToRoutesInAll");
     }
 
     @Test
@@ -219,7 +219,7 @@ public class InvocationPropertiesTestCase extends org.mule.tck.junit4.Functional
     /** Router drops invocation properties **/
     public void propagateThroughAllRouterWithResults() throws Exception
     {
-        testFlow("All");
+        testFlow("propagateThroughAllRouterWithResults");
     }
 
     @Test
@@ -228,6 +228,31 @@ public class InvocationPropertiesTestCase extends org.mule.tck.junit4.Functional
     public void propagateThroughAllRouterWithNoResults() throws Exception
     {
         testFlow("All");
+        testFlow("propagateThroughAllRouterWithNoResults");
+    }
+
+    @Test
+    public void noPropagateBetweenRoutes() throws Exception
+    {
+        testFlow("noPropagateBetweenRoutes");
+    }
+
+    @Test
+    public void noPropagateFromRouteToNextProcessorSingleRoute() throws Exception
+    {
+        testFlow("noPropagateFromRouteToNextProcessorSingleRoute");
+    }
+
+    @Test
+    public void noPropagateFromRouteToNextProcessorMultipleRoutes() throws Exception
+    {
+        testFlow("noPropagateFromRouteToNextProcessorMultipleRoutes");
+    }
+
+    @Test
+    public void noPropagateFromRouteToNextProcessorNoResult() throws Exception
+    {
+        testFlow("noPropagateFromRouteToNextProcessorNoResult");
     }
 
     
@@ -246,7 +271,7 @@ public class InvocationPropertiesTestCase extends org.mule.tck.junit4.Functional
         fruitList.add(new Apple());
         fruitList.add(new Orange());
         fruitList.add(new Banana());
-        testFlow("Split", getTestEvent(fruitList));
+        testFlow("propogationOfPropertiesInMessageSplitWithSplitter", getTestEvent(fruitList));
     }
 
     @Test
@@ -258,7 +283,7 @@ public class InvocationPropertiesTestCase extends org.mule.tck.junit4.Functional
         fruitList.add(new Apple());
         fruitList.add(new Orange());
         fruitList.add(new Banana());
-        testFlow("Aggregate", getTestEvent(fruitList));
+        testFlow("aggregationOfPropertiesFromMultipleMessageWithAggregator", getTestEvent(fruitList));
         FlowAssert.verify("Split");
     }
 
