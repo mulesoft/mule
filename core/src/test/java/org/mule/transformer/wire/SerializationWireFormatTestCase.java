@@ -10,30 +10,29 @@
 
 package org.mule.transformer.wire;
 
+import static org.junit.Assert.assertEquals;
+
 import org.mule.api.transformer.wire.WireFormat;
 import org.mule.transformer.simple.ByteArrayToSerializable;
 import org.mule.transformer.simple.SerializableToByteArray;
 
-import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-
 public class SerializationWireFormatTestCase extends AbstractWireFormatTestCase
 {
 
+    @Override
     protected WireFormat getWireFormat() throws Exception
     {
         return createObject(SerializationWireFormat.class);
     }
 
-    @Test
+    @Override
     public void testGetDefaultInboundTransformer()
     {
         SerializationWireFormat wireFormat = new SerializationWireFormat();
         assertEquals(ByteArrayToSerializable.class, wireFormat.getInboundTransformer().getClass());
     }
 
-    @Test
+    @Override
     public void testGetDefaultOutboundTransformer()
     {
         SerializationWireFormat wireFormat = new SerializationWireFormat();
