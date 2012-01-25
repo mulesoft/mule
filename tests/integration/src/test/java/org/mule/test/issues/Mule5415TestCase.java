@@ -9,16 +9,19 @@
  */
 package org.mule.test.issues;
 
-import static org.junit.Assert.*;
-import org.hamcrest.core.IsNull;
-import org.junit.Rule;
-import org.junit.Test;
+import static org.junit.Assert.assertThat;
+
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
-
 import java.util.HashMap;
+import org.hamcrest.core.IsNull;
+import org.junit.Rule;
+import org.junit.Test;
+
+
+
 
 public class Mule5415TestCase extends FunctionalTestCase
 {
