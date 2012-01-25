@@ -61,7 +61,7 @@ public class ResequenceMessagesCorrelatorCallback extends CollectionCorrelatorCa
         MuleEvent[] results;
         try
         {
-            results = (events == null) ? new MuleEvent[0] : events.toArray();
+            results = (events == null) ? new MuleEvent[0] : events.toArray(false);
         }
         catch (ObjectStoreException e)
         {
