@@ -117,7 +117,7 @@ public class AggregatorTestCase extends AbstractMuleContextTestCase
 
                     try
                     {
-                        for (Iterator iterator = events.iterator(); iterator.hasNext();)
+                        for (Iterator iterator = events.iterator(false); iterator.hasNext();)
                         {
                             MuleEvent event = (MuleEvent) iterator.next();
                             try

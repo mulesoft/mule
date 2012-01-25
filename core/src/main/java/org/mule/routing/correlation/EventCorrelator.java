@@ -437,7 +437,7 @@ public class EventCorrelator implements Startable, Stoppable
                         }
                         else
                         {
-                            final FlowConstruct service = group.toArray()[0].getFlowConstruct();
+                            final FlowConstruct service = group.toArray(false)[0].getFlowConstruct();
                             if (!(service instanceof Service))
                             {
                                 throw new UnsupportedOperationException(

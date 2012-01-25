@@ -65,7 +65,7 @@ public class ResequenceCorrelatorCallback extends CollectionCorrelatorCallback
         {
             try
             {
-                results = events.toArray();
+                results = events.toArray(false);
             }
             catch (ObjectStoreException e)
             {

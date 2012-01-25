@@ -35,7 +35,7 @@ public class BankQuotesAggregationLogic
         LoanQuote quote = null;
         MuleEvent event = null;
 
-        for (Iterator iterator = events.iterator(); iterator.hasNext();)
+        for (Iterator iterator = events.iterator(false); iterator.hasNext();)
         {
             event = (MuleEvent)iterator.next();
             Object o = event.getMessage().getPayload();

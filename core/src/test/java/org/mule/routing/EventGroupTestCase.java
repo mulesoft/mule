@@ -160,8 +160,8 @@ public class EventGroupTestCase extends AbstractMuleContextTestCase
         eg.addEvent(getTestEvent("foo1"));
         eg.addEvent(getTestEvent("foo2"));
 
-        Object[] array1 = IteratorUtils.toArray(eg.iterator());
-        MuleEvent[] array2 = eg.toArray();
+        Object[] array1 = IteratorUtils.toArray(eg.iterator(false));
+        MuleEvent[] array2 = eg.toArray(false);
         assertTrue(Arrays.equals(array1, array2));
     }
 

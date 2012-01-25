@@ -62,7 +62,7 @@ public class MessageChunkAggregator extends AbstractAggregator
                 MuleEvent[] collectedEvents;
                 try
                 {
-                    collectedEvents = events.toArray();
+                    collectedEvents = events.toArray(false);
                 }
                 catch (ObjectStoreException e)
                 {
