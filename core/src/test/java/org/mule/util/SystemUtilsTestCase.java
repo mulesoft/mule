@@ -34,15 +34,13 @@ public class SystemUtilsTestCase extends AbstractMuleTestCase
         assertFalse(env.isEmpty());
         assertSame(env, SystemUtils.getenv());
 
-        String envVarToTest = (SystemUtils.IS_OS_WINDOWS ? "Path" : "PATH");
-        // This is a hack to catch Cygwin environments; it won't work in cases where
-        // the user has a different term from /etc/termcaps
+        String envVarToTest = "PATH";
         if (SystemUtils.IS_OS_WINDOWS)
         {
-            String term = (String) env.get("TERM");
-            if (term != null && term.contains("cygwin"))
+            // Depending on the presence of Cygwin, it might be one or the other.
+            if (env.get(envVarToTest) == null)
             {
-                envVarToTest = "PATH";
+                envVarToTest = "Path";
             }
         }
 
