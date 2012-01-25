@@ -16,6 +16,12 @@
     <mule-xml:xslt-transformer xsl-file="proxy.xsl"
         name="TestXslt" returnClass="org.mule.module.xml.transformer.DelayedResult" />
 
+    <flow name="testCDATA">
+        <inbound-endpoint address="http://localhost:${port1}/services/CDATAService" exchange-pattern="request-response" />
+        <cxf:proxy-service />
+        <echo-component />
+    </flow>
+
     <flow name="serverClientProxyEnvelopeWithValidation">
         <inbound-endpoint
             address="http://localhost:${port1}/services/proxyEnvelopeWithValidation"
@@ -331,7 +337,8 @@
             <cxf:proxy-client />
         </outbound-endpoint>
 
-
     </sub-flow>
+
+
 
 </mule>
