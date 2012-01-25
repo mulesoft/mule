@@ -453,9 +453,19 @@ public class XMLStreamReaderToContentHandler implements StAXReaderToContentHandl
         // this event is listed in the javadoc, but not in the spec.
     }
 
-    protected void handleCDATA()
+    protected void handleCDATA() throws XMLStreamException
     {
-        // no-op ???
-        // this event is listed in the javadoc, but not in the spec.
+        char[] chars = staxStreamReader.getText().toCharArray();
+
+        try
+        {
+            filter.startCDATA();
+            filter.characters(chars, 0, chars.length);
+            filter.endCDATA();
+        }
+        catch(SAXException e)
+        {
+            throw new XMLStreamException(e);
+        }
     }
 }

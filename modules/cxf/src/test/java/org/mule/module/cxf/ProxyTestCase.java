@@ -10,6 +10,11 @@
 
 package org.mule.module.cxf;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
@@ -25,12 +30,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 public class ProxyTestCase extends FunctionalTestCase
 {
@@ -85,7 +88,7 @@ public class ProxyTestCase extends FunctionalTestCase
         assertTrue(resString.indexOf("<test xmlns=\"http://foo\"> foo </test>") != -1);
     }
 
-    @Test
+   @Test
     public void testServerClientProxy() throws Exception
     {
         String msg = "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">"
@@ -111,7 +114,7 @@ public class ProxyTestCase extends FunctionalTestCase
         doTestProxyValidation("http://localhost:" + dynamicPort.getNumber() + "/services/proxyBodyWithValidationAndSchemas");
     }
 
-    @Test
+   @Test
     public void testProxyEnvelopeValidation() throws Exception
     {
         doTestProxyValidation("http://localhost:" + dynamicPort.getNumber() + "/services/proxyEnvelopeWithValidation");
@@ -160,7 +163,7 @@ public class ProxyTestCase extends FunctionalTestCase
         assertTrue(resString.indexOf("<test xmlns=\"http://foo\"") != -1);
     }
 
-    @Test
+   @Test
     public void testServerClientProxyWithWsdl2() throws Exception
     {
         final Latch latch = new Latch();
@@ -288,6 +291,34 @@ public class ProxyTestCase extends FunctionalTestCase
         MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/services/envelope-proxy", msgWithComment, null);
         String resString = result.getPayloadAsString();
         assertTrue(resString.contains(doGoogleSearch));
+    }
+
+
+    @Test
+    public void testProxyCDATA() throws Exception
+    {
+        String msg="<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:sup=\"http://support.cxf.module.mule.org/\">\n" +
+                   "<soapenv:Header/>\n" +
+                   "<soapenv:Body>\n" +
+                   "<sup:invoke>\n" +
+                   "<soapenv:Envelope>\n" +
+                   "<soapenv:Header/>\n" +
+                   "<soapenv:Body>\n" +
+                   "<sup:invoke>\n" +
+                   "<Request>\n" +
+                   "<servicePayload><![CDATA[<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\"><soapenv:Header/><soapenv:Body><int:test/></soapenv:Body></soapenv:Envelope>]]></servicePayload>\n" +
+                   "</Request>\n" +
+                   "</sup:invoke>\n" +
+                   "</soapenv:Body>\n" +
+                   "</soapenv:Envelope>\n" +
+                   "</sup:invoke>\n" +
+                   "</soapenv:Body>\n" +
+                   "</soapenv:Envelope>";
+
+        MuleClient client = new MuleClient(muleContext);
+        MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/services/CDATAService", msg, null);
+        assertNotNull(result);
+        assertTrue(result.getPayloadAsString().contains("![CDATA["));
     }
 
     protected String prepareOneWayTestMessage()
