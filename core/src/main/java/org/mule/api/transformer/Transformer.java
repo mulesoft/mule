@@ -30,7 +30,7 @@ public interface Transformer extends MessageProcessor, Initialisable, Disposable
     /**
      * Determines if a particular source class can be handled by this transformer
      *
-     * @param aClass The class to check for compatability
+     * @param aClass The class to check for compatibility
      * @return true if the transformer supports this type of class or false
      *         otherwise
      * @deprecated use {@link #isSourceDataTypeSupported(org.mule.api.transformer.DataType)} instead
@@ -41,7 +41,7 @@ public interface Transformer extends MessageProcessor, Initialisable, Disposable
     /**
      * Determines if a particular source class can be handled by this transformer
      *
-     * @param dataType The DataType to check for compatability
+     * @param dataType The DataType to check for compatibility
      * @return true if the transformer supports this type of class or false
      *         otherwise
      * @since 3.0.0
@@ -77,13 +77,13 @@ public interface Transformer extends MessageProcessor, Initialisable, Disposable
      * with the transformer. Since transformers are often chained, it is useful to be able to ignore a transformer in the
      * chain and move to the next one.
      *
-     * @return true if the transformer can be ignorred if the currnet source type is not supported, false if an exception
+     * @return true if the transformer can be ignored if the current source type is not supported, false if an exception
      *         should be throw due to an incompatible source type being passed in.
      */
     boolean isIgnoreBadInput();
 
     /**
-     * Thransforms the supplied data and returns the result
+     * Transforms the supplied data and returns the result
      *
      * @param src the data to transform
      * @return the transformed data
@@ -93,7 +93,7 @@ public interface Transformer extends MessageProcessor, Initialisable, Disposable
     Object transform(Object src) throws TransformerException;
 
     /**
-     * Thransforms the supplied data and returns the result
+     * Transforms the supplied data and returns the result
      *
      * @param src      the data to transform
      * @param encoding the encoding to use by this transformer.  many transformations will not need encoding unless
@@ -131,7 +131,7 @@ public interface Transformer extends MessageProcessor, Initialisable, Disposable
      * data is not of this class type a <code>TransformerException</code> will be
      * thrown.
      * <p/>
-     * This method superseeds {@link #getReturnClass()} because it allows Generics information to be associated with the
+     * This method supersedes {@link #getReturnClass()} because it allows Generics information to be associated with the
      * return type of the transformer
      *
      * @param type the expected return type for this transformer
@@ -144,7 +144,7 @@ public interface Transformer extends MessageProcessor, Initialisable, Disposable
      * the return type but also allow users to perform automatic transformations based on the source type of the object
      * to transform and this return type.
      * <p/>
-     * This method superseeds {@link #getReturnClass()} because it allows Generics information to be associated with the
+     * This method supersedes {@link #getReturnClass()} because it allows Generics information to be associated with the
      * return type of the transformer
      *
      * @return the excepted return type for this transformer
