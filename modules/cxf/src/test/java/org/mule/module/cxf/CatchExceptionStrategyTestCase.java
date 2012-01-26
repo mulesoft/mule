@@ -23,18 +23,22 @@ import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.exception.TemplateMessagingExceptionStrategy;
 import org.mule.module.client.MuleClient;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transformer.AbstractTransformer;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Map;
 
 import org.apache.cxf.interceptor.Fault;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runners.Parameterized;
 
 
-public class CatchExceptionStrategyTestCase extends FunctionalTestCase
+public class CatchExceptionStrategyTestCase extends AbstractServiceAndFlowTestCase
 {
 
     private static final String requestPayload =
@@ -61,11 +65,20 @@ public class CatchExceptionStrategyTestCase extends FunctionalTestCase
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
-    @Override
-    protected String getConfigResources()
+    public CatchExceptionStrategyTestCase(ConfigVariant variant, String configResources)
     {
-        return "catch-exception-strategy-conf.xml";
+        super(variant, configResources);
     }
+
+    @Parameterized.Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][] {
+                {ConfigVariant.SERVICE, "catch-exception-strategy-service-conf.xml"},
+                {ConfigVariant.FLOW, "catch-exception-strategy-flow-conf.xml"}
+        });
+    }
+
 
     @Test
     public void testFaultInCxfServiceWithCatchExceptionStrategy() throws Exception

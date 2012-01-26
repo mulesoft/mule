@@ -10,11 +10,11 @@
 
 package org.mule.module.cxf;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import org.mule.DefaultMuleMessage;
+import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
@@ -24,11 +24,13 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transformer.AbstractTransformer;
 import org.mule.transport.NullPayload;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -36,8 +38,9 @@ import java.util.concurrent.TimeUnit;
 import org.apache.cxf.interceptor.Fault;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runners.Parameterized;
 
-public class ExceptionStrategyTestCase extends FunctionalTestCase
+public class ExceptionStrategyTestCase extends AbstractServiceAndFlowTestCase
 {
     private static final String requestPayload =
         "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\"\n" +
@@ -64,11 +67,20 @@ public class ExceptionStrategyTestCase extends FunctionalTestCase
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
-    @Override
-    protected String getConfigResources()
+    public ExceptionStrategyTestCase(ConfigVariant variant, String configResources)
     {
-        return "exception-strategy-conf.xml";
+        super(variant, configResources);
     }
+
+    @Parameterized.Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][] {
+                {ConfigVariant.SERVICE, "exception-strategy-service-conf.xml"},
+                {ConfigVariant.FLOW, "exception-strategy-flow-conf.xml"}
+        });
+    }
+
 
     @Test
     public void testFaultInCxfService() throws Exception
@@ -116,7 +128,7 @@ public class ExceptionStrategyTestCase extends FunctionalTestCase
         MuleMessage response = client.send("vm://testClientTransformerExceptionDefaultException", request);
         assertNotNull(response);
         assertTrue(response.getExceptionPayload() != null);
-        assertTrue(response.getExceptionPayload().getException().getCause() instanceof TransformerException);
+        assertTrue(response.getExceptionPayload().getException() instanceof MessagingException);
         assertTrue(response.getPayload() instanceof NullPayload);
     }
 
