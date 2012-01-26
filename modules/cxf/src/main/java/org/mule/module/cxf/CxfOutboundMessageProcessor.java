@@ -182,9 +182,9 @@ public class CxfOutboundMessageProcessor extends AbstractInterceptingMessageProc
         clientProxy.getRequestContext().putAll(props);
 
         Object response;
+        Object[] args = getArgs(event);
         try
         {
-            Object[] args = getArgs(event);
             response = method.invoke(clientProxy, args);
         }
         catch (InvocationTargetException e)
@@ -201,9 +201,9 @@ public class CxfOutboundMessageProcessor extends AbstractInterceptingMessageProc
             }
         }
 
-        // TODO: handle holders
+        Object[] objResponse = addHoldersToResponse(response, args);
         MuleEvent muleRes = responseHolder.value;
-        return buildResponseMessage(event, muleRes, new Object[]{ response });
+        return buildResponseMessage(event, muleRes, objResponse);
     }
 
     protected MuleEvent doSendWithClient(MuleEvent event) throws Exception
@@ -401,6 +401,22 @@ public class CxfOutboundMessageProcessor extends AbstractInterceptingMessageProc
         message.setPayload(payload);
 
         return transportResponse;
+    }
+
+    protected Object[] addHoldersToResponse(Object response, Object[] args)
+    {
+        List<Object> responseWithHolders = new ArrayList<Object>();
+        responseWithHolders.add(response);
+
+        for(Object arg : args)
+        {
+            if(arg instanceof Holder)
+            {
+                responseWithHolders.add(arg);
+            }
+        }
+
+        return responseWithHolders.toArray();
     }
 
 //    public String parseSoapAction(String soapAction, QName method, MuleEvent event)
