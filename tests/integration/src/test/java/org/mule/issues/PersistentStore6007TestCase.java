@@ -98,31 +98,31 @@ public class PersistentStore6007TestCase extends FunctionalTestCase
         }
 
         @Override
-        public List<Serializable> allKeys() throws ObjectStoreException
+        public synchronized List<Serializable> allKeys() throws ObjectStoreException
         {
             return new ArrayList<Serializable>(events.keySet());
         }
 
         @Override
-        public boolean contains(Serializable key) throws ObjectStoreException
+        public synchronized boolean contains(Serializable key) throws ObjectStoreException
         {
             return events.containsKey(key);
         }
 
         @Override
-        public void store(Serializable key, Serializable value) throws ObjectStoreException
+        public synchronized void store(Serializable key, Serializable value) throws ObjectStoreException
         {
             events.put(key, value);
         }
 
         @Override
-        public Serializable retrieve(Serializable key) throws ObjectStoreException
+        public synchronized Serializable retrieve(Serializable key) throws ObjectStoreException
         {
             return events.get(key);
         }
 
         @Override
-        public Serializable remove(Serializable key) throws ObjectStoreException
+        public synchronized Serializable remove(Serializable key) throws ObjectStoreException
         {
             return events.remove(key);
         }
@@ -138,8 +138,9 @@ public class PersistentStore6007TestCase extends FunctionalTestCase
     {
         private static Set<String> payloads = new HashSet<String>();
         private static Latch latch;
+
         @Override
-        public Object onCall(MuleEventContext eventContext) throws Exception
+        public synchronized Object onCall(MuleEventContext eventContext) throws Exception
         {
             payloads.add(eventContext.getMessageAsString());
             if (payloads.size() == 4)
