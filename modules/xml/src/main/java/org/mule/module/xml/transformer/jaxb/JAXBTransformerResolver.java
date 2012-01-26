@@ -163,10 +163,14 @@ public class JAXBTransformerResolver implements TransformerResolver, MuleContext
 
     protected boolean hasJaxbAnnotations(Class annotatedType)
     {
-        String p = annotatedType.getPackage().getName();
-        for (int i = 0; i < ignoredPackages.length; i++)
+        // MULE-5931 The package can be null, e.g. for DataType.BYTE_ARRAY_DATA_TYPE
+        if(annotatedType.getPackage() != null)
         {
-            if(p.startsWith(ignoredPackages[i])) return false;
+            String p = annotatedType.getPackage().getName();
+            for (int i = 0; i < ignoredPackages.length; i++)
+            {
+                if(p.startsWith(ignoredPackages[i])) return false;
+            }
         }
 
         try
