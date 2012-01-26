@@ -64,7 +64,7 @@ public class XmlMessageSplitter extends AbstractRoundRobinMessageSplitter
     public static final String JAXP_PROPERTIES_SCHEMA_LANGUAGE_VALUE = "http://www.w3.org/2001/XMLSchema";
 
     protected volatile String splitExpression = "";
-    protected volatile Map<?, ?> namespaces;
+    protected volatile Map<String, String> namespaces;
     protected NamespaceManager namespaceManager;
 
     protected volatile boolean validateSchema;
@@ -75,12 +75,12 @@ public class XmlMessageSplitter extends AbstractRoundRobinMessageSplitter
         this.splitExpression = StringUtils.trimToEmpty(splitExpression);
     }
 
-    public void setNamespaces(Map<?, ?> namespaces)
+    public void setNamespaces(Map<String, String> namespaces)
     {
         this.namespaces = namespaces;
     }
 
-    public Map<?, ?> getNamespaces()
+    public Map<String, String> getNamespaces()
     {
         return Collections.unmodifiableMap(namespaces);
     }
@@ -133,7 +133,7 @@ public class XmlMessageSplitter extends AbstractRoundRobinMessageSplitter
             {
                 if (namespaces == null)
                 {
-                    namespaces = new HashMap<Object, Object>(namespaceManager.getNamespaces());
+                    namespaces = new HashMap<String, String>(namespaceManager.getNamespaces());
                 }
                 else
                 {

@@ -18,14 +18,14 @@ import javax.xml.namespace.NamespaceContext;
 
 public final class MapNamespaceContext implements NamespaceContext
 {
-    private Map namespaces = new HashMap();
+    private Map<String, String> namespaces = new HashMap<String, String>();
 
     public MapNamespaceContext()
     {
         super();
     }
 
-    public MapNamespaceContext(final Map ns)
+    public MapNamespaceContext(final Map<String, String> ns)
     {
         this();
         this.namespaces = ns;
@@ -36,35 +36,37 @@ public final class MapNamespaceContext implements NamespaceContext
         this.namespaces.put(prefix, namespaceURI);
     }
 
-    public void addNamespaces(final Map ns)
+    public void addNamespaces(final Map<String, String> ns)
     {
         this.namespaces.putAll(ns);
     }
 
+    @Override
     public String getNamespaceURI(String prefix)
     {
-        return (String) namespaces.get(prefix);
+        return namespaces.get(prefix);
     }
 
+    @Override
     public String getPrefix(String namespaceURI)
     {
-        for (Iterator itr = namespaces.entrySet().iterator(); itr.hasNext();)
+        for (Map.Entry<String, String> entry : namespaces.entrySet())
         {
-            Map.Entry e = (Map.Entry) itr.next();
-            if (e.getValue().equals(namespaceURI))
+            if (entry.getValue().equals(namespaceURI))
             {
-                return (String) e.getKey();
+                return entry.getKey();
             }
         }
         return null;
     }
 
-    public Iterator getPrefixes(String namespaceURI)
+    @Override
+    public Iterator<String> getPrefixes(String namespaceURI)
     {
         return null;
     }
 
-    public Map getUsedNamespaces()
+    public Map<String, String> getUsedNamespaces()
     {
         return namespaces;
     }

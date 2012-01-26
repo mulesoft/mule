@@ -24,9 +24,9 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.context.notification.MuleContextNotification;
 import org.mule.module.xml.i18n.XmlMessages;
 import org.mule.module.xml.util.NamespaceManager;
+import org.mule.transformer.types.DataTypeFactory;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
@@ -34,7 +34,6 @@ import java.util.WeakHashMap;
 import org.dom4j.Document;
 import org.jaxen.JaxenException;
 import org.jaxen.XPath;
-import org.mule.transformer.types.DataTypeFactory;
 
 /**
  * Provides a base class for XPath property extractors. The XPath engine used is jaxen (http://jaxen.org) which supports
@@ -47,12 +46,14 @@ public abstract class AbstractXPathExpressionEvaluator implements ExpressionEval
     private MuleContext muleContext;
     private NamespaceManager namespaceManager;
 
+    @Override
     public void setMuleContext(MuleContext context)
     {
         this.muleContext = context;
 
     }
 
+    @Override
     public void initialise() throws InitialisationException
     {
         try
@@ -67,6 +68,7 @@ public abstract class AbstractXPathExpressionEvaluator implements ExpressionEval
              */
             this.muleContext.registerListener(new MuleContextNotificationListener<MuleContextNotification>(){
 
+                @Override
                 public void onNotification(MuleContextNotification notification)
                 {
                     // CONTEXT_INITIALIZED fires too soon, before registry is inited, thus using this one
@@ -103,6 +105,7 @@ public abstract class AbstractXPathExpressionEvaluator implements ExpressionEval
     }
 
     /** {@inheritDoc} */
+    @Override
     public Object evaluate(String expression, MuleMessage message)
     {
         try
@@ -147,21 +150,21 @@ public abstract class AbstractXPathExpressionEvaluator implements ExpressionEval
 
     protected void addNamespaces(NamespaceManager manager, XPath xpath)
     {
-        for (Iterator<?> iterator = manager.getNamespaces().entrySet().iterator(); iterator.hasNext();)
+        for (Map.Entry<String, String> entry : manager.getNamespaces().entrySet())
         {
-            Map.Entry<?, ?> entry = (Map.Entry<?, ?>)iterator.next();
             try
             {
-                xpath.addNamespace(entry.getKey().toString(), entry.getValue().toString());
+                xpath.addNamespace(entry.getKey(), entry.getValue());
             }
             catch (JaxenException e)
             {
-                throw new ExpressionRuntimeException(XmlMessages.failedToRegisterNamespace(entry.getKey().toString(), entry.getValue().toString()));
+                throw new ExpressionRuntimeException(XmlMessages.failedToRegisterNamespace(entry.getKey(), entry.getValue()));
             }
         }
     }
 
     /** {@inheritDoc} */
+    @Override
     public final void setName(String name)
     {
         throw new UnsupportedOperationException("setName");
@@ -217,6 +220,7 @@ public abstract class AbstractXPathExpressionEvaluator implements ExpressionEval
      * exception is thrown it should just be logged and processing should continue.
      * This method should not throw Runtime exceptions.
      */
+    @Override
     public void dispose()
     {
         cache.clear();

@@ -10,7 +10,6 @@
 
 package org.mule.module.xml.expression;
 
-import org.apache.commons.jxpath.Container;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.context.MuleContextAware;
@@ -22,9 +21,9 @@ import org.mule.module.xml.i18n.XmlMessages;
 import org.mule.module.xml.util.NamespaceManager;
 import org.mule.module.xml.util.XMLUtils;
 
-import java.util.Iterator;
 import java.util.Map;
 
+import org.apache.commons.jxpath.Container;
 import org.apache.commons.jxpath.JXPathContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -36,6 +35,7 @@ import org.w3c.dom.Document;
  * @deprecated Developers should use xpath, bean or groovy instead of this expression evaluator since there are some
  * quirks with JXPath and the performance is not good.
  */
+@Deprecated
 public class JXPathExpressionEvaluator implements ExpressionEvaluator, MuleContextAware
 {
     public static final String NAME = "jxpath";
@@ -46,11 +46,13 @@ public class JXPathExpressionEvaluator implements ExpressionEvaluator, MuleConte
     protected transient MuleContext muleContext;
     private NamespaceManager namespaceManager;
 
+    @Override
     public void setMuleContext(MuleContext context)
     {
         muleContext = context;
     }
 
+    @Override
     public Object evaluate(String expression, MuleMessage message)
     {
         Document document;
@@ -83,11 +85,13 @@ public class JXPathExpressionEvaluator implements ExpressionEvaluator, MuleConte
         Container container = new Container()
         {
 
+            @Override
             public Object getValue()
             {
                 return document;
             }
 
+            @Override
             public void setValue(Object value)
             {
                 throw new UnsupportedOperationException();
@@ -129,16 +133,15 @@ public class JXPathExpressionEvaluator implements ExpressionEvaluator, MuleConte
 
     protected void addNamespacesToContext(NamespaceManager manager, JXPathContext context)
     {
-        for (Iterator iterator = manager.getNamespaces().entrySet().iterator(); iterator.hasNext();)
+        for (Map.Entry<String, String> entry : manager.getNamespaces().entrySet())
         {
-            Map.Entry entry = (Map.Entry) iterator.next();
             try
             {
-                context.registerNamespace(entry.getKey().toString(), entry.getValue().toString());
+                context.registerNamespace(entry.getKey(), entry.getValue());
             }
             catch (Exception e)
             {
-                throw new ExpressionRuntimeException(XmlMessages.failedToRegisterNamespace(entry.getKey().toString(), entry.getValue().toString()));
+                throw new ExpressionRuntimeException(XmlMessages.failedToRegisterNamespace(entry.getKey(), entry.getValue()));
             }
         }
     }
@@ -146,6 +149,7 @@ public class JXPathExpressionEvaluator implements ExpressionEvaluator, MuleConte
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getName()
     {
         return NAME;
@@ -154,6 +158,7 @@ public class JXPathExpressionEvaluator implements ExpressionEvaluator, MuleConte
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setName(String name)
     {
         throw new UnsupportedOperationException("setName");

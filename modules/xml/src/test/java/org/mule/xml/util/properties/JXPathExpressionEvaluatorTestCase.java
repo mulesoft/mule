@@ -115,7 +115,7 @@ public class JXPathExpressionEvaluatorTestCase extends AbstractMuleContextTestCa
     public void testXmlWithInvalidNameSpaceIfNameSpaceAliasIsDefined() throws MalformedURLException, RegistrationException
     {
         NamespaceManager namespaceManager = new NamespaceManager();
-        Map<String, Object> namespaces = new HashMap<String, Object>();
+        Map<String, String> namespaces = new HashMap<String, String>();
         namespaces.put("f", "http://www.w3schools.com/furniture");
         namespaceManager.setNamespaces(namespaces);
         muleContext.getRegistry().registerObject(MuleProperties.OBJECT_MULE_NAMESPACE_MANAGER, namespaceManager);

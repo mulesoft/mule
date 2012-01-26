@@ -10,9 +10,6 @@
 
 package org.mule.module.xml.filters;
 
-import static org.mule.util.ClassUtils.equal;
-import static org.mule.util.ClassUtils.hash;
-
 import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.context.MuleContextAware;
@@ -22,10 +19,10 @@ import org.mule.api.routing.filter.Filter;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.module.xml.util.NamespaceManager;
 import org.mule.module.xml.util.XMLUtils;
+import org.mule.transformer.types.DataTypeFactory;
 
 import java.io.InputStream;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 import javax.xml.transform.dom.DOMSource;
@@ -39,7 +36,9 @@ import org.jaxen.JaxenException;
 import org.jaxen.dom.DOMXPath;
 import org.jaxen.dom4j.Dom4jXPath;
 import org.jaxen.javabean.JavaBeanXPath;
-import org.mule.transformer.types.DataTypeFactory;
+
+import static org.mule.util.ClassUtils.equal;
+import static org.mule.util.ClassUtils.hash;
 
 /**
  * <code>JaxenFilter</code> evaluates an XPath expression against an XML document
@@ -51,7 +50,7 @@ public class JaxenFilter implements Filter, MuleContextAware
 
     private String pattern;
     private String expectedValue;
-    private Map namespaces = null;
+    private Map<String, String> namespaces = null;
     private Map contextProperties = null;
     private AbstractFactory factory;
 
@@ -75,6 +74,7 @@ public class JaxenFilter implements Filter, MuleContextAware
     }
 
 
+    @Override
     public void setMuleContext(MuleContext context)
     {
         this.muleContext = context;
@@ -86,11 +86,11 @@ public class JaxenFilter implements Filter, MuleContextAware
         {
             throw new ExpressionRuntimeException(CoreMessages.failedToLoad("NamespaceManager"), e);
         }
-        if(namespaceManager!=null)
+        if (namespaceManager!=null)
         {
-            if(namespaces == null)
+            if (namespaces == null)
             {
-                namespaces = new HashMap(namespaceManager.getNamespaces());
+                namespaces = new HashMap<String, String>(namespaceManager.getNamespaces());
             }
             else
             {
@@ -99,19 +99,20 @@ public class JaxenFilter implements Filter, MuleContextAware
         }
     }
 
+    @Override
     public boolean accept(MuleMessage obj)
     {
         Object payload = obj.getPayload();
-        
-        try 
+
+        try
         {
             // Ensure that we have an object we can run an XPath on
             if (payload instanceof DOMSource)
             {
                 accept(((DOMSource) payload).getNode());
             }
-            else if (payload instanceof byte[] 
-                     || payload instanceof InputStream 
+            else if (payload instanceof byte[]
+                     || payload instanceof InputStream
                      || payload instanceof String)
             {
                 try
@@ -120,16 +121,16 @@ public class JaxenFilter implements Filter, MuleContextAware
                 }
                 catch (Exception e)
                 {
-                    logger.warn("JaxenPath filter rejected message because it could not convert from " 
-                            + payload.getClass() 
+                    logger.warn("JaxenPath filter rejected message because it could not convert from "
+                            + payload.getClass()
                             + " to Source: "+ e.getMessage(), e);
                     return false;
                 }
             }
-        
+
             return accept(payload);
         }
-        catch (JaxenException e) 
+        catch (JaxenException e)
         {
             logger.warn("JaxenPath filter rejected message because it could not build/evaluate the XPath expression.", e);
             return false;
@@ -178,7 +179,7 @@ public class JaxenFilter implements Filter, MuleContextAware
         {
             throw new JaxenException(e);
         }
-        
+
         // Payload is a DOM Document
         if (dom4jDoc != null)
         {
@@ -249,7 +250,7 @@ public class JaxenFilter implements Filter, MuleContextAware
         setupNamespaces(xpath);
         return xpath;
     }
-    
+
     protected JavaBeanXPath getJavaBeanXPath() throws JaxenException
     {
         JavaBeanXPath xpath = new JavaBeanXPath(pattern);
@@ -259,13 +260,11 @@ public class JaxenFilter implements Filter, MuleContextAware
 
     private void setupNamespaces(BaseXPath xpath) throws JaxenException
     {
-        if (namespaces != null) 
+        if (namespaces != null)
         {
-            for (Iterator itr = namespaces.entrySet().iterator(); itr.hasNext();)
+            for (Map.Entry<String, String>entry : namespaces.entrySet())
             {
-                Map.Entry entry = (Map.Entry) itr.next();
-                
-                xpath.addNamespace((String) entry.getKey(), (String) entry.getValue());
+                xpath.addNamespace(entry.getKey(), entry.getValue());
             }
         }
     }
@@ -294,12 +293,12 @@ public class JaxenFilter implements Filter, MuleContextAware
         this.expectedValue = expectedValue;
     }
 
-    public Map getNamespaces()
+    public Map<String, String> getNamespaces()
     {
         return namespaces;
     }
 
-    public void setNamespaces(Map namespaces)
+    public void setNamespaces(Map<String, String> namespaces)
     {
         this.namespaces = namespaces;
     }
@@ -323,6 +322,8 @@ public class JaxenFilter implements Filter, MuleContextAware
     {
         this.factory = factory;
     }
+
+    @Override
     public boolean equals(Object obj)
     {
         if (this == obj) return true;
@@ -335,6 +336,7 @@ public class JaxenFilter implements Filter, MuleContextAware
             && equal(pattern, other.pattern);
     }
 
+    @Override
     public int hashCode()
     {
         return hash(new Object[]{this.getClass(), expectedValue, contextProperties, namespaces, pattern});

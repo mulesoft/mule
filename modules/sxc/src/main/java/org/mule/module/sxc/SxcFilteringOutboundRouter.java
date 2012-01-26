@@ -68,12 +68,12 @@ public class SxcFilteringOutboundRouter extends FilteringOutboundRouter
         {
             throw new ExpressionRuntimeException(CoreMessages.failedToLoad("NamespaceManager"), e);
         }
-        
+
         if (namespaceManager != null)
         {
             if (namespaces == null)
             {
-                namespaces = new HashMap(namespaceManager.getNamespaces());
+                namespaces = new HashMap<String, String>(namespaceManager.getNamespaces());
             }
             else
             {
@@ -196,14 +196,14 @@ public class SxcFilteringOutboundRouter extends FilteringOutboundRouter
 
     /**
      * Gets an XMLStreamReader for this message.
-     * 
+     *
      * @param message
      * @throws TransformerException
      */
     protected ReversibleXMLStreamReader getXMLStreamReader(MuleMessage message) throws TransformerException
     {
          ReversibleXMLStreamReader r = (ReversibleXMLStreamReader) transformer.transform(message);
-         
+
          if (r != message.getPayload())
          {
              message.setPayload(r);

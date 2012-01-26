@@ -10,9 +10,6 @@
 
 package org.mule.module.xml.filters;
 
-import static org.mule.util.ClassUtils.equal;
-import static org.mule.util.ClassUtils.hash;
-
 import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.context.MuleContextAware;
@@ -42,12 +39,13 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.w3c.dom.Node;
 
+import static org.mule.util.ClassUtils.equal;
+import static org.mule.util.ClassUtils.hash;
+
 /**
  */
-public class XPathFilter extends AbstractJaxpFilter 
-    implements Filter, Initialisable, MuleContextAware
+public class XPathFilter extends AbstractJaxpFilter  implements Filter, Initialisable, MuleContextAware
 {
-
     protected transient Log logger = LogFactory.getLog(getClass());
 
     private String pattern;
@@ -61,6 +59,7 @@ public class XPathFilter extends AbstractJaxpFilter
 
     public XPathFilter()
     {
+        super();
     }
 
     public XPathFilter(String pattern)
@@ -74,15 +73,17 @@ public class XPathFilter extends AbstractJaxpFilter
         this.expectedValue = expectedValue;
     }
 
+    @Override
     public void setMuleContext(MuleContext context)
     {
         this.muleContext = context;
     }
 
+    @Override
     public void initialise() throws InitialisationException
     {
         super.initialise();
-        
+
         if (getXpath() == null)
         {
             setXpath(XPathFactory.newInstance().newXPath());
@@ -112,7 +113,7 @@ public class XPathFilter extends AbstractJaxpFilter
             {
                 if (prefixToNamespaceMap == null)
                 {
-                    prefixToNamespaceMap = new HashMap(namespaceManager.getNamespaces());
+                    prefixToNamespaceMap = new HashMap<String, String>(namespaceManager.getNamespaces());
                 }
                 else
                 {
@@ -120,17 +121,19 @@ public class XPathFilter extends AbstractJaxpFilter
                 }
             }
         }
-        
+
         final Map<String, String> prefixToNamespaceMap = this.prefixToNamespaceMap;
         if (prefixToNamespaceMap != null)
         {
             getXpath().setNamespaceContext(new NamespaceContext()
             {
+                @Override
                 public String getNamespaceURI(String prefix)
                 {
                     return prefixToNamespaceMap.get(prefix);
                 }
 
+                @Override
                 public String getPrefix(String namespaceURI)
                 {
 
@@ -145,12 +148,13 @@ public class XPathFilter extends AbstractJaxpFilter
                     return null;
                 }
 
-                public Iterator getPrefixes(String namespaceURI)
+                @Override
+                public Iterator<String> getPrefixes(String namespaceURI)
                 {
                     String prefix = getPrefix(namespaceURI);
                     if (prefix == null)
                     {
-                        return Collections.emptyList().iterator();
+                        return Collections.<String>emptyList().iterator();
                     }
                     else
                     {
@@ -167,6 +171,7 @@ public class XPathFilter extends AbstractJaxpFilter
         }
     }
 
+    @Override
     public boolean accept(MuleMessage message)
     {
         Object payload = message.getPayload();
@@ -308,7 +313,7 @@ public class XPathFilter extends AbstractJaxpFilter
 
     /**
      * Sets the expected result value of the XPath expression
-     * 
+     *
      * @param expectedValue The expected value.
      */
     public void setExpectedValue(String expectedValue)
@@ -318,7 +323,7 @@ public class XPathFilter extends AbstractJaxpFilter
 
     /**
      * The xpath object to use to evaluate the expression.
-     * 
+     *
      * @return The xpath object to use to evaluate the expression.
      */
     public XPath getXpath()
@@ -328,7 +333,7 @@ public class XPathFilter extends AbstractJaxpFilter
 
     /**
      * The xpath object to use to evaluate the expression.
-     * 
+     *
      * @param xpath The xpath object to use to evaluate the expression.
      */
     public void setXpath(XPath xpath)
@@ -340,7 +345,7 @@ public class XPathFilter extends AbstractJaxpFilter
     /**
      * The prefix-to-namespace map for the namespace context to be applied to the
      * XPath evaluation.
-     * 
+     *
      * @return The prefix-to-namespace map for the namespace context to be applied to
      *         the XPath evaluation.
      */
@@ -352,7 +357,7 @@ public class XPathFilter extends AbstractJaxpFilter
     /**
      * The prefix-to-namespace map for the namespace context to be applied to the
      * XPath evaluation.
-     * 
+     *
      * @param prefixToNamespaceMap The prefix-to-namespace map for the namespace
      *            context to be applied to the XPath evaluation.
      */
@@ -360,7 +365,8 @@ public class XPathFilter extends AbstractJaxpFilter
     {
         this.prefixToNamespaceMap = prefixToNamespaceMap;
     }
-    
+
+    @Override
     public boolean equals(Object obj)
     {
         if (this == obj) return true;
@@ -372,6 +378,7 @@ public class XPathFilter extends AbstractJaxpFilter
             && equal(pattern, other.pattern);
     }
 
+    @Override
     public int hashCode()
     {
         return hash(new Object[]{this.getClass(), expectedValue, prefixToNamespaceMap, pattern});

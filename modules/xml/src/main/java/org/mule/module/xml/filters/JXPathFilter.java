@@ -10,9 +10,6 @@
 
 package org.mule.module.xml.filters;
 
-import static org.mule.util.ClassUtils.equal;
-import static org.mule.util.ClassUtils.hash;
-
 import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.context.MuleContextAware;
@@ -37,18 +34,20 @@ import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
 import org.dom4j.XPath;
 
+import static org.mule.util.ClassUtils.equal;
+import static org.mule.util.ClassUtils.hash;
+
 /**
  * <code>JXPathFilter</code> evaluates an XPath expression against a W3C Document,
  * XML string, or Java bean and returns true if the result is as expected.
  */
 public class JXPathFilter implements Filter, MuleContextAware, Initialisable
 {
-
     protected transient Log logger = LogFactory.getLog(getClass());
 
     private String pattern;
     private String expectedValue;
-    private Map namespaces = null;
+    private Map<String, String> namespaces = null;
     private Map contextProperties = null;
     private AbstractFactory factory;
     private boolean lenient = true;
@@ -61,11 +60,13 @@ public class JXPathFilter implements Filter, MuleContextAware, Initialisable
         super();
     }
 
+    @Override
     public void setMuleContext(MuleContext context)
     {
         this.muleContext = context;
     }
 
+    @Override
     public void initialise() throws InitialisationException
     {
         try
@@ -81,7 +82,7 @@ public class JXPathFilter implements Filter, MuleContextAware, Initialisable
         {
             if (namespaces == null)
             {
-                namespaces = new HashMap(namespaceManager.getNamespaces());
+                namespaces = new HashMap<String, String>(namespaceManager.getNamespaces());
             }
             else
             {
@@ -101,6 +102,7 @@ public class JXPathFilter implements Filter, MuleContextAware, Initialisable
         this.expectedValue = expectedValue;
     }
 
+    @Override
     public boolean accept(MuleMessage obj)
     {
         if (obj.getPayload() instanceof byte[])
@@ -230,7 +232,6 @@ public class JXPathFilter implements Filter, MuleContextAware, Initialisable
      */
     protected void initialise(JXPathContext context)
     {
-        Map.Entry entry;
         if (namespaces != null)
         {
             if (logger.isDebugEnabled())
@@ -238,13 +239,13 @@ public class JXPathFilter implements Filter, MuleContextAware, Initialisable
                 logger.debug("Initializing JXPathContext with namespaces: " + namespaces);
             }
 
-            for (Iterator iterator = namespaces.entrySet().iterator(); iterator.hasNext();)
+            for (Map.Entry<String, String> entry : namespaces.entrySet())
             {
-                entry = (Map.Entry) iterator.next();
-                context.registerNamespace(entry.getKey().toString(), entry.getValue().toString());
+                context.registerNamespace(entry.getKey(), entry.getValue());
             }
         }
 
+        Map.Entry entry;
         if (contextProperties != null)
         {
             if (logger.isDebugEnabled())
@@ -303,6 +304,7 @@ public class JXPathFilter implements Filter, MuleContextAware, Initialisable
      * @return The expected result value of the XPath expression
      * @deprecated Use <code>getExpectedValue()</code>.
      */
+    @Deprecated
     public String getValue()
     {
         return getExpectedValue();
@@ -313,17 +315,18 @@ public class JXPathFilter implements Filter, MuleContextAware, Initialisable
      *
      * @deprecated Use <code>setExpectedValue(String expectedValue)</code>.
      */
+    @Deprecated
     public void setValue(String value)
     {
         setExpectedValue(value);
     }
 
-    public Map getNamespaces()
+    public Map<String, String> getNamespaces()
     {
         return namespaces;
     }
 
-    public void setNamespaces(Map namespaces)
+    public void setNamespaces(Map<String, String> namespaces)
     {
         this.namespaces = namespaces;
     }
@@ -357,7 +360,8 @@ public class JXPathFilter implements Filter, MuleContextAware, Initialisable
     {
         this.lenient = lenient;
     }
-    
+
+    @Override
     public boolean equals(Object obj)
     {
         if (this == obj) return true;
@@ -371,6 +375,7 @@ public class JXPathFilter implements Filter, MuleContextAware, Initialisable
             && lenient == other.lenient;
     }
 
+    @Override
     public int hashCode()
     {
         return hash(new Object[]{this.getClass(), expectedValue, contextProperties, namespaces, pattern, lenient});

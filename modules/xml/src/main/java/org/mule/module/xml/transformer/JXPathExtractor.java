@@ -48,15 +48,16 @@ public class JXPathExtractor extends AbstractTransformer
     public static final String OUTPUT_TYPE_VALUE = "VALUE";
 
     private volatile String expression;
-    
+
     private volatile String outputType;
-    
-    private volatile Map namespaces;
+
+    private volatile Map<String, String> namespaces;
 
     private volatile boolean singleResult = true;
 
     private NamespaceManager namespaceManager;
 
+    @Override
     public void setMuleContext(MuleContext context)
     {
         this.muleContext = context;
@@ -85,7 +86,7 @@ public class JXPathExtractor extends AbstractTransformer
         {
             if (namespaces == null)
             {
-                namespaces = new HashMap(namespaceManager.getNamespaces());
+                namespaces = new HashMap<String, String>(namespaceManager.getNamespaces());
             }
             else
             {
@@ -99,6 +100,7 @@ public class JXPathExtractor extends AbstractTransformer
      * result. If the given object is a string, it assumes it is an valid xml and
      * parses it before evaluating the xpath expression.
      */
+    @Override
     public Object doTransform(Object src, String encoding) throws TransformerException
     {
         try
@@ -113,7 +115,7 @@ public class JXPathExtractor extends AbstractTransformer
                 {
                     xpath.setNamespaceURIs(namespaces);
                 }
-                
+
                 // This is the way we always did it before, so keep doing it that way
                 // as xpath.evaluate() will return non-string results (like Doubles)
                 // for some scenarios.
@@ -121,7 +123,7 @@ public class JXPathExtractor extends AbstractTransformer
                 {
                     return xpath.valueOf(doc);
                 }
-                
+
                 // TODO handle non-list cases, see
                 //http://www.dom4j.org/apidocs/org/dom4j/XPath.html#evaluate(java.lang.Object)
                 Object obj = xpath.evaluate(doc);
@@ -131,7 +133,7 @@ public class JXPathExtractor extends AbstractTransformer
                     {
                         final Node node = (Node) ((List) obj).get(i);
                         result = add(result, node);
-                        
+
                         if (singleResult)
                         {
                             break;
@@ -157,7 +159,7 @@ public class JXPathExtractor extends AbstractTransformer
         }
 
     }
-    
+
     private Object add(Object result, Object value)
     {
         Object formattedResult = getResult(value);
@@ -171,7 +173,7 @@ public class JXPathExtractor extends AbstractTransformer
             {
                 result = new ArrayList();
             }
-            
+
             ((List) result).add(formattedResult);
         }
         return result;
@@ -188,7 +190,7 @@ public class JXPathExtractor extends AbstractTransformer
             }
             else
             {
-                // this maintains backward compat with previous 2.1.x versions. 
+                // this maintains backward compat with previous 2.1.x versions.
                 result = value.toString();
             }
         }
@@ -198,7 +200,7 @@ public class JXPathExtractor extends AbstractTransformer
             {
                 result = ((Node) value).asXML();
             }
-            else 
+            else
             {
                 throw new IllegalStateException("XPath expression output must be a Node to output as XML. Expression type was: " + value.getClass());
             }
@@ -228,7 +230,7 @@ public class JXPathExtractor extends AbstractTransformer
 
     /**
      * Should a single value be returned.
-     * 
+     *
      * @return value
      */
     public boolean isSingleResult()
@@ -239,7 +241,7 @@ public class JXPathExtractor extends AbstractTransformer
     /**
      * If multiple results are expected from the {@link #expression} evaluation, set
      * this to false.
-     * 
+     *
      * @param singleResult flag
      */
     public void setSingleResult(boolean singleResult)
@@ -257,14 +259,13 @@ public class JXPathExtractor extends AbstractTransformer
         this.outputType = outputEncoding;
     }
 
-    public Map getNamespaces()
+    public Map<String, String> getNamespaces()
     {
         return namespaces;
     }
 
-    public void setNamespaces(Map namespaceURIs)
+    public void setNamespaces(Map<String, String> namespaceURIs)
     {
         this.namespaces = namespaceURIs;
     }
-    
 }
