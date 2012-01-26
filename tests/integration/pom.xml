@@ -154,7 +154,7 @@
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-email</artifactId>
             <classifier>tests</classifier>
-            <version>${version}</version>
+            <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
 
