@@ -14,7 +14,6 @@ import org.mule.api.transaction.TransactionConfig;
 
 public class TransactionTemplateFactory
 {
-
     /**
      * TransactionTemplate created by this method should be used in the beginning of a flow execution.
      * Should be used when:
@@ -26,11 +25,6 @@ public class TransactionTemplateFactory
      *  Start a transaction if required by TransactionConfig action
      *  Resolve transaction if was started by this TransactionTemplate
      *  Route any exception to exception strategy if it was not already routed to it
-     *
-     * @param transactionConfig transactional configuration
-     * @param muleContext current MuleContext for the flow being executed
-     * @param <T>
-     * @return
      */
     public static <T> TransactionTemplate createMainTransactionTemplate(TransactionConfig transactionConfig, MuleContext muleContext)
     {
@@ -52,11 +46,6 @@ public class TransactionTemplateFactory
      *
      * Instance of TransactionTemplate created by this method will:
      *  Route any exception to exception strategy if it was not already routed to it
-     *
-     *
-     * @param muleContext
-     * @param <T>
-     * @return
      */
     public static  <T> TransactionTemplate createExceptionHandlingTransactionTemplate(MuleContext muleContext)
     {
@@ -78,12 +67,6 @@ public class TransactionTemplateFactory
      *  Suspend-Resume xa transaction created before it if the TransactionConfig action requires it
      *  Start a transaction if required by TransactionConfig action
      *  Resolve transaction if was started by this TransactionTemplate
-     *
-     *
-     * @param transactionConfig
-     * @param muleContext
-     * @param <T>
-     * @return
      */
     public static <T> TransactionTemplate createNestedTransactionTemplate(TransactionConfig transactionConfig, MuleContext muleContext)
     {

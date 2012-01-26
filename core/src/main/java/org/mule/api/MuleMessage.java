@@ -757,18 +757,21 @@ public interface MuleMessage extends Serializable
     DataType<?> getDataType();
 
     /**
-     * @Deprecated use {@link org.mule.api.MuleSession#getProperty(String)}
+     * @deprecated use {@link org.mule.api.MuleSession#getProperty(String)}
      */
+    @Deprecated
     <T> T getSessionProperty(String name, T defaultValue);
 
     /**
-     * @Deprecated use {@link org.mule.api.MuleSession#getProperty(String)}
+     * @deprecated use {@link org.mule.api.MuleSession#getProperty(String)}
      */
+    @Deprecated
     <T> T getSessionProperty(String name);
 
     /**
-     * @Deprecated use {@link org.mule.api.MuleSession#setProperty(String, Serializable)}
+     * @deprecated use {@link org.mule.api.MuleSession#setProperty(String, Serializable)}
      */
+    @Deprecated
     void setSessionProperty(String key, Object value);
 
     /**

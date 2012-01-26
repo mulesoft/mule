@@ -16,7 +16,7 @@ package org.mule.tck;
  * your tests. The test will need to only implement 'getNumPortsToFind' to tell this
  * class how many free test ports to find.
  *
- * @Deprecated: use {@link org.mule.tck.junit4.rule.DynamicPort} in a JUnit 4 test.
+ * @deprecated: use {@link org.mule.tck.junit4.rule.DynamicPort} in a JUnit 4 test.
  */
 @Deprecated
 public abstract class DynamicPortTestCase extends FunctionalTestCase

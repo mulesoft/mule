@@ -9,19 +9,14 @@
  */
 package org.mule.module.json.transformers;
 
-import com.sun.corba.se.spi.orbutil.fsm.Input;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.module.xml.filters.SchemaValidationFilter;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.util.IOUtils;
 
-import java.io.InputStream;
 import java.io.StringWriter;
 import java.io.Writer;
 
@@ -41,7 +36,6 @@ import java.io.Writer;
  */
 public class JsonSchemaValidationFilter extends  SchemaValidationFilter implements MuleContextAware
 {
-    protected transient Log logger = LogFactory.getLog(getClass());
     protected MuleContext muleContext;
     protected JsonToXml jToX;
 
@@ -83,6 +77,7 @@ public class JsonSchemaValidationFilter extends  SchemaValidationFilter implemen
         }
     }
 
+    @Override
     public void setMuleContext(MuleContext muleContext)
     {
         this.muleContext = muleContext;
