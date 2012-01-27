@@ -38,12 +38,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.junit.Test;
 
 public class PersistentStore6007TestCase extends FunctionalTestCase
 {
     private Latch latch;
-    
+    private static Log logger = LogFactory.getLog("org.mule.issues.PersistentStore6007TestCase");
     @Override
     protected String getConfigResources()
     {
@@ -60,11 +62,11 @@ public class PersistentStore6007TestCase extends FunctionalTestCase
     @Test
     public void testPersistentNonQueueStores() throws Exception
     {
+        latch = new Latch();
+        Component.latch = latch;
         PersistentObjectStore.addEvents(muleContext);
         muleContext.start();
         MuleClient client = new MuleClient(muleContext);
-        latch = new Latch();
-        Component.latch = latch;
         MuleMessage result = client.send("vm://input", "Hello", null); 
         assertEquals("Hello", result.getPayload());
         assertTrue(latch.await(5000, TimeUnit.MILLISECONDS));
@@ -138,16 +140,22 @@ public class PersistentStore6007TestCase extends FunctionalTestCase
     {
         private static Set<String> payloads = new HashSet<String>();
         private static Latch latch;
-
+        private static Object lock = new Object();
         @Override
-        public synchronized Object onCall(MuleEventContext eventContext) throws Exception
+        public Object onCall(MuleEventContext eventContext) throws Exception
         {
-            payloads.add(eventContext.getMessageAsString());
-            if (payloads.size() == 4)
+            synchronized (lock)
             {
-                latch.countDown();
+                String payload = eventContext.getMessageAsString();
+                payloads.add(payload);
+                logger.warn("Saw new payload: " + payload);
+                logger.warn("Count is now " + payloads.size());
+                if (payloads.size() == 4)
+                {
+                    latch.countDown();
+                }
+                return eventContext.getMessage().getPayload();
             }
-            return eventContext.getMessage().getPayload();
         }
     }
 }
