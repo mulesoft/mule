@@ -10,7 +10,9 @@
 
 package org.mule.module.cxf;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import org.mule.DefaultMuleMessage;
@@ -22,6 +24,8 @@ import org.mule.module.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transformer.AbstractTransformer;
+import org.mule.transport.http.HttpConnector;
+import org.mule.transport.http.HttpConstants;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -80,6 +84,7 @@ public class CxfErrorBehaviorTestCase extends AbstractServiceAndFlowTestCase
         MuleMessage response = client.send("http://localhost:" + dynamicPort.getNumber() + "/testServiceWithFault", request);
         assertNotNull(response);
         assertTrue(response.getPayloadAsString().contains("<faultstring>"));
+        assertEquals(String.valueOf(HttpConstants.SC_INTERNAL_SERVER_ERROR), response.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY));
     }
 
     @Test
@@ -90,6 +95,7 @@ public class CxfErrorBehaviorTestCase extends AbstractServiceAndFlowTestCase
         MuleMessage response = client.send("http://localhost:" + dynamicPort.getNumber() + "/testSimpleServiceWithFault", request);
         assertNotNull(response);
         assertTrue(response.getPayloadAsString().contains("<faultstring>"));
+        assertEquals(String.valueOf(HttpConstants.SC_INTERNAL_SERVER_ERROR), response.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY));
     }
 
     @Test
@@ -100,6 +106,7 @@ public class CxfErrorBehaviorTestCase extends AbstractServiceAndFlowTestCase
         MuleMessage response = client.send("http://localhost:" + dynamicPort.getNumber() + "/testTransformerException", request);
         assertNotNull(response);
         assertTrue(response.getPayloadAsString().contains("<faultstring>"));
+        assertEquals(String.valueOf(HttpConstants.SC_INTERNAL_SERVER_ERROR), response.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY));
     }
 
     @Test
@@ -111,6 +118,8 @@ public class CxfErrorBehaviorTestCase extends AbstractServiceAndFlowTestCase
         assertNotNull(response);
         assertNotNull(response.getExceptionPayload());
         assertTrue(response.getExceptionPayload().getException().getCause() instanceof Fault);
+        assertNull(response.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY));
+
     }
 
     @Test
@@ -131,6 +140,7 @@ public class CxfErrorBehaviorTestCase extends AbstractServiceAndFlowTestCase
         MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/testProxyWithFault", requestFaultPayload, null);
         String resString = result.getPayloadAsString();
         assertTrue(resString.contains("<faultstring>Cxf Exception Message</faultstring>"));
+        assertEquals(String.valueOf(HttpConstants.SC_INTERNAL_SERVER_ERROR), result.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY));
     }
 
     @Test
@@ -140,6 +150,7 @@ public class CxfErrorBehaviorTestCase extends AbstractServiceAndFlowTestCase
         MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/testProxyWithTransformerException", requestPayload, null);
         String resString = result.getPayloadAsString();
         assertTrue(resString.contains("TransformerException"));
+        assertEquals(String.valueOf(HttpConstants.SC_INTERNAL_SERVER_ERROR), result.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY));
     }
 
 

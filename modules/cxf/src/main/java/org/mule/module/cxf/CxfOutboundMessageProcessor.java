@@ -398,6 +398,12 @@ public class CxfOutboundMessageProcessor extends AbstractInterceptingMessageProc
         }
 
         MuleMessage message = transportResponse.getMessage();
+
+        if(isProxy())
+        {
+            message.setOutboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, message.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY));
+        }
+
         message.setPayload(payload);
 
         return transportResponse;

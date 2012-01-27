@@ -10,6 +10,7 @@
 
 package org.mule.module.cxf;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -28,6 +29,8 @@ import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transformer.AbstractTransformer;
 import org.mule.transport.NullPayload;
+import org.mule.transport.http.HttpConstants;
+import org.mule.transport.http.HttpConnector;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -98,6 +101,7 @@ public class ExceptionStrategyTestCase extends AbstractServiceAndFlowTestCase
         MuleMessage response = client.send("http://localhost:" + dynamicPort.getNumber() + "/testServiceWithFault", request);
         assertNotNull(response);
         assertTrue(response.getPayloadAsString().contains("<faultstring>"));
+        assertEquals(String.valueOf(HttpConstants.SC_INTERNAL_SERVER_ERROR), response.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY));
         assertTrue(latch.await(3000, TimeUnit.MILLISECONDS));
     }
 
@@ -117,6 +121,7 @@ public class ExceptionStrategyTestCase extends AbstractServiceAndFlowTestCase
         MuleMessage response = client.send("http://localhost:" + dynamicPort.getNumber() + "/testServiceWithException", request);
         assertNotNull(response);
         assertTrue(response.getPayloadAsString().contains("<faultstring>"));
+        assertEquals(String.valueOf(HttpConstants.SC_INTERNAL_SERVER_ERROR), response.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY));
         assertTrue(latch.await(3000, TimeUnit.MILLISECONDS));
     }
 
@@ -160,6 +165,7 @@ public class ExceptionStrategyTestCase extends AbstractServiceAndFlowTestCase
         assertNotNull(response);
         assertTrue(response.getPayloadAsString().contains("<faultstring>"));
         assertTrue(response.getExceptionPayload() != null);
+        assertEquals(String.valueOf(HttpConstants.SC_INTERNAL_SERVER_ERROR), response.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY));
         assertTrue(latch.await(3000, TimeUnit.MILLISECONDS));
     }
 

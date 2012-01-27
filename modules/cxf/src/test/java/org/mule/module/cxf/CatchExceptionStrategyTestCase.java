@@ -11,6 +11,7 @@
 package org.mule.module.cxf;
 
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -27,6 +28,8 @@ import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transformer.AbstractTransformer;
+import org.mule.transport.http.HttpConstants;
+import org.mule.transport.http.HttpConnector;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -87,6 +90,7 @@ public class CatchExceptionStrategyTestCase extends AbstractServiceAndFlowTestCa
         MuleClient client = new MuleClient(muleContext);
         MuleMessage response = client.send("http://localhost:" + dynamicPort.getNumber() + "/testServiceWithFaultCatchException", request);
         assertNotNull(response);
+        assertEquals(String.valueOf(HttpConstants.SC_OK), response.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY));
         assertTrue(response.getPayloadAsString().contains("Anonymous"));
     }
 
@@ -97,6 +101,7 @@ public class CatchExceptionStrategyTestCase extends AbstractServiceAndFlowTestCa
         MuleClient client = new MuleClient(muleContext);
         MuleMessage response = client.send("http://localhost:" + dynamicPort.getNumber() + "/testServiceWithFaultCatchExceptionRethrown", request);
         assertNotNull(response);
+        assertEquals(String.valueOf(HttpConstants.SC_INTERNAL_SERVER_ERROR), response.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY));
         assertTrue(response.getPayloadAsString().contains("<faultstring>"));
     }
 
@@ -107,6 +112,7 @@ public class CatchExceptionStrategyTestCase extends AbstractServiceAndFlowTestCa
         MuleClient client = new MuleClient(muleContext);
         MuleMessage response = client.send("http://localhost:" + dynamicPort.getNumber() + "/testTransformerExceptionCatchException", request);
         assertNotNull(response);
+        assertEquals(String.valueOf(HttpConstants.SC_OK), response.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY));
         assertTrue(response.getPayloadAsString().contains("APPEND"));
     }
 
@@ -147,6 +153,7 @@ public class CatchExceptionStrategyTestCase extends AbstractServiceAndFlowTestCa
         MuleClient client = new MuleClient(muleContext);
         MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/testProxyWithTransformerExceptionCatchStrategy", requestPayload, null);
         String resString = result.getPayloadAsString();
+        assertEquals(String.valueOf(HttpConstants.SC_OK), result.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY));
         assertTrue(resString.contains("Anonymous"));
     }
 
