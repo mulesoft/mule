@@ -4875,7 +4875,7 @@
 				<xsd:attribute name="entryTTL" type="substitutableInt">
 					<xsd:annotation>
 						<xsd:documentation>
-							The time-to-live for each message ID, specified in seconds, or '-1'
+							The time-to-live for each message ID, specified in milliseconds, or '-1'
 							for entries that should never expire. DO NOT combine this with an
 							unbounded store!
                         </xsd:documentation>
@@ -4885,7 +4885,7 @@
 					<xsd:annotation>
 						<xsd:documentation>
 							The interval for periodic bounded size enforcement and entry
-							expiration, specified in seconds. Arbitrary positive values
+							expiration, specified in milliseconds. Arbitrary positive values
 							between one second and several hours or days are possible, but
 							should be chosen carefully according to the expected message rate
 							to prevent OutOfMemory conditions.
