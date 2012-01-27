@@ -67,26 +67,29 @@ public abstract class AbstractNotificationLoggerAgent extends AbstractAgent
     private boolean ignoreEndpointMessageNotifications = false;
     private boolean ignoreComponentMessageNotifications = false;
 
-    private Set<ServerNotificationListener> listeners = new HashSet<ServerNotificationListener>();
+    private Set<ServerNotificationListener<? extends ServerNotification>> listeners = new HashSet<ServerNotificationListener<? extends ServerNotification>>();
 
     protected AbstractNotificationLoggerAgent(String name)
     {
         super(name);
     }
 
+    @Override
     public void start() throws MuleException
     {
         // nothing to do
     }
 
+    @Override
     public void stop() throws MuleException
     {
         // nothing to do
     }
 
+    @Override
     public void dispose()
     {
-        for (ServerNotificationListener listener : listeners)
+        for (ServerNotificationListener<?> listener : listeners)
         {
             muleContext.unregisterListener(listener);
         }
@@ -181,7 +184,7 @@ public abstract class AbstractNotificationLoggerAgent extends AbstractAgent
     {
         this.ignoreConnectionNotifications = ignoreConnectionNotifications;
     }
-    
+
     public boolean isIgnoreComponentMessageNotifications()
     {
         return ignoreComponentMessageNotifications;
@@ -202,14 +205,16 @@ public abstract class AbstractNotificationLoggerAgent extends AbstractAgent
         this.ignoreEndpointMessageNotifications = ignoreEndpointMessageNotifications;
     }
 
+    @Override
     public final void initialise() throws InitialisationException
     {
         doInitialise();
         if (!ignoreManagerNotifications)
         {
-            ServerNotificationListener<MuleContextNotification> l 
+            ServerNotificationListener<MuleContextNotification> l
                 = new MuleContextNotificationListener<MuleContextNotification>()
             {
+                @Override
                 public void onNotification(MuleContextNotification notification)
                 {
                     logEvent(notification);
@@ -227,9 +232,10 @@ public abstract class AbstractNotificationLoggerAgent extends AbstractAgent
         }
         if (!ignoreModelNotifications)
         {
-            ServerNotificationListener<ModelNotification> l 
+            ServerNotificationListener<ModelNotification> l
                 = new ModelNotificationListener<ModelNotification>()
             {
+                @Override
                 public void onNotification(ModelNotification notification)
                 {
                     logEvent(notification);
@@ -247,9 +253,10 @@ public abstract class AbstractNotificationLoggerAgent extends AbstractAgent
         }
         if (!ignoreComponentNotifications)
         {
-            ServerNotificationListener<ServiceNotification> l 
+            ServerNotificationListener<ServiceNotification> l
                 = new ServiceNotificationListener<ServiceNotification>()
             {
+                @Override
                 public void onNotification(ServiceNotification notification)
                 {
                     logEvent(notification);
@@ -267,9 +274,10 @@ public abstract class AbstractNotificationLoggerAgent extends AbstractAgent
         }
         if (!ignoreSecurityNotifications)
         {
-            ServerNotificationListener<SecurityNotification> l 
+            ServerNotificationListener<SecurityNotification> l
                 = new SecurityNotificationListener<SecurityNotification>()
             {
+                @Override
                 public void onNotification(SecurityNotification notification)
                 {
                     logEvent(notification);
@@ -288,9 +296,10 @@ public abstract class AbstractNotificationLoggerAgent extends AbstractAgent
 
         if (!ignoreManagementNotifications)
         {
-            ServerNotificationListener<ManagementNotification> l 
+            ServerNotificationListener<ManagementNotification> l
                 = new ManagementNotificationListener<ManagementNotification>()
             {
+                @Override
                 public void onNotification(ManagementNotification notification)
                 {
                     logEvent(notification);
@@ -309,8 +318,9 @@ public abstract class AbstractNotificationLoggerAgent extends AbstractAgent
 
         if (!ignoreCustomNotifications)
         {
-            ServerNotificationListener l = new CustomNotificationListener()
+            ServerNotificationListener<?> l = new CustomNotificationListener<ServerNotification>()
             {
+                @Override
                 public void onNotification(ServerNotification notification)
                 {
                     logEvent(notification);
@@ -329,9 +339,10 @@ public abstract class AbstractNotificationLoggerAgent extends AbstractAgent
 
         if (!ignoreConnectionNotifications)
         {
-            ServerNotificationListener<ConnectionNotification> l 
+            ServerNotificationListener<ConnectionNotification> l
                 = new ConnectionNotificationListener<ConnectionNotification>()
             {
+                @Override
                 public void onNotification(ConnectionNotification notification)
                 {
                     logEvent(notification);
@@ -350,9 +361,10 @@ public abstract class AbstractNotificationLoggerAgent extends AbstractAgent
 
         if (!ignoreMessageNotifications && !ignoreEndpointMessageNotifications)
         {
-            ServerNotificationListener<EndpointMessageNotification> l = 
+            ServerNotificationListener<EndpointMessageNotification> l =
                 new EndpointMessageNotificationListener<EndpointMessageNotification>()
             {
+                @Override
                 public void onNotification(EndpointMessageNotification notification)
                 {
                     logEvent(notification);
@@ -368,12 +380,13 @@ public abstract class AbstractNotificationLoggerAgent extends AbstractAgent
             }
             listeners.add(l);
         }
-        
+
         if (!ignoreMessageNotifications && !ignoreComponentMessageNotifications)
         {
-            ServerNotificationListener<ComponentMessageNotification> l = 
+            ServerNotificationListener<ComponentMessageNotification> l =
                 new ComponentMessageNotificationListener<ComponentMessageNotification>()
             {
+                @Override
                 public void onNotification(ComponentMessageNotification notification)
                 {
                     logEvent(notification);

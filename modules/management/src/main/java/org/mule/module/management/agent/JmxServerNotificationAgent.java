@@ -33,7 +33,6 @@ import javax.management.ObjectName;
  */
 public class JmxServerNotificationAgent extends AbstractNotificationLoggerAgent
 {
-
     public static final String LISTENER_JMX_OBJECT_NAME = "type=org.mule.Notification,name=MuleNotificationListener";
     public static final String BROADCASTER_JMX_OBJECT_NAME = "type=org.mule.Notification,name=MuleNotificationBroadcaster";
     public static final String DEFAULT_AGENT_NAME = "Jmx Notification Agent";
@@ -78,9 +77,6 @@ public class JmxServerNotificationAgent extends AbstractNotificationLoggerAgent
     }
 
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void dispose()
     {
@@ -109,9 +105,6 @@ public class JmxServerNotificationAgent extends AbstractNotificationLoggerAgent
         }        super.dispose();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void logEvent(ServerNotification e)
     {
@@ -119,9 +112,7 @@ public class JmxServerNotificationAgent extends AbstractNotificationLoggerAgent
     }
 
     /**
-     * Should be a 1 line description of the agent.
-     *
-     * @return description
+     * @return a 1 line description of the agent.
      */
     @Override
     public String getDescription()
@@ -130,21 +121,11 @@ public class JmxServerNotificationAgent extends AbstractNotificationLoggerAgent
     }
 
 
-    /**
-     * Getter for property 'jmxSupportFactory'.
-     *
-     * @return Value for property 'jmxSupportFactory'.
-     */
     public JmxSupportFactory getJmxSupportFactory()
     {
         return jmxSupportFactory;
     }
 
-    /**
-     * Setter for property 'jmxSupportFactory'.
-     *
-     * @param jmxSupportFactory Value to set for property 'jmxSupportFactory'.
-     */
     public void setJmxSupportFactory(JmxSupportFactory jmxSupportFactory)
     {
         this.jmxSupportFactory = jmxSupportFactory;
@@ -162,25 +143,10 @@ public class JmxServerNotificationAgent extends AbstractNotificationLoggerAgent
 
     public static interface NotificationListenerMBean
     {
-        /**
-         * Getter for property 'notificsationList'.
-         *
-         * @return Value for property 'notificsationList'.
-         */
-        List getNotificationsList();
+        List<Notification> getNotificationsList();
 
-        /**
-         * Getter for property 'listSize'.
-         *
-         * @return Value for property 'listSize'.
-         */
         int getListSize();
 
-        /**
-         * Setter for property 'listSize'.
-         *
-         * @param listSize Value to set for property 'listSize'.
-         */
         void setListSize(int listSize);
     }
 
@@ -188,11 +154,8 @@ public class JmxServerNotificationAgent extends AbstractNotificationLoggerAgent
     {
         private int listSize = 100;
 
-        private List notifs;
+        private List<Notification> notifs;
 
-        /**
-         * {@inheritDoc}
-         */
         @Override
         public void handleNotification(Notification notification, Object o)
         {
@@ -203,46 +166,31 @@ public class JmxServerNotificationAgent extends AbstractNotificationLoggerAgent
             getList().add(0, notification);
         }
 
-        /**
-         * {@inheritDoc}
-         */
-        public List getNotificationsList()
+        @Override
+        public List<Notification> getNotificationsList()
         {
             return notifs;
         }
 
-        /**
-         * {@inheritDoc}
-         */
         @Override
         public int getListSize()
         {
             return listSize;
         }
 
-        /**
-         * {@inheritDoc}
-         */
         @Override
         public void setListSize(int listSize)
         {
             this.listSize = listSize;
         }
 
-        /**
-         * Getter for property 'list'.
-         *
-         * @return Value for property 'list'.
-         */
-        protected List getList()
+        protected List<Notification> getList()
         {
             if (notifs == null)
             {
-                notifs = new ArrayList(listSize);
+                notifs = new ArrayList<Notification>(listSize);
             }
             return notifs;
         }
-
     }
-
 }

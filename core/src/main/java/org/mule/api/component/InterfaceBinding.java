@@ -39,6 +39,7 @@ public interface InterfaceBinding extends MessageProcessor
      * @since 2.1 the synchronous argument has been removed. Instead use the
      *        synchronous attribute of the endpoint you are dispatching to.
      */
+    @Override
     MuleEvent process(MuleEvent event) throws MuleException;
 
     void setEndpoint(ImmutableEndpoint endpoint) throws MuleException;

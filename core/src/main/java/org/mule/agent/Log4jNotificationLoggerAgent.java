@@ -10,6 +10,11 @@
 
 package org.mule.agent;
 
+import org.mule.api.context.notification.ServerNotification;
+import org.mule.api.lifecycle.InitialisationException;
+import org.mule.util.MapUtils;
+import org.mule.util.StringUtils;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -17,10 +22,6 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.apache.log4j.xml.DOMConfigurator;
-import org.mule.api.context.notification.ServerNotification;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.util.MapUtils;
-import org.mule.util.StringUtils;
 
 /**
  * <code>AbstractNotificationLoggerAgent</code> Receives Mule server notifications
@@ -28,7 +29,6 @@ import org.mule.util.StringUtils;
  */
 public class Log4jNotificationLoggerAgent extends AbstractNotificationLoggerAgent
 {
-
     protected static final int DEFAULT_DESCRIPTION_BUFFER_SIZE = 64;
 
     protected Logger eventLogger;
@@ -37,7 +37,7 @@ public class Log4jNotificationLoggerAgent extends AbstractNotificationLoggerAgen
     private String logConfigFile = null;
     private String chainsawHost = "localhost";
     private int chainsawPort = -1;
-    private final Map<?, ?> levelMappings = new HashMap<Object, Object>();
+    private final Map<String, String> levelMappings = new HashMap<String, String>();
 
     public Log4jNotificationLoggerAgent()
     {
@@ -46,8 +46,6 @@ public class Log4jNotificationLoggerAgent extends AbstractNotificationLoggerAgen
 
     /**
      * Should be a 1 line description of the agent
-     * 
-     * @return the description of this Agent
      */
     @Override
     public String getDescription()
@@ -190,12 +188,12 @@ public class Log4jNotificationLoggerAgent extends AbstractNotificationLoggerAgen
         this.chainsawPort = chainsawPort;
     }
 
-    public Map<?, ?> getLevelMappings()
+    public Map<String, String> getLevelMappings()
     {
         return levelMappings;
     }
 
-    public void setLevelMappings(Map levelMappings)
+    public void setLevelMappings(Map<String, String> levelMappings)
     {
         this.levelMappings.putAll(levelMappings);
     }

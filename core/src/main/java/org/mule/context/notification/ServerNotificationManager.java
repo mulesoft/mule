@@ -66,20 +66,21 @@ import org.apache.commons.logging.LogFactory;
  */
 public class ServerNotificationManager implements Work, Disposable, ServerNotificationHandler, MuleContextAware
 {
-
     public static final String NULL_SUBSCRIPTION = "NULL";
     protected Log logger = LogFactory.getLog(getClass());
     private boolean dynamic = false;
     private Configuration configuration = new Configuration();
     private AtomicBoolean disposed = new AtomicBoolean(false);
-    private BlockingDeque eventQueue = new LinkedBlockingDeque();
+    private BlockingDeque<ServerNotification> eventQueue = new LinkedBlockingDeque<ServerNotification>();
     private MuleContext muleContext;
 
+    @Override
     public boolean isNotificationDynamic()
     {
         return dynamic;
     }
 
+    @Override
     public void setMuleContext(MuleContext context)
     {
         muleContext = context;
@@ -131,7 +132,7 @@ public class ServerNotificationManager implements Work, Disposable, ServerNotifi
     {
         configuration.addAllListenerSubscriptionPairs(pairs);
     }
-    
+
     /**
      * @deprecated Use addAllListenerSubscriptionPairs which better describes the "add" operation that occurs.
      * @param pairs
@@ -175,6 +176,7 @@ public class ServerNotificationManager implements Work, Disposable, ServerNotifi
         configuration.disableAllTypes(types);
     }
 
+    @Override
     public boolean isListenerRegistered(ServerNotificationListener listener)
     {
         for (ListenerSubscriptionPair pair : configuration.getListeners())
@@ -187,6 +189,7 @@ public class ServerNotificationManager implements Work, Disposable, ServerNotifi
         return false;
     }
 
+    @Override
     public void fireNotification(ServerNotification notification)
     {
         if (!disposed.get())
@@ -217,6 +220,7 @@ public class ServerNotificationManager implements Work, Disposable, ServerNotifi
         }
     }
 
+    @Override
     public boolean isNotificationEnabled(Class<? extends ServerNotification> type)
     {
         boolean enabled = false;
@@ -231,6 +235,7 @@ public class ServerNotificationManager implements Work, Disposable, ServerNotifi
         return enabled;
     }
 
+    @Override
     public void dispose()
     {
         disposed.set(true);
@@ -249,20 +254,21 @@ public class ServerNotificationManager implements Work, Disposable, ServerNotifi
         }
     }
 
+    @Override
     public void release()
     {
         dispose();
     }
 
+    @Override
     public void run()
     {
         while (!disposed.get())
         {
             try
             {
-                ServerNotification notification = (ServerNotification) eventQueue.poll(
-                    muleContext.getConfiguration().getDefaultQueueTimeout(),
-                    TimeUnit.MILLISECONDS);
+                int timeout = muleContext.getConfiguration().getDefaultQueueTimeout();
+                ServerNotification notification = eventQueue.poll(timeout, TimeUnit.MILLISECONDS);
                 if (notification != null)
                 {
                     notifyListeners(notification);
@@ -278,7 +284,8 @@ public class ServerNotificationManager implements Work, Disposable, ServerNotifi
     /**
      * @return DIRECT reference to an event queue
      */
-    public Queue getEventQueue() {
+    public Queue<ServerNotification> getEventQueue()
+    {
         return eventQueue;
     }
 

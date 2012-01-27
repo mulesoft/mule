@@ -44,7 +44,6 @@ import org.apache.commons.collections.map.CaseInsensitiveMap;
  */
 public interface ThreadingProfile extends MuleContextAware
 {
-
     /**
      * Default value for MAX_THREADS_ACTIVE
      */
@@ -185,6 +184,4 @@ public interface ThreadingProfile extends MuleContextAware
     }
 
     MuleContext getMuleContext();
-
-    void setMuleContext(MuleContext muleContext);
 }

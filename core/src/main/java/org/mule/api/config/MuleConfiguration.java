@@ -10,8 +10,6 @@
 
 package org.mule.api.config;
 
-import org.mule.api.exception.MessagingExceptionHandler;
-
 /**
  * Configuration info. which can be set when creating the MuleContext but becomes
  * immutable after startup.
@@ -49,7 +47,7 @@ public interface MuleConfiguration
     boolean isValidateExpressions();
 
     int getDefaultQueueTimeout();
-    
+
     int getShutdownTimeout();
 
     /**

@@ -26,7 +26,6 @@ import static org.junit.Assert.assertNotNull;
 
 public class DefaultMuleContextBuilderTestCase extends AbstractMuleTestCase
 {
-
     @Test
     public void testBuildMuleContextDefault()
     {
@@ -71,14 +70,17 @@ public class DefaultMuleContextBuilderTestCase extends AbstractMuleTestCase
 
     static class MyLifeCycleManager extends MuleContextLifecycleManager
     {
+        // subclass just for testing
     }
 
     static class MyMuleConfiguration extends DefaultMuleConfiguration
     {
+        // subclass just for testing
     }
 
     static class MyServerNotificationManager extends ServerNotificationManager
     {
+        // subclass just for testing
     }
 
     static class MyWorkManager extends MuleWorkManager
@@ -88,5 +90,4 @@ public class DefaultMuleContextBuilderTestCase extends AbstractMuleTestCase
             super(profile, name, 5000);
         }
     }
-
 }

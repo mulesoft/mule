@@ -21,11 +21,11 @@ public class OptimisedNotificationHandler implements ServerNotificationHandler
 {
 
     private ServerNotificationHandler delegate;
-    private Class type;
+    private Class<? extends ServerNotification> type;
     private boolean dynamic = false;
     private boolean enabled = false;
 
-    public OptimisedNotificationHandler(ServerNotificationHandler delegate, Class type)
+    public OptimisedNotificationHandler(ServerNotificationHandler delegate, Class<? extends ServerNotification> type)
     {
         this.delegate = delegate;
         this.type = type;
@@ -33,11 +33,13 @@ public class OptimisedNotificationHandler implements ServerNotificationHandler
         enabled = delegate.isNotificationEnabled(type);
     }
 
+    @Override
     public boolean isNotificationDynamic()
     {
         return dynamic;
     }
 
+    @Override
     public boolean isListenerRegistered(ServerNotificationListener listener)
     {
         return delegate.isListenerRegistered(listener);
@@ -52,7 +54,8 @@ public class OptimisedNotificationHandler implements ServerNotificationHandler
      * @param notfnClass Either the notification class being generated or some superclass
      * @return false if there is no need to dispatch the notification
      */
-    public boolean isNotificationEnabled(Class notfnClass)
+    @Override
+    public boolean isNotificationEnabled(Class<? extends ServerNotification> notfnClass)
     {
         if ((!dynamic) && type.isAssignableFrom(notfnClass))
         {
@@ -64,6 +67,7 @@ public class OptimisedNotificationHandler implements ServerNotificationHandler
         }
     }
 
+    @Override
     public void fireNotification(ServerNotification notification)
     {
         if (isNotificationEnabled(notification.getClass()))
@@ -71,5 +75,4 @@ public class OptimisedNotificationHandler implements ServerNotificationHandler
             delegate.fireNotification(notification);
         }
     }
-
 }
