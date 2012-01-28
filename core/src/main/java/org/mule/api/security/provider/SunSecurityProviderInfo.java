@@ -15,30 +15,32 @@ package org.mule.api.security.provider;
  */
 public class SunSecurityProviderInfo implements SecurityProviderInfo
 {
-
     private static final String KEY_MANAGER_ALGORITHM = "SunX509";
     private static final String PROTOCOL_HANDLER = "com.sun.net.ssl.internal.www.protocol";
     private static final String PROVIDER_CLASS = "com.sun.net.ssl.internal.ssl.Provider";
     private static final String DEFAULT_SSL_TYPE = "SSLv3";
 
+    @Override
     public String getKeyManagerAlgorithm()
     {
         return KEY_MANAGER_ALGORITHM;
     }
 
+    @Override
     public String getProtocolHandler()
     {
         return PROTOCOL_HANDLER;
     }
 
+    @Override
     public String getProviderClass()
     {
         return PROVIDER_CLASS;
     }
 
+    @Override
     public String getDefaultSslType()
     {
         return DEFAULT_SSL_TYPE;
     }
-
 }

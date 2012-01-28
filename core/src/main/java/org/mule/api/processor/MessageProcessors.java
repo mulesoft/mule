@@ -29,7 +29,6 @@ import org.mule.processor.chain.DefaultMessageProcessorChain;
  */
 public class MessageProcessors
 {
-
     private MessageProcessors()
     {
         // do not instantiate
@@ -55,60 +54,61 @@ public class MessageProcessors
             this.delegate = delegate;
         }
 
+        @Override
         public void initialise() throws InitialisationException
         {
             if (delegate instanceof Initialisable)
             {
                 ((Initialisable) delegate).initialise();
             }
-
         }
 
+        @Override
         public void start() throws MuleException
         {
             if (delegate instanceof Startable)
             {
                 ((Startable) delegate).start();
             }
-
         }
 
+        @Override
         public void stop() throws MuleException
         {
             if (delegate instanceof Stoppable)
             {
                 ((Stoppable) delegate).stop();
             }
-
         }
 
+        @Override
         public void dispose()
         {
             if (delegate instanceof Disposable)
             {
                 ((Disposable) delegate).dispose();
             }
-
         }
 
+        @Override
         public void setFlowConstruct(FlowConstruct flowConstruct)
         {
             if (delegate instanceof FlowConstructAware)
             {
                 ((FlowConstructAware) delegate).setFlowConstruct(flowConstruct);
             }
-
         }
 
+        @Override
         public void setMuleContext(MuleContext context)
         {
             if (delegate instanceof MuleContextAware)
             {
                 ((MuleContextAware) delegate).setMuleContext(context);
             }
-
         }
 
+        @Override
         public MuleEvent process(MuleEvent event) throws MuleException
         {
             return delegate.process(event);

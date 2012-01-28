@@ -21,14 +21,14 @@ public class DefaultMuleAuthentication implements Authentication
     private boolean authenticated;
     private char[] credentials;
     private String user;
-    private Map properties;
+    private Map<String, Object> properties;
     private MuleEvent event;
-    
+
     public DefaultMuleAuthentication(Credentials credentials)
     {
         this(credentials, null);
     }
-    
+
     public DefaultMuleAuthentication(Credentials credentials, MuleEvent event)
     {
         this.event = event;
@@ -36,6 +36,7 @@ public class DefaultMuleAuthentication implements Authentication
         this.credentials = credentials.getPassword();
     }
 
+    @Override
     public MuleEvent getEvent()
     {
         return event;
@@ -46,34 +47,39 @@ public class DefaultMuleAuthentication implements Authentication
         this.event = muleEvent;
     }
 
+    @Override
     public void setAuthenticated(boolean b)
     {
         authenticated = b;
     }
 
+    @Override
     public boolean isAuthenticated()
     {
         return authenticated;
     }
 
+    @Override
     public Object getCredentials()
     {
         return new String(credentials);
     }
 
+    @Override
     public Object getPrincipal()
     {
         return user;
     }
 
-    public Map getProperties()
+    @Override
+    public Map<String, Object> getProperties()
     {
         return properties;
     }
 
-    public void setProperties(Map properties)
+    @Override
+    public void setProperties(Map<String, Object> properties)
     {
         this.properties = properties;
     }
-
 }

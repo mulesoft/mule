@@ -10,18 +10,9 @@
 
 package org.mule.session;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
-
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleSession;
-import org.mule.api.construct.FlowConstruct;
 import org.mule.api.registry.MuleRegistry;
 import org.mule.api.security.Authentication;
 import org.mule.api.security.SecurityContext;
@@ -36,9 +27,16 @@ import java.util.Collections;
 import org.junit.Test;
 import org.mockito.Mockito;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+
 public class DefaultMuleSessionTestCase
 {
-
     @Test
     public void create()
     {
@@ -56,10 +54,8 @@ public class DefaultMuleSessionTestCase
     }
 
     @Test
-    public void copy()
-        throws IllegalArgumentException, SecurityException, IllegalAccessException, NoSuchFieldException
+    public void copy() throws Exception
     {
-        FlowConstruct flowConstruct = Mockito.mock(FlowConstruct.class);
         DefaultMuleSession original = new DefaultMuleSession();
         original.setValid(false);
         original.setSecurityContext(Mockito.mock(SecurityContext.class));
@@ -217,7 +213,7 @@ public class DefaultMuleSessionTestCase
     private SecurityContext createTestAuthentication()
     {
         Authentication auth = new DefaultMuleAuthentication(new MuleCredentials("dan", new char[]{'d', 'f'}));
-        auth.setProperties(Collections.singletonMap("key1", "value1"));
+        auth.setProperties(Collections.<String, Object>singletonMap("key1", "value1"));
         SecurityContext securityContext = new DefaultSecurityContextFactory().create(auth);
         return securityContext;
     }

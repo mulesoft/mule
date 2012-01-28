@@ -24,7 +24,7 @@ public class PGPAuthentication implements Authentication
     private Message message;
     private PGPPublicKey publicKey;
     private MuleEvent event;
-    
+
     public PGPAuthentication(String userName, Message message)
     {
         this(userName, message, null);
@@ -37,16 +37,19 @@ public class PGPAuthentication implements Authentication
         this.message = message;
     }
 
+    @Override
     public void setAuthenticated(boolean b)
     {
         authenticated = b;
     }
 
+    @Override
     public boolean isAuthenticated()
     {
         return authenticated;
     }
 
+    @Override
     public Object getCredentials()
     {
         return message;
@@ -62,23 +65,26 @@ public class PGPAuthentication implements Authentication
         this.publicKey = publicKey;
     }
 
+    @Override
     public Object getPrincipal()
     {
         return userName;
     }
 
-    public Map getProperties()
+    @Override
+    public Map<String, Object> getProperties()
     {
         // TODO
         return null;
     }
 
-    public void setProperties(Map securityMode)
+    @Override
+    public void setProperties(Map<String, Object> properties)
     {
         // TODO
-
     }
 
+    @Override
     public MuleEvent getEvent()
     {
         return event;

@@ -26,7 +26,6 @@ import org.apache.commons.logging.LogFactory;
  */
 public class AutoDiscoverySecurityProviderFactory implements SecurityProviderFactory
 {
-
     /**
      * Default is Sun's JSSE.
      */
@@ -42,28 +41,14 @@ public class AutoDiscoverySecurityProviderFactory implements SecurityProviderFac
      */
     private static final SecurityProviderInfo IBM_SECURITY_PROVIDER = new IBMSecurityProviderInfo();
 
-    /**
-     * Security provider properties for IBM JDK 1.4.2 and higher.
-     */
-    // private static final SecurityProviderInfo IBM_SECURITY_PROVIDER_2 = new
-    // IBMSecurityProvider2Info();
-
+    @Override
     public SecurityProviderInfo getSecurityProviderInfo()
     {
         SecurityProviderInfo info;
 
         if (SystemUtils.isIbmJDK())
         {
-            // TODO test IBM JDK 1.4.2 more thoroughly and decide if
-            // it's worth including this newer provider support.
-            // switch to IBM's security provider
-            // if (SystemUtils.isJavaVersionAtLeast(142)) {
-            // IBM JSSE2
-            // info = IBM_SECURITY_PROVIDER_2;
-            // } else {
-            // older IBM JSSE
             info = IBM_SECURITY_PROVIDER;
-            // }
         }
         else
         {
@@ -76,6 +61,7 @@ public class AutoDiscoverySecurityProviderFactory implements SecurityProviderFac
         return info;
     }
 
+    @Override
     public Provider getProvider()
     {
         SecurityProviderInfo info = getSecurityProviderInfo();

@@ -21,37 +21,38 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * A security provider which only authenticates a single user at a time 
- * (i.e., authentication of a new user overwrites the previous authentication).  
+ * A security provider which only authenticates a single user at a time
+ * (i.e., authentication of a new user overwrites the previous authentication).
  */
 public class TestSingleUserSecurityProvider extends AbstractSecurityProvider
 {
     public static final String PROPERTY_FAVORITE_COLOR = "FAVORITE_COLOR";
     public static final String PROPERTY_NUMBER_LOGINS = "NUMBER_LOGINS";
-    
+
     private Authentication authentication;
-    
+
     protected transient final Log logger = LogFactory.getLog(getClass());
-    
+
     public TestSingleUserSecurityProvider()
     {
         super("single-user-test");
     }
-    
+
     public TestSingleUserSecurityProvider(String name)
     {
         super(name);
     }
 
+    @Override
     public Authentication authenticate(Authentication authenticationRequest) throws SecurityException
     {
         String user = (String) authenticationRequest.getPrincipal();
         logger.debug("Authenticating user: " + user);
-        
+
         // Check to see if user has already been authenticated
         if (authentication != null)
         {
-            Map props = authentication.getProperties();
+            Map<String, Object> props = authentication.getProperties();
             int numberLogins = (Integer) props.get(PROPERTY_NUMBER_LOGINS);
             String favoriteColor = (String) props.get(PROPERTY_FAVORITE_COLOR);
             props.put(PROPERTY_NUMBER_LOGINS, numberLogins + 1);
@@ -62,15 +63,16 @@ public class TestSingleUserSecurityProvider extends AbstractSecurityProvider
         {
             String favoriteColor = getFavoriteColor(user);
             logger.info("First login for user: " + user + ", favorite color is " + favoriteColor);
-            Map props = new HashMap();
+            Map<String, Object> props = new HashMap<String, Object>();
             props.put(PROPERTY_NUMBER_LOGINS, 1);
             props.put(PROPERTY_FAVORITE_COLOR, favoriteColor);
             authenticationRequest.setProperties(props);
             authentication = authenticationRequest;
         }
+
         return authentication;
     }
-    
+
     // This info. would be stored in an LDAP or RDBMS
     String getFavoriteColor(String user)
     {

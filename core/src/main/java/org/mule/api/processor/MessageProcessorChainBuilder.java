@@ -10,7 +10,6 @@
 
 package org.mule.api.processor;
 
-import org.mule.api.MuleException;
 
 /**
  * Builds {@link org.mule.api.processor.MessageProcessorChain} instances.
@@ -19,8 +18,6 @@ import org.mule.api.MuleException;
  */
 public interface MessageProcessorChainBuilder extends MessageProcessorBuilder
 {
-    MessageProcessorChain build() throws MuleException;
-
     MessageProcessorChainBuilder chain(MessageProcessor... processors);
 
     MessageProcessorChainBuilder chain(MessageProcessorBuilder... builders);

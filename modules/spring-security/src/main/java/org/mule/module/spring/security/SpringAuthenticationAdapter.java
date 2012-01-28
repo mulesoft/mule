@@ -17,28 +17,25 @@ import java.util.Map;
 
 import org.springframework.security.core.GrantedAuthority;
 
-/**
- * 
- */
 public class SpringAuthenticationAdapter implements Authentication
 {
     private static final long serialVersionUID = -5906282218126929871L;
 
-    private org.springframework.security.core.Authentication delegate;    
-    private Map properties;
+    private org.springframework.security.core.Authentication delegate;
+    private Map<String, Object> properties;
     private MuleEvent event;
-    
-    public SpringAuthenticationAdapter(org.springframework.security.core.Authentication authentication)    
+
+    public SpringAuthenticationAdapter(org.springframework.security.core.Authentication authentication)
     {
         this(authentication, null);
     }
 
-    public SpringAuthenticationAdapter(org.springframework.security.core.Authentication authentication, Map properties)    
+    public SpringAuthenticationAdapter(org.springframework.security.core.Authentication authentication, Map<String, Object> properties)
     {
         this(authentication, properties, null);
     }
 
-    public SpringAuthenticationAdapter(org.springframework.security.core.Authentication authentication, Map properties, MuleEvent event)    
+    public SpringAuthenticationAdapter(org.springframework.security.core.Authentication authentication, Map<String, Object> properties, MuleEvent event)
     {
         this.delegate = authentication;
         this.properties = properties;
@@ -57,9 +54,9 @@ public class SpringAuthenticationAdapter implements Authentication
         return delegate.isAuthenticated();
     }
 
-    public org.springframework.security.core.GrantedAuthority[] getAuthorities()    
+    public org.springframework.security.core.GrantedAuthority[] getAuthorities()
     {
-        return delegate.getAuthorities().toArray(new GrantedAuthority[delegate.getAuthorities().size()]);        
+        return delegate.getAuthorities().toArray(new GrantedAuthority[delegate.getAuthorities().size()]);
     }
 
     @Override
@@ -96,19 +93,19 @@ public class SpringAuthenticationAdapter implements Authentication
         return delegate.getName();
     }
 
-    public org.springframework.security.core.Authentication getDelegate()    
+    public org.springframework.security.core.Authentication getDelegate()
     {
         return delegate;
     }
 
     @Override
-    public Map getProperties()
+    public Map<String, Object> getProperties()
     {
         return properties;
     }
 
     @Override
-    public void setProperties(Map properties)
+    public void setProperties(Map<String, Object> properties)
     {
         this.properties = properties;
     }

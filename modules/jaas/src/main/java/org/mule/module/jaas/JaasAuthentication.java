@@ -23,16 +23,16 @@ public class JaasAuthentication implements Authentication
     private boolean authenticated;
     private char[] credentials;
     private String user;
-    private Map properties;
+    private Map<String, Object> properties;
     private Subject subject;
     private MuleEvent event;
-    
+
     public JaasAuthentication(Credentials credentials)
     {
         this.user = credentials.getUsername();
         this.credentials = credentials.getPassword();
     }
-    
+
     public JaasAuthentication(Object user, Object credentials, Subject subject)
     {
         this.user = (String) user;
@@ -40,6 +40,7 @@ public class JaasAuthentication implements Authentication
         this.subject = subject;
     }
 
+    @Override
     public MuleEvent getEvent()
     {
         return event;
@@ -49,33 +50,39 @@ public class JaasAuthentication implements Authentication
     {
         this.event = muleEvent;
     }
-    
+
+    @Override
     public void setAuthenticated(boolean b)
     {
         authenticated = b;
     }
 
+    @Override
     public boolean isAuthenticated()
     {
         return authenticated;
     }
 
+    @Override
     public Object getCredentials()
     {
         return new String(credentials);
     }
 
+    @Override
     public Object getPrincipal()
     {
         return user;
     }
 
-    public Map getProperties()
+    @Override
+    public Map<String, Object> getProperties()
     {
         return properties;
     }
 
-    public void setProperties(Map properties)
+    @Override
+    public void setProperties(Map<String, Object> properties)
     {
         this.properties = properties;
     }

@@ -24,28 +24,30 @@ import java.util.concurrent.ConcurrentHashMap;
 public class TestMultiuserSecurityProvider extends TestSingleUserSecurityProvider
 {
     private Map <String, Authentication> authentications;
-    
+
     public TestMultiuserSecurityProvider()
     {
         super("multi-user-test");
     }
-    
+
+    @Override
     protected void doInitialise() throws InitialisationException
     {
-        authentications = new ConcurrentHashMap();
+        authentications = new ConcurrentHashMap<String, Authentication>();
     }
-    
+
+    @Override
     public Authentication authenticate(Authentication authentication) throws SecurityException
     {
         String user = (String) authentication.getPrincipal();
         logger.debug("Authenticating user: " + user);
-        
+
         // Check to see if user has already been authenticated
         Authentication oldAuth = authentications.get(user);
         if (oldAuth != null)
         {
             authentication = oldAuth;
-            Map props = authentication.getProperties();
+            Map<String, Object> props = authentication.getProperties();
             int numberLogins = (Integer) props.get(PROPERTY_NUMBER_LOGINS);
             String favoriteColor = (String) props.get(PROPERTY_FAVORITE_COLOR);
             props.put(PROPERTY_NUMBER_LOGINS, numberLogins + 1);
@@ -57,12 +59,13 @@ public class TestMultiuserSecurityProvider extends TestSingleUserSecurityProvide
         {
             String favoriteColor = getFavoriteColor(user);
             logger.info("First login for user: " + user + ", favorite color is " + favoriteColor);
-            Map props = new HashMap();
+            Map<String, Object> props = new HashMap<String, Object>();
             props.put(PROPERTY_NUMBER_LOGINS, 1);
             props.put(PROPERTY_FAVORITE_COLOR, favoriteColor);
             authentication.setProperties(props);
             authentications.put(user, authentication);
         }
+
         return authentication;
     }
 }

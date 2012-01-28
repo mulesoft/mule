@@ -11,7 +11,6 @@
 package org.mule.api.endpoint;
 
 import org.mule.MessageExchangePattern;
-import org.mule.api.MuleContext;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.processor.MessageProcessor;
@@ -31,10 +30,9 @@ import java.util.Map;
  */
 public interface EndpointBuilder extends MuleContextAware, Cloneable
 {
-
     /**
      * Constructs inbound endpoints
-     * 
+     *
      * @throws EndpointException
      * @throws InitialisationException
      */
@@ -42,7 +40,7 @@ public interface EndpointBuilder extends MuleContextAware, Cloneable
 
     /**
      * Constructs outbound endpoints
-     * 
+     *
      * @throws EndpointException
      * @throws InitialisationException
      */
@@ -51,27 +49,31 @@ public interface EndpointBuilder extends MuleContextAware, Cloneable
     void setConnector(Connector connector);
 
     /** @deprecated Use addMessageProcessor() */
+    @Deprecated
     void addTransformer(Transformer transformer);
 
     /** @deprecated Use addResponseMessageProcessor() */
+    @Deprecated
     void addResponseTransformer(Transformer transformer);
 
     /** @deprecated Use setMessageProcessors() */
+    @Deprecated
     void setTransformers(List<Transformer> transformers);
 
     /** @deprecated Use setResponseMessageProcessors() */
+    @Deprecated
     void setResponseTransformers(List<Transformer> responseTransformer);
 
     void setName(String name);
 
     void setProperty(Object key, Object value);
-    
+
     void setProperties(Map<Object, Object> properties);
 
     void setTransactionConfig(TransactionConfig transactionConfig);
 
     void setDeleteUnacceptedMessages(boolean deleteUnacceptedMessages);
-    
+
     void setExchangePattern(MessageExchangePattern mep);
 
     void setResponseTimeout(int responseTimeout);
@@ -81,8 +83,6 @@ public interface EndpointBuilder extends MuleContextAware, Cloneable
     void setEncoding(String encoding);
 
     void setRegistryId(String registryId);
-
-    void setMuleContext(MuleContext muleContext);
 
     void setRetryPolicyTemplate(RetryPolicyTemplate retryPolicyTemplate);
 
@@ -95,9 +95,8 @@ public interface EndpointBuilder extends MuleContextAware, Cloneable
     void addResponseMessageProcessor(MessageProcessor responseMessageProcessor);
 
     void setDisableTransportTransformer(boolean disableTransportTransformer);
-    
+
     void setURIBuilder(URIBuilder URIBuilder);
 
     Object clone() throws CloneNotSupportedException;
-
 }

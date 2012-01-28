@@ -29,9 +29,9 @@ public interface Authentication extends Serializable
 
     Object getPrincipal();
 
-    Map getProperties();
+    Map<String, Object> getProperties();
 
-    void setProperties(Map properties);
-    
+    void setProperties(Map<String, Object> properties);
+
     MuleEvent getEvent();
 }

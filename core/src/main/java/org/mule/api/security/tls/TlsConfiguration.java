@@ -116,7 +116,6 @@ import org.apache.commons.logging.LogFactory;
 public final class TlsConfiguration
         implements TlsDirectTrustStore, TlsDirectKeyStore, TlsIndirectKeyStore, TlsProtocolHandler
 {
-
     public static final String DEFAULT_KEYSTORE = ".keystore";
     public static final String DEFAULT_KEYSTORE_TYPE = KeyStore.getDefaultType();
     public static final String JSSE_NAMESPACE = "javax.net";
@@ -394,11 +393,13 @@ public final class TlsConfiguration
         this.provider = provider;
     }
 
+    @Override
     public String getProtocolHandler()
     {
         return protocolHandler;
     }
 
+    @Override
     public void setProtocolHandler(String protocolHandler)
     {
         this.protocolHandler = protocolHandler;
@@ -416,11 +417,13 @@ public final class TlsConfiguration
 
     // access to the explicit key store variables
 
+    @Override
     public String getKeyStore()
     {
         return keyStoreName;
     }
 
+    @Override
     public void setKeyStore(String name) throws IOException
     {
         keyStoreName = name;
@@ -434,46 +437,55 @@ public final class TlsConfiguration
         }
     }
 
+    @Override
     public String getKeyPassword()
     {
         return keyPassword;
     }
 
+    @Override
     public void setKeyPassword(String keyPassword)
     {
         this.keyPassword = keyPassword;
     }
 
+    @Override
     public String getKeyStorePassword()
     {
         return keyStorePassword;
     }
 
+    @Override
     public void setKeyStorePassword(String storePassword)
     {
         this.keyStorePassword = storePassword;
     }
 
+    @Override
     public String getKeyStoreType()
     {
         return keystoreType;
     }
 
+    @Override
     public void setKeyStoreType(String keystoreType)
     {
         this.keystoreType = keystoreType;
     }
 
+    @Override
     public String getKeyManagerAlgorithm()
     {
         return keyManagerAlgorithm;
     }
 
+    @Override
     public void setKeyManagerAlgorithm(String keyManagerAlgorithm)
     {
         this.keyManagerAlgorithm = keyManagerAlgorithm;
     }
 
+    @Override
     public KeyManagerFactory getKeyManagerFactory()
     {
         return keyManagerFactory;
@@ -481,11 +493,13 @@ public final class TlsConfiguration
 
     // access to the implicit key store variables
 
+    @Override
     public String getClientKeyStore()
     {
         return clientKeyStoreName;
     }
 
+    @Override
     public void setClientKeyStore(String name) throws IOException
     {
         clientKeyStoreName = name;
@@ -499,21 +513,25 @@ public final class TlsConfiguration
         }
     }
 
+    @Override
     public String getClientKeyStorePassword()
     {
         return clientKeyStorePassword;
     }
 
+    @Override
     public void setClientKeyStorePassword(String clientKeyStorePassword)
     {
         this.clientKeyStorePassword = clientKeyStorePassword;
     }
 
+    @Override
     public void setClientKeyStoreType(String clientKeyStoreType)
     {
         this.clientKeyStoreType = clientKeyStoreType;
     }
 
+    @Override
     public String getClientKeyStoreType()
     {
         return clientKeyStoreType;
@@ -521,11 +539,13 @@ public final class TlsConfiguration
 
     // access to trust store variables
 
+    @Override
     public String getTrustStore()
     {
         return trustStoreName;
     }
 
+    @Override
     public void setTrustStore(String name) throws IOException
     {
         trustStoreName = name;
@@ -539,76 +559,89 @@ public final class TlsConfiguration
         }
     }
 
+    @Override
     public String getTrustStorePassword()
     {
         return trustStorePassword;
     }
 
+    @Override
     public void setTrustStorePassword(String trustStorePassword)
     {
         this.trustStorePassword = trustStorePassword;
     }
 
+    @Override
     public String getTrustStoreType()
     {
         return trustStoreType;
     }
 
+    @Override
     public void setTrustStoreType(String trustStoreType)
     {
         this.trustStoreType = trustStoreType;
     }
 
+    @Override
     public String getTrustManagerAlgorithm()
     {
         return trustManagerAlgorithm;
     }
 
+    @Override
     public void setTrustManagerAlgorithm(String trustManagerAlgorithm)
     {
         this.trustManagerAlgorithm = defaultForNull(trustManagerAlgorithm, spInfo.getKeyManagerAlgorithm());
     }
 
+    @Override
     public TrustManagerFactory getTrustManagerFactory()
     {
         return trustManagerFactory;
     }
 
+    @Override
     public void setTrustManagerFactory(TrustManagerFactory trustManagerFactory)
     {
         this.trustManagerFactory = trustManagerFactory;
     }
 
+    @Override
     public boolean isExplicitTrustStoreOnly()
     {
         return explicitTrustStoreOnly;
     }
 
+    @Override
     public void setExplicitTrustStoreOnly(boolean explicitTrustStoreOnly)
     {
         this.explicitTrustStoreOnly = explicitTrustStoreOnly;
     }
 
+    @Override
     public boolean isRequireClientAuthentication()
     {
         return requireClientAuthentication;
     }
 
+    @Override
     public void setRequireClientAuthentication(boolean requireClientAuthentication)
     {
         this.requireClientAuthentication = requireClientAuthentication;
     }
 
+    @Override
     public String getKeyAlias()
     {
         return keyAlias;
     }
 
+    @Override
     public void setKeyAlias(String keyAlias)
     {
         this.keyAlias = keyAlias;
     }
-
 }
 
 

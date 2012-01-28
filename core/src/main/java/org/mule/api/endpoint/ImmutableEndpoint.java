@@ -92,6 +92,7 @@ public interface ImmutableEndpoint extends Serializable, NamedObject
      * @return the transformers to use when receiving or sending data
      * @deprecated use getMessageProcessors() instead
      */
+    @Deprecated
     List<Transformer> getTransformers();
 
     /**
@@ -101,6 +102,7 @@ public interface ImmutableEndpoint extends Serializable, NamedObject
      * @return the transformer to use when receiving the response data
      * @deprecated use getResponseMessageProcessors() instead
      */
+    @Deprecated
     List<Transformer> getResponseTransformers();
 
     /**
@@ -171,14 +173,14 @@ public interface ImmutableEndpoint extends Serializable, NamedObject
     EndpointMessageProcessorChainFactory getMessageProcessorsFactory();
 
     List <MessageProcessor> getMessageProcessors();
-    
+
     List <MessageProcessor> getResponseMessageProcessors();
-    
+
     MessageExchangePattern getExchangePattern();
-    
+
     /**
-     * The timeout value for waiting for a response from a remote invocation or back channel. Mule 
-     * will only wait for a response if the endpoint's message exchange pattern requires a 
+     * The timeout value for waiting for a response from a remote invocation or back channel. Mule
+     * will only wait for a response if the endpoint's message exchange pattern requires a
      * response.
      *
      * @return the timeout in milliseconds
