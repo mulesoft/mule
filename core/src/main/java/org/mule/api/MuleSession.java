@@ -27,10 +27,9 @@ import java.util.Set;
  * In order for the session to be propagated from one Flow or Service to the next a transports that support
  * message properties needs to be used. A {@link SessionHandler} is used to store the session in an outbound
  * message property and then retrieve it from an inbound property using a specific strategy.
- * 
- * @See {@link SessionHandler}
+ *
+ * @see SessionHandler
  */
-
 public interface MuleSession extends Serializable
 {
 
