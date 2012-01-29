@@ -20,14 +20,14 @@ import org.junit.rules.ExternalResource;
  * on test shutdown.
  * To use an instance dynamic socket port:
  * <pre>
- *     @Rule
+ *     &#64;Rule
  *     public DynamicPort serverPort = new DynamicPort("server_port");
  * </pre>
  * <p/>
  * In order to use static dynamic ports:
  * <p/>
  * <pre>
- *     @ClassRule
+ *     &#64;ClassRule
  *     public static DynamicPort dynamicPort = new DynamicPort("server_port");
  * </pre>
  */
