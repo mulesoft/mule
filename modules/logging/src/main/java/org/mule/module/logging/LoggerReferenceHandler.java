@@ -54,6 +54,7 @@ public class LoggerReferenceHandler
                         logger.debug("Cleaning up the logging hierarchy");
                         final Integer classLoaderHash = references.get(reference);
                         loggerRepository.remove(classLoaderHash);
+                        reference.clear();
                     }
                     catch (InterruptedException e)
                     {
