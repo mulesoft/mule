@@ -155,13 +155,47 @@ public abstract class AbstractFlowConstuctTestCase extends AbstractMuleContextTe
             // expected
         }
     }
-    
+
     @Test
     public void testRegisterUnregister() throws MuleException, Exception
     {
         FlowConstruct construct = getFlowConstruct();
         muleContext.getRegistry().registerFlowConstruct(construct);
         assertNotNull(muleContext.getRegistry().lookupFlowConstruct(construct.getName()));
-    }    
+    }
+
+    @Test
+    public void testInitialStateStopped() throws Exception
+    {
+        AbstractFlowConstruct flow = getFlowConstruct();
+        flow.setInitialState(AbstractFlowConstruct.INITIAL_STATE_STOPPED);
+        assertFalse(flow.isStarted());
+        assertFalse(flow.isStopped());
+
+        flow.initialise();
+        assertFalse(flow.isStarted());
+        assertFalse(flow.isStopped());
+
+        // This should not actually start the flow
+        flow.start();
+        assertFalse(flow.isStarted());
+        assertTrue(flow.isStopped());
+
+        // Finally the flow is actually started
+        flow.start();
+        assertTrue(flow.isStarted());
+        assertFalse(flow.isStopped());
+
+        // Try to start again
+        try
+        {
+            flow.start();
+            fail("Exception expected: Cannot start an already started flow");
+        }
+        catch (final IllegalStateException e)
+        {
+            // expected
+        }
+    }
 
 }
