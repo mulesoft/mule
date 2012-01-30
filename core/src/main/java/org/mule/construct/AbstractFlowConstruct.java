@@ -29,6 +29,7 @@ import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.MessageInfoMapping;
 import org.mule.api.source.MessageSource;
+import org.mule.lifecycle.EmptyLifecycleCallback;
 import org.mule.management.stats.FlowConstructStatistics;
 import org.mule.routing.MuleMessageInfoMapping;
 import org.mule.util.ClassUtils;
@@ -72,6 +73,18 @@ public abstract class AbstractFlowConstruct implements FlowConstruct, Lifecycle,
     protected FlowConstructStatistics statistics;
     protected MessageInfoMapping messageInfoMapping = new MuleMessageInfoMapping();
     private final Map<QName, Object> annotations = new ConcurrentHashMap<QName, Object>();
+    
+    /**
+     * The initial states that the flow can be started in
+     */
+    public static final String INITIAL_STATE_STOPPED = "stopped";
+    public static final String INITIAL_STATE_STARTED = "started";
+    
+    /**
+     * Determines the initial state of this flow when the mule starts. Can be
+     * 'stopped' or 'started' (default)
+     */
+    protected String initialState = INITIAL_STATE_STARTED;
 
     public AbstractFlowConstruct(String name, MuleContext muleContext)
     {
@@ -114,6 +127,16 @@ public abstract class AbstractFlowConstruct implements FlowConstruct, Lifecycle,
 
     public final void start() throws MuleException
     {
+    	// Check if Initial State is Stopped
+    	if(!isStopped() && initialState.equals(INITIAL_STATE_STOPPED))
+    	{
+    		lifecycleManager.fireStartPhase(new EmptyLifecycleCallback<FlowConstruct>());
+            lifecycleManager.fireStopPhase(new EmptyLifecycleCallback<FlowConstruct>());
+
+            logger.info("Flow " + name + " has not been started (initial state = 'stopped')");
+            return;
+    	}
+    	
         lifecycleManager.fireStartPhase(new LifecycleCallback<FlowConstruct>()
         {
             public void onTransition(String phaseName, FlowConstruct object) throws MuleException
@@ -189,6 +212,16 @@ public abstract class AbstractFlowConstruct implements FlowConstruct, Lifecycle,
     {
         this.exceptionListener = exceptionListener;
     }
+    
+    public String getInitialState()
+    {
+        return initialState;
+    }
+
+    public void setInitialState(String initialState)
+    {
+        this.initialState = initialState;
+    }    
 
     public LifecycleState getLifecycleState()
     {
@@ -320,7 +353,6 @@ public abstract class AbstractFlowConstruct implements FlowConstruct, Lifecycle,
     }
 
     /**
-     *
      * @return the type of construct being created, e.g. "Flow"
      */
     public abstract String getConstructType();
