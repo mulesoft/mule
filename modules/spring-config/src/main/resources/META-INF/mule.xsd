@@ -3449,7 +3449,7 @@
                 <xsd:attribute name="scope" use="optional">
                     <xsd:annotation>
                         <xsd:documentation>
-                            Property scope to/from which properties are added/removed.  The scope determines the lifespan of the properties.
+                            Property scope to/from which properties are added/removed.  The scope determines the lifespan of the properties.  Default scope is outbound.
                         </xsd:documentation>
                     </xsd:annotation>
                     <xsd:simpleType>
