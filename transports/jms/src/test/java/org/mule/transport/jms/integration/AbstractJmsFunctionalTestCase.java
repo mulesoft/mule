@@ -89,8 +89,7 @@ import static org.junit.Assert.fail;
  * transformers for the Jms connector being tested. These configurations are known as 'connector' files, they share the same
  * file name as the generic configuration file prepended with 'connector-'.  The location of these files must be
  * <p/>
- * <code>
- * integration/&lt;provider_name>/connector-&lt;event_flow_config_name></code>
+ * <code>integration/&lt;provider_name>/connector-&lt;event_flow_config_name></code>
  * <p/>
  * The 'provider_name' is obtained from the {@link org.mule.transport.jms.integration.JmsVendorConfiguration} implementation.
  * <p/>
@@ -582,11 +581,6 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
 
     /**
      * By default this will create a Queue, override to create a topic
-     *
-     * @param session
-     * @param scenario
-     * @return
-     * @throws JMSException
      */
     protected Destination createInputDestination(Session session, Scenario scenario) throws JMSException
     {
@@ -595,18 +589,12 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
 
     /**
      * By default this will create a Queue, override to create a topic
-     *
-     * @param session
-     * @param scenario
-     * @return
-     * @throws JMSException
      */
     protected Destination createOutputDestination(Session session, Scenario scenario) throws JMSException
     {
         return session.createQueue(scenario.getOutputDestinationName());
     }
 
-     /**/
     public Message receive(Scenario scenario) throws Exception
     {
         assertNotNull("scenario is null!", scenario);
@@ -726,10 +714,6 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
 
     /**
      * Clear the specified topic
-     *
-     * @param destination
-     * @param topic
-     * @throws Exception
      */
     protected void purgeTopic(String destination, String topic) throws Exception
     {
@@ -815,7 +799,6 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
 
     protected interface Scenario
     {
-
         boolean isPersistent();
 
         void setPersistent(boolean persistent);
@@ -843,7 +826,6 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
 
     protected abstract class AbstractScenario implements Scenario
     {
-
         private String inputQueue = getInboundQueueName();
         private String outputQueue = getOutboundQueueName();
         private boolean persistent = false;
