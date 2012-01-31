@@ -50,9 +50,9 @@ public class ChoiceMessagingExceptionStrategyTestCase extends AbstractMuleTestCa
     public void testNonMatchThenCallDefault() throws Exception
     {
         ChoiceMessagingExceptionStrategy choiceMessagingExceptionStrategy = new ChoiceMessagingExceptionStrategy();
-        choiceMessagingExceptionStrategy.setExceptionListeners(new ArrayList<ChoiceMessagingExceptionHandler>(Arrays.<ChoiceMessagingExceptionHandler>asList(mockTestExceptionStrategy1, mockTestExceptionStrategy2)));
         when(mockMuleContext.getDefaultExceptionStrategy()).thenReturn(mockDefaultTestExceptionStrategy2);
         choiceMessagingExceptionStrategy.setMuleContext(mockMuleContext);
+        choiceMessagingExceptionStrategy.setExceptionListeners(new ArrayList<ChoiceMessagingExceptionHandler>(Arrays.<ChoiceMessagingExceptionHandler>asList(mockTestExceptionStrategy1, mockTestExceptionStrategy2)));
         choiceMessagingExceptionStrategy.initialise();
         when(mockTestExceptionStrategy1.accept(mockMuleEvent)).thenReturn(false);
         when(mockTestExceptionStrategy2.accept(mockMuleEvent)).thenReturn(false);
@@ -63,27 +63,13 @@ public class ChoiceMessagingExceptionStrategyTestCase extends AbstractMuleTestCa
         verify(mockDefaultTestExceptionStrategy2, VerificationModeFactory.times(1)).handleException(mockException, mockMuleEvent);
     }
 
-    @Test(expected = MuleRuntimeException.class)
-    public void testNoneMatchEvenDefault() throws Exception
-    {
-        ChoiceMessagingExceptionStrategy choiceMessagingExceptionStrategy = new ChoiceMessagingExceptionStrategy();
-        choiceMessagingExceptionStrategy.setExceptionListeners(new ArrayList<ChoiceMessagingExceptionHandler>(Arrays.<ChoiceMessagingExceptionHandler>asList(mockTestExceptionStrategy1, mockTestExceptionStrategy2)));
-        when(mockMuleContext.getDefaultExceptionStrategy()).thenReturn(mockDefaultTestExceptionStrategy2);
-        choiceMessagingExceptionStrategy.setMuleContext(mockMuleContext);
-        choiceMessagingExceptionStrategy.initialise();
-        when(mockTestExceptionStrategy1.accept(mockMuleEvent)).thenReturn(false);
-        when(mockTestExceptionStrategy2.accept(mockMuleEvent)).thenReturn(false);
-        when(mockDefaultTestExceptionStrategy2.accept(mockMuleEvent)).thenReturn(false);
-        choiceMessagingExceptionStrategy.handleException(mockException, mockMuleEvent);
-    }
-
     @Test
     public void testSecondMatches() throws Exception
     {
         ChoiceMessagingExceptionStrategy choiceMessagingExceptionStrategy = new ChoiceMessagingExceptionStrategy();
+        choiceMessagingExceptionStrategy.setMuleContext(mockMuleContext);
         choiceMessagingExceptionStrategy.setExceptionListeners(new ArrayList<ChoiceMessagingExceptionHandler>(Arrays.<ChoiceMessagingExceptionHandler>asList(mockTestExceptionStrategy1, mockTestExceptionStrategy2)));
         when(mockMuleContext.getDefaultExceptionStrategy()).thenReturn(mockDefaultTestExceptionStrategy2);
-        choiceMessagingExceptionStrategy.setMuleContext(mockMuleContext);
         choiceMessagingExceptionStrategy.initialise();
         when(mockTestExceptionStrategy1.accept(mockMuleEvent)).thenReturn(false);
         when(mockTestExceptionStrategy2.accept(mockMuleEvent)).thenReturn(true);
@@ -98,9 +84,9 @@ public class ChoiceMessagingExceptionStrategyTestCase extends AbstractMuleTestCa
     public void testFirstAcceptsAllMatches() throws Exception
     {
         ChoiceMessagingExceptionStrategy choiceMessagingExceptionStrategy = new ChoiceMessagingExceptionStrategy();
+        choiceMessagingExceptionStrategy.setMuleContext(mockMuleContext);
         choiceMessagingExceptionStrategy.setExceptionListeners(new ArrayList<ChoiceMessagingExceptionHandler>(Arrays.<ChoiceMessagingExceptionHandler>asList(mockTestExceptionStrategy1, mockTestExceptionStrategy2)));
         when(mockMuleContext.getDefaultExceptionStrategy()).thenReturn(mockDefaultTestExceptionStrategy2);
-        choiceMessagingExceptionStrategy.setMuleContext(mockMuleContext);
         when(mockTestExceptionStrategy1.acceptsAll()).thenReturn(true);
         when(mockTestExceptionStrategy2.acceptsAll()).thenReturn(false);
         when(mockDefaultTestExceptionStrategy2.acceptsAll()).thenReturn(true);
