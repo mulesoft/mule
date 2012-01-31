@@ -111,8 +111,9 @@ import org.mule.context.notification.ListenerSubscriptionPair;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.enricher.MessageEnricher;
 import org.mule.enricher.MessageEnricher.EnrichExpressionPair;
-import org.mule.exception.DefaultMessagingExceptionStrategy;
 import org.mule.exception.CatchMessagingExceptionStrategy;
+import org.mule.exception.ChoiceMessagingExceptionStrategy;
+import org.mule.exception.DefaultMessagingExceptionStrategy;
 import org.mule.expression.ExpressionConfig;
 import org.mule.expression.transformers.BeanBuilderTransformer;
 import org.mule.expression.transformers.ExpressionArgument;
@@ -245,6 +246,7 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         // Exception Strategies
         registerBeanDefinitionParser("default-exception-strategy", new ExceptionStrategyDefinitionParser(DefaultMessagingExceptionStrategy.class));
         registerBeanDefinitionParser("catch-exception-strategy", new ExceptionStrategyDefinitionParser(CatchMessagingExceptionStrategy.class));
+        registerBeanDefinitionParser("choice-exception-strategy", new ExceptionStrategyDefinitionParser(ChoiceMessagingExceptionStrategy.class));
         registerMuleBeanDefinitionParser("exception-strategy", new ReferenceExceptionStrategyDefinitionParser());
         registerDeprecatedBeanDefinitionParser("default-service-exception-strategy", new ChildDefinitionParser("exceptionListener", DefaultMessagingExceptionStrategy.class), "Use default-exception-strategy instead.");
         registerBeanDefinitionParser("custom-exception-strategy", new ExceptionStrategyDefinitionParser(null));

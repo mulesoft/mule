@@ -9,7 +9,6 @@
  */
 package org.mule.exception;
 
-import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 
 public class CatchMessagingExceptionStrategy extends TemplateMessagingExceptionStrategy
@@ -32,4 +31,5 @@ public class CatchMessagingExceptionStrategy extends TemplateMessagingExceptionS
     {
         return event;
     }
+
 }

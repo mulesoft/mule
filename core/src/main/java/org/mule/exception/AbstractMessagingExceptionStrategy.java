@@ -40,7 +40,7 @@ public abstract class AbstractMessagingExceptionStrategy extends AbstractExcepti
 
     public AbstractMessagingExceptionStrategy(MuleContext muleContext)
     {
-        this.muleContext = muleContext;
+        setMuleContext(muleContext);
     }
 
     public MuleEvent handleException(Exception ex, MuleEvent event)

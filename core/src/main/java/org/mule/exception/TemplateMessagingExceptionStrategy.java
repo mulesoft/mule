@@ -12,8 +12,7 @@ package org.mule.exception;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
-import org.mule.api.exception.MessagingExceptionHandler;
-import org.mule.api.exception.RollbackSourceCallback;
+import org.mule.api.exception.ChoiceMessagingExceptionHandler;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorChain;
@@ -22,13 +21,18 @@ import org.mule.message.DefaultExceptionPayload;
 import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.routing.requestreply.ReplyToPropertyRequestReplyReplier;
 
-import java.net.URI;
-
-public abstract class TemplateMessagingExceptionStrategy extends AbstractExceptionListener implements MessagingExceptionHandler
+public abstract class TemplateMessagingExceptionStrategy extends AbstractExceptionListener implements ChoiceMessagingExceptionHandler
 {
 
     private MessageProcessorChain configuredMessageProcessors;
     private MessageProcessor replyToMessageProcessor = new ReplyToPropertyRequestReplyReplier();
+    private String expression;
+
+    @Override
+    public boolean accept(MuleEvent event)
+    {
+        return acceptsAll() || muleContext.getExpressionManager().evaluateBoolean(expression,event.getMessage());
+    }
 
     @Override
     final public MuleEvent handleException(Exception exception, MuleEvent event)
@@ -102,6 +106,17 @@ public abstract class TemplateMessagingExceptionStrategy extends AbstractExcepti
         {
             throw new InitialisationException(e, this);
         }
+    }
+
+    public void setExpression(String expression)
+    {
+        this.expression = expression;
+    }
+
+    @Override
+    public boolean acceptsAll()
+    {
+        return expression == null;
     }
 
     protected abstract MuleEvent afterRouting(Exception exception, MuleEvent event);

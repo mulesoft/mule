@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd">
+
+    <flow name="flowA">
+        <logger/>
+        <choice-exception-strategy name="choice">
+            <catch-exception-strategy expression="#[exception-type:java.lang.NullPointerException]"/>
+            <defaul-exception-strategy/>
+        </choice-exception-strategy>
+    </flow>
+
+</mule>

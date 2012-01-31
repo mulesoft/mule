@@ -9,11 +9,15 @@
  */
 package org.mule.config.spring.parsers.specific;
 
+import org.mule.api.MuleRuntimeException;
 import org.mule.api.config.MuleConfiguration;
 import org.mule.api.config.MuleProperties;
+import org.mule.config.i18n.CoreMessages;
+import org.mule.config.spring.parsers.PostProcessor;
+import org.mule.config.spring.parsers.assembly.BeanAssembler;
 import org.mule.config.spring.parsers.generic.NamedDefinitionParser;
-
 import org.springframework.beans.factory.BeanDefinitionStoreException;
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
@@ -34,6 +38,27 @@ public class ConfigurationDefinitionParser extends NamedDefinitionParser
     {
         super(MuleProperties.OBJECT_MULE_CONFIGURATION);
         addIgnored(DEFAULT_EXCEPTION_STRATEGY_ATTRIBUTE);
+        registerPostProcessor(new PostProcessor()
+        {
+            @Override
+            public void postProcess(ParserContext context, BeanAssembler assembler, Element element)
+            {
+                AbstractBeanDefinition beanDefinition = assembler.getBean().getBeanDefinition();
+                if (beanDefinition.hasAttribute(DEFAULT_EXCEPTION_STRATEGY_ATTRIBUTE))
+                {
+                    Object defaultExceptionStrategyBeanName = beanDefinition.getAttribute(DEFAULT_EXCEPTION_STRATEGY_ATTRIBUTE);
+                    if (!context.getRegistry().containsBeanDefinition((String) defaultExceptionStrategyBeanName))
+                    {
+                        throw new MuleRuntimeException(CoreMessages.createStaticMessage(String.format("No global exception strategy defined with name %s.",defaultExceptionStrategyBeanName)));
+                    }
+                    BeanDefinition defaultExceptionStrategyBeanDefinition = context.getRegistry().getBeanDefinition(element.getAttribute(DEFAULT_EXCEPTION_STRATEGY_ATTRIBUTE));
+                    if (defaultExceptionStrategyBeanDefinition.hasAttribute("expression"))
+                    {
+                        throw new MuleRuntimeException(CoreMessages.createStaticMessage("Default exception strategy must not have expression attribute. It must accept any message."));
+                    }
+                }
+            }
+        });
         singleton=true;
     }
 
@@ -48,7 +73,7 @@ public class ConfigurationDefinitionParser extends NamedDefinitionParser
     {
         if (element.hasAttribute(DEFAULT_EXCEPTION_STRATEGY_ATTRIBUTE))
         {
-            builder.addPropertyValue("defaultExceptionStrategyName",element.getAttribute(DEFAULT_EXCEPTION_STRATEGY_ATTRIBUTE));
+            builder.addPropertyValue("defaultExceptionStrategyName", element.getAttribute(DEFAULT_EXCEPTION_STRATEGY_ATTRIBUTE));
         }
         super.doParse(element,context,builder);
     }

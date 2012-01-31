@@ -10,44 +10,16 @@
 package org.mule.config.spring.parsers.specific;
 
 import static org.mule.config.spring.parsers.specific.ExceptionStrategyDefinitionParser.createNoNameAttributePreProcessor;
-import org.mule.api.config.MuleProperties;
-import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
-import org.mule.config.spring.parsers.delegate.ParentContextDefinitionParser;
-import org.mule.config.spring.parsers.generic.OrphanDefinitionParser;
-import org.mule.config.spring.parsers.generic.ParentDefinitionParser;
-import org.springframework.beans.factory.support.AbstractBeanDefinition;
-import org.springframework.beans.factory.xml.ParserContext;
-import org.w3c.dom.Element;
 
-public class ReferenceExceptionStrategyDefinitionParser extends ParentContextDefinitionParser
+import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
+import org.mule.config.spring.parsers.generic.ParentDefinitionParser;
+
+public class ReferenceExceptionStrategyDefinitionParser extends ParentDefinitionParser
 {
     public ReferenceExceptionStrategyDefinitionParser()
     {
-        super("configuration", createConfigurationDefinitionParser());
-        otherwise(createInFlowServiceDefinitionParser());
-    }
-
-    private ParentDefinitionParser createInFlowServiceDefinitionParser()
-    {
-        ParentDefinitionParser inFlowServiceDefinitionParser = new ParentDefinitionParser();
-        inFlowServiceDefinitionParser.addAlias(AbstractMuleBeanDefinitionParser.ATTRIBUTE_REF, "exceptionListener");
-        inFlowServiceDefinitionParser.registerPreProcessor(createNoNameAttributePreProcessor());
-        return inFlowServiceDefinitionParser;
-    }
-
-    private static OrphanDefinitionParser createConfigurationDefinitionParser()
-    {
-        OrphanDefinitionParser orphanDefinitionParser = new OrphanDefinitionParser(false){
-            @Override
-            protected AbstractBeanDefinition parseInternal(Element element, ParserContext context)
-            {
-                String ref = element.getAttribute("ref");
-                context.getRegistry().registerAlias(ref,MuleProperties.OBJECT_DEFAULT_GLOBAL_EXCEPTION_STRATEGY);
-                return null;
-            }
-        };
-        orphanDefinitionParser.registerPreProcessor(createNoNameAttributePreProcessor());
-        return orphanDefinitionParser;
+        addAlias(AbstractMuleBeanDefinitionParser.ATTRIBUTE_REF, "exceptionListener");
+        registerPreProcessor(createNoNameAttributePreProcessor());
     }
 
 }

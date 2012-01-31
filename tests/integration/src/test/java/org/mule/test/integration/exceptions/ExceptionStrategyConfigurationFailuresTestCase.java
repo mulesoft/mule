@@ -9,6 +9,11 @@
  */
 package org.mule.test.integration.exceptions;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
+
 import org.junit.Test;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
@@ -23,11 +28,6 @@ import org.mule.context.DefaultMuleContextFactory;
 import org.mule.context.notification.MuleContextNotification;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.util.concurrent.Latch;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicReference;
 
 public class ExceptionStrategyConfigurationFailuresTestCase extends AbstractMuleTestCase
 {
@@ -51,6 +51,18 @@ public class ExceptionStrategyConfigurationFailuresTestCase extends AbstractMule
     }
 
     @Test(expected = ConfigurationException.class)
+    public void testChoiceExceptionStrategyCantHaveMiddleExceptionStrategyWithoutExpression() throws Exception
+    {
+        loadConfiguration("org/mule/test/integration/exceptions/exception-strategy-in-choice-without-expression.xml");
+    }
+
+    @Test(expected = ConfigurationException.class)
+    public void testChoiceExceptionStrategyCantHaveDefaultExceptionStrategy() throws Exception
+    {
+        loadConfiguration("org/mule/test/integration/exceptions/default-exception-strategy-in-choice.xml");
+    }
+
+    @Test(expected = ConfigurationException.class)
     public void testDefaultEsFailsAsReferencedExceptionStrategy() throws Exception
     {
         loadConfiguration("org/mule/test/integration/exceptions/default-es-as-referenced-exception-strategy.xml");
@@ -60,6 +72,12 @@ public class ExceptionStrategyConfigurationFailuresTestCase extends AbstractMule
     public void testDefaultExceptionStrategyReferencesNonExistentExceptionStrategy() throws Exception
     {
         loadConfiguration("org/mule/test/integration/exceptions/default-exception-strategy-reference-non-existent-es.xml");
+    }
+
+    @Test(expected = ConfigurationException.class)
+    public void testDefaultExceptionStrategyReferencesExceptionStrategyWithExpression() throws Exception
+    {
+        loadConfiguration("org/mule/test/integration/exceptions/default-exception-strategy-reference-has-expression.xml");
     }
 
     private void loadConfiguration(String configuration) throws MuleException, InterruptedException

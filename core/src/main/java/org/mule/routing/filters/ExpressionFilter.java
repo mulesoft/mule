@@ -12,6 +12,10 @@ package org.mule.routing.filters;
 import static org.mule.util.ClassUtils.equal;
 import static org.mule.util.ClassUtils.hash;
 
+import java.text.MessageFormat;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.context.MuleContextAware;
@@ -19,11 +23,6 @@ import org.mule.api.routing.filter.Filter;
 import org.mule.api.transport.PropertyScope;
 import org.mule.expression.ExpressionConfig;
 import org.mule.util.StringUtils;
-
-import java.text.MessageFormat;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * Allows boolean expressions to be executed on a message. Note that when using this filter you must be able to either specify
@@ -169,22 +168,13 @@ public class ExpressionFilter implements Filter, MuleContextAware
             }
             else if(config.getEvaluator().equals("exception-type"))
             {
-                try
+                if (StringUtils.isEmpty(config.getExpression()))
                 {
-                    if (StringUtils.isEmpty(config.getExpression()))
-                    {
-                        delegateFilter = new ExceptionTypeFilter();
-                    }
-                    else
-                    {
-                        delegateFilter = new ExceptionTypeFilter(config.getExpression());
-                    }
+                    delegateFilter = new ExceptionTypeFilter();
                 }
-                catch (ClassNotFoundException e)
+                else
                 {
-                    IllegalArgumentException iae = new IllegalArgumentException();
-                    iae.initCause(e);
-                    throw iae;
+                    delegateFilter = new ExceptionTypeFilter(config.getExpression());
                 }
             }
             else

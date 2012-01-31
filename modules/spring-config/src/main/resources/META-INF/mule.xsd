@@ -1718,7 +1718,7 @@
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:element>
-                    <xsd:element ref="legacy-abstract-exception-strategy" minOccurs="0" />
+                    <xsd:element ref="legacy-abstract-exception-strategy" minOccurs="0"/>
                     <xsd:element ref="abstract-message-info-mapping" minOccurs="0">
                         <xsd:annotation>
                             <xsd:documentation>
@@ -1810,6 +1810,13 @@
                     <xsd:annotation>
                         <xsd:documentation>
                             Name of the exception strategy that will be used in ref attribute of 'exception-strategy' element
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="expression" type="xsd:string" use="optional">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The expression that will be evaluated to determine if this expcetion strategy should be executed. This should always be a boolean expression.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -2189,7 +2196,7 @@
                             </xsd:complexType>
                         </xsd:element>
                     </xsd:choice>
-                    <xsd:element ref="legacy-abstract-exception-strategy" minOccurs="0"/>
+                    <xsd:element ref="legacy-abstract-exception-strategy" minOccurs="0" maxOccurs="unbounded"/>
                     <xsd:element ref="abstract-message-info-mapping" minOccurs="0">
                         <xsd:annotation>
                             <xsd:documentation>
@@ -4374,6 +4381,7 @@
             <xsd:enumeration value="attachments-list"/>
             <xsd:enumeration value="bean"/>
             <xsd:enumeration value="endpoint"/>
+            <xsd:enumeration value="exception-type"/>
             <xsd:enumeration value="function"/>
             <xsd:enumeration value="groovy"/>
             <xsd:enumeration value="header"/>
@@ -4801,6 +4809,15 @@
         </xsd:annotation>
     </xsd:element>
 
+    <xsd:element name="choice-exception-strategy" type="choiceExceptionStrategyType"
+                 substitutionGroup="abstract-exception-strategy">
+        <xsd:annotation>
+            <xsd:documentation>
+                Exception strategy used to route to different exception strategies. It will execute the exception strategy which expression attribute matches against MuleMessage. In case there's no match, then default exception strategy will be exeucted.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
     <xsd:element name="exception-strategy" type="referenceExceptionStrategyType"
                  substitutionGroup="abstract-exception-strategy">
         <xsd:annotation>
@@ -4821,6 +4838,24 @@
                         </xsd:annotation>
                     </xsd:group>
                 </xsd:sequence>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+
+    <xsd:complexType name="choiceExceptionStrategyType">
+        <xsd:complexContent>
+            <xsd:extension base="exceptionStrategyType">
+                <xsd:sequence>
+                    <xsd:element ref="abstract-exception-strategy" minOccurs="1" maxOccurs="unbounded"/>
+                </xsd:sequence>
+                <xsd:attribute name="name" type="substitutableName" use="optional">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Name of the exception strategy that will be used in ref attribute of 'exception-strategy' element
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>

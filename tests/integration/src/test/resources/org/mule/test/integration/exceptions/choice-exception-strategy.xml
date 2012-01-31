@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
+       http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/3.2/mule-test.xsd
+
+       http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.2/mule-vm.xsd
+       http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/3.2/mule-http.xsd">
+
+    <catch-exception-strategy name="global-catch" expression="#[exception-type:java.lang.ArithmeticException]">
+        <append-string-transformer message=" global catch es"/>
+    </catch-exception-strategy>
+
+    <catch-exception-strategy expression="#[exception-type:java.lang.IllegalArgumentException]">
+        <append-string-transformer message=" catch-1"/>
+    </catch-exception-strategy>
+
+    <flow name="matchesCorrectExceptionStrategyUsingExceptionType">
+        <vm:inbound-endpoint path="in" exchange-pattern="request-response"/>
+        <test:component/>
+        <choice-exception-strategy>
+            <catch-exception-strategy expression="#[exception-type:java.lang.IllegalArgumentException]">
+                <append-string-transformer message=" catch-1"/>
+            </catch-exception-strategy>
+            <catch-exception-strategy expression="#[exception-type:java.lang.IllegalStateException]">
+                <append-string-transformer message=" catch-2"/>
+            </catch-exception-strategy>
+            <catch-exception-strategy expression="#[exception-type:=org.mule.test.integration.exceptions.ChoiceExceptionStrategyTestCase$BaseException]">
+                <append-string-transformer message=" catch-3"/>
+            </catch-exception-strategy>
+            <catch-exception-strategy expression="#[exception-type:org.mule.test.integration.exceptions.ChoiceExceptionStrategyTestCase$SubtypeException]">
+                <append-string-transformer message=" catch-4"/>
+            </catch-exception-strategy>
+            <catch-exception-strategy expression="#[exception-type:(.*)mule.test.integration.(.*).ChoiceExceptionStrategyTestCase(.*)MyException]">
+                <append-string-transformer message=" catch-5"/>
+            </catch-exception-strategy>
+            <catch-exception-strategy expression="#[groovy:payload.equals('groovy')]">
+                <append-string-transformer message=" catch-6"/>
+            </catch-exception-strategy>
+            <exception-strategy ref="global-catch"/>
+        </choice-exception-strategy>
+    </flow>
+
+</mule>
