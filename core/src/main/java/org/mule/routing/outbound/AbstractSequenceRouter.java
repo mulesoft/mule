@@ -64,7 +64,7 @@ public abstract class AbstractSequenceRouter extends FilteringOutboundRouter
         {
             for (int i = 0; i < routes.size(); i++)
             {
-                MessageProcessor mp = routes.get(i);
+                MessageProcessor mp = getRoute(i,event);
                 OutboundEndpoint endpoint = mp instanceof OutboundEndpoint ? (OutboundEndpoint)mp : null;
                 if (endpoint == null || endpoint.getFilter() == null || (endpoint.getFilter() != null && endpoint.getFilter().accept(message)))
                 {
