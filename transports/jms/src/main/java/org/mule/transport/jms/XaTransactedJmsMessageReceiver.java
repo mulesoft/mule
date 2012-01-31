@@ -241,6 +241,7 @@ public class XaTransactedJmsMessageReceiver extends TransactedPollingMessageRece
             {
                 tx.setRollbackOnly();
             }
+            closeConsumerIfRequired(consumer);
             return null;
         }
         message = connector.preProcessMessage(message, session);
@@ -275,8 +276,20 @@ public class XaTransactedJmsMessageReceiver extends TransactedPollingMessageRece
 
         MuleMessage messageToRoute = createMuleMessage(message, endpoint.getEncoding());
         routeMessage(messageToRoute);
-        connector.closeQuietly(consumer);
+        closeConsumerIfRequired(consumer);
         return null;
+    }
+
+    private void closeConsumerIfRequired(MessageConsumer consumer)
+    {
+        if (!this.reuseConsumer)
+        {
+            connector.closeQuietly(consumer);
+            if (context.getContext() != null)
+            {
+                context.getContext().consumer = null;
+            }
+        }
     }
 
     @Override
