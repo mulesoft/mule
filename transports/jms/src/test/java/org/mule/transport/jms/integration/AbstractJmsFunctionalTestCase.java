@@ -59,7 +59,7 @@ import static org.junit.Assert.fail;
  * This is the base class for all integration tests that are part of the JMS integration test suite.  This is
  * a suite that can be run on multiple JMS providers since all configuration for the provider is abstracted into
  * a single class which implements {@link org.mule.transport.jms.integration.JmsVendorConfiguration}.  The implementation
- * of this class is loaded by looking for the classname in a properties file called 'jms-vendor-configs.txt'in the root
+ * of this class is loaded by looking for the classname in a properties file called 'jms-vendor-configs.txt' in the root
  * classpath.
  * <p/>
  * This test case provides a number of support methods for testing Jms providers with Mule.  This implementation is based
@@ -76,7 +76,7 @@ import static org.junit.Assert.fail;
  * The following properties are made available -
  * <ul>
  * <li>${inbound.destination} - the URI of the inbound destination (retrieved from an {@link org.mule.transport.jms.integration.JmsVendorConfiguration} implementation)</li>
- * <li>${outbound.destination} - the URI of the outbound destination (retrieved from an {@link org.mule.transport.jms.integration.JmsVendorConfiguration implementation)</li>
+ * <li>${outbound.destination} - the URI of the outbound destination (retrieved from an {@link org.mule.transport.jms.integration.JmsVendorConfiguration} implementation)</li>
  * <li>${middle.destination} - the URI of the middle destination (retrieved from an {@link org.mule.transport.jms.integration.JmsVendorConfiguration} implementation)</li>
  * <li>${middle2.destination} - the URI of a second middle destination 'middle2'.</li>
  * <li>${middle3.destination} - the URI of a third middle destination 'middle3'.</li>
@@ -202,15 +202,13 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
      * <p/>
      * <ul>
      * <li>${inbound.destination} - the URI of the inbound destination (retrieved from an {@link org.mule.transport.jms.integration.JmsVendorConfiguration} implementation)</li>
-     * <li>${outbound.destination} - the URI of the outbound destination (retrieved from an {@link org.mule.transport.jms.integration.JmsVendorConfiguration implementation)</li>
+     * <li>${outbound.destination} - the URI of the outbound destination (retrieved from an {@link org.mule.transport.jms.integration.JmsVendorConfiguration} implementation)</li>
      * <li>${middle.destination} - the URI of the middle destination (retrieved from an {@link org.mule.transport.jms.integration.JmsVendorConfiguration} implementation)</li>
      * <li>${middle2.destination} - the URI of a second middle destination 'middle2'.</li>
      * <li>${middle3.destination} - the URI of a third middle destination 'middle3'.</li>
      * <li>${broadcast.destination} - the URI of the broadcast topic (retrieved from an {@link org.mule.transport.jms.integration.JmsVendorConfiguration} implementation)</li>
      * <li>${protocol} - the protocol of the current messaging connector (retrieved from an {@link org.mule.transport.jms.integration.JmsVendorConfiguration} implementation)</li>
      * </ul>
-     *
-     * @return
      */
     @Override
     protected Properties getStartUpProperties()
