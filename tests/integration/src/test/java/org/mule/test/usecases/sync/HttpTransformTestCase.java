@@ -10,21 +10,23 @@
 
 package org.mule.test.usecases.sync;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.transformer.compression.GZipUncompressTransformer;
 import org.mule.transformer.simple.ByteArrayToSerializable;
 import org.mule.transformer.types.DataTypeFactory;
+import org.mule.util.SerializationUtils;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 public class HttpTransformTestCase extends AbstractServiceAndFlowTestCase
 {
@@ -60,8 +62,9 @@ public class HttpTransformTestCase extends AbstractServiceAndFlowTestCase
     public void testBinary() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
-        Object payload = Arrays.asList(42);
-        MuleMessage message = client.send("http://localhost:18081/RemoteService", payload, null);
+        ArrayList<Integer> payload = new ArrayList();
+        payload.add(42);
+        MuleMessage message = client.send("http://localhost:18081/RemoteService", SerializationUtils.serialize(payload), null);
         assertNotNull(message);
         ByteArrayToSerializable bas = new ByteArrayToSerializable();
         bas.setMuleContext(muleContext);

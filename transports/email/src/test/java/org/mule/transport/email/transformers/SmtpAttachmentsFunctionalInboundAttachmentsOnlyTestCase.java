@@ -56,7 +56,7 @@ public class SmtpAttachmentsFunctionalInboundAttachmentsOnlyTestCase extends Abs
         assertEquals(3, content.getCount());
         verifyMessage((String) content.getBodyPart(0).getContent());
         List<String> expectedTypes = Arrays.asList("text/plain", "text/xml");
-        for (int i = 1; i < 2; i++)
+        for (int i = 0; i < 3; i++)
         {
             BodyPart part = content.getBodyPart(i);
             String type = part.getContentType();

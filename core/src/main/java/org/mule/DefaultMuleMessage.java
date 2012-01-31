@@ -22,6 +22,7 @@ import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.MessageTransformer;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
+import org.mule.api.transformer.TransformerMessagingException;
 import org.mule.api.transport.OutputHandler;
 import org.mule.api.transport.PropertyScope;
 import org.mule.config.MuleManifest;
@@ -1363,47 +1364,11 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
                 }
 
                 Class<?> srcCls = getPayload().getClass();
-                if (transformer.isSourceDataTypeSupported(DataTypeFactory.create(srcCls)))
+                DataType<?> originalSourceType = DataTypeFactory.create(srcCls);
+
+                if (transformer.isSourceDataTypeSupported(originalSourceType))
                 {
-                    Object result;
-                    if (transformer instanceof MessageTransformer)
-                    {
-                        result = ((MessageTransformer) transformer).transform(this, event);
-                    }
-                    else
-                    {
-                        result = transformer.transform(this);
-                    }
-                    // Update the RequestContext with the result of the transformation.
-                    RequestContext.internalRewriteEvent(this, false);
-
-                    if (originalPayload == null && muleContext.getConfiguration().isCacheMessageOriginalPayload())
-                    {
-                        originalPayload = payload;
-                    }
-
-                    if (result instanceof MuleMessage)
-                    {
-                        if (!result.equals(this))
-                        {
-                            // Only copy the payload and properties of mule message
-                            // transformer result if the message is a different
-                            // instance
-                            synchronized (this)
-                            {
-                                MuleMessage resultMessage = (MuleMessage) result;
-                                setPayload(resultMessage.getPayload());
-                                originalPayload = resultMessage.getOriginalPayload();
-                                copyMessageProperties(resultMessage);
-                                copyAttachments(resultMessage);
-                            }
-                        }
-                    }
-                    else
-                    {
-                        setPayload(result);
-                    }
-                    setDataType(transformer.getReturnDataType());
+                    transformMessage(event, transformer);
                 }
                 else
                 {
@@ -1413,15 +1378,54 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
                     }
                     if (!transformer.isIgnoreBadInput())
                     {
-                        if (logger.isDebugEnabled())
-                        {
-                            logger.debug("Exiting from transformer chain (ignoreBadInput = false)");
-                        }
-                        break;
+                        throw new IllegalArgumentException("Cannot apply transformer " + transformer + " on source payload: " + srcCls);
                     }
                 }
             }
         }
+    }
+
+    private void transformMessage(MuleEvent event, Transformer transformer) throws TransformerMessagingException, TransformerException
+    {
+        Object result;
+        if (transformer instanceof MessageTransformer)
+        {
+            result = ((MessageTransformer) transformer).transform(this, event);
+        }
+        else
+        {
+            result = transformer.transform(this);
+        }
+        // Update the RequestContext with the result of the transformation.
+        RequestContext.internalRewriteEvent(this, false);
+
+        if (originalPayload == null && muleContext.getConfiguration().isCacheMessageOriginalPayload())
+        {
+            originalPayload = payload;
+        }
+
+        if (result instanceof MuleMessage)
+        {
+            if (!result.equals(this))
+            {
+                // Only copy the payload and properties of mule message
+                // transformer result if the message is a different
+                // instance
+                synchronized (this)
+                {
+                    MuleMessage resultMessage = (MuleMessage) result;
+                    setPayload(resultMessage.getPayload());
+                    originalPayload = resultMessage.getOriginalPayload();
+                    copyMessageProperties(resultMessage);
+                    copyAttachments(resultMessage);
+                }
+            }
+        }
+        else
+        {
+            setPayload(result);
+        }
+        setDataType(transformer.getReturnDataType());
     }
 
     protected void setDataType(DataType<?> dt)

@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:spring="http://www.springframework.org/schema/beans"
     xmlns:tcp="http://www.mulesoft.org/schema/mule/tcp" xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
     xsi:schemaLocation="
-               http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
                http://www.mulesoft.org/schema/mule/tcp http://www.mulesoft.org/schema/mule/tcp/3.2/mule-tcp.xsd
                http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/3.2/mule-jms.xsd">
@@ -15,12 +13,8 @@
     <jms:activemq-connector name="jmsConnector"
         specification="1.1" />
 
-    <jms:jmsmessage-to-object-transformer
-        name="jmsmessage-to-object" />
     <byte-array-to-object-transformer
         name="bytearray-to-object" />
-
-
 
     <flow name="TcpReceiver">
 
@@ -38,10 +32,8 @@
     </flow>
 
     <flow name="JMSReplyProvider">
-
         <inbound-endpoint address="jms://queue_in"
             exchange-pattern="one-way">
-            <transformer ref="jmsmessage-to-object" />
             <transformer ref="bytearray-to-object" />
         </inbound-endpoint>
         <custom-processor class="org.mule.routing.requestreply.ReplyToPropertyRequestReplyReplier"/>
@@ -50,6 +42,4 @@
                 class="org.mule.tck.testmodels.services.TestReceiver" />
         </component>
     </flow>
-
-
 </mule>

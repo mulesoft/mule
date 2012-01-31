@@ -13,6 +13,7 @@ package org.mule.transport.email.transformers;
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;
 import org.mule.transformer.simple.SerializableToByteArray;
+import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transport.email.AbstractMailConnector;
 import org.mule.util.StringUtils;
 
@@ -39,6 +40,24 @@ public class ObjectToMimeMessage extends StringToEmailMessage
     private Log logger = LogFactory.getLog(getClass());
     private boolean useInboundAttachments = true;
     private boolean useOutboundAttachments = true;
+
+    public ObjectToMimeMessage()
+    {
+        this.registerSourceType(DataTypeFactory.create(Message.class));
+    }
+
+    @Override
+    public Object transformMessage(MuleMessage message, String outputEncoding) throws TransformerException
+    {
+        if (message.getPayload() instanceof Message)
+        {
+            return message.getPayload();
+        }
+        else
+        {
+            return super.transformMessage(message, outputEncoding);
+        }
+    }
 
     @Override
     protected void setContent(Object payload, Message msg, String contentType, MuleMessage message)

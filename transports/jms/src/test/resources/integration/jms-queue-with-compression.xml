@@ -1,13 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:mule="http://www.mulesoft.org/schema/mule/core"
-      xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
       xmlns:test="http://www.mulesoft.org/schema/mule/test"
       xsi:schemaLocation="
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
-       http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/3.2/mule-test.xsd
-       http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/3.2/mule-jms.xsd">
+       http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/3.2/mule-test.xsd">
 
     <endpoint name="in" address="${inbound.destination}" exchange-pattern="one-way"/>
     <endpoint name="middle" address="${middle.destination}" exchange-pattern="one-way"/>
@@ -36,7 +33,6 @@
         <service name="MiddlePart">
             <inbound>
                 <inbound-endpoint ref="middle">
-                    <transformer ref="JmsToObject" />
                     <transformer ref="Uncompress" />
                 </inbound-endpoint>
             </inbound>
@@ -54,7 +50,6 @@
         <service name="OutputPart">
             <inbound>
                 <inbound-endpoint ref="middle2">
-                    <transformer ref="JmsToObject" />
                     <transformer ref="Uncompress" />
                 </inbound-endpoint>
             </inbound>
