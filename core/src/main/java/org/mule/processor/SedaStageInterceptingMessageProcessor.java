@@ -11,6 +11,7 @@
 package org.mule.processor;
 
 import org.mule.DefaultMuleEvent;
+import org.mule.OptimizedRequestContext;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
@@ -164,8 +165,9 @@ public class SedaStageInterceptingMessageProcessor extends OptionalAsyncIntercep
                 }
                 else
                 {
-                    exceptionListener.handleException(new MessagingException(
-                        CoreMessages.eventProcessingFailedFor(getStageDescription()), event, e), event);
+                    exceptionListener.handleException(
+                        new MessagingException(CoreMessages.eventProcessingFailedFor(getStageDescription()),
+                            event, e), event);
                 }
             }
         }
@@ -236,32 +238,36 @@ public class SedaStageInterceptingMessageProcessor extends OptionalAsyncIntercep
 
             if (event != null)
             {
-                try
+                if (isStatsEnabled())
                 {
-                    if (isStatsEnabled())
-                    {
-                        queueStatistics.decQueuedEvent();
-                    }
+                    queueStatistics.decQueuedEvent();
+                }
 
-                    if (logger.isDebugEnabled())
-                    {
-                        logger.debug(MessageFormat.format("{0}: Dequeued event from {1}",
-                            getStageDescription(), getQueueName()));
-                    }
-                    Work work = new SedaStageWorker(event);
-                    if (doThreading)
+                if (logger.isDebugEnabled())
+                {
+                    logger.debug(MessageFormat.format("{0}: Dequeued event from {1}", getStageDescription(),
+                        getQueueName()));
+                }
+                AbstractMuleEventWork work = new SedaStageWorker(event);
+                if (doThreading)
+                {
+                    try
                     {
                         workManagerSource.getWorkManager().scheduleWork(work, WorkManager.INDEFINITE, null,
                             new AsyncWorkListener(next));
                     }
-                    else
+                    catch (Exception e)
                     {
-                        work.run();
+                        // Use the event copy created in SedaStageWorker constructor
+                        // because dequeued event may still be owned by a previuos
+                        // thread
+                        OptimizedRequestContext.unsafeSetEvent(work.getEvent());
+                        event.getFlowConstruct().getExceptionListener().handleException(e, work.getEvent());
                     }
                 }
-                catch (Exception e)
+                else
                 {
-                    event.getFlowConstruct().getExceptionListener().handleException(e, event);
+                    work.run();
                 }
             }
         }
