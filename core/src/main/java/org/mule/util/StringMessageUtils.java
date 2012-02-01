@@ -252,6 +252,11 @@ public final class StringMessageUtils
                 for (Object name : names)
                 {
                     Object value = m.getProperty(name.toString(), scope);
+                    // avoid calling toString recursively on MuleMessages
+                    if (value instanceof MuleMessage)
+                    {
+                        value = "<<<MuleMessage>>>";
+                    }
                     if (name.equals("password") || name.toString().contains("secret") || name.equals("pass"))
                     {
                         value = "****";

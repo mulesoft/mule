@@ -10,9 +10,6 @@
 
 package org.mule.routing.outbound;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.RequestContext;
@@ -28,6 +25,9 @@ import org.mule.routing.AbstractSplitter;
 import org.mule.routing.CorrelationMode;
 import org.mule.routing.DefaultRouterResultsHandler;
 import org.mule.routing.MessageSequence;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Base implementation of a {@link MuleMessage} splitter, that converts its payload 
@@ -49,6 +49,8 @@ public abstract class AbstractMessageSequenceSplitter extends AbstractIntercepti
     protected RouterResultsHandler resultsHandler = new DefaultRouterResultsHandler();
     protected CorrelationMode enableCorrelation = CorrelationMode.IF_NOT_SET;
     protected MessageInfoMapping messageInfoMapping;
+    protected int groupSize;
+    protected String counterVariableName;
 
     public final MuleEvent process(MuleEvent event) throws MuleException
     {
@@ -95,14 +97,22 @@ public abstract class AbstractMessageSequenceSplitter extends AbstractIntercepti
         String correlationId = messageInfoMapping.getCorrelationId(originalEvent.getMessage());
         List<MuleEvent> resultEvents = new ArrayList<MuleEvent>();
         int correlationSequence = 0;
-        int count = seq.size();
-        MuleEvent currentEvent = originalEvent;
-        for (; seq.hasNext();)
+        MessageSequence<?> messageSequence = seq;
+        if (groupSize > 1)
         {
-            Object payload = seq.next();
+            messageSequence = new PartitionedMessageSequence(seq, groupSize);
+        }
+        int count = messageSequence.size();
+        MuleEvent currentEvent = originalEvent;
+        for (; messageSequence.hasNext();)
+        {
+            Object payload = messageSequence.next();
             MuleMessage message = createMessage(payload, originalEvent.getMessage());
             correlationSequence++;
-
+            if (counterVariableName != null)
+            {
+                message.setInvocationProperty(counterVariableName, correlationSequence);
+            }
             if (enableCorrelation != CorrelationMode.NEVER)
             {
                 boolean correlationSet = message.getCorrelationId() != null;
@@ -158,5 +168,18 @@ public abstract class AbstractMessageSequenceSplitter extends AbstractIntercepti
     public void setMessageInfoMapping(MessageInfoMapping messageInfoMapping)
     {
         this.messageInfoMapping = messageInfoMapping;
+    }
+
+    /**
+     * Split the elements in groups of the specified size
+     */
+    public void setGroupSize(int groupSize)
+    {
+        this.groupSize = groupSize;
+    }
+
+    public void setCounterVariableName(String counterVariableName)
+    {
+        this.counterVariableName = counterVariableName;
     }
 }

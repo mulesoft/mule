@@ -132,6 +132,7 @@ import org.mule.model.seda.SedaModel;
 import org.mule.model.seda.SedaService;
 import org.mule.object.PrototypeObjectFactory;
 import org.mule.object.SingletonObjectFactory;
+import org.mule.processor.ForeachMessageProcessor;
 import org.mule.processor.IdempotentRedeliveryPolicy;
 import org.mule.processor.InvokerMessageProcessor;
 import org.mule.processor.NullMessageProcessor;
@@ -219,6 +220,7 @@ import org.mule.transformer.simple.StringAppendTransformer;
 import org.mule.util.store.InMemoryObjectStore;
 import org.mule.util.store.ManagedObjectStore;
 import org.mule.util.store.TextFileObjectStore;
+
 import org.springframework.beans.factory.xml.BeanDefinitionParser;
 
 /**
@@ -511,6 +513,8 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("map-splitter", new SplitterDefinitionParser(MapSplitter.class));
         registerBeanDefinitionParser("message-chunk-splitter", new SplitterDefinitionParser(MessageChunkSplitter.class));
         registerBeanDefinitionParser("custom-splitter", new SplitterDefinitionParser());
+        registerMuleBeanDefinitionParser("foreach", new ChildDefinitionParser("messageProcessor", ForeachMessageProcessor.class)).addAlias("rootMessage",
+            "rootMessageVariableName").addAlias("counter", "counterVariableName");
 
         // Routing: Routing Message Processors
 

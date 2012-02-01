@@ -5641,6 +5641,41 @@
       </xsd:complexContent>
     </xsd:complexType>
 
+    <xsd:element name="foreach" type="foreachProcessorType"
+                 substitutionGroup="abstract-intercepting-message-processor"/>
+    <xsd:complexType name="foreachProcessorType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractInterceptingMessageProcessorType">
+                <xsd:sequence>
+                    <xsd:group ref="messageProcessorOrOutboundEndpoint" minOccurs="1" maxOccurs="unbounded"/>
+                </xsd:sequence>
+				<xsd:attributeGroup ref="optionalExpressionAttributes"/>
+                <xsd:attribute name="groupSize" use="optional" type="xsd:integer">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Partitions the collection in subcollections of the specified group size.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="rootMessage" use="optional" default="rootMessage" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Property name where the parent message is stored.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="counter" use="optional" default="counter" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Property name used to store the number of message being iterated.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+
     <!--==================================-->
     <!-- Routing (1-n) Message Processors  -->
     <!--==================================-->
