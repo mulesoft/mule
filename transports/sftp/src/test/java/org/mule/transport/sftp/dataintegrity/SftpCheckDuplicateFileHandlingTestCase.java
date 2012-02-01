@@ -10,20 +10,32 @@
 
 package org.mule.transport.sftp.dataintegrity;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+import org.mule.api.MuleException;
+import org.mule.module.client.MuleClient;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.tck.probe.PollingProber;
+import org.mule.tck.probe.Prober;
+import org.mule.transport.sftp.LatchDownExceptionListener;
+import org.mule.transport.sftp.SftpClient;
+import org.mule.transport.sftp.util.SftpServer;
 
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-import org.mule.api.endpoint.ImmutableEndpoint;
-import org.mule.api.transport.DispatchException;
-import org.mule.module.client.MuleClient;
-import org.mule.transport.sftp.SftpClient;
 
 /**
  * Test the three different types of handling when duplicate files (i.e. file names)
@@ -32,37 +44,43 @@ import org.mule.transport.sftp.SftpClient;
  * SftpConnectorPROPERTY_DUPLICATE_HANDLING_OVERWRITE = "overwrite" (currently not
  * implemented) - SftpConnector.PROPERTY_DUPLICATE_HANDLING_ASS_SEQ_NO = "addSeqNo"
  */
-public class SftpCheckDuplicateFileHandlingTestCase extends AbstractSftpDataIntegrityTestCase
+@Ignore
+public class SftpCheckDuplicateFileHandlingTestCase extends AbstractServiceAndFlowTestCase
 {
+    private static final String DUPLICATED_FILENAME = "file_1.txt";
+
+    private static final String FILENAME = "file.txt";
+
+    private static final String FILENAME_MESSAGE_PROPERTY = "filename";
+
+    private static SftpClient sftpClient;
+
+    @Rule
+    public DynamicPort port = new DynamicPort("SFTP_PORT");
+
+    private static SftpServer sftpServer;
 
     public SftpCheckDuplicateFileHandlingTestCase(ConfigVariant variant, String configResources)
     {
         super(variant, configResources);
     }
 
-    private static String INBOUND_ENDPOINT_NAME = "inboundEndpoint";
-    private static String OUTBOUND_ENDPOINT_NAME = "outboundEndpoint";
+    private static final HashMap<String, String> MESSAGE_PROPERTIES = new HashMap<String, String>();
+    {
+        MESSAGE_PROPERTIES.put(FILENAME_MESSAGE_PROPERTY, FILENAME);
+    };
 
-    private static String INBOUND_ENDPOINT_NAME2 = "inboundEndpoint2";
-    private static String OUTBOUND_ENDPOINT_NAME2 = "outboundEndpoint2";
-    
+    private Prober prober = new PollingProber(2000, 100);
+
+    private static MuleClient muleClient;
+
     @Parameters
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "dataintegrity/sftp-dataintegrity-duplicate-handling-service.xml"},
-            {ConfigVariant.FLOW, "dataintegrity/sftp-dataintegrity-duplicate-handling-flow.xml"}
-        });
-    }
-
-    @Override
-    protected void doSetUp() throws Exception
-    {
-        initEndpointDirectories(new String[]{"serviceDuplicateHandlingRename",
-            "serviceDuplicateHandlingThrowException"}, new String[]{INBOUND_ENDPOINT_NAME,
-            INBOUND_ENDPOINT_NAME2, OUTBOUND_ENDPOINT_NAME, OUTBOUND_ENDPOINT_NAME2});
-
-        muleContext.setExceptionListener(new org.mule.transport.sftp.notification.ExceptionListener());
+         {ConfigVariant.SERVICE,
+         "dataintegrity/sftp-dataintegrity-duplicate-handling-service.xml"},
+        {ConfigVariant.FLOW, "dataintegrity/sftp-dataintegrity-duplicate-handling-flow.xml"}});
     }
 
     /**
@@ -72,71 +90,70 @@ public class SftpCheckDuplicateFileHandlingTestCase extends AbstractSftpDataInte
     @Test
     public void testDuplicateChangeNameHandling() throws Exception
     {
-
-        MuleClient muleClient = new MuleClient(muleContext);
-        SftpClient sftpClient = getSftpClient(muleClient, OUTBOUND_ENDPOINT_NAME);
-
-        try
-        {
-
-            // Send a file to the SFTP server, which the inbound-outboundEndpoint
-            // then can pick up
-            dispatchAndWaitForDelivery(new DispatchParameters(INBOUND_ENDPOINT_NAME, OUTBOUND_ENDPOINT_NAME));
-
-            // Make sure the file exists only in the outbound endpoint
-            verifyInAndOutFiles(muleClient, INBOUND_ENDPOINT_NAME, OUTBOUND_ENDPOINT_NAME, false, true);
-
-            // Transfer the second file
-            dispatchAndWaitForDelivery(new DispatchParameters(INBOUND_ENDPOINT_NAME, OUTBOUND_ENDPOINT_NAME));
-
-            // Make sure a file still exists only in the outbound endpoint
-            verifyInAndOutFiles(muleClient, INBOUND_ENDPOINT_NAME, OUTBOUND_ENDPOINT_NAME, false, true);
-
-            // Make sure a new file with name according to the notation is created
-            ImmutableEndpoint endpoint = (ImmutableEndpoint) muleClient.getProperty(OUTBOUND_ENDPOINT_NAME);
-            assertTrue("A new file in the outbound endpoint should exist", verifyFileExists(sftpClient,
-                endpoint.getEndpointURI().getPath(), "file_1.txt"));
-
-        }
-        finally
-        {
-            sftpClient.disconnect();
-        }
+        String endpointUrl = "sftp://muletest1:muletest1@localhost:" + port.getNumber() + "/~/inbound";
+        muleClient.dispatch(endpointUrl, TEST_MESSAGE, MESSAGE_PROPERTIES);
+        prober.check(new SftpFilePresentProbe(sftpClient, "outbound", FILENAME));
+        muleClient.dispatch(endpointUrl, TEST_MESSAGE, MESSAGE_PROPERTIES);
+        prober.check(new SftpFilePresentProbe(sftpClient, "outbound", DUPLICATED_FILENAME));
     }
 
     /**
-     * Test transferring a duplicate file. The default handling of duplicates is to
-     * throw an exception.
+     * Try to transfer two files with the same name. The second dispatch will throw
+     * and exception.
      */
     @Test
-    public void testDuplicateDefaultExceptionHandling() throws Exception
+    public void testDuplicateThrowExceptionHandling() throws Exception
     {
+        String endpointUrl = "sftp://muletest1:muletest1@localhost:" + port.getNumber() + "/~/inbound2";
+        muleClient.dispatch(endpointUrl, TEST_MESSAGE, MESSAGE_PROPERTIES);
+        prober.check(new SftpFilePresentProbe(sftpClient, "outbound2", FILENAME));
+        final CountDownLatch latch = new CountDownLatch(1);
+        muleContext.registerListener(new LatchDownExceptionListener(latch));
+        muleClient.dispatch(endpointUrl, TEST_MESSAGE, MESSAGE_PROPERTIES);
+        assertTrue(latch.await(3000, TimeUnit.MILLISECONDS));
+    }
 
-        MuleClient muleClient = new MuleClient(muleContext);
-        SftpClient sftpClient = getSftpClient(muleClient, OUTBOUND_ENDPOINT_NAME2);
-
+    /**
+     * Returns a SftpClient that is logged in to the sftp server that the endpoint is
+     * configured against.
+     */
+    protected SftpClient getSftpClient(String host, int port, String user, String password)
+        throws IOException
+    {
+        SftpClient sftpClient = new SftpClient(host);
+        sftpClient.setPort(port);
         try
         {
-
-            // Send an file to the SFTP server, which the inbound-outboundEndpoint
-            // then can pick up
-            dispatchAndWaitForDelivery(new DispatchParameters(INBOUND_ENDPOINT_NAME2, OUTBOUND_ENDPOINT_NAME2));
-
-            verifyInAndOutFiles(muleClient, INBOUND_ENDPOINT_NAME2, OUTBOUND_ENDPOINT_NAME2, false, true);
-
-            Exception exception = dispatchAndWaitForException(new DispatchParameters(INBOUND_ENDPOINT_NAME2,
-                OUTBOUND_ENDPOINT_NAME2), "sftp", "serviceDuplicateHandlingThrowException");
-            assertNotNull(exception);
-            assertTrue(exception instanceof DispatchException);
-            assertTrue(exception.getCause() instanceof IOException);
-            assertEquals("Failure", exception.getCause().getMessage());
-
-            verifyInAndOutFiles(muleClient, INBOUND_ENDPOINT_NAME2, OUTBOUND_ENDPOINT_NAME2, true, true);
-
+            sftpClient.login(user, password);
         }
-        finally
+        catch (Exception e)
         {
-            sftpClient.disconnect();
+            fail("Login failed: " + e);
         }
+        return sftpClient;
     }
+
+    @Before
+    public void before() throws MuleException, IOException
+    {
+        sftpServer = new SftpServer(port.getNumber());
+        sftpServer.start();
+        muleClient = new MuleClient(muleContext);
+        sftpClient = getSftpClient("localhost", port.getNumber(), "muletest1", "muletest1");
+        sftpClient.mkdir("inbound");
+        sftpClient.mkdir("outbound");
+        sftpClient.mkdir("inbound2");
+        sftpClient.mkdir("outbound2");
+    }
+
+    @After
+    public void after() throws IOException
+    {
+        sftpClient.recursivelyDeleteDirectory("outbound");
+        sftpClient.recursivelyDeleteDirectory("inbound");
+        sftpClient.recursivelyDeleteDirectory("outbound2");
+        sftpClient.recursivelyDeleteDirectory("inbound2");
+        sftpServer.stop();
+    }
+    
 }

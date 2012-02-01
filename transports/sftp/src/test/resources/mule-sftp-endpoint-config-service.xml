@@ -25,7 +25,7 @@
          <service name="test2" initialState="stopped">
             <inbound>
                 <sftp:inbound-endpoint
-                        address="sftp://user42:passw0rd@foobar-host:4243/data"
+                        address="sftp://user42:passw0rd@foobar-host:4243/data2"
                         name="inboundEndpoint2"/>
             </inbound>
         </service>

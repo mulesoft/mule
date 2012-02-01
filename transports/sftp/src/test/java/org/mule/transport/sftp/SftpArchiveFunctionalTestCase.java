@@ -202,6 +202,7 @@ public class SftpArchiveFunctionalTestCase extends AbstractSftpTestCase
     @Test
     public void testCantWriteToArchive2() throws Exception
     {
+        fail();
         makeArchiveTmpFolderReadOnly();
         makeArchiveReadOnly();
         try

@@ -28,12 +28,12 @@
     <flow name="testComponent">
 
         <sftp:inbound-endpoint
-            address="sftp://${USER1_NAME}@${SFTP_HOST}/~/inbound" name="inboundEndpoint" />
+            address="sftp://${USER1_NAME}@${SFTP_HOST}:${SFTP_PORT}/~/inbound" name="inboundEndpoint" />
 
 
 
         <sftp:outbound-endpoint
-            address="sftp://${USER1_NAME}@${SFTP_HOST}/~/outbound"
+            address="sftp://${USER1_NAME}@${SFTP_HOST}:${SFTP_PORT}/~/outbound"
             outputPattern="#[header:originalFilename]" name="outboundEndpoint">
         </sftp:outbound-endpoint>
 

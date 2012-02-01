@@ -33,7 +33,7 @@
             <outbound>
                 <pass-through-router>
                     <sftp:outbound-endpoint
-                        address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}/~/data" outputPattern="#[function:systime]-#[function:count].dat"/>
+                        address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}:${SFTP_PORT}/~/data" outputPattern="#[function:systime]-#[function:count].dat"/>
                 </pass-through-router>
             </outbound>
         </service>
@@ -43,7 +43,7 @@
         <service name="receiving">
             <inbound>
                 <sftp:inbound-endpoint name="inboundEndpoint" autoDelete="true"
-                    address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}/~/data"/>
+                    address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}:${SFTP_PORT}/~/data"/>
             </inbound>
             <component>
                 <singleton-object class="org.mule.tck.functional.FunctionalTestComponent"/>

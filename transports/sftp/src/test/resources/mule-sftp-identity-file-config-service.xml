@@ -20,7 +20,7 @@
                 <!-- The identityFile & passphrase can be overridden -->
                 <sftp:inbound-endpoint
                         identityFile="${USER1_IDENTITYFILE}" passphrase="${USER1_IDENTITYFILE_PASSPHRASE}"
-                        address="sftp://${USER1_NAME}@${SFTP_HOST}/~/data-in"
+                        address="sftp://${USER1_NAME}@${SFTP_HOST}:${SFTP_PORT}/~/data-in"
                         autoDelete="true" pollingFrequency="500" connector-ref="sftpCustomConnector"
                         name="inboundEndpoint"/>
             </inbound>

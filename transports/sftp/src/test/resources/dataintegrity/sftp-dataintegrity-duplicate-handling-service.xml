@@ -23,12 +23,12 @@
     <model name="model">
         <service name="serviceDuplicateHandlingRename">
             <inbound>
-                <sftp:inbound-endpoint address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}/~/inbound"
+                <sftp:inbound-endpoint address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}:${SFTP_PORT}/~/inbound"
                                        name="inboundEndpoint" pollingFrequency="500" exchange-pattern="request-response" />
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <sftp:outbound-endpoint address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}/~/outbound"
+                    <sftp:outbound-endpoint address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}:${SFTP_PORT}/~/outbound"
                                             tempDir="uploading" outputPattern="#[header:originalFilename]"
                                             exchange-pattern="request-response" keepFileOnError="true"
                                             name="outboundEndpoint" duplicateHandling="addSeqNo"/>
@@ -37,13 +37,13 @@
         </service>
         <service name="serviceDuplicateHandlingThrowException">
             <inbound>
-                <sftp:inbound-endpoint address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}/~/inbound2"
+                <sftp:inbound-endpoint address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}:${SFTP_PORT}/~/inbound2"
                                        name="inboundEndpoint2" pollingFrequency="200" exchange-pattern="request-response" />
             </inbound>
             <outbound>
                 <pass-through-router>
                 <!-- tempDir="uploading"  -->
-                    <sftp:outbound-endpoint address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}/~/outbound2"
+                    <sftp:outbound-endpoint address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}:${SFTP_PORT}/~/outbound2"
                                             tempDir="uploading" outputPattern="#[header:originalFilename]"
                                             exchange-pattern="request-response" keepFileOnError="true"
                                             name="outboundEndpoint2" duplicateHandling="throwException"/>

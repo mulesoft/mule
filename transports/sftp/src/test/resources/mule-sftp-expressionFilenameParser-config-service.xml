@@ -31,14 +31,14 @@
         <service name="testComponent">
             <inbound>
                 <sftp:inbound-endpoint 
-                    address="sftp://${USER1_NAME}@${SFTP_HOST}/~/inbound"
+                    address="sftp://${USER1_NAME}@${SFTP_HOST}:${SFTP_PORT}/~/inbound"
                     name="inboundEndpoint"/>
             </inbound>
 
             <outbound>
                 <pass-through-router>
                     <sftp:outbound-endpoint 
-                        address="sftp://${USER1_NAME}@${SFTP_HOST}/~/outbound"
+                        address="sftp://${USER1_NAME}@${SFTP_HOST}:${SFTP_PORT}/~/outbound"
                         outputPattern="#[header:originalFilename]"
                         name="outboundEndpoint">
                     </sftp:outbound-endpoint>

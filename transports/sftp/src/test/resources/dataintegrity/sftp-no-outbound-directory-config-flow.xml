@@ -16,12 +16,12 @@
     <flow name="service">
 
         <sftp:inbound-endpoint
-            address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}/~/inbound"
+            address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}:${SFTP_PORT}/~/inbound"
             name="inboundEndpoint" pollingFrequency="500" />
 
 
         <sftp:outbound-endpoint
-            address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}/~/DIRECTORY-MISSING"
+            address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}:${SFTP_PORT}/~/DIRECTORY-MISSING"
             name="outboundEndpointDirMissing" keepFileOnError="true">
         </sftp:outbound-endpoint>
 

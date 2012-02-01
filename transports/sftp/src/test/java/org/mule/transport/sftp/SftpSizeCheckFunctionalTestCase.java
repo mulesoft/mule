@@ -59,6 +59,6 @@ public class SftpSizeCheckFunctionalTestCase extends AbstractSftpTestCase
         // and ensure that the sizeChec prevents the inbound enpoint to read the file
         // during creation of it
 
-        executeBaseTest("inboundEndpoint", "vm://test.upload", FILE_NAME, SEND_SIZE, "receiving", TIMEOUT);
+        executeBaseTest("inboundEndpoint", "vm://test.upload", FILENAME, SEND_SIZE, "receiving", TIMEOUT);
     }
 }

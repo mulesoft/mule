@@ -19,11 +19,10 @@
 
     <!-- Should be the same as the above -->
     <flow name="test2">
-
+    
         <sftp:inbound-endpoint
-            address="sftp://user42:passw0rd@foobar-host:4243/data" name="inboundEndpoint2" />
-
-        <echo-component />
+            address="sftp://user42:passw0rd@foobar-host:4243/data2" name="inboundEndpoint2" />
+        <echo-component/>
     </flow>
 
     <flow name="test3">

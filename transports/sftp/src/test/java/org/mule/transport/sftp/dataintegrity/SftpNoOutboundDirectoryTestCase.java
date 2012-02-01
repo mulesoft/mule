@@ -46,11 +46,9 @@ public class SftpNoOutboundDirectoryTestCase extends AbstractSftpDataIntegrityTe
     }
 
     @Override
-    protected void doSetUp() throws Exception
+    public void before() throws Exception
     {
-        super.doSetUp();
-
-        // Delete the in & outbound directories
+        super.before();
         initEndpointDirectory(ENDPOINT_NAME);
     }
 
@@ -84,7 +82,7 @@ public class SftpNoOutboundDirectoryTestCase extends AbstractSftpDataIntegrityTe
         {
             ImmutableEndpoint endpoint = (ImmutableEndpoint) muleClient.getProperty(ENDPOINT_NAME);
             assertTrue("The inbound file should still exist", super.verifyFileExists(sftpClient,
-                endpoint.getEndpointURI(), FILE_NAME));
+                endpoint.getEndpointURI(), FILENAME));
         }
         finally
         {

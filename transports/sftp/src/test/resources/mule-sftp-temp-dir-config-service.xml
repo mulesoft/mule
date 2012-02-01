@@ -31,14 +31,14 @@
     <model name="mainOutbound">
         <service name="testComponentOutbound">
             <inbound>
-                <sftp:inbound-endpoint address="sftp://${USER1_NAME}@${SFTP_HOST}/~/tempdir-test-inbound"
+                <sftp:inbound-endpoint address="sftp://${USER1_NAME}@${SFTP_HOST}:${SFTP_PORT}/~/tempdir-test-inbound"
                                        connector-ref="sftpCustomConnector"
                                        name="inboundEndpoint"/>
             </inbound>
 
             <outbound>
                 <pass-through-router>
-                    <sftp:outbound-endpoint address="sftp://${USER1_NAME}@${SFTP_HOST}/~/tempdir-test-outbound"
+                    <sftp:outbound-endpoint address="sftp://${USER1_NAME}@${SFTP_HOST}:${SFTP_PORT}/~/tempdir-test-outbound"
                                             connector-ref="sftpCustomConnectorTempDirOutbound"
                                             name="outboundEndpoint">
                     </sftp:outbound-endpoint>
@@ -50,14 +50,14 @@
     <model name="mainInbound">
         <service name="testComponentInbound">
             <inbound>
-                <sftp:inbound-endpoint address="sftp://${USER1_NAME}@${SFTP_HOST}/~/tempdir2-test-inbound"
+                <sftp:inbound-endpoint address="sftp://${USER1_NAME}@${SFTP_HOST}:${SFTP_PORT}/~/tempdir2-test-inbound"
                                        connector-ref="sftpCustomConnectorTempDirInbound"
                                        name="inboundEndpoint2"/>
             </inbound>
 
             <outbound>
                 <pass-through-router>
-                    <sftp:outbound-endpoint address="sftp://${USER1_NAME}@${SFTP_HOST}/~/tempdir2-test-outbound"
+                    <sftp:outbound-endpoint address="sftp://${USER1_NAME}@${SFTP_HOST}:${SFTP_PORT}/~/tempdir2-test-outbound"
                                             connector-ref="sftpCustomConnector"
                                             name="outboundEndpoint2">
                     </sftp:outbound-endpoint>

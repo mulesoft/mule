@@ -33,7 +33,7 @@
 
 
         <sftp:outbound-endpoint connector-ref="sftp-pool"
-            address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}/~/data"
+            address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}:${SFTP_PORT}/~/data"
             outputPattern="#[function:count]-#[function:systime].dat" />
 
     </flow>
@@ -44,7 +44,7 @@
 
         <sftp:inbound-endpoint name="inboundEndpoint"
             autoDelete="true" connector-ref="sftp-pool"
-            address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}/~/data" />
+            address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}:${SFTP_PORT}/~/data" />
 
         <component>
             <singleton-object
