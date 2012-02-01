@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:spring="http://www.springframework.org/schema/beans" xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+    xmlns:test="http://www.mulesoft.org/schema/mule/test"
+    xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
+
+        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.2/mule-vm.xsd
+        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/3.2/mule-test.xsd
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+    <description>
+        reproduce error that crashes seda service when seda
+        queue is full
+    </description>
+
+    <queued-asynchronous-processing-strategy
+        name="max2ThreadSmallTimeout" maxThreads="2"
+        poolExhaustedAction="WAIT" threadWaitTimeout="500" />
+
+    <flow name="sedaFlowCrash" processingStrategy="max2ThreadSmallTimeout">
+        <vm:inbound-endpoint address="vm://flow.in"
+            exchange-pattern="one-way" />
+        <test:component waitTime="1000" />
+        <vm:outbound-endpoint address="vm://flow.out"
+            exchange-pattern="one-way" />
+        <default-exception-strategy>
+            <vm:outbound-endpoint address="vm://flow.exception"
+                exchange-pattern="one-way" />
+        </default-exception-strategy>
+    </flow>
+
+</mule>
