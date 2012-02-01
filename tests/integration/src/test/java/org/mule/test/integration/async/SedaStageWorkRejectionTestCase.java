@@ -17,16 +17,29 @@ import static org.junit.Assert.assertTrue;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.transport.NullPayload;
 
-import org.junit.Test;
+import java.util.Arrays;
+import java.util.Collection;
 
-public class SedaStageWorkRejectionTestCase extends FunctionalTestCase
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+
+public class SedaStageWorkRejectionTestCase extends AbstractServiceAndFlowTestCase
 {
-    protected String getConfigResources()
+    public SedaStageWorkRejectionTestCase(ConfigVariant variant, String configResources)
     {
-        return "org/mule/test/integration/async/seda-stage-work-rejection-config.xml";
+        super(variant, configResources);
+    }
+
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE,
+                "org/mule/test/integration/async/seda-stage-work-rejection-config-service.xml"},
+            {ConfigVariant.FLOW, "org/mule/test/integration/async/seda-stage-work-rejection-config-flow.xml"}});
     }
 
     @Test
