@@ -11,6 +11,7 @@
 package org.mule.processor;
 
 import org.mule.DefaultMuleEvent;
+import org.mule.OptimizedRequestContext;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -235,7 +236,10 @@ public class SedaStageInterceptingMessageProcessor extends AsyncInterceptingMess
                     }
                     catch (Exception e)
                     {
-                        muleContext.getExceptionListener().handleException(e);
+                        // because dequeued event may still be owned by a previuos
+                        // thread we need to use the copy created in AsyncMessageProcessorWorker constructor.
+                        OptimizedRequestContext.unsafeSetEvent(work.getEvent());
+                        event.getFlowConstruct().getExceptionListener().handleException(e, work.getEvent());
                     }
                 }
                 else
