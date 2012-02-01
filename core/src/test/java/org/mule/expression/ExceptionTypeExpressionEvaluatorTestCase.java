@@ -34,7 +34,7 @@ public class ExceptionTypeExpressionEvaluatorTestCase extends AbstractMuleTestCa
     @Test
     public void testEvaluateNotMatchingExpression() throws Exception
     {
-        exceptionTypeExpressionEvaluator.evaluate("asdf", mockMuleMessage);
+        Assert.assertThat((Boolean) exceptionTypeExpressionEvaluator.evaluate("asdf", mockMuleMessage), Is.is(false));
     }
 
     @Test

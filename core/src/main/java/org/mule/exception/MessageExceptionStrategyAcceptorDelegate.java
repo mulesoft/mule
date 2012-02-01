@@ -13,15 +13,18 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.mule.api.MuleEvent;
-import org.mule.api.exception.ChoiceMessagingExceptionHandler;
+import org.mule.api.exception.MessageExceptionHandlerAcceptor;
 import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.processor.AbstractMuleObjectOwner;
 
-public class ChoiceDelegateMessagingExceptionStrategy extends AbstractMuleObjectOwner<MessagingExceptionHandler> implements ChoiceMessagingExceptionHandler
+/**
+ * Allows to use {@link org.mule.api.exception.MessagingExceptionHandler} as {@link org.mule.api.exception.MessageExceptionHandlerAcceptor}.
+ */
+public class MessageExceptionStrategyAcceptorDelegate extends AbstractMuleObjectOwner<MessagingExceptionHandler> implements MessageExceptionHandlerAcceptor
 {
     private MessagingExceptionHandler delegate;
 
-    public ChoiceDelegateMessagingExceptionStrategy(MessagingExceptionHandler messagingExceptionHandler)
+    public MessageExceptionStrategyAcceptorDelegate(MessagingExceptionHandler messagingExceptionHandler)
     {
         this.delegate = messagingExceptionHandler;
     }
@@ -29,9 +32,9 @@ public class ChoiceDelegateMessagingExceptionStrategy extends AbstractMuleObject
     @Override
     public boolean accept(MuleEvent event)
     {
-        if (delegate instanceof ChoiceMessagingExceptionHandler)
+        if (delegate instanceof MessageExceptionHandlerAcceptor)
         {
-            return ((ChoiceMessagingExceptionHandler)delegate).accept(event);
+            return ((MessageExceptionHandlerAcceptor)delegate).accept(event);
         }
         return true;
     }
@@ -39,9 +42,9 @@ public class ChoiceDelegateMessagingExceptionStrategy extends AbstractMuleObject
     @Override
     public boolean acceptsAll()
     {
-        if (delegate instanceof ChoiceMessagingExceptionHandler)
+        if (delegate instanceof MessageExceptionHandlerAcceptor)
         {
-            return ((ChoiceMessagingExceptionHandler)delegate).acceptsAll();
+            return ((MessageExceptionHandlerAcceptor)delegate).acceptsAll();
         }
         return true;
     }

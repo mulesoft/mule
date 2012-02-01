@@ -16,10 +16,12 @@ import org.mule.api.MuleMessage;
 import org.mule.api.client.LocalMuleClient;
 import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.exception.AbstractExceptionListener;
+import org.mule.exception.ChoiceMessagingExceptionStrategy;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transport.NullPayload;
 
 import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertThat;
 
 public class ReferenceExceptionStrategyTestCase extends FunctionalTestCase
@@ -69,7 +71,7 @@ public class ReferenceExceptionStrategyTestCase extends FunctionalTestCase
         MessagingExceptionHandler secondExceptionStrategy = muleContext.getRegistry().lookupFlowConstruct("anotherFlowUsingDifferentExceptionStrategy").getExceptionListener();
         assertThat(firstExceptionStrategy, IsNot.not(secondExceptionStrategy));
         assertThat(((AbstractExceptionListener)firstExceptionStrategy).getMessageProcessors().size(), is(2));
-        assertThat(((AbstractExceptionListener)secondExceptionStrategy).getMessageProcessors().size(), is(1));
+        assertThat(secondExceptionStrategy, instanceOf(ChoiceMessagingExceptionStrategy.class));
     }
 
 }

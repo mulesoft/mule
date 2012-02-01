@@ -14,10 +14,6 @@
         <append-string-transformer message=" global catch es"/>
     </catch-exception-strategy>
 
-    <catch-exception-strategy expression="#[exception-type:java.lang.IllegalArgumentException]">
-        <append-string-transformer message=" catch-1"/>
-    </catch-exception-strategy>
-
     <flow name="matchesCorrectExceptionStrategyUsingExceptionType">
         <vm:inbound-endpoint path="in" exchange-pattern="request-response"/>
         <test:component/>

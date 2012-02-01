@@ -7,18 +7,16 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.api.exception;
-
-import org.mule.api.MuleEvent;
+package org.mule.api;
 
 /**
  *  Provides capability to only accept handling certain MuleEvents.
  */
-public interface ChoiceMessagingExceptionHandler extends MessagingExceptionHandler
+public interface Acceptor
 {
     /**
      * @param event {@link MuleEvent} to route through exception handler
-     * @return true if this {@link MessagingExceptionHandler} should handler exception
+     * @return true if this {@link org.mule.api.exception.MessagingExceptionHandler} should handler exception
      *         false otherwise
      */
     boolean accept(MuleEvent event);

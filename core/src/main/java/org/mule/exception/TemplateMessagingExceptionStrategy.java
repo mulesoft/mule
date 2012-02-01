@@ -12,7 +12,7 @@ package org.mule.exception;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
-import org.mule.api.exception.ChoiceMessagingExceptionHandler;
+import org.mule.api.exception.MessageExceptionHandlerAcceptor;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorChain;
@@ -21,20 +21,13 @@ import org.mule.message.DefaultExceptionPayload;
 import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.routing.requestreply.ReplyToPropertyRequestReplyReplier;
 
-public abstract class TemplateMessagingExceptionStrategy extends AbstractExceptionListener implements ChoiceMessagingExceptionHandler
+public abstract class TemplateMessagingExceptionStrategy extends AbstractExceptionListener implements MessageExceptionHandlerAcceptor
 {
 
     private MessageProcessorChain configuredMessageProcessors;
     private MessageProcessor replyToMessageProcessor = new ReplyToPropertyRequestReplyReplier();
     private String expression;
 
-    @Override
-    public boolean accept(MuleEvent event)
-    {
-        return acceptsAll() || muleContext.getExpressionManager().evaluateBoolean(expression,event.getMessage());
-    }
-
-    @Override
     final public MuleEvent handleException(Exception exception, MuleEvent event)
     {
         fireNotification(exception);
@@ -92,7 +85,6 @@ public abstract class TemplateMessagingExceptionStrategy extends AbstractExcepti
         return event;
     }
 
-
     @Override
     protected void doInitialise(MuleContext muleContext) throws InitialisationException
     {
@@ -108,9 +100,15 @@ public abstract class TemplateMessagingExceptionStrategy extends AbstractExcepti
         }
     }
 
+
     public void setExpression(String expression)
     {
         this.expression = expression;
+    }
+
+    public boolean accept(MuleEvent event)
+    {
+        return acceptsAll() || muleContext.getExpressionManager().evaluateBoolean(expression,event.getMessage());
     }
 
     @Override

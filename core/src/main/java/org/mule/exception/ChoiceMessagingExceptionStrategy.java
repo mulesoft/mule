@@ -15,7 +15,7 @@ import java.util.List;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.context.MuleContextAware;
-import org.mule.api.exception.ChoiceMessagingExceptionHandler;
+import org.mule.api.exception.MessageExceptionHandlerAcceptor;
 import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Lifecycle;
@@ -26,17 +26,17 @@ import org.mule.processor.AbstractMuleObjectOwner;
 /**
  * Selects which exception strategy to execute based on filtering.
  *
- * Exception listeners must implement {@link ChoiceMessagingExceptionHandler} to be part of ChoiceMessagingExceptionStrategy
+ * Exception listeners must implement {@link org.mule.api.exception.MessageExceptionHandlerAcceptor} to be part of ChoiceMessagingExceptionStrategy
  */
-public class ChoiceMessagingExceptionStrategy extends AbstractMuleObjectOwner<ChoiceMessagingExceptionHandler> implements MessagingExceptionHandler, MuleContextAware, Lifecycle
+public class ChoiceMessagingExceptionStrategy extends AbstractMuleObjectOwner<MessageExceptionHandlerAcceptor> implements MessagingExceptionHandler, MuleContextAware, Lifecycle
 {
-    private List<ChoiceMessagingExceptionHandler> exceptionListeners;
+    private List<MessageExceptionHandlerAcceptor> exceptionListeners;
 
     @Override
     public MuleEvent handleException(Exception exception, MuleEvent event)
     {
         event.getMessage().setExceptionPayload(new DefaultExceptionPayload(exception));
-        for (ChoiceMessagingExceptionHandler exceptionListener : exceptionListeners)
+        for (MessageExceptionHandlerAcceptor exceptionListener : exceptionListeners)
         {
             if (exceptionListener.accept(event))
             {
@@ -47,32 +47,38 @@ public class ChoiceMessagingExceptionStrategy extends AbstractMuleObjectOwner<Ch
         throw new MuleRuntimeException(CoreMessages.createStaticMessage("Default exception strategy must accept any event."));
     }
 
-    public void setExceptionListeners(List<ChoiceMessagingExceptionHandler> exceptionListeners)
+    public void setExceptionListeners(List<MessageExceptionHandlerAcceptor> exceptionListeners)
     {
         this.exceptionListeners = exceptionListeners;
-        validateConfiguredExceptionStrategies();
-        addDefaultExceptionStrategyIfRequired();
     }
 
     @Override
-    protected List<ChoiceMessagingExceptionHandler> getOwnedObjects() {
-        return Collections.unmodifiableList(exceptionListeners);
+    public void initialise() throws InitialisationException
+    {
+        addDefaultExceptionStrategyIfRequired();
+        super.initialise();
+        validateConfiguredExceptionStrategies();
     }
 
     private void addDefaultExceptionStrategyIfRequired()
     {
         if (!exceptionListeners.get(exceptionListeners.size()-1).acceptsAll())
         {
-            this.exceptionListeners.add(new ChoiceDelegateMessagingExceptionStrategy(getMuleContext().getDefaultExceptionStrategy()));
+            this.exceptionListeners.add(new MessageExceptionStrategyAcceptorDelegate(getMuleContext().getDefaultExceptionStrategy()));
         }
+    }
+
+    @Override
+    protected List<MessageExceptionHandlerAcceptor> getOwnedObjects() {
+        return Collections.unmodifiableList(exceptionListeners);
     }
 
     private void validateConfiguredExceptionStrategies()
     {
         for (int i = 0; i < exceptionListeners.size()-1; i++)
         {
-             ChoiceMessagingExceptionHandler choiceMessagingExceptionHandler = exceptionListeners.get(i);
-             if (choiceMessagingExceptionHandler.acceptsAll())
+             MessageExceptionHandlerAcceptor messageExceptionHandlerAcceptor = exceptionListeners.get(i);
+             if (messageExceptionHandlerAcceptor.acceptsAll())
              {
                  throw new MuleRuntimeException(CoreMessages.createStaticMessage("Only last exception strategy inside <choice-exception-strategy> can accept any message. Maybe expression attribute is empty."));
              }

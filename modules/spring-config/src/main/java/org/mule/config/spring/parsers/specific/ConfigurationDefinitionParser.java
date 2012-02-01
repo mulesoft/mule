@@ -37,7 +37,6 @@ public class ConfigurationDefinitionParser extends NamedDefinitionParser
     public ConfigurationDefinitionParser()
     {
         super(MuleProperties.OBJECT_MULE_CONFIGURATION);
-        addIgnored(DEFAULT_EXCEPTION_STRATEGY_ATTRIBUTE);
         registerPostProcessor(new PostProcessor()
         {
             @Override

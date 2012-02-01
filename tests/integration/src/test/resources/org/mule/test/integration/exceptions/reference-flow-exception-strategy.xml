@@ -19,9 +19,11 @@
         <json:object-to-json-transformer/>
     </catch-exception-strategy>
 
-    <catch-exception-strategy name="anotherGlobalEs">
-        <append-string-transformer message="something"/>
-    </catch-exception-strategy>
+    <choice-exception-strategy name="anotherGlobalEs">
+        <catch-exception-strategy>
+            <append-string-transformer message="something"/>
+        </catch-exception-strategy>
+    </choice-exception-strategy>
 
     <flow name="referenceExceptionStrategyFlow">
         <vm:inbound-endpoint path="in" exchange-pattern="request-response"/>
