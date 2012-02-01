@@ -171,12 +171,6 @@ public class JaxpXPathExpressionEvaluator implements ExpressionEvaluator, Initia
         }
     }
 
-    @Override
-    public final void setName(String name)
-    {
-        throw new UnsupportedOperationException("setName");
-    }
-
     protected XPathExpression getXPath(String expression) throws XPathExpressionException
     {
         String key = expression + getClass().getName();

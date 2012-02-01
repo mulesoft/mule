@@ -125,13 +125,4 @@ public class MuleContextExpressionEvaluator implements ExpressionEvaluator, Mule
         return NAME;
     }
 
-    /**
-     * Sets the name of the object
-     *
-     * @param name the name of the object
-     */
-    public void setName(String name)
-    {
-        throw new UnsupportedOperationException();
-    }
 }

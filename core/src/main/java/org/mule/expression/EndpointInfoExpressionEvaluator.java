@@ -83,9 +83,4 @@ public class EndpointInfoExpressionEvaluator implements ExpressionEvaluator, Mul
         return NAME;
     }
 
-    /** {@inheritDoc} */
-    public void setName(String name)
-    {
-        throw new UnsupportedOperationException();
-    }
 }

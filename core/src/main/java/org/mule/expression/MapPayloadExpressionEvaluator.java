@@ -10,6 +10,9 @@
 
 package org.mule.expression;
 
+import static org.mule.expression.ExpressionConstants.DELIM;
+import static org.mule.expression.ExpressionConstants.OPTIONAL_ARGUMENT;
+
 import org.mule.api.MuleMessage;
 import org.mule.api.expression.ExpressionEvaluator;
 import org.mule.api.expression.RequiredValueException;
@@ -18,9 +21,6 @@ import org.mule.util.StringUtils;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import static org.mule.expression.ExpressionConstants.DELIM;
-import static org.mule.expression.ExpressionConstants.OPTIONAL_ARGUMENT;
 
 /**
  * If the message payload is a map this extractor will look up the property value in
@@ -95,14 +95,6 @@ public class MapPayloadExpressionEvaluator implements ExpressionEvaluator
     public String getName()
     {
         return NAME;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void setName(String name)
-    {
-        throw new UnsupportedOperationException();
     }
 
 }

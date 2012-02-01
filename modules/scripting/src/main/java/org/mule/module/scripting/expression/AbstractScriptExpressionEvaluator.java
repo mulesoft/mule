@@ -66,16 +66,6 @@ public abstract class AbstractScriptExpressionEvaluator implements ExpressionEva
         }
     }
 
-    /**
-     * Sets the name of the object
-     *
-     * @param name the name of the object
-     */
-    public void setName(String name)
-    {
-        throw new UnsupportedOperationException("setName");
-    }
-
     protected Scriptable getScript(String expression)
     {
         Scriptable script = (Scriptable)cache.get(expression);

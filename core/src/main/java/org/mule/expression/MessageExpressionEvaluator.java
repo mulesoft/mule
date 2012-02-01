@@ -109,11 +109,4 @@ public class MessageExpressionEvaluator implements ExpressionEvaluator
         return NAME;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public void setName(String name)
-    {
-        throw new UnsupportedOperationException();
-    }
 }

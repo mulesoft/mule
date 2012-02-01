@@ -10,6 +10,9 @@
 
 package org.mule.test.integration.exceptions;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
@@ -17,12 +20,7 @@ import org.mule.api.expression.ExpressionEvaluator;
 import org.mule.message.ExceptionMessage;
 import org.mule.tck.junit4.FunctionalTestCase;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 import org.junit.Test;
-
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 public class ExceptionStrategyWithCustomExpressionEvaluatorTestCase extends FunctionalTestCase
 {
@@ -48,11 +46,6 @@ public class ExceptionStrategyWithCustomExpressionEvaluatorTestCase extends Func
         public Object evaluate(String expression, MuleMessage message)
         {
             throw new UnsupportedOperationException("evaluate");
-        }
-
-        public void setName(String name)
-        {
-            throw new UnsupportedOperationException("setName");
         }
 
         public String getName()

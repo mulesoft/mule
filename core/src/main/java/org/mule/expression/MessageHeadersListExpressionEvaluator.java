@@ -40,11 +40,4 @@ public class MessageHeadersListExpressionEvaluator implements ExpressionEvaluato
         return NAME;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public void setName(String name)
-    {
-        throw new UnsupportedOperationException();
-    }
 }

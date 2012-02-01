@@ -143,13 +143,4 @@ public class FunctionExpressionEvaluator implements ExpressionEvaluator
         return NAME;
     }
 
-    /**
-     * Sets the name of the object
-     *
-     * @param name the name of the object
-     */
-    public void setName(String name)
-    {
-        throw new UnsupportedOperationException();
-    }
 }

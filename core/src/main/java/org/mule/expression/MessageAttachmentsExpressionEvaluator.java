@@ -10,6 +10,10 @@
 
 package org.mule.expression;
 
+import static org.mule.expression.ExpressionConstants.ALL_ARGUMENT;
+import static org.mule.expression.ExpressionConstants.DELIM;
+import static org.mule.expression.ExpressionConstants.OPTIONAL_ARGUMENT;
+
 import org.mule.api.MuleMessage;
 import org.mule.api.expression.ExpressionEvaluator;
 import org.mule.api.expression.RequiredValueException;
@@ -22,10 +26,6 @@ import java.util.Map;
 import java.util.StringTokenizer;
 
 import javax.activation.DataHandler;
-
-import static org.mule.expression.ExpressionConstants.ALL_ARGUMENT;
-import static org.mule.expression.ExpressionConstants.DELIM;
-import static org.mule.expression.ExpressionConstants.OPTIONAL_ARGUMENT;
 
 /**
  * Looks up the attachment(s) on the message using the expression given. The
@@ -106,11 +106,4 @@ public class MessageAttachmentsExpressionEvaluator implements ExpressionEvaluato
         return NAME;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public void setName(String name)
-    {
-        throw new UnsupportedOperationException();
-    }
 }

@@ -163,13 +163,6 @@ public abstract class AbstractXPathExpressionEvaluator implements ExpressionEval
         }
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public final void setName(String name)
-    {
-        throw new UnsupportedOperationException("setName");
-    }
-
     /*
         The cache is not thread safe, more than one instance of the same xpath can be created, it wouldn't be an
         issue in this case since one will eventually be selected for GC

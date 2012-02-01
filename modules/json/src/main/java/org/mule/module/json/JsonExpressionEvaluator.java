@@ -174,12 +174,6 @@ public class JsonExpressionEvaluator implements ExpressionEvaluator
     }
     
     @Override
-    public void setName(String name)
-    {
-        throw new UnsupportedOperationException("setName");
-    }
-
-    @Override
     public String getName()
     {
         return "json";

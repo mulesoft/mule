@@ -156,15 +156,6 @@ public class JXPathExpressionEvaluator implements ExpressionEvaluator, MuleConte
     }
 
     /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void setName(String name)
-    {
-        throw new UnsupportedOperationException("setName");
-    }
-
-    /**
      *
      * @return the nsmespace manager from the registry
      */

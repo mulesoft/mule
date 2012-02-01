@@ -10,14 +10,14 @@
 
 package org.mule.expression;
 
+import static org.mule.expression.ExpressionConstants.OPTIONAL_ARGUMENT;
+
 import org.mule.api.MuleMessage;
 import org.mule.api.expression.ExpressionEvaluator;
 import org.mule.api.expression.RequiredValueException;
 import org.mule.config.i18n.CoreMessages;
 
 import javax.activation.DataHandler;
-
-import static org.mule.expression.ExpressionConstants.OPTIONAL_ARGUMENT;
 
 /**
  * Looks up an attachment with the given name.
@@ -65,11 +65,4 @@ public class MessageAttachmentExpressionEvaluator implements ExpressionEvaluator
         return NAME;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public void setName(String name)
-    {
-        throw new UnsupportedOperationException();
-    }
 }

@@ -9,11 +9,12 @@
  */
 package org.mule.expression;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.api.MuleMessage;
 import org.mule.api.expression.ExpressionEvaluator;
 import org.mule.routing.filters.ExceptionTypeFilter;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 public class ExceptionTypeExpressionEvaluator implements ExpressionEvaluator
 {
@@ -23,12 +24,6 @@ public class ExceptionTypeExpressionEvaluator implements ExpressionEvaluator
     public Object evaluate(String expression, MuleMessage message)
     {
         return new ExceptionTypeFilter(expression).accept(message);
-    }
-
-    @Override
-    public void setName(String name)
-    {
-        throw new UnsupportedOperationException();
     }
 
     @Override

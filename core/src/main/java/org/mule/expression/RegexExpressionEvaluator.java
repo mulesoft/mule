@@ -97,12 +97,6 @@ public class RegexExpressionEvaluator implements ExpressionEvaluator
     }
 
     @Override
-    public void setName(String name)
-    {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     public String getName()
     {
         return NAME;

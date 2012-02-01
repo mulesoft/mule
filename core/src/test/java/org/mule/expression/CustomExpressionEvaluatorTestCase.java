@@ -10,6 +10,9 @@
 
 package org.mule.expression;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.expression.ExpressionEvaluator;
@@ -18,9 +21,6 @@ import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import java.util.Map;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 /**
  * Tests a custom expression evaluator using direct registration with the manager.
@@ -45,11 +45,6 @@ public class CustomExpressionEvaluatorTestCase extends AbstractMuleContextTestCa
         public Object evaluate(String expression, MuleMessage message)
         {
             return message.getPayload() + expression;
-        }
-
-        public void setName(String name)
-        {
-            throw new UnsupportedOperationException("setName");
         }
 
         public String getName()

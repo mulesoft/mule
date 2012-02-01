@@ -140,11 +140,4 @@ public class RegistryExpressionEvaluator implements ExpressionEvaluator, MuleCon
         return NAME;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public void setName(String name)
-    {
-        throw new UnsupportedOperationException();
-    }
 }

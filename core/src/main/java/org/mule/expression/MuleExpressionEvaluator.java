@@ -107,11 +107,6 @@ public class MuleExpressionEvaluator implements ExpressionEvaluator, MuleContext
         return new ExpressionConfig(expression, eval,  null);
     }
 
-    public void setName(String name)
-    {
-        throw new UnsupportedOperationException();
-    }
-
     public String getName()
     {
         return NAME;
