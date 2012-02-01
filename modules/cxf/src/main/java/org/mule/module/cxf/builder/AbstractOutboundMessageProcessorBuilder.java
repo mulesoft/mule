@@ -23,12 +23,14 @@ import org.mule.module.cxf.CxfConfiguration;
 import org.mule.module.cxf.CxfInboundMessageProcessor;
 import org.mule.module.cxf.CxfOutboundMessageProcessor;
 import org.mule.module.cxf.CxfPayloadToArguments;
+import org.mule.module.cxf.config.WsSecurity;
 import org.mule.module.cxf.support.MuleHeadersInInterceptor;
 import org.mule.module.cxf.support.MuleHeadersOutInterceptor;
 import org.mule.module.cxf.support.MuleSecurityManagerValidator;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -40,6 +42,7 @@ import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.ws.security.SecurityConstants;
+import org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor;
 
 public abstract class AbstractOutboundMessageProcessorBuilder 
     implements MessageProcessorBuilder, MuleContextAware
@@ -60,12 +63,14 @@ public abstract class AbstractOutboundMessageProcessorBuilder
     protected String soapVersion;
     protected boolean enableMuleSoapHeaders = true;
     protected CxfPayloadToArguments payloadToArguments = CxfPayloadToArguments.NULL_PAYLOAD_AS_PARAMETER;
-    protected Map<String,Object> properties;
+    protected Map<String,Object> properties = new HashMap<String, Object>();
     protected MuleContext muleContext;
     protected String address;
     protected String operation;
     protected String decoupledEndpoint;
     private MuleSecurityManagerValidator securityManager;
+
+    private WsSecurity wsSecurity;
 
 
     @Override
@@ -84,11 +89,8 @@ public abstract class AbstractOutboundMessageProcessorBuilder
         // set the thread default bus so the JAX-WS Service implementation (or other bits of CXF code
         // which I don't know about, but may depend on it) can use it when creating a Client -- DD
         BusFactory.setThreadDefaultBus(getBus());
-
-        if(securityManager != null)
-        {
-            properties.put(SecurityConstants.USERNAME_TOKEN_VALIDATOR, securityManager);
-        }
+       
+        setSecurityProperties();
 
         try
         {
@@ -105,7 +107,12 @@ public abstract class AbstractOutboundMessageProcessorBuilder
         addInterceptors(client.getOutFaultInterceptors(), outFaultInterceptors);
 
         client.setThreadLocalRequestContext(true);
-        
+
+        if(wsSecurity != null && wsSecurity.getConfigProperties() != null && !wsSecurity.getConfigProperties().isEmpty())
+        {
+            client.getOutInterceptors().add(new WSS4JOutInterceptor(wsSecurity.getConfigProperties()));
+        }
+
         configureClient(client);
         
         if (features != null)
@@ -216,7 +223,35 @@ public abstract class AbstractOutboundMessageProcessorBuilder
             client.getOutFaultInterceptors().add(new MuleHeadersOutInterceptor());
         }
     }
-    
+
+    private void setSecurityProperties()
+    {
+        if(securityManager != null)
+        {
+            properties.put(SecurityConstants.USERNAME_TOKEN_VALIDATOR, securityManager);
+        }
+
+        if(wsSecurity != null)
+        {
+            if(wsSecurity.getCustomValidator() != null && !wsSecurity.getCustomValidator().isEmpty())
+            {
+                if(wsSecurity.getCustomValidator() != null && !wsSecurity.getCustomValidator().isEmpty())
+                {
+                    for(Map.Entry<String, Object> entry : wsSecurity.getCustomValidator().entrySet())
+                    {
+                        properties.put(entry.getKey(), entry.getValue());
+                    }
+                }
+            }
+
+            if(wsSecurity.getSecurityManager() != null)
+            {
+                properties.put(SecurityConstants.USERNAME_TOKEN_VALIDATOR, wsSecurity.getSecurityManager());
+            }
+
+        }
+    }
+
     public String getOperation()
     {
         return operation;
@@ -381,6 +416,11 @@ public abstract class AbstractOutboundMessageProcessorBuilder
     public void setSecurityManager(MuleSecurityManagerValidator securityManager)
     {
         this.securityManager = securityManager;
+    }
+
+    public void setWsSecurity(WsSecurity wsSecurity)
+    {
+        this.wsSecurity = wsSecurity;
     }
 
 }

@@ -78,6 +78,16 @@ public class DatabindingTestCase extends FunctionalTestCase
     }
 
     @Test
+    public void testEchoWsdlJibxBinding() throws Exception
+    {
+        MuleClient client = new MuleClient(muleContext);
+        MuleMessage result = client.request(((InboundEndpoint) client.getMuleContext()
+            .getRegistry()
+            .lookupObject("httpInboundJibx")).getAddress()
+                                            + "?wsdl", 5000);
+        assertNotNull(result.getPayload());
+    }
+    @Test
     public void testEchoWsdlStaxBinding() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);

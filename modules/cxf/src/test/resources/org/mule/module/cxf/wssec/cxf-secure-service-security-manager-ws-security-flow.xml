@@ -9,6 +9,7 @@
        http://www.mulesoft.org/schema/mule/quartz http://www.mulesoft.org/schema/mule/quartz/3.2/mule-quartz.xsd
        http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/3.2/mule-cxf.xsd">
 
+
     <flow name="cxfClient">
         <quartz:inbound-endpoint jobName="eventTimer" repeatInterval="1000" repeatCount="0"
             startDelay="1000">

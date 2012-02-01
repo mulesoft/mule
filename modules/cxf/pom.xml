@@ -286,6 +286,50 @@
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-databinding-jibx</artifactId>
+            <version>${cxfVersion}</version>
+            <exclusions>
+                <!-- We use javax.activation -->
+                <exclusion>
+                    <groupId>org.apache.geronimo.specs</groupId>
+                    <artifactId>geronimo-activation_1.1_spec</artifactId>
+                </exclusion>
+                <!-- We use javax.mail -->
+                <exclusion>
+                    <groupId>org.apache.geronimo.specs</groupId>
+                    <artifactId>geronimo-javamail_1.4_spec</artifactId>
+                </exclusion>
+                <!-- We use stax-api -->
+                <exclusion>
+                    <groupId>org.apache.geronimo.specs</groupId>
+                    <artifactId>geronimo-stax-api_1.0_spec</artifactId>
+                </exclusion>
+                <!-- We use javax.xml.ws:jaxws-api -->
+                <exclusion>
+                    <groupId>org.apache.geronimo.specs</groupId>
+                    <artifactId>geronimo-jaxws_2.1_spec</artifactId>
+                </exclusion>
+                <!-- We use slf4j -->
+                <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.jibx</groupId>
+                    <artifactId>jibx-bind</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.jibx</groupId>
+                    <artifactId>jibx-tools</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.velocity</groupId>
+                    <artifactId>velocity</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-transports-local</artifactId>
             <version>${cxfVersion}</version>
             <exclusions>
@@ -315,7 +359,7 @@
                     <artifactId>commons-logging</artifactId>
                 </exclusion>
                 <exclusion>
-                    <groupId>velocity</groupId>
+                    <groupId>org.apache.velocity</groupId>
                     <artifactId>velocity</artifactId>
                 </exclusion>
                 <exclusion>

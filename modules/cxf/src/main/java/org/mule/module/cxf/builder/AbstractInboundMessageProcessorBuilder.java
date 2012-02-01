@@ -24,6 +24,7 @@ import org.mule.module.cxf.CxfConfiguration;
 import org.mule.module.cxf.CxfConstants;
 import org.mule.module.cxf.CxfInboundMessageProcessor;
 import org.mule.module.cxf.MuleInvoker;
+import org.mule.module.cxf.config.WsSecurity;
 import org.mule.module.cxf.support.CxfUtils;
 import org.mule.module.cxf.support.MuleHeadersInInterceptor;
 import org.mule.module.cxf.support.MuleHeadersOutInterceptor;
@@ -54,6 +55,7 @@ import org.apache.cxf.service.factory.AbstractServiceConfiguration;
 import org.apache.cxf.service.factory.ReflectionServiceFactoryBean;
 import org.apache.cxf.service.invoker.Invoker;
 import org.apache.cxf.ws.security.SecurityConstants;
+import org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor;
 
 /**
  * An abstract builder for CXF services. It handles all common operations such
@@ -85,6 +87,8 @@ public abstract class AbstractInboundMessageProcessorBuilder implements MuleCont
     private String onException = CxfConstants.CREATE_SOAP_FAULT;
     private final Map<QName, Object> annotations = new ConcurrentHashMap<QName, Object>();
     private MuleSecurityManagerValidator securityManager;
+    
+    private WsSecurity wsSecurity;
 
     @Override
     public CxfInboundMessageProcessor build() throws MuleException
@@ -159,11 +163,9 @@ public abstract class AbstractInboundMessageProcessorBuilder implements MuleCont
             sfb.getOutFaultInterceptors().add(new MuleHeadersOutInterceptor());
         }
 
-        if(securityManager != null)
-        {
-            properties.put(SecurityConstants.USERNAME_TOKEN_VALIDATOR, securityManager);
-        }
+        setSecurityConfig(sfb);
 
+            
         String address = getAddress();
         address = CxfUtils.mapUnsupportedSchemas(address);
         sfb.setAddress(address); // dummy URL for CXF
@@ -274,6 +276,33 @@ public abstract class AbstractInboundMessageProcessorBuilder implements MuleCont
         catch (ClassNotFoundException e)
         {
             // can be ignored.
+        }
+    }
+
+    private void setSecurityConfig(ServerFactoryBean sfb)
+    {
+        if(securityManager != null)
+        {
+            properties.put(SecurityConstants.USERNAME_TOKEN_VALIDATOR, securityManager);
+        }
+
+        if(wsSecurity != null)
+        {
+            if(wsSecurity.getCustomValidator() != null && !wsSecurity.getCustomValidator().isEmpty())
+            {
+                for(Map.Entry<String, Object> entry : wsSecurity.getCustomValidator().entrySet())
+                {
+                    properties.put(entry.getKey(), entry.getValue());
+                }
+            }
+            if(wsSecurity.getSecurityManager() != null)
+            {
+                properties.put(SecurityConstants.USERNAME_TOKEN_VALIDATOR, wsSecurity.getSecurityManager());
+            }
+            if(wsSecurity.getConfigProperties() != null && !wsSecurity.getConfigProperties().isEmpty())
+            {
+                sfb.getInInterceptors().add(new WSS4JInInterceptor(wsSecurity.getConfigProperties()));
+            }
         }
     }
 
@@ -495,6 +524,12 @@ public abstract class AbstractInboundMessageProcessorBuilder implements MuleCont
     public void setSecurityManager(MuleSecurityManagerValidator securityManager)
     {
         this.securityManager = securityManager;
+    }
+    
+    
+    public void setWsSecurity(WsSecurity wsSecurity)
+    {
+        this.wsSecurity = wsSecurity;
     }
 
 }

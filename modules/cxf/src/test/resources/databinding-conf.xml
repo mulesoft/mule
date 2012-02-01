@@ -44,6 +44,15 @@
         <component class="org.mule.component.simple.EchoComponent" />
     </flow>
 
+    <flow name="jibx">
+        <inbound-endpoint address="http://localhost:${port1}/services/jibx" name="httpInboundJibx">
+            <cxf:simple-service serviceClass="org.mule.component.simple.EchoComponent">
+                <cxf:jibx-databinding/>
+            </cxf:simple-service>
+        </inbound-endpoint>
+        <component class="org.mule.component.simple.EchoComponent" />
+    </flow>
+
     <flow name="source">
         <inbound-endpoint address="http://localhost:${port1}/services/source" name="httpInboundSource">
             <cxf:simple-service serviceClass="org.mule.component.simple.EchoComponent">

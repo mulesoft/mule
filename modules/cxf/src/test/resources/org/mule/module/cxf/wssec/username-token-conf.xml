@@ -9,25 +9,20 @@
        http://www.mulesoft.org/schema/mule/quartz http://www.mulesoft.org/schema/mule/quartz/3.2/mule-quartz.xsd
        http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/3.2/mule-cxf.xsd">
 
-    <spring:bean name="wss4jOutConfiguration"
-        class="org.springframework.beans.factory.config.MapFactoryBean">
-        <spring:property name="sourceMap">
-          <spring:map>
-              <spring:entry key="action" value="UsernameToken" />
-              <spring:entry key="user" value="joe" />
-              <spring:entry key="passwordType" value="PasswordDigest" />
-              <spring:entry key="passwordCallbackClass" value="org.mule.module.cxf.wssec.ClientPasswordCallback" />
-          </spring:map>
-        </spring:property>
-    </spring:bean>
+    <cxf:ws-security name="outboundConfig">
+        <cxf:ws-config>
+            <cxf:action value="UsernameToken"/>
+            <cxf:user value="joe"/>
+            <cxf:password-type value="PasswordDigest"/>
+            <cxf:password-callback-class value="org.mule.module.cxf.wssec.ClientPasswordCallback"/>
+        </cxf:ws-config>
+    </cxf:ws-security>
 
-    <spring:bean name="wss4jInConfiguration"
-        class="org.springframework.beans.factory.config.MapFactoryBean">
-        <spring:property name="sourceMap">
-            <spring:map>
-                <spring:entry key="action" value="UsernameToken" />
-                <spring:entry key="passwordCallbackClass" value="org.mule.module.cxf.wssec.ServerPasswordCallback" />
-            </spring:map>
-        </spring:property>
-    </spring:bean>
+    <cxf:ws-security name="inboundConfig">
+        <cxf:ws-config>
+            <cxf:action value="UsernameToken"/>
+            <cxf:password-callback-class value="org.mule.module.cxf.wssec.ServerPasswordCallback"/>
+        </cxf:ws-config>
+    </cxf:ws-security>
+
 </mule>

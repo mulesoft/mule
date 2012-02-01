@@ -15,10 +15,9 @@ import java.util.Collection;
 
 import org.junit.runners.Parameterized.Parameters;
 
-public class SpringSecurityProxyTestCase extends UsernameTokenProxyTestCase 
+public class SpringSecurityWithWsSecurityTestCase extends UsernameTokenTestCase
 {
-
-    public SpringSecurityProxyTestCase(ConfigVariant variant, String configResources)
+    public SpringSecurityWithWsSecurityTestCase(ConfigVariant variant, String configResources)
     {
         super(variant, configResources);
     }
@@ -27,8 +26,8 @@ public class SpringSecurityProxyTestCase extends UsernameTokenProxyTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "org/mule/module/cxf/wssec/cxf-secure-proxy-security-manager-service.xml, org/mule/module/cxf/wssec/spring-security-ws-security-conf.xml"},
-            {ConfigVariant.FLOW, "org/mule/module/cxf/wssec/cxf-secure-proxy-security-manager-flow.xml, org/mule/module/cxf/wssec/spring-security-ws-security-conf.xml"}
+            {ConfigVariant.SERVICE, "org/mule/module/cxf/wssec/cxf-secure-service-security-manager-ws-security-service.xml, org/mule/module/cxf/wssec/spring-security-ws-security-conf.xml"},
+            {ConfigVariant.FLOW, "org/mule/module/cxf/wssec/cxf-secure-service-security-manager-ws-security-flow.xml, org/mule/module/cxf/wssec/spring-security-ws-security-conf.xml"}
         });
-    }          
+    }      
 }

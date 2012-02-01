@@ -15,7 +15,6 @@ import org.mule.config.spring.parsers.collection.ChildListDefinitionParser;
 import org.mule.config.spring.parsers.collection.ChildMapDefinitionParser;
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
-import org.mule.config.spring.parsers.generic.OrphanDefinitionParser;
 import org.mule.config.spring.parsers.processors.AddAttribute;
 import org.mule.config.spring.parsers.specific.ComponentDefinitionParser;
 import org.mule.config.spring.parsers.specific.MessageProcessorDefinitionParser;
@@ -31,6 +30,7 @@ import org.apache.cxf.configuration.spring.StringBeanDefinitionParser;
 import org.apache.cxf.databinding.source.SourceDataBinding;
 import org.apache.cxf.databinding.stax.StaxDataBinding;
 import org.apache.cxf.jaxb.JAXBDataBinding;
+import org.apache.cxf.jibx.JibxDataBinding;
 import org.springframework.beans.factory.BeanDefinitionStoreException;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.xml.ParserContext;
@@ -72,8 +72,9 @@ public class CxfNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser(CxfConstants.FEATURES, new ChildListDefinitionParser(CxfConstants.FEATURES));
         registerBeanDefinitionParser("schemaLocations", new ChildListDefinitionParser("schemaLocations"));
         registerBeanDefinitionParser("schemaLocation", new StringBeanDefinitionParser());
-        
+
         registerBeanDefinitionParser("jaxb-databinding", new ChildDefinitionParser(CxfConstants.DATA_BINDING, JAXBDataBinding.class));
+        registerBeanDefinitionParser("jibx-databinding", new ChildDefinitionParser(CxfConstants.DATA_BINDING, JibxDataBinding.class));
         registerBeanDefinitionParser("stax-databinding", new ChildDefinitionParser(CxfConstants.DATA_BINDING, StaxDataBinding.class));
         registerBeanDefinitionParser("source-databinding", new ChildDefinitionParser(CxfConstants.DATA_BINDING, SourceDataBinding.class));
         registerBeanDefinitionParser("aegis-databinding", new ChildDefinitionParser(CxfConstants.DATA_BINDING, AegisDatabinding.class));
@@ -88,10 +89,17 @@ public class CxfNamespaceHandler extends AbstractMuleNamespaceHandler
 
         registerBeanDefinitionParser("wrapper-component", new ComponentDefinitionParser(WebServiceWrapperComponent.class));
         
+        registerMuleBeanDefinitionParser("properties", new ChildMapDefinitionParser("addProperties")).addCollection("addProperties");
+        
+        registerBeanDefinitionParser("ws-security", new WsSecurityDefinitionParser(WsSecurity.class));
+
         ChildDefinitionParser msmvParser = new ChildDefinitionParser("securityManager", MuleSecurityManagerValidator.class);
         msmvParser.registerPreProcessor(new AddAttribute("securityManager-ref", "_muleSecurityManager"));
         registerBeanDefinitionParser("mule-security-manager", msmvParser);
 
-        registerMuleBeanDefinitionParser("properties", new ChildMapDefinitionParser("addProperties")).addCollection("addProperties");
+        registerBeanDefinitionParser("ws-config", new WsSecurityConfigDefinitionParser("configProperties"));
+
+        registerBeanDefinitionParser("ws-custom-validator", new WsCustomValidatorDefinitionParser("customValidator"));
+
     }
 }
