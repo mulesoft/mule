@@ -49,6 +49,7 @@ import javax.resource.spi.work.Work;
 import javax.resource.spi.work.WorkEvent;
 import javax.resource.spi.work.WorkException;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.ArgumentMatcher;
 import org.mockito.invocation.InvocationOnMock;
@@ -149,6 +150,7 @@ public class SedaStageInterceptingMessageProcessorTestCase extends AsyncIntercep
     }
 
     @Test
+    @Ignore
     public void testProcessOneWayWithException() throws Exception
     {
         final Latch latch = new Latch();
