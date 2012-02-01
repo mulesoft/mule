@@ -11,6 +11,7 @@
 package org.mule.processor;
 
 import org.mule.DefaultMuleEvent;
+import org.mule.OptimizedRequestContext;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -126,7 +127,7 @@ public class SedaStageInterceptingMessageProcessor extends AsyncInterceptingMess
                 getStageDescription(), queueTimeout));
         }
 
-        MuleEvent event = (MuleEvent)queue.poll(queueTimeout);
+        MuleEvent event = (MuleEvent) queue.poll(queueTimeout);
         // If the service has been paused why the poll was waiting for an event to
         // arrive on the queue,
         // we put the object back on the queue
@@ -201,7 +202,7 @@ public class SedaStageInterceptingMessageProcessor extends AsyncInterceptingMess
                     }
                 }
 
-                event = (DefaultMuleEvent)dequeue();
+                event = (DefaultMuleEvent) dequeue();
             }
             catch (InterruptedException ie)
             {
@@ -235,6 +236,10 @@ public class SedaStageInterceptingMessageProcessor extends AsyncInterceptingMess
                     }
                     catch (Exception e)
                     {
+                        // because dequeued event may still be owned by a previuos
+                        // thread we need to use the copy created in AsyncMessageProcessorWorker constructor.
+                        OptimizedRequestContext.unsafeSetEvent(work.getEvent());
+                        event.getFlowConstruct().getExceptionListener().handleException(e, work.getEvent());
                         muleContext.getExceptionListener().handleException(e);
                     }
                 }
@@ -271,7 +276,7 @@ public class SedaStageInterceptingMessageProcessor extends AsyncInterceptingMess
         }
         else if (next instanceof NameableObject)
         {
-            return ((NameableObject)next).getName();
+            return ((NameableObject) next).getName();
         }
         else
         {
