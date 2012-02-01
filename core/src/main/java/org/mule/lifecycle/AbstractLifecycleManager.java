@@ -187,6 +187,10 @@ public abstract class AbstractLifecycleManager<O> implements LifecycleManager
         {
             completedPhases.remove(Startable.PHASE_NAME);
         }
+        else  if (currentPhase.equals(Startable.PHASE_NAME))
+        {
+            completedPhases.remove(Stoppable.PHASE_NAME);
+        }
         else if (currentPhase.equals(Disposable.PHASE_NAME))
         {
             completedPhases.remove(Initialisable.PHASE_NAME);
