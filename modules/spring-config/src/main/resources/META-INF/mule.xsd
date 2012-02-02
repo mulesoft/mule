@@ -5657,14 +5657,14 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="rootMessage" use="optional" default="rootMessage" type="xsd:string">
+                <xsd:attribute name="rootMessageVariableName" use="optional" default="rootMessage" type="xsd:string">
                     <xsd:annotation>
                         <xsd:documentation>
                             Property name where the parent message is stored.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="counter" use="optional" default="counter" type="xsd:string">
+                <xsd:attribute name="counterVariableName" use="optional" default="counter" type="xsd:string">
                     <xsd:annotation>
                         <xsd:documentation>
                             Property name used to store the number of message being iterated.

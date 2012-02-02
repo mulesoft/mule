@@ -14,8 +14,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
+import org.mule.DefaultMessageCollection;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
+import org.mule.api.MuleMessageCollection;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
 
@@ -174,6 +176,21 @@ public class ForeachTestCase extends FunctionalTestCase
         assertEquals(result.getInboundProperty("msg-last-index"), 3);
     }
 
+    @Test
+    public void testMessageCollectionConfiguration() throws Exception
+    {
+        MuleMessageCollection msgCollection = new DefaultMessageCollection(muleContext);
+        msgCollection.setInvocationProperty("totalMessages", 0);
+        for (int i = 0; i < 10; i++)
+        {
+            MuleMessage msg = new DefaultMuleMessage("message-" + i, muleContext);
+            msgCollection.addMessage(msg);
+        }
+
+        MuleMessage result = client.send("vm://input-7", msgCollection);
+        assertEquals(10, result.getInboundProperty("totalMessages"));
+        assertEquals(msgCollection.getPayload(), result.getPayload());
+    }
 }
 
 

@@ -14,7 +14,6 @@
 
     <flow name="minimal-config">
         <vm:inbound-endpoint path="input-1" exchange-pattern="request-response"/>
-        <!-- with this configuration, the response from target MP won't be considered an error (no failureExpression) -->
         <foreach>
             <test:component/>
             <vm:outbound-endpoint path="out"/>
@@ -23,7 +22,6 @@
 
     <flow name="minimal-config-plus-mp">
         <vm:inbound-endpoint path="input-2" exchange-pattern="request-response"/>
-        <!-- with this configuration, the response from target MP won't be considered an error (no failureExpression) -->
         <foreach>
             <test:component/>
             <vm:outbound-endpoint path="out"/>
@@ -38,7 +36,6 @@
 
     <flow name="minimal-config-expression">
         <vm:inbound-endpoint path="input-3" exchange-pattern="request-response"/>
-        <!-- with this configuration, the response from target MP won't be considered an error (no failureExpression) -->
         <foreach expression="#[header:INBOUND:names]">
             <test:component/>
             <vm:outbound-endpoint path="out"/>
@@ -47,7 +44,6 @@
 
     <flow name="partitioned-config">
         <vm:inbound-endpoint path="input-4" exchange-pattern="request-response"/>
-        <!-- with this configuration, the response from target MP won't be considered an error (no failureExpression) -->
         <foreach groupSize="3">
             <test:component/>
             <vm:outbound-endpoint path="out"/>
@@ -56,8 +52,7 @@
 
     <flow name="parent-message-config">
         <vm:inbound-endpoint path="input-5" exchange-pattern="request-response"/>
-        <!-- with this configuration, the response from target MP won't be considered an error (no failureExpression) -->
-        <foreach rootMessage="parent">
+        <foreach rootMessageVariableName="parent">
             <test:component/>
         </foreach>
         <message-properties-transformer scope="outbound">
@@ -67,8 +62,7 @@
 
     <flow name="counter-config">
         <vm:inbound-endpoint path="input-6" exchange-pattern="request-response"/>
-        <!-- with this configuration, the response from target MP won't be considered an error (no failureExpression) -->
-        <foreach counter="index">
+        <foreach counterVariableName="index">
             <test:component/>
             <message-properties-transformer scope="session">
             	<add-message-property key="msg-last-index" value="#[variable:index]"/>
@@ -78,5 +72,24 @@
         	<add-message-property key="msg-last-index" value="#[header:SESSION:msg-last-index]"/>
         </message-properties-transformer>
     </flow>
+
+    <flow name="message-collection-config">
+        <vm:inbound-endpoint path="input-7" exchange-pattern="request-response"/>
+        <logger level="WARN" message="message in -> #[payload]"/>
+        <foreach>
+            <test:component/>
+            <logger level="WARN" message="message number-#[variable:counter]-> #[payload]"/>
+            <message-properties-transformer scope="invocation">
+            	<add-message-property key="totalMessages" value="#[variable:counter]"/>
+            </message-properties-transformer>
+        </foreach>
+        <message-properties-transformer scope="outbound">
+        	<add-message-property key="totalMessages" value="#[variable:totalMessages]"/>
+        </message-properties-transformer>
+        <logger level="WARN" message="message out -> #[payload]"/>
+        <!-- 
+         -->
+    </flow>
+
 
 </mule>

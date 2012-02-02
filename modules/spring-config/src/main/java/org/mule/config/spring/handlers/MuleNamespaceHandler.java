@@ -513,8 +513,7 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("map-splitter", new SplitterDefinitionParser(MapSplitter.class));
         registerBeanDefinitionParser("message-chunk-splitter", new SplitterDefinitionParser(MessageChunkSplitter.class));
         registerBeanDefinitionParser("custom-splitter", new SplitterDefinitionParser());
-        registerMuleBeanDefinitionParser("foreach", new ChildDefinitionParser("messageProcessor", ForeachMessageProcessor.class)).addAlias("rootMessage",
-            "rootMessageVariableName").addAlias("counter", "counterVariableName");
+        registerBeanDefinitionParser("foreach", new ChildDefinitionParser("messageProcessor", ForeachMessageProcessor.class));
 
         // Routing: Routing Message Processors
 
