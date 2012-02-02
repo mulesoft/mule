@@ -127,4 +127,14 @@
 
     <spring:bean name="nonSerializableBean" class="java.lang.Object"/>
 
+    <flow name="defaultExceptionStrategy">
+        <message-properties-transformer scope="session">
+            <add-message-property key="P2" value="P2_VALUE" />
+        </message-properties-transformer>
+        <test:component throwException="true" />
+        <default-exception-strategy>
+            <test:assert expression="#[header:SESSION:P2]" />
+        </default-exception-strategy>
+    </flow>
+
 </mule>

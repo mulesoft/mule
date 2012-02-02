@@ -23,13 +23,22 @@ import org.mule.api.MuleMessage;
 import org.mule.api.transport.MessageDispatcher;
 import org.mule.api.transport.PropertyScope;
 import org.mule.construct.Flow;
+import org.mule.tck.functional.FlowAssert;
 import org.mule.transport.vm.VMMessageDispatcher;
 
+import org.junit.After;
 import org.junit.Ignore;
 import org.junit.Test;
 
 public class SessionPropertiesTestCase extends org.mule.tck.junit4.FunctionalTestCase
 {
+
+    @After
+    public void clearFlowAssertions()
+    {
+        FlowAssert.reset();
+    }
+
     @Test
     public void setSessionPropertyUsingAPIGetInFlow() throws Exception
     {
@@ -212,6 +221,12 @@ public class SessionPropertiesTestCase extends org.mule.tck.junit4.FunctionalTes
         assertEquals("value2NEW", result.getSession().getProperty("key2"));
         assertEquals("value3", result.getSession().getProperty("key3"));
         assertNull(result.getSession().getProperty("nonSerializableBean"));
+    }
+
+    @Test
+    public void defaultExceptionStrategy() throws Exception
+    {
+        testFlow("defaultExceptionStrategy");
     }
 
     @Override

@@ -346,5 +346,18 @@
         <test:assert expression="#[header:INVOCATION:P2]" />
     </flow>
 
+    <flow name="defaultExceptionStrategy">
+        <processor ref="addP1" />
+        <message-properties-transformer scope="session">
+            <add-message-property key="P2" value="P2_VALUE"/>
+        </message-properties-transformer>
+        <test:component throwException="true"/>
+        <default-exception-strategy>
+            <processor-chain>
+                <test:assert expression="#[header:INVOCATION:P1]" />
+                <test:assert expression="#[header:SESSION:P2]" />
+            </processor-chain>
+        </default-exception-strategy>
+    </flow>
 
 </mule>

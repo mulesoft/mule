@@ -278,6 +278,12 @@ public class InvocationPropertiesTestCase extends org.mule.tck.junit4.Functional
         testFlow("aggregationOfPropertiesFromMultipleMessageWithAggregator", getTestEvent(fruitList));
         FlowAssert.verify("Split");
     }
+    
+    @Test
+    public void defaultExceptionStrategy() throws Exception
+    {
+        testFlow("defaultExceptionStrategy");
+    }
 
     @Override
     protected String getConfigResources()
