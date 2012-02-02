@@ -1644,6 +1644,10 @@
                 <inherited>false</inherited>
                 <configuration>
                     <reportPlugins>
+                        <!--
+                            Disabled for now, the main purpose of the site is to generate javadocs. We
+                            never actually used the JXR output anyway.
+
                         <reportPlugin>
                             <groupId>org.apache.maven.plugins</groupId>
                             <artifactId>maven-jxr-plugin</artifactId>
@@ -1652,6 +1656,7 @@
                                 <aggregate>true</aggregate>
                             </configuration>
                         </reportPlugin>
+                        -->
                         <reportPlugin>
                             <groupId>org.apache.maven.plugins</groupId>
                             <artifactId>maven-project-info-reports-plugin</artifactId>
@@ -1724,29 +1729,38 @@
                         <!--
                             When there is JXR cross-refernce output available,
                             it will be linked to in case of test failures
-                        -->
+
+                            Disabled for now, the main purpose of the site is to generate javadocs. The
+                            current tests status is available through bamboo anyway.
+
                         <reportPlugin>
                             <groupId>org.apache.maven.plugins</groupId>
                             <artifactId>maven-surefire-report-plugin</artifactId>
                             <version>2.9</version>
                             <configuration>
-                                Display failed tests only
+                                <!- Display failed tests only ->
                                 <showSuccess>false</showSuccess>
                             </configuration>
                         </reportPlugin>
+                        -->
+                        <!--
+                            Disabled for now, the main purpose of the site is to generate javadocs.
+                            The site plugin configuration is currently not inherited to child modules,
+                            which means that the checkstyle plugin will not create any meaningful
+                            report anyway.
                         <reportPlugin>
                             <groupId>org.apache.maven.plugins</groupId>
                             <artifactId>maven-checkstyle-plugin</artifactId>
-                            <version>2.5</version>
                             <configuration>
                                 <configLocation>codecheck/checkstyle.xml</configLocation>
                                 <headerLocation>codecheck/LicenseHeader.txt</headerLocation>
-                                <!-- do not link to JXR output as that is aggregated and the checkstyle
+                                <!- do not link to JXR output as that is aggregated and the checkstyle
                                     plugin does not recognize that.
-                                -->
+                                ->
                                 <linkXRef>false</linkXRef>
                             </configuration>
                         </reportPlugin>
+                        -->
                         <!-- Code Coverage by Cobertura -->
                         <!--
                             This plugin is currently disabled, it causes trouble with
