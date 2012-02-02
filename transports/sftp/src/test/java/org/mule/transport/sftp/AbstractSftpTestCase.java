@@ -16,6 +16,21 @@ import static org.junit.Assert.fail;
 import static org.mule.context.notification.EndpointMessageNotification.MESSAGE_DISPATCHED;
 import static org.mule.context.notification.EndpointMessageNotification.MESSAGE_SENT;
 
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import org.apache.commons.lang.SystemUtils;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleException;
@@ -34,56 +49,20 @@ import org.mule.context.notification.EndpointMessageNotification;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.functional.EventCallback;
-import org.mule.tck.junit4.rule.DynamicPort;
-import org.mule.transport.sftp.util.SftpServer;
 import org.mule.transport.sftp.util.ValueHolder;
+import org.mule.util.IOUtils;
 import org.mule.util.StringMessageUtils;
 
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.SftpException;
-
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
-
-import org.apache.commons.lang.SystemUtils;
-import org.junit.Before;
-import org.junit.Rule;
 
 /**
  * @author Lennart Häggkvist, Magnus Larsson Date: Jun 8, 2009
  */
 public abstract class AbstractSftpTestCase extends AbstractServiceAndFlowTestCase
 {
-    private static final String HOST = "localhost";
-    private static final String USER = "muletest1";
-    private static final String PASSWORD = "muletest1";
-    private static final String FILENAME_HEADER = "filename";
-    protected static final Map<String, String> MESSAGE_PROPERTIES = new HashMap<String, String>();
-    protected static String INBOUND_ENDPOINT_DIR = "inbound";
-    protected static String OUTBOUND_ENDPOINT_DIR = "outbound";
-    {
-        MESSAGE_PROPERTIES.put(FILENAME_HEADER, FILENAME);
-    }
+    protected static final String FILE_NAME = "file.txt";
 
-    protected static final String FILENAME = "file.txt";
-
-    @Rule
-    public DynamicPort port = new DynamicPort("SFTP_PORT");
-
-    protected SftpServer sftpServer;
-    protected SftpClient sftpClient;
-    
     public AbstractSftpTestCase(ConfigVariant variant, String configResources)
     {
         super(variant, configResources);
@@ -241,7 +220,6 @@ public abstract class AbstractSftpTestCase extends AbstractServiceAndFlowTestCas
         ImmutableEndpoint endpoint = getImmutableEndpoint(muleClient, endpointName);
         EndpointURI endpointURI = endpoint.getEndpointURI();
         SftpClient sftpClient = new SftpClient(endpointURI.getHost());
-        sftpClient.setPort(endpointURI.getPort());
 
         SftpConnector sftpConnector = (SftpConnector) endpoint.getConnector();
 
@@ -271,27 +249,6 @@ public abstract class AbstractSftpTestCase extends AbstractServiceAndFlowTestCas
         return sftpClient;
     }
 
-    /**
-     * Returns a SftpClient that is logged in to the sftp server that the endpoint is
-     * configured against.
-     */
-    protected SftpClient getSftpClient(String host, int port, String user, String password)
-        throws IOException
-    {
-        SftpClient sftpClient = new SftpClient(host);
-        sftpClient.setPort(port);
-        try
-        {
-            sftpClient.login(user, password);
-        }
-        catch (Exception e)
-        {
-            fail("Login failed: " + e);
-        }
-        return sftpClient;
-    }
-
-    
     /** Checks if the file exists on the server */
     protected boolean verifyFileExists(SftpClient sftpClient, EndpointURI endpointURI, String file)
         throws IOException
@@ -1198,7 +1155,7 @@ public abstract class AbstractSftpTestCase extends AbstractServiceAndFlowTestCas
         /**
          * Optional name of the file, defaults to FILE_NAME
          */
-        private String filename = FILENAME;
+        private String filename = FILE_NAME;
 
         /**
          * Mandatory name of the outbound endpoint, i.e. where we will wait for a
@@ -1210,7 +1167,7 @@ public abstract class AbstractSftpTestCase extends AbstractServiceAndFlowTestCas
          * Optional timeout for how long we will wait for a message to be delivered
          * to the outbound endpoint
          */
-        private long timeout = 100000;
+        private long timeout = 10000;
 
         public DispatchParameters(String inboundEndpoint, String outboundEndpoint)
         {
@@ -1333,12 +1290,24 @@ public abstract class AbstractSftpTestCase extends AbstractServiceAndFlowTestCas
             assertTrue(pairs.getKey() + " is not started", pairs.getValue().getLifecycleState().isStarted());
         }
     }
-    
-    @Before
-    public void before() throws Exception {
-        sftpServer = new SftpServer(this.port.getNumber());
-        sftpServer.start();
-        sftpClient = getSftpClient(HOST, port.getNumber(), USER, PASSWORD);
+
+    /**
+     * Look for the sftp test properties file in our environment.
+     * If it's not found, don't run these tests
+     */
+    @Override
+    protected boolean isDisabledInThisEnvironment()
+    {
+
+        try
+        {
+            IOUtils.getResourceAsString("sftp-settings.properties", this.getClass());
+        }
+        catch (IOException e)
+        {
+            return true;
+        }
+
+        return false;
     }
-    
 }

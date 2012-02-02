@@ -61,7 +61,7 @@ public class SftpNotificationFunctionalTestCase extends AbstractSftpTestCase
     @Test
     public void testNotification() throws Exception
     {
-        executeBaseTest("inboundEndpoint", "vm://test.upload", FILENAME, SEND_SIZE, "receiving", TIMEOUT);
+        executeBaseTest("inboundEndpoint", "vm://test.upload", FILE_NAME, SEND_SIZE, "receiving", TIMEOUT);
     }
 
     /**

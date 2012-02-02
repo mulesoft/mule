@@ -10,11 +10,6 @@
 
 package org.mule.transport.sftp;
 
-import static org.mule.transport.sftp.notification.SftpTransportNotification.SFTP_DELETE_ACTION;
-import static org.mule.transport.sftp.notification.SftpTransportNotification.SFTP_GET_ACTION;
-import static org.mule.transport.sftp.notification.SftpTransportNotification.SFTP_PUT_ACTION;
-import static org.mule.transport.sftp.notification.SftpTransportNotification.SFTP_RENAME_ACTION;
-
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.transport.sftp.notification.SftpNotifier;
 
@@ -38,6 +33,11 @@ import java.util.Vector;
 import org.apache.commons.lang.NotImplementedException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import static org.mule.transport.sftp.notification.SftpTransportNotification.SFTP_DELETE_ACTION;
+import static org.mule.transport.sftp.notification.SftpTransportNotification.SFTP_GET_ACTION;
+import static org.mule.transport.sftp.notification.SftpTransportNotification.SFTP_PUT_ACTION;
+import static org.mule.transport.sftp.notification.SftpTransportNotification.SFTP_RENAME_ACTION;
 
 /**
  * <code>SftpClient</code> Wrapper around jsch sftp library. Provides access to basic
@@ -657,22 +657,5 @@ public class SftpClient
     public String getHost()
     {
         return host;
-    }
-
-    public void recursivelyDeleteDirectory(String dir) throws IOException
-    {
-        this.changeWorkingDirectory(dir);
-        String[] directories = this.listDirectories();
-        String[] files = this.listFiles();
-        for (int i = 0; i < directories.length; i++)
-        {
-            recursivelyDeleteDirectory(directories[i]);
-        }
-        for (int i = 0; i < files.length; i++)
-        {
-            deleteFile(files[i]);
-        }
-        this.changeWorkingDirectory("..");
-        this.deleteDirectory(dir);
     }
 }

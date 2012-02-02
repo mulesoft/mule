@@ -16,14 +16,15 @@
     <model name="model">
         <service name="service">
             <inbound>
-                <sftp:inbound-endpoint address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}:${SFTP_PORT}/~/inbound"
+                <sftp:inbound-endpoint address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}/~/inbound"
                                        name="inboundEndpoint" pollingFrequency="500"/>
             </inbound>
 
             <outbound>
                 <pass-through-router>
-                    <sftp:outbound-endpoint address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}:${SFTP_PORT}/~/outbound"
+                    <sftp:outbound-endpoint address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}/~/outbound"
                                             tempDir="uploading" outputPattern="#[header:originalFilename]"
+                                            keepFileOnError="true"
                                             name="outboundEndpoint" />
                 </pass-through-router>
             </outbound>

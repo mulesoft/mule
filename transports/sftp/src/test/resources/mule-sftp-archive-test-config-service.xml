@@ -36,7 +36,7 @@
             <outbound>
                 <pass-through-router>
                     <sftp:outbound-endpoint
-                        address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}:${SFTP_PORT}/~/data1"
+                        address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}/~/data1"
                         outputPattern="#[function:datestamp].dat"/>
                 </pass-through-router>
             </outbound>
@@ -49,7 +49,7 @@
                 <!-- synchronous="true" - otherwise the inbound endpoint will trigger several times -->
                 <sftp:inbound-endpoint
                     name="inboundEndpoint1"
-                    address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}:${SFTP_PORT}/~/data1"
+                    address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}/~/data1"
                     archiveDir="${ARCHIVE}" exchange-pattern="request-response"/>
             </inbound>
             <component>
@@ -69,7 +69,7 @@
             <outbound>
                 <pass-through-router>
                     <sftp:outbound-endpoint
-                        address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}:${SFTP_PORT}/~/data2"
+                        address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}/~/data2"
                         outputPattern="#[function:systime].dat"
                         tempDir="tmp_receiving"
                         useTempFileTimestampSuffix="true"/>
@@ -84,7 +84,7 @@
                 <!-- synchronous="true" - otherwise the inbound endpoint will trigger several times -->
                 <sftp:inbound-endpoint
                     name="inboundEndpoint2"
-                    address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}:${SFTP_PORT}/~/data2"
+                    address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}/~/data2"
                     tempDir="tmp_sending"
                     useTempFileTimestampSuffix="true"
                     archiveDir="${ARCHIVE}"
@@ -108,7 +108,7 @@
             <outbound>
                 <pass-through-router>
                     <sftp:outbound-endpoint
-                        address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}:${SFTP_PORT}/~/data3"
+                        address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}/~/data3"
                         outputPattern="#[function:systime].dat"
                         tempDir="tmp_receiving"
                         useTempFileTimestampSuffix="true"/>
@@ -123,7 +123,7 @@
                 <!-- synchronous="true" - otherwise the inbound endpoint will trigger several times -->
                 <sftp:inbound-endpoint
                     name="inboundEndpoint3"
-                    address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}:${SFTP_PORT}/~/data3"
+                    address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}/~/data3"
                     tempDir="tmp_sending"
                     useTempFileTimestampSuffix="true"
                     archiveDir="${ARCHIVE}" exchange-pattern="request-response"/>
@@ -145,7 +145,7 @@
             <outbound>
                 <pass-through-router>
                     <sftp:outbound-endpoint
-                        address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}:${SFTP_PORT}/~/data4"
+                        address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}/~/data4"
                         outputPattern="#[function:systime].dat"/>
                 </pass-through-router>
             </outbound>
@@ -158,7 +158,7 @@
                 <!-- synchronous="true" - otherwise the inbound endpoint will trigger several times -->
                 <sftp:inbound-endpoint
                     name="inboundEndpoint4"
-                    address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}:${SFTP_PORT}/~/data4"
+                    address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}/~/data4"
                     archiveDir="${ARCHIVE}"
                     archiveTempReceivingDir="tmp_receiving"
                     archiveTempSendingDir="tmp_sending" exchange-pattern="request-response"/>

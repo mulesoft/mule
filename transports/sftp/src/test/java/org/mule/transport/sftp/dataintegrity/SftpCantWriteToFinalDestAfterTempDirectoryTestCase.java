@@ -96,7 +96,7 @@ public class SftpCantWriteToFinalDestAfterTempDirectoryTestCase extends Abstract
 
             ImmutableEndpoint endpoint = (ImmutableEndpoint) muleClient.getProperty(OUTBOUND_ENDPOINT_NAME);
             assertFalse("The inbound file should not be left in the TEMP-dir", super.verifyFileExists(
-                sftpClient, endpoint.getEndpointURI().getPath() + "/" + TEMP_DIR, FILENAME));
+                sftpClient, endpoint.getEndpointURI().getPath() + "/" + TEMP_DIR, FILE_NAME));
         }
         finally
         {

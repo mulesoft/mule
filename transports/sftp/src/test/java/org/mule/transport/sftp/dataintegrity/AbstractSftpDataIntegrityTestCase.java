@@ -47,23 +47,23 @@ public abstract class AbstractSftpDataIntegrityTestCase extends AbstractSftpTest
             if (shouldInboundFileStillExist)
             {
                 assertTrue("The inbound file should still exist", super.verifyFileExists(sftpClientInbound,
-                    inboundEndpoint.getEndpointURI(), FILENAME));
+                    inboundEndpoint.getEndpointURI(), FILE_NAME));
             }
             else
             {
                 assertFalse("The inbound file should have been deleted", super.verifyFileExists(
-                    sftpClientInbound, inboundEndpoint.getEndpointURI(), FILENAME));
+                    sftpClientInbound, inboundEndpoint.getEndpointURI(), FILE_NAME));
             }
 
             if (shouldOutboundFileExist)
             {
                 assertTrue("The outbound file should exist", super.verifyFileExists(sftpClientOutbound,
-                    outboundEndpoint.getEndpointURI(), FILENAME));
+                    outboundEndpoint.getEndpointURI(), FILE_NAME));
             }
             else
             {
                 assertFalse("The outbound file should have been deleted", super.verifyFileExists(
-                    sftpClientOutbound, outboundEndpoint.getEndpointURI(), FILENAME));
+                    sftpClientOutbound, outboundEndpoint.getEndpointURI(), FILE_NAME));
             }
         }
         finally

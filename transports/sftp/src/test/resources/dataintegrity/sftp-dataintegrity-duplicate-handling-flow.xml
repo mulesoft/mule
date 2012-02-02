@@ -25,27 +25,30 @@
     <flow name="serviceDuplicateHandlingRename">
 
         <sftp:inbound-endpoint
-            address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}:${SFTP_PORT}/~/inbound"
+            address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}/~/inbound"
             name="inboundEndpoint" pollingFrequency="500"
-            exchange-pattern="one-way"/>
+            exchange-pattern="request-response" />
 
         <sftp:outbound-endpoint
-            address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}:${SFTP_PORT}/~/outbound"
+            address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}/~/outbound"
             tempDir="uploading" outputPattern="#[header:originalFilename]"
-            exchange-pattern="one-way" keepFileOnError="true"
+            exchange-pattern="request-response" keepFileOnError="true"
             name="outboundEndpoint" duplicateHandling="addSeqNo" />
 
     </flow>
     <flow name="serviceDuplicateHandlingThrowException">
+
         <sftp:inbound-endpoint
-            address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}:${SFTP_PORT}/~/inbound2"
-            name="inboundEndpoint2" pollingFrequency="500"
-            exchange-pattern="one-way" />
+            address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}/~/inbound2"
+            name="inboundEndpoint2" pollingFrequency="200"
+            exchange-pattern="request-response" />
+        <!-- tempDir="uploading" -->
         <sftp:outbound-endpoint
-            address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}:${SFTP_PORT}/~/outbound2"
+            address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}/~/outbound2"
             tempDir="uploading" outputPattern="#[header:originalFilename]"
-            exchange-pattern="one-way" keepFileOnError="false"
+            exchange-pattern="request-response" keepFileOnError="true"
             name="outboundEndpoint2" duplicateHandling="throwException" />
+
     </flow>
 
 </mule>

@@ -27,14 +27,14 @@
 
         <sftp:inbound-endpoint name="inboundEndpoint"
             autoDelete="false" connector-ref="sftp"
-            address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}:${SFTP_PORT}/~/data">
+            address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}/~/data">
             <file:filename-wildcard-filter
                 pattern="*.xml" />
         </sftp:inbound-endpoint>
 
         <sftp:outbound-endpoint connector-ref="sftp"
             name="outboundEndpoint"
-            address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}:${SFTP_PORT}/~/data2"
+            address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}/~/data2"
             outputPattern="#[header:originalFilename]" />
 
     </flow>

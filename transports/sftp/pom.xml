@@ -89,11 +89,6 @@
             <version>${mockobjectsVersion}</version>
             <scope>test</scope>
         </dependency>
-                <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-all</artifactId>
-            <scope>test</scope>
-        </dependency>
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-vm</artifactId>
@@ -104,18 +99,6 @@
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-quartz</artifactId>
             <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.sshd</groupId>
-            <artifactId>sshd-core</artifactId>
-            <version>0.6.0</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>bouncycastle</groupId>
-            <artifactId>bcprov-jdk14</artifactId>
-            <version>139</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -143,18 +126,18 @@
                                     <value>300</value>
                                 </property>
                                 <property>
-                                    <!-- Always pooling for ALL tests! (simple way to ensure that all 
-                                        tests works with pooling) -->
+                                    <!-- Always pooling for ALL tests! (simple 
+                                        way to ensure that all tests works with pooling) -->
                                     <name>mule.sftp.transport.maxConnectionPoolSize</name>
                                     <value>3</value>
                                 </property>
                             </systemProperties>
                             <excludes>
-                                <!-- These test cases test the pooling functionality, and since the 
-                                    tests uses another settings than the above (overridden) settings we can't 
-                                    run them. For example the test that one connector has no pooling and thus 
-                                    the command useConnectionPool() returns false - with the overridden value 
-                                    it will return true, thus an error should have occurred. -->
+                                <!-- These test cases test the pooling functionality,
+                                    and since the tests uses another settings than the above (overridden) settings
+                                    we can't run them. For example the test that one connector has no pooling
+                                    and thus the command useConnectionPool() returns false - with the overridden
+                                    value it will return true, thus an error should have occurred. -->
                                 <exclude>**/SftpPoolingFunctionalTestCase.java</exclude>
                                 <exclude>**/SftpNamespaceHandlerTestCase.java</exclude>
                             </excludes>

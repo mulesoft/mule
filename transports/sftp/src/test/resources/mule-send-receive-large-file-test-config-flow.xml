@@ -19,7 +19,7 @@
 
         <vm:inbound-endpoint path="test.upload" />
         <sftp:outbound-endpoint
-            address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}:${SFTP_PORT}/~/data"
+            address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}/~/data"
             outputPattern="#[function:dateStamp]-#[function:systime].dat" />
 
     </flow>
@@ -30,7 +30,7 @@
             several times -->
         <sftp:inbound-endpoint name="inboundEndpoint"
             exchange-pattern="request-response"
-            address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}:${SFTP_PORT}/~/data" />
+            address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}/~/data" />
 
         <component>
             <singleton-object

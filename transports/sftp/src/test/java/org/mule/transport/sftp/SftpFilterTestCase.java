@@ -64,7 +64,7 @@ public class SftpFilterTestCase extends AbstractSftpDataIntegrityTestCase
         // delivered to the endpoint (due to filter settings) we can't wait for a
         // delivery notification....
         HashMap<String, String> txtProps = new HashMap<String, String>(1);
-        txtProps.put(SftpConnector.PROPERTY_FILENAME, FILENAME);
+        txtProps.put(SftpConnector.PROPERTY_FILENAME, FILE_NAME);
         muleClient.dispatch(getAddressByEndpoint(muleClient, INBOUND_ENDPOINT_NAME), TEST_MESSAGE, txtProps);
 
         // Send .xml file
@@ -84,8 +84,8 @@ public class SftpFilterTestCase extends AbstractSftpDataIntegrityTestCase
             outboundEndpoint.getEndpointURI().getPath(), "file.xml"));
 
         assertTrue("The txt file should be left in the inbound directory", verifyFileExists(
-            inboundSftpClient, inboundEndpoint.getEndpointURI().getPath(), FILENAME));
+            inboundSftpClient, inboundEndpoint.getEndpointURI().getPath(), FILE_NAME));
         assertFalse("The txt file should not be in the outbound directory", verifyFileExists(
-            outboundSftpClient, outboundEndpoint.getEndpointURI().getPath(), FILENAME));
+            outboundSftpClient, outboundEndpoint.getEndpointURI().getPath(), FILE_NAME));
     }
 }

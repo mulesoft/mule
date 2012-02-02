@@ -33,7 +33,7 @@
             <outbound>
                 <pass-through-router>
                     <sftp:outbound-endpoint
-                        address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}:${SFTP_PORT}/~/data"
+                        address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}/~/data"
                         outputPattern="#[function:dateStamp].dat"
                         tempDir="tmp_sending"/>
                 </pass-through-router>
@@ -47,7 +47,7 @@
                 <!-- synchronous="true" - otherwise the inbound endpoint will trigger several times -->
                 <sftp:inbound-endpoint
                     name="inboundEndpoint"
-                    address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}:${SFTP_PORT}/~/data"/>
+                    address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}/~/data"/>
             </inbound>
             <component>
                 <singleton-object class="org.mule.tck.functional.FunctionalTestComponent"/>

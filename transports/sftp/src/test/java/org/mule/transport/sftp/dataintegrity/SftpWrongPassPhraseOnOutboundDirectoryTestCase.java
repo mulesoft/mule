@@ -17,20 +17,12 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 
-import org.apache.sshd.server.PasswordAuthenticator;
-import org.apache.sshd.server.session.ServerSession;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-
-import org.mule.api.MuleException;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.transport.DispatchException;
 import org.mule.module.client.MuleClient;
 import org.mule.transport.sftp.SftpClient;
-import org.mule.transport.sftp.util.SftpServer;
-
-import com.jcraft.jsch.ChannelSftp;
-import com.jcraft.jsch.SftpException;
 
 /**
  * Verify that the original file is not lost if the password for the outbound
@@ -54,14 +46,14 @@ public class SftpWrongPassPhraseOnOutboundDirectoryTestCase extends AbstractSftp
         });
     }
 
-//    @Override
-//    protected void doSetUp() throws Exception
-//    {
-//        super.doSetUp();
-//
-//        // Delete the in & outbound directories
-//        initEndpointDirectory(INBOUND_ENDPOINT_NAME);
-//    }
+    @Override
+    protected void doSetUp() throws Exception
+    {
+        super.doSetUp();
+
+        // Delete the in & outbound directories
+        initEndpointDirectory(INBOUND_ENDPOINT_NAME);
+    }
 
     /**
      * The outbound directory doesn't exist. The source file should still exist
@@ -91,45 +83,12 @@ public class SftpWrongPassPhraseOnOutboundDirectoryTestCase extends AbstractSftp
         {
             ImmutableEndpoint endpoint = (ImmutableEndpoint) muleClient.getProperty(INBOUND_ENDPOINT_NAME);
             assertTrue("The inbound file should still exist", super.verifyFileExists(sftpClient,
-                endpoint.getEndpointURI(), FILENAME));
+                endpoint.getEndpointURI(), FILE_NAME));
         }
         finally
         {
             sftpClient.disconnect();
         }
     }
-    
-    /**
-     * Ensures that the directory exists and is writable by deleting the directory
-     * and then recreate it. Overrides inherited behavior to use working credentials.
-     */
-    protected void initEndpointDirectory(String endpointName)
-        throws MuleException, IOException, SftpException
-    {
-//        MuleClient muleClient = new MuleClient(muleContext);
-//        SftpClient sftpClient = getSftpClient(muleClient, endpointName);
-//        try
-//        {
-//            ChannelSftp channelSftp = sftpClient.getChannelSftp();
-//            try
-//            {
-//                recursiveDelete(muleClient, sftpClient, endpointName, "");
-//            }
-//            catch (IOException e)
-//            {
-//                if (logger.isErrorEnabled())
-//                    logger.error("Failed to recursivly delete endpoint " + endpointName, e);
-//            }
-//
-//            String path = getPathByEndpoint(muleClient, sftpClient, endpointName);
-//            channelSftp.mkdir(path);
-//        }
-//        finally
-//        {
-//            sftpClient.disconnect();
-//            if (logger.isDebugEnabled()) logger.debug("Done init endpoint directory: " + endpointName);
-//        }
-    }
-    
-    
+
 }

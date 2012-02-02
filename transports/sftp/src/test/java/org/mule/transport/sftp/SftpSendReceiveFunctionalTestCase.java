@@ -13,11 +13,6 @@ package org.mule.transport.sftp;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import org.mule.api.MuleEventContext;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.functional.EventCallback;
-
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -30,6 +25,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
+import org.mule.api.MuleEventContext;
+import org.mule.module.client.MuleClient;
+import org.mule.tck.functional.EventCallback;
 
 /**
  * <code>SendReceiveFunctionalTestCase</code> tests sending an receiving multiple
@@ -55,6 +53,14 @@ public class SftpSendReceiveFunctionalTestCase extends AbstractSftpTestCase
     {
         return Arrays.asList(new Object[][]{{ConfigVariant.SERVICE, "mule-send-receive-test-config-service.xml"},
             {ConfigVariant.FLOW, "mule-send-receive-test-config-flow.xml"}});
+    }
+
+    @Override
+    protected void doSetUp() throws Exception
+    {
+        super.doSetUp();
+
+        initEndpointDirectory("inboundEndpoint");
     }
 
     @Test

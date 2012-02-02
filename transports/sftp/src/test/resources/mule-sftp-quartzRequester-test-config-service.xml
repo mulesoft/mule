@@ -22,7 +22,7 @@
     <!-- synchronous="true" - otherwise the inbound endpoint will trigger several times -->
     <sftp:endpoint
         name="inboundEndpoint"
-        address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}:${SFTP_PORT}/~/data" exchange-pattern="request-response"/>
+        address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}/~/data" exchange-pattern="request-response"/>
 
     <model name="send">
         <service name="sending">
@@ -33,7 +33,7 @@
                 <pass-through-router>
                     <sftp:outbound-endpoint
                         name="outboundEndpoint"
-                        address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}:${SFTP_PORT}/~/data"
+                        address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}/~/data"
                         outputPattern="#[function:dateStamp].dat"/>
                 </pass-through-router>
             </outbound>

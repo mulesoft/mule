@@ -76,9 +76,9 @@ public class SftpTempDirFunctionalTestCase extends AbstractSftpTestCase
             assertFalse(
                 "No file should exist in the temp directory",
                 super.verifyFileExists(sftpClientInbound, endpointInbound.getEndpointURI().getPath()
-                                                          + "/uploading", FILENAME));
+                                                          + "/uploading", FILE_NAME));
             assertFalse("The file should not exist in the source directory",
-                super.verifyFileExists(sftpClientInbound, endpointInbound.getEndpointURI(), FILENAME));
+                super.verifyFileExists(sftpClientInbound, endpointInbound.getEndpointURI(), FILE_NAME));
         }
         finally
         {
@@ -92,8 +92,8 @@ public class SftpTempDirFunctionalTestCase extends AbstractSftpTestCase
         {
             assertFalse("The temp directory should not have been created",
                 tempDirectoryExists(sftpClientOutbound, muleClient, OUTBOUND_ENDPOINT_NAME2));
-            assertTrue("The file should exist in the final destination : " + FILENAME,
-                super.verifyFileExists(sftpClientOutbound, endpointOutbound.getEndpointURI(), FILENAME));
+            assertTrue("The file should exist in the final destination : " + FILE_NAME,
+                super.verifyFileExists(sftpClientOutbound, endpointOutbound.getEndpointURI(), FILE_NAME));
         }
         finally
         {
@@ -119,7 +119,7 @@ public class SftpTempDirFunctionalTestCase extends AbstractSftpTestCase
             assertFalse("The temp directory should not have been created",
                 tempDirectoryExists(sftpClientInbound, muleClient, INBOUND_ENDPOINT_NAME));
             assertFalse("The file should not exist in the source directory",
-                super.verifyFileExists(sftpClientInbound, endpointInbound.getEndpointURI(), FILENAME));
+                super.verifyFileExists(sftpClientInbound, endpointInbound.getEndpointURI(), FILE_NAME));
         }
         finally
         {
@@ -134,7 +134,7 @@ public class SftpTempDirFunctionalTestCase extends AbstractSftpTestCase
             assertTrue("The temp directory should have been created",
                 tempDirectoryExists(sftpClientOutbound, muleClient, OUTBOUND_ENDPOINT_NAME));
             assertTrue("The file should exist in the final destination",
-                super.verifyFileExists(sftpClientOutbound, endpointOutbound.getEndpointURI(), FILENAME));
+                super.verifyFileExists(sftpClientOutbound, endpointOutbound.getEndpointURI(), FILE_NAME));
         }
         finally
         {
