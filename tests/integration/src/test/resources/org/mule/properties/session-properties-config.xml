@@ -10,6 +10,9 @@
 
     <vm:endpoint path="addSessionPropertiesFlowEndpoint" exchange-pattern="request-response" name="addSessionPropertiesFlowEndpoint" />
 
+    <message-properties-transformer scope="session" name="addP1">
+        <add-message-property key="P1" value="P1_VALUE" />
+    </message-properties-transformer>
 
     <flow name="A" processingStrategy="synchronous">
         <expression-transformer evaluator="header" expression="SESSION:key" />
@@ -128,5 +131,20 @@
 
     <spring:bean name="nonSerializableBean" class="java.lang.Object"/>
 
+    <flow name="defaultExceptionStrategy">
+        <processor ref="addP1" />
+        <test:component throwException="true"/>
+        <default-exception-strategy>
+            <test:assert expression="#[header:SESSION:P1]" />
+        </default-exception-strategy>
+    </flow>
 
+    <flow name="catchExceptionStrategy">
+        <processor ref="addP1" />
+        <test:component throwException="true"/>
+        <catch-exception-strategy>
+            <test:assert expression="#[header:SESSION:P1]" />
+        </catch-exception-strategy>
+    </flow>
+    
 </mule>

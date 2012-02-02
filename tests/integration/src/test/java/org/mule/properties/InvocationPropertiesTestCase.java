@@ -168,7 +168,7 @@ public class InvocationPropertiesTestCase extends org.mule.tck.junit4.Functional
     {
         testFlow("OverwriteInSubFlowRef");
     }
-    
+
     @Test
     public void propagationThroughAsyncElement() throws Exception
     {
@@ -248,7 +248,6 @@ public class InvocationPropertiesTestCase extends org.mule.tck.junit4.Functional
         testFlow("propagateFromRouteToNextProcessorNoResult");
     }
 
-    
     @Test
     public void allAsync() throws Exception
     {
@@ -274,6 +273,18 @@ public class InvocationPropertiesTestCase extends org.mule.tck.junit4.Functional
         fruitList.add(new Banana());
         testFlow("aggregationOfPropertiesFromMultipleMessageWithAggregator", getTestEvent(fruitList));
         FlowAssert.verify("Split");
+    }
+
+    @Test
+    public void defaultExceptionStrategy() throws Exception
+    {
+        testFlow("defaultExceptionStrategy");
+    }
+
+    @Test
+    public void catchExceptionStrategy() throws Exception
+    {
+        testFlow("catchExceptionStrategy");
     }
 
     @Override

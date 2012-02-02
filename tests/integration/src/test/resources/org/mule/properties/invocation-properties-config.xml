@@ -346,5 +346,20 @@
         <test:assert expression="#[header:INVOCATION:P2]" />
     </flow>
 
+    <flow name="defaultExceptionStrategy">
+        <processor ref="addP1" />
+        <test:component throwException="true"/>
+        <default-exception-strategy>
+            <test:assert expression="#[header:INVOCATION:P1]" />
+        </default-exception-strategy>
+    </flow>
+
+    <flow name="catchExceptionStrategy">
+        <processor ref="addP1" />
+        <test:component throwException="true"/>
+        <catch-exception-strategy>
+            <test:assert expression="#[header:INVOCATION:P1]" />
+        </catch-exception-strategy>
+    </flow>
 
 </mule>
