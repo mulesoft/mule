@@ -148,7 +148,6 @@ public class LifecycleTransitionTestCase
         private LifecycleManager manager = new MyLifecycleManager("this", this);
         private String transitionHistory = "";
 
-        @Override
         public void dispose()
         {
             try
@@ -166,7 +165,6 @@ public class LifecycleTransitionTestCase
             transitionHistory += DISPOSE;
         }
 
-        @Override
         public void initialise() throws InitialisationException
         {
             try
@@ -184,7 +182,6 @@ public class LifecycleTransitionTestCase
             transitionHistory += INIT;
         }
 
-        @Override
         public void start() throws MuleException
         {
             manager.fireLifecycle(Startable.PHASE_NAME);
@@ -195,7 +192,6 @@ public class LifecycleTransitionTestCase
             transitionHistory += START;
         }
 
-        @Override
         public void stop() throws MuleException
         {
             manager.fireLifecycle(Stoppable.PHASE_NAME);
