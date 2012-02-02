@@ -12,7 +12,7 @@ package org.mule.exception;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
-import org.mule.api.exception.MessageExceptionHandlerAcceptor;
+import org.mule.api.exception.MessagingExceptionHandlerAcceptor;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorChain;
@@ -21,7 +21,7 @@ import org.mule.message.DefaultExceptionPayload;
 import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.routing.requestreply.ReplyToPropertyRequestReplyReplier;
 
-public abstract class TemplateMessagingExceptionStrategy extends AbstractExceptionListener implements MessageExceptionHandlerAcceptor
+public abstract class TemplateMessagingExceptionStrategy extends AbstractExceptionListener implements MessagingExceptionHandlerAcceptor
 {
 
     private MessageProcessorChain configuredMessageProcessors;

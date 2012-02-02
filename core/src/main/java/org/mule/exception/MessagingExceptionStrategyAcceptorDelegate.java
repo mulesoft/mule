@@ -13,18 +13,18 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.mule.api.MuleEvent;
-import org.mule.api.exception.MessageExceptionHandlerAcceptor;
+import org.mule.api.exception.MessagingExceptionHandlerAcceptor;
 import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.processor.AbstractMuleObjectOwner;
 
 /**
- * Allows to use {@link org.mule.api.exception.MessagingExceptionHandler} as {@link org.mule.api.exception.MessageExceptionHandlerAcceptor}.
+ * Allows to use {@link org.mule.api.exception.MessagingExceptionHandler} as {@link org.mule.api.exception.MessagingExceptionHandlerAcceptor}.
  */
-public class MessageExceptionStrategyAcceptorDelegate extends AbstractMuleObjectOwner<MessagingExceptionHandler> implements MessageExceptionHandlerAcceptor
+public class MessagingExceptionStrategyAcceptorDelegate extends AbstractMuleObjectOwner<MessagingExceptionHandler> implements MessagingExceptionHandlerAcceptor
 {
     private MessagingExceptionHandler delegate;
 
-    public MessageExceptionStrategyAcceptorDelegate(MessagingExceptionHandler messagingExceptionHandler)
+    public MessagingExceptionStrategyAcceptorDelegate(MessagingExceptionHandler messagingExceptionHandler)
     {
         this.delegate = messagingExceptionHandler;
     }
@@ -32,9 +32,9 @@ public class MessageExceptionStrategyAcceptorDelegate extends AbstractMuleObject
     @Override
     public boolean accept(MuleEvent event)
     {
-        if (delegate instanceof MessageExceptionHandlerAcceptor)
+        if (delegate instanceof MessagingExceptionHandlerAcceptor)
         {
-            return ((MessageExceptionHandlerAcceptor)delegate).accept(event);
+            return ((MessagingExceptionHandlerAcceptor)delegate).accept(event);
         }
         return true;
     }
@@ -42,9 +42,9 @@ public class MessageExceptionStrategyAcceptorDelegate extends AbstractMuleObject
     @Override
     public boolean acceptsAll()
     {
-        if (delegate instanceof MessageExceptionHandlerAcceptor)
+        if (delegate instanceof MessagingExceptionHandlerAcceptor)
         {
-            return ((MessageExceptionHandlerAcceptor)delegate).acceptsAll();
+            return ((MessagingExceptionHandlerAcceptor)delegate).acceptsAll();
         }
         return true;
     }

@@ -25,7 +25,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleRuntimeException;
-import org.mule.api.exception.MessageExceptionHandlerAcceptor;
+import org.mule.api.exception.MessagingExceptionHandlerAcceptor;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -35,11 +35,11 @@ public class ChoiceMessagingExceptionStrategyTestCase extends AbstractMuleTestCa
 {
 
     @Mock
-    private MessageExceptionHandlerAcceptor mockTestExceptionStrategy1;
+    private MessagingExceptionHandlerAcceptor mockTestExceptionStrategy1;
     @Mock
-    private MessageExceptionHandlerAcceptor mockTestExceptionStrategy2;
+    private MessagingExceptionHandlerAcceptor mockTestExceptionStrategy2;
     @Mock
-    private MessageExceptionHandlerAcceptor mockDefaultTestExceptionStrategy2;
+    private MessagingExceptionHandlerAcceptor mockDefaultTestExceptionStrategy2;
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     private MuleEvent mockMuleEvent;
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
@@ -52,7 +52,7 @@ public class ChoiceMessagingExceptionStrategyTestCase extends AbstractMuleTestCa
         ChoiceMessagingExceptionStrategy choiceMessagingExceptionStrategy = new ChoiceMessagingExceptionStrategy();
         when(mockMuleContext.getDefaultExceptionStrategy()).thenReturn(mockDefaultTestExceptionStrategy2);
         choiceMessagingExceptionStrategy.setMuleContext(mockMuleContext);
-        choiceMessagingExceptionStrategy.setExceptionListeners(new ArrayList<MessageExceptionHandlerAcceptor>(Arrays.<MessageExceptionHandlerAcceptor>asList(mockTestExceptionStrategy1, mockTestExceptionStrategy2)));
+        choiceMessagingExceptionStrategy.setExceptionListeners(new ArrayList<MessagingExceptionHandlerAcceptor>(Arrays.<MessagingExceptionHandlerAcceptor>asList(mockTestExceptionStrategy1, mockTestExceptionStrategy2)));
         choiceMessagingExceptionStrategy.initialise();
         when(mockTestExceptionStrategy1.accept(mockMuleEvent)).thenReturn(false);
         when(mockTestExceptionStrategy2.accept(mockMuleEvent)).thenReturn(false);
@@ -68,7 +68,7 @@ public class ChoiceMessagingExceptionStrategyTestCase extends AbstractMuleTestCa
     {
         ChoiceMessagingExceptionStrategy choiceMessagingExceptionStrategy = new ChoiceMessagingExceptionStrategy();
         choiceMessagingExceptionStrategy.setMuleContext(mockMuleContext);
-        choiceMessagingExceptionStrategy.setExceptionListeners(new ArrayList<MessageExceptionHandlerAcceptor>(Arrays.<MessageExceptionHandlerAcceptor>asList(mockTestExceptionStrategy1, mockTestExceptionStrategy2)));
+        choiceMessagingExceptionStrategy.setExceptionListeners(new ArrayList<MessagingExceptionHandlerAcceptor>(Arrays.<MessagingExceptionHandlerAcceptor>asList(mockTestExceptionStrategy1, mockTestExceptionStrategy2)));
         when(mockMuleContext.getDefaultExceptionStrategy()).thenReturn(mockDefaultTestExceptionStrategy2);
         choiceMessagingExceptionStrategy.initialise();
         when(mockTestExceptionStrategy1.accept(mockMuleEvent)).thenReturn(false);
@@ -85,7 +85,7 @@ public class ChoiceMessagingExceptionStrategyTestCase extends AbstractMuleTestCa
     {
         ChoiceMessagingExceptionStrategy choiceMessagingExceptionStrategy = new ChoiceMessagingExceptionStrategy();
         choiceMessagingExceptionStrategy.setMuleContext(mockMuleContext);
-        choiceMessagingExceptionStrategy.setExceptionListeners(new ArrayList<MessageExceptionHandlerAcceptor>(Arrays.<MessageExceptionHandlerAcceptor>asList(mockTestExceptionStrategy1, mockTestExceptionStrategy2)));
+        choiceMessagingExceptionStrategy.setExceptionListeners(new ArrayList<MessagingExceptionHandlerAcceptor>(Arrays.<MessagingExceptionHandlerAcceptor>asList(mockTestExceptionStrategy1, mockTestExceptionStrategy2)));
         when(mockMuleContext.getDefaultExceptionStrategy()).thenReturn(mockDefaultTestExceptionStrategy2);
         when(mockTestExceptionStrategy1.acceptsAll()).thenReturn(true);
         when(mockTestExceptionStrategy2.acceptsAll()).thenReturn(false);

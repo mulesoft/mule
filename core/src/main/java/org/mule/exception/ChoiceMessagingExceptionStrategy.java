@@ -15,7 +15,7 @@ import java.util.List;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.context.MuleContextAware;
-import org.mule.api.exception.MessageExceptionHandlerAcceptor;
+import org.mule.api.exception.MessagingExceptionHandlerAcceptor;
 import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Lifecycle;
@@ -26,17 +26,17 @@ import org.mule.processor.AbstractMuleObjectOwner;
 /**
  * Selects which exception strategy to execute based on filtering.
  *
- * Exception listeners must implement {@link org.mule.api.exception.MessageExceptionHandlerAcceptor} to be part of ChoiceMessagingExceptionStrategy
+ * Exception listeners must implement {@link org.mule.api.exception.MessagingExceptionHandlerAcceptor} to be part of ChoiceMessagingExceptionStrategy
  */
-public class ChoiceMessagingExceptionStrategy extends AbstractMuleObjectOwner<MessageExceptionHandlerAcceptor> implements MessagingExceptionHandler, MuleContextAware, Lifecycle
+public class ChoiceMessagingExceptionStrategy extends AbstractMuleObjectOwner<MessagingExceptionHandlerAcceptor> implements MessagingExceptionHandler, MuleContextAware, Lifecycle
 {
-    private List<MessageExceptionHandlerAcceptor> exceptionListeners;
+    private List<MessagingExceptionHandlerAcceptor> exceptionListeners;
 
     @Override
     public MuleEvent handleException(Exception exception, MuleEvent event)
     {
         event.getMessage().setExceptionPayload(new DefaultExceptionPayload(exception));
-        for (MessageExceptionHandlerAcceptor exceptionListener : exceptionListeners)
+        for (MessagingExceptionHandlerAcceptor exceptionListener : exceptionListeners)
         {
             if (exceptionListener.accept(event))
             {
@@ -47,7 +47,7 @@ public class ChoiceMessagingExceptionStrategy extends AbstractMuleObjectOwner<Me
         throw new MuleRuntimeException(CoreMessages.createStaticMessage("Default exception strategy must accept any event."));
     }
 
-    public void setExceptionListeners(List<MessageExceptionHandlerAcceptor> exceptionListeners)
+    public void setExceptionListeners(List<MessagingExceptionHandlerAcceptor> exceptionListeners)
     {
         this.exceptionListeners = exceptionListeners;
     }
@@ -64,12 +64,12 @@ public class ChoiceMessagingExceptionStrategy extends AbstractMuleObjectOwner<Me
     {
         if (!exceptionListeners.get(exceptionListeners.size()-1).acceptsAll())
         {
-            this.exceptionListeners.add(new MessageExceptionStrategyAcceptorDelegate(getMuleContext().getDefaultExceptionStrategy()));
+            this.exceptionListeners.add(new MessagingExceptionStrategyAcceptorDelegate(getMuleContext().getDefaultExceptionStrategy()));
         }
     }
 
     @Override
-    protected List<MessageExceptionHandlerAcceptor> getOwnedObjects() {
+    protected List<MessagingExceptionHandlerAcceptor> getOwnedObjects() {
         return Collections.unmodifiableList(exceptionListeners);
     }
 
@@ -77,8 +77,8 @@ public class ChoiceMessagingExceptionStrategy extends AbstractMuleObjectOwner<Me
     {
         for (int i = 0; i < exceptionListeners.size()-1; i++)
         {
-             MessageExceptionHandlerAcceptor messageExceptionHandlerAcceptor = exceptionListeners.get(i);
-             if (messageExceptionHandlerAcceptor.acceptsAll())
+             MessagingExceptionHandlerAcceptor messagingExceptionHandlerAcceptor = exceptionListeners.get(i);
+             if (messagingExceptionHandlerAcceptor.acceptsAll())
              {
                  throw new MuleRuntimeException(CoreMessages.createStaticMessage("Only last exception strategy inside <choice-exception-strategy> can accept any message. Maybe expression attribute is empty."));
              }

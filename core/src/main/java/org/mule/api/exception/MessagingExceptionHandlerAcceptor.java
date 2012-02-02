@@ -14,6 +14,6 @@ import org.mule.api.Acceptor;
 /**
  *  MessagingExceptionHandlers that will only be executed if accepts to manage MuleEvent
  */
-public interface MessageExceptionHandlerAcceptor extends MessagingExceptionHandler, Acceptor
+public interface MessagingExceptionHandlerAcceptor extends MessagingExceptionHandler, Acceptor
 {
 }
