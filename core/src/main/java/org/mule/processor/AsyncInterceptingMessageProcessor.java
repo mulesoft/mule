@@ -164,7 +164,18 @@ public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessa
                     @Override
                     public MuleEvent process() throws Exception
                     {
-                        processNextTimed(event);
+                        try
+                        {
+                            processNextTimed(event);
+                        }
+                        catch (MessagingException e)
+                        {
+                            throw e;
+                        }
+                        catch (Exception e)
+                        {
+                            throw new MessagingException(event,e);
+                        }
                         return null;
                     }
                 });

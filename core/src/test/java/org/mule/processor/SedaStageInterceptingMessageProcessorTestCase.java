@@ -150,7 +150,6 @@ public class SedaStageInterceptingMessageProcessorTestCase extends AsyncIntercep
     }
 
     @Test
-    @Ignore
     public void testProcessOneWayWithException() throws Exception
     {
         final Latch latch = new Latch();

@@ -12,6 +12,7 @@ package org.mule.processor;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.OptimizedRequestContext;
+import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -29,6 +30,8 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.lifecycle.EmptyLifecycleCallback;
 import org.mule.management.stats.QueueStatistics;
+import org.mule.process.ProcessingCallback;
+import org.mule.process.TransactionalErrorHandlingProcessingTemplate;
 import org.mule.service.Pausable;
 import org.mule.service.Resumable;
 import org.mule.util.concurrent.WaitableBoolean;
@@ -215,36 +218,58 @@ public class SedaStageInterceptingMessageProcessor extends AsyncInterceptingMess
 
             if (event != null)
             {
-                if (isStatsEnabled())
+                final MuleEvent eventToProcess = event;
+                TransactionalErrorHandlingProcessingTemplate processingTemplate = new TransactionalErrorHandlingProcessingTemplate(muleContext, event.getFlowConstruct().getExceptionListener());
+                ProcessingCallback<MuleEvent> processingCallback = new ProcessingCallback<MuleEvent>()
                 {
-                    queueStatistics.decQueuedEvent();
-                }
 
-                if (logger.isDebugEnabled())
-                {
-                    logger.debug(MessageFormat.format("{0}: Dequeued event from {1}", getStageDescription(),
-                        getQueueName()));
-                }
-                AsyncMessageProcessorWorker work = new AsyncMessageProcessorWorker(event);
-                if (doThreading)
-                {
-                    try
+                    @Override
+                    public MuleEvent process() throws Exception
                     {
-                        // TODO Remove this thread handoff to ensure Zero Message Loss
-                        workManagerSource.getWorkManager().scheduleWork(work, WorkManager.INDEFINITE, null,
-                            new AsyncWorkListener(next));
+                        if (isStatsEnabled())
+                        {
+                            queueStatistics.decQueuedEvent();
+                        }
+
+                        if (logger.isDebugEnabled())
+                        {
+                            logger.debug(MessageFormat.format("{0}: Dequeued event from {1}", getStageDescription(),
+                                    getQueueName()));
+                        }
+                        AsyncMessageProcessorWorker work = new AsyncMessageProcessorWorker(eventToProcess);
+                        if (doThreading)
+                        {
+                            try
+                            {
+                                // TODO Remove this thread handoff to ensure Zero Message Loss
+                                workManagerSource.getWorkManager().scheduleWork(work, WorkManager.INDEFINITE, null,
+                                        new AsyncWorkListener(next));
+                            } catch (Exception e)
+                            {
+                                // because dequeued event may still be owned by a previuos
+                                // thread we need to use the copy created in AsyncMessageProcessorWorker constructor.
+                                OptimizedRequestContext.unsafeSetEvent(work.getEvent());
+                                throw new MessagingException(work.getEvent(),e);
+                            }
+                        } else
+                        {
+                            work.doRun();
+                        }
+                        return null;
                     }
-                    catch (Exception e)
-                    {
-                        // because dequeued event may still be owned by a previuos
-                        // thread we need to use the copy created in AsyncMessageProcessorWorker constructor.
-                        OptimizedRequestContext.unsafeSetEvent(work.getEvent());
-                        event.getFlowConstruct().getExceptionListener().handleException(e, work.getEvent());
-                    }
-                }
-                else
+                };
+
+                try
                 {
-                    work.doRun();
+                    processingTemplate.execute(processingCallback);
+                }
+                catch (MessagingException e)
+                {
+                    //Already handled by processing template
+                }
+                catch (Exception e)
+                {
+                    muleContext.getExceptionListener().handleException(e);
                 }
             }
         }

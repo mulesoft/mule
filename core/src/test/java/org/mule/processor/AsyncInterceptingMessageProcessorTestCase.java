@@ -162,8 +162,8 @@ public class AsyncInterceptingMessageProcessorTestCase extends AbstractMuleConte
     {
 
         Flow flow = new Flow("flow", muleContext);
-        LatchedSystemExceptionHandler exceptionListener = new LatchedSystemExceptionHandler();
-        muleContext.setExceptionListener(exceptionListener);
+        LatchedExceptionListener exceptionListener = new LatchedExceptionListener();
+        flow.setExceptionListener(exceptionListener);
         initialiseObject(flow);
 
         MuleEvent event = getTestEvent(TEST_MESSAGE, flow, MessageExchangePattern.ONE_WAY);
