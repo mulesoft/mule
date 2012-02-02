@@ -962,9 +962,10 @@ public class DefaultMuleEvent
         flowVariables.clear();
     }
 
-    public Object getFlowVariable(String key)
+    @SuppressWarnings("unchecked")
+    public <T> T getFlowVariable(String key)
     {
-        return flowVariables.get(key);
+        return (T) flowVariables.get(key);
     }
 
     public void setFlowVariable(String key, Object value)
@@ -979,7 +980,7 @@ public class DefaultMuleEvent
     }
 
     @Override
-    public Object getSessionVariable(String key)
+    public <T> T getSessionVariable(String key)
     {
         return session.getProperty(key);
     }
