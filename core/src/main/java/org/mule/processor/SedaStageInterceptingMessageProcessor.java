@@ -233,27 +233,23 @@ public class SedaStageInterceptingMessageProcessor extends AsyncInterceptingMess
 
                         if (logger.isDebugEnabled())
                         {
-                            logger.debug(MessageFormat.format("{0}: Dequeued event from {1}", getStageDescription(),
-                                    getQueueName()));
+                            logger.debug(MessageFormat.format("{0}: Dequeued event from {1}",
+                                getStageDescription(), getQueueName()));
                         }
                         AsyncMessageProcessorWorker work = new AsyncMessageProcessorWorker(eventToProcess);
-                        if (doThreading)
+                        try
                         {
-                            try
-                            {
-                                // TODO Remove this thread handoff to ensure Zero Message Loss
-                                workManagerSource.getWorkManager().scheduleWork(work, WorkManager.INDEFINITE, null,
-                                        new AsyncWorkListener(next));
-                            } catch (Exception e)
-                            {
-                                // because dequeued event may still be owned by a previuos
-                                // thread we need to use the copy created in AsyncMessageProcessorWorker constructor.
-                                OptimizedRequestContext.unsafeSetEvent(work.getEvent());
-                                throw new MessagingException(work.getEvent(),e);
-                            }
-                        } else
+                            // TODO Remove this thread handoff to ensure Zero Message Loss
+                            workManagerSource.getWorkManager().scheduleWork(work, WorkManager.INDEFINITE,
+                                null, new AsyncWorkListener(next));
+                        }
+                        catch (Exception e)
                         {
-                            work.doRun();
+                            // because dequeued event may still be owned by a previuos
+                            // thread we need to use the copy created in AsyncMessageProcessorWorker
+                            // constructor.
+                            OptimizedRequestContext.unsafeSetEvent(work.getEvent());
+                            throw new MessagingException(work.getEvent(), e);
                         }
                         return null;
                     }
