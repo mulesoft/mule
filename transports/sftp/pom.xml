@@ -1,168 +1,168 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<parent>
-		<groupId>org.mule.transports</groupId>
-		<artifactId>mule-transports</artifactId>
-		<version>3.3-M2-SNAPSHOT</version>
-	</parent>
-	<artifactId>mule-transport-sftp</artifactId>
-	<packaging>jar</packaging>
-	<name>SFTP Transport</name>
-	<description>A Mule transport for SFTP connectivity</description>
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.mule.transports</groupId>
+        <artifactId>mule-transports</artifactId>
+        <version>3.3-M2-SNAPSHOT</version>
+    </parent>
+    <artifactId>mule-transport-sftp</artifactId>
+    <packaging>jar</packaging>
+    <name>SFTP Transport</name>
+    <description>A Mule transport for SFTP connectivity</description>
 
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>build-helper-maven-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>add-test-resource</id>
-						<phase>generate-test-sources</phase>
-						<goals>
-							<goal>add-test-resource</goal>
-						</goals>
-						<configuration>
-							<resources>
-								<resource>
-									<directory>${basedir}</directory>
-									<includes>
-										<include>sftp-settings.properties</include>
-									</includes>
-								</resource>
-							</resources>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<!-- ensure that source jar files are created and installed as well -->
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-source-plugin</artifactId>
-				<executions>
-					<execution>
-						<phase>package</phase>
-						<goals>
-							<goal>jar</goal>
-							<goal>test-jar</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-		</plugins>
-	</build>
-	<dependencies>
-		<dependency>
-			<groupId>com.jcraft</groupId>
-			<artifactId>jsch</artifactId>
-			<version>${jschVersion}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.mule</groupId>
-			<artifactId>mule-core</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.mule.transports</groupId>
-			<artifactId>mule-transport-file</artifactId>
-			<version>${project.version}</version>
-		</dependency>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>add-test-resource</id>
+                        <phase>generate-test-sources</phase>
+                        <goals>
+                            <goal>add-test-resource</goal>
+                        </goals>
+                        <configuration>
+                            <resources>
+                                <resource>
+                                    <directory>${basedir}</directory>
+                                    <includes>
+                                        <include>sftp-settings.properties</include>
+                                    </includes>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <!-- ensure that source jar files are created and installed as well -->
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>jar</goal>
+                            <goal>test-jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+    <dependencies>
+        <dependency>
+            <groupId>com.jcraft</groupId>
+            <artifactId>jsch</artifactId>
+            <version>${jschVersion}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mule</groupId>
+            <artifactId>mule-core</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-file</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
-		<!-- test dependencies -->
-		<dependency>
-			<groupId>org.mule.modules</groupId>
-			<artifactId>mule-module-client</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.mule.tests</groupId>
-			<artifactId>mule-tests-functional</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>mockobjects</groupId>
-			<artifactId>mockobjects-core</artifactId>
-			<version>${mockobjectsVersion}</version>
-			<scope>test</scope>
-		</dependency>
-		        <dependency>
+        <!-- test dependencies -->
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-client</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.tests</groupId>
+            <artifactId>mule-tests-functional</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>mockobjects</groupId>
+            <artifactId>mockobjects-core</artifactId>
+            <version>${mockobjectsVersion}</version>
+            <scope>test</scope>
+        </dependency>
+                <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-all</artifactId>
             <scope>test</scope>
         </dependency>
-		<dependency>
-			<groupId>org.mule.transports</groupId>
-			<artifactId>mule-transport-vm</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.mule.transports</groupId>
-			<artifactId>mule-transport-quartz</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.sshd</groupId>
-			<artifactId>sshd-core</artifactId>
-			<version>0.6.0</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>bouncycastle</groupId>
-			<artifactId>bcprov-jdk14</artifactId>
-			<version>139</version>
-			<scope>test</scope>
-		</dependency>
-	</dependencies>
+        <dependency>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-vm</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-quartz</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.sshd</groupId>
+            <artifactId>sshd-core</artifactId>
+            <version>0.6.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>bouncycastle</groupId>
+            <artifactId>bcprov-jdk14</artifactId>
+            <version>139</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
 
-	<repositories>
-		<repository>
-			<name>jsch</name>
-			<url>http://jsch.sourceforge.net/maven2/</url>
-			<id>jsch</id>
-		</repository>
-	</repositories>
+    <repositories>
+        <repository>
+            <name>jsch</name>
+            <url>http://jsch.sourceforge.net/maven2/</url>
+            <id>jsch</id>
+        </repository>
+    </repositories>
 
-	<profiles>
-		<!-- A profile that can be used to run all tests with pooling enabled -->
-		<profile>
-			<id>pooling</id>
-			<build>
-				<plugins>
-					<plugin>
-						<artifactId>maven-surefire-plugin</artifactId>
-						<configuration>
-							<systemProperties>
-								<property>
-									<name>mule.test.timeoutSecs</name>
-									<value>300</value>
-								</property>
-								<property>
-									<!-- Always pooling for ALL tests! (simple way to ensure that all 
-										tests works with pooling) -->
-									<name>mule.sftp.transport.maxConnectionPoolSize</name>
-									<value>3</value>
-								</property>
-							</systemProperties>
-							<excludes>
-								<!-- These test cases test the pooling functionality, and since the 
-									tests uses another settings than the above (overridden) settings we can't 
-									run them. For example the test that one connector has no pooling and thus 
-									the command useConnectionPool() returns false - with the overridden value 
-									it will return true, thus an error should have occurred. -->
-								<exclude>**/SftpPoolingFunctionalTestCase.java</exclude>
-								<exclude>**/SftpNamespaceHandlerTestCase.java</exclude>
-							</excludes>
-							<useFile>false</useFile>
-						</configuration>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-	</profiles>
+    <profiles>
+        <!-- A profile that can be used to run all tests with pooling enabled -->
+        <profile>
+            <id>pooling</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <systemProperties>
+                                <property>
+                                    <name>mule.test.timeoutSecs</name>
+                                    <value>300</value>
+                                </property>
+                                <property>
+                                    <!-- Always pooling for ALL tests! (simple way to ensure that all 
+                                        tests works with pooling) -->
+                                    <name>mule.sftp.transport.maxConnectionPoolSize</name>
+                                    <value>3</value>
+                                </property>
+                            </systemProperties>
+                            <excludes>
+                                <!-- These test cases test the pooling functionality, and since the 
+                                    tests uses another settings than the above (overridden) settings we can't 
+                                    run them. For example the test that one connector has no pooling and thus 
+                                    the command useConnectionPool() returns false - with the overridden value 
+                                    it will return true, thus an error should have occurred. -->
+                                <exclude>**/SftpPoolingFunctionalTestCase.java</exclude>
+                                <exclude>**/SftpNamespaceHandlerTestCase.java</exclude>
+                            </excludes>
+                            <useFile>false</useFile>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>
