@@ -11,10 +11,14 @@
 package org.mule.config.spring;
 
 import org.mule.api.MuleContext;
+import org.mule.api.MuleRuntimeException;
 import org.mule.api.config.ConfigurationException;
 import org.mule.api.config.MuleConfiguration;
 import org.mule.api.context.MuleContextAware;
+import org.mule.api.exception.MessagingExceptionHandlerAcceptor;
+import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.config.DefaultMuleConfiguration;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
 
 import org.apache.commons.logging.Log;
@@ -63,11 +67,33 @@ public class MuleConfigurationConfigurator implements MuleContextAware, SmartFac
             defaultConfig.setDefaultTransactionTimeout(config.getDefaultTransactionTimeout());
             defaultConfig.setShutdownTimeout(config.getShutdownTimeout());
             defaultConfig.setDefaultExceptionStrategyName(config.getDefaultExceptionStrategyName());
+            validateDefaultExceptionStrategy();
             return configuration;
         }
         else
         {
             throw new ConfigurationException(MessageFactory.createStaticMessage("Unable to set properties on read-only MuleConfiguration: " + configuration.getClass()));
+        }
+    }
+
+    private void validateDefaultExceptionStrategy()
+    {
+        String defaultExceptionStrategyName = config.getDefaultExceptionStrategyName();
+        if (defaultExceptionStrategyName != null)
+        {
+            MessagingExceptionHandler messagingExceptionHandler = muleContext.getRegistry().lookupObject(defaultExceptionStrategyName);
+            if (messagingExceptionHandler == null)
+            {
+                throw new MuleRuntimeException(CoreMessages.createStaticMessage(String.format("No global exception strategy defined with name %s.", defaultExceptionStrategyName)));
+            }
+            if (messagingExceptionHandler instanceof MessagingExceptionHandlerAcceptor)
+            {
+                MessagingExceptionHandlerAcceptor messagingExceptionHandlerAcceptor = (MessagingExceptionHandlerAcceptor) messagingExceptionHandler;
+                if (!messagingExceptionHandlerAcceptor.acceptsAll())
+                {
+                    throw new MuleRuntimeException(CoreMessages.createStaticMessage("Default exception strategy must not have expression attribute. It must accept any message."));
+                }
+            }
         }
     }
 

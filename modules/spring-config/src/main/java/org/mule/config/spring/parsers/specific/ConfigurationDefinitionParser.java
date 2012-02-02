@@ -37,27 +37,7 @@ public class ConfigurationDefinitionParser extends NamedDefinitionParser
     public ConfigurationDefinitionParser()
     {
         super(MuleProperties.OBJECT_MULE_CONFIGURATION);
-        registerPostProcessor(new PostProcessor()
-        {
-            @Override
-            public void postProcess(ParserContext context, BeanAssembler assembler, Element element)
-            {
-                AbstractBeanDefinition beanDefinition = assembler.getBean().getBeanDefinition();
-                if (beanDefinition.hasAttribute(DEFAULT_EXCEPTION_STRATEGY_ATTRIBUTE))
-                {
-                    Object defaultExceptionStrategyBeanName = beanDefinition.getAttribute(DEFAULT_EXCEPTION_STRATEGY_ATTRIBUTE);
-                    if (!context.getRegistry().containsBeanDefinition((String) defaultExceptionStrategyBeanName))
-                    {
-                        throw new MuleRuntimeException(CoreMessages.createStaticMessage(String.format("No global exception strategy defined with name %s.",defaultExceptionStrategyBeanName)));
-                    }
-                    BeanDefinition defaultExceptionStrategyBeanDefinition = context.getRegistry().getBeanDefinition(element.getAttribute(DEFAULT_EXCEPTION_STRATEGY_ATTRIBUTE));
-                    if (defaultExceptionStrategyBeanDefinition.hasAttribute("expression"))
-                    {
-                        throw new MuleRuntimeException(CoreMessages.createStaticMessage("Default exception strategy must not have expression attribute. It must accept any message."));
-                    }
-                }
-            }
-        });
+        addIgnored(DEFAULT_EXCEPTION_STRATEGY_ATTRIBUTE);
         singleton=true;
     }
 
@@ -65,7 +45,6 @@ public class ConfigurationDefinitionParser extends NamedDefinitionParser
     {
         return MuleConfiguration.class;
     }
-
 
     @Override
     protected void doParse(Element element, ParserContext context, BeanDefinitionBuilder builder)
