@@ -27,8 +27,7 @@ import org.mule.util.queue.Queue;
 import org.mule.util.queue.QueueSession;
 
 /**
- * <code>VMMessageDispatcher</code> is used for providing in memory interaction
- * between components.
+ * <code>VMMessageDispatcher</code> is used for providing in memory interaction between components.
  */
 public class VMMessageDispatcher extends AbstractMessageDispatcher
 {
@@ -47,18 +46,18 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher
 
         if (endpointUri == null)
         {
-            throw new DispatchException(CoreMessages.objectIsNull("Endpoint"), event,
-                getEndpoint());
+            throw new DispatchException(CoreMessages.objectIsNull("Endpoint"), event, getEndpoint());
         }
-        MuleMessage newMessage = event.getMessage().createInboundMessage();
-        MuleEvent newEvent = new DefaultMuleEvent(newMessage, event);
+        MuleEvent eventToDispatch = DefaultMuleEvent.copy(event);
+        eventToDispatch.clearFlowVariables();
+        eventToDispatch.setMessage(eventToDispatch.getMessage().createInboundMessage());
         QueueSession session = connector.getQueueSession();
         Queue queue = session.getQueue(endpointUri.getAddress());
-        if (!queue.offer(newEvent, connector.getQueueTimeout()))
+        if (!queue.offer(eventToDispatch, connector.getQueueTimeout()))
         {
             // queue is full
             throw new DispatchException(VMMessages.queueIsFull(queue.getName(), queue.size()),
-                    newEvent, getEndpoint());
+                eventToDispatch, getEndpoint());
         }
         if (logger.isDebugEnabled())
         {
@@ -76,11 +75,13 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher
         if (receiver == null)
         {
             throw new NoReceiverForEndpointException(VMMessages.noReceiverForEndpoint(connector.getName(),
-                                                                                      endpoint.getEndpointURI()));
+                endpoint.getEndpointURI()));
         }
 
-        final MuleMessage message = event.getMessage().createInboundMessage();
-        ProcessingTemplate<MuleMessage> processingTemplate = new TransactionalProcessingTemplate<MuleMessage>(event.getMuleContext(),receiver.getEndpoint().getTransactionConfig());
+        MuleEvent eventToSend = DefaultMuleEvent.copy(event);
+        final MuleMessage message = eventToSend.getMessage().createInboundMessage();
+        ProcessingTemplate<MuleMessage> processingTemplate = new TransactionalProcessingTemplate<MuleMessage>(
+            event.getMuleContext(), receiver.getEndpoint().getTransactionConfig());
         ProcessingCallback<MuleMessage> processingCallback = new ProcessingCallback<MuleMessage>()
         {
             public MuleMessage process() throws Exception
@@ -89,10 +90,10 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher
             }
         };
         retMessage = processingTemplate.execute(processingCallback);
-        
+
         if (logger.isDebugEnabled())
         {
-            logger.debug("sent event on endpointUri: " +endpoint.getEndpointURI());
+            logger.debug("sent event on endpointUri: " + endpoint.getEndpointURI());
         }
         if (retMessage != null)
         {
@@ -113,8 +114,8 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher
         if (!endpoint.getExchangePattern().hasResponse())
         {
             // use the default queue profile to configure this queue.
-            connector.getQueueProfile().configureQueue(
-                    connector.getMuleContext(), endpoint.getEndpointURI().getAddress(), connector.getQueueManager());
+            connector.getQueueProfile().configureQueue(connector.getMuleContext(),
+                endpoint.getEndpointURI().getAddress(), connector.getQueueManager());
         }
     }
 

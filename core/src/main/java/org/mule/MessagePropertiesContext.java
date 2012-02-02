@@ -62,6 +62,7 @@ public class MessagePropertiesContext implements Serializable
      */
     protected Map<PropertyScope, Map<String, Object>> scopedMap;
 
+    protected Map<String, Object> invocationMap = new UndefinedInvocationPropertiesMap();
     protected transient Map<String, Object> sessionMap = new UndefinedSessionPropertiesMap();
 
     /**
@@ -74,8 +75,6 @@ public class MessagePropertiesContext implements Serializable
     {
         keySet = new TreeSet<String>();
         scopedMap = new TreeMap<PropertyScope, Map<String, Object>>(new PropertyScope.ScopeComparator());
-
-        scopedMap.put(PropertyScope.INVOCATION, new CaseInsensitiveHashMap/* <String, Object> */(6));
         scopedMap.put(PropertyScope.INBOUND, new CaseInsensitiveHashMap/* <String, Object> */(6));
         scopedMap.put(PropertyScope.OUTBOUND, new CaseInsensitiveHashMap/* <String, Object> */(6));
     }
@@ -85,6 +84,10 @@ public class MessagePropertiesContext implements Serializable
         if (PropertyScope.SESSION.equals(scope))
         {
             return sessionMap;
+        }
+        else if (PropertyScope.INVOCATION.equals(scope))
+        {
+            return invocationMap;
         }
         else
         {
@@ -348,8 +351,7 @@ public class MessagePropertiesContext implements Serializable
      */
     private void writeObject(java.io.ObjectOutputStream out) throws IOException
     {
-        for (PropertyScope scope : new PropertyScope[]{PropertyScope.INVOCATION, PropertyScope.INBOUND,
-            PropertyScope.OUTBOUND})
+        for (PropertyScope scope : new PropertyScope[]{PropertyScope.INBOUND, PropertyScope.OUTBOUND})
         {
             for (Map.Entry<String, Object> entry : scopedMap.get(scope).entrySet())
             {
@@ -358,6 +360,21 @@ public class MessagePropertiesContext implements Serializable
                 {
                     String message = String.format(
                         "Unable to serialize the %s message property %s, which is of type %s ", scope,
+                        entry.getKey(), value);
+                    logger.error(message);
+                    throw new IOException(message);
+                }
+            }
+        }
+        if (invocationMap instanceof UndefinedInvocationPropertiesMap)
+        {
+            for (Map.Entry<String, Object> entry : invocationMap.entrySet())
+            {
+                Object value = entry.getValue();
+                if (value != null && !(value instanceof Serializable))
+                {
+                    String message = String.format(
+                        "Unable to serialize the invocation message property %s, which is of type %s ",
                         entry.getKey(), value);
                     logger.error(message);
                     throw new IOException(message);
@@ -390,8 +407,8 @@ public class MessagePropertiesContext implements Serializable
         {
             throw new IllegalStateException(
                 String.format(
-                    "Detected an attempt to set a session property, "
-                                    + "but a MuleEvent hasn't been created useing this message yet. Key/value: %s=%s",
+                    "Detected an attempt to set a invocation or session property, "
+                                    + "but a MuleEvent hasn't been created using this message yet. Key/value: %s=%s",
                     key, value));
         };
 
@@ -399,10 +416,16 @@ public class MessagePropertiesContext implements Serializable
         public Object get(Object key)
         {
             logger.warn(String.format(
-                "Detected an attempt to get a session property, "
-                                + "but a MuleEvent hasn't been created useing this message yet. Key: %s", key));
+                "Detected an attempt to get a invocation or session property, "
+                                + "but a MuleEvent hasn't been created using this message yet. Key: %s", key));
             return null;
         }
+    }
+
+    private static class UndefinedInvocationPropertiesMap extends CaseInsensitiveHashMap
+    {
+        private static final long serialVersionUID = 8400889672358403911L;
+
     }
 
 }

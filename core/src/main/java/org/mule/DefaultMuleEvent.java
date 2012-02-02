@@ -33,6 +33,7 @@ import org.mule.security.MuleCredentials;
 import org.mule.session.DefaultMuleSession;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transport.DefaultReplyToHandler;
+import org.mule.util.CaseInsensitiveHashMap;
 import org.mule.util.store.DeserializationPostInitialisable;
 
 import java.io.IOException;
@@ -40,11 +41,12 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OptionalDataException;
 import java.io.OutputStream;
+import java.io.Serializable;
 import java.net.URI;
-import java.util.EventObject;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -54,11 +56,11 @@ import org.apache.commons.logging.LogFactory;
  * received within the Mule environment will be passed between components as an MuleEvent.
  * <p/>
  * The MuleEvent holds some data and provides helper methods for obtaining the data in a format that the
- * receiving Mule component understands. The event can also maintain any number of properties that can be set
+ * receiving Mule component understands. The event can also maintain any number of flowVariables that can be set
  * and retrieved by Mule components.
  */
 
-public class DefaultMuleEvent extends EventObject
+public class DefaultMuleEvent 
     implements MuleEvent, ThreadSafeAccess, DeserializationPostInitialisable
 {
     private static final long serialVersionUID = 1L;
@@ -69,7 +71,7 @@ public class DefaultMuleEvent extends EventObject
 
     /** The Universally Unique ID for the event */
     private final String id;
-    private final MuleMessage message;
+    private MuleMessage message;
     private final MuleSession session;
     private transient FlowConstruct flowConstruct;
 
@@ -92,6 +94,8 @@ public class DefaultMuleEvent extends EventObject
     protected String[] ignoredPropertyOverrides = new String[]{MuleProperties.MULE_METHOD_PROPERTY};
 
     private transient Map<String, Object> serializedData = null;
+
+    private Map<String, Object> flowVariables = new CaseInsensitiveHashMap/* <String, Object> */(6);
 
     // Constructors
 
@@ -190,11 +194,11 @@ public class DefaultMuleEvent extends EventObject
                             Credentials credentials,
                             ResponseOutputStream outputStream)
     {
-        super(message.getPayload());
         this.id = generateEventId(message.getMuleContext());
-        this.message = message;
         this.flowConstruct = flowConstruct;
         this.session = session;
+        setMessage(message);
+
         this.exchangePattern = exchangePattern;
         this.outputStream = outputStream;
         this.credentials = null;
@@ -207,10 +211,6 @@ public class DefaultMuleEvent extends EventObject
         this.timeout = timeout;
         this.transacted = false;
         this.synchronous = resolveEventSynchronicity();
-        if (message instanceof DefaultMuleMessage)
-        {
-            ((DefaultMuleMessage) message).setSessionProperties(session.getProperties());
-        }
     }
 
     // Constructors for inbound endpoint
@@ -223,9 +223,7 @@ public class DefaultMuleEvent extends EventObject
         this(message, endpoint, flowConstruct, session, null, null);
     }
 
-    public DefaultMuleEvent(MuleMessage message,
-                            InboundEndpoint endpoint,
-                            FlowConstruct flowConstruct)
+    public DefaultMuleEvent(MuleMessage message, InboundEndpoint endpoint, FlowConstruct flowConstruct)
     {
         this(message, endpoint, flowConstruct, new DefaultMuleSession(), null, null);
     }
@@ -237,11 +235,10 @@ public class DefaultMuleEvent extends EventObject
                             ReplyToHandler replyToHandler,
                             ResponseOutputStream outputStream)
     {
-        super(message.getPayload());
         this.id = generateEventId(message.getMuleContext());
-        this.message = message;
         this.flowConstruct = flowConstruct;
         this.session = session;
+        setMessage(message);
 
         this.outputStream = outputStream;
         this.processingTime = ProcessingTime.newInstance(this);
@@ -255,10 +252,6 @@ public class DefaultMuleEvent extends EventObject
         this.transacted = endpoint.getTransactionConfig().isTransacted();
         fillProperties(endpoint);
         this.synchronous = resolveEventSynchronicity();
-        if (message instanceof DefaultMuleMessage)
-        {
-            ((DefaultMuleMessage) message).setSessionProperties(session.getProperties());
-        }
     }
 
     // Constructors to copy MuleEvent
@@ -279,7 +272,7 @@ public class DefaultMuleEvent extends EventObject
         this(rewriteEvent.getMessage(), rewriteEvent, flowConstruct, rewriteEvent.getSession(),
             rewriteEvent.isSynchronous());
     }
-    
+
     public DefaultMuleEvent(MuleMessage message, MuleEvent rewriteEvent, boolean synchronus)
     {
         this(message, rewriteEvent, rewriteEvent.getFlowConstruct(), rewriteEvent.getSession(), synchronus);
@@ -297,14 +290,12 @@ public class DefaultMuleEvent extends EventObject
     }
 
     protected DefaultMuleEvent(MuleMessage message,
-                            MuleEvent rewriteEvent,
-                            FlowConstruct flowConstruct,
-                            MuleSession session,
-                            boolean synchronous)
+                               MuleEvent rewriteEvent,
+                               FlowConstruct flowConstruct,
+                               MuleSession session,
+                               boolean synchronous)
     {
-        super(message.getPayload());
         this.id = rewriteEvent.getId();
-        this.message = message;
         this.flowConstruct = flowConstruct;
         this.session = session;
 
@@ -317,21 +308,18 @@ public class DefaultMuleEvent extends EventObject
         if (rewriteEvent instanceof DefaultMuleEvent)
         {
             this.processingTime = ((DefaultMuleEvent) rewriteEvent).processingTime;
+            this.flowVariables = ((DefaultMuleEvent) rewriteEvent).flowVariables;
         }
         else
         {
             this.processingTime = ProcessingTime.newInstance(this);
         }
+        setMessage(message);
         this.replyToHandler = rewriteEvent.getReplyToHandler();
         this.replyToDestination = rewriteEvent.getReplyToDestination();
         this.timeout = rewriteEvent.getTimeout();
         this.transacted = rewriteEvent.isTransacted();
         this.synchronous = synchronous;
-        if (message instanceof DefaultMuleMessage)
-        {
-            ((DefaultMuleMessage) message).setSessionProperties(session.getProperties());
-        }
-
     }
 
     // Constructor with everything just in case
@@ -351,11 +339,11 @@ public class DefaultMuleEvent extends EventObject
                             Object replyToDestination,
                             ReplyToHandler replyToHandler)
     {
-        super(message.getPayload());
         this.id = generateEventId(message.getMuleContext());
-        this.message = message;
         this.flowConstruct = flowConstruct;
         this.session = session;
+        setMessage(message);
+
         this.credentials = credentials;
         this.encoding = encoding;
         this.exchangePattern = exchangePattern;
@@ -368,10 +356,6 @@ public class DefaultMuleEvent extends EventObject
         this.timeout = timeout;
         this.outputStream = outputStream;
         this.replyToDestination = replyToDestination;
-        if (message instanceof DefaultMuleMessage)
-        {
-            ((DefaultMuleMessage) message).setSessionProperties(session.getProperties());
-        }
     }
 
     protected boolean resolveEventSynchronicity()
@@ -400,7 +384,7 @@ public class DefaultMuleEvent extends EventObject
                 // don't overwrite property on the message
                 if (!ignoreProperty(prop))
                 {
-                    // inbound endpoint properties are in the invocation scope
+                    // inbound endpoint flowVariables are in the invocation scope
                     Object value = endpoint.getProperties().get(prop);
                     message.setInvocationProperty(prop, value);
                 }
@@ -726,6 +710,7 @@ public class DefaultMuleEvent extends EventObject
         if (message instanceof DefaultMuleMessage)
         {
             ((DefaultMuleMessage) message).initAfterDeserialisation(muleContext);
+            setMessage(message);
         }
         if (replyToHandler instanceof DefaultReplyToHandler)
         {
@@ -884,7 +869,7 @@ public class DefaultMuleEvent extends EventObject
     {
         return synchronous;
     }
-    
+
     // //////////////////////////
     // Serialization methods
     // //////////////////////////
@@ -908,6 +893,18 @@ public class DefaultMuleEvent extends EventObject
                 out.writeObject(getFlowConstruct() != null ? getFlowConstruct().getName() : "null");
             }
         }
+        for (Map.Entry<String, Object> entry : flowVariables.entrySet())
+        {
+            Object value = entry.getValue();
+            if (value != null && !(value instanceof Serializable))
+            {
+                String message = String.format(
+                    "Unable to serialize the flow variable %s, which is of type %s ", entry.getKey(), value);
+                logger.error(message);
+                throw new IOException(message);
+            }
+        }
+
     }
 
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException
@@ -924,5 +921,90 @@ public class DefaultMuleEvent extends EventObject
         {
             // ignore
         }
+    }
+
+    @Override
+    public void setMessage(MuleMessage message)
+    {
+        this.message = message;
+        if (message instanceof DefaultMuleMessage)
+        {
+            for (String name : message.getInvocationPropertyNames())
+            {
+                setFlowVariable(name, message.getInvocationProperty(name));
+            }
+            ((DefaultMuleMessage) message).setInvocationProperties(flowVariables);
+            if (session instanceof DefaultMuleSession)
+            {
+                ((DefaultMuleMessage) message).setSessionProperties(((DefaultMuleSession) session).getProperties());
+            }
+        }
+    }
+
+    public static MuleEvent copy(MuleEvent event)
+    {
+        MuleMessage messageCopy = (MuleMessage) ((ThreadSafeAccess) event.getMessage()).newThreadCopy();
+        DefaultMuleEvent eventCopy = new DefaultMuleEvent(messageCopy, event, new DefaultMuleSession(
+            event.getSession()));
+        eventCopy.flowVariables = new CaseInsensitiveHashMap(((DefaultMuleEvent) event).flowVariables);
+        ((DefaultMuleMessage) messageCopy).setInvocationProperties(eventCopy.flowVariables);
+        ((DefaultMuleMessage) messageCopy).resetAccessControl();
+        return eventCopy;
+    }
+
+    public Set<String> getFlowVariableNames()
+    {
+        return flowVariables.keySet();
+    }
+
+    public void clearFlowVariables()
+    {
+        flowVariables.clear();
+    }
+
+    public Object getFlowVariable(String key)
+    {
+        return flowVariables.get(key);
+    }
+
+    public void setFlowVariable(String key, Object value)
+    {
+        flowVariables.put(key, value);
+    }
+
+    @Override
+    public void removeFlowVariable(String key)
+    {
+        flowVariables.remove(key);
+    }
+
+    @Override
+    public Object getSessionVariable(String key)
+    {
+        return session.getProperty(key);
+    }
+
+    @Override
+    public void setSessionVariable(String key, Object value)
+    {
+        session.setProperty(key, value);
+    }
+
+    @Override
+    public void removeSessionVariable(String key)
+    {
+        session.removeProperty(key);
+    }
+
+    @Override
+    public Set<String> getSessionVariableNames()
+    {
+        return session.getPropertyNamesAsSet();
+    }
+
+    @Override
+    public void clearSessionVariables()
+    {
+        session.clearProperties();
     }
 }

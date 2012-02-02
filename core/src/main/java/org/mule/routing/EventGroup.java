@@ -457,10 +457,13 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
     {
         MuleSession session = new DefaultMuleSession(
             ((MuleEvent) events.retrieve(events.allKeys().get(0))).getSession());
-        for (int i = 1; i < events.allKeys().size(); i++)
+        for (Serializable key : events.allKeys())
         {
-            session.getProperties().putAll(
-                ((MuleEvent) events.retrieve(events.allKeys().get(i))).getSession().getProperties());
+            MuleEvent event = events.retrieve(key);
+            for (String name : event.getSession().getPropertyNamesAsSet())
+            {
+                session.setProperty(name, event.getSession().getProperty(name));
+            }
         }
         return session;
     }

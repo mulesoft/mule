@@ -213,7 +213,7 @@ public class InboundHeadersAnnotationTestCase extends AbstractServiceAndFlowTest
         Map<?, ?> result = (Map<?, ?>) message.getPayload();
         printResult(result);
         //Will match all Mule headers
-        assertEquals(3, result.size());
+        assertEquals(4, result.size());
         assertEquals("vm://headersWildcard", result.get(MuleProperties.MULE_ENDPOINT_PROPERTY));
         assertTrue(result.keySet().contains(MuleProperties.MULE_SESSION_PROPERTY));
     }
@@ -228,7 +228,7 @@ public class InboundHeadersAnnotationTestCase extends AbstractServiceAndFlowTest
         Map<?, ?> result = (Map<?, ?>) message.getPayload();
         printResult(result);
         //Will match all Mule headers
-        assertEquals(5, result.size());
+        assertEquals(6, result.size());
 
         //Match on MULE_*
         assertEquals("vm://headersMultiWildcard", result.get(MuleProperties.MULE_ENDPOINT_PROPERTY));
@@ -362,7 +362,7 @@ public class InboundHeadersAnnotationTestCase extends AbstractServiceAndFlowTest
         List<?> result = (List<?>) message.getPayload();
         printResult(result);
         //Will match all Mule headers
-        assertEquals(3, result.size());
+        assertEquals(4, result.size());
 
         //MULE_ENDPOINT
         assertTrue(result.contains("vm://headersListWildcard"));
@@ -379,7 +379,7 @@ public class InboundHeadersAnnotationTestCase extends AbstractServiceAndFlowTest
         List<?> result = (List<?>) message.getPayload();
         printResult(result);
         //Will match on MULE_* and ba*
-        assertEquals(5, result.size());
+        assertEquals(6, result.size());
 
         //Match on MULE_*
 

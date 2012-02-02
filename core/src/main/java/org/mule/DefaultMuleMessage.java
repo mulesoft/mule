@@ -206,6 +206,12 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
             setExceptionPayload(previous.getExceptionPayload());
         }
 
+        if (previous instanceof DefaultMuleMessage)
+        {
+            setInvocationProperties(((DefaultMuleMessage) previous).properties.invocationMap);
+            setSessionProperties(((DefaultMuleMessage) previous).properties.sessionMap);
+        }
+
         copyAttachments(previous);
 
         resetAccessControl();
@@ -218,7 +224,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
                 ((DefaultMuleMessage) muleMessage).properties.getScopedProperties(PropertyScope.INBOUND);
         addInboundProperties(inboundProperties);
 
-        for (PropertyScope scope : new PropertyScope[]{PropertyScope.INVOCATION, PropertyScope.INBOUND,
+        for (PropertyScope scope : new PropertyScope[]{PropertyScope.INBOUND,
             PropertyScope.OUTBOUND})
         {
             try
@@ -1922,4 +1928,10 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     {
         properties.sessionMap = sessionProperties;
     }
+
+    void setInvocationProperties(Map<String, Object> invocationProperties)
+    {
+        properties.invocationMap = invocationProperties;
+    }
+
 }

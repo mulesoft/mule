@@ -31,9 +31,12 @@ import org.mule.util.UUID;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
+import java.util.HashSet;
+import java.util.Set;
 
-/** An event used for outbound routing tests.  It is not fully fleshed out, containing only the information needed for
- * routing.
+/**
+ * An event used for outbound routing tests. It is not fully fleshed out, containing only the information
+ * needed for routing.
  */
 public class OutboundRoutingTestEvent implements MuleEvent
 {
@@ -43,8 +46,9 @@ public class OutboundRoutingTestEvent implements MuleEvent
     private boolean stopFurtherProcessing;
     int timeout = -1;
     private InboundEndpoint endpoint;
-    
-    public OutboundRoutingTestEvent(MuleMessage message, MuleSession session, MuleContext muleContext) throws Exception
+
+    public OutboundRoutingTestEvent(MuleMessage message, MuleSession session, MuleContext muleContext)
+        throws Exception
     {
         this.message = message;
         this.session = session;
@@ -237,19 +241,19 @@ public class OutboundRoutingTestEvent implements MuleEvent
     {
         return false;
     }
-    
+
     @Override
     public URI getMessageSourceURI()
     {
         return URI.create("test://test");
     }
-    
+
     @Override
     public String getMessageSourceName()
     {
         return "test";
     }
-    
+
     @Override
     public ReplyToHandler getReplyToHandler()
     {
@@ -272,4 +276,64 @@ public class OutboundRoutingTestEvent implements MuleEvent
     {
         return false;
     }
+
+    @Override
+    public void setMessage(MuleMessage message)
+    {
+    }
+
+    @Override
+    public Object getFlowVariable(String key)
+    {
+        return null;
+    }
+
+    @Override
+    public void setFlowVariable(String key, Object value)
+    {
+    }
+
+    @Override
+    public void removeFlowVariable(String key)
+    {
+    }
+
+    @Override
+    public Set<String> getFlowVariableNames()
+    {
+        return new HashSet<String>();
+    }
+
+    @Override
+    public void clearFlowVariables()
+    {
+    }
+
+    @Override
+    public Object getSessionVariable(String key)
+    {
+        return null;
+    }
+
+    @Override
+    public void setSessionVariable(String key, Object value)
+    {
+    }
+
+    @Override
+    public void removeSessionVariable(String key)
+    {
+    }
+
+    @Override
+    public Set<String> getSessionVariableNames()
+    {
+        return new HashSet<String>();
+    }
+
+    @Override
+    public void clearSessionVariables()
+    {
+    }
+
 }

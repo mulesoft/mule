@@ -12,7 +12,7 @@ package org.mule.routing;
 
 import org.mule.DefaultMessageCollection;
 import org.mule.DefaultMuleEvent;
-import org.mule.RequestContext;
+import org.mule.OptimizedRequestContext;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessageCollection;
@@ -96,7 +96,11 @@ public class DefaultRouterResultsHandler implements RouterResultsHandler
             coll.addMessage(event.getMessage());
         }
         coll.propagateRootId(previous.getMessage());
-        // ((DefaultMuleMessage) coll).copyInvocationProperties(previous.getMessage());
-        return RequestContext.setEvent(new DefaultMuleEvent(coll, previous, previous.getSession()));
+        MuleEvent resultEvent = new DefaultMuleEvent(coll, previous, previous.getSession());
+        for (String name : previous.getFlowVariableNames())
+        {
+            resultEvent.setFlowVariable(name, previous.getFlowVariable(name));
+        }
+        return OptimizedRequestContext.unsafeSetEvent(resultEvent);
     }
 }

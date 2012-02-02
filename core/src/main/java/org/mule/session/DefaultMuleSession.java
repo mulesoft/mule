@@ -164,11 +164,9 @@ public final class DefaultMuleSession implements MuleSession
     }
 
     /**
-     * Returns an iterater of property keys for the session properties on this
-     * session
-     *
-     * @return an iterater of property keys for the session properties on this
-     *         session
+     * Returns an iterater of property keys for the session properties on this session
+     * 
+     * @return an iterater of property keys for the session properties on this session
      * @deprecated Use getPropertyNamesAsSet() instead
      */
     @Override
@@ -206,7 +204,6 @@ public final class DefaultMuleSession implements MuleSession
         }
     }
 
-    @Override
     public Map<String, Object> getProperties()
     {
         return properties;
@@ -214,7 +211,7 @@ public final class DefaultMuleSession implements MuleSession
 
     void removeNonSerializableProperties()
     {
-        Iterator<Entry<String, Object>> propertyIterator = getProperties().entrySet().iterator();
+        Iterator<Entry<String, Object>> propertyIterator = properties.entrySet().iterator();
         while (propertyIterator.hasNext())
         {
             final Entry<String, Object> entry = propertyIterator.next();
@@ -253,7 +250,7 @@ public final class DefaultMuleSession implements MuleSession
         DefaultMuleSession copy = new DefaultMuleSession(this);
         copy.removeNonSerializableProperties();
         out.defaultWriteObject();
-        out.writeObject(copy.getProperties());
+        out.writeObject(copy.properties);
     }
 
     @SuppressWarnings("unchecked")
@@ -261,6 +258,12 @@ public final class DefaultMuleSession implements MuleSession
     {
         in.defaultReadObject();
         properties = (Map<String, Object>) in.readObject();
+    }
+
+    @Override
+    public void clearProperties()
+    {
+        properties.clear();
     }
 
 }

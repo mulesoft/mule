@@ -98,7 +98,7 @@ public class SimpleCollectionAggregatorTestCase extends AbstractMuleContextTestC
         assertEquals("test event C", results[2]);
 
         // Assert that session was merged correctly
-        assertEquals(3, sensingMessageProcessor.event.getSession().getProperties().size());
+        assertEquals(3, sensingMessageProcessor.event.getSession().getPropertyNamesAsSet().size());
         assertEquals("value1NEW", sensingMessageProcessor.event.getSession().getProperty("key1"));
         assertEquals("value2", sensingMessageProcessor.event.getSession().getProperty("key2"));
         assertEquals("value3", sensingMessageProcessor.event.getSession().getProperty("key3"));

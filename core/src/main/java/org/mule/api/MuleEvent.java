@@ -21,6 +21,7 @@ import org.mule.management.stats.ProcessingTime;
 import java.io.OutputStream;
 import java.io.Serializable;
 import java.net.URI;
+import java.util.Set;
 
 /**
  * <code>MuleEvent</code> represents any data event occuring in the Mule
@@ -295,4 +296,26 @@ public interface MuleEvent extends Serializable
     
     boolean isSynchronous();
     
+    void setMessage(MuleMessage message);
+    
+    Object getFlowVariable(String key);
+
+    void setFlowVariable(String key, Object value);
+
+    void removeFlowVariable(String key);
+
+    Set<String> getFlowVariableNames();
+
+    void clearFlowVariables();
+    
+    Object getSessionVariable(String key);
+
+    void setSessionVariable(String key, Object value);
+
+    void removeSessionVariable(String key);
+
+    Set<String> getSessionVariableNames();
+
+    void clearSessionVariables();
+
 }

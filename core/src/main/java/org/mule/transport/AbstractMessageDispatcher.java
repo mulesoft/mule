@@ -28,11 +28,11 @@ import org.mule.service.ServiceAsyncReplyCompositeMessageSource;
 import java.util.List;
 
 /**
- * Abstract implementation of an outbound channel adaptors. Outbound channel adaptors
- * send messages over over a specific transport. Different implementations may
- * support different Message Exchange Patterns.
+ * Abstract implementation of an outbound channel adaptors. Outbound channel adaptors send messages over over
+ * a specific transport. Different implementations may support different Message Exchange Patterns.
  */
-public abstract class AbstractMessageDispatcher extends AbstractTransportMessageHandler implements MessageDispatcher
+public abstract class AbstractMessageDispatcher extends AbstractTransportMessageHandler
+    implements MessageDispatcher
 {
 
     protected List<Transformer> defaultOutboundTransformers;
@@ -46,8 +46,8 @@ public abstract class AbstractMessageDispatcher extends AbstractTransportMessage
     @Override
     protected ConnectableLifecycleManager createLifecycleManager()
     {
-        defaultOutboundTransformers = connector.getDefaultOutboundTransformers(endpoint);       
-        defaultResponseTransformers = connector.getDefaultResponseTransformers(endpoint);       
+        defaultOutboundTransformers = connector.getDefaultOutboundTransformers(endpoint);
+        defaultResponseTransformers = connector.getDefaultResponseTransformers(endpoint);
         return new ConnectableLifecycleManager<MessageDispatcher>(getDispatcherName(), this);
     }
 
@@ -55,26 +55,25 @@ public abstract class AbstractMessageDispatcher extends AbstractTransportMessage
     {
         return getConnector().getName() + ".dispatcher." + System.identityHashCode(this);
     }
-    
-
 
     public MuleEvent process(MuleEvent event) throws MuleException
     {
-        MuleEvent resultEvent = null;
         try
         {
             connect();
 
-            String prop = event.getMessage().getOutboundProperty(MuleProperties.MULE_DISABLE_TRANSPORT_TRANSFORMER_PROPERTY);
-            boolean disableTransportTransformer = (prop != null && Boolean.parseBoolean(prop)) || endpoint.isDisableTransportTransformer();
-                        
+            String prop = event.getMessage().getOutboundProperty(
+                MuleProperties.MULE_DISABLE_TRANSPORT_TRANSFORMER_PROPERTY);
+            boolean disableTransportTransformer = (prop != null && Boolean.parseBoolean(prop))
+                                                  || endpoint.isDisableTransportTransformer();
+
             if (!disableTransportTransformer)
             {
-                applyOutboundTransformers(event);            
+                applyOutboundTransformers(event);
             }
             boolean hasResponse = endpoint.getExchangePattern().hasResponse();
 
-            connector.getSessionHandler().storeSessionInfoToMessage(event.getSession(),event.getMessage());
+            connector.getSessionHandler().storeSessionInfoToMessage(event.getSession(), event.getMessage());
 
             if (hasResponse)
             {
@@ -82,20 +81,22 @@ public abstract class AbstractMessageDispatcher extends AbstractTransportMessage
                 if (resultMessage != null)
                 {
                     resultMessage.setMessageRootId(event.getMessage().getMessageRootId());
-                    MuleSession storedSession = connector.getSessionHandler().retrieveSessionInfoFromMessage(resultMessage);
+                    MuleSession storedSession = connector.getSessionHandler().retrieveSessionInfoFromMessage(
+                        resultMessage);
                     event.getSession().merge(storedSession);
-                    resultEvent = new DefaultMuleEvent(resultMessage, event);
+                    MuleEvent resultEvent = new DefaultMuleEvent(resultMessage, event);
                     RequestContext.setEvent(resultEvent);
-                    // TODO It seems like this should go here but it causes unwanted behaviour and breaks test cases.
-                    //if (!disableTransportTransformer)
-                    //{
-                    //    applyResponseTransformers(resultEvent);            
-                    //}
+                    return resultEvent;
+                }
+                else
+                {
+                    return null;
                 }
             }
             else
             {
                 doDispatch(event);
+                return null;
             }
         }
         catch (MuleException muleException)
@@ -106,7 +107,6 @@ public abstract class AbstractMessageDispatcher extends AbstractTransportMessage
         {
             throw new DispatchException(event, getEndpoint(), e);
         }
-        return resultEvent;
     }
 
     /**
@@ -121,27 +121,24 @@ public abstract class AbstractMessageDispatcher extends AbstractTransportMessage
     }
 
     /**
-     * Used to determine if the dispatcher implementation should wait for a response
-     * to an event on a response channel after it sends the event. The following
-     * rules apply:
+     * Used to determine if the dispatcher implementation should wait for a response to an event on a response
+     * channel after it sends the event. The following rules apply:
      * <ol>
-     * <li>The connector has to support "back-channel" response. Some transports do
-     * not have the notion of a response channel.
-     * <li>Check if the endpoint is synchronous (outbound synchronicity is not
-     * explicit since 2.2 and does not use the remoteSync message property).
-     * <li>Or, if the send() method on the dispatcher was used. (This is required
-     * because the ChainingRouter uses send() with async endpoints. See MULE-4631).
-     * <li>Finally, if the current service has a response router configured, that the
-     * router will handle the response channel event and we should not try and
-     * receive a response in the Message dispatcher If remotesync should not be used
-     * we must remove the REMOTE_SYNC header Note the MuleClient will automatically
-     * set the REMOTE_SYNC header when client.send(..) is called so that results are
-     * returned from remote invocations too.
+     * <li>The connector has to support "back-channel" response. Some transports do not have the notion of a
+     * response channel.
+     * <li>Check if the endpoint is synchronous (outbound synchronicity is not explicit since 2.2 and does not
+     * use the remoteSync message property).
+     * <li>Or, if the send() method on the dispatcher was used. (This is required because the ChainingRouter
+     * uses send() with async endpoints. See MULE-4631).
+     * <li>Finally, if the current service has a response router configured, that the router will handle the
+     * response channel event and we should not try and receive a response in the Message dispatcher If
+     * remotesync should not be used we must remove the REMOTE_SYNC header Note the MuleClient will
+     * automatically set the REMOTE_SYNC header when client.send(..) is called so that results are returned
+     * from remote invocations too.
      * </ol>
      * 
      * @param event the current event
-     * @return true if a response channel should be used to get a response from the
-     *         event dispatch.
+     * @return true if a response channel should be used to get a response from the event dispatch.
      */
     protected boolean returnResponse(MuleEvent event, boolean doSend)
     {
@@ -193,7 +190,7 @@ public abstract class AbstractMessageDispatcher extends AbstractTransportMessage
     {
         return (OutboundEndpoint) super.getEndpoint();
     }
-    
+
     protected void applyOutboundTransformers(MuleEvent event) throws MuleException
     {
         event.getMessage().applyTransformers(event, defaultOutboundTransformers);

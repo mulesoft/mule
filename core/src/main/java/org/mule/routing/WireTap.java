@@ -10,7 +10,8 @@
 
 package org.mule.routing;
 
-import org.mule.RequestContext;
+import org.mule.DefaultMuleEvent;
+import org.mule.OptimizedRequestContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.processor.MessageProcessor;
@@ -56,9 +57,10 @@ public class WireTap extends AbstractMessageProcessorOwner implements MessagePro
 
         try
         {
-            // Do we need this?
-            RequestContext.setEvent(null);
-            filteredTap.process(RequestContext.setEvent(event));
+            MuleEvent tapEvent = DefaultMuleEvent.copy(event);
+            OptimizedRequestContext.unsafeSetEvent(tapEvent);
+            filteredTap.process(tapEvent);
+            OptimizedRequestContext.unsafeSetEvent(event);
         }
         catch (MuleException e)
         {

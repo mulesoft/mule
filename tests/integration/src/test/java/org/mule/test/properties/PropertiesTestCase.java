@@ -10,6 +10,9 @@
 
 package org.mule.test.properties;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
@@ -21,9 +24,6 @@ import java.util.Collection;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-
 public class PropertiesTestCase extends AbstractServiceAndFlowTestCase
 {
     @Parameters
@@ -31,8 +31,7 @@ public class PropertiesTestCase extends AbstractServiceAndFlowTestCase
     {
         return Arrays.asList(new Object[][]{
             {ConfigVariant.SERVICE, "org/mule/test/properties/properties-config-service.xml"},
-            {ConfigVariant.FLOW, "org/mule/test/properties/properties-config-flow.xml"}
-        });
+            {ConfigVariant.FLOW, "org/mule/test/properties/properties-config-flow.xml"}});
     }
 
     public PropertiesTestCase(ConfigVariant variant, String configResources)
@@ -41,7 +40,8 @@ public class PropertiesTestCase extends AbstractServiceAndFlowTestCase
     }
 
     /**
-     * Test that the VM transport correctly copies outbound to inbound properties both for requests amd responses
+     * Test that the VM transport correctly copies outbound to inbound properties both for requests amd
+     * responses
      */
     @Test
     public void testProperties() throws Exception
@@ -55,12 +55,12 @@ public class PropertiesTestCase extends AbstractServiceAndFlowTestCase
         assertNull(response.getInboundProperty("outbound2"));
         assertNull(response.getOutboundProperty("outbound1"));
         assertNull(response.getOutboundProperty("outbound2"));
-        assertNull(response.<Object>getInvocationProperty("invocation1"));
-        assertNull(response.<Object>getInvocationProperty("invocation2"));
+        assertEquals("ja", response.<Object> getInvocationProperty("invocation1"));
+        assertEquals("nein", response.<Object> getInvocationProperty("invocation2"));
         assertEquals("123", response.getInboundProperty("outbound3"));
         assertEquals("456", response.getInboundProperty("outbound4"));
-        assertNull(response.<Object>getInvocationProperty("invocation3"));
-        assertNull(response.<Object>getInvocationProperty("invocation4"));
+        assertNull(response.<Object> getInvocationProperty("invocation3"));
+        assertNull(response.<Object> getInvocationProperty("invocation4"));
 
         MuleMessage msg2 = createOutboundMessage();
         client.dispatch("vm://inQueue", msg2);
@@ -71,8 +71,8 @@ public class PropertiesTestCase extends AbstractServiceAndFlowTestCase
         assertEquals("no", response.getInboundProperty("outbound2"));
         assertNull(response.getOutboundProperty("outbound1"));
         assertNull(response.getOutboundProperty("outbound2"));
-        assertNull(response.<Object>getInvocationProperty("invocation1"));
-        assertNull(response.<Object>getInvocationProperty("invocation2"));
+        assertNull(response.<Object> getInvocationProperty("invocation1"));
+        assertNull(response.<Object> getInvocationProperty("invocation2"));
 
     }
 
@@ -89,8 +89,8 @@ public class PropertiesTestCase extends AbstractServiceAndFlowTestCase
     public static class Component
     {
         /**
-         * Create a message with outbound and invocation properties.  These should have been moved to the inbound scope
-         * by the time the message is received.  Invocation properties should have been removed
+         * Create a message with outbound and invocation properties. These should have been moved to the
+         * inbound scope by the time the message is received. Invocation properties should have been removed
          */
         public MuleMessage process(Object payload)
         {

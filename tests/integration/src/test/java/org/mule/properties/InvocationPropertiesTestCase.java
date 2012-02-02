@@ -31,7 +31,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.After;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -138,7 +137,6 @@ public class InvocationPropertiesTestCase extends org.mule.tck.junit4.Functional
     }
 
     @Test
-    @Ignore
     public void propagationWithHTTPRequestResponseOutboundEndpointMidFlow() throws Exception
     {
         testFlow("HTTPRequestResponseEndpointFlowMidFlow");
@@ -215,50 +213,43 @@ public class InvocationPropertiesTestCase extends org.mule.tck.junit4.Functional
     }
 
     @Test
-    @Ignore
-    /** Router drops invocation properties **/
     public void propagateThroughAllRouterWithResults() throws Exception
     {
         testFlow("propagateThroughAllRouterWithResults");
     }
 
     @Test
-    @Ignore
-    /** Router drops invocation properties **/
     public void propagateThroughAllRouterWithNoResults() throws Exception
     {
-        testFlow("All");
         testFlow("propagateThroughAllRouterWithNoResults");
     }
 
     @Test
-    public void noPropagateBetweenRoutes() throws Exception
+    public void propagateBetweenRoutes() throws Exception
     {
-        testFlow("noPropagateBetweenRoutes");
+        testFlow("propagateBetweenRoutes");
     }
 
     @Test
-    public void noPropagateFromRouteToNextProcessorSingleRoute() throws Exception
+    public void propagateFromRouteToNextProcessorSingleRoute() throws Exception
     {
-        testFlow("noPropagateFromRouteToNextProcessorSingleRoute");
+        testFlow("propagateFromRouteToNextProcessorSingleRoute");
     }
 
     @Test
-    public void noPropagateFromRouteToNextProcessorMultipleRoutes() throws Exception
+    public void propagateFromRouteToNextProcessorMultipleRoutes() throws Exception
     {
-        testFlow("noPropagateFromRouteToNextProcessorMultipleRoutes");
+        testFlow("propagateFromRouteToNextProcessorMultipleRoutes");
     }
 
     @Test
-    public void noPropagateFromRouteToNextProcessorNoResult() throws Exception
+    public void propagateFromRouteToNextProcessorNoResult() throws Exception
     {
-        testFlow("noPropagateFromRouteToNextProcessorNoResult");
+        testFlow("propagateFromRouteToNextProcessorNoResult");
     }
 
     
     @Test
-    @Ignore
-    /** Router drops invocation properties **/
     public void allAsync() throws Exception
     {
         testFlow("AllAsync");
@@ -275,8 +266,6 @@ public class InvocationPropertiesTestCase extends org.mule.tck.junit4.Functional
     }
 
     @Test
-    @Ignore
-    /** Aggregator drops invocation properties **/
     public void aggregationOfPropertiesFromMultipleMessageWithAggregator() throws Exception
     {
         List<Fruit> fruitList = new ArrayList<Fruit>();

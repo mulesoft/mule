@@ -34,6 +34,8 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.OutputStream;
 import java.net.URI;
+import java.util.Collections;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.junit.Test;
@@ -277,7 +279,7 @@ public class RequestContextTestCase extends AbstractMuleTestCase
         {
             return null;
         }
-        
+
         @Override
         public boolean isTransacted()
         {
@@ -289,13 +291,13 @@ public class RequestContextTestCase extends AbstractMuleTestCase
         {
             return URI.create("test://test");
         }
-        
+
         @Override
         public String getMessageSourceName()
         {
             return "test";
         }
-        
+
         @Override
         public ReplyToHandler getReplyToHandler()
         {
@@ -312,11 +314,70 @@ public class RequestContextTestCase extends AbstractMuleTestCase
         public void captureReplyToDestination()
         {
         }
-        
+
         @Override
         public boolean isSynchronous()
         {
             return false;
+        }
+
+        @Override
+        public void setMessage(MuleMessage message)
+        {
+        }
+
+        @Override
+        public void clearFlowVariables()
+        {
+        }
+
+        @Override
+        public Object getFlowVariable(String key)
+        {
+            return null;
+        }
+
+        @Override
+        public void setFlowVariable(String key, Object value)
+        {
+        }
+
+        @Override
+        public void removeFlowVariable(String key)
+        {
+        }
+
+        @Override
+        public Set<String> getFlowVariableNames()
+        {
+            return Collections.emptySet();
+        }
+
+        @Override
+        public Object getSessionVariable(String key)
+        {
+            return null;
+        }
+
+        @Override
+        public void setSessionVariable(String key, Object value)
+        {
+        }
+
+        @Override
+        public void removeSessionVariable(String key)
+        {
+        }
+
+        @Override
+        public Set<String> getSessionVariableNames()
+        {
+            return Collections.emptySet();
+        }
+
+        @Override
+        public void clearSessionVariables()
+        {
         }
     }
 

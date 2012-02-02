@@ -14,13 +14,13 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.fail;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.MessageExchangePattern;
 import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transport.PropertyScope;
@@ -30,91 +30,67 @@ import org.mule.tck.SensingNullMessageProcessor;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.util.SerializationUtils;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collections;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang.SerializationException;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class InvocationPropertiesTestCase extends AbstractMuleContextTestCase
 {
 
-    /**
-     * Session properties set via message API are lost and unavailable via both message and session API's.
-     */
     @Test
-    @Ignore
-    /** Session properties can be set with no event */
-    public void setInvocationPropertyNoEvent() throws Exception
+    public void setInvocationPropertyBeforeNewEvent() throws Exception
     {
         MuleMessage message = new DefaultMuleMessage("data", muleContext);
-        try
-        {
-            message.setProperty("key", "value", PropertyScope.INVOCATION);
-            fail("IllegalStateException excepted");
-        }
-        catch (IllegalStateException e)
-        {
-            // Expected
-        }
-        catch (Exception e)
-        {
-            fail("IllegalStateException excepted");
-
-        }
-
-        assertNull(message.getProperty("key", PropertyScope.INVOCATION));
-
+        message.setProperty("key", "value", PropertyScope.INVOCATION);
+        MuleEvent event = new DefaultMuleEvent(message, MessageExchangePattern.ONE_WAY, getTestService());
+        assertEquals("value", message.getProperty("key", PropertyScope.INVOCATION));
+        assertEquals("value", event.getFlowVariable("key"));
     }
 
-    /**
-     * Properties set via via message api are available via session API. But ONLY if RequestContext.setEvent()
-     * is used.
-     */
     @Test
-    @Ignore
-    /** Currently no API to get invocation properties from MuleEvent */
-    public void setInvocationPropertyOnMessageGetFromEvent() throws Exception
+    public void setInvocationPropertyBeforeExistingEvent() throws Exception
+    {
+        MuleMessage message = new DefaultMuleMessage("data", muleContext);
+        message.setProperty("key", "value", PropertyScope.INVOCATION);
+        MuleEvent event = new DefaultMuleEvent(message, MessageExchangePattern.ONE_WAY, getTestService());
+        event.setFlowVariable("key", "VALUE");
+        event.setFlowVariable("key2", "value2");
+        assertEquals("VALUE", message.getProperty("key", PropertyScope.INVOCATION));
+        assertEquals("value2", message.getProperty("key2", PropertyScope.INVOCATION));
+        assertEquals("VALUE", event.getFlowVariable("key"));
+        assertEquals("value2", event.getFlowVariable("key2"));
+    }
+
+    @Test
+    public void setInvocationPropertyViaMessageAPI() throws Exception
     {
         MuleMessage message = new DefaultMuleMessage("data", muleContext);
         MuleEvent event = new DefaultMuleEvent(message, MessageExchangePattern.ONE_WAY, getTestService());
 
         Object nonSerializable = new Object();
-        message.setProperty("key", "value", PropertyScope.SESSION);
-        message.setProperty("key2", nonSerializable, PropertyScope.SESSION);
-        message.setProperty("key3", "ERROR", PropertyScope.INVOCATION);
-        message.setProperty("key4", "ERROR", PropertyScope.INBOUND);
-        message.setProperty("key5", "ERROR", PropertyScope.OUTBOUND);
+        message.setProperty("key", "value", PropertyScope.INVOCATION);
+        message.setProperty("key2", nonSerializable, PropertyScope.INVOCATION);
 
-        assertEquals(2, event.getSession().getPropertyNamesAsSet().size());
-        assertEquals("value", event.getSession().getProperty("key"));
-        assertEquals(nonSerializable, event.getSession().getProperty("key2"));
+        assertEquals(2, event.getFlowVariableNames().size());
+        assertEquals("value", event.getFlowVariable("key"));
+        assertEquals(nonSerializable, event.getFlowVariable("key2"));
     }
 
-    /**
-     * Properties set via via session api are available via message API. But ONLY if RequestContext.setEvent()
-     * is used.
-     */
     @Test
-    @Ignore
-    /** Currently no API to set invocation properties on MuleEvent */
-    public void setInvocationPropertyOnEventGetFromMessage() throws Exception
+    public void getInvocationPropertyViaMessageAPI() throws Exception
     {
         MuleMessage message = new DefaultMuleMessage("data", muleContext);
         MuleEvent event = new DefaultMuleEvent(message, MessageExchangePattern.ONE_WAY, getTestService());
 
         Object nonSerializable = new Object();
-        event.getSession().setProperty("key", "value");
-        message.setProperty("key2", nonSerializable, PropertyScope.SESSION);
+        event.setFlowVariable("key", "value");
+        event.setFlowVariable("key2", nonSerializable);
 
-        assertEquals(2, message.getPropertyNames(PropertyScope.SESSION).size());
-        assertEquals("value", message.getProperty("key", PropertyScope.SESSION));
-        assertEquals(nonSerializable, message.getProperty("key2", PropertyScope.SESSION));
-        assertNull(message.getProperty("key", PropertyScope.INVOCATION));
-        assertNull(message.getProperty("key", PropertyScope.INBOUND));
-        assertNull(message.getProperty("key", PropertyScope.OUTBOUND));
+        assertEquals(2, message.getPropertyNames(PropertyScope.INVOCATION).size());
+        assertEquals("value", message.getInvocationProperty("key"));
+        assertEquals(nonSerializable, message.getInvocationProperty("key2"));
     }
 
     /**
@@ -214,26 +190,16 @@ public class InvocationPropertiesTestCase extends AbstractMuleContextTestCase
     /**
      * When invoking a Flow directly session properties are preserved
      */
+    @Test
     public void processFlowInvocationPropertyPropagation() throws Exception
     {
         MuleMessage message = new DefaultMuleMessage("data", muleContext);
-        MuleEvent event = new DefaultMuleEvent(message, getTestInboundEndpoint(""), getTestService());
-        SensingNullMessageProcessor flowListener = new SensingNullMessageProcessor();
+        MuleEvent event = new DefaultMuleEvent(message, MessageExchangePattern.REQUEST_RESPONSE,
+            getTestService());
 
-        List<MessageProcessor> processors = new ArrayList<MessageProcessor>();
-        processors.add(new MessageProcessor()
-        {
-            
-            public MuleEvent process(MuleEvent event) throws MuleException
-            {
-                event.getMessage().setInvocationProperty("newKey", "newValue");
-                return event;
-            }
-        });
-        processors.add(flowListener);
-        
+        SensingNullMessageProcessor flowListener = new SensingNullMessageProcessor();
         Flow flow = new Flow("flow", muleContext);
-        flow.setMessageProcessors(processors);
+        flow.setMessageProcessors(Collections.<MessageProcessor> singletonList(flowListener));
         flow.initialise();
         flow.start();
 
@@ -248,7 +214,8 @@ public class InvocationPropertiesTestCase extends AbstractMuleContextTestCase
 
         // Event is copied, but session isn't
         assertNotSame(processedEvent, event);
-        assertNotSame(processedEvent.getSession(), event.getSession());
+        assertEquals(processedEvent, event);
+        assertSame(processedEvent.getSession(), event.getSession());
 
         // Session properties available before new flow are available after too
         assertEquals("value", processedEvent.getMessage().getInvocationProperty("key"));
@@ -256,10 +223,12 @@ public class InvocationPropertiesTestCase extends AbstractMuleContextTestCase
 
         // Session properties set after new flow are available in message processor
         // before new flow
+        processedEvent.getMessage().setInvocationProperty("newKey", "newValue");
         assertEquals("newValue", processedEvent.getMessage().getInvocationProperty("newKey"));
-        assertNull(event.getMessage().getInvocationProperty("newKey"));
+        assertEquals("newValue", event.getMessage().getInvocationProperty("newKey"));
 
         flow.stop();
         flow.dispose();
     }
+
 }

@@ -15,7 +15,6 @@ import org.mule.api.transport.SessionHandler;
 
 import java.io.Serializable;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -127,5 +126,6 @@ public interface MuleSession extends Serializable
      */
     void merge(MuleSession updatedSession);
     
-    Map<String, Object> getProperties();
+    void clearProperties();
+    
 }

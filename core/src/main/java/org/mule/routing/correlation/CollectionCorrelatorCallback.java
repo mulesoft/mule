@@ -45,15 +45,13 @@ public class CollectionCorrelatorCallback implements EventCorrelatorCallback
     }
 
     /**
-     * This method is invoked if the shouldAggregate method is called and returns
-     * true. Once this method returns an aggregated message, the event group is
-     * removed from the router.
+     * This method is invoked if the shouldAggregate method is called and returns true. Once this method
+     * returns an aggregated message, the event group is removed from the router.
      * 
      * @param events the event group for this request
      * @return an aggregated message
-     * @throws org.mule.routing.AggregationException if the aggregation fails. in
-     *             this scenario the whole event group is removed and passed to the
-     *             exception handler for this componenet
+     * @throws org.mule.routing.AggregationException if the aggregation fails. in this scenario the whole
+     *             event group is removed and passed to the exception handler for this componenet
      */
     public MuleEvent aggregateEvents(EventGroup events) throws AggregationException
     {
@@ -65,11 +63,14 @@ public class CollectionCorrelatorCallback implements EventCorrelatorCallback
         MuleSession session = new DefaultMuleSession(events[0].getSession());
         for (int i = 1; i < events.length; i++)
         {
-            session.getProperties().putAll(events[i].getSession().getProperties());
+            for (String name : events[i].getSession().getPropertyNamesAsSet())
+            {
+                session.setProperty(name, events[i].getSession().getProperty(name));
+            }
         }
         return session;
     }
-    
+
     /**
      * Creates a new EventGroup that will expect the number of events as returned by
      * {@link MuleMessage#getCorrelationGroupSize()}.
@@ -81,8 +82,8 @@ public class CollectionCorrelatorCallback implements EventCorrelatorCallback
     }
 
     /**
-     * @return <code>true</code> if the correlation size is not set or exactly the
-     *         expected size of the event group.
+     * @return <code>true</code> if the correlation size is not set or exactly the expected size of the event
+     *         group.
      * @see org.mule.routing.correlation.EventCorrelatorCallback#shouldAggregateEvents(org.mule.routing.EventGroup)
      */
     public boolean shouldAggregateEvents(EventGroup events)

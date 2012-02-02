@@ -11,7 +11,7 @@
 package org.mule.enricher;
 
 import org.mule.DefaultMuleEvent;
-import org.mule.RequestContext;
+import org.mule.OptimizedRequestContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
@@ -34,7 +34,10 @@ public class MessageEnricher extends AbstractMessageProcessorOwner implements Me
     public MuleEvent process(MuleEvent event) throws MuleException
     {
         ExpressionManager expressionManager = event.getMuleContext().getExpressionManager();
-        MuleEvent enrichmentEvent = enrichmentProcessor.process(RequestContext.setEvent(event));
+        MuleEvent enricherEvent = DefaultMuleEvent.copy(event);
+        OptimizedRequestContext.unsafeSetEvent(enricherEvent);
+        MuleEvent enrichmentEvent = enrichmentProcessor.process(enricherEvent);
+        OptimizedRequestContext.unsafeSetEvent(event);
 
         if (enrichmentEvent != null)
         {
@@ -44,7 +47,6 @@ public class MessageEnricher extends AbstractMessageProcessorOwner implements Me
                     expressionManager);
             }
             event = new DefaultMuleEvent(event.getMessage(), event, enrichmentEvent.getSession());
-            event = RequestContext.setEvent(event);
         }
         return event;
     }

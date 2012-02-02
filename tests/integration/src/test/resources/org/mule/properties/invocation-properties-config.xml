@@ -95,7 +95,7 @@
         <test:assert expression="#[header:INVOCATION:P1]" />
     </flow>
     <flow name="VMEchoFlow">
-        <vm:inbound-endpoint path="echo" />
+        <vm:inbound-endpoint path="echo" exchange-pattern="request-response" />
         <echo-component />
     </flow>
 
@@ -275,33 +275,33 @@
         </all>
         <test:assert expression="#[header:INVOCATION:P1]" />
     </flow>
-    <flow name="noPropagateBetweenRoutes">
+    <flow name="propagateBetweenRoutes">
         <all>
             <processor ref="addP1" />
-            <test:assert expression="#[groovy:message.getInvocationProperty('P1')==null]" />
+        <test:assert expression="#[header:INVOCATION:P1]" />
         </all>
     </flow>
-    <flow name="noPropagateFromRouteToNextProcessorSingleRoute">
+    <flow name="propagateFromRouteToNextProcessorSingleRoute">
         <all>
             <processor ref="addP1" />
         </all>
         <test:assert expression="#[header:INVOCATION:P1]" />
     </flow>
-    <flow name="noPropagateFromRouteToNextProcessorMultipleRoutes">
+    <flow name="propagateFromRouteToNextProcessorMultipleRoutes">
         <all>
             <processor ref="addP1" />
             <processor ref="addP2" />
         </all>
-        <test:assert expression="#[groovy:message.getInvocationProperty('P1')==null]" />
+        <test:assert expression="#[header:INVOCATION:P1]" />
     </flow>
-    <flow name="noPropagateFromRouteToNextProcessorNoResult">
+    <flow name="propagateFromRouteToNextProcessorNoResult">
         <all>
             <processor-chain>
                 <processor ref="addP1"/>
                 <vm:outbound-endpoint path="tmp3" />
             </processor-chain>
         </all>
-        <test:assert expression="#[groovy:message.getInvocationProperty('P1')==null]" />
+        <test:assert expression="#[header:INVOCATION:P1]" />
     </flow>
     <flow name="AllAsync">
         <processor ref="addP1" />
