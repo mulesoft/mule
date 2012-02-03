@@ -350,7 +350,8 @@
     </flow>
 
     <flow name="aggregationOfPropertiesFromMultipleMessageWithAggregator">
-        <flow-ref name="propogationOfPropertiesInMessageSplitWithSplitter" />
+        <processor ref="addP1" />
+        <collection-splitter />
         <processor ref="addP2" />
         <collection-aggregator />
         <test:assert expression="#[groovy:message instanceof org.mule.api.MuleMessageCollection]" />
