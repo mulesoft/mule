@@ -260,7 +260,7 @@
 /mule-standalone-nodocs-${productVersion}/lib/opt/juli-6.0.29.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/livetribe-jsr223-2.0.5.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/mail-1.4.3.jar
-/mule-standalone-nodocs-${productVersion}/lib/opt/mockito-all-1.8.4.jar
+/mule-standalone-nodocs-${productVersion}/lib/opt/mockito-all-1.9.0.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/msv-core-2010.1.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/mvel2-2.0.10.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/mx4j-impl-2.1.1-osgi.jar
