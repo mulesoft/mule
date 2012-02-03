@@ -73,6 +73,7 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
         {
             workManager.dispose();
         }
+        super.stop();
     }
 
     public MuleEvent process(MuleEvent event) throws MuleException
