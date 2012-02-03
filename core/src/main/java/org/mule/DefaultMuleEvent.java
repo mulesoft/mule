@@ -982,7 +982,7 @@ public class DefaultMuleEvent
     @Override
     public <T> T getSessionVariable(String key)
     {
-        return session.getProperty(key);
+        return session.<T> getProperty(key);
     }
 
     @Override
