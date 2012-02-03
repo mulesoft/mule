@@ -10,6 +10,11 @@
 
 package org.mule.transport.sftp;
 
+import static org.mule.transport.sftp.notification.SftpTransportNotification.SFTP_DELETE_ACTION;
+import static org.mule.transport.sftp.notification.SftpTransportNotification.SFTP_GET_ACTION;
+import static org.mule.transport.sftp.notification.SftpTransportNotification.SFTP_PUT_ACTION;
+import static org.mule.transport.sftp.notification.SftpTransportNotification.SFTP_RENAME_ACTION;
+
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.transport.sftp.notification.SftpNotifier;
 
@@ -33,11 +38,6 @@ import java.util.Vector;
 import org.apache.commons.lang.NotImplementedException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import static org.mule.transport.sftp.notification.SftpTransportNotification.SFTP_DELETE_ACTION;
-import static org.mule.transport.sftp.notification.SftpTransportNotification.SFTP_GET_ACTION;
-import static org.mule.transport.sftp.notification.SftpTransportNotification.SFTP_PUT_ACTION;
-import static org.mule.transport.sftp.notification.SftpTransportNotification.SFTP_RENAME_ACTION;
 
 /**
  * <code>SftpClient</code> Wrapper around jsch sftp library. Provides access to basic
@@ -107,7 +107,7 @@ public class SftpClient
     /**
      * Converts a relative path to an absolute path according to
      * http://tools.ietf.org/html/draft-ietf-secsh-scp-sftp-ssh-uri-04.
-     *
+     * 
      * @param path relative path
      * @return Absolute path
      */
@@ -298,7 +298,8 @@ public class SftpClient
     {
         try
         {
-            Vector vv = channelSftp.ls(path);
+            @SuppressWarnings("unchecked")
+            Vector<String> vv = channelSftp.ls(path);
             if (vv != null)
             {
                 List<String> ret = new ArrayList<String>();
@@ -435,7 +436,7 @@ public class SftpClient
 
     /**
      * Creates a directory
-     *
+     * 
      * @param directoryName The directory name
      * @throws IOException If an error occurs
      */
@@ -479,7 +480,7 @@ public class SftpClient
 
     /**
      * Setter for 'home'
-     *
+     * 
      * @param home The path to home
      */
     void setHome(String home)
@@ -500,7 +501,7 @@ public class SftpClient
      * SftpClient methods can be merged Note, this method is synchronized because it
      * in rare cases can be called from two threads at the same time and thus cause
      * an error.
-     *
+     * 
      * @param endpoint
      * @param newDir
      * @throws IOException
@@ -657,5 +658,22 @@ public class SftpClient
     public String getHost()
     {
         return host;
+    }
+
+    public void recursivelyDeleteDirectory(String dir) throws IOException
+    {
+        this.changeWorkingDirectory(dir);
+        String[] directories = this.listDirectories();
+        String[] files = this.listFiles();
+        for (int i = 0; i < directories.length; i++)
+        {
+            recursivelyDeleteDirectory(directories[i]);
+        }
+        for (int i = 0; i < files.length; i++)
+        {
+            deleteFile(files[i]);
+        }
+        this.changeWorkingDirectory("..");
+        this.deleteDirectory(dir);
     }
 }

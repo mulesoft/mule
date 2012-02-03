@@ -1,8 +1,7 @@
-<mule xmlns="http://www.mulesoft.org/schema/mule/core"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:spring="http://www.springframework.org/schema/beans"
-      xmlns:sftp="http://www.mulesoft.org/schema/mule/sftp"
-      xsi:schemaLocation="
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:spring="http://www.springframework.org/schema/beans"
+    xmlns:sftp="http://www.mulesoft.org/schema/mule/sftp"
+    xsi:schemaLocation="
         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
         http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
         http://www.mulesoft.org/schema/mule/sftp http://www.mulesoft.org/schema/mule/sftp/3.2/mule-sftp.xsd">
@@ -10,45 +9,39 @@
     <model name="main">
         <service name="test1" initialState="stopped">
             <inbound>
-                <sftp:inbound-endpoint
-                        user="user42"
-                        password="passw0rd"
-                        path="data"
-                        port="4243"
-                        host="foobar-host"
-                        pollingFrequency="500"
-                        name="inboundEndpoint1"/>
+                <sftp:inbound-endpoint user="user42"
+                    password="passw0rd" path="data" port="4243" host="foobar-host"
+                    pollingFrequency="500" name="inboundEndpoint1" />
             </inbound>
         </service>
 
         <!-- Should be the same as the above -->
-         <service name="test2" initialState="stopped">
+        <service name="test2" initialState="stopped">
             <inbound>
                 <sftp:inbound-endpoint
-                        address="sftp://user42:passw0rd@foobar-host:4243/data"
-                        name="inboundEndpoint2"/>
+                    address="sftp://user42:passw0rd@foobar-host:4243/data2"
+                    name="inboundEndpoint2" />
             </inbound>
         </service>
 
-        <service name="test3" >
+        <service name="test3">
             <outbound>
-              <pass-through-router>
-                <sftp:outbound-endpoint
+                <pass-through-router>
+                    <sftp:outbound-endpoint
                         address="sftp://user42:passw0rd@foobar-host:4243/data"
                         name="outboundEndpoint1" />
-              </pass-through-router>
+                </pass-through-router>
 
             </outbound>
         </service>
 
-        <service name="test4" >
+        <service name="test4">
             <outbound>
-              <pass-through-router>
-                <sftp:outbound-endpoint
+                <pass-through-router>
+                    <sftp:outbound-endpoint
                         address="sftp://user42:passw0rd@foobar-host:4243/data"
-                        name="outboundEndpoint2"
-                        keepFileOnError="false"/>
-              </pass-through-router>
+                        name="outboundEndpoint2" keepFileOnError="false" />
+                </pass-through-router>
             </outbound>
         </service>
     </model>

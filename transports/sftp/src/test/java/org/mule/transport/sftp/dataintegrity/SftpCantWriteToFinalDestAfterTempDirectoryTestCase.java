@@ -53,7 +53,6 @@ public class SftpCantWriteToFinalDestAfterTempDirectoryTestCase extends Abstract
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
-
         // Delete the in & outbound directories
         initEndpointDirectory(INBOUND_ENDPOINT_NAME);
         initEndpointDirectory(OUTBOUND_ENDPOINT_NAME);
@@ -96,7 +95,7 @@ public class SftpCantWriteToFinalDestAfterTempDirectoryTestCase extends Abstract
 
             ImmutableEndpoint endpoint = (ImmutableEndpoint) muleClient.getProperty(OUTBOUND_ENDPOINT_NAME);
             assertFalse("The inbound file should not be left in the TEMP-dir", super.verifyFileExists(
-                sftpClient, endpoint.getEndpointURI().getPath() + "/" + TEMP_DIR, FILE_NAME));
+                sftpClient, endpoint.getEndpointURI().getPath() + "/" + TEMP_DIR, FILENAME));
         }
         finally
         {

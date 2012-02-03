@@ -14,6 +14,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import org.mule.api.MuleEventContext;
+import org.mule.module.client.MuleClient;
+import org.mule.tck.functional.EventCallback;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -27,9 +31,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-import org.mule.api.MuleEventContext;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.functional.EventCallback;
 
 /**
  * <code>SftpPoolingFunctionalTestCase</code> tests sending an receiving multiple
@@ -57,13 +58,6 @@ public class SftpPoolingFunctionalTestCase extends AbstractSftpTestCase
             {ConfigVariant.SERVICE, "mule-pooling-test-config-service.xml"},
             {ConfigVariant.FLOW, "mule-pooling-test-config-flow.xml"}
         });
-    }
-    @Override
-    protected void doSetUp() throws Exception
-    {
-        super.doSetUp();
-
-        initEndpointDirectory("inboundEndpoint");
     }
 
     @Test
@@ -157,8 +151,7 @@ public class SftpPoolingFunctionalTestCase extends AbstractSftpTestCase
             client.dispatch("vm://test.upload", sendFile, props);
         }
 
-        boolean done = latch.await(TIMEOUT, TimeUnit.MILLISECONDS);
-        // assertTrue("The test should not time out", done);
+        latch.await(TIMEOUT, TimeUnit.MILLISECONDS);
 
         logger.debug("Number of files sent: " + sendFiles.size());
         logger.debug("Number of files received: " + receiveFiles.size());

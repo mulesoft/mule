@@ -1,37 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
-<mule xmlns="http://www.mulesoft.org/schema/mule/core"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:spring="http://www.springframework.org/schema/beans"
-      xmlns:sftp="http://www.mulesoft.org/schema/mule/sftp"
-      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
-      xsi:schemaLocation="
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:spring="http://www.springframework.org/schema/beans"
+    xmlns:sftp="http://www.mulesoft.org/schema/mule/sftp" xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+    xsi:schemaLocation="
         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
         http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
         http://www.mulesoft.org/schema/mule/sftp http://www.mulesoft.org/schema/mule/sftp/3.2/mule-sftp.xsd
         http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.2/mule-vm.xsd">
 
     <spring:beans>
-        <spring:import resource="sftp-properties.xml"/>
+        <spring:import resource="sftp-properties.xml" />
     </spring:beans>
 
     <sftp:connector name="sftp" pollingFrequency="2000" />
 
-    <sftp:connector name="sftpAddSeq" pollingFrequency="2000" duplicateHandling="addSeqNo" />
+    <sftp:connector name="sftpAddSeq" pollingFrequency="2000"
+        duplicateHandling="addSeqNo" />
 
-    <!--
-      Test 1 - test duplicate handling by throwing an exception
-      -->
+    <!-- Test 1 - test duplicate handling by throwing an exception -->
     <model name="send1">
         <service name="sending1">
             <inbound>
-                <vm:inbound-endpoint path="test.upload1"/>
+                <vm:inbound-endpoint path="test.upload1" />
             </inbound>
             <outbound>
                 <pass-through-router>
                     <sftp:outbound-endpoint
-                        address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}/~/data1"
-                        outputPattern="#[function:dateStamp].dat" connector-ref="sftp"
-                        duplicateHandling="throwException"/>
+                        address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}:${SFTP_PORT}/~/data1"
+                        outputPattern="#[function:dateStamp].dat"
+                        connector-ref="sftp" duplicateHandling="throwException" />
                 </pass-through-router>
             </outbound>
         </service>
@@ -40,32 +37,31 @@
     <model name="receive1">
         <service name="receiving1">
             <inbound>
-                <!-- synchronous="true" - otherwise the inbound endpoint will trigger several times -->
-                <sftp:inbound-endpoint
-                    name="inboundEndpoint1"
+                <!-- synchronous="true" - otherwise the inbound endpoint 
+                    will trigger several times -->
+                <sftp:inbound-endpoint name="inboundEndpoint1"
                     connector-ref="sftp"
-                    address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}/~/data1"/>
+                    address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}:${SFTP_PORT}/~/data1" />
             </inbound>
             <component>
-                <singleton-object class="org.mule.tck.functional.FunctionalTestComponent"/>
+                <singleton-object
+                    class="org.mule.tck.functional.FunctionalTestComponent" />
             </component>
         </service>
     </model>
 
-    <!--
-      Test 2 - test duplicate handling by overwriting the existing file
-      -->
+    <!-- Test 2 - test duplicate handling by overwriting the existing file -->
     <model name="send2">
         <service name="sending2">
             <inbound>
-                <vm:inbound-endpoint path="test.upload2"/>
+                <vm:inbound-endpoint path="test.upload2" />
             </inbound>
             <outbound>
                 <pass-through-router>
                     <sftp:outbound-endpoint
-                        address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}/~/data2"
-                        outputPattern="#[function:dateStamp].dat" connector-ref="sftp"
-                        duplicateHandling="overwrite"/>
+                        address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}:${SFTP_PORT}/~/data2"
+                        outputPattern="#[function:dateStamp].dat"
+                        connector-ref="sftp" duplicateHandling="overwrite" />
                 </pass-through-router>
             </outbound>
         </service>
@@ -74,32 +70,32 @@
     <model name="receive2">
         <service name="receiving2">
             <inbound>
-                <!-- synchronous="true" - otherwise the inbound endpoint will trigger several times -->
-                <sftp:inbound-endpoint
-                    name="inboundEndpoint2"
+                <!-- synchronous="true" - otherwise the inbound endpoint 
+                    will trigger several times -->
+                <sftp:inbound-endpoint name="inboundEndpoint2"
                     connector-ref="sftp"
-                    address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}/~/data2"/>
+                    address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}:${SFTP_PORT}/~/data2" />
             </inbound>
             <component>
-                <singleton-object class="org.mule.tck.functional.FunctionalTestComponent"/>
+                <singleton-object
+                    class="org.mule.tck.functional.FunctionalTestComponent" />
             </component>
         </service>
     </model>
 
-    <!--
-      Test 3 - test duplicate handling by adding a sequence number to the new file
-      -->
+    <!-- Test 3 - test duplicate handling by adding a sequence number to 
+        the new file -->
     <model name="send3">
         <service name="sending3">
             <inbound>
-                <vm:inbound-endpoint path="test.upload3"/>
+                <vm:inbound-endpoint path="test.upload3" />
             </inbound>
             <outbound>
                 <pass-through-router>
                     <sftp:outbound-endpoint
-                        address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}/~/data3"
-                        outputPattern="#[function:dateStamp].dat" connector-ref="sftp"
-                        duplicateHandling="addSeqNo"/>
+                        address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}:${SFTP_PORT}/~/data3"
+                        outputPattern="#[function:dateStamp].dat"
+                        connector-ref="sftp" duplicateHandling="addSeqNo" />
                 </pass-through-router>
             </outbound>
         </service>
@@ -108,31 +104,32 @@
     <model name="receive3">
         <service name="receiving3">
             <inbound>
-                <!-- synchronous="true" - otherwise the inbound endpoint will trigger several times -->
-                <sftp:inbound-endpoint
-                    name="inboundEndpoint3"
+                <!-- synchronous="true" - otherwise the inbound endpoint 
+                    will trigger several times -->
+                <sftp:inbound-endpoint name="inboundEndpoint3"
                     connector-ref="sftp"
-                    address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}/~/data3"/>
+                    address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}:${SFTP_PORT}/~/data3" />
             </inbound>
             <component>
-                <singleton-object class="org.mule.tck.functional.FunctionalTestComponent"/>
+                <singleton-object
+                    class="org.mule.tck.functional.FunctionalTestComponent" />
             </component>
         </service>
     </model>
 
-    <!--
-        Test 4 - test duplicate handling by using the value set on the connector (addSeqNo)
-    -->
+    <!-- Test 4 - test duplicate handling by using the value set on the connector 
+        (addSeqNo) -->
     <model name="send4">
         <service name="sending4">
             <inbound>
-                <vm:inbound-endpoint path="test.upload4"/>
+                <vm:inbound-endpoint path="test.upload4" />
             </inbound>
             <outbound>
                 <pass-through-router>
                     <sftp:outbound-endpoint
-                        address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}/~/data4"
-                        outputPattern="#[function:dateStamp].dat" connector-ref="sftpAddSeq" name="send4outbound"/>
+                        address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}:${SFTP_PORT}/~/data4"
+                        outputPattern="#[function:dateStamp].dat"
+                        connector-ref="sftpAddSeq" name="send4outbound" />
                 </pass-through-router>
             </outbound>
         </service>
@@ -141,14 +138,15 @@
     <model name="receive4">
         <service name="receiving4">
             <inbound>
-                <!-- synchronous="true" - otherwise the inbound endpoint will trigger several times -->
-                <sftp:inbound-endpoint
-                    name="inboundEndpoint4"
+                <!-- synchronous="true" - otherwise the inbound endpoint 
+                    will trigger several times -->
+                <sftp:inbound-endpoint name="inboundEndpoint4"
                     connector-ref="sftp"
-                    address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}/~/data4"/>
+                    address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}:${SFTP_PORT}/~/data4" />
             </inbound>
             <component>
-                <singleton-object class="org.mule.tck.functional.FunctionalTestComponent"/>
+                <singleton-object
+                    class="org.mule.tck.functional.FunctionalTestComponent" />
             </component>
         </service>
     </model>

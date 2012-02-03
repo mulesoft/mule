@@ -4,7 +4,7 @@
       xmlns:spring="http://www.springframework.org/schema/beans"
       xmlns:sftp="http://www.mulesoft.org/schema/mule/sftp"
       xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
-      xsi:schemaLocation="
+      xsi:schemaLocation=" 
         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
         http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
         http://www.mulesoft.org/schema/mule/sftp http://www.mulesoft.org/schema/mule/sftp/3.2/mule-sftp.xsd
@@ -24,7 +24,7 @@
             <outbound>
                 <pass-through-router>
                     <sftp:outbound-endpoint
-                        address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}/~/data"
+                        address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}:${SFTP_PORT}/~/data"
                         outputPattern="#[function:dateStamp].dat"/>
                 </pass-through-router>
             </outbound>
@@ -37,7 +37,7 @@
                 <!-- synchronous="true" - otherwise the inbound endpoint will trigger several times -->
                 <sftp:inbound-endpoint
                     name="inboundEndpoint"
-                    address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}/~/data"
+                    address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}:${SFTP_PORT}/~/data"
                     sizeCheckWaitTime="1000"/>
             </inbound>
             <component>

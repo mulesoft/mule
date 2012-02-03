@@ -1,0 +1,21 @@
+#
+# Test cases listed in this file are not run.
+#
+org.mule.transport.sftp.SftpSendReceiveLargeFileFunctionalTestCase
+
+org.mule.transport.sftp.SftpArchiveFunctionalTestCase
+org.mule.transport.sftp.SftpDuplicateHandlingFunctionalTestCase
+org.mule.transport.sftp.SftpExpressionFilenameParserTestCase
+org.mule.transport.sftp.SftpFilterTestCase
+org.mule.transport.sftp.SftpIdentityFileFunctionalTestCase
+org.mule.transport.sftp.SftpNotificationFunctionalTestCase
+org.mule.transport.sftp.SftpQuartzRequesterFunctionalTestCase
+org.mule.transport.sftp.SftpSizeCheckFunctionalTestCase
+org.mule.transport.sftp.SftpTempDirFunctionalTestCase
+
+org.mule.transport.sftp.dataintegrity.SftpCantWriteToFinalDestAfterTempDirectoryTestCase
+org.mule.transport.sftp.dataintegrity.SftpInvalidInboundEndpointTestCase
+org.mule.transport.sftp.dataintegrity.SftpNoOutboundDirectoryTestCase
+org.mule.transport.sftp.dataintegrity.SftpNoWriteAccessToOutboundDirectoryTestCase
+org.mule.transport.sftp.dataintegrity.SftpWrongPassPhraseOnOutboundDirectoryTestCase
+org.mule.transport.sftp.dataintegrity.SftpCheckDuplicateFileHandlingTestCase

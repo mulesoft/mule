@@ -10,109 +10,72 @@
 
 package org.mule.transport.sftp.dataintegrity;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import java.io.IOException;
+import org.mule.module.client.MuleClient;
+import org.mule.transport.sftp.LatchDownExceptionListener;
+
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
+import org.junit.After;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-import org.mule.api.transport.DispatchException;
-import org.mule.module.client.MuleClient;
-import org.mule.transport.sftp.SftpClient;
 
 /**
  * Tests that files are not deleted if the temp directory can't be created
  */
 public class SftpCantCreateTempDirectoryTestCase extends AbstractSftpDataIntegrityTestCase
 {
+    private static final int EXCEPTION_TIMEOUT = 3000;
     private static String INBOUND_ENDPOINT_NAME = "inboundEndpoint";
-    private static String OUTBOUND_ENDPOINT_NAME = "outboundEndpoint";
 
     public SftpCantCreateTempDirectoryTestCase(ConfigVariant variant, String configResources)
     {
         super(variant, configResources);
     }
-    
+
     @Parameters
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
             {ConfigVariant.SERVICE, "dataintegrity/sftp-dataintegrity-common-with-tempdir-config-service.xml"},
-            {ConfigVariant.FLOW, "dataintegrity/sftp-dataintegrity-common-with-tempdir-config-flow.xml"}
-        });
+            {ConfigVariant.FLOW, "dataintegrity/sftp-dataintegrity-common-with-tempdir-config-flow.xml"}});
     }
 
-    @Override
-    protected void doSetUp() throws Exception
+    public void before() throws Exception
     {
-        super.doSetUp();
+        super.before();
+        sftpClient.mkdir(INBOUND_ENDPOINT_DIR);
+        sftpClient.mkdir(OUTBOUND_ENDPOINT_DIR);
+    }
 
-        // Delete the in & outbound directories
-        initEndpointDirectory(INBOUND_ENDPOINT_NAME);
-        initEndpointDirectory(OUTBOUND_ENDPOINT_NAME);
+    @After
+    public void after() throws Exception
+    {
+        Runtime.getRuntime().exec(new String[]{"chmod", "777", OUTBOUND_ENDPOINT_DIR});
+        sftpClient.recursivelyDeleteDirectory(INBOUND_ENDPOINT_DIR);
+        sftpClient.recursivelyDeleteDirectory(OUTBOUND_ENDPOINT_DIR);
+        sftpClient.disconnect();
     }
 
     /**
      * No write access on the outbound directory and thus the TEMP directory cant be
      * created. The source file should still exist
-     *
-     * @throws Exception If an error occurred
      */
     @Test
     public void testCantCreateTempDirectory() throws Exception
     {
         MuleClient muleClient = new MuleClient(muleContext);
-
-        SftpClient sftpClient = getSftpClient(muleClient, OUTBOUND_ENDPOINT_NAME);
-
-        try
-        {
-            // change the chmod to "dr-x------" on the outbound-directory
-            // --> the temp directory should not be able to be created
-            remoteChmod(muleClient, sftpClient, OUTBOUND_ENDPOINT_NAME, 00500);
-
-            // Send an file to the SFTP server, which the inbound-outboundEndpoint
-            // then can pick up
-            // Expect an error, permission denied
-            Exception exception = dispatchAndWaitForException(new DispatchParameters(INBOUND_ENDPOINT_NAME,
-                OUTBOUND_ENDPOINT_NAME), "sftp", "service");
-            assertNotNull(exception);
-            assertTrue("expected DispatchException, but got : " + exception.getClass().toString(),
-                exception instanceof DispatchException);
-            assertTrue("expected IOException, but got : " + exception.getCause().getClass().toString(),
-                exception.getCause() instanceof IOException);
-            assertEquals("Could not create the directory 'uploading', caused by: Permission denied",
-                exception.getCause().getMessage());
-
-            verifyInAndOutFiles(muleClient, INBOUND_ENDPOINT_NAME, OUTBOUND_ENDPOINT_NAME, true, false);
-        }
-        finally
-        {
-            sftpClient.disconnect();
-        }
+        Runtime.getRuntime().exec(new String[]{"chmod", "320", OUTBOUND_ENDPOINT_DIR});
+        final CountDownLatch exceptionLatch = new CountDownLatch(1);
+        muleContext.registerListener(new LatchDownExceptionListener(exceptionLatch));
+        muleClient.dispatch("sftp://localhost:" + port.getNumber() + "/" + INBOUND_ENDPOINT_NAME,
+            TEST_MESSAGE, MESSAGE_PROPERTIES);
+        assertTrue(exceptionLatch.await(EXCEPTION_TIMEOUT, TimeUnit.MILLISECONDS));
+        assertTrue(Arrays.asList(sftpClient.listFiles()).contains(FILENAME));
     }
-
-    /**
-     * The same test as above, but with the difference that this time it should be
-     * okay to create the directory, and the file should be gone from the inbound
-     * directory.
-     */
-    // Works, but this is more or less the same test as SftpTempDirFunctionalTestCase
-    // so don't use this
-    // @Test
-    //public void testCanCreateTempDirectory() throws Exception
-    // {
-    // MuleClient muleClient = new MuleClient();
-    //
-    // dispatchAndWaitForDelivery(new DispatchParameters(INBOUND_ENDPOINT_NAME,
-    // OUTBOUND_ENDPOINT_NAME));
-    //
-    // verifyInAndOutFiles(muleClient, INBOUND_ENDPOINT_NAME, OUTBOUND_ENDPOINT_NAME,
-    // false, true);
-    // }
 
 }

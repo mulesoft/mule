@@ -12,19 +12,13 @@
 
     <sftp:connector name="sftp" />
 
-
     <flow name="service">
-
         <sftp:inbound-endpoint
-            address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}/~/inbound"
+            address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}:${SFTP_PORT}/~/inbound"
             name="inboundEndpoint" pollingFrequency="500" />
-
-
-
         <sftp:outbound-endpoint
-            address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}/~/outbound"
+            address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}:${SFTP_PORT}/~/outbound"
             keepFileOnError="true" name="outboundEndpoint" />
-
     </flow>
 
 </mule>

@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<mule xmlns="http://www.mulesoft.org/schema/mule/core"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:spring="http://www.springframework.org/schema/beans"
-      xmlns:sftp="http://www.mulesoft.org/schema/mule/sftp"
-      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
-      xmlns:quartz="http://www.mulesoft.org/schema/mule/quartz"
-      xsi:schemaLocation="
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:spring="http://www.springframework.org/schema/beans"
+    xmlns:sftp="http://www.mulesoft.org/schema/mule/sftp" xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+    xmlns:quartz="http://www.mulesoft.org/schema/mule/quartz"
+    xsi:schemaLocation="
         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
         http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
         http://www.mulesoft.org/schema/mule/sftp http://www.mulesoft.org/schema/mule/sftp/3.2/mule-sftp.xsd
@@ -14,27 +12,27 @@
         http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/3.2/mule-test.xsd">
 
     <spring:beans>
-        <spring:import resource="sftp-properties.xml"/>
+        <spring:import resource="sftp-properties.xml" />
     </spring:beans>
 
-    <sftp:connector name="sftp"/>
+    <sftp:connector name="sftp" />
 
-    <!-- synchronous="true" - otherwise the inbound endpoint will trigger several times -->
-    <sftp:endpoint
-        name="inboundEndpoint"
-        address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}/~/data" exchange-pattern="request-response"/>
+    <!-- synchronous="true" - otherwise the inbound endpoint will trigger 
+        several times -->
+    <sftp:endpoint name="inboundEndpoint"
+        address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}:${SFTP_PORT}/~/data"
+        exchange-pattern="request-response" />
 
     <model name="send">
         <service name="sending">
             <inbound>
-                <vm:inbound-endpoint path="test.upload"/>
+                <vm:inbound-endpoint path="test.upload" />
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <sftp:outbound-endpoint
-                        name="outboundEndpoint"
-                        address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}/~/data"
-                        outputPattern="#[function:dateStamp].dat"/>
+                    <sftp:outbound-endpoint name="outboundEndpoint"
+                        address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}:${SFTP_PORT}/~/data"
+                        outputPattern="#[function:dateStamp].dat" />
                 </pass-through-router>
             </outbound>
         </service>
@@ -43,17 +41,16 @@
     <model name="receive">
         <service name="receiving">
             <inbound>
-                <quartz:inbound-endpoint
-                    name="quartzInboundEndpoint"
-                    cronExpression="0/3 * * * * ?"
-                    jobName="cronJob">
+                <quartz:inbound-endpoint name="quartzInboundEndpoint"
+                    cronExpression="0/3 * * * * ?" jobName="cronJob">
                     <quartz:endpoint-polling-job>
                         <quartz:job-endpoint ref="inboundEndpoint" />
                     </quartz:endpoint-polling-job>
                 </quartz:inbound-endpoint>
             </inbound>
             <component>
-                <singleton-object class="org.mule.tck.functional.FunctionalTestComponent"/>
+                <singleton-object
+                    class="org.mule.tck.functional.FunctionalTestComponent" />
             </component>
         </service>
     </model>

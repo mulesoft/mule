@@ -11,7 +11,7 @@
 package org.mule.transport.sftp;
 
 import static org.junit.Assert.assertTrue;
-
+ 
 import java.util.Arrays;
 import java.util.Collection;
 
@@ -69,7 +69,7 @@ public class SftpExpressionFilenameParserTestCase extends AbstractSftpTestCase
             sftpClient = getSftpClient(muleClient, OUTBOUND_ENDPOINT_NAME);
             ImmutableEndpoint endpoint = (ImmutableEndpoint) muleClient.getProperty(OUTBOUND_ENDPOINT_NAME);
             assertTrue("A new file in the outbound endpoint should exist", super.verifyFileExists(sftpClient,
-                endpoint.getEndpointURI().getPath(), FILE_NAME));
+                endpoint.getEndpointURI().getPath(), FILENAME));
         }
         finally
         {

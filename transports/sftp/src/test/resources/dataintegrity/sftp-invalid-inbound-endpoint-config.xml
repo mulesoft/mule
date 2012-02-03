@@ -1,35 +1,25 @@
-<mule xmlns="http://www.mulesoft.org/schema/mule/core"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:spring="http://www.springframework.org/schema/beans"
-      xmlns:sftp="http://www.mulesoft.org/schema/mule/sftp"
-      xsi:schemaLocation="
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:spring="http://www.springframework.org/schema/beans"
+    xmlns:sftp="http://www.mulesoft.org/schema/mule/sftp"
+    xsi:schemaLocation="
         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
         http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
         http://www.mulesoft.org/schema/mule/sftp http://www.mulesoft.org/schema/mule/sftp/3.2/mule-sftp.xsd">
 
     <spring:beans>
-        <spring:import resource="sftp-properties.xml"/>
+        <spring:import resource="sftp-properties.xml" />
     </spring:beans>
 
-    <sftp:connector name="sftp"/>
-    <sftp:endpoint address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}/~/DIRECTORY-MISSING" name="InvalidEndpoint"/>
+    <sftp:connector name="sftp" />
+    <sftp:endpoint
+        address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}:${SFTP_PORT}/~/DIRECTORY-MISSING"
+        name="InvalidEndpoint" />
 
     <model name="model">
-<!-- 
-        <service name="service">
-            <inbound>
-                <sftp:inbound-endpoint address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}/~/inbound"
-                                       name="inboundEndpoint" pollingFrequency="500"/>
-            </inbound>
-
-            <outbound>
-                <pass-through-router>
-                    <sftp:outbound-endpoint address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}/~/DIRECTORY-MISSING"
-                                            name="outboundEndpointDirMissing" keepFileOnError="true">
-                    </sftp:outbound-endpoint>
-                </pass-through-router>
-            </outbound>
-        </service>
--->
+        <!-- <service name="service"> <inbound> <sftp:inbound-endpoint address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}:${SFTP_PORT}/~/inbound" 
+            name="inboundEndpoint" pollingFrequency="500"/> </inbound> <outbound> <pass-through-router> 
+            <sftp:outbound-endpoint address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}:${SFTP_PORT}/~/DIRECTORY-MISSING" 
+            name="outboundEndpointDirMissing" keepFileOnError="true"> </sftp:outbound-endpoint> 
+            </pass-through-router> </outbound> </service> -->
     </model>
 </mule>

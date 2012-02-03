@@ -5,7 +5,7 @@
  *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
- * LICENSE.txt file.
+ * LICENSE.txt file. 
  */
 
 package org.mule.transport.sftp;
@@ -64,7 +64,7 @@ public class SftpFilterTestCase extends AbstractSftpDataIntegrityTestCase
         // delivered to the endpoint (due to filter settings) we can't wait for a
         // delivery notification....
         HashMap<String, String> txtProps = new HashMap<String, String>(1);
-        txtProps.put(SftpConnector.PROPERTY_FILENAME, FILE_NAME);
+        txtProps.put(SftpConnector.PROPERTY_FILENAME, FILENAME);
         muleClient.dispatch(getAddressByEndpoint(muleClient, INBOUND_ENDPOINT_NAME), TEST_MESSAGE, txtProps);
 
         // Send .xml file
@@ -84,8 +84,8 @@ public class SftpFilterTestCase extends AbstractSftpDataIntegrityTestCase
             outboundEndpoint.getEndpointURI().getPath(), "file.xml"));
 
         assertTrue("The txt file should be left in the inbound directory", verifyFileExists(
-            inboundSftpClient, inboundEndpoint.getEndpointURI().getPath(), FILE_NAME));
+            inboundSftpClient, inboundEndpoint.getEndpointURI().getPath(), FILENAME));
         assertFalse("The txt file should not be in the outbound directory", verifyFileExists(
-            outboundSftpClient, outboundEndpoint.getEndpointURI().getPath(), FILE_NAME));
+            outboundSftpClient, outboundEndpoint.getEndpointURI().getPath(), FILENAME));
     }
 }

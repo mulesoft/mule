@@ -26,26 +26,17 @@
         </vm:queueProfile>
     </vm:connector>
 
-
     <flow name="sending">
-
         <vm:inbound-endpoint path="test.upload" />
-
-
         <sftp:outbound-endpoint connector-ref="sftp-pool"
-            address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}/~/data"
+            address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}:${SFTP_PORT}/~/data"
             outputPattern="#[function:count]-#[function:systime].dat" />
-
     </flow>
 
-
-
     <flow name="receiving">
-
         <sftp:inbound-endpoint name="inboundEndpoint"
             autoDelete="true" connector-ref="sftp-pool"
-            address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}/~/data" />
-
+            address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}:${SFTP_PORT}/~/data" />
         <component>
             <singleton-object
                 class="org.mule.tck.functional.FunctionalTestComponent" />

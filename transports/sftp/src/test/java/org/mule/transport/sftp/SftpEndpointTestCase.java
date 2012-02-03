@@ -13,10 +13,11 @@ package org.mule.transport.sftp;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-
+ 
 import java.util.Arrays;
 import java.util.Collection;
 
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 import org.mule.api.MuleException;
@@ -24,9 +25,14 @@ import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.endpoint.MuleEndpointURI;
 import org.mule.module.client.MuleClient;
+import org.mule.tck.junit4.rule.DynamicPort;
 
 public class SftpEndpointTestCase extends AbstractSftpTestCase
 {
+    
+    @Rule
+    public DynamicPort dynamicPort1 = new DynamicPort("SFTP_PORT");
+    
     public SftpEndpointTestCase(ConfigVariant variant, String configResources)
     {
         super(variant, configResources);
@@ -96,8 +102,6 @@ public class SftpEndpointTestCase extends AbstractSftpTestCase
         assertEquals(4243, url2.getPort());
         assertEquals("passw0rd", url2.getPassword());
         assertEquals("user42", url2.getUser());
-
-        assertEquals(url1.getUri().toString(), url2.getUri().toString());
 
         ImmutableEndpoint outboundEndpoint1 = (ImmutableEndpoint) muleClient.getProperty("outboundEndpoint1");
         ImmutableEndpoint outboundEndpoint2 = (ImmutableEndpoint) muleClient.getProperty("outboundEndpoint2");

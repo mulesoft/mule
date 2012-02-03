@@ -1,32 +1,33 @@
-<mule xmlns="http://www.mulesoft.org/schema/mule/core"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:spring="http://www.springframework.org/schema/beans"
-      xmlns:sftp="http://www.mulesoft.org/schema/mule/sftp"
-      xsi:schemaLocation="
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:spring="http://www.springframework.org/schema/beans"
+    xmlns:sftp="http://www.mulesoft.org/schema/mule/sftp"
+    xsi:schemaLocation="
         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
         http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
         http://www.mulesoft.org/schema/mule/sftp http://www.mulesoft.org/schema/mule/sftp/3.2/mule-sftp.xsd">
 
     <spring:beans>
-        <spring:import resource="sftp-properties.xml"/>
+        <spring:import resource="sftp-properties.xml" />
     </spring:beans>
 
-    <sftp:connector name="sftpCustomConnector" pollingFrequency="1000" autoDelete="true"
-                    identityFile="${USER1_IDENTITYFILE}" passphrase="${USER1_IDENTITYFILE_PASSPHRASE}"/>
+    <sftp:connector name="sftpCustomConnector"
+        pollingFrequency="1000" autoDelete="true" identityFile="${USER1_IDENTITYFILE}"
+        passphrase="${USER1_IDENTITYFILE_PASSPHRASE}" />
 
     <model name="main">
         <service name="testComponent">
             <inbound>
                 <!-- The identityFile & passphrase can be overridden -->
                 <sftp:inbound-endpoint
-                        identityFile="${USER1_IDENTITYFILE}" passphrase="${USER1_IDENTITYFILE_PASSPHRASE}"
-                        address="sftp://${USER1_NAME}@${SFTP_HOST}/~/data-in"
-                        autoDelete="true" pollingFrequency="500" connector-ref="sftpCustomConnector"
-                        name="inboundEndpoint"/>
+                    identityFile="${USER1_IDENTITYFILE}" passphrase="${USER1_IDENTITYFILE_PASSPHRASE}"
+                    address="sftp://${USER1_NAME}@${SFTP_HOST}:${SFTP_PORT}/~/data-in"
+                    autoDelete="true" pollingFrequency="500"
+                    connector-ref="sftpCustomConnector" name="inboundEndpoint" />
             </inbound>
             <component>
-                <!--  this is to verify the data coming in on the endpoint -->
-                <singleton-object class="org.mule.tck.functional.FunctionalTestComponent"/>
+                <!-- this is to verify the data coming in on the endpoint -->
+                <singleton-object
+                    class="org.mule.tck.functional.FunctionalTestComponent" />
             </component>
         </service>
     </model>

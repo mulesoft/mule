@@ -1,40 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
-<mule xmlns="http://www.mulesoft.org/schema/mule/core"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:spring="http://www.springframework.org/schema/beans"
-      xmlns:sftp="http://www.mulesoft.org/schema/mule/sftp"
-      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
-      xsi:schemaLocation="
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:spring="http://www.springframework.org/schema/beans"
+    xmlns:sftp="http://www.mulesoft.org/schema/mule/sftp" xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+    xsi:schemaLocation="
         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
         http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
         http://www.mulesoft.org/schema/mule/sftp http://www.mulesoft.org/schema/mule/sftp/3.2/mule-sftp.xsd
         http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.2/mule-vm.xsd">
 
     <spring:beans>
-        <spring:import resource="sftp-properties.xml"/>
+        <spring:import resource="sftp-properties.xml" />
     </spring:beans>
 
-    <sftp:connector name="sftp-default"/>
+    <sftp:connector name="sftp-default" />
 
-    <sftp:connector name="sftp-no-pool" maxConnectionPoolSize="0"/>
+    <sftp:connector name="sftp-no-pool"
+        maxConnectionPoolSize="0" />
 
-    <sftp:connector name="sftp-pool" maxConnectionPoolSize="3"/>
+    <sftp:connector name="sftp-pool"
+        maxConnectionPoolSize="3" />
 
     <vm:connector name="VMQueue">
-        <vm:queueProfile >
-            <default-persistent-queue-store/>
-        </vm:queueProfile>            
+        <vm:queueProfile>
+            <default-persistent-queue-store />
+        </vm:queueProfile>
     </vm:connector>
 
     <model name="send">
         <service name="sending">
             <inbound>
-                <vm:inbound-endpoint path="test.upload"/>
+                <vm:inbound-endpoint path="test.upload" />
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <sftp:outbound-endpoint connector-ref="sftp-pool"
-                                            address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}/~/data" outputPattern="#[function:count]-#[function:systime].dat"/>
+                    <sftp:outbound-endpoint
+                        connector-ref="sftp-pool"
+                        address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}:${SFTP_PORT}/~/data"
+                        outputPattern="#[function:count]-#[function:systime].dat" />
                 </pass-through-router>
             </outbound>
         </service>
@@ -43,11 +45,13 @@
     <model name="receive">
         <service name="receiving">
             <inbound>
-                <sftp:inbound-endpoint name="inboundEndpoint" autoDelete="true" connector-ref="sftp-pool"
-                                       address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}/~/data"/>
+                <sftp:inbound-endpoint name="inboundEndpoint"
+                    autoDelete="true" connector-ref="sftp-pool"
+                    address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}:${SFTP_PORT}/~/data" />
             </inbound>
             <component>
-                <singleton-object class="org.mule.tck.functional.FunctionalTestComponent"/>
+                <singleton-object
+                    class="org.mule.tck.functional.FunctionalTestComponent" />
             </component>
         </service>
     </model>

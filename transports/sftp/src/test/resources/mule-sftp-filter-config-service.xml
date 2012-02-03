@@ -1,39 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
-<mule xmlns="http://www.mulesoft.org/schema/mule/core"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:spring="http://www.springframework.org/schema/beans"
-      xmlns:sftp="http://www.mulesoft.org/schema/mule/sftp"
-      xmlns:file="http://www.mulesoft.org/schema/mule/file"
-      xsi:schemaLocation="
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:spring="http://www.springframework.org/schema/beans"
+    xmlns:sftp="http://www.mulesoft.org/schema/mule/sftp" xmlns:file="http://www.mulesoft.org/schema/mule/file"
+    xsi:schemaLocation="
         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
         http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
         http://www.mulesoft.org/schema/mule/sftp http://www.mulesoft.org/schema/mule/sftp/3.2/mule-sftp.xsd
         http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/3.2/mule-file.xsd">
 
     <spring:beans>
-        <spring:import resource="sftp-properties.xml"/>
+        <spring:import resource="sftp-properties.xml" />
     </spring:beans>
 
-    <sftp:connector name="sftp" autoDelete="true" pollingFrequency="500 "/>
+    <sftp:connector name="sftp" autoDelete="true"
+        pollingFrequency="500 " />
 
-    <spring:bean name="endpointMessageNotificationLogger" class="org.mule.transport.sftp.notification.EndpointMessageNotificationTestListener"/>
+    <spring:bean name="endpointMessageNotificationLogger"
+        class="org.mule.transport.sftp.notification.EndpointMessageNotificationTestListener" />
     <notifications>
-        <notification event="ENDPOINT-MESSAGE"/>
-        <notification-listener ref="endpointMessageNotificationLogger"/>
+        <notification event="ENDPOINT-MESSAGE" />
+        <notification-listener ref="endpointMessageNotificationLogger" />
     </notifications>
 
     <model name="test">
         <service name="testing">
             <inbound>
-                <sftp:inbound-endpoint name="inboundEndpoint" autoDelete="false" connector-ref="sftp"
-                                       address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}/~/data">
-                    <file:filename-wildcard-filter pattern="*.xml"/>
+                <sftp:inbound-endpoint name="inboundEndpoint"
+                    autoDelete="false" connector-ref="sftp"
+                    address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}:${SFTP_PORT}/~/data">
+                    <file:filename-wildcard-filter
+                        pattern="*.xml" />
                 </sftp:inbound-endpoint>
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <sftp:outbound-endpoint connector-ref="sftp" name="outboundEndpoint"
-                                            address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}/~/data2" outputPattern="#[header:originalFilename]"/>
+                    <sftp:outbound-endpoint
+                        connector-ref="sftp" name="outboundEndpoint"
+                        address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}:${SFTP_PORT}/~/data2"
+                        outputPattern="#[header:originalFilename]" />
                 </pass-through-router>
             </outbound>
         </service>

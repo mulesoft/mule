@@ -20,32 +20,23 @@
     <!-- synchronous="true" - otherwise the inbound endpoint will trigger 
         several times -->
     <sftp:endpoint name="inboundEndpoint"
-        address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}/~/data"
+        address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}:${SFTP_PORT}/~/data"
         exchange-pattern="request-response" />
 
-
     <flow name="sending">
-
         <vm:inbound-endpoint path="test.upload" />
-
-
         <sftp:outbound-endpoint name="outboundEndpoint"
-            address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}/~/data"
+            address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}:${SFTP_PORT}/~/data"
             outputPattern="#[function:dateStamp].dat" />
-
     </flow>
 
-
-
     <flow name="receiving">
-
         <quartz:inbound-endpoint name="quartzInboundEndpoint"
             cronExpression="0/3 * * * * ?" jobName="cronJob">
             <quartz:endpoint-polling-job>
                 <quartz:job-endpoint ref="inboundEndpoint" />
             </quartz:endpoint-polling-job>
         </quartz:inbound-endpoint>
-
         <component>
             <singleton-object
                 class="org.mule.tck.functional.FunctionalTestComponent" />

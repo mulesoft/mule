@@ -29,18 +29,16 @@ public class SftpInvalidInboundEndpointTestCase extends AbstractSftpDataIntegrit
 {
     private static final int NO_OF_INVALID_ATTEMPTS = 50;
 
-
     public SftpInvalidInboundEndpointTestCase(ConfigVariant variant, String configResources)
     {
         super(variant, configResources);
     }
-    
+
     @Parameters
     public static Collection<Object[]> parameters()
     {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "dataintegrity/sftp-invalid-inbound-endpoint-config.xml"}            
-        });
+        return Arrays.asList(new Object[][]{{ConfigVariant.SERVICE,
+            "dataintegrity/sftp-invalid-inbound-endpoint-config.xml"}});
     }
 
     @Test

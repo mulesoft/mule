@@ -1,7 +1,7 @@
 <mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:spring="http://www.springframework.org/schema/beans"
     xmlns:sftp="http://www.mulesoft.org/schema/mule/sftp"
-    xsi:schemaLocation="
+    xsi:schemaLocation=" 
         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
         http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
         http://www.mulesoft.org/schema/mule/sftp http://www.mulesoft.org/schema/mule/sftp/3.2/mule-sftp.xsd">
@@ -33,13 +33,13 @@
     <flow name="testComponentOutbound">
 
         <sftp:inbound-endpoint
-            address="sftp://${USER1_NAME}@${SFTP_HOST}/~/tempdir-test-inbound"
+            address="sftp://${USER1_NAME}@${SFTP_HOST}:${SFTP_PORT}/~/tempdir-test-inbound"
             connector-ref="sftpCustomConnector" name="inboundEndpoint" />
 
 
 
         <sftp:outbound-endpoint
-            address="sftp://${USER1_NAME}@${SFTP_HOST}/~/tempdir-test-outbound"
+            address="sftp://${USER1_NAME}@${SFTP_HOST}:${SFTP_PORT}/~/tempdir-test-outbound"
             connector-ref="sftpCustomConnectorTempDirOutbound" name="outboundEndpoint">
         </sftp:outbound-endpoint>
 
@@ -50,13 +50,13 @@
     <flow name="testComponentInbound">
 
         <sftp:inbound-endpoint
-            address="sftp://${USER1_NAME}@${SFTP_HOST}/~/tempdir2-test-inbound"
+            address="sftp://${USER1_NAME}@${SFTP_HOST}:${SFTP_PORT}/~/tempdir2-test-inbound"
             connector-ref="sftpCustomConnectorTempDirInbound" name="inboundEndpoint2" />
 
 
 
         <sftp:outbound-endpoint
-            address="sftp://${USER1_NAME}@${SFTP_HOST}/~/tempdir2-test-outbound"
+            address="sftp://${USER1_NAME}@${SFTP_HOST}:${SFTP_PORT}/~/tempdir2-test-outbound"
             connector-ref="sftpCustomConnector" name="outboundEndpoint2">
         </sftp:outbound-endpoint>
 

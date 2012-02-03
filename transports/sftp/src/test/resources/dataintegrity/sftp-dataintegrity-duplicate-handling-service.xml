@@ -1,52 +1,61 @@
-<mule xmlns="http://www.mulesoft.org/schema/mule/core"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:spring="http://www.springframework.org/schema/beans"
-      xmlns:sftp="http://www.mulesoft.org/schema/mule/sftp"
-      xsi:schemaLocation="
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:spring="http://www.springframework.org/schema/beans"
+    xmlns:sftp="http://www.mulesoft.org/schema/mule/sftp"
+    xsi:schemaLocation="
         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
         http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
         http://www.mulesoft.org/schema/mule/sftp http://www.mulesoft.org/schema/mule/sftp/3.2/mule-sftp.xsd">
 
     <spring:beans>
-        <spring:import resource="sftp-properties.xml"/>
+        <spring:import resource="sftp-properties.xml" />
     </spring:beans>
 
-    <spring:bean name="endpointMessageNotificationLogger" class="org.mule.transport.sftp.notification.EndpointMessageNotificationTestListener"/>
-    <spring:bean name="sftpTransportNotificationLogger" class="org.mule.transport.sftp.notification.SftpTransportNotificationTestListener"/>
+    <spring:bean name="endpointMessageNotificationLogger"
+        class="org.mule.transport.sftp.notification.EndpointMessageNotificationTestListener" />
+    <spring:bean name="sftpTransportNotificationLogger"
+        class="org.mule.transport.sftp.notification.SftpTransportNotificationTestListener" />
     <notifications>
-        <notification event="ENDPOINT-MESSAGE"/>
-        <notification event="CUSTOM"/>
-        <notification-listener ref="endpointMessageNotificationLogger"/>
-        <notification-listener ref="sftpTransportNotificationLogger"/>
+        <notification event="ENDPOINT-MESSAGE" />
+        <notification event="CUSTOM" />
+        <notification-listener ref="endpointMessageNotificationLogger" />
+        <notification-listener ref="sftpTransportNotificationLogger" />
     </notifications>
 
     <model name="model">
         <service name="serviceDuplicateHandlingRename">
             <inbound>
-                <sftp:inbound-endpoint address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}/~/inbound"
-                                       name="inboundEndpoint" pollingFrequency="500" exchange-pattern="request-response" />
+                <sftp:inbound-endpoint
+                    address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}:${SFTP_PORT}/~/inbound"
+                    name="inboundEndpoint" pollingFrequency="500"
+                    exchange-pattern="request-response" />
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <sftp:outbound-endpoint address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}/~/outbound"
-                                            tempDir="uploading" outputPattern="#[header:originalFilename]"
-                                            exchange-pattern="request-response" keepFileOnError="true"
-                                            name="outboundEndpoint" duplicateHandling="addSeqNo"/>
+                    <sftp:outbound-endpoint
+                        address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}:${SFTP_PORT}/~/outbound"
+                        tempDir="uploading" outputPattern="#[header:originalFilename]"
+                        exchange-pattern="request-response"
+                        keepFileOnError="true" name="outboundEndpoint"
+                        duplicateHandling="addSeqNo" />
                 </pass-through-router>
             </outbound>
         </service>
         <service name="serviceDuplicateHandlingThrowException">
             <inbound>
-                <sftp:inbound-endpoint address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}/~/inbound2"
-                                       name="inboundEndpoint2" pollingFrequency="200" exchange-pattern="request-response" />
+                <sftp:inbound-endpoint
+                    address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}:${SFTP_PORT}/~/inbound2"
+                    name="inboundEndpoint2" pollingFrequency="200"
+                    exchange-pattern="request-response" />
             </inbound>
             <outbound>
                 <pass-through-router>
-                <!-- tempDir="uploading"  -->
-                    <sftp:outbound-endpoint address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}/~/outbound2"
-                                            tempDir="uploading" outputPattern="#[header:originalFilename]"
-                                            exchange-pattern="request-response" keepFileOnError="true"
-                                            name="outboundEndpoint2" duplicateHandling="throwException"/>
+                    <!-- tempDir="uploading" -->
+                    <sftp:outbound-endpoint
+                        address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}:${SFTP_PORT}/~/outbound2"
+                        tempDir="uploading" outputPattern="#[header:originalFilename]"
+                        exchange-pattern="request-response"
+                        keepFileOnError="true" name="outboundEndpoint2"
+                        duplicateHandling="throwException" />
                 </pass-through-router>
             </outbound>
         </service>

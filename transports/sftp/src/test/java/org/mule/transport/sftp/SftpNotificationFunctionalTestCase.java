@@ -5,7 +5,7 @@
  *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
- * LICENSE.txt file.
+ * LICENSE.txt file. 
  */
 
 package org.mule.transport.sftp;
@@ -61,7 +61,7 @@ public class SftpNotificationFunctionalTestCase extends AbstractSftpTestCase
     @Test
     public void testNotification() throws Exception
     {
-        executeBaseTest("inboundEndpoint", "vm://test.upload", FILE_NAME, SEND_SIZE, "receiving", TIMEOUT);
+        executeBaseTest("inboundEndpoint", "vm://test.upload", FILENAME, SEND_SIZE, "receiving", TIMEOUT);
     }
 
     /**

@@ -20,15 +20,11 @@
     <!-- Test 1 - test duplicate handling by throwing an exception -->
 
     <flow name="sending1">
-
         <vm:inbound-endpoint path="test.upload1" />
-
-
         <sftp:outbound-endpoint
-            address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}/~/data1"
+            address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}:${SFTP_PORT}/~/data1"
             outputPattern="#[function:dateStamp].dat" connector-ref="sftp"
             duplicateHandling="throwException" />
-
     </flow>
 
 
@@ -39,7 +35,7 @@
             several times -->
         <sftp:inbound-endpoint name="inboundEndpoint1"
             connector-ref="sftp"
-            address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}/~/data1" />
+            address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}:${SFTP_PORT}/~/data1" />
 
         <component>
             <singleton-object
@@ -56,7 +52,7 @@
 
 
         <sftp:outbound-endpoint
-            address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}/~/data2"
+            address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}:${SFTP_PORT}/~/data2"
             outputPattern="#[function:dateStamp].dat" connector-ref="sftp"
             duplicateHandling="overwrite" />
 
@@ -70,7 +66,7 @@
             several times -->
         <sftp:inbound-endpoint name="inboundEndpoint2"
             connector-ref="sftp"
-            address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}/~/data2" />
+            address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}:${SFTP_PORT}/~/data2" />
 
         <component>
             <singleton-object
@@ -87,7 +83,7 @@
         <vm:inbound-endpoint path="test.upload3" />
 
         <sftp:outbound-endpoint
-            address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}/~/data3"
+            address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}:${SFTP_PORT}/~/data3"
             outputPattern="#[function:dateStamp].dat" connector-ref="sftp"
             duplicateHandling="addSeqNo" />
 
@@ -101,7 +97,7 @@
             several times -->
         <sftp:inbound-endpoint name="inboundEndpoint3"
             connector-ref="sftp"
-            address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}/~/data3" />
+            address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}:${SFTP_PORT}/~/data3" />
 
         <component>
             <singleton-object
@@ -118,7 +114,7 @@
 
 
         <sftp:outbound-endpoint
-            address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}/~/data4"
+            address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}:${SFTP_PORT}/~/data4"
             outputPattern="#[function:dateStamp].dat" connector-ref="sftpAddSeq"
             name="send4outbound" />
 
@@ -132,7 +128,7 @@
             several times -->
         <sftp:inbound-endpoint name="inboundEndpoint4"
             connector-ref="sftp"
-            address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}/~/data4" />
+            address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}:${SFTP_PORT}/~/data4" />
 
         <component>
             <singleton-object

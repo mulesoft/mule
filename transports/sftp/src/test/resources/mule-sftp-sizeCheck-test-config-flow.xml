@@ -11,31 +11,23 @@
     <spring:beans>
         <spring:import resource="sftp-properties.xml" />
     </spring:beans>
-
     <sftp:connector name="sftp" pollingFrequency="2000" />
 
 
     <flow name="sending">
-
         <vm:inbound-endpoint path="test.upload" />
-
-
         <sftp:outbound-endpoint
-            address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}/~/data"
+            address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}:${SFTP_PORT}/~/data"
             outputPattern="#[function:dateStamp].dat" />
-
     </flow>
-
-
 
     <flow name="receiving">
 
         <!-- synchronous="true" - otherwise the inbound endpoint will trigger 
             several times -->
         <sftp:inbound-endpoint name="inboundEndpoint"
-            address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}/~/data"
+            address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}:${SFTP_PORT}/~/data"
             sizeCheckWaitTime="1000" />
-
         <component>
             <singleton-object
                 class="org.mule.tck.functional.FunctionalTestComponent" />

@@ -17,6 +17,7 @@ import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.io.IOException;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.ResourceBundle;
@@ -202,6 +203,7 @@ public class SftpArchiveFunctionalTestCase extends AbstractSftpTestCase
     @Test
     public void testCantWriteToArchive2() throws Exception
     {
+        fail();
         makeArchiveTmpFolderReadOnly();
         makeArchiveReadOnly();
         try

@@ -1,46 +1,41 @@
-<mule xmlns="http://www.mulesoft.org/schema/mule/core"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:spring="http://www.springframework.org/schema/beans"
-      xmlns:sftp="http://www.mulesoft.org/schema/mule/sftp"
-      xmlns:file="http://www.mulesoft.org/schema/mule/file"
-      xsi:schemaLocation="
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:spring="http://www.springframework.org/schema/beans"
+    xmlns:sftp="http://www.mulesoft.org/schema/mule/sftp" xmlns:file="http://www.mulesoft.org/schema/mule/file"
+    xsi:schemaLocation="
         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
         http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
         http://www.mulesoft.org/schema/mule/sftp http://www.mulesoft.org/schema/mule/sftp/3.2/mule-sftp.xsd
         http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/3.2/mule-file.xsd">
 
     <spring:beans>
-        <spring:import resource="sftp-properties.xml"/>
+        <spring:import resource="sftp-properties.xml" />
     </spring:beans>
 
-    <sftp:connector
-        name="sftpConnector"
-        pollingFrequency="500"
-        identityFile="${USER1_IDENTITYFILE}"
+    <sftp:connector name="sftpConnector"
+        pollingFrequency="500" identityFile="${USER1_IDENTITYFILE}"
         passphrase="${USER1_IDENTITYFILE_PASSPHRASE}">
-        <file:expression-filename-parser/>
+        <file:expression-filename-parser />
     </sftp:connector>
 
-    <spring:bean name="endpointMessageNotificationLogger" class="org.mule.transport.sftp.notification.EndpointMessageNotificationTestListener"/>
+    <spring:bean name="endpointMessageNotificationLogger"
+        class="org.mule.transport.sftp.notification.EndpointMessageNotificationTestListener" />
     <notifications>
-        <notification event="ENDPOINT-MESSAGE"/>
-        <notification-listener ref="endpointMessageNotificationLogger"/>
+        <notification event="ENDPOINT-MESSAGE" />
+        <notification-listener ref="endpointMessageNotificationLogger" />
     </notifications>
 
     <model name="main">
         <service name="testComponent">
             <inbound>
-                <sftp:inbound-endpoint 
-                    address="sftp://${USER1_NAME}@${SFTP_HOST}/~/inbound"
-                    name="inboundEndpoint"/>
+                <sftp:inbound-endpoint
+                    address="sftp://${USER1_NAME}@${SFTP_HOST}:${SFTP_PORT}/~/inbound"
+                    name="inboundEndpoint" />
             </inbound>
-
             <outbound>
                 <pass-through-router>
-                    <sftp:outbound-endpoint 
-                        address="sftp://${USER1_NAME}@${SFTP_HOST}/~/outbound"
-                        outputPattern="#[header:originalFilename]"
-                        name="outboundEndpoint">
+                    <sftp:outbound-endpoint
+                        address="sftp://${USER1_NAME}@${SFTP_HOST}:${SFTP_PORT}/~/outbound"
+                        outputPattern="#[header:originalFilename]" name="outboundEndpoint">
                     </sftp:outbound-endpoint>
                 </pass-through-router>
             </outbound>
