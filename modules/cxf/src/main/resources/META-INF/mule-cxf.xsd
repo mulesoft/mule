@@ -648,7 +648,6 @@
             <xsd:complexContent>
                 <xsd:extension base="mule:annotatedType">
                     <xsd:sequence>
-                        <!--<xsd:element minOccurs="1" maxOccurs="1" ref="abstract-ws-custom-validator"/>-->
                         <xsd:element ref="username-token-validator" minOccurs="0" maxOccurs="1"/>
                         <xsd:element ref="saml1-token-validator" minOccurs="0" maxOccurs="1"/>
                         <xsd:element ref="saml2-token-validator" minOccurs="0" maxOccurs="1"/>
