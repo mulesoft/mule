@@ -19,12 +19,15 @@ import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Callable;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
+import org.mule.api.lifecycle.Startable;
+import org.mule.api.lifecycle.Stoppable;
 import org.mule.tck.exceptions.FunctionalTestException;
 import org.mule.util.ClassUtils;
 import org.mule.util.NumberUtils;
 import org.mule.util.StringMessageUtils;
 import org.mule.util.SystemUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -46,7 +49,7 @@ import org.apache.commons.logging.LogFactory;
  * @see FunctionalTestNotificationListener
  */
 // TODO This should really extend StaticComponent from mule-core as it is quite similar.
-public class FunctionalTestComponent implements Callable, Initialisable, Disposable, MuleContextAware, Receiveable
+public class FunctionalTestComponent implements Callable, Initialisable, Disposable, MuleContextAware, Receiveable, Startable, Stoppable
 {
     protected transient Log logger = LogFactory.getLog(getClass());
 
@@ -64,8 +67,11 @@ public class FunctionalTestComponent implements Callable, Initialisable, Disposa
     private String appendString;
     private long waitTime = 0;
     private boolean logMessageDetails = false;
+    private String id = "<none>";
     private MuleContext muleContext;
+    private static List<LifecycleCallback> lifecycleCallbacks = new ArrayList<LifecycleCallback>();
 
+    
     /**
      * Keeps a list of any messages received on this service. Note that only references
      * to the messages (objects) are stored, so any subsequent changes to the objects
@@ -80,18 +86,41 @@ public class FunctionalTestComponent implements Callable, Initialisable, Disposa
         {
             messageHistory = new CopyOnWriteArrayList<Object>();
         }
+        for (LifecycleCallback callback : lifecycleCallbacks)
+        {
+            callback.onTransition(id, Initialisable.PHASE_NAME);
+        }
     }
 
     @Override
+    public void start() throws MuleException
+    {
+        for (LifecycleCallback callback : lifecycleCallbacks)
+        {
+            callback.onTransition(id, Startable.PHASE_NAME);
+        }
+    }
+
     public void setMuleContext(MuleContext context)
     {
         this.muleContext = context;
     }
 
     @Override
+    public void stop() throws MuleException
+    {
+        for (LifecycleCallback callback : lifecycleCallbacks)
+        {
+            callback.onTransition(id, Stoppable.PHASE_NAME);
+        }
+    }
+
     public void dispose()
     {
-        // nothing to do
+        for (LifecycleCallback callback : lifecycleCallbacks)
+        {
+            callback.onTransition(id, Disposable.PHASE_NAME);
+        }
     }
 
     /**
@@ -490,6 +519,7 @@ public class FunctionalTestComponent implements Callable, Initialisable, Disposa
     {
         this.logMessageDetails = logMessageDetails;
     }
+
     
     public String getExceptionText()
     {
@@ -500,4 +530,25 @@ public class FunctionalTestComponent implements Callable, Initialisable, Disposa
     {
         exceptionText = text;
     }
+
+    public void setId(String id)
+    {
+        this.id = id;
+    }
+
+    public static void addLifecycleCallback(LifecycleCallback callback)
+    {
+        lifecycleCallbacks.add(callback);
+    }
+
+    public static void removeLifecycleCallback(LifecycleCallback callback)
+    {
+        lifecycleCallbacks.remove(callback);
+    }
+
+    public interface LifecycleCallback
+    {
+        void onTransition(String name, String newPhase);
+    }
+
 }
