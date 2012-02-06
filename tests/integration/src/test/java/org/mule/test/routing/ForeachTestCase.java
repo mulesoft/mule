@@ -191,6 +191,40 @@ public class ForeachTestCase extends FunctionalTestCase
         assertEquals(10, result.getInboundProperty("totalMessages"));
         assertEquals(msgCollection.getPayload(), result.getPayload());
     }
+
+    @Test
+    public void testMapPayload() throws Exception
+    {
+        final Map<String, String> payload = new HashMap<String, String>();
+        payload.put("name", "david");
+        payload.put("surname", "bowie");
+        MuleMessage parent = new DefaultMuleMessage(payload, muleContext);
+
+        MuleMessage result = client.send("vm://input-8", parent);
+        assertTrue(result.getPayload() instanceof Map);
+        Map<?, ?> resultPayload = (Map<?, ?>) result.getPayload();
+        assertEquals(payload.size(), resultPayload.size());
+        assertEquals(payload.size(), result.getInboundProperty("totalMessages"));
+        assertSame(payload, resultPayload);
+    }
+
+    @Test
+    public void testMapExpression() throws Exception
+    {
+        final Collection<String> names = new ArrayList<String>();
+        names.add("Sergei");
+        names.add("Vasilievich");
+        names.add("Rachmaninoff");
+        Map<String, Object> props = new HashMap<String, Object>();
+        props.put("names", names);
+        MuleMessage message = new DefaultMuleMessage("message payload", props, muleContext);
+
+        MuleMessage result = client.send("vm://input-9", message);
+        assertTrue(result.getPayload() instanceof String);
+        assertEquals(names.size(), ((Collection<?>) message.getOutboundProperty("names")).size());
+        assertEquals(names.size(), result.getInboundProperty("totalMessages"));
+    }
+
 }
 
 

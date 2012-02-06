@@ -8,21 +8,27 @@
  * LICENSE.txt file.
  */
 
-package org.mule.processor;
+package org.mule.routing;
 
+import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
+import org.mule.api.MuleMessage;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.processor.InterceptingMessageProcessor;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.expression.ExpressionConfig;
+import org.mule.processor.AbstractMessageProcessorOwner;
 import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
-import org.mule.routing.CollectionSplitter;
-import org.mule.routing.ExpressionSplitter;
 import org.mule.routing.outbound.AbstractMessageSequenceSplitter;
+import org.mule.routing.outbound.CollectionMessageSequence;
 
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -110,7 +116,7 @@ public class ForeachMessageProcessor extends AbstractMessageProcessorOwner imple
         }
         else
         {
-            splitter = new CollectionSplitter();
+            splitter = new CollectionMapSplitter();
         }
         splitter.setGroupSize(groupSize);
         splitter.setCounterVariableName(counterVariableName);
@@ -148,6 +154,29 @@ public class ForeachMessageProcessor extends AbstractMessageProcessorOwner imple
         this.counterVariableName = counterVariableName;
     }
 
+    private static class CollectionMapSplitter extends CollectionSplitter
+    {
+
+        @Override
+        protected MessageSequence<?> splitMessageIntoSequence(MuleEvent event)
+        {
+            Object payload = event.getMessage().getPayload();
+            if (payload instanceof Map<?, ?>)
+            {
+                List<MuleMessage> list = new LinkedList<MuleMessage>();
+                Set<Map.Entry<?, ?>> set = ((Map) payload).entrySet();
+                for (Entry<?, ?> entry : set)
+                {
+                    MuleMessage splitMessage = new DefaultMuleMessage(entry.getValue(), muleContext);
+                    splitMessage.setInvocationProperty(MapSplitter.MAP_ENTRY_KEY, entry.getKey());
+                    list.add(splitMessage);
+                }
+                return new CollectionMessageSequence(list);
+            }
+            return super.splitMessageIntoSequence(event);
+        }
+
+    }
 }
 
 

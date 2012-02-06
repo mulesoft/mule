@@ -91,5 +91,33 @@
          -->
     </flow>
 
+    <flow name="map-config">
+        <vm:inbound-endpoint path="input-8" exchange-pattern="request-response"/>
+        <foreach>
+            <test:component/>
+            <message-properties-transformer scope="invocation">
+            	<add-message-property key="totalMessages" value="#[variable:counter]"/>
+            </message-properties-transformer>
+        </foreach>
+        <message-properties-transformer scope="outbound">
+        	<add-message-property key="totalMessages" value="#[variable:totalMessages]"/>
+        </message-properties-transformer>
+        <!-- 
+        <test:assert expression="#[groovy:message.getInvocationProperty('totalMessages')==2]" />
+         -->
+    </flow>
+
+    <flow name="map-expression-config">
+        <vm:inbound-endpoint path="input-9" exchange-pattern="request-response"/>
+        <foreach expression="#[header:INBOUND:names]">
+            <test:component/>
+            <message-properties-transformer scope="invocation">
+            	<add-message-property key="totalMessages" value="#[variable:counter]"/>
+            </message-properties-transformer>
+        </foreach>
+        <message-properties-transformer scope="outbound">
+        	<add-message-property key="totalMessages" value="#[variable:totalMessages]"/>
+        </message-properties-transformer>
+    </flow>
 
 </mule>

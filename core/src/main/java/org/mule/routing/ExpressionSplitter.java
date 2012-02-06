@@ -20,7 +20,11 @@ import org.mule.expression.ExpressionConfig;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 /**
  * Splits a message using the expression provided invoking the next message processor
@@ -64,6 +68,18 @@ public class ExpressionSplitter extends AbstractSplitter
                 messages.add(new DefaultMuleMessage(object, muleContext));
             }
             return messages;
+        }
+        else if (result instanceof Map<?, ?>)
+        {
+            List<MuleMessage> list = new LinkedList<MuleMessage>();
+            Set<Map.Entry<?, ?>> set = ((Map) result).entrySet();
+            for (Entry<?, ?> entry : set)
+            {
+                MuleMessage message = new DefaultMuleMessage(entry.getValue(), muleContext);
+                message.setInvocationProperty(MapSplitter.MAP_ENTRY_KEY, entry.getKey());
+                list.add(message);
+            }
+            return list;
         }
         else if (result instanceof MuleMessage)
         {
