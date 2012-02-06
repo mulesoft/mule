@@ -18,6 +18,8 @@ import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.DispatchException;
+import org.mule.config.ExceptionHelper;
+import org.mule.config.i18n.MessageFactory;
 import org.mule.message.DefaultExceptionPayload;
 import org.mule.module.cxf.i18n.CxfMessages;
 import org.mule.module.cxf.security.WebServiceSecurityException;
@@ -142,11 +144,11 @@ public class CxfOutboundMessageProcessor extends AbstractInterceptingMessageProc
             {
                 throw (MuleException) f.getCause();
             }
-            throw new DispatchException(event,this,f);
+            throw new DispatchException(MessageFactory.createStaticMessage(f.getMessage()), event,this,f);
         }
         catch (Exception e)
         {
-            throw new DispatchException(event,this,e);
+            throw new DispatchException(MessageFactory.createStaticMessage(ExceptionHelper.getRootException(e).getMessage()), event, this, e);
         }
         finally
         {
