@@ -90,7 +90,7 @@ public class CxfComponentExceptionStrategyTestCase extends FunctionalTestCase
         }
         catch (MessagingException e)
         {
-            assertTrue(e.getCause().getCause() instanceof Fault);
+            assertTrue(e.getCause() instanceof Fault);
         }
     }
 

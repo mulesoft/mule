@@ -23,6 +23,7 @@ import org.mule.api.MuleSession;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.OutputHandler;
+import org.mule.config.i18n.MessageFactory;
 import org.mule.module.cxf.CxfConfiguration;
 import org.mule.module.cxf.CxfConstants;
 import org.mule.module.cxf.CxfOutboundMessageProcessor;
@@ -32,6 +33,7 @@ import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transport.NullPayload;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
+import org.mule.api.DefaultMuleException;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -191,7 +193,7 @@ public class MuleUniversalConduit extends AbstractConduit
                 {
                     dispatchMuleMessage(m, finalEvent);
                 }
-                catch (IOException e)
+                catch (MuleException e)
                 {
                     throw new Fault(e);
                 }
@@ -241,7 +243,7 @@ public class MuleUniversalConduit extends AbstractConduit
         return result;
     }
     
-    protected void dispatchMuleMessage(Message m, MuleEvent reqEvent) throws IOException {
+    protected void dispatchMuleMessage(Message m, MuleEvent reqEvent) throws MuleException {
         try
         {   
             MuleMessage req = reqEvent.getMessage();
@@ -278,16 +280,13 @@ public class MuleUniversalConduit extends AbstractConduit
                 getMessageObserver().onMessage(inMessage);
             }
         }
+        catch(MuleException me)
+        {
+            throw me;
+        }
         catch (Exception e)
         {
-            if (e instanceof IOException)
-            {
-                throw (IOException) e;
-            }
-
-            IOException ex = new IOException("Could not send message to Mule.");
-            ex.initCause(e);
-            throw ex;
+            throw new DefaultMuleException(MessageFactory.createStaticMessage("Could not send message to Mule."), e);
         }
     }
 

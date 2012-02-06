@@ -71,7 +71,7 @@ public class CxfErrorBehaviorTestCase extends FunctionalTestCase
         MuleMessage response = client.send("vm://testClientSOAPFault", request);
         assertNotNull(response);
         assertNotNull(response.getExceptionPayload());
-        assertTrue(response.getExceptionPayload().getException().getCause().getCause() instanceof Fault);
+        assertTrue(response.getExceptionPayload().getException().getCause() instanceof Fault);
         assertNull(response.getInboundProperty("http.status"));
 
     }
