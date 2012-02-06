@@ -33,6 +33,7 @@ import org.mule.endpoint.outbound.OutboundRewriteResponseEventMessageProcessor;
 import org.mule.endpoint.outbound.OutboundRootMessageIdPropertyMessageProcessor;
 import org.mule.endpoint.outbound.OutboundSessionHandlerMessageProcessor;
 import org.mule.lifecycle.processor.ProcessIfStartedMessageProcessor;
+import org.mule.processor.AbstractRedeliveryPolicy;
 import org.mule.processor.TransactionalInterceptingMessageProcessor;
 import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.routing.requestreply.ReplyToPropertyRequestReplyReplier;
@@ -109,9 +110,10 @@ public class DefaultEndpointMessageProcessorChainFactory implements EndpointMess
         // Default MPs
         requestChainBuilder.chain(createInboundMessageProcessors(endpoint));
         // Configured MPs (if any)
-        if (endpoint.getRedeliveryPolicy() != null)
+        AbstractRedeliveryPolicy redeliveryPolicy = endpoint.getRedeliveryPolicy();
+        if (redeliveryPolicy != null)
         {
-            requestChainBuilder.chain(endpoint.getRedeliveryPolicy());
+            requestChainBuilder.chain(redeliveryPolicy);
         }
         requestChainBuilder.chain(endpoint.getMessageProcessors());
         

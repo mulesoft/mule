@@ -37,7 +37,6 @@ public class InboundMessageLossFlowTestCase extends InboundMessageLossTestCase
     }
 
     @Test
-    @Override
     public void testTransformerException() throws Exception
     {
         tmpDir = createFolder(".mule/transformerException");
@@ -63,7 +62,6 @@ public class InboundMessageLossFlowTestCase extends InboundMessageLossTestCase
     }
 
     @Test
-    @Override
     public void testRouterException() throws Exception
     {
         tmpDir = createFolder(".mule/routerException");

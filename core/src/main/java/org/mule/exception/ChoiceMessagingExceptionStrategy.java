@@ -52,6 +52,11 @@ public class ChoiceMessagingExceptionStrategy extends AbstractMuleObjectOwner<Me
         this.exceptionListeners = exceptionListeners;
     }
 
+    public List<MessagingExceptionHandlerAcceptor> getExceptionListeners()
+    {
+        return Collections.unmodifiableList(exceptionListeners);
+    }
+
     @Override
     public void initialise() throws InitialisationException
     {

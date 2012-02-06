@@ -107,10 +107,8 @@ public abstract class AbstractFlowConstruct implements FlowConstruct, Lifecycle,
                 {
                     injectFlowConstructMuleContext(exceptionListener);
                     initialiseIfInitialisable(exceptionListener);
-
-                    doInitialise();
-
                     validateConstruct();
+                    doInitialise();
                 }
             });
 

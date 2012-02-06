@@ -10,6 +10,8 @@
 
 package org.mule.transport.jms.reliability;
 
+import org.hamcrest.core.Is;
+import org.hamcrest.core.IsNull;
 import org.mule.api.context.notification.ExceptionNotificationListener;
 import org.mule.context.notification.ExceptionNotification;
 import org.mule.exception.DefaultSystemExceptionStrategy;
@@ -17,12 +19,15 @@ import org.mule.routing.filters.WildcardFilter;
 import org.mule.transport.jms.redelivery.MessageRedeliveredException;
 import org.mule.util.concurrent.Latch;
 
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
 
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * Verify that no inbound messages are lost when exceptions occur.
@@ -118,6 +123,25 @@ public class InboundMessageLossTestCase extends AbstractJmsReliabilityTestCase
     }
 
     @Test
+    public void testRollbackExceptionStrategyConsumesMessage() throws Exception
+    {
+        final CountDownLatch exceptionStrategyListener = new CountDownLatch(4);
+        muleContext.registerListener(new ExceptionNotificationListener<ExceptionNotification>() {
+            @Override
+            public void onNotification(ExceptionNotification notification)
+            {
+                exceptionStrategyListener.countDown();
+            }
+        });
+        putMessageOnQueue("rollbackOnException");
+        if (!exceptionStrategyListener.await(RECEIVE_TIMEOUT,TimeUnit.MILLISECONDS))
+        {
+            fail("Message should have been redelivered");
+        }
+        assertThat(muleContext.getClient().request("jms://rollbackOnException?connector=jmsConnectorNoRedelivery", RECEIVE_TIMEOUT / 10), IsNull.<Object>nullValue());
+    }
+
+    @Test
     public void testDefaultExceptionStrategyConsumesMessage() throws Exception
     {
         putMessageOnQueue("commitOnException");
@@ -126,6 +150,5 @@ public class InboundMessageLossTestCase extends AbstractJmsReliabilityTestCase
         assertFalse("Message should not have been redelivered",
             messageRedelivered.await(latchTimeout, TimeUnit.MILLISECONDS));
     }
-
 
 }

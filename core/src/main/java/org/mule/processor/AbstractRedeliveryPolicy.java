@@ -35,6 +35,7 @@ public abstract class AbstractRedeliveryPolicy extends AbstractInterceptingMessa
     protected FlowConstruct flowConstruct;
     protected int maxRedeliveryCount;
     protected MessageProcessor deadLetterQueue;
+    public static final int REDELIVERY_FAIL_ON_FIRST = 0;
 
     @Override
     public void setFlowConstruct(FlowConstruct flowConstruct)
@@ -49,7 +50,7 @@ public abstract class AbstractRedeliveryPolicy extends AbstractInterceptingMessa
     @Override
     public void initialise() throws InitialisationException
     {
-        if (maxRedeliveryCount < 1)
+        if (maxRedeliveryCount < 0)
         {
             throw new InitialisationException(
                 CoreMessages.initialisationFailure(

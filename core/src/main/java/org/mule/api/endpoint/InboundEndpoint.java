@@ -15,9 +15,10 @@ import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.source.MessageSource;
 import org.mule.api.transport.MessageRequesting;
+import org.mule.processor.AbstractRedeliveryPolicy;
 
 public interface InboundEndpoint
     extends ImmutableEndpoint, MessageRequesting, MessageSource, FlowConstructAware, Startable, Stoppable
 {
-    // empty
+    AbstractRedeliveryPolicy createDefaultRedeliveryPolicy(int maxRedelivery);
 }

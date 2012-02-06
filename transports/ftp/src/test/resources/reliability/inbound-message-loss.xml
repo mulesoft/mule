@@ -54,5 +54,13 @@
             </default-exception-strategy>
             <threading-profile doThreading="false"/>
         </service>
+        <service name="RollbackExceptionStrategyCommit" >
+            <inbound>
+                <ftp:inbound-endpoint address="ftp://anonymous:password@localhost:${port1}/rollbackOnException"/>
+            </inbound>
+            <test:component throwException="true"/>
+            <rollback-exception-strategy maxRedeliveryAttempts="2"/>
+            <threading-profile doThreading="false"/>
+        </service>
     </model>
 </mule>

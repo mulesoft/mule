@@ -10,6 +10,9 @@
 
 package org.mule.transport.file.reliability;
 
+import static org.junit.Assert.fail;
+import org.mule.api.context.notification.ExceptionNotificationListener;
+import org.mule.context.notification.ExceptionNotification;
 import org.mule.exception.DefaultSystemExceptionStrategy;
 import org.mule.routing.filters.WildcardFilter;
 import org.mule.tck.probe.PollingProber;
@@ -18,6 +21,8 @@ import org.mule.tck.probe.Prober;
 import org.mule.transport.file.AbstractFileMoveDeleteTestCase;
 
 import java.io.File;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
 
@@ -194,4 +199,38 @@ public class InboundMessageLossTestCase extends AbstractFileMoveDeleteTestCase
             }
         });
     }
+
+    @Test
+    public void testRollbackExceptionStrategyConsumesMessage() throws Exception
+    {
+        final CountDownLatch exceptionStrategyLatch = new CountDownLatch(4);
+        tmpDir = createFolder(".mule/rollbackOnException");
+        final File file = createDataFile(tmpDir, "test1.txt");
+        muleContext.registerListener(new ExceptionNotificationListener<ExceptionNotification>() {
+            @Override
+            public void onNotification(ExceptionNotification notification)
+            {
+                exceptionStrategyLatch.countDown();
+            }
+        });
+        if (!exceptionStrategyLatch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS))
+        {
+            fail("message should be redelivered");
+        }
+        prober.check(new Probe()
+        {
+            @Override
+            public boolean isSatisfied()
+            {
+                return !file.exists();
+            }
+
+            @Override
+            public String describeFailure()
+            {
+                return "File should be gone";
+            }
+        });
+    }
+
 }

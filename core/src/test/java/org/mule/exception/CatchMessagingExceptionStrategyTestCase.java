@@ -84,8 +84,7 @@ public class CatchMessagingExceptionStrategyTestCase
         MuleEvent resultEvent = catchMessagingExceptionStrategy.handleException(mockException, mockMuleEvent);
         assertThat(resultEvent, is(resultEvent));
 
-        verify(mockMuleMessage).setExceptionPayload(Matchers.<ExceptionPayload>any(ExceptionPayload.class));
-        verify(mockMuleMessage).setExceptionPayload(null);
+        verify(mockMuleMessage, VerificationModeFactory.times(2)).setExceptionPayload(Matchers.<ExceptionPayload>any(ExceptionPayload.class));
         verify(mockTransaction, VerificationModeFactory.times(0)).setRollbackOnly();
         verify(mockTransaction, VerificationModeFactory.times(0)).commit();
         verify(mockTransaction, VerificationModeFactory.times(0)).rollback();

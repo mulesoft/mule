@@ -31,7 +31,6 @@ public class InboundMessageLossTransactionsTestCase extends InboundMessageLossTe
         return "reliability/activemq-config.xml, reliability/inbound-message-loss-transactions.xml";
     }
 
-    @Override
     public void testComponentException() throws Exception
     {
         putMessageOnQueue("componentException");

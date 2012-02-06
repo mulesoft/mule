@@ -25,6 +25,7 @@ import org.mule.api.lifecycle.LifecycleStateEnabled;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.retry.RetryPolicyTemplate;
 import org.mule.model.streaming.CallbackOutputStream;
+import org.mule.processor.AbstractRedeliveryPolicy;
 
 import java.io.OutputStream;
 import java.util.List;
@@ -192,4 +193,10 @@ public interface Connector extends Lifecycle, NameableObject, Connectable, Lifec
      * @return The strategy used for reading and writing session information to and from the transport.
      */
     SessionHandler getSessionHandler();
+
+    /**
+     * @param maxRedelivery times to try message redelivery
+     * @return AbstractRedeliveryPolicy to use for message redelivery, null if it shouldn't be used
+     */
+    AbstractRedeliveryPolicy createDefaultRedeliveryPolicy(int maxRedelivery);
 }

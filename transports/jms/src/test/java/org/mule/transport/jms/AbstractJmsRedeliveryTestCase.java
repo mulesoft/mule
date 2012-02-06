@@ -10,11 +10,14 @@
 
 package org.mule.transport.jms;
 
+import org.apache.activemq.command.ActiveMQMessage;
+import org.mule.api.ExceptionPayload;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.api.context.notification.ExceptionNotificationListener;
+import org.mule.api.exception.MessageRedeliveredException;
 import org.mule.context.notification.ExceptionNotification;
 import org.mule.context.notification.NotificationException;
 import org.mule.message.ExceptionMessage;
@@ -22,7 +25,6 @@ import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.exceptions.FunctionalTestException;
 import org.mule.tck.functional.CounterCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
-import org.mule.transport.jms.redelivery.MessageRedeliveredException;
 import org.mule.util.concurrent.Latch;
 
 import java.util.Arrays;
@@ -39,8 +41,9 @@ import static org.junit.Assert.assertTrue;
 public abstract class AbstractJmsRedeliveryTestCase extends AbstractServiceAndFlowTestCase
 {
 
-    protected static final String JMS_INPUT_QUEUE = "jms://in";
-    protected static final String JMS_DEAD_LETTER = "jms://dead.letter";
+    protected static final String JMS_INPUT_QUEUE = "jms://in?connector=jmsConnectorLimitedRedelivery";
+    protected static final String JMS_INPUT_QUEUE2 = "jms://in2?connector=jmsConnectorNoRedelivery";
+    protected static final String JMS_DEAD_LETTER = "jms://dead.letter?connector=jmsConnectorNoRedelivery";
     protected final int timeout = getTestTimeoutSecs() * 1000 / 4;
 
     protected MuleClient client;
@@ -51,6 +54,7 @@ public abstract class AbstractJmsRedeliveryTestCase extends AbstractServiceAndFl
     {
         super(variant, configResources);
         System.setProperty("maxRedelivery", String.valueOf(getMaxRedelivery()));
+        System.setProperty("maxRedeliveryAttempts", String.valueOf(getMaxRedeliveryAttempts()));
     }
 
     @Parameterized.Parameters
@@ -80,6 +84,13 @@ public abstract class AbstractJmsRedeliveryTestCase extends AbstractServiceAndFl
         assertTrue(em.getException() instanceof MessageRedeliveredException);
     }
 
+    protected void assertMessageInDlqRollbackEs() throws Exception
+    {
+        MuleMessage dl = client.request(JMS_DEAD_LETTER, 1000);
+        assertNotNull(dl);        
+        assertTrue(dl.getPayloadAsString().equals(TEST_MESSAGE));
+    }
+
     protected void purgeQueue() throws MuleException
     {
         // required if broker is not restarted with the test - it tries to deliver those messages to the client
@@ -93,9 +104,10 @@ public abstract class AbstractJmsRedeliveryTestCase extends AbstractServiceAndFl
     protected void setupCallback() throws Exception
     {
         callback = createCallback();
-
         FunctionalTestComponent ftc = getFunctionalTestComponent("Bouncer");
+        FunctionalTestComponent ftc2 = getFunctionalTestComponent("Bouncer2");
         ftc.setEventCallback(callback);
+        ftc2.setEventCallback(callback);
     }
 
     private CounterCallback createCallback()
@@ -136,7 +148,10 @@ public abstract class AbstractJmsRedeliveryTestCase extends AbstractServiceAndFl
     public void cleanUpMaxRedelivery()
     {
         System.clearProperty("maxRedelivery");
+        System.clearProperty("maxRedeliveryAttempts");
     }
 
     protected abstract int getMaxRedelivery();
+
+    protected abstract int getMaxRedeliveryAttempts();
 }

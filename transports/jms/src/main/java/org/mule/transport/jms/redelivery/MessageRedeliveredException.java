@@ -11,53 +11,17 @@
 package org.mule.transport.jms.redelivery;
 
 import org.mule.DefaultMuleEvent;
-import org.mule.api.MessagingException;
 import org.mule.api.MuleMessage;
 import org.mule.api.construct.FlowConstruct;
-import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.transport.jms.i18n.JmsMessages;
 
-public class MessageRedeliveredException extends MessagingException
+public class MessageRedeliveredException extends org.mule.api.exception.MessageRedeliveredException
 {
-    /**
-     * Serial version
-     */
-    private static final long serialVersionUID = 9013890402770563931L;
-
-    protected final transient ImmutableEndpoint endpoint;
-    
-    String messageId;
-    int redeliveryCount;
-    int maxRedelivery;
-
     public MessageRedeliveredException(String messageId, int redeliveryCount, int maxRedelivery, InboundEndpoint endpoint, FlowConstruct flow, MuleMessage muleMessage)
-    {        
-        super(JmsMessages.tooManyRedeliveries(messageId, redeliveryCount, maxRedelivery, endpoint),
-            new DefaultMuleEvent(muleMessage, endpoint, flow));
-        this.messageId = messageId;
-        this.redeliveryCount = redeliveryCount;
-        this.maxRedelivery = maxRedelivery;
-        this.endpoint = endpoint;
-    }
-    
-    public String getMessageId()
     {
-        return messageId;
+        super(messageId, redeliveryCount, maxRedelivery, endpoint,
+            new DefaultMuleEvent(muleMessage, endpoint, flow),JmsMessages.tooManyRedeliveries(messageId, redeliveryCount, maxRedelivery, endpoint));
     }
 
-    public int getRedeliveryCount()
-    {
-        return redeliveryCount;
-    }
-
-    public int getMaxRedelivery()
-    {
-        return maxRedelivery;
-    }
-
-    public ImmutableEndpoint getEndpoint()
-    {
-        return endpoint;
-    }
 }

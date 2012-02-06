@@ -56,5 +56,13 @@
             </default-exception-strategy>
             <threading-profile doThreading="false"/>
         </service>
+        <service name="RollbackExceptionStrategyCommit" >
+            <inbound>
+                <file:inbound-endpoint path=".mule/rollbackOnException"/>
+            </inbound>
+            <test:component throwException="true"/>
+            <rollback-exception-strategy maxRedeliveryAttempts="2"/>
+            <threading-profile doThreading="false"/>
+        </service>
     </model>
 </mule>

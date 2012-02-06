@@ -20,6 +20,8 @@ import org.mule.api.context.MuleContextAware;
 import org.mule.api.endpoint.EndpointMessageProcessorChainFactory;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.exception.MessagingExceptionHandler;
+import org.mule.api.exception.MessagingExceptionHandlerAcceptor;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.LifecycleException;
 import org.mule.api.lifecycle.Startable;
@@ -30,6 +32,8 @@ import org.mule.api.transaction.TransactionConfig;
 import org.mule.api.transport.Connector;
 import org.mule.config.MuleManifest;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.exception.ChoiceMessagingExceptionStrategy;
+import org.mule.exception.RollbackMessagingExceptionStrategy;
 import org.mule.processor.AbstractRedeliveryPolicy;
 import org.mule.transport.ConnectException;
 import org.mule.transport.polling.MessageProcessorPollingMessageReceiver;
@@ -211,5 +215,51 @@ public class DefaultInboundEndpoint extends AbstractEndpoint implements InboundE
         // services get mixed up after deserialization of events
         return System.identityHashCode(this);
     }
-    
+
+    @Override
+    public AbstractRedeliveryPolicy getRedeliveryPolicy()
+    {
+        AbstractRedeliveryPolicy redeliveryPolicy = super.getRedeliveryPolicy();
+        if (redeliveryPolicy == null)
+        {
+            /*TODO Next commit will fix this horrible thing:
+             inbound endpoint should only be aware of a redelivery policy configured on it
+             flowConstruct should be responsible of redelivery policy use */
+            if (flowConstruct != null && flowConstruct.getExceptionListener() != null)
+            {
+                MessagingExceptionHandler exceptionListener = flowConstruct.getExceptionListener();
+                RollbackMessagingExceptionStrategy rollbackMessagingExceptionStrategy = null;
+                if (exceptionListener instanceof RollbackMessagingExceptionStrategy)
+                {
+                    rollbackMessagingExceptionStrategy = (RollbackMessagingExceptionStrategy) exceptionListener;
+                }
+                else if (exceptionListener instanceof ChoiceMessagingExceptionStrategy)
+                {
+                    ChoiceMessagingExceptionStrategy choiceMessagingExceptionStrategy = (ChoiceMessagingExceptionStrategy) exceptionListener;
+                    for (MessagingExceptionHandlerAcceptor messagingExceptionHandlerAcceptor : choiceMessagingExceptionStrategy.getExceptionListeners())
+                    {
+                        if (messagingExceptionHandlerAcceptor instanceof RollbackMessagingExceptionStrategy && ((RollbackMessagingExceptionStrategy) messagingExceptionHandlerAcceptor).hasMaxRedeliveryAttempts())
+                        {
+                            rollbackMessagingExceptionStrategy = (RollbackMessagingExceptionStrategy) messagingExceptionHandlerAcceptor;
+                            break;
+                        }
+                    }
+                }
+                if (rollbackMessagingExceptionStrategy != null)
+                {
+                    if (rollbackMessagingExceptionStrategy.hasMaxRedeliveryAttempts())
+                    {
+                        redeliveryPolicy = createDefaultRedeliveryPolicy(rollbackMessagingExceptionStrategy.getMaxRedeliveryAttempts());
+                    }
+                }
+            }
+        }
+        return redeliveryPolicy;
+    }
+
+    @Override
+    public AbstractRedeliveryPolicy createDefaultRedeliveryPolicy(int maxRedelivery)
+    {
+        return getConnector().createDefaultRedeliveryPolicy(maxRedelivery);
+    }
 }

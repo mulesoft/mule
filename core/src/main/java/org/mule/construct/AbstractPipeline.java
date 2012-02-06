@@ -16,6 +16,7 @@ import org.mule.api.MuleException;
 import org.mule.api.construct.FlowConstructInvalidException;
 import org.mule.api.construct.Pipeline;
 import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.exception.MessagingExceptionHandlerAcceptor;
 import org.mule.api.lifecycle.LifecycleException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorBuilder;
@@ -25,6 +26,8 @@ import org.mule.api.source.CompositeMessageSource;
 import org.mule.api.source.MessageSource;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.construct.flow.DefaultFlowProcessingStrategy;
+import org.mule.exception.ChoiceMessagingExceptionStrategy;
+import org.mule.exception.RollbackMessagingExceptionStrategy;
 import org.mule.processor.AbstractFilteringMessageProcessor;
 import org.mule.processor.AbstractInterceptingMessageProcessor;
 import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
@@ -168,15 +171,49 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
         super.validateConstruct();
 
         // Ensure that inbound endpoints are compatible with processing strategy.
+        boolean userConfiguredProcessingStrategy = !(processingStrategy instanceof DefaultFlowProcessingStrategy);
         boolean userConfiguredAsyncProcessingStrategy = processingStrategy instanceof AsynchronousProcessingStrategy
-                                                        && !(processingStrategy instanceof DefaultFlowProcessingStrategy);
+                                                        && userConfiguredProcessingStrategy;
 
-        if (userConfiguredAsyncProcessingStrategy && !isMessageSourceCompatibleWithAsync(messageSource))
+        boolean redeliveryHandlerConfigured = isRedeliveryPolicyConfigured();
+
+        if (userConfiguredAsyncProcessingStrategy && (!isMessageSourceCompatibleWithAsync(messageSource) || (redeliveryHandlerConfigured)))
         {
             throw new FlowConstructInvalidException(
-                CoreMessages.createStaticMessage("One of the inbound endpoint configured on this Flow is not compatible with an asynchronous processing strategy.  Either because it is request-response or has a transaction defined."),
+                CoreMessages.createStaticMessage("One of the inbound endpoint configured on this Flow is not compatible with an asynchronous processing strategy.  Either because it is request-response, has a transaction defined, or messaging redelivered is configured."),
                 this);
         }
+
+        if (!userConfiguredProcessingStrategy && redeliveryHandlerConfigured)
+        {
+            setProcessingStrategy(new SynchronousProcessingStrategy());
+            if (logger.isWarnEnabled())
+            {
+                logger.warn("Using message redelivery and rollback-exception-strategy requires synchronous processing strategy. Processing strategy re-configured to synchronous");
+            }
+        }
+    }
+
+    protected boolean isRedeliveryPolicyConfigured()
+    {
+        boolean isRedeliveredPolicyConfigured = false;
+        if (this.exceptionListener instanceof RollbackMessagingExceptionStrategy && ((RollbackMessagingExceptionStrategy)exceptionListener).hasMaxRedeliveryAttempts())
+        {
+            isRedeliveredPolicyConfigured = true;
+        } 
+        else if (this.exceptionListener instanceof ChoiceMessagingExceptionStrategy)
+        {
+            ChoiceMessagingExceptionStrategy choiceMessagingExceptionStrategy = (ChoiceMessagingExceptionStrategy) this.exceptionListener;
+            for (MessagingExceptionHandlerAcceptor messagingExceptionHandlerAcceptor : choiceMessagingExceptionStrategy.getExceptionListeners())
+            {
+                if (messagingExceptionHandlerAcceptor instanceof RollbackMessagingExceptionStrategy)
+                {
+                    isRedeliveredPolicyConfigured = true;
+                    break;
+                }
+            }
+        }
+        return isRedeliveredPolicyConfigured;
     }
 
     private boolean isMessageSourceCompatibleWithAsync(MessageSource source)

@@ -229,6 +229,12 @@ public class DynamicURIInboundEndpoint implements InboundEndpoint
     }
 
     @Override
+    public AbstractRedeliveryPolicy createDefaultRedeliveryPolicy(int maxRedelivery)
+    {
+        return endpoint.createDefaultRedeliveryPolicy(maxRedelivery);
+    }
+
+    @Override
     public int hashCode()
     {
         final int prime = 31;

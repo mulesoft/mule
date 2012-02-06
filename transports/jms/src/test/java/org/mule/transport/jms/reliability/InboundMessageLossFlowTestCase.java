@@ -31,7 +31,6 @@ public class InboundMessageLossFlowTestCase extends InboundMessageLossTestCase
         return "reliability/activemq-config.xml, reliability/inbound-message-loss-flow.xml";
     }
 
-    @Override
     public void testTransformerException() throws Exception
     {
         putMessageOnQueue("transformerException");
@@ -44,7 +43,6 @@ public class InboundMessageLossFlowTestCase extends InboundMessageLossTestCase
             messageRedelivered.await(latchTimeout, TimeUnit.MILLISECONDS));
     }
 
-    @Override
     public void testRouterException() throws Exception
     {
         putMessageOnQueue("routerException");

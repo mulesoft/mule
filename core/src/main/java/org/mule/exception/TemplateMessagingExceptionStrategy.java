@@ -12,6 +12,7 @@ package org.mule.exception;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
+import org.mule.api.construct.FlowConstruct;
 import org.mule.api.exception.MessagingExceptionHandlerAcceptor;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.processor.MessageProcessor;
@@ -30,32 +31,39 @@ public abstract class TemplateMessagingExceptionStrategy extends AbstractExcepti
 
     final public MuleEvent handleException(Exception exception, MuleEvent event)
     {
+        FlowConstruct flowConstruct = event.getFlowConstruct();
         fireNotification(exception);
         logException(exception);
         processStatistics(event);
+        event.getMessage().setExceptionPayload(new DefaultExceptionPayload(exception));
         event = beforeRouting(exception, event);
         event = route(event, exception);
-        processOutboundRouterStatistics(event);
+        processOutboundRouterStatistics(flowConstruct);
         event = afterRouting(exception, event);
-        processReplyTo(event);
-        closeStream(event.getMessage());
-        nullifyExceptionPayloadIfRequired(event);
+        if (event != null)
+        {
+            processReplyTo(event, exception);
+            closeStream(event.getMessage());
+            nullifyExceptionPayloadIfRequired(event);
+        }
         return event;
     }
 
-    protected void processReplyTo(MuleEvent event)
+    protected void processReplyTo(MuleEvent event, Exception e)
     {
         try
         {
             replyToMessageProcessor.process(event);
         }
-        catch (MuleException e)
+        catch (MuleException ex)
         {
-            logFatal(event,e);
+            logFatal(event,ex);
         }
     }
 
-    protected abstract void nullifyExceptionPayloadIfRequired(MuleEvent event);
+    protected void nullifyExceptionPayloadIfRequired(MuleEvent event)
+    {
+    }
 
     private void processStatistics(MuleEvent event)
     {
@@ -66,15 +74,14 @@ public abstract class TemplateMessagingExceptionStrategy extends AbstractExcepti
         }
     }
 
-    protected MuleEvent route(MuleEvent event, Throwable t)
+    protected MuleEvent route(MuleEvent event, Exception t)
     {
         if (!getMessageProcessors().isEmpty())
         {
             try
             {
                 event.getMessage().setExceptionPayload(new DefaultExceptionPayload(t));
-                MuleEvent result = configuredMessageProcessors.process(event);
-                processOutboundRouterStatistics(event);
+                MuleEvent result = configuredMessageProcessors.process(event);                
                 return result;
             }
             catch (Exception e)
@@ -84,6 +91,7 @@ public abstract class TemplateMessagingExceptionStrategy extends AbstractExcepti
         }
         return event;
     }
+
 
     @Override
     protected void doInitialise(MuleContext muleContext) throws InitialisationException
@@ -117,7 +125,13 @@ public abstract class TemplateMessagingExceptionStrategy extends AbstractExcepti
         return expression == null;
     }
 
-    protected abstract MuleEvent afterRouting(Exception exception, MuleEvent event);
+    protected MuleEvent afterRouting(Exception exception, MuleEvent event)
+    {
+        return event;
+    }
 
-    protected abstract MuleEvent beforeRouting(Exception exception, MuleEvent event);
+    protected MuleEvent beforeRouting(Exception exception, MuleEvent event)
+    {
+        return event;
+    }
 }

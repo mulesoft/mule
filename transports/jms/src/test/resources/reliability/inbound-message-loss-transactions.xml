@@ -12,7 +12,7 @@
     <model>
         <service name="NoException">
             <inbound>
-                <jms:inbound-endpoint queue="noException">
+                <jms:inbound-endpoint queue="noException" connector-ref="jmsConnector">
 			        <jms:transaction action="ALWAYS_BEGIN" />
                 </jms:inbound-endpoint>
             </inbound>
@@ -20,7 +20,7 @@
         </service>
         <service name="TransformerException">
             <inbound>
-                <jms:inbound-endpoint queue="transformerException">
+                <jms:inbound-endpoint queue="transformerException" connector-ref="jmsConnector">
 			        <jms:transaction action="ALWAYS_BEGIN" />
                 </jms:inbound-endpoint>
                 <custom-transformer class="org.mule.tck.testmodels.mule.FailingTransformer" />
@@ -29,7 +29,7 @@
         </service>
         <service name="RouterException">
             <inbound>
-                <jms:inbound-endpoint queue="routerException">
+                <jms:inbound-endpoint queue="routerException" connector-ref="jmsConnector">
 			        <jms:transaction action="ALWAYS_BEGIN" />
                 </jms:inbound-endpoint>
                 <custom-inbound-router class="org.mule.tck.testmodels.mule.FailingRouter" />
@@ -38,11 +38,20 @@
         </service>
         <service name="ComponentException">
             <inbound>
-                <jms:inbound-endpoint queue="componentException">
+                <jms:inbound-endpoint queue="componentException" connector-ref="jmsConnector">
 			        <jms:transaction action="ALWAYS_BEGIN" />
                 </jms:inbound-endpoint>
             </inbound>
             <test:component throwException="true" />
+        </service>
+        <service name="RollbackExceptionStrategyCommit">
+            <inbound>
+                <jms:inbound-endpoint queue="rollbackOnException" connector-ref="jmsConnectorNoRedelivery">
+                    <jms:transaction action="ALWAYS_BEGIN"/>
+                </jms:inbound-endpoint>
+            </inbound>
+            <test:component throwException="true"/>
+            <rollback-exception-strategy maxRedeliveryAttempts="2"/>
         </service>
     </model>
 </mule>

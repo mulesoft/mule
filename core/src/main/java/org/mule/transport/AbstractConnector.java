@@ -59,6 +59,8 @@ import org.mule.context.notification.EndpointMessageNotification;
 import org.mule.context.notification.OptimisedNotificationHandler;
 import org.mule.endpoint.outbound.OutboundNotificationMessageProcessor;
 import org.mule.model.streaming.DelegatingInputStream;
+import org.mule.processor.AbstractRedeliveryPolicy;
+import org.mule.processor.IdempotentRedeliveryPolicy;
 import org.mule.processor.LaxAsyncInterceptingMessageProcessor;
 import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.routing.filters.WildcardFilter;
@@ -1962,6 +1964,15 @@ public abstract class AbstractConnector implements Connector, WorkListener
     public SessionHandler getSessionHandler()
     {
         return sessionHandler;
+    }
+
+    @Override
+    public AbstractRedeliveryPolicy createDefaultRedeliveryPolicy(int maxRedelivery)
+    {
+        IdempotentRedeliveryPolicy idempotentRedeliveryPolicy = new IdempotentRedeliveryPolicy();
+        idempotentRedeliveryPolicy.setUseSecureHash(true);
+        idempotentRedeliveryPolicy.setMaxRedeliveryCount(maxRedelivery);
+        return idempotentRedeliveryPolicy;
     }
 
     /**

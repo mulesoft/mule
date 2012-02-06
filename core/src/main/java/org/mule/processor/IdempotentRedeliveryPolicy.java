@@ -9,6 +9,7 @@
  */
 package org.mule.processor;
 
+import org.mule.api.exception.MessageRedeliveredException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.lifecycle.Disposable;
@@ -19,7 +20,6 @@ import org.mule.api.store.ObjectStoreException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.transformer.simple.ByteArrayToHexString;
 import org.mule.transformer.simple.ObjectToByteArray;
-import org.mule.transformer.simple.SerializableToByteArray;
 import org.mule.util.store.AbstractMonitoredObjectStore;
 import org.mule.util.store.InMemoryObjectStore;
 
@@ -56,10 +56,11 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy
         super.initialise();
         if (useSecureHash && idExpression != null)
         {
-            throw new InitialisationException(
-                CoreMessages.initialisationFailure(String.format(
-                    "The Id expression'%s' was specified when a secure hash will be used",
-                    idExpression)), this);
+            useSecureHash = false;
+            if (logger.isWarnEnabled())
+            {
+                logger.warn("Disabling useSecureHash in idempotent-redelivery-policy since an idExpression has been configured");
+            }
         }
         if (!useSecureHash && messageDigestAlgorithm != null)
         {
@@ -162,7 +163,18 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy
         {
             try
             {
-                return deadLetterQueue.process(event);
+                if (deadLetterQueue != null)
+                {
+                    return deadLetterQueue.process(event);
+                }
+                else
+                {
+                    throw new MessageRedeliveredException(messageId,counter.get(),maxRedeliveryCount,null,event);
+                }
+            }
+            catch (MessageRedeliveredException ex)
+            {
+                throw ex;
             }
             catch (Exception ex)
             {

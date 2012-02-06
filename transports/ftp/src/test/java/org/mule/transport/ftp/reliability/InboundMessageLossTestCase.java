@@ -10,6 +10,9 @@
 
 package org.mule.transport.ftp.reliability;
 
+import static org.junit.Assert.fail;
+import org.mule.api.context.notification.ExceptionNotificationListener;
+import org.mule.context.notification.ExceptionNotification;
 import org.mule.exception.DefaultSystemExceptionStrategy;
 import org.mule.routing.filters.WildcardFilter;
 import org.mule.tck.probe.PollingProber;
@@ -20,6 +23,8 @@ import org.mule.transport.ftp.AbstractFtpServerTestCase;
 import java.io.File;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
@@ -65,6 +70,7 @@ public class InboundMessageLossTestCase extends AbstractFtpServerTestCase
         createFtpServerDir("componentException");
         createFtpServerDir("exceptionHandled");
         createFtpServerDir("commitOnException");
+        createFtpServerDir("rollbackOnException");
     }
 
     @Test
@@ -195,4 +201,39 @@ public class InboundMessageLossTestCase extends AbstractFtpServerTestCase
             }
         });
     }
+
+    @Test
+    public void testRollbackExceptionStrategyConsumesMessage() throws Exception
+    {
+        final CountDownLatch exceptionStrategyLatch = new CountDownLatch(4);
+        muleContext.registerListener(new ExceptionNotificationListener<ExceptionNotification>() {
+            @Override
+            public void onNotification(ExceptionNotification notification)
+            {
+                exceptionStrategyLatch.countDown();
+            }
+        });
+        createFileOnFtpServer("rollbackOnException/test1");
+        if (!exceptionStrategyLatch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS))
+        {
+            fail("message should be redelivered");
+        }
+        prober.check(new Probe()
+        {
+            @Override
+            public boolean isSatisfied()
+            {
+                // Component exception occurs after the SEDA queue for an asynchronous request, so from the client's
+                // perspective, the message has been delivered successfully.
+                return !fileExists("commitOnException/test1");
+            }
+
+            @Override
+            public String describeFailure()
+            {
+                return "File should be gone";
+            }
+        });
+    }
+
 }

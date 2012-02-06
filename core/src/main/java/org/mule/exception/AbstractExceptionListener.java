@@ -213,7 +213,7 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
             }
         }
 
-        processOutboundRouterStatistics(event);
+        processOutboundRouterStatistics(event.getFlowConstruct());
     }
 
     /*
@@ -471,10 +471,10 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
         }
     }
 
-    void processOutboundRouterStatistics(MuleEvent event)
+    void processOutboundRouterStatistics(FlowConstruct flowConstruct)
     {
         List<MessageProcessor> processors = getMessageProcessors();
-        FlowConstructStatistics statistics = event.getFlowConstruct().getStatistics();
+        FlowConstructStatistics statistics = flowConstruct.getStatistics();
         if (CollectionUtils.isNotEmpty(processors) && statistics instanceof ServiceStatistics)
         {
             if (statistics.isEnabled())

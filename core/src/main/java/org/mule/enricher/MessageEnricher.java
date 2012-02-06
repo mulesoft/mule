@@ -39,6 +39,8 @@ public class MessageEnricher extends AbstractMessageProcessorOwner implements Me
         MuleEvent enrichmentEvent = enrichmentProcessor.process(enricherEvent);
         OptimizedRequestContext.unsafeSetEvent(event);
 
+
+
         if (enrichmentEvent != null)
         {
             for (EnrichExpressionPair pair : enrichExpressionPairs)

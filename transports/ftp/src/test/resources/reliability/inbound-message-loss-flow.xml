@@ -39,4 +39,9 @@
             <commit-transaction exception-pattern="*"/>
         </default-exception-strategy>
     </flow>
+    <flow name="RollbackExceptionStrategy">
+        <ftp:inbound-endpoint address="ftp://anonymous:password@localhost:${port1}/rollbackException" />
+        <test:component throwException="true"/>
+        <rollback-exception-strategy/>
+    </flow>
 </mule>

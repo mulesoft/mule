@@ -14,4 +14,10 @@
         acknowledgementMode="CLIENT_ACKNOWLEDGE"
         maxRedelivery="0"
         brokerURL="vm://localhost?broker.persistent=false&amp;broker.useJmx=false&amp;jms.redeliveryPolicy.maximumRedeliveries=0" />
+
+    <jms:activemq-connector name="jmsConnectorNoRedelivery"
+            specification="1.1"
+            acknowledgementMode="CLIENT_ACKNOWLEDGE"
+            maxRedelivery="-1"
+            brokerURL="vm://localhost?broker.persistent=false&amp;broker.useJmx=false" />
 </mule>

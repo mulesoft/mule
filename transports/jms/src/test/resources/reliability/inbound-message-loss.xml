@@ -12,33 +12,33 @@
     <model>
         <service name="NoException">
             <inbound>
-                <jms:inbound-endpoint queue="noException" />
+                <jms:inbound-endpoint queue="noException" connector-ref="jmsConnector"/>
             </inbound>
             <test:component />
         </service>
         <service name="TransformerException">
             <inbound>
-                <jms:inbound-endpoint queue="transformerException" />
+                <jms:inbound-endpoint queue="transformerException" connector-ref="jmsConnector"/>
                 <custom-transformer class="org.mule.tck.testmodels.mule.FailingTransformer" />
             </inbound>
             <test:component />
         </service>
         <service name="RouterException">
             <inbound>
-                <jms:inbound-endpoint queue="routerException" />
+                <jms:inbound-endpoint queue="routerException" connector-ref="jmsConnector" />
                 <custom-inbound-router class="org.mule.tck.testmodels.mule.FailingRouter" />
             </inbound>
             <test:component />
         </service>
         <service name="ComponentException">
             <inbound>
-                <jms:inbound-endpoint queue="componentException" />
+                <jms:inbound-endpoint queue="componentException" connector-ref="jmsConnector"/>
             </inbound>
             <test:component throwException="true" />
         </service>
         <service name="CatchExceptionStrategy">
             <inbound>
-                <jms:inbound-endpoint queue="exceptionHandled" exchange-pattern="request-response"/>
+                <jms:inbound-endpoint queue="exceptionHandled" connector-ref="jmsConnector" exchange-pattern="request-response"/>
             </inbound>
             <test:component throwException="true"/>
             <catch-exception-strategy/>
@@ -46,12 +46,20 @@
         </service>
         <service name="DefaultExceptionStrategyCommit" >
             <inbound>
-                <jms:inbound-endpoint queue="commitOnException"/>
+                <jms:inbound-endpoint queue="commitOnException" connector-ref="jmsConnector"/>
             </inbound>
             <test:component throwException="true"/>
             <default-exception-strategy>
                 <commit-transaction exception-pattern="*"/>
             </default-exception-strategy>
+            <threading-profile doThreading="false"/>
+        </service>
+        <service name="RollbackExceptionStrategyCommit">
+            <inbound>
+                <jms:inbound-endpoint queue="rollbackOnException" connector-ref="jmsConnectorNoRedelivery"/>
+            </inbound>
+            <test:component throwException="true"/>
+            <rollback-exception-strategy maxRedeliveryAttempts="2"/>
             <threading-profile doThreading="false"/>
         </service>
     </model>

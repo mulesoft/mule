@@ -857,8 +857,8 @@
             <xsd:complexContent>
                 <xsd:extension base="abstractMessageProcessorType">
                     <xsd:sequence>
-                        <xsd:group ref="messageProcessorOrOutboundEndpoint" maxOccurs="unbounded"/>
                         <xsd:element ref="abstract-transaction"/>
+                        <xsd:group ref="messageProcessorOrOutboundEndpoint" maxOccurs="unbounded"/>
                     </xsd:sequence>
                 </xsd:extension>
             </xsd:complexContent>
@@ -4818,6 +4818,16 @@
         </xsd:annotation>
     </xsd:element>
 
+    <xsd:element name="rollback-exception-strategy" type="rollbackExceptionStrategyType"
+                 substitutionGroup="abstract-exception-strategy">
+        <xsd:annotation>
+            <xsd:documentation>
+                Exception strategy used to rollback inbound message. It will rollback any transaction or not consume
+                inbound message unless a org.mule.api.exception.MessageRedeliveredException is thrown.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
     <xsd:element name="exception-strategy" type="referenceExceptionStrategyType"
                  substitutionGroup="abstract-exception-strategy">
         <xsd:annotation>
@@ -4833,7 +4843,7 @@
                 <xsd:sequence>
                     <xsd:group ref="messageProcessorOrOutboundEndpoint" minOccurs="0" maxOccurs="unbounded">
                         <xsd:annotation>
-                            <xsd:documentation>Destination to which an ExceptionMessage will be sent; this could be an outbound endpoint, a router, or other message processor.
+                            <xsd:documentation>Destination to which a MuleMessage with an ExceptionPayload will be sent; this could be any message processor or outbound endpoint.
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:group>
@@ -4853,6 +4863,41 @@
                     <xsd:annotation>
                         <xsd:documentation>
                             Name of the exception strategy that will be used in ref attribute of 'exception-strategy' element
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="rollbackExceptionStrategyType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractNotificationExceptionStrategyType">
+                <xsd:sequence>
+                    <xsd:group ref="messageProcessorOrOutboundEndpoint" minOccurs="0" maxOccurs="unbounded">
+                        <xsd:annotation>
+                            <xsd:documentation>Destination to which the message will be sent; this could be an outbound endpoint, a router, or message processor.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:group>
+                    <xsd:element name="on-redelivery-attempts-exceeded" minOccurs="0">
+                        <xsd:complexType>
+                            <xsd:sequence>
+                                <xsd:group ref="messageProcessorOrOutboundEndpoint" minOccurs="0" maxOccurs="unbounded">
+                                    <xsd:annotation>
+                                        <xsd:documentation>Destination to which the message will be sent in case that max redelivery attempts configured is exceeded, this
+                                            could be any sequence of outbound endpoint, router, or message processor.
+                                        </xsd:documentation>
+                                    </xsd:annotation>
+                                </xsd:group>
+                            </xsd:sequence>
+                        </xsd:complexType>
+                    </xsd:element>
+                </xsd:sequence>
+                <xsd:attribute name="maxRedeliveryAttempts" type="substitutableInt">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Times a message will be redelivery until it's consider a poison message. Once maxRedeliveryAttempts is exceeded on-redelivery-attempts-exceeded child message processors will be executed.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -5275,7 +5320,7 @@
         <xsd:complexContent>
             <xsd:extension base="annotatedType">
                 <xsd:sequence>
-                    <xsd:element name="dead-letter-queue" type="singleTarget">
+                    <xsd:element name="dead-letter-queue" type="singleTarget" minOccurs="0">
                         <xsd:annotation>
                             <xsd:documentation>
                                 Message processor to call if a message exceeds its redelivery count without being processed successfully
@@ -5283,7 +5328,7 @@
                         </xsd:annotation>
                     </xsd:element>
                 </xsd:sequence>
-                <xsd:attribute name="maxRedeliveryCount" type="xsd:integer" default="5">
+                <xsd:attribute name="maxRedeliveryCount" type="substitutableInt" default="5">
                     <xsd:annotation>
                         <xsd:documentation>
                             The maximum number of times a message can be redelivered and processed unsuccessfully before triggering
