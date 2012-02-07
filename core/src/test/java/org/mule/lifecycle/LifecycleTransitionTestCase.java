@@ -1,5 +1,5 @@
 /*
- * $Id: URIBuilder.java 23505 2011-12-20 08:20:49Z mike.schilling $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  *
