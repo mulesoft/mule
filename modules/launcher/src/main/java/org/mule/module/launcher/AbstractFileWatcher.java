@@ -19,7 +19,6 @@ import org.apache.commons.logging.LogFactory;
 
 public abstract class AbstractFileWatcher implements Runnable
 {
-
     protected Log logger = LogFactory.getLog(getClass());
 
     private long timeStamp;
@@ -35,12 +34,13 @@ public abstract class AbstractFileWatcher implements Runnable
         this.files = files;
         this.timeStamp = System.currentTimeMillis();
     }
-    
+
+    @Override
     public final void run()
     {
         long lastTimeStamp = timeStamp;
         File latestFile = null;
-        
+
         for (File file : files)
         {
             long timestamp = file.lastModified();
@@ -50,7 +50,7 @@ public abstract class AbstractFileWatcher implements Runnable
                 latestFile = file;
             }
         }
-        
+
         if (latestFile != null)
         {
             this.timeStamp = lastTimeStamp;
