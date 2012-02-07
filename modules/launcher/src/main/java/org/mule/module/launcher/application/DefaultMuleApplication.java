@@ -10,8 +10,6 @@
 
 package org.mule.module.launcher.application;
 
-import static org.mule.util.SplashScreen.miniSplash;
-
 import org.mule.MuleServer;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
@@ -60,9 +58,10 @@ import java.util.concurrent.TimeUnit;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import static org.mule.util.SplashScreen.miniSplash;
+
 public class DefaultMuleApplication implements Application
 {
-
     protected static final int DEFAULT_RELOAD_CHECK_INTERVAL_MS = 3000;
     protected static final String ANCHOR_FILE_BLURB = "Delete this file while Mule is running to undeploy this app in a clean way.";
 
@@ -112,9 +111,8 @@ public class DefaultMuleApplication implements Application
             final File file = toAbsoluteFile(resource);
             if (!file.exists())
             {
-                throw new InstallException(
-                        MessageFactory.createStaticMessage(String.format("Config for app '%s' not found: %s", getAppName(), file))
-                );
+                String message = String.format("Config for app '%s' not found: %s", getAppName(), file);
+                throw new InstallException(MessageFactory.createStaticMessage(message));
             }
 
             absoluteResourcePaths[i] = file.getAbsolutePath();
@@ -470,8 +468,7 @@ public class DefaultMuleApplication implements Application
         }
 
         final MuleApplicationClassLoader appCl = new MuleApplicationClassLoader(descriptor.getAppName(),
-                                                                                parent,
-                                                                                descriptor.getLoaderOverride());
+            parent, descriptor.getLoaderOverride());
         this.deploymentClassLoader = appCl;
     }
 
@@ -479,34 +476,17 @@ public class DefaultMuleApplication implements Application
     {
         if (logger.isInfoEnabled())
         {
-            logger.info("Monitoring for hot-deployment: " + new File(absoluteResourcePaths [0]));
+            logger.info("Monitoring for hot-deployment: " + StringUtils.join(absoluteResourcePaths, ';'));
         }
 
-        final AbstractFileWatcher watcher = new ConfigFileWatcher(new File(absoluteResourcePaths [0]));
+        List<File> configFiles = new ArrayList<File>();
+        for (String path : absoluteResourcePaths)
+        {
+            configFiles.add(new File(path));
+        }
 
         // register a config monitor only after context has started, as it may take some time
-        muleContext.registerListener(new MuleContextNotificationListener<MuleContextNotification>()
-        {
-            @Override
-            public void onNotification(MuleContextNotification notification)
-            {
-                final int action = notification.getAction();
-                switch (action)
-                {
-                    case MuleContextNotification.CONTEXT_STARTED:
-                        scheduleConfigMonitor(watcher);
-                        break;
-                    case MuleContextNotification.CONTEXT_STOPPING:
-                        if (watchTimer != null)
-                        {
-                            // edge case when app startup was interrupted and we haven't started monitoring it yet
-                            watchTimer.shutdownNow();
-                        }
-                        muleContext.unregisterListener(this);
-                        break;
-                }
-            }
-        });
+        new ConfigFileWatcher(configFiles).register();
     }
 
     protected void scheduleConfigMonitor(AbstractFileWatcher watcher)
@@ -536,9 +516,14 @@ public class DefaultMuleApplication implements Application
 
     protected class ConfigFileWatcher extends AbstractFileWatcher
     {
-        public ConfigFileWatcher(File watchedResource)
+        public ConfigFileWatcher(List<File> watchedResources)
         {
-            super(watchedResource);
+            super(watchedResources);
+        }
+
+        public void register() throws NotificationException
+        {
+            muleContext.registerListener(new FileWatcherNotificationListener(this));
         }
 
         @Override
@@ -553,6 +538,38 @@ public class DefaultMuleApplication implements Application
             final ClassLoader cl = getDeploymentClassLoader();
             Thread.currentThread().setContextClassLoader(cl);
             redeploy();
+        }
+    }
+
+    protected class FileWatcherNotificationListener implements MuleContextNotificationListener<MuleContextNotification>
+    {
+        private AbstractFileWatcher watcher;
+
+        public FileWatcherNotificationListener(AbstractFileWatcher watcher)
+        {
+            this.watcher = watcher;
+        }
+
+        @Override
+        public void onNotification(MuleContextNotification notification)
+        {
+            final int action = notification.getAction();
+            switch (action)
+            {
+                case MuleContextNotification.CONTEXT_STARTED :
+                    scheduleConfigMonitor(watcher);
+                    break;
+
+                case MuleContextNotification.CONTEXT_STOPPING :
+                    if (watchTimer != null)
+                    {
+                        // edge case when app startup was interrupted and we haven't
+                        // started monitoring it yet
+                        watchTimer.shutdownNow();
+                    }
+                    muleContext.unregisterListener(this);
+                    break;
+            }
         }
     }
 }
