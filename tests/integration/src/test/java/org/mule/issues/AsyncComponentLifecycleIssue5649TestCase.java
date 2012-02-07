@@ -8,6 +8,7 @@
  * LICENSE.txt file.
  */
 
+
 package org.mule.issues;
 
 import static org.junit.Assert.assertEquals;
