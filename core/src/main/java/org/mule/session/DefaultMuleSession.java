@@ -10,7 +10,9 @@
 
 package org.mule.session;
 
+import org.mule.api.MuleContext;
 import org.mule.api.MuleSession;
+import org.mule.api.construct.FlowConstruct;
 import org.mule.api.security.SecurityContext;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.util.CaseInsensitiveHashMap;
@@ -78,7 +80,27 @@ public final class DefaultMuleSession implements MuleSession
             this.properties.put(key, session.getProperty(key));
         }
     }
+    
+    // Deprecated constructor
+    
+    @Deprecated
+    public DefaultMuleSession(MuleContext muleContext)
+    {
+        this();
+    }
 
+    @Deprecated
+    public DefaultMuleSession(FlowConstruct flowConstruct, MuleContext muleContext)
+    {
+        this();
+    }
+
+    @Deprecated
+    public DefaultMuleSession(MuleSession source, FlowConstruct flowConstruct)
+    {
+        this(source);
+    }
+    
     @Override
     public String getId()
     {
