@@ -56,12 +56,11 @@ import org.apache.commons.logging.LogFactory;
  * received within the Mule environment will be passed between components as an MuleEvent.
  * <p/>
  * The MuleEvent holds some data and provides helper methods for obtaining the data in a format that the
- * receiving Mule component understands. The event can also maintain any number of flowVariables that can be set
- * and retrieved by Mule components.
+ * receiving Mule component understands. The event can also maintain any number of flowVariables that can be
+ * set and retrieved by Mule components.
  */
 
-public class DefaultMuleEvent 
-    implements MuleEvent, ThreadSafeAccess, DeserializationPostInitialisable
+public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, DeserializationPostInitialisable
 {
     private static final long serialVersionUID = 1L;
 
@@ -1007,5 +1006,145 @@ public class DefaultMuleEvent
     public void clearSessionVariables()
     {
         session.clearProperties();
+    }
+
+    // Deprecated constructors
+
+    /**
+     * WARNING: Only use this constructor if the instance of MuleSession has a flowConstruct set. This
+     * constructor is only here for backwards compatibility.
+     */
+    @Deprecated
+    public DefaultMuleEvent(MuleMessage message, MessageExchangePattern exchangePattern, MuleSession session)
+    {
+        this(message, exchangePattern, session, message.getMuleContext()
+            .getConfiguration()
+            .getDefaultResponseTimeout(), null, null);
+    }
+
+    /**
+     * WARNING: Only use this constructor if the instance of MuleSession has a flowConstruct set. This
+     * constructor is only here for backwards compatibility.
+     */
+    @Deprecated
+    public DefaultMuleEvent(MuleMessage message,
+                            MessageExchangePattern exchangePattern,
+                            MuleSession session,
+                            ResponseOutputStream outputStream)
+    {
+        this(message, exchangePattern, session, message.getMuleContext()
+            .getConfiguration()
+            .getDefaultResponseTimeout(), null, outputStream);
+    }
+
+    /**
+     * WARNING: Only use this constructor if the instance of MuleSession has a flowConstruct set. This
+     * constructor is only here for backwards compatibility.
+     */
+    @Deprecated
+    public DefaultMuleEvent(MuleMessage message,
+                            MessageExchangePattern exchangePattern,
+                            MuleSession session,
+                            int timeout,
+                            Credentials credentials,
+                            ResponseOutputStream outputStream)
+    {
+        this(message, URI.create("none"), exchangePattern, session, timeout, credentials, outputStream);
+    }
+
+    /**
+     * WARNING: Only use this constructor if the instance of MuleSession has a flowConstruct set. This
+     * constructor is only here for backwards compatibility.
+     */
+    @Deprecated
+    public DefaultMuleEvent(MuleMessage message,
+                            URI messageSourceURI,
+                            MessageExchangePattern exchangePattern,
+                            MuleSession session)
+    {
+        this(message, messageSourceURI, exchangePattern, session, message.getMuleContext()
+            .getConfiguration()
+            .getDefaultResponseTimeout(), null, null);
+    }
+
+    /**
+     * WARNING: Only use this constructor if the instance of MuleSession has a flowConstruct set. This
+     * constructor is only here for backwards compatibility.
+     */
+    @Deprecated
+    public DefaultMuleEvent(MuleMessage message,
+                            URI messageSourceURI,
+                            MessageExchangePattern exchangePattern,
+                            MuleSession session,
+                            ResponseOutputStream outputStream)
+    {
+        this(message, messageSourceURI, exchangePattern, session, message.getMuleContext()
+            .getConfiguration()
+            .getDefaultResponseTimeout(), null, outputStream);
+    }
+
+    /**
+     * WARNING: Only use this constructor if the instance of MuleSession has a flowConstruct set. This
+     * constructor is only here for backwards compatibility.
+     */
+    @Deprecated
+    public DefaultMuleEvent(MuleMessage message,
+                            URI messageSourceURI,
+                            MessageExchangePattern exchangePattern,
+                            MuleSession session,
+                            int timeout,
+                            Credentials credentials,
+                            ResponseOutputStream outputStream)
+    {
+        this(message, messageSourceURI, exchangePattern, session.getFlowConstruct(), session, timeout,
+            credentials, outputStream);
+    }
+
+    /**
+     * WARNING: Only use this constructor if the instance of MuleSession has a flowConstruct set. This
+     * constructor is only here for backwards compatibility.
+     */
+    @Deprecated
+    public DefaultMuleEvent(MuleMessage message, InboundEndpoint endpoint, MuleSession session)
+    {
+        this(message, endpoint, session, null, null);
+    }
+
+    /**
+     * WARNING: Only use this constructor if the instance of MuleSession has a flowConstruct set. This
+     * constructor is only here for backwards compatibility.
+     */
+    @Deprecated
+    public DefaultMuleEvent(MuleMessage message,
+                            InboundEndpoint endpoint,
+                            MuleSession session,
+                            ReplyToHandler replyToHandler,
+                            ResponseOutputStream outputStream)
+    {
+        this(message, endpoint, session.getFlowConstruct(), session, replyToHandler, outputStream);
+    }
+
+    /**
+     * WARNING: Only use this constructor if the instance of MuleSession has a flowConstruct set. This
+     * constructor is only here for backwards compatibility.
+     */
+    @Deprecated
+    public DefaultMuleEvent(MuleMessage message,
+                            URI messageSourceURI,
+                            String messageSourceName,
+                            MessageExchangePattern exchangePattern,
+                            MuleSession session,
+                            int timeout,
+                            Credentials credentials,
+                            ResponseOutputStream outputStream,
+                            String encoding,
+                            boolean transacted,
+                            boolean synchronous,
+                            Object replyToDestination,
+                            ReplyToHandler replyToHandler)
+    {
+        this(message, messageSourceURI, messageSourceName, exchangePattern, session.getFlowConstruct(),
+            session, timeout, credentials, outputStream, encoding, transacted, synchronous,
+            replyToDestination, replyToHandler);
     }
 }

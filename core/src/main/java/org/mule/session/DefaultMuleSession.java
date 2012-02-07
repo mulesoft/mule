@@ -61,6 +61,9 @@ public final class DefaultMuleSession implements MuleSession
     private SecurityContext securityContext;
 
     private transient Map<String, Object> properties;
+    
+    @Deprecated
+    private FlowConstruct flowConstruct;
 
     public DefaultMuleSession()
     {
@@ -93,6 +96,7 @@ public final class DefaultMuleSession implements MuleSession
     public DefaultMuleSession(FlowConstruct flowConstruct, MuleContext muleContext)
     {
         this();
+        this.flowConstruct = flowConstruct;
     }
 
     @Deprecated
@@ -105,6 +109,7 @@ public final class DefaultMuleSession implements MuleSession
     public DefaultMuleSession(MuleSession source, FlowConstruct flowConstruct)
     {
         this(source);
+        this.flowConstruct = flowConstruct;
     }
     
     @Override
@@ -292,6 +297,18 @@ public final class DefaultMuleSession implements MuleSession
     public void clearProperties()
     {
         properties.clear();
+    }
+
+    @Override
+    public FlowConstruct getFlowConstruct()
+    {
+        return flowConstruct;
+    }
+
+    @Override
+    public void setFlowConstruct(FlowConstruct flowConstruct)
+    {
+        this.flowConstruct = flowConstruct;
     }
 
 }
