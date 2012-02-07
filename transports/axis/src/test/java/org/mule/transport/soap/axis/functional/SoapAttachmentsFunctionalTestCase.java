@@ -16,6 +16,7 @@ import static org.junit.Assert.assertNotNull;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
+import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.message.ds.StringDataSource;
 import org.mule.tck.junit4.FunctionalTestCase;
@@ -59,7 +60,8 @@ public class SoapAttachmentsFunctionalTestCase extends FunctionalTestCase
         {
             MuleMessage msg = new DefaultMuleMessage("testPayload", muleContext);
             msg.addOutboundAttachment("testAttachment", new DataHandler(new StringDataSource("foo")));
-            DefaultMuleEvent event = new DefaultMuleEvent(msg, getTestInboundEndpoint("test://test"), null);
+            DefaultMuleEvent event = new DefaultMuleEvent(msg, getTestInboundEndpoint("test://test"),
+                (FlowConstruct) null);
             MuleMessage result = client.process(event).getMessage();
             assertNotNull(result);
             assertNotNull(result.getPayload());

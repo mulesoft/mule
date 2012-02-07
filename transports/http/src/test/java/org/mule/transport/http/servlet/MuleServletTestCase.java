@@ -17,6 +17,7 @@ import org.mule.DefaultMuleMessage;
 import org.mule.MessageExchangePattern;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
+import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.EndpointException;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.registry.MuleRegistry;
@@ -164,7 +165,7 @@ public class MuleServletTestCase extends Assert {
         when(ep.getTransactionConfig()).thenReturn(txConfig);
         when(ep.getExchangePattern()).thenReturn(MessageExchangePattern.REQUEST_RESPONSE);
         
-        DefaultMuleEvent event = new DefaultMuleEvent(message, ep, null);
+        DefaultMuleEvent event = new DefaultMuleEvent(message, ep, (FlowConstruct) null);
         return event;
     }
 }

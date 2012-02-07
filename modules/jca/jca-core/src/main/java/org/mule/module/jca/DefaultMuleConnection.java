@@ -18,6 +18,7 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
+import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
@@ -167,7 +168,7 @@ public class DefaultMuleConnection implements MuleConnection
             message.setOutboundProperty(MuleProperties.MULE_USER_PROPERTY, "Plain " + credentials.getToken());
         }
 
-        return new DefaultMuleEvent(message, endpoint.getExchangePattern(), null);
+        return new DefaultMuleEvent(message, endpoint.getExchangePattern(), (FlowConstruct) null);
     }
 
     /**

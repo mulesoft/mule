@@ -20,6 +20,7 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
+import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.EndpointFactory;
 import org.mule.api.endpoint.ImmutableEndpoint;
@@ -368,7 +369,7 @@ public class RemoteDispatcher implements Disposable
 
         message.addProperties(action.getProperties());
 
-        MuleEvent event = new DefaultMuleEvent(message, serverEndpoint.getExchangePattern(), null);
+        MuleEvent event = new DefaultMuleEvent(message, serverEndpoint.getExchangePattern(),(FlowConstruct) null);
         event.setTimeout(timeout);
         if (logger.isDebugEnabled())
         {
@@ -456,6 +457,7 @@ public class RemoteDispatcher implements Disposable
     protected void updateContext(MuleMessage message, ImmutableEndpoint endpoint, boolean synchronous)
         throws MuleException
     {
-        RequestContext.setEvent(new DefaultMuleEvent(message, endpoint.getExchangePattern(), null));
+        RequestContext.setEvent(new DefaultMuleEvent(message, endpoint.getExchangePattern(),
+            (FlowConstruct) null));
     }
 }
