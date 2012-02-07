@@ -59,7 +59,6 @@
 # /examples/bookstore
 #
 /mule-standalone-${productVersion}/examples/bookstore
-/mule-standalone-${productVersion}/examples/bookstore/.muleide
 /mule-standalone-${productVersion}/examples/bookstore/mule-example-bookstore-${productVersion}.zip
 /mule-standalone-${productVersion}/examples/bookstore/pom.xml
 /mule-standalone-${productVersion}/examples/bookstore/README.txt
@@ -158,7 +157,6 @@
 # /examples/echo
 #
 /mule-standalone-${productVersion}/examples/echo
-/mule-standalone-${productVersion}/examples/echo/.muleide
 /mule-standalone-${productVersion}/examples/echo/build.xml
 /mule-standalone-${productVersion}/examples/echo/mule-example-echo-${productVersion}.zip
 /mule-standalone-${productVersion}/examples/echo/pom.xml
@@ -194,7 +192,6 @@
 # /examples/errohandler
 #
 /mule-standalone-${productVersion}/examples/errorhandler
-/mule-standalone-${productVersion}/examples/errorhandler/.muleide
 /mule-standalone-${productVersion}/examples/errorhandler/build.xml
 /mule-standalone-${productVersion}/examples/errorhandler/mule-example-errorhandler-${productVersion}.zip
 /mule-standalone-${productVersion}/examples/errorhandler/pom.xml
@@ -255,7 +252,6 @@
 # /examples/gpswalker
 #
 /mule-standalone-${productVersion}/examples/gpswalker
-/mule-standalone-${productVersion}/examples/gpswalker/.muleide
 /mule-standalone-${productVersion}/examples/gpswalker/mule-example-gpswalker-${productVersion}.zip
 /mule-standalone-${productVersion}/examples/gpswalker/pom.xml
 /mule-standalone-${productVersion}/examples/gpswalker/README.txt
@@ -281,7 +277,6 @@
 # /examples/hello
 #
 /mule-standalone-${productVersion}/examples/hello
-/mule-standalone-${productVersion}/examples/hello/.muleide
 /mule-standalone-${productVersion}/examples/hello/build.xml
 /mule-standalone-${productVersion}/examples/hello/mule-example-hello-${productVersion}.zip
 /mule-standalone-${productVersion}/examples/hello/pom.xml
@@ -391,7 +386,6 @@
 # /examples/loanbroker-simple
 #
 /mule-standalone-${productVersion}/examples/loanbroker-simple
-/mule-standalone-${productVersion}/examples/loanbroker-simple/.muleide
 /mule-standalone-${productVersion}/examples/loanbroker-simple/mule-example-loanbroker-simple-${productVersion}.zip
 /mule-standalone-${productVersion}/examples/loanbroker-simple/pom.xml
 /mule-standalone-${productVersion}/examples/loanbroker-simple/README.txt
@@ -586,7 +580,6 @@
 # /examples/notifications
 #
 /mule-standalone-${productVersion}/examples/notifications
-/mule-standalone-${productVersion}/examples/notifications/.muleide
 /mule-standalone-${productVersion}/examples/notifications/mule-example-notifications-${productVersion}.zip
 /mule-standalone-${productVersion}/examples/notifications/pom.xml
 /mule-standalone-${productVersion}/examples/notifications/README.txt
@@ -621,7 +614,6 @@
 # /examples/scripting
 #
 /mule-standalone-${productVersion}/examples/scripting
-/mule-standalone-${productVersion}/examples/scripting/.muleide
 /mule-standalone-${productVersion}/examples/scripting/build.xml
 /mule-standalone-${productVersion}/examples/scripting/mule-example-scripting-${productVersion}.zip
 /mule-standalone-${productVersion}/examples/scripting/pom.xml
@@ -654,7 +646,6 @@
 # /examples/stockquote
 #
 /mule-standalone-${productVersion}/examples/stockquote
-/mule-standalone-${productVersion}/examples/stockquote/.muleide
 /mule-standalone-${productVersion}/examples/stockquote/build.xml
 /mule-standalone-${productVersion}/examples/stockquote/mule-example-stockquote-${productVersion}.zip
 /mule-standalone-${productVersion}/examples/stockquote/pom.xml
