@@ -1,3 +1,13 @@
+/*
+ * $Id$
+ * --------------------------------------------------------------------------------------
+ * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ *
+ * The software in this package is published under the terms of the CPAL v1.0
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ */
+
 package org.mule.module.cxf.wssec;
 
 import static org.junit.Assert.assertEquals;
@@ -37,7 +47,7 @@ public class SAMLValidatorTestCase extends FunctionalTestCase
     @Test
     public void testSAMLUnsignedAssertion() throws Exception
     {
-        MuleMessage request = new DefaultMuleMessage("me", (Map<String,Object>)null, muleContext);
+        MuleMessage request = new DefaultMuleMessage("me", (Map<String, Object>) null, muleContext);
         MuleClient client = new MuleClient(muleContext);
         MuleMessage received = client.send("vm://greetMe", request);
 
@@ -49,7 +59,7 @@ public class SAMLValidatorTestCase extends FunctionalTestCase
     @Ignore
     public void testSAMLSignedAssertion() throws Exception
     {
-        MuleMessage request = new DefaultMuleMessage("me", (Map<String,Object>)null, muleContext);
+        MuleMessage request = new DefaultMuleMessage("me", (Map<String, Object>) null, muleContext);
         MuleClient client = new MuleClient(muleContext);
         MuleMessage received = client.send("vm://greetMeSigned", request);
 
@@ -65,7 +75,6 @@ public class SAMLValidatorTestCase extends FunctionalTestCase
 
             pc.setPassword("keyStorePassword");
         }
-
 
     }
 
