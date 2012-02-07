@@ -96,6 +96,12 @@ public final class DefaultMuleSession implements MuleSession
     }
 
     @Deprecated
+    public DefaultMuleSession(MuleSession source, MuleContext muleContext)
+    {
+        this(source);
+    }
+
+    @Deprecated
     public DefaultMuleSession(MuleSession source, FlowConstruct flowConstruct)
     {
         this(source);
