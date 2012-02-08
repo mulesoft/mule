@@ -59,7 +59,7 @@
                 <xsd:attribute name="useContinuations" type="mule:substitutableBoolean">
                     <xsd:annotation>
                         <xsd:documentation>
-                            Whether to use continuations to free up connections in high load situations. 
+                            Whether to use continuations to free up connections in high load situations.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -75,7 +75,7 @@
     </xsd:complexType>
 
     <xsd:complexType name="webappsType">
-        <xsd:attribute name="port" type="xsd:integer">
+        <xsd:attribute name="port" type="mule:substitutablePortNumber">
             <xsd:annotation>
                 <xsd:documentation>
                     The port of the Jetty instance. Default: 8585
@@ -113,7 +113,7 @@
             </xsd:annotation>
         </xsd:attribute>
     </xsd:complexType>
-    
+
     <xsd:element name="inbound-endpoint" type="inboundEndpointType" substitutionGroup="mule:abstract-inbound-endpoint">
         <xsd:annotation>
             <xsd:documentation>
