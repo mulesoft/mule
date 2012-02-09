@@ -19,7 +19,6 @@ import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.api.exception.RollbackSourceCallback;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.transport.Connector;
 import org.mule.api.transport.PropertyScope;
@@ -188,11 +187,6 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
                 }
             }
         }
-        catch (MessagingException e)
-        {
-            MuleEvent event = e.getEvent();
-            event.getFlowConstruct().getExceptionListener().handleException(e, event);
-        }
         catch (Exception e)
         {
             getConnector().getMuleContext().getExceptionListener().handleException(e);
@@ -291,8 +285,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
         {
             if (fileConnector.isStreaming())
             {
-                ReceiverFileInputStream payload = new ReceiverFileInputStream(sourceFile,
-                    fileConnector.isAutoDelete(), destinationFile);
+                ReceiverFileInputStream payload = createReceiverFileInputStream(sourceFile, destinationFile);
                 message = createMuleMessage(payload, encoding);
             }
             else
@@ -315,91 +308,116 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
 
         final Object originalPayload = message.getPayload();
 
+        ProcessingTemplate<MuleEvent> processingTemplate = createProcessingTemplate();
+        final MuleMessage finalMessage = message;
+
+        if (fileConnector.isStreaming())
+        {
+            processWithStreaming(sourceFile, (ReceiverFileInputStream) originalPayload, processingTemplate, finalMessage);
+        }
+        else
+        {
+            processWithoutStreaming(originalSourceFile, originalSourceFileName, sourceFile, destinationFile, processingTemplate, finalMessage);
+        }
+    }
+
+    private void processWithoutStreaming(String originalSourceFile, final String originalSourceFileName, final File sourceFile,final File destinationFile, ProcessingTemplate<MuleEvent> processingTemplate, final MuleMessage finalMessage) throws DefaultMuleException
+    {
         try
         {
-            ProcessingTemplate<MuleEvent> processingTemplate = createProcessingTemplate();
-            final File finalDestinationFile = destinationFile;
-            final MuleMessage finalMessage = message;
-            processingTemplate.execute(new ProcessingCallback<MuleEvent> () {
+            processingTemplate.execute(new ProcessingCallback<MuleEvent>()
+            {
                 @Override
                 public MuleEvent process() throws Exception
                 {
-                    if (!fileConnector.isStreaming())
+                    moveAndDelete(sourceFile, destinationFile, originalSourceFileName, finalMessage);
+                    return null;
+                }
+            });
+            deleteFileIfRequired(sourceFile, destinationFile);
+        }
+        catch (MessagingException e)
+        {
+            if (e.isCauseRollback())
+            {
+                rollbackFileMoveIfRequired(originalSourceFile, sourceFile);
+            }
+            else
+            {
+                deleteFileIfRequired(sourceFile, destinationFile);
+            }
+        }
+        catch (Exception e)
+        {
+            rollbackFileMoveIfRequired(originalSourceFile, sourceFile);
+            connector.getMuleContext().getExceptionListener().handleException(e);
+        }
+    }
+
+    private void processWithStreaming(final File sourceFile, final ReceiverFileInputStream originalPayload, ProcessingTemplate<MuleEvent> processingTemplate, final MuleMessage finalMessage)
+    {
+        try
+        {
+            processingTemplate.execute(new ProcessingCallback<MuleEvent>()
+            {
+                @Override
+                public MuleEvent process() throws Exception
+                {
+                    try
                     {
-                        moveAndDelete(sourceFile, finalDestinationFile, originalSourceFileName, finalMessage);
+                        // If we are streaming no need to move/delete now, that will be done when
+                        // stream is closed
+                        finalMessage.setOutboundProperty(FileConnector.PROPERTY_FILENAME, sourceFile.getName());
+                        FileMessageReceiver.this.routeMessage(finalMessage);
                     }
-                    else
+                    catch (Exception e)
                     {
-                        try
-                        {
-                            // If we are streaming no need to move/delete now, that will be done when
-                            // stream is closed
-                            finalMessage.setOutboundProperty(FileConnector.PROPERTY_FILENAME, sourceFile.getName());
-                            FileMessageReceiver.this.routeMessage(finalMessage);
-                        }
-                        catch (Exception e)
-                        {
-                            if (originalPayload instanceof ReceiverFileInputStream)
-                            {
-                                ((ReceiverFileInputStream)originalPayload).setStreamProcessingError(true);
-                            }
-                            throw e;
-                        }
+                        //ES will try to close stream but FileMessageReceiver is the one that must close it.
+                        originalPayload.setStreamProcessingError(true);
+                        throw e;
                     }
                     return null;
                 }
             });
         }
+        catch (MessagingException e)
+        {
+            if (!e.isCauseRollback())
+            {
+                try
+                {
+                    originalPayload.setStreamProcessingError(false);
+                    originalPayload.close();
+                }
+                catch (Exception ex)
+                {
+                    logger.warn(ex);
+                }
+            }
+        }
         catch (Exception e)
         {
-            RollbackSourceCallback rollbackMethod = null;
+            connector.getMuleContext().getExceptionListener().handleException(e);
+        }
+    }
 
-            if (fileConnector.isStreaming())
-            {
-                if (originalPayload instanceof ReceiverFileInputStream)
-                {
-                    final ReceiverFileInputStream receiverFileInputStream = (ReceiverFileInputStream) originalPayload;
-                    rollbackMethod = new RollbackSourceCallback()
-                    {
-                        @Override
-                        public void rollback()
-                        {
-                            receiverFileInputStream.setStreamProcessingError(true);
-                        }
-                    };
-                }
-            }
-            else if (!sourceFile.getAbsolutePath().equals(originalSourceFile))
-            {
-                rollbackMethod = new RollbackSourceCallback()
-                {
-                    @Override
-                    public void rollback()
-                    {
-                        try
-                        {
-                            rollbackFileMove(sourceFile, originalSourceFile);
-                        }
-                        catch (IOException iox)
-                        {
-                            logger.warn(iox);
-                        }
-                    }
-                };
-            }
+    protected ReceiverFileInputStream createReceiverFileInputStream(File sourceFile, File destinationFile) throws FileNotFoundException
+    {
+        return new ReceiverFileInputStream(sourceFile,
+            fileConnector.isAutoDelete(), destinationFile);
+    }
 
-            if (e instanceof MessagingException)
+    private void rollbackFileMoveIfRequired(String originalSourceFile, File sourceFile)
+    {
+        if (!sourceFile.getAbsolutePath().equals(originalSourceFile))
+        {
+            try
             {
-                MessagingException messagingException = (MessagingException) e;
-                if (rollbackMethod != null && messagingException.isCauseRollback())
-                {
-                    //Exception not handled
-                    rollbackMethod.rollback();
-                }
+                rollbackFileMove(sourceFile, originalSourceFile);
             }
-            else
+            catch (IOException iox)
             {
-                connector.getMuleContext().getExceptionListener().handleException(e, rollbackMethod);
+                logger.warn(iox);
             }
         }
     }
@@ -432,7 +450,10 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
 
         // finally deliver the file message
         this.routeMessage(message);
+    }
 
+    private void deleteFileIfRequired(File sourceFile, File destinationFile) throws DefaultMuleException
+    {
         // at this point msgAdapter either points to the old sourceFile
         // or the new destinationFile.
         if (fileConnector.isAutoDelete())

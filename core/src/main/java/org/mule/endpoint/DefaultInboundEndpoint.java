@@ -219,39 +219,40 @@ public class DefaultInboundEndpoint extends AbstractEndpoint implements InboundE
     @Override
     public AbstractRedeliveryPolicy getRedeliveryPolicy()
     {
+        /*TODO Next commit will fix this horrible thing:
+         inbound endpoint should only be aware of a redelivery policy configured on it
+         flowConstruct should be responsible of redelivery policy use */
         AbstractRedeliveryPolicy redeliveryPolicy = super.getRedeliveryPolicy();
-        if (redeliveryPolicy == null)
+        RollbackMessagingExceptionStrategy rollbackMessagingExceptionStrategy = null;
+        if (flowConstruct != null && flowConstruct.getExceptionListener() != null)
         {
-            /*TODO Next commit will fix this horrible thing:
-             inbound endpoint should only be aware of a redelivery policy configured on it
-             flowConstruct should be responsible of redelivery policy use */
-            if (flowConstruct != null && flowConstruct.getExceptionListener() != null)
+            MessagingExceptionHandler exceptionListener = flowConstruct.getExceptionListener();
+            if (exceptionListener instanceof RollbackMessagingExceptionStrategy)
             {
-                MessagingExceptionHandler exceptionListener = flowConstruct.getExceptionListener();
-                RollbackMessagingExceptionStrategy rollbackMessagingExceptionStrategy = null;
-                if (exceptionListener instanceof RollbackMessagingExceptionStrategy)
+                rollbackMessagingExceptionStrategy = (RollbackMessagingExceptionStrategy) exceptionListener;
+            }
+            else if (exceptionListener instanceof ChoiceMessagingExceptionStrategy)
+            {
+                ChoiceMessagingExceptionStrategy choiceMessagingExceptionStrategy = (ChoiceMessagingExceptionStrategy) exceptionListener;
+                for (MessagingExceptionHandlerAcceptor messagingExceptionHandlerAcceptor : choiceMessagingExceptionStrategy.getExceptionListeners())
                 {
-                    rollbackMessagingExceptionStrategy = (RollbackMessagingExceptionStrategy) exceptionListener;
-                }
-                else if (exceptionListener instanceof ChoiceMessagingExceptionStrategy)
-                {
-                    ChoiceMessagingExceptionStrategy choiceMessagingExceptionStrategy = (ChoiceMessagingExceptionStrategy) exceptionListener;
-                    for (MessagingExceptionHandlerAcceptor messagingExceptionHandlerAcceptor : choiceMessagingExceptionStrategy.getExceptionListeners())
+                    if (messagingExceptionHandlerAcceptor instanceof RollbackMessagingExceptionStrategy && ((RollbackMessagingExceptionStrategy) messagingExceptionHandlerAcceptor).hasMaxRedeliveryAttempts())
                     {
-                        if (messagingExceptionHandlerAcceptor instanceof RollbackMessagingExceptionStrategy && ((RollbackMessagingExceptionStrategy) messagingExceptionHandlerAcceptor).hasMaxRedeliveryAttempts())
-                        {
-                            rollbackMessagingExceptionStrategy = (RollbackMessagingExceptionStrategy) messagingExceptionHandlerAcceptor;
-                            break;
-                        }
+                        rollbackMessagingExceptionStrategy = (RollbackMessagingExceptionStrategy) messagingExceptionHandlerAcceptor;
+                        break;
                     }
                 }
-                if (rollbackMessagingExceptionStrategy != null)
-                {
-                    if (rollbackMessagingExceptionStrategy.hasMaxRedeliveryAttempts())
-                    {
-                        redeliveryPolicy = createDefaultRedeliveryPolicy(rollbackMessagingExceptionStrategy.getMaxRedeliveryAttempts());
-                    }
-                }
+            }
+        }
+        if (rollbackMessagingExceptionStrategy != null && rollbackMessagingExceptionStrategy.hasMaxRedeliveryAttempts())
+        {
+            if (redeliveryPolicy == null)
+            {
+                redeliveryPolicy = createDefaultRedeliveryPolicy(rollbackMessagingExceptionStrategy.getMaxRedeliveryAttempts());
+            }
+            else
+            {
+                redeliveryPolicy.setMaxRedeliveryCount(rollbackMessagingExceptionStrategy.getMaxRedeliveryAttempts());
             }
         }
         return redeliveryPolicy;

@@ -2196,7 +2196,7 @@
                             </xsd:complexType>
                         </xsd:element>
                     </xsd:choice>
-                    <xsd:element ref="legacy-abstract-exception-strategy" minOccurs="0" maxOccurs="unbounded"/>
+                    <xsd:element ref="legacy-abstract-exception-strategy" minOccurs="0"/>
                     <xsd:element ref="abstract-message-info-mapping" minOccurs="0">
                         <xsd:annotation>
                             <xsd:documentation>
