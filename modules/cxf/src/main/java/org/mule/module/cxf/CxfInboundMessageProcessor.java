@@ -22,6 +22,7 @@ import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.OutputHandler;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.message.DefaultExceptionPayload;
+import org.mule.module.cxf.support.CxfUtils;
 import org.mule.module.cxf.support.DelegatingOutputStream;
 import org.mule.module.xml.stax.StaxSource;
 import org.mule.processor.AbstractInterceptingMessageProcessor;
@@ -29,6 +30,7 @@ import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
 import org.mule.util.StringUtils;
+import org.mule.api.MessagingException;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -223,121 +225,114 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
 
     protected MuleEvent sendToDestination(MuleEvent event) throws MuleException, IOException
     {
-        try
+        final MessageImpl m = new MessageImpl();
+        final MuleMessage muleReqMsg = event.getMessage();
+        String method = muleReqMsg.getInboundProperty(HttpConnector.HTTP_METHOD_PROPERTY);
+
+        String ct = muleReqMsg.getInboundProperty(HttpConstants.HEADER_CONTENT_TYPE);
+        if (ct != null)
         {
-            final MessageImpl m = new MessageImpl();
-            final MuleMessage muleReqMsg = event.getMessage();
-            String method = muleReqMsg.getInboundProperty(HttpConnector.HTTP_METHOD_PROPERTY);
-
-            String ct = muleReqMsg.getInboundProperty(HttpConstants.HEADER_CONTENT_TYPE);
-            if (ct != null)
-            {
-                m.put(Message.CONTENT_TYPE, ct);
-            }
-
-            String path = muleReqMsg.getInboundProperty(HttpConnector.HTTP_REQUEST_PATH_PROPERTY);
-            if (path == null)
-            {
-                path = "";
-            }
-
-            if (method != null)
-            {
-                m.put(Message.HTTP_REQUEST_METHOD, method);
-                m.put(Message.PATH_INFO, path);
-                Object basePath = muleReqMsg.getInboundProperty(HttpConnector.HTTP_CONTEXT_PATH_PROPERTY);
-                m.put(Message.BASE_PATH, basePath);
-
-                method = method.toUpperCase();
-            }
-
-            if (!"GET".equals(method))
-            {
-                Object payload = event.getMessage().getPayload();
-
-                setPayload(event, m, payload);
-            }
-
-            // TODO: Not sure if this is 100% correct - DBD
-            String soapAction = getSoapAction(event.getMessage());
-            m.put(org.mule.module.cxf.SoapConstants.SOAP_ACTION_PROPERTY_CAPS, soapAction);
-
-            org.apache.cxf.transport.Destination d;
-            
-            if (server != null) 
-            {
-                d = server.getDestination();
-            }
-            else
-            {
-                String serviceUri = getUri(event);
-
-                DestinationFactoryManager dfm = bus.getExtension(DestinationFactoryManager.class);
-                DestinationFactory df = dfm.getDestinationFactoryForUri(serviceUri);
-                
-                EndpointInfo ei = new EndpointInfo();
-                ei.setAddress(serviceUri);
-                d = df.getDestination(ei);
-            }
-
-            // Set up a listener for the response
-            m.put(LocalConduit.DIRECT_DISPATCH, Boolean.TRUE);
-            m.setDestination(d);
-
-            ExchangeImpl exchange = new ExchangeImpl();
-            exchange.setInMessage(m);
-
-            // if there is a fault, then we need an event in here because we won't
-            // have a responseEvent from the MuleInvoker
-            exchange.put(CxfConstants.MULE_EVENT, event);
-
-            // invoke the actual web service up until right before we serialize the
-            // response
-            d.getMessageObserver().onMessage(m);
-            
-            // get the response event
-            MuleEvent responseEvent = (MuleEvent) exchange.get(CxfConstants.MULE_EVENT);
-
-            // If there isn't one, there was probably a fault, so use the original
-            // event
-            if (responseEvent == null || !event.getExchangePattern().hasResponse())
-            {
-                return null;
-            }
-            
-            MuleMessage muleResMsg = responseEvent.getMessage();
-            muleResMsg.setPayload(getRessponseOutputHandler(m));
-
-            // Handle a fault if there is one.
-            Message faultMsg = m.getExchange().getOutFaultMessage();
-            if (faultMsg != null)
-            {
-                Exception ex = faultMsg.getContent(Exception.class);
-                if (ex != null)
-                {
-                    ExceptionPayload exceptionPayload = new DefaultExceptionPayload(ex);
-                    event.getMessage().setExceptionPayload(exceptionPayload);
-                    muleResMsg.setOutboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 500);
-                }
-            }
-
-            //If SoapFault should trigger Mule ExceptionStrategy instead of handling it by CXF - intercept it here
-            if (isOnFaultInvokeStrategy())
-            {
-                Object o = exchange.get(Exception.class);
-                if (o != null && o instanceof Exception)
-                {
-                    throw new DefaultMuleException((Exception)o);
-                }
-            }
-
-            return responseEvent;
+            m.put(Message.CONTENT_TYPE, ct);
         }
-        catch (MuleException e)
+
+        String path = muleReqMsg.getInboundProperty(HttpConnector.HTTP_REQUEST_PATH_PROPERTY);
+        if (path == null)
         {
-            logger.warn("Could not dispatch message to CXF!", e);
-            throw e;
+            path = "";
         }
+
+        if (method != null)
+        {
+            m.put(Message.HTTP_REQUEST_METHOD, method);
+            m.put(Message.PATH_INFO, path);
+            Object basePath = muleReqMsg.getInboundProperty(HttpConnector.HTTP_CONTEXT_PATH_PROPERTY);
+            m.put(Message.BASE_PATH, basePath);
+
+            method = method.toUpperCase();
+        }
+
+        if (!"GET".equals(method))
+        {
+            Object payload = event.getMessage().getPayload();
+
+            setPayload(event, m, payload);
+        }
+
+        // TODO: Not sure if this is 100% correct - DBD
+        String soapAction = getSoapAction(event.getMessage());
+        m.put(org.mule.module.cxf.SoapConstants.SOAP_ACTION_PROPERTY_CAPS, soapAction);
+
+        org.apache.cxf.transport.Destination d;
+
+        if (server != null)
+        {
+            d = server.getDestination();
+        }
+        else
+        {
+            String serviceUri = getUri(event);
+
+            DestinationFactoryManager dfm = bus.getExtension(DestinationFactoryManager.class);
+            DestinationFactory df = dfm.getDestinationFactoryForUri(serviceUri);
+
+            EndpointInfo ei = new EndpointInfo();
+            ei.setAddress(serviceUri);
+            d = df.getDestination(ei);
+        }
+
+        // Set up a listener for the response
+        m.put(LocalConduit.DIRECT_DISPATCH, Boolean.TRUE);
+        m.setDestination(d);
+
+        ExchangeImpl exchange = new ExchangeImpl();
+        exchange.setInMessage(m);
+
+        // if there is a fault, then we need an event in here because we won't
+        // have a responseEvent from the MuleInvoker
+        exchange.put(CxfConstants.MULE_EVENT, event);
+
+        // invoke the actual web service up until right before we serialize the
+        // response
+        d.getMessageObserver().onMessage(m);
+
+        // get the response event
+        MuleEvent responseEvent = (MuleEvent) exchange.get(CxfConstants.MULE_EVENT);
+
+        // If there isn't one, there was probably a fault, so use the original
+        // event
+        if (responseEvent == null || !event.getExchangePattern().hasResponse())
+        {
+            return null;
+        }
+
+        MuleMessage muleResMsg = responseEvent.getMessage();
+        muleResMsg.setPayload(getRessponseOutputHandler(m));
+
+        // Handle a fault if there is one.
+        Message faultMsg = m.getExchange().getOutFaultMessage();
+        if (faultMsg != null)
+        {
+            Exception ex = faultMsg.getContent(Exception.class);
+            if (ex != null)
+            {
+                ExceptionPayload exceptionPayload = new DefaultExceptionPayload(ex);
+                event.getMessage().setExceptionPayload(exceptionPayload);
+                muleResMsg.setOutboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 500);
+            }
+        }
+
+        //If SoapFault should trigger Mule ExceptionStrategy instead of handling it by CXF - intercept it here
+        if (isOnFaultInvokeStrategy())
+        {
+            Object o = exchange.get(Exception.class);
+            if (o != null && o instanceof Exception)
+            {
+                muleResMsg.setPayload(getSoapFaultMessage(muleResMsg));
+                throw new MessagingException(responseEvent, (Exception)o);
+            }
+        }
+
+        return responseEvent;
     }
 
     @Override
@@ -460,6 +455,19 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
         }
 
         return action;
+    }
+    
+    private Object getSoapFaultMessage(MuleMessage message)
+    {
+        try
+        {
+            return message.getPayloadAsString();
+        }
+        catch(Exception e)
+        {
+            return message.getPayload();
+        }
+
     }
 
     public Bus getBus()

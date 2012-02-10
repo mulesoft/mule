@@ -4,14 +4,15 @@
        xmlns:spring="http://www.springframework.org/schema/beans"
        xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
        xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+       xmlns:test="http://www.mulesoft.org/schema/mule/test"
        xmlns:http="http://www.mulesoft.org/schema/mule/http"
     xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
        http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/3.2/mule-cxf.xsd
        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.2/mule-vm.xsd
+       http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/3.2/mule-test.xsd
        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/3.2/mule-http.xsd">
-
 
     <flow name="FlowServiceFault">
        <http:inbound-endpoint address="http://localhost:${port1}/testServiceWithFault"/>
@@ -24,6 +25,14 @@
        <cxf:jaxws-service serviceClass="org.mule.module.cxf.TestServiceFaultImpl" onException="INVOKE_EXCEPTION_STRATEGY"/>
        <component class="org.mule.module.cxf.TestServiceFaultImpl" />
        <default-exception-strategy/>
+    </flow>
+
+    <flow name="FlowExceptionInvokeExceptionStrategy">
+        <http:inbound-endpoint address="http://localhost:${port1}/testServiceWithExceptionInvokeStrategy"/>
+        <cxf:jaxws-service serviceClass="org.mule.module.cxf.example.HelloWorldImpl" onException="INVOKE_EXCEPTION_STRATEGY"/>
+        <component class="org.mule.module.cxf.example.HelloWorldImpl" />
+        <test:component throwException="true" />
+        <default-exception-strategy/>
     </flow>
 
     <flow name="FlowServiceFaultInvokeComponentExceptionStrategy">
