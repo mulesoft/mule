@@ -3446,7 +3446,7 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="scope" use="optional">
+                <xsd:attribute name="scope" use="optional" default="outbound">
                     <xsd:annotation>
                         <xsd:documentation>
                             Property scope to/from which properties are added/removed.  The scope determines the lifespan of the properties.  Default scope is outbound.
