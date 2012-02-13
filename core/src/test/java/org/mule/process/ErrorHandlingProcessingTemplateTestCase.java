@@ -21,15 +21,12 @@ import org.mockito.internal.verification.VerificationModeFactory;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
-import org.mockito.verification.VerificationMode;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.transaction.Transaction;
 import org.mule.exception.DefaultMessagingExceptionStrategy;
-import org.mule.process.ErrorHandlingProcessingTemplate;
-import org.mule.process.ProcessingTemplate;
 import org.mule.routing.filters.WildcardFilter;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.testmodels.mule.TestTransaction;
@@ -41,7 +38,6 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
-import static org.mule.transaction.TransactionTemplateFactory.createExceptionHandlingTransactionTemplate;
 import static org.mule.transaction.TransactionTemplateTestUtils.getEmptyTransactionCallback;
 
 @RunWith(MockitoJUnitRunner.class)

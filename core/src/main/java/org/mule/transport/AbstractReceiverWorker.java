@@ -15,17 +15,14 @@ import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.transaction.Transaction;
-import org.mule.api.transaction.TransactionCallback;
 import org.mule.api.transaction.TransactionException;
 import org.mule.api.transport.SessionHandler;
-import org.mule.process.ErrorHandlingProcessingTemplate;
 import org.mule.process.ProcessingCallback;
 import org.mule.process.ProcessingTemplate;
 import org.mule.process.TransactionalErrorHandlingProcessingTemplate;
 import org.mule.process.TransactionalProcessingTemplate;
 import org.mule.session.LegacySessionHandler;
 import org.mule.session.MuleSessionHandler;
-import org.mule.transaction.MuleTransactionConfig;
 import org.mule.transaction.TransactionCoordination;
 
 import java.io.OutputStream;
@@ -35,7 +32,6 @@ import java.util.List;
 import javax.resource.spi.work.Work;
 
 import org.apache.commons.lang.SerializationException;
-import org.mule.transaction.TransactionTemplateFactory;
 
 /**
  * A base Worker used by Transport {@link org.mule.api.transport.MessageReceiver} implementations.

@@ -78,7 +78,7 @@ public class DefaultEndpointMessageProcessorChainFactory implements EndpointMess
         list.add(new OutboundLoggingMessageProcessor());
         list.add(new ProcessIfStartedMessageProcessor(connector, connector.getLifecycleState()));
 
-        // Everything is processed within TransactionTemplate
+        // Everything is processed within ProcessingTemplate
         list.add(new TransactionalInterceptingMessageProcessor(endpoint.getTransactionConfig()));
 
         list.add(new OutboundEventTimeoutMessageProcessor());

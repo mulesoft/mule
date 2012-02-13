@@ -31,7 +31,7 @@ public class MessagingException extends MuleException
     /**
      * The MuleMessage being processed when the error occurred
      */
-    protected final transient MuleMessage muleMessage;
+    protected transient MuleMessage muleMessage;
     
     /**
      * The MuleEvent being processed when the error occurred
@@ -119,9 +119,13 @@ public class MessagingException extends MuleException
         return buf.toString();
     }
 
+    /**
+     * @deprecated use {@link #getEvent().getMessage()} instead
+     */
+    @Deprecated
     public MuleMessage getMuleMessage()
     {
-        if ((getEvent() != null) && (muleMessage == null))
+        if ((getEvent() != null))
         {
             return event.getMessage();
         }
@@ -135,7 +139,16 @@ public class MessagingException extends MuleException
 
     public void setProcessedEvent(MuleEvent processedEvent)
     {
-        this.processedEvent = processedEvent;
+        if (processedEvent != null)
+        {
+            this.processedEvent = processedEvent;
+            this.muleMessage = this.processedEvent.getMessage();
+        }
+        else
+        {
+            this.processedEvent = null;
+            this.muleMessage = null;
+        }
     }
 
     public boolean isCauseRollback()
