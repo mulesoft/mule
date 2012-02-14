@@ -125,16 +125,16 @@ public abstract class AbstractFlowConstruct implements FlowConstruct, Lifecycle,
 
     public final void start() throws MuleException
     {
-    	// Check if Initial State is Stopped
-    	if(!isStopped() && initialState.equals(INITIAL_STATE_STOPPED))
-    	{
-    		lifecycleManager.fireStartPhase(new EmptyLifecycleCallback<FlowConstruct>());
+        // Check if Initial State is Stopped
+        if(!isStopped() && initialState.equals(INITIAL_STATE_STOPPED))
+        {
+            lifecycleManager.fireStartPhase(new EmptyLifecycleCallback<FlowConstruct>());
             lifecycleManager.fireStopPhase(new EmptyLifecycleCallback<FlowConstruct>());
 
             logger.info("Flow " + name + " has not been started (initial state = 'stopped')");
             return;
-    	}
-    	
+        }
+        
         lifecycleManager.fireStartPhase(new LifecycleCallback<FlowConstruct>()
         {
             public void onTransition(String phaseName, FlowConstruct object) throws MuleException
