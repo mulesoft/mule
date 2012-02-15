@@ -167,6 +167,8 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
 
     protected boolean isRollback(Throwable t)
     {
+        // Work with the root exception, not anything thaat wraps it
+        t = ExceptionHelper.getRootException(t);
         if (rollbackTxFilter == null && commitTxFilter == null)
         {
             return true;
