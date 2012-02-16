@@ -30,7 +30,6 @@ import org.mule.tck.testmodels.fruit.Orange;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -42,12 +41,6 @@ public class InvocationPropertiesTestCase extends org.mule.tck.junit4.Functional
 
     @Rule
     public DynamicPort dynamicPort2 = new DynamicPort("port2");
-
-    @After
-    public void clearFlowAssertions()
-    {
-        FlowAssert.reset();
-    }
 
     @Test
     public void setInvocationPropertyUsingAPIGetInFlow() throws Exception

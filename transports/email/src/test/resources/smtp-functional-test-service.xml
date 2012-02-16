@@ -26,7 +26,7 @@
             <outbound>
                 <pass-through-router>
                     <smtp:outbound-endpoint host="#[header:OUTBOUND:host]" port="${port1}" to="#[header:OUTBOUND:to]"
-                                            subject="#[groovy:message.getPayload()]"/>
+                                            subject="#[groovy:payload]"/>
                 </pass-through-router>
             </outbound>
         </service>

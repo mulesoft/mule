@@ -28,19 +28,17 @@ public class GroovyScriptTransformerFunctionalTestCase extends AbstractServiceAn
     public GroovyScriptTransformerFunctionalTestCase(ConfigVariant variant, String configResources)
     {
         super(variant, configResources);
-        //Groovy really hammers the startup time since it needs to create the interpreter on every start
-        setDisposeContextPerClass(true);
+        // Groovy really hammers the startup time since it needs to create the interpreter on every start
+        setDisposeContextPerClass(false);
     }
 
     @Parameters
     public static Collection<Object[]> parameters()
     {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "groovy-transformer-config-service.xml"},
-            {ConfigVariant.FLOW, "groovy-transformer-config-flow.xml"}
-        });
-    }      
-    
+        return Arrays.asList(new Object[][]{{ConfigVariant.SERVICE, "groovy-transformer-config-service.xml"},
+            {ConfigVariant.FLOW, "groovy-transformer-config-flow.xml"}});
+    }
+
     @Test
     public void testInlineScript() throws Exception
     {
@@ -80,4 +78,24 @@ public class GroovyScriptTransformerFunctionalTestCase extends AbstractServiceAn
         assertNotNull(response);
         assertEquals("hexxo", response.getPayload());
     }
+
+    @Test
+    public void transformByAssigningPayload() throws Exception
+    {
+        MuleClient client = new MuleClient(muleContext);
+        MuleMessage response = client.send("vm://in5", "hello", null);
+        assertNotNull(response);
+        assertEquals("bar", response.getPayload());
+    }
+
+    @Test
+    public void transformByAssigningHeader() throws Exception
+    {
+        MuleClient client = new MuleClient(muleContext);
+        MuleMessage response = client.send("vm://in6", "hello", null);
+        assertNotNull(response);
+        assertEquals("hello", response.getPayload());
+        assertEquals("bar", response.getInboundProperty("foo"));
+    }
+
 }

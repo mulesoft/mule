@@ -23,19 +23,12 @@ import org.mule.api.MuleMessage;
 import org.mule.api.transport.MessageDispatcher;
 import org.mule.api.transport.PropertyScope;
 import org.mule.construct.Flow;
-import org.mule.tck.functional.FlowAssert;
 import org.mule.transport.vm.VMMessageDispatcher;
 
-import org.junit.After;
 import org.junit.Test;
 
 public class SessionPropertiesTestCase extends org.mule.tck.junit4.FunctionalTestCase
 {
-    @After
-    public void clearFlowAssertions()
-    {
-        FlowAssert.reset();
-    }
 
     @Test
     public void setSessionPropertyUsingAPIGetInFlow() throws Exception

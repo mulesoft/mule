@@ -406,7 +406,8 @@
     </flow>
 
 
-    <invoke name="invokeme" object-ref="pojo" method="method" methodArguments="#[string:Account] ,    #[groovy:message.payload]" methodArgumentTypes="java.lang.String, java.lang.String"/>
+    <invoke name="invokeme" object-ref="pojo" method="method" methodArguments="#[string:Account] ,    #[groovy:payload]"
+        methodArgumentTypes="java.lang.String, java.lang.String" />
 
     <invoke name="invokeme-noargs" object-ref="pojo" method="method"/>
 

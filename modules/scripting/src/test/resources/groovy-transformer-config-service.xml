@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<mule xmlns="http://www.mulesoft.org/schema/mule/core"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:spring="http://www.springframework.org/schema/beans"
-      xmlns:script="http://www.mulesoft.org/schema/mule/scripting"
-      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
-      xsi:schemaLocation="
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:spring="http://www.springframework.org/schema/beans" xmlns:script="http://www.mulesoft.org/schema/mule/scripting"
+    xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+    xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
        http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/3.2/mule-scripting.xsd
@@ -19,8 +17,8 @@
     <!--// START SNIPPET: transformer-config -->
     <script:transformer name="stringReplaceWithParams">
         <script:script engine="groovy">
-            <property key="oldStr" value="l"/>
-            <property key="newStr" value="x"/>
+            <property key="oldStr" value="l" />
+            <property key="newStr" value="x" />
             <script:text>
                 return payload.toString().replaceAll("$oldStr", "$newStr")
             </script:text>
@@ -31,9 +29,9 @@
     <model>
         <service name="inlineScript">
             <inbound>
-                <inbound-endpoint address="vm://in1" exchange-pattern="one-way"/>
+                <inbound-endpoint address="vm://in1" exchange-pattern="one-way" />
             </inbound>
-            <echo-component/>
+            <echo-component />
             <outbound>
                 <pass-through-router>
                     <outbound-endpoint address="vm://out1" exchange-pattern="one-way">
@@ -49,14 +47,14 @@
 
         <service name="fileBasedScript">
             <inbound>
-                <inbound-endpoint address="vm://in2" exchange-pattern="one-way"/>
+                <inbound-endpoint address="vm://in2" exchange-pattern="one-way" />
             </inbound>
-            <echo-component/>
+            <echo-component />
             <outbound>
                 <pass-through-router>
                     <outbound-endpoint address="vm://out2" exchange-pattern="one-way">
                         <script:transformer>
-                            <script:script file="simple-transformer.groovy"/>
+                            <script:script file="simple-transformer.groovy" />
                         </script:transformer>
                     </outbound-endpoint>
                 </pass-through-router>
@@ -65,13 +63,13 @@
 
         <service name="referencedTransformer">
             <inbound>
-                <inbound-endpoint address="vm://in3" exchange-pattern="one-way"/>
+                <inbound-endpoint address="vm://in3" exchange-pattern="one-way" />
             </inbound>
-            <echo-component/>
+            <echo-component />
             <outbound>
                 <pass-through-router>
                     <outbound-endpoint address="vm://out3" exchange-pattern="one-way">
-                        <transformer ref="stringReplace"/>
+                        <transformer ref="stringReplace" />
                     </outbound-endpoint>
                 </pass-through-router>
             </outbound>
@@ -79,16 +77,46 @@
 
         <service name="referencedTransformerWithParameters">
             <inbound>
-                <inbound-endpoint address="vm://in4"/>
+                <inbound-endpoint address="vm://in4" />
             </inbound>
-            <echo-component/>
+            <echo-component />
             <outbound>
                 <pass-through-router>
                     <outbound-endpoint address="vm://out4" exchange-pattern="one-way">
-                        <transformer ref="stringReplaceWithParams"/>
+                        <transformer ref="stringReplaceWithParams" />
                     </outbound-endpoint>
                 </pass-through-router>
             </outbound>
         </service>
+
+        <service name="transformByAssigningPayload">
+            <inbound>
+                <inbound-endpoint address="vm://in5" exchange-pattern="request-response">
+                    <script:transformer>
+                        <script:script engine="groovy">
+                            payload = 'bar'
+                            return payload
+                        </script:script>
+                    </script:transformer>
+                </inbound-endpoint>
+            </inbound>
+            <echo-component />
+        </service>
+
+        <service name="transformByAssigningHeader">
+            <inbound>
+                <inbound-endpoint address="vm://in6" exchange-pattern="request-response">
+                    <script:transformer>
+                        <script:script engine="groovy">
+                            outbound['foo'] = 'bar'
+                            return payload
+                        </script:script>
+                    </script:transformer>
+                </inbound-endpoint>
+            </inbound>
+            <echo-component />
+        </service>
+
     </model>
+
 </mule>

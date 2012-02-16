@@ -5,9 +5,11 @@
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:script="http://www.mulesoft.org/schema/mule/scripting"
       xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
       xsi:schemaLocation="
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
        http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/3.2/mule-scripting.xsd
+       http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/3.2/mule-test.xsd
        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.2/mule-vm.xsd">
 
     <script:script name="myScript" engine="groovy">
@@ -26,6 +28,73 @@
         </script:component>
         <outbound-endpoint address="vm://out1" exchange-pattern="one-way"/>
     </flow>
+
+    <flow name="inlineScriptMutateProperty">
+        <script:component>
+            <script:script engine="groovy">
+                outbound['foo'] = 'bar-mutated'                
+             </script:script>
+        </script:component>
+        <test:assert expression="#[groovy:message.getOutboundProperty('foo').equals('bar-mutated')]"/>
+    </flow>
+
+    <flow name="inlineScriptAddProperty">
+        <script:component>
+            <script:script engine="groovy">
+                outbound['foo'] = 'bar'                
+             </script:script>
+        </script:component>
+        <test:assert expression="#[groovy:message.getOutboundProperty('foo').equals('bar')]"/>
+    </flow>
+
+    <flow name="inlineScriptMutatePropertiesMap">
+        <script:component>
+            <script:script engine="groovy">
+                outbound = new HashMap()              
+             </script:script>
+        </script:component>
+        <test:assert expression="#[groovy:message.getOutboundProperty('foo').equals('bar')]"/>
+        <test:assert expression="#[groovy:payload instanceof HashMap]"/>
+    </flow>
+
+    <flow name="inlineScriptMutateVariable">
+        <script:component>
+            <script:script engine="groovy">
+                flowVariables['foo'] = 'bar-mutated'                
+             </script:script>
+        </script:component>
+        <test:assert expression="#[groovy:message.getInvocationProperty('foo').equals('bar-mutated')]"/>
+    </flow>
+    
+    <flow name="inlineScriptAddVariable">
+        <script:component>
+            <script:script engine="groovy">
+                flowVariables['foo'] = 'bar'                
+             </script:script>
+        </script:component>
+        <test:assert expression="#[groovy:message.getInvocationProperty('foo').equals('bar')]"/>
+    </flow>
+
+    <flow name="inlineScriptMutateVariablesMap">
+        <script:component>
+            <script:script engine="groovy">
+                flowVariables = new HashMap()              
+             </script:script>
+        </script:component>
+        <test:assert expression="#[groovy:message.getInvocationProperty('foo').equals('bar')]"/>
+        <test:assert expression="#[groovy:payload instanceof HashMap]"/>
+    </flow>
+    
+
+    <flow name="inlineScriptMutatePayload">
+        <script:component>
+            <script:script engine="groovy">
+                payload = 'bar-mutated'               
+             </script:script>
+        </script:component>
+        <test:assert expression="#[groovy:payload.equals('bar-mutated')]"/>
+    </flow>
+
 
     <!--// END SNIPPET: component-example -->
 

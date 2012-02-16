@@ -33,7 +33,7 @@
             <catch-exception-strategy expression="#[exception-type:(.*)mule.test.integration.(.*).ChoiceExceptionStrategyTestCase(.*)MyException]">
                 <append-string-transformer message=" catch-5"/>
             </catch-exception-strategy>
-            <catch-exception-strategy expression="#[groovy:payload.equals('groovy')]">
+            <catch-exception-strategy expression="#[groovy:payload == 'groovy']">
                 <append-string-transformer message=" catch-6"/>
             </catch-exception-strategy>
             <exception-strategy ref="global-catch"/>

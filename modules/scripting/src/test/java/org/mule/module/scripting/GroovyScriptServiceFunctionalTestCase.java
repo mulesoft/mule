@@ -15,31 +15,12 @@ import static org.junit.Assert.assertNotNull;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
-
-import java.util.Arrays;
-import java.util.Collection;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
-public class GroovyScriptFunctionalTestCase extends AbstractServiceAndFlowTestCase
-{    
-    public GroovyScriptFunctionalTestCase(ConfigVariant variant, String configResources)
-    {
-        //Groovy really hammers the startup time since it needs to create the interpreter on every start
-        super(variant, configResources);
-        setDisposeContextPerClass(true);
-    }
-
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "groovy-component-config-service.xml"},
-            {ConfigVariant.FLOW, "groovy-component-config-flow.xml"}
-        });
-    }              
+public class GroovyScriptServiceFunctionalTestCase extends FunctionalTestCase
+{
 
     @Test
     public void testInlineScript() throws Exception
@@ -50,7 +31,7 @@ public class GroovyScriptFunctionalTestCase extends AbstractServiceAndFlowTestCa
         assertNotNull(response);
         assertEquals("Important Message Received", response.getPayloadAsString());
     }
-    
+
     @Test
     public void testFileBasedScript() throws Exception
     {
@@ -60,7 +41,7 @@ public class GroovyScriptFunctionalTestCase extends AbstractServiceAndFlowTestCa
         assertNotNull(response);
         assertEquals("Important Message Received", response.getPayloadAsString());
     }
-    
+
     @Test
     public void testReferencedScript() throws Exception
     {
@@ -69,7 +50,7 @@ public class GroovyScriptFunctionalTestCase extends AbstractServiceAndFlowTestCa
         MuleMessage response = client.request("vm://out3", RECEIVE_TIMEOUT);
         assertNotNull(response);
         assertEquals("Important Message Received", response.getPayloadAsString());
-    }    
+    }
 
     @Test
     public void testScriptVariables() throws Exception
@@ -79,7 +60,11 @@ public class GroovyScriptFunctionalTestCase extends AbstractServiceAndFlowTestCa
         MuleMessage response = client.request("vm://out4", RECEIVE_TIMEOUT);
         assertNotNull(response);
         assertEquals("Important Message Received A-OK", response.getPayloadAsString());
-    }    
+    }
+
+    @Override
+    protected String getConfigResources()
+    {
+        return "groovy-component-config-service.xml";
+    }
 }
-
-

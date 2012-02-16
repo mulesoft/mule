@@ -10,6 +10,8 @@
 
 package org.mule.tck.junit4;
 
+import static org.junit.Assume.assumeThat;
+
 import org.mule.RequestContext;
 import org.mule.tck.junit4.rule.WarningTimeout;
 import org.mule.util.ClassUtils;
@@ -39,8 +41,6 @@ import org.junit.Rule;
 import org.junit.rules.TestName;
 import org.junit.rules.TestRule;
 import org.junit.rules.Timeout;
-
-import static org.junit.Assume.assumeThat;
 
 /**
  * <code>AbstractMuleTestCase</code> is a base class for Mule test cases. This

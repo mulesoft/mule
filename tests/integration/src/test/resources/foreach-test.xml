@@ -103,7 +103,7 @@
         	<add-message-property key="totalMessages" value="#[variable:totalMessages]"/>
         </message-properties-transformer>
         <!-- 
-        <test:assert expression="#[groovy:message.getInvocationProperty('totalMessages')==2]" />
+        <test:assert expression="#[groovy:totalMessages == 2]" />
          -->
     </flow>
 
