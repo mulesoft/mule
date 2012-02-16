@@ -1552,8 +1552,8 @@
                         <configuration>
                             <rules>
                                 <requireMavenVersion>
-                                    <!-- minimum version is 2.0.8, higher versions allowed -->
-                                    <version>[2.0.8,)</version>
+                                    <!-- minimum version is 3.0.0, higher versions allowed -->
+                                    <version>[3.0.0,)</version>
                                 </requireMavenVersion>
                                 <requireJavaVersion>
                                     <!-- Java version must be 1.6 or higher -->
