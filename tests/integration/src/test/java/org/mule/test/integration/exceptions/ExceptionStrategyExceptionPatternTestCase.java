@@ -82,8 +82,8 @@ public class ExceptionStrategyExceptionPatternTestCase extends AbstractServiceAn
         {
             fail("exception should be thrown");
         }
-        MuleMessage muleMessage = client.request("jms://in", TIMEOUT);
-        assertThat(muleMessage, IsNull.nullValue());
+        MuleMessage muleMessage = client.request("jms://out", TIMEOUT);
+        assertThat(muleMessage, IsNull.notNullValue());
     }
     
     @Test
@@ -97,9 +97,7 @@ public class ExceptionStrategyExceptionPatternTestCase extends AbstractServiceAn
         {
             fail("exception should be thrown");
         }
-        MuleMessage muleMessage = client.request("jms://in", TIMEOUT);
-        FlowConstruct failingFlow = getFlowConstruct("failingFlow");
-        while (!failingFlow.getLifecycleState().isStopped());
-        assertThat(muleMessage, IsNull.notNullValue());
+        MuleMessage muleMessage = client.request("jms://out", TIMEOUT);
+        assertThat(muleMessage, IsNull.nullValue());
     }
 }
