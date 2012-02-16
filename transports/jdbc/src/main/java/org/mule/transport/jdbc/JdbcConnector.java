@@ -366,7 +366,19 @@ public class JdbcConnector extends AbstractConnector
 
     protected void doConnect() throws Exception
     {
-        // template method
+        Connection connection = null;
+
+        try
+        {
+            connection = getConnection();
+        }
+        finally
+        {
+            if (connection != null)
+            {
+                connection.close();
+            }
+        }
     }
 
     /** 
