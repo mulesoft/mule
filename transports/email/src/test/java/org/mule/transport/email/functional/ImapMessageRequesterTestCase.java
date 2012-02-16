@@ -56,7 +56,7 @@ public class ImapMessageRequesterTestCase extends FunctionalTestCase
 
     private void startGreenmailServer() throws Exception
     {
-        ServerSetup setup = new ServerSetup(PORT, null, ImapConnector.IMAP);
+        ServerSetup setup = new ServerSetup(PORT, "localhost", ImapConnector.IMAP);
         server = new GreenMail(setup);
         server.start();
         GreenMailUtilities.storeEmail(server.getManagers().getUserManager(), EMAIL, USER, PASSWORD,
