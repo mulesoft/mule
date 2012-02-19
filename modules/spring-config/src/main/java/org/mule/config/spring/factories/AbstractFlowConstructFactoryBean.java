@@ -80,6 +80,11 @@ public abstract class AbstractFlowConstructFactoryBean implements FactoryBean<Fl
         getFlowConstructBuilder().name(name);
     }
 
+    public void setInitialState(String initialState)
+    {
+        getFlowConstructBuilder().initialState(initialState);
+    }
+
     public void setMessageSource(MessageSource messageSource)
     {
         final AbstractFlowConstructBuilder<?, ?> flowConstructBuilder = getFlowConstructBuilder();

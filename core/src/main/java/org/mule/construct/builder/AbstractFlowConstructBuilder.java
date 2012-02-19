@@ -24,6 +24,7 @@ import org.mule.construct.AbstractFlowConstruct;
 public abstract class AbstractFlowConstructBuilder<T extends AbstractFlowConstructBuilder<?, ?>, F extends AbstractFlowConstruct>
 {
     protected String name;
+    protected String initialState;
     protected MessageSource messageSource;
     protected MessagingExceptionHandler exceptionListener;
 
@@ -49,10 +50,17 @@ public abstract class AbstractFlowConstructBuilder<T extends AbstractFlowConstru
         return (T) this;
     }
 
+    public T initialState(String initialState)
+    {
+        this.initialState = initialState;
+        return (T) this;
+    }
+
     public F build(MuleContext muleContext) throws MuleException
     {
         final F flowConstruct = buildFlowConstruct(muleContext);
         addExceptionListener(flowConstruct);
+        flowConstruct.setInitialState(initialState);
         return flowConstruct;
     }
 
