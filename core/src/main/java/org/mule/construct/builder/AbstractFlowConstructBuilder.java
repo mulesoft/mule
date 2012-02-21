@@ -52,7 +52,10 @@ public abstract class AbstractFlowConstructBuilder<T extends AbstractFlowConstru
     {
         final F flowConstruct = buildFlowConstruct(muleContext);
         addExceptionListener(flowConstruct);
-        flowConstruct.setInitialState(initialState);
+        if(initialState!=null)
+        {
+            flowConstruct.setInitialState(initialState);
+        }
         return flowConstruct;
     }
 
