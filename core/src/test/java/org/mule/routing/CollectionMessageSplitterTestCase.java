@@ -66,6 +66,12 @@ public class CollectionMessageSplitterTestCase extends AbstractMuleContextTestCa
         assertRouted(TEST_LIST_SINGLE, 1, true);
     }
 
+    @Test
+    public void testRouterArray() throws Exception
+    {
+        assertRouted(new String[]{"abc", "def", "ghi"}, 3, true);
+    }
+
     /**
      * Tests that an iterable payload can be routed properly
      */

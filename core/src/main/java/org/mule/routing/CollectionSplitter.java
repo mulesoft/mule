@@ -10,15 +10,16 @@
 
 package org.mule.routing;
 
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedList;
-
 import org.mule.api.MuleEvent;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.routing.outbound.AbstractMessageSequenceSplitter;
+import org.mule.routing.outbound.ArrayMessageSequence;
 import org.mule.routing.outbound.CollectionMessageSequence;
 import org.mule.routing.outbound.IteratorMessageSequence;
+
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.LinkedList;
 
 /**
  * Splits a message that has a Collection, Iterable, MessageSequence or Iterator
@@ -49,6 +50,10 @@ public class CollectionSplitter extends AbstractMessageSequenceSplitter
         if (payload instanceof Iterable<?>)
         {
             return new IteratorMessageSequence<Object>(((Iterable<Object>) payload).iterator());
+        }
+        if (payload instanceof Object[])
+        {
+            return new ArrayMessageSequence((Object[]) payload);
         }
         else
         {

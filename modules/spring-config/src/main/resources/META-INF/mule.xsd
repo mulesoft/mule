@@ -5707,11 +5707,17 @@
                 <xsd:sequence>
                     <xsd:group ref="messageProcessorOrOutboundEndpoint" minOccurs="1" maxOccurs="unbounded"/>
                 </xsd:sequence>
-				<xsd:attributeGroup ref="optionalExpressionAttributes"/>
-                <xsd:attribute name="groupSize" use="optional" type="xsd:integer">
+                <xsd:attribute name="collection" use="optional" type="xsd:string">
                     <xsd:annotation>
                         <xsd:documentation>
-                            Partitions the collection in subcollections of the specified group size.
+                            An expression to that returns a java collection, object array, map or DOM nodes.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="batchSize" use="optional" type="xsd:integer">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Partitions the collection in subcollections of the specified size.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>

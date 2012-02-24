@@ -5,11 +5,15 @@
       xmlns:test="http://www.mulesoft.org/schema/mule/test"
       xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
       xmlns:script="http://www.mulesoft.org/schema/mule/scripting"
+      xmlns:mule-xml="http://www.mulesoft.org/schema/mule/xml"
+      xmlns:json="http://www.mulesoft.org/schema/mule/json"
       xsi:schemaLocation="
                http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
                http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.2/mule-vm.xsd
                http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/3.2/mule-test.xsd
+               http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/3.2/mule-xml.xsd
+               http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/3.2/mule-json.xsd
                http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/3.2/mule-scripting.xsd">
 
     <flow name="minimal-config">
@@ -36,7 +40,7 @@
 
     <flow name="minimal-config-expression">
         <vm:inbound-endpoint path="input-3" exchange-pattern="request-response"/>
-        <foreach expression="#[header:INBOUND:names]">
+        <foreach collection="#[header:INBOUND:names]">
             <test:component/>
             <vm:outbound-endpoint path="out"/>
         </foreach>
@@ -44,7 +48,7 @@
 
     <flow name="partitioned-config">
         <vm:inbound-endpoint path="input-4" exchange-pattern="request-response"/>
-        <foreach groupSize="3">
+        <foreach batchSize="3">
             <test:component/>
             <vm:outbound-endpoint path="out"/>
         </foreach>
@@ -75,10 +79,8 @@
 
     <flow name="message-collection-config">
         <vm:inbound-endpoint path="input-7" exchange-pattern="request-response"/>
-        <logger level="WARN" message="message in -> #[payload]"/>
         <foreach>
             <test:component/>
-            <logger level="WARN" message="message number-#[variable:counter]-> #[payload]"/>
             <message-properties-transformer scope="invocation">
             	<add-message-property key="totalMessages" value="#[variable:counter]"/>
             </message-properties-transformer>
@@ -86,9 +88,6 @@
         <message-properties-transformer scope="outbound">
         	<add-message-property key="totalMessages" value="#[variable:totalMessages]"/>
         </message-properties-transformer>
-        <logger level="WARN" message="message out -> #[payload]"/>
-        <!-- 
-         -->
     </flow>
 
     <flow name="map-config">
@@ -109,7 +108,7 @@
 
     <flow name="map-expression-config">
         <vm:inbound-endpoint path="input-9" exchange-pattern="request-response"/>
-        <foreach expression="#[header:INBOUND:names]">
+        <foreach collection="#[header:INBOUND:names]">
             <test:component/>
             <message-properties-transformer scope="invocation">
             	<add-message-property key="totalMessages" value="#[variable:counter]"/>
@@ -119,5 +118,66 @@
         	<add-message-property key="totalMessages" value="#[variable:totalMessages]"/>
         </message-properties-transformer>
     </flow>
+
+    <flow name="process-order-update">
+        <vm:inbound-endpoint path="input-10" exchange-pattern="request-response"/>
+        <message-properties-transformer scope="invocation">
+            <add-message-property key="total_before" value="#[xpath:sum(//Price)]"/>
+        </message-properties-transformer>
+        <foreach collection="#[xpath:/PurchaseOrder/Items/Item]">
+            <script:component>
+                <script:script engine="groovy">
+                    def item = payload
+                    use(groovy.xml.dom.DOMCategory)
+                    {
+                        item.Price[0].setValue(item.Price.text().toInteger() * 2 + '')
+                        item.appendNode('Sku', '1234')
+                    }
+                </script:script>
+            </script:component>
+        </foreach>
+        <message-properties-transformer scope="invocation">
+            <add-message-property key="total_after" value="#[xpath:sum(//Price)]"/>
+        </message-properties-transformer>
+        <test:assert expression="#[groovy:message.getInvocationProperty('total_after') == message.getInvocationProperty('total_before') * 2]" />
+        <test:assert expression="#[groovy:payload instanceof String]" />
+    </flow>
+
+    <flow name="process-json-update">
+        <vm:inbound-endpoint path="input-11" exchange-pattern="request-response"/>
+        <json:json-to-object-transformer returnClass="java.util.Map"/>
+        <test:assert expression="#[groovy:payload.order.items.size() == 2]" />
+        <foreach collection="#[groovy:payload.order.items]">
+            <script:component>
+                <script:script engine="groovy">
+                    <![CDATA[
+                    def root = message.getInvocationProperty("rootMessage").payload
+                    def key = "key3-" + message.getInvocationProperty("counter")
+                    root.order.items << [(key) : "je"]
+                    ]]>
+                </script:script>
+            </script:component>
+        </foreach>
+        <test:assert expression="#[groovy:payload instanceof Map]" />
+        <test:assert expression="#[groovy:payload.order.items.size() == 4]" />
+    </flow>
+
+    <flow name="array-expression-config">
+        <vm:inbound-endpoint path="input-12" exchange-pattern="request-response"/>
+        <message-properties-transformer scope="invocation">
+            <add-message-property key="loops" value="0"/>
+        </message-properties-transformer>
+        <foreach>
+            <script:component>
+                <script:script engine="groovy">
+                    def loops = message.getInvocationProperty("loops").toInteger()
+                    loops++
+                    message.setInvocationProperty("loops", loops + "")
+                </script:script>
+            </script:component>
+        </foreach>
+        <test:assert expression="#[groovy:message.getInvocationProperty('loops') == '3']" />
+    </flow>
+
 
 </mule>

@@ -19,6 +19,7 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleMessageCollection;
 import org.mule.module.client.MuleClient;
+import org.mule.tck.functional.FlowAssert;
 import org.mule.tck.junit4.FunctionalTestCase;
 
 import java.util.ArrayList;
@@ -26,6 +27,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.junit.Before;
 import org.junit.Test;
 
 public class ForeachTestCase extends FunctionalTestCase
@@ -33,10 +35,9 @@ public class ForeachTestCase extends FunctionalTestCase
 
     private MuleClient client;
 
-    @Override
-    protected void doSetUp() throws Exception
+    @Before
+    public void setUp() throws Exception
     {
-        super.doSetUp();
         client = new MuleClient(muleContext);
     }
 
@@ -223,6 +224,37 @@ public class ForeachTestCase extends FunctionalTestCase
         assertTrue(result.getPayload() instanceof String);
         assertEquals(names.size(), ((Collection<?>) message.getOutboundProperty("names")).size());
         assertEquals(names.size(), result.getInboundProperty("totalMessages"));
+    }
+
+    @Test
+    public void testXmlUpdate() throws Exception
+    {
+        String xml = "<PurchaseOrder>" + "<Address><Name>Ellen Adams</Name></Address>" + "<Items>" + "<Item PartNumber=\"872-AA\"><Price>140</Price></Item>"
+                     + "<Item PartNumber=\"926-AA\"><Price>35</Price></Item>" + "</Items>" + "</PurchaseOrder>";
+        client.send("vm://input-10", xml, null);
+        FlowAssert.verify("process-order-update");
+    }
+
+    @Test
+    public void testJsonUpdate() throws Exception
+    {
+        String json = "{\"order\": {\"name\": \"Ellen\", \"email\": \"ellen@mail.com\", \"items\": [{\"key1\": \"value1\"}, {\"key2\": \"value2\"}] } }";
+        client.send("vm://input-11", json, null);
+        FlowAssert.verify("process-json-update");
+    }
+
+    @Test
+    public void testArrayPayload() throws Exception
+    {
+        String[] payload = {"uno", "dos", "tres"};
+        MuleMessage parent = new DefaultMuleMessage(payload, muleContext);
+
+        MuleMessage result = client.send("vm://input-12", parent);
+        assertTrue(result.getPayload() instanceof String[]);
+        String[] resultPayload = (String[]) result.getPayload();
+        assertEquals(payload.length, resultPayload.length);
+        assertSame(payload, resultPayload);
+        FlowAssert.verify("array-expression-config");
     }
 
 }

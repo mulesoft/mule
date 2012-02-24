@@ -49,7 +49,7 @@ public abstract class AbstractMessageSequenceSplitter extends AbstractIntercepti
     protected RouterResultsHandler resultsHandler = new DefaultRouterResultsHandler();
     protected CorrelationMode enableCorrelation = CorrelationMode.IF_NOT_SET;
     protected MessageInfoMapping messageInfoMapping;
-    protected int groupSize;
+    protected int batchSize;
     protected String counterVariableName;
 
     public final MuleEvent process(MuleEvent event) throws MuleException
@@ -98,9 +98,9 @@ public abstract class AbstractMessageSequenceSplitter extends AbstractIntercepti
         List<MuleEvent> resultEvents = new ArrayList<MuleEvent>();
         int correlationSequence = 0;
         MessageSequence<?> messageSequence = seq;
-        if (groupSize > 1)
+        if (batchSize > 1)
         {
-            messageSequence = new PartitionedMessageSequence(seq, groupSize);
+            messageSequence = new PartitionedMessageSequence(seq, batchSize);
         }
         int count = messageSequence.size();
         MuleEvent currentEvent = originalEvent;
@@ -173,9 +173,9 @@ public abstract class AbstractMessageSequenceSplitter extends AbstractIntercepti
     /**
      * Split the elements in groups of the specified size
      */
-    public void setGroupSize(int groupSize)
+    public void setBatchSize(int batchSize)
     {
-        this.groupSize = groupSize;
+        this.batchSize = batchSize;
     }
 
     public void setCounterVariableName(String counterVariableName)
