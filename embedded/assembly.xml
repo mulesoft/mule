@@ -18,6 +18,7 @@ Assembly descriptor for the composite Mule library (jar).
             <includes>
                 <include>spring.schemas</include>
                 <include>spring.handlers</include>
+                <include>mule.custom-property-editors</include>
             </includes>
         </fileSet>
         <fileSet>

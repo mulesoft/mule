@@ -51,6 +51,25 @@ new File("$project.build.directory/spring.handlers").withWriter
     }
 }
 
+// aggregate all custom.property.editors files into one
+fileScanner = ant.fileScanner
+{
+    fileset(dir: muleRoot) 
+    {
+        include(name: "**/mule.custom-property-editors")
+        exclude(name: "**/target/**")
+    }
+}
+new File("$project.build.directory/mule.custom-property-editors").withWriter
+{ writer ->
+
+    fileScanner.each
+    { file ->
+
+        writer.writeLine(file.text)
+    }
+}
+
 // aggregate all registry-bootstrap.properties into one
 fileScanner = ant.fileScanner
 {
