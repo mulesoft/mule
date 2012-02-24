@@ -180,11 +180,10 @@ public class SimpleCollectionAggregatorTestCase extends AbstractMuleContextTestC
         List<List<String>> payload = (List<List<String>>) resultMessage.getPayload();
         assertEquals(2, payload.size());
 
-        // Unable to assert results because of MULE-5998
-        // assertEquals("test event A", ((List)payload.get(0)).get(0));
-        // assertEquals("test event B", ((List)payload.get(0)).get(1));
-        // assertEquals("test event C", ((List)payload.get(1)).get(0));
-        // assertEquals("test event D", ((List)payload.get(1)).get(1));
+         assertEquals("test event A", ((List)payload.get(0)).get(0));
+         assertEquals("test event B", ((List)payload.get(0)).get(1));
+         assertEquals("test event C", ((List)payload.get(1)).get(0));
+         assertEquals("test event D", ((List)payload.get(1)).get(1));
 
     }
 
