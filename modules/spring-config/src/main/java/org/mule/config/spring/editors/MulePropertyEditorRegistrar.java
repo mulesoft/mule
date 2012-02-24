@@ -16,10 +16,19 @@ import org.mule.api.context.MuleContextAware;
 import org.mule.api.transport.Connector;
 import org.mule.construct.SimpleService.Type;
 import org.mule.endpoint.URIBuilder;
+import org.mule.util.ClassUtils;
+import org.mule.util.IOUtils;
 
+import java.beans.PropertyEditor;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import java.util.Enumeration;
+import java.util.Map;
+import java.util.Properties;
 import org.springframework.beans.PropertyEditorRegistrar;
 import org.springframework.beans.PropertyEditorRegistry;
 
@@ -30,6 +39,7 @@ import org.springframework.beans.PropertyEditorRegistry;
 public class MulePropertyEditorRegistrar implements PropertyEditorRegistrar, MuleContextAware
 {
     private MuleContext muleContext;
+    private static final String CUSTOM_PROPERTY_EDITOR_RESOURCE_NAME = "META-INF/mule.custom-property-editors";
 
     public void setMuleContext(MuleContext context)
     {
@@ -45,5 +55,37 @@ public class MulePropertyEditorRegistrar implements PropertyEditorRegistrar, Mul
         registry.registerCustomEditor(Type.class, new SimpleServiceTypePropertyEditor());
         registry.registerCustomEditor(Date.class, new DatePropertyEditor(new SimpleDateFormat("yyyy-MM-dd hh:mm:ss"), new SimpleDateFormat("yyyy-MM-dd"), true));
 
+        // Look for any editors needed by extensions
+        try
+        {
+            Enumeration<URL> urls = ClassUtils.getResources(CUSTOM_PROPERTY_EDITOR_RESOURCE_NAME, getClass());
+            while (urls.hasMoreElements())
+            {
+                URL url = urls.nextElement();
+                Properties props = new Properties();
+                InputStream stream = url.openStream();
+                try
+                {
+                    props.load(stream);
+                    for (Map.Entry<Object, Object> entry : props.entrySet())
+                    {
+                        String target = (String) entry.getKey();
+                        String editor = (String) entry.getValue();
+                        registry.registerCustomEditor(
+                                ClassUtils.loadClass(target, getClass()),
+                                (PropertyEditor)ClassUtils.instanciateClass(ClassUtils.loadClass(editor, getClass())));
+
+                    }
+                }
+                finally
+                {
+                    IOUtils.closeQuietly(stream);
+                }
+            }
+        } 
+        catch (Exception e)
+        {
+            throw new IllegalStateException("Error loading custom property editors", e);
+        }
     }
 }
