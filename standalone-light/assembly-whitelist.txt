@@ -161,7 +161,7 @@
 /mule-standalone-nodocs-${productVersion}/lib/opt/asm-commons-3.1.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/asm-tree-3.1.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/aspectjrt-1.5.4.jar
-/mule-standalone-nodocs-${productVersion}/lib/opt/aspectjweaver-1.6.8.jar
+#/mule-standalone-nodocs-${productVersion}/lib/opt/aspectjweaver-1.6.8.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/axiom-api-1.2.5.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/axiom-impl-1.2.5.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/bcmail-jdk16-1.46.jar
@@ -298,9 +298,10 @@
 /mule-standalone-nodocs-${productVersion}/lib/opt/spring-jdbc-3.1.0.RELEASE.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/spring-jms-3.1.0.RELEASE.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/spring-modules-cache-0.9.jar
-/mule-standalone-nodocs-${productVersion}/lib/opt/spring-security-config-3.0.3.RELEASE.jar
-/mule-standalone-nodocs-${productVersion}/lib/opt/spring-security-core-3.0.3.RELEASE.jar
-/mule-standalone-nodocs-${productVersion}/lib/opt/spring-security-web-3.0.3.RELEASE.jar
+/mule-standalone-nodocs-${productVersion}/lib/opt/spring-security-config-3.1.0.RELEASE.jar
+/mule-standalone-nodocs-${productVersion}/lib/opt/spring-security-core-3.1.0.RELEASE.jar
+/mule-standalone-nodocs-${productVersion}/lib/opt/spring-security-crypto-3.1.0.RELEASE.jar
+/mule-standalone-nodocs-${productVersion}/lib/opt/spring-security-web-3.1.0.RELEASE.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/spring-tx-3.1.0.RELEASE.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/spring-web-3.1.0.RELEASE.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/stax-api-1.0-2.jar
