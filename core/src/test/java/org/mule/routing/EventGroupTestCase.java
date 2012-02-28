@@ -214,8 +214,7 @@ public class EventGroupTestCase extends AbstractMuleContextTestCase
         
         MuleEvent result = eg.getMessageCollectionEvent();
         assertEquals("value1", result.getSession().getProperty("key1"));
-        // Cannot assert this because the ordering of events aren't ordered. See MULE-5998
-        //assertEquals("value2NEW", result.getSession().getProperty("key2"));
+        assertEquals("value2NEW", result.getSession().getProperty("key2"));
         assertEquals("value3", result.getSession().getProperty("key3"));
         assertEquals("value4", result.getSession().getProperty("key4"));
     }
