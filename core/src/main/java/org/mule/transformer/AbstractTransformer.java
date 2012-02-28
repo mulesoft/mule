@@ -400,7 +400,7 @@ public abstract class AbstractTransformer implements Transformer, AnnotatedObjec
 
         if (!isSourceDataTypeSupported(sourceType))
         {
-            if (ignoreBadInput)
+            if (ignoreBadInput && !TransformerUtils.isTransformationEnforced(muleContext))
             {
                 logger.debug("Source type is incompatible with this transformer and property 'ignoreBadInput' is set to true, so the transformer chain will continue.");
                 return payload;

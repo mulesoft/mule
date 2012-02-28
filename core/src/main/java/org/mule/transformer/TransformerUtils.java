@@ -13,6 +13,7 @@ package org.mule.transformer;
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
+import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transformer.Transformer;
@@ -20,6 +21,7 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transport.service.TransportFactoryException;
 import org.mule.transport.service.TransportServiceDescriptor;
+import org.mule.util.ObjectUtils;
 
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -33,6 +35,8 @@ public class TransformerUtils
 {
 
     public static final String COMMA = ",";
+
+    public static final Boolean DEFAULT_TRANSFORMER_ENFORCEMENT = Boolean.TRUE;
 
     private static Log logger = LogFactory.getLog(AbstractTransformer.class);
 
@@ -167,4 +171,15 @@ public class TransformerUtils
         }
     }
 
+    public static Boolean isTransformationEnforced(MuleContext muleContext)
+    {
+        Boolean result = DEFAULT_TRANSFORMER_ENFORCEMENT;
+
+        if (muleContext != null && muleContext.getRegistry() != null)
+        {
+            result = ObjectUtils.getBoolean(muleContext.getRegistry().get(MuleProperties.TRANSFORMATION_ENFORCE), result);
+        }
+
+        return result;
+    }
 }

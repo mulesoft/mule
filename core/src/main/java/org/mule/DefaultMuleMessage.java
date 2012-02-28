@@ -27,6 +27,7 @@ import org.mule.api.transport.OutputHandler;
 import org.mule.api.transport.PropertyScope;
 import org.mule.config.MuleManifest;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.transformer.TransformerUtils;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transformer.types.MimeTypes;
 import org.mule.transport.NullPayload;
@@ -1384,7 +1385,18 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
                     }
                     if (!transformer.isIgnoreBadInput())
                     {
-                        throw new IllegalArgumentException("Cannot apply transformer " + transformer + " on source payload: " + srcCls);
+                        if (TransformerUtils.isTransformationEnforced(muleContext))
+                        {
+                            throw new IllegalArgumentException("Cannot apply transformer " + transformer + " on source payload: " + srcCls);
+                        }
+                        else
+                        {
+                            if (logger.isDebugEnabled())
+                            {
+                                logger.debug("Exiting from transformer chain (ignoreBadInput = false)");
+                            }
+                            break;
+                        }
                     }
                 }
             }
