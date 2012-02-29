@@ -16,6 +16,8 @@ import org.mule.transport.service.TransportFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
+import java.util.Enumeration;
 import java.util.Properties;
 
 import org.apache.commons.logging.Log;
@@ -127,6 +129,62 @@ public class SpiUtils
             {
                 return null;
             }
+        }
+        catch (IOException e)
+        {
+            return null;
+        }
+    }
+
+    /**
+     * Find all resources of the given name and merge them
+     */
+    public static Properties findServiceDescriptors(String path, String name, Class currentClass)
+    {
+        if (!name.endsWith(".properties"))
+        {
+            name += ".properties";
+        }
+
+        if (path.startsWith("/"))
+        {
+            path = path.substring(1);
+        }
+        if (!path.endsWith("/"))
+        {
+            path += "/";
+        }
+        if (path.startsWith(SERVICE_ROOT))
+        {
+            path += name;
+        }
+        else
+        {
+            path = SERVICE_ROOT + path + name;
+        }
+        try
+        {
+            Properties props = new Properties();
+            Enumeration<URL> urls = currentClass.getClassLoader().getResources(path);
+            while (urls.hasMoreElements())
+            {
+                URL url = urls.nextElement();
+                InputStream inputStream = null;
+                try
+                {
+                    inputStream = url.openStream();
+                    props.load(inputStream);
+                }
+                catch (IOException e)
+                {
+                    logger.warn("Descriptor found but unable to load properties for service " + name);
+                }
+                finally
+                {
+                    IOUtils.closeQuietly(inputStream);
+                }
+            }
+            return props;
         }
         catch (IOException e)
         {

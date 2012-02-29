@@ -13,11 +13,11 @@ package org.mule.transport.vm;
 import org.mule.api.MuleContext;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionException;
-import org.mule.api.transaction.TransactionFactory;
+import org.mule.api.transaction.UniversalTransactionFactory;
 
-public class VMTransactionFactory implements TransactionFactory
+public class VMTransactionFactory implements UniversalTransactionFactory
 {
-    public static TransactionFactory factoryDelegate = new VMTransactionFactoryDelegate();
+    public static UniversalTransactionFactory factoryDelegate = new VMTransactionFactoryDelegate();
 
     public Transaction beginTransaction(MuleContext muleContext) throws TransactionException
     {
@@ -30,17 +30,23 @@ public class VMTransactionFactory implements TransactionFactory
     }
 
     /**
-     * sets the transaction factory to be used to create VM transactions
+     * sets the transaction factory to be used to create VM transactions.  This must also be an UnboundTransactionFactory
      */
-    public static void setFactoryDelegate(TransactionFactory factoryDelegate)
+    public static void setFactoryDelegate(UniversalTransactionFactory factoryDelegate)
     {
         VMTransactionFactory.factoryDelegate = factoryDelegate;
+    }
+
+    @Override
+    public Transaction createUnboundTransaction(MuleContext muleContext) throws TransactionException
+    {
+        return factoryDelegate.createUnboundTransaction(muleContext);
     }
 
     /**
      * Create normal VM transactions
      */
-    static class VMTransactionFactoryDelegate implements TransactionFactory
+    static class VMTransactionFactoryDelegate implements UniversalTransactionFactory
     {
         public Transaction beginTransaction(MuleContext muleContext) throws TransactionException
         {
@@ -52,6 +58,12 @@ public class VMTransactionFactory implements TransactionFactory
         public boolean isTransacted()
         {
             return true;
+        }
+
+        @Override
+        public Transaction createUnboundTransaction(MuleContext muleContext) throws TransactionException
+        {
+            return new VMTransaction(muleContext, false);
         }
     }
 

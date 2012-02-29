@@ -24,10 +24,18 @@ public class VMTransaction extends AbstractSingleResourceTransaction
 
     public VMTransaction(MuleContext muleContext) throws TransactionException
     {
+        this(muleContext, true);
+    }
+
+    public VMTransaction(MuleContext muleContext, boolean initialize) throws TransactionException
+    {
         super(muleContext);
-        QueueManager qm = muleContext.getQueueManager();
-        QueueSession qs = qm.getQueueSession();
-        bindResource(qm, qs);
+        if (initialize)
+        {
+            QueueManager qm = muleContext.getQueueManager();
+            QueueSession qs = qm.getQueueSession();
+            bindResource(qm, qs);
+        }
     }
 
     public void bindResource(Object key, Object resource) throws TransactionException

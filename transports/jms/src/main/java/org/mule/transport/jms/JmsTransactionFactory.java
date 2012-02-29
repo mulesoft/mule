@@ -13,13 +13,13 @@ package org.mule.transport.jms;
 import org.mule.api.MuleContext;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionException;
-import org.mule.api.transaction.TransactionFactory;
+import org.mule.api.transaction.UniversalTransactionFactory;
 
 /**
  * <p>
  * <code>JmsTransactionFactory</code> creates a JMS local transaction
  */
-public class JmsTransactionFactory implements TransactionFactory
+public class JmsTransactionFactory implements UniversalTransactionFactory
 {
     private String name;
     
@@ -43,5 +43,11 @@ public class JmsTransactionFactory implements TransactionFactory
     public void setName(String name)
     {
         this.name = name;
+    }
+
+    @Override
+    public Transaction createUnboundTransaction(MuleContext muleContext)
+    {
+        return new JmsTransaction(muleContext);
     }
 }
