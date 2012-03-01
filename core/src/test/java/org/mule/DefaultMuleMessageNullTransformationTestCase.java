@@ -23,9 +23,11 @@ import org.mule.api.config.MuleConfiguration;
 import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.Transformer;
 import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.size.SmallTest;
 
 import org.junit.Test;
 
+@SmallTest
 public class DefaultMuleMessageNullTransformationTestCase extends AbstractMuleTestCase
 {
 

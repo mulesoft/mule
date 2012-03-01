@@ -1352,24 +1352,6 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         {
             for (Transformer transformer : transformers)
             {
-                if (getPayload() == null)
-                {
-                    if (transformer.isAcceptNull())
-                    {
-                        setPayload(NullPayload.getInstance());
-                        setDataType(null);
-                    }
-                    else
-                    {
-                        if (logger.isDebugEnabled())
-                        {
-                            logger.debug("Transformer " + transformer +
-                                    " doesn't support the null payload, exiting from transformer chain.");
-                        }
-                        break;
-                    }
-                }
-
                 Class<?> srcCls = getPayload().getClass();
                 DataType<?> originalSourceType = DataTypeFactory.create(srcCls);
 
