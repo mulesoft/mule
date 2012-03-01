@@ -190,6 +190,13 @@ public class FilePersistenceStrategy implements QueuePersistenceStrategy, MuleCo
             }
             else if (files[i].getName().endsWith(EXTENSION))
             {
+                if (files[i].length() == 0)
+                {
+                    FileUtils.deleteQuietly(files[i]);
+                    logger.debug("Removing zero size file: " + files[i].getAbsolutePath());
+                    continue;
+                }
+
                 String id = files[i].getCanonicalPath();
                 id = id.substring(store.getCanonicalPath().length() + 1, id.length() - EXTENSION.length());
                 String queue = id.substring(0, id.indexOf(File.separator));
