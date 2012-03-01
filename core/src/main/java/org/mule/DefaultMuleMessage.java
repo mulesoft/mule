@@ -19,6 +19,7 @@ import org.mule.api.MuleRuntimeException;
 import org.mule.api.ThreadSafeAccess;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.transformer.DataType;
+import org.mule.api.transformer.DiscoverableTransformer;
 import org.mule.api.transformer.MessageTransformer;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
@@ -1350,10 +1351,13 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     {
         if (!transformers.isEmpty())
         {
+            boolean checkPayloadTypeAfterTransformations = false;
+
             for (Transformer transformer : transformers)
             {
                 Class<?> srcCls = getPayload().getClass();
                 DataType<?> originalSourceType = DataTypeFactory.create(srcCls);
+                checkPayloadTypeAfterTransformations = false;
 
                 if (transformer.isSourceDataTypeSupported(originalSourceType))
                 {
@@ -1365,22 +1369,34 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
                     {
                         logger.debug("Transformer " + transformer + " doesn't support the source payload: " + srcCls);
                     }
-                    if (!transformer.isIgnoreBadInput())
+
+                    if (TransformerUtils.isTransformationEnforced(muleContext))
                     {
-                        if (TransformerUtils.isTransformationEnforced(muleContext))
+                        if (transformer instanceof DiscoverableTransformer)
                         {
-                            throw new IllegalArgumentException("Cannot apply transformer " + transformer + " on source payload: " + srcCls);
+                            logger.debug("Skipping converter: " + transformer);
+                            checkPayloadTypeAfterTransformations = true;
                         }
                         else
                         {
-                            if (logger.isDebugEnabled())
-                            {
-                                logger.debug("Exiting from transformer chain (ignoreBadInput = false)");
-                            }
-                            break;
+                            throw new IllegalArgumentException("Cannot apply transformer " + transformer + " on source payload: " + srcCls);
                         }
                     }
+                    else if (!transformer.isIgnoreBadInput())
+                    {
+                        if (logger.isDebugEnabled())
+                        {
+                            logger.debug("Exiting from transformer chain (ignoreBadInput = false)");
+                        }
+                        break;
+                    }
                 }
+            }
+
+            if (checkPayloadTypeAfterTransformations)
+            {
+               Transformer transformer = transformers.get(transformers.size() -1);
+               TransformerUtils.checkTransformerReturnClass(transformer, payload);
             }
         }
     }

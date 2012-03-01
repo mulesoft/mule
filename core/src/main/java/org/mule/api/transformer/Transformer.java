@@ -73,6 +73,13 @@ public interface Transformer extends MessageProcessor, Initialisable, Disposable
     boolean isAcceptNull();
 
     /**
+     * Does this transformer allow null output?
+     *
+     * @return true if this transformer can accept a null output
+     */
+    boolean isAllowNullReturn();
+
+    /**
      * By default, Mule will throw an exception if a transformer is invoked with a source object that is not compatible
      * with the transformer. Since transformers are often chained, it is useful to be able to ignore a transformer in the
      * chain and move to the next one.

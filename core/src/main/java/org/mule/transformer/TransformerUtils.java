@@ -16,11 +16,15 @@ import org.mule.api.MuleException;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.Transformer;
+import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.transformer.types.DataTypeFactory;
+import org.mule.transport.NullPayload;
 import org.mule.transport.service.TransportFactoryException;
 import org.mule.transport.service.TransportServiceDescriptor;
+import org.mule.util.ClassUtils;
 import org.mule.util.ObjectUtils;
 
 import java.util.Iterator;
@@ -141,7 +145,7 @@ public class TransformerUtils
     /**
      * Builds a list of Transformers.
      *
-     * @param names - a list of transformers separated by commans
+     * @param names - a list of transformers separated by commands
      * @param muleContext the current muleContext. This is used to look up transformers in the registry
      * @return a list (possibly empty) of transformers or
      * @throws org.mule.api.DefaultMuleException if any of the transformers cannot be found
@@ -181,5 +185,41 @@ public class TransformerUtils
         }
 
         return result;
+    }
+
+    /**
+     * Checks whether a given value is a valid output for a transformer.
+     *
+     * @param transformer the transformer used to validate
+     * @param value the output value
+     * @throws TransformerException if the out[ut value is of a unexpected type.
+     */
+    public static void checkTransformerReturnClass(Transformer transformer, Object value) throws TransformerException
+    {
+        if (value == null || value instanceof NullPayload && transformer.isAllowNullReturn())
+        {
+            return;
+        }
+
+        if (transformer.getReturnDataType() != null)
+        {
+            {
+                if (transformer.getReturnDataType() != null)
+                {
+                    DataType<?> dt = DataTypeFactory.create(value.getClass());
+                    if (!transformer.getReturnDataType().isCompatibleWith(dt))
+                    {
+                        throw new TransformerException(
+                                CoreMessages.transformUnexpectedType(dt, transformer.getReturnDataType()),
+                                transformer);
+                    }
+                }
+            }
+
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("The transformed value is of expected type. Type is: " + ClassUtils.getSimpleName(value.getClass()));
+            }
+        }
     }
 }
