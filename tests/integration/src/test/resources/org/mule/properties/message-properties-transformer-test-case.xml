@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xmlns:scripting="http://www.mulesoft.org/schema/mule/scripting"
+    xsi:schemaLocation="
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
+       http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/3.2/mule-scripting.xsd
+       http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/3.2/mule-test.xsd">
+
+    <message-properties-transformer name="addOutboundProperty">
+        <add-message-property key="outPropKey" value="outPropValue"/>
+    </message-properties-transformer>
+
+    <message-properties-transformer name="addOutboundPropertyName">
+        <add-message-property key="outPropKeyName" value="outPropKey"/>
+    </message-properties-transformer>
+
+    <message-properties-transformer name="addOutboundProperty2">
+        <add-message-property key="outPropKey2" value="outPropValue2"/>
+    </message-properties-transformer>
+
+    <message-properties-transformer scope="invocation" name="addInvocationProperty">
+        <add-message-property key="invPropKey" value="invPropValue"/>
+    </message-properties-transformer>
+
+    <scripting:transformer name="addInboundProperty">
+        <scripting:script engine="groovy">
+            message.setProperty('inbPropKey','inbPropValue',org.mule.api.transport.PropertyScope.INBOUND);
+            message
+        </scripting:script>
+    </scripting:transformer>
+
+    <scripting:transformer name="addInboundProperty2">
+        <scripting:script engine="groovy">
+            message.setProperty('inbPropKey2','inbPropValue2',org.mule.api.transport.PropertyScope.INBOUND);
+            message
+        </scripting:script>
+    </scripting:transformer>
+
+    <flow name="addProperty" processingStrategy="synchronous">
+        <add-property key="prop" value="#[string:some value]"/>
+        <test:assert expression="#[groovy:message.getOutboundProperty('prop').equals('some value')]"/>
+    </flow>
+    
+    <flow name="addPropertyUsingExpressionKey" processingStrategy="synchronous">
+        <transformer ref="addOutboundProperty"/>
+        <transformer ref="addInvocationProperty"/>
+        <add-property key="#[header:OUTBOUND:outPropKey]" value="#[header:INVOCATION:invPropKey]"/>
+        <test:assert expression="#[groovy:message.getOutboundProperty('outPropValue').equals('invPropValue')]"/>
+    </flow>
+
+    <flow name="removeProperty" processingStrategy="synchronous">
+        <transformer ref="addOutboundProperty"/>
+        <remove-property key="outPropKey" />
+        <test:assert expression="#[groovy:message.getOutboundProperty('outPropKey') == null]"/>
+    </flow>
+
+    <flow name="removePropertyUsingExpression" processingStrategy="synchronous">
+        <transformer ref="addOutboundProperty"/>
+        <transformer ref="addOutboundPropertyName"/>
+        <remove-property key="#[header:OUTBOUND:outPropKeyName]" />
+        <test:assert expression="#[groovy:message.getOutboundProperty('outPropKey') == null]"/>
+    </flow>
+    
+    <flow name="removePropertyUsingRegex" processingStrategy="synchronous">
+        <transformer ref="addOutboundProperty"/>
+        <transformer ref="addOutboundProperty2"/>
+        <remove-property key="out*" />
+        <test:assert expression="#[groovy:message.getOutboundProperty('outPropKey') == null]"/>
+        <test:assert expression="#[groovy:message.getOutboundProperty('outPropKey2') == null]"/>
+    </flow>
+    
+    <flow name="removeAllProperties" processingStrategy="synchronous">
+        <transformer ref="addOutboundProperty"/>
+        <transformer ref="addOutboundProperty2"/>
+        <remove-property key="*" />
+        <test:assert expression="#[groovy:message.getOutboundProperty('outPropKey') == null]"/>
+        <test:assert expression="#[groovy:message.getOutboundProperty('outPropKey2') == null]"/>
+    </flow>
+
+    <flow name="copyProperties">
+        <transformer ref="addInboundProperty"/>
+        <transformer ref="addInboundProperty2"/>
+        <copy-properties key="inbPropKey"/>
+        <test:assert expression="#[groovy:message.getOutboundProperty('inbPropKey').equals('inbPropValue')]"/>
+        <test:assert expression="#[groovy:message.getOutboundProperty('inbPropKey2') == null]"/>
+    </flow>
+
+    <flow name="copyPropertiesUsingExpression">
+        <transformer ref="addInboundProperty"/>
+        <transformer ref="addInboundProperty2"/>
+        <copy-properties key="#[string:inbPropKey]"/>
+        <test:assert expression="#[groovy:message.getOutboundProperty('inbPropKey').equals('inbPropValue')]"/>
+    </flow>
+
+    <flow name="copyPropertiesUsingRegex">
+        <transformer ref="addInboundProperty"/>
+        <transformer ref="addInboundProperty2"/>
+        <copy-properties key=".*2$"/>
+        <test:assert expression="#[groovy:message.getOutboundProperty('inbPropKey') == null]"/>
+        <test:assert expression="#[groovy:message.getOutboundProperty('inbPropKey2').equals('inbPropValue2')]"/>
+    </flow>
+
+    <flow name="copyAllProperties">
+        <transformer ref="addInboundProperty"/>
+        <transformer ref="addInboundProperty2"/>
+        <copy-properties key="*"/>
+        <test:assert expression="#[groovy:message.getOutboundProperty('inbPropKey').equals('inbPropValue')]"/>
+        <test:assert expression="#[groovy:message.getOutboundProperty('inbPropKey2').equals('inbPropValue2')]"/>
+    </flow>
+
+</mule>

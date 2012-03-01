@@ -27,35 +27,9 @@ import javax.activation.DataHandler;
  * @see org.mule.api.expression.ExpressionEvaluator
  * @see DefaultExpressionManager
  */
-public class MessageAttachmentExpressionEvaluator implements ExpressionEvaluator
+public class MessageAttachmentExpressionEvaluator extends BaseAttachmentExpressionEvaluator
 {
     public static final String NAME = "attachment";
-
-    public Object evaluate(String expression, MuleMessage message)
-    {
-        if (expression == null)
-        {
-            return null;
-        }
-
-        boolean required;
-        if (expression.endsWith(OPTIONAL_ARGUMENT))
-        {
-            expression = expression.substring(0, expression.length() - OPTIONAL_ARGUMENT.length());
-            required = false;
-        }
-        else
-        {
-            required = true;
-        }
-        DataHandler dh = message.getInboundAttachment(expression);
-
-        if (dh == null && required)
-        {
-            throw new RequiredValueException(CoreMessages.expressionEvaluatorReturnedNull(NAME, expression));
-        }
-        return dh;
-    }
 
     /**
      * {@inheritDoc}
@@ -65,4 +39,9 @@ public class MessageAttachmentExpressionEvaluator implements ExpressionEvaluator
         return NAME;
     }
 
+    @Override
+    protected DataHandler getAttachment(MuleMessage message, String attachmentName)
+    {
+        return message.getInboundAttachment(attachmentName);
+    }
 }

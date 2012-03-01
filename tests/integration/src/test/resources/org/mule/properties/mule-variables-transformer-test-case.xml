@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xmlns:scripting="http://www.mulesoft.org/schema/mule/scripting"
+    xsi:schemaLocation="
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
+       http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/3.2/mule-scripting.xsd
+       http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/3.2/mule-test.xsd">
+
+    <message-properties-transformer name="addInvocationVariable" scope="invocation">
+        <add-message-property key="invVarKey" value="invVarValue"/>
+    </message-properties-transformer>
+
+    <message-properties-transformer name="addInvocationVariableName" scope="invocation">
+        <add-message-property key="invVarKeyName" value="invVarKey"/>
+    </message-properties-transformer>
+
+    <message-properties-transformer name="addInvocationVariable2" scope="invocation">
+        <add-message-property key="invVarKey2" value="invVarValue2"/>
+    </message-properties-transformer>
+
+    <message-properties-transformer name="addAnotherInvocationVariable" scope="invocation">
+        <add-message-property key="anotherInvVarKey" value="anotherInvVarValue"/>
+    </message-properties-transformer>
+
+    <message-properties-transformer scope="session" name="addSessionVariable">
+        <add-message-property key="sesVarKey" value="sesVarValue"/>
+    </message-properties-transformer>
+
+    <message-properties-transformer scope="session" name="addSessionVariable2">
+        <add-message-property key="sesVarKey2" value="sesVarValue2"/>
+    </message-properties-transformer>
+
+    <flow name="addVariable" processingStrategy="synchronous">
+        <add-variable key="prop" value="#[string:some value]"/>
+        <test:assert expression="#[groovy:message.getInvocationProperty('prop').equals('some value')]"/>
+    </flow>
+
+    <flow name="addVariableUsingExpressionKey" processingStrategy="synchronous">
+        <transformer ref="addInvocationVariable"/>
+        <transformer ref="addSessionVariable"/>
+        <add-variable key="#[header:INVOCATION:invVarKey]" value="#[header:SESSION:sesVarKey]"/>
+        <test:assert expression="#[groovy:message.getInvocationProperty('invVarValue').equals('sesVarValue')]"/>
+    </flow>
+
+    <flow name="removeVariable" processingStrategy="synchronous">
+        <transformer ref="addInvocationVariable"/>
+        <remove-variable key="invVarKey" />
+        <test:assert expression="#[groovy:message.getInvocationProperty('invVarKey') == null]"/>
+    </flow>
+
+    <flow name="removeVariableUsingExpression" processingStrategy="synchronous">
+        <transformer ref="addInvocationVariable"/>
+        <transformer ref="addInvocationVariableName"/>
+        <remove-variable key="#[header:INVOCATION:invVarKeyName]"/>
+        <test:assert expression="#[groovy:message.getInvocationProperty('invVarKey') == null]"/>
+    </flow>
+    
+    <flow name="removeVariableUsingRegex" processingStrategy="synchronous">
+        <transformer ref="addInvocationVariable"/>
+        <transformer ref="addInvocationVariable2"/>
+        <transformer ref="addAnotherInvocationVariable"/>
+        <remove-variable key="inv*"/>
+        <test:assert expression="#[groovy:message.getInvocationProperty('invVarKey') == null]"/>
+        <test:assert expression="#[groovy:message.getInvocationProperty('invVarKey2') == null]"/>
+        <test:assert expression="#[groovy:message.getInvocationProperty('anotherInvVarKey') != null]"/>
+    </flow>
+    
+    <flow name="removeAllVariables" processingStrategy="synchronous">
+        <transformer ref="addInvocationVariable"/>
+        <transformer ref="addInvocationVariable2"/>
+        <remove-variable key="*" />
+        <test:assert expression="#[groovy:message.getInvocationProperty('invVarKey') == null]"/>
+        <test:assert expression="#[groovy:message.getInvocationProperty('invVarKey2') == null]"/>
+    </flow>
+
+</mule>

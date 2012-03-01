@@ -207,16 +207,26 @@ import org.mule.transformer.compression.GZipCompressTransformer;
 import org.mule.transformer.compression.GZipUncompressTransformer;
 import org.mule.transformer.encryption.DecryptionTransformer;
 import org.mule.transformer.encryption.EncryptionTransformer;
+import org.mule.transformer.simple.AddAttachmentTransformer;
+import org.mule.transformer.simple.AddPropertyTransformer;
+import org.mule.transformer.simple.AddFlowVariableTransformer;
+import org.mule.transformer.simple.AddSessionVariableTransformer;
 import org.mule.transformer.simple.AutoTransformer;
 import org.mule.transformer.simple.BeanToMap;
 import org.mule.transformer.simple.ByteArrayToHexString;
 import org.mule.transformer.simple.ByteArrayToObject;
 import org.mule.transformer.simple.ByteArrayToSerializable;
 import org.mule.transformer.simple.CombineCollectionsTransformer;
+import org.mule.transformer.simple.CopyAttachmentsTransformer;
+import org.mule.transformer.simple.CopyPropertiesTransformer;
 import org.mule.transformer.simple.HexStringToByteArray;
 import org.mule.transformer.simple.MapToBean;
 import org.mule.transformer.simple.ObjectToByteArray;
 import org.mule.transformer.simple.ObjectToString;
+import org.mule.transformer.simple.RemoveAttachmentTransformer;
+import org.mule.transformer.simple.RemovePropertyTransformer;
+import org.mule.transformer.simple.RemoveFlowVariableTransformer;
+import org.mule.transformer.simple.RemoveSessionVariableTransformer;
 import org.mule.transformer.simple.SerializableToByteArray;
 import org.mule.transformer.simple.StringAppendTransformer;
 import org.mule.util.store.InMemoryObjectStore;
@@ -293,9 +303,19 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("custom-transformer", new MessageProcessorDefinitionParser());
         registerBeanDefinitionParser("auto-transformer", new MessageProcessorDefinitionParser(AutoTransformer.class));
         registerBeanDefinitionParser("message-properties-transformer", new MessagePropertiesTransformerDefinitionParser());
+        registerBeanDefinitionParser("add-property", new MessageProcessorDefinitionParser(AddPropertyTransformer.class));
+        registerBeanDefinitionParser("remove-property", new MessageProcessorDefinitionParser(RemovePropertyTransformer.class));
+        registerBeanDefinitionParser("copy-properties", new MessageProcessorDefinitionParser(CopyPropertiesTransformer.class));
+        registerBeanDefinitionParser("add-variable", new MessageProcessorDefinitionParser(AddFlowVariableTransformer.class));
+        registerBeanDefinitionParser("remove-variable", new MessageProcessorDefinitionParser(RemoveFlowVariableTransformer.class));
+        registerBeanDefinitionParser("add-session-variable", new MessageProcessorDefinitionParser(AddSessionVariableTransformer.class));
+        registerBeanDefinitionParser("remove-session-variable", new MessageProcessorDefinitionParser(RemoveSessionVariableTransformer.class));
+        registerBeanDefinitionParser("add-attachment", new MessageProcessorDefinitionParser(AddAttachmentTransformer.class));
+        registerBeanDefinitionParser("remove-attachment", new MessageProcessorDefinitionParser(RemoveAttachmentTransformer.class));
+        registerBeanDefinitionParser("copy-attachments", new MessageProcessorDefinitionParser(CopyAttachmentsTransformer.class));
 
         registerMuleBeanDefinitionParser("expression-transformer", new ExpressionTransformerDefinitionParser(
-            ExpressionTransformer.class));
+                ExpressionTransformer.class));
 
         registerBeanDefinitionParser("return-argument", new ChildDefinitionParser("argument", ExpressionArgument.class));
 

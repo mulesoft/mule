@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
+       http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/3.2/mule-test.xsd">
+
+    <message-properties-transformer name="addInvocationProperty" scope="invocation">
+        <add-message-property key="invPropKey" value="invPropValue"/>
+    </message-properties-transformer>
+
+    <message-properties-transformer name="addInvocationPropertyName" scope="invocation">
+        <add-message-property key="invPropKeyName" value="invPropKey"/>
+    </message-properties-transformer>
+
+    <message-properties-transformer name="addInvocationProperty2" scope="invocation">
+        <add-message-property key="invPropKey2" value="invPropValue2"/>
+    </message-properties-transformer>
+
+    <message-properties-transformer scope="session" name="addSessionProperty">
+        <add-message-property key="sesPropKey" value="sesPropValue"/>
+    </message-properties-transformer>
+
+    <message-properties-transformer scope="session" name="addSessionProperty2">
+        <add-message-property key="sesPropKey2" value="sesPropValue2"/>
+    </message-properties-transformer>
+   
+    <flow name="addAttachment" processingStrategy="synchronous">
+        <add-attachment key="attach" value="#[string:some value]" contentType="text/plain"/>
+        <test:assert expression="#[groovy:message.getOutboundAttachment('attach').getContentType().equals('text/plain')]"/>
+    </flow>
+
+    <flow name="addAttachmentUsingExpressionKey" processingStrategy="synchronous">
+        <transformer ref="addInvocationProperty"/>
+        <transformer ref="addSessionProperty"/>
+        <add-attachment key="#[header:INVOCATION:invPropKey]" value="#[header:SESSION:sesPropKey]" contentType="text/plain"/>
+        <test:assert expression="#[groovy:message.getOutboundAttachment('invPropValue') != null]"/>
+        <test:assert expression="#[groovy:message.getOutboundAttachment('invPropValue').getContentType().equals('text/plain')]"/>
+    </flow>
+
+    <flow name="addAttachmentUsingExpressionContentType" processingStrategy="synchronous">
+        <add-attachment key="attach" value="value" contentType="#[string:application/xml]"/>
+        <test:assert expression="#[groovy:message.getOutboundAttachment('attach').getContentType().equals('application/xml')]"/>
+    </flow>
+
+    <flow name="removeAttachment" processingStrategy="synchronous">
+        <add-attachment key="attach" value="#[string:some value]" contentType="text/plain"/>
+        <add-attachment key="attach2" value="#[string:some value]" contentType="text/plain"/>
+        <remove-attachment key="attach" />
+        <test:assert expression="#[groovy:message.getOutboundAttachment('attach') == null]"/>
+        <test:assert expression="#[groovy:message.getOutboundAttachment('attach2') != null]"/>
+    </flow>
+
+    <flow name="removeAttachmentUsingExpression" processingStrategy="synchronous">
+        <add-attachment key="attach" value="#[string:some value]" contentType="text/plain"/>
+        <add-attachment key="attach2" value="#[string:some value]" contentType="text/plain"/>
+        <remove-attachment key="#[string:attach]"/>
+        <test:assert expression="#[groovy:message.getOutboundAttachment('attach') == null]"/>
+        <test:assert expression="#[groovy:message.getOutboundAttachment('attach2') != null]"/>
+    </flow>
+    
+    <flow name="removeAttachmentUsingRegex" processingStrategy="synchronous">
+        <add-attachment key="attach" value="#[string:some value]" contentType="text/plain"/>
+        <add-attachment key="attach2" value="#[string:some value]" contentType="text/plain"/>
+        <add-attachment key="attach22" value="#[string:some value]" contentType="text/plain"/>
+        <remove-attachment key="*2"/>
+        <test:assert expression="#[groovy:message.getOutboundAttachment('attach') != null]"/>
+        <test:assert expression="#[groovy:message.getOutboundAttachment('attach2') == null]"/>
+        <test:assert expression="#[groovy:message.getOutboundAttachment('attach22') == null]"/>
+    </flow>
+    
+    <flow name="removeAllAttachments" processingStrategy="synchronous">
+        <add-attachment key="attach" value="#[string:some value]" contentType="text/plain"/>
+        <add-attachment key="attach2" value="#[string:some value]" contentType="text/plain"/>
+        <add-attachment key="attach22" value="#[string:some value]" contentType="text/plain"/>
+        <remove-attachment key="*" />
+        <test:assert expression="#[groovy:message.getOutboundAttachment('attach') == null]"/>
+        <test:assert expression="#[groovy:message.getOutboundAttachment('attach2') == null]"/>
+        <test:assert expression="#[groovy:message.getOutboundAttachment('attach22') == null]"/>
+    </flow>
+
+    <!--<flow name="enrichAttachment" processingStrategy="synchronous">
+        <enricher>
+            <add-variable key="enricherAttachment" value="some text"/>
+            <enrich target="#[attachment:attach,text/plain]" source="#[variable:enricherAttachment]"/>
+        </enricher>
+        <test:assert expression="#[groovy:message.getOutboundAttachment('attach') != null]"/>
+        <test:assert expression="#[groovy:message.getOutboundAttachment('attach').getContentType().equals('text/plain')]"/>
+        <expression-transformer expression="#[outbound-attachment:attach]"/>
+        <expression-transformer expression="#[groovy:message.getPayload().getInputStream()]"/>
+        <object-to-string-transformer/>
+        <test:assert expression="#[groovy:message.getPayloadAsString().equals('some text')]"/>
+    </flow>
+
+    <flow name="enrichAttachmentUsingDataHandler" processingStrategy="synchronous">
+        <enricher>
+            <add-attachment key="enricherAttachment" value="{message: 'value'}" contentType="application/json"/>
+            <enrich target="#[attachment:attach]" source="#[outbound-attachment:enricherAttachment]"/>
+        </enricher>
+        <test:assert expression="#[groovy:message.getOutboundAttachment('attach') != null]"/>
+        <test:assert expression="#[groovy:message.getOutboundAttachment('attach').getContentType().equals('application/json')]"/>
+    </flow>
+
+    <flow name="enrichAttachmentWithoutContentType" processingStrategy="synchronous">
+        <flow-ref name="flowEnricher"/>
+        <test:assert expression="#[groovy:message.getInvocationProperty('failure') != null]"/>
+    </flow>
+    
+    <flow name="flowEnricher" processingStrategy="synchronous">
+        <enricher>
+            <add-variable key="enricherAttachment" value="some text"/>
+            <enrich target="#[attachment:attach]" source="#[variable:enricherAttachment]"/>
+        </enricher>
+        <catch-exception-strategy>
+            <add-variable key="failure" value="failedExecution"/>
+        </catch-exception-strategy>
+    </flow>-->
+
+</mule>
