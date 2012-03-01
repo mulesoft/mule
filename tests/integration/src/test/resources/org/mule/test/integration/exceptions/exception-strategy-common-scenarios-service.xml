@@ -155,29 +155,6 @@
             </default-exception-strategy>
         </service>
 
-        <service name="RollbackTransactionAndSendEmail">
-            <inbound>
-                <jms:inbound-endpoint queue="in6">
-                    <jms:transaction action="ALWAYS_BEGIN"/>
-                </jms:inbound-endpoint>
-            </inbound>
-            <test:component throwException="true"/>
-            <default-exception-strategy>
-                <rollback-transaction exception-pattern="*"/>
-                <processor-chain>
-                    <message-properties-transformer >
-                        <add-message-property key="exception" value="#[groovy:payload.exception]"/>
-                    </message-properties-transformer>
-                    <expression-transformer evaluator="groovy"
-                                            expression='"Failed to process message: " + payload.getPayload() + " due to failure: " + '/>
-                    <smtp:outbound-endpoint user="pablolagreca" password="Neruda10" host="smtp.gmail.com"
-                                            from="pablolagreca@gmail.com" to="pablolagreca@gmail.com"
-                                            subject="Message Failure"/>
-                    <custom-processor
-                            class="org.mule.test.integration.exceptions.ExceptionStrategyCommonScenariosTestCase$EndMessageProcessor"/>
-                </processor-chain>
-            </default-exception-strategy>
-        </service>
     </model>
 
 

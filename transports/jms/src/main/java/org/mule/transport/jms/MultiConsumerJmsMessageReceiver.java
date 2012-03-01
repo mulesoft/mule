@@ -167,6 +167,7 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
 
         protected volatile boolean connected;
         protected volatile boolean started;
+        protected volatile boolean isProcessingMessage;
         
         protected void doConnect() throws MuleException
         {
@@ -197,8 +198,25 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
         {
             jmsConnector.closeQuietly(consumer);
             consumer = null;
+            if (isProcessingMessage)
+            {
+                recoverSession();
+            }
             jmsConnector.closeQuietly(session);
             session = null;
+        }
+
+        private void recoverSession()
+        {
+            try
+            {
+                //If it's processing a message then don't lose it
+                session.recover();
+            }
+            catch (Exception jmsEx)
+            {
+                logger.error(jmsEx);
+            }
         }
 
         protected void doStart() throws MuleException
@@ -318,6 +336,7 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
         {
             try
             {
+                isProcessingMessage = true;
                 // Note: Despite the name "Worker", there is no new thread created here in order to maintain synchronicity for exception handling.  
                 JmsWorker worker = new JmsWorker(message, MultiConsumerJmsMessageReceiver.this, this);
                 worker.processMessages();
@@ -329,14 +348,7 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
                 {                    
                     public void rollback()
                     {
-                        try
-                        {
-                            session.recover();
-                        }
-                        catch (JMSException jmsEx)
-                        {
-                            logger.error(jmsEx);
-                        }
+                        recoverSession();
                     }
                 };
                 
@@ -352,6 +364,10 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
                 {
                     getConnector().getMuleContext().getExceptionListener().handleException(e, rollbackMethod);
                 }
+            }
+            finally
+            {
+                isProcessingMessage = false;
             }
         }
     }
