@@ -64,6 +64,7 @@ public class ErrorHandlingProcessingTemplateTestCase extends AbstractMuleTestCas
         {
             TransactionCoordination.getInstance().unbindTransaction(currentTransaction);
         }
+        when(mockMessagingException.getStackTrace()).thenReturn(new StackTraceElement[0]);
     }
 
     @Test
