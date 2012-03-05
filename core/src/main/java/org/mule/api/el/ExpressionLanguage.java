@@ -29,8 +29,8 @@ public interface ExpressionLanguage
 {
 
     /**
-     * Execute the expression resulting the result. The expression will be executed without any event or
-     * message context.
+     * Execute the expression returning the result. The expression will be executed by the expression language
+     * implementation without making any event or message context available.
      * 
      * @param <T> the return type expected
      * @param expression the expression to be executed
@@ -39,10 +39,11 @@ public interface ExpressionLanguage
     <T> T execute(String expression);
 
     /**
-     * Execute the expression resulting the result. The expression will be executed without any event or
-     * message context. A Map of variables can be provided that will be able to the expression when executed.
-     * Variable provided in the map will only be available if there are not conflicts with existing context
-     * variables provided by the expression language implementation.
+     * Execute the expression returning the result. The expression will be executed by the expression language
+     * implementation without making any event or message context available. A Map of variables can be
+     * provided that will be able to the expression when executed. Variable provided in the map will only be
+     * available if there are no conflicts with context variables provided by the expression language
+     * implementation.
      * 
      * @param <T> the return type expected
      * @param expression the expression to be executed
@@ -52,7 +53,7 @@ public interface ExpressionLanguage
     <T> T execute(String expression, Map<String, ? extends Object> vars);
 
     /**
-     * Execute the expression resulting the result. The expression will be executed with MuleEvent context,
+     * Execute the expression returning the result. The expression will be executed with MuleEvent context,
      * meaning the expression language implementation should provided access to the message.
      * 
      * @param <T> the return type expected
@@ -63,11 +64,11 @@ public interface ExpressionLanguage
     <T> T execute(String expression, MuleEvent event);
 
     /**
-     * Execute the expression resulting the result. The expression will be executed with MuleEvent context,
+     * Execute the expression returning the result. The expression will be executed with MuleEvent context,
      * meaning the expression language implementation should provided access to the message. A Map of
      * variables can be provided that will be able to the expression when executed. Variable provided in the
-     * map will only be available if there are not conflicts with existing context variables provided by the
-     * expression language implementation.
+     * map will only be available if there are no conflict with context variables provided by the expression
+     * language implementation.
      * 
      * @param <T> the return type expected
      * @param expression the expression to be executed
