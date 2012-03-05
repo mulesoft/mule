@@ -62,8 +62,13 @@ public class QueueInfo
         }
         if (delegate == null || (config != null && !hadConfig))
         {
-            this.delegate = factory != null ? factory.createDelegate(this, muleContext) : new DefaultQueueInfoDelegate(capacity);
+            QueueInfoDelegate newDelegate = factory != null ? factory.createDelegate(this, muleContext) : new DefaultQueueInfoDelegate(capacity);
             delegateCanTake = this.delegate instanceof TakingQueueInfoDelegate;
+            if (delegate != null && delegate instanceof DefaultQueueInfoDelegate)
+            {
+                newDelegate.addAll(((DefaultQueueInfoDelegate) delegate).list);
+            }
+            delegate = newDelegate;
         }
     }
 
