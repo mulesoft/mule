@@ -9,6 +9,7 @@
  */
 package org.mule.api;
 
+import org.mule.DataTypeConversionResolver;
 import org.mule.api.client.LocalMuleClient;
 import org.mule.api.config.MuleConfiguration;
 import org.mule.api.config.ThreadingProfile;
@@ -282,5 +283,10 @@ public interface MuleContext extends Lifecycle
      * @return default exception strategy. If no default exception strategy was configured it returns {@link org.mule.exception.DefaultMessagingExceptionStrategy}
      */
     MessagingExceptionHandler getDefaultExceptionStrategy();
+
+    /**
+     * @return a non null {@link org.mule.DataTypeConversionResolver} instance to resolve implicit data type conversions
+     */
+    DataTypeConversionResolver getDataTypeConverterResolver();
 }
 

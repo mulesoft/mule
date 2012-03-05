@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xsi:schemaLocation="
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
+       http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.2/mule-vm.xsd">
+
+    <custom-transformer name="TestStringTransformer"
+                        class="org.mule.test.transformers.ImplicitTransformationTestCase$TestStringTransformer"/>
+
+    <custom-transformer name="TestByteArrayTransformer"
+                        class="org.mule.test.transformers.ImplicitTransformationTestCase$TestByteArrayTransformer"/>
+
+    <custom-transformer name="TestInputStreamTransformer"
+                        class="org.mule.test.transformers.ImplicitTransformationTestCase$TestInputStreamTransformer"/>
+
+
+    <flow name="StringEchoService">
+        <vm:inbound-endpoint path="stringInput"
+                             exchange-pattern="request-response" transformer-refs="TestStringTransformer"/>
+        <echo-component/>
+    </flow>
+
+    <flow name="ByteArrayEchoService">
+        <vm:inbound-endpoint path="byteArrayInput"
+                             exchange-pattern="request-response" transformer-refs="TestByteArrayTransformer"/>
+        <echo-component/>
+    </flow>
+
+    <flow name="InputStreamEchoService">
+        <vm:inbound-endpoint path="inputStreamInput"
+                             exchange-pattern="request-response" transformer-refs="TestInputStreamTransformer"/>
+        <echo-component/>
+    </flow>
+</mule>

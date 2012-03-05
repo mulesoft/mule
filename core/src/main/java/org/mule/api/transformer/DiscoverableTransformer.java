@@ -16,7 +16,7 @@ package org.mule.api.transformer;
  * to help select a transformer when there are two or more matches. The transformer with the highest priorityWeighting
  * will be selected.
  */
-public interface DiscoverableTransformer
+public interface DiscoverableTransformer extends Converter
 {
     int MAX_PRIORITY_WEIGHTING = 10;
     int MIN_PRIORITY_WEIGHTING = 1;

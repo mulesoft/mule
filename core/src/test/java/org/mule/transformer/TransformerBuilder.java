@@ -21,14 +21,14 @@ public class TransformerBuilder
     private Object returnValue;
     private MuleContext muleContext;
 
-    public TransformerBuilder from(DataType<?> returnDataType)
+    public TransformerBuilder to(DataType<?> returnDataType)
     {
         this.returnDataType = returnDataType;
 
         return this;
     }
 
-    public TransformerBuilder to(DataType<?> sourceDataType)
+    public TransformerBuilder from(DataType<?> sourceDataType)
     {
         this.sourceDataType = sourceDataType;
 

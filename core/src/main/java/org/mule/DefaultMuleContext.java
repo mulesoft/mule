@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule;
 
 import org.mule.api.MessagingException;
@@ -15,7 +16,6 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.client.LocalMuleClient;
-import org.mule.api.config.ConfigurationException;
 import org.mule.api.config.MuleConfiguration;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.config.ThreadingProfile;
@@ -761,5 +761,27 @@ public class DefaultMuleContext implements MuleContext
             defaultExceptionStrategy = new DefaultMessagingExceptionStrategy(this);
         }
         return defaultExceptionStrategy;
+    }
+
+    @Override
+    public DataTypeConversionResolver getDataTypeConverterResolver()
+    {
+        DataTypeConversionResolver dataTypeConversionResolver = getRegistry().lookupObject(MuleProperties.OBJECT_CONVERTER_RESOLVER);
+        if (dataTypeConversionResolver == null)
+        {
+            dataTypeConversionResolver = new DynamicDataTypeConversionResolver(this);
+
+            try
+            {
+                getRegistry().registerObject(MuleProperties.OBJECT_CONVERTER_RESOLVER, dataTypeConversionResolver);
+            }
+            catch (RegistrationException e)
+            {
+                // Should not occur
+                throw new IllegalStateException(e);
+            }
+        }
+
+        return dataTypeConversionResolver;
     }
 }

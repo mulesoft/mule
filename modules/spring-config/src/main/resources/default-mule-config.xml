@@ -64,6 +64,10 @@
 
     <bean name="_defaultThreadingProfile" class="org.mule.config.ChainedThreadingProfile"/>
 
+    <bean name="_converterResolver" class="org.mule.DynamicDataTypeConversionResolver">
+        <constructor-arg ref="_muleContext"/>
+    </bean>
+
     <bean name="_defaultMessageDispatcherThreadingProfile" class="org.mule.config.ChainedThreadingProfile">
         <constructor-arg ref="_defaultThreadingProfile"/>
     </bean>

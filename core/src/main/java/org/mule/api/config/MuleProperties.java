@@ -146,6 +146,7 @@ public class MuleProperties
     public static final String OBJECT_DEFAULT_RETRY_POLICY_TEMPLATE = "_defaultRetryPolicyTemplate";
     public static final String OBJECT_MULE_CONFIGURATION = "_muleConfiguration";
     public static final String OBJECT_MULE_NAMESPACE_MANAGER = "_muleNamespaceManager";
+    public static final String OBJECT_CONVERTER_RESOLVER = "_converterResolver";
 
     // Not currently used as these need to be instance variables of the MuleContext.
     public static final String OBJECT_WORK_MANAGER = "_muleWorkManager";

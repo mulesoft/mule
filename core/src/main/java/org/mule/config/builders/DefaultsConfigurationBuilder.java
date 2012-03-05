@@ -10,6 +10,7 @@
 
 package org.mule.config.builders;
 
+import org.mule.DynamicDataTypeConversionResolver;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.config.MuleProperties;
@@ -75,6 +76,7 @@ public class DefaultsConfigurationBuilder extends AbstractConfigurationBuilder
         configureThreadingProfiles(registry);
 
         registry.registerObject(MuleProperties.OBJECT_DEFAULT_RETRY_POLICY_TEMPLATE, new NoRetryPolicyTemplate());
+        registry.registerObject(MuleProperties.OBJECT_CONVERTER_RESOLVER, new DynamicDataTypeConversionResolver(muleContext));
 
         configureSystemModel(registry);
     }

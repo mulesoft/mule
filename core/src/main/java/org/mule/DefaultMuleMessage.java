@@ -1379,7 +1379,17 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
                         }
                         else
                         {
-                            throw new IllegalArgumentException("Cannot apply transformer " + transformer + " on source payload: " + srcCls);
+                            Transformer implicitTransformer = muleContext.getDataTypeConverterResolver().resolve(originalSourceType, transformer.getSourceDataTypes());
+
+                            if (implicitTransformer != null)
+                            {
+                                transformMessage(event, implicitTransformer);
+                                transformMessage(event, transformer);
+                            }
+                            else
+                            {
+                                throw new IllegalArgumentException("Cannot apply transformer " + transformer + " on source payload: " + srcCls);
+                            }
                         }
                     }
                     else if (!transformer.isIgnoreBadInput())

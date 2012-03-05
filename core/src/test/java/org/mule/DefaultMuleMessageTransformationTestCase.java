@@ -14,6 +14,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
@@ -26,13 +27,14 @@ import org.mule.transformer.TestTransformer;
 import org.mule.transformer.TransformerBuilder;
 import org.mule.transformer.types.SimpleDataType;
 
+import org.junit.Before;
 import org.junit.Test;
 
 @SmallTest
 public class DefaultMuleMessageTransformationTestCase extends AbstractMuleTestCase
 {
 
-    private MuleContext muleContext = mock(MuleContext.class);
+    private MuleContext muleContext;
 
     private class A
     {
@@ -54,6 +56,14 @@ public class DefaultMuleMessageTransformationTestCase extends AbstractMuleTestCa
 
     }
 
+    @Before
+    public void setUp() throws Exception
+    {
+        // Configures a converter resolver that does nothing
+        muleContext = mock(MuleContext.class);
+        when(muleContext.getDataTypeConverterResolver()).thenReturn(mock(DataTypeConversionResolver.class));
+    }
+
     private static final DataType<Object> dataTypeB = new SimpleDataType<Object>(B.class);
     private static final DataType<Object> dataTypeC = new SimpleDataType<Object>(C.class);
     private static final DataType<Object> dataTypeD = new SimpleDataType<Object>(D.class);
@@ -62,7 +72,7 @@ public class DefaultMuleMessageTransformationTestCase extends AbstractMuleTestCa
     public void failsOnConverterWhenSourceAndReturnTypeDoesNotMatch() throws MuleException
     {
         // Converter(B->C), payload A: FAIL
-        TestConverter converter1 = new TransformerBuilder().to(dataTypeB).from(dataTypeC).returning(new C()).boundTo(muleContext).buildConverter(1);
+        TestConverter converter1 = new TransformerBuilder().from(dataTypeB).to(dataTypeC).returning(new C()).boundTo(muleContext).buildConverter(1);
 
         DefaultMuleMessage message = new DefaultMuleMessage(new A(), muleContext);
 
@@ -81,7 +91,7 @@ public class DefaultMuleMessageTransformationTestCase extends AbstractMuleTestCa
     public void appliesConverter() throws MuleException
     {
         // Converter(B->C), payload B: OK
-        TestConverter converter1 = new TransformerBuilder().to(dataTypeB).from(dataTypeC).returning(new C()).boundTo(muleContext).buildConverter(1);
+        TestConverter converter1 = new TransformerBuilder().from(dataTypeB).to(dataTypeC).returning(new C()).boundTo(muleContext).buildConverter(1);
 
         DefaultMuleMessage message = new DefaultMuleMessage(new B(), muleContext);
         message.applyTransformers(null, converter1);
@@ -94,7 +104,7 @@ public class DefaultMuleMessageTransformationTestCase extends AbstractMuleTestCa
     public void skipsConverterThatDoesNotMatchWhenOriginalPayloadMatchesExpectedOutputType() throws MuleException
     {
         // Converter(B->C), payload C: OK - skips transformer but C is the expected output type -> OK
-        TestConverter converter1 = new TransformerBuilder().to(dataTypeB).from(dataTypeC).returning(new C()).boundTo(muleContext).buildConverter(1);
+        TestConverter converter1 = new TransformerBuilder().from(dataTypeB).to(dataTypeC).returning(new C()).boundTo(muleContext).buildConverter(1);
 
         DefaultMuleMessage message = new DefaultMuleMessage(new C(), muleContext);
         message.applyTransformers(null, converter1);
@@ -107,8 +117,8 @@ public class DefaultMuleMessageTransformationTestCase extends AbstractMuleTestCa
     public void failsTransformationUsingConverterWhenSourceAndReturnTypeDoesNotMatch2() throws MuleException
     {
         // Converter(B -> C) Converter(C->D), payload A: FAIL
-        TestConverter converter1 = new TransformerBuilder().to(dataTypeB).from(dataTypeC).returning(new C()).boundTo(muleContext).buildConverter(1);
-        TestConverter converter2 = new TransformerBuilder().to(dataTypeC).from(dataTypeD).returning(new D()).boundTo(muleContext).buildConverter(1);
+        TestConverter converter1 = new TransformerBuilder().from(dataTypeB).to(dataTypeC).returning(new C()).boundTo(muleContext).buildConverter(1);
+        TestConverter converter2 = new TransformerBuilder().from(dataTypeC).to(dataTypeD).returning(new D()).boundTo(muleContext).buildConverter(1);
 
         DefaultMuleMessage message = new DefaultMuleMessage(new A(), muleContext);
         try
@@ -127,8 +137,8 @@ public class DefaultMuleMessageTransformationTestCase extends AbstractMuleTestCa
     public void appliesBothConverters() throws MuleException
     {
         // Converter(B -> C) Converter(C->D), payload B: converts B->C, C->D
-        TestConverter converter1 = new TransformerBuilder().to(dataTypeB).from(dataTypeC).returning(new C()).boundTo(muleContext).buildConverter(1);
-        TestConverter converter2 = new TransformerBuilder().to(dataTypeC).from(dataTypeD).returning(new D()).boundTo(muleContext).buildConverter(1);
+        TestConverter converter1 = new TransformerBuilder().from(dataTypeB).to(dataTypeC).returning(new C()).boundTo(muleContext).buildConverter(1);
+        TestConverter converter2 = new TransformerBuilder().from(dataTypeC).to(dataTypeD).returning(new D()).boundTo(muleContext).buildConverter(1);
 
         DefaultMuleMessage message = new DefaultMuleMessage(new B(), muleContext);
         message.applyTransformers(null, converter1, converter2);
@@ -142,8 +152,8 @@ public class DefaultMuleMessageTransformationTestCase extends AbstractMuleTestCa
     public void skipsFirstConverterAppliesSecond() throws MuleException
     {
         // Converter(B -> C) Converter(C->D), payload C: skips converter(B->C), applies Converter(C->D)
-        TestConverter converter1 = new TransformerBuilder().to(dataTypeB).from(dataTypeC).returning(new C()).boundTo(muleContext).buildConverter(1);
-        TestConverter converter2 = new TransformerBuilder().to(dataTypeC).from(dataTypeD).returning(new D()).boundTo(muleContext).buildConverter(1);
+        TestConverter converter1 = new TransformerBuilder().from(dataTypeB).to(dataTypeC).returning(new C()).boundTo(muleContext).buildConverter(1);
+        TestConverter converter2 = new TransformerBuilder().from(dataTypeC).to(dataTypeD).returning(new D()).boundTo(muleContext).buildConverter(1);
 
         DefaultMuleMessage message = new DefaultMuleMessage(new C(), muleContext);
         message.applyTransformers(null, converter1, converter2);
@@ -157,8 +167,8 @@ public class DefaultMuleMessageTransformationTestCase extends AbstractMuleTestCa
     public void skipBothConvertersButPayloadMatchesExpectedOutputType() throws MuleException
     {
         // Converter(B -> C) Converter(C->D), payload D: skips converter(B-C), skips converter(C->D), but D is the expected output type -> OK
-        TestConverter converter1 = new TransformerBuilder().to(dataTypeB).from(dataTypeC).returning(new C()).boundTo(muleContext).buildConverter(1);
-        TestConverter converter2 = new TransformerBuilder().to(dataTypeC).from(dataTypeD).returning(new D()).boundTo(muleContext).buildConverter(1);
+        TestConverter converter1 = new TransformerBuilder().from(dataTypeB).to(dataTypeC).returning(new C()).boundTo(muleContext).buildConverter(1);
+        TestConverter converter2 = new TransformerBuilder().from(dataTypeC).to(dataTypeD).returning(new D()).boundTo(muleContext).buildConverter(1);
 
         DefaultMuleMessage message = new DefaultMuleMessage(new D(), muleContext);
         message.applyTransformers(null, converter1, converter2);
@@ -172,8 +182,8 @@ public class DefaultMuleMessageTransformationTestCase extends AbstractMuleTestCa
     public void failsTransformerIgnoringNonMatchingConverter() throws MuleException
     {
         // Transformer(B -> D) Converter(C->D), payload A: FAIL
-        TestTransformer transformer1 = new TransformerBuilder().to(dataTypeB).from(dataTypeD).returning(new D()).boundTo(muleContext).build();
-        TestConverter converter2 = new TransformerBuilder().to(dataTypeC).from(dataTypeD).returning(new D()).boundTo(muleContext).buildConverter(1);
+        TestTransformer transformer1 = new TransformerBuilder().from(dataTypeB).to(dataTypeD).returning(new D()).boundTo(muleContext).build();
+        TestConverter converter2 = new TransformerBuilder().from(dataTypeC).to(dataTypeD).returning(new D()).boundTo(muleContext).buildConverter(1);
 
         DefaultMuleMessage message = new DefaultMuleMessage(new A(), muleContext);
         try
@@ -192,8 +202,8 @@ public class DefaultMuleMessageTransformationTestCase extends AbstractMuleTestCa
     public void appliesTransformerSkipsConverter() throws MuleException
     {
         // Transformer(B -> D) Converter(C->D), payload B: converts B->D, skips converter C->D, resulting output is of the expected type -> OK
-        TestTransformer transformer1 = new TransformerBuilder().to(dataTypeB).from(dataTypeD).returning(new D()).boundTo(muleContext).build();
-        TestConverter converter2 = new TransformerBuilder().to(dataTypeC).from(dataTypeD).returning(new D()).boundTo(muleContext).buildConverter(1);
+        TestTransformer transformer1 = new TransformerBuilder().from(dataTypeB).to(dataTypeD).returning(new D()).boundTo(muleContext).build();
+        TestConverter converter2 = new TransformerBuilder().from(dataTypeC).to(dataTypeD).returning(new D()).boundTo(muleContext).buildConverter(1);
 
         DefaultMuleMessage message = new DefaultMuleMessage(new B(), muleContext);
         message.applyTransformers(null, transformer1, converter2);
@@ -207,8 +217,8 @@ public class DefaultMuleMessageTransformationTestCase extends AbstractMuleTestCa
     public void failsTransformerIgnoringMatchingConverter() throws MuleException
     {
         // Transformer(B -> D) Converter(C->D), payload C: FAIL
-        TestTransformer transformer1 = new TransformerBuilder().to(dataTypeB).from(dataTypeD).returning(new D()).boundTo(muleContext).build();
-        TestConverter converter2 = new TransformerBuilder().to(dataTypeC).from(dataTypeD).returning(new D()).boundTo(muleContext).buildConverter(1);
+        TestTransformer transformer1 = new TransformerBuilder().from(dataTypeB).to(dataTypeD).returning(new D()).boundTo(muleContext).build();
+        TestConverter converter2 = new TransformerBuilder().from(dataTypeC).to(dataTypeD).returning(new D()).boundTo(muleContext).buildConverter(1);
 
         DefaultMuleMessage message = new DefaultMuleMessage(new C(), muleContext);
         try
@@ -227,8 +237,8 @@ public class DefaultMuleMessageTransformationTestCase extends AbstractMuleTestCa
     public void failsTransformerIgnoringMatchingConverterWhenOriginalPayloadMatchesExpectedOutputType() throws MuleException
     {
         // Transformer(B -> D) Converter(C->D), payload D: FAIL
-        TestTransformer transformer1 = new TransformerBuilder().to(dataTypeB).from(dataTypeD).returning(new D()).boundTo(muleContext).build();
-        TestConverter converter2 = new TransformerBuilder().to(dataTypeC).from(dataTypeD).returning(new D()).boundTo(muleContext).buildConverter(1);
+        TestTransformer transformer1 = new TransformerBuilder().from(dataTypeB).to(dataTypeD).returning(new D()).boundTo(muleContext).build();
+        TestConverter converter2 = new TransformerBuilder().from(dataTypeC).to(dataTypeD).returning(new D()).boundTo(muleContext).buildConverter(1);
 
         DefaultMuleMessage message = new DefaultMuleMessage(new D(), muleContext);
         try
@@ -247,8 +257,8 @@ public class DefaultMuleMessageTransformationTestCase extends AbstractMuleTestCa
     public void skipsConverterFailsOnTransformer() throws MuleException
     {
         // Converter(B -> D) Transformer(C->D), payload A: FAIL
-        TestConverter converter1 = new TransformerBuilder().to(dataTypeB).from(dataTypeD).returning(new D()).boundTo(muleContext).buildConverter(1);
-        TestTransformer transformer2 = new TransformerBuilder().to(dataTypeC).from(dataTypeD).returning(new D()).boundTo(muleContext).build();
+        TestConverter converter1 = new TransformerBuilder().from(dataTypeB).to(dataTypeD).returning(new D()).boundTo(muleContext).buildConverter(1);
+        TestTransformer transformer2 = new TransformerBuilder().from(dataTypeC).to(dataTypeD).returning(new D()).boundTo(muleContext).build();
 
         DefaultMuleMessage message = new DefaultMuleMessage(new A(), muleContext);
 
@@ -268,8 +278,8 @@ public class DefaultMuleMessageTransformationTestCase extends AbstractMuleTestCa
     public void appliesConverterFailsOnTransformer() throws MuleException
     {
         // Converter(B -> D) Transformer(C->D), payload B: converts B-> D, cannot apply transformer -> FAIL
-        TestConverter converter1 = new TransformerBuilder().to(dataTypeB).from(dataTypeD).returning(new D()).boundTo(muleContext).buildConverter(1);
-        TestTransformer transformer2 = new TransformerBuilder().to(dataTypeC).from(dataTypeD).returning(new D()).boundTo(muleContext).build();
+        TestConverter converter1 = new TransformerBuilder().from(dataTypeB).to(dataTypeD).returning(new D()).boundTo(muleContext).buildConverter(1);
+        TestTransformer transformer2 = new TransformerBuilder().from(dataTypeC).to(dataTypeD).returning(new D()).boundTo(muleContext).build();
 
         DefaultMuleMessage message = new DefaultMuleMessage(new B(), muleContext);
         try
@@ -288,8 +298,8 @@ public class DefaultMuleMessageTransformationTestCase extends AbstractMuleTestCa
     public void skipsConverterAppliesTransformer() throws MuleException
     {
         // Converter(B -> D) Transformer(C->D), payload C: skips converter, transforms C to D -> OK
-        TestConverter converter1 = new TransformerBuilder().to(dataTypeB).from(dataTypeD).returning(new D()).boundTo(muleContext).buildConverter(1);
-        TestTransformer transformer2 = new TransformerBuilder().to(dataTypeC).from(dataTypeD).returning(new D()).boundTo(muleContext).build();
+        TestConverter converter1 = new TransformerBuilder().from(dataTypeB).to(dataTypeD).returning(new D()).boundTo(muleContext).buildConverter(1);
+        TestTransformer transformer2 = new TransformerBuilder().from(dataTypeC).to(dataTypeD).returning(new D()).boundTo(muleContext).build();
 
         DefaultMuleMessage message = new DefaultMuleMessage(new C(), muleContext);
         message.applyTransformers(null, converter1, transformer2);
@@ -303,8 +313,8 @@ public class DefaultMuleMessageTransformationTestCase extends AbstractMuleTestCa
     public void skipsConverterFailsOnTransformerWhenOriginalPayloadMatchesExpectedOutputType() throws MuleException
     {
         // Converter(B -> D) Transformer(C->D), payload D: FAIL
-        TestConverter converter1 = new TransformerBuilder().to(dataTypeB).from(dataTypeD).returning(new D()).boundTo(muleContext).buildConverter(1);
-        TestTransformer transformer2 = new TransformerBuilder().to(dataTypeC).from(dataTypeD).returning(new D()).boundTo(muleContext).build();
+        TestConverter converter1 = new TransformerBuilder().from(dataTypeB).to(dataTypeD).returning(new D()).boundTo(muleContext).buildConverter(1);
+        TestTransformer transformer2 = new TransformerBuilder().from(dataTypeC).to(dataTypeD).returning(new D()).boundTo(muleContext).build();
 
         DefaultMuleMessage message = new DefaultMuleMessage(new D(), muleContext);
         try
@@ -323,8 +333,8 @@ public class DefaultMuleMessageTransformationTestCase extends AbstractMuleTestCa
     public void failsOnFirstTransformer() throws MuleException
     {
         // Transformer(B ->D) Transformer(C->D), payload A: FAIL
-        TestTransformer transformer1 = new TransformerBuilder().to(dataTypeB).from(dataTypeD).returning(new D()).boundTo(muleContext).build();
-        TestTransformer transformer2 = new TransformerBuilder().to(dataTypeC).from(dataTypeD).returning(new D()).boundTo(muleContext).build();
+        TestTransformer transformer1 = new TransformerBuilder().from(dataTypeB).to(dataTypeD).returning(new D()).boundTo(muleContext).build();
+        TestTransformer transformer2 = new TransformerBuilder().from(dataTypeC).to(dataTypeD).returning(new D()).boundTo(muleContext).build();
 
         DefaultMuleMessage message = new DefaultMuleMessage(new A(), muleContext);
 
@@ -344,8 +354,8 @@ public class DefaultMuleMessageTransformationTestCase extends AbstractMuleTestCa
     public void appliesFirstTransformerFailsOnSecondTransformer() throws MuleException
     {
         // Transformer(B ->D) Transformer(C->D), payload B: applies first transformer, cannot apply second transformer -> FAIL
-        TestTransformer transformer1 = new TransformerBuilder().to(dataTypeB).from(dataTypeD).returning(new D()).boundTo(muleContext).build();
-        TestTransformer transformer2 = new TransformerBuilder().to(dataTypeC).from(dataTypeD).returning(new D()).boundTo(muleContext).build();
+        TestTransformer transformer1 = new TransformerBuilder().from(dataTypeB).to(dataTypeD).returning(new D()).boundTo(muleContext).build();
+        TestTransformer transformer2 = new TransformerBuilder().from(dataTypeC).to(dataTypeD).returning(new D()).boundTo(muleContext).build();
 
         DefaultMuleMessage message = new DefaultMuleMessage(new B(), muleContext);
 
@@ -365,8 +375,8 @@ public class DefaultMuleMessageTransformationTestCase extends AbstractMuleTestCa
     public void failsOnFirstTransformerIgnoresSecondTransformer() throws MuleException
     {
         // Transformer(B ->D) Transformer(C->D), payload C: FAIL
-        TestTransformer transformer1 = new TransformerBuilder().to(dataTypeB).from(dataTypeD).returning(new D()).boundTo(muleContext).build();
-        TestTransformer transformer2 = new TransformerBuilder().to(dataTypeC).from(dataTypeD).returning(new D()).boundTo(muleContext).build();
+        TestTransformer transformer1 = new TransformerBuilder().from(dataTypeB).to(dataTypeD).returning(new D()).boundTo(muleContext).build();
+        TestTransformer transformer2 = new TransformerBuilder().from(dataTypeC).to(dataTypeD).returning(new D()).boundTo(muleContext).build();
 
         DefaultMuleMessage message = new DefaultMuleMessage(new C(), muleContext);
 
@@ -386,8 +396,8 @@ public class DefaultMuleMessageTransformationTestCase extends AbstractMuleTestCa
     public void failsOnFirstTransformerIgnoresSecondTransformerWhenOriginalPayloadMatchesExpectedOutputType() throws MuleException
     {
         // Transformer(B ->D) Transformer(C->D), payload D: FAIL
-        TestTransformer transformer1 = new TransformerBuilder().to(dataTypeB).from(dataTypeD).returning(new D()).boundTo(muleContext).build();
-        TestTransformer transformer2 = new TransformerBuilder().to(dataTypeC).from(dataTypeD).returning(new D()).boundTo(muleContext).build();
+        TestTransformer transformer1 = new TransformerBuilder().from(dataTypeB).to(dataTypeD).returning(new D()).boundTo(muleContext).build();
+        TestTransformer transformer2 = new TransformerBuilder().from(dataTypeC).to(dataTypeD).returning(new D()).boundTo(muleContext).build();
 
         DefaultMuleMessage message = new DefaultMuleMessage(new D(), muleContext);
 
@@ -407,7 +417,7 @@ public class DefaultMuleMessageTransformationTestCase extends AbstractMuleTestCa
     public void failsOnTransformerWhenSourceAndReturnTypeDoesNotMatch() throws MuleException
     {
         // Transformer(B->C), payload A: FAIL
-        TestTransformer transformer1 = new TransformerBuilder().to(dataTypeB).from(dataTypeC).returning(new C()).boundTo(muleContext).build();
+        TestTransformer transformer1 = new TransformerBuilder().from(dataTypeB).to(dataTypeC).returning(new C()).boundTo(muleContext).build();
 
         DefaultMuleMessage message = new DefaultMuleMessage(new A(), muleContext);
 
@@ -426,7 +436,7 @@ public class DefaultMuleMessageTransformationTestCase extends AbstractMuleTestCa
     public void appliesTransformer() throws MuleException
     {
         // Transformer(B->C), payload B: OK
-        TestTransformer transformer1 = new TransformerBuilder().to(dataTypeB).from(dataTypeC).returning(new C()).boundTo(muleContext).build();
+        TestTransformer transformer1 = new TransformerBuilder().from(dataTypeB).to(dataTypeC).returning(new C()).boundTo(muleContext).build();
 
         DefaultMuleMessage message = new DefaultMuleMessage(new B(), muleContext);
         message.applyTransformers(null, transformer1);
@@ -439,7 +449,7 @@ public class DefaultMuleMessageTransformationTestCase extends AbstractMuleTestCa
     public void failsOnTransformerWhenOriginalPayloadMatchesExpectedOutputType() throws MuleException
     {
         // Transformer(B->C), payload C: FAIL
-        TestTransformer transformer1 = new TransformerBuilder().to(dataTypeB).from(dataTypeC).returning(new C()).boundTo(muleContext).build();
+        TestTransformer transformer1 = new TransformerBuilder().from(dataTypeB).to(dataTypeC).returning(new C()).boundTo(muleContext).build();
 
         DefaultMuleMessage message = new DefaultMuleMessage(new C(), muleContext);
         try
