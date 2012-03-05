@@ -16,6 +16,7 @@ import org.mule.api.store.ListableObjectStore;
 import org.mule.api.store.ObjectStore;
 import org.mule.api.store.ObjectStoreException;
 import org.mule.util.UUID;
+import org.mule.util.store.QueuePersistenceObjectStore;
 import org.mule.util.xa.AbstractTransactionContext;
 import org.mule.util.xa.AbstractXAResourceManager;
 import org.mule.util.xa.ResourceManagerException;
@@ -131,6 +132,10 @@ public class TransactionalQueueManager extends AbstractXAResourceManager impleme
         {
             try
             {
+                if (store instanceof QueuePersistenceObjectStore)
+                {
+                    ((QueuePersistenceObjectStore) store).removeUnhealthyFiles();
+                }
                 List<Serializable> keys = store.allKeys();
                 for (Serializable key : keys)
                 {

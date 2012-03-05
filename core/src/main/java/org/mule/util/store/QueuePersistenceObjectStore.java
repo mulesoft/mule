@@ -188,12 +188,6 @@ public class QueuePersistenceObjectStore<T extends Serializable> extends Abstrac
             }
             else if (files[i].getName().endsWith(FILE_EXTENSION))
             {
-                if (files[i].length() == 0)
-                {
-                    FileUtils.deleteQuietly(files[i]);
-                    logger.debug("Removing zero size file: " + files[i].getAbsolutePath());
-                    continue;
-                }
                 String id = files[i].getCanonicalPath();
 
                 int beginIndex = storeDirectory.getCanonicalPath().length() + 1;
@@ -325,5 +319,21 @@ public class QueuePersistenceObjectStore<T extends Serializable> extends Abstrac
     public void setMuleContext(MuleContext context)
     {
         muleContext = context;
+    }
+
+    public void removeUnhealthyFiles() throws ObjectStoreException
+    {
+        List<Serializable> keys = allKeys();
+        for (Serializable key : keys)
+        {
+            QueueKey qkey = (QueueKey) key;
+            String fileName = storeDirectory + File.separator + qkey.queueName + File.separator + qkey.id + FILE_EXTENSION;
+            File file = new File(fileName);
+            if (file.length() == 0)
+            {
+                FileUtils.deleteQuietly(file);
+                logger.info("Removing zero size file: " + file.getAbsolutePath());
+            }
+        }
     }
 }
