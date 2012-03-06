@@ -67,13 +67,13 @@ public class MessageProcessorExpressionEvaluatorTestCase extends AbstractMuleCon
     {
         MessageProcessorExpressionEvaluator evaluator = new MessageProcessorExpressionEvaluator();
         assertEquals("0123",
-            ((MuleMessage) evaluator.evaluate("processor:payload", createTestMessage())).getPayloadAsString());
+            ((MuleMessage) evaluator.evaluate("processor:payload:", createTestMessage())).getPayloadAsString());
     }
 
     @Test
     public void testNestedPayloadExpressionExpressionManager() throws ExpressionRuntimeException, Exception
     {
-        assertEquals("0123", ((MuleMessage) expressionManager.evaluate("#[process:processor:#[payload]]",
+        assertEquals("0123", ((MuleMessage) expressionManager.evaluate("#[process:processor:#[payload:]]",
             createTestMessage())).getPayloadAsString());
     }
 

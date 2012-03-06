@@ -160,7 +160,7 @@ public class InvokerMessageProcessorTestCase extends AbstractMuleContextTestCase
     public void testReplacePayload() throws MuleException, Exception
     {
         invoker.setMethodName("testMethod3");
-        invoker.setArgumentExpressionsString("#[payload]");
+        invoker.setArgumentExpressionsString("#[payload:]");
         invoker.initialise();
         assertEquals("hello echo", invoker.process(getTestEvent("hello")).getMessageAsString());
     }

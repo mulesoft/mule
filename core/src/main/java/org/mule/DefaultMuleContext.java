@@ -289,7 +289,7 @@ public class DefaultMuleContext implements MuleContext
         notificationManager.dispose();
         workManager.dispose();
         
-        if (expressionManager instanceof Disposable)
+        if (expressionManager != null && expressionManager instanceof Disposable)
         {
             ((Disposable) expressionManager).dispose();
         }
