@@ -28,6 +28,7 @@ import org.mule.transport.email.MailProperties;
 import org.mule.transport.email.Pop3Connector;
 import org.mule.util.SystemUtils;
 
+import com.icegreen.greenmail.user.GreenMailUser;
 import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.ServerSetup;
 
@@ -56,7 +57,8 @@ public abstract class AbstractEmailFunctionalTestCase extends AbstractServiceAnd
     protected static final String DEFAULT_USER = "bob";
     protected static final String DEFAULT_MESSAGE = "Test email message";
     protected static final String DEFAULT_PASSWORD = "password";
-
+    protected static final String DEFAULT_PROCESSED_MAILBOX = "processed";
+    
     private String protocol;
     private boolean isMimeMessage;
     private int port;    
@@ -256,7 +258,15 @@ public abstract class AbstractEmailFunctionalTestCase extends AbstractServiceAnd
         else
         {
             server = new GreenMail(setup);
-        }                
+        }           
+        
+        server.getManagers().getUserManager().createUser(email, user, password);
+        GreenMailUser gmUser = server.getManagers().getUserManager().getUser(user);
+        assert null != gmUser;
+        server.getManagers().getImapHostManager().createMailbox(
+                server.getManagers().getUserManager().getUser(DEFAULT_USER), 
+                DEFAULT_PROCESSED_MAILBOX);
+        
         server.start();
         if (protocol.startsWith(Pop3Connector.POP3) || protocol.startsWith(ImapConnector.IMAP))
         {

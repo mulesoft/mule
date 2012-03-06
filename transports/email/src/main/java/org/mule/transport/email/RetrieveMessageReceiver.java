@@ -137,38 +137,57 @@ public class RetrieveMessageReceiver extends AbstractPollingMessageReceiver impl
                     {
                         break;
                     }
-                    processedMessages.add(messages[i]);
                     try
                     {
                         if (!messages[i].getFlags().contains(Flags.Flag.DELETED)
                             && !messages[i].getFlags().contains(Flags.Flag.SEEN))
                         {
-                            MimeMessage mimeMessage = new MimeMessage((MimeMessage) messages[i]);
-                            storeMessage(mimeMessage);
-                            message = createMuleMessage(mimeMessage, endpoint.getEncoding());
-    
-                            if (castConnector().isDeleteReadMessages())
+                            try
                             {
-                                // Mark as deleted
-                                messages[i].setFlag(Flags.Flag.DELETED, true);
-                            }
-                            else
-                            {
-                                if (this.getEndpoint().getFilter() != null && this.getEndpoint().getFilter().accept(message))
+                                MimeMessage mimeMessage = new MimeMessage((MimeMessage) messages[i]);
+                                storeMessage(mimeMessage);
+                                message = createMuleMessage(mimeMessage, endpoint.getEncoding());
+
+                                if (castConnector().isDeleteReadMessages())
                                 {
-                                    Flags.Flag flag = castConnector().getDefaultProcessMessageAction();
-                                    if (flag != null)
+                                    if (moveToFolder != null)
                                     {
-                                        messages[i].setFlag(flag, true);
+                                        folder.copyMessages(new Message[]{messages[i]}, moveToFolder);
                                     }
+                                    // Mark as deleted
+                                    messages[i].setFlag(Flags.Flag.DELETED, true);
                                 }
                                 else
                                 {
-                                    messages[i].setFlag(Flags.Flag.SEEN, false);
+                                    if (this.getEndpoint().getFilter() != null && this.getEndpoint().getFilter().accept(message))
+                                    {
+                                        Flags.Flag flag = castConnector().getDefaultProcessMessageAction();
+                                        if (flag != null)
+                                        {
+                                            if(flag == Flags.Flag.DELETED && moveToFolder != null)
+                                            {
+                                                folder.copyMessages(new Message[]{messages[i]}, moveToFolder);
+                                            }
+                                            messages[i].setFlag(flag, true);
+                                        }
+                                    }
+                                    else
+                                    {
+                                        messages[i].setFlag(Flags.Flag.SEEN, true);
+                                        processedMessages.add(messages[i]);
+                                    }
                                 }
+                                routeMessage(message);
                             }
-    
-                            routeMessage(message);
+                            catch (org.mule.api.MessagingException e)
+                            {
+                                //Already handled by TransactionTemplate
+                            }
+                            catch (Exception e)
+                            {
+                                connector.getMuleContext().getExceptionListener().handleException(e);
+                                throw e;
+                            }
                         }
                     }
                     catch (MuleException e)
@@ -190,7 +209,7 @@ public class RetrieveMessageReceiver extends AbstractPollingMessageReceiver impl
                         throw forwarded;
                     }
                 }
-                // Lets move all messages in one go
+                // Copy processed messages that have not been deleted (the deleted were already moved)
                 if (moveToFolder != null)
                 {
                     folder.copyMessages(processedMessages.toArray(new Message[processedMessages.size()]), moveToFolder);

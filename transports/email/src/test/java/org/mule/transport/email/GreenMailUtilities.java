@@ -31,8 +31,8 @@ public class GreenMailUtilities
     protected static Log logger = LogFactory.getLog(GreenMailUtilities.class);
 
     public static void storeEmail(UserManager userManager, String email, String user, String password,
-                                  MimeMessage message)
-            throws Exception
+            MimeMessage message)
+    throws Exception
     {
         // note that with greenmail 1.1 the Servers object is unreliable
         // and the approach taken in their examples will not work.
@@ -40,8 +40,12 @@ public class GreenMailUtilities
         // (there is some confusion in the greenmail code about
         // whether users are identified by email or name alone)
         // in which case try retrieving by EMAIL rather than USER
-        userManager.createUser(email, user, password);
         GreenMailUser gmUser = userManager.getUser(user);
+        
+        if(gmUser == null || gmUser.getEmail() != email || gmUser.getPassword() != password){
+            userManager.createUser(email, user, password);
+            gmUser = userManager.getUser(user);
+        }
         assert null != gmUser;
         gmUser.deliver(message);
     }
