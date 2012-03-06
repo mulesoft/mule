@@ -93,7 +93,7 @@ public abstract class AbstractELTestCase extends AbstractMuleContextTestCase
     @Parameters
     public static List<Object[]> parameters()
     {
-        return Arrays.asList(new Object[][]{{Variant.EVALUATOR_LANGUAGE}});
+        return Arrays.asList(new Object[][]{{Variant.EVALUATOR_LANGUAGE}, {Variant.EXPRESSION_MANAGER}});
     }
 
     protected ExpressionLanguage getExpressionLanguage()

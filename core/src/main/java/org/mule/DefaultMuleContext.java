@@ -183,6 +183,11 @@ public class DefaultMuleContext implements MuleContext
 
         try
         {
+            if (expressionManager instanceof Initialisable)
+            {
+                ((Initialisable) expressionManager).initialise();
+            }
+            
             // Initialize the helper, this only initialises the helper class and does not call the registry lifecycle manager
             //The registry lifecycle is called below using 'getLifecycleManager().fireLifecycle(Initialisable.PHASE_NAME);'
             muleRegistryHelper.initialise();
@@ -283,6 +288,11 @@ public class DefaultMuleContext implements MuleContext
 
         notificationManager.dispose();
         workManager.dispose();
+        
+        if (expressionManager instanceof Disposable)
+        {
+            ((Disposable) expressionManager).dispose();
+        }
 
         if ((getStartDate() > 0) && logger.isInfoEnabled())
         {

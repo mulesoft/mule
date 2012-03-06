@@ -15,6 +15,7 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.el.ExpressionLanguage;
 import org.mule.api.expression.ExpressionRuntimeException;
+import org.mule.api.expression.InvalidExpressionException;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
@@ -83,7 +84,10 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
     {
         VariableResolverFactoryChainBuilder builder = new VariableResolverFactoryChainBuilder(
             appVariableResolverFactory);
-        builder.add(new CachedMapVariableResolverFactory(vars));
+        if (vars != null)
+        {
+            builder.add(new CachedMapVariableResolverFactory(vars));
+        }
         return (T) interalExecuteExpression(expression, builder.build());
     }
 
@@ -100,7 +104,10 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
     {
         VariableResolverFactoryChainBuilder builder = new VariableResolverFactoryChainBuilder(
             appVariableResolverFactory);
-        builder.add(new CachedMapVariableResolverFactory(vars));
+        if (vars != null)
+        {
+            builder.add(new CachedMapVariableResolverFactory(vars));
+        }
         return (T) interalExecuteExpression(expression, builder.build());
     }
 
@@ -109,6 +116,19 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
     public <T> T evaluate(String expression, MuleMessage message)
     {
         return (T) interalExecuteExpression(expression, appVariableResolverFactory);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public <T> T evaluate(String expression, MuleMessage message, Map<String, Object> vars)
+    {
+        VariableResolverFactoryChainBuilder builder = new VariableResolverFactoryChainBuilder(
+            appVariableResolverFactory);
+        if (vars != null)
+        {
+            builder.add(new CachedMapVariableResolverFactory(vars));
+        }
+        return (T) interalExecuteExpression(expression, builder.build());
     }
 
     @SuppressWarnings("unchecked")
@@ -131,12 +151,25 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
     {
         try
         {
-            getCompiledExpression(expression);
+            validate(expression);
             return true;
+        }
+        catch (InvalidExpressionException e)
+        {
+            return false;
+        }
+    }
+
+    @Override
+    public void validate(String expression) throws InvalidExpressionException
+    {
+        try
+        {
+            getCompiledExpression(expression);
         }
         catch (CompileException e)
         {
-            return false;
+            throw new InvalidExpressionException(expression, e.getMessage());
         }
     }
 

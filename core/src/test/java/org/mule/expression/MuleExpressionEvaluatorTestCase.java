@@ -9,6 +9,13 @@
  */
 package org.mule.expression;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import org.mule.DefaultMuleMessage;
 import org.mule.RequestContext;
 import org.mule.api.MuleEvent;
@@ -34,13 +41,6 @@ import java.util.Map;
 import javax.activation.DataHandler;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 public class MuleExpressionEvaluatorTestCase extends AbstractMuleContextTestCase
 {
@@ -890,7 +890,7 @@ public class MuleExpressionEvaluatorTestCase extends AbstractMuleContextTestCase
         assertNotNull(result);
         assertEquals("test", result);
 
-        result = muleContext.getExpressionManager().evaluate("#[mule:message.payload]", null);
+        result = muleContext.getExpressionManager().evaluate("#[mule:message.payload]", (MuleMessage) null);
         assertNull(result);
     }
 

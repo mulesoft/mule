@@ -7,9 +7,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.expression;
 
 import org.mule.api.MuleContext;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.expression.ExpressionEnricher;
@@ -19,10 +21,15 @@ import org.mule.api.expression.ExpressionRuntimeException;
 import org.mule.api.expression.InvalidExpressionException;
 import org.mule.api.expression.RequiredValueException;
 import org.mule.api.lifecycle.Disposable;
+import org.mule.api.lifecycle.Initialisable;
+import org.mule.api.lifecycle.InitialisationException;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.el.mvel.MVELExpressionLanguage;
+import org.mule.util.StringUtils;
 import org.mule.util.TemplateParser;
 
 import java.text.MessageFormat;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -32,18 +39,21 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * Provides universal access for evaluating expressions embedded in Mule configurations, such  as Xml, Java,
+ * Provides universal access for evaluating expressions embedded in Mule configurations, such as Xml, Java,
  * scripting and annotations.
  * <p/>
  * Users can register or unregister {@link ExpressionEvaluator} through this interface.
  */
-public class DefaultExpressionManager implements ExpressionManager, MuleContextAware
+public class DefaultExpressionManager
+    implements ExpressionManager, MuleContextAware, Initialisable, Disposable
 {
 
     /**
      * logger used by this class
      */
     protected static transient final Log logger = LogFactory.getLog(DefaultExpressionManager.class);
+
+    private static final String OBJECT_FOR_ENRICHMENT = "__object_for_enrichment";
 
     // default style parser
     private TemplateParser parser = TemplateParser.createMuleStyleParser();
@@ -52,6 +62,8 @@ public class DefaultExpressionManager implements ExpressionManager, MuleContextA
     private ConcurrentMap enrichers = new ConcurrentHashMap(8);
 
     private MuleContext muleContext;
+
+    private MVELExpressionLanguage expressionLanguage;
 
     public void setMuleContext(MuleContext context)
     {
@@ -69,7 +81,8 @@ public class DefaultExpressionManager implements ExpressionManager, MuleContextA
         // TODO MULE-3809 Eliminate duplicate evaluators registration
         if (logger.isDebugEnabled())
         {
-            logger.debug("Evaluators already contain an object named '" + name + "'.  The previous object will be overwritten.");
+            logger.debug("Evaluators already contain an object named '" + name
+                         + "'.  The previous object will be overwritten.");
         }
         evaluators.put(evaluator.getName(), evaluator);
     }
@@ -85,14 +98,15 @@ public class DefaultExpressionManager implements ExpressionManager, MuleContextA
         // TODO MULE-3809 Eliminate duplicate evaluators registration
         if (logger.isDebugEnabled())
         {
-            logger.debug("Enrichers already contain an object named '" + name + "'.  The previous object will be overwritten.");
+            logger.debug("Enrichers already contain an object named '" + name
+                         + "'.  The previous object will be overwritten.");
         }
         enrichers.put(enricher.getName(), enricher);
     }
 
     /**
      * Checks whether an evaluator is registered with the manager
-     *
+     * 
      * @param name the name of the expression evaluator
      * @return true if the evaluator is registered with the manager, false otherwise
      */
@@ -100,10 +114,10 @@ public class DefaultExpressionManager implements ExpressionManager, MuleContextA
     {
         return evaluators.containsKey(name);
     }
-    
+
     /**
      * Checks whether an enricher is registered with the manager
-     *
+     * 
      * @param name the name of the expression enricher
      * @return true if the enricher is registered with the manager, false otherwise
      */
@@ -111,10 +125,10 @@ public class DefaultExpressionManager implements ExpressionManager, MuleContextA
     {
         return enrichers.containsKey(name);
     }
-    
+
     /**
      * Removes the evaluator with the given name
-     *
+     * 
      * @param name the name of the evaluator to remove
      */
     public ExpressionEvaluator unregisterEvaluator(String name)
@@ -131,10 +145,10 @@ public class DefaultExpressionManager implements ExpressionManager, MuleContextA
         }
         return evaluator;
     }
-    
+
     /**
      * Removes the evaluator with the given name
-     *
+     * 
      * @param name the name of the evaluator to remove
      */
     public ExpressionEnricher unregisterEnricher(String name)
@@ -153,88 +167,103 @@ public class DefaultExpressionManager implements ExpressionManager, MuleContextA
     }
 
     /**
-     * Evaluates the given expression.  The expression should be a single expression definition with or without
-     * enclosing braces. i.e. "context:serviceName" and "#[context:serviceName]" are both valid. For situations where
-     * one or more expressions need to be parsed within a single text, the {@link org.mule.api.expression.ExpressionManager#parse(String,org.mule.api.MuleMessage,boolean)}
-     * method should be used since it will iterate through all expressions in a string.
-     *
+     * Evaluates the given expression. The expression should be a single expression definition with or without
+     * enclosing braces. i.e. "context:serviceName" and "#[context:serviceName]" are both valid. For
+     * situations where one or more expressions need to be parsed within a single text, the
+     * {@link org.mule.api.expression.ExpressionManager#parse(String,org.mule.api.MuleMessage,boolean)} method
+     * should be used since it will iterate through all expressions in a string.
+     * 
      * @param expression a single expression i.e. xpath://foo
-     * @param message    the current message to process.  The expression will evaluata on the message.
-     * @return the result of the evaluation. Expressions that return collection will return an empty collection, not null.
-     * @throws ExpressionRuntimeException if the expression is invalid, or a null is found for the expression and
-     *                                    'failIfNull is set to true.
+     * @param message the current message to process. The expression will evaluata on the message.
+     * @return the result of the evaluation. Expressions that return collection will return an empty
+     *         collection, not null.
+     * @throws ExpressionRuntimeException if the expression is invalid, or a null is found for the expression
+     *             and 'failIfNull is set to true.
      */
     public Object evaluate(String expression, MuleMessage message) throws ExpressionRuntimeException
     {
         return evaluate(expression, message, false);
     }
 
-    /**
-     * Evaluates the given expression.  The expression should be a single expression definition with or without
-     * enclosing braces. i.e. "context:serviceName" and "#[context:serviceName]" are both valid. For situations where
-     * one or more expressions need to be parsed within a single text, the {@link org.mule.api.expression.ExpressionManager#parse(String,org.mule.api.MuleMessage,boolean)}
-     * method should be used since it will iterate through all expressions in a string.
-     *
-     * @param expression a single expression i.e. xpath://foo
-     * @param message    the current message to process.  The expression will evaluata on the message.
-     * @param failIfNull determines if an exception should be thrown if expression could not be evaluated or returns
-     *                   null.
-     * @return the result of the evaluation.  Expressions that return collection will return an empty collection, not null.
-     * @throws ExpressionRuntimeException if the expression is invalid, or a null is found for the expression and
-     *                                    'failIfNull is set to true.
-     */
-    public Object evaluate(String expression, MuleMessage message, boolean failIfNull) throws ExpressionRuntimeException
+    public Object evaluate(String expression, MuleEvent event) throws ExpressionRuntimeException
     {
-        String name;
+        return evaluate(expression, event, false);
+    }
 
-        if (expression == null)
+    /**
+     * Evaluates the given expression. The expression should be a single expression definition with or without
+     * enclosing braces. i.e. "context:serviceName" and "#[context:serviceName]" are both valid. For
+     * situations where one or more expressions need to be parsed within a single text, the
+     * {@link org.mule.api.expression.ExpressionManager#parse(String,org.mule.api.MuleMessage,boolean)} method
+     * should be used since it will iterate through all expressions in a string.
+     * 
+     * @param expression a single expression i.e. xpath://foo
+     * @param message the current message to process. The expression will evaluata on the message.
+     * @param failIfNull determines if an exception should be thrown if expression could not be evaluated or
+     *            returns null.
+     * @return the result of the evaluation. Expressions that return collection will return an empty
+     *         collection, not null.
+     * @throws ExpressionRuntimeException if the expression is invalid, or a null is found for the expression
+     *             and 'failIfNull is set to true.
+     */
+    public Object evaluate(String expression, MuleEvent event, boolean failIfNull)
+        throws ExpressionRuntimeException
+    {
+        expression = preProcessExpression(expression);
+        if (isEvaluatorExpression(expression))
         {
-            throw new IllegalArgumentException(CoreMessages.objectIsNull("expression").getMessage());
-        }
-        if (expression.startsWith(DEFAULT_EXPRESSION_PREFIX))
-        {
-            expression = expression.substring(2, expression.length() - 1);
-        }
-        int i = expression.indexOf(":");
-        if (i > -1)
-        {
-            name = expression.substring(0, i);
-            expression = expression.substring(i + DEFAULT_EXPRESSION_POSTFIX.length());
+            return evaluate(expression, event.getMessage(), failIfNull);
         }
         else
         {
-            name = expression;
-            expression = null;
+            return expressionLanguage.evaluate(expression, event);
         }
-        return evaluate(expression, name, message, failIfNull);
     }
 
+    public Object evaluate(String expression, MuleMessage message, boolean failIfNull)
+    {
+        expression = preProcessExpression(expression);
+        if (isEvaluatorExpression(expression))
+        {
+            String[] parts = expression.split(":", 2);
+            return evaluate(parts[1], parts[0], message, failIfNull);
+        }
+        else
+        {
+            return expressionLanguage.evaluate(expression, message);
+        }
+    }
 
     public void enrich(String expression, MuleMessage message, Object object)
         throws ExpressionRuntimeException
     {
-        String enricherName;
-
-        if (expression == null)
+        expression = preProcessExpression(expression);
+        if (isEvaluatorExpression(expression))
         {
-            throw new IllegalArgumentException(CoreMessages.objectIsNull("expression").getMessage());
-        }
-        if (expression.startsWith(DEFAULT_EXPRESSION_PREFIX))
-        {
-            expression = expression.substring(2, expression.length() - 1);
-        }
-        int i = expression.indexOf(":");
-        if (i > -1)
-        {
-            enricherName = expression.substring(0, i);
-            expression = expression.substring(i + DEFAULT_EXPRESSION_POSTFIX.length());
+            String[] parts = expression.split(":", 2);
+            enrich(parts[1], parts[0], message, object);
         }
         else
         {
-            enricherName = expression;
-            expression = null;
+            expressionLanguage.evaluate(createEnrichmentExpression(expression), message,
+                Collections.singletonMap(OBJECT_FOR_ENRICHMENT, object));
         }
-        enrich(expression, enricherName, message, object);
+    }
+
+    @Override
+    public void enrich(String expression, MuleEvent event, Object object)
+    {
+        expression = preProcessExpression(expression);
+        if (isEvaluatorExpression(expression))
+        {
+            enrich(expression, event.getMessage(), object);
+        }
+        else
+        {
+            expression = createEnrichmentExpression(expression);
+            expressionLanguage.evaluate(expression, event,
+                Collections.singletonMap(OBJECT_FOR_ENRICHMENT, object));
+        }
     }
 
     public void enrich(String expression, String enricherName, MuleMessage message, Object object)
@@ -249,36 +278,42 @@ public class DefaultExpressionManager implements ExpressionManager, MuleContextA
     }
 
     /**
-     * Evaluates the given expression.  The expression should be a single expression definition with or without
-     * enclosing braces. i.e. "context:serviceName" and "#[context:serviceName]" are both valid. For situations where
-     * one or more expressions need to be parsed within a single text, the {@link org.mule.api.expression.ExpressionManager#parse(String,org.mule.api.MuleMessage,boolean)}
-     * method should be used since it will iterate through all expressions in a string.
-     *
+     * Evaluates the given expression. The expression should be a single expression definition with or without
+     * enclosing braces. i.e. "context:serviceName" and "#[context:serviceName]" are both valid. For
+     * situations where one or more expressions need to be parsed within a single text, the
+     * {@link org.mule.api.expression.ExpressionManager#parse(String,org.mule.api.MuleMessage,boolean)} method
+     * should be used since it will iterate through all expressions in a string.
+     * 
      * @param expression a single expression i.e. xpath://foo
-     * @param evaluator  the evaluator to use when executing the expression
-     * @param message    the current message to process.  The expression will evaluata on the message.
-     * @param failIfNull determines if an exception should be thrown if expression could not be evaluated or returns
-     *                   null or if an exception should be thrown if an empty collection is returned.
-     * @return the result of the evaluation. Expressions that return collection will return an empty collection, not null.
-     * @throws ExpressionRuntimeException if the expression is invalid, or a null is found for the expression and
-     *                                    'failIfNull is set to true.
+     * @param evaluator the evaluator to use when executing the expression
+     * @param message the current message to process. The expression will evaluata on the message.
+     * @param failIfNull determines if an exception should be thrown if expression could not be evaluated or
+     *            returns null or if an exception should be thrown if an empty collection is returned.
+     * @return the result of the evaluation. Expressions that return collection will return an empty
+     *         collection, not null.
+     * @throws ExpressionRuntimeException if the expression is invalid, or a null is found for the expression
+     *             and 'failIfNull is set to true.
      */
-    public Object evaluate(String expression, String evaluator, MuleMessage message, boolean failIfNull) throws ExpressionRuntimeException
+    public Object evaluate(String expression, String evaluator, MuleMessage message, boolean failIfNull)
+        throws ExpressionRuntimeException
     {
         ExpressionEvaluator extractor = (ExpressionEvaluator) evaluators.get(evaluator);
         if (extractor == null)
         {
-            throw new IllegalArgumentException(CoreMessages.expressionEvaluatorNotRegistered(evaluator).getMessage());
+            throw new IllegalArgumentException(CoreMessages.expressionEvaluatorNotRegistered(evaluator)
+                .getMessage());
         }
         Object result = extractor.evaluate(expression, message);
-        //TODO Handle empty collections || (result instanceof Collection && ((Collection)result).size()==0)
+        // TODO Handle empty collections || (result instanceof Collection && ((Collection)result).size()==0)
         if (failIfNull && (result == null))
         {
-            throw new RequiredValueException(CoreMessages.expressionEvaluatorReturnedNull(evaluator, expression));
+            throw new RequiredValueException(CoreMessages.expressionEvaluatorReturnedNull(evaluator,
+                expression));
         }
         if (logger.isDebugEnabled())
         {
-            logger.debug(MessageFormat.format("Result of expression: {0}:{1} is: {2}", evaluator, expression, result));
+            logger.debug(MessageFormat.format("Result of expression: {0}:{1} is: {2}", evaluator, expression,
+                result));
         }
         return result;
     }
@@ -327,6 +362,16 @@ public class DefaultExpressionManager implements ExpressionManager, MuleContextA
         }
     }
 
+    @Override
+    public boolean evaluateBoolean(String expression,
+                                   MuleEvent event,
+                                   boolean nullReturnsTrue,
+                                   boolean nonBooleanReturnsTrue) throws ExpressionRuntimeException
+    {
+        return resolveBoolean(evaluate(expression, event, false), nullReturnsTrue, nonBooleanReturnsTrue,
+            expression);
+    }
+
     protected boolean resolveBoolean(Object result,
                                      boolean nullReturnsTrue,
                                      boolean nonBooleanReturnsTrue,
@@ -364,39 +409,71 @@ public class DefaultExpressionManager implements ExpressionManager, MuleContextA
     }
 
     /**
-     * Evaluates expressions in a given string. This method will iterate through each expression and evaluate it. If
-     * a user needs to evaluate a single expression they can use {@link org.mule.api.expression.ExpressionManager#evaluate(String,org.mule.api.MuleMessage,boolean)}.
-     *
+     * Evaluates expressions in a given string. This method will iterate through each expression and evaluate
+     * it. If a user needs to evaluate a single expression they can use
+     * {@link org.mule.api.expression.ExpressionManager#evaluate(String,org.mule.api.MuleMessage,boolean)}.
+     * 
      * @param expression a single expression i.e. xpath://foo
-     * @param message    the current message to process.  The expression will evaluata on the message.
-     * @return the result of the evaluation. Expressions that return collection will return an empty collection, not null.
-     * @throws org.mule.api.expression.ExpressionRuntimeException
-     *          if the expression is invalid, or a null is found for the expression and
-     *          'failIfNull is set to true.
+     * @param message the current message to process. The expression will evaluata on the message.
+     * @return the result of the evaluation. Expressions that return collection will return an empty
+     *         collection, not null.
+     * @throws org.mule.api.expression.ExpressionRuntimeException if the expression is invalid, or a null is
+     *             found for the expression and 'failIfNull is set to true.
      */
     public String parse(String expression, MuleMessage message) throws ExpressionRuntimeException
     {
         return parse(expression, message, false);
     }
 
+    @Override
+    public String parse(String expression, MuleEvent event) throws ExpressionRuntimeException
+    {
+        return parse(expression, event, false);
+    }
+
     /**
-     * Evaluates expressions in a given string. This method will iterate through each expression and evaluate it. If
-     * a user needs to evaluate a single expression they can use {@link org.mule.api.expression.ExpressionManager#evaluate(String,org.mule.api.MuleMessage,boolean)}.
-     *
+     * Evaluates expressions in a given string. This method will iterate through each expression and evaluate
+     * it. If a user needs to evaluate a single expression they can use
+     * {@link org.mule.api.expression.ExpressionManager#evaluate(String,org.mule.api.MuleMessage,boolean)}.
+     * 
      * @param expression a single expression i.e. xpath://foo
-     * @param message    the current message to process.  The expression will evaluata on the message.
-     * @param failIfNull determines if an exception should be thrown if expression could not be evaluated or returns null.
-     * @return the result of the evaluation. Expressions that return collection will return an empty collection, not null.
-     * @throws ExpressionRuntimeException if the expression is invalid, or a null is found for the expression and
-     *                                    'failIfNull is set to true.
+     * @param message the current message to process. The expression will evaluata on the message.
+     * @param failIfNull determines if an exception should be thrown if expression could not be evaluated or
+     *            returns null.
+     * @return the result of the evaluation. Expressions that return collection will return an empty
+     *         collection, not null.
+     * @throws ExpressionRuntimeException if the expression is invalid, or a null is found for the expression
+     *             and 'failIfNull is set to true.
      */
-    public String parse(final String expression, final MuleMessage message, final boolean failIfNull) throws ExpressionRuntimeException
+    public String parse(final String expression, final MuleMessage message, final boolean failIfNull)
+        throws ExpressionRuntimeException
     {
         return parser.parse(new TemplateParser.TemplateCallback()
         {
             public Object match(String token)
             {
                 Object result = evaluate(token, message, failIfNull);
+                if (result instanceof MuleMessage)
+                {
+                    return ((MuleMessage) result).getPayload();
+                }
+                else
+                {
+                    return result;
+                }
+            }
+        }, expression);
+    }
+
+    @Override
+    public String parse(String expression, final MuleEvent event, final boolean failIfNull)
+        throws ExpressionRuntimeException
+    {
+        return parser.parse(new TemplateParser.TemplateCallback()
+        {
+            public Object match(String token)
+            {
+                Object result = evaluate(token, event, failIfNull);
                 if (result instanceof MuleMessage)
                 {
                     return ((MuleMessage) result).getPayload();
@@ -424,7 +501,7 @@ public class DefaultExpressionManager implements ExpressionManager, MuleContextA
         }
         evaluators.clear();
     }
-    
+
     public void clearEnrichers()
     {
         for (Iterator iterator = enrichers.values().iterator(); iterator.hasNext();)
@@ -444,9 +521,9 @@ public class DefaultExpressionManager implements ExpressionManager, MuleContextA
     }
 
     /**
-     * Determines if the expression is valid or not.  This method will validate a single expression or
-     * expressions embedded in a string.  the expression must be well formed i.e. #[bean:user]
-     *
+     * Determines if the expression is valid or not. This method will validate a single expression or
+     * expressions embedded in a string. the expression must be well formed i.e. #[bean:user]
+     * 
      * @param expression the expression to validate
      * @return true if the expression evaluator is recognised
      */
@@ -468,7 +545,8 @@ public class DefaultExpressionManager implements ExpressionManager, MuleContextA
     {
         if (!muleContext.getConfiguration().isValidateExpressions())
         {
-            if (logger.isDebugEnabled()) {
+            if (logger.isDebugEnabled())
+            {
                 logger.debug("Validate expressions is turned off, no checking done for: " + expression);
             }
             return;
@@ -490,13 +568,20 @@ public class DefaultExpressionManager implements ExpressionManager, MuleContextA
             public Object match(String token)
             {
                 match.set(true);
-                if (token.indexOf(":") == -1)
+                if (!isEvaluatorExpression(token))
                 {
                     if (valid.get())
                     {
-                        valid.compareAndSet(true, false);
+                        try
+                        {
+                            expressionLanguage.validate(token);
+                        }
+                        catch (InvalidExpressionException e)
+                        {
+                            valid.compareAndSet(true, false);
+                            message.append(token).append(" is invalid\n");
+                        }
                     }
-                    message.append(token).append(" is invalid\n");
                 }
                 return null;
             }
@@ -506,10 +591,82 @@ public class DefaultExpressionManager implements ExpressionManager, MuleContextA
         {
             throw new InvalidExpressionException(expression, message.toString());
         }
-        else if(!match.get())
+        else if (!match.get())
         {
-            throw new InvalidExpressionException(expression, "Expression string is not an expression.  Use isExpression(String) to validate first");
+            throw new InvalidExpressionException(expression,
+                "Expression string is not an expression.  Use isExpression(String) to validate first");
         }
+    }
+
+    @Override
+    public void dispose()
+    {
+        expressionLanguage.dispose();
+    }
+
+    @Override
+    public void initialise() throws InitialisationException
+    {
+        expressionLanguage = new MVELExpressionLanguage(muleContext);
+        expressionLanguage.initialise();
+    }
+
+    @Override
+    public boolean evaluateBoolean(String expression, MuleEvent event) throws ExpressionRuntimeException
+    {
+        return evaluateBoolean(expression, event, false, false);
+    }
+
+    protected String preProcessExpression(String expression)
+    {
+        if (expression == null)
+        {
+            throw new IllegalArgumentException(CoreMessages.objectIsNull("expression").getMessage());
+        }
+        if (expression.startsWith(DEFAULT_EXPRESSION_PREFIX))
+        {
+            expression = expression.substring(2, expression.length() - 1);
+        }
+        return expression;
+    }
+
+    protected boolean isEvaluatorExpression(String expression)
+    {
+        int colonIndex = expression.indexOf(":");
+        if (colonIndex < 0)
+        {
+            return false;
+        }
+        else
+        {
+            return evaluators.containsKey(expression.substring(0, colonIndex));
+        }
+    }
+
+    protected boolean isEnricherExpression(String expression)
+    {
+        int colonIndex = expression.indexOf(":");
+        if (colonIndex < 0)
+        {
+            return false;
+        }
+        else
+        {
+            return enrichers.containsKey(expression.substring(0, colonIndex));
+        }
+    }
+
+    protected String createEnrichmentExpression(String expression)
+    {
+        if (expression.contains("$"))
+        {
+            expression = StringUtils.replace(expression, "$", OBJECT_FOR_ENRICHMENT);
+        }
+        else
+        {
+            expression = expression + "=" + OBJECT_FOR_ENRICHMENT;
+        }
+        return expression;
     }
 
 }

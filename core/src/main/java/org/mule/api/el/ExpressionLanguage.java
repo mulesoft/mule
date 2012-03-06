@@ -13,6 +13,7 @@ package org.mule.api.el;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.expression.ExpressionRuntimeException;
+import org.mule.api.expression.InvalidExpressionException;
 
 import java.util.Map;
 
@@ -79,13 +80,22 @@ public interface ExpressionLanguage
     <T> T evaluate(String expression, MuleEvent event, Map<String, Object> vars);
 
     /**
-     * Validates the expression. All implementors should should validate expression syntactically. Semantic
-     * validation is optional.
+     * Validates the expression returning true is the expression is valid, false otherwise.. All implementors
+     * should should validate expression syntactically. Semantic validation is optional.
      * 
      * @param expression
      * @return
      */
     boolean isValid(String expression);
+
+    /**
+     * Validates the expression returning. An {@link ExpressionInvalidException} will be thrown is the All
+     * implementors should should validate expression syntactically. Semantic validation is optional.
+     * 
+     * @param expression
+     * @return
+     */
+    void validate(String expression) throws InvalidExpressionException;
 
     /**
      * Required to provide gradual migration to use of MuleEvent signatures
@@ -94,5 +104,13 @@ public interface ExpressionLanguage
      */
     @Deprecated
     <T> T evaluate(String expression, MuleMessage message);
+
+    /**
+     * Required to provide gradual migration to use of MuleEvent signatures
+     * 
+     * @see ExpressionLanguage#evaluate(String, MuleEvent)
+     */
+    @Deprecated
+    <T> T evaluate(String expression, MuleMessage message, Map<String, Object> vars);
 
 }

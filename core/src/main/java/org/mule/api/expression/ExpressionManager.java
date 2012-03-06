@@ -9,6 +9,7 @@
  */
 package org.mule.api.expression;
 
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 
 /**
@@ -70,7 +71,10 @@ public interface ExpressionManager
      * @throws ExpressionRuntimeException if the expression is invalid, or a null is found for the expression and
      *                                    'failIfNull is set to true.
      */
+    @Deprecated
     public Object evaluate(String expression, MuleMessage message) throws ExpressionRuntimeException;
+
+    public Object evaluate(String expression, MuleEvent event) throws ExpressionRuntimeException;
 
     /**
      * Evaluates the given expression.  The expression should be a single expression definition with or without
@@ -86,7 +90,12 @@ public interface ExpressionManager
      * @throws ExpressionRuntimeException if the expression is invalid, or a null is found for the expression and
      *                                    'failIfNull is set to true.
      */
-    public Object evaluate(String expression, MuleMessage message, boolean failIfNull) throws ExpressionRuntimeException;
+    @Deprecated
+    public Object evaluate(String expression, MuleMessage message, boolean failIfNull)
+        throws ExpressionRuntimeException;
+
+    public Object evaluate(String expression, MuleEvent event, boolean failIfNull)
+        throws ExpressionRuntimeException;
 
     /**
      * Evaluates the given expression.  The expression should be a single expression definition with or without
@@ -103,7 +112,8 @@ public interface ExpressionManager
      * @throws ExpressionRuntimeException if the expression is invalid, or a null is found for the expression and
      *                                    'failIfNull is set to true.
      */
-    public Object evaluate(String expression, String evaluator, MuleMessage message, boolean failIfNull) throws ExpressionRuntimeException;
+    public Object evaluate(String expression, String evaluator, MuleMessage message, boolean failIfNull)
+        throws ExpressionRuntimeException;
 
     /**
      * Evaluates the given expression resolving the result of the evaluation to a
@@ -115,7 +125,8 @@ public interface ExpressionManager
      * @param evaluator the evaluator to use when executing the expression
      * @param message The current message being processed
      */
-    public boolean evaluateBoolean(String expression, String evaluator, MuleMessage message) throws ExpressionRuntimeException;
+    public boolean evaluateBoolean(String expression, String evaluator, MuleMessage message)
+        throws ExpressionRuntimeException;
 
     /**
      * Evaluates the given expression resolving the result of the evaluation to a
@@ -126,8 +137,11 @@ public interface ExpressionManager
      * @param expression a single expression i.e. header:foo=bar
      * @param message The current message being processed
      */
+    @Deprecated
     public boolean evaluateBoolean(String expression, MuleMessage message) throws ExpressionRuntimeException;
 
+    public boolean evaluateBoolean(String expression, MuleEvent event) throws ExpressionRuntimeException;
+
     /**
      * Evaluates the given expression resolving the result of the evaluation to a
      * boolean. The expression should be a single expression definition with or
@@ -142,7 +156,11 @@ public interface ExpressionManager
      * @param nonBooleanReturnsTrue determines if true should returned if the result
      *            is not null but isn't recognised as a boolean
      */
-    public boolean evaluateBoolean(String expression, String evaluator, MuleMessage message, boolean nullReturnsTrue, boolean nonBooleanReturnsTrue) throws ExpressionRuntimeException;
+    public boolean evaluateBoolean(String expression,
+                                   String evaluator,
+                                   MuleMessage message,
+                                   boolean nullReturnsTrue,
+                                   boolean nonBooleanReturnsTrue) throws ExpressionRuntimeException;
 
     /**
      * Evaluates the given expression resolving the result of the evaluation to a
@@ -157,7 +175,16 @@ public interface ExpressionManager
      * @param nonBooleanReturnsTrue determines if true should returned if the result
      *            is not null but isn't recognised as a boolean
      */
-    public boolean evaluateBoolean(String expression, MuleMessage message, boolean nullReturnsTrue, boolean nonBooleanReturnsTrue) throws ExpressionRuntimeException;
+    @Deprecated
+    public boolean evaluateBoolean(String expression,
+                                   MuleMessage message,
+                                   boolean nullReturnsTrue,
+                                   boolean nonBooleanReturnsTrue) throws ExpressionRuntimeException;
+
+    public boolean evaluateBoolean(String expression,
+                                   MuleEvent event,
+                                   boolean nullReturnsTrue,
+                                   boolean nonBooleanReturnsTrue) throws ExpressionRuntimeException;
 
     /**
      * Enriches the current message using
@@ -166,6 +193,9 @@ public interface ExpressionManager
      * @param object The object that will be used to enrich the message
      */
     public void enrich(String expression, MuleMessage message, Object object);
+
+    @Deprecated
+    public void enrich(String expression, MuleEvent message, Object object);
 
     /**
      * Enriches the current message
@@ -187,7 +217,10 @@ public interface ExpressionManager
      *          if the expression is invalid, or a null is found for the expression and
      *          'failIfNull is set to true.
      */
+    @Deprecated
     public String parse(String expression, MuleMessage message) throws ExpressionRuntimeException;
+
+    public String parse(String expression, MuleEvent event) throws ExpressionRuntimeException;
 
     /**
      * Evaluates expressions in a given string. This method will iterate through each expression and evaluate it. If
@@ -201,7 +234,12 @@ public interface ExpressionManager
      * @throws ExpressionRuntimeException if the expression is invalid, or a null is found for the expression and
      *                                    'failIfNull is set to true.
      */
-    public String parse(final String expression, final MuleMessage message, final boolean failIfNull) throws ExpressionRuntimeException;
+    @Deprecated
+    public String parse(final String expression, final MuleMessage message, final boolean failIfNull)
+        throws ExpressionRuntimeException;
+
+    public String parse(final String expression, final MuleEvent event, final boolean failIfNull)
+        throws ExpressionRuntimeException;
 
     /**
      * Clears all registered evaluators from the manager.
@@ -214,32 +252,34 @@ public interface ExpressionManager
     public void clearEnrichers();
 
     /**
-     * Determines if the expression is valid or not.  This method will validate a single expression or
-     * expressions embedded in a string.  the expression must be well formed i.e. #[bean:user]
-     *
+     * Determines if the expression is valid or not. This method will validate a single expression or
+     * expressions embedded in a string. The expression must either be a well formed expression evaluator i.e.
+     * #[bean:user] or must be a valid expression language expression.
+     * 
      * @param expression the expression to validate
      * @return true if the expression evaluator is recognised
      */
     public boolean isValidExpression(String expression);
 
     /**
-     * Determines if the expression is valid or not.  This method will validate a single expression or
-     * expressions embedded in a string.  the expression must be well formed i.e. #[bean:user]
-     *
+     * Determines if the expression is valid or not. This method will validate a single expression or
+     * expressions embedded in a string. The expression must either be a well formed expression evaluator i.e.
+     * #[bean:user] or must be a valid expression language expression.
+     * 
      * @param expression the expression to validate
-     * @throws InvalidExpressionException if the expression is invalid, including information about the position and fault
-     *
+     * @throws InvalidExpressionException if the expression is invalid, including information about the
+     *             position and fault
      * @since 3.0
      */
     public void validateExpression(String expression) throws InvalidExpressionException;
 
     /**
-     * Determines if the string is an expression.  This method will validate that the string contains either the expression
-     * prefix (malformed) or a full expression.  This isn't full proof but catches most error cases
-     *
+     * Determines if the string is an expression. This method will validate that the string contains either
+     * the expression prefix (malformed) or a full expression. This isn't full proof but catches most error
+     * cases
+     * 
      * @param string is this string an expression string
      * @return true if the string contains an expression
-     *
      * @since 3.0
      */
     public boolean isExpression(String string);

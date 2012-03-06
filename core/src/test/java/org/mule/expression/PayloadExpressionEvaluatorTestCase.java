@@ -9,6 +9,12 @@
  */
 package org.mule.expression;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -21,12 +27,6 @@ import org.mule.tck.testmodels.fruit.FruitBowlToFruitBasket;
 import java.io.ByteArrayInputStream;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 
 public class PayloadExpressionEvaluatorTestCase extends AbstractMuleContextTestCase
 {
@@ -63,7 +63,7 @@ public class PayloadExpressionEvaluatorTestCase extends AbstractMuleContextTestC
         assertNotNull(result);
         assertEquals("test", result);
 
-        result = muleContext.getExpressionManager().evaluate("#[payload:]", null);
+        result = muleContext.getExpressionManager().evaluate("#[payload:]", (MuleMessage) null);
         assertNull(result);
     }
 
