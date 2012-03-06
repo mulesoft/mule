@@ -16,6 +16,7 @@ import static org.junit.Assert.assertNotNull;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
+import org.mule.api.config.MuleProperties;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
@@ -41,6 +42,7 @@ public class ValidatorTestCase extends FunctionalTestCase
     {
         super.doSetUp();
         muleClient = new MuleClient(muleContext);
+        muleContext.getRegistry().registerObject(MuleProperties.TRANSFORMATION_ENFORCE, Boolean.FALSE);
     }
 
     @Override
@@ -129,7 +131,7 @@ public class ValidatorTestCase extends FunctionalTestCase
 
     private Object doTestValidMessageError(String serviceName) throws MuleException
     {
-        final Integer payload = RandomUtils.nextInt();
+        final Integer payload = 777;//RandomUtils.nextInt();
         assertEquals("ERROR:" + payload + "@" + serviceName, muleClient.send("vm://" + serviceName + ".in",
             payload, null).getPayload());
         return payload;
