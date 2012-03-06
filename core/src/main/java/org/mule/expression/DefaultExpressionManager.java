@@ -580,6 +580,7 @@ public class DefaultExpressionManager
                         {
                             valid.compareAndSet(true, false);
                             message.append(token).append(" is invalid\n");
+                            message.append(e.getMessage());
                         }
                     }
                 }
