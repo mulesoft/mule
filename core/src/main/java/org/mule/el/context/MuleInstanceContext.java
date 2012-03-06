@@ -34,20 +34,19 @@ public class MuleInstanceContext
         return MuleManifest.getProductVersion();
     }
 
-    public String getClusterid()
+    public String getClusterId()
     {
         return muleContext.getClusterId();
     }
 
-    public int getNodeid()
+    public int getNodeId()
     {
         return muleContext.getClusterNodeId();
     }
 
-    public String getHomedir()
+    public String getHome()
     {
         return muleContext.getConfiguration().getMuleHomeDirectory();
     }
 
-    
 }

@@ -43,7 +43,7 @@ public class AppContext
         return muleContext.getConfiguration().getId();
     }
 
-    public String getWorkdir()
+    public String getWorkDir()
     {
         return muleContext.getConfiguration().getWorkingDirectory();
     }

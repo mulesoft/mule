@@ -60,13 +60,13 @@ public class AppContextTestCase extends AbstractELTestCase
     @Test
     public void workDir()
     {
-        assertEquals(muleContext.getConfiguration().getWorkingDirectory(), evaluate("app.workdir"));
+        assertEquals(muleContext.getConfiguration().getWorkingDirectory(), evaluate("app.workDir"));
     }
 
     @Test(expected = MuleRuntimeException.class)
     public void assignValueToWorkDir()
     {
-        evaluate("app.workdir='1'");
+        evaluate("app.workDir='1'");
     }
 
     @Test

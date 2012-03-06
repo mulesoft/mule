@@ -68,25 +68,25 @@ public class ServerContextTestCase extends AbstractELTestCase
     @Test
     public void tmpDir()
     {
-        Assert.assertEquals(System.getProperty("java.io.tmpdir"), evaluate("server.tmpdir"));
+        Assert.assertEquals(System.getProperty("java.io.tmpdir"), evaluate("server.tmpDir"));
     }
 
     @Test(expected = MuleRuntimeException.class)
     public void assignValueToTmpdir()
     {
-        evaluate("server.tmpdir='1'");
+        evaluate("server.tmpDir='1'");
     }
 
     @Test
     public void fileSeperator()
     {
-        Assert.assertEquals(System.getProperty("file.separator"), evaluate("server.fileseperator"));
+        Assert.assertEquals(System.getProperty("file.separator"), evaluate("server.fileSeperator"));
     }
 
     @Test(expected = MuleRuntimeException.class)
     public void assignValueToFileseperator()
     {
-        evaluate("server.fileseperator='1'");
+        evaluate("server.fileSeperator='1'");
     }
 
     @Test
@@ -200,13 +200,13 @@ public class ServerContextTestCase extends AbstractELTestCase
     @Test
     public void timeZone()
     {
-        Assert.assertEquals(Calendar.getInstance().getTimeZone(), evaluate("server.timezone"));
+        Assert.assertEquals(Calendar.getInstance().getTimeZone(), evaluate("server.timeZone"));
     }
 
     @Test(expected = MuleRuntimeException.class)
     public void assignValueToTimeZone()
     {
-        evaluate("server.timezone='1'");
+        evaluate("server.timeZone='1'");
     }
 
     @Test

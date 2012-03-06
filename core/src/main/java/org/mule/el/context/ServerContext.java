@@ -59,12 +59,7 @@ public class ServerContext
         return new JAVARuntimeContext();
     }
 
-    public static Properties getSystemProperties()
-    {
-        return System.getProperties();
-    }
-
-    public static TimeZone getTimezone()
+    public static TimeZone getTimeZone()
     {
         return Calendar.getInstance().getTimeZone();
     }
@@ -74,12 +69,12 @@ public class ServerContext
         return Locale.getDefault();
     }
 
-    public String getTmpdir()
+    public String getTmpDir()
     {
         return System.getProperty("java.io.tmpdir");
     }
 
-    public String getFileseperator()
+    public String getFileSeperator()
     {
         return System.getProperty("file.separator");
     }

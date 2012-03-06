@@ -42,39 +42,39 @@ public class MuleInstanceContextTestCase extends AbstractELTestCase
     }
 
     @Test
-    public void homeDir() throws UnknownHostException
+    public void home() throws UnknownHostException
     {
-        Assert.assertEquals(muleContext.getConfiguration().getMuleHomeDirectory(), evaluate("mule.homedir"));
+        Assert.assertEquals(muleContext.getConfiguration().getMuleHomeDirectory(), evaluate("mule.home"));
     }
 
     @Test(expected = MuleRuntimeException.class)
     public void assignValueToHomeDir()
     {
-        evaluate("mule.homedir='1'", Mockito.mock(MuleMessage.class));
+        evaluate("mule.home='1'", Mockito.mock(MuleMessage.class));
     }
 
     @Test
     public void clusterId() throws UnknownHostException
     {
-        Assert.assertEquals(muleContext.getClusterId(), evaluate("mule.clusterid"));
+        Assert.assertEquals(muleContext.getClusterId(), evaluate("mule.clusterId"));
     }
 
     @Test(expected = MuleRuntimeException.class)
     public void assignValueToClusterId()
     {
-        evaluate("mule.clusterid='1'", Mockito.mock(MuleMessage.class));
+        evaluate("mule.clusterId='1'", Mockito.mock(MuleMessage.class));
     }
 
     @Test
     public void nodeId() throws UnknownHostException
     {
-        Assert.assertEquals(muleContext.getClusterNodeId(), evaluate("mule.nodeid"));
+        Assert.assertEquals(muleContext.getClusterNodeId(), evaluate("mule.nodeId"));
     }
 
     @Test(expected = MuleRuntimeException.class)
     public void assignValueToNodeId()
     {
-        evaluate("mule.nodeid='1'", Mockito.mock(MuleMessage.class));
+        evaluate("mule.nodeId='1'", Mockito.mock(MuleMessage.class));
     }
 
 }
