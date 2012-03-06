@@ -40,48 +40,48 @@ public class MVELExpressionLanguageTestCase
     }
 
     @Test
-    public void executeReturnInt()
+    public void evaluateReturnInt()
     {
-        assertEquals(4, mvel.execute("2*2"));
+        assertEquals(4, mvel.evaluate("2*2"));
     }
 
     @Test
-    public void executeReturnString()
+    public void evaluateReturnString()
     {
-        assertEquals("hi", mvel.execute("'hi'"));
+        assertEquals("hi", mvel.evaluate("'hi'"));
     }
 
     @Test(expected = ExpressionRuntimeException.class)
-    public void executeInvalidExpression()
+    public void evaluateInvalidExpression()
     {
-        assertEquals(4, mvel.execute("2*'2"));
+        assertEquals(4, mvel.evaluate("2*'2"));
     }
 
     @Test
-    public void executeWithIntVar()
+    public void evaluateWithIntVar()
     {
-        assertEquals(4, mvel.execute("a*2", Collections.singletonMap("a", 2)));
+        assertEquals(4, mvel.evaluate("a*2", Collections.singletonMap("a", 2)));
     }
 
     @Test
-    public void executeWithStringVar()
+    public void evaluateWithStringVar()
     {
-        assertEquals("Hi Dan", mvel.execute("'Hi '#a", Collections.singletonMap("a", "Dan")));
+        assertEquals("Hi Dan", mvel.evaluate("'Hi '#a", Collections.singletonMap("a", "Dan")));
     }
 
     @Test
-    public void executeWithMultipleVars()
+    public void evaluateWithMultipleVars()
     {
         Map<String, Object> vars = new HashMap<String, Object>();
         vars.put("a", "Dan");
         vars.put("b", 2);
-        assertEquals("Hi Dan2", mvel.execute("'Hi '#a#b", vars));
+        assertEquals("Hi Dan2", mvel.evaluate("'Hi '#a#b", vars));
     }
 
     @Test(expected = ExpressionRuntimeException.class)
-    public void executeInvalidExpressionWithVars()
+    public void evaluateInvalidExpressionWithVars()
     {
-        assertEquals(4, mvel.execute("2*'2", Collections.singletonMap("a", 2)));
+        assertEquals(4, mvel.evaluate("2*'2", Collections.singletonMap("a", 2)));
     }
 
     @Test

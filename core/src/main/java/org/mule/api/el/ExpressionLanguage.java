@@ -36,7 +36,7 @@ public interface ExpressionLanguage
      * @param expression the expression to be executed
      * @return the result of execution of the expression.
      */
-    <T> T execute(String expression);
+    <T> T evaluate(String expression);
 
     /**
      * Execute the expression returning the result. The expression will be executed by the expression language
@@ -50,7 +50,7 @@ public interface ExpressionLanguage
      * @param vars a map of expression variables
      * @return the result of execution of the expression.
      */
-    <T> T execute(String expression, Map<String, ? extends Object> vars);
+    <T> T evaluate(String expression, Map<String, ? extends Object> vars);
 
     /**
      * Execute the expression returning the result. The expression will be executed with MuleEvent context,
@@ -61,7 +61,7 @@ public interface ExpressionLanguage
      * @param event the current event being processed
      * @return the result of execution of the expression.
      */
-    <T> T execute(String expression, MuleEvent event);
+    <T> T evaluate(String expression, MuleEvent event);
 
     /**
      * Execute the expression returning the result. The expression will be executed with MuleEvent context,
@@ -76,7 +76,7 @@ public interface ExpressionLanguage
      * @param vars a map of expression variables
      * @return the result of execution of the expression.
      */
-    <T> T execute(String expression, MuleEvent event, Map<String, ? extends Object> vars);
+    <T> T evaluate(String expression, MuleEvent event, Map<String, ? extends Object> vars);
 
     /**
      * Validates the expression. All implementors should should validate expression syntactically. Semantic
@@ -90,9 +90,9 @@ public interface ExpressionLanguage
     /**
      * Required to provide gradual migration to use of MuleEvent signatures
      * 
-     * @see ExpressionLanguage#execute(String, MuleEvent)
+     * @see ExpressionLanguage#evaluate(String, MuleEvent)
      */
     @Deprecated
-    <T> T execute(String expression, MuleMessage message);
+    <T> T evaluate(String expression, MuleMessage message);
 
 }
