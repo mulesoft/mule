@@ -1,3 +1,12 @@
+/*
+ * $Id$
+ * --------------------------------------------------------------------------------------
+ * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ *
+ * The software in this package is published under the terms of the CPAL v1.0
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ */
 
 package org.mule.el.mvel;
 
@@ -13,7 +22,8 @@ import org.mvel2.integration.VariableResolver;
 import org.mvel2.integration.impl.BaseVariableResolverFactory;
 import org.mvel2.integration.impl.SimpleSTValueResolver;
 
-public abstract class AbstractVariableResolverFactory extends BaseVariableResolverFactory implements MuleVariableResolverFactory
+public abstract class AbstractVariableResolverFactory extends BaseVariableResolverFactory
+    implements MuleVariableResolverFactory
 {
 
     private static final long serialVersionUID = 909413730991198290L;
@@ -71,7 +81,8 @@ public abstract class AbstractVariableResolverFactory extends BaseVariableResolv
         return vr;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
      * @see org.mule.el.mvel.MuleVariableResolverFactory#addVariable(java.lang.String, java.lang.Object)
      */
     @Override
@@ -80,7 +91,8 @@ public abstract class AbstractVariableResolverFactory extends BaseVariableResolv
         addResolver(name, new MuleVariableResolver(name, value, value.getClass()));
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
      * @see org.mule.el.mvel.MuleVariableResolverFactory#addFinalVariable(java.lang.String, java.lang.Object)
      */
     @Override
