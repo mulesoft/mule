@@ -23,14 +23,12 @@ import org.mule.enricher.MessageEnricher.EnrichExpressionPair;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.transformer.simple.StringAppendTransformer;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class MessageEnricherTestCase extends AbstractMuleContextTestCase
 {
 
     @Test
-    @Ignore
     public void testEnrichHeaderWithPayload() throws Exception
     {
         MessageEnricher enricher = new MessageEnricher();

@@ -61,7 +61,7 @@ public class MessageEnricher extends AbstractMessageProcessorOwner implements Me
     {
         if (StringUtils.isEmpty(sourceExpressionArg))
         {
-            sourceExpressionArg = "#[payload]";
+            sourceExpressionArg = "#[payload:]";
         }
 
         Object enrichmentObject = expressionManager.evaluate(sourceExpressionArg, enrichmentMessage);
