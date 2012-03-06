@@ -1354,9 +1354,14 @@ public class CoreMessages extends MessageFactory
         return factory.createMessage(BUNDLE_PATH, 334, key);
     }
 
-    public static Message expressionExecutionFailed(String key)
+    public static Message expressionEvaluationFailed(String key)
     {
         return factory.createMessage(BUNDLE_PATH, 335, key);
+    }
+
+    public static Message expressionFinalVariableCannotBeAssignedValue(String key)
+    {
+        return factory.createMessage(BUNDLE_PATH, 336, key);
     }
 
     

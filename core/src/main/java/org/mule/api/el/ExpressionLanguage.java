@@ -50,7 +50,7 @@ public interface ExpressionLanguage
      * @param vars a map of expression variables
      * @return the result of execution of the expression.
      */
-    <T> T evaluate(String expression, Map<String, ? extends Object> vars);
+    <T> T evaluate(String expression, Map<String, Object> vars);
 
     /**
      * Execute the expression returning the result. The expression will be executed with MuleEvent context,
@@ -76,7 +76,7 @@ public interface ExpressionLanguage
      * @param vars a map of expression variables
      * @return the result of execution of the expression.
      */
-    <T> T evaluate(String expression, MuleEvent event, Map<String, ? extends Object> vars);
+    <T> T evaluate(String expression, MuleEvent event, Map<String, Object> vars);
 
     /**
      * Validates the expression. All implementors should should validate expression syntactically. Semantic

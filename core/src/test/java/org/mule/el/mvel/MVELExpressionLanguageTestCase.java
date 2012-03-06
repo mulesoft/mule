@@ -20,6 +20,7 @@ import org.mule.api.lifecycle.InitialisationException;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import org.junit.Before;
@@ -60,13 +61,14 @@ public class MVELExpressionLanguageTestCase
     @Test
     public void evaluateWithIntVar()
     {
-        assertEquals(4, mvel.evaluate("a*2", Collections.singletonMap("a", 2)));
+        assertEquals(4, mvel.evaluate("a*2", Collections.<String, Object> singletonMap("a", new Integer(2))));
     }
 
     @Test
     public void evaluateWithStringVar()
     {
-        assertEquals("Hi Dan", mvel.evaluate("'Hi '#a", Collections.singletonMap("a", "Dan")));
+        assertEquals("Hi Dan",
+            mvel.evaluate("'Hi '#a", Collections.<String, Object> singletonMap("a", "Dan")));
     }
 
     @Test
@@ -81,7 +83,7 @@ public class MVELExpressionLanguageTestCase
     @Test(expected = ExpressionRuntimeException.class)
     public void evaluateInvalidExpressionWithVars()
     {
-        assertEquals(4, mvel.evaluate("2*'2", Collections.singletonMap("a", 2)));
+        assertEquals(4, mvel.evaluate("2*'2", Collections.<String, Object> singletonMap("a", 2)));
     }
 
     @Test
@@ -94,6 +96,18 @@ public class MVELExpressionLanguageTestCase
     public void validExpression()
     {
         assertTrue(mvel.isValid("var a = 2"));
+    }
+
+    @Test
+    public void evaluateWithAppContext1()
+    {
+        assertEquals(System.getProperty("user.name"), mvel.evaluate("server.user"));
+    }
+
+    @Test
+    public void evaluateWithAppContext2()
+    {
+        assertEquals(Locale.getDefault(), mvel.evaluate("server.locale"));
     }
 
 }

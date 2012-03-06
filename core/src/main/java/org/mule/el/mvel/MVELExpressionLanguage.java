@@ -21,6 +21,8 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.config.i18n.CoreMessages;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -32,7 +34,7 @@ import org.mvel2.CompileException;
 import org.mvel2.MVEL;
 import org.mvel2.ParserContext;
 import org.mvel2.integration.VariableResolverFactory;
-import org.mvel2.integration.impl.MapVariableResolverFactory;
+import org.mvel2.integration.impl.CachedMapVariableResolverFactory;
 
 /**
  * Expression language that uses MVEL (http://mvel.codehaus.org/).
@@ -42,9 +44,10 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
 
     private static final int COMPILED_EXPRESSION_MAX_CACHE_SIZE = 1000;
 
-    private ParserContext parserContext;
-    private LRUMap compiledExpressionsCache = new LRUMap(COMPILED_EXPRESSION_MAX_CACHE_SIZE);
-    private MuleContext muleContext;
+    protected ParserContext parserContext;
+    protected LRUMap compiledExpressionsCache = new LRUMap(COMPILED_EXPRESSION_MAX_CACHE_SIZE);
+    protected AppVariableResolverFactory appVariableResolverFactory;
+    protected MuleContext muleContext;
 
     public MVELExpressionLanguage(MuleContext muleContext)
     {
@@ -52,17 +55,36 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
     }
 
     @Override
-    @SuppressWarnings("unchecked")
-    public <T> T evaluate(String expression)
+    public void initialise() throws InitialisationException
     {
-        return (T) interalExecuteExpression(expression, new MapVariableResolverFactory(null));
+        System.setProperty("mvel2.compiler.allow_override_all_prophandling", "true");
+
+        parserContext = createParserContext();
+
+        appVariableResolverFactory = new AppVariableResolverFactory(parserContext, muleContext);
+    }
+
+    @Override
+    public void dispose()
+    {
+        compiledExpressionsCache.clear();
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    public <T> T evaluate(String expression, Map<String, ? extends Object> vars)
+    public <T> T evaluate(String expression)
     {
-        return (T) interalExecuteExpression(expression, new MapVariableResolverFactory(vars));
+        return (T) interalExecuteExpression(expression, appVariableResolverFactory);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public <T> T evaluate(String expression, Map<String, Object> vars)
+    {
+        VariableResolverFactoryChainBuilder builder = new VariableResolverFactoryChainBuilder(
+            appVariableResolverFactory);
+        builder.add(new CachedMapVariableResolverFactory(vars));
+        return (T) interalExecuteExpression(expression, builder.build());
     }
 
     @Override
@@ -74,16 +96,19 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
 
     @Override
     @SuppressWarnings("unchecked")
-    public <T> T evaluate(String expression, MuleEvent event, Map<String, ? extends Object> vars)
+    public <T> T evaluate(String expression, MuleEvent event, Map<String, Object> vars)
     {
-        return (T) interalExecuteExpression(expression, new MapVariableResolverFactory(vars));
+        VariableResolverFactoryChainBuilder builder = new VariableResolverFactoryChainBuilder(
+            appVariableResolverFactory);
+        builder.add(new CachedMapVariableResolverFactory(vars));
+        return (T) interalExecuteExpression(expression, builder.build());
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public <T> T evaluate(String expression, MuleMessage message)
     {
-        return (T) interalExecuteExpression(expression, new MapVariableResolverFactory(null));
+        return (T) interalExecuteExpression(expression, appVariableResolverFactory);
     }
 
     @SuppressWarnings("unchecked")
@@ -96,7 +121,7 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
         }
         catch (Exception e)
         {
-            throw new ExpressionRuntimeException(CoreMessages.expressionExecutionFailed(expression), e);
+            throw new ExpressionRuntimeException(CoreMessages.expressionEvaluationFailed(expression), e);
         }
 
     }
@@ -113,20 +138,6 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
         {
             return false;
         }
-    }
-
-    @Override
-    public void initialise() throws InitialisationException
-    {
-        System.setProperty("mvel2.compiler.allow_override_all_prophandling", "true");
-
-        parserContext = createParserContext();
-    }
-
-    @Override
-    public void dispose()
-    {
-        compiledExpressionsCache.clear();
     }
 
     protected ParserContext createParserContext()
@@ -156,6 +167,8 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
         parserContext.addImport(Object.class);
         parserContext.addImport(Short.class);
         parserContext.addImport(String.class);
+        parserContext.addImport(System.class);
+        parserContext.addImport(Calendar.class);
     }
 
     /**
@@ -176,6 +189,35 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
             Serializable compiledExpression = MVEL.compileExpression(expression, parserContext);
             compiledExpressionsCache.put(expression, compiledExpression);
             return compiledExpression;
+        }
+    }
+
+    /**
+     * Utility builder for creating chain of {@link VariableResolverFactory}'s
+     */
+    private class VariableResolverFactoryChainBuilder
+    {
+
+        List<VariableResolverFactory> factories = new ArrayList<VariableResolverFactory>();
+
+        public VariableResolverFactoryChainBuilder(VariableResolverFactory factory)
+        {
+            add(factory);
+        }
+
+        public VariableResolverFactoryChainBuilder add(VariableResolverFactory factory)
+        {
+            factories.add(factory);
+            return this;
+        }
+
+        public VariableResolverFactory build()
+        {
+            for (int i = 0; i < factories.size() - 1; i++)
+            {
+                factories.get(i).setNextFactory(factories.get(i + 1));
+            }
+            return factories.get(0);
         }
     }
 
