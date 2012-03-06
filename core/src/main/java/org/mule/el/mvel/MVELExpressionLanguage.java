@@ -52,33 +52,38 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public <T> T execute(String expression)
     {
-        return interalExecuteExpression(expression, new MapVariableResolverFactory(null));
+        return (T) interalExecuteExpression(expression, new MapVariableResolverFactory(null));
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public <T> T execute(String expression, Map<String, ? extends Object> vars)
     {
-        return interalExecuteExpression(expression, new MapVariableResolverFactory(vars));
+        return (T) interalExecuteExpression(expression, new MapVariableResolverFactory(vars));
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public <T> T execute(String expression, MuleEvent event)
     {
-        return execute(expression, event, null);
+        return (T) execute(expression, event, null);
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public <T> T execute(String expression, MuleEvent event, Map<String, ? extends Object> vars)
     {
-        return interalExecuteExpression(expression, new MapVariableResolverFactory(vars));
+        return (T) interalExecuteExpression(expression, new MapVariableResolverFactory(vars));
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public <T> T execute(String expression, MuleMessage message)
     {
-        return interalExecuteExpression(expression, new MapVariableResolverFactory(null));
+        return (T) interalExecuteExpression(expression, new MapVariableResolverFactory(null));
     }
 
     @SuppressWarnings("unchecked")
