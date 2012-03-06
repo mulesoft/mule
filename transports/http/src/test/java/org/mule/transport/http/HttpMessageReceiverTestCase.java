@@ -10,6 +10,8 @@
 
 package org.mule.transport.http;
 
+import static org.junit.Assert.assertEquals;
+
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.service.Service;
@@ -22,8 +24,17 @@ import org.mule.util.CollectionUtils;
 
 import com.mockobjects.dynamic.Mock;
 
+import org.junit.Before;
+import org.junit.Test;
+
 public class HttpMessageReceiverTestCase extends AbstractMessageReceiverTestCase
 {
+    private static final String CONTEXT_PATH = "/resources";
+    private static final String CLIENT_PATH = "/resources/client";
+    private static final String CLIENT_NAME_PATH = "/resources/client/name";
+
+    private HttpMessageReceiver httpMessageReceiver;
+
     public MessageReceiver getMessageReceiver() throws Exception
     {
         Mock mockComponent = new Mock(Service.class);
@@ -40,4 +51,30 @@ public class HttpMessageReceiverTestCase extends AbstractMessageReceiverTestCase
         endpoint = muleContext.getEndpointFactory().getInboundEndpoint(endpointBuilder);
         return endpoint;
     }
+
+    @Before
+    public void setUp() throws Exception
+    {
+        httpMessageReceiver = (HttpMessageReceiver) getMessageReceiver();
+    }
+
+
+    @Test
+    public void testProcessResourceRelativePath()
+    {
+        assertEquals("/client", httpMessageReceiver.processRelativePath(CONTEXT_PATH, CLIENT_PATH));
+    }
+    
+    @Test
+    public void testProcessRelativePathSameLevel()
+    {
+        assertEquals("/", httpMessageReceiver.processRelativePath(CONTEXT_PATH, CONTEXT_PATH));
+    }
+    
+    @Test
+    public void testProcessResourcePropertyRelativePath()
+    {
+        assertEquals("/client/name", httpMessageReceiver.processRelativePath(CONTEXT_PATH, CLIENT_NAME_PATH));
+    }
+
 }

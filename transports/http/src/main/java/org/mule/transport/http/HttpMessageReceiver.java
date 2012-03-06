@@ -282,10 +282,15 @@ public class HttpMessageReceiver extends TcpMessageReceiver
             // A) the request was not served or B) a null result was returned
             if (receiver != null)
             {
+                String contextPath = HttpConnector.normalizeUrl(receiver.getEndpointURI().getPath());
                 message.setProperty(HttpConnector.HTTP_CONTEXT_PATH_PROPERTY,
-                                           HttpConnector.normalizeUrl(receiver.getEndpointURI().getPath()),
+                                           contextPath,
                                            PropertyScope.INBOUND);
 
+                message.setProperty(HttpConnector.HTTP_RELATIVE_PATH_PROPERTY, 
+                                    processRelativePath(contextPath, path),
+                                    PropertyScope.INBOUND);
+                
                 ProcessingTemplate<MuleEvent> processingTemplate = createProcessingTemplate();
 
                 MuleEvent returnEvent;
@@ -387,6 +392,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
             return true;
         }
 
+
         protected HttpResponse doOtherValid(RequestLine requestLine, String method) throws MuleException
         {
             MuleMessage message = createMuleMessage(null);
@@ -467,6 +473,16 @@ public class HttpMessageReceiver extends TcpMessageReceiver
             conn.close();
             conn = null;
         }
+    }
+
+    protected String processRelativePath(String contextPath, String path)
+    {
+        String relativePath = path.substring(contextPath.length());
+        if("".equals(relativePath))
+        {
+            return "/";
+        }
+        return relativePath;
     }
 
     protected MessageReceiver getTargetReceiver(MuleMessage message, ImmutableEndpoint ep)

@@ -18,7 +18,9 @@ import org.mule.transport.AbstractMuleMessageFactoryTestCase;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.httpclient.Header;
@@ -187,5 +189,54 @@ public class HttpMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTe
         assertEquals(2, parsedHeaders.size());
         assertEquals("top", parsedHeaders.get("k1"));
         assertEquals("priority,always,true", parsedHeaders.get("k2"));
+    }
+
+    @Test
+    public void testProcessQueryParams() throws UnsupportedEncodingException
+    {
+        HttpMuleMessageFactory messageFactory = new HttpMuleMessageFactory(null);
+        
+        String queryParams = "key1=value1&key2=value2&key1=value4&key3=value3&key1=value5";
+        Map<String, Object> processedParams = messageFactory.processQueryParams("http://localhost:8080/resources?" + queryParams, "UTF-8");
+
+        Object value1 = processedParams.get("key1");
+        assertNotNull(value1);
+        assertTrue(value1 instanceof List);
+        assertTrue(((List)value1).contains("value1"));
+        assertTrue(((List)value1).contains("value4"));
+        assertTrue(((List)value1).contains("value5"));
+        
+        Object value2 = processedParams.get("key2");
+        assertNotNull(value2);
+        assertEquals("value2", value2);
+
+        Object value3 = processedParams.get("key3");
+        assertNotNull(value3);
+        assertEquals("value3", value3);
+
+    }
+    
+    @Test
+    public void testProcessEscapedQueryParams() throws UnsupportedEncodingException
+    {
+        HttpMuleMessageFactory messageFactory = new HttpMuleMessageFactory(null);
+        
+        String queryParams = "key1=value%201&key2=value2&key%203=value3&key%203=value4";
+        Map<String, Object> processedParams = messageFactory.processQueryParams("http://localhost:8080/resources?" + queryParams, "UTF-8");
+        
+        Object value1 = processedParams.get("key1");
+        assertNotNull(value1);
+        assertEquals("value 1", value1);
+        
+        Object value2 = processedParams.get("key2");
+        assertNotNull(value2);
+        assertEquals("value2", value2);
+        
+        Object value3 = processedParams.get("key 3");
+        assertNotNull(value3);
+        assertTrue(value3 instanceof List);
+        assertTrue(((List)value3).contains("value3"));
+        assertTrue(((List)value3).contains("value4"));
+
     }
 }

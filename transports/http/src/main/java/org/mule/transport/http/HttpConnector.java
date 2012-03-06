@@ -78,6 +78,17 @@ public class HttpConnector extends TcpConnector
     @Deprecated
     public static final String HTTP_CUSTOM_HEADERS_MAP_PROPERTY = HTTP_PREFIX + "custom.headers";
 
+    /**
+     * Encapsulates all the HTTP headers
+     */
+    public static final String HTTP_HEADERS = HTTP_PREFIX + "headers";
+
+    /**
+     * Stores the HTTP query parameters received, supports multiple values per key and both query parameter key and
+     * value are unescaped
+     */
+    public static final String HTTP_QUERY_PARAMS = HTTP_PREFIX + "query.params";
+    
     public static final String HTTP_METHOD_PROPERTY = HTTP_PREFIX + "method";
     
     /**
@@ -95,6 +106,11 @@ public class HttpConnector extends TcpConnector
      * HTTP endpoint is listening on.
      */
     public static final String HTTP_CONTEXT_PATH_PROPERTY = HTTP_PREFIX + "context.path";
+
+    /**
+     * The relative path of the URI being accessed in relation to the context path
+     */
+    public static final String HTTP_RELATIVE_PATH_PROPERTY = HTTP_PREFIX + "relative.path";
 
     public static final String HTTP_SERVLET_REQUEST_PROPERTY = HTTP_PREFIX + "servlet.request";
     public static final String HTTP_SERVLET_RESPONSE_PROPERTY = HTTP_PREFIX + "servlet.response";

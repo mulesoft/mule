@@ -23,10 +23,15 @@ import org.mule.util.StringUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URLDecoder;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.StringTokenizer;
 
 import org.apache.commons.httpclient.Cookie;
 import org.apache.commons.httpclient.Header;
@@ -41,6 +46,7 @@ import org.apache.commons.logging.LogFactory;
 public class HttpMuleMessageFactory extends AbstractMuleMessageFactory
 {
     private static Log log = LogFactory.getLog(HttpMuleMessageFactory.class);
+    private static final String DEFAULT_ENCODING = "UTF-8";
 
     private boolean enableCookies = false;
     private String cookieSpec;
@@ -120,7 +126,9 @@ public class HttpMuleMessageFactory extends AbstractMuleMessageFactory
         HttpVersion httpVersion;
         String uri;
         String statusCode = null;
-        Map<String, Object> headers;
+        Map<String, Object> headers;  
+        Map<String, Object> httpHeaders = new HashMap<String, Object>();
+        Map<String, Object> queryParameters = new HashMap<String, Object>();
 
         if (transportMessage instanceof HttpRequest)
         {
@@ -150,6 +158,12 @@ public class HttpMuleMessageFactory extends AbstractMuleMessageFactory
 
         headers = processIncomingHeaders(headers);
 
+        httpHeaders.put(HttpConnector.HTTP_HEADERS, new HashMap<String, Object>(headers));
+
+        String encoding = getEncoding(headers);
+        
+        queryParameters.put(HttpConnector.HTTP_QUERY_PARAMS, processQueryParams(uri, encoding));
+
         //Make any URI params available ans inbound message headers
         addUriParamsAsHeaders(headers, uri);
 
@@ -167,10 +181,12 @@ public class HttpMuleMessageFactory extends AbstractMuleMessageFactory
         }
 
         message.addInboundProperties(headers);
+        message.addInboundProperties(httpHeaders);
+        message.addInboundProperties(queryParameters);
 
         // The encoding is stored as message property. To avoid overriding it from the message
         // properties, it must be initialized last
-        initEncoding(message, headers);
+        initEncoding(message, encoding);
     }
 
     protected Map<String, Object> processIncomingHeaders(Map<String, Object> headers) throws Exception
@@ -269,25 +285,32 @@ public class HttpMuleMessageFactory extends AbstractMuleMessageFactory
         }
     }
 
-    private void initEncoding(MuleMessage message, Map<String, Object> headers)
+    private String getEncoding(Map<String, Object> headers)
     {
+        String encoding = DEFAULT_ENCODING;
         Object contentType = headers.get(HttpConstants.HEADER_CONTENT_TYPE);
         if (contentType != null)
         {
             // use HttpClient classes to parse the charset part from the Content-Type
             // header (e.g. "text/html; charset=UTF-16BE")
             Header contentTypeHeader = new Header(HttpConstants.HEADER_CONTENT_TYPE,
-                    contentType.toString());
+                                                  contentType.toString());
             HeaderElement values[] = contentTypeHeader.getElements();
             if (values.length == 1)
             {
                 NameValuePair param = values[0].getParameterByName("charset");
                 if (param != null)
                 {
-                    message.setEncoding(param.getValue());
+                    encoding = param.getValue();
                 }
             }
         }
+        return encoding;
+    }
+    
+    private void initEncoding(MuleMessage message, String encoding)
+    {
+        message.setEncoding(encoding);
     }
 
     private void rewriteConnectionAndKeepAliveHeaders(Map<String, Object> headers)
@@ -326,11 +349,69 @@ public class HttpMuleMessageFactory extends AbstractMuleMessageFactory
     protected void addUriParamsAsHeaders(Map headers, String uri)
     {
         int i = uri.indexOf("?");
-        if (i > -1)
+        if(i > -1)
         {
             headers.putAll(PropertiesUtils.getPropertiesFromQueryString(uri.substring(i + 1)));
         }
     }
+    
+    protected Map<String, Object> processQueryParams(String uri, String encoding) throws UnsupportedEncodingException
+    {
+        Map<String, Object> httpParams = new HashMap<String, Object>();
+        
+        int i = uri.indexOf("?");
+        if(i > -1)
+        {
+            String queryString = uri.substring(i + 1);
+            for (StringTokenizer st = new StringTokenizer(queryString, "&"); st.hasMoreTokens();)
+            {
+                String token = st.nextToken();
+                int idx = token.indexOf('=');
+                if (idx < 0)
+                {
+                    addQueryParamToMap(httpParams, unescape(token, encoding), null);
+                }
+                else if (idx > 0)
+                {
+                    addQueryParamToMap(httpParams, unescape(token.substring(0, idx), encoding),
+                        unescape(token.substring(idx + 1), encoding));
+                }
+            }
+        }
+            
+        return httpParams;
+    }
+
+    private void addQueryParamToMap(Map<String, Object> httpParams, String key, String value)
+    {
+        Object existingValue = httpParams.get(key);
+        if (existingValue == null)
+        {
+            httpParams.put(key, value);
+        }
+        else if (existingValue instanceof List)
+        {
+            List<String> list = (List<String>) existingValue;
+            list.add(value);
+        }
+        else if (existingValue instanceof String)
+        {
+            List<String> list = new ArrayList<String>();
+            list.add((String) existingValue);
+            list.add(value);
+            httpParams.put(key, list);
+        }
+    }
+    
+    private String unescape(String escapedValue, String encoding) throws UnsupportedEncodingException
+    {
+        if(escapedValue != null)
+        {
+            return URLDecoder.decode(escapedValue, encoding);
+        }
+        return escapedValue;
+    }
+    
 
     protected void convertMultiPartHeaders(Map<String, Object> headers)
     {

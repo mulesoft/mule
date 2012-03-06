@@ -18,7 +18,7 @@ import org.mule.transport.http.HttpConstants;
 import org.mule.util.StringUtils;
 
 import java.net.URI;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -110,7 +110,8 @@ public class HttpRequestBodyToParamMap extends AbstractMessageTransformer
             }
             else
             {
-                values = Arrays.asList(existingValue);
+                values = new ArrayList<Object>();
+                values.add(existingValue);
             }
 
             values.add(value);
