@@ -56,42 +56,25 @@ public  class SimpleUpdateSqlStatementStrategy implements SqlStatementStrategy
 
         Transaction tx = TransactionCoordination.getInstance().getTransaction();
 
-        try
+        if (logger.isDebugEnabled())
         {
-            if (logger.isDebugEnabled())
-            {
-                logger.debug("SQL UPDATE: " + sql + ", params = " + ArrayUtils.toString(paramValues));
-            }
-
-            int nbRows = connector.getQueryRunnerFor(endpoint).update(connection, sql, paramValues);
-            if (logger.isInfoEnabled())
-            {
-                logger.info("Executing SQL statement: " + nbRows + " row(s) updated");
-            }
-
-            // TODO Why should it always be 1?  Can't we update more than one row at a time with
-            // an update statement?  Or no rows depending on the contents of the table and/or
-            // parameters?
-            //if (nbRows != 1)
-            //{
-            //    logger.warn("Row count for write should be 1 and not " + nbRows);
-            //}
-            if (tx == null)
-            {
-                JdbcUtils.commitAndClose(connection);
-            }
-            logger.debug("MuleEvent dispatched succesfuly");
-        }
-        catch (Exception e)
-        {
-            logger.debug("Error dispatching event: " + e.getMessage(), e);
-            if (tx == null)
-            {
-                JdbcUtils.rollbackAndClose(connection);
-            }
-            throw e;
+            logger.debug("SQL UPDATE: " + sql + ", params = " + ArrayUtils.toString(paramValues));
         }
 
+        int nbRows = connector.getQueryRunnerFor(endpoint).update(connection, sql, paramValues);
+        if (logger.isInfoEnabled())
+        {
+            logger.info("Executing SQL statement: " + nbRows + " row(s) updated");
+        }
+
+        // TODO Why should it always be 1?  Can't we update more than one row at a time with
+        // an update statement?  Or no rows depending on the contents of the table and/or
+        // parameters?
+        //if (nbRows != 1)
+        //{
+        //    logger.warn("Row count for write should be 1 and not " + nbRows);
+        //}
+        logger.debug("MuleEvent dispatched succesfuly");
         return event.getMessage();
     }
 

@@ -54,106 +54,88 @@ public  class SelectSqlStatementStrategy implements SqlStatementStrategy
         ackStmt = connector.parseStatement(ackStmt, ackParams);
 
         long t0 = System.currentTimeMillis();
-        Transaction tx  = TransactionCoordination.getInstance().getTransaction();
-        try
-        {
-            //This method is used in both JDBCMessageDispatcher and JDBCMessageRequester.
-            //JDBCMessageRequester specifies a finite timeout.
-            if (timeout < 0)
-            {
-                timeout = Long.MAX_VALUE;
-            }
-            Object result;
-            
-            //do-while loop.  execute query until there's a result or timeout exceeded
-            do
-            {
-                //Get the actual param values from the message.
-                Object[] params = connector.getParams(endpoint, readParams,
-                    event != null ? event.getMessage() : null,
-                    endpoint.getEndpointURI().getAddress());
-                
-                if (logger.isDebugEnabled())
-                {
-                    logger.debug("SQL QUERY: " + readStmt + ", params = " + ArrayUtils.toString(params));
-                }
 
-                //Perform actual query
-                result = connector.getQueryRunnerFor(endpoint).query(connection, readStmt,
-                    connector.getResultSetHandler(), params);
-                
-                if (result != null)
-                {
-                    if (logger.isDebugEnabled())
-                    {
-                        logger.debug("SQL query received a result: " + result);
-                    }
-                    else if (logger.isInfoEnabled())
-                    {
-                        logger.info("SQL query received a result");
-                    }
-                    break;
-                }
-                long sleep = Math.min(connector.getPollingFrequency(),
-                                      timeout - (System.currentTimeMillis() - t0));
-                if (sleep > 0)
-                {
-                    if (logger.isDebugEnabled())
-                    {
-                        logger.debug("No results, sleeping for " + sleep);
-                    }
-                    Thread.sleep(sleep);
-                }
-                else
-                {
-                    logger.debug("Timeout");
-                    JdbcUtils.rollbackAndClose(connection);
-                    return null;
-                }
-            } while (true);
-            
-            //Execute ack statement
-            if (ackStmt != null)
+        //This method is used in both JDBCMessageDispatcher and JDBCMessageRequester.
+        //JDBCMessageRequester specifies a finite timeout.
+        if (timeout < 0)
+        {
+            timeout = Long.MAX_VALUE;
+        }
+        Object result;
+
+        //do-while loop.  execute query until there's a result or timeout exceeded
+        do
+        {
+            //Get the actual param values from the message.
+            Object[] params = connector.getParams(endpoint, readParams,
+                event != null ? event.getMessage() : null,
+                endpoint.getEndpointURI().getAddress());
+
+            if (logger.isDebugEnabled())
             {
-                Object[] params = connector.getParams(endpoint, ackParams,
-                        new DefaultMuleMessage(result, (Map)null, connector.getMuleContext()), ackStmt);
+                logger.debug("SQL QUERY: " + readStmt + ", params = " + ArrayUtils.toString(params));
+            }
+
+            //Perform actual query
+            result = connector.getQueryRunnerFor(endpoint).query(connection, readStmt,
+                connector.getResultSetHandler(), params);
+
+            if (result != null)
+            {
                 if (logger.isDebugEnabled())
                 {
-                    logger.debug("SQL UPDATE: " + ackStmt + ", params = " + ArrayUtils.toString(params));
+                    logger.debug("SQL query received a result: " + result);
                 }
-                int nbRows = connector.getQueryRunnerFor(endpoint).update(connection, ackStmt, params);
-                if (nbRows != 1)
+                else if (logger.isInfoEnabled())
                 {
-                    logger.warn("Row count for ack should be 1 and not " + nbRows);
+                    logger.info("SQL query received a result");
                 }
+                break;
             }
-            
-            // Package up result
-            MuleMessage message = null;
-            if (event != null)
+            long sleep = Math.min(connector.getPollingFrequency(),
+                                  timeout - (System.currentTimeMillis() - t0));
+            if (sleep > 0)
             {
-                message = new DefaultMuleMessage(result, event.getMessage(), connector.getMuleContext());
+                if (logger.isDebugEnabled())
+                {
+                    logger.debug("No results, sleeping for " + sleep);
+                }
+                Thread.sleep(sleep);
             }
             else
             {
-                message = new DefaultMuleMessage(result, connector.getMuleContext());
-            }
-            
-            //Close or return connection if not in a transaction
-            if (tx == null)
-            {
-                JdbcUtils.commitAndClose(connection);
-            }
-            
-            return message;
-        }
-        catch (Exception e)
-        {
-            if (tx == null)
-            {
+                logger.debug("Timeout");
                 JdbcUtils.rollbackAndClose(connection);
+                return null;
             }
-            throw e;
+        } while (true);
+
+        //Execute ack statement
+        if (ackStmt != null)
+        {
+            Object[] params = connector.getParams(endpoint, ackParams,
+                    new DefaultMuleMessage(result, (Map)null, connector.getMuleContext()), ackStmt);
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("SQL UPDATE: " + ackStmt + ", params = " + ArrayUtils.toString(params));
+            }
+            int nbRows = connector.getQueryRunnerFor(endpoint).update(connection, ackStmt, params);
+            if (nbRows != 1)
+            {
+                logger.warn("Row count for ack should be 1 and not " + nbRows);
+            }
         }
+
+        // Package up result
+        MuleMessage message = null;
+        if (event != null)
+        {
+            message = new DefaultMuleMessage(result, event.getMessage(), connector.getMuleContext());
+        }
+        else
+        {
+            message = new DefaultMuleMessage(result, connector.getMuleContext());
+        }
+        return message;
     }
 }

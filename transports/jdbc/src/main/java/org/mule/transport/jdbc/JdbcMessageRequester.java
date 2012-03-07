@@ -17,12 +17,14 @@ import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.transport.AbstractMessageRequester;
 import org.mule.transport.jdbc.sqlstrategy.SqlStatementStrategy;
+import org.mule.transport.jdbc.sqlstrategy.SqlStatementStrategyExecutor;
 
 
 public class JdbcMessageRequester extends AbstractMessageRequester
 {
 
     private JdbcConnector connector;
+    private SqlStatementStrategyExecutor sqlStatementExecutor = new SqlStatementStrategyExecutor();
 
     public JdbcMessageRequester(InboundEndpoint endpoint)
     {
@@ -65,7 +67,8 @@ public class JdbcMessageRequester extends AbstractMessageRequester
     {
         String statement = connector.getStatement(endpoint);
         SqlStatementStrategy strategy = connector.getSqlStatementStrategyFactory().create(statement, null);
-        return strategy.executeStatement(connector, endpoint, event, timeout, connector.getConnection());
+        Connection connection = connector.getConnection();
+        return sqlStatementExecutor.execute(strategy,connector, endpoint, event, timeout, connection);
     }
 
 
