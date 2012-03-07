@@ -16,8 +16,8 @@ import org.mule.config.i18n.CoreMessages;
 
 import java.util.HashMap;
 
+import org.mvel2.ImmutableElementException;
 import org.mvel2.ParserContext;
-import org.mvel2.PropertyAccessException;
 import org.mvel2.integration.VariableResolver;
 import org.mvel2.integration.impl.BaseVariableResolverFactory;
 import org.mvel2.integration.impl.SimpleSTValueResolver;
@@ -131,8 +131,8 @@ public abstract class AbstractVariableResolverFactory extends BaseVariableResolv
         @Override
         public void setValue(Object value)
         {
-            throw new PropertyAccessException(CoreMessages.expressionFinalVariableCannotBeAssignedValue(name)
-                .getMessage());
+            throw new ImmutableElementException(CoreMessages.expressionFinalVariableCannotBeAssignedValue(
+                name).getMessage());
         }
     }
 

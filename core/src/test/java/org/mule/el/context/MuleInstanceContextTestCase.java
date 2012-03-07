@@ -10,8 +10,6 @@
 
 package org.mule.el.context;
 
-import org.mule.api.MuleMessage;
-import org.mule.api.MuleRuntimeException;
 import org.mule.config.MuleManifest;
 import org.mule.el.AbstractELTestCase;
 
@@ -20,7 +18,6 @@ import java.net.UnknownHostException;
 import junit.framework.Assert;
 
 import org.junit.Test;
-import org.mockito.Mockito;
 
 public class MuleInstanceContextTestCase extends AbstractELTestCase
 {
@@ -35,10 +32,9 @@ public class MuleInstanceContextTestCase extends AbstractELTestCase
         Assert.assertEquals(MuleManifest.getProductVersion(), evaluate("mule.version"));
     }
 
-    @Test(expected = MuleRuntimeException.class)
     public void assignValueToMuleVersion()
     {
-        evaluate("mule.version='1'", Mockito.mock(MuleMessage.class));
+        assertImmutableVariable("mule.version='1'");
     }
 
     @Test
@@ -47,10 +43,9 @@ public class MuleInstanceContextTestCase extends AbstractELTestCase
         Assert.assertEquals(muleContext.getConfiguration().getMuleHomeDirectory(), evaluate("mule.home"));
     }
 
-    @Test(expected = MuleRuntimeException.class)
     public void assignValueToHomeDir()
     {
-        evaluate("mule.home='1'", Mockito.mock(MuleMessage.class));
+        assertImmutableVariable("mule.home='1'");
     }
 
     @Test
@@ -59,10 +54,9 @@ public class MuleInstanceContextTestCase extends AbstractELTestCase
         Assert.assertEquals(muleContext.getClusterId(), evaluate("mule.clusterId"));
     }
 
-    @Test(expected = MuleRuntimeException.class)
     public void assignValueToClusterId()
     {
-        evaluate("mule.clusterId='1'", Mockito.mock(MuleMessage.class));
+        assertImmutableVariable("mule.clusterId='1'");
     }
 
     @Test
@@ -71,10 +65,9 @@ public class MuleInstanceContextTestCase extends AbstractELTestCase
         Assert.assertEquals(muleContext.getClusterNodeId(), evaluate("mule.nodeId"));
     }
 
-    @Test(expected = MuleRuntimeException.class)
     public void assignValueToNodeId()
     {
-        evaluate("mule.nodeId='1'", Mockito.mock(MuleMessage.class));
+        assertImmutableVariable("mule.nodeId='1'");
     }
 
 }

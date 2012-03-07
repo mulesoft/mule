@@ -10,13 +10,18 @@
 
 package org.mule.el;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.el.ExpressionLanguage;
+import org.mule.api.expression.ExpressionRuntimeException;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.el.mvel.MVELExpressionLanguage;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.util.ExceptionUtils;
 
 import java.util.Arrays;
 import java.util.List;
@@ -25,6 +30,7 @@ import org.junit.Before;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
+import org.mvel2.ImmutableElementException;
 
 @RunWith(Parameterized.class)
 public abstract class AbstractELTestCase extends AbstractMuleContextTestCase
@@ -55,7 +61,7 @@ public abstract class AbstractELTestCase extends AbstractMuleContextTestCase
             case EVALUATOR_LANGUAGE :
                 return expressionLanguage.evaluate(expression);
             case EXPRESSION_MANAGER :
-                return muleContext.getExpressionManager().evaluate(expression, (MuleMessage) null);
+                return muleContext.getExpressionManager().evaluate(expression, (MuleEvent) null);
         }
         return null;
     }
@@ -73,6 +79,7 @@ public abstract class AbstractELTestCase extends AbstractMuleContextTestCase
         return null;
     }
 
+    @SuppressWarnings("deprecation")
     protected Object evaluate(String expression, MuleEvent event)
     {
         switch (variant)
@@ -99,6 +106,58 @@ public abstract class AbstractELTestCase extends AbstractMuleContextTestCase
     protected ExpressionLanguage getExpressionLanguage()
     {
         return new MVELExpressionLanguage(muleContext);
+    }
+
+    protected void assertUnsupportedOperation(String expression)
+    {
+        try
+        {
+            evaluate(expression);
+            fail("ExpressionRuntimeException expected");
+        }
+        catch (ExpressionRuntimeException e)
+        {
+            assertEquals(UnsupportedOperationException.class, ExceptionUtils.getRootCause(e).getClass());
+        }
+    }
+
+    protected void assertImmutableVariable(String expression)
+    {
+        try
+        {
+            evaluate(expression);
+            fail("ExpressionRuntimeException expected");
+        }
+        catch (ExpressionRuntimeException e)
+        {
+            assertEquals(ImmutableElementException.class, ExceptionUtils.getRootCause(e).getClass());
+        }
+    }
+
+    protected void assertImmutableVariable(String expression, MuleMessage message)
+    {
+        try
+        {
+            evaluate(expression, message);
+            fail("ExpressionRuntimeException expected");
+        }
+        catch (ExpressionRuntimeException e)
+        {
+            assertEquals(ImmutableElementException.class, ExceptionUtils.getRootCause(e).getClass());
+        }
+    }
+
+    protected void assertImmutableVariable(String expression, MuleEvent event)
+    {
+        try
+        {
+            evaluate(expression, event);
+            fail("ExpressionRuntimeException expected");
+        }
+        catch (ExpressionRuntimeException e)
+        {
+            assertEquals(ImmutableElementException.class, ExceptionUtils.getRootCause(e).getClass());
+        }
     }
 
 }

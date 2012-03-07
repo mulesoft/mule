@@ -13,13 +13,9 @@ package org.mule.el.context;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
-import org.mule.api.MuleRuntimeException;
-import org.mule.api.expression.ExpressionRuntimeException;
 import org.mule.api.registry.RegistrationException;
 import org.mule.el.AbstractELTestCase;
-import org.mule.util.ExceptionUtils;
 
 import java.util.Map;
 
@@ -39,10 +35,9 @@ public class AppContextTestCase extends AbstractELTestCase
         assertEquals(muleContext.getConfiguration().getId(), evaluate("app.name"));
     }
 
-    @Test(expected = MuleRuntimeException.class)
     public void assignValueToName()
     {
-        evaluate("app.name='1'");
+        assertImmutableVariable("app.name='1'");
     }
 
     @Test
@@ -51,10 +46,9 @@ public class AppContextTestCase extends AbstractELTestCase
         assertEquals(muleContext.getConfiguration().getDefaultEncoding(), evaluate("app.encoding"));
     }
 
-    @Test(expected = MuleRuntimeException.class)
     public void assignValueToEncoding()
     {
-        evaluate("app.encoding='1'");
+        assertImmutableVariable("app.encoding='1'");
     }
 
     @Test
@@ -63,10 +57,9 @@ public class AppContextTestCase extends AbstractELTestCase
         assertEquals(muleContext.getConfiguration().getWorkingDirectory(), evaluate("app.workDir"));
     }
 
-    @Test(expected = MuleRuntimeException.class)
     public void assignValueToWorkDir()
     {
-        evaluate("app.workDir='1'");
+        assertImmutableVariable("app.workDir='1'");
     }
 
     @Test
@@ -75,10 +68,9 @@ public class AppContextTestCase extends AbstractELTestCase
         assertFalse(muleContext.getClusterId(), (Boolean) evaluate("app.standalone"));
     }
 
-    @Test(expected = MuleRuntimeException.class)
     public void assignValueToStandalone()
     {
-        evaluate("app.standalone='1'");
+        assertImmutableVariable("app.standalone='1'");
     }
 
     @Test
@@ -87,12 +79,11 @@ public class AppContextTestCase extends AbstractELTestCase
         assertTrue(evaluate("app.registry") instanceof Map);
     }
 
-    @Test(expected = MuleRuntimeException.class)
     public void assignValueToRegistry()
     {
-        evaluate("app.registy='1'");
+        assertImmutableVariable("app.registy='1'");
     }
-    
+
     @Test
     public void registryGet() throws RegistrationException
     {
@@ -123,7 +114,7 @@ public class AppContextTestCase extends AbstractELTestCase
         muleContext.getRegistry().registerObject("myString", "dan");
         assertTrue((Boolean) evaluate("app.registry.containsKey('myString')"));
     }
-    
+
     @Test
     public void registryEntrySet()
     {
@@ -147,7 +138,7 @@ public class AppContextTestCase extends AbstractELTestCase
     {
         assertUnsupportedOperation("app.registry.values()");
     }
-    
+
     @Test
     public void registrySize()
     {
@@ -158,19 +149,6 @@ public class AppContextTestCase extends AbstractELTestCase
     public void registryContainsValue()
     {
         assertUnsupportedOperation("app.registry.containsValue('foo')");
-    }
-
-    protected void assertUnsupportedOperation(String expression)
-    {
-        try
-        {
-            evaluate(expression);
-            fail("ExpressionRuntimeException expected");
-        }
-        catch (ExpressionRuntimeException e)
-        {
-            assertEquals(UnsupportedOperationException.class, ExceptionUtils.getRootCause(e).getClass());
-        }
     }
 
 }

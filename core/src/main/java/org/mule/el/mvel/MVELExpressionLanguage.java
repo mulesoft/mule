@@ -104,6 +104,7 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
     {
         VariableResolverFactoryChainBuilder builder = new VariableResolverFactoryChainBuilder(
             appVariableResolverFactory);
+        builder.add(new MessageVariableResolverFactory(parserContext, muleContext, event.getMessage()));
         if (vars != null)
         {
             builder.add(new CachedMapVariableResolverFactory(vars));
@@ -115,7 +116,10 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
     @SuppressWarnings("unchecked")
     public <T> T evaluate(String expression, MuleMessage message)
     {
-        return (T) interalExecuteExpression(expression, appVariableResolverFactory);
+        VariableResolverFactoryChainBuilder builder = new VariableResolverFactoryChainBuilder(
+            appVariableResolverFactory);
+        builder.add(new MessageVariableResolverFactory(parserContext, muleContext, message));
+        return (T) interalExecuteExpression(expression, builder.build());
     }
 
     @SuppressWarnings("unchecked")
@@ -124,6 +128,7 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
     {
         VariableResolverFactoryChainBuilder builder = new VariableResolverFactoryChainBuilder(
             appVariableResolverFactory);
+        builder.add(new MessageVariableResolverFactory(parserContext, muleContext, message));
         if (vars != null)
         {
             builder.add(new CachedMapVariableResolverFactory(vars));

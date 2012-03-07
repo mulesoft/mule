@@ -10,7 +10,6 @@
 
 package org.mule.el.context;
 
-import org.mule.api.MuleRuntimeException;
 import org.mule.el.AbstractELTestCase;
 
 import java.net.InetAddress;
@@ -35,10 +34,9 @@ public class ServerContextTestCase extends AbstractELTestCase
         Assert.assertEquals(InetAddress.getLocalHost().getCanonicalHostName(), evaluate("server.host"));
     }
 
-    @Test(expected = MuleRuntimeException.class)
     public void assignValueToHost()
     {
-        evaluate("server.host='1'");
+        assertImmutableVariable("server.host='1'");
     }
 
     @Test
@@ -47,10 +45,9 @@ public class ServerContextTestCase extends AbstractELTestCase
         Assert.assertEquals(InetAddress.getLocalHost().getHostAddress(), evaluate("server.ip"));
     }
 
-    @Test(expected = MuleRuntimeException.class)
     public void assignValueToIp()
     {
-        evaluate("server.ip='1'");
+        assertImmutableVariable("server.ip='1'");
     }
 
     @Test
@@ -59,10 +56,9 @@ public class ServerContextTestCase extends AbstractELTestCase
         Assert.assertEquals(System.getProperties(), evaluate("server.java.properties"));
     }
 
-    @Test(expected = MuleRuntimeException.class)
     public void assignValueToJavaSystemProperties()
     {
-        evaluate("server.java.properties='1'");
+        assertImmutableVariable("server.java.properties='1'");
     }
 
     @Test
@@ -71,10 +67,9 @@ public class ServerContextTestCase extends AbstractELTestCase
         Assert.assertEquals(System.getProperty("java.io.tmpdir"), evaluate("server.tmpDir"));
     }
 
-    @Test(expected = MuleRuntimeException.class)
     public void assignValueToTmpdir()
     {
-        evaluate("server.tmpDir='1'");
+        assertImmutableVariable("server.tmpDir='1'");
     }
 
     @Test
@@ -83,10 +78,9 @@ public class ServerContextTestCase extends AbstractELTestCase
         Assert.assertEquals(System.getProperty("file.separator"), evaluate("server.fileSeperator"));
     }
 
-    @Test(expected = MuleRuntimeException.class)
     public void assignValueToFileseperator()
     {
-        evaluate("server.fileSeperator='1'");
+        assertImmutableVariable("server.fileSeperator='1'");
     }
 
     @Test
@@ -95,10 +89,9 @@ public class ServerContextTestCase extends AbstractELTestCase
         Assert.assertEquals(System.getProperty("user.name"), evaluate("server.user"));
     }
 
-    @Test(expected = MuleRuntimeException.class)
     public void assignValueUser()
     {
-        evaluate("server.user='1'");
+        assertImmutableVariable("server.user='1'");
     }
 
     @Test
@@ -107,10 +100,9 @@ public class ServerContextTestCase extends AbstractELTestCase
         evaluate("server.os");
     }
 
-    @Test(expected = MuleRuntimeException.class)
     public void assignValueToOs()
     {
-        evaluate("server.os='1'");
+        assertImmutableVariable("server.os='1'");
     }
 
     @Test
@@ -119,10 +111,9 @@ public class ServerContextTestCase extends AbstractELTestCase
         Assert.assertEquals(System.getProperty("os.name"), evaluate("server.os.name"));
     }
 
-    @Test(expected = MuleRuntimeException.class)
     public void assignValueToOsName()
     {
-        evaluate("server.os.name='1'");
+        assertImmutableVariable("server.os.name='1'");
     }
 
     @Test
@@ -131,10 +122,9 @@ public class ServerContextTestCase extends AbstractELTestCase
         Assert.assertEquals(System.getProperty("os.arch"), evaluate("server.os.arch"));
     }
 
-    @Test(expected = MuleRuntimeException.class)
     public void assignValueToOsArch()
     {
-        evaluate("server.os.arch='1'");
+        assertImmutableVariable("server.os.arch='1'");
     }
 
     @Test
@@ -143,10 +133,9 @@ public class ServerContextTestCase extends AbstractELTestCase
         Assert.assertEquals(System.getProperty("os.version"), evaluate("server.os.version"));
     }
 
-    @Test(expected = MuleRuntimeException.class)
     public void assignValueToOsVersion()
     {
-        evaluate("server.os.version='1'");
+        assertImmutableVariable("server.os.version='1'");
     }
 
     @Test
@@ -155,10 +144,9 @@ public class ServerContextTestCase extends AbstractELTestCase
         evaluate("server.java");
     }
 
-    @Test(expected = MuleRuntimeException.class)
     public void assignValueToJava()
     {
-        evaluate("server.java='1'");
+        assertImmutableVariable("server.java='1'");
     }
 
     @Test
@@ -167,10 +155,9 @@ public class ServerContextTestCase extends AbstractELTestCase
         Assert.assertEquals(System.getProperty("java.version"), evaluate("server.java.version"));
     }
 
-    @Test(expected = MuleRuntimeException.class)
     public void assignValueToJavaVersion()
     {
-        evaluate("server.java.version='1'");
+        assertImmutableVariable("server.java.version='1'");
     }
 
     @Test
@@ -179,10 +166,9 @@ public class ServerContextTestCase extends AbstractELTestCase
         Assert.assertEquals(System.getProperty("java.vendor"), evaluate("server.java.vendor"));
     }
 
-    @Test(expected = MuleRuntimeException.class)
     public void assignValueToJavaVendor()
     {
-        evaluate("server.java.vendor='1'");
+        assertImmutableVariable("server.java.vendor='1'");
     }
 
     @Test
@@ -191,10 +177,9 @@ public class ServerContextTestCase extends AbstractELTestCase
         Assert.assertEquals(System.getenv(), evaluate("server.env"));
     }
 
-    @Test(expected = MuleRuntimeException.class)
     public void assignValueToEnv()
     {
-        evaluate("server.env='1'");
+        assertImmutableVariable("server.env='1'");
     }
 
     @Test
@@ -203,10 +188,9 @@ public class ServerContextTestCase extends AbstractELTestCase
         Assert.assertEquals(Calendar.getInstance().getTimeZone(), evaluate("server.timeZone"));
     }
 
-    @Test(expected = MuleRuntimeException.class)
     public void assignValueToTimeZone()
     {
-        evaluate("server.timeZone='1'");
+        assertImmutableVariable("server.timeZone='1'");
     }
 
     @Test
@@ -215,10 +199,9 @@ public class ServerContextTestCase extends AbstractELTestCase
         Assert.assertEquals(Locale.getDefault(), evaluate("server.locale"));
     }
 
-    @Test(expected = MuleRuntimeException.class)
     public void assignValueToLocal()
     {
-        evaluate("server.locale='1'");
+        assertImmutableVariable("server.locale='1'");
     }
 
 }

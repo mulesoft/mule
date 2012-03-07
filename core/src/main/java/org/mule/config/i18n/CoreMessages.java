@@ -1364,5 +1364,14 @@ public class CoreMessages extends MessageFactory
         return factory.createMessage(BUNDLE_PATH, 336, key);
     }
 
+    public static Message inboundMessagePropertiesImmutable(Object key)
+    {
+        return factory.createMessage(BUNDLE_PATH, 337, key);
+    }
+
+    public static Message inboundMessageAttachmentsImmutable(Object key)
+    {
+        return factory.createMessage(BUNDLE_PATH, 338, key);
+    }
     
 }
