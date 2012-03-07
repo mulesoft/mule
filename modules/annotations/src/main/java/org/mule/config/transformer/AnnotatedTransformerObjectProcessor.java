@@ -15,6 +15,7 @@ import org.mule.api.annotations.ContainsTransformerMethods;
 import org.mule.api.annotations.Transformer;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.registry.PreInitProcessor;
+import org.mule.transformer.types.MimeTypes;
 import org.mule.util.annotation.AnnotationMetaData;
 import org.mule.util.annotation.AnnotationUtils;
 
@@ -65,10 +66,12 @@ public class AnnotatedTransformerObjectProcessor implements PreInitProcessor, Mu
             try
             {
                 Transformer anno = (Transformer) data.getAnnotation();
+                String sourceMimeType = anno.sourceMimeType().equals(MimeTypes.ANY) ? null : anno.sourceMimeType();
+                String resultMimeType = anno.resultMimeType().equals(MimeTypes.ANY) ? null : anno.resultMimeType();
                 AnnotatedTransformerProxy trans = new AnnotatedTransformerProxy(
                         anno.priorityWeighting(),
                         object, (Method) data.getMember(), anno.sourceTypes(),
-                        null /*anno.sourceMimeType()*/, null /*anno.resultMimeType()*/);
+                        sourceMimeType, resultMimeType);
 
                 muleContext.getRegistry().registerTransformer(trans);
             }

@@ -59,7 +59,7 @@ public class AnnotatedTransformerProxy extends AbstractMessageTransformer implem
         validateMethod(transformMethod, additionalSourceTypes);
 
         this.transformMethod = transformMethod;
-        setReturnDataType(DataTypeFactory.createFromReturnType(transformMethod));
+        setReturnDataType(DataTypeFactory.createFromReturnType(transformMethod, resultMimeType));
 
         messageAware = MuleMessage.class.isAssignableFrom(transformMethod.getParameterTypes()[0]);
         this.transformMethod = transformMethod;
@@ -67,7 +67,7 @@ public class AnnotatedTransformerProxy extends AbstractMessageTransformer implem
         {
             if (messageAware)
             {
-                logger.error("Transformer: " + getName() + " is MuleMessage aware, this means additional source types configured on the transformer will be ignorred. Source types are: " + Arrays.toString(additionalSourceTypes));
+                logger.error("Transformer: " + getName() + " is MuleMessage aware, this means additional source types configured on the transformer will be ignored. Source types are: " + Arrays.toString(additionalSourceTypes));
             }
             else
             {
@@ -80,7 +80,7 @@ public class AnnotatedTransformerProxy extends AbstractMessageTransformer implem
         }
         //The first Param is the always the object to transform
         Class<?> source = transformMethod.getParameterTypes()[0];
-        registerSourceType(DataTypeFactory.create(source));
+        registerSourceType(DataTypeFactory.create(source, sourceMimeType));
         sourceAnnotated = (transformMethod.getParameterAnnotations()[0].length > 0 &&
                 transformMethod.getParameterAnnotations()[0][0] instanceof Payload);
 
@@ -95,7 +95,7 @@ public class AnnotatedTransformerProxy extends AbstractMessageTransformer implem
                 method.getReturnType().equals(Object.class) || Arrays.asList(method.getParameterTypes()).contains(Object.class) ||
                 Arrays.asList(sourceTypes).contains(Object.class))
         {
-            //May lift the ban on OBject return and source types
+            //May lift the ban on Object return and source types
             //The details as to why the method is invalid are in the message
             throw new IllegalArgumentException(AnnotationsMessages.transformerMethodNotValid(method).getMessage());
         }
@@ -285,6 +285,5 @@ public class AnnotatedTransformerProxy extends AbstractMessageTransformer implem
         result = 31 * result + (messageAware ? 1 : 0);
         return result;
     }
-
 
 }

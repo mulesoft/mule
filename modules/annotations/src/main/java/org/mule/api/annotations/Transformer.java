@@ -10,6 +10,8 @@
 
 package org.mule.api.annotations;
 
+import org.mule.transformer.types.MimeTypes;
+
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -53,10 +55,21 @@ public @interface Transformer
      */
     int priorityWeighting() default 5;
 
-    //TODO BL-140 add when we get support for Transformer mime types
-//    String sourceMimeType() default MimeTypes.ANY;
-//
-//    String resultMimeType() default MimeTypes.ANY;
+    /**
+     * Source mime type describes the acceptable MIME type of this transformer input.
+     *
+     * @return The supported MIME type for input.
+     * @since 3.3.0
+     */
+    String sourceMimeType() default MimeTypes.ANY;
+
+    /**
+     * The result MIME type describes the MIME type of this transformer output.
+     *
+     * @return The MIME type for the output of this transformer.
+     * @since 3.3.0
+     */
+    String resultMimeType() default MimeTypes.ANY;
 
     /**
      * SourceTypes define additional types that this transformer will accepts as a sourceType (beyond the method parameter).
