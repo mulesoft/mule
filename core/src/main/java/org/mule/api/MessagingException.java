@@ -10,6 +10,7 @@
 
 package org.mule.api;
 
+import org.mule.config.ExceptionHelper;
 import org.mule.config.MuleManifest;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.Message;
@@ -41,6 +42,7 @@ public class MessagingException extends MuleException
     protected transient MuleEvent processedEvent;
 
     private boolean causeRollback;
+    private boolean handled;
 
     /**
      * @deprecated use MessagingException(Message, MuleEvent)
@@ -150,8 +152,46 @@ public class MessagingException extends MuleException
             this.muleMessage = null;
         }
     }
+    
+    public boolean causedBy(Class e)
+    {
+        if (e == null)
+        {
+            throw new IllegalArgumentException("Class cannot be null");
+        }
+        Throwable rootException = ExceptionHelper.getRootException(this);
+        if (rootException != null)
+        {
+            return e.isAssignableFrom(rootException.getClass());
+        }
+        return false;
+    }
 
-    public boolean isCauseRollback()
+    public boolean causedExactlyBy(Class e)
+    {
+        if (e == null)
+        {
+            throw new IllegalArgumentException("Class cannot be null");
+        }
+        Throwable rootException = ExceptionHelper.getRootException(this);
+        if (rootException == null)
+        {
+            rootException = this;
+        }
+        return e.equals(rootException.getClass());
+    }
+    
+    public Exception getCauseException()
+    {
+        Throwable rootException = ExceptionHelper.getRootException(this);
+        if (rootException == null)
+        {
+            rootException = this;
+        }
+        return (Exception) rootException;
+    }
+
+    public boolean causedRollback()
     {
         return causeRollback;
     }
@@ -159,6 +199,16 @@ public class MessagingException extends MuleException
     public void setCauseRollback(boolean causeRollback)
     {
         this.causeRollback = causeRollback;
+    }
+
+    public void setHandled(boolean handled)
+    {
+        this.handled = handled;
+    }
+
+    public boolean handled()
+    {
+        return handled;
     }
 }
 

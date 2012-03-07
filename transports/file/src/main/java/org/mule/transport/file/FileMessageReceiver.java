@@ -338,7 +338,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
         }
         catch (MessagingException e)
         {
-            if (e.isCauseRollback())
+            if (e.causedRollback())
             {
                 rollbackFileMoveIfRequired(originalSourceFile, sourceFile);
             }
@@ -382,7 +382,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
         }
         catch (MessagingException e)
         {
-            if (!e.isCauseRollback())
+            if (!e.causedRollback())
             {
                 try
                 {

@@ -292,7 +292,7 @@ public class FtpMessageReceiver extends AbstractPollingMessageReceiver
             catch (MessagingException e)
             {
                 //Already handled by TransactionTemplate
-                if (!e.isCauseRollback())
+                if (!e.causedRollback())
                 {
                     try
                     {
