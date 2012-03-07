@@ -149,13 +149,13 @@ public class ExpressionManagerTestCase extends AbstractMuleContextTestCase
     @Test
     public void testELExpression()
     {
-        assertEquals(4, muleContext.getExpressionManager().evaluate("#[2*2]", (MuleEvent) null));
+        assertEquals(4, muleContext.getExpressionManager().evaluate("#[2*2]", (MuleMessage) null));
     }
 
     @Test
     public void testBooleanELExpression()
     {
-        assertEquals(true, muleContext.getExpressionManager().evaluateBoolean("#[2>1]", (MuleEvent) null));
+        assertEquals(true, muleContext.getExpressionManager().evaluateBoolean("#[2>1]", (MuleMessage) null));
     }
 
     @Test
