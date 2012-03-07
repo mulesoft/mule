@@ -9,4 +9,14 @@
     <jms:activemq-connector name="jmsConnector1" />
     <jms:activemq-connector name="jmsConnector2" />
 
+    <endpoint name="out1" address="jms://out1"
+        connector-ref="jmsConnector1" exchange-pattern="one-way">
+    </endpoint>
+    <endpoint name="out2" address="jms://out2"
+        connector-ref="jmsConnector1" exchange-pattern="one-way">
+    </endpoint>
+    <endpoint name="out3" address="jms://out3"
+        connector-ref="jmsConnector2" exchange-pattern="one-way">
+    </endpoint>
+
 </mule>

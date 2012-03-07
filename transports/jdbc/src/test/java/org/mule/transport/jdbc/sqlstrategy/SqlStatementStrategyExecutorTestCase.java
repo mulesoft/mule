@@ -1,3 +1,12 @@
+/*
+ * $Id$
+ * --------------------------------------------------------------------------------------
+ * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ *
+ * The software in this package is published under the terms of the CPAL v1.0
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ */
 package org.mule.transport.jdbc.sqlstrategy;
 
 import static org.mockito.Mockito.verify;
@@ -14,13 +23,14 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.mule.api.MuleEvent;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.transaction.Transaction;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.transport.jdbc.JdbcConnector;
 
 @RunWith(MockitoJUnitRunner.class)
 @SmallTest
-public class SqlStatementStrategyExecutorTest
+public class SqlStatementStrategyExecutorTestCase extends AbstractMuleTestCase
 {
     public static final int TIMEOUT = 1000;
     @Mock

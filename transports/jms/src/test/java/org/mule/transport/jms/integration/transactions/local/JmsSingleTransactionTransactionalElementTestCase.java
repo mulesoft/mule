@@ -16,12 +16,10 @@ import static org.junit.Assert.fail;
 
 import javax.jms.JMSException;
 
-import org.hamcrest.core.Is;
 import org.junit.Before;
 import org.junit.Test;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.transaction.TransactionException;
 import org.mule.api.transport.DispatchException;
 import org.mule.construct.Flow;
 import org.mule.transport.jms.integration.AbstractJmsFunctionalTestCase;
@@ -37,9 +35,9 @@ public class JmsSingleTransactionTransactionalElementTestCase extends AbstractJm
     @Before
     public void setUpTest() throws JMSException
     {
-        purge("jms://out1?connector=jmsConnector1");
-        purge("jms://out2?connector=jmsConnector1");
-        purge("jms://out3?connector=jmsConnector2");
+        purge("out1");
+        purge("out2");
+        purge("out3");
     }
     
     @Test
@@ -48,8 +46,8 @@ public class JmsSingleTransactionTransactionalElementTestCase extends AbstractJm
         Flow flow = (Flow) getFlowConstruct("transactional");
         MuleEvent event = getTestEvent("message", flow);
         flow.process(event);
-        MuleMessage message1 = muleContext.getClient().request("jms://out1?connector=jmsConnector1", 1000);
-        MuleMessage message2 = muleContext.getClient().request("jms://out2?connector=jmsConnector1", 1000);
+        MuleMessage message1 = muleContext.getClient().request("out1", 1000);
+        MuleMessage message2 = muleContext.getClient().request("out2", 1000);
         assertThat(message1, notNullValue());
         assertThat(message2, notNullValue());
     }
