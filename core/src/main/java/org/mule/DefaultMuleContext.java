@@ -15,6 +15,7 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleRuntimeException;
+import org.mule.api.SingleResourceTransactionFactoryManager;
 import org.mule.api.client.LocalMuleClient;
 import org.mule.api.config.MuleConfiguration;
 import org.mule.api.config.MuleProperties;
@@ -133,6 +134,8 @@ public class DefaultMuleContext implements MuleContext
     private PollingController pollingController = new DefaultPollingController();
 
     private Map<QName, Set<Object>> configurationAnnotations;
+
+    private SingleResourceTransactionFactoryManager singleResourceTransactionFactoryManager = new SingleResourceTransactionFactoryManager();
 
     public DefaultMuleContext(MuleConfiguration config,
                               WorkManager workManager,
@@ -771,6 +774,12 @@ public class DefaultMuleContext implements MuleContext
             defaultExceptionStrategy = new DefaultMessagingExceptionStrategy(this);
         }
         return defaultExceptionStrategy;
+    }
+
+    @Override
+    public SingleResourceTransactionFactoryManager getTransactionFactoryManager()
+    {
+        return this.singleResourceTransactionFactoryManager;
     }
 
     @Override

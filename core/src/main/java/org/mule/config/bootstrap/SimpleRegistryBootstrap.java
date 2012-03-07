@@ -17,6 +17,7 @@ import org.mule.api.registry.MuleRegistry;
 import org.mule.api.registry.ObjectProcessor;
 import org.mule.api.registry.RegistrationException;
 import org.mule.api.registry.Registry;
+import org.mule.api.transaction.TransactionFactory;
 import org.mule.api.transformer.DiscoverableTransformer;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.util.StreamCloser;
@@ -30,6 +31,7 @@ import org.mule.util.UUID;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -82,6 +84,7 @@ public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
 
     public String TRANSFORMER_KEY = ".transformer.";
     public String OBJECT_KEY = ".object.";
+    public String SINGLE_TX = ".singletx.";
 
     protected final transient Log logger = LogFactory.getLog(getClass());
 
@@ -125,6 +128,7 @@ public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
         Properties transformers = new Properties();
         Properties namedObjects = new Properties();
         Properties unnamedObjects = new Properties();
+        Map<String,String> singleTransactionFactories = new HashMap<String,String>();
 
         for (Properties bootstrap : bootstraps)
         {
@@ -140,6 +144,19 @@ public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
                 {
                     String newKey = key.substring(0, key.lastIndexOf(".")) + transformerCounter++;
                     transformers.put(newKey, entry.getValue());
+                }
+                else if (key.contains(SINGLE_TX))
+                {
+                    if (!key.contains(".transaction.resource"))
+                    {
+                        String transactionResourceKey = key.replace(".transaction.factory",".transaction.resource");
+                        String transactionResource = bootstrap.getProperty(transactionResourceKey);
+                        if (transactionResource == null)
+                        {
+                            throw new InitialisationException(CoreMessages.createStaticMessage(String.format("Theres no transaction resource specified for transaction factory %s",key)),this);
+                        }
+                        singleTransactionFactories.put((String) entry.getValue(),transactionResource);
+                    }
                 }
                 else
                 {
@@ -163,10 +180,20 @@ public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
             registerUnnamedObjects(unnamedObjects, context.getRegistry());
             registerTransformers(transformers, context.getRegistry());
             registerObjects(namedObjects, context.getRegistry());
+            registerTransactionFactories(singleTransactionFactories, context);
         }
         catch (Exception e1)
         {
             throw new InitialisationException(e1, this);
+        }
+    }
+
+    private void registerTransactionFactories(Map<String, String> singleTransactionFactories, MuleContext context) throws Exception
+    {
+        for (String transactionFactoryClassName : singleTransactionFactories.keySet())
+        {
+            String transactionResourceClassName = singleTransactionFactories.get(transactionFactoryClassName);
+            context.getTransactionFactoryManager().registerTransactionFactory(Class.forName(transactionResourceClassName), (TransactionFactory) Class.forName(transactionFactoryClassName).newInstance());
         }
     }
 

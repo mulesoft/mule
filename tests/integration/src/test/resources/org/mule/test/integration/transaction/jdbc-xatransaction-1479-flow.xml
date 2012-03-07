@@ -30,7 +30,7 @@
 
     <vm:connector name="vmConnector"/>
 
-    <jdbc:connector name="jdbcConnectorXA" dataSource-ref="jdbcDataSourceXA">
+    <jdbc:connector name="jdbcConnectorXA" dataSource-ref="jdbcDataSource">
         <jdbc:query key="insertRecord" value="INSERT into Test (data) VALUES (#[payload])"/>
         <jdbc:query key="causeException" value="INSERT into Test (bad_column_name) VALUES (#[payload])"/>
     </jdbc:connector>
@@ -40,15 +40,17 @@
     <flow name="TestJdbc">
 
         <vm:inbound-endpoint path="in" exchange-pattern="one-way"/>
-        <all>
-            <jdbc:outbound-endpoint queryKey="insertRecord" exchange-pattern="one-way">
-                <xa-transaction action="ALWAYS_JOIN"/>
-            </jdbc:outbound-endpoint>
-            <jdbc:outbound-endpoint queryKey="causeException" exchange-pattern="one-way">
-                <xa-transaction action="ALWAYS_JOIN"/>
-            </jdbc:outbound-endpoint>
-            <!-- <xa-transaction action="ALWAYS_BEGIN"/>   -->
-        </all>
+        <transactional>
+            <all>
+                <jdbc:outbound-endpoint queryKey="insertRecord" exchange-pattern="one-way">
+                    <xa-transaction action="ALWAYS_JOIN"/>
+                </jdbc:outbound-endpoint>
+                <jdbc:outbound-endpoint queryKey="causeException" exchange-pattern="one-way">
+                    <xa-transaction action="ALWAYS_JOIN"/>
+                </jdbc:outbound-endpoint>
+                <!-- <xa-transaction action="ALWAYS_BEGIN"/>   -->
+            </all>
+        </transactional>
         <default-exception-strategy>
             <rollback-transaction exception-pattern="*" />
         </default-exception-strategy>
@@ -56,15 +58,17 @@
 
     <flow name="TestJms">
         <vm:inbound-endpoint path="in1" exchange-pattern="one-way"/>
-        <all>
-            <jdbc:outbound-endpoint queryKey="insertRecord" exchange-pattern="one-way">
-                <xa-transaction action="ALWAYS_JOIN"/>
-            </jdbc:outbound-endpoint>
-            <jms:outbound-endpoint queue="queue.out" exchange-pattern="request-response">
-                <xa-transaction action="ALWAYS_JOIN"/>
-            </jms:outbound-endpoint>
-            <!-- <xa-transaction action="ALWAYS_BEGIN"/> -->
-        </all>
+        <transactional>
+            <all>
+                <jdbc:outbound-endpoint queryKey="insertRecord" exchange-pattern="one-way">
+                    <xa-transaction action="ALWAYS_JOIN"/>
+                </jdbc:outbound-endpoint>
+                <jms:outbound-endpoint queue="queue.out" exchange-pattern="request-response">
+                    <xa-transaction action="ALWAYS_JOIN"/>
+                </jms:outbound-endpoint>
+                <!-- <xa-transaction action="ALWAYS_BEGIN"/> -->
+            </all>
+        </transactional>
         <default-exception-strategy>
             <rollback-transaction exception-pattern="*" />
         </default-exception-strategy>

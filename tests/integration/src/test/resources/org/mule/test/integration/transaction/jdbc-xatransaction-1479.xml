@@ -30,7 +30,7 @@
    
     <vm:connector name="vmConnector"/>
        
-    <jdbc:connector name="jdbcConnectorXA" dataSource-ref="jdbcDataSourceXA">
+    <jdbc:connector name="jdbcConnectorXA" dataSource-ref="jdbcDataSource">
         <jdbc:query key="insertRecord" value="INSERT into Test (data) VALUES (#[payload])"/>
         <jdbc:query key="causeException" value="INSERT into Test (bad_column_name) VALUES (#[payload])"/>
     </jdbc:connector>

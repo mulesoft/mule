@@ -12,6 +12,7 @@ package org.mule.transport.vm;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.api.MuleEvent;
+import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.OutboundEndpoint;
@@ -51,7 +52,7 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher
         MuleEvent eventToDispatch = DefaultMuleEvent.copy(event);
         eventToDispatch.clearFlowVariables();
         eventToDispatch.setMessage(eventToDispatch.getMessage().createInboundMessage());
-        QueueSession session = connector.getQueueSession();
+        QueueSession session = getQueueSession();
         Queue queue = session.getQueue(endpointUri.getAddress());
         if (!queue.offer(eventToDispatch, connector.getQueueTimeout()))
         {
@@ -63,6 +64,13 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher
         {
             logger.debug("dispatched MuleEvent on endpointUri: " + endpointUri);
         }
+    }
+
+    private QueueSession getQueueSession() throws MuleException
+    {
+        QueueSession session = connector.getTransactionalResource(endpoint);
+        connector.bindXaResourceIfRequired();
+        return session;
     }
 
     @Override

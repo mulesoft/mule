@@ -41,6 +41,7 @@ public class MuleTransactionConfig implements TransactionConfig, MuleContextAwar
     public static final String ACTION_JOIN_IF_POSSIBLE_STRING = "JOIN_IF_POSSIBLE";
     public static final String ACTION_NEVER_STRING = "NEVER";
     public static final String ACTION_INDIFFERENT_STRING = "INDIFFERENT";
+    public static final String ACTION_NOT_SUPPORTED_STRING = "NOT_SUPPORTED";
 
     private TransactionFactory factory;
 
@@ -135,6 +136,10 @@ public class MuleTransactionConfig implements TransactionConfig, MuleContextAwar
         {
             this.action = ACTION_INDIFFERENT;
         }
+        else if (ACTION_NOT_SUPPORTED_STRING.equals(action))
+        {
+            this.action = ACTION_NOT_SUPPORTED;
+        }
         else
         {
             throw new IllegalArgumentException("Action " + action + " is not recognised as a begin action.");
@@ -167,7 +172,7 @@ public class MuleTransactionConfig implements TransactionConfig, MuleContextAwar
      */
     public boolean isTransacted()
     {
-        if (action == ACTION_NEVER || action == ACTION_NONE)
+        if (action == ACTION_NEVER || action == ACTION_NONE || action == ACTION_NOT_SUPPORTED)
         {
             return false;
         }

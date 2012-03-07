@@ -66,7 +66,7 @@ public class XAJdbcMule1479TestCase extends AbstractDerbyTestCase
             
             Thread.sleep(1000);
         }
-    }    
+    }
 
     @Test
     public void testJmsXa() throws Exception

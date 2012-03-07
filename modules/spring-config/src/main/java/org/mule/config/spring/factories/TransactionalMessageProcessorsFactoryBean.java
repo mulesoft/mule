@@ -10,26 +10,31 @@
 
 package org.mule.config.spring.factories;
 
+import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorBuilder;
 import org.mule.api.processor.MessageProcessors;
 import org.mule.api.transaction.TransactionConfig;
+import org.mule.processor.DelegateTransactionFactory;
+import org.mule.processor.EndpointTransactionalInterceptingMessageProcessor;
 import org.mule.processor.TransactionalInterceptingMessageProcessor;
 import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
 
 import java.util.List;
 
+import org.mule.transaction.MuleTransactionConfig;
 import org.springframework.beans.factory.FactoryBean;
 
 public class TransactionalMessageProcessorsFactoryBean implements FactoryBean
 {
 
     protected List messageProcessors;
-    protected TransactionConfig transactionConfig;
+    protected MessagingExceptionHandler exceptionListener;
+    protected String action;
 
     public Class getObjectType()
     {
-        return MessageProcessor.class;
+        return TransactionalInterceptingMessageProcessor.class;
     }
 
     public void setMessageProcessors(List messageProcessors)
@@ -41,8 +46,12 @@ public class TransactionalMessageProcessorsFactoryBean implements FactoryBean
     {
         DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
         builder.setName("'transaction' child processor chain");
-        TransactionalInterceptingMessageProcessor txProcessor = 
-            new TransactionalInterceptingMessageProcessor(transactionConfig);
+        TransactionalInterceptingMessageProcessor txProcessor =
+            new TransactionalInterceptingMessageProcessor();
+        txProcessor.setExceptionListener(this.exceptionListener);
+        MuleTransactionConfig transactionConfig = createTransactionConfig(this.action);
+        txProcessor.setTransactionConfig(transactionConfig);
+        transactionConfig.setFactory(new DelegateTransactionFactory());
         builder.chain(txProcessor);
         for (Object processor : messageProcessors)
         {
@@ -63,13 +72,25 @@ public class TransactionalMessageProcessorsFactoryBean implements FactoryBean
         return MessageProcessors.lifecyleAwareMessageProcessorWrapper(builder.build());
     }
 
+    protected MuleTransactionConfig createTransactionConfig(String action)
+    {
+        MuleTransactionConfig transactionConfig = new MuleTransactionConfig();
+        transactionConfig.setActionAsString(action);
+        return transactionConfig;
+    }
+
     public boolean isSingleton()
     {
         return false;
     }
 
-    public void setTransactionConfig(TransactionConfig transactionConfig)
+    public void setExceptionListener(MessagingExceptionHandler exceptionListener)
     {
-        this.transactionConfig = transactionConfig;
+        this.exceptionListener = exceptionListener;
+    }
+
+    public void setAction(String action)
+    {
+        this.action = action;
     }
 }

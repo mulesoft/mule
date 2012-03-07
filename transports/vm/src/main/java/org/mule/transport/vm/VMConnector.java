@@ -15,6 +15,7 @@ import org.mule.api.MuleException;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.EndpointException;
 import org.mule.api.endpoint.EndpointURI;
+import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transaction.Transaction;
@@ -253,4 +254,24 @@ public class VMConnector extends AbstractConnector
         return queueManager;
     }
 
+    public void bindXaResourceIfRequired() throws TransactionException
+    {
+        Transaction tx = TransactionCoordination.getInstance().getTransaction();
+        if (xaResourceFactory != null && tx instanceof XaTransaction)
+        {
+            tx.bindResource(this, xaResourceFactory.create());
+        }
+    }
+
+    @Override
+    protected <T> T createOperationResource(ImmutableEndpoint endpoint) throws MuleException
+    {
+        return (T) getQueueManager().getQueueSession();
+    }
+
+    @Override
+    protected <T> T getOperationResourceFactory()
+    {
+        return (T) getQueueManager();
+    }
 }

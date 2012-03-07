@@ -35,7 +35,7 @@ public  class SelectSqlStatementStrategy implements SqlStatementStrategy
     protected transient Logger logger = Logger.getLogger(getClass());
     
     public MuleMessage executeStatement(JdbcConnector connector, ImmutableEndpoint endpoint,
-        MuleEvent event, long timeout) throws Exception
+                                        MuleEvent event, long timeout, Connection connection) throws Exception
     {
         logger.debug("Trying to receive a message with a timeout of " + timeout);
         
@@ -53,14 +53,11 @@ public  class SelectSqlStatementStrategy implements SqlStatementStrategy
         readStmt = connector.parseStatement(readStmt, readParams);
         ackStmt = connector.parseStatement(ackStmt, ackParams);
 
-        Connection con = null;
         long t0 = System.currentTimeMillis();
         Transaction tx  = TransactionCoordination.getInstance().getTransaction();
         try
         {
-            con = connector.getConnection();
-            
-            //This method is used in both JDBCMessageDispatcher and JDBCMessageRequester.  
+            //This method is used in both JDBCMessageDispatcher and JDBCMessageRequester.
             //JDBCMessageRequester specifies a finite timeout.
             if (timeout < 0)
             {
@@ -82,7 +79,7 @@ public  class SelectSqlStatementStrategy implements SqlStatementStrategy
                 }
 
                 //Perform actual query
-                result = connector.getQueryRunnerFor(endpoint).query(con, readStmt, 
+                result = connector.getQueryRunnerFor(endpoint).query(connection, readStmt,
                     connector.getResultSetHandler(), params);
                 
                 if (result != null)
@@ -110,7 +107,7 @@ public  class SelectSqlStatementStrategy implements SqlStatementStrategy
                 else
                 {
                     logger.debug("Timeout");
-                    JdbcUtils.rollbackAndClose(con);
+                    JdbcUtils.rollbackAndClose(connection);
                     return null;
                 }
             } while (true);
@@ -124,7 +121,7 @@ public  class SelectSqlStatementStrategy implements SqlStatementStrategy
                 {
                     logger.debug("SQL UPDATE: " + ackStmt + ", params = " + ArrayUtils.toString(params));
                 }
-                int nbRows = connector.getQueryRunnerFor(endpoint).update(con, ackStmt, params);
+                int nbRows = connector.getQueryRunnerFor(endpoint).update(connection, ackStmt, params);
                 if (nbRows != 1)
                 {
                     logger.warn("Row count for ack should be 1 and not " + nbRows);
@@ -145,7 +142,7 @@ public  class SelectSqlStatementStrategy implements SqlStatementStrategy
             //Close or return connection if not in a transaction
             if (tx == null)
             {
-                JdbcUtils.commitAndClose(con);
+                JdbcUtils.commitAndClose(connection);
             }
             
             return message;
@@ -154,7 +151,7 @@ public  class SelectSqlStatementStrategy implements SqlStatementStrategy
         {
             if (tx == null)
             {
-                JdbcUtils.rollbackAndClose(con);
+                JdbcUtils.rollbackAndClose(connection);
             }
             throw e;
         }

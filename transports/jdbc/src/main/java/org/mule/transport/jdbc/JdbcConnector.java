@@ -10,6 +10,7 @@
 
 package org.mule.transport.jdbc;
 
+import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
@@ -35,6 +36,7 @@ import org.mule.util.StringUtils;
 import org.mule.util.TemplateParser;
 
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.text.MessageFormat;
 import java.util.List;
 import java.util.Map;
@@ -558,5 +560,24 @@ public class JdbcConnector extends AbstractConnector
     public void setQueryTimeout(int queryTimeout)
     {
         this.queryTimeout = queryTimeout;
+    }
+
+    @Override
+    protected <T> T getOperationResourceFactory()
+    {
+        return (T) getDataSource();
+    }
+
+    @Override
+    protected <T> T createOperationResource(ImmutableEndpoint endpoint) throws MuleException
+    {
+        try
+        {
+            return (T) getDataSource().getConnection();
+        }
+        catch (SQLException e)
+        {
+            throw new DefaultMuleException(e);
+        }
     }
 }

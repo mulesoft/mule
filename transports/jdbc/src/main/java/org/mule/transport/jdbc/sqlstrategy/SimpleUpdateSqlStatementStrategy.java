@@ -35,7 +35,7 @@ public  class SimpleUpdateSqlStatementStrategy implements SqlStatementStrategy
 
     @Override
     public MuleMessage executeStatement(JdbcConnector connector,
-            ImmutableEndpoint endpoint, MuleEvent event,long timeout) throws Exception
+                                        ImmutableEndpoint endpoint, MuleEvent event, long timeout, Connection connection) throws Exception
     {
         //Unparsed SQL statement (with #[foo] format parameters)
         String statement = connector.getStatement(endpoint);
@@ -55,19 +55,15 @@ public  class SimpleUpdateSqlStatementStrategy implements SqlStatementStrategy
             event.getMessage().getPayload(), message, event.getMuleContext()), endpoint.getEndpointURI().getAddress());
 
         Transaction tx = TransactionCoordination.getInstance().getTransaction();
-        Connection con = null;
 
         try
         {
-            con = connector.getConnection();
-
-
             if (logger.isDebugEnabled())
             {
                 logger.debug("SQL UPDATE: " + sql + ", params = " + ArrayUtils.toString(paramValues));
             }
 
-            int nbRows = connector.getQueryRunnerFor(endpoint).update(con, sql, paramValues);
+            int nbRows = connector.getQueryRunnerFor(endpoint).update(connection, sql, paramValues);
             if (logger.isInfoEnabled())
             {
                 logger.info("Executing SQL statement: " + nbRows + " row(s) updated");
@@ -82,7 +78,7 @@ public  class SimpleUpdateSqlStatementStrategy implements SqlStatementStrategy
             //}
             if (tx == null)
             {
-                JdbcUtils.commitAndClose(con);
+                JdbcUtils.commitAndClose(connection);
             }
             logger.debug("MuleEvent dispatched succesfuly");
         }
@@ -91,7 +87,7 @@ public  class SimpleUpdateSqlStatementStrategy implements SqlStatementStrategy
             logger.debug("Error dispatching event: " + e.getMessage(), e);
             if (tx == null)
             {
-                JdbcUtils.rollbackAndClose(con);
+                JdbcUtils.rollbackAndClose(connection);
             }
             throw e;
         }

@@ -846,6 +846,7 @@
             </xsd:complexContent>
         </xsd:complexType>
     </xsd:element>
+    -->
 
     <xsd:element name="transactional" substitutionGroup="abstract-message-processor">
         <xsd:annotation>
@@ -857,14 +858,22 @@
             <xsd:complexContent>
                 <xsd:extension base="abstractMessageProcessorType">
                     <xsd:sequence>
-                        <xsd:element ref="abstract-transaction"/>
                         <xsd:group ref="messageProcessorOrOutboundEndpoint" maxOccurs="unbounded"/>
+                        <xsd:element ref="abstract-exception-strategy" minOccurs="0"/>
                     </xsd:sequence>
+                    <xsd:attribute name="action" type="transactionalActionType" default="ALWAYS_BEGIN"/>
                 </xsd:extension>
             </xsd:complexContent>
         </xsd:complexType>
     </xsd:element>
-    -->
+
+    <xsd:simpleType name="transactionalActionType">
+        <xsd:restriction base="xsd:NMTOKEN">
+            <xsd:enumeration value="ALWAYS_BEGIN"/>
+            <xsd:enumeration value="BEGIN_OR_JOIN"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+
 
     <!-- Message Sources -->
     <xsd:element name="abstract-message-source" abstract="true" type="abstractMessageSourceType">
@@ -2976,6 +2985,7 @@
                     BEGIN_OR_JOIN - If a transaction is already in progress when a message is received, join the transaction if possible. Otherwise, start a new transaction.
                     ALWAYS_JOIN - Always expects a transaction to be in progress when a message is received. If there is no transaction, an exception is thrown.
                     JOIN_IF_POSSIBLE - Join the current transaction if one is available. Otherwise, no transaction is created.
+                    NOT_SUPPORTED - Execute outside any existent transaction
                 </xsd:documentation>
             </xsd:annotation>
             <xsd:simpleType>
@@ -2985,6 +2995,7 @@
                     <xsd:enumeration value="BEGIN_OR_JOIN"/>
                     <xsd:enumeration value="ALWAYS_JOIN"/>
                     <xsd:enumeration value="JOIN_IF_POSSIBLE"/>
+                    <xsd:enumeration value="NOT_SUPPORTED"/>
                 </xsd:restriction>
             </xsd:simpleType>
         </xsd:attribute>

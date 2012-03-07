@@ -80,6 +80,18 @@ public class TransactionNotificationsTestCase extends AbstractMuleContextTestCas
             super(muleContext);
         }
 
+        @Override
+        protected Class getResourceType()
+        {
+            return null;  //To change body of implemented methods use File | Settings | File Templates.
+        }
+
+        @Override
+        protected Class getKeyType()
+        {
+            return null;  //To change body of implemented methods use File | Settings | File Templates.
+        }
+
         protected void doBegin() throws TransactionException
         {
 

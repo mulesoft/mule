@@ -58,6 +58,8 @@ public class JmsTransaction extends AbstractSingleResourceTransaction
         super.bindResource(key, resource);
     }
 
+
+
     protected void doBegin() throws TransactionException
     {
         // do nothing
@@ -125,4 +127,15 @@ public class JmsTransaction extends AbstractSingleResourceTransaction
         }
     }
 
+    @Override
+    protected Class getResourceType()
+    {
+        return Session.class;
+    }
+
+    @Override
+    protected Class getKeyType()
+    {
+        return Connection.class;
+    }
 }

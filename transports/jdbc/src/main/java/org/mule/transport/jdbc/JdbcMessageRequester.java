@@ -10,6 +10,8 @@
 
 package org.mule.transport.jdbc;
 
+import java.sql.Connection;
+
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.InboundEndpoint;
@@ -63,7 +65,7 @@ public class JdbcMessageRequester extends AbstractMessageRequester
     {
         String statement = connector.getStatement(endpoint);
         SqlStatementStrategy strategy = connector.getSqlStatementStrategyFactory().create(statement, null);
-        return strategy.executeStatement(connector, endpoint, event, timeout);        
+        return strategy.executeStatement(connector, endpoint, event, timeout, connector.getConnection());
     }
 
 

@@ -66,6 +66,11 @@ public interface TransactionConfig
      */
     byte ACTION_INDIFFERENT = 6;
 
+    /*
+     * Executes outside any existent transaction
+     */
+    byte ACTION_NOT_SUPPORTED = 7;
+
     /**
      * Transaction action by default.  Note that before 3.2 it was ACTION_NONE
      * <p>

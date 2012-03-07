@@ -21,17 +21,18 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.process.ProcessingCallback;
 import org.mule.process.ProcessingTemplate;
 import org.mule.process.TransactionalProcessingTemplate;
+import org.mule.transaction.MuleTransactionConfig;
 
 /**
  * Wraps the invocation of the next {@link MessageProcessor} with a transaction. If
  * the {@link TransactionConfig} is null then no transaction is used and the next
  * {@link MessageProcessor} is invoked directly.
  */
-public class TransactionalInterceptingMessageProcessor extends AbstractInterceptingMessageProcessor
+public class EndpointTransactionalInterceptingMessageProcessor extends AbstractInterceptingMessageProcessor
 {
     protected TransactionConfig transactionConfig;
 
-    public TransactionalInterceptingMessageProcessor(TransactionConfig transactionConfig)
+    public EndpointTransactionalInterceptingMessageProcessor(TransactionConfig transactionConfig)
     {
         this.transactionConfig = transactionConfig;
     }

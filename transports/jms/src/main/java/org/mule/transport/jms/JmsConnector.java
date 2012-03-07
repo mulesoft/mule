@@ -10,6 +10,7 @@
 
 package org.mule.transport.jms;
 
+import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleRuntimeException;
@@ -199,7 +200,7 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
 
     @Override
     protected void doInitialise() throws InitialisationException
-    {        
+    {
         try
         {
             connectionFactory = this.createConnectionFactory();
@@ -256,6 +257,7 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
         {
             jmsSupport = createJmsSupport();
         }
+        muleContext.getTransactionFactoryManager().registerTransactionFactory(Session.class,new JmsTransactionFactory());
     }
 
     /**
@@ -549,6 +551,11 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
         final boolean topic = getTopicResolver().isTopic(endpoint);
         return getSession(endpoint.getTransactionConfig().isTransacted(), topic);
     }
+    
+    public Session createSession(ImmutableEndpoint endpoint) throws JMSException
+    {
+        return createSession(endpoint.getTransactionConfig().isTransacted(),getTopicResolver().isTopic(endpoint));
+    }
 
     public Session getSession(boolean transacted, boolean topic) throws JMSException
     {
@@ -560,7 +567,7 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
 
         Transaction tx = TransactionCoordination.getInstance().getTransaction();
 
-        session = jmsSupport.createSession(connection, topic, transacted, acknowledgementMode, noLocal);
+        session = createSession(transacted, topic);
 
         if (logger.isDebugEnabled())
         {
@@ -583,6 +590,13 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
                 throw new RuntimeException("Could not bind session to current transaction", e);
             }
         }
+        return session;
+    }
+
+    private Session createSession(boolean transacted, boolean topic) throws JMSException
+    {
+        Session session;
+        session = jmsSupport.createSession(connection, topic, transacted, acknowledgementMode, noLocal);
         return session;
     }
 
@@ -1357,5 +1371,24 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
         }
 
         return null;
+    }
+
+    @Override
+    protected Session createOperationResource(ImmutableEndpoint endpoint) throws MuleException
+    {
+        try
+        {
+            return createSession(endpoint);
+        }
+        catch (JMSException e)
+        {
+            throw new DefaultMuleException(e);
+        }
+    }
+
+    @Override
+    protected Object getOperationResourceFactory()
+    {
+        return getConnection();
     }
 }

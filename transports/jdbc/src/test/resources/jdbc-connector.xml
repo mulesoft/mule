@@ -13,16 +13,26 @@
     <jdbc:connector name="jdbcConnector" pollingFrequency="1000" dataSource-ref="jdbcDataSource" queryTimeout="3000">
         <jdbc:query key="getTest"
                     value="SELECT ID, TYPE, DATA, ACK, RESULT FROM TEST WHERE TYPE = #[type] AND ACK IS NULL"/>
+        <jdbc:query key="getTestType1"
+                    value="SELECT ID, TYPE, DATA, ACK, RESULT FROM TEST WHERE TYPE = 1 AND ACK IS NULL"/>
         <jdbc:query key="getTestPayload"
                     value="SELECT ID, TYPE, DATA, ACK, RESULT FROM TEST WHERE TYPE = #[jxpath:type] AND ACK IS NULL"/>
         <jdbc:query key="getTest.ack"
                     value="UPDATE TEST SET ACK = #[function:NOW] WHERE ID = #[id] AND TYPE = #[type] AND DATA = #[data]"/>
+        <jdbc:query key="getTestType1.ack"
+                    value="UPDATE TEST SET ACK = #[function:NOW] WHERE TYPE = 1"/>
         <jdbc:query key="selectCount"
                     value="SELECT COUNT(*) FROM TEST"/>
         <jdbc:query key="writeTest"
                     value="INSERT INTO TEST(TYPE, DATA, ACK, RESULT) VALUES(#[type], #[payload], NULL, NULL)"/>
         <jdbc:query key="writeMap"
                     value="INSERT INTO TEST(TYPE, DATA, ACK, RESULT) VALUES(#[type], #[map-payload:data], NULL, NULL)"/>
+        <jdbc:query key="write1"
+                    value="INSERT INTO TEST(TYPE, DATA, ACK, RESULT) VALUES(1, NULL, NULL, NULL)"/>
+        <jdbc:query key="write2"
+                    value="INSERT INTO TEST(TYPE, DATA, ACK, RESULT) VALUES(2, NULL, NULL, NULL)"/>
+        <jdbc:query key="write3"
+                    value="INSERT INTO TEST(TYPE, DATA, ACK, RESULT) VALUES(3, NULL, NULL, NULL)"/>
         <jdbc:query key="insertIdempotency"
                     value="INSERT INTO IDS(K, VALUE) VALUES(?, ?)"/>
         <jdbc:query key="selectIdempotency"

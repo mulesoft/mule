@@ -105,4 +105,10 @@ public class JmsClientAcknowledgeTransaction extends AbstractSingleResourceTrans
 
         super.bindResource(key, resource);
     }
+
+    @Override
+    public boolean supports(Object key, Object resource)
+    {
+        return false;
+    }
 }

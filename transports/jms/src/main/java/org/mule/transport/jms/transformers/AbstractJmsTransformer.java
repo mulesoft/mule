@@ -10,6 +10,7 @@
 
 package org.mule.transport.jms.transformers;
 
+import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.transaction.Transaction;
@@ -194,11 +195,11 @@ public abstract class AbstractJmsTransformer extends AbstractMessageTransformer 
         }
     }
 
-    protected Session getSession() throws JMSException
+    protected Session getSession() throws Exception
     {
         if (endpoint != null)
         {
-            return ((JmsConnector) endpoint.getConnector()).getSession(endpoint);
+            return ((JmsConnector)endpoint.getConnector()).getTransactionalResource(endpoint);
         }
         else
         {

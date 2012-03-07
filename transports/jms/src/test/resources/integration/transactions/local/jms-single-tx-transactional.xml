@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+    xmlns:test="http://www.mulesoft.org/schema/mule/test" xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
+    xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+    xmlns:spring="http://www.springframework.org/schema/beans"
+    xsi:schemaLocation="
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
+       http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/3.2/mule-jms.xsd
+       http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.2/mule-vm.xsd
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd              
+       http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/3.2/mule-test.xsd">
+
+
+
+    <flow name="transactional">
+        <append-string-transformer message=" a"/>
+        <transactional>
+            <jms:outbound-endpoint queue="out1" connector-ref="jmsConnector1"/>
+            <jms:outbound-endpoint queue="out2" connector-ref="jmsConnector1"/>
+        </transactional>
+    </flow>
+
+    <flow name="transactionalFailInTheMiddle">
+        <append-string-transformer message=" b"/>
+        <transactional>
+            <jms:outbound-endpoint queue="out1" connector-ref="jmsConnector1"/>
+            <test:component throwException="true"/>
+            <jms:outbound-endpoint queue="out2" connector-ref="jmsConnector1"/>
+        </transactional>
+    </flow>
+
+    <flow name="transactionalFailAtEnd">
+        <append-string-transformer message=" c"/>
+        <transactional>
+            <jms:outbound-endpoint queue="out1" connector-ref="jmsConnector1"/>
+            <jms:outbound-endpoint queue="out2" connector-ref="jmsConnector1"/>
+            <test:component throwException="true"/>
+        </transactional>
+    </flow>
+
+    <flow name="transactionalFailAfterEnd">
+        <append-string-transformer message=" d"/>
+        <transactional>
+            <jms:outbound-endpoint queue="out1" connector-ref="jmsConnector1"/>
+            <jms:outbound-endpoint queue="out2" connector-ref="jmsConnector1"/>
+        </transactional>
+        <test:component throwException="true"/>
+    </flow>
+
+    <flow name="transactionalFailInTheMiddleWithCatchExceptionStrategy">
+        <append-string-transformer message=" e"/>
+        <transactional>
+            <jms:outbound-endpoint queue="out1" connector-ref="jmsConnector1"/>
+            <test:component throwException="true"/>
+            <jms:outbound-endpoint queue="out2" connector-ref="jmsConnector1"/>
+            <catch-exception-strategy/>
+        </transactional>
+    </flow>
+
+    <flow name="transactionalFailAtEndWithCatchExceptionStrategy">
+        <append-string-transformer message=" f"/>
+        <transactional>
+            <jms:outbound-endpoint queue="out1" connector-ref="jmsConnector1"/>
+            <jms:outbound-endpoint queue="out2" connector-ref="jmsConnector1"/>
+            <test:component throwException="true"/>
+            <catch-exception-strategy/>
+        </transactional>
+    </flow>
+
+    <flow name="transactionalFailsWithAnotherResourceType">
+        <append-string-transformer message=" g"/>
+        <transactional>
+            <jms:outbound-endpoint queue="out1" connector-ref="jmsConnector1"/>
+            <jms:outbound-endpoint queue="out2" connector-ref="jmsConnector1"/>
+            <jms:outbound-endpoint queue="out3" connector-ref="jmsConnector2"/>
+        </transactional>
+    </flow>
+
+    <flow name="transactionalDoesntFailWithAnotherResourceType">
+        <append-string-transformer message=" h"/>
+        <transactional>
+            <jms:outbound-endpoint queue="out1" connector-ref="jmsConnector1"/>
+            <jms:outbound-endpoint queue="out2" connector-ref="jmsConnector1"/>
+            <jms:outbound-endpoint queue="out3" connector-ref="jmsConnector2">
+                <jms:transaction action="NOT_SUPPORTED"/>
+            </jms:outbound-endpoint>
+        </transactional>
+    </flow>
+
+    <flow name="transactionalWithAnotherResourceTypeAndExceptionAtEnd">
+        <append-string-transformer message=" i"/>
+        <transactional>
+            <jms:outbound-endpoint queue="out1" connector-ref="jmsConnector1"/>
+            <jms:outbound-endpoint queue="out3" connector-ref="jmsConnector2">
+                <jms:transaction action="NOT_SUPPORTED"/>
+            </jms:outbound-endpoint>
+            <jms:outbound-endpoint queue="out2" connector-ref="jmsConnector1"/>
+            <test:component throwException="true"/>
+        </transactional>
+    </flow>
+
+
+    <flow name="nestedTransactional">
+        <transactional>
+            <jms:outbound-endpoint queue="out1" connector-ref="jmsConnector1"/>
+            <transactional>
+                <jms:outbound-endpoint queue="out2" connector-ref="jmsConnector1"/>
+            </transactional>
+        </transactional>
+    </flow>
+
+    <flow name="nestedTransactionalFail">
+        <transactional>
+            <jms:outbound-endpoint queue="out1" connector-ref="jmsConnector1"/>
+            <transactional>
+                <jms:outbound-endpoint queue="out2" connector-ref="jmsConnector1"/>
+                <test:component throwException="true"/>
+            </transactional>
+        </transactional>
+    </flow>
+
+    <flow name="nestedTransactionalFailWithCatch">
+        <transactional>
+            <jms:outbound-endpoint queue="out1" connector-ref="jmsConnector1"/>
+            <transactional>
+                <jms:outbound-endpoint queue="out2" connector-ref="jmsConnector1"/>
+                <test:component throwException="true"/>
+                <catch-exception-strategy/>
+            </transactional>
+        </transactional>
+    </flow>
+
+    <flow name="nestedTransactionalWithBeginOrJoin">
+        <transactional>
+            <jms:outbound-endpoint queue="out1" connector-ref="jmsConnector1"/>
+            <transactional action="BEGIN_OR_JOIN">
+                <jms:outbound-endpoint queue="out2" connector-ref="jmsConnector1"/>
+            </transactional>
+        </transactional>
+    </flow>
+
+    <flow name="nestedTransactionalWithBeginOrJoinFail">
+        <transactional>
+            <jms:outbound-endpoint queue="out1" connector-ref="jmsConnector1"/>
+            <transactional action="BEGIN_OR_JOIN">
+                <jms:outbound-endpoint queue="out2" connector-ref="jmsConnector1"/>
+                <test:component throwException="true"/>
+            </transactional>
+        </transactional>
+    </flow>
+
+    <flow name="nestedTransactionalWithBeginOrJoinFailWithCatch">
+        <transactional>
+            <jms:outbound-endpoint queue="out1" connector-ref="jmsConnector1"/>
+            <transactional action="BEGIN_OR_JOIN">
+                <jms:outbound-endpoint queue="out2" connector-ref="jmsConnector1"/>
+                <test:component throwException="true"/>
+                <catch-exception-strategy/>
+            </transactional>
+        </transactional>
+    </flow>
+
+</mule>

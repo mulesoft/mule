@@ -121,8 +121,8 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
         boolean sessionManaged = true;
         try
         {
-            session = connector.getSessionFromTransaction();
-            if (session != null)
+            session = connector.getTransactionalResource(endpoint);
+            if (muleTx != null && muleTx.hasResource(session))
             {
                 transacted = true;
             }
@@ -138,7 +138,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
                 }
                 else
                 {
-                    session = connector.getSession(endpoint);
+                    //session = connector.getSession(endpoint);
                     cachedSession = session;
                 }
             }
@@ -147,7 +147,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
                 // by now we're running with a different connector and connection
                 sessionManaged = muleTx != null && muleTx.isXA();
 
-                session = connector.getSession(endpoint);
+                //session = connector.getSession(endpoint);
                 if (endpoint.getTransactionConfig().isTransacted())
                 {
                     transacted = true;

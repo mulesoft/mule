@@ -98,4 +98,14 @@ public class JdbcTransaction extends AbstractSingleResourceTransaction
             throw new TransactionRollbackException(CoreMessages.transactionRollbackFailed(), e);
         }
     }
+
+    protected Class<Connection> getResourceType()
+    {
+        return Connection.class;
+    }
+
+    protected Class<DataSource> getKeyType()
+    {
+        return DataSource.class;
+    }
 }

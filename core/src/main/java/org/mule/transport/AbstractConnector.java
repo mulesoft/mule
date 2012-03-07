@@ -39,6 +39,8 @@ import org.mule.api.registry.ServiceType;
 import org.mule.api.retry.RetryCallback;
 import org.mule.api.retry.RetryContext;
 import org.mule.api.retry.RetryPolicyTemplate;
+import org.mule.api.transaction.Transaction;
+import org.mule.api.transaction.TransactionException;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.Connectable;
 import org.mule.api.transport.Connector;
@@ -65,6 +67,7 @@ import org.mule.processor.LaxAsyncInterceptingMessageProcessor;
 import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.routing.filters.WildcardFilter;
 import org.mule.session.SerializeAndEncodeSessionHandler;
+import org.mule.transaction.TransactionCoordination;
 import org.mule.transformer.TransformerUtils;
 import org.mule.transport.service.TransportFactory;
 import org.mule.transport.service.TransportServiceDescriptor;
@@ -1973,6 +1976,60 @@ public abstract class AbstractConnector implements Connector, WorkListener
         idempotentRedeliveryPolicy.setUseSecureHash(true);
         idempotentRedeliveryPolicy.setMaxRedeliveryCount(maxRedelivery);
         return idempotentRedeliveryPolicy;
+    }
+
+    /**
+     * Returns transactional resource to use based on endpoint configuration
+     * and transactional context.
+     *
+     * Transactional resource factory must be provided by overriding method
+     * getOperationResourceFactory().
+     *
+     * Transactional resource instantiation must be provided by overriding method
+     * createOperationResource().
+     *
+     * @param endpoint which holds the transaction configuration
+     * @param <T> Type of the transaction resource
+     * @return An operation resource that can be transacted or not based on transaction configuration
+     * @throws MuleException
+     */
+    final public <T> T getTransactionalResource(ImmutableEndpoint endpoint) throws MuleException
+    {
+        Transaction currentTx = TransactionCoordination.getInstance().getTransaction();
+        if (currentTx != null)
+        {
+            if (currentTx.hasResource(this.getOperationResourceFactory()))
+            {
+                return (T) currentTx.getResource(this.getOperationResourceFactory());
+            }
+            else
+            {
+                Object connectionResource = this.createOperationResource(endpoint);
+                if (currentTx.supports(this.getOperationResourceFactory(),connectionResource))
+                {
+                    currentTx.bindResource(this.getOperationResourceFactory(), connectionResource);
+                }
+                else if (endpoint.getTransactionConfig().isTransacted())
+                {
+                    throw new TransactionException(CoreMessages.createStaticMessage("Endpoint is transactional but transaction does not support it"));
+                }
+                return (T) connectionResource;
+            }
+        }
+        else
+        {
+            return (T) createOperationResource(endpoint);
+        }
+    }
+
+    protected <T> T createOperationResource(ImmutableEndpoint endpoint) throws MuleException
+    {
+        throw new MuleRuntimeException(CoreMessages.createStaticMessage("Operation not supported by dispatcher"));
+    }
+
+    protected <T> T getOperationResourceFactory()
+    {
+        throw new MuleRuntimeException(CoreMessages.createStaticMessage("Operation not supported by dispatcher"));
     }
 
     /**

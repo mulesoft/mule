@@ -16,10 +16,30 @@ import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.transaction.TransactionConfig;
 import org.mule.transaction.MuleTransactionConfig;
 
+/**
+* ProcessingTemplate created by this method should be used on the beginning of the execution of a chain of
+* MessageProcessor that should manage exceptions.
+* Should be used when:
+*  An asynchronous MessageProcessor chain is being executed
+*      Because of an <async> element
+*      Because of an asynchronous processing strategy
+*  A Flow is called using a <flow-ref> element
+*
+* Instance of ErrorHandlingProcessingTemplate will:
+*  Route any exception to exception strategy if it was not already routed to it
+*
+*/
 public class ErrorHandlingProcessingTemplate implements ProcessingTemplate<MuleEvent>
 {
     private final ProcessingInterceptor<MuleEvent> processingInterceptor;
 
+    /**
+     * Creates a ErrorHandlingProcessingTemplate that will route any
+     * MessagingException thrown to an exception listener
+     *
+     * @param muleContext MuleContext for this application
+     * @param messagingExceptionHandler exception listener to execute for any MessagingException exception
+     */
     public ErrorHandlingProcessingTemplate(final MuleContext muleContext, final MessagingExceptionHandler messagingExceptionHandler)
     {
         final TransactionConfig transactionConfig = new MuleTransactionConfig();

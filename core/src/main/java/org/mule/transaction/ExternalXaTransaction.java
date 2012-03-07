@@ -137,6 +137,12 @@ public class ExternalXaTransaction extends XaTransaction
             return ExternalXaTransaction.this.hasResource(key);
         }
 
+        @Override
+        public boolean supports(Object key, Object resource)
+        {
+            return ExternalXaTransaction.this.supports(key,resource);
+        }
+
         public void bindResource(Object key, Object resource) throws TransactionException
         {
         }

@@ -179,6 +179,21 @@ public abstract class AbstractJdbcFunctionalTestCase extends AbstractServiceAndF
             JdbcUtils.close(con);
         }
     }
+
+    protected Integer getCountWithType1() throws Exception
+    {
+        return (Integer) ((Object[]) execSqlQuery("select count(*) from TEST where TYPE = 1").get(0))[0];
+    }
+
+    protected Integer getCountWithType2() throws Exception
+    {
+        return (Integer) ((Object[]) execSqlQuery("select count(*) from TEST where TYPE = 2").get(0))[0];
+    }
+
+    protected Integer getCountWithType3() throws Exception
+    {
+        return (Integer) ((Object[]) execSqlQuery("select count(*) from TEST where TYPE = 3").get(0))[0];
+    }
     
 }
 

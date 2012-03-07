@@ -15,10 +15,31 @@ import org.mule.api.MuleEvent;
 import org.mule.api.transaction.TransactionConfig;
 import org.mule.transaction.MuleTransactionConfig;
 
+/**
+* ProcessingTemplate created should be used on a MessageProcessor that are previously wrapper by
+* TransactionalErrorHandlingProcessingTemplate or  ErrorHandlingProcessingTemplate
+* Should be used when:
+*  An outbound endpoint is called
+*  An outbound router is called
+*  Any other MessageProcessor able to manage transactions is called
+* Instance of TransactionTemplate created by this method will:
+*  Resolve non xa transactions created before it if the TransactionConfig action requires it
+*  Suspend-Resume xa transaction created before it if the TransactionConfig action requires it
+*  Start a transaction if required by TransactionConfig action
+*  Resolve transaction if was started by this TransactionTemplate
+*  Route any exception to exception strategy if it was not already routed to it
+*
+*/
 public class TransactionalProcessingTemplate<T> implements ProcessingTemplate<T>
 {
     private ProcessingInterceptor<T> processingInterceptor;
 
+    /**
+     * Creates a ProcessingTemplate that will manage transactional context according to configured TransactionConfig
+     *
+     * @param muleContext MuleContext for this application
+     * @param transactionConfig transaction config for the execution context
+     */
     public TransactionalProcessingTemplate(MuleContext muleContext, TransactionConfig transactionConfig)
     {
         if (transactionConfig == null)
@@ -31,7 +52,8 @@ public class TransactionalProcessingTemplate<T> implements ProcessingTemplate<T>
         tempProcessingInterceptor = new ResolvePreviousTransactionInterceptor<T>(tempProcessingInterceptor,transactionConfig);
         tempProcessingInterceptor = new SuspendXaTransactionInterceptor<T>(tempProcessingInterceptor,transactionConfig,processTransactionOnException);
         tempProcessingInterceptor = new ValidateTransactionalStateInterceptor<T>(tempProcessingInterceptor,transactionConfig);
-        this.processingInterceptor = new ExternalTransactionInterceptor<T>(tempProcessingInterceptor,transactionConfig, muleContext);
+        tempProcessingInterceptor = new IsolateCurrentTransactionInterceptor<T>(tempProcessingInterceptor, transactionConfig);
+        this.processingInterceptor = new ExternalTransactionInterceptor(tempProcessingInterceptor,transactionConfig, muleContext);
     }
 
     @Override

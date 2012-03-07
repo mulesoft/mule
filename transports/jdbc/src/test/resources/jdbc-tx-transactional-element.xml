@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:jdbc="http://www.mulesoft.org/schema/mule/jdbc"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xsi:schemaLocation="
+       http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/3.2/mule-test.xsd
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
+       http://www.mulesoft.org/schema/mule/jdbc http://www.mulesoft.org/schema/mule/jdbc/3.2/mule-jdbc.xsd">
+
+    <jdbc:derby-data-source name="jdbcDataSource2" url="jdbc:derby:muleEmbeddedDB"/>
+
+    <jdbc:connector name="jdbcConnector2" pollingFrequency="1000" dataSource-ref="jdbcDataSource2" queryTimeout="3000">
+        <jdbc:query key="write1"
+                    value="INSERT INTO TEST(TYPE, DATA, ACK, RESULT) VALUES(1, NULL, NULL, NULL)"/>
+        <jdbc:query key="write2"
+                    value="INSERT INTO TEST(TYPE, DATA, ACK, RESULT) VALUES(2, NULL, NULL, NULL)"/>
+        <jdbc:query key="write3"
+                    value="INSERT INTO TEST(TYPE, DATA, ACK, RESULT) VALUES(3, NULL, NULL, NULL)"/>
+    </jdbc:connector>
+
+    <jdbc:endpoint name="out1" queryKey="write1" connector-ref="jdbcConnector"/>
+    <jdbc:endpoint name="out2" queryKey="write2" connector-ref="jdbcConnector"/>
+    <jdbc:endpoint name="out3" queryKey="write3" connector-ref="jdbcConnector2"/>
+
+    <flow name="transactional">
+        <append-string-transformer message=" a"/>
+        <transactional>
+            <jdbc:outbound-endpoint ref="out1"/>
+            <jdbc:outbound-endpoint ref="out2"/>
+        </transactional>
+    </flow>
+
+    <flow name="transactionalFailInTheMiddle">
+        <append-string-transformer message=" b"/>
+        <transactional>
+            <jdbc:outbound-endpoint ref="out1"/>
+            <test:component throwException="true"/>
+            <jdbc:outbound-endpoint ref="out2"/>
+        </transactional>
+    </flow>
+
+    <flow name="transactionalFailAtEnd">
+        <append-string-transformer message=" c"/>
+        <transactional>
+            <jdbc:outbound-endpoint ref="out1"/>
+            <jdbc:outbound-endpoint ref="out2"/>
+            <test:component throwException="true"/>
+        </transactional>
+    </flow>
+
+    <flow name="transactionalFailAfterEnd">
+        <append-string-transformer message=" d"/>
+        <transactional>
+            <jdbc:outbound-endpoint ref="out1"/>
+            <jdbc:outbound-endpoint ref="out2"/>
+        </transactional>
+        <test:component throwException="true"/>
+    </flow>
+
+    <flow name="transactionalFailInTheMiddleWithCatchExceptionStrategy">
+        <append-string-transformer message=" e"/>
+        <transactional>
+            <jdbc:outbound-endpoint ref="out1"/>
+            <test:component throwException="true"/>
+            <jdbc:outbound-endpoint ref="out2"/>
+            <catch-exception-strategy/>
+        </transactional>
+    </flow>
+
+    <flow name="transactionalFailAtEndWithCatchExceptionStrategy">
+        <append-string-transformer message=" f"/>
+        <transactional>
+            <jdbc:outbound-endpoint ref="out1"/>
+            <jdbc:outbound-endpoint ref="out2"/>
+            <test:component throwException="true"/>
+            <catch-exception-strategy/>
+        </transactional>
+    </flow>
+
+    <flow name="transactionalFailsWithAnotherResourceType">
+        <append-string-transformer message=" g"/>
+        <transactional>
+            <jdbc:outbound-endpoint ref="out1"/>
+            <jdbc:outbound-endpoint ref="out2"/>
+            <jdbc:outbound-endpoint ref="out3"/>
+        </transactional>
+    </flow>
+
+    <flow name="transactionalDoesntFailWithAnotherResourceType">
+        <append-string-transformer message=" h"/>
+        <transactional>
+            <jdbc:outbound-endpoint ref="out1"/>
+            <jdbc:outbound-endpoint ref="out2"/>
+            <jdbc:outbound-endpoint ref="out3">
+                <jdbc:transaction action="NOT_SUPPORTED"/>
+            </jdbc:outbound-endpoint>
+        </transactional>
+    </flow>
+
+    <flow name="transactionalWithAnotherResourceTypeAndExceptionAtEnd">
+        <append-string-transformer message=" i"/>
+        <transactional>
+            <jdbc:outbound-endpoint ref="out1"/>
+            <jdbc:outbound-endpoint ref="out3">
+                <jdbc:transaction action="NOT_SUPPORTED"/>
+            </jdbc:outbound-endpoint>
+            <jdbc:outbound-endpoint ref="out2"/>
+            <test:component throwException="true"/>
+        </transactional>
+    </flow>
+
+    <flow name="nestedTransactional">
+        <transactional>
+            <jdbc:outbound-endpoint ref="out1"/>
+            <transactional>
+                <jdbc:outbound-endpoint ref="out2"/>
+            </transactional>
+        </transactional>
+    </flow>
+
+    <flow name="nestedTransactionalFail">
+        <transactional>
+            <jdbc:outbound-endpoint ref="out1"/>
+            <transactional>
+                <jdbc:outbound-endpoint ref="out2"/>
+                <test:component throwException="true"/>
+            </transactional>
+        </transactional>
+    </flow>
+
+    <flow name="nestedTransactionalFailWithCatch">
+        <transactional>
+            <jdbc:outbound-endpoint ref="out1"/>
+            <transactional>
+                <jdbc:outbound-endpoint ref="out2"/>
+                <test:component throwException="true"/>
+                <catch-exception-strategy/>
+            </transactional>
+        </transactional>
+    </flow>
+
+    <flow name="nestedTransactionalWithBeginOrJoin">
+        <transactional>
+            <jdbc:outbound-endpoint ref="out1"/>
+            <transactional action="BEGIN_OR_JOIN">
+                <jdbc:outbound-endpoint ref="out2"/>
+            </transactional>
+        </transactional>
+    </flow>
+
+    <flow name="nestedTransactionalWithBeginOrJoinFail">
+        <transactional>
+            <jdbc:outbound-endpoint ref="out1"/>
+            <transactional action="BEGIN_OR_JOIN">
+                <jdbc:outbound-endpoint ref="out2"/>
+                <test:component throwException="true"/>
+            </transactional>
+        </transactional>
+    </flow>
+
+    <flow name="nestedTransactionalWithBeginOrJoinFailWithCatch">
+        <transactional>
+            <jdbc:outbound-endpoint ref="out1"/>
+            <transactional action="BEGIN_OR_JOIN">
+                <jdbc:outbound-endpoint ref="out2"/>
+                <test:component throwException="true"/>
+                <catch-exception-strategy/>
+            </transactional>
+        </transactional>
+    </flow>
+</mule>

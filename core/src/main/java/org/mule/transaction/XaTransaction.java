@@ -464,4 +464,9 @@ public class XaTransaction extends AbstractTransaction
         String CLOSE_METHOD_NAME = "close";
     }
 
+    @Override
+    public boolean supports(Object key, Object resource)
+    {
+        return resource instanceof XAResource || resource instanceof MuleXaObject;
+    }
 }

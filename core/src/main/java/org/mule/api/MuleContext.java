@@ -285,6 +285,11 @@ public interface MuleContext extends Lifecycle
     MessagingExceptionHandler getDefaultExceptionStrategy();
 
     /**
+     * @return single resource transaction factory manager. Used to retrieve a transaction factory for each transactional resource (i.e jdbc DataSource, jms Connection)
+     */
+    SingleResourceTransactionFactoryManager getTransactionFactoryManager();
+
+    /**
      * @return a non null {@link org.mule.DataTypeConversionResolver} instance to resolve implicit data type conversions
      */
     DataTypeConversionResolver getDataTypeConverterResolver();

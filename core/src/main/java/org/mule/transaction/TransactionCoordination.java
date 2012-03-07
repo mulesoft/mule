@@ -10,12 +10,13 @@
 
 package org.mule.transaction;
 
+import org.apache.commons.collections.ArrayStack;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.junit.Test;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionException;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.processor.DelegateTransaction;
 
 public final class TransactionCoordination
 {
@@ -32,6 +33,7 @@ public final class TransactionCoordination
      */
     private final ThreadLocal<Transaction> transactions = new ThreadLocal<Transaction>();
     private final ThreadLocal<Transaction> suspendedTransaction = new ThreadLocal<Transaction>();
+    private final ThreadLocal<ArrayStack>  isolatedTransactions = new ThreadLocal<ArrayStack>();
 
     /** Lock variable that is used to access {@link #txCounter}. */
     private final Object txCounterLock = new Object();
@@ -42,7 +44,7 @@ public final class TransactionCoordination
     /** Do not instanciate. */
     private TransactionCoordination()
     {
-        super();
+        super();        
     }
 
     public static TransactionCoordination getInstance()
@@ -104,9 +106,19 @@ public final class TransactionCoordination
     {
         Transaction oldTx = transactions.get();
         // special handling for transaction collection
-        if (oldTx != null && !(oldTx instanceof TransactionCollection))
+        if (oldTx != null && !(oldTx instanceof TransactionCollection) && !(oldTx instanceof DelegateTransaction))
         {
             throw new IllegalTransactionStateException(CoreMessages.transactionAlreadyBound());
+        }
+
+        if (oldTx != null && oldTx instanceof DelegateTransaction)
+        {
+            DelegateTransaction delegateTransaction = (DelegateTransaction) oldTx;
+            if (!delegateTransaction.supportsInnerTransaction(transaction))
+            {
+                throw new IllegalTransactionStateException(CoreMessages.transactionAlreadyBound());
+            }
+            return;
         }
 
         if (oldTx instanceof TransactionCollection)
@@ -247,5 +259,31 @@ public final class TransactionCoordination
     {
         suspendedTransaction.remove();
         transactions.remove();
+        if (isolatedTransactions.get() != null)
+        {
+            isolatedTransactions.get().clear();
+        }
+        isolatedTransactions.remove();
+    }
+
+    public void isolateTransaction()
+    {
+        if (transactions.get() != null)
+        {
+            if (isolatedTransactions.get() == null)
+            {
+                isolatedTransactions.set(new ArrayStack());
+            }
+            isolatedTransactions.get().push(transactions.get());
+            transactions.set(null);
+        }
+    }
+
+    public void restoreIsolatedTransaction()
+    {
+        if (isolatedTransactions.get() != null && !isolatedTransactions.get().isEmpty())
+        {
+            transactions.set((Transaction) isolatedTransactions.get().pop());
+        }
     }
 }

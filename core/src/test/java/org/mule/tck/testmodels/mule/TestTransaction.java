@@ -33,6 +33,18 @@ public class TestTransaction extends AbstractSingleResourceTransaction
         super(muleContext);
     }
 
+    @Override
+    protected Class getResourceType()
+    {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    protected Class getKeyType()
+    {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
     public TestTransaction(MuleContext mockMuleContext, boolean isXa)
     {
         super(mockMuleContext);

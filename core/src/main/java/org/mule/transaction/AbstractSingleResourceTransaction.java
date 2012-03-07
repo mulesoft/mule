@@ -11,6 +11,7 @@
 package org.mule.transaction;
 
 import org.mule.api.MuleContext;
+import org.mule.api.MuleRuntimeException;
 import org.mule.api.transaction.TransactionException;
 import org.mule.config.i18n.CoreMessages;
 
@@ -172,5 +173,21 @@ public abstract class AbstractSingleResourceTransaction extends AbstractTransact
                 .append(", key=").append(key)
                 .append(", resource=").append(resource)
                 .append("]").toString();
+    }
+
+    @Override
+    public boolean supports(Object key, Object resource)
+    {
+        return (this.key == null && (getKeyType().isAssignableFrom(key.getClass()) && getResourceType().isAssignableFrom(resource.getClass()))) || (this.key != null && (this.key == key && this.resource == resource));
+    }
+
+    protected Class getResourceType()
+    {
+        throw new MuleRuntimeException(CoreMessages.createStaticMessage("Transaction type: " + this.getClass().getName() + " doesn't support supports(..) method"));
+    }
+
+    protected Class getKeyType()
+    {
+        throw new MuleRuntimeException(CoreMessages.createStaticMessage("Transaction type: " + this.getClass().getName() + " doesn't support supports(..) method"));
     }
 }

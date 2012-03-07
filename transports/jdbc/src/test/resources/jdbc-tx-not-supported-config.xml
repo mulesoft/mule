@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:jdbc="http://www.mulesoft.org/schema/mule/jdbc"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/3.2/mule-test.xsd
+
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
+       http://www.mulesoft.org/schema/mule/jdbc http://www.mulesoft.org/schema/mule/jdbc/3.2/mule-jdbc.xsd">
+
+    <jdbc:endpoint name="out1" queryKey="write1"/>
+    <jdbc:endpoint name="out2" queryKey="write2"/>
+    <jdbc:endpoint name="out3" queryKey="write3"/>
+
+    <flow name="endpointNotSupported">
+        <jdbc:inbound-endpoint queryKey="getTestType1">
+           <jdbc:transaction action="ALWAYS_BEGIN"/>
+        </jdbc:inbound-endpoint>
+        <transactional action="BEGIN_OR_JOIN">
+            <jdbc:outbound-endpoint ref="out2"/>
+            <jdbc:outbound-endpoint ref="out3">
+                <jdbc:transaction action="NOT_SUPPORTED"/>
+            </jdbc:outbound-endpoint>
+        </transactional>
+    </flow>
+    
+    <flow name="endpointNotSupportedFailingAtEnd">
+        <transactional action="BEGIN_OR_JOIN">
+            <jdbc:outbound-endpoint ref="out2">
+                <jdbc:transaction action="NOT_SUPPORTED"/>
+            </jdbc:outbound-endpoint>
+            <jdbc:outbound-endpoint ref="out3">
+                <jdbc:transaction action="NOT_SUPPORTED"/>
+            </jdbc:outbound-endpoint>
+            <test:component throwException="true"/>
+        </transactional>
+    </flow>
+
+</mule>
