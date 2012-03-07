@@ -54,6 +54,7 @@ public abstract class AbstractELTestCase extends AbstractMuleContextTestCase
         }
     }
 
+    @SuppressWarnings("deprecation")
     protected Object evaluate(String expression)
     {
         switch (variant)
@@ -61,7 +62,7 @@ public abstract class AbstractELTestCase extends AbstractMuleContextTestCase
             case EVALUATOR_LANGUAGE :
                 return expressionLanguage.evaluate(expression);
             case EXPRESSION_MANAGER :
-                return muleContext.getExpressionManager().evaluate(expression, (MuleEvent) null);
+                return muleContext.getExpressionManager().evaluate(expression, (MuleMessage) null);
         }
         return null;
     }
