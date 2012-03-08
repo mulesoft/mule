@@ -34,9 +34,7 @@ import org.mule.api.model.Model;
 import org.mule.api.routing.filter.ObjectFilter;
 import org.mule.api.service.Service;
 import org.mule.api.source.CompositeMessageSource;
-import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
-import org.mule.api.transport.Connector;
 import org.mule.component.DefaultJavaComponent;
 import org.mule.config.QueueProfile;
 import org.mule.endpoint.MuleEndpointURI;
@@ -52,7 +50,6 @@ import java.beans.ExceptionListener;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.ExecutorService;
@@ -70,7 +67,7 @@ import org.springframework.context.event.ContextRefreshedEvent;
 
 /**
  * <code>MuleEventMulticaster</code> is an implementation of a Spring
- * ApplicationeventMulticaster. This implementation allows Mule event to be sent and
+ * ApplicationEventMulticaster. This implementation allows Mule event to be sent and
  * received through the Spring ApplicationContext. This allows any Spring bean to
  * receive and send events from any transport that Mule supports such as Jms, Http,
  * Tcp, Pop3, Smtp, File, etc. All a bean needs to do to receive and send events is
@@ -150,12 +147,12 @@ public class MuleEventMulticaster
     protected String[] subscriptions = null;
 
     /**
-     * The Spring acpplication context
+     * The Spring application context
      */
     protected ApplicationContext applicationContext;
 
     /**
-     * The mule instance compoennt for the Multicaster
+     * The mule instance component for the Multicaster
      */
     protected Service service;
 
@@ -247,7 +244,6 @@ public class MuleEventMulticaster
         }
         listeners.remove(listener);
     }
-
 
     public void addApplicationListenerBean(String s)
        {
@@ -419,23 +415,6 @@ public class MuleEventMulticaster
         {
             String subscription = subscriptions[i];
 
-            // Subscriptions can be full Mule Urls or resource specific such as
-            // my.queue
-            // if it is a MuleEndpointURI we need to extract the Resource
-            // specific part
-            // if (MuleEndpointURI.isMuleUri(subscription)) {
-            // EndpointURI ep = (EndpointURI) endpointsCache.get(subscription);
-            // if (ep == null) {
-            // try {
-            // ep = new MuleEndpointURI(subscription);
-            // } catch (MalformedEndpointException e) {
-            // throw new IllegalArgumentException(e.getMessage());
-            // }
-            // endpointsCache.put(subscription, ep);
-            // }
-            // subscription = ep.getAddress();
-            // }
-
             ObjectFilter filter = createFilter(subscription);
             if (filter.accept(endpoint))
             {
@@ -458,7 +437,7 @@ public class MuleEventMulticaster
     /**
      * Determines whether events will be processed asynchronously
      *
-     * @param asynchronous true if aysnchronous
+     * @param asynchronous true if asynchronous
      */
     public void setAsynchronous(boolean asynchronous)
     {
@@ -502,10 +481,6 @@ public class MuleEventMulticaster
         {
             try
             {
-                // if (applicationEvent.getEndpoint() != null) {
-                // endpoint.setEndpointURI(applicationEvent.getEndpoint());
-                // }
-
                 DefaultMuleMessage message = new DefaultMuleMessage(applicationEvent.getSource(),
                     applicationEvent.getProperties(), muleContext);
                 // has dispatch been triggered using beanFactory.publish()
@@ -556,7 +531,7 @@ public class MuleEventMulticaster
 
     protected void registerMulticasterComponent() throws MuleException
     {
-        // A discriptor hasn't been explicitly configured, so create a default
+        // A descriptor hasn't been explicitly configured, so create a default
         if (service == null)
         {
             service = getDefaultService();
@@ -604,7 +579,7 @@ public class MuleEventMulticaster
                     endpoint);
 
                 // check whether the endpoint has already been set on the
-                // MuleEventMulticastor
+                // MuleEventMulticaster
                 if (((ServiceCompositeMessageSource) service.getMessageSource()).getEndpoint(ep.getName()) == null)
                 {
                     ((ServiceCompositeMessageSource) service.getMessageSource()).addSource(ep);
@@ -645,10 +620,10 @@ public class MuleEventMulticaster
             SedaService s = new SedaService(muleContext);
             s.setName(serviceName);
             s.setModel(muleContext.getRegistry().lookupSystemModel());
-            
+
             QueueProfile queueProfile = QueueProfile.newInstancePersistingToDefaultMemoryQueueStore(muleContext);
             s.setQueueProfile(queueProfile);
-            
+
             ((CompositeMessageSource) s.getMessageSource()).addSource(
                 muleContext.getEndpointFactory().getInboundEndpoint(newEndpoint));
             final DefaultJavaComponent component = new DefaultJavaComponent(new SingletonObjectFactory(listener));
@@ -660,54 +635,6 @@ public class MuleEventMulticaster
         else
         {
             return false;
-        }
-    }
-
-    protected void registerConnectors() throws MuleException
-    {
-        if (!muleContext.isInitialised())
-        {
-            // Next see if there are any Connectors to register
-            Map connectors = applicationContext.getBeansOfType(Connector.class, true, true);
-            if (connectors.size() > 0)
-            {
-                Map.Entry entry;
-                Connector c;
-                for (Iterator iterator = connectors.entrySet().iterator(); iterator.hasNext();)
-                {
-                    entry = (Map.Entry) iterator.next();
-                    c = (Connector) entry.getValue();
-                    if (c.getName() == null)
-                    {
-                        c.setName(entry.getKey().toString());
-                    }
-                    muleContext.getRegistry().registerConnector(c);
-                }
-            }
-        }
-    }
-
-    protected void registerTransformers() throws MuleException
-    {
-        if (!muleContext.isInitialised())
-        {
-            // Next see if there are any Connectors to register
-            Map transformers = applicationContext.getBeansOfType(Transformer.class, true, true);
-            if (transformers.size() > 0)
-            {
-                Map.Entry entry;
-                Transformer t;
-                for (Iterator iterator = transformers.entrySet().iterator(); iterator.hasNext();)
-                {
-                    entry = (Map.Entry) iterator.next();
-                    t = (Transformer) entry.getValue();
-                    if (t.getName() == null)
-                    {
-                        t.setName(entry.getKey().toString());
-                    }
-                    muleContext.getRegistry().registerTransformer(t);
-                }
-            }
         }
     }
 
@@ -818,7 +745,7 @@ public class MuleEventMulticaster
      * here for convenience, the event multicaster will use these to create a default
      * MuleDescriptor for itself at runtime
      *
-     * @param subscriptions a list of enpoints to listen on
+     * @param subscriptions a list of endpoints to listen on
      */
     public void setSubscriptions(String[] subscriptions)
     {
