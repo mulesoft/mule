@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.el;
+package org.mule.el.context;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -56,14 +56,14 @@ public class MessagePropertiesTestCase extends AbstractELTestCase
     {
         MuleMessage message = new DefaultMuleMessage("", muleContext);
         message.setProperty("foo", "bar", PropertyScope.INBOUND);
-        assertImmutableVariable("inbound['foo']='bar'", message);
+        assertUnsupportedOperation("inbound['foo']='bar'", message);
     }
 
     @Test
     public void assignValueToNewInboundProperty() throws Exception
     {
         MuleMessage message = new DefaultMuleMessage("", muleContext);
-        assertImmutableVariable("inbound['foo_new']='bar'", message);
+        assertUnsupportedOperation("inbound['foo_new']='bar'", message);
     }
 
     @Test

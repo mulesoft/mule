@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.el;
+package org.mule.el.context;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -114,6 +114,19 @@ public abstract class AbstractELTestCase extends AbstractMuleContextTestCase
         try
         {
             evaluate(expression);
+            fail("ExpressionRuntimeException expected");
+        }
+        catch (ExpressionRuntimeException e)
+        {
+            assertEquals(UnsupportedOperationException.class, ExceptionUtils.getRootCause(e).getClass());
+        }
+    }
+    
+    protected void assertUnsupportedOperation(String expression, MuleMessage message)
+    {
+        try
+        {
+            evaluate(expression, message);
             fail("ExpressionRuntimeException expected");
         }
         catch (ExpressionRuntimeException e)

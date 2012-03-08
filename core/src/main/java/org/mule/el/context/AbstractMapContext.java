@@ -8,13 +8,13 @@
  * LICENSE.txt file.
  */
 
-package org.mule.el;
+package org.mule.el.context;
 
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
-public abstract class AbstractExpressionLanguageMap<K, V> implements Map<K, V>
+public abstract class AbstractMapContext<K, V> implements Map<K, V>
 {
 
     public boolean containsValue(Object value)

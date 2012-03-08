@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.el;
+package org.mule.el.context;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -21,7 +21,6 @@ import org.mule.api.MuleMessage;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.message.DefaultExceptionPayload;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class ExceptionTestCase extends AbstractELTestCase
@@ -50,7 +49,6 @@ public class ExceptionTestCase extends AbstractELTestCase
     }
 
     @Test
-    @Ignore
     public void exceptionCausedBy() throws Exception
     {
         MuleMessage message = new DefaultMuleMessage("", muleContext);

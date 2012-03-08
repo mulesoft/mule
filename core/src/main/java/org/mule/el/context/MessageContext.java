@@ -8,12 +8,12 @@
  * LICENSE.txt file.
  */
 
-package org.mule.el.mvel;
+package org.mule.el.context;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.DataType;
 
-public class MessageWrapper
+public class MessageContext
 {
     protected MuleMessage message;
 
@@ -37,7 +37,7 @@ public class MessageWrapper
         return message.getDataType();
     }
 
-    public MessageWrapper(MuleMessage message)
+    public MessageContext(MuleMessage message)
     {
         this.message = message;
     }

@@ -8,23 +8,20 @@
  * LICENSE.txt file.
  */
 
-package org.mule.el.mvel;
+package org.mule.el.context;
 
 import org.mule.api.MuleMessage;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.el.AbstractExpressionLanguageMap;
 
 import java.util.Set;
 
 import javax.activation.DataHandler;
 
-import org.mvel2.ImmutableElementException;
-
-class InboundAttachmentWrapperMap extends AbstractExpressionLanguageMap<String, DataHandler>
+public class InboundAttachmentMapContext extends AbstractMapContext<String, DataHandler>
 {
     private MuleMessage message;
 
-    public InboundAttachmentWrapperMap(MuleMessage message)
+    public InboundAttachmentMapContext(MuleMessage message)
     {
         this.message = message;
     }
@@ -32,7 +29,8 @@ class InboundAttachmentWrapperMap extends AbstractExpressionLanguageMap<String, 
     @Override
     public void clear()
     {
-        throw new ImmutableElementException(CoreMessages.inboundMessageAttachmentsImmutable().getMessage());
+        throw new UnsupportedOperationException(CoreMessages.inboundMessageAttachmentsImmutable()
+            .getMessage());
     }
 
     @Override
@@ -60,12 +58,14 @@ class InboundAttachmentWrapperMap extends AbstractExpressionLanguageMap<String, 
     @Override
     public DataHandler put(String key, DataHandler value)
     {
-        throw new ImmutableElementException(CoreMessages.inboundMessageAttachmentsImmutable(key).getMessage());
+        throw new UnsupportedOperationException(CoreMessages.inboundMessageAttachmentsImmutable(key)
+            .getMessage());
     }
 
     @Override
     public DataHandler remove(Object key)
     {
-        throw new ImmutableElementException(CoreMessages.inboundMessageAttachmentsImmutable(key).getMessage());
+        throw new UnsupportedOperationException(CoreMessages.inboundMessageAttachmentsImmutable(key)
+            .getMessage());
     }
 }

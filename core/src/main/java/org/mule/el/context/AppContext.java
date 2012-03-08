@@ -14,7 +14,6 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.registry.MuleRegistry;
 import org.mule.api.registry.RegistrationException;
-import org.mule.el.AbstractExpressionLanguageMap;
 
 import java.util.Map;
 import java.util.Set;
@@ -63,7 +62,7 @@ public class AppContext
         return new RegistryWrapperMap(muleContext.getRegistry());
     }
 
-    private static class RegistryWrapperMap extends AbstractExpressionLanguageMap<String, Object>
+    private static class RegistryWrapperMap extends AbstractMapContext<String, Object>
     {
         private MuleRegistry registry;
 

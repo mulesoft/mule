@@ -8,23 +8,20 @@
  * LICENSE.txt file.
  */
 
-package org.mule.el.mvel;
+package org.mule.el.context;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.transport.PropertyScope;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.el.AbstractExpressionLanguageMap;
 
 import java.util.Set;
 
-import org.mvel2.ImmutableElementException;
-
-class MessagePropertyWrapperMap extends AbstractExpressionLanguageMap<String, Object>
+public class MessagePropertyMapContext extends AbstractMapContext<String, Object>
 {
     private MuleMessage message;
     private PropertyScope propertyScope;
 
-    public MessagePropertyWrapperMap(MuleMessage message, PropertyScope propertyScope)
+    public MessagePropertyMapContext(MuleMessage message, PropertyScope propertyScope)
     {
         this.message = message;
         this.propertyScope = propertyScope;
@@ -35,7 +32,8 @@ class MessagePropertyWrapperMap extends AbstractExpressionLanguageMap<String, Ob
     {
         if (PropertyScope.INBOUND.equals(propertyScope))
         {
-            throw new ImmutableElementException(CoreMessages.inboundMessagePropertiesImmutable().getMessage());
+            throw new UnsupportedOperationException(CoreMessages.inboundMessagePropertiesImmutable()
+                .getMessage());
         }
         message.clearProperties(propertyScope);
     }
@@ -67,7 +65,7 @@ class MessagePropertyWrapperMap extends AbstractExpressionLanguageMap<String, Ob
     {
         if (PropertyScope.INBOUND.equals(propertyScope))
         {
-            throw new ImmutableElementException(CoreMessages.inboundMessagePropertiesImmutable(key)
+            throw new UnsupportedOperationException(CoreMessages.inboundMessagePropertiesImmutable(key)
                 .getMessage());
         }
         else
@@ -88,7 +86,7 @@ class MessagePropertyWrapperMap extends AbstractExpressionLanguageMap<String, Ob
 
         if (PropertyScope.INBOUND.equals(propertyScope))
         {
-            throw new ImmutableElementException(CoreMessages.inboundMessagePropertiesImmutable(key)
+            throw new UnsupportedOperationException(CoreMessages.inboundMessagePropertiesImmutable(key)
                 .getMessage());
         }
         else

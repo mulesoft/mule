@@ -10,7 +10,6 @@
 
 package org.mule.el.context;
 
-import org.mule.el.AbstractELTestCase;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;

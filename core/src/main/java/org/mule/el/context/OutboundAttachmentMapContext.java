@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: OutboundAttachmentMapContext.java 23971 2012-03-08 00:48:02Z dfeist $
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  *
@@ -8,21 +8,20 @@
  * LICENSE.txt file.
  */
 
-package org.mule.el.mvel;
+package org.mule.el.context;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleRuntimeException;
-import org.mule.el.AbstractExpressionLanguageMap;
 
 import java.util.Set;
 
 import javax.activation.DataHandler;
 
-class OutboundAttachmentWrapperMap extends AbstractExpressionLanguageMap<String, DataHandler>
+public class OutboundAttachmentMapContext extends AbstractMapContext<String, DataHandler>
 {
     private MuleMessage message;
 
-    public OutboundAttachmentWrapperMap(MuleMessage message)
+    public OutboundAttachmentMapContext(MuleMessage message)
     {
         this.message = message;
     }

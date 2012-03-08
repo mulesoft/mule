@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.el;
+package org.mule.el.context;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -59,14 +59,15 @@ public class MessageAttachmentsTestCase extends AbstractELTestCase
         DefaultMuleMessage message = new DefaultMuleMessage("", muleContext);
         DataHandler dataHandler = Mockito.mock(DataHandler.class);
         message.addInboundAttachment("foo", dataHandler);
-        assertImmutableVariable("inboundAttachments['foo']=new DataHandler('bar','text/plain')", message);
+        assertUnsupportedOperation("inboundAttachments['foo']=new DataHandler('bar','text/plain')", message);
     }
 
     @Test
     public void assignValueToNewInboundAttachment() throws Exception
     {
         MuleMessage message = new DefaultMuleMessage("", muleContext);
-        assertImmutableVariable("inboundAttachments['foo_new']=new DataHandler('bar','text/plain')", message);
+        assertUnsupportedOperation("inboundAttachments['foo_new']=new DataHandler('bar','text/plain')",
+            message);
     }
 
     @Test

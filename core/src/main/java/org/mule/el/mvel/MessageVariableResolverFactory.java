@@ -13,6 +13,9 @@ package org.mule.el.mvel;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.transport.PropertyScope;
+import org.mule.el.context.InboundAttachmentMapContext;
+import org.mule.el.context.MessagePropertyMapContext;
+import org.mule.el.context.OutboundAttachmentMapContext;
 
 import org.mvel2.ParserContext;
 
@@ -40,14 +43,14 @@ public class MessageVariableResolverFactory extends AbstractVariableResolverFact
             }
 
             // Property, variable and attachment maps
-            addFinalVariable("inbound", new MessagePropertyWrapperMap(message, PropertyScope.INBOUND));
-            addFinalVariable("outbound", new MessagePropertyWrapperMap(message, PropertyScope.OUTBOUND));
+            addFinalVariable("inbound", new MessagePropertyMapContext(message, PropertyScope.INBOUND));
+            addFinalVariable("outbound", new MessagePropertyMapContext(message, PropertyScope.OUTBOUND));
             addFinalVariable("flowVariables",
-                new MessagePropertyWrapperMap(message, PropertyScope.INVOCATION));
+                new MessagePropertyMapContext(message, PropertyScope.INVOCATION));
             addFinalVariable("sessionVariables",
-                new MessagePropertyWrapperMap(message, PropertyScope.SESSION));
-            addFinalVariable("inboundAttachments", new InboundAttachmentWrapperMap(message));
-            addFinalVariable("outboundAttachments", new OutboundAttachmentWrapperMap(message));
+                new MessagePropertyMapContext(message, PropertyScope.SESSION));
+            addFinalVariable("inboundAttachments", new InboundAttachmentMapContext(message));
+            addFinalVariable("outboundAttachments", new OutboundAttachmentMapContext(message));
         }
     }
 }

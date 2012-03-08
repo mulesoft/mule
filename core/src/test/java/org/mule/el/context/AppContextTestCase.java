@@ -15,7 +15,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import org.mule.api.registry.RegistrationException;
-import org.mule.el.AbstractELTestCase;
 
 import java.util.Map;
 

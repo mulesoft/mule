@@ -11,7 +11,6 @@
 package org.mule.el.context;
 
 import org.mule.config.MuleManifest;
-import org.mule.el.AbstractELTestCase;
 
 import java.net.UnknownHostException;
 
