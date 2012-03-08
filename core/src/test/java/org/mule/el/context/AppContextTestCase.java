@@ -124,7 +124,7 @@ public class AppContextTestCase extends AbstractELTestCase
     @Test
     public void registryIsEmpty()
     {
-        assertFalse((Boolean) evaluate("app.registry.empty"));
+        assertFalse((Boolean) evaluate("app.registry.isEmpty()"));
     }
 
     @Test
