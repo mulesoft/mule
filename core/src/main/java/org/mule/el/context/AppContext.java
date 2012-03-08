@@ -14,8 +14,8 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.registry.MuleRegistry;
 import org.mule.api.registry.RegistrationException;
+import org.mule.el.AbstractExpressionLanguageMap;
 
-import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
@@ -63,7 +63,7 @@ public class AppContext
         return new RegistryWrapperMap(muleContext.getRegistry());
     }
 
-    private static class RegistryWrapperMap implements Map<String, Object>
+    private static class RegistryWrapperMap extends AbstractExpressionLanguageMap<String, Object>
     {
         private MuleRegistry registry;
 
@@ -85,33 +85,13 @@ public class AppContext
         }
 
         @Override
-        public boolean containsValue(Object value)
-        {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public Set<java.util.Map.Entry<String, Object>> entrySet()
-        {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
         public Object get(Object key)
         {
+            if (!(key instanceof String))
+            {
+                return null;
+            }
             return registry.get((String) key);
-        }
-
-        @Override
-        public boolean isEmpty()
-        {
-            return false;
-        }
-
-        @Override
-        public Set<String> keySet()
-        {
-            throw new UnsupportedOperationException();
         }
 
         @Override
@@ -147,6 +127,11 @@ public class AppContext
         @Override
         public Object remove(Object key)
         {
+            if (!(key instanceof String))
+            {
+                return null;
+            }
+
             Object value = registry.lookupObject((String) key);
             if (value != null)
             {
@@ -159,17 +144,23 @@ public class AppContext
                     throw new MuleRuntimeException(e);
                 }
             }
-            return key;
+            return value;
         }
 
         @Override
-        public int size()
+        public boolean isEmpty()
+        {
+            return false;
+        }
+
+        @Override
+        public Set<String> keySet()
         {
             throw new UnsupportedOperationException();
         }
 
         @Override
-        public Collection<Object> values()
+        public int size()
         {
             throw new UnsupportedOperationException();
         }

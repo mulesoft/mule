@@ -30,6 +30,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.activation.DataHandler;
+
 import org.apache.commons.collections.map.LRUMap;
 import org.mvel2.CompileException;
 import org.mvel2.MVEL;
@@ -207,6 +209,7 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
         parserContext.addImport(String.class);
         parserContext.addImport(System.class);
         parserContext.addImport(Calendar.class);
+        parserContext.addImport(DataHandler.class);
     }
 
     /**

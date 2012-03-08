@@ -46,11 +46,8 @@ public class MessageVariableResolverFactory extends AbstractVariableResolverFact
                 new MessagePropertyWrapperMap(message, PropertyScope.INVOCATION));
             addFinalVariable("sessionVariables",
                 new MessagePropertyWrapperMap(message, PropertyScope.SESSION));
-            // addFinalVariable("inboundAttachments", new MessagePropertyWrapperMap(message,
-            // PropertyScope.INBOUND));
-            // addFinalVariable("outboundAttachments", new MessagePropertyWrapperMap(message,
-            // PropertyScope.OUTBOUND));
+            addFinalVariable("inboundAttachments", new InboundAttachmentWrapperMap(message));
+            addFinalVariable("outboundAttachments", new OutboundAttachmentWrapperMap(message));
         }
     }
-
 }

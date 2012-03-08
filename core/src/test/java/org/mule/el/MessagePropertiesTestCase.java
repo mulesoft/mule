@@ -21,9 +21,9 @@ import java.util.Map;
 
 import org.junit.Test;
 
-public class PropertiesTestCase extends AbstractELTestCase
+public class MessagePropertiesTestCase extends AbstractELTestCase
 {
-    public PropertiesTestCase(Variant variant)
+    public MessagePropertiesTestCase(Variant variant)
     {
         super(variant);
     }
@@ -52,10 +52,18 @@ public class PropertiesTestCase extends AbstractELTestCase
     }
 
     @Test
-    public void assignInboundProperty() throws Exception
+    public void assignValueToInboundProperty() throws Exception
     {
         MuleMessage message = new DefaultMuleMessage("", muleContext);
+        message.setProperty("foo", "bar", PropertyScope.INBOUND);
         assertImmutableVariable("inbound['foo']='bar'", message);
+    }
+
+    @Test
+    public void assignValueToNewInboundProperty() throws Exception
+    {
+        MuleMessage message = new DefaultMuleMessage("", muleContext);
+        assertImmutableVariable("inbound['foo_new']='bar'", message);
     }
 
     @Test

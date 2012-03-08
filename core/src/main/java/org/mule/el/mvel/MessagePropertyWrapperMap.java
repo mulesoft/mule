@@ -13,14 +13,13 @@ package org.mule.el.mvel;
 import org.mule.api.MuleMessage;
 import org.mule.api.transport.PropertyScope;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.el.AbstractExpressionLanguageMap;
 
-import java.util.Collection;
-import java.util.Map;
 import java.util.Set;
 
 import org.mvel2.ImmutableElementException;
 
-class MessagePropertyWrapperMap implements Map<String, Object>
+class MessagePropertyWrapperMap extends AbstractExpressionLanguageMap<String, Object>
 {
     private MuleMessage message;
     private PropertyScope propertyScope;
@@ -34,6 +33,10 @@ class MessagePropertyWrapperMap implements Map<String, Object>
     @Override
     public void clear()
     {
+        if (PropertyScope.INBOUND.equals(propertyScope))
+        {
+            throw new ImmutableElementException(CoreMessages.inboundMessagePropertiesImmutable().getMessage());
+        }
         message.clearProperties(propertyScope);
     }
 
@@ -44,27 +47,13 @@ class MessagePropertyWrapperMap implements Map<String, Object>
     }
 
     @Override
-    public boolean containsValue(Object value)
-    {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public Set<java.util.Map.Entry<String, Object>> entrySet()
-    {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     public Object get(Object key)
     {
+        if (!(key instanceof String))
+        {
+            return null;
+        }
         return message.getProperty((String) key, propertyScope);
-    }
-
-    @Override
-    public boolean isEmpty()
-    {
-        return message.getPropertyNames(propertyScope).isEmpty();
     }
 
     @Override
@@ -90,38 +79,22 @@ class MessagePropertyWrapperMap implements Map<String, Object>
     }
 
     @Override
-    public void putAll(Map<? extends String, ? extends Object> m)
-    {
-        for (Map.Entry<? extends String, ? extends Object> entry : m.entrySet())
-        {
-            put(entry.getKey(), entry.getValue());
-        }
-    }
-
-    @Override
     public Object remove(Object key)
     {
+        if (!(key instanceof String))
+        {
+            return null;
+        }
+
         if (PropertyScope.INBOUND.equals(propertyScope))
         {
-            throw new UnsupportedOperationException(CoreMessages.inboundMessagePropertiesImmutable(key)
+            throw new ImmutableElementException(CoreMessages.inboundMessagePropertiesImmutable(key)
                 .getMessage());
         }
         else
         {
             return message.removeProperty((String) key, propertyScope);
         }
-    }
-
-    @Override
-    public int size()
-    {
-        return message.getPropertyNames(propertyScope).size();
-    }
-
-    @Override
-    public Collection<Object> values()
-    {
-        throw new UnsupportedOperationException();
     }
 
 }

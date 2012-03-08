@@ -11,115 +11,94 @@
 package org.mule.el.mvel;
 
 import org.mule.api.MuleMessage;
-import org.mule.api.transport.PropertyScope;
-import org.mule.config.i18n.CoreMessages;
+import org.mule.api.MuleRuntimeException;
+import org.mule.el.AbstractExpressionLanguageMap;
 
-import java.util.Collection;
-import java.util.Map;
 import java.util.Set;
 
-class OutboundAttachmentWrapperMap implements Map<String, Object>
+import javax.activation.DataHandler;
+
+class OutboundAttachmentWrapperMap extends AbstractExpressionLanguageMap<String, DataHandler>
 {
     private MuleMessage message;
-    private PropertyScope propertyScope;
 
-    public OutboundAttachmentWrapperMap(MuleMessage message, PropertyScope propertyScope)
+    public OutboundAttachmentWrapperMap(MuleMessage message)
     {
         this.message = message;
-        this.propertyScope = propertyScope;
     }
 
     @Override
     public void clear()
     {
-        message.clearProperties(propertyScope);
+        for (String name : message.getOutboundAttachmentNames())
+        {
+            try
+            {
+                message.removeOutboundAttachment(name);
+            }
+            catch (Exception e)
+            {
+                throw new MuleRuntimeException(e);
+            }
+        }
     }
 
     @Override
     public boolean containsKey(Object key)
     {
-        return message.getPropertyNames(propertyScope).contains(key);
+        return message.getOutboundAttachmentNames().contains(key);
     }
 
     @Override
-    public boolean containsValue(Object value)
+    public DataHandler get(Object key)
     {
-        throw new UnsupportedOperationException();
-    }
+        if (!(key instanceof String))
+        {
+            return null;
+        }
 
-    @Override
-    public Set<java.util.Map.Entry<String, Object>> entrySet()
-    {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public Object get(Object key)
-    {
-        return message.getProperty((String) key, propertyScope);
-    }
-
-    @Override
-    public boolean isEmpty()
-    {
-        return message.getPropertyNames(propertyScope).isEmpty();
+        return message.getOutboundAttachment((String) key);
     }
 
     @Override
     public Set<String> keySet()
     {
-        return message.getPropertyNames(propertyScope);
+        return message.getOutboundPropertyNames();
     }
 
     @Override
-    public Object put(String key, Object value)
+    public DataHandler put(String key, DataHandler value)
     {
-        if (PropertyScope.INBOUND.equals(propertyScope))
+        DataHandler previousValue = get(key);
+        try
         {
-            throw new UnsupportedOperationException(CoreMessages.inboundMessagePropertiesImmutable(key)
-                .getMessage());
+            message.addOutboundAttachment(key, (DataHandler) value);
         }
-        else
+        catch (Exception e)
         {
-            Object previousValue = get(key);
-            message.setProperty(key, value, propertyScope);
-            return previousValue;
+            throw new MuleRuntimeException(e);
         }
+        return previousValue;
     }
 
     @Override
-    public void putAll(Map<? extends String, ? extends Object> m)
+    public DataHandler remove(Object key)
     {
-        for (Map.Entry<? extends String, ? extends Object> entry : m.entrySet())
+        if (!(key instanceof String))
         {
-            put(entry.getKey(), entry.getValue());
+            return null;
         }
-    }
 
-    @Override
-    public Object remove(Object key)
-    {
-        if (PropertyScope.INBOUND.equals(propertyScope))
+        DataHandler previousValue = get(key);
+        try
         {
-            throw new UnsupportedOperationException(CoreMessages.inboundMessagePropertiesImmutable(key)
-                .getMessage());
+            message.removeOutboundAttachment((String) key);
         }
-        else
+        catch (Exception e)
         {
-            return message.removeProperty((String) key, propertyScope);
+            throw new RuntimeException(e);
         }
-    }
-
-    @Override
-    public int size()
-    {
-        return message.getPropertyNames(propertyScope).size();
-    }
-
-    @Override
-    public Collection<Object> values()
-    {
-        throw new UnsupportedOperationException();
+        return previousValue;
     }
 
 }
