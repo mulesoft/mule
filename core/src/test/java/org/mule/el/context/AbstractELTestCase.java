@@ -31,6 +31,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 import org.mvel2.ImmutableElementException;
+import org.mvel2.PropertyAccessException;
 
 @RunWith(Parameterized.class)
 public abstract class AbstractELTestCase extends AbstractMuleContextTestCase
@@ -121,7 +122,7 @@ public abstract class AbstractELTestCase extends AbstractMuleContextTestCase
             assertEquals(UnsupportedOperationException.class, ExceptionUtils.getRootCause(e).getClass());
         }
     }
-    
+
     protected void assertUnsupportedOperation(String expression, MuleMessage message)
     {
         try
@@ -171,6 +172,45 @@ public abstract class AbstractELTestCase extends AbstractMuleContextTestCase
         catch (ExpressionRuntimeException e)
         {
             assertEquals(ImmutableElementException.class, ExceptionUtils.getRootCause(e).getClass());
+        }
+    }
+
+    protected void assertFinalProperty(String expression)
+    {
+        try
+        {
+            evaluate(expression);
+            fail("ExpressionRuntimeException expected");
+        }
+        catch (ExpressionRuntimeException e)
+        {
+            assertEquals(PropertyAccessException.class, ExceptionUtils.getRootCause(e).getClass());
+        }
+    }
+
+    protected void assertFinalProperty(String expression, MuleMessage message)
+    {
+        try
+        {
+            evaluate(expression, message);
+            fail("ExpressionRuntimeException expected");
+        }
+        catch (ExpressionRuntimeException e)
+        {
+            assertEquals(PropertyAccessException.class, ExceptionUtils.getRootCause(e).getClass());
+        }
+    }
+
+    protected void assertFinalProperty(String expression, MuleEvent event)
+    {
+        try
+        {
+            evaluate(expression, event);
+            fail("ExpressionRuntimeException expected");
+        }
+        catch (ExpressionRuntimeException e)
+        {
+            assertEquals(PropertyAccessException.class, ExceptionUtils.getRootCause(e).getClass());
         }
     }
 

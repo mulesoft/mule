@@ -11,11 +11,30 @@
 package org.mule.el.context;
 
 import org.mule.api.MuleMessage;
-import org.mule.api.transformer.DataType;
+import org.mule.api.transport.PropertyScope;
+
+import java.util.Map;
+
+import javax.activation.DataHandler;
 
 public class MessageContext
 {
     protected MuleMessage message;
+
+    public MessageContext(MuleMessage message)
+    {
+        this.message = message;
+    }
+
+    public String getId()
+    {
+        return message.getUniqueId();
+    }
+
+    public String getRootId()
+    {
+        return message.getMessageRootId();
+    }
 
     public String getCorrelationId()
     {
@@ -32,14 +51,24 @@ public class MessageContext
         return message.getCorrelationGroupSize();
     }
 
-    public DataType<?> getDataType()
+    public Object getReplyTo()
     {
-        return message.getDataType();
+        return message.getReplyTo();
     }
 
-    public MessageContext(MuleMessage message)
+    public void setReplyTo(String replyTo)
     {
-        this.message = message;
+        message.setReplyTo(replyTo);
+    }
+
+    public String getEncoding()
+    {
+        return message.getDataType().getEncoding();
+    }
+
+    public String getMimeType()
+    {
+        return message.getDataType().getMimeType();
     }
 
     public Object getPayload()
@@ -50,6 +79,26 @@ public class MessageContext
     public void setPayload(Object payload)
     {
         message.setPayload(payload);
+    }
+
+    public Map<String, Object> getInboundProps()
+    {
+        return new MessagePropertyMapContext(message, PropertyScope.INBOUND);
+    }
+
+    public Map<String, Object> getOutboundProps()
+    {
+        return new MessagePropertyMapContext(message, PropertyScope.OUTBOUND);
+    }
+
+    public Map<String, DataHandler> getInboundAttachments()
+    {
+        return new InboundAttachmentMapContext(message);
+    }
+
+    public Map<String, DataHandler> getOutboundAttachments()
+    {
+        return new OutboundAttachmentMapContext(message);
     }
 
 }

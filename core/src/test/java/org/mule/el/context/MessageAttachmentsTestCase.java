@@ -34,14 +34,14 @@ public class MessageAttachmentsTestCase extends AbstractELTestCase
     public void inboundAttachmentMap() throws Exception
     {
         MuleMessage message = new DefaultMuleMessage("", muleContext);
-        assertTrue(evaluate("inboundAttachments", message) instanceof Map);
+        assertTrue(evaluate("message.inboundAttachments", message) instanceof Map);
     }
 
     @Test
     public void assignToInboundAttachmentMap() throws Exception
     {
         MuleMessage message = new DefaultMuleMessage("", muleContext);
-        assertImmutableVariable("inboundAttachments='foo'", message);
+        assertFinalProperty("message.inboundAttachments='foo'", message);
     }
 
     @Test
@@ -50,7 +50,7 @@ public class MessageAttachmentsTestCase extends AbstractELTestCase
         DefaultMuleMessage message = new DefaultMuleMessage("", muleContext);
         DataHandler dataHandler = Mockito.mock(DataHandler.class);
         message.addInboundAttachment("foo", dataHandler);
-        assertEquals(dataHandler, evaluate("inboundAttachments['foo']", message));
+        assertEquals(dataHandler, evaluate("message.inboundAttachments['foo']", message));
     }
 
     @Test
@@ -59,29 +59,30 @@ public class MessageAttachmentsTestCase extends AbstractELTestCase
         DefaultMuleMessage message = new DefaultMuleMessage("", muleContext);
         DataHandler dataHandler = Mockito.mock(DataHandler.class);
         message.addInboundAttachment("foo", dataHandler);
-        assertUnsupportedOperation("inboundAttachments['foo']=new DataHandler('bar','text/plain')", message);
+        assertUnsupportedOperation("message.inboundAttachments['foo']=new DataHandler('bar','text/plain')",
+            message);
     }
 
     @Test
     public void assignValueToNewInboundAttachment() throws Exception
     {
         MuleMessage message = new DefaultMuleMessage("", muleContext);
-        assertUnsupportedOperation("inboundAttachments['foo_new']=new DataHandler('bar','text/plain')",
-            message);
+        assertUnsupportedOperation(
+            "message.inboundAttachments['foo_new']=new DataHandler('bar','text/plain')", message);
     }
 
     @Test
     public void outboundAttachmentMap() throws Exception
     {
         MuleMessage message = new DefaultMuleMessage("", muleContext);
-        assertTrue(evaluate("outboundAttachments", message) instanceof Map);
+        assertTrue(evaluate("message.outboundAttachments", message) instanceof Map);
     }
 
     @Test
     public void assignToOutboundAttachmentMap() throws Exception
     {
         MuleMessage message = new DefaultMuleMessage("", muleContext);
-        assertImmutableVariable("outboundAttachments='foo'", message);
+        assertFinalProperty("message.outboundAttachments='foo'", message);
     }
 
     @Test
@@ -90,7 +91,7 @@ public class MessageAttachmentsTestCase extends AbstractELTestCase
         MuleMessage message = new DefaultMuleMessage("", muleContext);
         DataHandler dataHandler = Mockito.mock(DataHandler.class);
         message.addOutboundAttachment("foo", dataHandler);
-        assertEquals(dataHandler, evaluate("outboundAttachments['foo']", message));
+        assertEquals(dataHandler, evaluate("message.outboundAttachments['foo']", message));
     }
 
     @Test
@@ -98,7 +99,7 @@ public class MessageAttachmentsTestCase extends AbstractELTestCase
     {
         MuleMessage message = new DefaultMuleMessage("", muleContext);
         message.addOutboundAttachment("foo", Mockito.mock(DataHandler.class));
-        evaluate("outboundAttachments['foo']=new DataHandler('bar','text/plain')", message);
+        evaluate("message.outboundAttachments['foo']=new DataHandler('bar','text/plain')", message);
         assertEquals("bar", message.getOutboundAttachment("foo").getContent());
     }
 
@@ -106,7 +107,7 @@ public class MessageAttachmentsTestCase extends AbstractELTestCase
     public void assignValueToNewOutboundAttachment() throws Exception
     {
         MuleMessage message = new DefaultMuleMessage("", muleContext);
-        evaluate("outboundAttachments['foo']=new DataHandler('bar','text/plain')", message);
+        evaluate("message.outboundAttachments['foo']=new DataHandler('bar','text/plain')", message);
         assertEquals("bar", message.getOutboundAttachment("foo").getContent());
     }
 

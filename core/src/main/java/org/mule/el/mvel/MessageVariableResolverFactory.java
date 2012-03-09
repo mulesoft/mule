@@ -13,9 +13,8 @@ package org.mule.el.mvel;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.transport.PropertyScope;
-import org.mule.el.context.InboundAttachmentMapContext;
+import org.mule.el.context.MessageContext;
 import org.mule.el.context.MessagePropertyMapContext;
-import org.mule.el.context.OutboundAttachmentMapContext;
 
 import org.mvel2.ParserContext;
 
@@ -33,8 +32,8 @@ public class MessageVariableResolverFactory extends AbstractVariableResolverFact
         if (message != null)
         {
             // Message / Payload
-            addFinalVariable("message", message);
-            addResolver("payload", new PayloadVariableResolver(message));
+            addFinalVariable("message", new MessageContext(message));
+            // addResolver("payload", new PayloadVariableResolver(message));
 
             // Only add exception is present
             if (message.getExceptionPayload() != null)
@@ -43,14 +42,12 @@ public class MessageVariableResolverFactory extends AbstractVariableResolverFact
             }
 
             // Property, variable and attachment maps
-            addFinalVariable("inbound", new MessagePropertyMapContext(message, PropertyScope.INBOUND));
-            addFinalVariable("outbound", new MessagePropertyMapContext(message, PropertyScope.OUTBOUND));
-            addFinalVariable("flowVariables",
-                new MessagePropertyMapContext(message, PropertyScope.INVOCATION));
-            addFinalVariable("sessionVariables",
-                new MessagePropertyMapContext(message, PropertyScope.SESSION));
-            addFinalVariable("inboundAttachments", new InboundAttachmentMapContext(message));
-            addFinalVariable("outboundAttachments", new OutboundAttachmentMapContext(message));
+            // addFinalVariable("inbound", new MessagePropertyMapContext(message, PropertyScope.INBOUND));
+            // addFinalVariable("outbound", new MessagePropertyMapContext(message, PropertyScope.OUTBOUND));
+            addFinalVariable("flowVars", new MessagePropertyMapContext(message, PropertyScope.INVOCATION));
+            addFinalVariable("sessionVars", new MessagePropertyMapContext(message, PropertyScope.SESSION));
+            // addFinalVariable("inboundAttachments", new InboundAttachmentMapContext(message));
+            // addFinalVariable("outboundAttachments", new OutboundAttachmentMapContext(message));
         }
     }
 }

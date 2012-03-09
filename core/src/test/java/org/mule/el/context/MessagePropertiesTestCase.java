@@ -33,14 +33,14 @@ public class MessagePropertiesTestCase extends AbstractELTestCase
     {
         MuleMessage message = new DefaultMuleMessage("", muleContext);
         message.setProperty("foo", "bar", PropertyScope.INBOUND);
-        assertTrue(evaluate("inbound", message) instanceof Map);
+        assertTrue(evaluate("message.inboundProps", message) instanceof Map);
     }
 
     @Test
     public void assignToInboundPropertyMap() throws Exception
     {
         MuleMessage message = new DefaultMuleMessage("", muleContext);
-        assertImmutableVariable("inbound='foo'", message);
+        assertFinalProperty("message.inboundProps='foo'", message);
     }
 
     @Test
@@ -48,7 +48,7 @@ public class MessagePropertiesTestCase extends AbstractELTestCase
     {
         MuleMessage message = new DefaultMuleMessage("", muleContext);
         message.setProperty("foo", "bar", PropertyScope.INBOUND);
-        assertEquals("bar", evaluate("inbound['foo']", message));
+        assertEquals("bar", evaluate("message.inboundProps['foo']", message));
     }
 
     @Test
@@ -56,14 +56,14 @@ public class MessagePropertiesTestCase extends AbstractELTestCase
     {
         MuleMessage message = new DefaultMuleMessage("", muleContext);
         message.setProperty("foo", "bar", PropertyScope.INBOUND);
-        assertUnsupportedOperation("inbound['foo']='bar'", message);
+        assertUnsupportedOperation("message.inboundProps['foo']='bar'", message);
     }
 
     @Test
     public void assignValueToNewInboundProperty() throws Exception
     {
         MuleMessage message = new DefaultMuleMessage("", muleContext);
-        assertUnsupportedOperation("inbound['foo_new']='bar'", message);
+        assertUnsupportedOperation("message.inboundProps['foo_new']='bar'", message);
     }
 
     @Test
@@ -71,14 +71,14 @@ public class MessagePropertiesTestCase extends AbstractELTestCase
     {
         MuleMessage message = new DefaultMuleMessage("", muleContext);
         message.setProperty("foo", "bar", PropertyScope.OUTBOUND);
-        assertTrue(evaluate("outbound", message) instanceof Map);
+        assertTrue(evaluate("message.outboundProps", message) instanceof Map);
     }
 
     @Test
     public void assignToOutboundPropertyMap() throws Exception
     {
         MuleMessage message = new DefaultMuleMessage("", muleContext);
-        assertImmutableVariable("outbound='foo'", message);
+        assertFinalProperty("message.outboundProps='foo'", message);
     }
 
     @Test
@@ -86,7 +86,7 @@ public class MessagePropertiesTestCase extends AbstractELTestCase
     {
         MuleMessage message = new DefaultMuleMessage("", muleContext);
         message.setOutboundProperty("foo", "bar");
-        assertEquals("bar", evaluate("outbound['foo']", message));
+        assertEquals("bar", evaluate("message.outboundProps['foo']", message));
     }
 
     @Test
@@ -94,7 +94,7 @@ public class MessagePropertiesTestCase extends AbstractELTestCase
     {
         MuleMessage message = new DefaultMuleMessage("", muleContext);
         message.setOutboundProperty("foo", "bar_old");
-        evaluate("outbound['foo']='bar'", message);
+        evaluate("message.outboundProps['foo']='bar'", message);
         assertEquals("bar", message.getOutboundProperty("foo"));
     }
 
@@ -102,7 +102,7 @@ public class MessagePropertiesTestCase extends AbstractELTestCase
     public void assignValueToNewOutboundProperty() throws Exception
     {
         MuleMessage message = new DefaultMuleMessage("", muleContext);
-        evaluate("outbound['foo']='bar'", message);
+        evaluate("message.outboundProps['foo']='bar'", message);
         assertEquals("bar", message.getOutboundProperty("foo"));
     }
 
