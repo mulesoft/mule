@@ -8,7 +8,7 @@
 
     <spring:beans>
         <spring:bean id="keyGenerator"
-                     class="org.mule.cache.config.CachingStrategyConfigTestCase.TestKeyGenerator"/>
+                     class="org.mule.cache.config.CachingStrategyConfigTestCase.TestMuleEventKeyGenerator"/>
 
         <spring:bean id="responseGenerator"
                      class="org.mule.cache.config.CachingStrategyConfigTestCase.TestResponseGenerator"/>
