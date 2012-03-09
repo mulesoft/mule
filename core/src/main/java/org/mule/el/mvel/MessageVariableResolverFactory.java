@@ -33,7 +33,8 @@ class MessageVariableResolverFactory extends AbstractVariableResolverFactory
         {
             // Message / Payload
             addFinalVariable("message", new MessageContext(message));
-            // addResolver("payload", new PayloadVariableResolver(message));
+            // We need payload top-level for compatability with payload expression evaluator without ':'
+            addResolver("payload", new PayloadVariableResolver(message));
 
             // Only add exception is present
             if (message.getExceptionPayload() != null)
