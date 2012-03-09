@@ -14,9 +14,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import org.mule.api.MuleContext;
 import org.mule.api.expression.ExpressionRuntimeException;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -25,9 +25,8 @@ import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
 
-public class MVELExpressionLanguageTestCase
+public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase
 {
 
     protected MVELExpressionLanguage mvel;
@@ -35,7 +34,6 @@ public class MVELExpressionLanguageTestCase
     @Before
     public void setupMVEL() throws InitialisationException
     {
-        MuleContext muleContext = Mockito.mock(MuleContext.class);
         mvel = new MVELExpressionLanguage(muleContext);
         mvel.initialise();
     }
