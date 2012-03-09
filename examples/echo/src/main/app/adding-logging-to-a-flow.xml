@@ -21,7 +21,7 @@ http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/cor
         <http:inbound-endpoint host="localhost"
             port="8082" keep-alive="false" doc:name="HTTP"
             doc:description="Process HTTP reqests or responses." />
-        <logger message="About to echo #[payload]" level="INFO" />
+        <logger message="About to echo #[message:payload]" level="INFO" />
         <echo-component />
     </flow>
 </mule>
