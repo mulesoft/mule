@@ -8,12 +8,13 @@
  * LICENSE.txt file.
  */
 
-package org.mule.el.mvel.spi;
+package org.mule.el;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.el.ExpressionLanguage;
-import org.mule.api.el.mvel.MuleVariableResolverFactory;
+import org.mule.api.el.ExpressionLanguageContext;
+import org.mule.api.el.ExpressionLanguagePerEvaluationExtension;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.registry.RegistrationException;
 import org.mule.api.transport.PropertyScope;
@@ -24,10 +25,10 @@ import org.mule.el.mvel.MVELExpressionLanguage;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class MVELExpressionLanguageDynamicContributionTestCase extends AbstractELTestCase
+public class ExpressionLanguagePerEvaluationExtensionTestCase extends AbstractELTestCase
 {
 
-    public MVELExpressionLanguageDynamicContributionTestCase(Variant variant)
+    public ExpressionLanguagePerEvaluationExtensionTestCase(Variant variant)
     {
         super(variant);
     }
@@ -71,15 +72,15 @@ public class MVELExpressionLanguageDynamicContributionTestCase extends AbstractE
         Assert.assertEquals("bar", mvel.evaluate("i['foo']", message));
     }
 
-    class TestDynamicContribution implements MVELExpressionLanguageDynamicExtension
+    class TestDynamicContribution implements ExpressionLanguagePerEvaluationExtension
     {
 
         @Override
-        public void configureDynamicVariableResolverFactory(MuleVariableResolverFactory resolverFactory)
+        public void configureContext(ExpressionLanguageContext resolverFactory)
         {
             resolverFactory.addVariable("a", "hi");
             resolverFactory.addFinalVariable("b", "hi");
-            if (resolverFactory.isResolveable("message"))
+            if (resolverFactory.containsVariable("message"))
             {
                 resolverFactory.addVariable("i",
                     ((MessageContext) resolverFactory.getVariable("message")).getInboundProperties());

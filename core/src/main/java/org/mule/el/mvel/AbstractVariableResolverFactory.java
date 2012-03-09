@@ -11,19 +11,23 @@
 package org.mule.el.mvel;
 
 import org.mule.api.MuleContext;
-import org.mule.api.el.mvel.MuleVariableResolverFactory;
+import org.mule.api.el.ExpressionLanguageContext;
+import org.mule.api.el.ExpressionLanguageFunction;
 import org.mule.config.i18n.CoreMessages;
 
+import java.lang.reflect.Method;
 import java.util.HashMap;
 
 import org.mvel2.ImmutableElementException;
 import org.mvel2.ParserContext;
+import org.mvel2.ast.Function;
 import org.mvel2.integration.VariableResolver;
+import org.mvel2.integration.VariableResolverFactory;
 import org.mvel2.integration.impl.BaseVariableResolverFactory;
 import org.mvel2.integration.impl.SimpleSTValueResolver;
 
 public abstract class AbstractVariableResolverFactory extends BaseVariableResolverFactory
-    implements MuleVariableResolverFactory
+    implements ExpressionLanguageContext
 {
 
     private static final long serialVersionUID = 909413730991198290L;
@@ -143,4 +147,57 @@ public abstract class AbstractVariableResolverFactory extends BaseVariableResolv
         }
     }
 
+    @Override
+    public void importClass(Class<?> clazz)
+    {
+        parserContext.addImport(clazz);
+    }
+
+    @Override
+    public void importClass(String name, Class<?> clazz)
+    {
+        parserContext.addImport(name, clazz);
+    }
+
+    @Override
+    public void importStaticMethod(String name, Method method)
+    {
+        parserContext.addImport(name, method);
+    }
+
+    @Override
+    public boolean containsVariable(String name)
+    {
+        return isResolveable(name);
+    }
+
+    @Override
+    public void declareFunction(String name, ExpressionLanguageFunction function)
+    {
+        addVariable(name, new MVELFunctionAdaptor(name, function));
+    }
+
+    private class MVELFunctionAdaptor extends Function
+    {
+        private ExpressionLanguageFunction function;
+
+        public MVELFunctionAdaptor(String name, ExpressionLanguageFunction function)
+        {
+            super(name, new char[]{}, new char[]{}, 0, parserContext);
+            this.function = function;
+        }
+
+        @Override
+        public Object call(Object ctx, Object thisValue, VariableResolverFactory factory, Object[] parms)
+        {
+            function.validateParams(parms);
+            return function.call(parms, AbstractVariableResolverFactory.this);
+        }
+
+        @Override
+        public void checkArgumentCount(int passing)
+        {
+            // no-op
+        }
+    }
 }

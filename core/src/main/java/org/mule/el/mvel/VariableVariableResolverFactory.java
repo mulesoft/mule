@@ -45,6 +45,10 @@ class VariableVariableResolverFactory extends AbstractVariableResolverFactory
     @SuppressWarnings("deprecation")
     public boolean isTarget(String name)
     {
+        if (message == null)
+        {
+            return false;
+        }
         return message.getInvocationPropertyNames().contains(name)
                || message.getSessionPropertyNames().contains(name);
     }

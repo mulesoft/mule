@@ -14,15 +14,15 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.el.ExpressionLanguage;
-import org.mule.api.el.mvel.MuleVariableResolverFactory;
+import org.mule.api.el.ExpressionLanguageContext;
+import org.mule.api.el.ExpressionLanguageExtension;
+import org.mule.api.el.ExpressionLanguagePerEvaluationExtension;
 import org.mule.api.expression.ExpressionRuntimeException;
 import org.mule.api.expression.InvalidExpressionException;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.el.mvel.spi.MVELExpressionLanguageDynamicExtension;
-import org.mule.el.mvel.spi.MVELExpressionLanguageExtension;
 
 import java.io.Serializable;
 import java.util.Calendar;
@@ -38,6 +38,7 @@ import org.apache.commons.collections.map.LRUMap;
 import org.mvel2.CompileException;
 import org.mvel2.MVEL;
 import org.mvel2.ParserContext;
+import org.mvel2.integration.VariableResolverFactory;
 import org.mvel2.integration.impl.CachedMapVariableResolverFactory;
 
 /**
@@ -74,11 +75,10 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
         if (!extensionsAdded)
         {
             extensionsAdded = true;
-            for (MVELExpressionLanguageExtension extension : muleContext.getRegistry()
-                .lookupObjectsForLifecycle(MVELExpressionLanguageExtension.class))
+            for (ExpressionLanguageExtension extension : muleContext.getRegistry().lookupObjectsForLifecycle(
+                ExpressionLanguageExtension.class))
             {
-                extension.configureParserContext(parserContext);
-                extension.configureStaticVariableResolverFactory(appVariableResolverFactory);
+                extension.configureContext(appVariableResolverFactory);
             }
         }
     }
@@ -168,12 +168,12 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
     }
 
     @SuppressWarnings("unchecked")
-    protected <T> T evaluateInternal(String expression, MuleVariableResolverFactory variableResolverFactory)
+    protected <T> T evaluateInternal(String expression, VariableResolverFactory variableResolverFactory)
     {
         try
         {
             addExtensions();
-            addDynamicExtensions(variableResolverFactory);
+            addDynamicExtensions((ExpressionLanguageContext) variableResolverFactory);
             return (T) MVEL.executeExpression(getCompiledExpression(expression), variableResolverFactory);
         }
         catch (Exception e)
@@ -182,12 +182,12 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
         }
     }
 
-    protected void addDynamicExtensions(MuleVariableResolverFactory variableResolverFactory)
+    protected void addDynamicExtensions(ExpressionLanguageContext context)
     {
-        for (MVELExpressionLanguageDynamicExtension contribution : muleContext.getRegistry()
-            .lookupObjectsForLifecycle(MVELExpressionLanguageDynamicExtension.class))
+        for (ExpressionLanguagePerEvaluationExtension extension : muleContext.getRegistry()
+            .lookupObjectsForLifecycle(ExpressionLanguagePerEvaluationExtension.class))
         {
-            contribution.configureDynamicVariableResolverFactory(variableResolverFactory);
+            extension.configureContext(context);
         }
     }
 

@@ -8,27 +8,29 @@
  * LICENSE.txt file.
  */
 
-package org.mule.el.mvel.spi;
+package org.mule.el;
 
 import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.el.ExpressionLanguage;
-import org.mule.api.el.mvel.MuleVariableResolverFactory;
+import org.mule.api.el.ExpressionLanguageContext;
+import org.mule.api.el.ExpressionLanguageExtension;
+import org.mule.api.el.ExpressionLanguageFunction;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.registry.RegistrationException;
 import org.mule.config.builders.SimpleConfigurationBuilder;
 import org.mule.el.context.AbstractELTestCase;
+import org.mule.el.context.AppContext;
 import org.mule.el.mvel.MVELExpressionLanguage;
 
 import java.util.Collections;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.mvel2.ParserContext;
 
-public class MVELExpressionLanguageStaticContributionTestCase extends AbstractELTestCase
+public class ExpressionLanguageExtensionTestCase extends AbstractELTestCase
 {
 
-    public MVELExpressionLanguageStaticContributionTestCase(Variant variant)
+    public ExpressionLanguageExtensionTestCase(Variant variant)
     {
         super(variant);
     }
@@ -88,22 +90,45 @@ public class MVELExpressionLanguageStaticContributionTestCase extends AbstractEL
         Assert.assertEquals(muleContext.getConfiguration().getId(), mvel.evaluate("appShortcut.name"));
     }
 
-    class TestStaticContribution implements MVELExpressionLanguageExtension
+    @Test
+    public void testFunction() throws RegistrationException, InitialisationException
+    {
+        MVELExpressionLanguage mvel = new MVELExpressionLanguage(muleContext);
+        mvel.initialise();
+
+        Assert.assertEquals("called param[0]=one,param[1]=two,app.name="
+                            + muleContext.getConfiguration().getId(), mvel.evaluate("f('one','two')"));
+    }
+
+    class TestStaticContribution implements ExpressionLanguageExtension
     {
 
         @Override
-        public void configureParserContext(ParserContext parserContext)
+        public void configureContext(ExpressionLanguageContext context)
         {
-            parserContext.addImport(TestStaticContribution.class);
+            context.importClass(TestStaticContribution.class);
+            context.addVariable("a", "hi");
+            context.addFinalVariable("b", "hi");
+            context.addVariable("appShortcut", context.getVariable("app"));
+            context.declareFunction("f", new ExpressionLanguageFunction()
+            {
 
-        }
+                @Override
+                public void validateParams(Object[] params)
+                {
+                    if (params.length != 2)
+                    {
+                        throw new RuntimeException();
+                    }
+                }
 
-        @Override
-        public void configureStaticVariableResolverFactory(MuleVariableResolverFactory resolverFactory)
-        {
-            resolverFactory.addVariable("a", "hi");
-            resolverFactory.addFinalVariable("b", "hi");
-            resolverFactory.addVariable("appShortcut", resolverFactory.getVariable("app"));
+                @Override
+                public Object call(Object[] params, ExpressionLanguageContext context)
+                {
+                    return "called param[0]=" + params[0] + ",param[1]=" + params[1] + ",app.name="
+                           + ((AppContext) context.getVariable("app")).getName();
+                }
+            });
         }
     }
 }

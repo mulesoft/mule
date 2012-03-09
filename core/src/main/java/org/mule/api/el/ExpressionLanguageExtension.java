@@ -8,13 +8,12 @@
  * LICENSE.txt file.
  */
 
-package org.mule.el.mvel.spi;
+package org.mule.api.el;
 
-import org.mule.api.el.mvel.MuleVariableResolverFactory;
 
-public interface MVELExpressionLanguageDynamicExtension
+public interface ExpressionLanguageExtension
 {
 
-    void configureDynamicVariableResolverFactory(MuleVariableResolverFactory resolverFactory);
+    void configureContext(ExpressionLanguageContext context);
 
 }

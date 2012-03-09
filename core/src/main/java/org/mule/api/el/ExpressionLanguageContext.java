@@ -8,19 +8,27 @@
  * LICENSE.txt file.
  */
 
-package org.mule.api.el.mvel;
+package org.mule.api.el;
 
-import org.mvel2.integration.VariableResolverFactory;
+import java.lang.reflect.Method;
 
-public interface MuleVariableResolverFactory extends VariableResolverFactory
+public interface ExpressionLanguageContext
 {
+
+    void importClass(Class<?> clazz);
+
+    void importClass(String name, Class<?> clazz);
+
+    void importStaticMethod(String name, Method method);
 
     void addVariable(String name, Object value);
 
     void addFinalVariable(String name, Object value);
 
+    void declareFunction(String name, ExpressionLanguageFunction function);
+
     <T> T getVariable(String name);
 
-    boolean isResolveable(String name);
+    boolean containsVariable(String name);
 
 }

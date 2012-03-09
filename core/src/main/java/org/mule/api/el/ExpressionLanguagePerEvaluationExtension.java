@@ -8,17 +8,9 @@
  * LICENSE.txt file.
  */
 
-package org.mule.el.mvel.spi;
+package org.mule.api.el;
 
-import org.mule.api.el.mvel.MuleVariableResolverFactory;
-
-import org.mvel2.ParserContext;
-
-public interface MVELExpressionLanguageExtension
+public interface ExpressionLanguagePerEvaluationExtension extends ExpressionLanguageExtension
 {
-
-    void configureParserContext(ParserContext parserContext);
-
-    void configureStaticVariableResolverFactory(MuleVariableResolverFactory resolverFactory);
 
 }
