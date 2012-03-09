@@ -158,19 +158,21 @@
 #
 /mule-standalone-${productVersion}/examples/echo
 /mule-standalone-${productVersion}/examples/echo/build.xml
+/mule-standalone-${productVersion}/examples/echo/adding-logging-to-a-flow.xml
+/mule-standalone-${productVersion}/examples/echo/mule-deploy.properties
 /mule-standalone-${productVersion}/examples/echo/mule-example-echo-${productVersion}.zip
 /mule-standalone-${productVersion}/examples/echo/pom.xml
 /mule-standalone-${productVersion}/examples/echo/README.txt
 /mule-standalone-${productVersion}/examples/echo/src
 /mule-standalone-${productVersion}/examples/echo/src/main
 /mule-standalone-${productVersion}/examples/echo/src/main/app
-/mule-standalone-${productVersion}/examples/echo/src/main/app/mule-config.xml
+/mule-standalone-${productVersion}/examples/echo/src/main/app/adding-logging-to-a-flow.xml
+/mule-standalone-${productVersion}/examples/echo/src/main/app/mule-deploy.properties
 /mule-standalone-${productVersion}/examples/echo/src/main/java
 /mule-standalone-${productVersion}/examples/echo/src/main/java/org
 /mule-standalone-${productVersion}/examples/echo/src/main/java/org/mule
 /mule-standalone-${productVersion}/examples/echo/src/main/java/org/mule/example
 /mule-standalone-${productVersion}/examples/echo/src/main/java/org/mule/example/echo
-/mule-standalone-${productVersion}/examples/echo/src/main/java/org/mule/example/echo/Echo.java
 /mule-standalone-${productVersion}/examples/echo/src/main/resources
 /mule-standalone-${productVersion}/examples/echo/src/test
 /mule-standalone-${productVersion}/examples/echo/src/test/java
@@ -178,15 +180,10 @@
 /mule-standalone-${productVersion}/examples/echo/src/test/java/org/mule
 /mule-standalone-${productVersion}/examples/echo/src/test/java/org/mule/example
 /mule-standalone-${productVersion}/examples/echo/src/test/java/org/mule/example/echo
-/mule-standalone-${productVersion}/examples/echo/src/test/java/org/mule/example/echo/CxfEchoFlowTestCase.java
-/mule-standalone-${productVersion}/examples/echo/src/test/java/org/mule/example/echo/CxfEchoTestCase.java
+/mule-standalone-${productVersion}/examples/echo/src/test/java/org/mule/example/echo/EchoTestCase.java
 /mule-standalone-${productVersion}/examples/echo/src/test/resources
-/mule-standalone-${productVersion}/examples/echo/src/test/resources/echo-cxf-config.xml
-/mule-standalone-${productVersion}/examples/echo/src/test/resources/echo-cxf-response.xml
 /mule-standalone-${productVersion}/examples/echo/src/test/resources/log4j.properties
 /mule-standalone-${productVersion}/examples/echo/src/test/resources/mule-test-exclusions.txt
-
-
 
 #
 # /examples/errohandler
