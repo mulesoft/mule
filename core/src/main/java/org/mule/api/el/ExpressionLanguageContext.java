@@ -25,10 +25,14 @@ public interface ExpressionLanguageContext
 
     void addFinalVariable(String name, Object value);
 
+    void addAlias(String alias, String expression);
+
     void declareFunction(String name, ExpressionLanguageFunction function);
 
     <T> T getVariable(String name);
 
-    boolean containsVariable(String name);
+    <T> T getVariable(String name, Class<T> type);
+
+    boolean contains(String name);
 
 }

@@ -10,7 +10,8 @@
 
 package org.mule.api.el;
 
-public interface ExpressionLanguagePerEvaluationExtension extends ExpressionLanguageExtension
+public interface ExpressionLanguagePerEvaluationExtension
 {
+    void configureContext(ExpressionLanguageContext context);
 
 }

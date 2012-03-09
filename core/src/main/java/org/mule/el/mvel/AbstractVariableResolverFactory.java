@@ -17,6 +17,7 @@ import org.mule.config.i18n.CoreMessages;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
+import java.util.Map;
 
 import org.mvel2.ImmutableElementException;
 import org.mvel2.ParserContext;
@@ -34,6 +35,7 @@ public abstract class AbstractVariableResolverFactory extends BaseVariableResolv
 
     protected ParserContext parserContext;
     protected MuleContext muleContext;
+    protected Map<String, String> aliases = new HashMap<String, String>();
 
     public AbstractVariableResolverFactory(ParserContext parserContext, MuleContext muleContext)
     {
@@ -102,6 +104,12 @@ public abstract class AbstractVariableResolverFactory extends BaseVariableResolv
         }
     }
 
+    @Override
+    public <T> T getVariable(String name, Class<T> type)
+    {
+        return getVariable(name);
+    }
+
     protected VariableResolver addResolver(String name, VariableResolver vr)
     {
         if (this.variableResolvers == null)
@@ -112,7 +120,13 @@ public abstract class AbstractVariableResolverFactory extends BaseVariableResolv
         return vr;
     }
 
-    private static class MuleVariableResolver extends SimpleSTValueResolver
+    @Override
+    public void addAlias(String alias, String expression)
+    {
+        aliases.put(alias, expression);
+    }
+
+    protected static class MuleVariableResolver extends SimpleSTValueResolver
     {
         private static final long serialVersionUID = -4957789619105599831L;
         private String name;
@@ -129,7 +143,7 @@ public abstract class AbstractVariableResolverFactory extends BaseVariableResolv
         }
     }
 
-    private static class MuleFinalVariableResolver extends MuleVariableResolver
+    protected static class MuleFinalVariableResolver extends MuleVariableResolver
     {
         private static final long serialVersionUID = -4957789619105599831L;
         private String name;
@@ -166,7 +180,7 @@ public abstract class AbstractVariableResolverFactory extends BaseVariableResolv
     }
 
     @Override
-    public boolean containsVariable(String name)
+    public boolean contains(String name)
     {
         return isResolveable(name);
     }
@@ -177,6 +191,7 @@ public abstract class AbstractVariableResolverFactory extends BaseVariableResolv
         addVariable(name, new MVELFunctionAdaptor(name, function));
     }
 
+    @SuppressWarnings("serial")
     private class MVELFunctionAdaptor extends Function
     {
         private ExpressionLanguageFunction function;
@@ -199,5 +214,10 @@ public abstract class AbstractVariableResolverFactory extends BaseVariableResolv
         {
             // no-op
         }
+    }
+
+    public Map<String, String> getAliases()
+    {
+        return aliases;
     }
 }

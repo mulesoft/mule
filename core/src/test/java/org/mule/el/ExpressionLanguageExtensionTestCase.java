@@ -10,11 +10,14 @@
 
 package org.mule.el;
 
+import org.mule.DefaultMuleMessage;
+import org.mule.api.MuleMessage;
 import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.el.ExpressionLanguage;
 import org.mule.api.el.ExpressionLanguageContext;
 import org.mule.api.el.ExpressionLanguageExtension;
 import org.mule.api.el.ExpressionLanguageFunction;
+import org.mule.api.expression.ExpressionRuntimeException;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.registry.RegistrationException;
 import org.mule.config.builders.SimpleConfigurationBuilder;
@@ -22,6 +25,8 @@ import org.mule.el.context.AbstractELTestCase;
 import org.mule.el.context.AppContext;
 import org.mule.el.mvel.MVELExpressionLanguage;
 
+import java.text.DateFormat;
+import java.util.Calendar;
 import java.util.Collections;
 
 import org.junit.Assert;
@@ -38,7 +43,7 @@ public class ExpressionLanguageExtensionTestCase extends AbstractELTestCase
     @Override
     protected ConfigurationBuilder getBuilder() throws Exception
     {
-        return new SimpleConfigurationBuilder(Collections.singletonMap("key1", new TestStaticContribution()));
+        return new SimpleConfigurationBuilder(Collections.singletonMap("key1", new TestExtension()));
     }
 
     @Override
@@ -49,34 +54,43 @@ public class ExpressionLanguageExtensionTestCase extends AbstractELTestCase
     }
 
     @Test
-    public void addImport() throws RegistrationException, InitialisationException
+    public void importClass() throws RegistrationException, InitialisationException
     {
-
-        Assert.assertEquals(TestStaticContribution.class,
-            expressionLanguage.evaluate("TestStaticContribution"));
+        Assert.assertEquals(Calendar.class, expressionLanguage.evaluate("Calendar"));
     }
 
     @Test
-    public void customStringVariable() throws RegistrationException, InitialisationException
+    public void importClassWithName() throws RegistrationException, InitialisationException
+    {
+        Assert.assertEquals(Calendar.class, expressionLanguage.evaluate("CAL"));
+    }
+
+    @Test
+    public void importStaticMethod() throws RegistrationException, InitialisationException
+    {
+        Assert.assertEquals(DateFormat.getInstance(), expressionLanguage.evaluate("dateFormat()"));
+    }
+
+    @Test
+    public void variable() throws RegistrationException, InitialisationException
     {
         Assert.assertEquals("hi", expressionLanguage.evaluate("a"));
     }
 
     @Test
-    public void assignValueToCustomStringVariable() throws RegistrationException, InitialisationException
+    public void assignValueToVariable() throws RegistrationException, InitialisationException
     {
         Assert.assertEquals("1", expressionLanguage.evaluate("a=1"));
     }
 
     @Test
-    public void customFinalStringVariable() throws RegistrationException, InitialisationException
+    public void finalVariable() throws RegistrationException, InitialisationException
     {
         Assert.assertEquals("hi", expressionLanguage.evaluate("b"));
     }
 
     @Test
-    public void assignValueToCustomFinalStringVariable()
-        throws RegistrationException, InitialisationException
+    public void assignValueToFinalVariable() throws RegistrationException, InitialisationException
     {
         assertImmutableVariable("b=1");
     }
@@ -91,6 +105,17 @@ public class ExpressionLanguageExtensionTestCase extends AbstractELTestCase
     }
 
     @Test
+    public void testVariableAlias() throws RegistrationException, InitialisationException
+    {
+        MVELExpressionLanguage mvel = new MVELExpressionLanguage(muleContext);
+        mvel.initialise();
+
+        MuleMessage message = new DefaultMuleMessage("foo", muleContext);
+
+        Assert.assertEquals("foo", mvel.evaluate("p", message));
+    }
+
+    @Test
     public void testFunction() throws RegistrationException, InitialisationException
     {
         MVELExpressionLanguage mvel = new MVELExpressionLanguage(muleContext);
@@ -100,16 +125,35 @@ public class ExpressionLanguageExtensionTestCase extends AbstractELTestCase
                             + muleContext.getConfiguration().getId(), mvel.evaluate("f('one','two')"));
     }
 
-    class TestStaticContribution implements ExpressionLanguageExtension
+    @Test(expected = ExpressionRuntimeException.class)
+    public void testFunctionInvalidParams() throws RegistrationException, InitialisationException
+    {
+        MVELExpressionLanguage mvel = new MVELExpressionLanguage(muleContext);
+        mvel.initialise();
+        mvel.evaluate("f('one')");
+    }
+
+    class TestExtension implements ExpressionLanguageExtension
     {
 
         @Override
         public void configureContext(ExpressionLanguageContext context)
         {
-            context.importClass(TestStaticContribution.class);
+            context.importClass(Calendar.class);
+            context.importClass("CAL", Calendar.class);
+            try
+            {
+                context.importStaticMethod("dateFormat",
+                    DateFormat.class.getMethod("getInstance", new Class[]{}));
+            }
+            catch (Exception e)
+            {
+                throw new RuntimeException(e);
+            }
             context.addVariable("a", "hi");
             context.addFinalVariable("b", "hi");
             context.addVariable("appShortcut", context.getVariable("app"));
+            context.addAlias("p", "message.payload");
             context.declareFunction("f", new ExpressionLanguageFunction()
             {
 

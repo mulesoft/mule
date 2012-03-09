@@ -15,12 +15,14 @@ import org.mule.api.MuleContext;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.mvel2.MVEL;
 import org.mvel2.ParserContext;
 import org.mvel2.UnresolveablePropertyException;
 import org.mvel2.integration.VariableResolver;
 import org.mvel2.integration.VariableResolverFactory;
 
-public class CompositeVariableResolverFactory extends AbstractVariableResolverFactory implements VariableResolverFactory
+public class CompositeVariableResolverFactory extends AbstractVariableResolverFactory
+    implements VariableResolverFactory
 {
 
     private static final long serialVersionUID = 5926079137228159391L;
@@ -34,7 +36,7 @@ public class CompositeVariableResolverFactory extends AbstractVariableResolverFa
         super(parserContext, muleContext);
         for (VariableResolverFactory variableResolverFactory : factories)
         {
-            resolverFactories.add(variableResolverFactory);
+            addVariableResolverFactory(variableResolverFactory);
         }
     }
 
@@ -46,30 +48,38 @@ public class CompositeVariableResolverFactory extends AbstractVariableResolverFa
             if (factory.isResolveable(name))
             {
                 return true;
+            }
+            else if (factory instanceof AbstractVariableResolverFactory
+                     && ((AbstractVariableResolverFactory) factory).getAliases().containsKey(name))
+            {
+                return true;
             };
         }
         return isTarget(name);
     }
 
-    public VariableResolver getVariableResolver(String name)
+    public VariableResolver getVariableResolver(final String name)
     {
-        if (isResolveable(name))
+        for (VariableResolverFactory factory : resolverFactories)
         {
-            for (VariableResolverFactory factory : resolverFactories)
+            if (factory.isResolveable(name))
             {
-                if (factory.isResolveable(name))
-                {
-                    return factory.getVariableResolver(name);
-                };
+                return factory.getVariableResolver(name);
             }
-            if (variableResolvers.containsKey(name))
+            else if (factory instanceof AbstractVariableResolverFactory
+                     && ((AbstractVariableResolverFactory) factory).getAliases().containsKey(name))
             {
-                return variableResolvers.get(name);
+                return new MuleVariableResolver(name, MVEL.eval(
+                    ((AbstractVariableResolverFactory) factory).getAliases().get(name), this), null);
             }
-            else if (nextFactory != null)
-            {
-                return nextFactory.getVariableResolver(name);
-            }
+        }
+        if (variableResolvers.containsKey(name))
+        {
+            return variableResolvers.get(name);
+        }
+        else if (nextFactory != null)
+        {
+            return nextFactory.getVariableResolver(name);
         }
 
         throw new UnresolveablePropertyException("unable to resolve variable '" + name + "'");
@@ -85,4 +95,5 @@ public class CompositeVariableResolverFactory extends AbstractVariableResolverFa
     {
         throw new UnsupportedOperationException();
     }
+
 }

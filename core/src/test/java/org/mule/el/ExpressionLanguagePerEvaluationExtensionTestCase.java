@@ -12,20 +12,25 @@ package org.mule.el;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
-import org.mule.api.el.ExpressionLanguage;
+import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.el.ExpressionLanguageContext;
+import org.mule.api.el.ExpressionLanguageFunction;
 import org.mule.api.el.ExpressionLanguagePerEvaluationExtension;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.registry.RegistrationException;
-import org.mule.api.transport.PropertyScope;
-import org.mule.el.context.AbstractELTestCase;
+import org.mule.config.builders.SimpleConfigurationBuilder;
+import org.mule.el.context.AppContext;
 import org.mule.el.context.MessageContext;
 import org.mule.el.mvel.MVELExpressionLanguage;
+
+import java.text.DateFormat;
+import java.util.Calendar;
+import java.util.Collections;
 
 import org.junit.Assert;
 import org.junit.Test;
 
-public class ExpressionLanguagePerEvaluationExtensionTestCase extends AbstractELTestCase
+public class ExpressionLanguagePerEvaluationExtensionTestCase extends ExpressionLanguageExtensionTestCase
 {
 
     public ExpressionLanguagePerEvaluationExtensionTestCase(Variant variant)
@@ -34,57 +39,77 @@ public class ExpressionLanguagePerEvaluationExtensionTestCase extends AbstractEL
     }
 
     @Override
-    protected ExpressionLanguage getExpressionLanguage() throws RegistrationException
+    protected ConfigurationBuilder getBuilder() throws Exception
+    {
+        return new SimpleConfigurationBuilder(Collections.singletonMap("key1", new TestExtension()));
+    }
+
+    @Test
+    public void testMessageShortcutVariable() throws RegistrationException, InitialisationException
     {
         MVELExpressionLanguage mvel = new MVELExpressionLanguage(muleContext);
-        muleContext.getRegistry().registerObject("key1", new TestDynamicContribution());
-        return mvel;
-    }
-
-    @Test
-    public void customStringVariable() throws RegistrationException, InitialisationException
-    {
-        Assert.assertEquals("hi", expressionLanguage.evaluate("a"));
-    }
-
-    @Test
-    public void customFinalStringVariable() throws RegistrationException, InitialisationException
-    {
-        Assert.assertEquals("hi", expressionLanguage.evaluate("b"));
-    }
-
-    @Test
-    public void assignValueToCustomFinalStringVariable()
-        throws RegistrationException, InitialisationException
-    {
-        assertImmutableVariable("b=1");
-    }
-
-    @Test
-    public void testShortcutVariable() throws RegistrationException, InitialisationException
-    {
-        MVELExpressionLanguage mvel = new MVELExpressionLanguage(muleContext);
-        muleContext.getRegistry().registerObject("key1", new TestDynamicContribution());
         mvel.initialise();
-        MuleMessage message = new DefaultMuleMessage("", muleContext);
-        message.setProperty("foo", "bar", PropertyScope.INBOUND);
 
-        Assert.assertEquals("bar", mvel.evaluate("i['foo']", message));
+        MuleMessage message = new DefaultMuleMessage("foo", muleContext);
+
+        Assert.assertEquals("foo", mvel.evaluate("p", message));
     }
 
-    class TestDynamicContribution implements ExpressionLanguagePerEvaluationExtension
+    // @Test
+    // public void testVariableAlias() throws RegistrationException, InitialisationException
+    // {
+    // MVELExpressionLanguage mvel = new MVELExpressionLanguage(muleContext);
+    // mvel.initialise();
+    //
+    // MuleMessage message = new DefaultMuleMessage("foo", muleContext);
+    //
+    // Assert.assertEquals("foo", mvel.evaluate("p2", message));
+    // }
+
+    class TestExtension implements ExpressionLanguagePerEvaluationExtension
     {
 
         @Override
-        public void configureContext(ExpressionLanguageContext resolverFactory)
+        public void configureContext(ExpressionLanguageContext context)
         {
-            resolverFactory.addVariable("a", "hi");
-            resolverFactory.addFinalVariable("b", "hi");
-            if (resolverFactory.containsVariable("message"))
+            context.importClass(Calendar.class);
+            context.importClass("CAL", Calendar.class);
+            try
             {
-                resolverFactory.addVariable("i",
-                    ((MessageContext) resolverFactory.getVariable("message")).getInboundProperties());
+                context.importStaticMethod("dateFormat",
+                    DateFormat.class.getMethod("getInstance", new Class[]{}));
             }
+            catch (Exception e)
+            {
+                throw new RuntimeException(e);
+            }
+            context.addVariable("a", "hi");
+            context.addFinalVariable("b", "hi");
+            context.addVariable("appShortcut", context.getVariable("app"));
+            if (context.contains("message"))
+            {
+                context.addVariable("p", context.getVariable("message", MessageContext.class).getPayload());
+            }
+            context.addAlias("p2", "message.payload");
+            context.declareFunction("f", new ExpressionLanguageFunction()
+            {
+
+                @Override
+                public void validateParams(Object[] params)
+                {
+                    if (params.length != 2)
+                    {
+                        throw new RuntimeException();
+                    }
+                }
+
+                @Override
+                public Object call(Object[] params, ExpressionLanguageContext context)
+                {
+                    return "called param[0]=" + params[0] + ",param[1]=" + params[1] + ",app.name="
+                           + ((AppContext) context.getVariable("app")).getName();
+                }
+            });
         }
     }
 }
