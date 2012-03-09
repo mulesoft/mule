@@ -10,12 +10,19 @@
 
 package org.mule.cache;
 
+import static org.junit.Assert.assertSame;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import org.mule.api.MuleEvent;
+import org.mule.api.MuleEventKeyGenerator;
 import org.mule.api.MuleMessage;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.filter.Filter;
 import org.mule.api.store.ObjectStore;
-import org.mule.cache.keygenerator.KeyGenerator;
 import org.mule.cache.responsegenerator.ResponseGenerator;
 import org.mule.routing.filters.AcceptAllFilter;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -25,13 +32,6 @@ import java.io.Serializable;
 import org.junit.Test;
 import org.mockito.Matchers;
 import org.mockito.Mockito;
-
-import static org.junit.Assert.assertSame;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 public class ObjectStoreCachingStrategyTestCase extends AbstractMuleTestCase
 {
@@ -44,7 +44,7 @@ public class ObjectStoreCachingStrategyTestCase extends AbstractMuleTestCase
         MuleEvent mockEvent = mock(MuleEvent.class);
         final MuleEvent mockResponse = mock(MuleEvent.class);
 
-        KeyGenerator keyGenerator = mock(KeyGenerator.class);
+        MuleEventKeyGenerator keyGenerator = mock(MuleEventKeyGenerator.class);
         when(keyGenerator.generateKey(mockEvent)).thenReturn(OBJECT_KEY);
 
         ObjectStore<MuleEvent> objectStore = mock(ObjectStore.class);
@@ -72,7 +72,7 @@ public class ObjectStoreCachingStrategyTestCase extends AbstractMuleTestCase
         MuleEvent mockEvent = mock(MuleEvent.class);
         final MuleEvent mockResponse = mock(MuleEvent.class);
 
-        KeyGenerator keyGenerator = mock(KeyGenerator.class);
+        MuleEventKeyGenerator keyGenerator = mock(MuleEventKeyGenerator.class);
         when(keyGenerator.generateKey(mockEvent)).thenReturn(OBJECT_KEY);
 
         ResponseGenerator responseGenerator = mock(ResponseGenerator.class);
@@ -124,7 +124,7 @@ public class ObjectStoreCachingStrategyTestCase extends AbstractMuleTestCase
         MuleEvent mockEvent = mock(MuleEvent.class);
         final MuleEvent mockResponse = mock(MuleEvent.class);
 
-        KeyGenerator keyGenerator = mock(KeyGenerator.class);
+        MuleEventKeyGenerator keyGenerator = mock(MuleEventKeyGenerator.class);
         when(keyGenerator.generateKey(mockEvent)).thenReturn(OBJECT_KEY);
 
         ResponseGenerator responseGenerator = mock(ResponseGenerator.class);
@@ -156,7 +156,7 @@ public class ObjectStoreCachingStrategyTestCase extends AbstractMuleTestCase
         MuleEvent mockEvent = mock(MuleEvent.class);
         final MuleEvent mockResponse = mock(MuleEvent.class);
 
-        KeyGenerator keyGenerator = mock(KeyGenerator.class);
+        MuleEventKeyGenerator keyGenerator = mock(MuleEventKeyGenerator.class);
         when(keyGenerator.generateKey(mockEvent)).thenThrow(new IllegalArgumentException());
 
         Filter consumablePayloadFilter = mock(Filter.class);

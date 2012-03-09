@@ -10,14 +10,14 @@
 
 package org.mule.cache.config;
 
+import org.mule.api.MuleEventKeyGenerator;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.routing.filter.Filter;
 import org.mule.cache.CachingMessageProcessor;
 import org.mule.cache.CachingStrategy;
 import org.mule.cache.ObjectStoreCachingStrategy;
-import org.mule.cache.keygenerator.ExpressionKeyGenerator;
-import org.mule.cache.keygenerator.KeyGenerator;
+import org.mule.keygenerator.ExpressionMuleEventKeyGenerator;
 import org.mule.cache.responsegenerator.ResponseGenerator;
 import org.mule.construct.Flow;
 import org.mule.tck.junit4.FunctionalTestCase;
@@ -55,8 +55,8 @@ public class CachingStrategyConfigTestCase extends FunctionalTestCase
         assertTrue(cachingStrategy instanceof ObjectStoreCachingStrategy);
         ObjectStoreCachingStrategy objectStoreCachingStrategy = (ObjectStoreCachingStrategy) cachingStrategy;
 
-        assertTrue(objectStoreCachingStrategy.getKeyGenerator() instanceof ExpressionKeyGenerator);
-        ExpressionKeyGenerator keyGenerator = (ExpressionKeyGenerator) objectStoreCachingStrategy.getKeyGenerator();
+        assertTrue(objectStoreCachingStrategy.getKeyGenerator() instanceof ExpressionMuleEventKeyGenerator);
+        ExpressionMuleEventKeyGenerator keyGenerator = (ExpressionMuleEventKeyGenerator) objectStoreCachingStrategy.getKeyGenerator();
         assertEquals("#[payload]", keyGenerator.getExpression());
     }
 
@@ -70,7 +70,7 @@ public class CachingStrategyConfigTestCase extends FunctionalTestCase
         assertTrue(cachingStrategy instanceof ObjectStoreCachingStrategy);
         ObjectStoreCachingStrategy objectStoreCachingStrategy = (ObjectStoreCachingStrategy) cachingStrategy;
 
-        assertTrue(objectStoreCachingStrategy.getKeyGenerator() instanceof TestKeyGenerator);
+        assertTrue(objectStoreCachingStrategy.getKeyGenerator() instanceof TestMuleEventKeyGenerator);
     }
 
     @Test
@@ -106,10 +106,10 @@ public class CachingStrategyConfigTestCase extends FunctionalTestCase
         return (CachingMessageProcessor) flow.getMessageProcessors().get(0);
     }
 
-    public static class TestKeyGenerator implements KeyGenerator
+    public static class TestMuleEventKeyGenerator implements MuleEventKeyGenerator
     {
 
-        public TestKeyGenerator()
+        public TestMuleEventKeyGenerator()
         {
 
         }

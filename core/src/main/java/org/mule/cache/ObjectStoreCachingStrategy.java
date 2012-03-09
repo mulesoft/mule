@@ -10,6 +10,7 @@
 
 package org.mule.cache;
 
+import org.mule.api.MuleEventKeyGenerator;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.ThreadSafeAccess;
@@ -20,8 +21,7 @@ import org.mule.api.store.ObjectDoesNotExistException;
 import org.mule.api.store.ObjectStore;
 import org.mule.api.store.ObjectStoreException;
 import org.mule.cache.filter.ConsumableMuleMessageFilter;
-import org.mule.cache.keygenerator.KeyGenerator;
-import org.mule.cache.keygenerator.MD5KeyGenerator;
+import org.mule.keygenerator.MD5MuleEventKeyGenerator;
 import org.mule.cache.responsegenerator.DefaultResponseGenerator;
 import org.mule.cache.responsegenerator.ResponseGenerator;
 import org.mule.util.store.InMemoryObjectStore;
@@ -34,7 +34,7 @@ import org.apache.commons.logging.LogFactory;
 /**
  * Implements {@link CachingStrategy} using an {@link ObjectStore} as a cache.
  * <p/>
- * Object's keys are generated using a {@link KeyGenerator} and the responses
+ * Object's keys are generated using a {@link org.mule.api.MuleEventKeyGenerator} and the responses
  * are generated using a {@link ResponseGenerator}.
  * The caching strategy will only cache the {@link MuleEvent} that have a
  * non consumable message's payload. This check is done in both request and response
@@ -47,7 +47,7 @@ public class ObjectStoreCachingStrategy implements CachingStrategy
 
     private ObjectStore<MuleEvent> store = new InMemoryObjectStore<MuleEvent>();
 
-    private KeyGenerator keyGenerator = new MD5KeyGenerator();
+    private MuleEventKeyGenerator keyGenerator = new MD5MuleEventKeyGenerator();
 
     private ResponseGenerator responseGenerator = new DefaultResponseGenerator();
 
@@ -180,12 +180,12 @@ public class ObjectStoreCachingStrategy implements CachingStrategy
         this.store = store;
     }
 
-    public KeyGenerator getKeyGenerator()
+    public MuleEventKeyGenerator getKeyGenerator()
     {
         return keyGenerator;
     }
 
-    public void setKeyGenerator(KeyGenerator keyGenerator)
+    public void setKeyGenerator(MuleEventKeyGenerator keyGenerator)
     {
         this.keyGenerator = keyGenerator;
     }

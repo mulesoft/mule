@@ -14,7 +14,7 @@ import org.mule.cache.CachingMessageProcessor;
 import org.mule.cache.CachingStrategy;
 import org.mule.cache.ObjectStoreCachingStrategy;
 import org.mule.cache.filter.ConsumableMuleMessageFilter;
-import org.mule.cache.keygenerator.MD5KeyGenerator;
+import org.mule.keygenerator.MD5MuleEventKeyGenerator;
 import org.mule.cache.responsegenerator.DefaultResponseGenerator;
 import org.mule.construct.Flow;
 import org.mule.routing.filters.AcceptAllFilter;
@@ -89,7 +89,7 @@ public class CacheConfigTestCase extends FunctionalTestCase
         ObjectStoreCachingStrategy objectStoreCachingStrategy = (ObjectStoreCachingStrategy) cachingStrategy;
 
         assertTrue(objectStoreCachingStrategy.getConsumableFilter() instanceof ConsumableMuleMessageFilter);
-        assertTrue(objectStoreCachingStrategy.getKeyGenerator() instanceof MD5KeyGenerator);
+        assertTrue(objectStoreCachingStrategy.getKeyGenerator() instanceof MD5MuleEventKeyGenerator);
         assertEquals("org.mule.util.store.TextFileObjectStore",  objectStoreCachingStrategy.getStore().getClass().getName());
         assertTrue(objectStoreCachingStrategy.getResponseGenerator() instanceof DefaultResponseGenerator);
     }
@@ -100,7 +100,7 @@ public class CacheConfigTestCase extends FunctionalTestCase
         ObjectStoreCachingStrategy objectStoreCachingStrategy = (ObjectStoreCachingStrategy) cachingStrategy;
 
         assertTrue(objectStoreCachingStrategy.getConsumableFilter() instanceof ConsumableMuleMessageFilter);
-        assertTrue(objectStoreCachingStrategy.getKeyGenerator() instanceof MD5KeyGenerator);
+        assertTrue(objectStoreCachingStrategy.getKeyGenerator() instanceof MD5MuleEventKeyGenerator);
         assertTrue(objectStoreCachingStrategy.getStore() instanceof InMemoryObjectStore);
         assertTrue(objectStoreCachingStrategy.getResponseGenerator() instanceof DefaultResponseGenerator);
     }

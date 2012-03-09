@@ -7,8 +7,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.cache.keygenerator;
+package org.mule.keygenerator;
 
+import org.mule.api.MuleEventKeyGenerator;
 import org.mule.api.MuleEvent;
 
 import java.io.NotSerializableException;
@@ -19,10 +20,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * Implements {@link KeyGenerator} applying an MD5 digest to the event's
+ * Implements {@link org.mule.api.MuleEventKeyGenerator} applying an MD5 digest to the event's
  * message payload.
  */
-public class MD5KeyGenerator implements KeyGenerator
+public class MD5MuleEventKeyGenerator implements MuleEventKeyGenerator
 {
 
     protected Log logger = LogFactory.getLog(getClass());

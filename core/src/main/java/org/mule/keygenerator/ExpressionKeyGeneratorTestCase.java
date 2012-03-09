@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.cache.keygenerator;
+package org.mule.keygenerator;
 
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
@@ -32,7 +32,7 @@ public class ExpressionKeyGeneratorTestCase extends AbstractMuleTestCase
     private static final String KEY = "KEY";
     private static final String EXPRESSION = "muleExpression";
 
-    private ExpressionKeyGenerator keyGenerator;
+    private ExpressionMuleEventKeyGenerator keyGenerator;
     private MuleMessage message;
     private MuleEvent event;
 
@@ -49,7 +49,7 @@ public class ExpressionKeyGeneratorTestCase extends AbstractMuleTestCase
         when(event.getMessage()).thenReturn(message);
         when(event.getMuleContext()).thenReturn(context);
 
-        keyGenerator = new ExpressionKeyGenerator();
+        keyGenerator = new ExpressionMuleEventKeyGenerator();
         keyGenerator.setExpression(EXPRESSION);
     }
 

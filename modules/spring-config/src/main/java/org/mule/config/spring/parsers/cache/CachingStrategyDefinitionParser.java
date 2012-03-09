@@ -11,7 +11,7 @@
 package org.mule.config.spring.parsers.cache;
 
 import org.mule.cache.ObjectStoreCachingStrategy;
-import org.mule.cache.keygenerator.ExpressionKeyGenerator;
+import org.mule.keygenerator.ExpressionMuleEventKeyGenerator;
 import org.mule.config.spring.parsers.assembly.BeanAssembler;
 import org.mule.config.spring.parsers.assembly.BeanAssemblerFactory;
 import org.mule.config.spring.parsers.assembly.DefaultBeanAssembler;
@@ -48,7 +48,7 @@ public class CachingStrategyDefinitionParser extends OrphanDefinitionParser
         {
             if ("keyGenerationExpression".equals(name))
             {
-                BeanDefinitionBuilder wrapper = BeanDefinitionBuilder.genericBeanDefinition(ExpressionKeyGenerator.class);
+                BeanDefinitionBuilder wrapper = BeanDefinitionBuilder.genericBeanDefinition(ExpressionMuleEventKeyGenerator.class);
                 wrapper.addPropertyValue("expression", value);
 
                 super.addPropertyWithReference(properties, config, "keyGenerator", wrapper.getBeanDefinition());

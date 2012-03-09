@@ -7,7 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.cache.keygenerator;
+package org.mule.api;
 
 import org.mule.api.MuleEvent;
 
@@ -17,7 +17,7 @@ import java.io.Serializable;
 /**
  * Defines a way to generate cache keys for {@link MuleEvent} instances.
  */
-public interface KeyGenerator
+public interface MuleEventKeyGenerator
 {
 
     /**
