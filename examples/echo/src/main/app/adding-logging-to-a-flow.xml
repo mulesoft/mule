@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+    xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+    xmlns:core="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd 
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd ">
+
+    <description>
+		This example shows how to add message processing components, in this example Logger and Echo, to a Flow. By doing so, you can perform custom logging in your Mule application. Logging is useful to introspect the current message and create logging events for your specific needs.
+        
+		When a request is received, the echo component simply returns whatever was sent as part of the request. The logger component logs the message payload.
+
+        The flow is invoked by going to the URL in your browser - 
+            http://localhost:8082/your_message.
+			
+    </description>
+
+    <flow name="EchoFlow">
+        <http:inbound-endpoint host="localhost"
+            port="8082" keep-alive="false" doc:name="HTTP"
+            doc:description="Process HTTP reqests or responses." />
+        <logger message="About to echo #[payload]" level="INFO" />
+        <echo-component />
+    </flow>
+</mule>

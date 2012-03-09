@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.mule.examples</groupId>
@@ -8,11 +9,11 @@
     </parent>
     <artifactId>mule-example-echo</artifactId>
     <packaging>mule</packaging>
-    <name>Echo Example</name>
-    <description>Is a simple component example that demonstrates how to expose a component over multiple transports (soap and stream).</description>
+    <name>Mule Echo Example</name>
+    <description>This example shows how to add message processing components, in this example Logger and Echo, to a Flow. By doing so, you can perform custom logging in your Mule application. Logging is useful to introspect the current message and create logging events for your specific needs.</description>
 
     <build>
-         <plugins>
+        <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
@@ -55,11 +56,6 @@
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-http</artifactId>
             <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>xmlunit</groupId>
-            <artifactId>xmlunit</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>

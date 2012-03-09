@@ -7,7 +7,7 @@
     <version>1.0</version>
     <name>Echo Example</name>
     <packaging>mule</packaging>
-    <description>Is a simple component example that demonstrates how to expose a component over multiple transports (soap and stream).</description>
+    <description>This example shows how to add message processing components, in this example Logger and Echo, to a Flow. By doing so, you can perform custom logging in your Mule application. Logging is useful to introspect the current message and create logging events for your specific needs.</description>
 
     <properties>
         <muleVersion>3.3-M3-SNAPSHOT</muleVersion>
@@ -42,21 +42,9 @@
 
         <!-- Better testing of XML -->
         <dependency>
-            <groupId>xmlunit</groupId>
-            <artifactId>xmlunit</artifactId>
-            <version>1.1</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-tests-functional</artifactId>
             <version>${muleVersion}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.geronimo.specs</groupId>
-            <artifactId>geronimo-servlet_2.5_spec</artifactId>
-            <version>1.1</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
