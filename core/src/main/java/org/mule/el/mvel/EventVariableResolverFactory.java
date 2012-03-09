@@ -12,6 +12,7 @@ package org.mule.el.mvel;
 
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
+import org.mule.api.construct.FlowConstruct;
 
 import org.mvel2.ParserContext;
 
@@ -27,5 +28,22 @@ class EventVariableResolverFactory extends MessageVariableResolverFactory
         super(parserContext, muleContext, event.getMessage());
         this.event = event;
 
+        addFinalVariable("flow", new FlowContext(event.getFlowConstruct()));
+
+    }
+
+    public static class FlowContext
+    {
+        private FlowConstruct flowConstruct;
+
+        public FlowContext(FlowConstruct flowConstruct)
+        {
+            this.flowConstruct = flowConstruct;
+        }
+
+        public String getName()
+        {
+            return flowConstruct.getName();
+        }
     }
 }
