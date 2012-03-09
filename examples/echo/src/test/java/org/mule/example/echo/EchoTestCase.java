@@ -1,5 +1,5 @@
 /*
- * $Id$Id$ $Revision$ $Date$ $Author$ $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  *
