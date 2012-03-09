@@ -20,7 +20,7 @@ import org.mvel2.ParserContext;
 /**
  * Add's variable available to the Mule application to the MVEL expression context.
  */
-public class AppVariableResolverFactory extends AbstractVariableResolverFactory
+class AppVariableResolverFactory extends AbstractVariableResolverFactory
 {
 
     private static final long serialVersionUID = -6819292692339684915L;

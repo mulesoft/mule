@@ -11,6 +11,7 @@
 package org.mule.el.context;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import org.mule.DefaultMuleEvent;
@@ -19,6 +20,7 @@ import org.mule.MessageExchangePattern;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.construct.FlowConstruct;
+import org.mule.api.expression.ExpressionRuntimeException;
 import org.mule.api.transport.PropertyScope;
 
 import java.util.Map;
@@ -124,6 +126,77 @@ public class VariablesTestCase extends AbstractELTestCase
             Mockito.mock(FlowConstruct.class));
         evaluate("sessionVars['foo']='bar'", message);
         assertEquals("bar", event.getSessionVariable("foo"));
+    }
+
+    @Test
+    public void variableFromFlowScope() throws Exception
+    {
+        MuleMessage message = new DefaultMuleMessage("", muleContext);
+        MuleEvent event = new DefaultMuleEvent(message, MessageExchangePattern.ONE_WAY,
+            Mockito.mock(FlowConstruct.class));
+        event.setFlowVariable("foo", "bar");
+        event.setSessionVariable("foo", "NOTbar");
+        assertEquals(event.getFlowVariable("foo"), evaluate("foo", message));
+    }
+
+    @Test
+    public void updateVariableFromFlowScope() throws Exception
+    {
+        MuleMessage message = new DefaultMuleMessage("", muleContext);
+        MuleEvent event = new DefaultMuleEvent(message, MessageExchangePattern.ONE_WAY,
+            Mockito.mock(FlowConstruct.class));
+        event.setFlowVariable("foo", "bar");
+        assertEquals("bar_new", evaluate("foo='bar_new'", message));
+    }
+
+    @Test
+    public void variableFromSessionScope() throws Exception
+    {
+        MuleMessage message = new DefaultMuleMessage("", muleContext);
+        MuleEvent event = new DefaultMuleEvent(message, MessageExchangePattern.ONE_WAY,
+            Mockito.mock(FlowConstruct.class));
+        event.setSessionVariable("foo", "bar");
+        assertEquals(event.getSessionVariable("foo"), evaluate("foo", message));
+    }
+
+    @Test
+    public void updateVariableFromSessionScope() throws Exception
+    {
+        MuleMessage message = new DefaultMuleMessage("", muleContext);
+        MuleEvent event = new DefaultMuleEvent(message, MessageExchangePattern.ONE_WAY,
+            Mockito.mock(FlowConstruct.class));
+        event.setSessionVariable("foo", "bar");
+        assertEquals("bar_new", evaluate("foo='bar_new'", message));
+    }
+
+    @Test
+    public void variableFromRegistry() throws Exception
+    {
+        MuleMessage message = new DefaultMuleMessage("", muleContext);
+        muleContext.getRegistry().registerObject("foo", "bar");
+        assertEquals("bar", evaluate("foo", message));
+    }
+
+    @Test
+    public void assignValueToVariable() throws Exception
+    {
+        MuleMessage message = new DefaultMuleMessage("", muleContext);
+        MuleEvent event = new DefaultMuleEvent(message, MessageExchangePattern.ONE_WAY,
+            Mockito.mock(FlowConstruct.class));
+        event.setFlowVariable("foo", "bar_old");
+        evaluate("foo='bar'", message);
+        assertEquals("bar", event.getFlowVariable("foo"));
+    }
+
+    @Test(expected = ExpressionRuntimeException.class)
+    public void assignValueToNewVariable() throws Exception
+    {
+        MuleMessage message = new DefaultMuleMessage("", muleContext);
+        MuleEvent event = new DefaultMuleEvent(message, MessageExchangePattern.ONE_WAY,
+            Mockito.mock(FlowConstruct.class));
+        evaluate("foo='bar'", message);
+        // Value is not assigned, not sure why this doesn't fail.
+        assertNull(event.getFlowVariable("foo"));
     }
 
 }

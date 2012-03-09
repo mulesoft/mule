@@ -18,7 +18,7 @@ import org.mule.el.context.MessagePropertyMapContext;
 
 import org.mvel2.ParserContext;
 
-public class MessageVariableResolverFactory extends AbstractVariableResolverFactory
+class MessageVariableResolverFactory extends AbstractVariableResolverFactory
 {
 
     private static final long serialVersionUID = -6819292692339684915L;

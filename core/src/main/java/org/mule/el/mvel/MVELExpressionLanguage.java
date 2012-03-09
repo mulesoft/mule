@@ -106,7 +106,8 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
     {
         VariableResolverFactoryChainBuilder builder = new VariableResolverFactoryChainBuilder(
             appVariableResolverFactory);
-        builder.add(new MessageVariableResolverFactory(parserContext, muleContext, event.getMessage()));
+        builder.add(new EventVariableResolverFactory(parserContext, muleContext, event));
+        builder.add(new VariableVariableResolverFactory(parserContext, muleContext, event));
         if (vars != null)
         {
             builder.add(new CachedMapVariableResolverFactory(vars));
@@ -121,6 +122,7 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
         VariableResolverFactoryChainBuilder builder = new VariableResolverFactoryChainBuilder(
             appVariableResolverFactory);
         builder.add(new MessageVariableResolverFactory(parserContext, muleContext, message));
+        builder.add(new VariableVariableResolverFactory(parserContext, muleContext, message));
         return (T) interalExecuteExpression(expression, builder.build());
     }
 
@@ -131,6 +133,7 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
         VariableResolverFactoryChainBuilder builder = new VariableResolverFactoryChainBuilder(
             appVariableResolverFactory);
         builder.add(new MessageVariableResolverFactory(parserContext, muleContext, message));
+        builder.add(new VariableVariableResolverFactory(parserContext, muleContext, message));
         if (vars != null)
         {
             builder.add(new CachedMapVariableResolverFactory(vars));
