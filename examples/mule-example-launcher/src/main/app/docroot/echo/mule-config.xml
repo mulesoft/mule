@@ -1,35 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<mule xmlns="http://www.mulesoft.org/schema/mule/core"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:spring="http://www.springframework.org/schema/beans"
-       xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
+
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+    xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+    xmlns:spring="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="
-       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
-       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
-       http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/3.2/mule-cxf.xsd">
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd 
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd ">
 
-    <description>
-        This config builds a JAX-WS service with CXF.
-        
-        We use a "serviceClass" which is a JAX-WS interface we've defined. It allows us
-        to ensure that the WSDL is only generated for the "echo" method (as opposed
-        to all the other methods on the EchoComponent). This keeps our WSDL nice
-        in clean - but it is not required.
-
-        To invoke the EchoUMO hit the following URL -
-            http://localhost:65082/services/EchoUMO/echo/text/hello
-        
-        To view the WSDL for the EchoUMO service go to -
-            http://localhost:65082/services/EchoUMO?wsdl
-    </description>
-
-    <flow name="EchoFlow">
-        <inbound-endpoint address="http://localhost:65082/services/EchoUMO" exchange-pattern="request-response"/>
-        <cxf:jaxws-service serviceClass="org.mule.example.echo.Echo"/>
-        <component>
-            <singleton-object class="org.mule.example.echo.Echo" />
-        </component>
-        
+    <flow name="Flow1">
+        <http:inbound-endpoint host="localhost"
+            port="8082" keep-alive="false" doc:name="HTTP"
+            doc:description="Process HTTP reqests or responses." />
+        <logger message="About to echo #[payload]" level="INFO" />
+        <echo-component />
     </flow>
-    
 </mule>

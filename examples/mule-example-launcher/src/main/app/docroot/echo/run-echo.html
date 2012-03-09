@@ -5,7 +5,7 @@
 
 <script type="text/javascript">
 
-var echoUrlPrefix = "http://localhost:65082/services/EchoUMO/echo/text/"
+var echoUrlPrefix = "http://localhost:8082/echo/"
 
 function doEcho() {
     var data = new Object();
@@ -35,14 +35,9 @@ function rpcEchoResponse(message) {
 <br/>
 
 <p class="example-title">Additional Information</p>
-<p class="example-text">
-You can also consume this service by directly calling the CXF endpoint, opening a URL such as <a
-    href="http://localhost:65082/services/EchoUMO/echo/text/hello"
-    target="_blank">http://localhost:65082/services/EchoUMO/echo/text/hello</a>, replacing "hello" with the message you want to submit.
-</p>
 <p class="example-text">    
     Complete documentation for this example can be found <a
-    href="http://www.mulesoft.org/documentation/display/MULE3EXAMPLES/Echo+Example"
+    href="http://www.mulesoft.org/documentation/display/MULE3EXAMPLES/Adding+Message+Processors+to+a+Flow"
     target="_blank">here</a>.
 </p>
 </body>

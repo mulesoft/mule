@@ -1,19 +1,20 @@
 <p class="example-title">What is covered?</p>
 <p class="example-text">
     <ul class="example-text">
-        <li>SOAP Web Services using JAX-WS with CXF</li>
-        <li>Pojo Component</li>
+        <li>Message Processors</li>
+        <li>Mule Expressions</li>
     </ul>
 </p>
 
 <p class="example-title">Description</p>
 <p class="example-text">
-This is a simple example that demonstrates how to expose a Mule ESB component as a service using Flow.
+This example shows how to add message processing components, in this example Logger and Echo, to a Flow. By doing so, you can perform custom logging in your Mule application. Logging is useful to introspect the current message and create logging events for your specific needs.
 </p>
 
 <p class="example-title">Under the Hood</p>
 <p class="example-text">
-The Echo service is based on a POJO component that has been annotated with JAX-WS annotations to expose it as a web service over Mule using flow-based configuration. 
+The Mule flow created a HTTP server for accepting incoming requests. The flow is invoked by going to the URL in your browser http://localhost:8082/echo. When a request is received, the echo component simply returns whatever was sent as part of the request.
+Additionally a Logger message processor demonstrates how different processors can be sequenced in a Flow. And the #[payload] expression is used to log the payload of the request. The expression is evaluated for every message received at runtime.
 </p>
 
 <p>
