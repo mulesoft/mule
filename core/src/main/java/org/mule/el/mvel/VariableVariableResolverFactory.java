@@ -46,26 +46,23 @@ class VariableVariableResolverFactory extends AbstractVariableResolverFactory
     public boolean isTarget(String name)
     {
         return message.getInvocationPropertyNames().contains(name)
-               || message.getSessionPropertyNames().contains(name)
-               || message.getMuleContext().getRegistry().lookupObject(name) != null;
+               || message.getSessionPropertyNames().contains(name);
     }
 
     @SuppressWarnings("deprecation")
     @Override
     public VariableResolver getVariableResolver(String name)
     {
-        if (message.getInvocationPropertyNames().contains(name))
+
+        if (message != null && message.getInvocationPropertyNames().contains(name))
         {
             return new FlowVariableVariableResolver(name);
         }
-        else if (message.getSessionPropertyNames().contains(name))
+        else if (message != null && message.getSessionPropertyNames().contains(name))
         {
             return new SessionVariableVariableResolver(name);
         }
-        else
-        {
-            return new RegistryVariableVariableResolver(name);
-        }
+        throw new UnresolveablePropertyException("unable to resolve variable '" + name + "'");
     }
 
     @SuppressWarnings("rawtypes")

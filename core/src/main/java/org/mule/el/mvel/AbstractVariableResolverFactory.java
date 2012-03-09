@@ -37,16 +37,19 @@ public abstract class AbstractVariableResolverFactory extends BaseVariableResolv
         this.muleContext = muleContext;
     }
 
+    @Override
     public boolean isTarget(String name)
     {
         return this.variableResolvers.containsKey(name);
     }
 
+    @Override
     public boolean isResolveable(String name)
     {
         return isTarget(name) || isNextResolveable(name);
     }
 
+    @Override
     public VariableResolver createVariable(String name, Object value)
     {
         return createVariable(name, value, null);
@@ -57,27 +60,6 @@ public abstract class AbstractVariableResolverFactory extends BaseVariableResolv
     {
         VariableResolver vr = getVariableResolver(name);
         vr.setValue(value);
-        return vr;
-    }
-
-    public VariableResolver addResolver(String name, VariableResolver vr, Object value)
-    {
-        if (this.variableResolvers == null)
-        {
-            this.variableResolvers = new HashMap<String, VariableResolver>();
-        }
-        this.variableResolvers.put(name, vr);
-        vr.setValue(value);
-        return vr;
-    }
-
-    public VariableResolver addResolver(String name, VariableResolver vr)
-    {
-        if (this.variableResolvers == null)
-        {
-            this.variableResolvers = new HashMap<String, VariableResolver>();
-        }
-        this.variableResolvers.put(name, vr);
         return vr;
     }
 
@@ -99,6 +81,31 @@ public abstract class AbstractVariableResolverFactory extends BaseVariableResolv
     public void addFinalVariable(String name, Object value)
     {
         addResolver(name, new MuleFinalVariableResolver(name, value, value.getClass()));
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public <T> T getVariable(String name)
+    {
+        VariableResolver resolver = getVariableResolver(name);
+        if (resolver != null)
+        {
+            return (T) resolver.getValue();
+        }
+        else
+        {
+            return null;
+        }
+    }
+
+    protected VariableResolver addResolver(String name, VariableResolver vr)
+    {
+        if (this.variableResolvers == null)
+        {
+            this.variableResolvers = new HashMap<String, VariableResolver>();
+        }
+        this.variableResolvers.put(name, vr);
+        return vr;
     }
 
     private static class MuleVariableResolver extends SimpleSTValueResolver

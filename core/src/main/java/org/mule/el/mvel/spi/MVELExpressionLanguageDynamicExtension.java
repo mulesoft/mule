@@ -8,19 +8,13 @@
  * LICENSE.txt file.
  */
 
-package org.mule.api.el.mvel;
+package org.mule.el.mvel.spi;
 
-import org.mvel2.integration.VariableResolverFactory;
+import org.mule.api.el.mvel.MuleVariableResolverFactory;
 
-public interface MuleVariableResolverFactory extends VariableResolverFactory
+public interface MVELExpressionLanguageDynamicExtension
 {
 
-    void addVariable(String name, Object value);
-
-    void addFinalVariable(String name, Object value);
-
-    <T> T getVariable(String name);
-
-    boolean isResolveable(String name);
+    void configureDynamicVariableResolverFactory(MuleVariableResolverFactory resolverFactory);
 
 }

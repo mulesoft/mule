@@ -18,7 +18,6 @@ import org.mule.api.MuleMessage;
 import org.mule.api.el.ExpressionLanguage;
 import org.mule.api.expression.ExpressionRuntimeException;
 import org.mule.api.lifecycle.Initialisable;
-import org.mule.api.lifecycle.InitialisationException;
 import org.mule.el.mvel.MVELExpressionLanguage;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.util.ExceptionUtils;
@@ -37,8 +36,8 @@ import org.mvel2.PropertyAccessException;
 public abstract class AbstractELTestCase extends AbstractMuleContextTestCase
 {
 
-    private Variant variant;
-    private ExpressionLanguage expressionLanguage;
+    protected Variant variant;
+    protected ExpressionLanguage expressionLanguage;
 
     public AbstractELTestCase(Variant variant)
     {
@@ -46,7 +45,7 @@ public abstract class AbstractELTestCase extends AbstractMuleContextTestCase
     }
 
     @Before
-    public void setupExprssionEvaluator() throws InitialisationException
+    public void setupExprssionEvaluator() throws Exception
     {
         expressionLanguage = getExpressionLanguage();
         if (expressionLanguage instanceof Initialisable)
@@ -105,7 +104,7 @@ public abstract class AbstractELTestCase extends AbstractMuleContextTestCase
         return Arrays.asList(new Object[][]{{Variant.EVALUATOR_LANGUAGE}, {Variant.EXPRESSION_MANAGER}});
     }
 
-    protected ExpressionLanguage getExpressionLanguage()
+    protected ExpressionLanguage getExpressionLanguage() throws Exception
     {
         return new MVELExpressionLanguage(muleContext);
     }

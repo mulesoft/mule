@@ -186,11 +186,6 @@ public class DefaultMuleContext implements MuleContext
 
         try
         {
-            if (expressionManager instanceof Initialisable)
-            {
-                ((Initialisable) expressionManager).initialise();
-            }
-            
             // Initialize the helper, this only initialises the helper class and does not call the registry lifecycle manager
             //The registry lifecycle is called below using 'getLifecycleManager().fireLifecycle(Initialisable.PHASE_NAME);'
             muleRegistryHelper.initialise();
@@ -206,6 +201,11 @@ public class DefaultMuleContext implements MuleContext
             getNotificationManager().start(workManager, workListener);
             fireNotification(new MuleContextNotification(this, MuleContextNotification.CONTEXT_INITIALISING));
             getLifecycleManager().fireLifecycle(Initialisable.PHASE_NAME);
+
+            if (expressionManager instanceof Initialisable)
+            {
+                ((Initialisable) expressionManager).initialise();
+            }
 
             fireNotification(new MuleContextNotification(this, MuleContextNotification.CONTEXT_INITIALISED));
         }

@@ -14,15 +14,17 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.el.ExpressionLanguage;
+import org.mule.api.el.mvel.MuleVariableResolverFactory;
 import org.mule.api.expression.ExpressionRuntimeException;
 import org.mule.api.expression.InvalidExpressionException;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.el.mvel.spi.MVELExpressionLanguageDynamicExtension;
+import org.mule.el.mvel.spi.MVELExpressionLanguageExtension;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
@@ -36,7 +38,6 @@ import org.apache.commons.collections.map.LRUMap;
 import org.mvel2.CompileException;
 import org.mvel2.MVEL;
 import org.mvel2.ParserContext;
-import org.mvel2.integration.VariableResolverFactory;
 import org.mvel2.integration.impl.CachedMapVariableResolverFactory;
 
 /**
@@ -51,6 +52,7 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
     protected LRUMap compiledExpressionsCache = new LRUMap(COMPILED_EXPRESSION_MAX_CACHE_SIZE);
     protected AppVariableResolverFactory appVariableResolverFactory;
     protected MuleContext muleContext;
+    protected boolean extensionsAdded;
 
     public MVELExpressionLanguage(MuleContext muleContext)
     {
@@ -67,6 +69,20 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
         appVariableResolverFactory = new AppVariableResolverFactory(parserContext, muleContext);
     }
 
+    protected void addExtensions()
+    {
+        if (!extensionsAdded)
+        {
+            extensionsAdded = true;
+            for (MVELExpressionLanguageExtension extension : muleContext.getRegistry()
+                .lookupObjectsForLifecycle(MVELExpressionLanguageExtension.class))
+            {
+                extension.configureParserContext(parserContext);
+                extension.configureStaticVariableResolverFactory(appVariableResolverFactory);
+            }
+        }
+    }
+
     @Override
     public void dispose()
     {
@@ -77,20 +93,22 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
     @SuppressWarnings("unchecked")
     public <T> T evaluate(String expression)
     {
-        return (T) interalExecuteExpression(expression, appVariableResolverFactory);
+        return (T) evaluateInternal(expression, new CompositeVariableResolverFactory(parserContext,
+            muleContext, appVariableResolverFactory));
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public <T> T evaluate(String expression, Map<String, Object> vars)
     {
-        VariableResolverFactoryChainBuilder builder = new VariableResolverFactoryChainBuilder(
-            appVariableResolverFactory);
+        CompositeVariableResolverFactory factory = new CompositeVariableResolverFactory(parserContext,
+            muleContext, appVariableResolverFactory);
+        factory.addVariableResolverFactory(new RegistryVariableResolverFactory(parserContext, muleContext));
         if (vars != null)
         {
-            builder.add(new CachedMapVariableResolverFactory(vars));
+            factory.addVariableResolverFactory(new CachedMapVariableResolverFactory(vars));
         }
-        return (T) interalExecuteExpression(expression, builder.build());
+        return (T) evaluateInternal(expression, factory);
     }
 
     @Override
@@ -104,56 +122,73 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
     @SuppressWarnings("unchecked")
     public <T> T evaluate(String expression, MuleEvent event, Map<String, Object> vars)
     {
-        VariableResolverFactoryChainBuilder builder = new VariableResolverFactoryChainBuilder(
-            appVariableResolverFactory);
-        builder.add(new EventVariableResolverFactory(parserContext, muleContext, event));
-        builder.add(new VariableVariableResolverFactory(parserContext, muleContext, event));
+        CompositeVariableResolverFactory factory = new CompositeVariableResolverFactory(parserContext,
+            muleContext, appVariableResolverFactory);
+        factory.addVariableResolverFactory(new EventVariableResolverFactory(parserContext, muleContext, event));
+        factory.addVariableResolverFactory(new VariableVariableResolverFactory(parserContext, muleContext,
+            event));
+        factory.addVariableResolverFactory(new RegistryVariableResolverFactory(parserContext, muleContext));
         if (vars != null)
         {
-            builder.add(new CachedMapVariableResolverFactory(vars));
+            factory.addVariableResolverFactory(new CachedMapVariableResolverFactory(vars));
         }
-        return (T) interalExecuteExpression(expression, builder.build());
+        return (T) evaluateInternal(expression, factory);
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public <T> T evaluate(String expression, MuleMessage message)
     {
-        VariableResolverFactoryChainBuilder builder = new VariableResolverFactoryChainBuilder(
-            appVariableResolverFactory);
-        builder.add(new MessageVariableResolverFactory(parserContext, muleContext, message));
-        builder.add(new VariableVariableResolverFactory(parserContext, muleContext, message));
-        return (T) interalExecuteExpression(expression, builder.build());
+        CompositeVariableResolverFactory factory = new CompositeVariableResolverFactory(parserContext,
+            muleContext, appVariableResolverFactory);
+        factory.addVariableResolverFactory(new MessageVariableResolverFactory(parserContext, muleContext,
+            message));
+        factory.addVariableResolverFactory(new VariableVariableResolverFactory(parserContext, muleContext,
+            message));
+        factory.addVariableResolverFactory(new RegistryVariableResolverFactory(parserContext, muleContext));
+        return (T) evaluateInternal(expression, factory);
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public <T> T evaluate(String expression, MuleMessage message, Map<String, Object> vars)
     {
-        VariableResolverFactoryChainBuilder builder = new VariableResolverFactoryChainBuilder(
-            appVariableResolverFactory);
-        builder.add(new MessageVariableResolverFactory(parserContext, muleContext, message));
-        builder.add(new VariableVariableResolverFactory(parserContext, muleContext, message));
+        CompositeVariableResolverFactory factory = new CompositeVariableResolverFactory(parserContext,
+            muleContext, appVariableResolverFactory);
+        factory.addVariableResolverFactory(new MessageVariableResolverFactory(parserContext, muleContext,
+            message));
+        factory.addVariableResolverFactory(new VariableVariableResolverFactory(parserContext, muleContext,
+            message));
+        factory.addVariableResolverFactory(new RegistryVariableResolverFactory(parserContext, muleContext));
         if (vars != null)
         {
-            builder.add(new CachedMapVariableResolverFactory(vars));
+            factory.addVariableResolverFactory(new CachedMapVariableResolverFactory(vars));
         }
-        return (T) interalExecuteExpression(expression, builder.build());
+        return (T) evaluateInternal(expression, factory);
     }
 
     @SuppressWarnings("unchecked")
-    protected <T> T interalExecuteExpression(String expression,
-                                             VariableResolverFactory variableResolverFactory)
+    protected <T> T evaluateInternal(String expression, MuleVariableResolverFactory variableResolverFactory)
     {
         try
         {
+            addExtensions();
+            addDynamicExtensions(variableResolverFactory);
             return (T) MVEL.executeExpression(getCompiledExpression(expression), variableResolverFactory);
         }
         catch (Exception e)
         {
             throw new ExpressionRuntimeException(CoreMessages.expressionEvaluationFailed(expression), e);
         }
+    }
 
+    protected void addDynamicExtensions(MuleVariableResolverFactory variableResolverFactory)
+    {
+        for (MVELExpressionLanguageDynamicExtension contribution : muleContext.getRegistry()
+            .lookupObjectsForLifecycle(MVELExpressionLanguageDynamicExtension.class))
+        {
+            contribution.configureDynamicVariableResolverFactory(variableResolverFactory);
+        }
     }
 
     @Override
@@ -192,7 +227,7 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
 
     protected void configureParserContext(ParserContext parserContext)
     {
-        // defaults importsw
+        // defaults imports
         parserContext.addImport(Date.class);
         parserContext.addImport(Collection.class);
         parserContext.addImport(List.class);
@@ -233,35 +268,6 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
             Serializable compiledExpression = MVEL.compileExpression(expression, parserContext);
             compiledExpressionsCache.put(expression, compiledExpression);
             return compiledExpression;
-        }
-    }
-
-    /**
-     * Utility builder for creating chain of {@link VariableResolverFactory}'s
-     */
-    private class VariableResolverFactoryChainBuilder
-    {
-
-        List<VariableResolverFactory> factories = new ArrayList<VariableResolverFactory>();
-
-        public VariableResolverFactoryChainBuilder(VariableResolverFactory factory)
-        {
-            add(factory);
-        }
-
-        public VariableResolverFactoryChainBuilder add(VariableResolverFactory factory)
-        {
-            factories.add(factory);
-            return this;
-        }
-
-        public VariableResolverFactory build()
-        {
-            for (int i = 0; i < factories.size() - 1; i++)
-            {
-                factories.get(i).setNextFactory(factories.get(i + 1));
-            }
-            return factories.get(0);
         }
     }
 

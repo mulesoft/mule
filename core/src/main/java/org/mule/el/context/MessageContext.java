@@ -81,12 +81,12 @@ public class MessageContext
         message.setPayload(payload);
     }
 
-    public Map<String, Object> getInboundProps()
+    public Map<String, Object> getInboundProperties()
     {
         return new MessagePropertyMapContext(message, PropertyScope.INBOUND);
     }
 
-    public Map<String, Object> getOutboundProps()
+    public Map<String, Object> getOutboundProperties()
     {
         return new MessagePropertyMapContext(message, PropertyScope.OUTBOUND);
     }
