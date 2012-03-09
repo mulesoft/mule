@@ -116,6 +116,17 @@ public class ExpressionLanguageExtensionTestCase extends AbstractELTestCase
     }
 
     @Test
+    public void testAssignValueToVariableAlias() throws RegistrationException, InitialisationException
+    {
+        MVELExpressionLanguage mvel = new MVELExpressionLanguage(muleContext);
+        mvel.initialise();
+
+        MuleMessage message = new DefaultMuleMessage("foo", muleContext);
+
+        Assert.assertEquals("bar", mvel.evaluate("p='bar'", message));
+    }
+
+    @Test
     public void testFunction() throws RegistrationException, InitialisationException
     {
         MVELExpressionLanguage mvel = new MVELExpressionLanguage(muleContext);

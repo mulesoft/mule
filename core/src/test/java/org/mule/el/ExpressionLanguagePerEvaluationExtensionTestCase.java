@@ -55,17 +55,6 @@ public class ExpressionLanguagePerEvaluationExtensionTestCase extends Expression
         Assert.assertEquals("foo", mvel.evaluate("p", message));
     }
 
-    // @Test
-    // public void testVariableAlias() throws RegistrationException, InitialisationException
-    // {
-    // MVELExpressionLanguage mvel = new MVELExpressionLanguage(muleContext);
-    // mvel.initialise();
-    //
-    // MuleMessage message = new DefaultMuleMessage("foo", muleContext);
-    //
-    // Assert.assertEquals("foo", mvel.evaluate("p2", message));
-    // }
-
     class TestExtension implements ExpressionLanguagePerEvaluationExtension
     {
 
