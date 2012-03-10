@@ -16,8 +16,11 @@ import static org.junit.Assert.assertTrue;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
-import org.mule.transformer.types.SimpleDataType;
+import org.mule.api.transformer.DataType;
+import org.mule.tck.testmodels.fruit.Banana;
+import org.mule.transformer.types.DataTypeFactory;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mockito;
 
@@ -105,24 +108,12 @@ public class MessageTestCase extends AbstractELTestCase
         assertEquals("my://uri", message.getReplyTo());
     }
 
-    @SuppressWarnings({"unchecked", "rawtypes"})
     @Test
-    public void encoding() throws Exception
+    public void dataType() throws Exception
     {
         MuleMessage message = Mockito.mock(MuleMessage.class);
-        Mockito.when(message.getDataType()).thenReturn(
-            new SimpleDataType(String.class, "text/xml;charset=UTF-8 "));
-        assertEquals("UTF-8", evaluate("message.encoding", message));
-        assertFinalProperty("message.encoding=2", message);
-    }
-
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    @Test
-    public void mimeType() throws Exception
-    {
-        MuleMessage message = Mockito.mock(MuleMessage.class);
-        Mockito.when(message.getDataType()).thenReturn(new SimpleDataType(String.class));
-        assertEquals("*/*", evaluate("message.mimeType", message));
+        Mockito.when(message.getDataType()).thenReturn((DataType) DataTypeFactory.STRING);
+        assertEquals(DataTypeFactory.STRING, evaluate("message.dataType", message));
         assertFinalProperty("message.mimType=2", message);
     }
 
@@ -141,6 +132,39 @@ public class MessageTestCase extends AbstractELTestCase
         MuleMessage message = new DefaultMuleMessage("", muleContext);
         evaluate("message.payload = 'foo'", message);
         assertEquals("foo", message.getPayload());
+    }
+
+    @Test
+    public void payloadAsType() throws Exception
+    {
+        MuleMessage mockMessage = Mockito.mock(MuleMessage.class);
+        Banana b = new Banana();
+        Mockito.when(mockMessage.getPayload(Mockito.any(Class.class))).thenReturn(b);
+        assertSame(b, evaluate("message.payloadAs(org.mule.tck.testmodels.fruit.Banana)", mockMessage));
+    }
+
+    @Test
+    public void payloadAsDataType() throws Exception
+    {
+        MuleMessage mockMessage = Mockito.mock(MuleMessage.class);
+        Banana b = new Banana();
+        Mockito.when(mockMessage.getPayload(Mockito.any(DataType.class))).thenReturn(b);
+        assertSame(b,
+            evaluate("message.payloadAs(org.mule.transformer.types.DataTypeFactory.STRING)", mockMessage));
+    }
+
+    @Test
+    @Ignore
+    public void transformedPayload() throws Exception
+    {
+        MuleMessage mockMessage = Mockito.mock(MuleMessage.class);
+        Banana b = new Banana();
+        Mockito.when(mockMessage.getPayload()).thenReturn("a");
+        assertEquals(
+            "ab",
+            evaluate(
+                "message.transformedPayload(new org.mule.transformer.simple.StringAppendTransformer('b'))",
+                mockMessage));
     }
 
 }
