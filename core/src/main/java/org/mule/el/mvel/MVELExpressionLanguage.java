@@ -14,9 +14,7 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.el.ExpressionLanguage;
-import org.mule.api.el.ExpressionLanguageContext;
 import org.mule.api.el.ExpressionLanguageExtension;
-import org.mule.api.el.ExpressionLanguagePerEvaluationExtension;
 import org.mule.api.expression.ExpressionRuntimeException;
 import org.mule.api.expression.InvalidExpressionException;
 import org.mule.api.lifecycle.Disposable;
@@ -173,21 +171,11 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
         try
         {
             addExtensions();
-            addDynamicExtensions((ExpressionLanguageContext) variableResolverFactory);
             return (T) MVEL.executeExpression(getCompiledExpression(expression), variableResolverFactory);
         }
         catch (Exception e)
         {
             throw new ExpressionRuntimeException(CoreMessages.expressionEvaluationFailed(expression), e);
-        }
-    }
-
-    protected void addDynamicExtensions(ExpressionLanguageContext context)
-    {
-        for (ExpressionLanguagePerEvaluationExtension extension : muleContext.getRegistry()
-            .lookupObjectsForLifecycle(ExpressionLanguagePerEvaluationExtension.class))
-        {
-            extension.configureContext(context);
         }
     }
 
