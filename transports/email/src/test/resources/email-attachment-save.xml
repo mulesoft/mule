@@ -3,10 +3,10 @@
     xmlns:context="http://www.springframework.org/schema/context"
     xmlns:imap="http://www.mulesoft.org/schema/mule/imap" xmlns:file="http://www.mulesoft.org/schema/mule/file"
     xsi:schemaLocation="
-       http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd
-       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
-       http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/3.2/mule-file.xsd
-       http://www.mulesoft.org/schema/mule/imap http://www.mulesoft.org/schema/mule/imap/3.2/mule-imap.xsd">
+       http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-current.xsd
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+       http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd
+       http://www.mulesoft.org/schema/mule/imap http://www.mulesoft.org/schema/mule/imap/current/mule-imap.xsd">
 
     <flow name="incoming-orders">
         <imap:inbound-endpoint user="${mail.user}"

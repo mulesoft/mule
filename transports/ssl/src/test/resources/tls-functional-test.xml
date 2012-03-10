@@ -4,9 +4,9 @@
        xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
        xmlns:test="http://www.mulesoft.org/schema/mule/test"
     xsi:schemaLocation="
-       http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/3.2/mule-test.xsd
-       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
-       http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/3.2/mule-tls.xsd">
+       http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+       http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd">
 
     <!-- keepSendSocketOpen is required for the Async test case?  see TCP -->
     <tls:connector name="tlsConnector" keepSendSocketOpen="true">

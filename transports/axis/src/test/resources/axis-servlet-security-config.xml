@@ -7,12 +7,12 @@
        xmlns:axis="http://www.mulesoft.org/schema/mule/axis"
        xmlns:servlet="http://www.mulesoft.org/schema/mule/servlet"
     xsi:schemaLocation="
-       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
        http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.0.xsd
-       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
-       http://www.mulesoft.org/schema/mule/spring-security http://www.mulesoft.org/schema/mule/spring-security/3.2/mule-spring-security.xsd
-       http://www.mulesoft.org/schema/mule/axis http://www.mulesoft.org/schema/mule/axis/3.2/mule-axis.xsd
-       http://www.mulesoft.org/schema/mule/servlet http://www.mulesoft.org/schema/mule/servlet/3.2/mule-servlet.xsd">
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+       http://www.mulesoft.org/schema/mule/spring-security http://www.mulesoft.org/schema/mule/spring-security/current/mule-spring-security.xsd
+       http://www.mulesoft.org/schema/mule/axis http://www.mulesoft.org/schema/mule/axis/current/mule-axis.xsd
+       http://www.mulesoft.org/schema/mule/servlet http://www.mulesoft.org/schema/mule/servlet/current/mule-servlet.xsd">
 
     <spring:beans>
         <sec:authentication-manager alias="authenticationManager">

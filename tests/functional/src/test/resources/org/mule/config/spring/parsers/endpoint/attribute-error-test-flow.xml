@@ -4,8 +4,8 @@
        xmlns:spring="http://www.springframework.org/schema/beans"
        xmlns:parsers-test="http://www.mulesoft.org/schema/mule/parsers-test"
     xsi:schemaLocation="
-       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
-       http://www.mulesoft.org/schema/mule/parsers-test http://www.mulesoft.org/schema/mule/parsers-test/3.2/mule-parsers-test.xsd">
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+       http://www.mulesoft.org/schema/mule/parsers-test http://www.mulesoft.org/schema/mule/parsers-test/current/mule-parsers-test.xsd">
 
     <!-- TODO - prolly not necessary if error detected -->
     <spring:bean name="bar" class="java.lang.Object"/>

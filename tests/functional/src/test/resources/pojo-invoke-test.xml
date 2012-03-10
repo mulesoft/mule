@@ -2,8 +2,8 @@
 <mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:pojo="http://www.mulesoft.org/schema/mule/pojo-test"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="
-       http://www.mulesoft.org/schema/mule/pojo-test http://www.mulesoft.org/schema/mule/pojo-test/3.2/mule-pojo-test.xsd
-       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd">
+       http://www.mulesoft.org/schema/mule/pojo-test http://www.mulesoft.org/schema/mule/pojo-test/current/mule-pojo-test.xsd
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
     <pojo:config name="pojo" config1="config1Val" config2="config2Val" />
     <pojo:config name="pojo2" config1="config1Val"/>

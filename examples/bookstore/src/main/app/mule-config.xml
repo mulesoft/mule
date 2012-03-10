@@ -3,8 +3,8 @@
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:jetty="http://www.mulesoft.org/schema/mule/jetty"
       xsi:schemaLocation="
-        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
-        http://www.mulesoft.org/schema/mule/jetty http://www.mulesoft.org/schema/mule/jetty/3.2/mule-jetty.xsd">
+        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+        http://www.mulesoft.org/schema/mule/jetty http://www.mulesoft.org/schema/mule/jetty/current/mule-jetty.xsd">
 
     <description>
         This is the configuration file that is started up by Mule when the application is deployed.

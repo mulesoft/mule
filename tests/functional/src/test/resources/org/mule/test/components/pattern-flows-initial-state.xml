@@ -3,7 +3,7 @@
 	xmlns:spring="http://www.springframework.org/schema/beans"
 	xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
-       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd">
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
 	<simple-service name="defaultSimpleService" address="test://in.simple.default"
 		component-class="org.mule.component.simple.EchoComponent" />

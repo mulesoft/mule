@@ -4,9 +4,9 @@
        xmlns:spring="http://www.springframework.org/schema/beans"
        xmlns:jaas="http://www.mulesoft.org/schema/mule/jaas"
     xsi:schemaLocation="
-       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
-       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
-       http://www.mulesoft.org/schema/mule/jaas http://www.mulesoft.org/schema/mule/jaas/3.2/mule-jaas.xsd">
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+       http://www.mulesoft.org/schema/mule/jaas http://www.mulesoft.org/schema/mule/jaas/current/mule-jaas.xsd">
 
     <jaas:security-manager>
         <jaas:security-provider name="jaasSecurityProvider" loginContextName="jaasTest" loginConfig="jaas.conf"/>

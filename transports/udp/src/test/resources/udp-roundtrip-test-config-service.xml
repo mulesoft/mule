@@ -4,8 +4,8 @@
        xmlns:udp="http://www.mulesoft.org/schema/mule/udp"
        xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
        xsi:schemaLocation="
-               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
-               http://www.mulesoft.org/schema/mule/udp http://www.mulesoft.org/schema/mule/udp/3.2/mule-udp.xsd">
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/udp http://www.mulesoft.org/schema/mule/udp/current/mule-udp.xsd">
 
     <serializable-to-byte-array-transformer name="SerializableToByteArray"/>
 

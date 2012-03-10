@@ -4,9 +4,9 @@
        xmlns:jetty="http://www.mulesoft.org/schema/mule/jetty"
        xmlns:jetty-ssl="http://www.mulesoft.org/schema/mule/jetty-ssl"
     xsi:schemaLocation="
-       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
-       http://www.mulesoft.org/schema/mule/jetty http://www.mulesoft.org/schema/mule/jetty/3.2/mule-jetty.xsd
-       http://www.mulesoft.org/schema/mule/jetty-ssl http://www.mulesoft.org/schema/mule/jetty-ssl/3.2/mule-jetty-ssl.xsd">
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+       http://www.mulesoft.org/schema/mule/jetty http://www.mulesoft.org/schema/mule/jetty/current/mule-jetty.xsd
+       http://www.mulesoft.org/schema/mule/jetty-ssl http://www.mulesoft.org/schema/mule/jetty-ssl/current/mule-jetty-ssl.xsd">
 
     <jetty:connector name="jettyConnector" configFile="jetty-config.xml"/>
 

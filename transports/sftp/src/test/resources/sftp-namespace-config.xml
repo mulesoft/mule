@@ -2,8 +2,8 @@
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:sftp="http://www.mulesoft.org/schema/mule/sftp"
       xsi:schemaLocation="
-        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
-        http://www.mulesoft.org/schema/mule/sftp http://www.mulesoft.org/schema/mule/sftp/3.2/mule-sftp.xsd">
+        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+        http://www.mulesoft.org/schema/mule/sftp http://www.mulesoft.org/schema/mule/sftp/current/mule-sftp.xsd">
 
     <sftp:connector name="sftpConnector"
                     pollingFrequency="15000"

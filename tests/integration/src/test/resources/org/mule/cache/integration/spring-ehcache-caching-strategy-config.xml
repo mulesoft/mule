@@ -5,10 +5,10 @@
       xmlns:ehcache="http://www.springmodules.org/schema/ehcache"
       xmlns:extras="http://www.mulesoft.org/schema/mule/spring-extras"
       xsi:schemaLocation="
-            http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
-            http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
+            http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+            http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
             http://www.springmodules.org/schema/ehcache http://www.springmodules.org/schema/cache/springmodules-ehcache.xsd
-            http://www.mulesoft.org/schema/mule/spring-extras http://www.mulesoft.org/schema/mule/spring-extras/3.2/mule-spring-extras.xsd">
+            http://www.mulesoft.org/schema/mule/spring-extras http://www.mulesoft.org/schema/mule/spring-extras/current/mule-spring-extras.xsd">
 
     <spring:beans>
         <ehcache:config id="ehcache"

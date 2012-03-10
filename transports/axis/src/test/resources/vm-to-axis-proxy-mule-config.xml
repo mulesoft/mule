@@ -4,9 +4,9 @@
        xmlns:spring="http://www.springframework.org/schema/beans"
        xmlns:axis="http://www.mulesoft.org/schema/mule/axis"
     xsi:schemaLocation="
-       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
-       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
-       http://www.mulesoft.org/schema/mule/axis http://www.mulesoft.org/schema/mule/axis/3.2/mule-axis.xsd">
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+       http://www.mulesoft.org/schema/mule/axis http://www.mulesoft.org/schema/mule/axis/current/mule-axis.xsd">
 
     <model name="test">
         <service name="proxy">

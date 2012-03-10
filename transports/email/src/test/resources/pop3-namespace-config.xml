@@ -5,10 +5,10 @@
        xmlns:pop3="http://www.mulesoft.org/schema/mule/pop3"
        xmlns:pop3s="http://www.mulesoft.org/schema/mule/pop3s"
        xsi:schemaLocation="
-       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
-       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
-       http://www.mulesoft.org/schema/mule/pop3 http://www.mulesoft.org/schema/mule/pop3/3.2/mule-pop3.xsd
-       http://www.mulesoft.org/schema/mule/pop3s http://www.mulesoft.org/schema/mule/pop3s/3.2/mule-pop3s.xsd">
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+       http://www.mulesoft.org/schema/mule/pop3 http://www.mulesoft.org/schema/mule/pop3/current/mule-pop3.xsd
+       http://www.mulesoft.org/schema/mule/pop3s http://www.mulesoft.org/schema/mule/pop3s/current/mule-pop3s.xsd">
 
     <pop3:connector name="pop3Connector" backupEnabled="true" backupFolder="newBackup" checkFrequency="1234"
                     mailboxFolder="newMailbox" deleteReadMessages="false"/>

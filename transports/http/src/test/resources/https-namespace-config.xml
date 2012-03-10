@@ -4,9 +4,9 @@
        xmlns:spring="http://www.springframework.org/schema/beans"
        xmlns:https="http://www.mulesoft.org/schema/mule/https"
     xsi:schemaLocation="
-       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
-       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
-       http://www.mulesoft.org/schema/mule/https http://www.mulesoft.org/schema/mule/https/3.2/mule-https.xsd">
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+       http://www.mulesoft.org/schema/mule/https http://www.mulesoft.org/schema/mule/https/current/mule-https.xsd">
 
     <https:connector name="httpsConnector" clientSoTimeout="1234" cookieSpec="netscape" proxyHostname="bcd"
                      proxyPassword="cde" proxyPort="2345" proxyUsername="def" receiveBacklog="34"

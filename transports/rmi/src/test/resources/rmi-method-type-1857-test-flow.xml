@@ -5,10 +5,10 @@
        xmlns:rmi="http://www.mulesoft.org/schema/mule/rmi"
        xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
        xsi:schemaLocation="
-               http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
-               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
-               http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.2/mule-vm.xsd
-               http://www.mulesoft.org/schema/mule/rmi http://www.mulesoft.org/schema/mule/rmi/3.2/mule-rmi.xsd">
+               http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+               http://www.mulesoft.org/schema/mule/rmi http://www.mulesoft.org/schema/mule/rmi/current/mule-rmi.xsd">
 
     <spring:bean name="jndiFactory" class="org.mule.transport.rmi.MuleRMIFactory"/>
 

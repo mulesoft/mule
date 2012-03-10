@@ -4,9 +4,9 @@
        xmlns:spring="http://www.springframework.org/schema/beans"
        xmlns:multicast="http://www.mulesoft.org/schema/mule/multicast"
     xsi:schemaLocation="
-       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
-       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
-       http://www.mulesoft.org/schema/mule/multicast http://www.mulesoft.org/schema/mule/multicast/3.2/mule-multicast.xsd">
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+       http://www.mulesoft.org/schema/mule/multicast http://www.mulesoft.org/schema/mule/multicast/current/mule-multicast.xsd">
 
     <multicast:connector name="multicastConnector" receiveBufferSize="1234" timeout="2345" sendBufferSize="3456"
                          timeToLive="5678" broadcast="true" loopback="true"

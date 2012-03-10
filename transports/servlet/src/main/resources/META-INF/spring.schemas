@@ -1,2 +1,2 @@
-http\://www.mulesoft.org/schema/mule/servlet/3.2/mule-servlet.xsd=META-INF/mule-servlet.xsd
+http\://www.mulesoft.org/schema/mule/servlet/3.3/mule-servlet.xsd=META-INF/mule-servlet.xsd
 http\://www.mulesoft.org/schema/mule/servlet/current/mule-servlet.xsd=META-INF/mule-servlet.xsd

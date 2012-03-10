@@ -5,9 +5,9 @@
       xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
       xmlns:jbossts="http://www.mulesoft.org/schema/mule/jbossts"
       xsi:schemaLocation="
-       http://www.mulesoft.org/schema/mule/jbossts http://www.mulesoft.org/schema/mule/jbossts/3.2/mule-jbossts.xsd
-       http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/3.2/mule-jms.xsd
-       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd">
+       http://www.mulesoft.org/schema/mule/jbossts http://www.mulesoft.org/schema/mule/jbossts/current/mule-jbossts.xsd
+       http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
     <jms:activemq-connector name="simpleJmsConnector" brokerURL="tcp://localhost:61616" specification="1.1"
                             disableTemporaryReplyToDestinations="true"/>

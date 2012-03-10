@@ -4,9 +4,9 @@
        xmlns:ssl="http://www.mulesoft.org/schema/mule/ssl"
        xmlns:test="http://www.mulesoft.org/schema/mule/test"
     xsi:schemaLocation="
-       http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/3.2/mule-test.xsd
-       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
-       http://www.mulesoft.org/schema/mule/ssl http://www.mulesoft.org/schema/mule/ssl/3.2/mule-ssl.xsd">
+       http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+       http://www.mulesoft.org/schema/mule/ssl http://www.mulesoft.org/schema/mule/ssl/current/mule-ssl.xsd">
 
     <ssl:connector name="SslConnector">
         <ssl:client path="clientKeyStore" storePassword="mulepassword"/>

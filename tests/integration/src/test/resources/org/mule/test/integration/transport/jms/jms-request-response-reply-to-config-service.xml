@@ -3,9 +3,9 @@
       xmlns:http="http://www.mulesoft.org/schema/mule/http"
       xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
       xsi:schemaLocation="
-          http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
-          http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/3.2/mule-http.xsd
-          http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/3.2/mule-jms.xsd">
+          http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+          http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+          http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd">
 
     <jms:activemq-connector name="jmsConnector1" specification="1.1" persistentDelivery="true" maxRedelivery="0"
                             clientId="fileQueue"/>
