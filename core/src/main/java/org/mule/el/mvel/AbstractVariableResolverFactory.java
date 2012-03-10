@@ -104,10 +104,11 @@ public abstract class AbstractVariableResolverFactory extends BaseVariableResolv
         }
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public <T> T getVariable(String name, Class<T> type)
     {
-        return getVariable(name);
+        return (T) getVariable(name);
     }
 
     protected VariableResolver addResolver(String name, VariableResolver vr)
