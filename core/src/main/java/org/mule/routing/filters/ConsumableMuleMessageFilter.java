@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.cache.filter;
+package org.mule.routing.filters;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;

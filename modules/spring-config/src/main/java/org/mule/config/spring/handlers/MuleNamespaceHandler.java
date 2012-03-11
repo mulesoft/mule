@@ -14,8 +14,6 @@ import org.mule.api.config.MuleProperties;
 import org.mule.api.config.ThreadingProfile;
 import org.mule.api.processor.LoggerMessageProcessor;
 import org.mule.api.source.MessageSource;
-import org.mule.cache.CachingMessageProcessor;
-import org.mule.cache.ObjectStoreCachingStrategy;
 import org.mule.component.DefaultInterfaceBinding;
 import org.mule.component.DefaultJavaComponent;
 import org.mule.component.PooledJavaComponent;
@@ -38,8 +36,6 @@ import org.mule.config.spring.factories.QueueProfileFactoryBean;
 import org.mule.config.spring.factories.SimpleMemoryQueueStoreFactoryBean;
 import org.mule.config.spring.factories.TransactionalMessageProcessorsFactoryBean;
 import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
-import org.mule.config.spring.parsers.cache.CacheDefinitionParser;
-import org.mule.config.spring.parsers.cache.CachingStrategyDefinitionParser;
 import org.mule.config.spring.parsers.collection.ChildListDefinitionParser;
 import org.mule.config.spring.parsers.collection.ChildListEntryDefinitionParser;
 import org.mule.config.spring.parsers.collection.ChildMapDefinitionParser;
@@ -111,9 +107,9 @@ import org.mule.context.notification.ListenerSubscriptionPair;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.enricher.MessageEnricher;
 import org.mule.enricher.MessageEnricher.EnrichExpressionPair;
+import org.mule.exception.CatchMessagingExceptionStrategy;
 import org.mule.exception.ChoiceMessagingExceptionStrategy;
 import org.mule.exception.DefaultMessagingExceptionStrategy;
-import org.mule.exception.CatchMessagingExceptionStrategy;
 import org.mule.exception.RedeliveryExceeded;
 import org.mule.exception.RollbackMessagingExceptionStrategy;
 import org.mule.expression.ExpressionConfig;
@@ -208,8 +204,8 @@ import org.mule.transformer.compression.GZipUncompressTransformer;
 import org.mule.transformer.encryption.DecryptionTransformer;
 import org.mule.transformer.encryption.EncryptionTransformer;
 import org.mule.transformer.simple.AddAttachmentTransformer;
-import org.mule.transformer.simple.AddPropertyTransformer;
 import org.mule.transformer.simple.AddFlowVariableTransformer;
+import org.mule.transformer.simple.AddPropertyTransformer;
 import org.mule.transformer.simple.AddSessionVariableTransformer;
 import org.mule.transformer.simple.AutoTransformer;
 import org.mule.transformer.simple.BeanToMap;
@@ -224,14 +220,15 @@ import org.mule.transformer.simple.MapToBean;
 import org.mule.transformer.simple.ObjectToByteArray;
 import org.mule.transformer.simple.ObjectToString;
 import org.mule.transformer.simple.RemoveAttachmentTransformer;
-import org.mule.transformer.simple.RemovePropertyTransformer;
 import org.mule.transformer.simple.RemoveFlowVariableTransformer;
+import org.mule.transformer.simple.RemovePropertyTransformer;
 import org.mule.transformer.simple.RemoveSessionVariableTransformer;
 import org.mule.transformer.simple.SerializableToByteArray;
 import org.mule.transformer.simple.StringAppendTransformer;
 import org.mule.util.store.InMemoryObjectStore;
 import org.mule.util.store.ManagedObjectStore;
 import org.mule.util.store.TextFileObjectStore;
+
 import org.springframework.beans.factory.xml.BeanDefinitionParser;
 
 /**
@@ -608,9 +605,5 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("custom-interceptor", new InterceptorDefinitionParser());
         registerBeanDefinitionParser("timer-interceptor", new InterceptorDefinitionParser(TimerInterceptor.class));
         registerBeanDefinitionParser("logging-interceptor", new InterceptorDefinitionParser(LoggingInterceptor.class));
-
-        // Cache
-        registerBeanDefinitionParser("caching-strategy", new CachingStrategyDefinitionParser(ObjectStoreCachingStrategy.class, true));
-        registerBeanDefinitionParser("cache", new CacheDefinitionParser("messageProcessor", CachingMessageProcessor.class));
     }
 }

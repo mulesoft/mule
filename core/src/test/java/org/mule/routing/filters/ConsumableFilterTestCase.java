@@ -8,11 +8,16 @@
  * LICENSE.txt file.
  */
 
-package org.mule.cache.filter;
+package org.mule.routing.filters;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
+import org.mule.routing.filters.ConsumableMuleMessageFilter;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.ByteArrayInputStream;
@@ -20,10 +25,6 @@ import java.io.InputStream;
 
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.mock;
 
 public class ConsumableFilterTestCase extends AbstractMuleTestCase
 {
