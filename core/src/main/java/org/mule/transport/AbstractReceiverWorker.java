@@ -90,7 +90,7 @@ public abstract class AbstractReceiverWorker implements Work
     public void processMessages() throws Exception
     {
         //No need to do error handling. It will be done by inner TransactionTemplate per Message
-        ProcessingTemplate<List<MuleEvent>> processingTemplate = new TransactionalProcessingTemplate<List<MuleEvent>>(receiver.getConnector().getMuleContext(),endpoint.getTransactionConfig());
+        ProcessingTemplate<List<MuleEvent>> processingTemplate = TransactionalProcessingTemplate.createTransactionalProcessingTemplate(receiver.getConnector().getMuleContext(), endpoint.getTransactionConfig());
 
         // Receive messages and process them in a single transaction
         // Do not enable threading here, but serveral workers
@@ -108,7 +108,7 @@ public abstract class AbstractReceiverWorker implements Work
 
                 for (final Object payload : messages)
                 {
-                    ProcessingTemplate<MuleEvent> processingTemplate = new TransactionalErrorHandlingProcessingTemplate(endpoint.getMuleContext(), receiver.flowConstruct.getExceptionListener());
+                    ProcessingTemplate<MuleEvent> processingTemplate = TransactionalErrorHandlingProcessingTemplate.createMainProcessingTemplate(endpoint.getMuleContext(), receiver.flowConstruct.getExceptionListener());
                     MuleEvent resultEvent;
                     try
                     {

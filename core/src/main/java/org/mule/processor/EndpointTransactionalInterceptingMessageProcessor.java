@@ -11,17 +11,14 @@
 package org.mule.processor;
 
 import org.mule.api.DefaultMuleException;
-import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.processor.MessageProcessor;
-import org.mule.api.transaction.TransactionCallback;
 import org.mule.api.transaction.TransactionConfig;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.process.ProcessingCallback;
 import org.mule.process.ProcessingTemplate;
 import org.mule.process.TransactionalProcessingTemplate;
-import org.mule.transaction.MuleTransactionConfig;
 
 /**
  * Wraps the invocation of the next {@link MessageProcessor} with a transaction. If
@@ -45,7 +42,7 @@ public class EndpointTransactionalInterceptingMessageProcessor extends AbstractI
         }
         else
         {
-            ProcessingTemplate<MuleEvent> processingTemplate = new TransactionalProcessingTemplate<MuleEvent>(muleContext,transactionConfig);
+            ProcessingTemplate<MuleEvent> processingTemplate = TransactionalProcessingTemplate.createTransactionalProcessingTemplate(muleContext, transactionConfig);
             ProcessingCallback<MuleEvent> processingCallback = new ProcessingCallback<MuleEvent>()
             {
                 public MuleEvent process() throws Exception

@@ -79,7 +79,7 @@ public class MuleInvoker implements Invoker
                 reqMsg.setProperty(CxfConstants.INBOUND_SERVICE, svc.getName(), PropertyScope.INVOCATION);
             }
 
-            ErrorHandlingProcessingTemplate errorHandlingProcessingTemplate = new ErrorHandlingProcessingTemplate(event.getMuleContext(), event.getFlowConstruct().getExceptionListener());
+            ErrorHandlingProcessingTemplate errorHandlingProcessingTemplate = ErrorHandlingProcessingTemplate.createErrorHandlingProcessingTemplate(event.getMuleContext(), event.getFlowConstruct().getExceptionListener());
             responseEvent = errorHandlingProcessingTemplate.execute(new ProcessingCallback<MuleEvent>()
             {
                 @Override

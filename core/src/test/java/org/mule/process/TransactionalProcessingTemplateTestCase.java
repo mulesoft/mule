@@ -29,6 +29,7 @@ import org.mule.api.transaction.ExternalTransactionAwareTransactionFactory;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionConfig;
 import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.size.SmallTest;
 import org.mule.tck.testmodels.mule.TestTransaction;
 import org.mule.tck.testmodels.mule.TestTransactionFactory;
 import org.mule.transaction.IllegalTransactionStateException;
@@ -41,6 +42,7 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
+@SmallTest
 public class TransactionalProcessingTemplateTestCase extends AbstractMuleTestCase
 {
     protected MuleContext mockMuleContext = mock(MuleContext.class);
@@ -372,7 +374,7 @@ public class TransactionalProcessingTemplateTestCase extends AbstractMuleTestCas
 
     protected ProcessingTemplate createProcessingTemplate(MuleTransactionConfig config)
     {
-        return new TransactionalErrorHandlingProcessingTemplate(mockMuleContext, config, mockMessagingExceptionHandler);
+        return TransactionalErrorHandlingProcessingTemplate.createMainProcessingTemplate(mockMuleContext, config, mockMessagingExceptionHandler);
     }
 
     protected ProcessingCallback getEmptyTransactionCallback()

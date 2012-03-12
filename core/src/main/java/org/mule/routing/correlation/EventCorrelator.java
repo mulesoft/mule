@@ -29,7 +29,6 @@ import org.mule.api.store.ObjectDoesNotExistException;
 import org.mule.api.store.ObjectStore;
 import org.mule.api.store.ObjectStoreException;
 import org.mule.api.store.ObjectStoreManager;
-import org.mule.api.transaction.TransactionCallback;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.context.notification.RoutingNotification;
 import org.mule.process.ErrorHandlingProcessingTemplate;
@@ -551,7 +550,7 @@ public class EventCorrelator implements Startable, Stoppable
                 for (Object anExpired : expired)
                 {
                     final EventGroup group = (EventGroup) anExpired;
-                    ProcessingTemplate<MuleEvent> processingTemplate = new ErrorHandlingProcessingTemplate(muleContext, group.getMessageCollectionEvent().getFlowConstruct().getExceptionListener());
+                    ProcessingTemplate<MuleEvent> processingTemplate = ErrorHandlingProcessingTemplate.createErrorHandlingProcessingTemplate(muleContext, group.getMessageCollectionEvent().getFlowConstruct().getExceptionListener());
                     try
                     {
                         processingTemplate.execute(new ProcessingCallback<MuleEvent>()

@@ -157,7 +157,7 @@ public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessa
         @Override
         protected void doRun()
         {
-            ProcessingTemplate<MuleEvent> processingTemplate = new TransactionalErrorHandlingProcessingTemplate(muleContext,new MuleTransactionConfig(),event.getFlowConstruct().getExceptionListener());
+            ProcessingTemplate<MuleEvent> processingTemplate = TransactionalErrorHandlingProcessingTemplate.createMainProcessingTemplate(muleContext, new MuleTransactionConfig(), event.getFlowConstruct().getExceptionListener());
             try
             {
                 processingTemplate.execute(new ProcessingCallback<MuleEvent>() {

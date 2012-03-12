@@ -11,7 +11,6 @@ package org.mule.process;
 
 import org.hamcrest.core.Is;
 import org.hamcrest.core.IsNull;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Answers;
@@ -24,7 +23,9 @@ import org.mule.api.MuleEvent;
 import org.mule.api.transaction.ExternalTransactionAwareTransactionFactory;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionConfig;
+import org.mule.exception.CatchMessagingExceptionStrategy;
 import org.mule.exception.DefaultMessagingExceptionStrategy;
+import org.mule.tck.size.SmallTest;
 import org.mule.tck.testmodels.mule.TestTransaction;
 import org.mule.tck.testmodels.mule.TestTransactionFactory;
 import org.mule.transaction.MuleTransactionConfig;
@@ -39,6 +40,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
+@SmallTest
 public class TransactionalErrorHandlingProcessingTemplateTestCase extends TransactionalProcessingTemplateTestCase
 {
 
@@ -124,12 +126,49 @@ public class TransactionalErrorHandlingProcessingTemplateTestCase extends Transa
         verify(mockTransaction, VerificationModeFactory.times(1)).rollback();
         assertThat( TransactionCoordination.getInstance().getTransaction(), IsNull.<Object>nullValue());
     }
+    
+    @Test
+    public void testInnerTransactionCreatedAndResolved() throws Exception
+    {
+        ProcessingTemplate transactionTemplate = createProcessingTemplate(new MuleTransactionConfig());
+        configureExceptionListenerCall();
+        when(mockMessagingException.causedRollback()).thenReturn(false);
+        try
+        {
+            transactionTemplate.execute(TransactionTemplateTestUtils.getFailureTransactionCallbackStartsTransaction(mockMessagingException, mockTransaction));
+        }
+        catch (MessagingException e)
+        {
+            assertThat(e, Is.is(mockMessagingException));
+        }
+        verify(mockTransaction, VerificationModeFactory.times(0)).commit();
+        verify(mockTransaction, VerificationModeFactory.times(1)).rollback();
+        assertThat( TransactionCoordination.getInstance().getTransaction(), IsNull.<Object>nullValue());
+    }
 
+    @Test
+    public void testInnerTransactionCreatedAndNotResolved() throws Exception
+    {
+        ProcessingTemplate transactionTemplate = TransactionalErrorHandlingProcessingTemplate.createScopeProcessingTemplate(mockMuleContext, new MuleTransactionConfig(),mockMessagingExceptionHandler);
+        configureCatchExceptionListenerCall();
+        when(mockMessagingException.causedRollback()).thenReturn(false);
+        try
+        {
+            transactionTemplate.execute(TransactionTemplateTestUtils.getFailureTransactionCallbackStartsTransaction(mockMessagingException, mockTransaction));
+        }
+        catch (MessagingException e)
+        {
+            assertThat(e, Is.is(mockMessagingException));
+        }
+        verify(mockTransaction, VerificationModeFactory.times(0)).commit();
+        verify(mockTransaction, VerificationModeFactory.times(0)).rollback();
+        assertThat( TransactionCoordination.getInstance().getTransaction(), IsNull.<Object>notNullValue());
+    }
 
     @Override
     protected ProcessingTemplate createProcessingTemplate(MuleTransactionConfig config)
     {
-        return new TransactionalErrorHandlingProcessingTemplate(mockMuleContext, config, mockMessagingExceptionHandler);
+        return TransactionalErrorHandlingProcessingTemplate.createMainProcessingTemplate(mockMuleContext, config, mockMessagingExceptionHandler);
     }
 
     private MuleEvent configureExceptionListenerCall()
@@ -142,6 +181,22 @@ public class TransactionalErrorHandlingProcessingTemplateTestCase extends Transa
             public Object answer(InvocationOnMock invocationOnMock) throws Throwable
             {
                 new DefaultMessagingExceptionStrategy().handleException((Exception)invocationOnMock.getArguments()[0],(MuleEvent)invocationOnMock.getArguments()[1]);
+                return mockResultEvent;
+            }
+        });
+        return mockResultEvent;
+    }
+
+    private MuleEvent configureCatchExceptionListenerCall()
+    {
+        final MuleEvent mockResultEvent = mock(MuleEvent.class, Answers.RETURNS_DEEP_STUBS.get());
+        when(mockMessagingException.getEvent()).thenReturn(mockEvent).thenReturn(mockResultEvent);
+        when(mockMessagingExceptionHandler.handleException(mockMessagingException, mockEvent)).thenAnswer(new Answer<Object>()
+        {
+            @Override
+            public Object answer(InvocationOnMock invocationOnMock) throws Throwable
+            {
+                new CatchMessagingExceptionStrategy().handleException((Exception)invocationOnMock.getArguments()[0],(MuleEvent)invocationOnMock.getArguments()[1]);
                 return mockResultEvent;
             }
         });

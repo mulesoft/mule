@@ -21,6 +21,7 @@ import org.mule.api.MuleEvent;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionConfig;
 import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.size.SmallTest;
 import org.mule.transaction.IllegalTransactionStateException;
 import org.mule.transaction.MuleTransactionConfig;
 import org.mule.transaction.TransactionCoordination;
@@ -33,6 +34,7 @@ import java.util.Map;
 import static org.junit.Assert.assertThat;
 
 @RunWith(Parameterized.class)
+@SmallTest
 public class ValidateTransactionalStateInterceptorTestCase extends AbstractMuleTestCase
 {
 

@@ -381,6 +381,6 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
 
     protected ProcessingTemplate<MuleEvent> createProcessingTemplate()
     {
-        return new TransactionalErrorHandlingProcessingTemplate(endpoint.getMuleContext(),endpoint.getTransactionConfig());
+        return TransactionalErrorHandlingProcessingTemplate.createMainProcessingTemplate(endpoint.getMuleContext(), endpoint.getTransactionConfig());
     }
 }

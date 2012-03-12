@@ -11,7 +11,6 @@
 package org.mule.process;
 
 import org.mule.api.MuleContext;
-import org.mule.api.MuleEvent;
 import org.mule.api.transaction.TransactionConfig;
 import org.mule.transaction.MuleTransactionConfig;
 
@@ -34,13 +33,8 @@ public class TransactionalProcessingTemplate<T> implements ProcessingTemplate<T>
 {
     private ProcessingInterceptor<T> processingInterceptor;
 
-    /**
-     * Creates a ProcessingTemplate that will manage transactional context according to configured TransactionConfig
-     *
-     * @param muleContext MuleContext for this application
-     * @param transactionConfig transaction config for the execution context
-     */
-    public TransactionalProcessingTemplate(MuleContext muleContext, TransactionConfig transactionConfig)
+
+    private TransactionalProcessingTemplate(MuleContext muleContext, TransactionConfig transactionConfig)
     {
         if (transactionConfig == null)
         {
@@ -48,12 +42,23 @@ public class TransactionalProcessingTemplate<T> implements ProcessingTemplate<T>
         }
         final boolean processTransactionOnException = false;
         ProcessingInterceptor<T> tempProcessingInterceptor = new ExecuteCallbackInterceptor<T>();
-        tempProcessingInterceptor = new BeginAndResolveTransactionInterceptor<T>(tempProcessingInterceptor,transactionConfig,muleContext, processTransactionOnException);
+        tempProcessingInterceptor = new BeginAndResolveTransactionInterceptor<T>(tempProcessingInterceptor,transactionConfig,muleContext, processTransactionOnException, false);
         tempProcessingInterceptor = new ResolvePreviousTransactionInterceptor<T>(tempProcessingInterceptor,transactionConfig);
         tempProcessingInterceptor = new SuspendXaTransactionInterceptor<T>(tempProcessingInterceptor,transactionConfig,processTransactionOnException);
         tempProcessingInterceptor = new ValidateTransactionalStateInterceptor<T>(tempProcessingInterceptor,transactionConfig);
         tempProcessingInterceptor = new IsolateCurrentTransactionInterceptor<T>(tempProcessingInterceptor, transactionConfig);
         this.processingInterceptor = new ExternalTransactionInterceptor(tempProcessingInterceptor,transactionConfig, muleContext);
+    }
+
+    /**
+     * Creates a ProcessingTemplate that will manage transactional context according to configured TransactionConfig
+     *
+     * @param muleContext MuleContext for this application
+     * @param transactionConfig transaction config for the execution context
+     */
+    public static <T> TransactionalProcessingTemplate<T> createTransactionalProcessingTemplate(MuleContext muleContext, TransactionConfig transactionConfig)
+    {
+        return new TransactionalProcessingTemplate<T>(muleContext, transactionConfig);
     }
 
     @Override

@@ -16,12 +16,10 @@ import org.mule.api.MuleException;
 import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.transaction.TransactionConfig;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.process.ProcessingCallback;
 import org.mule.process.ProcessingTemplate;
 import org.mule.process.TransactionalErrorHandlingProcessingTemplate;
-import org.mule.process.TransactionalProcessingTemplate;
 import org.mule.transaction.MuleTransactionConfig;
 
 /**
@@ -42,7 +40,7 @@ public class TransactionalInterceptingMessageProcessor extends AbstractIntercept
         }
         else
         {
-            ProcessingTemplate<MuleEvent> processingTemplate = new TransactionalErrorHandlingProcessingTemplate(muleContext, transactionConfig, exceptionListener);
+            ProcessingTemplate<MuleEvent> processingTemplate = TransactionalErrorHandlingProcessingTemplate.createMainProcessingTemplate(muleContext, transactionConfig, exceptionListener);
             ProcessingCallback<MuleEvent> processingCallback = new ProcessingCallback<MuleEvent>()
             {
                 public MuleEvent process() throws Exception

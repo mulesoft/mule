@@ -26,41 +26,43 @@ class BeginAndResolveTransactionInterceptor<T> implements ProcessingInterceptor<
     private final TransactionConfig transactionConfig;
     private final MuleContext muleContext;
     private final boolean processOnException;
+    private boolean mustResolveAnyTransaction;
 
-    BeginAndResolveTransactionInterceptor(ProcessingInterceptor next, TransactionConfig transactionConfig, MuleContext muleContext, boolean processOnException)
+    BeginAndResolveTransactionInterceptor(ProcessingInterceptor next, TransactionConfig transactionConfig, MuleContext muleContext, boolean processOnException, boolean mustResolveAnyTransaction)
     {
         this.next = next;
         this.transactionConfig = transactionConfig;
         this.muleContext = muleContext;
         this.processOnException = processOnException;
+        this.mustResolveAnyTransaction = mustResolveAnyTransaction;
     }
 
     @Override
     public T execute(ProcessingCallback<T> callback) throws Exception
     {
         byte action = transactionConfig.getAction();
-        boolean mustResolveTransaction = false;
+        boolean resolveStartedTransaction = false;
         Transaction tx = TransactionCoordination.getInstance().getTransaction();
         if (action == TransactionConfig.ACTION_ALWAYS_BEGIN
                 || (action == TransactionConfig.ACTION_BEGIN_OR_JOIN && tx == null))
         {
             logger.debug("Beginning transaction");
             tx = transactionConfig.getFactory().beginTransaction(muleContext);
-            mustResolveTransaction = true;
+            resolveStartedTransaction = true;
             logger.debug("Transaction successfully started: " + tx);
         }
         T result;
         try
         {
             result = next.execute(callback);
-            resolveTransactionIfRequired(mustResolveTransaction);
+            resolveTransactionIfRequired(resolveStartedTransaction);
             return result;
         }
         catch (MessagingException e)
         {
             if (processOnException)
             {
-                resolveTransactionIfRequired(true);
+                resolveTransactionIfRequired(resolveStartedTransaction || mustResolveAnyTransaction);
             }
             throw e;
         }

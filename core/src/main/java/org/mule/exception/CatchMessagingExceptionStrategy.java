@@ -13,12 +13,16 @@ import org.mule.api.MuleEvent;
 
 public class CatchMessagingExceptionStrategy extends TemplateMessagingExceptionStrategy
 {
+    public CatchMessagingExceptionStrategy()
+    {
+        setHandleException(true);
+    }
+
     @Override
     protected void nullifyExceptionPayloadIfRequired(MuleEvent event)
     {
         event.getMessage().setExceptionPayload(null);
     }
-
 
     @Override
     protected MuleEvent afterRouting(Exception exception, MuleEvent event)

@@ -35,7 +35,6 @@ import org.mule.api.routing.OutboundRouterCollection;
 import org.mule.api.routing.RouterStatisticsRecorder;
 import org.mule.api.service.Service;
 import org.mule.api.source.MessageSource;
-import org.mule.api.transaction.TransactionCallback;
 import org.mule.component.simple.PassThroughComponent;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.lifecycle.EmptyLifecycleCallback;
@@ -660,7 +659,7 @@ public abstract class AbstractService implements Service, MessageProcessor, Anno
         RequestContext.setEvent(newEvent);
         try
         {
-            ProcessingTemplate<MuleEvent> processingTemplate = new ErrorHandlingProcessingTemplate(muleContext, this.exceptionListener);
+            ProcessingTemplate<MuleEvent> processingTemplate = ErrorHandlingProcessingTemplate.createErrorHandlingProcessingTemplate(muleContext, this.exceptionListener);
             return processingTemplate.execute(new ProcessingCallback<MuleEvent> () {
 
                 @Override

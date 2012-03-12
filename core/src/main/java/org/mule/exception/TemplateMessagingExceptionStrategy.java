@@ -9,6 +9,7 @@
  */
 package org.mule.exception;
 
+import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -28,6 +29,7 @@ public abstract class TemplateMessagingExceptionStrategy extends AbstractExcepti
     private MessageProcessorChain configuredMessageProcessors;
     private MessageProcessor replyToMessageProcessor = new ReplyToPropertyRequestReplyReplier();
     private String expression;
+    private boolean handleException;
 
     final public MuleEvent handleException(Exception exception, MuleEvent event)
     {
@@ -40,6 +42,7 @@ public abstract class TemplateMessagingExceptionStrategy extends AbstractExcepti
         event = route(event, exception);
         processOutboundRouterStatistics(flowConstruct);
         event = afterRouting(exception, event);
+        markExceptionAsHandledIfRequired(exception);
         if (event != null)
         {
             processReplyTo(event, exception);
@@ -47,6 +50,14 @@ public abstract class TemplateMessagingExceptionStrategy extends AbstractExcepti
             nullifyExceptionPayloadIfRequired(event);
         }
         return event;
+    }
+
+    protected void markExceptionAsHandledIfRequired(Exception exception)
+    {
+        if (exception instanceof MessagingException && handleException)
+        {
+            ((MessagingException)exception).setHandled(handleException);
+        }
     }
 
     protected void processReplyTo(MuleEvent event, Exception e)
@@ -133,5 +144,10 @@ public abstract class TemplateMessagingExceptionStrategy extends AbstractExcepti
     protected MuleEvent beforeRouting(Exception exception, MuleEvent event)
     {
         return event;
+    }
+
+    public void setHandleException(boolean handleException)
+    {
+        this.handleException = handleException;
     }
 }

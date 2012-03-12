@@ -26,29 +26,33 @@ import org.mule.transaction.MuleTransactionConfig;
 *  A Flow is called using a <flow-ref> element
 *
 * Instance of ErrorHandlingProcessingTemplate will:
-*  Route any exception to exception strategy if it was not already routed to it
+*  Route any exception to exception strategy
 *
 */
 public class ErrorHandlingProcessingTemplate implements ProcessingTemplate<MuleEvent>
 {
     private final ProcessingInterceptor<MuleEvent> processingInterceptor;
 
-    /**
-     * Creates a ErrorHandlingProcessingTemplate that will route any
-     * MessagingException thrown to an exception listener
-     *
-     * @param muleContext MuleContext for this application
-     * @param messagingExceptionHandler exception listener to execute for any MessagingException exception
-     */
-    public ErrorHandlingProcessingTemplate(final MuleContext muleContext, final MessagingExceptionHandler messagingExceptionHandler)
+    private ErrorHandlingProcessingTemplate(final MuleContext muleContext, final MessagingExceptionHandler messagingExceptionHandler)
     {
         final TransactionConfig transactionConfig = new MuleTransactionConfig();
         final boolean processTransactionOnException = false;
         ProcessingInterceptor<MuleEvent> tempProcessingInterceptor = new ExecuteCallbackInterceptor<MuleEvent>();
         tempProcessingInterceptor = new HandleExceptionInterceptor(tempProcessingInterceptor, messagingExceptionHandler);
-        tempProcessingInterceptor = new BeginAndResolveTransactionInterceptor<MuleEvent>(tempProcessingInterceptor,transactionConfig,muleContext, processTransactionOnException);
+        tempProcessingInterceptor = new BeginAndResolveTransactionInterceptor<MuleEvent>(tempProcessingInterceptor,transactionConfig,muleContext, processTransactionOnException, false);
         tempProcessingInterceptor = new SuspendXaTransactionInterceptor<MuleEvent>(tempProcessingInterceptor,transactionConfig,processTransactionOnException);
         this.processingInterceptor = new RethrowExceptionInterceptor(tempProcessingInterceptor);
+    }
+
+    /**
+     * Creates a ErrorHandlingProcessingTemplate to be used as the main enthat will route any MessagingException thrown to an exception listener
+     *
+     * @param muleContext MuleContext for this application
+     * @param messagingExceptionHandler exception listener to execute for any MessagingException exception
+     */
+    public static ErrorHandlingProcessingTemplate createErrorHandlingProcessingTemplate(final MuleContext muleContext, final MessagingExceptionHandler messagingExceptionHandler)
+    {
+        return new ErrorHandlingProcessingTemplate(muleContext, messagingExceptionHandler);
     }
 
     @Override

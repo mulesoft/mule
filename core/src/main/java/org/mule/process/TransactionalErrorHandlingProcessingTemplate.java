@@ -33,30 +33,17 @@ public class TransactionalErrorHandlingProcessingTemplate implements ProcessingT
 {
     private ProcessingInterceptor<MuleEvent> processingInterceptor;
 
-    /**
-     * Creates a TransactionalErrorHandlingProcessingTemplate using no transaction configuration
-     *
-     * @param muleContext MuleContext for this application
-     * @param messagingExceptionHandler exception listener to use for any MessagingException thrown
-     */
-    public TransactionalErrorHandlingProcessingTemplate(MuleContext muleContext, MessagingExceptionHandler messagingExceptionHandler)
+    private TransactionalErrorHandlingProcessingTemplate(MuleContext muleContext, MessagingExceptionHandler messagingExceptionHandler, boolean resolveAnyTransaction)
     {
-        this(muleContext, new MuleTransactionConfig(), messagingExceptionHandler);
+        this(muleContext, new MuleTransactionConfig(), messagingExceptionHandler, resolveAnyTransaction);
     }
 
-    /**
-     * Creates a TransactionalErrorHandlingProcessingTemplate
-     *
-     * @param muleContext MuleContext for this application
-     * @param transactionConfig Transaction configuration
-     * @param messagingExceptionHandler Exception listener for any MessagingException thrown
-     */
-    public TransactionalErrorHandlingProcessingTemplate(MuleContext muleContext, TransactionConfig transactionConfig, MessagingExceptionHandler messagingExceptionHandler)
+    private TransactionalErrorHandlingProcessingTemplate(MuleContext muleContext, TransactionConfig transactionConfig, MessagingExceptionHandler messagingExceptionHandler, boolean resolveAnyTransaction)
     {
         final boolean processTransactionOnException = true;
         ProcessingInterceptor<MuleEvent> tempProcessingInterceptor = new ExecuteCallbackInterceptor<MuleEvent>();
         tempProcessingInterceptor = new HandleExceptionInterceptor(tempProcessingInterceptor, messagingExceptionHandler);
-        tempProcessingInterceptor = new BeginAndResolveTransactionInterceptor<MuleEvent>(tempProcessingInterceptor,transactionConfig,muleContext, processTransactionOnException);
+        tempProcessingInterceptor = new BeginAndResolveTransactionInterceptor<MuleEvent>(tempProcessingInterceptor,transactionConfig,muleContext, processTransactionOnException, resolveAnyTransaction);
         tempProcessingInterceptor = new ResolvePreviousTransactionInterceptor<MuleEvent>(tempProcessingInterceptor,transactionConfig);
         tempProcessingInterceptor = new SuspendXaTransactionInterceptor<MuleEvent>(tempProcessingInterceptor,transactionConfig,processTransactionOnException);
         tempProcessingInterceptor = new ValidateTransactionalStateInterceptor<MuleEvent>(tempProcessingInterceptor,transactionConfig);
@@ -65,17 +52,58 @@ public class TransactionalErrorHandlingProcessingTemplate implements ProcessingT
         this.processingInterceptor = new RethrowExceptionInterceptor(tempProcessingInterceptor);
     }
 
+    private TransactionalErrorHandlingProcessingTemplate(MuleContext muleContext, TransactionConfig transactionConfig, boolean resolveAnyTransaction)
+    {
+        this(muleContext, transactionConfig, null, resolveAnyTransaction);
+    }
+
     /**
-     * Creates a TransactionalErrorHandlingProcessingTemplate using no particular exception listener.
+     * Creates a TransactionalErrorHandlingProcessingTemplate to be used as first processing template in a flow using no transaction configuration
+     *
+     * @param muleContext MuleContext for this application
+     * @param messagingExceptionHandler exception listener to use for any MessagingException thrown
+     */
+    public static TransactionalErrorHandlingProcessingTemplate createMainProcessingTemplate(MuleContext muleContext, MessagingExceptionHandler messagingExceptionHandler)
+    {
+        return new TransactionalErrorHandlingProcessingTemplate(muleContext, messagingExceptionHandler, true);
+    }
+
+    /**
+     * Creates a TransactionalErrorHandlingProcessingTemplate to be used as first processing template in a flow
+     *
+     * @param muleContext MuleContext for this application
+     * @param transactionConfig Transaction configuration
+     * @param messagingExceptionHandler Exception listener for any MessagingException thrown
+     */
+    public static TransactionalErrorHandlingProcessingTemplate createMainProcessingTemplate(MuleContext muleContext, TransactionConfig transactionConfig, MessagingExceptionHandler messagingExceptionHandler)
+    {
+        return new TransactionalErrorHandlingProcessingTemplate(muleContext, transactionConfig, messagingExceptionHandler, true);
+    }
+
+    /**
+     * Creates a TransactionalErrorHandlingProcessingTemplate to be used as first processing template in a flow using no particular exception listener.
      * Exception listener configured in the flow within this ProcessingTemplate is executed will be used.
      *
      * @param muleContext MuleContext for this application
      * @param transactionConfig Transaction configuration
      */
-    public TransactionalErrorHandlingProcessingTemplate(MuleContext muleContext, TransactionConfig transactionConfig)
+    public static TransactionalErrorHandlingProcessingTemplate createMainProcessingTemplate(MuleContext muleContext, TransactionConfig transactionConfig)
     {
-        this(muleContext, transactionConfig, null);
+        return new TransactionalErrorHandlingProcessingTemplate(muleContext, transactionConfig, true);
     }
+
+    /**
+     * Creates a TransactionalErrorHandlingProcessingTemplate for inner scopes within a flow
+     *
+     * @param muleContext
+     * @param transactionConfig
+     * @return
+     */
+    public static TransactionalErrorHandlingProcessingTemplate createScopeProcessingTemplate(MuleContext muleContext, TransactionConfig transactionConfig, MessagingExceptionHandler messagingExceptionHandler)
+    {
+        return new TransactionalErrorHandlingProcessingTemplate(muleContext, transactionConfig, messagingExceptionHandler, false);
+    }
+
 
     @Override
     public MuleEvent execute(ProcessingCallback<MuleEvent> processingCallback) throws Exception

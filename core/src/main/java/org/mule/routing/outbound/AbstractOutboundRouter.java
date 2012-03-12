@@ -27,7 +27,6 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.OutboundRouter;
 import org.mule.api.routing.RouterResultsHandler;
 import org.mule.api.routing.RoutingException;
-import org.mule.api.transaction.TransactionCallback;
 import org.mule.api.transaction.TransactionConfig;
 import org.mule.api.transport.DispatchException;
 import org.mule.config.i18n.CoreMessages;
@@ -90,7 +89,7 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
 
     public MuleEvent process(final MuleEvent event) throws MuleException
     {
-        ProcessingTemplate<MuleEvent> processingTemplate = new TransactionalProcessingTemplate<MuleEvent>(muleContext, getTransactionConfig());
+        ProcessingTemplate<MuleEvent> processingTemplate = TransactionalProcessingTemplate.createTransactionalProcessingTemplate(muleContext, getTransactionConfig());
         ProcessingCallback<MuleEvent> processingCallback = new ProcessingCallback<MuleEvent>()
         {
             public MuleEvent process() throws Exception

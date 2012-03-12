@@ -18,7 +18,6 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorChainBuilder;
 import org.mule.api.processor.ProcessingStrategy;
 import org.mule.api.processor.ProcessingStrategy.StageNameSource;
-import org.mule.api.transaction.TransactionCallback;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.construct.flow.DefaultFlowProcessingStrategy;
 import org.mule.construct.processor.FlowConstructStatisticsMessageProcessor;
@@ -60,7 +59,7 @@ public class Flow extends AbstractPipeline implements MessageProcessor
         RequestContext.setEvent(newEvent);
         try
         {
-            ProcessingTemplate<MuleEvent> exceptionHandlingProcessingTemplate = new ErrorHandlingProcessingTemplate(muleContext,getExceptionListener());
+            ProcessingTemplate<MuleEvent> exceptionHandlingProcessingTemplate = ErrorHandlingProcessingTemplate.createErrorHandlingProcessingTemplate(muleContext, getExceptionListener());
             MuleEvent result = exceptionHandlingProcessingTemplate.execute(new ProcessingCallback<MuleEvent>()
             {
 

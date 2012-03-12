@@ -29,6 +29,7 @@ import org.mule.api.transaction.Transaction;
 import org.mule.exception.DefaultMessagingExceptionStrategy;
 import org.mule.routing.filters.WildcardFilter;
 import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.size.SmallTest;
 import org.mule.tck.testmodels.mule.TestTransaction;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.transaction.TransactionTemplateTestUtils;
@@ -41,6 +42,7 @@ import static org.mockito.Mockito.*;
 import static org.mule.transaction.TransactionTemplateTestUtils.getEmptyTransactionCallback;
 
 @RunWith(MockitoJUnitRunner.class)
+@SmallTest
 public class ErrorHandlingProcessingTemplateTestCase extends AbstractMuleTestCase
 {
     private MuleContext mockMuleContext = mock(MuleContext.class);
@@ -77,7 +79,7 @@ public class ErrorHandlingProcessingTemplateTestCase extends AbstractMuleTestCas
 
     private ProcessingTemplate createExceptionHandlingTransactionTemplate()
     {
-        return new ErrorHandlingProcessingTemplate(mockMuleContext, mockMessagingExceptionHandler);
+        return ErrorHandlingProcessingTemplate.createErrorHandlingProcessingTemplate(mockMuleContext, mockMessagingExceptionHandler);
     }
 
     @Test

@@ -88,8 +88,8 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher
 
         MuleEvent eventToSend = DefaultMuleEvent.copy(event);
         final MuleMessage message = eventToSend.getMessage().createInboundMessage();
-        ProcessingTemplate<MuleMessage> processingTemplate = new TransactionalProcessingTemplate<MuleMessage>(
-            event.getMuleContext(), receiver.getEndpoint().getTransactionConfig());
+        ProcessingTemplate<MuleMessage> processingTemplate = TransactionalProcessingTemplate.createTransactionalProcessingTemplate(
+                event.getMuleContext(), receiver.getEndpoint().getTransactionConfig());
         ProcessingCallback<MuleMessage> processingCallback = new ProcessingCallback<MuleMessage>()
         {
             public MuleMessage process() throws Exception

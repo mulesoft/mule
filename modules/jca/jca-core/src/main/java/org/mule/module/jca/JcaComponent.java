@@ -18,7 +18,6 @@ import org.mule.api.component.LifecycleAdapter;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.model.EntryPointResolverSet;
-import org.mule.api.transaction.TransactionCallback;
 import org.mule.component.AbstractJavaComponent;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.Message;
@@ -119,7 +118,7 @@ public class JcaComponent extends AbstractJavaComponent implements WorkListener
             }
             try
             {
-                ProcessingTemplate<MuleEvent> processingTemplate = new TransactionalErrorHandlingProcessingTemplate(muleContext, new MuleTransactionConfig(),event.getFlowConstruct().getExceptionListener());
+                ProcessingTemplate<MuleEvent> processingTemplate = TransactionalErrorHandlingProcessingTemplate.createMainProcessingTemplate(muleContext, new MuleTransactionConfig(), event.getFlowConstruct().getExceptionListener());
                 processingTemplate.execute(new ProcessingCallback<MuleEvent> () {
                     @Override
                     public MuleEvent process() throws Exception

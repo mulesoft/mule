@@ -32,11 +32,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.quartz.Job;
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
-import org.quartz.SchedulerException;
 
 /**
  * Will receive on an endpoint and dispatch it to the component set via the Receiver information.
@@ -106,17 +104,17 @@ public class EndpointPollingJob extends AbstractJob
 
                     //TODO MULE-5050 work around because the builder is no longer idempotent, we now cache the endpoint instance
                     muleContext.getRegistry().registerObject(jobConfig.getEndpointRef() + ".quartz-job", endpoint);
-                    processingTemplate = new TransactionalErrorHandlingProcessingTemplate(muleContext, endpoint.getTransactionConfig(), receiver.getFlowConstruct().getExceptionListener());
+                    processingTemplate = TransactionalErrorHandlingProcessingTemplate.createMainProcessingTemplate(muleContext, endpoint.getTransactionConfig(), receiver.getFlowConstruct().getExceptionListener());
                 }
                 else
                 {
                     // a simple inline endpoint
-                    processingTemplate = new TransactionalErrorHandlingProcessingTemplate(muleContext, new MuleTransactionConfig(), receiver.getFlowConstruct().getExceptionListener());
+                    processingTemplate = TransactionalErrorHandlingProcessingTemplate.createMainProcessingTemplate(muleContext, new MuleTransactionConfig(), receiver.getFlowConstruct().getExceptionListener());
                 }
             }
             else
             {
-                processingTemplate = new TransactionalErrorHandlingProcessingTemplate(muleContext, endpoint.getTransactionConfig(), receiver.getFlowConstruct().getExceptionListener());
+                processingTemplate = TransactionalErrorHandlingProcessingTemplate.createMainProcessingTemplate(muleContext, endpoint.getTransactionConfig(), receiver.getFlowConstruct().getExceptionListener());
             }
 
 

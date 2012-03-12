@@ -23,8 +23,10 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.size.SmallTest;
 
 @RunWith(MockitoJUnitRunner.class)
+@SmallTest
 public class MessagingExceptionTestCase extends AbstractMuleTestCase
 {
 

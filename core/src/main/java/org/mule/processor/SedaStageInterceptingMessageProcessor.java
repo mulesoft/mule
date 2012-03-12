@@ -219,7 +219,7 @@ public class SedaStageInterceptingMessageProcessor extends AsyncInterceptingMess
             if (event != null)
             {
                 final MuleEvent eventToProcess = event;
-                TransactionalErrorHandlingProcessingTemplate processingTemplate = new TransactionalErrorHandlingProcessingTemplate(muleContext, event.getFlowConstruct().getExceptionListener());
+                TransactionalErrorHandlingProcessingTemplate processingTemplate = TransactionalErrorHandlingProcessingTemplate.createMainProcessingTemplate(muleContext, event.getFlowConstruct().getExceptionListener());
                 ProcessingCallback<MuleEvent> processingCallback = new ProcessingCallback<MuleEvent>()
                 {
 

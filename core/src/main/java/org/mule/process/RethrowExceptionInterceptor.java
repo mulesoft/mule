@@ -32,7 +32,7 @@ class RethrowExceptionInterceptor implements ProcessingInterceptor<MuleEvent>
         }
         catch (MessagingException e)
         {
-            if (e.getEvent().getMessage().getExceptionPayload() == null)
+            if (e.handled())
             {
                 return e.getEvent();
             }

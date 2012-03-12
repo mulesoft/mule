@@ -15,7 +15,6 @@ import java.sql.SQLException;
 
 import org.apache.commons.dbutils.ResultSetHandler;
 import org.apache.commons.dbutils.handlers.ArrayHandler;
-import org.mule.api.MuleEvent;
 import org.mule.api.store.ObjectAlreadyExistsException;
 import org.mule.api.store.ObjectDoesNotExistException;
 import org.mule.api.store.ObjectStoreException;
@@ -208,7 +207,7 @@ public class JdbcObjectStore<T extends Serializable> extends AbstractMonitoredOb
 
     private Object executeInTransactionTemplate(ProcessingCallback<Object> processingCallback) throws Exception
     {
-        ProcessingTemplate<Object> processingTemplate = new TransactionalProcessingTemplate<Object>(this.jdbcConnector.getMuleContext(), this.transactionConfig);
+        ProcessingTemplate<Object> processingTemplate = TransactionalProcessingTemplate.createTransactionalProcessingTemplate(this.jdbcConnector.getMuleContext(), this.transactionConfig);
         return processingTemplate.execute(processingCallback);
     }
 

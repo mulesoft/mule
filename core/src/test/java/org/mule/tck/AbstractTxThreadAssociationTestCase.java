@@ -10,7 +10,6 @@
 
 package org.mule.tck;
 
-import org.mule.api.transaction.TransactionCallback;
 import org.mule.api.transaction.TransactionConfig;
 import org.mule.api.transaction.TransactionManagerFactory;
 import org.mule.process.ProcessingCallback;
@@ -135,7 +134,7 @@ public abstract class AbstractTxThreadAssociationTestCase extends AbstractMuleCo
         // this is one component with a TX always begin
         TransactionConfig config = new MuleTransactionConfig(TransactionConfig.ACTION_ALWAYS_BEGIN);
         config.setFactory(new XaTransactionFactory());
-        ProcessingTemplate<Void> processingTemplate = new TransactionalProcessingTemplate(muleContext,config);
+        ProcessingTemplate<Void> processingTemplate = TransactionalProcessingTemplate.createTransactionalProcessingTemplate(muleContext, config);
 
         // and the callee component which should begin new transaction, current must be suspended
         final TransactionConfig nestedConfig = new MuleTransactionConfig(TransactionConfig.ACTION_ALWAYS_BEGIN);
@@ -148,7 +147,7 @@ public abstract class AbstractTxThreadAssociationTestCase extends AbstractMuleCo
             {
                 // the callee executes within its own TX template, but uses the same global XA transaction,
                 // bound to the current thread of execution via a ThreadLocal
-                ProcessingTemplate<Void> processingTemplate = new TransactionalProcessingTemplate(muleContext,nestedConfig);
+                ProcessingTemplate<Void> processingTemplate = TransactionalProcessingTemplate.createTransactionalProcessingTemplate(muleContext, nestedConfig);
                 final Transaction firstTx = tm.getTransaction();
                 assertNotNull(firstTx);
                 assertEquals(firstTx.getStatus(), Status.STATUS_ACTIVE);
@@ -216,7 +215,7 @@ public abstract class AbstractTxThreadAssociationTestCase extends AbstractMuleCo
         // this is one component with a TX always begin
         TransactionConfig config = new MuleTransactionConfig(TransactionConfig.ACTION_ALWAYS_BEGIN);
         config.setFactory(new XaTransactionFactory());
-        ProcessingTemplate<Void> processingTemplate = new TransactionalProcessingTemplate(muleContext,config);
+        ProcessingTemplate<Void> processingTemplate = TransactionalProcessingTemplate.createTransactionalProcessingTemplate(muleContext, config);
 
         // and the callee component which should begin new transaction, current must be suspended
         final TransactionConfig nestedConfig = new MuleTransactionConfig(TransactionConfig.ACTION_NONE);
@@ -229,7 +228,7 @@ public abstract class AbstractTxThreadAssociationTestCase extends AbstractMuleCo
             {
                 // the callee executes within its own TX template, but uses the same global XA transaction,
                 // bound to the current thread of execution via a ThreadLocal
-                ProcessingTemplate<Void> nestedProcessingTemplate = new TransactionalProcessingTemplate<Void>(muleContext, nestedConfig);
+                ProcessingTemplate<Void> nestedProcessingTemplate = TransactionalProcessingTemplate.createTransactionalProcessingTemplate(muleContext, nestedConfig);
                 final Transaction firstTx = tm.getTransaction();
                 assertNotNull(firstTx);
                 assertEquals(firstTx.getStatus(), Status.STATUS_ACTIVE);
@@ -309,7 +308,7 @@ public abstract class AbstractTxThreadAssociationTestCase extends AbstractMuleCo
         // this is one service with a TX always begin
         TransactionConfig config = new MuleTransactionConfig(TransactionConfig.ACTION_ALWAYS_BEGIN);
         config.setFactory(new XaTransactionFactory());
-        ProcessingTemplate<Void> processingTemplate = new TransactionalProcessingTemplate(muleContext,config);
+        ProcessingTemplate<Void> processingTemplate = TransactionalProcessingTemplate.createTransactionalProcessingTemplate(muleContext, config);
 
         // and the callee service which should join the current XA transaction, not begin a nested one
         final TransactionConfig nestedConfig = new MuleTransactionConfig(TransactionConfig.ACTION_BEGIN_OR_JOIN);
@@ -322,7 +321,7 @@ public abstract class AbstractTxThreadAssociationTestCase extends AbstractMuleCo
             {
                 // the callee executes within its own TX template, but uses the same global XA transaction,
                 // bound to the current thread of execution via a ThreadLocal
-                ProcessingTemplate<Void> nestedProcessingTemplate = new TransactionalProcessingTemplate<Void>(muleContext, nestedConfig);
+                ProcessingTemplate<Void> nestedProcessingTemplate = TransactionalProcessingTemplate.createTransactionalProcessingTemplate(muleContext, nestedConfig);
                 return nestedProcessingTemplate.execute(new ProcessingCallback<Void>()
                 {
                     public Void process() throws Exception
