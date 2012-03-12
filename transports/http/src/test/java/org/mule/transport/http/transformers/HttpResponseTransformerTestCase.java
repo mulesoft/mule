@@ -13,9 +13,14 @@ package org.mule.transport.http.transformers;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import org.mule.DefaultMuleMessage;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.api.MuleContext;
+import org.mule.api.expression.ExpressionManager;
+import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.size.SmallTest;
 import org.mule.transport.http.CookieWrapper;
 import org.mule.transport.http.HttpConstants;
 import org.mule.transport.http.HttpResponse;
@@ -26,12 +31,44 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.httpclient.Header;
+import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
 
-public class HttpResponseTransformerTestCase extends AbstractMuleContextTestCase
+@SmallTest
+public class HttpResponseTransformerTestCase extends AbstractMuleTestCase
 {
     private static final String HTTP_BODY = "<html><head></head><body><p>This is the response body</p></body></html>";
     private static final String HTTP_BODY_WITH_EXPRESSION = "<html><head></head><body><p>Hello #[header:userName]</p></body></html>";
+    private static final String HEADER_VERSION = "#[header:version]";
+    private static final String HEADER_STATUS = "#[header:status]";
+    private static final String HEADER_CONTENT_TYPE = "#[header:contentType]";
+    private static final String HEADER_ALLOW = "#[header:allow]";
+    private static final String HEADER_CACHE_CONTROL = "#[header:cacheControl]";
+    private static final String HEADER_CONNECTION = "#[header:connection]";
+    private static final String HEADER_CONTENT_ENCODING = "#[header:contentEncoding]";
+    private static final String HEADER_EXPIRES = "#[header:expires]";
+    private static final String HEADER_LOCATION = "#[header:location]";
+    private static final String HEADER_TRANSFER_ENCODING = "#[header:transferEncoding]";
+    private static final String HEADER_NAME = "#[header:name]";
+    private static final String HEADER_VALUE = "#[header:value]";
+    private static final String HEADER_DOMAIN = "#[header:domain]";
+    private static final String HEADER_PATH = "#[header:path]";
+    private static final String HEADER_EXPIRY_DATE = "#[header:expiryDate]";
+    private static final String HEADER_SECURE = "#[header:secure]";
+
+
+    private MuleContext muleContext;
+    private ExpressionManager mockExpressionManager = Mockito.mock(ExpressionManager.class);
+
+    @Before
+    public void setUp()
+    {
+        muleContext = mock(MuleContext.class);
+        mockExpressionManager = mock(ExpressionManager.class);
+        when(muleContext.getExpressionManager()).thenReturn(mockExpressionManager);
+    }
+
 
     @Test
     public void testEmptyHttpResponseTransformer() throws Exception
@@ -39,11 +76,13 @@ public class HttpResponseTransformerTestCase extends AbstractMuleContextTestCase
         HttpResponseTransformer httpResponsetransformer = createHttpResponseTransformer();
         DefaultMuleMessage muleMessage = new DefaultMuleMessage(HTTP_BODY, muleContext);
 
+        when(mockExpressionManager.isExpression(Mockito.anyString())).thenReturn(false);
+
         HttpResponse httpResponse = (HttpResponse) httpResponsetransformer.transformMessage(muleMessage, "UTF-8");
         assertEquals(HTTP_BODY, httpResponse.getBodyAsString());
         assertEquals(HttpConstants.HTTP11, httpResponse.getHttpVersion().toString());
         assertEquals(HttpConstants.SC_OK, httpResponse.getStatusCode());
-        validateHeader(httpResponse.getHeaders(), "Content-Type", HttpConstants.DEFAULT_CONTENT_TYPE);
+        validateHeader(httpResponse.getHeaders(), HttpConstants.HEADER_CONTENT_TYPE, HttpConstants.DEFAULT_CONTENT_TYPE);
     }
 
     @Test
@@ -52,65 +91,75 @@ public class HttpResponseTransformerTestCase extends AbstractMuleContextTestCase
         HttpResponseTransformer httpResponseTransformer = createHttpResponseTransformer();
         DefaultMuleMessage muleMessage = new DefaultMuleMessage(HTTP_BODY, muleContext);
 
+        when(mockExpressionManager.isExpression(Mockito.anyString())).thenReturn(false);
+
         httpResponseTransformer.setContentType("text/html");
         httpResponseTransformer.setVersion("1.0");
-        httpResponseTransformer.setStatus("500");
+        httpResponseTransformer.setStatus(String.valueOf(HttpConstants.SC_INTERNAL_SERVER_ERROR));
 
         HttpResponse httpResponse = (HttpResponse) httpResponseTransformer.transformMessage(muleMessage, "UTF-8");
         assertEquals(HTTP_BODY, httpResponse.getBodyAsString());
         assertEquals(HttpConstants.HTTP10, httpResponse.getHttpVersion().toString());
         assertEquals(HttpConstants.SC_INTERNAL_SERVER_ERROR, httpResponse.getStatusCode());
-        validateHeader(httpResponse.getHeaders(), "Content-Type", "text/html");
+        validateHeader(httpResponse.getHeaders(), HttpConstants.HEADER_CONTENT_TYPE, "text/html");
     }
 
     @Test
     public void testHttpResponseTransformerAttributesWithExpressions() throws Exception
     {
         HttpResponseTransformer httpResponseTransformer = createHttpResponseTransformer();
+        DefaultMuleMessage muleMessage = new DefaultMuleMessage(HTTP_BODY, muleContext);
 
-        Map<String, Object> properties = new HashMap<String, Object>();
-        properties.put("version", HttpConstants.HTTP10);
-        properties.put("status", HttpConstants.SC_INTERNAL_SERVER_ERROR);
-        properties.put("contentType", "text/html");
+        httpResponseTransformer.setVersion(HEADER_VERSION);
+        httpResponseTransformer.setStatus(HEADER_STATUS);
+        httpResponseTransformer.setContentType(HEADER_CONTENT_TYPE);
 
-        DefaultMuleMessage muleMessage = new DefaultMuleMessage(HTTP_BODY, properties, muleContext);
+        when(mockExpressionManager.isExpression(HEADER_VERSION)).thenReturn(true);
+        when(mockExpressionManager.evaluate(HEADER_VERSION, muleMessage)).thenReturn(HttpConstants.HTTP10);
+        when(mockExpressionManager.isExpression(HEADER_STATUS)).thenReturn(true);
+        when(mockExpressionManager.evaluate(HEADER_STATUS, muleMessage)).thenReturn(HttpConstants.SC_INTERNAL_SERVER_ERROR);
+        when(mockExpressionManager.isExpression(HEADER_CONTENT_TYPE)).thenReturn(true);
+        when(mockExpressionManager.evaluate(HEADER_CONTENT_TYPE, muleMessage)).thenReturn("text/html");
 
-        httpResponseTransformer.setVersion("#[header:version]");
-        httpResponseTransformer.setStatus("#[header:status]");
-        httpResponseTransformer.setContentType("#[header:contentType]");
 
         HttpResponse httpResponse = (HttpResponse) httpResponseTransformer.transformMessage(muleMessage, "UTF-8");
         assertEquals(HTTP_BODY, httpResponse.getBodyAsString());
         assertEquals(HttpConstants.HTTP10, httpResponse.getHttpVersion().toString());
         assertEquals(HttpConstants.SC_INTERNAL_SERVER_ERROR, httpResponse.getStatusCode());
-        validateHeader(httpResponse.getHeaders(), "Content-Type", "text/html");
+        validateHeader(httpResponse.getHeaders(), HttpConstants.HEADER_CONTENT_TYPE, "text/html");
     }
 
     @Test
     public void testHttpResponseTransformerHeaders() throws Exception
     {
         HttpResponseTransformer httpResponseTransformer = createHttpResponseTransformer();
-
-        Map<String, Object> properties = new HashMap<String, Object>();
-        properties.put("allow", "GET, HEAD");
-        properties.put("cacheControl", "max-age=3600");
-        properties.put("connection", "close");
-        properties.put("contentEncoding", "gzip");
-        properties.put("expires", "Thu, 01 Dec 1994 16:00:00 GMT");
-        properties.put("location", "http://localhost:8080");
-        properties.put("transferEncoding", "chunked");
+        DefaultMuleMessage muleMessage = new DefaultMuleMessage(HTTP_BODY, muleContext);
 
         Map<String, String> headers = new HashMap<String, String>();
-        headers.put("Allow", "#[header:allow]");
-        headers.put("Cache-Control", "#[header:cacheControl]");
-        headers.put("Connection", "#[header:connection]");
-        headers.put("Content-Encoding", "#[header:contentEncoding]");
-        headers.put("Expires", "#[header:expires]");
-        headers.put("Location", "#[header:location]");
-        headers.put("Transfer-Encoding", "#[header:transferEncoding]");
+        headers.put("Allow", HEADER_ALLOW);
+        headers.put("Cache-Control", HEADER_CACHE_CONTROL);
+        headers.put("Connection", HEADER_CONNECTION);
+        headers.put("Content-Encoding", HEADER_CONTENT_ENCODING);
+        headers.put("Expires", HEADER_EXPIRES);
+        headers.put("Location", HEADER_LOCATION);
+        headers.put("Transfer-Encoding", HEADER_TRANSFER_ENCODING);
         httpResponseTransformer.setHeaders(headers);
 
-        DefaultMuleMessage muleMessage = new DefaultMuleMessage(HTTP_BODY, properties, muleContext);
+        when(mockExpressionManager.isExpression(HEADER_ALLOW)).thenReturn(true);
+        when(mockExpressionManager.evaluate(HEADER_ALLOW, muleMessage)).thenReturn("GET, HEAD");
+        when(mockExpressionManager.isExpression(HEADER_CACHE_CONTROL)).thenReturn(true);
+        when(mockExpressionManager.evaluate(HEADER_CACHE_CONTROL, muleMessage)).thenReturn("max-age=3600");
+        when(mockExpressionManager.isExpression(HEADER_CONNECTION)).thenReturn(true);
+        when(mockExpressionManager.evaluate(HEADER_CONNECTION, muleMessage)).thenReturn("close");
+        when(mockExpressionManager.isExpression(HEADER_CONTENT_ENCODING)).thenReturn(true);
+        when(mockExpressionManager.evaluate(HEADER_CONTENT_ENCODING, muleMessage)).thenReturn("gzip");
+        when(mockExpressionManager.isExpression(HEADER_EXPIRES)).thenReturn(true);
+        when(mockExpressionManager.evaluate(HEADER_EXPIRES, muleMessage)).thenReturn("Thu, 01 Dec 1994 16:00:00 GMT");
+        when(mockExpressionManager.isExpression(HEADER_LOCATION)).thenReturn(true);
+        when(mockExpressionManager.evaluate(HEADER_LOCATION, muleMessage)).thenReturn("http://localhost:8080");
+        when(mockExpressionManager.isExpression(HEADER_TRANSFER_ENCODING)).thenReturn(true);
+        when(mockExpressionManager.evaluate(HEADER_TRANSFER_ENCODING, muleMessage)).thenReturn("chunked");
+
 
         HttpResponse httpResponse = (HttpResponse) httpResponseTransformer.transformMessage(muleMessage, "UTF-8");
         validateHeaders(httpResponse.getHeaders());
@@ -140,14 +189,16 @@ public class HttpResponseTransformerTestCase extends AbstractMuleContextTestCase
     public void testHttpResponseTransformerHeadersWithExpressionInHeaderName() throws Exception
     {
         HttpResponseTransformer httpResponseTransformer = createHttpResponseTransformer();
-        Map<String, Object> properties = new HashMap<String, Object>();
-        properties.put("allow", "Allow");
 
         Map<String, String> headers = new HashMap<String, String>();
-        headers.put("#[header:allow]", "GET");
+        headers.put(HEADER_ALLOW, "GET");
         httpResponseTransformer.setHeaders(headers);
 
-        DefaultMuleMessage muleMessage = new DefaultMuleMessage(HTTP_BODY,  properties, muleContext);
+        DefaultMuleMessage muleMessage = new DefaultMuleMessage(HTTP_BODY, muleContext);
+
+        when(mockExpressionManager.isExpression(HEADER_ALLOW)).thenReturn(true);
+        when(mockExpressionManager.evaluate(HEADER_ALLOW, muleMessage)).thenReturn("GET");
+
 
         HttpResponse httpResponse = (HttpResponse) httpResponseTransformer.transformMessage(muleMessage, "UTF-8");
         validateHeader(httpResponse.getHeaders(), "Allow", "GET");
@@ -159,10 +210,9 @@ public class HttpResponseTransformerTestCase extends AbstractMuleContextTestCase
         HttpResponseTransformer httpResponseTransformer = createHttpResponseTransformer();
         httpResponseTransformer.setBody(HTTP_BODY_WITH_EXPRESSION);
 
-        Map<String, Object> properties = new HashMap<String, Object>();
-        properties.put("userName", "John Galt");
+        DefaultMuleMessage muleMessage = new DefaultMuleMessage(HTTP_BODY, muleContext);
+        when(mockExpressionManager.parse(HTTP_BODY_WITH_EXPRESSION, muleMessage)).thenReturn("<html><head></head><body><p>Hello John Galt</p></body></html>");
 
-        DefaultMuleMessage muleMessage = new DefaultMuleMessage(HTTP_BODY, properties, muleContext);
 
         HttpResponse httpResponse = (HttpResponse) httpResponseTransformer.transformMessage(muleMessage, "UTF-8");
         assertTrue(httpResponse.getBodyAsString().contains("Hello John Galt"));
@@ -174,8 +224,8 @@ public class HttpResponseTransformerTestCase extends AbstractMuleContextTestCase
         HttpResponseTransformer httpResponseTransformer = createHttpResponseTransformer();
         List<CookieWrapper> cookies = new ArrayList<CookieWrapper>();
 
-        cookies.add(createCookie("userName", "John_Galt", "localhost", "/", "Thu, 15 Dec 2013 16:00:00 GMT", "true"));
-        cookies.add(createCookie("userId", "1", "localhost", "/", "Thu, 01 Dec 2013 16:00:00 GMT", "true"));
+        cookies.add(createCookie("userName", "John_Galt", "localhost", "/", "Thu, 15 Dec 2013 16:00:00 GMT", "true", "1"));
+        cookies.add(createCookie("userId", "1", "localhost", "/", "Thu, 01 Dec 2013 16:00:00 GMT", "true", "1"));
 
         httpResponseTransformer.setCookies(cookies);
 
@@ -184,8 +234,8 @@ public class HttpResponseTransformerTestCase extends AbstractMuleContextTestCase
         HttpResponse httpResponse = (HttpResponse) httpResponseTransformer.transformMessage(muleMessage, "UTF-8");
         Map<String, String> responseCookies = getHeaderCookie(httpResponse.getHeaders());
         assertNotNull(responseCookies);
-        assertEquals("userName=John_Galt; Domain=localhost; Path=/; Secure; Expires=Sun, 15-Dec-2013 16:00:00 GMT", responseCookies.get("userName"));
-        assertEquals("userId=1; Domain=localhost; Path=/; Secure; Expires=Sun, 1-Dec-2013 16:00:00 GMT", responseCookies.get("userId"));
+        assertEquals("userName=John_Galt; Version=1; Domain=localhost; Path=/; Secure; Expires=Sun, 15-Dec-2013 16:00:00 GMT", responseCookies.get("userName"));
+        assertEquals("userId=1; Version=1; Domain=localhost; Path=/; Secure; Expires=Sun, 1-Dec-2013 16:00:00 GMT", responseCookies.get("userId"));
     }
 
     @Test
@@ -193,27 +243,34 @@ public class HttpResponseTransformerTestCase extends AbstractMuleContextTestCase
     {
         HttpResponseTransformer httpResponseTransformer = createHttpResponseTransformer();
 
-        Map<String, Object> properties = new HashMap<String, Object>();
-        properties.put("name", "userName");
-        properties.put("value", "John_Galt");
-        properties.put("domain", "localhost");
-        properties.put("path", "/");
-        properties.put("expiryDate", "Thu, 15 Dec 2013 16:00:00 GMT");
-        properties.put("secure", "true");
-
         List<CookieWrapper> cookies = new ArrayList<CookieWrapper>();
-        cookies.add(createCookie("#[header:name]", "#[header:value]", "#[header:domain]", "#[header:path]", "#[header:expiryDate]", "#[header:secure]"));
+        cookies.add(createCookie(HEADER_NAME, HEADER_VALUE, HEADER_DOMAIN, HEADER_PATH, HEADER_EXPIRY_DATE, HEADER_SECURE, HEADER_VERSION));
         httpResponseTransformer.setCookies(cookies);
 
-        DefaultMuleMessage muleMessage = new DefaultMuleMessage(HTTP_BODY, properties, muleContext);
+        DefaultMuleMessage muleMessage = new DefaultMuleMessage(HTTP_BODY, muleContext);
+
+        when(mockExpressionManager.isExpression(HEADER_NAME)).thenReturn(true);
+        when(mockExpressionManager.evaluate(HEADER_NAME, muleMessage)).thenReturn("userName");
+        when(mockExpressionManager.isExpression(HEADER_VALUE)).thenReturn(true);
+        when(mockExpressionManager.evaluate(HEADER_VALUE, muleMessage)).thenReturn("John_Galt");
+        when(mockExpressionManager.isExpression(HEADER_DOMAIN)).thenReturn(true);
+        when(mockExpressionManager.evaluate(HEADER_DOMAIN, muleMessage)).thenReturn("localhost");
+        when(mockExpressionManager.isExpression(HEADER_PATH)).thenReturn(true);
+        when(mockExpressionManager.evaluate(HEADER_PATH, muleMessage)).thenReturn("/");
+        when(mockExpressionManager.isExpression(HEADER_EXPIRY_DATE)).thenReturn(true);
+        when(mockExpressionManager.evaluate(HEADER_EXPIRY_DATE, muleMessage)).thenReturn("Thu, 15 Dec 2013 16:00:00 GMT");
+        when(mockExpressionManager.isExpression(HEADER_SECURE)).thenReturn(true);
+        when(mockExpressionManager.evaluate(HEADER_SECURE, muleMessage)).thenReturn("true");
+        when(mockExpressionManager.isExpression(HEADER_VERSION)).thenReturn(true);
+        when(mockExpressionManager.evaluate(HEADER_VERSION, muleMessage)).thenReturn("1");
 
         HttpResponse httpResponse = (HttpResponse) httpResponseTransformer.transformMessage(muleMessage, "UTF-8");
         Map<String, String> responseCookies = getHeaderCookie(httpResponse.getHeaders());
         assertNotNull(responseCookies);
-        assertEquals("userName=John_Galt; Domain=localhost; Path=/; Secure; Expires=Sun, 15-Dec-2013 16:00:00 GMT", responseCookies.get("userName"));
+        assertEquals("userName=John_Galt; Version=1; Domain=localhost; Path=/; Secure; Expires=Sun, 15-Dec-2013 16:00:00 GMT", responseCookies.get("userName"));
     }
 
-    private CookieWrapper createCookie(String name, String value, String domain, String path, String expiryDate, String secure)
+    private CookieWrapper createCookie(String name, String value, String domain, String path, String expiryDate, String secure, String version)
     {
         CookieWrapper cookie = new CookieWrapper();
         cookie.setName(name);
@@ -222,6 +279,7 @@ public class HttpResponseTransformerTestCase extends AbstractMuleContextTestCase
         cookie.setPath(path);
         cookie.setExpiryDate(expiryDate);
         cookie.setSecure(secure);
+        cookie.setVersion(version);
         return cookie;
     }
 
