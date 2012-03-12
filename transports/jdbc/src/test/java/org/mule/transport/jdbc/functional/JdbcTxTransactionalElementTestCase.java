@@ -133,25 +133,6 @@ public class JdbcTxTransactionalElementTestCase extends AbstractJdbcFunctionalTe
     }
 
     @Test
-    public void testTransactionalFailsWithAnotherResourceType() throws Exception
-    {
-        Flow flow = (Flow) getFlowConstruct("transactionalFailsWithAnotherResourceType");
-        MuleEvent event = getTestEvent("message", flow);
-        try
-        {
-            flow.process(event);
-            fail("DispatchException should be thrown");
-        } catch (DispatchException e)
-        {
-            assertThat(e.getCause() instanceof TransactionException, Is.is(true));
-        }
-        Integer countWithType1 = getCountWithType1();
-        Integer countWithType2 = getCountWithType2();
-        assertThat(countWithType1,Is.is(0));
-        assertThat(countWithType2,Is.is(0));
-    }
-
-    @Test
     public void testTransactionalDoesntFailWithAnotherResourceType() throws Exception
     {
         Flow flow = (Flow) getFlowConstruct("transactionalDoesntFailWithAnotherResourceType");

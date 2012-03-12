@@ -848,24 +848,25 @@
     </xsd:element>
     -->
 
-    <xsd:element name="transactional" substitutionGroup="abstract-message-processor">
+    <xsd:element name="transactional" type="abstractTransactional" substitutionGroup="abstract-message-processor">
         <xsd:annotation>
             <xsd:documentation>
-                Processes the nest list of message processors asychronously using a thread pool
+                Processes the nest list of message processors within a transaction
             </xsd:documentation>
         </xsd:annotation>
-        <xsd:complexType>
-            <xsd:complexContent>
-                <xsd:extension base="abstractMessageProcessorType">
-                    <xsd:sequence>
-                        <xsd:group ref="messageProcessorOrOutboundEndpoint" maxOccurs="unbounded"/>
-                        <xsd:element ref="abstract-exception-strategy" minOccurs="0"/>
-                    </xsd:sequence>
-                    <xsd:attribute name="action" type="transactionalActionType" default="ALWAYS_BEGIN"/>
-                </xsd:extension>
-            </xsd:complexContent>
-        </xsd:complexType>
     </xsd:element>
+
+    <xsd:complexType name="abstractTransactional">
+        <xsd:complexContent>
+            <xsd:extension base="abstractMessageProcessorType">
+                <xsd:sequence>
+                    <xsd:group ref="messageProcessorOrOutboundEndpoint" maxOccurs="unbounded"/>
+                    <xsd:element ref="abstract-exception-strategy" minOccurs="0"/>
+                </xsd:sequence>
+                <xsd:attribute name="action" type="transactionalActionType" default="ALWAYS_BEGIN"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
 
     <xsd:simpleType name="transactionalActionType">
         <xsd:restriction base="xsd:NMTOKEN">

@@ -15,6 +15,7 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorBuilder;
 import org.mule.api.processor.MessageProcessors;
 import org.mule.api.transaction.TransactionConfig;
+import org.mule.api.transaction.TransactionFactory;
 import org.mule.processor.DelegateTransactionFactory;
 import org.mule.processor.EndpointTransactionalInterceptingMessageProcessor;
 import org.mule.processor.TransactionalInterceptingMessageProcessor;
@@ -51,7 +52,7 @@ public class TransactionalMessageProcessorsFactoryBean implements FactoryBean
         txProcessor.setExceptionListener(this.exceptionListener);
         MuleTransactionConfig transactionConfig = createTransactionConfig(this.action);
         txProcessor.setTransactionConfig(transactionConfig);
-        transactionConfig.setFactory(new DelegateTransactionFactory());
+        transactionConfig.setFactory(getTransactionFactory());
         builder.chain(txProcessor);
         for (Object processor : messageProcessors)
         {
@@ -70,6 +71,11 @@ public class TransactionalMessageProcessorsFactoryBean implements FactoryBean
             }
         }
         return MessageProcessors.lifecyleAwareMessageProcessorWrapper(builder.build());
+    }
+
+    protected TransactionFactory getTransactionFactory()
+    {
+        return new DelegateTransactionFactory();
     }
 
     protected MuleTransactionConfig createTransactionConfig(String action)

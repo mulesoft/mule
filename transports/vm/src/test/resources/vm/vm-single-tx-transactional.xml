@@ -73,7 +73,7 @@
         </transactional>
     </flow>
 
-    <flow name="transactionalFailsWithAnotherResourceType">
+    <flow name="transactionalWorksWithAnotherResourceType">
         <append-string-transformer message=" g"/>
         <transactional>
             <vm:outbound-endpoint ref="out1"/>

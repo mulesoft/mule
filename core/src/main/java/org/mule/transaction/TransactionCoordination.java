@@ -268,7 +268,8 @@ public final class TransactionCoordination
 
     public void isolateTransaction()
     {
-        if (transactions.get() != null)
+        Transaction currentTransaction = transactions.get();
+        if (currentTransaction != null)
         {
             if (isolatedTransactions.get() == null)
             {

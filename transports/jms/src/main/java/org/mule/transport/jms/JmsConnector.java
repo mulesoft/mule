@@ -257,7 +257,6 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
         {
             jmsSupport = createJmsSupport();
         }
-        muleContext.getTransactionFactoryManager().registerTransactionFactory(Session.class,new JmsTransactionFactory());
     }
 
     /**

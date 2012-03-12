@@ -136,9 +136,9 @@ public class VmSingleTransactionTransactionalElementTestCase extends FunctionalT
 
     @Test
     @Ignore
-    public void testTransactionalFailsWithAnotherResourceType() throws Exception
+    public void testTransactionalWorksWithAnotherResourceType() throws Exception
     {
-        Flow flow = (Flow) getFlowConstruct("transactionalFailsWithAnotherResourceType");
+        Flow flow = (Flow) getFlowConstruct("transactionalWorksWithAnotherResourceType");
         MuleEvent event = getTestEvent("message", flow);
         try
         {

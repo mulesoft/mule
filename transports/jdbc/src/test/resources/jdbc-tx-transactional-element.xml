@@ -80,15 +80,6 @@
         </transactional>
     </flow>
 
-    <flow name="transactionalFailsWithAnotherResourceType">
-        <append-string-transformer message=" g"/>
-        <transactional>
-            <jdbc:outbound-endpoint ref="out1"/>
-            <jdbc:outbound-endpoint ref="out2"/>
-            <jdbc:outbound-endpoint ref="out3"/>
-        </transactional>
-    </flow>
-
     <flow name="transactionalDoesntFailWithAnotherResourceType">
         <append-string-transformer message=" h"/>
         <transactional>
