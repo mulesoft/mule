@@ -74,6 +74,10 @@ public abstract class TemplateMessagingExceptionStrategy extends AbstractExcepti
 
     protected void nullifyExceptionPayloadIfRequired(MuleEvent event)
     {
+        if (this.handleException)
+        {
+            event.getMessage().setExceptionPayload(null);
+        }
     }
 
     private void processStatistics(MuleEvent event)

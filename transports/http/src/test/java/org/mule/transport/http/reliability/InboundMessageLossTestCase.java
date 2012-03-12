@@ -143,6 +143,7 @@ public class InboundMessageLossTestCase extends FunctionalTestCase
         public MuleEvent handleException(Exception ex, MuleEvent event)
         {
             doHandleException(ex, event);
+            ((MessagingException)ex).setHandled(true);
             return new DefaultMuleEvent(new DefaultMuleMessage("Success!", muleContext), event);
         }
     }
