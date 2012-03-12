@@ -123,6 +123,11 @@
             <groupId>org.mvel</groupId>
             <artifactId>mvel2</artifactId>
         </dependency>
+        <dependency>
+            <groupId>jgrapht</groupId>
+            <artifactId>jgrapht</artifactId>
+            <version>0.7.3</version>
+        </dependency>
 
         <dependency>
             <groupId>mockobjects</groupId>
