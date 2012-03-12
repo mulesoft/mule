@@ -13,10 +13,9 @@ package org.mule.el.mvel;
 import org.mule.api.MuleContext;
 
 import org.mvel2.ParserContext;
-import org.mvel2.UnresolveablePropertyException;
 import org.mvel2.integration.VariableResolver;
 
-class RegistryVariableResolverFactory extends AbstractVariableResolverFactory
+class RegistryVariableResolverFactory extends MVELExpressionLanguageContext
 {
 
     private static final long serialVersionUID = -4433478558175131280L;
@@ -34,8 +33,18 @@ class RegistryVariableResolverFactory extends AbstractVariableResolverFactory
     @Override
     public VariableResolver getVariableResolver(String name)
     {
-
-        return new RegistryVariableVariableResolver(name);
+        if (isResolveable(name))
+        {
+            if (isTarget(name))
+            {
+                return new RegistryVariableVariableResolver(name);
+            }
+            else if (nextFactory != null)
+            {
+                return nextFactory.getVariableResolver(name);
+            }
+        }
+        return null;
     }
 
     @SuppressWarnings("rawtypes")
@@ -84,7 +93,7 @@ class RegistryVariableResolverFactory extends AbstractVariableResolverFactory
             }
             else
             {
-                throw new UnresolveablePropertyException(name);
+                return null;
             }
         }
 

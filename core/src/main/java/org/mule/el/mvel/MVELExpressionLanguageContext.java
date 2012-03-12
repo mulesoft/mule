@@ -16,18 +16,21 @@ import org.mule.api.el.ExpressionLanguageFunction;
 import org.mule.config.i18n.CoreMessages;
 
 import java.lang.reflect.Method;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.Map;
 
 import org.mvel2.ImmutableElementException;
 import org.mvel2.ParserContext;
+import org.mvel2.UnresolveablePropertyException;
 import org.mvel2.ast.Function;
 import org.mvel2.integration.VariableResolver;
 import org.mvel2.integration.VariableResolverFactory;
 import org.mvel2.integration.impl.BaseVariableResolverFactory;
+import org.mvel2.integration.impl.ClassImportResolverFactory;
 import org.mvel2.integration.impl.SimpleSTValueResolver;
+import org.mvel2.integration.impl.SimpleVariableResolverFactory;
 
-public abstract class AbstractVariableResolverFactory extends BaseVariableResolverFactory
+public class MVELExpressionLanguageContext extends BaseVariableResolverFactory
     implements ExpressionLanguageContext
 {
 
@@ -35,18 +38,28 @@ public abstract class AbstractVariableResolverFactory extends BaseVariableResolv
 
     protected ParserContext parserContext;
     protected MuleContext muleContext;
-    protected Map<String, String> aliases = new HashMap<String, String>();
+    protected InternalVariableResolverFactory localFactory;
 
-    public AbstractVariableResolverFactory(ParserContext parserContext, MuleContext muleContext)
+    public MVELExpressionLanguageContext(ParserContext parserContext, MuleContext muleContext)
     {
         this.parserContext = parserContext;
         this.muleContext = muleContext;
+        this.localFactory = new InternalVariableResolverFactory(Collections.<String, Object> emptyMap());
+        this.nextFactory = localFactory;
+    }
+
+    public MVELExpressionLanguageContext(MVELExpressionLanguageContext context)
+    {
+        this.parserContext = context.parserContext;
+        this.muleContext = context.muleContext;
+        this.localFactory = context.localFactory;
+        this.nextFactory = context.nextFactory;
     }
 
     @Override
     public boolean isTarget(String name)
     {
-        return this.variableResolvers.containsKey(name);
+        return variableResolvers.containsKey(name);
     }
 
     @Override
@@ -59,6 +72,22 @@ public abstract class AbstractVariableResolverFactory extends BaseVariableResolv
     public VariableResolver createVariable(String name, Object value)
     {
         return createVariable(name, value, null);
+    }
+
+    public VariableResolver getVariableResolver(String name)
+    {
+        if (isResolveable(name))
+        {
+            if (variableResolvers.containsKey(name))
+            {
+                return variableResolvers.get(name);
+            }
+            else
+            {
+                return nextFactory.getVariableResolver(name);
+            }
+        }
+        throw new UnresolveablePropertyException("unable to resolve variable '" + name + "'");
     }
 
     @Override
@@ -111,20 +140,26 @@ public abstract class AbstractVariableResolverFactory extends BaseVariableResolv
         return (T) getVariable(name);
     }
 
-    protected VariableResolver addResolver(String name, VariableResolver vr)
+    /*
+     * Use an internal VariableResolverFactory in order to use chain resolution while ensuring custom
+     * variables from extension aren't given precedence
+     */
+    protected void addResolver(String name, VariableResolver vr)
     {
-        if (this.variableResolvers == null)
+        if (this.getClass().equals(MVELExpressionLanguageContext.class))
         {
-            this.variableResolvers = new HashMap<String, VariableResolver>();
+            localFactory.addResolver(name, vr);
         }
-        this.variableResolvers.put(name, vr);
-        return vr;
+        else
+        {
+            variableResolvers.put(name, vr);
+        }
     }
 
     @Override
     public void addAlias(String alias, String expression)
     {
-        aliases.put(alias, expression);
+        addResolver(alias, new MuleAliasVariableResolver(alias, expression, this));
     }
 
     protected static class MuleVariableResolver extends SimpleSTValueResolver
@@ -141,6 +176,11 @@ public abstract class AbstractVariableResolverFactory extends BaseVariableResolv
         public String getName()
         {
             return name;
+        }
+
+        public Object getValue(VariableResolverFactory variableResolverFactory)
+        {
+            return getValue();
         }
     }
 
@@ -162,22 +202,62 @@ public abstract class AbstractVariableResolverFactory extends BaseVariableResolv
         }
     }
 
+    static protected class MuleAliasVariableResolver extends MuleVariableResolver
+    {
+        private static final long serialVersionUID = -4957789619105599831L;
+        private String expression;
+        private MVELExpressionLanguageContext context;
+        private MVELExpressionExecutor executor;
+
+        public MuleAliasVariableResolver(String name, String expression, MVELExpressionLanguageContext context)
+        {
+            super(name, null, null);
+            this.expression = expression;
+            this.context = context;
+            this.executor = new MVELExpressionExecutor(context.parserContext);
+        }
+
+        @Override
+        public Object getValue()
+        {
+            return executor.execute(expression, context);
+        }
+
+        @Override
+        public void setValue(Object value)
+        {
+            MVELExpressionLanguageContext newContext = new MVELExpressionLanguageContext(context);
+            expression = expression + "= ___value";
+            newContext.addVariable("___value", value);
+            executor.execute(expression, newContext);
+        }
+    }
+
     @Override
     public void importClass(Class<?> clazz)
     {
-        parserContext.addImport(clazz);
+        if (parserContext.hasImport(clazz.getSimpleName()))
+        {
+            parserContext.addImport(clazz);
+        }
     }
 
     @Override
     public void importClass(String name, Class<?> clazz)
     {
-        parserContext.addImport(name, clazz);
+        if (!parserContext.hasImport(name))
+        {
+            parserContext.addImport(name, clazz);
+        }
     }
 
     @Override
     public void importStaticMethod(String name, Method method)
     {
-        parserContext.addImport(name, method);
+        if (!parserContext.hasImport(name))
+        {
+            parserContext.addImport(name, method);
+        }
     }
 
     @Override
@@ -207,7 +287,11 @@ public abstract class AbstractVariableResolverFactory extends BaseVariableResolv
         public Object call(Object ctx, Object thisValue, VariableResolverFactory factory, Object[] parms)
         {
             function.validateParams(parms);
-            return function.call(parms, AbstractVariableResolverFactory.this);
+            if (factory instanceof ClassImportResolverFactory)
+            {
+                factory = factory.getNextFactory();
+            }
+            return function.call(parms, (ExpressionLanguageContext) factory);
         }
 
         @Override
@@ -217,8 +301,38 @@ public abstract class AbstractVariableResolverFactory extends BaseVariableResolv
         }
     }
 
-    public Map<String, String> getAliases()
+    @Override
+    public void appendFactory(VariableResolverFactory resolverFactory)
     {
-        return aliases;
+        if (nextFactory instanceof InternalVariableResolverFactory)
+        {
+            setNextFactory(resolverFactory);
+            resolverFactory.setNextFactory(localFactory);
+        }
+        else
+        {
+            VariableResolverFactory vrf = nextFactory;
+            while (vrf.getNextFactory() != null
+                   && !(vrf.getNextFactory() instanceof InternalVariableResolverFactory))
+            {
+                vrf = vrf.getNextFactory();
+            }
+            vrf.setNextFactory(resolverFactory);
+            resolverFactory.setNextFactory(localFactory);
+        }
+    }
+
+    @SuppressWarnings("serial")
+    class InternalVariableResolverFactory extends SimpleVariableResolverFactory
+    {
+        public InternalVariableResolverFactory(Map<String, Object> variables)
+        {
+            super(variables);
+        }
+
+        public void addResolver(String name, VariableResolver resolver)
+        {
+            variableResolvers.put(name, resolver);
+        }
     }
 }

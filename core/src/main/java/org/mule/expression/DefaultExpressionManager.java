@@ -602,9 +602,9 @@ public class DefaultExpressionManager
     @Override
     public void dispose()
     {
-        if (expressionLanguage != null)
+        if (expressionLanguage != null  && expressionLanguage instanceof Disposable)
         {
-            expressionLanguage.dispose();
+            ((Disposable) expressionLanguage).dispose();
         }
     }
 

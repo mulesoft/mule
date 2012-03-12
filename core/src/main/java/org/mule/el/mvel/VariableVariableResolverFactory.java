@@ -18,7 +18,7 @@ import org.mvel2.ParserContext;
 import org.mvel2.UnresolveablePropertyException;
 import org.mvel2.integration.VariableResolver;
 
-class VariableVariableResolverFactory extends AbstractVariableResolverFactory
+class VariableVariableResolverFactory extends MVELExpressionLanguageContext
 {
 
     private static final long serialVersionUID = -4433478558175131280L;
@@ -47,10 +47,10 @@ class VariableVariableResolverFactory extends AbstractVariableResolverFactory
     {
         if (message == null)
         {
-            return false;
+            return isNextResolveable(name);
         }
         return message.getInvocationPropertyNames().contains(name)
-               || message.getSessionPropertyNames().contains(name);
+               || message.getSessionPropertyNames().contains(name) || isNextResolveable(name);
     }
 
     @SuppressWarnings("deprecation")
@@ -66,7 +66,14 @@ class VariableVariableResolverFactory extends AbstractVariableResolverFactory
         {
             return new SessionVariableVariableResolver(name);
         }
-        throw new UnresolveablePropertyException("unable to resolve variable '" + name + "'");
+        else if (nextFactory != null)
+        {
+            return nextFactory.getVariableResolver(name);
+        }
+        else
+        {
+            throw new UnresolveablePropertyException("unable to resolve variable '" + name + "'");
+        }
     }
 
     @SuppressWarnings("rawtypes")

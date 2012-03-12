@@ -10,7 +10,9 @@
 
 package org.mule.api.el;
 
-
+/**
+ * @since 3.3
+ */
 public interface ExpressionLanguageExtension
 {
 

@@ -21,15 +21,10 @@ class EventVariableResolverFactory extends MessageVariableResolverFactory
 
     private static final long serialVersionUID = -6819292692339684915L;
 
-    private MuleEvent event;
-
     public EventVariableResolverFactory(ParserContext parserContext, MuleContext muleContext, MuleEvent event)
     {
         super(parserContext, muleContext, event.getMessage());
-        this.event = event;
-
         addFinalVariable("flow", new FlowContext(event.getFlowConstruct()));
-
     }
 
     public static class FlowContext

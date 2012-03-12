@@ -123,7 +123,8 @@ public class ExpressionLanguageExtensionTestCase extends AbstractELTestCase
 
         MuleMessage message = new DefaultMuleMessage("foo", muleContext);
 
-        Assert.assertEquals("bar", mvel.evaluate("p='bar'", message));
+        mvel.evaluate("p='bar'", message);
+        Assert.assertEquals("bar", message.getPayload());
     }
 
     @Test

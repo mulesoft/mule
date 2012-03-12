@@ -14,15 +14,19 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.el.ExpressionLanguage;
+import org.mule.api.el.ExpressionLanguageContext;
 import org.mule.api.el.ExpressionLanguageExtension;
 import org.mule.api.expression.ExpressionRuntimeException;
 import org.mule.api.expression.InvalidExpressionException;
-import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.transformer.DataType;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.el.context.AppContext;
+import org.mule.el.context.MuleInstanceContext;
+import org.mule.el.context.ServerContext;
+import org.mule.transformer.types.DataTypeFactory;
 
-import java.io.Serializable;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
@@ -31,27 +35,29 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.activation.DataHandler;
+import javax.activation.MimeType;
 
-import org.apache.commons.collections.map.LRUMap;
 import org.mvel2.CompileException;
-import org.mvel2.MVEL;
 import org.mvel2.ParserContext;
-import org.mvel2.integration.VariableResolverFactory;
 import org.mvel2.integration.impl.CachedMapVariableResolverFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Expression language that uses MVEL (http://mvel.codehaus.org/).
  */
-public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable, Disposable
+public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
 {
-
-    private static final int COMPILED_EXPRESSION_MAX_CACHE_SIZE = 1000;
+    private static Logger log = LoggerFactory.getLogger(MVELExpressionLanguage.class);
 
     protected ParserContext parserContext;
-    protected LRUMap compiledExpressionsCache = new LRUMap(COMPILED_EXPRESSION_MAX_CACHE_SIZE);
-    protected AppVariableResolverFactory appVariableResolverFactory;
     protected MuleContext muleContext;
-    protected boolean extensionsAdded;
+    protected MVELExpressionExecutor expressionExecutor;
+
+    // Static context objects
+    protected ServerContext serverContext;
+    protected MuleInstanceContext muleInstanceContext;
+    protected AppContext appContext;
 
     public MVELExpressionLanguage(MuleContext muleContext)
     {
@@ -64,47 +70,42 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
         System.setProperty("mvel2.compiler.allow_override_all_prophandling", "true");
 
         parserContext = createParserContext();
+        expressionExecutor = new MVELExpressionExecutor(parserContext);
 
-        appVariableResolverFactory = new AppVariableResolverFactory(parserContext, muleContext);
+        // Static context
+        serverContext = new ServerContext();
+        muleInstanceContext = new MuleInstanceContext(muleContext);
+        appContext = new AppContext(muleContext);
     }
 
-    protected void addExtensions()
+    protected void addExtensions(ExpressionLanguageContext context)
     {
-        if (!extensionsAdded)
+        for (ExpressionLanguageExtension extension : muleContext.getRegistry().lookupObjectsForLifecycle(
+            ExpressionLanguageExtension.class))
         {
-            extensionsAdded = true;
-            for (ExpressionLanguageExtension extension : muleContext.getRegistry().lookupObjectsForLifecycle(
-                ExpressionLanguageExtension.class))
-            {
-                extension.configureContext(appVariableResolverFactory);
-            }
+            extension.configureContext(context);
         }
-    }
 
-    @Override
-    public void dispose()
-    {
-        compiledExpressionsCache.clear();
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public <T> T evaluate(String expression)
     {
-        return (T) evaluateInternal(expression, new CompositeVariableResolverFactory(parserContext,
-            muleContext, appVariableResolverFactory));
+        MVELExpressionLanguageContext factory = new MVELExpressionLanguageContext(parserContext, muleContext);
+        factory.appendFactory(new RegistryVariableResolverFactory(parserContext, muleContext));
+        return (T) evaluateInternal(expression, factory);
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public <T> T evaluate(String expression, Map<String, Object> vars)
     {
-        CompositeVariableResolverFactory factory = new CompositeVariableResolverFactory(parserContext,
-            muleContext, appVariableResolverFactory);
-        factory.addVariableResolverFactory(new RegistryVariableResolverFactory(parserContext, muleContext));
+        MVELExpressionLanguageContext factory = new MVELExpressionLanguageContext(parserContext, muleContext);
+        factory.appendFactory(new RegistryVariableResolverFactory(parserContext, muleContext));
         if (vars != null)
         {
-            factory.addVariableResolverFactory(new CachedMapVariableResolverFactory(vars));
+            factory.appendFactory(new CachedMapVariableResolverFactory(vars));
         }
         return (T) evaluateInternal(expression, factory);
     }
@@ -120,58 +121,53 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
     @SuppressWarnings("unchecked")
     public <T> T evaluate(String expression, MuleEvent event, Map<String, Object> vars)
     {
-        CompositeVariableResolverFactory factory = new CompositeVariableResolverFactory(parserContext,
-            muleContext, appVariableResolverFactory);
-        factory.addVariableResolverFactory(new EventVariableResolverFactory(parserContext, muleContext, event));
-        factory.addVariableResolverFactory(new VariableVariableResolverFactory(parserContext, muleContext,
-            event));
-        factory.addVariableResolverFactory(new RegistryVariableResolverFactory(parserContext, muleContext));
+        MVELExpressionLanguageContext factory = new MVELExpressionLanguageContext(parserContext, muleContext);
+        factory.appendFactory(new EventVariableResolverFactory(parserContext, muleContext, event));
+        factory.appendFactory(new VariableVariableResolverFactory(parserContext, muleContext, event));
+        factory.appendFactory(new RegistryVariableResolverFactory(parserContext, muleContext));
         if (vars != null)
         {
-            factory.addVariableResolverFactory(new CachedMapVariableResolverFactory(vars));
+            factory.appendFactory(new CachedMapVariableResolverFactory(vars));
         }
         return (T) evaluateInternal(expression, factory);
     }
 
     @Override
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked", "deprecation"})
     public <T> T evaluate(String expression, MuleMessage message)
     {
-        CompositeVariableResolverFactory factory = new CompositeVariableResolverFactory(parserContext,
-            muleContext, appVariableResolverFactory);
-        factory.addVariableResolverFactory(new MessageVariableResolverFactory(parserContext, muleContext,
-            message));
-        factory.addVariableResolverFactory(new VariableVariableResolverFactory(parserContext, muleContext,
-            message));
-        factory.addVariableResolverFactory(new RegistryVariableResolverFactory(parserContext, muleContext));
+        MVELExpressionLanguageContext factory = new MVELExpressionLanguageContext(parserContext, muleContext);
+        factory.appendFactory(new MessageVariableResolverFactory(parserContext, muleContext, message));
+        factory.appendFactory(new VariableVariableResolverFactory(parserContext, muleContext, message));
+        factory.appendFactory(new RegistryVariableResolverFactory(parserContext, muleContext));
         return (T) evaluateInternal(expression, factory);
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked", "deprecation"})
     @Override
     public <T> T evaluate(String expression, MuleMessage message, Map<String, Object> vars)
     {
-        CompositeVariableResolverFactory factory = new CompositeVariableResolverFactory(parserContext,
-            muleContext, appVariableResolverFactory);
-        factory.addVariableResolverFactory(new MessageVariableResolverFactory(parserContext, muleContext,
-            message));
-        factory.addVariableResolverFactory(new VariableVariableResolverFactory(parserContext, muleContext,
-            message));
-        factory.addVariableResolverFactory(new RegistryVariableResolverFactory(parserContext, muleContext));
+        MVELExpressionLanguageContext factory = new MVELExpressionLanguageContext(parserContext, muleContext);
+        factory.appendFactory(new MessageVariableResolverFactory(parserContext, muleContext, message));
+        factory.appendFactory(new VariableVariableResolverFactory(parserContext, muleContext, message));
+        factory.appendFactory(new RegistryVariableResolverFactory(parserContext, muleContext));
         if (vars != null)
         {
-            factory.addVariableResolverFactory(new CachedMapVariableResolverFactory(vars));
+            factory.appendFactory(new CachedMapVariableResolverFactory(vars));
         }
         return (T) evaluateInternal(expression, factory);
     }
 
     @SuppressWarnings("unchecked")
-    protected <T> T evaluateInternal(String expression, VariableResolverFactory variableResolverFactory)
+    protected <T> T evaluateInternal(String expression, MVELExpressionLanguageContext variableResolverFactory)
     {
         try
         {
-            addExtensions();
-            return (T) MVEL.executeExpression(getCompiledExpression(expression), variableResolverFactory);
+            variableResolverFactory.addFinalVariable("server", serverContext);
+            variableResolverFactory.addFinalVariable("mule", muleInstanceContext);
+            variableResolverFactory.addFinalVariable("app", appContext);
+            addExtensions(variableResolverFactory);
+            return (T) expressionExecutor.execute(expression, variableResolverFactory);
         }
         catch (Exception e)
         {
@@ -198,7 +194,7 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
     {
         try
         {
-            getCompiledExpression(expression);
+            expressionExecutor.validate(expression);
         }
         catch (CompileException e)
         {
@@ -236,27 +232,9 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
         parserContext.addImport(System.class);
         parserContext.addImport(Calendar.class);
         parserContext.addImport(DataHandler.class);
-    }
-
-    /**
-     * Compile an expression. If such expression was compiled before then return the compilation output from a
-     * cache.
-     * 
-     * @param expression Expression to be compiled
-     * @return A {@link Serializable} object representing the compiled expression
-     */
-    protected Serializable getCompiledExpression(String expression)
-    {
-        if (compiledExpressionsCache.containsKey(expression))
-        {
-            return (Serializable) compiledExpressionsCache.get(expression);
-        }
-        else
-        {
-            Serializable compiledExpression = MVEL.compileExpression(expression, parserContext);
-            compiledExpressionsCache.put(expression, compiledExpression);
-            return compiledExpression;
-        }
+        parserContext.addImport(DataType.class);
+        parserContext.addImport(DataTypeFactory.class);
+        parserContext.addImport(MimeType.class);
     }
 
 }

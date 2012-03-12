@@ -13,18 +13,25 @@ package org.mule.el.mvel;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
-import org.mule.api.expression.ExpressionRuntimeException;
+import org.mule.api.MuleEvent;
+import org.mule.api.MuleMessage;
+import org.mule.api.construct.FlowConstruct;
+import org.mule.api.expression.InvalidExpressionException;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.config.MuleManifest;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
+import java.util.Calendar;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
+
+;
 
 public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase
 {
@@ -39,73 +46,161 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase
     }
 
     @Test
-    public void evaluateReturnInt()
+    public void testEvaluateString()
     {
-        assertEquals(4, mvel.evaluate("2*2"));
-    }
-
-    @Test
-    public void evaluateReturnString()
-    {
+        // Literals
         assertEquals("hi", mvel.evaluate("'hi'"));
-    }
+        assertEquals(4, mvel.evaluate("2*2"));
 
-    @Test(expected = ExpressionRuntimeException.class)
-    public void evaluateInvalidExpression()
-    {
-        assertEquals(4, mvel.evaluate("2*'2"));
-    }
-
-    @Test
-    public void evaluateWithIntVar()
-    {
-        assertEquals(4, mvel.evaluate("a*2", Collections.<String, Object> singletonMap("a", new Integer(2))));
+        // Static context
+        assertEquals(Calendar.getInstance().getTimeZone(), mvel.evaluate("server.timeZone"));
+        assertEquals(MuleManifest.getProductVersion(), mvel.evaluate("mule.version"));
+        assertEquals(muleContext.getConfiguration().getId(), mvel.evaluate("app.name"));
     }
 
     @Test
-    public void evaluateWithStringVar()
+    public void testEvaluateStringMapOfStringObject()
     {
-        assertEquals("Hi Dan",
-            mvel.evaluate("'Hi '#a", Collections.<String, Object> singletonMap("a", "Dan")));
+        // Literals
+        assertEquals("hi", mvel.evaluate("'hi'", Collections.<String, Object> emptyMap()));
+        assertEquals(4, mvel.evaluate("2*2", Collections.<String, Object> emptyMap()));
+
+        // Static context
+        assertEquals(Calendar.getInstance().getTimeZone(),
+            mvel.evaluate("server.timeZone", Collections.<String, Object> emptyMap()));
+        assertEquals(MuleManifest.getProductVersion(),
+            mvel.evaluate("mule.version", Collections.<String, Object> emptyMap()));
+        assertEquals(muleContext.getConfiguration().getId(),
+            mvel.evaluate("app.name", Collections.<String, Object> emptyMap()));
+
+        // Custom variables (via method param)
+        assertEquals(1, mvel.evaluate("foo", Collections.<String, Object> singletonMap("foo", 1)));
+        assertEquals("bar", mvel.evaluate("foo", Collections.<String, Object> singletonMap("foo", "bar")));
     }
 
     @Test
-    public void evaluateWithMultipleVars()
+    public void testEvaluateStringMuleEvent()
     {
-        Map<String, Object> vars = new HashMap<String, Object>();
-        vars.put("a", "Dan");
-        vars.put("b", 2);
-        assertEquals("Hi Dan2", mvel.evaluate("'Hi '#a#b", vars));
-    }
+        MuleEvent event = createMockEvent();
 
-    @Test(expected = ExpressionRuntimeException.class)
-    public void evaluateInvalidExpressionWithVars()
-    {
-        assertEquals(4, mvel.evaluate("2*'2", Collections.<String, Object> singletonMap("a", 2)));
-    }
+//        // Literals
+//        assertEquals("hi", mvel.evaluate("'hi'", event));
+//        assertEquals(4, mvel.evaluate("2*2", event));
+//
+//        // Static context
+//        assertEquals(Calendar.getInstance().getTimeZone(), mvel.evaluate("server.timeZone", event));
+//        assertEquals(MuleManifest.getProductVersion(), mvel.evaluate("mule.version", event));
+//        assertEquals(muleContext.getConfiguration().getId(), mvel.evaluate("app.name", event));
 
-    @Test
-    public void invalidExpression()
-    {
-        assertFalse(mvel.isValid("a9-#'"));
-    }
+        // Event context
+        assertEquals("myFlow", mvel.evaluate("flow.name", event));
+        assertEquals("foo", mvel.evaluate("message.payload", event));
 
-    @Test
-    public void validExpression()
-    {
-        assertTrue(mvel.isValid("var a = 2"));
     }
 
     @Test
-    public void evaluateWithAppContext1()
+    public void testEvaluateStringMuleEventMapOfStringObject()
     {
-        assertEquals(System.getProperty("user.name"), mvel.evaluate("server.user"));
+        MuleEvent event = createMockEvent();
+
+        // Literals
+        assertEquals("hi", mvel.evaluate("'hi'", event));
+        assertEquals(4, mvel.evaluate("2*2", event));
+
+        // Static context
+        assertEquals(Calendar.getInstance().getTimeZone(), mvel.evaluate("server.timeZone", event));
+        assertEquals(MuleManifest.getProductVersion(), mvel.evaluate("mule.version", event));
+        assertEquals(muleContext.getConfiguration().getId(), mvel.evaluate("app.name", event));
+
+        // Event context
+        assertEquals("myFlow", mvel.evaluate("flow.name", event));
+        assertEquals("foo", mvel.evaluate("message.payload", event));
+
+        // Custom variables (via method param)
+        assertEquals(1, mvel.evaluate("foo", Collections.<String, Object> singletonMap("foo", 1)));
+        assertEquals("bar", mvel.evaluate("foo", Collections.<String, Object> singletonMap("foo", "bar")));
     }
 
     @Test
-    public void evaluateWithAppContext2()
+    public void testEvaluateStringMuleMessage()
     {
-        assertEquals(Locale.getDefault(), mvel.evaluate("server.locale"));
+        MuleMessage message = createMockMessage();
+
+        // Literals
+        assertEquals("hi", mvel.evaluate("'hi'", message));
+        assertEquals(4, mvel.evaluate("2*2", message));
+
+        // Static context
+        assertEquals(Calendar.getInstance().getTimeZone(), mvel.evaluate("server.timeZone", message));
+        assertEquals(MuleManifest.getProductVersion(), mvel.evaluate("mule.version", message));
+        assertEquals(muleContext.getConfiguration().getId(), mvel.evaluate("app.name", message));
+
+        // Event context
+        assertEquals("foo", mvel.evaluate("message.payload", message));
+    }
+
+    @Test
+    public void testEvaluateStringMuleMessageMapOfStringObject()
+    {
+        MuleMessage message = createMockMessage();
+
+        // Literals
+        assertEquals("hi", mvel.evaluate("'hi'", message));
+        assertEquals(4, mvel.evaluate("2*2", message));
+
+        // Static context
+        assertEquals(Calendar.getInstance().getTimeZone(), mvel.evaluate("server.timeZone", message));
+        assertEquals(MuleManifest.getProductVersion(), mvel.evaluate("mule.version", message));
+        assertEquals(muleContext.getConfiguration().getId(), mvel.evaluate("app.name", message));
+
+        // Event context
+        assertEquals("foo", mvel.evaluate("message.payload", message));
+
+        // Custom variables (via method param)
+        assertEquals(1, mvel.evaluate("foo", Collections.<String, Object> singletonMap("foo", 1)));
+        assertEquals("bar", mvel.evaluate("foo", Collections.<String, Object> singletonMap("foo", "bar")));
+    }
+
+    @Test
+    public void testIsValid()
+    {
+        assertTrue(mvel.isValid("2*2"));
+    }
+
+    @Test
+    public void testIsValidInvalid()
+    {
+        assertFalse(mvel.isValid("2*'2"));
+    }
+
+    @Test
+    public void testValidate()
+    {
+        mvel.validate("2*2");
+    }
+
+    @Test(expected = InvalidExpressionException.class)
+    public void testValidateInvalid()
+    {
+        mvel.validate("2*'2");
+    }
+
+    protected MuleEvent createMockEvent()
+    {
+        MuleEvent event = mock(MuleEvent.class);
+        FlowConstruct flowConstruct = mock(FlowConstruct.class);
+        when(flowConstruct.getName()).thenReturn("myFlow");
+        MuleMessage message = createMockMessage();
+        Mockito.when(event.getFlowConstruct()).thenReturn(flowConstruct);
+        Mockito.when(event.getMessage()).thenReturn(message);
+        return event;
+    }
+
+    protected MuleMessage createMockMessage()
+    {
+        MuleMessage message = mock(MuleMessage.class);
+        Mockito.when(message.getPayload()).thenReturn("foo");
+        return message;
     }
 
 }

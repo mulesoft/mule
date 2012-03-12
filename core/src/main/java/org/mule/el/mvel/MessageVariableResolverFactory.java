@@ -18,7 +18,7 @@ import org.mule.el.context.MessagePropertyMapContext;
 
 import org.mvel2.ParserContext;
 
-class MessageVariableResolverFactory extends AbstractVariableResolverFactory
+class MessageVariableResolverFactory extends MVELExpressionLanguageContext
 {
 
     private static final long serialVersionUID = -6819292692339684915L;
@@ -31,9 +31,9 @@ class MessageVariableResolverFactory extends AbstractVariableResolverFactory
 
         if (message != null)
         {
-            // Message / Payload
             addFinalVariable("message", new MessageContext(message));
-            // We need payload top-level for compatability with payload expression evaluator without ':'
+
+            // We need payload top-level for compatibility with payload expression evaluator without ':'
             addResolver("payload", new PayloadVariableResolver(message));
 
             // Only add exception is present
@@ -42,13 +42,8 @@ class MessageVariableResolverFactory extends AbstractVariableResolverFactory
                 addFinalVariable("exception", message.getExceptionPayload().getException());
             }
 
-            // Property, variable and attachment maps
-            // addFinalVariable("inbound", new MessagePropertyMapContext(message, PropertyScope.INBOUND));
-            // addFinalVariable("outbound", new MessagePropertyMapContext(message, PropertyScope.OUTBOUND));
             addFinalVariable("flowVars", new MessagePropertyMapContext(message, PropertyScope.INVOCATION));
             addFinalVariable("sessionVars", new MessagePropertyMapContext(message, PropertyScope.SESSION));
-            // addFinalVariable("inboundAttachments", new InboundAttachmentMapContext(message));
-            // addFinalVariable("outboundAttachments", new OutboundAttachmentMapContext(message));
         }
     }
 }

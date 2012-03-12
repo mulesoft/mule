@@ -12,6 +12,9 @@ package org.mule.api.el;
 
 import java.lang.reflect.Method;
 
+/**
+ * @since 3.3
+ */
 public interface ExpressionLanguageContext
 {
 
