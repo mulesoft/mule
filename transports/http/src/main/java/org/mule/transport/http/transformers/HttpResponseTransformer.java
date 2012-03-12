@@ -17,6 +17,7 @@ import org.mule.transformer.AbstractMessageTransformer;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transport.http.CookieHelper;
 import org.mule.transport.http.CookieWrapper;
+import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
 import org.mule.transport.http.HttpResponse;
 
@@ -28,7 +29,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import org.apache.commons.httpclient.Cookie;
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpVersion;
 import org.apache.commons.httpclient.ProtocolException;
@@ -68,7 +68,6 @@ public class HttpResponseTransformer extends AbstractMessageTransformer
     }
 
 
-
     private void setBody(HttpResponse response, MuleMessage message) throws TransformerException
     {
         MuleMessage bodyContent = message;
@@ -103,31 +102,26 @@ public class HttpResponseTransformer extends AbstractMessageTransformer
                         // Ensure that we convert the payload to an in memory representation
                         // so we don't end up with a chunked response
                         len = msg.getPayloadAsBytes().length;
-
                         response.setBody(msg);
-
-                        Header header = new Header(HttpConstants.HEADER_CONTENT_LENGTH, Long.toString(len));
-                        response.setHeader(header);
+                        response.setHeader(new Header(HttpConstants.HEADER_CONTENT_LENGTH, Long.toString(len)));
                     }
                     else
                     {
-                        Header header = new Header(HttpConstants.HEADER_TRANSFER_ENCODING, "chunked");
-                        response.addHeader(header);
+                        response.addHeader(new Header(HttpConstants.HEADER_TRANSFER_ENCODING, "chunked"));
                     }
                 }
                 else
                 {
-                    Header header = new Header(HttpConstants.HEADER_CONTENT_LENGTH, Long.toString(len));
-                    response.setHeader(header);
+                    response.setHeader(new Header(HttpConstants.HEADER_CONTENT_LENGTH, Long.toString(len)));
                 }
             }
             else
             {
-                Header header = new Header(HttpConstants.HEADER_CONTENT_LENGTH, "0");
-                response.addHeader(header);
+                response.addHeader(new Header(HttpConstants.HEADER_CONTENT_LENGTH, "0"));
             }
         }
     }
+
 
     private void setCookies(HttpResponse response, MuleMessage message) throws TransformerException
     {
@@ -164,20 +158,9 @@ public class HttpResponseTransformer extends AbstractMessageTransformer
         }
     }
 
-    private void checkVersion(MuleMessage message)
+    protected void checkVersion(MuleMessage message)
     {
-        if(version == null)
-        {
-            version = HttpConstants.HTTP11;
-        }
-        else
-        {
-            version = evaluate(version, message);
-            if(!version.startsWith("HTTP/"))
-            {
-                version = "HTTP/" + version;
-            }
-        }
+        setDefaultVersion(message);
     }
 
     private void setStatus(HttpResponse response, MuleMessage message) throws TransformerException
@@ -201,12 +184,13 @@ public class HttpResponseTransformer extends AbstractMessageTransformer
     {
         if(contentType == null)
         {
-            contentType = HttpConstants.DEFAULT_CONTENT_TYPE;
+            contentType = getDefaultContentType(message);
+
         }
         response.setHeader(new Header(HttpConstants.HEADER_CONTENT_TYPE, evaluate(contentType, message)));
     }
 
-    public String evaluate(String value, MuleMessage message)
+    private String evaluate(String value, MuleMessage message)
     {
         Object realValue = value;
 
@@ -216,6 +200,25 @@ public class HttpResponseTransformer extends AbstractMessageTransformer
         }
 
         return String.valueOf(realValue);
+    }
+
+    private void setDefaultVersion(MuleMessage message)
+    {
+        version = message.getInboundProperty(HttpConnector.HTTP_VERSION_PROPERTY);
+        if(version == null)
+        {
+           version = HttpConstants.HTTP11;
+        }
+    }
+
+    private String getDefaultContentType(MuleMessage message)
+    {
+        String contentType = message.getInboundProperty(HttpConstants.HEADER_CONTENT_TYPE);
+        if(contentType == null)
+        {
+            contentType = HttpConstants.DEFAULT_CONTENT_TYPE;
+        }
+        return contentType;
     }
 
 

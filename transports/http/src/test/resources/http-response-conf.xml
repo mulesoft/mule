@@ -12,7 +12,7 @@
 
     <flow name="testResponseError" processingStrategy="synchronous">
         <http:inbound-endpoint address="http://localhost:${port1}/resources/error" exchange-pattern="request-response"/>
-        <http:response status="500" contentType="text/plain; charset=utf-8">
+        <http:response status="500" contentType="text/html; charset=utf-8">
             <http:body><![CDATA[<html><body>#[header:inbound:errorMessage] Internal Server Error</body></html>]]></http:body>
         </http:response>
         <echo-component/>
@@ -28,13 +28,10 @@
 
     <flow name="testResponseAll" processingStrategy="synchronous">
         <http:inbound-endpoint address="http://localhost:${port1}/resources/all" exchange-pattern="request-response"/>
-        <http:response status="404" contentType="text/html" version="1.0">
-            <http:allow value="GET"/>
+        <http:response status="404" contentType="text/html">
             <http:cache-control value="max-age=3600"/>
-            <http:content-encoding value="gzip"/>
             <http:expires value="Thu, 01 Dec 2014 16:00:00 GMT" />
             <http:location value="http://localhost:9090"/>
-            <http:transfer-encoding value="chunked"/>
             <http:set-cookie name="cookie1" value="value1" domain="localhost" path="/" expiryDate="Fri, 12 Dec 2014 17:00:00 GMT" secure="true"/>
             <http:set-cookie name="cookie2" value="value2" maxAge="1000"/>
             <http:header name="header1" value="value1"/>
@@ -46,13 +43,10 @@
 
      <flow name="testResponseAllExpressions" processingStrategy="synchronous">
         <http:inbound-endpoint address="http://localhost:${port1}/resources/allExpressions" exchange-pattern="request-response"/>
-        <http:response status="#[header:inbound:status]" contentType="#[header:inbound:contentType]" version="#[header:inbound:version]">
-            <http:allow value="GET"/>
+        <http:response status="#[header:inbound:status]" contentType="#[header:inbound:contentType]">
             <http:cache-control value="#[header:inbound:cacheControl]"/>
-            <http:content-encoding value="#[header:inbound:contentEncoding]"/>
             <http:expires value="Thu, 01 Dec 2014 16:00:00 GMT" />
             <http:location value="http://localhost:9090"/>
-            <http:transfer-encoding value="#[header:inbound:transferEncoding]"/>
             <http:set-cookie name="#[header:inbound:cookie1]" value="#[header:inbound:value1]" domain="#[header:inbound:domain]" path="#[header:inbound:path]" expiryDate="#[header:inbound:expiryDate]" secure="#[header:inbound:secure]"/>
             <http:set-cookie name="#[header:inbound:cookie2]" value="#[header:inbound:value2]" maxAge="#[header:inbound:maxAge]"/>
             <http:header name="#[header:inbound:header1]" value="#[header:inbound:value1]"/>

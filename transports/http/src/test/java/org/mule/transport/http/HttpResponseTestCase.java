@@ -75,12 +75,9 @@ public class HttpResponseTestCase extends FunctionalTestCase
         MuleMessage response = client.send("http://localhost:" + dynamicPort.getNumber() + "/resources/all", muleMessage);
         assertEquals("Custom body", response.getPayloadAsString());
         assertEquals("" + HttpConstants.SC_NOT_FOUND, response.getInboundProperty("http.status"));
-        assertEquals("GET", response.getInboundProperty("Allow"));
         assertEquals("max-age=3600", response.getInboundProperty("Cache-Control"));
-        assertEquals("gzip", response.getInboundProperty("Content-Encoding"));
         assertEquals("Thu, 01 Dec 2014 16:00:00 GMT", response.getInboundProperty("Expires"));
         assertEquals("http://localhost:9090", response.getInboundProperty("Location"));
-        assertEquals("chunked", response.getInboundProperty("Transfer-Encoding"));
         assertEquals("value1", response.getInboundProperty("header1"));
         Cookie[] cookies = (Cookie[]) response.getInboundProperty("Set-Cookie");
         assertEquals(2, cookies.length);
@@ -98,12 +95,9 @@ public class HttpResponseTestCase extends FunctionalTestCase
         MuleMessage response = client.send("http://localhost:" + dynamicPort.getNumber() + "/resources/allExpressions",  muleMessage, properties);
         assertEquals("Custom body", response.getPayloadAsString());
         assertEquals("" + HttpConstants.SC_NOT_FOUND, response.getInboundProperty("http.status"));
-        assertEquals("GET", response.getInboundProperty("Allow"));
         assertEquals("max-age=3600", response.getInboundProperty("Cache-Control"));
-        assertEquals("gzip", response.getInboundProperty("Content-Encoding"));
         assertEquals("Thu, 01 Dec 2014 16:00:00 GMT", response.getInboundProperty("Expires"));
         assertEquals("http://localhost:9090", response.getInboundProperty("Location"));
-        assertEquals("chunked", response.getInboundProperty("Transfer-Encoding"));
         assertEquals("value1", response.getInboundProperty("header1"));
         Cookie[] cookies = (Cookie[]) response.getInboundProperty("Set-Cookie");
         assertEquals(2, cookies.length);
@@ -115,15 +109,11 @@ public class HttpResponseTestCase extends FunctionalTestCase
     {
         Map<String, Object> properties = new HashMap<String, Object>();
         properties.put("customBody", "Custom body");
-        properties.put("version", "1.0");
         properties.put("contentType", "text/html");
         properties.put("status", HttpConstants.SC_NOT_FOUND);
-        properties.put("allow", "GET");
         properties.put("cacheControl", "max-age=3600");
-        properties.put("contentEncoding", "gzip");
         properties.put("expires", "Thu, 01 Dec 2014 16:00:00 GMT");
         properties.put("location", "http://localhost:9090");
-        properties.put("transferEncoding", "chunked");
         properties.put("header1", "header1");
         properties.put("header2", "header2");
         properties.put("value1", "value1");

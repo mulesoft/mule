@@ -47,13 +47,9 @@ public class HttpResponseDefinitionParserTransformerTestCase extends AbstractMul
     private Map<String, String> populateHeaderNamesMapping()
     {
         Map<String, String> headerNameMapping = new HashMap<String, String>();
-        headerNameMapping.put("allow", "Allow");
         headerNameMapping.put("cache-control", "Cache-Control");
-        headerNameMapping.put("connection", "Connection");
-        headerNameMapping.put("content-encoding", "Content-Encoding");
         headerNameMapping.put("location", "Location");
         headerNameMapping.put("expires", "Expires");
-        headerNameMapping.put("transfer-encoding", "Transfer-Encoding");
         return headerNameMapping;
     }
 
