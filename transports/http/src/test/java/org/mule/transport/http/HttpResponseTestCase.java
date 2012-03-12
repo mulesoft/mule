@@ -20,6 +20,9 @@ import org.mule.module.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -143,7 +146,7 @@ public class HttpResponseTestCase extends FunctionalTestCase
             assertEquals("value1", cookie.getValue());
             assertEquals("/", cookie.getPath());
             assertEquals("localhost", cookie.getDomain());
-            assertEquals("Fri Dec 12 14:00:00 GMT-03:00 2014", cookie.getExpiryDate().toString());
+            validateDate(cookie.getExpiryDate());
             assertTrue(cookie.getSecure());
         }
         else
@@ -152,6 +155,16 @@ public class HttpResponseTestCase extends FunctionalTestCase
             assertEquals("value2", cookie.getValue());
             assertFalse(cookie.getSecure());
         }
+    }
+
+    private void validateDate(Date date)
+    {
+        GregorianCalendar cookieDate = new GregorianCalendar();
+        cookieDate.setTime(date);
+
+        assertEquals(2014, cookieDate.get(GregorianCalendar.YEAR));
+        assertEquals(12, cookieDate.get(GregorianCalendar.DAY_OF_MONTH));
+        assertEquals(11, cookieDate.get(GregorianCalendar.MONTH));
     }
 
 }
