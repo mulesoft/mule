@@ -40,7 +40,7 @@ public class TransactionalInterceptingMessageProcessor extends AbstractIntercept
         }
         else
         {
-            ProcessingTemplate<MuleEvent> processingTemplate = TransactionalErrorHandlingProcessingTemplate.createMainProcessingTemplate(muleContext, transactionConfig, exceptionListener);
+            ProcessingTemplate<MuleEvent> processingTemplate = TransactionalErrorHandlingProcessingTemplate.createScopeProcessingTemplate(muleContext, transactionConfig, exceptionListener);
             ProcessingCallback<MuleEvent> processingCallback = new ProcessingCallback<MuleEvent>()
             {
                 public MuleEvent process() throws Exception

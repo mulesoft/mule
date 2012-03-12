@@ -259,4 +259,16 @@ public class JmsSingleTransactionTransactionalElementTestCase extends AbstractJm
         assertThat(message2, notNullValue());
     }
 
+    @Test
+    public void testNestedTransactionalWithBeginOrJoinFailWithCatchAndRollback() throws Exception
+    {
+        Flow flow = (Flow) getFlowConstruct("nestedTransactionalWithBeginOrJoinFailWithCatchAndRollback");
+        MuleEvent event = getTestEvent("message", flow);
+        flow.process(event);
+        MuleMessage message1 = muleContext.getClient().request("jms://out1?connector=jmsConnector1", 1000);
+        MuleMessage message2 = muleContext.getClient().request("jms://out2?connector=jmsConnector1", 1000);
+        assertThat(message1, nullValue());
+        assertThat(message2, nullValue());
+    }
+
 }
