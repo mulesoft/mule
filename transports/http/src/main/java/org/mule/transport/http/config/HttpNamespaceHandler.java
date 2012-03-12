@@ -14,20 +14,26 @@ package org.mule.transport.http.config;
 import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
 import org.mule.config.spring.parsers.collection.ChildListEntryDefinitionParser;
 import org.mule.config.spring.parsers.collection.ChildMapEntryDefinitionParser;
+import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
 import org.mule.config.spring.parsers.generic.ParentDefinitionParser;
+import org.mule.config.spring.parsers.generic.TextDefinitionParser;
+import org.mule.config.spring.parsers.processors.CheckExclusiveAttributes;
 import org.mule.config.spring.parsers.specific.ComponentDefinitionParser;
 import org.mule.config.spring.parsers.specific.FilterDefinitionParser;
 import org.mule.config.spring.parsers.specific.MessageProcessorDefinitionParser;
 import org.mule.config.spring.parsers.specific.SecurityFilterDefinitionParser;
 import org.mule.endpoint.URIBuilder;
+import org.mule.transport.http.CookieWrapper;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
 import org.mule.transport.http.HttpPollingConnector;
+import org.mule.transport.http.builder.HttpResponseDefinitionParser;
 import org.mule.transport.http.components.RestServiceWrapper;
 import org.mule.transport.http.components.StaticResourceMessageProcessor;
 import org.mule.transport.http.filters.HttpBasicAuthenticationFilter;
 import org.mule.transport.http.filters.HttpRequestWildcardFilter;
+import org.mule.transport.http.transformers.HttpResponseTransformer;
 import org.mule.transport.http.transformers.HttpClientMethodResponseToObject;
 import org.mule.transport.http.transformers.HttpRequestBodyToParamMap;
 import org.mule.transport.http.transformers.HttpResponseToString;
@@ -65,5 +71,21 @@ public class HttpNamespaceHandler extends AbstractMuleNamespaceHandler
 
         registerMuleBeanDefinitionParser("static-resource-handler",
                 new MessageProcessorDefinitionParser(StaticResourceMessageProcessor.class));
+
+        registerBeanDefinitionParser("response", new MessageProcessorDefinitionParser(HttpResponseTransformer.class));
+        registerMuleBeanDefinitionParser("header", new ChildMapEntryDefinitionParser("headers", "name", "value")).addCollection("headers");
+        registerMuleBeanDefinitionParser("set-cookie", new ChildDefinitionParser("cookie", CookieWrapper.class)).registerPreProcessor(new CheckExclusiveAttributes(new String[][]{new String[]{"maxAge"}, new String[]{"expiryDate"}}));
+        registerMuleBeanDefinitionParser("body", new TextDefinitionParser("body"));
+        registerMuleBeanDefinitionParser("location", new HttpResponseDefinitionParser("header"));
+        registerMuleBeanDefinitionParser("allow", new HttpResponseDefinitionParser("header"));
+        registerMuleBeanDefinitionParser("cache-control", new HttpResponseDefinitionParser("header"));
+        registerMuleBeanDefinitionParser("connection", new HttpResponseDefinitionParser("header"));
+        registerMuleBeanDefinitionParser("content-encoding", new HttpResponseDefinitionParser("header"));
+        registerMuleBeanDefinitionParser("expires", new HttpResponseDefinitionParser("header"));
+        registerMuleBeanDefinitionParser("transfer-encoding", new HttpResponseDefinitionParser("header"));
+
+
+
+
     }
 }

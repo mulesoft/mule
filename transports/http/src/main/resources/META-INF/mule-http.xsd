@@ -432,4 +432,407 @@
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
+
+    <xsd:element name="response" substitutionGroup="mule:abstract-message-processor">
+        <xsd:annotation>
+            <xsd:documentation>
+                HTTP response
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexType>
+            <xsd:complexContent>
+                <xsd:extension base="mule:abstractTransformerType">
+                    <xsd:sequence>
+                        <xsd:element name="allow" minOccurs="0" maxOccurs="1" type="headerType"/>
+                        <xsd:element name="cache-control" minOccurs="0" maxOccurs="1" type="headerType"/>
+                        <xsd:element name="connection" minOccurs="0" maxOccurs="1" type="headerType"/>
+                        <xsd:element name="content-encoding" minOccurs="0" maxOccurs="1" type="headerType"/>
+                        <xsd:element name="expires" minOccurs="0" maxOccurs="1" type="headerType"/>
+                        <xsd:element name="location" minOccurs="0" maxOccurs="1" type="headerType"/>
+                        <xsd:element name="transfer-encoding" minOccurs="0" maxOccurs="1" type="headerType"/>
+                        <xsd:element name="set-cookie" minOccurs="0" maxOccurs="unbounded" type="cookieType"/>
+                        <xsd:element name="header" minOccurs="0" maxOccurs="unbounded" type="mule:nameValueType"/>
+                        <xsd:element name="body" minOccurs="0" maxOccurs="1" type="xsd:string"/>
+                    </xsd:sequence>
+                    <xsd:attribute name="status" type="statusType">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                HTTP status code of the response
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:attribute>
+                    <xsd:attribute name="contentType" type="xsd:string">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                The content type of the response
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:attribute>
+                    <xsd:attribute name="version" default="1.0">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                The content type of the response
+                            </xsd:documentation>
+                        </xsd:annotation>
+                        <xsd:simpleType>
+                            <xsd:union>
+                                <xsd:simpleType>
+                                    <xsd:restriction base="xsd:string"/>
+                                </xsd:simpleType>
+                                <xsd:simpleType>
+                                    <xsd:restriction base="xsd:NMTOKEN">
+                                        <xsd:enumeration value="1.0"/>
+                                        <xsd:enumeration value="1.1"/>
+                                    </xsd:restriction>
+                                </xsd:simpleType>
+                            </xsd:union>
+                        </xsd:simpleType>
+                    </xsd:attribute>
+                </xsd:extension>
+            </xsd:complexContent>
+        </xsd:complexType>
+    </xsd:element>
+
+     <xsd:complexType name="headerType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:annotatedType">
+               <xsd:attribute name="value" type="xsd:string" />
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="cookieType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:annotatedType">
+                <xsd:attribute name="name" type="xsd:string" use="required"/>
+                <xsd:attribute name="value" type="xsd:string" use="required"/>
+                <xsd:attribute name="domain" type="xsd:string" use="optional"/>
+                <xsd:attribute name="path" type="xsd:string" use="optional"/>
+                <xsd:attribute name="expiryDate" type="xsd:string" use="optional">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Indicates the exact date/time when the cookie expires. It is specified in the form of "Wdy, DD Mon YYYY HH:MM:SS GMT"
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="maxAge" type="mule:substitutableInt" use="optional"/>
+                <xsd:attribute name="secure" type="mule:substitutableBoolean" use="optional" default="false"/>
+                <xsd:attribute name="version" type="mule:substitutableInt" use="optional"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+
+    <xsd:simpleType name="statusType">
+        <xsd:union>
+            <xsd:simpleType>
+                <xsd:restriction base="mule:substitutableInt">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The Status Code of the HTTP response.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:restriction>
+            </xsd:simpleType>
+            <xsd:simpleType>
+                <xsd:restriction base="xsd:NMTOKEN">
+                    <xsd:enumeration value="100">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Continue
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="101">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                               Switching Protocol
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="200">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                OK
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="201">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                               Created
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="202">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Accepted
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="203">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                               Non-Authoritative Information
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="204">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                No Content
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="205">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                               Reset Content
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="100">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Continue
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="206">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                               Partial Content
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="300">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Multiple Choices
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="301">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                               Moved Permanently
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="302">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Found
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="303">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                               See Other
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="304">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Not Modified
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="305">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                               Use Proxy
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="307">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Temporary Redirect
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="400">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                               Bad Request
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="401">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Unauthorized
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="402">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                               Payment Required
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="403">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Forbidden
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="404">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                               Not Found
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="405">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Method Not Allowed
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="406">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                               Not Acceptable
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="407">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Proxy Authentication Required
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="408">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                               Request Timeout
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="409">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Conflict
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="410">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                               Gone
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="411">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Length Required
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="412">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                               Precondition Failed
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="413">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Request Entity Too Large
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="414">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                               Request-URI too long
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="415">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Unsupported Media Type
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="416">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                               Requested Range Not Satisfiable
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="417">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Expectation Failed
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="500">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                               Internal Server Error
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="501">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Not Implemented
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="502">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                               Bad Gateway
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="503">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Service Unavailable
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="504">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                               Gateway Timeout
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="300">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Multiple Choices
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="505">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                               HTTP Version Not Supported
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:enumeration>
+                </xsd:restriction>
+            </xsd:simpleType>
+        </xsd:union>
+    </xsd:simpleType>
+
 </xsd:schema>
