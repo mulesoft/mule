@@ -16,6 +16,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -560,6 +561,26 @@ public final class ExceptionHelper
     {
         exceptionReaders.add(reader);
     }
+    
+    public static <T> T traverseCauseHierarchy(Throwable e, ExceptionEvaluator<T> evaluator)
+    {
+        LinkedList<Throwable> exceptions = new LinkedList<Throwable>();
+        exceptions.add(e);
+        while (e.getCause() != null && !e.getCause().equals(e))
+        {
+            exceptions.addFirst(e.getCause());
+            e = e.getCause();
+        }
+        for (Throwable exception : exceptions)
+        {
+            T value = evaluator.evaluate(exception);
+            if (value != null)
+            {
+                return value;
+            }
+        }
+        return null;
+    }
 
     /**
      * Gets an exception reader for the exception
@@ -596,5 +617,10 @@ public final class ExceptionHelper
         }
         return t;
 
+    }
+    
+    public static interface ExceptionEvaluator<T> 
+    {
+        T evaluate(Throwable e);
     }
 }

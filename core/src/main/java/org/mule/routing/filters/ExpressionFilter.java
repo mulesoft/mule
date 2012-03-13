@@ -171,13 +171,22 @@ public class ExpressionFilter implements Filter, MuleContextAware
             }
             else if (config.getEvaluator().equals("exception-type"))
             {
-                if (StringUtils.isEmpty(config.getExpression()))
+                try
                 {
-                    delegateFilter = new ExceptionTypeFilter();
+                    if (StringUtils.isEmpty(config.getExpression()))
+                    {
+                        delegateFilter = new ExceptionTypeFilter();
+                    }
+                    else
+                    {
+                        delegateFilter = new ExceptionTypeFilter(config.getExpression());
+                    }
                 }
-                else
+                catch (ClassNotFoundException e)
                 {
-                    delegateFilter = new ExceptionTypeFilter(config.getExpression());
+                    IllegalArgumentException iae = new IllegalArgumentException();
+                    iae.initCause(e);
+                    throw iae;
                 }
             }
             else

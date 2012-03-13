@@ -14,6 +14,8 @@ import org.mule.config.ExceptionHelper;
 import org.mule.config.MuleManifest;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.Message;
+import org.mule.routing.filters.RegExFilter;
+import org.mule.routing.filters.WildcardFilter;
 import org.mule.transport.NullPayload;
 import org.mule.util.StringUtils;
 
@@ -167,18 +169,24 @@ public class MessagingException extends MuleException
      * @param e exception type to check against
      * @return true if the cause exception is an instance of the provided exception type
      */
-    public boolean causedBy(Class e)
+    public boolean causedBy(final Class e)
     {
         if (e == null)
         {
             throw new IllegalArgumentException("Class cannot be null");
         }
-        Throwable rootException = ExceptionHelper.getRootException(this);
-        if (rootException != null)
+        return (ExceptionHelper.traverseCauseHierarchy(this, new ExceptionHelper.ExceptionEvaluator<Object>()
         {
-            return e.isAssignableFrom(rootException.getClass());
-        }
-        return false;
+            @Override
+            public Object evaluate(Throwable causeException)
+            {
+                if (e.isAssignableFrom(causeException.getClass()))
+                {
+                    return causeException;
+                }
+                return null;
+            }
+        }) != null);
     }
 
     /**
@@ -189,18 +197,24 @@ public class MessagingException extends MuleException
      * @param e exception type to check against
      * @return true if the cause exception is exaclty the provided exception type
      */
-    public boolean causedExactlyBy(Class e)
+    public boolean causedExactlyBy(final Class e)
     {
         if (e == null)
         {
             throw new IllegalArgumentException("Class cannot be null");
         }
-        Throwable rootException = ExceptionHelper.getRootException(this);
-        if (rootException == null)
+        return (ExceptionHelper.traverseCauseHierarchy(this, new ExceptionHelper.ExceptionEvaluator<Object>()
         {
-            rootException = this;
-        }
-        return e.equals(rootException.getClass());
+            @Override
+            public Object evaluate(Throwable causeException)
+            {
+                if (causeException.getClass().equals(e))
+                {
+                    return causeException;
+                }
+                return null;
+            }
+        }) != null);
     }
 
     /**
@@ -216,18 +230,45 @@ public class MessagingException extends MuleException
         return (Exception) rootException;
     }
 
-    public boolean matches(String regex)
+    /**
+     * Checks the cause exception type name matches the provided regex.
+     *
+     * Supports any java regex plus *, * prefix, * sufix
+     *
+     * @param regex regular expression to match against the exception type name
+     * @return true if the exception matches the regex, false otherwise
+     */
+    public boolean causeMatches(final String regex)
     {
         if (regex == null)
         {
             throw new IllegalArgumentException("regex cannot be null");
         }
-        Throwable rootException = ExceptionHelper.getRootException(this);
-        if (rootException == null)
+        return (ExceptionHelper.traverseCauseHierarchy(this,new ExceptionHelper.ExceptionEvaluator<Object>()
         {
-            return false;
-        }
-        return false;
+            @Override
+            public Object evaluate(Throwable e)
+            {
+                WildcardFilter wildcardFilter = new WildcardFilter(regex);
+                if (wildcardFilter.accept(e.getClass().getName()))
+                {
+                    return e;
+                }
+                try
+                {
+                    RegExFilter regExFilter = new RegExFilter(regex);
+                    if (regExFilter.accept(e.getClass().getName()))
+                    {
+                        return e;
+                    }
+                }
+                catch (Exception regexEx)
+                {
+                    //Do nothing, regex such as *, *something, something* will fail, just don't match
+                }
+                return null;
+            }
+        })) != null;
     }
 
     /**

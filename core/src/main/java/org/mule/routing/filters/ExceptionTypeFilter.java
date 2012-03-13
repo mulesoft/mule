@@ -12,7 +12,6 @@ package org.mule.routing.filters;
 
 import org.mule.api.ExceptionPayload;
 import org.mule.api.MuleMessage;
-import org.mule.config.ExceptionHelper;
 import org.mule.util.ClassUtils;
 
 /**
@@ -23,25 +22,15 @@ import org.mule.util.ClassUtils;
 public class ExceptionTypeFilter extends PayloadTypeFilter
 {
 
-    private String expression;
-
     public ExceptionTypeFilter()
     {
         super();
     }
 
 
-    public ExceptionTypeFilter(String expectedType)
+    public ExceptionTypeFilter(String expectedType) throws ClassNotFoundException
     {
-        try 
-        {
-            Class exceptionType = ClassUtils.loadClass(expectedType, ExceptionTypeFilter.class);
-            setExpectedType(exceptionType);
-        } 
-        catch (ClassNotFoundException e)
-        {
-            this.expression = expectedType;            
-        }
+        this(ClassUtils.loadClass(expectedType, ExceptionTypeFilter.class));
     }
 
     public ExceptionTypeFilter(Class expectedType)
@@ -59,32 +48,13 @@ public class ExceptionTypeFilter extends PayloadTypeFilter
     {
         ExceptionPayload epl = message.getExceptionPayload();
 
-        if (getExpectedType() == null && this.expression == null)
+        if (getExpectedType() == null)
         {
             return epl != null;
         }
         else if (epl != null)
         {
-            Throwable wrappedException = ExceptionHelper.getNonMuleException(epl.getException());
-            if (getExpectedType() != null)
-            {
-                //Exception type configured
-                return getExpectedType().isAssignableFrom(epl.getException().getClass()) || (wrappedException != null && getExpectedType().isAssignableFrom(wrappedException.getClass()));
-            }
-            else 
-            {
-                //Expression configured
-                if (expression.startsWith("="))
-                {
-                    String expectedType = expression.substring(1, expression.length());
-                    return epl.getException().getClass().getName().equals(expectedType) || (wrappedException != null && wrappedException.getClass().getName().equals(expectedType));
-                }
-                else
-                {
-                    RegExFilter regExFilter = new RegExFilter(expression);
-                    return regExFilter.accept(epl.getException().getClass().getName()) || (wrappedException != null && regExFilter.accept(wrappedException.getClass().getName()));
-                }
-            }
+            return getExpectedType().isAssignableFrom(epl.getException().getClass());
         }
         else
         {

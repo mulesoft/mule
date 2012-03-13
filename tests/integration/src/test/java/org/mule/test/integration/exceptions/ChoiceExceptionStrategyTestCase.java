@@ -47,7 +47,7 @@ public class ChoiceExceptionStrategyTestCase extends FunctionalTestCase
     @Test
     public void testMatchesCorrectExceptionStrategyUsingWrapperAndCause() throws Exception
     {
-        callVmAndThrowException(new ResolverException(CoreMessages.createStaticMessage(""), new IllegalStateException(new NullPointerException())), "0 catch-2");
+        callVmAndThrowException(new ResolverException(CoreMessages.createStaticMessage(""), new RuntimeException(new IllegalStateException())), "0 catch-2");
     }
 
     @Test
@@ -78,6 +78,24 @@ public class ChoiceExceptionStrategyTestCase extends FunctionalTestCase
     public void testMatchesCorrectExceptionStrategyUsingGroovyExpressionEvaluator() throws Exception
     {
         callVmAndThrowException("groovy", new SQLDataException(), "groovy catch-6");
+    }
+
+    @Test
+    public void testMatchesCorrectExceptionStrategyUsingStartsWithWildcard() throws Exception
+    {
+        callVmAndThrowException(new StartsWithException(), "0 catch-7");
+    }
+
+    @Test
+    public void testMatchesCorrectExceptionStrategyUsingFinishesWithWildcard() throws Exception
+    {
+        callVmAndThrowException(new ThisExceptionFinishesWithException(), "0 catch-8");
+    }
+
+    @Test
+    public void testMatchesCorrectExceptionStrategyUsingMatchesAll() throws Exception
+    {
+        callVmAndThrowException(new AnotherTotallyDifferentKindOfException(), "0 catch-9");
     }
 
     @Test
@@ -126,6 +144,18 @@ public class ChoiceExceptionStrategyTestCase extends FunctionalTestCase
     }
 
     public static class AnotherTypeMyException extends Exception
+    {
+    }
+
+    public static class StartsWithException extends Exception
+    {
+    }
+
+    public static class ThisExceptionFinishesWithException extends Exception
+    {
+    }
+
+    public static class AnotherTotallyDifferentKindOfException extends Exception
     {
     }
 }

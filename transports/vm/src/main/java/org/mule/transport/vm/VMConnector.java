@@ -257,7 +257,7 @@ public class VMConnector extends AbstractConnector
     public void bindXaResourceIfRequired() throws TransactionException
     {
         Transaction tx = TransactionCoordination.getInstance().getTransaction();
-        if (xaResourceFactory != null && tx instanceof XaTransaction)
+        if (xaResourceFactory != null && tx instanceof XaTransaction && !tx.hasResource(this))
         {
             tx.bindResource(this, xaResourceFactory.create());
         }

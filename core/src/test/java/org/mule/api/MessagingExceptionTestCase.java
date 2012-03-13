@@ -91,7 +91,7 @@ public class MessagingExceptionTestCase extends AbstractMuleTestCase
         DefaultMuleException causeException = new DefaultMuleException(causeCauseException);
         MessagingException exception = new MessagingException(CoreMessages.createStaticMessage(""),mockEvent,causeException);
         assertThat(exception.causedBy(DefaultMuleException.class), is(true));
-        assertThat(exception.causedBy(MessagingException.class), is(false));
+        assertThat(exception.causedBy(MessagingException.class), is(true));
     }
 
     @Test
@@ -100,8 +100,9 @@ public class MessagingExceptionTestCase extends AbstractMuleTestCase
         IOException causeException = new IOException("");
         MessagingException exception = new MessagingException(CoreMessages.createStaticMessage(""),mockEvent,causeException);
         assertThat(exception.causedBy(IOException.class), is(true));
-        assertThat(exception.causedBy(MessagingException.class), is(false));
+        assertThat(exception.causedBy(MessagingException.class), is(true));
         assertThat(exception.causedBy(Exception.class), is(true));
+        assertThat(exception.causedBy(NullPointerException.class), is(false));
     }
 
     @Test
@@ -110,10 +111,10 @@ public class MessagingExceptionTestCase extends AbstractMuleTestCase
         ConnectException causeCauseException = new ConnectException();
         IOException causeException = new IOException(causeCauseException);
         MessagingException exception = new MessagingException(CoreMessages.createStaticMessage(""),mockEvent,causeException);
-        assertThat(exception.causedBy(ConnectException.class), is(true));
+        assertThat(exception.causedBy(NullPointerException.class), is(false));
         assertThat(exception.causedBy(SocketException.class), is(true));
         assertThat(exception.causedBy(IOException.class), is(true));
-        assertThat(exception.causedBy(MessagingException.class), is(false));
+        assertThat(exception.causedBy(MessagingException.class), is(true));
     }
 
     @Test
@@ -133,7 +134,7 @@ public class MessagingExceptionTestCase extends AbstractMuleTestCase
         DefaultMuleException causeException = new DefaultMuleException(causeCauseException);
         MessagingException exception = new MessagingException(CoreMessages.createStaticMessage(""),mockEvent,causeException);
         assertThat(exception.causedExactlyBy(DefaultMuleException.class), is(true));
-        assertThat(exception.causedExactlyBy(MessagingException.class), is(false));
+        assertThat(exception.causedExactlyBy(MessagingException.class), is(true));
     }
 
     @Test
@@ -142,8 +143,9 @@ public class MessagingExceptionTestCase extends AbstractMuleTestCase
         IOException causeException = new IOException("");
         MessagingException exception = new MessagingException(CoreMessages.createStaticMessage(""),mockEvent,causeException);
         assertThat(exception.causedExactlyBy(IOException.class), is(true));
-        assertThat(exception.causedExactlyBy(MessagingException.class), is(false));
+        assertThat(exception.causedExactlyBy(MessagingException.class), is(true));
         assertThat(exception.causedExactlyBy(Exception.class), is(false));
+        assertThat(exception.causedExactlyBy(NullPointerException.class), is(false));
     }
 
     @Test
@@ -154,7 +156,7 @@ public class MessagingExceptionTestCase extends AbstractMuleTestCase
         MessagingException exception = new MessagingException(CoreMessages.createStaticMessage(""),mockEvent,causeException);
         assertThat(exception.causedExactlyBy(ConnectException.class), is(true));
         assertThat(exception.causedExactlyBy(SocketException.class), is(false));
-        assertThat(exception.causedExactlyBy(IOException.class), is(false));
-        assertThat(exception.causedExactlyBy(MessagingException.class), is(false));
+        assertThat(exception.causedExactlyBy(IOException.class), is(true));
+        assertThat(exception.causedExactlyBy(MessagingException.class), is(true));
     }
 }
