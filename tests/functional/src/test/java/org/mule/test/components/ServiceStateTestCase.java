@@ -10,6 +10,7 @@
 
 package org.mule.test.components;
 
+import org.mule.api.MessagingException;
 import org.mule.api.MuleException;
 import org.mule.api.lifecycle.LifecycleException;
 import org.mule.api.service.Service;
@@ -131,9 +132,9 @@ public class ServiceStateTestCase extends FunctionalTestCase
             c.dispatchEvent(getTestEvent("hello", c));
             fail();
         }
-        catch (LifecycleException e)
+        catch (MessagingException e)
         {
-            // expected
+            assertTrue(e.getCause() instanceof LifecycleException);
         }
 
         try
@@ -141,9 +142,9 @@ public class ServiceStateTestCase extends FunctionalTestCase
             c.sendEvent(getTestEvent("hello", c));
             fail();
         }
-        catch (LifecycleException e)
+        catch (MessagingException e)
         {
-            // expected
+            assertTrue(e.getCause() instanceof LifecycleException);
         }
     }
 
