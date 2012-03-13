@@ -16,10 +16,10 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.execution.ExecutionCallback;
+import org.mule.api.execution.ExecutionTemplate;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.transport.Connector;
-import org.mule.process.ProcessingCallback;
-import org.mule.process.ProcessingTemplate;
 import org.mule.transport.AbstractPollingMessageReceiver;
 
 import org.jivesoftware.smack.packet.Message;
@@ -90,10 +90,10 @@ public class XmppPollingMessageReceiver extends AbstractPollingMessageReceiver
 
     protected void processMessage(final Message xmppMessage) throws MuleException
     {
-        ProcessingTemplate<MuleEvent> processingTemplate = createProcessingTemplate();
+        ExecutionTemplate<MuleEvent> executionTemplate = createExecutionTemplate();
         try
         {
-            processingTemplate.execute(new ProcessingCallback<MuleEvent>()
+            executionTemplate.execute(new ExecutionCallback<MuleEvent>()
             {
                 @Override
                 public MuleEvent process() throws Exception

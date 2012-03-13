@@ -1823,10 +1823,10 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="expression" type="xsd:string" use="optional">
+                <xsd:attribute name="when" type="xsd:string" use="optional">
                     <xsd:annotation>
                         <xsd:documentation>
-                            The expression that will be evaluated to determine if this expcetion strategy should be executed. This should always be a boolean expression.
+                            The expression that will be evaluated to determine if this exception strategy should be executed. This should always be a boolean expression.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>

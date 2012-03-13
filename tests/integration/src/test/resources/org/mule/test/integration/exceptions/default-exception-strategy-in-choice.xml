@@ -7,7 +7,7 @@
     <flow name="flowA">
         <logger/>
         <choice-exception-strategy name="choice">
-            <catch-exception-strategy expression="#[exception-type:java.lang.NullPointerException]"/>
+            <catch-exception-strategy when="#[exception-type:java.lang.NullPointerException]"/>
             <defaul-exception-strategy/>
         </choice-exception-strategy>
     </flow>

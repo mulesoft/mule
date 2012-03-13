@@ -17,8 +17,8 @@ import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transport.Connector;
-import org.mule.process.ProcessingCallback;
-import org.mule.process.ProcessingTemplate;
+import org.mule.api.execution.ExecutionCallback;
+import org.mule.api.execution.ExecutionTemplate;
 import org.mule.retry.policies.NoRetryPolicyTemplate;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.transaction.XaTransaction;
@@ -159,8 +159,8 @@ public class XaTransactedJmsMessageReceiver extends TransactedPollingMessageRece
     {
         logger.debug("Polling...");
 
-        ProcessingTemplate<MuleEvent> processingCallback = createProcessingTemplate();
-        ProcessingCallback<MuleEvent> cb = new ProcessingCallback<MuleEvent>()
+        ExecutionTemplate<MuleEvent> processingCallback = createExecutionTemplate();
+        ExecutionCallback<MuleEvent> cb = new ExecutionCallback<MuleEvent>()
         {
             @Override
             public MuleEvent process() throws Exception

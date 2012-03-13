@@ -19,9 +19,9 @@ import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.transport.DispatchException;
 import org.mule.api.transport.NoReceiverForEndpointException;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.process.ProcessingCallback;
-import org.mule.process.ProcessingTemplate;
-import org.mule.process.TransactionalProcessingTemplate;
+import org.mule.api.execution.ExecutionCallback;
+import org.mule.api.execution.ExecutionTemplate;
+import org.mule.execution.TransactionalExecutionTemplate;
 import org.mule.transport.AbstractMessageDispatcher;
 import org.mule.transport.vm.i18n.VMMessages;
 import org.mule.util.queue.Queue;
@@ -88,16 +88,16 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher
 
         MuleEvent eventToSend = DefaultMuleEvent.copy(event);
         final MuleMessage message = eventToSend.getMessage().createInboundMessage();
-        ProcessingTemplate<MuleMessage> processingTemplate = TransactionalProcessingTemplate.createTransactionalProcessingTemplate(
+        ExecutionTemplate<MuleMessage> executionTemplate = TransactionalExecutionTemplate.createTransactionalExecutionTemplate(
                 event.getMuleContext(), receiver.getEndpoint().getTransactionConfig());
-        ProcessingCallback<MuleMessage> processingCallback = new ProcessingCallback<MuleMessage>()
+        ExecutionCallback<MuleMessage> processingCallback = new ExecutionCallback<MuleMessage>()
         {
             public MuleMessage process() throws Exception
             {
                 return receiver.onCall(message);
             }
         };
-        retMessage = processingTemplate.execute(processingCallback);
+        retMessage = executionTemplate.execute(processingCallback);
 
         if (logger.isDebugEnabled())
         {

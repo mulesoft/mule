@@ -14,10 +14,10 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
+import org.mule.api.execution.ExecutionCallback;
 import org.mule.api.transport.PropertyScope;
 import org.mule.component.ComponentException;
-import org.mule.process.ErrorHandlingProcessingTemplate;
-import org.mule.process.ProcessingCallback;
+import org.mule.execution.ErrorHandlingExecutionTemplate;
 import org.mule.transport.NullPayload;
 
 import java.lang.reflect.Method;
@@ -79,8 +79,8 @@ public class MuleInvoker implements Invoker
                 reqMsg.setProperty(CxfConstants.INBOUND_SERVICE, svc.getName(), PropertyScope.INVOCATION);
             }
 
-            ErrorHandlingProcessingTemplate errorHandlingProcessingTemplate = ErrorHandlingProcessingTemplate.createErrorHandlingProcessingTemplate(event.getMuleContext(), event.getFlowConstruct().getExceptionListener());
-            responseEvent = errorHandlingProcessingTemplate.execute(new ProcessingCallback<MuleEvent>()
+            ErrorHandlingExecutionTemplate errorHandlingExecutionTemplate = ErrorHandlingExecutionTemplate.createErrorHandlingExecutionTemplate(event.getMuleContext(), event.getFlowConstruct().getExceptionListener());
+            responseEvent = errorHandlingExecutionTemplate.execute(new ExecutionCallback<MuleEvent>()
             {
                 @Override
                 public MuleEvent process() throws Exception

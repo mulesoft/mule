@@ -10,7 +10,7 @@
        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
-    <catch-exception-strategy name="global-catch" expression="#[exception-type:java.lang.ArithmeticException]">
+    <catch-exception-strategy name="global-catch" when="#[exception-type:java.lang.ArithmeticException]">
         <append-string-transformer message=" global catch es"/>
     </catch-exception-strategy>
 
@@ -18,22 +18,22 @@
         <vm:inbound-endpoint path="in" exchange-pattern="request-response"/>
         <test:component/>
         <choice-exception-strategy>
-            <catch-exception-strategy expression="#[exception-type:java.lang.IllegalArgumentException]">
+            <catch-exception-strategy when="#[exception-type:java.lang.IllegalArgumentException]">
                 <append-string-transformer message=" catch-1"/>
             </catch-exception-strategy>
-            <catch-exception-strategy expression="#[exception-type:java.lang.IllegalStateException]">
+            <catch-exception-strategy when="#[exception-type:java.lang.IllegalStateException]">
                 <append-string-transformer message=" catch-2"/>
             </catch-exception-strategy>
-            <catch-exception-strategy expression="#[exception-type:=org.mule.test.integration.exceptions.ChoiceExceptionStrategyTestCase$BaseException]">
+            <catch-exception-strategy when="#[exception-type:=org.mule.test.integration.exceptions.ChoiceExceptionStrategyTestCase$BaseException]">
                 <append-string-transformer message=" catch-3"/>
             </catch-exception-strategy>
-            <catch-exception-strategy expression="#[exception-type:org.mule.test.integration.exceptions.ChoiceExceptionStrategyTestCase$SubtypeException]">
+            <catch-exception-strategy when="#[exception-type:org.mule.test.integration.exceptions.ChoiceExceptionStrategyTestCase$SubtypeException]">
                 <append-string-transformer message=" catch-4"/>
             </catch-exception-strategy>
-            <catch-exception-strategy expression="#[exception-type:(.*)mule.test.integration.(.*).ChoiceExceptionStrategyTestCase(.*)MyException]">
+            <catch-exception-strategy when="#[exception-type:(.*)mule.test.integration.(.*).ChoiceExceptionStrategyTestCase(.*)MyException]">
                 <append-string-transformer message=" catch-5"/>
             </catch-exception-strategy>
-            <catch-exception-strategy expression="#[groovy:payload == 'groovy']">
+            <catch-exception-strategy when="#[groovy:payload == 'groovy']">
                 <append-string-transformer message=" catch-6"/>
             </catch-exception-strategy>
             <exception-strategy ref="global-catch"/>

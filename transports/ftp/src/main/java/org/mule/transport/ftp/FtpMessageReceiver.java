@@ -15,12 +15,12 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.execution.ExecutionCallback;
+import org.mule.api.execution.ExecutionTemplate;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.retry.RetryContext;
 import org.mule.api.transport.Connector;
-import org.mule.process.ProcessingCallback;
-import org.mule.process.ProcessingTemplate;
 import org.mule.transport.AbstractPollingMessageReceiver;
 
 import java.io.FilenameFilter;
@@ -277,8 +277,8 @@ public class FtpMessageReceiver extends AbstractPollingMessageReceiver
                 FtpMuleMessageFactory muleMessageFactory = createMuleMessageFactory(finalClient);
                 final MuleMessage finalMessage = muleMessageFactory.create(file, endpoint.getEncoding());
                 muleMessage = finalMessage;
-                ProcessingTemplate<MuleEvent> processingTemplate = createProcessingTemplate();
-                processingTemplate.execute(new ProcessingCallback<MuleEvent> ()
+                ExecutionTemplate<MuleEvent> executionTemplate = createExecutionTemplate();
+                executionTemplate.execute(new ExecutionCallback<MuleEvent>()
                 {
                     @Override
                     public MuleEvent process() throws Exception

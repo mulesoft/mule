@@ -15,9 +15,9 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.execution.ExecutionCallback;
+import org.mule.api.execution.ExecutionTemplate;
 import org.mule.api.lifecycle.CreateException;
-import org.mule.process.ProcessingCallback;
-import org.mule.process.ProcessingTemplate;
 import org.mule.transport.AbstractPollingMessageReceiver;
 import org.mule.transport.sftp.notification.SftpNotifier;
 
@@ -105,8 +105,8 @@ public class SftpMessageReceiver extends AbstractPollingMessageReceiver
 
     protected void routeFile(final String path) throws Exception
     {
-        ProcessingTemplate<MuleEvent> processingTemplate = createProcessingTemplate();
-        processingTemplate.execute(new ProcessingCallback<MuleEvent> ()
+        ExecutionTemplate<MuleEvent> executionTemplate = createExecutionTemplate();
+        executionTemplate.execute(new ExecutionCallback<MuleEvent>()
         {
             @Override
             public MuleEvent process() throws Exception
@@ -114,7 +114,7 @@ public class SftpMessageReceiver extends AbstractPollingMessageReceiver
                 // A bit tricky initialization of the notifier in this case since we don't
                 // have access to the message yet...
                 SftpNotifier notifier = new SftpNotifier((SftpConnector) connector, createNullMuleMessage(),
-                    endpoint, flowConstruct.getName());
+                        endpoint, flowConstruct.getName());
 
                 InputStream inputStream = sftpRRUtil.retrieveFile(path, notifier);
 

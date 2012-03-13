@@ -216,6 +216,20 @@ public class MessagingException extends MuleException
         return (Exception) rootException;
     }
 
+    public boolean matches(String regex)
+    {
+        if (regex == null)
+        {
+            throw new IllegalArgumentException("regex cannot be null");
+        }
+        Throwable rootException = ExceptionHelper.getRootException(this);
+        if (rootException == null)
+        {
+            return false;
+        }
+        return false;
+    }
+
     /**
      * Signals if the exception cause rollback of any current transaction if any
      * or if the message source should rollback incoming message

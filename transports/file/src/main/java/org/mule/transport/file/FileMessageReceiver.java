@@ -22,8 +22,8 @@ import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.transport.Connector;
 import org.mule.api.transport.PropertyScope;
-import org.mule.process.ProcessingCallback;
-import org.mule.process.ProcessingTemplate;
+import org.mule.api.execution.ExecutionCallback;
+import org.mule.api.execution.ExecutionTemplate;
 import org.mule.transport.AbstractPollingMessageReceiver;
 import org.mule.transport.ConnectException;
 import org.mule.transport.file.i18n.FileMessages;
@@ -308,24 +308,24 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
 
         final Object originalPayload = message.getPayload();
 
-        ProcessingTemplate<MuleEvent> processingTemplate = createProcessingTemplate();
+        ExecutionTemplate<MuleEvent> executionTemplate = createExecutionTemplate();
         final MuleMessage finalMessage = message;
 
         if (fileConnector.isStreaming())
         {
-            processWithStreaming(sourceFile, (ReceiverFileInputStream) originalPayload, processingTemplate, finalMessage);
+            processWithStreaming(sourceFile, (ReceiverFileInputStream) originalPayload, executionTemplate, finalMessage);
         }
         else
         {
-            processWithoutStreaming(originalSourceFile, originalSourceFileName, sourceFile, destinationFile, processingTemplate, finalMessage);
+            processWithoutStreaming(originalSourceFile, originalSourceFileName, sourceFile, destinationFile, executionTemplate, finalMessage);
         }
     }
 
-    private void processWithoutStreaming(String originalSourceFile, final String originalSourceFileName, final File sourceFile,final File destinationFile, ProcessingTemplate<MuleEvent> processingTemplate, final MuleMessage finalMessage) throws DefaultMuleException
+    private void processWithoutStreaming(String originalSourceFile, final String originalSourceFileName, final File sourceFile,final File destinationFile, ExecutionTemplate<MuleEvent> executionTemplate, final MuleMessage finalMessage) throws DefaultMuleException
     {
         try
         {
-            processingTemplate.execute(new ProcessingCallback<MuleEvent>()
+            executionTemplate.execute(new ExecutionCallback<MuleEvent>()
             {
                 @Override
                 public MuleEvent process() throws Exception
@@ -354,11 +354,11 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
         }
     }
 
-    private void processWithStreaming(final File sourceFile, final ReceiverFileInputStream originalPayload, ProcessingTemplate<MuleEvent> processingTemplate, final MuleMessage finalMessage)
+    private void processWithStreaming(final File sourceFile, final ReceiverFileInputStream originalPayload, ExecutionTemplate<MuleEvent> executionTemplate, final MuleMessage finalMessage)
     {
         try
         {
-            processingTemplate.execute(new ProcessingCallback<MuleEvent>()
+            executionTemplate.execute(new ExecutionCallback<MuleEvent>()
             {
                 @Override
                 public MuleEvent process() throws Exception
@@ -369,8 +369,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
                         // stream is closed
                         finalMessage.setOutboundProperty(FileConnector.PROPERTY_FILENAME, sourceFile.getName());
                         FileMessageReceiver.this.routeMessage(finalMessage);
-                    }
-                    catch (Exception e)
+                    } catch (Exception e)
                     {
                         //ES will try to close stream but FileMessageReceiver is the one that must close it.
                         originalPayload.setStreamProcessingError(true);

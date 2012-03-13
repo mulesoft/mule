@@ -15,10 +15,10 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 
+import org.mule.api.execution.ExecutionCallback;
+import org.mule.api.execution.ExecutionTemplate;
 import org.mule.api.transaction.TransactionConfig;
 import org.mule.module.client.MuleClient;
-import org.mule.process.ProcessingCallback;
-import org.mule.process.ProcessingTemplate;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -57,7 +57,7 @@ public class NoExternalTransactionTestCase extends AbstractExternalTransactionTe
     public void testBeginOrJoinTransaction() throws Exception
     {
         init();
-        ProcessingTemplate<String> processingTemplate = createProcessingTemplate(TransactionConfig.ACTION_BEGIN_OR_JOIN, false);
+        ExecutionTemplate<String> executionTemplate = createExecutionTemplate(TransactionConfig.ACTION_BEGIN_OR_JOIN, false);
 
         logger.debug("TM is a " + tm.getClass().toString());
         tm.begin();
@@ -72,7 +72,7 @@ public class NoExternalTransactionTestCase extends AbstractExternalTransactionTe
         // This will throw, becasue nested transactions are not supported
         try
         {
-            result = processingTemplate.execute(new ProcessingCallback<String> ()
+            result = executionTemplate.execute(new ExecutionCallback<String>()
             {
                 public String process() throws Exception
                 {
@@ -89,7 +89,7 @@ public class NoExternalTransactionTestCase extends AbstractExternalTransactionTe
         tm.rollback();
 
         // now try with no active transaction
-        result = processingTemplate.execute(new ProcessingCallback<String>()
+        result = executionTemplate.execute(new ExecutionCallback<String>()
         {
             public String process() throws Exception
             {
@@ -108,7 +108,7 @@ public class NoExternalTransactionTestCase extends AbstractExternalTransactionTe
     public void testBeginTransaction() throws Exception
     {
         init();
-        ProcessingTemplate<String> tt = createProcessingTemplate(TransactionConfig.ACTION_ALWAYS_BEGIN, false);
+        ExecutionTemplate<String> tt = createExecutionTemplate(TransactionConfig.ACTION_ALWAYS_BEGIN, false);
 
         tm.begin();
         final Transaction tx = tm.getTransaction();
@@ -122,7 +122,7 @@ public class NoExternalTransactionTestCase extends AbstractExternalTransactionTe
         // This will throw, because nested transactions are not supported
         try
         {
-            result = tt.execute(new ProcessingCallback<String>()
+            result = tt.execute(new ExecutionCallback<String>()
             {
                 public String process() throws Exception
                 {
@@ -139,7 +139,7 @@ public class NoExternalTransactionTestCase extends AbstractExternalTransactionTe
         tm.rollback();
 
         // now try with no active transaction
-        result = tt.execute(new ProcessingCallback<String>()
+        result = tt.execute(new ExecutionCallback<String>()
         {
             public String process() throws Exception
             {
@@ -158,7 +158,7 @@ public class NoExternalTransactionTestCase extends AbstractExternalTransactionTe
     public void testNoTransactionProcessing() throws Exception
     {
         init();
-        ProcessingTemplate<String> tt = createProcessingTemplate(TransactionConfig.ACTION_NONE, false);
+        ExecutionTemplate<String> tt = createExecutionTemplate(TransactionConfig.ACTION_NONE, false);
 
         tm.begin();
         final Transaction tx = tm.getTransaction();
@@ -167,7 +167,7 @@ public class NoExternalTransactionTestCase extends AbstractExternalTransactionTe
         assertNotNull(tx);
         tx.enlistResource(resource1);
         resource1.setValue(14);
-        String result = tt.execute(new ProcessingCallback<String>()
+        String result = tt.execute(new ExecutionCallback<String>()
         {
             public String process() throws Exception
             {
@@ -186,7 +186,7 @@ public class NoExternalTransactionTestCase extends AbstractExternalTransactionTe
         // Now it's committed
         assertEquals(14, resource1.getPersistentValue());
 
-        result = tt.execute(new ProcessingCallback<String>()
+        result = tt.execute(new ExecutionCallback<String>()
         {
             public String process() throws Exception
             {
@@ -201,7 +201,7 @@ public class NoExternalTransactionTestCase extends AbstractExternalTransactionTe
     public void testAlwaysJoinTransaction() throws Exception
     {
         init();
-        ProcessingTemplate<String> processingTemplate = createProcessingTemplate(TransactionConfig.ACTION_ALWAYS_JOIN, false);
+        ExecutionTemplate<String> executionTemplate = createExecutionTemplate(TransactionConfig.ACTION_ALWAYS_JOIN, false);
 
         tm.begin();
         final Transaction tx = tm.getTransaction();
@@ -214,7 +214,7 @@ public class NoExternalTransactionTestCase extends AbstractExternalTransactionTe
         try
         {
             // Thjis will throw, because Mule sees no transaction to join
-            result = processingTemplate.execute(new ProcessingCallback<String>()
+            result = executionTemplate.execute(new ExecutionCallback<String>()
             {
                 public String process() throws Exception
                 {
@@ -238,7 +238,7 @@ public class NoExternalTransactionTestCase extends AbstractExternalTransactionTe
         // try with no active transaction.. Should still throw
         try
         {
-            result = processingTemplate.execute(new ProcessingCallback<String>()
+            result = executionTemplate.execute(new ExecutionCallback<String>()
             {
                 public String process() throws Exception
                 {
@@ -258,14 +258,14 @@ public class NoExternalTransactionTestCase extends AbstractExternalTransactionTe
     public void testJoinTransactionIfPossible() throws Exception
     {
         init();
-        ProcessingTemplate<String> tt = createProcessingTemplate(TransactionConfig.ACTION_JOIN_IF_POSSIBLE, false);
+        ExecutionTemplate<String> tt = createExecutionTemplate(TransactionConfig.ACTION_JOIN_IF_POSSIBLE, false);
 
         tm.begin();
         final Transaction tx = tm.getTransaction();
         final TestResource resource1 = new TestResource(tm);
         tx.enlistResource(resource1);
         assertNotNull(tx);
-        String result = tt.execute(new ProcessingCallback<String>()
+        String result = tt.execute(new ExecutionCallback<String>()
         {
             public String process() throws Exception
             {
@@ -286,7 +286,7 @@ public class NoExternalTransactionTestCase extends AbstractExternalTransactionTe
         assertEquals(14, resource1.getPersistentValue());
 
         // try with no active transaction.. Should run with none
-        result = tt.execute(new ProcessingCallback<String>()
+        result = tt.execute(new ExecutionCallback<String>()
         {
             public String process() throws Exception
             {
@@ -302,7 +302,7 @@ public class NoExternalTransactionTestCase extends AbstractExternalTransactionTe
     public void testNoTransactionAllowed() throws Exception
     {
         init();
-        ProcessingTemplate<String> tt = createProcessingTemplate(TransactionConfig.ACTION_NEVER, false);
+        ExecutionTemplate<String> tt = createExecutionTemplate(TransactionConfig.ACTION_NEVER, false);
 
         tm.begin();
         final Transaction tx = tm.getTransaction();
@@ -311,7 +311,7 @@ public class NoExternalTransactionTestCase extends AbstractExternalTransactionTe
         assertNotNull(tx);
 
         // This will not throw since Mule sees no transaction
-        String result = tt.execute(new ProcessingCallback<String>()
+        String result = tt.execute(new ExecutionCallback<String>()
         {
             public String process() throws Exception
             {

@@ -23,8 +23,8 @@ import org.mule.api.lifecycle.StopException;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transport.Connector;
 import org.mule.api.transport.MessageReceiver;
-import org.mule.process.ProcessingCallback;
-import org.mule.process.ProcessingTemplate;
+import org.mule.api.execution.ExecutionCallback;
+import org.mule.api.execution.ExecutionTemplate;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.transport.AbstractMessageReceiver;
 import org.mule.transport.ConnectException;
@@ -222,13 +222,13 @@ public class TransactedSingleResourceJmsMessageReceiver extends AbstractMessageR
 
     public void processMessages(final Message message, final MessageReceiver receiver) throws Exception
     {
-        ProcessingTemplate<MuleEvent> processingTemplate = createProcessingTemplate();
+        ExecutionTemplate<MuleEvent> executionTemplate = createExecutionTemplate();
 
         final String encoding = endpoint.getEncoding();
 
         if (receiveMessagesInTransaction)
         {
-            ProcessingCallback<MuleEvent> processingCallback = new MessageProcessingCallback<MuleEvent>(message)
+            ExecutionCallback<MuleEvent> processingCallback = new MessageProcessingCallback<MuleEvent>(message)
             {
 
                 public MuleEvent process() throws Exception
@@ -277,7 +277,7 @@ public class TransactedSingleResourceJmsMessageReceiver extends AbstractMessageR
                     return null;
                 }
             };
-            processingTemplate.execute(processingCallback);
+            executionTemplate.execute(processingCallback);
         }
         else
         {

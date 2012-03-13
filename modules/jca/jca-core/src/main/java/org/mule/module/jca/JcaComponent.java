@@ -21,10 +21,10 @@ import org.mule.api.model.EntryPointResolverSet;
 import org.mule.component.AbstractJavaComponent;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.Message;
+import org.mule.execution.TransactionalErrorHandlingExecutionTemplate;
 import org.mule.module.jca.i18n.JcaMessages;
-import org.mule.process.ProcessingCallback;
-import org.mule.process.ProcessingTemplate;
-import org.mule.process.TransactionalErrorHandlingProcessingTemplate;
+import org.mule.api.execution.ExecutionCallback;
+import org.mule.api.execution.ExecutionTemplate;
 import org.mule.transaction.MuleTransactionConfig;
 import org.mule.work.AbstractMuleEventWork;
 
@@ -118,8 +118,9 @@ public class JcaComponent extends AbstractJavaComponent implements WorkListener
             }
             try
             {
-                ProcessingTemplate<MuleEvent> processingTemplate = TransactionalErrorHandlingProcessingTemplate.createMainProcessingTemplate(muleContext, new MuleTransactionConfig(), event.getFlowConstruct().getExceptionListener());
-                processingTemplate.execute(new ProcessingCallback<MuleEvent> () {
+                ExecutionTemplate<MuleEvent> executionTemplate = TransactionalErrorHandlingExecutionTemplate.createMainExecutionTemplate(muleContext, new MuleTransactionConfig(), event.getFlowConstruct().getExceptionListener());
+                executionTemplate.execute(new ExecutionCallback<MuleEvent>()
+                {
                     @Override
                     public MuleEvent process() throws Exception
                     {
@@ -127,12 +128,11 @@ public class JcaComponent extends AbstractJavaComponent implements WorkListener
                         {
                             // Invoke method
                             entryPointResolverSet.invoke(getManagedInstance(), RequestContext.getEventContext());
-                        }
-                        catch (UnavailableException e)
+                        } catch (UnavailableException e)
                         {
                             Message message = JcaMessages.cannotAllocateManagedInstance();
                             logger.error(message);
-                            throw new MessagingException(event,e);
+                            throw new MessagingException(event, e);
                         }
                         return null;
                     }

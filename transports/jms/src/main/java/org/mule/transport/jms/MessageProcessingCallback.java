@@ -10,11 +10,11 @@
 
 package org.mule.transport.jms;
 
-import org.mule.process.ProcessingCallback;
+import org.mule.api.execution.ExecutionCallback;
 
 import javax.jms.Message;
 
-public abstract class MessageProcessingCallback<T> implements ProcessingCallback<T>
+public abstract class MessageProcessingCallback<T> implements ExecutionCallback<T>
 {
     protected final Message message;
 

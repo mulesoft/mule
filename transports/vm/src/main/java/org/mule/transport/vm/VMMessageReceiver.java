@@ -14,10 +14,10 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.*;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.execution.ExecutionCallback;
+import org.mule.api.execution.ExecutionTemplate;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.transport.Connector;
-import org.mule.process.ProcessingCallback;
-import org.mule.process.ProcessingTemplate;
 import org.mule.transport.ContinuousPollingReceiverWorker;
 import org.mule.transport.PollingReceiverWorker;
 import org.mule.transport.TransactedPollingMessageReceiver;
@@ -99,8 +99,8 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
 
         try
         {
-            ProcessingTemplate<MuleEvent> processingTemplate = createProcessingTemplate();
-            MuleEvent resultEvent = processingTemplate.execute(new ProcessingCallback<MuleEvent>()
+            ExecutionTemplate<MuleEvent> executionTemplate = createExecutionTemplate();
+            MuleEvent resultEvent = executionTemplate.execute(new ExecutionCallback<MuleEvent>()
             {
                 @Override
                 public MuleEvent process() throws Exception

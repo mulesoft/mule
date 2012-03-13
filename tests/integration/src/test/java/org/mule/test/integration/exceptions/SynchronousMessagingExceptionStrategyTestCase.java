@@ -82,15 +82,10 @@ public class SynchronousMessagingExceptionStrategyTestCase extends AbstractExcep
     @Test
     public void testInboundRouter() throws Exception
     {
-        try
-        {
-            client.send("vm://in6", TEST_MESSAGE, null);
-            fail("Must throw an exception");
-        }
-        catch (MuleException e) {}
+        client.send("vm://in6", TEST_MESSAGE, null);
         latch.await(LATCH_AWAIT_TIMEOUT, TimeUnit.MILLISECONDS);
-        assertEquals(0, serviceExceptionCounter.get());
-        assertEquals(1, systemExceptionCounter.get());
+        assertEquals(1, serviceExceptionCounter.get());
+        assertEquals(0, systemExceptionCounter.get());
     }
 
     @Test
