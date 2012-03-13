@@ -62,19 +62,19 @@ public class HttpMessageReceiverTestCase extends AbstractMessageReceiverTestCase
     @Test
     public void testProcessResourceRelativePath()
     {
-        assertEquals("/client", httpMessageReceiver.processRelativePath(CONTEXT_PATH, CLIENT_PATH));
+        assertEquals("client", httpMessageReceiver.processRelativePath(CONTEXT_PATH, CLIENT_PATH));
     }
     
     @Test
     public void testProcessRelativePathSameLevel()
     {
-        assertEquals("/", httpMessageReceiver.processRelativePath(CONTEXT_PATH, CONTEXT_PATH));
+        assertEquals("", httpMessageReceiver.processRelativePath(CONTEXT_PATH, CONTEXT_PATH));
     }
     
     @Test
     public void testProcessResourcePropertyRelativePath()
     {
-        assertEquals("/client/name", httpMessageReceiver.processRelativePath(CONTEXT_PATH, CLIENT_NAME_PATH));
+        assertEquals("client/name", httpMessageReceiver.processRelativePath(CONTEXT_PATH, CLIENT_NAME_PATH));
     }
 
 }

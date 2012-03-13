@@ -287,10 +287,10 @@ public class HttpMessageReceiver extends TcpMessageReceiver
                                            contextPath,
                                            PropertyScope.INBOUND);
 
-                message.setProperty(HttpConnector.HTTP_RELATIVE_PATH_PROPERTY, 
+                message.setProperty(HttpConnector.HTTP_RELATIVE_PATH_PROPERTY,
                                     processRelativePath(contextPath, path),
                                     PropertyScope.INBOUND);
-                
+
                 ExecutionTemplate<MuleEvent> executionTemplate = createExecutionTemplate();
 
                 MuleEvent returnEvent;
@@ -478,9 +478,9 @@ public class HttpMessageReceiver extends TcpMessageReceiver
     protected String processRelativePath(String contextPath, String path)
     {
         String relativePath = path.substring(contextPath.length());
-        if("".equals(relativePath))
+        if(relativePath.startsWith("/"))
         {
-            return "/";
+            return relativePath.substring(1);
         }
         return relativePath;
     }

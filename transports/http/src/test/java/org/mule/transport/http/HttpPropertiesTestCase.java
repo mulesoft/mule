@@ -15,6 +15,7 @@ import static org.junit.Assert.assertNotNull;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
+import org.mule.tck.functional.FlowAssert;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -44,7 +45,9 @@ public class HttpPropertiesTestCase extends FunctionalTestCase
         new HttpClient().executeMethod(httpGet);
         String result =  httpGet.getResponseBodyAsString();
         assertEquals("Retrieving client with id = 1", result);
+        FlowAssert.verify("testProperties");
     }
+
 
     @Test
     public void testPropertiesPostMethod() throws Exception
@@ -57,6 +60,14 @@ public class HttpPropertiesTestCase extends FunctionalTestCase
 
         assertNotNull(response);
         assertEquals("Storing client with name = John and lastname = Galt", response.getPayloadAsString());
+    }
+
+    @Test
+    public void testRedirectionWithRelativeProperty() throws Exception
+    {
+        MuleClient client = new MuleClient(muleContext);
+        MuleMessage response = client.send("http://localhost:" + dynamicPort.getNumber() + "/redirect/products?retrieve=all&order=desc", TEST_MESSAGE, null);
+        assertEquals("Successfully redirected: products?retrieve=all&order=desc", response.getPayloadAsString());
     }
 
 }

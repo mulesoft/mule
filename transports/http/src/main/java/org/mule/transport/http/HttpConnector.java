@@ -88,7 +88,9 @@ public class HttpConnector extends TcpConnector
      * value are unescaped
      */
     public static final String HTTP_QUERY_PARAMS = HTTP_PREFIX + "query.params";
-    
+
+    public static final String HTTP_QUERY_STRING = HTTP_PREFIX + "query.string";
+
     public static final String HTTP_METHOD_PROPERTY = HTTP_PREFIX + "method";
     
     /**

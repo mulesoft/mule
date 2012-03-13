@@ -29,6 +29,7 @@ import org.apache.commons.httpclient.HttpVersion;
 import org.apache.commons.httpclient.StatusLine;
 import org.apache.commons.httpclient.URI;
 import org.junit.Test;
+import sun.net.www.HeaderParser;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -43,6 +44,8 @@ public class HttpMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTe
     private static final String MULTIPART_BOUNDARY = "------------------------------2eab2c5d5c7e";
     private static final String MULTIPART_MESSAGE = MULTIPART_BOUNDARY + "\n" + "Content-Disposition: form-data; name=\"payload\"\n" + TEST_MESSAGE
                                                     + "\n" + MULTIPART_BOUNDARY + "--";
+    private static final String URI = "http://localhost/services/Echo";
+    private static final String REQUEST = "/services/Echo?name=John&lastname=Galt";
 
     @Override
     protected MuleMessageFactory doCreateMuleMessageFactory()
@@ -134,7 +137,7 @@ public class HttpMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTe
     public void testHttpMethodGet() throws Exception
     {
         InputStream body = new ByteArrayInputStream("/services/Echo".getBytes());
-        HttpMethod method = createMockHttpMethod(HttpConstants.METHOD_GET, body);
+        HttpMethod method = createMockHttpMethod(HttpConstants.METHOD_GET, body, URI, HEADERS);
         
         MuleMessageFactory factory = createMuleMessageFactory();
         MuleMessage message = factory.create(method, encoding);
@@ -149,7 +152,7 @@ public class HttpMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTe
     public void testHttpMethodPost() throws Exception
     {
         InputStream body = new ByteArrayInputStream(TEST_MESSAGE.getBytes());
-        HttpMethod method = createMockHttpMethod(HttpConstants.METHOD_POST, body);
+        HttpMethod method = createMockHttpMethod(HttpConstants.METHOD_POST, body, "http://localhost/services/Echo", HEADERS);
 
         MuleMessageFactory factory = createMuleMessageFactory();
         MuleMessage message = factory.create(method, encoding);
@@ -159,15 +162,56 @@ public class HttpMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTe
         assertEquals(HttpVersion.HTTP_1_1.toString(), message.getInboundProperty(HttpConnector.HTTP_VERSION_PROPERTY));
         assertEquals("200", message.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY));
     }
-    
-    private HttpMethod createMockHttpMethod(String method, InputStream body) throws Exception
+
+    @Test
+    public void testQueryParamProperties() throws Exception
+    {
+        InputStream body = new ByteArrayInputStream(REQUEST.getBytes());
+        HttpMethod method = createMockHttpMethod(HttpConstants.METHOD_GET, body, "http://localhost" + REQUEST, HEADERS);
+
+        MuleMessageFactory factory = createMuleMessageFactory();
+        MuleMessage message = factory.create(method, encoding);
+        Map<String, Object> queryParams = (Map<String, Object>) message.getInboundProperty(HttpConnector.HTTP_QUERY_PARAMS);
+        assertNotNull(queryParams);
+        assertEquals("John", queryParams.get("name"));
+        assertEquals("John", message.getInboundProperty("name"));
+        assertEquals("Galt", queryParams.get("lastname"));
+        assertEquals("Galt", message.getInboundProperty("lastname"));
+
+        assertEquals("name=John&lastname=Galt", message.getInboundProperty(HttpConnector.HTTP_QUERY_STRING));
+    }
+
+    @Test
+    public void testHeaderProperties() throws Exception
+    {
+        InputStream body = new ByteArrayInputStream(REQUEST.getBytes());
+        Header[] headers = new Header[3];
+        headers[0] = new Header("foo-header", "foo-value");
+        headers[1] = new Header("User-Agent", "Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; WOW64; Trident/5.0)");
+        headers[2] = new Header("Host", "localhost");
+
+        HttpMethod method = createMockHttpMethod(HttpConstants.METHOD_GET, body, URI, headers);
+
+        MuleMessageFactory factory = createMuleMessageFactory();
+        MuleMessage message = factory.create(method, encoding);
+        Map<String, Object> httpHeaders = message.getInboundProperty(HttpConnector.HTTP_HEADERS);
+        assertNotNull(headers);
+        assertEquals("foo-value", httpHeaders.get("foo-header"));
+        assertEquals("Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; WOW64; Trident/5.0)", httpHeaders.get("User-Agent"));
+        assertEquals("localhost", httpHeaders.get("Host"));
+        assertEquals("false", httpHeaders.get("Keep-Alive"));
+        assertEquals("false", httpHeaders.get("Connection"));
+        assertEquals("", message.getInboundProperty(HttpConnector.HTTP_QUERY_STRING));
+    }
+
+    private HttpMethod createMockHttpMethod(String method, InputStream body, String uri, Header[] headers) throws Exception
     {
         HttpMethod httpMethod = mock(HttpMethod.class);
         when(httpMethod.getName()).thenReturn(method);
         when(httpMethod.getStatusLine()).thenReturn(new StatusLine("HTTP/1.1 200 OK"));
         when(httpMethod.getStatusCode()).thenReturn(HttpConstants.SC_OK);
-        when(httpMethod.getURI()).thenReturn(new URI("http://localhost/services/Echo", false));
-        when(httpMethod.getResponseHeaders()).thenReturn(HEADERS);
+        when(httpMethod.getURI()).thenReturn(new URI(uri, false));
+        when(httpMethod.getResponseHeaders()).thenReturn(headers);
         when(httpMethod.getResponseBodyAsStream()).thenReturn(body);
         
         return httpMethod;

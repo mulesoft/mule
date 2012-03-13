@@ -349,10 +349,13 @@ public class HttpMuleMessageFactory extends AbstractMuleMessageFactory
     protected void addUriParamsAsHeaders(Map headers, String uri)
     {
         int i = uri.indexOf("?");
+        String queryString = "";
         if(i > -1)
         {
-            headers.putAll(PropertiesUtils.getPropertiesFromQueryString(uri.substring(i + 1)));
+            queryString = uri.substring(i + 1);
+            headers.putAll(PropertiesUtils.getPropertiesFromQueryString(queryString));
         }
+        headers.put(HttpConnector.HTTP_QUERY_STRING, queryString);
     }
     
     protected Map<String, Object> processQueryParams(String uri, String encoding) throws UnsupportedEncodingException
