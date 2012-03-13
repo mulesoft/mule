@@ -7830,4 +7830,31 @@
     </xsd:attribute>
 
     -->
+
+    <!--==============================================================-->
+    <!--  Cache                                                       -->
+    <!--==============================================================-->
+
+    <xsd:element name="abstract-caching-strategy" abstract="true" type="abstractCachingStrategyType"
+                 substitutionGroup="abstract-extension">
+        <xsd:annotation>
+            <xsd:documentation>
+                A placeholder for caching strategies elements.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="abstractCachingStrategyType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractExtensionType">
+                <xsd:attribute name="name" use="optional" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The name of the caching strategy.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
 </xsd:schema>
