@@ -68,7 +68,7 @@ public class AttachmentTransformerTestCase extends FunctionalTestCase
         runScenario("removeAllAttachments");
     }
 
-    /*@Test
+    @Test
     public void testEnrichAttachment() throws Exception
     {
         runScenario("enrichAttachment");
@@ -84,7 +84,7 @@ public class AttachmentTransformerTestCase extends FunctionalTestCase
     public void testEnrichAttachmentWithoutContentType() throws Exception
     {
         runScenario("enrichAttachmentWithoutContentType");
-    }*/
+    }
 
 
     public void runScenario(String flowName) throws Exception

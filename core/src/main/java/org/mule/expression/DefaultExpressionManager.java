@@ -112,7 +112,7 @@ public class DefaultExpressionManager
      */
     public boolean isEvaluatorRegistered(String name)
     {
-        return evaluators.containsKey(name);
+        return name != null ? evaluators.containsKey(name) : false;
     }
 
     /**
@@ -123,7 +123,7 @@ public class DefaultExpressionManager
      */
     public boolean isEnricherRegistered(String name)
     {
-        return enrichers.containsKey(name);
+        return name != null ? enrichers.containsKey(name) : false;
     }
 
     /**
@@ -297,6 +297,10 @@ public class DefaultExpressionManager
     public Object evaluate(String expression, String evaluator, MuleMessage message, boolean failIfNull)
         throws ExpressionRuntimeException
     {
+        if (evaluator == null)
+        {
+            return expressionLanguage.evaluate(expression,message);
+        }
         ExpressionEvaluator extractor = (ExpressionEvaluator) evaluators.get(evaluator);
         if (extractor == null)
         {

@@ -41,6 +41,10 @@ class MessageVariableResolverFactory extends MVELExpressionLanguageContext
             {
                 addFinalVariable("exception", message.getExceptionPayload().getException());
             }
+            else
+            {
+                addFinalVariable("exception", null);
+            }
 
             addFinalVariable("flowVars", new MessagePropertyMapContext(message, PropertyScope.INVOCATION));
             addFinalVariable("sessionVars", new MessagePropertyMapContext(message, PropertyScope.SESSION));

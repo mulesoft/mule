@@ -170,4 +170,18 @@ public class ExpressionManagerTestCase extends AbstractMuleContextTestCase
         assertFalse(muleContext.getExpressionManager().isValidExpression("#[2*'2]"));
     }
 
+    @Test
+    public void testEvaluateELExpressionWithNullEvaluator()
+    {
+        assertEquals(4, muleContext.getExpressionManager()
+            .evaluate("#[2*2]", null, (MuleMessage) null, false));
+    }
+
+    @Test
+    public void testEvaluateBooleanELExpressionWithNullEvaluator()
+    {
+        assertEquals(4, muleContext.getExpressionManager()
+            .evaluate("#[2>1]", null, (MuleMessage) null, false));
+    }
+
 }

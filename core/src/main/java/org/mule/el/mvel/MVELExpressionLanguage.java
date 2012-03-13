@@ -16,6 +16,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.el.ExpressionLanguage;
 import org.mule.api.el.ExpressionLanguageContext;
 import org.mule.api.el.ExpressionLanguageExtension;
+import org.mule.api.expression.ExpressionManager;
 import org.mule.api.expression.ExpressionRuntimeException;
 import org.mule.api.expression.InvalidExpressionException;
 import org.mule.api.lifecycle.Initialisable;
@@ -161,6 +162,12 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
     @SuppressWarnings("unchecked")
     protected <T> T evaluateInternal(String expression, MVELExpressionLanguageContext variableResolverFactory)
     {
+        validate(expression);
+
+        if (expression.startsWith(ExpressionManager.DEFAULT_EXPRESSION_PREFIX))
+        {
+            expression = expression.substring(2, expression.length() - 1);
+        }
         try
         {
             variableResolverFactory.addFinalVariable("server", serverContext);
@@ -192,6 +199,15 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
     @Override
     public void validate(String expression) throws InvalidExpressionException
     {
+        if (expression.startsWith(ExpressionManager.DEFAULT_EXPRESSION_PREFIX))
+        {
+            if (!expression.endsWith(ExpressionManager.DEFAULT_EXPRESSION_POSTFIX))
+            {
+                throw new InvalidExpressionException(expression, "Expression string is not an expression");
+            }
+            expression = expression.substring(2, expression.length() - 1);
+        }
+
         try
         {
             expressionExecutor.validate(expression);
@@ -211,6 +227,9 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
 
     protected void configureParserContext(ParserContext parserContext)
     {
+        // Nullify ParserConfiguration classloader to ensure context classloader is used instead
+        parserContext.getParserConfiguration().setClassLoader(null);
+
         // defaults imports
         parserContext.addImport(Date.class);
         parserContext.addImport(Collection.class);

@@ -7,15 +7,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.routing.filters;
 
 import static org.mule.util.ClassUtils.equal;
 import static org.mule.util.ClassUtils.hash;
 
-import java.text.MessageFormat;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.context.MuleContextAware;
@@ -24,25 +21,27 @@ import org.mule.api.transport.PropertyScope;
 import org.mule.expression.ExpressionConfig;
 import org.mule.util.StringUtils;
 
+import java.text.MessageFormat;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
- * Allows boolean expressions to be executed on a message. Note that when using this filter you must be able to either specify
- * a boolean expression when using an expression filter or use one of the standard Mule filters.  These can be defined as follows -
- *
+ * Allows boolean expressions to be executed on a message. Note that when using this filter you must be able
+ * to either specify a boolean expression when using an expression filter or use one of the standard Mule
+ * filters. These can be defined as follows -
  * <ul>
  * <li>RegEx - 'regex:<pattern>': #[regex:'error' [0-9]]</li>
  * <li>Wildcard - 'wildcard:<pattern>': #[wildcard: *foo*</li>
  * <li>PayloadType - 'payload-type:<fully qualified class name>': #[payload:javax.jms.TextMessage]</li>
- * <li>ExceptionType - 'exception-type:<fully qualified class name>': #[exception-type:java.io.FileNotFoundException]</li>
+ * <li>ExceptionType - 'exception-type:<fully qualified class name>':
+ * #[exception-type:java.io.FileNotFoundException]</li>
  * <li>Header - 'header:<boolean expression>': #[header:foo!=null]</li>
  * </ul>
- *
- * Otherwise you can use eny expression filter providing you can define a boolean expression i.e.
- * <code>
+ * Otherwise you can use eny expression filter providing you can define a boolean expression i.e. <code>
  * #[xpath:count(/Foo/Bar) == 0]
- * </code>
- *
- * Note that it if the expression is not a boolean expression this filter will return true if the expression returns a result
- * 
+ * </code> Note that it if the expression is not a boolean expression this filter will return true if the
+ * expression returns a result
  */
 public class ExpressionFilter implements Filter, MuleContextAware
 {
@@ -57,11 +56,11 @@ public class ExpressionFilter implements Filter, MuleContextAware
     private MuleContext muleContext;
 
     /**
-     * The class-loader that should be used to load any classes used in scripts.
-     * Default to the classloader used to load this filter
+     * The class-loader that should be used to load any classes used in scripts. Default to the classloader
+     * used to load this filter
      **/
     private ClassLoader expressionEvaluationClassLoader = Thread.currentThread().getContextClassLoader();
-    
+
     /** For evaluators that are not expression languages we can delegate the execution to another filter */
     private Filter delegateFilter;
 
@@ -94,7 +93,7 @@ public class ExpressionFilter implements Filter, MuleContextAware
 
     /**
      * Check a given message against this filter.
-     *
+     * 
      * @param message a non null message to filter.
      * @return <code>true</code> if the message matches the filter
      */
@@ -133,10 +132,14 @@ public class ExpressionFilter implements Filter, MuleContextAware
 
     protected String getFullExpression()
     {
-        if(fullExpression==null)
+        if (config.getEvaluator() == null)
         {
-            //Handle non-expression filters
-            if(config.getEvaluator().equals("header"))
+            return config.getExpression();
+        }
+        if (fullExpression == null)
+        {
+            // Handle non-expression filters
+            if (config.getEvaluator().equals("header"))
             {
                 delegateFilter = new MessagePropertyFilter(config.getExpression());
             }
@@ -145,15 +148,15 @@ public class ExpressionFilter implements Filter, MuleContextAware
                 delegateFilter = new MessagePropertyFilter(PropertyScope.INVOCATION_NAME + ":"
                                                            + config.getExpression());
             }
-            else if(config.getEvaluator().equals("regex"))
+            else if (config.getEvaluator().equals("regex"))
             {
                 delegateFilter = new RegExFilter(config.getExpression());
             }
-            else if(config.getEvaluator().equals("wildcard"))
+            else if (config.getEvaluator().equals("wildcard"))
             {
                 delegateFilter = new WildcardFilter(config.getExpression());
             }
-            else if(config.getEvaluator().equals("payload-type"))
+            else if (config.getEvaluator().equals("payload-type"))
             {
                 try
                 {
@@ -166,7 +169,7 @@ public class ExpressionFilter implements Filter, MuleContextAware
                     throw iae;
                 }
             }
-            else if(config.getEvaluator().equals("exception-type"))
+            else if (config.getEvaluator().equals("exception-type"))
             {
                 if (StringUtils.isEmpty(config.getExpression()))
                 {
@@ -179,7 +182,7 @@ public class ExpressionFilter implements Filter, MuleContextAware
             }
             else
             {
-                //In the case of 'payload' the expression can be null
+                // In the case of 'payload' the expression can be null
                 fullExpression = config.getFullExpression(muleContext.getExpressionManager());
             }
         }
@@ -194,7 +197,7 @@ public class ExpressionFilter implements Filter, MuleContextAware
     public void setCustomEvaluator(String customEvaluator)
     {
         this.config.setCustomEvaluator(customEvaluator);
-        fullExpression=null;        
+        fullExpression = null;
     }
 
     public String getEvaluator()
@@ -205,7 +208,7 @@ public class ExpressionFilter implements Filter, MuleContextAware
     public void setEvaluator(String evaluator)
     {
         this.config.setEvaluator(evaluator);
-        fullExpression=null;
+        fullExpression = null;
     }
 
     public String getExpression()
@@ -216,7 +219,7 @@ public class ExpressionFilter implements Filter, MuleContextAware
     public void setExpression(String expression)
     {
         this.config.setExpression(expression);
-        fullExpression=null;
+        fullExpression = null;
     }
 
     public boolean isNullReturnsTrue()
@@ -236,9 +239,8 @@ public class ExpressionFilter implements Filter, MuleContextAware
         if (obj == null || getClass() != obj.getClass()) return false;
 
         final ExpressionFilter other = (ExpressionFilter) obj;
-        return equal(config, other.config)
-            && equal(delegateFilter, other.delegateFilter)
-            && nullReturnsTrue == other.nullReturnsTrue;
+        return equal(config, other.config) && equal(delegateFilter, other.delegateFilter)
+               && nullReturnsTrue == other.nullReturnsTrue;
     }
 
     @Override

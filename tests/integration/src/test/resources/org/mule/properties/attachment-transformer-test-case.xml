@@ -79,14 +79,14 @@
         <test:assert expression="#[groovy:message.getOutboundAttachment('attach22') == null]"/>
     </flow>
 
-    <!--<flow name="enrichAttachment" processingStrategy="synchronous">
+    <flow name="enrichAttachment" processingStrategy="synchronous">
         <enricher>
             <add-variable key="enricherAttachment" value="some text"/>
-            <enrich target="#[attachment:attach,text/plain]" source="#[variable:enricherAttachment]"/>
+            <enrich target="#[message.outboundAttachments['attach'] = new DataHandler($, 'text/plain')]" source="#[variable:enricherAttachment]"/>
         </enricher>
         <test:assert expression="#[groovy:message.getOutboundAttachment('attach') != null]"/>
         <test:assert expression="#[groovy:message.getOutboundAttachment('attach').getContentType().equals('text/plain')]"/>
-        <expression-transformer expression="#[outbound-attachment:attach]"/>
+        <expression-transformer expression="#[message.outboundAttachments['attach']]"/>
         <expression-transformer expression="#[groovy:message.getPayload().getInputStream()]"/>
         <object-to-string-transformer/>
         <test:assert expression="#[groovy:message.getPayloadAsString().equals('some text')]"/>
@@ -95,7 +95,7 @@
     <flow name="enrichAttachmentUsingDataHandler" processingStrategy="synchronous">
         <enricher>
             <add-attachment key="enricherAttachment" value="{message: 'value'}" contentType="application/json"/>
-            <enrich target="#[attachment:attach]" source="#[outbound-attachment:enricherAttachment]"/>
+            <enrich target="#[message.outboundAttachments['attach']]" source="#[outboundAttachments.enricherAttachment]"/>
         </enricher>
         <test:assert expression="#[groovy:message.getOutboundAttachment('attach') != null]"/>
         <test:assert expression="#[groovy:message.getOutboundAttachment('attach').getContentType().equals('application/json')]"/>
@@ -105,15 +105,15 @@
         <flow-ref name="flowEnricher"/>
         <test:assert expression="#[groovy:message.getInvocationProperty('failure') != null]"/>
     </flow>
-    
+
     <flow name="flowEnricher" processingStrategy="synchronous">
         <enricher>
             <add-variable key="enricherAttachment" value="some text"/>
-            <enrich target="#[attachment:attach]" source="#[variable:enricherAttachment]"/>
+            <enrich target="#[message.outboundAttachments['attach']]" source="#[variable:enricherAttachment]"/>
         </enricher>
         <catch-exception-strategy>
             <add-variable key="failure" value="failedExecution"/>
         </catch-exception-strategy>
-    </flow>-->
+    </flow>
 
 </mule>

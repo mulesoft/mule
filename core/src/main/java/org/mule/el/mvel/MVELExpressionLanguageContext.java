@@ -105,7 +105,7 @@ public class MVELExpressionLanguageContext extends BaseVariableResolverFactory
     @Override
     public void addVariable(String name, Object value)
     {
-        addResolver(name, new MuleVariableResolver(name, value, value.getClass()));
+        addResolver(name, new MuleVariableResolver(name, value, value != null ? value.getClass() : null));
     }
 
     /*
@@ -115,7 +115,7 @@ public class MVELExpressionLanguageContext extends BaseVariableResolverFactory
     @Override
     public void addFinalVariable(String name, Object value)
     {
-        addResolver(name, new MuleFinalVariableResolver(name, value, value.getClass()));
+        addResolver(name, new MuleFinalVariableResolver(name, value, value != null ? value.getClass() : null));
     }
 
     @SuppressWarnings("unchecked")

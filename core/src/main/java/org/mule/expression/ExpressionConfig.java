@@ -7,16 +7,19 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.expression;
 
 import org.mule.api.expression.ExpressionManager;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.util.StringUtils;
 
+import java.util.regex.Pattern;
+
 /**
- * A simple configuration object for holding the common Expression evaluator configuration.
- * The {@link #getFullExpression(ExpressionManager)} will return the evaluator and expression 
- * information in a format that can be passed into the {@link DefaultExpressionManager}
+ * A simple configuration object for holding the common Expression evaluator configuration. The
+ * {@link #getFullExpression(ExpressionManager)} will return the evaluator and expression information in a
+ * format that can be passed into the {@link DefaultExpressionManager}
  */
 public class ExpressionConfig
 {
@@ -40,13 +43,16 @@ public class ExpressionConfig
 
     public ExpressionConfig(String expression, String evaluator, String customEvaluator)
     {
-        this(expression, evaluator, customEvaluator,
-                ExpressionManager.DEFAULT_EXPRESSION_PREFIX,
-                ExpressionManager.DEFAULT_EXPRESSION_POSTFIX);
+        this(expression, evaluator, customEvaluator, ExpressionManager.DEFAULT_EXPRESSION_PREFIX,
+            ExpressionManager.DEFAULT_EXPRESSION_POSTFIX);
 
     }
 
-    public ExpressionConfig(String expression, String evaluator, String customEvaluator, String expressionPrefix, String expressionPostfix)
+    public ExpressionConfig(String expression,
+                            String evaluator,
+                            String customEvaluator,
+                            String expressionPrefix,
+                            String expressionPostfix)
     {
         setCustomEvaluator(customEvaluator);
         setEvaluator(evaluator);
@@ -57,19 +63,33 @@ public class ExpressionConfig
 
     public void parse(String expressionString)
     {
-        if(expressionString.startsWith(expressionPrefix))
+        if (expressionString.startsWith(expressionPrefix))
         {
             expressionString = expressionString.substring(expressionPrefix.length());
-            expressionString = expressionString.substring(0, expressionString.length() - expressionPostfix.length());
+            expressionString = expressionString.substring(0,
+                expressionString.length() - expressionPostfix.length());
         }
-        
+
         int i = expressionString.indexOf(EXPRESSION_SEPARATOR);
-        if(i < 0)
+        if (i >= 0 && evaluator == null)
         {
-            throw new IllegalArgumentException("Expression is invalid: " + expressionString);
+            // Attempt to work out if the expression uses an evaluator. This doesn't catch all cases, any
+            // other cases will be caught during validation.
+            String candidateEvaluator = expressionString.substring(0, i);
+            if (!candidateEvaluator.matches("^[^:'" + Pattern.quote("?") + Pattern.quote("(") + "]+$"))
+            {
+                this.expression = expressionString;
+            }
+            else
+            {
+                this.evaluator = expressionString.substring(0, i);
+                this.expression = expressionString.substring(i + 1);
+            }
         }
-        this.evaluator = expressionString.substring(0, i);
-        this.expression = expressionString.substring(i+1);
+        else
+        {
+            this.expression = expressionString;
+        }
     }
 
     public void validate(ExpressionManager manager)
@@ -77,10 +97,6 @@ public class ExpressionConfig
         if (expression == null)
         {
             throw new IllegalArgumentException(CoreMessages.objectIsNull("expression").getMessage());
-        }
-        if (evaluator == null)
-        {
-            throw new IllegalArgumentException(CoreMessages.objectIsNull("evaluator").getMessage());
         }
         if (CUSTOM_EVALUATOR.equalsIgnoreCase(evaluator))
         {
@@ -94,9 +110,10 @@ public class ExpressionConfig
             }
         }
 
-        if (!manager.isEvaluatorRegistered(evaluator))
+        if (evaluator != null && !manager.isEvaluatorRegistered(evaluator))
         {
-            throw new IllegalArgumentException(CoreMessages.expressionEvaluatorNotRegistered(evaluator).getMessage());
+            throw new IllegalArgumentException(CoreMessages.expressionEvaluatorNotRegistered(evaluator)
+                .getMessage());
         }
     }
 
@@ -105,7 +122,15 @@ public class ExpressionConfig
         if (fullExpression == null)
         {
             validate(manager);
-            fullExpression = expressionPrefix + evaluator + EXPRESSION_SEPARATOR + expression + expressionPostfix;
+            if (evaluator != null)
+            {
+                fullExpression = expressionPrefix + evaluator + EXPRESSION_SEPARATOR + expression
+                                 + expressionPostfix;
+            }
+            else
+            {
+                fullExpression = expressionPrefix + expression + expressionPostfix;
+            }
         }
         return fullExpression;
     }
@@ -118,7 +143,7 @@ public class ExpressionConfig
     public void setCustomEvaluator(String customEvaluator)
     {
         this.customEvaluator = StringUtils.trimToNull(customEvaluator);
-        fullExpression=null;        
+        fullExpression = null;
     }
 
     public String getEvaluator()
@@ -129,7 +154,7 @@ public class ExpressionConfig
     public void setEvaluator(String evaluator)
     {
         this.evaluator = StringUtils.trimToNull(evaluator);
-        fullExpression=null;
+        fullExpression = null;
     }
 
     public String getExpression()
@@ -139,14 +164,7 @@ public class ExpressionConfig
 
     public void setExpression(String expression)
     {
-        if (expression.startsWith(expressionPrefix))
-        {
-            parse(expression);
-        }
-        else
-        {
-            this.expression = StringUtils.trimToEmpty(expression);
-        }
-        fullExpression=null;
+        parse(StringUtils.trimToEmpty(expression));
+        fullExpression = null;
     }
 }
