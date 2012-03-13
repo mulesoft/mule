@@ -31,7 +31,7 @@ import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.stream.StreamResult;
 
 import org.apache.commons.io.output.ByteArrayOutputStream;
-import org.dom4j.Document;
+import org.dom4j.Node;
 import org.dom4j.io.DocumentResult;
 
 /**
@@ -51,7 +51,7 @@ public abstract class AbstractXmlTransformer extends AbstractMessageTransformer
         registerSourceType(DataTypeFactory.BYTE_ARRAY);
         registerSourceType(DataTypeFactory.create(javax.xml.transform.Source.class));
         registerSourceType(DataTypeFactory.create(org.xml.sax.InputSource.class));
-        registerSourceType(DataTypeFactory.create(org.dom4j.Document.class));
+        registerSourceType(DataTypeFactory.create(org.dom4j.Node.class));
         registerSourceType(DataTypeFactory.create(org.w3c.dom.Document.class));
         registerSourceType(DataTypeFactory.create(org.w3c.dom.Element.class));
         registerSourceType(DataTypeFactory.create(java.io.InputStream.class));
@@ -220,9 +220,9 @@ public abstract class AbstractXmlTransformer extends AbstractMessageTransformer
         {
             return (String) obj;
         }
-        else if (obj instanceof Document)
+        else if (obj instanceof Node)
         {
-            return ((Document) obj).asXML();
+            return ((Node) obj).asXML();
         }
         // No easy fix, so use the transformer.
         Source src = XMLUtils.toXmlSource(xmlInputFactory, useStaxSource, obj);

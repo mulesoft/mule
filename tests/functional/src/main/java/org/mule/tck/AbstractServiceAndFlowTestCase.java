@@ -69,6 +69,6 @@ public abstract class AbstractServiceAndFlowTestCase extends FunctionalTestCase
 
     public static enum ConfigVariant
     {
-        FLOW, SERVICE
+        FLOW, SERVICE, FLOW_EL
     }
 }

@@ -11,6 +11,7 @@
 package org.mule.test.integration.routing.outbound;
 
 import org.dom4j.Document;
+import org.dom4j.Element;
 
 /**
  * TODO
@@ -23,4 +24,12 @@ public class AddReceivedNodeService
 
         return doc;
     }
+
+    public Element addNodeTo(Element doc)
+    {
+        doc.addElement("Received");
+
+        return doc;
+    }
+
 }
