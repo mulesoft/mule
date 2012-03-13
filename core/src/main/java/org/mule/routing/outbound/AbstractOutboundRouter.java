@@ -18,6 +18,8 @@ import org.mule.api.construct.FlowConstruct;
 import org.mule.api.construct.FlowConstructAware;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.execution.ExecutionCallback;
+import org.mule.api.execution.ExecutionTemplate;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
@@ -31,9 +33,7 @@ import org.mule.api.transaction.TransactionConfig;
 import org.mule.api.transport.DispatchException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.management.stats.RouterStatistics;
-import org.mule.process.ProcessingCallback;
-import org.mule.process.ProcessingTemplate;
-import org.mule.process.TransactionalProcessingTemplate;
+import org.mule.execution.TransactionalExecutionTemplate;
 import org.mule.processor.AbstractMessageProcessorOwner;
 import org.mule.routing.CorrelationMode;
 import org.mule.routing.DefaultRouterResultsHandler;
@@ -89,8 +89,8 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
 
     public MuleEvent process(final MuleEvent event) throws MuleException
     {
-        ProcessingTemplate<MuleEvent> processingTemplate = TransactionalProcessingTemplate.createTransactionalProcessingTemplate(muleContext, getTransactionConfig());
-        ProcessingCallback<MuleEvent> processingCallback = new ProcessingCallback<MuleEvent>()
+        ExecutionTemplate<MuleEvent> executionTemplate = TransactionalExecutionTemplate.createTransactionalExecutionTemplate(muleContext, getTransactionConfig());
+        ExecutionCallback<MuleEvent> processingCallback = new ExecutionCallback<MuleEvent>()
         {
             public MuleEvent process() throws Exception
             {
@@ -110,7 +110,7 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
         };
         try
         {
-            return processingTemplate.execute(processingCallback);
+            return executionTemplate.execute(processingCallback);
         }
         catch (MuleException e)
         {

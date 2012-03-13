@@ -18,6 +18,8 @@ import org.mule.api.construct.FlowConstruct;
 import org.mule.api.construct.FlowConstructAware;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.exception.MessagingExceptionHandler;
+import org.mule.api.execution.ExecutionCallback;
+import org.mule.api.execution.ExecutionTemplate;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
@@ -37,13 +39,11 @@ import org.mule.api.service.Service;
 import org.mule.api.source.MessageSource;
 import org.mule.component.simple.PassThroughComponent;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.execution.ErrorHandlingExecutionTemplate;
 import org.mule.lifecycle.EmptyLifecycleCallback;
 import org.mule.lifecycle.processor.ProcessIfStartedWaitIfPausedMessageProcessor;
 import org.mule.management.stats.RouterStatistics;
 import org.mule.management.stats.ServiceStatistics;
-import org.mule.process.ErrorHandlingProcessingTemplate;
-import org.mule.process.ProcessingCallback;
-import org.mule.process.ProcessingTemplate;
 import org.mule.processor.AbstractInterceptingMessageProcessor;
 import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.routing.MuleMessageInfoMapping;
@@ -659,8 +659,8 @@ public abstract class AbstractService implements Service, MessageProcessor, Anno
         RequestContext.setEvent(newEvent);
         try
         {
-            ProcessingTemplate<MuleEvent> processingTemplate = ErrorHandlingProcessingTemplate.createErrorHandlingProcessingTemplate(muleContext, this.exceptionListener);
-            return processingTemplate.execute(new ProcessingCallback<MuleEvent> () {
+            ExecutionTemplate<MuleEvent> executionTemplate = ErrorHandlingExecutionTemplate.createErrorHandlingExecutionTemplate(muleContext, this.exceptionListener);
+            return executionTemplate.execute(new ExecutionCallback<MuleEvent>() {
 
                 @Override
                 public MuleEvent process() throws Exception

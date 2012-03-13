@@ -134,11 +134,19 @@ public class MessagingException extends MuleException
         return muleMessage;
     }
 
+    /**
+     * @return event associated with the exception
+     */
     public MuleEvent getEvent()
     {
         return processedEvent != null ? processedEvent : event;
     }
 
+    /**
+     * Sets the event that should be processed once this exception is caught
+     *
+     * @param processedEvent event bounded to the exception
+     */
     public void setProcessedEvent(MuleEvent processedEvent)
     {
         if (processedEvent != null)
@@ -152,7 +160,13 @@ public class MessagingException extends MuleException
             this.muleMessage = null;
         }
     }
-    
+
+    /**
+     * Evaluates if the exception was caused (instance of) by the provided exception type
+     *
+     * @param e exception type to check against
+     * @return true if the cause exception is an instance of the provided exception type
+     */
     public boolean causedBy(Class e)
     {
         if (e == null)
@@ -167,6 +181,14 @@ public class MessagingException extends MuleException
         return false;
     }
 
+    /**
+     * Evaluates if the exception was caused by the type and only the type provided exception type
+     *
+     * i,e: if cause exception is NullPointerException will only return true if provided exception type is NullPointerException
+     *
+     * @param e exception type to check against
+     * @return true if the cause exception is exaclty the provided exception type
+     */
     public boolean causedExactlyBy(Class e)
     {
         if (e == null)
@@ -180,7 +202,10 @@ public class MessagingException extends MuleException
         }
         return e.equals(rootException.getClass());
     }
-    
+
+    /**
+     * @return the exception thrown by the failing message processor
+     */
     public Exception getCauseException()
     {
         Throwable rootException = ExceptionHelper.getRootException(this);
@@ -191,21 +216,43 @@ public class MessagingException extends MuleException
         return (Exception) rootException;
     }
 
+    /**
+     * Signals if the exception cause rollback of any current transaction if any
+     * or if the message source should rollback incoming message
+     *
+     * @return true if exception cause rollback, false otherwise
+     */
     public boolean causedRollback()
     {
         return causeRollback;
     }
 
+    /**
+     * Marks exception as rollback cause. Useful for message sources that can
+     * provide some rollback mechanism.
+     *
+     * @param causeRollback
+     */
     public void setCauseRollback(boolean causeRollback)
     {
         this.causeRollback = causeRollback;
     }
 
+    /**
+     * Marks an exception as handled so it won't be re-throwed
+     *
+     * @param handled true if the exception must be mark as handled, false otherwise
+     */
     public void setHandled(boolean handled)
     {
         this.handled = handled;
     }
 
+    /**
+     * Signals if exception has been handled or not
+     *
+     * @return true if exception has been handled, false otherwise
+     */
     public boolean handled()
     {
         return handled;

@@ -7,7 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.process;
+package org.mule.execution;
 
 import org.hamcrest.core.Is;
 import org.hamcrest.core.IsNull;
@@ -25,6 +25,7 @@ import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.exception.MessagingExceptionHandler;
+import org.mule.api.execution.ExecutionTemplate;
 import org.mule.api.transaction.Transaction;
 import org.mule.exception.DefaultMessagingExceptionStrategy;
 import org.mule.routing.filters.WildcardFilter;
@@ -43,7 +44,7 @@ import static org.mule.transaction.TransactionTemplateTestUtils.getEmptyTransact
 
 @RunWith(MockitoJUnitRunner.class)
 @SmallTest
-public class ErrorHandlingProcessingTemplateTestCase extends AbstractMuleTestCase
+public class ErrorHandlingExecutionTemplateTestCase extends AbstractMuleTestCase
 {
     private MuleContext mockMuleContext = mock(MuleContext.class);
     @Mock
@@ -72,26 +73,26 @@ public class ErrorHandlingProcessingTemplateTestCase extends AbstractMuleTestCas
     @Test
     public void testSuccessfulExecution() throws Exception
     {
-        ProcessingTemplate processingTemplate = createExceptionHandlingTransactionTemplate();
-        Object result = processingTemplate.execute(getEmptyTransactionCallback(RETURN_VALUE));
+        ExecutionTemplate executionTemplate = createExceptionHandlingTransactionTemplate();
+        Object result = executionTemplate.execute(getEmptyTransactionCallback(RETURN_VALUE));
         assertThat((MuleEvent) result, is(RETURN_VALUE));
     }
 
-    private ProcessingTemplate createExceptionHandlingTransactionTemplate()
+    private ExecutionTemplate createExceptionHandlingTransactionTemplate()
     {
-        return ErrorHandlingProcessingTemplate.createErrorHandlingProcessingTemplate(mockMuleContext, mockMessagingExceptionHandler);
+        return ErrorHandlingExecutionTemplate.createErrorHandlingExecutionTemplate(mockMuleContext, mockMessagingExceptionHandler);
     }
 
     @Test
     public void testFailureException() throws Exception
     {
-        ProcessingTemplate processingTemplate = createExceptionHandlingTransactionTemplate();
+        ExecutionTemplate executionTemplate = createExceptionHandlingTransactionTemplate();
         MuleEvent mockResultEvent = mock(MuleEvent.class);
         when(mockMessagingException.getEvent()).thenReturn(mockEvent).thenReturn(mockEvent).thenReturn(mockResultEvent);
         when(mockMessagingExceptionHandler.handleException(mockMessagingException, mockEvent)).thenReturn(mockResultEvent);
         try
         {
-            processingTemplate.execute(TransactionTemplateTestUtils.getFailureTransactionCallback(mockMessagingException));
+            executionTemplate.execute(TransactionTemplateTestUtils.getFailureTransactionCallback(mockMessagingException));
             fail("MessagingException must be thrown");
         }
         catch (MessagingException e)
@@ -104,12 +105,12 @@ public class ErrorHandlingProcessingTemplateTestCase extends AbstractMuleTestCas
     @Test
     public void testTransactionIsMarkedRollbackOnExceptionByDefault() throws Exception
     {
-        ProcessingTemplate processingTemplate = createExceptionHandlingTransactionTemplate();
+        ExecutionTemplate executionTemplate = createExceptionHandlingTransactionTemplate();
         TransactionCoordination.getInstance().bindTransaction(mockTransaction);
         configureExceptionListener(null,null);
         try
         {
-            processingTemplate.execute(TransactionTemplateTestUtils.getFailureTransactionCallback(mockMessagingException));
+            executionTemplate.execute(TransactionTemplateTestUtils.getFailureTransactionCallback(mockMessagingException));
             fail("MessagingException must be thrown");
         }
         catch (MessagingException e) {}
@@ -119,12 +120,12 @@ public class ErrorHandlingProcessingTemplateTestCase extends AbstractMuleTestCas
     @Test
     public void testTransactionIsNotRollbackOnEveryException() throws Exception
     {
-        ProcessingTemplate processingTemplate = createExceptionHandlingTransactionTemplate();
+        ExecutionTemplate executionTemplate = createExceptionHandlingTransactionTemplate();
         TransactionCoordination.getInstance().bindTransaction(mockTransaction);
         configureExceptionListener(null, "*");
         try
         {
-            processingTemplate.execute(TransactionTemplateTestUtils.getFailureTransactionCallback(mockMessagingException));
+            executionTemplate.execute(TransactionTemplateTestUtils.getFailureTransactionCallback(mockMessagingException));
             fail("MessagingException must be thrown");
         }
         catch (MessagingException e) {}
@@ -136,12 +137,12 @@ public class ErrorHandlingProcessingTemplateTestCase extends AbstractMuleTestCas
     @Test
     public void testTransactionIsNotRollbackOnMatcherRegexPatternException() throws Exception
     {
-        ProcessingTemplate processingTemplate = createExceptionHandlingTransactionTemplate();
+        ExecutionTemplate executionTemplate = createExceptionHandlingTransactionTemplate();
         TransactionCoordination.getInstance().bindTransaction(mockTransaction);
         configureExceptionListener(null, "org.mule.ap*");
         try
         {
-            processingTemplate.execute(TransactionTemplateTestUtils.getFailureTransactionCallback(mockMessagingException));
+            executionTemplate.execute(TransactionTemplateTestUtils.getFailureTransactionCallback(mockMessagingException));
             fail("MessagingException must be thrown");
         }
         catch (MessagingException e) {}
@@ -153,12 +154,12 @@ public class ErrorHandlingProcessingTemplateTestCase extends AbstractMuleTestCas
     @Test
     public void testTransactionIsNotRollbackOnClassHierarchyPatternException() throws Exception
     {
-        ProcessingTemplate processingTemplate = createExceptionHandlingTransactionTemplate();
+        ExecutionTemplate executionTemplate = createExceptionHandlingTransactionTemplate();
         TransactionCoordination.getInstance().bindTransaction(mockTransaction);
         configureExceptionListener(null, "org.mule.api.MuleException+");
         try
         {
-            processingTemplate.execute(TransactionTemplateTestUtils.getFailureTransactionCallback(mockMessagingException));
+            executionTemplate.execute(TransactionTemplateTestUtils.getFailureTransactionCallback(mockMessagingException));
             fail("MessagingException must be thrown");
         }
         catch (MessagingException e) {}
@@ -170,12 +171,12 @@ public class ErrorHandlingProcessingTemplateTestCase extends AbstractMuleTestCas
     @Test
     public void testTransactionIsNotRollbackOnClassExactlyPatternException() throws Exception
     {
-        ProcessingTemplate processingTemplate = createExceptionHandlingTransactionTemplate();
+        ExecutionTemplate executionTemplate = createExceptionHandlingTransactionTemplate();
         TransactionCoordination.getInstance().bindTransaction(mockTransaction);
         configureExceptionListener(null, "org.mule.api.MessagingException");
         try
         {
-            processingTemplate.execute(TransactionTemplateTestUtils.getFailureTransactionCallback(new MessagingException(mockEvent,null)));
+            executionTemplate.execute(TransactionTemplateTestUtils.getFailureTransactionCallback(new MessagingException(mockEvent, null)));
             fail("MessagingException must be thrown");
         }
         catch (MessagingException e) {}
@@ -187,12 +188,12 @@ public class ErrorHandlingProcessingTemplateTestCase extends AbstractMuleTestCas
     @Test
     public void testTransactionIsRollbackOnPatternAppliesToRollbackAndCommit() throws Exception
     {
-        ProcessingTemplate processingTemplate = createExceptionHandlingTransactionTemplate();
+        ExecutionTemplate executionTemplate = createExceptionHandlingTransactionTemplate();
         TransactionCoordination.getInstance().bindTransaction(mockTransaction);
         configureExceptionListener("org.mule.api.MuleException+", "org.mule.api.MessagingException");
         try
         {
-            processingTemplate.execute(TransactionTemplateTestUtils.getFailureTransactionCallback(mockMessagingException));
+            executionTemplate.execute(TransactionTemplateTestUtils.getFailureTransactionCallback(mockMessagingException));
             fail("MessagingException must be thrown");
         }
         catch (MessagingException e) {}
@@ -209,10 +210,10 @@ public class ErrorHandlingProcessingTemplateTestCase extends AbstractMuleTestCas
         TransactionCoordination.getInstance().suspendCurrentTransaction();
         assertThat(TransactionCoordination.getInstance().getTransaction(), IsNull.<Object>nullValue());
         configureExceptionListener(null,null);
-        ProcessingTemplate processingTemplate = createExceptionHandlingTransactionTemplate();
+        ExecutionTemplate executionTemplate = createExceptionHandlingTransactionTemplate();
         try
         {
-            processingTemplate.execute(TransactionTemplateTestUtils.getFailureTransactionCallback(mockMessagingException));
+            executionTemplate.execute(TransactionTemplateTestUtils.getFailureTransactionCallback(mockMessagingException));
             fail("MessagingException must be thrown");
         }
         catch (MessagingException e) {}
@@ -231,11 +232,11 @@ public class ErrorHandlingProcessingTemplateTestCase extends AbstractMuleTestCas
         TransactionCoordination.getInstance().suspendCurrentTransaction();
         assertThat(TransactionCoordination.getInstance().getTransaction(), IsNull.<Object>nullValue());
         configureExceptionListener(null,null);
-        ProcessingTemplate processingTemplate = createExceptionHandlingTransactionTemplate();
+        ExecutionTemplate executionTemplate = createExceptionHandlingTransactionTemplate();
         final Transaction mockNewTransaction = spy(new TestTransaction(mockMuleContext));
         try
         {
-            processingTemplate.execute(TransactionTemplateTestUtils.getFailureTransactionCallbackStartsTransaction(mockMessagingException,mockNewTransaction));
+            executionTemplate.execute(TransactionTemplateTestUtils.getFailureTransactionCallbackStartsTransaction(mockMessagingException, mockNewTransaction));
             fail("MessagingException must be thrown");
         }
         catch (MessagingException e) {}
@@ -253,10 +254,10 @@ public class ErrorHandlingProcessingTemplateTestCase extends AbstractMuleTestCas
     public void testTransactionIsResolved() throws Exception
     {
         configureExceptionListener(null,null);
-        ProcessingTemplate processingTemplate = createExceptionHandlingTransactionTemplate();
+        ExecutionTemplate executionTemplate = createExceptionHandlingTransactionTemplate();
         try
         {
-            processingTemplate.execute(TransactionTemplateTestUtils.getFailureTransactionCallbackStartsTransaction(mockMessagingException, mockTransaction));
+            executionTemplate.execute(TransactionTemplateTestUtils.getFailureTransactionCallbackStartsTransaction(mockMessagingException, mockTransaction));
             fail("MessagingException must be thrown");
         }
         catch (MessagingException e) {}

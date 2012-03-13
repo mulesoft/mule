@@ -7,7 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.process;
+package org.mule.execution;
 
 import org.hamcrest.core.Is;
 import org.hamcrest.core.IsInstanceOf;
@@ -18,6 +18,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.mockito.Mockito;
 import org.mule.api.MuleEvent;
+import org.mule.api.execution.ExecutionCallback;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionConfig;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -121,7 +122,7 @@ public class ValidateTransactionalStateInterceptorTestCase extends AbstractMuleT
         ValidateTransactionalStateInterceptor<MuleEvent> interceptor = new ValidateTransactionalStateInterceptor<MuleEvent>(new ExecuteCallbackInterceptor<MuleEvent>(), transactionConfig);
         try
         {
-            result = interceptor.execute(new ProcessingCallback<MuleEvent>()
+            result = interceptor.execute(new ExecutionCallback<MuleEvent>()
             {
                 @Override
                 public MuleEvent process() throws Exception

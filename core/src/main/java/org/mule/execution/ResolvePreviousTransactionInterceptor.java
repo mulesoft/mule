@@ -8,30 +8,30 @@
  * LICENSE.txt file.
  */
 
-package org.mule.process;
+package org.mule.execution;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mule.api.MessagingException;
+import org.mule.api.execution.ExecutionCallback;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionConfig;
 import org.mule.api.transaction.TransactionException;
 import org.mule.transaction.TransactionCoordination;
 
-class ResolvePreviousTransactionInterceptor<T> implements ProcessingInterceptor<T>
+class ResolvePreviousTransactionInterceptor<T> implements ExecutionInterceptor<T>
 {
     private static final Log logger = LogFactory.getLog(ResolvePreviousTransactionInterceptor.class);
-    final private ProcessingInterceptor<T> next;
+    final private ExecutionInterceptor<T> next;
     private TransactionConfig transactionConfig;
 
-    public ResolvePreviousTransactionInterceptor(ProcessingInterceptor<T> next, TransactionConfig transactionConfig)
+    public ResolvePreviousTransactionInterceptor(ExecutionInterceptor<T> next, TransactionConfig transactionConfig)
     {
         this.next = next;
         this.transactionConfig = transactionConfig;
     }
 
     @Override
-    public T execute(ProcessingCallback<T> callback) throws Exception
+    public T execute(ExecutionCallback<T> callback) throws Exception
     {
         byte action = transactionConfig.getAction();
         Transaction transactionBeforeTemplate = TransactionCoordination.getInstance().getTransaction();

@@ -8,27 +8,28 @@
  * LICENSE.txt file.
  */
 
-package org.mule.process;
+package org.mule.execution;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
+import org.mule.api.execution.ExecutionCallback;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionConfig;
 import org.mule.api.transaction.TransactionException;
 import org.mule.transaction.TransactionCoordination;
 
-class BeginAndResolveTransactionInterceptor<T> implements ProcessingInterceptor<T>
+class BeginAndResolveTransactionInterceptor<T> implements ExecutionInterceptor<T>
 {
     private static final Log logger = LogFactory.getLog(BeginAndResolveTransactionInterceptor.class);
-    private final ProcessingInterceptor<T> next;
+    private final ExecutionInterceptor<T> next;
     private final TransactionConfig transactionConfig;
     private final MuleContext muleContext;
     private final boolean processOnException;
     private boolean mustResolveAnyTransaction;
 
-    BeginAndResolveTransactionInterceptor(ProcessingInterceptor next, TransactionConfig transactionConfig, MuleContext muleContext, boolean processOnException, boolean mustResolveAnyTransaction)
+    BeginAndResolveTransactionInterceptor(ExecutionInterceptor next, TransactionConfig transactionConfig, MuleContext muleContext, boolean processOnException, boolean mustResolveAnyTransaction)
     {
         this.next = next;
         this.transactionConfig = transactionConfig;
@@ -38,7 +39,7 @@ class BeginAndResolveTransactionInterceptor<T> implements ProcessingInterceptor<
     }
 
     @Override
-    public T execute(ProcessingCallback<T> callback) throws Exception
+    public T execute(ExecutionCallback<T> callback) throws Exception
     {
         byte action = transactionConfig.getAction();
         boolean resolveStartedTransaction = false;

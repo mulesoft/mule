@@ -10,11 +10,11 @@
 
 package org.mule.tck;
 
+import org.mule.api.execution.ExecutionCallback;
+import org.mule.api.execution.ExecutionTemplate;
 import org.mule.api.transaction.TransactionConfig;
 import org.mule.api.transaction.TransactionManagerFactory;
-import org.mule.process.ProcessingCallback;
-import org.mule.process.ProcessingTemplate;
-import org.mule.process.TransactionalProcessingTemplate;
+import org.mule.execution.TransactionalExecutionTemplate;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.transaction.MuleTransactionConfig;
 import org.mule.transaction.XaTransaction;
@@ -134,24 +134,24 @@ public abstract class AbstractTxThreadAssociationTestCase extends AbstractMuleCo
         // this is one component with a TX always begin
         TransactionConfig config = new MuleTransactionConfig(TransactionConfig.ACTION_ALWAYS_BEGIN);
         config.setFactory(new XaTransactionFactory());
-        ProcessingTemplate<Void> processingTemplate = TransactionalProcessingTemplate.createTransactionalProcessingTemplate(muleContext, config);
+        ExecutionTemplate<Void> executionTemplate = TransactionalExecutionTemplate.createTransactionalExecutionTemplate(muleContext, config);
 
         // and the callee component which should begin new transaction, current must be suspended
         final TransactionConfig nestedConfig = new MuleTransactionConfig(TransactionConfig.ACTION_ALWAYS_BEGIN);
         nestedConfig.setFactory(new XaTransactionFactory());
 
         // start the call chain
-        processingTemplate.execute(new ProcessingCallback<Void>()
+        executionTemplate.execute(new ExecutionCallback<Void>()
         {
             public Void process() throws Exception
             {
                 // the callee executes within its own TX template, but uses the same global XA transaction,
                 // bound to the current thread of execution via a ThreadLocal
-                ProcessingTemplate<Void> processingTemplate = TransactionalProcessingTemplate.createTransactionalProcessingTemplate(muleContext, nestedConfig);
+                ExecutionTemplate<Void> innerExecutionTemplate = TransactionalExecutionTemplate.createTransactionalExecutionTemplate(muleContext, nestedConfig);
                 final Transaction firstTx = tm.getTransaction();
                 assertNotNull(firstTx);
                 assertEquals(firstTx.getStatus(), Status.STATUS_ACTIVE);
-                return processingTemplate.execute(new ProcessingCallback<Void>()
+                return innerExecutionTemplate.execute(new ExecutionCallback<Void>()
                 {
                     public Void process() throws Exception
                     {
@@ -163,8 +163,7 @@ public abstract class AbstractTxThreadAssociationTestCase extends AbstractMuleCo
                         {
                             tm.resume(firstTx);
                             fail("Second transaction must be active");
-                        }
-                        catch (java.lang.IllegalStateException e)
+                        } catch (java.lang.IllegalStateException e)
                         {
                             // expected
 
@@ -182,8 +181,7 @@ public abstract class AbstractTxThreadAssociationTestCase extends AbstractMuleCo
                             Transaction a = tm.suspend();
                             assertTrue(a.equals(firstTx));
                             tm.resume(secondTx);
-                        }
-                        catch (Exception e)
+                        } catch (Exception e)
                         {
                             fail("Error: " + e);
                         }
@@ -215,24 +213,24 @@ public abstract class AbstractTxThreadAssociationTestCase extends AbstractMuleCo
         // this is one component with a TX always begin
         TransactionConfig config = new MuleTransactionConfig(TransactionConfig.ACTION_ALWAYS_BEGIN);
         config.setFactory(new XaTransactionFactory());
-        ProcessingTemplate<Void> processingTemplate = TransactionalProcessingTemplate.createTransactionalProcessingTemplate(muleContext, config);
+        ExecutionTemplate<Void> executionTemplate = TransactionalExecutionTemplate.createTransactionalExecutionTemplate(muleContext, config);
 
         // and the callee component which should begin new transaction, current must be suspended
         final TransactionConfig nestedConfig = new MuleTransactionConfig(TransactionConfig.ACTION_NONE);
         nestedConfig.setFactory(new XaTransactionFactory());
 
         // start the call chain
-        processingTemplate.execute(new ProcessingCallback<Void>()
+        executionTemplate.execute(new ExecutionCallback<Void>()
         {
             public Void process() throws Exception
             {
                 // the callee executes within its own TX template, but uses the same global XA transaction,
                 // bound to the current thread of execution via a ThreadLocal
-                ProcessingTemplate<Void> nestedProcessingTemplate = TransactionalProcessingTemplate.createTransactionalProcessingTemplate(muleContext, nestedConfig);
+                ExecutionTemplate<Void> nestedExecutionTemplate = TransactionalExecutionTemplate.createTransactionalExecutionTemplate(muleContext, nestedConfig);
                 final Transaction firstTx = tm.getTransaction();
                 assertNotNull(firstTx);
                 assertEquals(firstTx.getStatus(), Status.STATUS_ACTIVE);
-                return nestedProcessingTemplate.execute(new ProcessingCallback<Void>()
+                return nestedExecutionTemplate.execute(new ExecutionCallback<Void>()
                 {
                     public Void process() throws Exception
                     {
@@ -246,8 +244,7 @@ public abstract class AbstractTxThreadAssociationTestCase extends AbstractMuleCo
                             assertEquals(firstTx.getStatus(), Status.STATUS_ACTIVE);
                             Transaction a = tm.suspend();
                             assertTrue(a.equals(firstTx));
-                        }
-                        catch (Exception e)
+                        } catch (Exception e)
                         {
                             fail("Error: " + e);
                         }
@@ -308,21 +305,21 @@ public abstract class AbstractTxThreadAssociationTestCase extends AbstractMuleCo
         // this is one service with a TX always begin
         TransactionConfig config = new MuleTransactionConfig(TransactionConfig.ACTION_ALWAYS_BEGIN);
         config.setFactory(new XaTransactionFactory());
-        ProcessingTemplate<Void> processingTemplate = TransactionalProcessingTemplate.createTransactionalProcessingTemplate(muleContext, config);
+        ExecutionTemplate<Void> executionTemplate = TransactionalExecutionTemplate.createTransactionalExecutionTemplate(muleContext, config);
 
         // and the callee service which should join the current XA transaction, not begin a nested one
         final TransactionConfig nestedConfig = new MuleTransactionConfig(TransactionConfig.ACTION_BEGIN_OR_JOIN);
         nestedConfig.setFactory(new XaTransactionFactory());
 
         // start the call chain
-        processingTemplate.execute(new ProcessingCallback<Void>()
+        executionTemplate.execute(new ExecutionCallback<Void>()
         {
             public Void process() throws Exception
             {
                 // the callee executes within its own TX template, but uses the same global XA transaction,
                 // bound to the current thread of execution via a ThreadLocal
-                ProcessingTemplate<Void> nestedProcessingTemplate = TransactionalProcessingTemplate.createTransactionalProcessingTemplate(muleContext, nestedConfig);
-                return nestedProcessingTemplate.execute(new ProcessingCallback<Void>()
+                ExecutionTemplate<Void> nestedExecutionTemplate = TransactionalExecutionTemplate.createTransactionalExecutionTemplate(muleContext, nestedConfig);
+                return nestedExecutionTemplate.execute(new ExecutionCallback<Void>()
                 {
                     public Void process() throws Exception
                     {

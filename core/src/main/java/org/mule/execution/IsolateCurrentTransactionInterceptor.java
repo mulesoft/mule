@@ -7,18 +7,19 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.process;
+package org.mule.execution;
 
+import org.mule.api.execution.ExecutionCallback;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionConfig;
 import org.mule.transaction.TransactionCoordination;
 
-public class IsolateCurrentTransactionInterceptor<T> implements ProcessingInterceptor<T>
+public class IsolateCurrentTransactionInterceptor<T> implements ExecutionInterceptor<T>
 {
-    private ProcessingInterceptor<T> next;
+    private ExecutionInterceptor<T> next;
     private TransactionConfig transactionConfig;
 
-    public IsolateCurrentTransactionInterceptor(ProcessingInterceptor<T> nextProcessingInterceptor, TransactionConfig transactionConfig)
+    public IsolateCurrentTransactionInterceptor(ExecutionInterceptor<T> nextProcessingInterceptor, TransactionConfig transactionConfig)
     {
         this.next = nextProcessingInterceptor;
         this.transactionConfig = transactionConfig;
@@ -26,7 +27,7 @@ public class IsolateCurrentTransactionInterceptor<T> implements ProcessingInterc
 
 
     @Override
-    public T execute(ProcessingCallback<T> muleEventProcessingCallback) throws Exception
+    public T execute(ExecutionCallback<T> muleEventProcessingCallback) throws Exception
     {
         boolean transactionIsolated = false;
         try

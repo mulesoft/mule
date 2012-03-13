@@ -8,22 +8,23 @@
  * LICENSE.txt file.
  */
 
-package org.mule.process;
+package org.mule.execution;
 
 import org.mule.api.MuleContext;
+import org.mule.api.execution.ExecutionCallback;
 import org.mule.api.transaction.ExternalTransactionAwareTransactionFactory;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionConfig;
 import org.mule.api.transaction.TransactionFactory;
 import org.mule.transaction.TransactionCoordination;
 
-class ExternalTransactionInterceptor<T> implements ProcessingInterceptor<T>
+class ExternalTransactionInterceptor<T> implements ExecutionInterceptor<T>
 {
-    private final ProcessingInterceptor<T> next;
+    private final ExecutionInterceptor<T> next;
     private TransactionConfig transactionConfig;
     private MuleContext muleContext;
 
-    public ExternalTransactionInterceptor(ProcessingInterceptor<T> next, TransactionConfig transactionConfig, MuleContext muleContext)
+    public ExternalTransactionInterceptor(ExecutionInterceptor<T> next, TransactionConfig transactionConfig, MuleContext muleContext)
     {
         this.next = next;
         this.transactionConfig = transactionConfig;
@@ -31,7 +32,7 @@ class ExternalTransactionInterceptor<T> implements ProcessingInterceptor<T>
     }
 
     @Override
-    public T execute(ProcessingCallback<T> callback) throws Exception
+    public T execute(ExecutionCallback<T> callback) throws Exception
     {
         Transaction joinedExternal = null;
         Transaction tx = TransactionCoordination.getInstance().getTransaction();

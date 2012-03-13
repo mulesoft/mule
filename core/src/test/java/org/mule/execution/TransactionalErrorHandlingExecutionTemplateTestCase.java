@@ -7,7 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.process;
+package org.mule.execution;
 
 import org.hamcrest.core.Is;
 import org.hamcrest.core.IsNull;
@@ -20,6 +20,8 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
+import org.mule.api.execution.ExecutionCallback;
+import org.mule.api.execution.ExecutionTemplate;
 import org.mule.api.transaction.ExternalTransactionAwareTransactionFactory;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionConfig;
@@ -41,7 +43,7 @@ import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 @SmallTest
-public class TransactionalErrorHandlingProcessingTemplateTestCase extends TransactionalProcessingTemplateTestCase
+public class TransactionalErrorHandlingExecutionTemplateTestCase extends TransactionalExecutionTemplateTestCase
 {
 
     @Test
@@ -50,11 +52,11 @@ public class TransactionalErrorHandlingProcessingTemplateTestCase extends Transa
         mockTransaction.setXA(true);
         TransactionCoordination.getInstance().bindTransaction(mockTransaction);
         MuleTransactionConfig config = new MuleTransactionConfig(TransactionConfig.ACTION_NONE);
-        ProcessingTemplate processingTemplate = createProcessingTemplate(config);
+        ExecutionTemplate executionTemplate = createExecutionTemplate(config);
         MuleEvent mockExceptionListenerResultEvent = configureExceptionListenerCall();
         try
         {
-            processingTemplate.execute(getFailureTransactionCallback());
+            executionTemplate.execute(getFailureTransactionCallback());
             fail("MessagingException must be thrown");
         }
         catch (MessagingException e)
@@ -75,12 +77,12 @@ public class TransactionalErrorHandlingProcessingTemplateTestCase extends Transa
         TransactionCoordination.getInstance().bindTransaction(mockTransaction);
         mockTransaction.setXA(true);
         MuleTransactionConfig config = new MuleTransactionConfig(TransactionConfig.ACTION_ALWAYS_BEGIN);
-        ProcessingTemplate processingTemplate = createProcessingTemplate(config);
+        ExecutionTemplate executionTemplate = createExecutionTemplate(config);
         config.setFactory(new TestTransactionFactory(mockNewTransaction));
         MuleEvent exceptionListenerResult = configureExceptionListenerCall();
         try
         {
-            processingTemplate.execute(getFailureTransactionCallback());
+            executionTemplate.execute(getFailureTransactionCallback());
         }
         catch (MessagingException e)
         {
@@ -111,7 +113,7 @@ public class TransactionalErrorHandlingProcessingTemplateTestCase extends Transa
                 return mockTransaction;
             }
         });
-        ProcessingTemplate transactionTemplate = createProcessingTemplate(config);
+        ExecutionTemplate transactionTemplate = createExecutionTemplate(config);
         MuleEvent exceptionListenerResult = configureExceptionListenerCall();
         try
         {
@@ -130,7 +132,7 @@ public class TransactionalErrorHandlingProcessingTemplateTestCase extends Transa
     @Test
     public void testInnerTransactionCreatedAndResolved() throws Exception
     {
-        ProcessingTemplate transactionTemplate = createProcessingTemplate(new MuleTransactionConfig());
+        ExecutionTemplate transactionTemplate = createExecutionTemplate(new MuleTransactionConfig());
         configureExceptionListenerCall();
         when(mockMessagingException.causedRollback()).thenReturn(false);
         try
@@ -149,7 +151,7 @@ public class TransactionalErrorHandlingProcessingTemplateTestCase extends Transa
     @Test
     public void testInnerTransactionCreatedAndNotResolved() throws Exception
     {
-        ProcessingTemplate transactionTemplate = TransactionalErrorHandlingProcessingTemplate.createScopeProcessingTemplate(mockMuleContext, new MuleTransactionConfig(),mockMessagingExceptionHandler);
+        ExecutionTemplate transactionTemplate = TransactionalErrorHandlingExecutionTemplate.createScopeExecutionTemplate(mockMuleContext, new MuleTransactionConfig(), mockMessagingExceptionHandler);
         configureCatchExceptionListenerCall();
         when(mockMessagingException.causedRollback()).thenReturn(false);
         try
@@ -166,9 +168,9 @@ public class TransactionalErrorHandlingProcessingTemplateTestCase extends Transa
     }
 
     @Override
-    protected ProcessingTemplate createProcessingTemplate(MuleTransactionConfig config)
+    protected ExecutionTemplate createExecutionTemplate(MuleTransactionConfig config)
     {
-        return TransactionalErrorHandlingProcessingTemplate.createMainProcessingTemplate(mockMuleContext, config, mockMessagingExceptionHandler);
+        return TransactionalErrorHandlingExecutionTemplate.createMainExecutionTemplate(mockMuleContext, config, mockMessagingExceptionHandler);
     }
 
     private MuleEvent configureExceptionListenerCall()
@@ -203,7 +205,7 @@ public class TransactionalErrorHandlingProcessingTemplateTestCase extends Transa
         return mockResultEvent;
     }
 
-    protected ProcessingCallback<MuleEvent> getFailureTransactionCallback() throws Exception
+    protected ExecutionCallback<MuleEvent> getFailureTransactionCallback() throws Exception
     {
         return TransactionTemplateTestUtils.getFailureTransactionCallback(mockMessagingException);
     }

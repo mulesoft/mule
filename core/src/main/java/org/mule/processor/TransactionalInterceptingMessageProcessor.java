@@ -14,12 +14,12 @@ import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.exception.MessagingExceptionHandler;
+import org.mule.api.execution.ExecutionCallback;
+import org.mule.api.execution.ExecutionTemplate;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.process.ProcessingCallback;
-import org.mule.process.ProcessingTemplate;
-import org.mule.process.TransactionalErrorHandlingProcessingTemplate;
+import org.mule.execution.TransactionalErrorHandlingExecutionTemplate;
 import org.mule.transaction.MuleTransactionConfig;
 
 /**
@@ -40,8 +40,8 @@ public class TransactionalInterceptingMessageProcessor extends AbstractIntercept
         }
         else
         {
-            ProcessingTemplate<MuleEvent> processingTemplate = TransactionalErrorHandlingProcessingTemplate.createScopeProcessingTemplate(muleContext, transactionConfig, exceptionListener);
-            ProcessingCallback<MuleEvent> processingCallback = new ProcessingCallback<MuleEvent>()
+            ExecutionTemplate<MuleEvent> executionTemplate = TransactionalErrorHandlingExecutionTemplate.createScopeExecutionTemplate(muleContext, transactionConfig, exceptionListener);
+            ExecutionCallback<MuleEvent> processingCallback = new ExecutionCallback<MuleEvent>()
             {
                 public MuleEvent process() throws Exception
                 {
@@ -51,7 +51,7 @@ public class TransactionalInterceptingMessageProcessor extends AbstractIntercept
 
             try
             {
-                return processingTemplate.execute(processingCallback);
+                return executionTemplate.execute(processingCallback);
             }
             catch (MuleException e)
             {

@@ -21,6 +21,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.mule.MessageExchangePattern;
+import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleRuntimeException;
@@ -202,7 +203,7 @@ public class SedaStageInterceptingMessageProcessorTestCase extends AsyncIntercep
 
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test(expected = MessagingException.class)
     public void testProcessOneWayNoThreadingWithException() throws Exception
     {
         ThreadingProfile threadingProfile = new ChainedThreadingProfile(

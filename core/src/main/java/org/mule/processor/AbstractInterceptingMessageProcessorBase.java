@@ -19,6 +19,7 @@ import javax.xml.namespace.QName;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.api.AnnotatedObject;
+import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -104,10 +105,15 @@ public abstract class AbstractInterceptingMessageProcessorBase
             {
                 result = next.process(event);
             }
-            catch (MuleException e)
+            catch (MessagingException e)
             {
                 event.getSession().setValid(false);
                 throw e;
+            }
+            catch (Exception e)
+            {
+                event.getSession().setValid(false);
+                throw new MessagingException(event,e);
             }
             if (fireNotification)
             {

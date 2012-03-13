@@ -20,10 +20,10 @@ import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.execution.TransactionalErrorHandlingExecutionTemplate;
 import org.mule.interceptor.ProcessingTimeInterceptor;
-import org.mule.process.ProcessingCallback;
-import org.mule.process.ProcessingTemplate;
-import org.mule.process.TransactionalErrorHandlingProcessingTemplate;
+import org.mule.api.execution.ExecutionCallback;
+import org.mule.api.execution.ExecutionTemplate;
 import org.mule.transaction.MuleTransactionConfig;
 import org.mule.work.AbstractMuleEventWork;
 import org.mule.work.MuleWorkManager;
@@ -157,24 +157,23 @@ public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessa
         @Override
         protected void doRun()
         {
-            ProcessingTemplate<MuleEvent> processingTemplate = TransactionalErrorHandlingProcessingTemplate.createMainProcessingTemplate(muleContext, new MuleTransactionConfig(), event.getFlowConstruct().getExceptionListener());
+            ExecutionTemplate<MuleEvent> executionTemplate = TransactionalErrorHandlingExecutionTemplate.createMainExecutionTemplate(muleContext, new MuleTransactionConfig(), event.getFlowConstruct().getExceptionListener());
             try
             {
-                processingTemplate.execute(new ProcessingCallback<MuleEvent>() {
+                executionTemplate.execute(new ExecutionCallback<MuleEvent>()
+                {
                     @Override
                     public MuleEvent process() throws Exception
                     {
                         try
                         {
                             processNextTimed(event);
-                        }
-                        catch (MessagingException e)
+                        } catch (MessagingException e)
                         {
                             throw e;
-                        }
-                        catch (Exception e)
+                        } catch (Exception e)
                         {
-                            throw new MessagingException(event,e);
+                            throw new MessagingException(event, e);
                         }
                         return null;
                     }

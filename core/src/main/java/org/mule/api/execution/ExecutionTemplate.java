@@ -8,13 +8,17 @@
  * LICENSE.txt file.
  */
 
-package org.mule.process;
+package org.mule.api.execution;
 
-class ExecuteCallbackInterceptor<T> implements ProcessingInterceptor<T>
+/**
+ * ExecutionTemplate provides an execution context for message processing.
+ *
+ * Examples of execution context can be to provide error handling, transaction state verification,
+ * transactional demarcation.
+ *
+ * @param <T> type of the return value of the processing execution
+ */
+public interface ExecutionTemplate<T>
 {
-    @Override
-    public T execute(ProcessingCallback<T> callback) throws Exception
-    {
-        return callback.process();
-    }
+    public T execute(ExecutionCallback<T> callback) throws Exception;
 }

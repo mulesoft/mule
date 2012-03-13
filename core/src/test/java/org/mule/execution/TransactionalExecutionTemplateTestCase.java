@@ -7,7 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.process;
+package org.mule.execution;
 
 import org.hamcrest.core.Is;
 import org.hamcrest.core.IsNull;
@@ -25,6 +25,8 @@ import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.exception.MessagingExceptionHandler;
+import org.mule.api.execution.ExecutionCallback;
+import org.mule.api.execution.ExecutionTemplate;
 import org.mule.api.transaction.ExternalTransactionAwareTransactionFactory;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionConfig;
@@ -43,7 +45,7 @@ import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 @SmallTest
-public class TransactionalProcessingTemplateTestCase extends AbstractMuleTestCase
+public class TransactionalExecutionTemplateTestCase extends AbstractMuleTestCase
 {
     protected MuleContext mockMuleContext = mock(MuleContext.class);
     @Mock
@@ -76,8 +78,8 @@ public class TransactionalProcessingTemplateTestCase extends AbstractMuleTestCas
     public void testActionIndifferentConfig() throws Exception
     {
         MuleTransactionConfig config = new MuleTransactionConfig(TransactionConfig.ACTION_INDIFFERENT);
-        ProcessingTemplate processingTemplate = createProcessingTemplate(config);
-        Object result = processingTemplate.execute(getEmptyTransactionCallback());
+        ExecutionTemplate executionTemplate = createExecutionTemplate(config);
+        Object result = executionTemplate.execute(getEmptyTransactionCallback());
         assertThat((MuleEvent) result, is(RETURN_VALUE));
         assertThat(TransactionCoordination.getInstance().getTransaction(), IsNull.<Object>nullValue());
     }
@@ -86,8 +88,8 @@ public class TransactionalProcessingTemplateTestCase extends AbstractMuleTestCas
     public void testActionNeverAndNoTx() throws Exception
     {
         MuleTransactionConfig config = new MuleTransactionConfig(TransactionConfig.ACTION_NEVER);
-        ProcessingTemplate processingTemplate = createProcessingTemplate(config);
-        Object result = processingTemplate.execute(getEmptyTransactionCallback());
+        ExecutionTemplate executionTemplate = createExecutionTemplate(config);
+        Object result = executionTemplate.execute(getEmptyTransactionCallback());
         assertThat((MuleEvent) result, is(RETURN_VALUE));
     }
 
@@ -96,16 +98,16 @@ public class TransactionalProcessingTemplateTestCase extends AbstractMuleTestCas
     {
         TransactionCoordination.getInstance().bindTransaction(mockTransaction);
         MuleTransactionConfig config = new MuleTransactionConfig(TransactionConfig.ACTION_NEVER);
-        ProcessingTemplate processingTemplate = createProcessingTemplate(config);
-        processingTemplate.execute(getEmptyTransactionCallback());
+        ExecutionTemplate executionTemplate = createExecutionTemplate(config);
+        executionTemplate.execute(getEmptyTransactionCallback());
     }
 
     @Test
     public void testActionNoneAndNoTx() throws Exception
     {
         MuleTransactionConfig config = new MuleTransactionConfig(TransactionConfig.ACTION_NONE);
-        ProcessingTemplate processingTemplate = createProcessingTemplate(config);
-        Object result = processingTemplate.execute(getEmptyTransactionCallback());
+        ExecutionTemplate executionTemplate = createExecutionTemplate(config);
+        Object result = executionTemplate.execute(getEmptyTransactionCallback());
         assertThat((MuleEvent) result, is(RETURN_VALUE));
     }
 
@@ -114,8 +116,8 @@ public class TransactionalProcessingTemplateTestCase extends AbstractMuleTestCas
     {
         TransactionCoordination.getInstance().bindTransaction(mockTransaction);
         MuleTransactionConfig config = new MuleTransactionConfig(TransactionConfig.ACTION_NONE);
-        ProcessingTemplate processingTemplate = createProcessingTemplate(config);
-        Object result = processingTemplate.execute(getEmptyTransactionCallback());
+        ExecutionTemplate executionTemplate = createExecutionTemplate(config);
+        Object result = executionTemplate.execute(getEmptyTransactionCallback());
         assertThat((MuleEvent) result, is(RETURN_VALUE));
         verify(mockTransaction).commit();
         verify(mockTransaction, VerificationModeFactory.times(0)).rollback();
@@ -128,8 +130,8 @@ public class TransactionalProcessingTemplateTestCase extends AbstractMuleTestCas
         when(mockTransaction.isRollbackOnly()).thenReturn(true);
         TransactionCoordination.getInstance().bindTransaction(mockTransaction);
         MuleTransactionConfig config = new MuleTransactionConfig(TransactionConfig.ACTION_NONE);
-        ProcessingTemplate processingTemplate = createProcessingTemplate(config);
-        Object result = processingTemplate.execute(getEmptyTransactionCallback());
+        ExecutionTemplate executionTemplate = createExecutionTemplate(config);
+        Object result = executionTemplate.execute(getEmptyTransactionCallback());
         assertThat((MuleEvent) result, is(RETURN_VALUE));
         verify(mockTransaction).rollback();
         verify(mockTransaction, VerificationModeFactory.times(0)).commit();
@@ -141,8 +143,8 @@ public class TransactionalProcessingTemplateTestCase extends AbstractMuleTestCas
         mockTransaction.setXA(true);
         TransactionCoordination.getInstance().bindTransaction(mockTransaction);
         MuleTransactionConfig config = new MuleTransactionConfig(TransactionConfig.ACTION_NONE);
-        ProcessingTemplate processingTemplate = createProcessingTemplate(config);
-        Object result = processingTemplate.execute(getEmptyTransactionCallback());
+        ExecutionTemplate executionTemplate = createExecutionTemplate(config);
+        Object result = executionTemplate.execute(getEmptyTransactionCallback());
         assertThat((MuleEvent) result, is(RETURN_VALUE));
         verify(mockTransaction).suspend();
         verify(mockTransaction).resume();
@@ -168,8 +170,8 @@ public class TransactionalProcessingTemplateTestCase extends AbstractMuleTestCas
             }
         });
         mockTransaction.setXA(true);
-        ProcessingTemplate processingTemplate = createProcessingTemplate(config);
-        Object result = processingTemplate.execute(getEmptyTransactionCallback());
+        ExecutionTemplate executionTemplate = createExecutionTemplate(config);
+        Object result = executionTemplate.execute(getEmptyTransactionCallback());
         assertThat((MuleEvent) result, is(RETURN_VALUE));
         verify(mockTransaction).suspend();
         verify(mockTransaction).resume();
@@ -188,8 +190,8 @@ public class TransactionalProcessingTemplateTestCase extends AbstractMuleTestCas
         config.setFactory(mockExternalTransactionFactory);
         Transaction externalTransaction = mock(Transaction.class);
         when(mockExternalTransactionFactory.joinExternalTransaction(mockMuleContext)).thenReturn(externalTransaction);
-        ProcessingTemplate processingTemplate = createProcessingTemplate(config);
-        Object result = processingTemplate.execute(getEmptyTransactionCallback());
+        ExecutionTemplate executionTemplate = createExecutionTemplate(config);
+        Object result = executionTemplate.execute(getEmptyTransactionCallback());
         assertThat((MuleEvent) result, is(RETURN_VALUE));
         verify(mockTransaction).commit();
         verify(mockTransaction, VerificationModeFactory.times(0)).rollback();
@@ -200,9 +202,9 @@ public class TransactionalProcessingTemplateTestCase extends AbstractMuleTestCas
     public void testActionAlwaysBeginAndNoTx() throws Exception
     {
         MuleTransactionConfig config = new MuleTransactionConfig(TransactionConfig.ACTION_ALWAYS_BEGIN);
-        ProcessingTemplate processingTemplate = createProcessingTemplate(config);
+        ExecutionTemplate executionTemplate = createExecutionTemplate(config);
         config.setFactory(new TestTransactionFactory(mockTransaction));
-        Object result = processingTemplate.execute(getEmptyTransactionCallback());
+        Object result = executionTemplate.execute(getEmptyTransactionCallback());
         assertThat((MuleEvent) result, is(RETURN_VALUE));
         verify(mockTransaction).commit();
         verify(mockTransaction, VerificationModeFactory.times(0)).rollback();
@@ -214,9 +216,9 @@ public class TransactionalProcessingTemplateTestCase extends AbstractMuleTestCas
     {
         TransactionCoordination.getInstance().bindTransaction(mockTransaction);
         MuleTransactionConfig config = new MuleTransactionConfig(TransactionConfig.ACTION_ALWAYS_BEGIN);
-        ProcessingTemplate processingTemplate = createProcessingTemplate(config);
+        ExecutionTemplate executionTemplate = createExecutionTemplate(config);
         config.setFactory(new TestTransactionFactory(mockNewTransaction));
-        Object result = processingTemplate.execute(getEmptyTransactionCallback());
+        Object result = executionTemplate.execute(getEmptyTransactionCallback());
         assertThat((MuleEvent) result, is(RETURN_VALUE));
         verify(mockTransaction).commit();
         verify(mockNewTransaction).commit();
@@ -231,9 +233,9 @@ public class TransactionalProcessingTemplateTestCase extends AbstractMuleTestCas
         TransactionCoordination.getInstance().bindTransaction(mockTransaction);
         when(mockTransaction.isRollbackOnly()).thenReturn(true);
         MuleTransactionConfig config = new MuleTransactionConfig(TransactionConfig.ACTION_ALWAYS_BEGIN);
-        ProcessingTemplate processingTemplate = createProcessingTemplate(config);
+        ExecutionTemplate executionTemplate = createExecutionTemplate(config);
         config.setFactory(new TestTransactionFactory(mockNewTransaction));
-        Object result = processingTemplate.execute(getEmptyTransactionCallback());
+        Object result = executionTemplate.execute(getEmptyTransactionCallback());
         assertThat((MuleEvent) result, is(RETURN_VALUE));
         verify(mockTransaction).rollback();
         verify(mockNewTransaction).commit();
@@ -248,9 +250,9 @@ public class TransactionalProcessingTemplateTestCase extends AbstractMuleTestCas
         TransactionCoordination.getInstance().bindTransaction(mockTransaction);
         when(mockTransaction.isRollbackOnly()).thenReturn(true);
         MuleTransactionConfig config = new MuleTransactionConfig(TransactionConfig.ACTION_ALWAYS_BEGIN);
-        ProcessingTemplate processingTemplate = createProcessingTemplate(config);
+        ExecutionTemplate executionTemplate = createExecutionTemplate(config);
         config.setFactory(new TestTransactionFactory(mockNewTransaction));
-        Object result = processingTemplate.execute(getRollbackTransactionCallback());
+        Object result = executionTemplate.execute(getRollbackTransactionCallback());
         assertThat((MuleEvent) result, is(RETURN_VALUE));
         verify(mockTransaction).rollback();
         verify(mockNewTransaction).rollback();
@@ -265,9 +267,9 @@ public class TransactionalProcessingTemplateTestCase extends AbstractMuleTestCas
         TransactionCoordination.getInstance().bindTransaction(mockTransaction);
         mockTransaction.setXA(true);
         MuleTransactionConfig config = new MuleTransactionConfig(TransactionConfig.ACTION_ALWAYS_BEGIN);
-        ProcessingTemplate processingTemplate = createProcessingTemplate(config);
+        ExecutionTemplate executionTemplate = createExecutionTemplate(config);
         config.setFactory(new TestTransactionFactory(mockNewTransaction));
-        Object result = processingTemplate.execute(getEmptyTransactionCallback());
+        Object result = executionTemplate.execute(getEmptyTransactionCallback());
         assertThat((MuleEvent) result, is(RETURN_VALUE));
         verify(mockNewTransaction).commit();
         verify(mockNewTransaction, VerificationModeFactory.times(0)).rollback();
@@ -285,9 +287,9 @@ public class TransactionalProcessingTemplateTestCase extends AbstractMuleTestCas
         mockTransaction.setXA(true);
         when(mockTransaction.isRollbackOnly()).thenReturn(true);
         MuleTransactionConfig config = new MuleTransactionConfig(TransactionConfig.ACTION_ALWAYS_BEGIN);
-        ProcessingTemplate processingTemplate = createProcessingTemplate(config);
+        ExecutionTemplate executionTemplate = createExecutionTemplate(config);
         config.setFactory(new TestTransactionFactory(mockNewTransaction));
-        Object result = processingTemplate.execute(getRollbackTransactionCallback());
+        Object result = executionTemplate.execute(getRollbackTransactionCallback());
         assertThat((MuleEvent) result, is(RETURN_VALUE));
         verify(mockNewTransaction).rollback();
         verify(mockNewTransaction, VerificationModeFactory.times(0)).commit();
@@ -304,8 +306,8 @@ public class TransactionalProcessingTemplateTestCase extends AbstractMuleTestCas
     public void testActionAlwaysJoinAndNoTx() throws Exception
     {
         MuleTransactionConfig config = new MuleTransactionConfig(TransactionConfig.ACTION_ALWAYS_JOIN);
-        ProcessingTemplate processingTemplate = createProcessingTemplate(config);
-        processingTemplate.execute(getRollbackTransactionCallback());
+        ExecutionTemplate executionTemplate = createExecutionTemplate(config);
+        executionTemplate.execute(getRollbackTransactionCallback());
     }
 
     @Test
@@ -313,8 +315,8 @@ public class TransactionalProcessingTemplateTestCase extends AbstractMuleTestCas
     {
         TransactionCoordination.getInstance().bindTransaction(mockTransaction);
         MuleTransactionConfig config = new MuleTransactionConfig(TransactionConfig.ACTION_ALWAYS_JOIN);
-        ProcessingTemplate processingTemplate = createProcessingTemplate(config);
-        Object result = processingTemplate.execute(getRollbackTransactionCallback());
+        ExecutionTemplate executionTemplate = createExecutionTemplate(config);
+        Object result = executionTemplate.execute(getRollbackTransactionCallback());
         assertThat((MuleEvent) result, is(RETURN_VALUE));
         verify(mockTransaction, VerificationModeFactory.times(0)).commit();
         verify(mockTransaction, VerificationModeFactory.times(0)).rollback();
@@ -326,9 +328,9 @@ public class TransactionalProcessingTemplateTestCase extends AbstractMuleTestCas
     public void testActionBeginOrJoinAndNoTx() throws Exception
     {
         MuleTransactionConfig config = new MuleTransactionConfig(TransactionConfig.ACTION_BEGIN_OR_JOIN);
-        ProcessingTemplate processingTemplate = createProcessingTemplate(config);
+        ExecutionTemplate executionTemplate = createExecutionTemplate(config);
         config.setFactory(new TestTransactionFactory(mockTransaction));
-        Object result = processingTemplate.execute(getEmptyTransactionCallback());
+        Object result = executionTemplate.execute(getEmptyTransactionCallback());
         assertThat((MuleEvent) result, is(RETURN_VALUE));
         verify(mockTransaction).commit();
         verify(mockTransaction, VerificationModeFactory.times(0)).rollback();
@@ -340,9 +342,9 @@ public class TransactionalProcessingTemplateTestCase extends AbstractMuleTestCas
     {
         TransactionCoordination.getInstance().bindTransaction(mockTransaction);
         MuleTransactionConfig config = new MuleTransactionConfig(TransactionConfig.ACTION_BEGIN_OR_JOIN);
-        ProcessingTemplate processingTemplate = createProcessingTemplate(config);
+        ExecutionTemplate executionTemplate = createExecutionTemplate(config);
         config.setFactory(new TestTransactionFactory(mockTransaction));
-        Object result = processingTemplate.execute(getEmptyTransactionCallback());
+        Object result = executionTemplate.execute(getEmptyTransactionCallback());
         assertThat((MuleEvent) result, is(RETURN_VALUE));
         verify(mockTransaction, VerificationModeFactory.times(0)).commit();
         verify(mockTransaction, VerificationModeFactory.times(0)).rollback();
@@ -353,8 +355,8 @@ public class TransactionalProcessingTemplateTestCase extends AbstractMuleTestCas
     public void testActionJoinIfPossibleAndNoTx() throws Exception
     {
         MuleTransactionConfig config = new MuleTransactionConfig(TransactionConfig.ACTION_JOIN_IF_POSSIBLE);
-        ProcessingTemplate processingTemplate = createProcessingTemplate(config);
-        Object result = processingTemplate.execute(getEmptyTransactionCallback());
+        ExecutionTemplate executionTemplate = createExecutionTemplate(config);
+        Object result = executionTemplate.execute(getEmptyTransactionCallback());
         assertThat((MuleEvent) result, is(RETURN_VALUE));
         assertThat(TransactionCoordination.getInstance().getTransaction(), IsNull.<Object>nullValue());
     }
@@ -364,25 +366,25 @@ public class TransactionalProcessingTemplateTestCase extends AbstractMuleTestCas
     {
         TransactionCoordination.getInstance().bindTransaction(mockTransaction);
         MuleTransactionConfig config = new MuleTransactionConfig(TransactionConfig.ACTION_JOIN_IF_POSSIBLE);
-        ProcessingTemplate processingTemplate = createProcessingTemplate(config);
-        Object result = processingTemplate.execute(getEmptyTransactionCallback());
+        ExecutionTemplate executionTemplate = createExecutionTemplate(config);
+        Object result = executionTemplate.execute(getEmptyTransactionCallback());
         assertThat((MuleEvent) result, is(RETURN_VALUE));
         verify(mockTransaction, VerificationModeFactory.times(0)).commit();
         verify(mockTransaction, VerificationModeFactory.times(0)).rollback();
         assertThat((TestTransaction) TransactionCoordination.getInstance().getTransaction(), Is.is(mockTransaction));
     }
 
-    protected ProcessingTemplate createProcessingTemplate(MuleTransactionConfig config)
+    protected ExecutionTemplate createExecutionTemplate(MuleTransactionConfig config)
     {
-        return TransactionalErrorHandlingProcessingTemplate.createMainProcessingTemplate(mockMuleContext, config, mockMessagingExceptionHandler);
+        return TransactionalErrorHandlingExecutionTemplate.createMainExecutionTemplate(mockMuleContext, config, mockMessagingExceptionHandler);
     }
 
-    protected ProcessingCallback getEmptyTransactionCallback()
+    protected ExecutionCallback getEmptyTransactionCallback()
     {
         return TransactionTemplateTestUtils.getEmptyTransactionCallback(RETURN_VALUE);
     }
 
-    protected ProcessingCallback getRollbackTransactionCallback()
+    protected ExecutionCallback getRollbackTransactionCallback()
     {
         return TransactionTemplateTestUtils.getRollbackTransactionCallback(RETURN_VALUE);
     }

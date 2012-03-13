@@ -12,6 +12,7 @@ package org.mule.processor.chain;
 
 import org.mule.MessageExchangePattern;
 import org.mule.OptimizedRequestContext;
+import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.component.Component;
@@ -96,7 +97,19 @@ public class DefaultMessageProcessorChain extends AbstractMessageProcessorChain
                 copy = OptimizedRequestContext.criticalSetEvent(currentEvent);
             }
 
-            resultEvent = processor.process(currentEvent);
+            try 
+            {
+                resultEvent = processor.process(currentEvent);
+            }
+            catch (MessagingException e)
+            {
+                throw e;
+            }
+            catch (Exception e)
+            {
+                throw new MessagingException(currentEvent,e);
+            }
+
             if (resultWasNull && processor instanceof RequestReplyReplierMessageProcessor)
             {
                 // reply-to processing should not resurrect a dead event

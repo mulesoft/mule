@@ -11,6 +11,7 @@
 package org.mule.transport;
 
 
+import org.mule.api.MessagingException;
 import org.mule.api.MuleException;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
@@ -392,7 +393,7 @@ public class ConnectorLifecycleTestCase extends AbstractMuleContextTestCase
             out.process(getTestEvent("data"));
             fail("cannot send on a connector that is not started");
         }
-        catch (LifecycleException e)
+        catch (MessagingException e)
         {
             // expected
         }

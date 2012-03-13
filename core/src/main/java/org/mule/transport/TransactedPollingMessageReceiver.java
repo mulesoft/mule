@@ -19,8 +19,8 @@ import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.transport.Connector;
-import org.mule.process.ProcessingCallback;
-import org.mule.process.ProcessingTemplate;
+import org.mule.api.execution.ExecutionCallback;
+import org.mule.api.execution.ExecutionTemplate;
 
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -107,7 +107,7 @@ public abstract class TransactedPollingMessageReceiver extends AbstractPollingMe
     @Override
     public void poll() throws Exception
     {
-        ProcessingTemplate<MuleEvent> pt = createProcessingTemplate();
+        ExecutionTemplate<MuleEvent> pt = createExecutionTemplate();
 
         if (this.isReceiveMessagesInTransaction())
         {
@@ -118,7 +118,7 @@ public abstract class TransactedPollingMessageReceiver extends AbstractPollingMe
             // Receive messages and process them in a single transaction
             // Do not enable threading here, but several workers
             // may have been started
-            ProcessingCallback<MuleEvent> cb = new ProcessingCallback<MuleEvent>()
+            ExecutionCallback<MuleEvent> cb = new ExecutionCallback<MuleEvent>()
             {
                 @Override
                 public MuleEvent process() throws Exception
@@ -170,13 +170,13 @@ public abstract class TransactedPollingMessageReceiver extends AbstractPollingMe
         return  false;
     }
 
-    protected class MessageProcessorWorker implements Work, ProcessingCallback<MuleEvent>
+    protected class MessageProcessorWorker implements Work, ExecutionCallback<MuleEvent>
     {
-        private final ProcessingTemplate<MuleEvent> pt;
+        private final ExecutionTemplate<MuleEvent> pt;
         private final Object message;
         private final CountDownLatch latch;
 
-        public MessageProcessorWorker(ProcessingTemplate<MuleEvent> pt, CountDownLatch latch, Object message)
+        public MessageProcessorWorker(ExecutionTemplate<MuleEvent> pt, CountDownLatch latch, Object message)
         {
             this.pt = pt;
             this.message = message;

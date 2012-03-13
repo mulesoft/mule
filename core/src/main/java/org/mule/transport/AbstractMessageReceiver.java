@@ -23,6 +23,7 @@ import org.mule.api.construct.FlowConstruct;
 import org.mule.api.context.WorkManager;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.execution.ExecutionTemplate;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.processor.MessageProcessor;
@@ -34,8 +35,7 @@ import org.mule.api.transport.MessageReceiver;
 import org.mule.api.transport.PropertyScope;
 import org.mule.api.transport.ReplyToHandler;
 import org.mule.context.notification.EndpointMessageNotification;
-import org.mule.process.ProcessingTemplate;
-import org.mule.process.TransactionalErrorHandlingProcessingTemplate;
+import org.mule.execution.TransactionalErrorHandlingExecutionTemplate;
 import org.mule.session.DefaultMuleSession;
 import org.mule.session.LegacySessionHandler;
 import org.mule.transaction.TransactionCoordination;
@@ -379,8 +379,8 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
         return ((AbstractConnector) endpoint.getConnector()).getReplyToHandler(endpoint);
     }
 
-    protected ProcessingTemplate<MuleEvent> createProcessingTemplate()
+    protected ExecutionTemplate<MuleEvent> createExecutionTemplate()
     {
-        return TransactionalErrorHandlingProcessingTemplate.createMainProcessingTemplate(endpoint.getMuleContext(), endpoint.getTransactionConfig());
+        return TransactionalErrorHandlingExecutionTemplate.createMainExecutionTemplate(endpoint.getMuleContext(), endpoint.getTransactionConfig());
     }
 }

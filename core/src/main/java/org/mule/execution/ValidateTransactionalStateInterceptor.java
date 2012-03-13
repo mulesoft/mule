@@ -8,27 +8,28 @@
  * LICENSE.txt file.
  */
 
-package org.mule.process;
+package org.mule.execution;
 
+import org.mule.api.execution.ExecutionCallback;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionConfig;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.transaction.IllegalTransactionStateException;
 import org.mule.transaction.TransactionCoordination;
 
-class ValidateTransactionalStateInterceptor<T> implements ProcessingInterceptor<T>
+class ValidateTransactionalStateInterceptor<T> implements ExecutionInterceptor<T>
 {
-    private final ProcessingInterceptor<T> next;
+    private final ExecutionInterceptor<T> next;
     private final TransactionConfig transactionConfig;
 
-    public ValidateTransactionalStateInterceptor(ProcessingInterceptor<T> next, TransactionConfig transactionConfig)
+    public ValidateTransactionalStateInterceptor(ExecutionInterceptor<T> next, TransactionConfig transactionConfig)
     {
         this.next = next;
         this.transactionConfig = transactionConfig;
     }
 
     @Override
-    public T execute(ProcessingCallback<T> callback) throws Exception
+    public T execute(ExecutionCallback<T> callback) throws Exception
     {
         Transaction tx = TransactionCoordination.getInstance().getTransaction();
         if (transactionConfig.getAction() == TransactionConfig.ACTION_NEVER && tx != null)

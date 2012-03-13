@@ -8,9 +8,11 @@
  * LICENSE.txt file.
  */
 
-package org.mule.process;
+package org.mule.execution;
 
-interface ProcessingInterceptor<T>
+import org.mule.api.execution.ExecutionCallback;
+
+interface ExecutionInterceptor<T>
 {
-    T execute(ProcessingCallback<T> callback) throws Exception;
+    T execute(ExecutionCallback<T> callback) throws Exception;
 }

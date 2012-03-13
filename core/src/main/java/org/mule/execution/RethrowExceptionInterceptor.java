@@ -8,23 +8,24 @@
  * LICENSE.txt file.
  */
 
-package org.mule.process;
+package org.mule.execution;
 
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
+import org.mule.api.execution.ExecutionCallback;
 
-class RethrowExceptionInterceptor implements ProcessingInterceptor<MuleEvent>
+class RethrowExceptionInterceptor implements ExecutionInterceptor<MuleEvent>
 {
 
-    private final ProcessingInterceptor<MuleEvent> next;
+    private final ExecutionInterceptor<MuleEvent> next;
 
-    public RethrowExceptionInterceptor(ProcessingInterceptor<MuleEvent> next)
+    public RethrowExceptionInterceptor(ExecutionInterceptor<MuleEvent> next)
     {
         this.next = next;
     }
 
     @Override
-    public MuleEvent execute(ProcessingCallback<MuleEvent> processingCallback) throws Exception
+    public MuleEvent execute(ExecutionCallback<MuleEvent> processingCallback) throws Exception
     {
         try
         {

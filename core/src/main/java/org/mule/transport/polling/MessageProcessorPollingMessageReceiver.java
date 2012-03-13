@@ -20,13 +20,13 @@ import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.execution.ExecutionCallback;
+import org.mule.api.execution.ExecutionTemplate;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transport.Connector;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.process.ProcessingCallback;
-import org.mule.process.ProcessingTemplate;
 import org.mule.transport.AbstractConnector;
 import org.mule.transport.AbstractPollingMessageReceiver;
 import org.mule.transport.NullPayload;
@@ -73,16 +73,16 @@ public class MessageProcessorPollingMessageReceiver extends AbstractPollingMessa
     @Override
     public void poll() throws Exception
     {
-        ProcessingTemplate<MuleEvent> processingTemplate = createProcessingTemplate();
+        ExecutionTemplate<MuleEvent> executionTemplate = createExecutionTemplate();
         try
         {
-            processingTemplate.execute(new ProcessingCallback<MuleEvent> ()
+            executionTemplate.execute(new ExecutionCallback<MuleEvent>()
             {
                 @Override
                 public MuleEvent process() throws Exception
                 {
                     MuleMessage request = new DefaultMuleMessage(StringUtils.EMPTY, (Map<String, Object>) null,
-                    connector.getMuleContext());
+                            connector.getMuleContext());
                     ImmutableEndpoint ep = endpoint;
                     if (sourceMessageProcessor instanceof ImmutableEndpoint)
                     {
@@ -95,12 +95,11 @@ public class MessageProcessorPollingMessageReceiver extends AbstractPollingMessa
                     if (isNewMessage(sourceEvent))
                     {
                         routeMessage(sourceEvent.getMessage());
-                    }
-                    else
+                    } else
                     {
                         // TODO DF: i18n
                         logger.info(String.format("Polling of '%s' returned null, the flow will not be invoked.",
-                            sourceMessageProcessor));
+                                sourceMessageProcessor));
                     }
                     return null;
                 }

@@ -19,6 +19,7 @@ import org.mule.api.MuleException;
 import org.mule.api.NameableObject;
 import org.mule.api.config.ThreadingProfile;
 import org.mule.api.context.WorkManager;
+import org.mule.api.execution.ExecutionCallback;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Lifecycle;
 import org.mule.api.lifecycle.LifecycleCallback;
@@ -28,10 +29,9 @@ import org.mule.api.service.FailedToQueueEventException;
 import org.mule.config.QueueProfile;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
+import org.mule.execution.TransactionalErrorHandlingExecutionTemplate;
 import org.mule.lifecycle.EmptyLifecycleCallback;
 import org.mule.management.stats.QueueStatistics;
-import org.mule.process.ProcessingCallback;
-import org.mule.process.TransactionalErrorHandlingProcessingTemplate;
 import org.mule.service.Pausable;
 import org.mule.service.Resumable;
 import org.mule.util.concurrent.WaitableBoolean;
@@ -219,8 +219,8 @@ public class SedaStageInterceptingMessageProcessor extends AsyncInterceptingMess
             if (event != null)
             {
                 final MuleEvent eventToProcess = event;
-                TransactionalErrorHandlingProcessingTemplate processingTemplate = TransactionalErrorHandlingProcessingTemplate.createMainProcessingTemplate(muleContext, event.getFlowConstruct().getExceptionListener());
-                ProcessingCallback<MuleEvent> processingCallback = new ProcessingCallback<MuleEvent>()
+                TransactionalErrorHandlingExecutionTemplate executionTemplate = TransactionalErrorHandlingExecutionTemplate.createMainExecutionTemplate(muleContext, event.getFlowConstruct().getExceptionListener());
+                ExecutionCallback<MuleEvent> processingCallback = new ExecutionCallback<MuleEvent>()
                 {
 
                     @Override
@@ -257,7 +257,7 @@ public class SedaStageInterceptingMessageProcessor extends AsyncInterceptingMess
 
                 try
                 {
-                    processingTemplate.execute(processingCallback);
+                    executionTemplate.execute(processingCallback);
                 }
                 catch (MessagingException e)
                 {

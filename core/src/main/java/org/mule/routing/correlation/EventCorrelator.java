@@ -17,6 +17,8 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessageCollection;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.construct.FlowConstruct;
+import org.mule.api.execution.ExecutionCallback;
+import org.mule.api.execution.ExecutionTemplate;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.processor.MessageProcessor;
@@ -31,9 +33,7 @@ import org.mule.api.store.ObjectStoreException;
 import org.mule.api.store.ObjectStoreManager;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.context.notification.RoutingNotification;
-import org.mule.process.ErrorHandlingProcessingTemplate;
-import org.mule.process.ProcessingCallback;
-import org.mule.process.ProcessingTemplate;
+import org.mule.execution.ErrorHandlingExecutionTemplate;
 import org.mule.routing.EventGroup;
 import org.mule.routing.EventProcessingThread;
 import org.mule.util.StringMessageUtils;
@@ -550,10 +550,10 @@ public class EventCorrelator implements Startable, Stoppable
                 for (Object anExpired : expired)
                 {
                     final EventGroup group = (EventGroup) anExpired;
-                    ProcessingTemplate<MuleEvent> processingTemplate = ErrorHandlingProcessingTemplate.createErrorHandlingProcessingTemplate(muleContext, group.getMessageCollectionEvent().getFlowConstruct().getExceptionListener());
+                    ExecutionTemplate<MuleEvent> executionTemplate = ErrorHandlingExecutionTemplate.createErrorHandlingExecutionTemplate(muleContext, group.getMessageCollectionEvent().getFlowConstruct().getExceptionListener());
                     try
                     {
-                        processingTemplate.execute(new ProcessingCallback<MuleEvent>()
+                        executionTemplate.execute(new ExecutionCallback<MuleEvent>()
                         {
                             @Override
                             public MuleEvent process() throws Exception

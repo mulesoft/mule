@@ -8,24 +8,25 @@
  * LICENSE.txt file.
  */
 
-package org.mule.process;
+package org.mule.execution;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.api.MessagingException;
+import org.mule.api.execution.ExecutionCallback;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionConfig;
 import org.mule.api.transaction.TransactionException;
 import org.mule.transaction.TransactionCoordination;
 
-public class SuspendXaTransactionInterceptor<T> implements ProcessingInterceptor<T>
+public class SuspendXaTransactionInterceptor<T> implements ExecutionInterceptor<T>
 {
     private static final Log logger = LogFactory.getLog(SuspendXaTransactionInterceptor.class);
-    private final ProcessingInterceptor<T> next;
+    private final ExecutionInterceptor<T> next;
     private final TransactionConfig transactionConfig;
     private final boolean processOnException;
 
-    public SuspendXaTransactionInterceptor(ProcessingInterceptor<T> next, TransactionConfig transactionConfig, boolean processOnException)
+    public SuspendXaTransactionInterceptor(ExecutionInterceptor<T> next, TransactionConfig transactionConfig, boolean processOnException)
     {
         this.next = next;
         this.transactionConfig = transactionConfig;
@@ -33,7 +34,7 @@ public class SuspendXaTransactionInterceptor<T> implements ProcessingInterceptor
     }
 
     @Override
-    public T execute(ProcessingCallback<T> callback) throws Exception
+    public T execute(ExecutionCallback<T> callback) throws Exception
     {
         Transaction suspendedXATx = null;
         Transaction tx = TransactionCoordination.getInstance().getTransaction();
