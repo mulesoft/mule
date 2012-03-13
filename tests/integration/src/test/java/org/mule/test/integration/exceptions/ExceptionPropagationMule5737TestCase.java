@@ -13,6 +13,7 @@ package org.mule.test.integration.exceptions;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.client.MuleClient;
@@ -105,6 +106,7 @@ public class ExceptionPropagationMule5737TestCase extends FunctionalTestCase
             caught = true;
             MuleEvent resultEvent = super.handleException(e, event);
             resultEvent.getMessage().setExceptionPayload(null);
+            ((MessagingException)e).setHandled(true);
             return resultEvent;
         }
 

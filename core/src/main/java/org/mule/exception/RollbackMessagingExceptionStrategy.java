@@ -80,6 +80,7 @@ public class RollbackMessagingExceptionStrategy extends TemplateMessagingExcepti
             {
                 try
                 {
+                    markExceptionAsHandled(t);
                     resultEvent = redeliveryExceeded.process(event);
                 }
                 catch (MuleException e)

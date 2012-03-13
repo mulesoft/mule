@@ -52,11 +52,19 @@ public abstract class TemplateMessagingExceptionStrategy extends AbstractExcepti
         return event;
     }
 
-    protected void markExceptionAsHandledIfRequired(Exception exception)
+    private void markExceptionAsHandledIfRequired(Exception exception)
     {
-        if (exception instanceof MessagingException && handleException)
+        if (handleException)
         {
-            ((MessagingException)exception).setHandled(handleException);
+            markExceptionAsHandled(exception);
+        }
+    }
+    
+    protected void markExceptionAsHandled(Exception exception)
+    {
+        if (exception instanceof MessagingException)
+        {
+            ((MessagingException)exception).setHandled(true);
         }
     }
 
