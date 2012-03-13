@@ -10,6 +10,8 @@
 
 package org.mule.test.integration.construct;
 
+import static org.junit.Assert.assertTrue;
+
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.cache.CachingStrategy;
@@ -18,6 +20,8 @@ import org.mule.api.processor.MessageProcessor;
 import java.util.Arrays;
 import java.util.Collection;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.runners.Parameterized;
 
 /**
@@ -26,6 +30,7 @@ import org.junit.runners.Parameterized;
  */
 public class CachedHttpProxyTestCase extends HttpProxyTestCase
 {
+    private static boolean invokedCache;
 
     public CachedHttpProxyTestCase(ConfigVariant variant, String configResources)
     {
@@ -40,12 +45,25 @@ public class CachedHttpProxyTestCase extends HttpProxyTestCase
         });
     }
 
+    @Before
+    public void setUp() throws Exception
+    {
+        invokedCache = false;
+    }
+
+    @After
+    public void tearDown() throws Exception
+    {
+        assertTrue("Cache was never invoked", invokedCache);
+    }
+
     public static class TestCachingStrategy implements CachingStrategy
     {
 
         @Override
         public MuleEvent process(MuleEvent request, MessageProcessor messageProcessor) throws MuleException
         {
+            invokedCache = true;
             return messageProcessor.process(request);
         }
     }
