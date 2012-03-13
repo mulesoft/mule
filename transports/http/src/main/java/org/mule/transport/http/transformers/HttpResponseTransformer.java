@@ -15,6 +15,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;
 import org.mule.transformer.AbstractMessageTransformer;
 import org.mule.transformer.types.DataTypeFactory;
+import org.mule.transport.http.CacheControlHeader;
 import org.mule.transport.http.CookieHelper;
 import org.mule.transport.http.CookieWrapper;
 import org.mule.transport.http.HttpConnector;
@@ -41,6 +42,7 @@ public class HttpResponseTransformer extends AbstractMessageTransformer
     private String contentType;
     private String status;
     private String version;
+    private CacheControlHeader cacheControl;
 
     public HttpResponseTransformer()
     {
@@ -58,7 +60,7 @@ public class HttpResponseTransformer extends AbstractMessageTransformer
         setContentType(httpResponse, msg);
         setHeaders(httpResponse, msg);
         setCookies(httpResponse, msg);
-
+        setCacheControl(httpResponse, msg);
         String date = new SimpleDateFormat(HttpConstants.DATE_FORMAT, Locale.US).format(new Date());
         httpResponse.setHeader(new Header(HttpConstants.HEADER_DATE, date));
 
@@ -67,8 +69,25 @@ public class HttpResponseTransformer extends AbstractMessageTransformer
         return httpResponse;
     }
 
+    protected void setCacheControl(HttpResponse response, MuleMessage message)
+    {
+        if(cacheControl != null)
+        {
+            cacheControl.evaluate(message, muleContext.getExpressionManager());
+            String cacheControlValue = cacheControl.toString();
+            if(!"".equals(cacheControlValue))
+            {
+                Header cacheControlHeader = response.getFirstHeader(HttpConstants.HEADER_CACHE_CONTROL);
+                if(cacheControlHeader != null)
+                {
+                    cacheControlValue += "," + cacheControlHeader.getValue();
+                }
+                response.setHeader(new Header(HttpConstants.HEADER_CACHE_CONTROL, cacheControlValue));
+            }
+        }
+    }
 
-    private void setBody(HttpResponse response, MuleMessage message) throws TransformerException
+    protected void setBody(HttpResponse response, MuleMessage message) throws TransformerException
     {
         MuleMessage bodyContent = message;
         if(body != null)
@@ -123,7 +142,7 @@ public class HttpResponseTransformer extends AbstractMessageTransformer
     }
 
 
-    private void setCookies(HttpResponse response, MuleMessage message) throws TransformerException
+    protected void setCookies(HttpResponse response, MuleMessage message) throws TransformerException
     {
         if(!cookies.isEmpty())
         {
@@ -145,7 +164,7 @@ public class HttpResponseTransformer extends AbstractMessageTransformer
         }
     }
 
-    private void setHeaders(HttpResponse response, MuleMessage message)
+    protected void setHeaders(HttpResponse response, MuleMessage message)
     {
         if(headers != null && !headers.isEmpty())
         {
@@ -160,7 +179,11 @@ public class HttpResponseTransformer extends AbstractMessageTransformer
 
     protected void checkVersion(MuleMessage message)
     {
-        setDefaultVersion(message);
+        version = message.getInboundProperty(HttpConnector.HTTP_VERSION_PROPERTY);
+        if(version == null)
+        {
+           version = HttpConstants.HTTP11;
+        }
     }
 
     private void setStatus(HttpResponse response, MuleMessage message) throws TransformerException
@@ -180,7 +203,7 @@ public class HttpResponseTransformer extends AbstractMessageTransformer
 
     }
 
-    private void setContentType(HttpResponse response, MuleMessage message)
+    protected void setContentType(HttpResponse response, MuleMessage message)
     {
         if(contentType == null)
         {
@@ -200,15 +223,6 @@ public class HttpResponseTransformer extends AbstractMessageTransformer
         }
 
         return String.valueOf(realValue);
-    }
-
-    private void setDefaultVersion(MuleMessage message)
-    {
-        version = message.getInboundProperty(HttpConnector.HTTP_VERSION_PROPERTY);
-        if(version == null)
-        {
-           version = HttpConstants.HTTP11;
-        }
     }
 
     private String getDefaultContentType(MuleMessage message)
@@ -255,6 +269,16 @@ public class HttpResponseTransformer extends AbstractMessageTransformer
     public void addHeader(String key, String value)
     {
         headers.put(key, value);
+    }
+
+    public void setCacheControl(CacheControlHeader cacheControl)
+    {
+        this.cacheControl = cacheControl;
+    }
+
+    public String getVersion()
+    {
+        return version;
     }
 
 }

@@ -75,7 +75,7 @@ public class HttpResponseTestCase extends FunctionalTestCase
         MuleMessage response = client.send("http://localhost:" + dynamicPort.getNumber() + "/resources/all", muleMessage);
         assertEquals("Custom body", response.getPayloadAsString());
         assertEquals("" + HttpConstants.SC_NOT_FOUND, response.getInboundProperty("http.status"));
-        assertEquals("max-age=3600", response.getInboundProperty("Cache-Control"));
+        assertEquals("public,no-cache,must-revalidate,max-age=3600,no-transform", response.getInboundProperty("Cache-Control"));
         assertEquals("Thu, 01 Dec 2014 16:00:00 GMT", response.getInboundProperty("Expires"));
         assertEquals("http://localhost:9090", response.getInboundProperty("Location"));
         assertEquals("value1", response.getInboundProperty("header1"));
@@ -111,7 +111,7 @@ public class HttpResponseTestCase extends FunctionalTestCase
         properties.put("customBody", "Custom body");
         properties.put("contentType", "text/html");
         properties.put("status", HttpConstants.SC_NOT_FOUND);
-        properties.put("cacheControl", "max-age=3600");
+        properties.put("cacheControl", "3600");
         properties.put("expires", "Thu, 01 Dec 2014 16:00:00 GMT");
         properties.put("location", "http://localhost:9090");
         properties.put("header1", "header1");

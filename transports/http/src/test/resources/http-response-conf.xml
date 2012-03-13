@@ -29,11 +29,12 @@
     <flow name="testResponseAll" processingStrategy="synchronous">
         <http:inbound-endpoint address="http://localhost:${port1}/resources/all" exchange-pattern="request-response"/>
         <http:response status="404" contentType="text/html">
-            <http:cache-control value="max-age=3600"/>
+            <http:cache-control directive="public" noCache="true" mustRevalidate="true" maxAge="3600"/>
             <http:expires value="Thu, 01 Dec 2014 16:00:00 GMT" />
             <http:location value="http://localhost:9090"/>
             <http:set-cookie name="cookie1" value="value1" domain="localhost" path="/" expiryDate="Fri, 12 Dec 2014 17:00:00 GMT" secure="true"/>
             <http:set-cookie name="cookie2" value="value2" maxAge="1000"/>
+            <http:header name="Cache-Control" value="no-transform"/>
             <http:header name="header1" value="value1"/>
             <http:header name="header2" value="value2"/>
             <http:body>Custom body</http:body>
@@ -44,7 +45,7 @@
      <flow name="testResponseAllExpressions" processingStrategy="synchronous">
         <http:inbound-endpoint address="http://localhost:${port1}/resources/allExpressions" exchange-pattern="request-response"/>
         <http:response status="#[header:inbound:status]" contentType="#[header:inbound:contentType]">
-            <http:cache-control value="#[header:inbound:cacheControl]"/>
+            <http:cache-control maxAge="#[header:inbound:cacheControl]"/>
             <http:expires value="Thu, 01 Dec 2014 16:00:00 GMT" />
             <http:location value="http://localhost:9090"/>
             <http:set-cookie name="#[header:inbound:cookie1]" value="#[header:inbound:value1]" domain="#[header:inbound:domain]" path="#[header:inbound:path]" expiryDate="#[header:inbound:expiryDate]" secure="#[header:inbound:secure]"/>
