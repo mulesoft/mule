@@ -15,14 +15,9 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
-import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
-import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.expression.RequiredValueException;
-import org.mule.construct.Flow;
 import org.mule.expression.transformers.BeanBuilderTransformer;
 import org.mule.expression.transformers.ExpressionArgument;
 import org.mule.expression.transformers.ExpressionTransformer;
@@ -44,7 +39,7 @@ public class ExpressionTransformerELTestCase extends FunctionalTestCase
     @Override
     protected String getConfigResources()
     {
-        return "org/mule/test/transformers/expression-transformers-test.xml";
+        return "org/mule/test/transformers/expression-transformers-el-test.xml";
     }
 
     private void testTransformerConfig(String name) throws Exception
@@ -55,8 +50,8 @@ public class ExpressionTransformerELTestCase extends FunctionalTestCase
         assertNotNull(transformer.getArguments());
         assertEquals(2, transformer.getArguments().size());
         ExpressionArgument arg1 = transformer.getArguments().get(0);
-        assertEquals("payload", arg1.getEvaluator());
-        assertEquals("org.mule.tck.testmodels.fruit.FruitBasket", arg1.getExpression());
+        assertNull(arg1.getEvaluator());
+        assertEquals("message.payloadAs(org.mule.tck.testmodels.fruit.FruitBasket)", arg1.getExpression());
         assertFalse(arg1.isOptional());
 
         ExpressionArgument arg2 = transformer.getArguments().get(1);
@@ -86,14 +81,14 @@ public class ExpressionTransformerELTestCase extends FunctionalTestCase
         assertEquals(3, transformer.getArguments().size());
         ExpressionArgument arg1 = transformer.getArguments().get(0);
         assertEquals("brand", arg1.getName());
-        assertEquals("message", arg1.getEvaluator());
+        assertNull(arg1.getEvaluator());
         assertEquals("payload", arg1.getExpression());
         assertFalse(arg1.isOptional());
 
         ExpressionArgument arg2 = transformer.getArguments().get(1);
         assertEquals("segments", arg2.getName());
-        assertEquals("header", arg2.getEvaluator());
-        assertEquals("SEGMENTS", arg2.getExpression());
+        assertNull(arg2.getEvaluator());
+        assertEquals("message.outboundProperties['SEGMENTS']", arg2.getExpression());
         assertTrue(arg2.isOptional());
     }
 
@@ -101,12 +96,6 @@ public class ExpressionTransformerELTestCase extends FunctionalTestCase
     public void testExecutionWithCorrectMessage() throws Exception
     {
         testExecutionWithCorrectMessage("testTransformer");
-    }
-
-    @Test
-    public void testExecutionWithCorrectMessageEvaluatorInline() throws Exception
-    {
-        testExecutionWithCorrectMessage("testTransformerInline");
     }
 
     private void testExecutionWithCorrectMessage(String name) throws Exception
@@ -222,41 +211,4 @@ public class ExpressionTransformerELTestCase extends FunctionalTestCase
         assertTrue(list.contains("mar"));
     }
 
-    @Test
-    public void testTransformerConfigWithSingleArgumentShortcutConfigInFlow() throws Exception
-    {
-        Flow flow = (Flow) muleContext.getRegistry().lookupFlowConstruct("et");
-        Map<String, Object> props = new HashMap<String, Object>();
-        props.put("foo", "moo");
-        props.put("bar", "mar");
-
-        MuleMessage message = new DefaultMuleMessage(new FruitBowl(new Apple(), new Banana()), props,
-            muleContext);
-
-        MuleEvent resultEvent = flow.process(new DefaultMuleEvent(message, getTestInboundEndpoint(""),
-            getTestService(), getTestSession(null, muleContext)));
-        assertNotNull(resultEvent);
-        assertNotNull(resultEvent.getMessage().getPayload());
-        Object payload = resultEvent.getMessage().getPayload();
-        assertFalse(payload.getClass().isArray());
-        assertTrue(payload instanceof List<?>);
-        List<?> list = (List<?>) payload;
-        assertTrue(list.contains("moo"));
-        assertTrue(list.contains("mar"));
-    }
-
-    @Test(expected = RequiredValueException.class)
-    public void testExecutionWithInCorrectMessage() throws Exception
-    {
-        ExpressionTransformer transformer = (ExpressionTransformer) muleContext.getRegistry()
-            .lookupTransformer("testTransformer2");
-        Map<String, Object> props = new HashMap<String, Object>();
-        props.put("foo", "moo");
-
-        MuleMessage message = new DefaultMuleMessage(new FruitBowl(new Apple(), new Banana()), props,
-            muleContext);
-
-        transformer.transform(message);
-        fail("Not all headers present, the transform should have failed");
-    }
 }

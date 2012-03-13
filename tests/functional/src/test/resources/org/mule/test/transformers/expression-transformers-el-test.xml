@@ -16,7 +16,7 @@
     </expression-transformer>
 
     <expression-transformer name="testTransformer2">
-        <return-argument expression="#[[message.outboundProperties['foo'],message.outboundProperties['bar']]" optional="false"/>
+        <return-argument expression="#[[message.outboundProperties['foo'],message.outboundProperties['bar']]]" optional="false"/>
     </expression-transformer>
 
     <bean-builder-transformer name="testTransformer3" beanClass="org.mule.tck.testmodels.fruit.Orange">
@@ -26,7 +26,7 @@
     </bean-builder-transformer>
     
     
-    <expression-transformer name="testTransformer4" expression="#[[message.outboundProperties['foo'],message.outboundProperties['bar']]"/>
+    <expression-transformer name="testTransformer4" expression="#[[message.outboundProperties['foo'],message.outboundProperties['bar']]]"/>
     
 
 </mule>

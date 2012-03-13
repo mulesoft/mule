@@ -10,6 +10,13 @@
 
 package org.mule.transformers.simple;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
@@ -31,20 +38,13 @@ import java.util.Map;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 public class ExpressionTransformerTestCase extends FunctionalTestCase
 {
 
     @Override
     protected String getConfigResources()
     {
-        return "org/mule/test/transformers/expression-transformers-el-test.xml";
+        return "org/mule/test/transformers/expression-transformers-test.xml";
     }
 
     private void testTransformerConfig(String name) throws Exception
