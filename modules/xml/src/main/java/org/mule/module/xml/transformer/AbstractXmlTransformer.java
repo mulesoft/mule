@@ -52,6 +52,7 @@ public abstract class AbstractXmlTransformer extends AbstractMessageTransformer
         registerSourceType(DataTypeFactory.create(javax.xml.transform.Source.class));
         registerSourceType(DataTypeFactory.create(org.xml.sax.InputSource.class));
         registerSourceType(DataTypeFactory.create(org.dom4j.Node.class));
+        registerSourceType(DataTypeFactory.create(org.dom4j.Document.class));
         registerSourceType(DataTypeFactory.create(org.w3c.dom.Document.class));
         registerSourceType(DataTypeFactory.create(org.w3c.dom.Element.class));
         registerSourceType(DataTypeFactory.create(java.io.InputStream.class));

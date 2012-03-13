@@ -15,12 +15,10 @@ import static org.junit.Assert.assertTrue;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.el.context.AbstractELTestCase;
-import org.mule.tck.size.SmallTest;
 
 import org.dom4j.Document;
 import org.junit.Test;
 
-@SmallTest
 public class XMLExpressionLanguageEnrichmentDom4jTestCase extends AbstractELTestCase
 {
 
