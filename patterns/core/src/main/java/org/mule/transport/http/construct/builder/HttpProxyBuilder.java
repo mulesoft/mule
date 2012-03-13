@@ -10,22 +10,21 @@
 
 package org.mule.transport.http.construct.builder;
 
-import java.util.Arrays;
-
 import org.mule.MessageExchangePattern;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
-import org.mule.api.processor.InterceptingMessageProcessor;
+import org.mule.api.cache.CachingStrategy;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transformer.Transformer;
 import org.mule.construct.builder.AbstractFlowConstructWithSingleInboundAndOutboundEndpointBuilder;
 import org.mule.transport.http.construct.HttpProxy;
 
+import java.util.Arrays;
+
 public class HttpProxyBuilder extends
     AbstractFlowConstructWithSingleInboundAndOutboundEndpointBuilder<HttpProxyBuilder, HttpProxy>
-
 {
-    private InterceptingMessageProcessor cachingMessageProcessor;
+    private CachingStrategy cachingStrategy;
 
     @Override
     protected MessageExchangePattern getInboundMessageExchangePattern()
@@ -51,9 +50,9 @@ public class HttpProxyBuilder extends
         return this;
     }
 
-    public HttpProxyBuilder cachingMessageProcessor(final InterceptingMessageProcessor cachingMessageProcessor)
+    public HttpProxyBuilder cachingStrategy(final CachingStrategy cachingStrategy)
     {
-        this.cachingMessageProcessor = cachingMessageProcessor;
+        this.cachingStrategy = cachingStrategy;
         return this;
     }
 
@@ -62,6 +61,6 @@ public class HttpProxyBuilder extends
     {
         return new HttpProxy(name, muleContext, getOrBuildInboundEndpoint(muleContext),
             getOrBuildOutboundEndpoint(muleContext), transformers, responseTransformers,
-            cachingMessageProcessor);
+            cachingStrategy);
     }
 }

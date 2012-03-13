@@ -10,24 +10,24 @@
 
 package org.mule.transport.http.config.spring.factories;
 
+import org.mule.api.cache.CachingStrategy;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.OutboundEndpoint;
-import org.mule.api.processor.InterceptingMessageProcessor;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transformer.Transformer;
 import org.mule.config.spring.factories.AbstractFlowConstructFactoryBean;
 import org.mule.construct.builder.AbstractFlowConstructBuilder;
-import org.mule.module.ws.construct.WSProxy;
 import org.mule.transport.http.construct.HttpProxy;
 import org.mule.transport.http.construct.builder.HttpProxyBuilder;
 
 public class HttpProxyFactoryBean extends AbstractFlowConstructFactoryBean
 {
+
     final HttpProxyBuilder httpProxyBuilder = new HttpProxyBuilder();
 
     public Class<?> getObjectType()
     {
-        return WSProxy.class;
+        return HttpProxy.class;
     }
 
     @Override
@@ -76,8 +76,8 @@ public class HttpProxyFactoryBean extends AbstractFlowConstructFactoryBean
         httpProxyBuilder.responseTransformers(responseTransformers);
     }
 
-    public void setCachingMessageProcessor(final InterceptingMessageProcessor cachingMessageProcessor)
+    public void setCachingStrategy(final CachingStrategy cachingStrategy)
     {
-        httpProxyBuilder.cachingMessageProcessor(cachingMessageProcessor);
+        httpProxyBuilder.cachingStrategy(cachingStrategy);
     }
 }

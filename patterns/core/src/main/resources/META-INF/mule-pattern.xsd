@@ -93,8 +93,6 @@
                       </xsd:annotation>
                   </xsd:element>
                   <xsd:element ref="mule:legacy-abstract-exception-strategy" minOccurs="0" maxOccurs="1"/>
-                  <!-- TODO (DDO) allow only http cache element from mule-module-cache -->
-                  <xsd:element ref="mule:abstract-message-processor" minOccurs="0" maxOccurs="1" />
                 </xsd:sequence>
                 <xsd:attribute name="inboundAddress" type="xsd:string">
                     <xsd:annotation>
@@ -138,8 +136,14 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
+                <xsd:attribute name="cachingStrategy-ref" type="xsd:NMTOKENS">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            A caching strategy to provide cached access to the proxied web resource.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
-
 </xsd:schema>

@@ -12,13 +12,15 @@ package org.mule.transport.http.construct;
 
 import org.mule.MessageExchangePattern;
 import org.mule.api.MuleContext;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
+import org.mule.api.cache.CachingStrategy;
 import org.mule.api.construct.FlowConstructInvalidException;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
-import org.mule.api.processor.InterceptingMessageProcessor;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.api.processor.MessageProcessorChain;
 import org.mule.api.processor.MessageProcessorChainBuilder;
 import org.mule.api.source.MessageSource;
 import org.mule.api.transport.PropertyScope;
@@ -29,6 +31,7 @@ import org.mule.endpoint.DynamicURIOutboundEndpoint;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.pattern.core.support.CopyInboundToOutboundPropertiesTransformerCallback;
 import org.mule.processor.ResponseMessageProcessorAdapter;
+import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.transformer.TransformerTemplate;
 import org.mule.transformer.TransformerTemplate.TransformerCallback;
 import org.mule.transformer.simple.MessagePropertiesTransformer;
@@ -44,7 +47,7 @@ public class HttpProxy extends AbstractConfigurationPattern
 {
     private final OutboundEndpoint outboundEndpoint;
 
-    private final InterceptingMessageProcessor cachingMessageProcessor;
+    private final CachingStrategy cachingStrategy;
 
     public HttpProxy(final String name,
                      final MuleContext muleContext,
@@ -52,7 +55,7 @@ public class HttpProxy extends AbstractConfigurationPattern
                      final OutboundEndpoint outboundEndpoint,
                      final List<MessageProcessor> transformers,
                      final List<MessageProcessor> responseTransformers,
-                     final InterceptingMessageProcessor cachingMessageProcessor) throws MuleException
+                     final CachingStrategy cachingStrategy) throws MuleException
     {
         super(name, muleContext, transformers, responseTransformers);
 
@@ -73,7 +76,7 @@ public class HttpProxy extends AbstractConfigurationPattern
         }
 
         this.outboundEndpoint = outboundEndpoint;
-        this.cachingMessageProcessor = cachingMessageProcessor;
+        this.cachingStrategy = cachingStrategy;
     }
 
     @Override
@@ -89,37 +92,33 @@ public class HttpProxy extends AbstractConfigurationPattern
         // ensure properties, hence HTTP headers, are propagated both ways
         final TransformerTemplate copyInboundToOutboundPropertiesTransformer = new TransformerTemplate(
             new CopyInboundToOutboundPropertiesTransformerCallback());
-        builder.chain(copyInboundToOutboundPropertiesTransformer);
-        builder.chain(new ResponseMessageProcessorAdapter(copyInboundToOutboundPropertiesTransformer));
 
-        if (cachingMessageProcessor != null)
-        {
-            builder.chain(cachingMessageProcessor);
-        }
+        final DefaultMessageProcessorChainBuilder proxyBuilder = new DefaultMessageProcessorChainBuilder();
+        proxyBuilder.chain(copyInboundToOutboundPropertiesTransformer);
+        proxyBuilder.chain(new ResponseMessageProcessorAdapter(copyInboundToOutboundPropertiesTransformer));
 
         if (outboundEndpoint instanceof DynamicURIOutboundEndpoint)
         {
             // do not mess with endpoints that are already dynamic
-            builder.chain(outboundEndpoint);
+            proxyBuilder.chain(outboundEndpoint);
         }
         else
         {
             // create a templated outbound endpoint to propagate extra path elements (including query parameters)
-            builder.chain(new TransformerTemplate(new TransformerCallback()
+            proxyBuilder.chain(new TransformerTemplate(new TransformerCallback()
             {
                 public Object doTransform(final MuleMessage message) throws Exception
                 {
                     final String pathExtension = StringUtils.substringAfter(
-                        (String) message.getInboundProperty("http.request"),
-                        (String) message.getInboundProperty("http.context.path"));
+                            (String) message.getInboundProperty("http.request"),
+                            (String) message.getInboundProperty("http.context.path"));
 
                     message.setInvocationProperty("http.path.extension",
-                        StringUtils.defaultString(pathExtension));
+                                                  StringUtils.defaultString(pathExtension));
                     return message;
                 }
             }));
 
-            logger.error("Endpoint: " + outboundEndpoint);
             final DynamicOutboundEndpoint dynamicOutboundEndpoint;
 
             if (outboundEndpoint instanceof DynamicOutboundEndpoint)
@@ -135,8 +134,30 @@ public class HttpProxy extends AbstractConfigurationPattern
                         new EndpointURIEndpointBuilder(outboundEndpoint), uriTemplate);
             }
 
-            builder.chain(dynamicOutboundEndpoint);
+            proxyBuilder.chain(dynamicOutboundEndpoint);
         }
+
+        MessageProcessor proxyMessageProcessor;
+        if (cachingStrategy != null)
+        {
+            final MessageProcessorChain cachedMessageProcessors = proxyBuilder.build();
+
+            proxyMessageProcessor = new MessageProcessor()
+            {
+
+                @Override
+                public MuleEvent process(MuleEvent event) throws MuleException
+                {
+                    return cachingStrategy.process(event, cachedMessageProcessors);
+                }
+            };
+        }
+        else
+        {
+            proxyMessageProcessor = proxyBuilder.build();
+        }
+
+        builder.chain(proxyMessageProcessor);
     }
 
     public static void configureContentLengthRemover(final AbstractConfigurationPattern configurationPattern,
