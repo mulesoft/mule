@@ -180,8 +180,7 @@ public class ExpressionManagerTestCase extends AbstractMuleContextTestCase
     @Test
     public void testEvaluateBooleanELExpressionWithNullEvaluator()
     {
-        assertEquals(4, muleContext.getExpressionManager()
-            .evaluate("#[2>1]", null, (MuleMessage) null, false));
+        assertTrue(muleContext.getExpressionManager().evaluateBoolean("#[2>1]", null, (MuleMessage) null,
+            false, false));
     }
-
 }
