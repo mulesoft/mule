@@ -443,7 +443,7 @@
             <xsd:complexContent>
                 <xsd:extension base="mule:abstractTransformerType">
                     <xsd:sequence>
-                        <xsd:element name="cache-control" minOccurs="0" maxOccurs="1" type="headerType"/>
+                        <xsd:element name="cache-control" minOccurs="0" maxOccurs="1" type="cacheControlType"/>
                         <xsd:element name="expires" minOccurs="0" maxOccurs="1" type="headerType"/>
                         <xsd:element name="location" minOccurs="0" maxOccurs="1" type="headerType"/>
                         <xsd:element name="set-cookie" minOccurs="0" maxOccurs="unbounded" type="cookieType"/>
@@ -494,6 +494,68 @@
                 <xsd:attribute name="maxAge" type="mule:substitutableInt" use="optional"/>
                 <xsd:attribute name="secure" type="mule:substitutableBoolean" use="optional" default="false"/>
                 <xsd:attribute name="version" type="mule:substitutableInt" use="optional"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="cacheControlType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:annotatedType">
+                <xsd:attribute name="directive">
+                    <xsd:simpleType>
+                        <xsd:union>
+                            <xsd:simpleType>
+                                <xsd:restriction base="mule:substitutableInt"/>
+                            </xsd:simpleType>
+                            <xsd:simpleType>
+                                <xsd:restriction base="xsd:NMTOKEN">
+                                    <xsd:enumeration value="public">
+                                        <xsd:annotation>
+                                            <xsd:documentation>
+                                                Indicates that the response MAY be cached by any cache.
+                                            </xsd:documentation>
+                                        </xsd:annotation>
+                                    </xsd:enumeration>
+                                    <xsd:enumeration value="private">
+                                        <xsd:annotation>
+                                            <xsd:documentation>
+                                                Indicates that all or part of the response message is intended for a single user and MUST NOT be cached by a shared cache.
+                                            </xsd:documentation>
+                                        </xsd:annotation>
+                                    </xsd:enumeration>
+                                </xsd:restriction>
+                            </xsd:simpleType>
+                        </xsd:union>
+                    </xsd:simpleType>
+                </xsd:attribute>
+                <xsd:attribute name="noCache" type="mule:substitutableBoolean" use="optional" default="false">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Specifies that a cache MUST NOT use the response to satisfy a subsequent request without successful revalidation with the origin server.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="noStore" type="mule:substitutableBoolean" use="optional" default="false">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The purpose of the no-store directive is to prevent the inadvertent release or retention of sensitive information.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="mustRevalidate" type="mule:substitutableBoolean" use="optional" default="false">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                             When the must-revalidate directive is present in a response received by a cache, that cache MUST NOT use the entry after it becomes stale to respond to a subsequent request without first revalidating it with the origin server.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="maxAge" type="mule:substitutableInt" use="optional">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            When the max-age cache-control directive is present in a cached response, the response is stale if its current age is greater than the age value given. If a response includes both an Expires header and a max-age directive, the max-age directive overrides the Expires header, even if the Expires header is more restrictive.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
