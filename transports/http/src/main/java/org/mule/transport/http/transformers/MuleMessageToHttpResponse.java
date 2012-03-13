@@ -215,10 +215,6 @@ public class MuleMessageToHttpResponse extends AbstractMessageTransformer
         }
         response.setHeader(new Header(HttpConstants.HEADER_DATE, date));
         response.setHeader(new Header(HttpConstants.HEADER_SERVER, server));
-        if (msg.getOutboundProperty(HttpConstants.HEADER_EXPIRES) == null)
-        {
-            response.setHeader(new Header(HttpConstants.HEADER_EXPIRES, date));
-        }
 
         String etag = msg.getOutboundProperty(HttpConstants.HEADER_ETAG);
         if (etag != null)
