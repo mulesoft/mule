@@ -10,6 +10,7 @@
 
 package org.mule.processor;
 
+import org.junit.Ignore;
 import org.mule.MessageExchangePattern;
 import org.mule.api.MuleEvent;
 import org.mule.api.endpoint.OutboundEndpoint;
@@ -25,6 +26,8 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
+@Ignore
+//Test is ignored since ExceptionHandlingMessageProcessor is not longer used - should be removed in next major release
 public class ExceptionHandlingMessageProcessorTestCase extends AbstractMessageProcessorTestCase
 {
     private TestExceptionListener exceptionListener;
