@@ -16,6 +16,7 @@ import org.mule.api.config.ThreadingProfile;
 import org.mule.api.context.WorkManager;
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.api.context.notification.ServerNotificationListener;
+import org.mule.api.el.ExpressionLanguage;
 import org.mule.api.endpoint.EndpointFactory;
 import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.exception.RollbackSourceCallback;
@@ -293,5 +294,11 @@ public interface MuleContext extends Lifecycle
      * @return a non null {@link org.mule.DataTypeConversionResolver} instance to resolve implicit data type conversions
      */
     DataTypeConversionResolver getDataTypeConverterResolver();
+    
+    /**
+     * Expression Language for evaluating expressions using Mule as the context
+     * @return 
+     */
+    ExpressionLanguage getExpressionLanguage();
 }
 

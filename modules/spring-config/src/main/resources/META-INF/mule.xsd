@@ -143,6 +143,7 @@
             <xsd:element ref="abstract-global-intercepting-message-processor"/>
             <xsd:element ref="custom-queue-store" minOccurs="0" maxOccurs="unbounded"/>
             <xsd:element ref="abstract-processing-strategy" minOccurs="0" maxOccurs="unbounded"/>
+            <xsd:element ref="expression-language"/>
         </xsd:choice>
     </xsd:group>
 
@@ -202,6 +203,39 @@
         </xsd:complexContent>
     </xsd:complexType>
 
+    <xsd:element name="expression-language">
+        <xsd:annotation>
+            <xsd:documentation>
+                Configuration of Mule Expression Language
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexType>
+            <xsd:complexContent mixed="true">
+                <xsd:extension base="abstractMixedContentExtensionType">
+                    <xsd:sequence>
+                        <xsd:element minOccurs="0" maxOccurs="unbounded" name="alias">
+                            <xsd:complexType>
+                                <xsd:attribute name="name" use="required" />
+                                <xsd:attribute name="expression" use="required" />
+                            </xsd:complexType>
+                        </xsd:element>
+                        <xsd:element minOccurs="0" maxOccurs="1" name="global-functions" />
+                    </xsd:sequence>
+                </xsd:extension>
+            </xsd:complexContent>
+        </xsd:complexType>
+    </xsd:element>
+    
+    <xsd:element name="el-execute" substitutionGroup="abstract-message-processor">
+        <xsd:complexType>
+            <xsd:complexContent>
+                <xsd:extension base="abstractMessageProcessorType">
+                    <xsd:attribute name="expression" use="required"/>
+                </xsd:extension>
+            </xsd:complexContent>
+        </xsd:complexType>
+    </xsd:element>
+    
     <xsd:element name="abstract-connector" abstract="true" type="abstractConnectorType">
         <xsd:annotation>
             <xsd:documentation>

@@ -14,6 +14,7 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.context.MuleContextAware;
+import org.mule.api.el.ExpressionLanguage;
 import org.mule.api.expression.ExpressionEnricher;
 import org.mule.api.expression.ExpressionEvaluator;
 import org.mule.api.expression.ExpressionManager;
@@ -44,8 +45,7 @@ import org.apache.commons.logging.LogFactory;
  * <p/>
  * Users can register or unregister {@link ExpressionEvaluator} through this interface.
  */
-public class DefaultExpressionManager
-    implements ExpressionManager, MuleContextAware, Initialisable, Disposable
+public class DefaultExpressionManager implements ExpressionManager, MuleContextAware, Initialisable
 {
 
     /**
@@ -63,7 +63,7 @@ public class DefaultExpressionManager
 
     private MuleContext muleContext;
 
-    private MVELExpressionLanguage expressionLanguage;
+    private ExpressionLanguage expressionLanguage;
 
     public void setMuleContext(MuleContext context)
     {
@@ -299,7 +299,7 @@ public class DefaultExpressionManager
     {
         if (evaluator == null)
         {
-            return expressionLanguage.evaluate(expression,message);
+            return expressionLanguage.evaluate(expression, message);
         }
         ExpressionEvaluator extractor = (ExpressionEvaluator) evaluators.get(evaluator);
         if (extractor == null)
@@ -604,19 +604,11 @@ public class DefaultExpressionManager
     }
 
     @Override
-    public void dispose()
-    {
-        if (expressionLanguage != null  && expressionLanguage instanceof Disposable)
-        {
-            ((Disposable) expressionLanguage).dispose();
-        }
-    }
-
-    @Override
     public void initialise() throws InitialisationException
     {
-        expressionLanguage = new MVELExpressionLanguage(muleContext);
-        expressionLanguage.initialise();
+        MVELExpressionLanguage mel = new MVELExpressionLanguage(muleContext);
+        mel.initialise();
+        expressionLanguage = mel;
     }
 
     @Override
@@ -675,6 +667,11 @@ public class DefaultExpressionManager
             expression = expression + "=" + OBJECT_FOR_ENRICHMENT;
         }
         return expression;
+    }
+
+    public void setExpressionLanguage(ExpressionLanguage expressionLanguage)
+    {
+        this.expressionLanguage = expressionLanguage;
     }
 
 }

@@ -26,13 +26,16 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.el.context.AppContext;
 import org.mule.el.context.MuleInstanceContext;
 import org.mule.el.context.ServerContext;
+import org.mule.expression.DefaultExpressionManager;
 import org.mule.transformer.types.DataTypeFactory;
 
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import javax.activation.DataHandler;
@@ -40,7 +43,10 @@ import javax.activation.MimeType;
 
 import org.mvel2.CompileException;
 import org.mvel2.ParserContext;
+import org.mvel2.ast.Function;
+import org.mvel2.compiler.ExpressionCompiler;
 import org.mvel2.integration.impl.CachedMapVariableResolverFactory;
+import org.mvel2.util.CompilerTools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,6 +66,11 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
     protected MuleInstanceContext muleInstanceContext;
     protected AppContext appContext;
 
+    // Configuration
+    protected String globalFunctionsString;
+    protected Map<String, Function> globalFunctions;
+    protected Map<String, String> aliases = new HashMap<String, String>();
+
     public MVELExpressionLanguage(MuleContext muleContext)
     {
         this.muleContext = muleContext;
@@ -77,6 +88,14 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
         serverContext = new ServerContext();
         muleInstanceContext = new MuleInstanceContext(muleContext);
         appContext = new AppContext(muleContext);
+
+        globalFunctions = CompilerTools.extractAllDeclaredFunctions(new ExpressionCompiler(
+            globalFunctionsString).compile());
+
+        if (muleContext.getExpressionManager() instanceof DefaultExpressionManager)
+        {
+            ((DefaultExpressionManager) muleContext.getExpressionManager()).setExpressionLanguage(this);
+        }
     }
 
     protected void addExtensions(ExpressionLanguageContext context)
@@ -168,11 +187,21 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
         {
             expression = expression.substring(2, expression.length() - 1);
         }
+
+        for (Entry<String, String> alias : aliases.entrySet())
+        {
+            variableResolverFactory.addAlias(alias.getKey(), alias.getValue());
+        }
+        for (Entry<String, Function> function : globalFunctions.entrySet())
+        {
+            variableResolverFactory.addVariable(function.getKey(), function.getValue());
+        }
+        variableResolverFactory.addFinalVariable("server", serverContext);
+        variableResolverFactory.addFinalVariable("mule", muleInstanceContext);
+        variableResolverFactory.addFinalVariable("app", appContext);
+
         try
         {
-            variableResolverFactory.addFinalVariable("server", serverContext);
-            variableResolverFactory.addFinalVariable("mule", muleInstanceContext);
-            variableResolverFactory.addFinalVariable("app", appContext);
             addExtensions(variableResolverFactory);
             return (T) expressionExecutor.execute(expression, variableResolverFactory);
         }
@@ -254,6 +283,16 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
         parserContext.addImport(DataType.class);
         parserContext.addImport(DataTypeFactory.class);
         parserContext.addImport(MimeType.class);
+    }
+
+    public void setGlobalFunctionsString(String globalFunctionsString)
+    {
+        this.globalFunctionsString = globalFunctionsString;
+    }
+
+    public void setAliases(Map<String, String> aliases)
+    {
+        this.aliases = aliases;
     }
 
 }

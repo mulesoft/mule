@@ -10,7 +10,10 @@
 
 package org.mule.config.spring.parsers.collection;
 
+import org.mule.config.spring.parsers.generic.AutoIdUtils;
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
+
+import org.w3c.dom.Element;
 
 public class ChildMapEntryDefinitionParser extends ChildDefinitionParser
 {
@@ -28,6 +31,18 @@ public class ChildMapEntryDefinitionParser extends ChildDefinitionParser
         this(mapName);
         addAlias(keyName, KEY);
         addAlias(valueName, VALUE);
+    }
+    
+    @Override
+    public String getBeanName(Element e)
+    {
+        // Use parent bean name always given map entry is part of map in parent
+        String parentId = getParentBeanName(e);
+        if (!parentId.startsWith("."))
+        {
+            parentId = "." + parentId;
+        }
+        return AutoIdUtils.uniqueValue(parentId + ":" + e.getLocalName());
     }
 
     public static class KeyValuePair

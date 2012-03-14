@@ -47,6 +47,7 @@ import org.mule.config.spring.parsers.generic.NameTransferDefinitionParser;
 import org.mule.config.spring.parsers.generic.NamedDefinitionParser;
 import org.mule.config.spring.parsers.generic.OrphanDefinitionParser;
 import org.mule.config.spring.parsers.generic.ParentDefinitionParser;
+import org.mule.config.spring.parsers.generic.TextDefinitionParser;
 import org.mule.config.spring.parsers.processors.CheckExclusiveAttributes;
 import org.mule.config.spring.parsers.processors.CheckExclusiveAttributesAndChildren;
 import org.mule.config.spring.parsers.processors.CheckRequiredAttributesWhenNoChildren;
@@ -61,6 +62,7 @@ import org.mule.config.spring.parsers.specific.DefaultNameMuleOrphanDefinitionPa
 import org.mule.config.spring.parsers.specific.DefaultThreadingProfileDefinitionParser;
 import org.mule.config.spring.parsers.specific.ExceptionStrategyDefinitionParser;
 import org.mule.config.spring.parsers.specific.ExceptionTXFilterDefinitionParser;
+import org.mule.config.spring.parsers.specific.ExpressionLanguageDefinitionParser;
 import org.mule.config.spring.parsers.specific.ExpressionTransformerDefinitionParser;
 import org.mule.config.spring.parsers.specific.FilterDefinitionParser;
 import org.mule.config.spring.parsers.specific.FilterRefDefinitionParser;
@@ -104,6 +106,7 @@ import org.mule.config.spring.parsers.specific.endpoint.support.ChildEndpointDef
 import org.mule.config.spring.parsers.specific.endpoint.support.OrphanEndpointDefinitionParser;
 import org.mule.config.spring.util.SpringBeanLookup;
 import org.mule.context.notification.ListenerSubscriptionPair;
+import org.mule.el.ExpressionLanguageExecutor;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.enricher.MessageEnricher;
 import org.mule.enricher.MessageEnricher.EnrichExpressionPair;
@@ -252,6 +255,9 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("default-service-threading-profile", new DefaultThreadingProfileDefinitionParser(MuleProperties.OBJECT_DEFAULT_SERVICE_THREADING_PROFILE));
         registerBeanDefinitionParser("threading-profile", new ThreadingProfileDefinitionParser("threadingProfile", MuleProperties.OBJECT_DEFAULT_SERVICE_THREADING_PROFILE));
         registerBeanDefinitionParser("custom-agent", new DefaultNameMuleOrphanDefinitionParser());
+        registerBeanDefinitionParser("expression-language", new ExpressionLanguageDefinitionParser());
+        registerBeanDefinitionParser("global-functions", new TextDefinitionParser("globalFunctionsString", true));
+        registerMuleBeanDefinitionParser("alias", new ChildMapEntryDefinitionParser("aliases")).addAlias("name", "key").addAlias("expression", "value").addCollection("addAliases");
 
         // Exception Strategies
         registerBeanDefinitionParser("default-exception-strategy", new ExceptionStrategyDefinitionParser(DefaultMessagingExceptionStrategy.class));
@@ -395,6 +401,8 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
             TransactionalMessageProcessorsFactoryBean.class));
         registerMuleBeanDefinitionParser("logger", new ChildDefinitionParser("messageProcessor",
             LoggerMessageProcessor.class));
+        registerMuleBeanDefinitionParser("el-execute", new ChildDefinitionParser("messageProcessor",
+            ExpressionLanguageExecutor.class));
 
         // Message Sources
         registerBeanDefinitionParser("custom-source", new ChildDefinitionParser("messageSource", null, MessageSource.class));

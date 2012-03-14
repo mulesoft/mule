@@ -24,6 +24,7 @@ import org.mule.api.context.MuleContextAware;
 import org.mule.api.context.WorkManager;
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.api.context.notification.ServerNotificationListener;
+import org.mule.api.el.ExpressionLanguage;
 import org.mule.api.endpoint.EndpointFactory;
 import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.exception.RollbackSourceCallback;
@@ -516,7 +517,6 @@ public class DefaultMuleContext implements MuleContext
     {
 
         return config;
-        //return (MuleConfiguration) getRegistry().lookupObject(MuleProperties.OBJECT_MULE_CONFIGURATION);
     }
 
     public ServerNotificationManager getNotificationManager()
@@ -802,5 +802,11 @@ public class DefaultMuleContext implements MuleContext
         }
 
         return dataTypeConversionResolver;
+    }
+
+    @Override
+    public ExpressionLanguage getExpressionLanguage()
+    {
+        return registryBroker.lookupObject(MuleProperties.OBJECT_EXPRESSION_LANGUAGE);
     }
 }

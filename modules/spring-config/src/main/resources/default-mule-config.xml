@@ -86,6 +86,10 @@
 
     <bean name="_defaultRetryPolicyTemplate" class="org.mule.retry.policies.NoRetryPolicyTemplate"/>
 
+    <bean name="_muleExpressionLanguage" class="org.mule.el.mvel.MVELExpressionLanguage">
+        <constructor-arg ref="_muleContext"/>
+    </bean>
+
     <!-- Default Transformers are now loaded from META-INF/services/org/mule/config/registry-bootstrap.properties so that
     the transformers will be available even when using the TransientRegistry only -->
 

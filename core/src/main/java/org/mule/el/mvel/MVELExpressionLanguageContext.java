@@ -13,13 +13,11 @@ package org.mule.el.mvel;
 import org.mule.api.MuleContext;
 import org.mule.api.el.ExpressionLanguageContext;
 import org.mule.api.el.ExpressionLanguageFunction;
-import org.mule.config.i18n.CoreMessages;
 
 import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.Map;
 
-import org.mvel2.ImmutableElementException;
 import org.mvel2.ParserContext;
 import org.mvel2.UnresolveablePropertyException;
 import org.mvel2.ast.Function;
@@ -27,7 +25,6 @@ import org.mvel2.integration.VariableResolver;
 import org.mvel2.integration.VariableResolverFactory;
 import org.mvel2.integration.impl.BaseVariableResolverFactory;
 import org.mvel2.integration.impl.ClassImportResolverFactory;
-import org.mvel2.integration.impl.SimpleSTValueResolver;
 import org.mvel2.integration.impl.SimpleVariableResolverFactory;
 
 public class MVELExpressionLanguageContext extends BaseVariableResolverFactory
@@ -160,77 +157,6 @@ public class MVELExpressionLanguageContext extends BaseVariableResolverFactory
     public void addAlias(String alias, String expression)
     {
         addResolver(alias, new MuleAliasVariableResolver(alias, expression, this));
-    }
-
-    protected static class MuleVariableResolver extends SimpleSTValueResolver
-    {
-        private static final long serialVersionUID = -4957789619105599831L;
-        private String name;
-
-        public MuleVariableResolver(String name, Object value, Class<?> type)
-        {
-            super(value, type);
-        }
-
-        @Override
-        public String getName()
-        {
-            return name;
-        }
-
-        public Object getValue(VariableResolverFactory variableResolverFactory)
-        {
-            return getValue();
-        }
-    }
-
-    protected static class MuleFinalVariableResolver extends MuleVariableResolver
-    {
-        private static final long serialVersionUID = -4957789619105599831L;
-        private String name;
-
-        public MuleFinalVariableResolver(String name, Object value, Class<?> type)
-        {
-            super(name, value, type);
-        }
-
-        @Override
-        public void setValue(Object value)
-        {
-            throw new ImmutableElementException(CoreMessages.expressionFinalVariableCannotBeAssignedValue(
-                name).getMessage());
-        }
-    }
-
-    static protected class MuleAliasVariableResolver extends MuleVariableResolver
-    {
-        private static final long serialVersionUID = -4957789619105599831L;
-        private String expression;
-        private MVELExpressionLanguageContext context;
-        private MVELExpressionExecutor executor;
-
-        public MuleAliasVariableResolver(String name, String expression, MVELExpressionLanguageContext context)
-        {
-            super(name, null, null);
-            this.expression = expression;
-            this.context = context;
-            this.executor = new MVELExpressionExecutor(context.parserContext);
-        }
-
-        @Override
-        public Object getValue()
-        {
-            return executor.execute(expression, context);
-        }
-
-        @Override
-        public void setValue(Object value)
-        {
-            MVELExpressionLanguageContext newContext = new MVELExpressionLanguageContext(context);
-            expression = expression + "= ___value";
-            newContext.addVariable("___value", value);
-            executor.execute(expression, newContext);
-        }
     }
 
     @Override
