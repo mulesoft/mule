@@ -954,7 +954,6 @@
 /mule-standalone-${productVersion}/lib/opt/spring-expression-3.1.0.RELEASE.jar
 /mule-standalone-${productVersion}/lib/opt/spring-jdbc-3.1.0.RELEASE.jar
 /mule-standalone-${productVersion}/lib/opt/spring-jms-3.1.0.RELEASE.jar
-/mule-standalone-${productVersion}/lib/opt/spring-modules-cache-0.9.jar
 /mule-standalone-${productVersion}/lib/opt/spring-security-config-3.1.0.RELEASE.jar
 /mule-standalone-${productVersion}/lib/opt/spring-security-core-3.1.0.RELEASE.jar
 /mule-standalone-${productVersion}/lib/opt/spring-security-web-3.1.0.RELEASE.jar
