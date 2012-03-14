@@ -93,10 +93,10 @@ public class XsltTransformerTestCase extends AbstractXmlTransformerTestCase
     {
         List<?> list = XMLTestUtils.getXmlMessageVariants("cdcatalog.xml");
         Iterator<?> it = list.iterator();
-        
+
         Object expectedResult = getResultData();
         assertNotNull(expectedResult);
-        
+
         Object msg, result;
         while (it.hasNext())
         {
@@ -112,9 +112,9 @@ public class XsltTransformerTestCase extends AbstractXmlTransformerTestCase
     {
         Object expectedResult = getResultData();
         assertNotNull(expectedResult);
-        
+
         XsltTransformer transformer = (XsltTransformer) getTransformer();
-        
+
         InputStream is = IOUtils.getResourceAsStream("cdcatalog.xml", XMLTestUtils.class);
         XMLStreamReader sr = XMLUtils.toXMLStreamReader(transformer.getXMLInputFactory(), is);
 
@@ -122,7 +122,7 @@ public class XsltTransformerTestCase extends AbstractXmlTransformerTestCase
         assertNotNull(result);
         assertTrue("expected: " + expectedResult + "\nresult: " + result, compareResults(expectedResult, result));
     }
-    
+
     @Test
     public void testCustomTransformerFactoryClass() throws InitialisationException
     {
@@ -175,7 +175,7 @@ public class XsltTransformerTestCase extends AbstractXmlTransformerTestCase
         transformer.setXslt(xsl);
 
         // set parameter
-        Map params = new HashMap();
+        Map<String, Object> params = new HashMap<String, Object>();
         params.put("param1", param);
         transformer.setContextProperties(params);
 
@@ -236,7 +236,7 @@ public class XsltTransformerTestCase extends AbstractXmlTransformerTestCase
         transformer.setXslt(xsl);
 
         // set parameter
-        Map params = new HashMap();
+        Map<String, Object> params = new HashMap<String, Object>();
         params.put("param1", "#[header:myproperty]");
         transformer.setContextProperties(params);
 

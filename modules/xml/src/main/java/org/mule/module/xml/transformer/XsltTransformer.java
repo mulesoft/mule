@@ -23,7 +23,6 @@ import org.mule.util.StringUtils;
 
 import java.io.StringReader;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -109,7 +108,7 @@ public class XsltTransformer extends AbstractXmlTransformer
     private volatile String xslTransformerFactoryClassName = PREFERRED_TRANSFORMER_FACTORY;
     private volatile String xslFile;
     private volatile String xslt;
-    private volatile Map contextProperties;
+    private volatile Map<String, Object> contextProperties;
 
     private URIResolver uriResolver;
 
@@ -121,13 +120,7 @@ public class XsltTransformer extends AbstractXmlTransformer
         transformerPool.setMaxIdle(MAX_IDLE_TRANSFORMERS);
         transformerPool.setMaxActive(MAX_ACTIVE_TRANSFORMERS);
         uriResolver = new LocalURIResolver();
-        contextProperties = new HashMap();
-    }
-
-    public XsltTransformer(String xslFile)
-    {
-        this();
-        this.setXslFile(xslFile);
+        contextProperties = new HashMap<String, Object>();
     }
 
     @Override
@@ -140,6 +133,7 @@ public class XsltTransformer extends AbstractXmlTransformer
             if (xslFile != null)
             {
                 this.xslt = IOUtils.getResourceAsString(xslFile, getClass());
+                this.uriResolver = new LocalURIResolver(xslFile);
             }
             transformerPool.addObject();
         }
@@ -155,7 +149,7 @@ public class XsltTransformer extends AbstractXmlTransformer
      * @return The result in the type specified by the user
      */
     @Override
-    public Object transformMessage(MuleMessage message, String encoding) throws TransformerException
+    public Object transformMessage(MuleMessage message, String putputEncoding) throws TransformerException
     {
         Object src = message.getPayload();
         try
@@ -178,10 +172,10 @@ public class XsltTransformer extends AbstractXmlTransformer
             // as it is the most efficient.
             if (holder == null || DelayedResult.class.equals(returnType.getType()))
             {
-                return getDelayedResult(message, encoding, sourceDoc);
+                return getDelayedResult(message, putputEncoding, sourceDoc);
             }
 
-            doTransform(message, encoding, sourceDoc, holder.getResult());
+            doTransform(message, putputEncoding, sourceDoc, holder.getResult());
 
             return holder.getResultObject();
         }
@@ -191,22 +185,25 @@ public class XsltTransformer extends AbstractXmlTransformer
         }
     }
 
-    protected Object getDelayedResult(final MuleMessage message, final String encoding, final Source sourceDoc)
+    protected Object getDelayedResult(final MuleMessage message, final String outputEncoding, final Source sourceDoc)
     {
         return new DelayedResult()
         {
             private String systemId;
 
+            @Override
             public void write(Result result) throws Exception
             {
-                doTransform(message, encoding, sourceDoc, result);
+                doTransform(message, outputEncoding, sourceDoc, result);
             }
 
+            @Override
             public String getSystemId()
             {
                 return systemId;
             }
 
+            @Override
             public void setSystemId(String systemId)
             {
                 this.systemId = systemId;
@@ -214,7 +211,7 @@ public class XsltTransformer extends AbstractXmlTransformer
         };
     }
 
-    protected void doTransform(MuleMessage message, String encoding, Source sourceDoc, Result result)
+    protected void doTransform(MuleMessage message, String outputEncoding, Source sourceDoc, Result result)
             throws Exception
     {
         DefaultErrorListener errorListener = new DefaultErrorListener(this);
@@ -225,15 +222,14 @@ public class XsltTransformer extends AbstractXmlTransformer
             transformer = (javax.xml.transform.Transformer) transformerPool.borrowObject();
 
             transformer.setErrorListener(errorListener);
-            transformer.setOutputProperty(OutputKeys.ENCODING, encoding);
+            transformer.setOutputProperty(OutputKeys.ENCODING, outputEncoding);
 
             // set transformation parameters
             if (contextProperties != null)
             {
-                for (Iterator i = contextProperties.entrySet().iterator(); i.hasNext();)
+                for (Entry<String, Object> parameter : contextProperties.entrySet())
                 {
-                    Map.Entry parameter = (Entry) i.next();
-                    String key = (String) parameter.getKey();
+                    String key = parameter.getKey();
                     transformer.setParameter(key, evaluateTransformParameter(key, parameter.getValue(), message));
                 }
             }
@@ -280,17 +276,11 @@ public class XsltTransformer extends AbstractXmlTransformer
         this.xslTransformerFactoryClassName = xslTransformerFactory;
     }
 
-    /**
-     * @return Returns the xslFile.
-     */
     public String getXslFile()
     {
         return xslFile;
     }
 
-    /**
-     * @param xslFile The xslFile to set.
-     */
     public void setXslFile(String xslFile)
     {
         this.xslFile = xslFile;
@@ -319,7 +309,7 @@ public class XsltTransformer extends AbstractXmlTransformer
     /**
      * Returns the StreamSource corresponding to xslt (which should have been loaded
      * in {@link #initialise()}).
-     * 
+     *
      * @return The StreamSource
      */
     protected StreamSource getStreamSource() throws InitialisationException
@@ -394,18 +384,21 @@ public class XsltTransformer extends AbstractXmlTransformer
             return e != null;
         }
 
+        @Override
         public void error(javax.xml.transform.TransformerException exception)
                 throws javax.xml.transform.TransformerException
         {
             e = new TransformerException(trans, exception);
         }
 
+        @Override
         public void fatalError(javax.xml.transform.TransformerException exception)
                 throws javax.xml.transform.TransformerException
         {
             e = new TransformerException(trans, exception);
         }
 
+        @Override
         public void warning(javax.xml.transform.TransformerException exception)
                 throws javax.xml.transform.TransformerException
         {
@@ -459,7 +452,7 @@ public class XsltTransformer extends AbstractXmlTransformer
      * @see javax.xml.transform.Transformer#setParameter(java.lang.String,
      *      java.lang.Object)
      */
-    public Map getContextProperties()
+    public Map<String, Object> getContextProperties()
     {
         return contextProperties;
     }
@@ -471,25 +464,26 @@ public class XsltTransformer extends AbstractXmlTransformer
      * @see javax.xml.transform.Transformer#setParameter(java.lang.String,
      *      java.lang.Object)
      */
-    public void setContextProperties(Map contextProperties)
+    public void setContextProperties(Map<String, Object> contextProperties)
     {
         this.contextProperties = contextProperties;
     }
 
     /**
      * Returns the value to be set for the parameter. This method is called for each
-     * parameter before it is set on the transformer. The purpose of this method is to
-     * allow dynamic parameters related to the event (usually message properties) to be
-     * used. Any attribute of the current MuleEvent can be accessed using Property Extractors
-     * such as JXpath, bean path or header retrieval.
+     * parameter before it is set on the transformer. The purpose of this method is
+     * to allow dynamic parameters related to the event (usually message properties)
+     * to be used. Any attribute of the current MuleEvent can be accessed using
+     * Property Extractors such as JXpath, bean path or header retrieval.
      *
-     * @param name  the name of the parameter. The name isn't used for this implementation but is exposed as a
-     *              param for classes that may need it.
+     * @param key the name of the parameter. The name isn't used for this
+     *            implementation but is exposed as a param for classes that may need
+     *            it.
      * @param value the value of the paramter
      * @return the object to be set as the parameter value
      * @throws TransformerException
      */
-    protected Object evaluateTransformParameter(String name, Object value, MuleMessage message) throws TransformerException
+    protected Object evaluateTransformParameter(String key, Object value, MuleMessage message) throws TransformerException
     {
         if (value instanceof String)
         {
