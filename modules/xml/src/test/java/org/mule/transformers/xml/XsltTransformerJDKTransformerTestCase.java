@@ -38,7 +38,6 @@ import static org.junit.Assert.fail;
 
 public class XsltTransformerJDKTransformerTestCase extends AbstractXmlTransformerTestCase
 {
-
     private String srcData;
     private String resultData;
 
@@ -78,7 +77,7 @@ public class XsltTransformerJDKTransformerTestCase extends AbstractXmlTransforme
     @Override
     public Object getTestData()
     {
-        Map props = new HashMap();
+        Map<String, Object> props = new HashMap<String, Object>();
         props.put("ListTitle", "MyList");
         props.put("ListRating", new Integer(6));
         return new DefaultMuleMessage(srcData, props, muleContext);
@@ -93,8 +92,8 @@ public class XsltTransformerJDKTransformerTestCase extends AbstractXmlTransforme
     @Test
     public void testAllXmlMessageTypes() throws Exception
     {
-        List list = XMLTestUtils.getXmlMessageVariants("cdcatalog.xml");
-        Iterator it = list.iterator();
+        List<?> list = XMLTestUtils.getXmlMessageVariants("cdcatalog.xml");
+        Iterator<?> it = list.iterator();
 
         Object expectedResult = getResultData();
         assertNotNull(expectedResult);
@@ -188,7 +187,7 @@ public class XsltTransformerJDKTransformerTestCase extends AbstractXmlTransforme
         transformer.setXslt(xsl);
 
         // set parameter
-        Map params = new HashMap();
+        Map<String, Object> params = new HashMap<String, Object>();
         params.put("param1", param);
         transformer.setContextProperties(params);
 
@@ -245,7 +244,7 @@ public class XsltTransformerJDKTransformerTestCase extends AbstractXmlTransforme
         transformer.setXslt(xsl);
 
         // set parameter
-        Map params = new HashMap();
+        Map<String, Object> params = new HashMap<String, Object>();
         params.put("param1", "#[header:myproperty]");
         transformer.setContextProperties(params);
 
