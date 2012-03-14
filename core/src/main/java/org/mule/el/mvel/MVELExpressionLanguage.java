@@ -113,7 +113,6 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
     public <T> T evaluate(String expression)
     {
         MVELExpressionLanguageContext factory = new MVELExpressionLanguageContext(parserContext, muleContext);
-        factory.appendFactory(new RegistryVariableResolverFactory(parserContext, muleContext));
         return (T) evaluateInternal(expression, factory);
     }
 
@@ -122,7 +121,6 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
     public <T> T evaluate(String expression, Map<String, Object> vars)
     {
         MVELExpressionLanguageContext factory = new MVELExpressionLanguageContext(parserContext, muleContext);
-        factory.appendFactory(new RegistryVariableResolverFactory(parserContext, muleContext));
         if (vars != null)
         {
             factory.appendFactory(new CachedMapVariableResolverFactory(vars));
@@ -144,7 +142,6 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
         MVELExpressionLanguageContext factory = new MVELExpressionLanguageContext(parserContext, muleContext);
         factory.appendFactory(new EventVariableResolverFactory(parserContext, muleContext, event));
         factory.appendFactory(new VariableVariableResolverFactory(parserContext, muleContext, event));
-        factory.appendFactory(new RegistryVariableResolverFactory(parserContext, muleContext));
         if (vars != null)
         {
             factory.appendFactory(new CachedMapVariableResolverFactory(vars));
@@ -159,7 +156,6 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
         MVELExpressionLanguageContext factory = new MVELExpressionLanguageContext(parserContext, muleContext);
         factory.appendFactory(new MessageVariableResolverFactory(parserContext, muleContext, message));
         factory.appendFactory(new VariableVariableResolverFactory(parserContext, muleContext, message));
-        factory.appendFactory(new RegistryVariableResolverFactory(parserContext, muleContext));
         return (T) evaluateInternal(expression, factory);
     }
 
@@ -170,7 +166,6 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
         MVELExpressionLanguageContext factory = new MVELExpressionLanguageContext(parserContext, muleContext);
         factory.appendFactory(new MessageVariableResolverFactory(parserContext, muleContext, message));
         factory.appendFactory(new VariableVariableResolverFactory(parserContext, muleContext, message));
-        factory.appendFactory(new RegistryVariableResolverFactory(parserContext, muleContext));
         if (vars != null)
         {
             factory.appendFactory(new CachedMapVariableResolverFactory(vars));

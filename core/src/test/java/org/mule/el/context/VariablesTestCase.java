@@ -170,14 +170,6 @@ public class VariablesTestCase extends AbstractELTestCase
     }
 
     @Test
-    public void variableFromRegistry() throws Exception
-    {
-        MuleMessage message = new DefaultMuleMessage("", muleContext);
-        muleContext.getRegistry().registerObject("foo", "bar");
-        assertEquals("bar", evaluate("foo", message));
-    }
-
-    @Test
     public void assignValueToVariable() throws Exception
     {
         MuleMessage message = new DefaultMuleMessage("", muleContext);
