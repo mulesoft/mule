@@ -29,6 +29,7 @@ import org.mule.transport.http.CookieWrapper;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
 import org.mule.transport.http.HttpPollingConnector;
+import org.mule.transport.http.builder.HttpCookiesDefinitionParser;
 import org.mule.transport.http.builder.HttpResponseDefinitionParser;
 import org.mule.transport.http.components.RestServiceWrapper;
 import org.mule.transport.http.components.StaticResourceMessageProcessor;
@@ -75,7 +76,7 @@ public class HttpNamespaceHandler extends AbstractMuleNamespaceHandler
 
         registerBeanDefinitionParser("response", new MessageProcessorDefinitionParser(HttpResponseTransformer.class));
         registerMuleBeanDefinitionParser("header", new ChildMapEntryDefinitionParser("headers", "name", "value")).addCollection("headers");
-        registerMuleBeanDefinitionParser("set-cookie", new ChildDefinitionParser("cookie", CookieWrapper.class)).registerPreProcessor(new CheckExclusiveAttributes(new String[][] {new String[] {"maxAge"}, new String[] {"expiryDate"}}));
+        registerMuleBeanDefinitionParser("set-cookie", new HttpCookiesDefinitionParser("cookie", CookieWrapper.class)).registerPreProcessor(new CheckExclusiveAttributes(new String[][] {new String[] {"maxAge"}, new String[] {"expiryDate"}}));
         registerMuleBeanDefinitionParser("body", new TextDefinitionParser("body"));
         registerMuleBeanDefinitionParser("location", new HttpResponseDefinitionParser("header"));
         registerMuleBeanDefinitionParser("cache-control", new ChildDefinitionParser("cacheControl", CacheControlHeader.class));
