@@ -403,7 +403,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer
         for (String headerName : msg.getOutboundPropertyNames())
         {
             String headerValue = ObjectUtils.getString(msg.getOutboundProperty(headerName), null);
-
+                
             if (headerName.startsWith(MuleProperties.PROPERTY_PREFIX))
             {
                 // Define Mule headers a custom headers
@@ -411,6 +411,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer
                 httpMethod.addRequestHeader(headerName, headerValue);
 
             }
+            
             else if (!HttpConstants.RESPONSE_HEADER_NAMES.containsKey(headerName)
                      && !HttpConnector.HTTP_INBOUND_PROPERTIES.contains(headerName)
                      && !HttpConnector.HTTP_COOKIES_PROPERTY.equals(headerName))

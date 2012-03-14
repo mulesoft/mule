@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.Locale;
 import java.util.Map;
 
@@ -227,7 +228,9 @@ public class MuleMessageToHttpResponse extends AbstractMessageTransformer
         }
         response.setFallbackCharset(encoding);
 
-        Collection<String> headerNames = HttpConstants.RESPONSE_HEADER_NAMES.values();
+        Collection<String> headerNames = new LinkedList<String>();
+        headerNames.addAll(HttpConstants.RESPONSE_HEADER_NAMES.values());
+        headerNames.addAll(HttpConstants.GENERAL_AND_ENTITY_HEADER_NAMES.values());
 
         for (String headerName : headerNames)
         {
@@ -248,7 +251,7 @@ public class MuleMessageToHttpResponse extends AbstractMessageTransformer
                 {
                     continue;
                 }
-                
+
                 if (!(cookiesObject instanceof Cookie[]))
                 {
                     response.addHeader(new Header(headerName, cookiesObject.toString()));
@@ -265,18 +268,18 @@ public class MuleMessageToHttpResponse extends AbstractMessageTransformer
             }
             else
             {
-                String value = msg.getInvocationProperty(headerName);
+                Object value = msg.getInvocationProperty(headerName);
                 if (value == null)
                 {
                     value = msg.getOutboundProperty(headerName);
                 }
                 if (value != null)
                 {
-                    response.setHeader(new Header(headerName, value));
+                    response.setHeader(new Header(headerName, value.toString()));
                 }
             }
         }
-
+        
         Map customHeaders = msg.getOutboundProperty(HttpConnector.HTTP_CUSTOM_HEADERS_MAP_PROPERTY);
         if (customHeaders != null)
         {
