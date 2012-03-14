@@ -10,6 +10,8 @@
 
 package org.mule.config.spring;
 
+import static org.junit.Assert.assertEquals;
+
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.util.ClassUtils;
 
@@ -17,8 +19,6 @@ import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
 
 public class SchemaDefaultsTestCase extends AbstractMuleContextTestCase
 {
@@ -53,5 +53,7 @@ public class SchemaDefaultsTestCase extends AbstractMuleContextTestCase
         assertEquals(muleContext.getConfiguration().getShutdownTimeout(),
             configurationType.numberValueOf("xsd:complexContent/xsd:extension/xsd:attribute[@name='shutdownTimeout']/@default")
                 .intValue());
+        assertEquals(muleContext.getConfiguration().useExtendedTransformations(), Boolean.parseBoolean(
+                     configurationType.valueOf("xsd:complexContent/xsd:extension/xsd:attribute[@name='useExtendedTransformations']/@default")));
     }
 }

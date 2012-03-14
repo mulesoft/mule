@@ -81,4 +81,7 @@ public interface MuleConfiguration
      * configured explicitly.
      */
     String getDefaultExceptionStrategyName();
+
+
+    boolean useExtendedTransformations();
 }

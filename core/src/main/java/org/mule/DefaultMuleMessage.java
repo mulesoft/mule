@@ -1370,7 +1370,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
                         logger.debug("Transformer " + transformer + " doesn't support the source payload: " + srcCls);
                     }
 
-                    if (TransformerUtils.isTransformationEnforced(muleContext))
+                    if (useExtendedTransformations())
                     {
                         if (transformer instanceof DiscoverableTransformer)
                         {
@@ -1409,6 +1409,17 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
                TransformerUtils.checkTransformerReturnClass(transformer, payload);
             }
         }
+    }
+
+    private boolean useExtendedTransformations()
+    {
+        boolean result = true;
+        if (muleContext != null && muleContext.getConfiguration() != null)
+        {
+            result = muleContext.getConfiguration().useExtendedTransformations();
+        }
+
+        return result;
     }
 
     private void transformMessage(MuleEvent event, Transformer transformer) throws TransformerMessagingException, TransformerException

@@ -372,7 +372,7 @@ public abstract class AbstractTransformer implements Transformer, AnnotatedObjec
 
         if (!isSourceDataTypeSupported(sourceType))
         {
-            if (ignoreBadInput && !TransformerUtils.isTransformationEnforced(muleContext))
+            if (ignoreBadInput && !useExtendedTransformations())
             {
                 logger.debug("Source type is incompatible with this transformer and property 'ignoreBadInput' is set to true, so the transformer chain will continue.");
                 return payload;
@@ -408,6 +408,18 @@ public abstract class AbstractTransformer implements Transformer, AnnotatedObjec
 
         return result;
     }
+
+    private boolean useExtendedTransformations()
+    {
+        boolean result = true;
+        if (muleContext != null && muleContext.getConfiguration() != null)
+        {
+            result = muleContext.getConfiguration().useExtendedTransformations();
+        }
+
+        return result;
+    }
+
 
     protected String getEncoding(Object src)
     {

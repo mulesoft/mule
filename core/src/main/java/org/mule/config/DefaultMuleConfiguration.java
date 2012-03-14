@@ -14,12 +14,10 @@ import org.mule.api.MuleContext;
 import org.mule.api.config.MuleConfiguration;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.context.MuleContextAware;
-import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.lifecycle.FatalException;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.Startable;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.exception.DefaultMessagingExceptionStrategy;
 import org.mule.util.FileUtils;
 import org.mule.util.NumberUtils;
 import org.mule.util.StringUtils;
@@ -45,6 +43,8 @@ import org.apache.commons.logging.LogFactory;
  */
 public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextAware
 {
+
+    public static final boolean DEFAULT_TRANSFORMATION_RESOLVE_NON_DIRECT = true;
 
     public static final String[] DEFAULT_STACKTRACE_FILTER = (
             "org.mule.processor.AbstractInterceptingMessageProcessor," +
@@ -149,6 +149,8 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
      * being closed; this would cause the validation to fail.  Users can turn off validation using this flag.
      */
     private boolean validateExpressions = true;
+
+    private boolean useExtendedTransformations = DEFAULT_TRANSFORMATION_RESOLVE_NON_DIRECT;
 
     /**
      * Generic string/string map of properties in addition to standard Mule props.
@@ -419,7 +421,6 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
         }
     }
 
-
     public boolean isValidateExpressions()
     {
         return validateExpressions;
@@ -655,6 +656,20 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
         return defaultExceptionStrategyName;
     }
 
+    public void setUseExtendedTransformations(boolean useExtendedTransformations)
+    {
+        if (verifyContextNotStarted())
+        {
+            this.useExtendedTransformations = useExtendedTransformations;
+        }
+    }
+
+    @Override
+    public boolean useExtendedTransformations()
+    {
+        return useExtendedTransformations;
+    }
+
     public void setDefaultExceptionStrategyName(String defaultExceptionStrategyName)
     {
         this.defaultExceptionStrategyName = defaultExceptionStrategyName;
@@ -677,6 +692,7 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
         result = prime * result + ((id == null) ? 0 : id.hashCode());
         result = prime * result + responseTimeout;
         result = prime * result + shutdownTimeout;
+        result = prime * result + (useExtendedTransformations ? 1231 : 1237);
         result = prime * result + (synchronous ? 1231 : 1237);
         result = prime * result + ((systemModelType == null) ? 0 : systemModelType.hashCode());
         result = prime * result + ((workingDirectory == null) ? 0 : workingDirectory.hashCode());
@@ -687,47 +703,123 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
     @Override
     public boolean equals(Object obj)
     {
-        if (this == obj) return true;
-        if (obj == null) return false;
-        if (getClass() != obj.getClass()) return false;
+        if (this == obj)
+        {
+            return true;
+        }
+        if (obj == null)
+        {
+            return false;
+        }
+        if (getClass() != obj.getClass())
+        {
+            return false;
+        }
         DefaultMuleConfiguration other = (DefaultMuleConfiguration) obj;
-        if (autoWrapMessageAwareTransform != other.autoWrapMessageAwareTransform) return false;
-        if (cacheMessageAsBytes != other.cacheMessageAsBytes) return false;
-        if (cacheMessageOriginalPayload != other.cacheMessageOriginalPayload) return false;
-        if (clientMode != other.clientMode) return false;
-        if (defaultQueueTimeout != other.defaultQueueTimeout) return false;
-        if (defaultTransactionTimeout != other.defaultTransactionTimeout) return false;
+        if (autoWrapMessageAwareTransform != other.autoWrapMessageAwareTransform)
+        {
+            return false;
+        }
+        if (cacheMessageAsBytes != other.cacheMessageAsBytes)
+        {
+            return false;
+        }
+        if (cacheMessageOriginalPayload != other.cacheMessageOriginalPayload)
+        {
+            return false;
+        }
+        if (clientMode != other.clientMode)
+        {
+            return false;
+        }
+        if (defaultQueueTimeout != other.defaultQueueTimeout)
+        {
+            return false;
+        }
+        if (defaultTransactionTimeout != other.defaultTransactionTimeout)
+        {
+            return false;
+        }
         if (domainId == null)
         {
-            if (other.domainId != null) return false;
+            if (other.domainId != null)
+            {
+                return false;
+            }
         }
-        else if (!domainId.equals(other.domainId)) return false;
-        if (enableStreaming != other.enableStreaming) return false;
+        else if (!domainId.equals(other.domainId))
+        {
+            return false;
+        }
+        if (enableStreaming != other.enableStreaming)
+        {
+            return false;
+        }
         if (encoding == null)
         {
-            if (other.encoding != null) return false;
+            if (other.encoding != null)
+            {
+                return false;
+            }
         }
-        else if (!encoding.equals(other.encoding)) return false;
+        else if (!encoding.equals(other.encoding))
+        {
+            return false;
+        }
         if (id == null)
         {
-            if (other.id != null) return false;
+            if (other.id != null)
+            {
+                return false;
+            }
         }
-        else if (!id.equals(other.id)) return false;
-        if (responseTimeout != other.responseTimeout) return false;
-        if (shutdownTimeout != other.shutdownTimeout) return false;
-        if (synchronous != other.synchronous) return false;
+        else if (!id.equals(other.id))
+        {
+            return false;
+        }
+        if (responseTimeout != other.responseTimeout)
+        {
+            return false;
+        }
+        if (shutdownTimeout != other.shutdownTimeout)
+        {
+            return false;
+        }
+        if (useExtendedTransformations != other.useExtendedTransformations)
+        {
+            return false;
+        }
+        if (synchronous != other.synchronous)
+        {
+            return false;
+        }
         if (systemModelType == null)
         {
-            if (other.systemModelType != null) return false;
+            if (other.systemModelType != null)
+            {
+                return false;
+            }
         }
-        else if (!systemModelType.equals(other.systemModelType)) return false;
+        else if (!systemModelType.equals(other.systemModelType))
+        {
+            return false;
+        }
         if (workingDirectory == null)
         {
-            if (other.workingDirectory != null) return false;
+            if (other.workingDirectory != null)
+            {
+                return false;
+            }
         }
-        else if (!workingDirectory.equals(other.workingDirectory)) return false;
+        else if (!workingDirectory.equals(other.workingDirectory))
+        {
+            return false;
+        }
 
-        if (containerMode != other.containerMode) return false;
+        if (containerMode != other.containerMode)
+        {
+            return false;
+        }
 
         return true;
     }

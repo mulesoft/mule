@@ -16,10 +16,10 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
+import org.mule.config.DefaultMuleConfiguration;
 import org.mule.transformer.AbstractTransformer;
 import org.mule.transformer.AbstractTransformerTestCase;
 import org.mule.transformer.types.DataTypeFactory;
@@ -142,7 +142,7 @@ public class MailMessageTransformersTestCase extends AbstractTransformerTestCase
     {
         AbstractTransformer trans = (AbstractTransformer) getTransformer();
         trans.setIgnoreBadInput(true);
-        muleContext.getRegistry().registerObject(MuleProperties.TRANSFORMATION_ENFORCE, Boolean.FALSE);
+        ((DefaultMuleConfiguration) muleContext.getConfiguration()).setUseExtendedTransformations(false);
         Object result = trans.transform(getResultData());
         trans.setIgnoreBadInput(false);
         assertEquals(result, getResultData());

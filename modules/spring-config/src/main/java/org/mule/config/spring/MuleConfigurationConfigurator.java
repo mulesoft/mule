@@ -66,6 +66,7 @@ public class MuleConfigurationConfigurator implements MuleContextAware, SmartFac
             defaultConfig.setDefaultResponseTimeout(config.getDefaultResponseTimeout());
             defaultConfig.setDefaultTransactionTimeout(config.getDefaultTransactionTimeout());
             defaultConfig.setShutdownTimeout(config.getShutdownTimeout());
+            defaultConfig.setUseExtendedTransformations(config.useExtendedTransformations());
             defaultConfig.setDefaultExceptionStrategyName(config.getDefaultExceptionStrategyName());
             validateDefaultExceptionStrategy();
             return configuration;
@@ -117,7 +118,6 @@ public class MuleConfigurationConfigurator implements MuleContextAware, SmartFac
         config.setDefaultResponseTimeout(responseTimeout);
     }
     
-    
     public void setDefaultTransactionTimeout(int defaultTransactionTimeout)
     {
         config.setDefaultTransactionTimeout(defaultTransactionTimeout);
@@ -131,5 +131,10 @@ public class MuleConfigurationConfigurator implements MuleContextAware, SmartFac
     public void setDefaultExceptionStrategyName(String defaultExceptionStrategyName)
     {
         config.setDefaultExceptionStrategyName(defaultExceptionStrategyName);
+    }
+
+    public void setUseExtendedTransformations(boolean resolveNonDirectTransformations)
+    {
+        config.setUseExtendedTransformations(resolveNonDirectTransformations);
     }
 }

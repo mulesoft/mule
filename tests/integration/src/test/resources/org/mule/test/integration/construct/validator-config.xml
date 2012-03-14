@@ -12,6 +12,8 @@
        http://www.mulesoft.org/schema/mule/pattern http://www.mulesoft.org/schema/mule/pattern/current/mule-pattern.xsd
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd">
 
+    <configuration useExtendedTransformations="false"/>
+
   <vm:endpoint name="test-service-channel"
                path="test-service.in"
                exchange-pattern="one-way" />

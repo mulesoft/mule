@@ -19,8 +19,7 @@ import static org.mockito.Mockito.when;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
-import org.mule.api.config.MuleProperties;
-import org.mule.api.registry.MuleRegistry;
+import org.mule.api.config.MuleConfiguration;
 import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
@@ -37,13 +36,13 @@ public class TransformerChainingTestCase extends AbstractMuleTestCase
 {
 
     private MuleContext muleContext = mock(MuleContext.class);
-    private MuleRegistry muleRegistry = mock(MuleRegistry.class);
+    private MuleConfiguration muleConfiguration = mock(MuleConfiguration.class);
 
     @Before
     public void setUp() throws Exception
     {
-        when(muleRegistry.get(MuleProperties.TRANSFORMATION_ENFORCE)).thenReturn(Boolean.FALSE);
-        when(muleContext.getRegistry()).thenReturn(muleRegistry);
+        when(muleConfiguration.useExtendedTransformations()).thenReturn(Boolean.FALSE);
+        when(muleContext.getConfiguration()).thenReturn(muleConfiguration);
     }
 
     @Test

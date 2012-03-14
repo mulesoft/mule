@@ -17,8 +17,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.when;
 
 import org.mule.api.MuleContext;
-import org.mule.api.config.MuleProperties;
-import org.mule.api.registry.MuleRegistry;
+import org.mule.api.config.MuleConfiguration;
 import org.mule.api.transformer.TransformerException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -32,7 +31,7 @@ public class TransformerSourceTypeEnforcementTestCase extends AbstractMuleTestCa
 {
 
     private MuleContext muleContext = mock(MuleContext.class);
-    private MuleRegistry registry = mock(MuleRegistry.class);
+    private MuleConfiguration muleConfiguration = mock(MuleConfiguration.class);
 
     @Test
     public void ignoresBadInputIfEnforcementOff() throws TransformerException
@@ -44,7 +43,7 @@ public class TransformerSourceTypeEnforcementTestCase extends AbstractMuleTestCa
         Object result = transformer.transform("TEST");
         assertEquals("TEST", result);
 
-        Mockito.verify(registry, times(1)).get(MuleProperties.TRANSFORMATION_ENFORCE);
+        Mockito.verify(muleConfiguration, times(1)).useExtendedTransformations();
     }
 
     @Test
@@ -63,14 +62,14 @@ public class TransformerSourceTypeEnforcementTestCase extends AbstractMuleTestCa
         {
         }
 
-        Mockito.verify(registry, times(1)).get(MuleProperties.TRANSFORMATION_ENFORCE);
+        Mockito.verify(muleConfiguration, times(1)).useExtendedTransformations();
     }
 
     @Test
     public void rejectsBadInputUsingDefaultEnforcement() throws TransformerException
     {
         AbstractTransformer transformer = createDummyTransformer(true);
-        when(muleContext.getRegistry()).thenReturn(registry);
+        //setTransformationEnforcement(true);
 
         try
         {
@@ -81,7 +80,7 @@ public class TransformerSourceTypeEnforcementTestCase extends AbstractMuleTestCa
         {
         }
 
-        Mockito.verify(registry, times(1)).get(MuleProperties.TRANSFORMATION_ENFORCE);
+        //Mockito.verify(muleConfiguration, times(1)).useExtendedTransformations();
     }
 
     @Test
@@ -91,18 +90,18 @@ public class TransformerSourceTypeEnforcementTestCase extends AbstractMuleTestCa
         transformer.sourceTypes.add(DataTypeFactory.STRING);
         transformer.returnType = DataTypeFactory.STRING;
 
-        when(muleContext.getRegistry()).thenReturn(registry);
+        when(muleContext.getConfiguration()).thenReturn(muleConfiguration);
 
         Object result = transformer.transform("TEST");
         assertEquals("TRANSFORMED", result);
 
-        Mockito.verify(registry, times(0)).get(MuleProperties.TRANSFORMATION_ENFORCE);
+        Mockito.verify(muleConfiguration, times(0)).useExtendedTransformations();
     }
 
     private void setTransformationEnforcement(boolean enforce)
     {
-        when(registry.get(MuleProperties.TRANSFORMATION_ENFORCE)).thenReturn(Boolean.toString(enforce));
-        when(muleContext.getRegistry()).thenReturn(registry);
+        when(muleConfiguration.useExtendedTransformations()).thenReturn(enforce);
+        when(muleContext.getConfiguration()).thenReturn(muleConfiguration);
     }
 
     private AbstractTransformer createDummyTransformer(boolean ignoreBadInput)
