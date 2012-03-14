@@ -25,6 +25,7 @@ public class ExpressionConfig
 {
     public static final String CUSTOM_EVALUATOR = "custom";
     public static final String EXPRESSION_SEPARATOR = ":";
+    private String unParsedExpression;
     private String expression;
 
     private String evaluator;
@@ -121,6 +122,10 @@ public class ExpressionConfig
     {
         if (fullExpression == null)
         {
+            if (expression == null)
+            {
+                parse(unParsedExpression);
+            }
             validate(manager);
             if (evaluator != null)
             {
@@ -137,6 +142,10 @@ public class ExpressionConfig
 
     public String getCustomEvaluator()
     {
+        if (expression == null)
+        {
+            parse(unParsedExpression);
+        }
         return customEvaluator;
     }
 
@@ -148,6 +157,10 @@ public class ExpressionConfig
 
     public String getEvaluator()
     {
+        if (expression == null)
+        {
+            parse(unParsedExpression);
+        }
         return evaluator;
     }
 
@@ -159,12 +172,16 @@ public class ExpressionConfig
 
     public String getExpression()
     {
+        if (expression == null)
+        {
+            parse(unParsedExpression);
+        }
         return expression;
     }
 
     public void setExpression(String expression)
     {
-        parse(StringUtils.trimToEmpty(expression));
+        this.unParsedExpression = expression;
         fullExpression = null;
     }
 }

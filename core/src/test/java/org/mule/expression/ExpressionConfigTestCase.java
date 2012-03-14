@@ -199,4 +199,28 @@ public class ExpressionConfigTestCase extends AbstractMuleContextTestCase
         assertEquals("#['This is a message : msg']", expressionConfig.getFullExpression(expressionManager));
     }
 
+    @Test
+    public void testXPathExpressionWithNamesapce()
+    {
+        ExpressionConfig expressionConfig = new ExpressionConfig();
+        expressionConfig.setExpression("//this:other/@attr");
+        expressionConfig.setEvaluator("header");
+        assertEquals("header", expressionConfig.getEvaluator());
+        assertNull(expressionConfig.getCustomEvaluator());
+        assertEquals("//this:other/@attr", expressionConfig.getExpression());
+        assertEquals("#[header://this:other/@attr]", expressionConfig.getFullExpression(expressionManager));
+    }
+
+    @Test
+    public void testXPathExpressionWithNamesapce2()
+    {
+        ExpressionConfig expressionConfig = new ExpressionConfig();
+        expressionConfig.setEvaluator("header");
+        expressionConfig.setExpression("//this:other/@attr");
+        assertEquals("header", expressionConfig.getEvaluator());
+        assertNull(expressionConfig.getCustomEvaluator());
+        assertEquals("//this:other/@attr", expressionConfig.getExpression());
+        assertEquals("#[header://this:other/@attr]", expressionConfig.getFullExpression(expressionManager));
+    }
+
 }
