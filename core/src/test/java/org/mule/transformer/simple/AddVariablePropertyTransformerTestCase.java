@@ -71,9 +71,9 @@ public class AddVariablePropertyTransformerTestCase extends AbstractMuleTestCase
     {
         Mockito.when(mockMuleContext.getExpressionManager()).thenReturn(mockExpressionManager);
         Mockito.when(mockExpressionManager.isExpression(EXPRESSION)).thenReturn(true);
-        Mockito.when(mockExpressionManager.parse(EXPRESSION, mockMessage)).thenReturn(EXPRESSION_VALUE);
+        Mockito.when(mockExpressionManager.evaluate(EXPRESSION, mockMessage)).thenReturn(EXPRESSION_VALUE);
         Mockito.when(mockExpressionManager.isExpression(NULL_EXPRESSION)).thenReturn(true);
-        Mockito.when(mockExpressionManager.parse(NULL_EXPRESSION,mockMessage)).thenReturn(NULL_EXPRESSION_VALUE);
+        Mockito.when(mockExpressionManager.evaluate(NULL_EXPRESSION,mockMessage)).thenReturn(NULL_EXPRESSION_VALUE);
         addVariableTransformer.setMuleContext(mockMuleContext);
     }
     

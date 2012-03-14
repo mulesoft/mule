@@ -133,7 +133,7 @@ public class AttributeEvaluator
         }
         if (isExpression())
         {
-            return expressionManager.parse(attributeValue,message);
+            return expressionManager.evaluate(attributeValue,message);
         }
         else
         {
