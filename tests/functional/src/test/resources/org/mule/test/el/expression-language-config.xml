@@ -6,14 +6,16 @@
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
 
-    <expression-language>
-        <alias name="appName" expression="app.name" />
-        <global-functions>
-            <![CDATA[
-                def hello() {'Hello '+appName+'!'}
-            ]]>
-        </global-functions>
-    </expression-language>
+    <configuration>
+        <expression-language autoResolveVariables="false">
+            <alias name="appName" expression="app.name" />
+            <global-functions>
+                <![CDATA[
+                    def hello() {'Hello '+appName+'!'}
+                ]]>
+            </global-functions>
+        </expression-language>
+    </configuration>
 
     <flow name="flow">
         <test:assert expression="#[payload == 'foo']" />

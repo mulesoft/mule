@@ -143,7 +143,6 @@
             <xsd:element ref="abstract-global-intercepting-message-processor"/>
             <xsd:element ref="custom-queue-store" minOccurs="0" maxOccurs="unbounded"/>
             <xsd:element ref="abstract-processing-strategy" minOccurs="0" maxOccurs="unbounded"/>
-            <xsd:element ref="expression-language"/>
         </xsd:choice>
     </xsd:group>
 
@@ -203,29 +202,6 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="expression-language">
-        <xsd:annotation>
-            <xsd:documentation>
-                Configuration of Mule Expression Language
-            </xsd:documentation>
-        </xsd:annotation>
-        <xsd:complexType>
-            <xsd:complexContent mixed="true">
-                <xsd:extension base="abstractMixedContentExtensionType">
-                    <xsd:sequence>
-                        <xsd:element minOccurs="0" maxOccurs="unbounded" name="alias">
-                            <xsd:complexType>
-                                <xsd:attribute name="name" use="required" />
-                                <xsd:attribute name="expression" use="required" />
-                            </xsd:complexType>
-                        </xsd:element>
-                        <xsd:element minOccurs="0" maxOccurs="1" name="global-functions" />
-                    </xsd:sequence>
-                </xsd:extension>
-            </xsd:complexContent>
-        </xsd:complexType>
-    </xsd:element>
-    
     <xsd:element name="el-execute" substitutionGroup="abstract-message-processor">
         <xsd:complexType>
             <xsd:complexContent>
@@ -1188,6 +1164,29 @@
                                 The default reconnection strategy, used by connectors and endpoints. This can also be configured on connectors, in which case the connector configuration is used instead of this default.
                             </xsd:documentation>
                         </xsd:annotation>
+                    </xsd:element>
+                    <xsd:element name="expression-language" minOccurs="0">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Configuration of Mule Expression Language
+                            </xsd:documentation>
+                        </xsd:annotation>
+                        <xsd:complexType>
+                            <xsd:complexContent mixed="true">
+                                <xsd:extension base="abstractMixedContentExtensionType">
+                                    <xsd:sequence>
+                                        <xsd:element minOccurs="0" maxOccurs="unbounded" name="alias">
+                                            <xsd:complexType>
+                                                <xsd:attribute name="name" use="required" />
+                                                <xsd:attribute name="expression" use="required" />
+                                            </xsd:complexType>
+                                        </xsd:element>
+                                        <xsd:element minOccurs="0" maxOccurs="1" name="global-functions" />
+                                    </xsd:sequence>
+                                    <xsd:attribute name="autoResolveVariables" default="true" type="substitutableBoolean"/>
+                                </xsd:extension>
+                            </xsd:complexContent>
+                        </xsd:complexType>
                     </xsd:element>
                 </xsd:sequence>
                 <xsd:attribute name="defaultResponseTimeout" type="xsd:string" default="10000">

@@ -70,6 +70,7 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
     protected String globalFunctionsString;
     protected Map<String, Function> globalFunctions;
     protected Map<String, String> aliases = new HashMap<String, String>();
+    protected boolean autoResolveVariables = true;
 
     public MVELExpressionLanguage(MuleContext muleContext)
     {
@@ -141,7 +142,10 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
     {
         MVELExpressionLanguageContext factory = new MVELExpressionLanguageContext(parserContext, muleContext);
         factory.appendFactory(new EventVariableResolverFactory(parserContext, muleContext, event));
-        factory.appendFactory(new VariableVariableResolverFactory(parserContext, muleContext, event));
+        if (autoResolveVariables)
+        {
+            factory.appendFactory(new VariableVariableResolverFactory(parserContext, muleContext, event));
+        }
         if (vars != null)
         {
             factory.appendFactory(new CachedMapVariableResolverFactory(vars));
@@ -155,7 +159,10 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
     {
         MVELExpressionLanguageContext factory = new MVELExpressionLanguageContext(parserContext, muleContext);
         factory.appendFactory(new MessageVariableResolverFactory(parserContext, muleContext, message));
-        factory.appendFactory(new VariableVariableResolverFactory(parserContext, muleContext, message));
+        if (autoResolveVariables)
+        {
+            factory.appendFactory(new VariableVariableResolverFactory(parserContext, muleContext, message));
+        }
         return (T) evaluateInternal(expression, factory);
     }
 
@@ -165,7 +172,10 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
     {
         MVELExpressionLanguageContext factory = new MVELExpressionLanguageContext(parserContext, muleContext);
         factory.appendFactory(new MessageVariableResolverFactory(parserContext, muleContext, message));
-        factory.appendFactory(new VariableVariableResolverFactory(parserContext, muleContext, message));
+        if (autoResolveVariables)
+        {
+            factory.appendFactory(new VariableVariableResolverFactory(parserContext, muleContext, message));
+        }
         if (vars != null)
         {
             factory.appendFactory(new CachedMapVariableResolverFactory(vars));
@@ -288,6 +298,11 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
     public void setAliases(Map<String, String> aliases)
     {
         this.aliases = aliases;
+    }
+
+    public void setAutoResolveVariables(boolean autoResolveVariables)
+    {
+        this.autoResolveVariables = autoResolveVariables;
     }
 
 }
