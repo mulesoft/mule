@@ -124,12 +124,6 @@ public class XsltTransformer extends AbstractXmlTransformer
         contextProperties = new HashMap();
     }
 
-    public XsltTransformer(String xslFile)
-    {
-        this();
-        this.setXslFile(xslFile);
-    }
-
     @Override
     public void initialise() throws InitialisationException
     {
@@ -140,6 +134,7 @@ public class XsltTransformer extends AbstractXmlTransformer
             if (xslFile != null)
             {
                 this.xslt = IOUtils.getResourceAsString(xslFile, getClass());
+                this.uriResolver = new LocalURIResolver(xslFile);
             }
             transformerPool.addObject();
         }
@@ -197,16 +192,19 @@ public class XsltTransformer extends AbstractXmlTransformer
         {
             private String systemId;
 
+            @Override
             public void write(Result result) throws Exception
             {
                 doTransform(message, encoding, sourceDoc, result);
             }
 
+            @Override
             public String getSystemId()
             {
                 return systemId;
             }
 
+            @Override
             public void setSystemId(String systemId)
             {
                 this.systemId = systemId;
@@ -319,7 +317,7 @@ public class XsltTransformer extends AbstractXmlTransformer
     /**
      * Returns the StreamSource corresponding to xslt (which should have been loaded
      * in {@link #initialise()}).
-     * 
+     *
      * @return The StreamSource
      */
     protected StreamSource getStreamSource() throws InitialisationException
@@ -394,18 +392,21 @@ public class XsltTransformer extends AbstractXmlTransformer
             return e != null;
         }
 
+        @Override
         public void error(javax.xml.transform.TransformerException exception)
                 throws javax.xml.transform.TransformerException
         {
             e = new TransformerException(trans, exception);
         }
 
+        @Override
         public void fatalError(javax.xml.transform.TransformerException exception)
                 throws javax.xml.transform.TransformerException
         {
             e = new TransformerException(trans, exception);
         }
 
+        @Override
         public void warning(javax.xml.transform.TransformerException exception)
                 throws javax.xml.transform.TransformerException
         {
