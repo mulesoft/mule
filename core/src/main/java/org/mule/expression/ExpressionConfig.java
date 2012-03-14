@@ -97,6 +97,10 @@ public class ExpressionConfig
     {
         if (expression == null)
         {
+            parse(unParsedExpression);
+        }
+        if (expression == null)
+        {
             throw new IllegalArgumentException(CoreMessages.objectIsNull("expression").getMessage());
         }
         if (CUSTOM_EVALUATOR.equalsIgnoreCase(evaluator))
