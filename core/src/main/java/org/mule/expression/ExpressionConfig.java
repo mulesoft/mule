@@ -64,7 +64,7 @@ public class ExpressionConfig
 
     public void parse(String expressionString)
     {
-        if (expressionString.startsWith(expressionPrefix))
+        if (expressionString.startsWith(expressionPrefix) && evaluator == null)
         {
             expressionString = expressionString.substring(expressionPrefix.length());
             expressionString = expressionString.substring(0,
@@ -186,6 +186,7 @@ public class ExpressionConfig
     public void setExpression(String expression)
     {
         this.unParsedExpression = expression;
-        fullExpression = null;
+        this.expression = null;
+        this.fullExpression = null;
     }
 }

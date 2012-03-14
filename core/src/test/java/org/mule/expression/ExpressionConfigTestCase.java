@@ -18,13 +18,11 @@ import org.mule.api.MuleMessage;
 import org.mule.api.expression.ExpressionEvaluator;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
-import org.mule.tck.size.SmallTest;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-@SmallTest
 public class ExpressionConfigTestCase extends AbstractMuleContextTestCase
 {
 
@@ -221,6 +219,33 @@ public class ExpressionConfigTestCase extends AbstractMuleContextTestCase
         assertNull(expressionConfig.getCustomEvaluator());
         assertEquals("//this:other/@attr", expressionConfig.getExpression());
         assertEquals("#[header://this:other/@attr]", expressionConfig.getFullExpression(expressionManager));
+    }
+
+    @Test
+    public void testNestedExpression()
+    {
+        muleContext.getExpressionManager().registerEvaluator(new StringExpressionEvaluator());
+
+        ExpressionConfig expressionConfig = new ExpressionConfig();
+        expressionConfig.setExpression("#[header:#[header:foo]]");
+        assertEquals("header", expressionConfig.getEvaluator());
+        assertNull(expressionConfig.getCustomEvaluator());
+        assertEquals("#[header:foo]", expressionConfig.getExpression());
+        assertEquals("#[header:#[header:foo]]", expressionConfig.getFullExpression(expressionManager));
+    }
+
+    @Test
+    public void testSetExpressionTwice()
+    {
+        muleContext.getExpressionManager().registerEvaluator(new StringExpressionEvaluator());
+
+        ExpressionConfig expressionConfig = new ExpressionConfig();
+        expressionConfig.setExpression("#[header:this]");
+        expressionConfig.setExpression("#[header:other]");
+        assertEquals("header", expressionConfig.getEvaluator());
+        assertNull(expressionConfig.getCustomEvaluator());
+        assertEquals("other", expressionConfig.getExpression());
+        assertEquals("#[header:other]", expressionConfig.getFullExpression(expressionManager));
     }
 
 }
