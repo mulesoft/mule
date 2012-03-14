@@ -118,12 +118,6 @@ public class CompositeTransformer implements Transformer
         return chain.size() > 0 && chain.peekFirst().isAcceptNull();
     }
 
-    @Override
-    public boolean isAllowNullReturn()
-    {
-        return chain.size() > 0 && chain.peekFirst().isAllowNullReturn();
-    }
-
     /**
      * By default, Mule will throw an exception if a transformer is invoked with a source object that is not compatible
      * with the transformer. Since transformers are often chained, it is useful to be able to ignore a transformer in the

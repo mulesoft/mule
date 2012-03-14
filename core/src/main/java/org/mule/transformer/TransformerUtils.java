@@ -182,7 +182,7 @@ public class TransformerUtils
      */
     public static void checkTransformerReturnClass(Transformer transformer, Object value) throws TransformerException
     {
-        if (value == null || value instanceof NullPayload && transformer.isAllowNullReturn())
+        if (value == null || value instanceof NullPayload && (transformer instanceof AbstractTransformer &&((AbstractTransformer) transformer).isAllowNullReturn()))
         {
             return;
         }

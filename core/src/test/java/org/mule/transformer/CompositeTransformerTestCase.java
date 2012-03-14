@@ -39,7 +39,6 @@ public class CompositeTransformerTestCase
 {
     private Transformer mockTransformerA = mock(Transformer.class);
     private Transformer mockTransformerB = mock(Transformer.class);
-    private CompositeTransformer chain;
 
     @Test(expected = IllegalArgumentException.class)
     public void rejectsEmptyCompositeTransformer() throws Exception
@@ -167,25 +166,6 @@ public class CompositeTransformerTestCase
         assertEquals("UTF-8", chain.getEncoding());
     }
 
-    @Test
-    public void allowsNullReturn()
-    {
-        doReturn(true).when(mockTransformerA).isAllowNullReturn();
-
-        CompositeTransformer chain = new CompositeTransformer(mockTransformerA, mockTransformerB);
-
-        assertEquals(true, chain.isAllowNullReturn());
-    }
-
-    @Test
-    public void doesNotAllowsNullReturn()
-    {
-        doReturn(false).when(mockTransformerA).isAllowNullReturn();
-
-        CompositeTransformer chain = new CompositeTransformer(mockTransformerA, mockTransformerB);
-
-        assertEquals(false, chain.isAllowNullReturn());
-    }
 
     @Test
     public void getEndpoint()

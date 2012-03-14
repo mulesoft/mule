@@ -45,12 +45,6 @@ public class DummyMuleContextAware implements MuleContextAware, Transformer
         return false;
     }
 
-    @Override
-    public boolean isAllowNullReturn()
-    {
-        return false;
-    }
-
     public boolean isIgnoreBadInput()
     {
         return false;
