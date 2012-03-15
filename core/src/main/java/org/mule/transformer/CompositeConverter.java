@@ -35,12 +35,6 @@ public class CompositeConverter implements Transformer, Converter
 
     private String name;
 
-    public LinkedList<Transformer> getChain()
-    {
-        //GUARDA: esto lo meti para testear, tendria que implementar equals mejor y hashcode tambien
-        return chain;
-    }
-
     protected LinkedList<Transformer> chain;
 
     /**
