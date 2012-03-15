@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.registry;
 
 import org.mule.api.MuleContext;
@@ -21,6 +22,7 @@ import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.DiscoverableTransformer;
 import org.mule.api.transformer.Transformer;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.transformer.GraphTransformerResolver;
 import org.mule.transformer.TransformerChain;
 import org.mule.transformer.TransformerWeighting;
 import org.mule.transformer.simple.ObjectToByteArray;
@@ -53,6 +55,7 @@ public class TypeBasedTransformerResolver implements TransformerResolver, MuleCo
 
     protected Map<String, Transformer> exactTransformerCache = new ConcurrentHashMap/*<String, Transformer>*/(8);
 
+    protected GraphTransformerResolver graphTransformerResolver = new GraphTransformerResolver();
 
     public void setMuleContext(MuleContext context)
     {
@@ -83,6 +86,15 @@ public class TypeBasedTransformerResolver implements TransformerResolver, MuleCo
         }
 
         List<Transformer> trans = muleContext.getRegistry().lookupTransformers(source, result);
+
+        if (muleContext != null && muleContext.getConfiguration().useExtendedTransformations())
+        {
+            Transformer compositeTransformer = graphTransformerResolver.resolve(source, result);
+            if (compositeTransformer != null)
+            {
+                trans.add(compositeTransformer);
+            }
+        }
 
         transformer = getNearestTransformerMatch(trans, source.getType(), result.getType());
         //If an exact mach is not found, we have a 'second pass' transformer that can be used to converting to String or
@@ -185,6 +197,7 @@ public class TypeBasedTransformerResolver implements TransformerResolver, MuleCo
     {
         if (transformer instanceof DiscoverableTransformer)
         {
+            graphTransformerResolver.transformerChange(transformer, registryAction);
             exactTransformerCache.clear();
         }
     }

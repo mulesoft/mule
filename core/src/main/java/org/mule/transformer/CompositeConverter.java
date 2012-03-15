@@ -15,6 +15,7 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.transformer.Converter;
 import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
@@ -29,10 +30,17 @@ import java.util.List;
  * When {@link #transform(Object)} is called each transformer in the same order they are included in the composition.
  * The output of a given transformer is the input of the next composed transformer.
  */
-public class CompositeTransformer implements Transformer
+public class CompositeConverter implements Transformer, Converter
 {
 
     private String name;
+
+    public LinkedList<Transformer> getChain()
+    {
+        //GUARDA: esto lo meti para testear, tendria que implementar equals mejor y hashcode tambien
+        return chain;
+    }
+
     protected LinkedList<Transformer> chain;
 
     /**
@@ -40,7 +48,7 @@ public class CompositeTransformer implements Transformer
      *
      * @param transformers List of transformers using to build the chain
      */
-    public CompositeTransformer(Transformer... transformers)
+    public CompositeConverter(Transformer... transformers)
     {
         if (transformers.length == 0)
         {
@@ -51,6 +59,10 @@ public class CompositeTransformer implements Transformer
 
         for (Transformer transformer : transformers)
         {
+            if (!(transformer instanceof Converter))
+            {
+                throw new IllegalArgumentException("Transformer must implement Converter interface");
+            }
             chain.addLast(transformer);
         }
     }
@@ -315,5 +327,25 @@ public class CompositeTransformer implements Transformer
     public String getName()
     {
         return this.name;
+    }
+
+    @Override
+    public int getPriorityWeighting()
+    {
+        int priorityWeighting = 0;
+        for (Transformer transformer : chain)
+        {
+            if (transformer instanceof Converter)
+            {
+                priorityWeighting += ((Converter) transformer).getPriorityWeighting();
+            }
+        }
+
+        return priorityWeighting;
+    }
+
+    @Override
+    public void setPriorityWeighting(int weighting)
+    {
     }
 }

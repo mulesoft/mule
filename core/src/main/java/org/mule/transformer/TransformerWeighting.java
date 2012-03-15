@@ -9,8 +9,8 @@
  */
 package org.mule.transformer;
 
+import org.mule.api.transformer.Converter;
 import org.mule.api.transformer.DataType;
-import org.mule.api.transformer.DiscoverableTransformer;
 import org.mule.api.transformer.Transformer;
 
 import java.util.List;
@@ -50,7 +50,7 @@ public class TransformerWeighting implements Comparable
             }
         }
 
-        outputWeighting = getWeighting(-1, outputClass, transformer.getReturnClass());
+        outputWeighting = getWeighting(-1, outputClass, transformer.getReturnDataType().getType());
 
         inputWeighting = (inputWeighting == Integer.MAX_VALUE ? -1 : inputWeighting);
         outputWeighting = (outputWeighting == Integer.MAX_VALUE ? -1 : outputWeighting);
@@ -153,12 +153,12 @@ public class TransformerWeighting implements Comparable
                 weighting.getOutputWeighting() == getOutputWeighting())
         {
             //We only check the weighting if we have an exact match
-            //These transformers should always implement DiscoverableTransformer, but jic we check here
-            if (weighting.getTransformer() instanceof DiscoverableTransformer
-                    && this.getTransformer() instanceof DiscoverableTransformer)
+            //These transformers should always implement Converter, but jic we check here
+            if (weighting.getTransformer() instanceof Converter
+                    && this.getTransformer() instanceof Converter)
             {
-                int x = ((DiscoverableTransformer) weighting.getTransformer()).getPriorityWeighting();
-                int y = ((DiscoverableTransformer) this.getTransformer()).getPriorityWeighting();
+                int x = ((Converter) weighting.getTransformer()).getPriorityWeighting();
+                int y = ((Converter) this.getTransformer()).getPriorityWeighting();
                 if (x > y)
                 {
                     return -1;

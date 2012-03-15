@@ -11,13 +11,14 @@ package org.mule.transformer;
 
 import org.mule.api.registry.ResolverException;
 import org.mule.api.registry.TransformerResolver;
+import org.mule.api.transformer.Converter;
 import org.mule.api.transformer.DataType;
-import org.mule.api.transformer.DiscoverableTransformer;
 import org.mule.api.transformer.Transformer;
 
-import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -25,9 +26,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import org.apache.commons.collections.map.LRUMap;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.jgrapht.Graphs;
-import org.jgrapht.graph.DirectedWeightedMultigraph;
-import org.jgrapht.traverse.ClosestFirstIterator;
+import org.jgrapht.graph.DirectedMultigraph;
 
 /**
  * A transformer resolver that will find direct and non direct transformations
@@ -68,11 +67,11 @@ public class GraphTransformerResolver implements TransformerResolver
 
     /**
      * Find a transformer chain suitable for the specified criteria. The chain will
-     * be wrapper inside a {@link CompositeTransformer}
+     * be wrapper inside a {@link CompositeConverter}
      *
      * @param source information about the source object including the object itself
      * @param result information about the result object to transform to
-     * @return A {@link CompositeTransformer}
+     * @return A {@link CompositeConverter}
      * @throws ResolverException
      */
     @Override
@@ -88,22 +87,23 @@ public class GraphTransformerResolver implements TransformerResolver
 
         try
         {
-            // Checks if there is a transformer with the specified input data type
-            if (!this.graph.containsVertex(source))
+            Transformer nearestTransformerMatch = null;
+
+            List<List<TransformationEdge>> transformationPaths = findTransformationPaths(source, result);
+
+            if (transformationPaths.size() != 0)
             {
-                return null;
+                sortTransformationPathsByLength(transformationPaths);
+
+                List<Transformer> transformers = createTransformers(getShortestTransformationPaths(transformationPaths));
+
+                nearestTransformerMatch = getNearestTransformerMatch(transformers, source.getType(), result.getType());
             }
 
-            // Checks if there is a transformer with the specified output data type
-            if (!this.graph.containsVertex(result))
-            {
-                return null;
-            }
+            // Caches the obtained value
+            lruMap.put(cacheKey, nearestTransformerMatch);
 
-            Transformer transformer = findTransformer(source, result);
-            lruMap.put(cacheKey, transformer);
-
-            return transformer;
+            return nearestTransformerMatch;
         }
         finally
         {
@@ -111,58 +111,178 @@ public class GraphTransformerResolver implements TransformerResolver
         }
     }
 
-    private Transformer findTransformer(DataType<?> source, DataType<?> result)
+    private List<List<TransformationEdge>> getShortestTransformationPaths(List<List<TransformationEdge>> transformationPaths)
     {
-        ClosestFirstIterator<DataType<?>, TransformationEdge> iter = new ClosestFirstIterator<DataType<?>, TransformationEdge>(graph, source);
-
-        while (iter.hasNext())
+        int shortestPathLength = transformationPaths.get(0).size();
+        int index = 1;
+        for (; index < transformationPaths.size(); index++)
         {
-            DataType<?> currentDataType = iter.next();
-
-            if (currentDataType.isCompatibleWith(result))
-            {
-                return createTransformer(iter, result);
-            }
-        }
-
-        return null;
-    }
-
-    private Transformer createTransformer(ClosestFirstIterator<DataType<?>, TransformationEdge> iter, DataType<?> result)
-    {
-        List<TransformationEdge> edgeList = new ArrayList<TransformationEdge>();
-
-        DataType<?> currentDataType = result;
-        while (true)
-        {
-            TransformationEdge edge = iter.getSpanningTreeEdge(currentDataType);
-
-            if (edge == null)
+            if (transformationPaths.get(index).size() > shortestPathLength)
             {
                 break;
             }
-
-            edgeList.add(edge);
-            currentDataType = Graphs.getOppositeVertex(graph, edge, currentDataType);
         }
 
-        if (edgeList.size() == 1)
+        return transformationPaths.subList(0, index);
+    }
+
+    private void sortTransformationPathsByLength(List<List<TransformationEdge>> transformationPaths)
+    {
+        Collections.sort(transformationPaths, new Comparator<List<TransformationEdge>>()
         {
-            return edgeList.get(0).transformer;
+            @Override
+            public int compare(List<TransformationEdge> transformationEdges, List<TransformationEdge> transformationEdges1)
+            {
+                return transformationEdges.size() - transformationEdges1.size();
+            }
+        });
+    }
+
+    public List<Transformer> lookupTransformers(DataType<?> source, DataType<?> target)
+    {
+        List<Transformer> transformers = new LinkedList<Transformer>();
+        if (!graph.containsVertex(source))
+        {
+            return transformers;
+        }
+
+        // Checks if there is a transformer with the specified output data type
+        if (!graph.containsVertex(target))
+        {
+            return transformers;
+        }
+
+        Set<DataType<?>> visited = new HashSet<DataType<?>>();
+
+        List<List<TransformationEdge>> transformationPaths = findTransformationPaths(source, target, visited);
+
+        logger.error("Transformation paths: " + transformationPaths);
+
+        transformers = createTransformers(transformationPaths);
+
+        return transformers;
+    }
+
+    private List<Transformer> createTransformers(List<List<TransformationEdge>> transformationPaths)
+    {
+        List<Transformer> transformers = new LinkedList<Transformer>();
+
+        for (List<TransformationEdge> transformationPath : transformationPaths)
+        {
+            Transformer[] pathTransformers = new Transformer[transformationPath.size()];
+
+            int index = 0;
+            for (TransformationEdge edge : transformationPath)
+            {
+                pathTransformers[index++] = edge.transformer;
+            }
+
+            Transformer transformer;
+            if (transformationPath.size() == 1)
+            {
+                transformer = transformationPath.get(0).getTransformer();
+            }
+            else
+            {
+                transformer = new CompositeConverter(pathTransformers);
+            }
+            transformers.add(transformer);
+        }
+
+        return transformers;
+    }
+
+    private List<List<TransformationEdge>> findTransformationPaths(DataType<?> source, DataType<?> target)
+    {
+        List<List<TransformationEdge>> transformationPaths = new LinkedList<List<TransformationEdge>>();
+
+        if (!graph.containsVertex(source))
+        {
+            return transformationPaths;
+        }
+
+        if (!graph.containsVertex(target))
+        {
+            return transformationPaths;
+        }
+
+        Set<DataType<?>> visited = new HashSet<DataType<?>>();
+
+
+        transformationPaths = findTransformationPaths(source, target, visited);
+        logger.error("TransformationPaths: " + transformationPaths);
+
+        return transformationPaths;
+    }
+
+    private List<List<TransformationEdge>> findTransformationPaths(DataType<?> source, DataType<?> target, Set<DataType<?>> visited)
+    {
+        List<List<TransformationEdge>> transformers = new LinkedList<List<TransformationEdge>>();
+
+        if (visited.contains(source))
+        {
+            return transformers;
         }
         else
         {
-            Collections.reverse(edgeList);
+            visited.add(source);
 
-            Transformer[] transformers = new Transformer[edgeList.size()];
-
-            int index = 0;
-            for (TransformationEdge edge : edgeList)
+            Set<TransformationEdge> transformationEdges = graph.outgoingEdgesOf(source);
+            for (TransformationEdge transformationEdge : transformationEdges)
             {
-                transformers[index++] = edge.transformer;
+                DataType<?> edgeTarget = graph.getEdgeTarget(transformationEdge);
+
+                if (edgeTarget.equals(target))
+                {
+                    LinkedList<TransformationEdge> transformationEdges1 = new LinkedList<TransformationEdge>();
+                    transformationEdges1.add(transformationEdge);
+                    transformers.add(transformationEdges1);
+                }
+                else
+                {
+                    List<List<TransformationEdge>> newTransformations = findTransformationPaths(edgeTarget, target, visited);
+
+                    for (List<TransformationEdge> transformationEdgeList : newTransformations)
+                    {
+                        transformationEdgeList.add(0, transformationEdge);
+                        transformers.add(transformationEdgeList);
+                    }
+                }
             }
 
-            return new CompositeTransformer(transformers);
+            visited.remove(source);
+        }
+
+
+        return transformers;
+    }
+
+    protected Transformer getNearestTransformerMatch(List<Transformer> trans, Class input, Class output) throws ResolverException
+    {
+        if (trans.size() == 0)
+        {
+            return null;
+        }
+        else if (trans.size() == 1)
+        {
+            return trans.get(0);
+        }
+        else
+        {
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Comparing transformers for best match: input = " + input + " output = " + output + " Possible transformers = " + trans);
+            }
+
+            List<TransformerWeighting> weightings = new LinkedList<TransformerWeighting>();
+            for (Transformer transformer : trans)
+            {
+                TransformerWeighting current = new TransformerWeighting(input, output, transformer);
+                weightings.add(current);
+            }
+            Collections.sort(weightings);
+
+            return weightings.get(weightings.size() - 1).getTransformer();
         }
     }
 
@@ -175,7 +295,7 @@ public class GraphTransformerResolver implements TransformerResolver
     @Override
     public void transformerChange(Transformer transformer, RegistryAction registryAction)
     {
-        if (!(transformer instanceof DiscoverableTransformer))
+        if (!(transformer instanceof Converter))
         {
             return;
         }
@@ -295,23 +415,20 @@ public class GraphTransformerResolver implements TransformerResolver
         {
             return transformer;
         }
+
+        @Override
+        public String toString()
+        {
+            return transformer.getClass().getName();
+        }
     }
 
-    protected class TransformationGraph extends DirectedWeightedMultigraph<DataType<?>, TransformationEdge>
+    protected class TransformationGraph extends DirectedMultigraph<DataType<?>, TransformationEdge>
     {
 
         public TransformationGraph()
         {
             super(TransformationEdge.class);
-        }
-
-        @Override
-        public double getEdgeWeight(TransformationEdge transformationEdge)
-        {
-            DiscoverableTransformer transformer = (DiscoverableTransformer) transformationEdge.transformer;
-
-            int negativeWeight = DiscoverableTransformer.MAX_PRIORITY_WEIGHTING - transformer.getPriorityWeighting();
-            return negativeWeight < 0 ? 0 : negativeWeight;
         }
     }
 
