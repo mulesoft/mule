@@ -13,14 +13,14 @@
     <flow name="testProperties" processingStrategy="synchronous">
         <http:inbound-endpoint address="http://localhost:${port1}/resources" exchange-pattern="request-response"/>
         <choice>
-            <when evaluator="groovy" expression="inbound['http.relative.path'] == 'client'">
+            <when evaluator="groovy" expression="message.getInboundProperty('http.relative.path') == 'client'">
                 <choice>
-                    <when evaluator="groovy" expression="inbound['http.method'] == 'GET'">
+                    <when evaluator="groovy" expression="message.getInboundProperty('http.method') == 'GET'">
                         <expression-transformer>
-                            <return-argument evaluator="groovy" expression="'Retrieving client with id = ' + inbound['http.query.params']['id']"/>
+                            <return-argument evaluator="groovy" expression="'Retrieving client with id = ' + message.getInboundProperty('http.query.params')['id']"/>
                         </expression-transformer>
                     </when>
-                    <when evaluator="groovy" expression="inbound['http.method'] == 'POST'">
+                    <when evaluator="groovy" expression="message.getInboundProperty('http.method') == 'POST'">
                         <http:body-to-parameter-map-transformer/>
                         <expression-transformer>
                             <return-argument evaluator="groovy" expression="'Storing client with name = ' + payload['name'] + ' and lastname = ' + payload['lastname']"/>
@@ -28,14 +28,14 @@
                     </when>
                     <otherwise>
                         <expression-transformer>
-                            <return-argument evaluator="groovy" expression="'Unknown HTTP method: ' + inbound['http.method']"/>
+                            <return-argument evaluator="groovy" expression="'Unknown HTTP method: ' + message.getInboundProperty('http.method')"/>
                         </expression-transformer>
                     </otherwise>
                 </choice>
             </when>
             <otherwise>
                 <expression-transformer>
-                    <return-argument evaluator="groovy" expression="'Unknown resource: ' + inbound['http.relative.path']"/>
+                    <return-argument evaluator="groovy" expression="'Unknown resource: ' + message.getInboundProperty('http.relative.path')"/>
                 </expression-transformer>
             </otherwise>
         </choice>
@@ -50,7 +50,7 @@
     <flow name="testRedirection" processingStrategy="synchronous">
         <http:inbound-endpoint address="http://localhost:${port1}/newSite" exchange-pattern="request-response"/>
         <expression-transformer>
-            <return-argument evaluator="groovy" expression="'Successfully redirected: ' + inbound['http.relative.path'] + '?' + inbound['http.query.string']"/>
+            <return-argument evaluator="groovy" expression="'Successfully redirected: ' + message.getInboundProperty('http.relative.path') + '?' + message.getInboundProperty('http.query.string')"/>
         </expression-transformer>
     </flow>
 </mule>

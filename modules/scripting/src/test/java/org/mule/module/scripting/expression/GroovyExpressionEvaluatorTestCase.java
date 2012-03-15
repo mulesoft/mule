@@ -25,7 +25,6 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.construct.FlowConstruct;
-import org.mule.api.transport.PropertyScope;
 import org.mule.message.DefaultExceptionPayload;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
@@ -195,47 +194,6 @@ public class GroovyExpressionEvaluatorTestCase extends AbstractMuleContextTestCa
     }
 
     @Test
-    public void inboundProperty() throws Exception
-    {
-        MuleMessage message = new DefaultMuleMessage("", muleContext);
-        message.setProperty("foo", "bar", PropertyScope.INBOUND);
-        assertEquals("bar", muleContext.getExpressionManager().evaluate("#[groovy:inbound['foo']]", message));
-    }
-
-    @Test(expected = MuleRuntimeException.class)
-    public void assignInboundProperty() throws Exception
-    {
-        MuleMessage message = new DefaultMuleMessage("", muleContext);
-        muleContext.getExpressionManager().evaluate("#[groovy:inbound['foo']='bar']", message);
-        assertEquals("bar", message.getInboundProperty("foo"));
-    }
-
-    @Test
-    public void outboundProperty() throws Exception
-    {
-        MuleMessage message = new DefaultMuleMessage("", muleContext);
-        message.setOutboundProperty("foo", "bar");
-        assertEquals("bar", muleContext.getExpressionManager().evaluate("#[groovy:outbound['foo']]", message));
-    }
-
-    @Test
-    public void assignValueToOutboundProperty() throws Exception
-    {
-        MuleMessage message = new DefaultMuleMessage("", muleContext);
-        message.setOutboundProperty("foo", "bar_old");
-        muleContext.getExpressionManager().evaluate("#[groovy:outbound['foo']='bar']", message);
-        assertEquals("bar", message.getOutboundProperty("foo"));
-    }
-
-    @Test
-    public void assignValueToNewOutboundProperty() throws Exception
-    {
-        MuleMessage message = new DefaultMuleMessage("", muleContext);
-        muleContext.getExpressionManager().evaluate("#[groovy:outbound['foo']='bar']", message);
-        assertEquals("bar", message.getOutboundProperty("foo"));
-    }
-
-    @Test
     public void variableFromFlowScope() throws Exception
     {
         MuleMessage message = new DefaultMuleMessage("", muleContext);
@@ -289,7 +247,7 @@ public class GroovyExpressionEvaluatorTestCase extends AbstractMuleContextTestCa
             Mockito.mock(FlowConstruct.class));
         event.setFlowVariable("foo", "bar");
         assertEquals(event.getFlowVariable("foo"),
-            muleContext.getExpressionManager().evaluate("#[groovy:flowVariables['foo']]", message));
+            muleContext.getExpressionManager().evaluate("#[groovy:flowVars['foo']]", message));
     }
 
     @Test
@@ -299,7 +257,7 @@ public class GroovyExpressionEvaluatorTestCase extends AbstractMuleContextTestCa
         MuleEvent event = new DefaultMuleEvent(message, MessageExchangePattern.ONE_WAY,
             Mockito.mock(FlowConstruct.class));
         event.setFlowVariable("foo", "bar_old");
-        muleContext.getExpressionManager().evaluate("#[groovy:flowVariables['foo']='bar']", message);
+        muleContext.getExpressionManager().evaluate("#[groovy:flowVars['foo']='bar']", message);
         assertEquals("bar", event.getFlowVariable("foo"));
     }
 
@@ -309,7 +267,7 @@ public class GroovyExpressionEvaluatorTestCase extends AbstractMuleContextTestCa
         MuleMessage message = new DefaultMuleMessage("", muleContext);
         MuleEvent event = new DefaultMuleEvent(message, MessageExchangePattern.ONE_WAY,
             Mockito.mock(FlowConstruct.class));
-        muleContext.getExpressionManager().evaluate("#[groovy:flowVariables['foo']='bar']", message);
+        muleContext.getExpressionManager().evaluate("#[groovy:flowVars['foo']='bar']", message);
         assertEquals("bar", event.getFlowVariable("foo"));
     }
 
@@ -321,7 +279,7 @@ public class GroovyExpressionEvaluatorTestCase extends AbstractMuleContextTestCa
             Mockito.mock(FlowConstruct.class));
         event.setSessionVariable("foo", "bar");
         assertEquals(event.getSessionVariable("foo"),
-            muleContext.getExpressionManager().evaluate("#[groovy:sessionVariables['foo']]", message));
+            muleContext.getExpressionManager().evaluate("#[groovy:sessionVars['foo']]", message));
     }
 
     @Test
@@ -331,7 +289,7 @@ public class GroovyExpressionEvaluatorTestCase extends AbstractMuleContextTestCa
         MuleEvent event = new DefaultMuleEvent(message, MessageExchangePattern.ONE_WAY,
             Mockito.mock(FlowConstruct.class));
         event.setSessionVariable("foo", "bar_old");
-        muleContext.getExpressionManager().evaluate("#[groovy:sessionVariables['foo']='bar']", message);
+        muleContext.getExpressionManager().evaluate("#[groovy:sessionVars['foo']='bar']", message);
         assertEquals("bar", event.getSessionVariable("foo"));
     }
 
@@ -341,7 +299,7 @@ public class GroovyExpressionEvaluatorTestCase extends AbstractMuleContextTestCa
         MuleMessage message = new DefaultMuleMessage("", muleContext);
         MuleEvent event = new DefaultMuleEvent(message, MessageExchangePattern.ONE_WAY,
             Mockito.mock(FlowConstruct.class));
-        muleContext.getExpressionManager().evaluate("#[groovy:sessionVariables['foo']='bar']", message);
+        muleContext.getExpressionManager().evaluate("#[groovy:sessionVars['foo']='bar']", message);
         assertEquals("bar", event.getSessionVariable("foo"));
     }
 

@@ -45,7 +45,7 @@
             <test:assert expression="#[groovy:P2]" />
         </response>
         <test:assert expression="#[groovy:P1]" />
-        <test:assert expression="#[groovy:flowVariables['P2'] == null]" />
+        <test:assert expression="#[groovy:flowVars['P2'] == null]" />
         <processor ref="addP2" />
         <test:assert expression="#[groovy:P1]" />
         <test:assert expression="#[groovy:P2]" />
@@ -60,7 +60,7 @@
     <flow name="noPropagationInDifferentFlowVMOneWay-2">
         <vm:inbound-endpoint path="noPropagationInDifferentFlowVMOneWay-2"
             exchange-pattern="one-way" />
-        <test:assert expression="#[groovy:flowVariables['P1'] == null]" />
+        <test:assert expression="#[groovy:flowVars['P1'] == null]" />
     </flow>
 
     <flow name="noPropagationInDifferentFlowVMRequestResponse">
@@ -72,7 +72,7 @@
     <flow name="noPropagationInDifferentFlowVMRequestResponse-2">
         <vm:inbound-endpoint path="noPropagationInDifferentFlowVMRequestResponse-2"
             exchange-pattern="request-response" />
-        <test:assert expression="#[groovy:flowVariables['P1'] == null]" />
+        <test:assert expression="#[groovy:flowVars['P1'] == null]" />
     </flow>
 
     <flow name="noPropagationInDifferentFlowHttp">
@@ -82,7 +82,7 @@
     </flow>
     <flow name="noPropagationInDifferentFlowHttp-2">
         <http:inbound-endpoint address="http://localhost:${port2}" />
-        <test:assert expression="#[groovy:flowVariables['P1'] == null]" />
+        <test:assert expression="#[groovy:flowVars['P1'] == null]" />
     </flow>
 
     <flow name="AsyncFlow">
@@ -123,7 +123,7 @@
         <flow-ref name="FlowRef-2" />
         <test:assert expression="#[groovy:P1]" />
         <test:assert expression="#[groovy:P2]" />
-        <test:assert expression="#[groovy:flowVariables['P3'] == null]" />
+        <test:assert expression="#[groovy:flowVars['P3'] == null]" />
         <test:assert expression="#[header:INVOCATION:P4]" message="I failed" />
     </flow>
     <flow name="FlowRef-1" processingStrategy="synchronous">
@@ -212,7 +212,7 @@
             <processor ref="addP2" />
         </async>
         <test:assert expression="#[groovy:P1]" />
-        <test:assert expression="#[groovy:flowVariables['P2'] == null]" />
+        <test:assert expression="#[groovy:flowVars['P2'] == null]" />
     </flow>
 
     <flow name="propagationThroughWireTap">
@@ -227,7 +227,7 @@
         <wire-tap>
             <flow-ref name="WireTap2-2" />
         </wire-tap>
-        <test:assert expression="#[groovy:flowVariables['P1'] == null]" />
+        <test:assert expression="#[groovy:flowVars['P1'] == null]" />
     </flow>
     <sub-flow name="WireTap2-2">
         <processor ref="addP1" />
@@ -246,7 +246,7 @@
         <enricher target="#[variable:test]">
             <flow-ref name="Enricher2-2" />
         </enricher>
-        <test:assert expression="#[groovy:flowVariables['P1'] == null]" />
+        <test:assert expression="#[groovy:flowVars['P1'] == null]" />
     </flow>
     <sub-flow name="Enricher2-2">
         <processor ref="addP1" />
@@ -319,8 +319,8 @@
             </async>
         </all>
         <test:assert expression="#[groovy:P1]" />
-        <test:assert expression="#[groovy:flowVariables['P2'] == null]" />
-        <test:assert expression="#[groovy:flowVariables['P3'] == null]" />
+        <test:assert expression="#[groovy:flowVars['P2'] == null]" />
+        <test:assert expression="#[groovy:flowVars['P3'] == null]" />
     </flow>
     <sub-flow name="All-1">
         <processor ref="addP2" />
@@ -330,7 +330,7 @@
     <sub-flow name="All-2">
         <processor ref="addP3" />
         <test:assert expression="#[groovy:P1]" />
-        <test:assert expression="#[groovy:flowVariables['P2'] == null]" />
+        <test:assert expression="#[groovy:flowVars['P2'] == null]" />
         <test:assert expression="#[groovy:P3]" />
     </sub-flow>
 

@@ -80,7 +80,7 @@
         <inbound-endpoint address="vm://in6" exchange-pattern="request-response">
             <script:transformer>
                 <script:script engine="groovy">
-                    outbound['foo'] = 'bar'
+                    message.getOutboundProperty('foo') = 'bar'
                     return payload
                 </script:script>
             </script:transformer>

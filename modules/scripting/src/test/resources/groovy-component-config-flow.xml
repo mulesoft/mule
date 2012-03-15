@@ -32,7 +32,7 @@
     <flow name="inlineScriptMutateProperty">
         <script:component>
             <script:script engine="groovy">
-                outbound['foo'] = 'bar-mutated'                
+                message.getOutboundProperty('foo') = 'bar-mutated'                
              </script:script>
         </script:component>
         <test:assert expression="#[groovy:message.getOutboundProperty('foo').equals('bar-mutated')]"/>
@@ -41,7 +41,7 @@
     <flow name="inlineScriptAddProperty">
         <script:component>
             <script:script engine="groovy">
-                outbound['foo'] = 'bar'                
+                message.getOutboundProperty('foo') = 'bar'                
              </script:script>
         </script:component>
         <test:assert expression="#[groovy:message.getOutboundProperty('foo').equals('bar')]"/>
@@ -60,7 +60,7 @@
     <flow name="inlineScriptMutateVariable">
         <script:component>
             <script:script engine="groovy">
-                flowVariables['foo'] = 'bar-mutated'                
+                message.setInvocationProperty('foo','bar-mutated')                
              </script:script>
         </script:component>
         <test:assert expression="#[groovy:message.getInvocationProperty('foo').equals('bar-mutated')]"/>
@@ -69,7 +69,7 @@
     <flow name="inlineScriptAddVariable">
         <script:component>
             <script:script engine="groovy">
-                flowVariables['foo'] = 'bar'                
+                message.setInvocationProperty('foo','bar')                
              </script:script>
         </script:component>
         <test:assert expression="#[groovy:message.getInvocationProperty('foo').equals('bar')]"/>
@@ -78,7 +78,7 @@
     <flow name="inlineScriptMutateVariablesMap">
         <script:component>
             <script:script engine="groovy">
-                flowVariables = new HashMap()              
+                flowVars = new HashMap()              
              </script:script>
         </script:component>
         <test:assert expression="#[groovy:message.getInvocationProperty('foo').equals('bar')]"/>

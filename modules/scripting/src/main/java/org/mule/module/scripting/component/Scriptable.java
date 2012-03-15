@@ -237,10 +237,8 @@ public class Scriptable implements Initialisable, MuleContextAware
 
     private void populateHeadersVariablesAndException(Bindings bindings, MuleMessage message)
     {
-        bindings.put("inbound", new MesssagePropertyMap(message, PropertyScope.INBOUND));
-        bindings.put("outbound", new MesssagePropertyMap(message, PropertyScope.OUTBOUND));
-        bindings.put("flowVariables", new MesssagePropertyMap(message, PropertyScope.INVOCATION));
-        bindings.put("sessionVariables", new MesssagePropertyMap(message, PropertyScope.SESSION));
+        bindings.put("flowVars", new MesssagePropertyMap(message, PropertyScope.INVOCATION));
+        bindings.put("sessionVars", new MesssagePropertyMap(message, PropertyScope.SESSION));
 
         if (message.getExceptionPayload() != null)
         {
