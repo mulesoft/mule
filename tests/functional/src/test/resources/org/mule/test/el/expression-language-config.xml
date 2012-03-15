@@ -8,6 +8,7 @@
 
     <configuration>
         <expression-language autoResolveVariables="false">
+            <import name="loc" class="java.util.Locale" />
             <alias name="appName" expression="app.name" />
             <global-functions>
                 def hello() {'Hello '+appName+'!'}
@@ -19,6 +20,8 @@
         <test:assert expression="#[payload == 'foo']" />
         <eval expression="#[payload='bar']" />
         <test:assert expression="#[payload == 'bar']" />
+        <test:assert expression="#[loc is java.util.Locale]" />
+        <eval expression="#[System.out.println(loc.getName())]" />
     </flow>
 
 </mule>

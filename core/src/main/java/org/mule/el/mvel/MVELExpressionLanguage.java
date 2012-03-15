@@ -14,7 +14,6 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.el.ExpressionLanguage;
-import org.mule.api.el.ExpressionLanguageContext;
 import org.mule.api.expression.ExpressionManager;
 import org.mule.api.expression.ExpressionRuntimeException;
 import org.mule.api.expression.InvalidExpressionException;
@@ -61,8 +60,9 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
 
     // Configuration
     protected String globalFunctionsString;
-    protected Map<String, Function> globalFunctions;
+    protected Map<String, Function> globalFunctions = new HashMap<String, Function>();
     protected Map<String, String> aliases = new HashMap<String, String>();
+    protected Map<String, Class<?>> imports = new HashMap<String, Class<?>>();
     protected boolean autoResolveVariables = true;
 
     public MVELExpressionLanguage(MuleContext muleContext)
@@ -78,8 +78,8 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
         parserContext = createParserContext();
         expressionExecutor = new MVELExpressionExecutor(parserContext);
 
-        globalFunctions = CompilerTools.extractAllDeclaredFunctions(new ExpressionCompiler(
-            globalFunctionsString).compile());
+        globalFunctions.putAll(CompilerTools.extractAllDeclaredFunctions(new ExpressionCompiler(
+            globalFunctionsString).compile()));
 
         staticContext = new StaticVariableResolverFactory(parserContext, muleContext);
 
@@ -87,10 +87,6 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
         {
             ((DefaultExpressionManager) muleContext.getExpressionManager()).setExpressionLanguage(this);
         }
-    }
-
-    protected void addExtensions(ExpressionLanguageContext context)
-    {
     }
 
     @Override
@@ -290,9 +286,29 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
         this.aliases = aliases;
     }
 
+    public void setImports(Map<String, Class<?>> imports)
+    {
+        this.imports = imports;
+    }
+
     public void setAutoResolveVariables(boolean autoResolveVariables)
     {
         this.autoResolveVariables = autoResolveVariables;
+    }
+
+    public void addGlobalFunction(String name, Function function)
+    {
+        this.globalFunctions.put(name, function);
+    }
+
+    public void addImport(String name, Class<?> clazz)
+    {
+        this.imports.put(name, clazz);
+    }
+
+    public void addAlias(String name, String expression)
+    {
+        this.aliases.put(name, expression);
     }
 
 }

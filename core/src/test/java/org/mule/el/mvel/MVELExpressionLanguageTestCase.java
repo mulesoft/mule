@@ -34,6 +34,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import org.junit.Before;
@@ -42,6 +43,8 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 import org.mockito.Mockito;
+import org.mvel2.ParserContext;
+import org.mvel2.ast.Function;
 
 @RunWith(Parameterized.class)
 public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase
@@ -289,6 +292,30 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase
         assertEquals("bar", evaluate("foo"));
     }
 
+    @Test
+    public void addImport() throws InitialisationException
+    {
+        mvel.setImports(Collections.<String, Class<?>> singletonMap("loc", Locale.class));
+        mvel.initialise();
+        assertEquals(Locale.class, evaluate("loc"));
+    }
+
+    @Test
+    public void addAlias() throws InitialisationException
+    {
+        mvel.setAliases(Collections.<String, String> singletonMap("appName", "app.name"));
+        mvel.initialise();
+        assertEquals(muleContext.getConfiguration().getId(), evaluate("appName"));
+    }
+
+    @Test
+    public void addGlobalFunction() throws InitialisationException
+    {
+        mvel.addGlobalFunction("hello", new HelloWorldFunction(mvel.parserContext));
+        mvel.initialise();
+        assertEquals("Hello World!", evaluate("hello()"));
+    }
+
     protected Object evaluate(String expression)
     {
         if (variant.equals(Variant.EXPRESSION_WITH_DELIMITER))
@@ -377,6 +404,22 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase
     {
         return Arrays.asList(new Object[][]{{Variant.EXPRESSION_WITH_DELIMITER},
             {Variant.EXPRESSION_STRAIGHT_UP}});
+    }
+
+    private static class HelloWorldFunction extends Function
+    {
+        public HelloWorldFunction(ParserContext parserContext)
+        {
+            super("hello", new char[]{}, new char[]{}, 0, parserContext);
+        }
+
+        public Object call(Object ctx,
+                           Object thisValue,
+                           org.mvel2.integration.VariableResolverFactory factory,
+                           Object[] parms)
+        {
+            return "Hello World!";
+        };
     }
 
 }
