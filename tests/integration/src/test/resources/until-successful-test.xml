@@ -29,7 +29,7 @@
         <vm:inbound-endpoint path="input-2" exchange-pattern="request-response"/>
         <until-successful objectStore-ref="objectStore"
                           ackExpression="#[string:ACK]"
-                          failureExpression="#[regex:(?i).*error]"
+                          failureExpression="#[regex('(?i).*error')]"
                           maxRetries="2"
                           secondsBetweenRetries="1"
                           deadLetterQueue-ref="dlqChannel">
