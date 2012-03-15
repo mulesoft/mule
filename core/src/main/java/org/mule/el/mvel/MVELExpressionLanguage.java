@@ -26,6 +26,7 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.el.context.AppContext;
 import org.mule.el.context.MuleInstanceContext;
 import org.mule.el.context.ServerContext;
+import org.mule.el.function.RegexExpressionLanguageFuntion;
 import org.mule.expression.DefaultExpressionManager;
 import org.mule.transformer.types.DataTypeFactory;
 
@@ -37,6 +38,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import javax.activation.DataHandler;
 import javax.activation.MimeType;
@@ -204,6 +206,7 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
         variableResolverFactory.addFinalVariable("server", serverContext);
         variableResolverFactory.addFinalVariable("mule", muleInstanceContext);
         variableResolverFactory.addFinalVariable("app", appContext);
+        variableResolverFactory.declareFunction("regex", new RegexExpressionLanguageFuntion());
 
         try
         {
@@ -288,6 +291,7 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
         parserContext.addImport(DataType.class);
         parserContext.addImport(DataTypeFactory.class);
         parserContext.addImport(MimeType.class);
+        parserContext.addImport(Pattern.class);
     }
 
     public void setGlobalFunctionsString(String globalFunctionsString)

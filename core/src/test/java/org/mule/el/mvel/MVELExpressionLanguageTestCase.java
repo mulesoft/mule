@@ -16,6 +16,7 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.construct.FlowConstruct;
@@ -194,6 +195,13 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase
     public void testValidateInvalid()
     {
         validate("2*'2");
+    }
+
+    @Test
+    public void regexFunction()
+    {
+        assertEquals("foo",
+            evaluate("regex('TEST(\\\\w+)TEST')", new DefaultMuleMessage("TESTfooTEST", muleContext)));
     }
 
     protected Object evaluate(String expression)
