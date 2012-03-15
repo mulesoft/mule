@@ -117,9 +117,8 @@ public class ExpressionManagerTestCase extends AbstractMuleContextTestCase
 
         assertEquals(
             "-1-abcde-2-",
-            muleContext.getExpressionManager()
-                .parse("-#[string:1]-#[process:proc2:#[string:a#[process:proc1]d]]-#[string:2]-",
-                    event.getMessage()));
+            muleContext.getExpressionManager().parse(
+                "-#[string:1]-#[process:proc2:#[string:a#[process:proc1]d]]-#[string:2]-", event));
     }
 
     @Test

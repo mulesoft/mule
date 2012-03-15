@@ -105,12 +105,12 @@ public class IdempotentMessageFilter extends AbstractFilteringMessageProcessor i
 
     protected String getValueForEvent(MuleEvent event) throws MessagingException
     {
-        return event.getMuleContext().getExpressionManager().parse(valueExpression, event.getMessage(), true);
+        return event.getMuleContext().getExpressionManager().parse(valueExpression, event, true);
     }
 
     protected String getIdForEvent(MuleEvent event) throws MessagingException
     {
-        return event.getMuleContext().getExpressionManager().parse(idExpression, event.getMessage(), true);
+        return event.getMuleContext().getExpressionManager().parse(idExpression, event, true);
     }
 
     public String getIdExpression()

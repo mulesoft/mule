@@ -72,7 +72,7 @@ public class EndpointSelector extends FilteringOutboundRouter
         Object property = null;
         try
         {
-            property = expressionManager.evaluate(prop, message);
+            property = expressionManager.evaluate(prop, event);
         }
         catch (ExpressionRuntimeException e)
         {

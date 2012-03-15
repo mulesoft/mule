@@ -195,7 +195,7 @@ public class FilteringOutboundRouter extends AbstractOutboundRouter implements T
                 String newUriString = parser.parse(props, uri);
                 if (parser.isContainsTemplate(newUriString))
                 {
-                    newUriString = this.getMuleContext().getExpressionManager().parse(newUriString, message, true);
+                    newUriString = this.getMuleContext().getExpressionManager().parse(newUriString, event, true);
                 }
                 if (logger.isDebugEnabled())
                 {

@@ -177,7 +177,7 @@ public class RestServiceWrapper extends AbstractComponent
         if (muleContext.getExpressionManager().isExpression(serviceUrl))
         {
             muleContext.getExpressionManager().validateExpression(serviceUrl);
-            tempUrl = muleContext.getExpressionManager().parse(serviceUrl, event.getMessage(), true);
+            tempUrl = muleContext.getExpressionManager().parse(serviceUrl, event, true);
         }
 
         StringBuffer urlBuffer = new StringBuffer(tempUrl);

@@ -222,7 +222,7 @@ public class WSProxy extends AbstractConfigurationPattern
                 ExpressionManager expressionManager = event.getMuleContext().getExpressionManager();
                 if (expressionManager.isValidExpression(outboundAddress))
                 {
-                    substitutedAddress = expressionManager.parse(outboundAddress, event.getMessage(), true);
+                    substitutedAddress = expressionManager.parse(outboundAddress, event, true);
                 }
                 wsdlContents = wsdlContents.replaceAll(substitutedAddress, inboundAddress);
             }
@@ -363,7 +363,7 @@ public class WSProxy extends AbstractConfigurationPattern
                     {
                         final String resolvedWsAddress = event.getMuleContext()
                             .getExpressionManager()
-                            .parse(wsAddress, event.getMessage(), true);
+                            .parse(wsAddress, event, true);
 
                         return makeWsdlAddress(resolvedWsAddress);
                     }

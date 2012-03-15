@@ -88,8 +88,8 @@ public class UsernamePasswordAuthenticationFilter extends AbstractAuthentication
     {   
         ExpressionManager expressionManager = event.getMuleContext().getExpressionManager();
         
-        Object usernameEval = expressionManager.evaluate(username, event.getMessage());
-        Object passwordEval = expressionManager.evaluate(password, event.getMessage());
+        Object usernameEval = expressionManager.evaluate(username, event);
+        Object passwordEval = expressionManager.evaluate(password, event);
      
         if (usernameEval == null) {
             throw new UnauthorisedException(CoreMessages.authNoCredentials());

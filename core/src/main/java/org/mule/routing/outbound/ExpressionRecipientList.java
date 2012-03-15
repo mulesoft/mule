@@ -43,7 +43,7 @@ public class ExpressionRecipientList extends AbstractRecipientList
                     CoreMessages.expressionInvalidForProperty("expression", expr), event, null);
         }
 
-        Object msgRecipients = muleContext.getExpressionManager().evaluate(expr, event.getMessage());
+        Object msgRecipients = muleContext.getExpressionManager().evaluate(expr, event);
         if (msgRecipients == null)
         {
             throw new CouldNotRouteOutboundMessageException(

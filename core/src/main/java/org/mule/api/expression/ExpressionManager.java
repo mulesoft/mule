@@ -192,9 +192,9 @@ public interface ExpressionManager
      * @param message The current message being processed that will be enriched
      * @param object The object that will be used to enrich the message
      */
+    @Deprecated
     public void enrich(String expression, MuleMessage message, Object object);
 
-    @Deprecated
     public void enrich(String expression, MuleEvent message, Object object);
 
     /**

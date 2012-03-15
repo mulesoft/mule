@@ -58,7 +58,7 @@ public class ExpressionKeyGeneratorTestCase extends AbstractMuleTestCase
     @Test
     public void testGeneratesSerializableKey() throws Exception
     {
-        when(expressionManager.evaluate(EXPRESSION, message)).thenReturn(KEY);
+        when(expressionManager.evaluate(EXPRESSION, event)).thenReturn(KEY);
         Serializable key = keyGenerator.generateKey(event);
 
         assertEquals(KEY, key);
@@ -67,7 +67,7 @@ public class ExpressionKeyGeneratorTestCase extends AbstractMuleTestCase
     @Test(expected = NotSerializableException.class)
     public void testThrowsExceptionOnNonSerializableKey() throws Exception
     {
-        when(expressionManager.evaluate(EXPRESSION, message)).thenReturn(null);
+        when(expressionManager.evaluate(EXPRESSION, event)).thenReturn(null);
         keyGenerator.generateKey(event);
     }
 }

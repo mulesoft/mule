@@ -670,9 +670,7 @@ enum CookieStorageType
                 final String value;
                 if (event != null)
                 {
-                    value = event.getMuleContext()
-                        .getExpressionManager()
-                        .parse(cookieValue, event.getMessage());
+                    value = event.getMuleContext().getExpressionManager().parse(cookieValue, event);
                 }
                 else
                 {

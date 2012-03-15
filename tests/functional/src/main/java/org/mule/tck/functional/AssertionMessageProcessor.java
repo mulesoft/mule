@@ -59,7 +59,7 @@ public class AssertionMessageProcessor implements MessageProcessor, FlowConstruc
     public MuleEvent process(MuleEvent event) throws MuleException
     {
         this.event = event;
-        result = result && expressionManager.evaluateBoolean(expression, event.getMessage(), false, true);
+        result = result && expressionManager.evaluateBoolean(expression, event, false, true);
         latch.countDown();
         return event;
     }

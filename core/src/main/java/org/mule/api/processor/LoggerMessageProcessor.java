@@ -86,7 +86,7 @@ public class LoggerMessageProcessor implements MessageProcessor, Initialisable, 
             }
             else
             {
-                logWithLevel(expressionManager.parse(message, event.getMessage()));
+                logWithLevel(expressionManager.parse(message, event));
             }
         }
     }

@@ -9,9 +9,9 @@
  */
 package org.mule.processor;
 
-import org.mule.api.exception.MessageRedeliveredException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
+import org.mule.api.exception.MessageRedeliveredException;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Startable;
@@ -22,7 +22,6 @@ import org.mule.transformer.simple.ByteArrayToHexString;
 import org.mule.transformer.simple.ObjectToByteArray;
 import org.mule.util.store.AbstractMonitoredObjectStore;
 import org.mule.util.store.InMemoryObjectStore;
-
 
 import java.io.InputStream;
 import java.security.MessageDigest;
@@ -257,7 +256,7 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy
         }
         else
         {
-             return event.getMuleContext().getExpressionManager().parse(idExpression, event.getMessage(), true);
+             return event.getMuleContext().getExpressionManager().parse(idExpression, event, true);
         }
     }
 

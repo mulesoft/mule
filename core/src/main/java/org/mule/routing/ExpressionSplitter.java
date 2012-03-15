@@ -58,8 +58,9 @@ public class ExpressionSplitter extends AbstractSplitter
 
     protected List<MuleMessage> splitMessage(MuleEvent event)
     {
-        Object result = event.getMuleContext().getExpressionManager().evaluate(
-            config.getFullExpression(expressionManager), event.getMessage());
+        Object result = event.getMuleContext()
+            .getExpressionManager()
+            .evaluate(config.getFullExpression(expressionManager), event);
         if (result instanceof List<?>)
         {
             List<MuleMessage> messages = new ArrayList<MuleMessage>();

@@ -214,7 +214,7 @@ public class UntilSuccessful extends AbstractOutboundRouter
             }
 
             final Object ackResponsePayload = muleContext.getExpressionManager().evaluate(ackExpression,
-                event.getMessage());
+                event);
 
             return new DefaultMuleEvent(new DefaultMuleMessage(ackResponsePayload, event.getMessage(),
                 muleContext), event);

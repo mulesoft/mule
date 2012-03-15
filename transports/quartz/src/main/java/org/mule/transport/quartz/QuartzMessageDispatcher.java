@@ -82,8 +82,9 @@ public class QuartzMessageDispatcher extends AbstractMessageDispatcher
         if (jobConfig instanceof ScheduledDispatchJobConfig) 
         {
             ScheduledDispatchJobConfig scheduledDispatchJobConfig = (ScheduledDispatchJobConfig) jobConfig;
-            String endpointRef = event.getMuleContext().getExpressionManager().parse(
-                scheduledDispatchJobConfig.getEndpointRef(), event.getMessage());
+            String endpointRef = event.getMuleContext()
+                .getExpressionManager()
+                .parse(scheduledDispatchJobConfig.getEndpointRef(), event);
 
             jobDataMap.put("endpointRef", endpointRef);
         }

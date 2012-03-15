@@ -9,8 +9,8 @@
  */
 package org.mule.keygenerator;
 
-import org.mule.api.MuleEventKeyGenerator;
 import org.mule.api.MuleEvent;
+import org.mule.api.MuleEventKeyGenerator;
 
 import java.io.NotSerializableException;
 import java.io.Serializable;
@@ -31,7 +31,7 @@ public class ExpressionMuleEventKeyGenerator implements MuleEventKeyGenerator
 
     public Serializable generateKey(MuleEvent event) throws NotSerializableException
     {
-        Object key = event.getMuleContext().getExpressionManager().evaluate(expression, event.getMessage());
+        Object key = event.getMuleContext().getExpressionManager().evaluate(expression, event);
 
         if (logger.isDebugEnabled())
         {
