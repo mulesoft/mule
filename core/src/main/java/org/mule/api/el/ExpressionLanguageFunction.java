@@ -18,6 +18,4 @@ public interface ExpressionLanguageFunction
 
     Object call(Object[] params, ExpressionLanguageContext context);
 
-    void validateParams(Object[] params);
-
 }

@@ -73,7 +73,7 @@ public class MessageContext
         return message.getPayload();
     }
 
-    public Object payloadAs(Class<?> type) throws TransformerException
+    public <T> T payloadAs(Class<T> type) throws TransformerException
     {
         return message.getPayload(type);
     }

@@ -25,11 +25,6 @@ class XPathFunction implements ExpressionLanguageFunction
         this.muleContext = muleContext;
     }
 
-    @Override
-    public void validateParams(Object[] params)
-    {
-    }
-
     @SuppressWarnings("deprecation")
     @Override
     public Object call(Object[] params, ExpressionLanguageContext context)

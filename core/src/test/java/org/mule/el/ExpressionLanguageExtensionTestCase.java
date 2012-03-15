@@ -168,16 +168,6 @@ public class ExpressionLanguageExtensionTestCase extends AbstractELTestCase
             context.addAlias("p", "message.payload");
             context.declareFunction("f", new ExpressionLanguageFunction()
             {
-
-                @Override
-                public void validateParams(Object[] params)
-                {
-                    if (params.length != 2)
-                    {
-                        throw new RuntimeException();
-                    }
-                }
-
                 @Override
                 public Object call(Object[] params, ExpressionLanguageContext context)
                 {

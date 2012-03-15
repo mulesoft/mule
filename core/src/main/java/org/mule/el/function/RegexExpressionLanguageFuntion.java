@@ -135,12 +135,6 @@ public class RegexExpressionLanguageFuntion implements ExpressionLanguageFunctio
         return result;
     }
 
-    @Override
-    public void validateParams(Object[] params)
-    {
-
-    }
-
     private Matcher createMatcher(String expression, String string, int flags)
     {
         Pattern pattern = patterns.get(expression + flags);
