@@ -260,7 +260,7 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase
             }
         });
         mvel.initialise();
-        assertEquals("bar", evaluate("foo"));
+        assertEquals("bar", evaluate("foo", message));
     }
 
     @Test
