@@ -20,6 +20,7 @@ import static org.mockito.Mockito.when;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
+import org.mule.api.config.MuleProperties;
 import org.mule.api.expression.ExpressionManager;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -33,7 +34,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import org.apache.commons.httpclient.Cookie;
 import org.apache.commons.httpclient.Header;
 import org.junit.Before;
 import org.junit.Test;
@@ -133,7 +136,7 @@ public class HttpResponseTransformerTestCase extends AbstractMuleTestCase
     }
 
     @Test
-    public void testHttpResponseTransformerHeaders() throws Exception
+    public void testHttpResponseTransformerHeadersWithExpressions() throws Exception
     {
         HttpResponseTransformer httpResponseTransformer = createHttpResponseTransformer();
 
@@ -157,7 +160,7 @@ public class HttpResponseTransformerTestCase extends AbstractMuleTestCase
     }
 
     @Test
-    public void testHttpResponseTransformerHeadersWithExpressions() throws Exception
+    public void testHttpResponseTransformerHeaders() throws Exception
     {
         HttpResponseTransformer httpResponseTransformer = createHttpResponseTransformer();
         Map<String, String> headers = new HashMap<String, String>();
@@ -353,6 +356,88 @@ public class HttpResponseTransformerTestCase extends AbstractMuleTestCase
         assertEquals("max-age=3600,smax-age=3600", response.getFirstHeader(HttpConstants.HEADER_CACHE_CONTROL).getValue());
 
     }
+
+    @Test
+    public void testHttpResponseCopyOutboundProperties() throws Exception
+    {
+        HttpResponseTransformer httpResponseTransformer = createHttpResponseTransformer();
+        Map<String, Object> outboundProperties = new HashMap<String, Object>();
+        outboundProperties.put(HttpConstants.HEADER_AGE, "12");
+        outboundProperties.put(HttpConstants.HEADER_CACHE_CONTROL, "max-age=3600");
+        outboundProperties.put(MuleProperties.MULE_ENCODING_PROPERTY, "UTF-8");
+        Cookie[] cookies = new Cookie[2];
+        cookies[0] = new Cookie(null, "clientId", "2");
+        cookies[1] = new Cookie(null, "category", "premium");
+        outboundProperties.put(HttpConstants.HEADER_COOKIE_SET, cookies);
+
+        Set<String> propertyNames =  outboundProperties.keySet();
+        when(mockMuleMessage.getOutboundPropertyNames()).thenReturn(propertyNames);
+        for(String propertyName : propertyNames)
+        {
+            when(mockMuleMessage.getOutboundProperty(propertyName)).thenReturn(outboundProperties.get(propertyName));
+        }
+
+        HttpResponse response = new HttpResponse();
+        httpResponseTransformer.copyOutboundProperties(response, mockMuleMessage);
+
+        Header[] headers = response.getHeaders();
+        for(Header header : headers)
+        {
+            if(HttpConstants.HEADER_COOKIE_SET.equals(header.getName()))
+            {
+                if(header.getValue().startsWith(cookies[0].getName()))
+                {
+                    assertEquals(cookies[0].toString(), header.getValue());
+                }
+                else
+                {
+                    assertEquals(cookies[1].toString(), header.getValue());
+                }
+
+            }
+            else if(header.getName().startsWith(HttpConstants.CUSTOM_HEADER_PREFIX))
+            {
+                assertEquals(outboundProperties.get(header.getName().substring(HttpConstants.CUSTOM_HEADER_PREFIX.length())), header.getValue());
+            }
+            else
+            {
+                assertEquals(outboundProperties.get(header.getName()), header.getValue());
+            }
+        }
+    }
+
+    @Test
+    public void testHttpResponseWithOutboundProperties() throws Exception
+    {
+        HttpResponseTransformer httpResponsetransformer = createHttpResponseTransformer();
+        CacheControlHeader cacheControl = new CacheControlHeader();
+        cacheControl.setMaxAge("3600");
+        httpResponsetransformer.setCacheControl(cacheControl);
+
+        Map<String, String> headers = new HashMap<String, String>();
+        headers.put(HttpConstants.HEADER_CACHE_CONTROL, "public");
+        headers.put(HttpConstants.HEADER_AGE, "12");
+        httpResponsetransformer.setHeaders(headers);
+
+        Map<String, Object> outboundProperties = new HashMap<String, Object>();
+        outboundProperties.put(HttpConstants.HEADER_CACHE_CONTROL, "no-cache");
+        outboundProperties.put(HttpConstants.HEADER_AGE, "20");
+        outboundProperties.put(HttpConstants.HEADER_LOCATION, "http://localhost:9090");
+
+        Set<String> outboundHeaderNames = outboundProperties.keySet();
+        when(mockMuleMessage.getOutboundPropertyNames()).thenReturn(outboundHeaderNames);
+        for(String outboundHeaderName : outboundHeaderNames)
+        {
+            when(mockMuleMessage.getOutboundProperty(outboundHeaderName)).thenReturn(outboundProperties.get(outboundHeaderName));
+        }
+
+        HttpResponse httpResponse = (HttpResponse) httpResponsetransformer.transformMessage(mockMuleMessage, "UTF-8");
+        Header[] resultHeaders = httpResponse.getHeaders();
+        validateHeader(resultHeaders, HttpConstants.HEADER_CACHE_CONTROL, "max-age=3600,public");
+        validateHeader(resultHeaders, HttpConstants.HEADER_AGE, "12");
+        validateHeader(resultHeaders, HttpConstants.HEADER_LOCATION, "http://localhost:9090");
+    }
+
 
     private CookieWrapper createCookie(String name, String value, String domain, String path, String expiryDate, String secure, String version)
     {

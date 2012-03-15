@@ -10,8 +10,8 @@
 
 package org.mule.transport.http.transformers;
 
-import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
+import org.mule.api.config.MuleProperties;
 import org.mule.api.transformer.TransformerException;
 import org.mule.transformer.AbstractMessageTransformer;
 import org.mule.transformer.types.DataTypeFactory;
@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import org.apache.commons.httpclient.Cookie;
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpVersion;
 import org.apache.commons.httpclient.ProtocolException;
@@ -53,21 +54,122 @@ public class HttpResponseTransformer extends AbstractMessageTransformer
     @Override
     public Object transformMessage(MuleMessage msg, String outputEncoding) throws TransformerException
     {
-        HttpResponse httpResponse = new HttpResponse();
+        try
+        {
+            HttpResponse httpResponse = getHttpResponse(msg);
 
-        checkVersion(msg);
-        setStatus(httpResponse, msg);
-        setContentType(httpResponse, msg);
-        setHeaders(httpResponse, msg);
-        setCookies(httpResponse, msg);
-        setCacheControl(httpResponse, msg);
-        String date = new SimpleDateFormat(HttpConstants.DATE_FORMAT, Locale.US).format(new Date());
-        httpResponse.setHeader(new Header(HttpConstants.HEADER_DATE, date));
+            propagateMessageProperties(httpResponse, msg);
+            checkVersion(msg);
+            setStatus(httpResponse, msg);
+            setContentType(httpResponse, msg);
+            setHeaders(httpResponse, msg);
+            setCookies(httpResponse, msg);
+            setCacheControl(httpResponse, msg);
+            String date = new SimpleDateFormat(HttpConstants.DATE_FORMAT, Locale.US).format(new Date());
+            httpResponse.setHeader(new Header(HttpConstants.HEADER_DATE, date));
+            setBody(httpResponse, msg);
+            return httpResponse;
+        }
+        catch(Exception e)
+        {
+            throw new TransformerException(this, e);
+        }
+    }
 
-        setBody(httpResponse, msg);
+    private void propagateMessageProperties(HttpResponse response, MuleMessage message)
+    {
+        copyOutboundProperties(response, message);
+        copyCorrelationIdProperties(response, message);
+        copyReplyToProperty(response, message);
+    }
+
+    private void copyCorrelationIdProperties(HttpResponse response, MuleMessage message)
+    {
+        if(message.getCorrelationId() != null)
+        {
+            response.setHeader(new Header(HttpConstants.CUSTOM_HEADER_PREFIX + MuleProperties.MULE_CORRELATION_ID_PROPERTY,
+                    message.getCorrelationId()));
+            response.setHeader(new Header(HttpConstants.CUSTOM_HEADER_PREFIX + MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY,
+                    String.valueOf(message.getCorrelationGroupSize())));
+            response.setHeader(new Header(HttpConstants.CUSTOM_HEADER_PREFIX + MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY,
+                    String.valueOf(message.getCorrelationSequence())));
+        }
+    }
+
+    private void copyReplyToProperty(HttpResponse response, MuleMessage message)
+    {
+        if(message.getReplyTo() != null)
+        {
+            response.setHeader(new Header(HttpConstants.CUSTOM_HEADER_PREFIX + MuleProperties.MULE_REPLY_TO_PROPERTY,
+                    message.getReplyTo().toString()));
+        }
+    }
+
+    protected void copyOutboundProperties(HttpResponse response, MuleMessage message)
+    {
+        for(String headerName : message.getOutboundPropertyNames())
+        {
+            Object headerValue = message.getOutboundProperty(headerName);
+            if(headerValue != null)
+            {
+                if(isMuleProperty(headerName))
+                {
+                    addMuleHeader(response, headerName, headerValue);
+                }
+                else if(isMultiValueCookie(headerName, headerValue))
+                {
+                    addMultiValueCookie(response, (Cookie[]) headerValue);
+                }
+                else
+                {
+                    response.setHeader(new Header(headerName, headerValue.toString()));
+                }
+            }
+        }
+    }
+
+    private void addMuleHeader(HttpResponse response, String headerName, Object headerValue)
+    {
+        response.setHeader(new Header(HttpConstants.CUSTOM_HEADER_PREFIX + headerName, headerValue.toString()));
+    }
+
+    private boolean isMuleProperty(String headerName)
+    {
+        return headerName.startsWith(MuleProperties.PROPERTY_PREFIX);
+    }
+
+    private void addMultiValueCookie(HttpResponse response, Cookie[] cookies)
+    {
+        Cookie[] arrayOfCookies = CookieHelper.asArrayOfCookies(cookies);
+        for (Cookie cookie : arrayOfCookies)
+        {
+            response.addHeader(new Header(HttpConstants.HEADER_COOKIE_SET,
+                CookieHelper.formatCookieForASetCookieHeader(cookie)));
+        }
+    }
+
+    private boolean isMultiValueCookie(String headerName, Object headerValue)
+    {
+        return HttpConstants.HEADER_COOKIE_SET.equals(headerName)
+                && headerValue instanceof Cookie[];
+    }
+
+    private HttpResponse getHttpResponse(MuleMessage message)
+    {
+        HttpResponse httpResponse;
+
+        if(message.getPayload() instanceof HttpResponse)
+        {
+            httpResponse = (HttpResponse) message.getPayload();
+        }
+        else
+        {
+            httpResponse = new HttpResponse();
+        }
 
         return httpResponse;
     }
+
 
     protected void setCacheControl(HttpResponse response, MuleMessage message)
     {
@@ -77,10 +179,13 @@ public class HttpResponseTransformer extends AbstractMessageTransformer
             String cacheControlValue = cacheControl.toString();
             if(!"".equals(cacheControlValue))
             {
-                Header cacheControlHeader = response.getFirstHeader(HttpConstants.HEADER_CACHE_CONTROL);
-                if(cacheControlHeader != null)
+                if(headers.get(HttpConstants.HEADER_CACHE_CONTROL) != null)
                 {
-                    cacheControlValue += "," + cacheControlHeader.getValue();
+                    Header cacheControlHeader = response.getFirstHeader(HttpConstants.HEADER_CACHE_CONTROL);
+                    if(cacheControlHeader != null)
+                    {
+                        cacheControlValue += "," + cacheControlHeader.getValue();
+                    }
                 }
                 response.setHeader(new Header(HttpConstants.HEADER_CACHE_CONTROL, cacheControlValue));
             }
@@ -89,58 +194,22 @@ public class HttpResponseTransformer extends AbstractMessageTransformer
 
     protected void setBody(HttpResponse response, MuleMessage message) throws TransformerException
     {
-        MuleMessage bodyContent = message;
-        if(body != null)
-        {
-            Object processBody = muleContext.getExpressionManager().parse(body, message);
-            bodyContent = new DefaultMuleMessage(processBody, muleContext);
-        }
         try
         {
-            response.setBody(bodyContent);
-            setBodyContentLength(response, bodyContent);
+            if(body != null)
+            {
+                response.setBody(muleContext.getExpressionManager().parse(body, message));
+            }
+            else
+            {
+                response.setBody(message);
+            }
         }
         catch(Exception e)
         {
             throw new TransformerException(this, e);
         }
     }
-
-    private void setBodyContentLength(HttpResponse response, MuleMessage msg) throws Exception
-    {
-        if (!response.containsHeader(HttpConstants.HEADER_CONTENT_LENGTH)
-                && !response.containsHeader(HttpConstants.HEADER_TRANSFER_ENCODING))
-        {
-            if (response.hasBody())
-            {
-                long len = response.getContentLength();
-                if (len < 0)
-                {
-                    if (response.getHttpVersion().lessEquals(HttpVersion.HTTP_1_0))
-                    {
-                        // Ensure that we convert the payload to an in memory representation
-                        // so we don't end up with a chunked response
-                        len = msg.getPayloadAsBytes().length;
-                        response.setBody(msg);
-                        response.setHeader(new Header(HttpConstants.HEADER_CONTENT_LENGTH, Long.toString(len)));
-                    }
-                    else
-                    {
-                        response.addHeader(new Header(HttpConstants.HEADER_TRANSFER_ENCODING, "chunked"));
-                    }
-                }
-                else
-                {
-                    response.setHeader(new Header(HttpConstants.HEADER_CONTENT_LENGTH, Long.toString(len)));
-                }
-            }
-            else
-            {
-                response.addHeader(new Header(HttpConstants.HEADER_CONTENT_LENGTH, "0"));
-            }
-        }
-    }
-
 
     protected void setCookies(HttpResponse response, MuleMessage message) throws TransformerException
     {
@@ -179,28 +248,27 @@ public class HttpResponseTransformer extends AbstractMessageTransformer
 
     protected void checkVersion(MuleMessage message)
     {
-        version = message.getInboundProperty(HttpConnector.HTTP_VERSION_PROPERTY);
-        if(version == null)
-        {
-           version = HttpConstants.HTTP11;
-        }
+        version = HttpConstants.HTTP10;
+        //version = message.getInboundProperty(HttpConnector.HTTP_VERSION_PROPERTY);
+        //if(version == null)
+        //{
+        //   version = HttpConstants.HTTP11;
+        //}
     }
 
     private void setStatus(HttpResponse response, MuleMessage message) throws TransformerException
     {
-        if(status == null)
+        if(status != null)
         {
-            status = String.valueOf(HttpConstants.SC_OK);
+            try
+            {
+                response.setStatusLine(HttpVersion.parse(version), Integer.valueOf(evaluate(status, message)));
+            }
+            catch(ProtocolException e)
+            {
+                throw new TransformerException(this, e);
+            }
         }
-        try
-        {
-            response.setStatusLine(HttpVersion.parse(version), Integer.valueOf(evaluate(status, message)));
-        }
-        catch(ProtocolException e)
-        {
-            throw new TransformerException(this, e);
-        }
-
     }
 
     protected void setContentType(HttpResponse response, MuleMessage message)

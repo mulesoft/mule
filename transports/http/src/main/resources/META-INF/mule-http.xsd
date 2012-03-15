@@ -433,7 +433,7 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="response" substitutionGroup="mule:abstract-message-processor">
+    <xsd:element name="response-builder" substitutionGroup="mule:abstract-transformer">
         <xsd:annotation>
             <xsd:documentation>
                 HTTP response
@@ -487,11 +487,17 @@
                 <xsd:attribute name="expiryDate" type="xsd:string" use="optional">
                     <xsd:annotation>
                         <xsd:documentation>
-                            Indicates the exact date/time when the cookie expires. It is specified in the form of "Wdy, DD Mon YYYY HH:MM:SS GMT"
+                            Indicates the exact date/time when the cookie expires. It must be specified in the form "Wdy, DD Mon YYYY HH:MM:SS GMT".
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="maxAge" type="mule:substitutableInt" use="optional"/>
+                <xsd:attribute name="maxAge" type="mule:substitutableInt" use="optional">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Indicates, in seconds, the max age of the cookie.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
                 <xsd:attribute name="secure" type="mule:substitutableBoolean" use="optional" default="false"/>
                 <xsd:attribute name="version" type="mule:substitutableInt" use="optional"/>
             </xsd:extension>

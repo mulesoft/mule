@@ -74,7 +74,7 @@ public class HttpNamespaceHandler extends AbstractMuleNamespaceHandler
         registerMuleBeanDefinitionParser("static-resource-handler",
                 new MessageProcessorDefinitionParser(StaticResourceMessageProcessor.class));
 
-        registerBeanDefinitionParser("response", new MessageProcessorDefinitionParser(HttpResponseTransformer.class));
+        registerBeanDefinitionParser("response-builder", new MessageProcessorDefinitionParser(HttpResponseTransformer.class));
         registerMuleBeanDefinitionParser("header", new ChildMapEntryDefinitionParser("headers", "name", "value")).addCollection("headers");
         registerMuleBeanDefinitionParser("set-cookie", new HttpCookiesDefinitionParser("cookie", CookieWrapper.class)).registerPreProcessor(new CheckExclusiveAttributes(new String[][] {new String[] {"maxAge"}, new String[] {"expiryDate"}}));
         registerMuleBeanDefinitionParser("body", new TextDefinitionParser("body"));
