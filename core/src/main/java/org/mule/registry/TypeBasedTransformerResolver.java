@@ -29,6 +29,7 @@ import org.mule.transformer.simple.ObjectToByteArray;
 import org.mule.transformer.simple.ObjectToString;
 import org.mule.transformer.types.SimpleDataType;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -92,6 +93,8 @@ public class TypeBasedTransformerResolver implements TransformerResolver, MuleCo
             Transformer compositeTransformer = graphTransformerResolver.resolve(source, result);
             if (compositeTransformer != null)
             {
+                // Needs to create a new list because the lookup returns a cached instance
+                trans = new LinkedList<Transformer>(trans);
                 trans.add(compositeTransformer);
             }
         }

@@ -11,13 +11,13 @@ package org.mule.module.atom;
 
 import org.mule.module.atom.event.EntryReceiver;
 import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.probe.PollingProber;
+import org.mule.tck.probe.Probe;
 
 import java.io.File;
 import java.io.FileOutputStream;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
 
 public class FileAtomFeedConsumeTestCase extends FunctionalTestCase
 {
@@ -36,10 +36,23 @@ public class FileAtomFeedConsumeTestCase extends FunctionalTestCase
         fos.write(feed.getBytes("UTF-8"));
         fos.close();
 
-        //allow the file connector to poll a couple of times to ensure we only get the same 25 entries
-        Thread.sleep(5000);
-        EntryReceiver component = (EntryReceiver)getComponent("feedSplitterConsumer");
-        assertEquals(25, component.getCount());
+        final EntryReceiver component = (EntryReceiver)getComponent("feedSplitterConsumer");
+
+        PollingProber prober = new PollingProber(10000, 100);
+        prober.check(new Probe()
+        {
+            @Override
+            public boolean isSatisfied()
+            {
+                return component.getCount() == 25;
+            }
+
+            @Override
+            public String describeFailure()
+            {
+                return "Component did not process the expected number of feeds";
+            }
+        });
     }
 
 }
