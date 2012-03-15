@@ -212,7 +212,6 @@ public class MVELExpressionLanguageContext extends BaseVariableResolverFactory
         @Override
         public Object call(Object ctx, Object thisValue, VariableResolverFactory factory, Object[] parms)
         {
-            function.validateParams(parms);
             if (factory instanceof ClassImportResolverFactory)
             {
                 factory = factory.getNextFactory();
