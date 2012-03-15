@@ -248,12 +248,11 @@ public class HttpResponseTransformer extends AbstractMessageTransformer
 
     protected void checkVersion(MuleMessage message)
     {
-        version = HttpConstants.HTTP10;
-        //version = message.getInboundProperty(HttpConnector.HTTP_VERSION_PROPERTY);
-        //if(version == null)
-        //{
-        //   version = HttpConstants.HTTP11;
-        //}
+        version = message.getInboundProperty(HttpConnector.HTTP_VERSION_PROPERTY);
+        if(version == null)
+        {
+           version = HttpConstants.HTTP11;
+        }
     }
 
     private void setStatus(HttpResponse response, MuleMessage message) throws TransformerException
