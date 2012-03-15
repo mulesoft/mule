@@ -10,6 +10,8 @@
 
 package org.mule.module.launcher.application;
 
+import static org.mule.util.SplashScreen.miniSplash;
+
 import org.mule.MuleServer;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
@@ -58,8 +60,6 @@ import java.util.concurrent.TimeUnit;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import static org.mule.util.SplashScreen.miniSplash;
-
 public class DefaultMuleApplication implements Application
 {
     protected static final int DEFAULT_RELOAD_CHECK_INTERVAL_MS = 3000;
@@ -70,9 +70,9 @@ public class DefaultMuleApplication implements Application
 
     protected ScheduledExecutorService watchTimer;
 
-    private MuleContext muleContext;
-    private ClassLoader deploymentClassLoader;
-    private ApplicationDescriptor descriptor;
+    protected MuleContext muleContext;
+    protected ClassLoader deploymentClassLoader;
+    protected ApplicationDescriptor descriptor;
 
     protected String[] absoluteResourcePaths;
 
