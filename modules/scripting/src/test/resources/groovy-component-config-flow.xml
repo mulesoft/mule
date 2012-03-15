@@ -32,7 +32,7 @@
     <flow name="inlineScriptMutateProperty">
         <script:component>
             <script:script engine="groovy">
-                message.getOutboundProperty('foo') = 'bar-mutated'                
+                message.setOutboundProperty('foo', 'bar-mutated')                
              </script:script>
         </script:component>
         <test:assert expression="#[groovy:message.getOutboundProperty('foo').equals('bar-mutated')]"/>
@@ -41,7 +41,7 @@
     <flow name="inlineScriptAddProperty">
         <script:component>
             <script:script engine="groovy">
-                message.getOutboundProperty('foo') = 'bar'                
+                message.setOutboundProperty('foo', 'bar')                
              </script:script>
         </script:component>
         <test:assert expression="#[groovy:message.getOutboundProperty('foo').equals('bar')]"/>
