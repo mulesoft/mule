@@ -10,6 +10,7 @@
 
 package org.mule.routing;
 
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.routing.RoutePathNotFoundException;
 import org.mule.management.stats.RouterStatistics;
@@ -42,15 +43,8 @@ public class ChoiceRouterTestCase extends AbstractMuleContextTestCase
     @Test
     public void testNoRoute() throws Exception
     {
-        try
-        {
-            choiceRouter.process(getTestEvent("foo"));
-            fail("should have got a MuleException");
-        }
-        catch (MuleException me)
-        {
-            assertTrue(me instanceof RoutePathNotFoundException);
-        }
+        assertEquals("No route, should return the same MuleEvent",
+                "foo",choiceRouter.process(getTestEvent("foo")).getMessageAsString());
     }
 
     @Test
@@ -63,16 +57,9 @@ public class ChoiceRouterTestCase extends AbstractMuleContextTestCase
     @Test
     public void testNoMatchingNorDefaultRoute() throws Exception
     {
-        try
-        {
-            choiceRouter.addRoute(new TestMessageProcessor("bar"), new EqualsFilter("zap"));
-            choiceRouter.process(getTestEvent("foo"));
-            fail("should have got a MuleException");
-        }
-        catch (MuleException me)
-        {
-            assertTrue(me instanceof RoutePathNotFoundException);
-        }
+        choiceRouter.addRoute(new TestMessageProcessor("bar"), new EqualsFilter("zap"));
+        assertEquals("No matching Processor, should return the same MuleEvent",
+                "foo", choiceRouter.process(getTestEvent("foo")).getMessageAsString());
     }
 
     @Test
@@ -102,19 +89,12 @@ public class ChoiceRouterTestCase extends AbstractMuleContextTestCase
     @Test
     public void testAddAndDeleteRoute() throws Exception
     {
-        try
-        {
-            TestMessageProcessor mp = new TestMessageProcessor("bar");
-            choiceRouter.addRoute(mp, new EqualsFilter("zap"));
-            choiceRouter.removeRoute(mp);
-            choiceRouter.setRouterStatistics(new RouterStatistics(RouterStatistics.TYPE_OUTBOUND));
-            choiceRouter.process(getTestEvent("zap"));
-            fail("should have got a MuleException");
-        }
-        catch (MuleException me)
-        {
-            assertTrue(me instanceof RoutePathNotFoundException);
-        }
+        TestMessageProcessor mp = new TestMessageProcessor("bar");
+        choiceRouter.addRoute(mp, new EqualsFilter("zap"));
+        choiceRouter.removeRoute(mp);
+        choiceRouter.setRouterStatistics(new RouterStatistics(RouterStatistics.TYPE_OUTBOUND));
+        assertEquals("A messageProcessor was applied, with no Processors registered"
+                ,"zap", choiceRouter.process(getTestEvent("zap")).getMessageAsString());
     }
 
     @Test

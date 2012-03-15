@@ -203,14 +203,7 @@ public abstract class AbstractSelectiveRouter
             return routeWithProcessor(defaultProcessor, event);
         }
 
-        if (getRouterStatistics() != null  && getRouterStatistics().isEnabled())
-        {
-            getRouterStatistics().incrementNoRoutedMessage();
-        }
-
-        throw new RoutePathNotFoundException(
-            MessageFactory.createStaticMessage("Can't process message because no route has been found matching any filter and no default route is defined"),
-            event, this);
+        return event;
     }
 
     /**
