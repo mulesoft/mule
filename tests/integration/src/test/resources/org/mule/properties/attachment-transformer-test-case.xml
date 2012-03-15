@@ -95,7 +95,7 @@
     <flow name="enrichAttachmentUsingDataHandler" processingStrategy="synchronous">
         <enricher>
             <add-attachment key="enricherAttachment" value="{message: 'value'}" contentType="application/json"/>
-            <enrich target="#[message.outboundAttachments['attach']]" source="#[outboundAttachments.enricherAttachment]"/>
+            <enrich target="#[message.outboundAttachments['attach']]" source="#[message.outboundAttachments['enricherAttachment']]"/>
         </enricher>
         <test:assert expression="#[groovy:message.getOutboundAttachment('attach') != null]"/>
         <test:assert expression="#[groovy:message.getOutboundAttachment('attach').getContentType().equals('application/json')]"/>
