@@ -51,6 +51,7 @@ public class MVELExpressionLanguageContext extends BaseVariableResolverFactory
         this.muleContext = context.muleContext;
         this.localFactory = context.localFactory;
         this.nextFactory = context.nextFactory;
+        this.variableResolvers = context.variableResolvers;
     }
 
     @Override
@@ -156,7 +157,7 @@ public class MVELExpressionLanguageContext extends BaseVariableResolverFactory
     @Override
     public void addAlias(String alias, String expression)
     {
-        addResolver(alias, new MuleAliasVariableResolver(alias, expression, this));
+        addResolver(alias, new MuleAliasVariableResolver(alias, expression, getParentContext()));
     }
 
     @Override
@@ -259,5 +260,9 @@ public class MVELExpressionLanguageContext extends BaseVariableResolverFactory
         {
             variableResolvers.put(name, resolver);
         }
+    }
+    
+    MVELExpressionLanguageContext getParentContext(){
+        return this;
     }
 }

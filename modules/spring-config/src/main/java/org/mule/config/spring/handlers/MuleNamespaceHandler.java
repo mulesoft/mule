@@ -256,7 +256,7 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("threading-profile", new ThreadingProfileDefinitionParser("threadingProfile", MuleProperties.OBJECT_DEFAULT_SERVICE_THREADING_PROFILE));
         registerBeanDefinitionParser("custom-agent", new DefaultNameMuleOrphanDefinitionParser());
         registerBeanDefinitionParser("expression-language", new ExpressionLanguageDefinitionParser());
-        registerBeanDefinitionParser("global-functions", new TextDefinitionParser("globalFunctionsString", true));
+        registerBeanDefinitionParser("global-functions", new TextDefinitionParser("globalFunctionsString"));
         registerMuleBeanDefinitionParser("alias", new ChildMapEntryDefinitionParser("aliases")).addAlias("name", "key").addAlias("expression", "value").addCollection("addAliases");
 
         // Exception Strategies

@@ -20,9 +20,14 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.construct.FlowConstruct;
+import org.mule.api.el.ExpressionLanguageContext;
+import org.mule.api.el.ExpressionLanguageExtension;
 import org.mule.api.expression.InvalidExpressionException;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.registry.RegistrationException;
 import org.mule.config.MuleManifest;
+import org.mule.el.context.AppContext;
+import org.mule.el.context.MessageContext;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.Arrays;
@@ -202,6 +207,86 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase
     {
         assertEquals("foo",
             evaluate("regex('TEST(\\\\w+)TEST')", new DefaultMuleMessage("TESTfooTEST", muleContext)));
+    }
+
+    @Test
+    public void appTakesPrecedenceOverEverything() throws RegistrationException, InitialisationException
+    {
+        mvel.setAliases(Collections.singletonMap("app", "'other1'"));
+        MuleMessage message = new DefaultMuleMessage("", muleContext);
+        message.setInvocationProperty("app", "otherb");
+        muleContext.getRegistry().registerObject("foo", new ExpressionLanguageExtension()
+        {
+            @Override
+            public void configureContext(ExpressionLanguageContext context)
+            {
+                context.addVariable("app", "otherc");
+            }
+        });
+        mvel.initialise();
+        assertEquals(AppContext.class, evaluate("app").getClass());
+    }
+
+    @Test
+    public void messageTakesPrecedenceOverEverything() throws RegistrationException, InitialisationException
+    {
+        mvel.setAliases(Collections.singletonMap("message", "'other1'"));
+        MuleMessage message = new DefaultMuleMessage("", muleContext);
+        message.setInvocationProperty("message", "other2");
+        muleContext.getRegistry().registerObject("foo", new ExpressionLanguageExtension()
+        {
+            @Override
+            public void configureContext(ExpressionLanguageContext context)
+            {
+                context.addVariable("message", "other3");
+            }
+        });
+        mvel.initialise();
+        assertEquals(MessageContext.class, evaluate("message", message).getClass());
+    }
+
+    @Test
+    public void extensionTakesPrecedenceOverAutoResolved()
+        throws RegistrationException, InitialisationException
+    {
+        MuleMessage message = new DefaultMuleMessage("", muleContext);
+        message.setInvocationProperty("foo", "other");
+        muleContext.getRegistry().registerObject("key", new ExpressionLanguageExtension()
+        {
+            @Override
+            public void configureContext(ExpressionLanguageContext context)
+            {
+                context.addVariable("foo", "bar");
+            }
+        });
+        mvel.initialise();
+        assertEquals("bar", evaluate("foo"));
+    }
+
+    @Test
+    public void aliasTakesPrecedenceOverAutoResolved() throws RegistrationException, InitialisationException
+    {
+        mvel.setAliases(Collections.singletonMap("foo", "'bar'"));
+        muleContext.getRegistry().registerObject("key", new ExpressionLanguageExtension()
+        {
+            @Override
+            public void configureContext(ExpressionLanguageContext context)
+            {
+                context.addVariable("foo", "other");
+            }
+        });
+        mvel.initialise();
+        assertEquals("bar", evaluate("foo"));
+    }
+
+    @Test
+    public void aliasTakesPrecedenceOverExtension() throws RegistrationException, InitialisationException
+    {
+        mvel.setAliases(Collections.singletonMap("foo", "'bar'"));
+        MuleMessage message = new DefaultMuleMessage("", muleContext);
+        message.setInvocationProperty("foo", "other");
+        mvel.initialise();
+        assertEquals("bar", evaluate("foo"));
     }
 
     protected Object evaluate(String expression)

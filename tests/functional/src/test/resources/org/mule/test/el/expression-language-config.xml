@@ -10,9 +10,7 @@
         <expression-language autoResolveVariables="false">
             <alias name="appName" expression="app.name" />
             <global-functions>
-                <![CDATA[
-                    def hello() {'Hello '+appName+'!'}
-                ]]>
+                def hello() {'Hello '+appName+'!'}
             </global-functions>
         </expression-language>
     </configuration>

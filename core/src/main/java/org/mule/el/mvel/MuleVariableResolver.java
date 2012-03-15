@@ -16,11 +16,12 @@ import org.mvel2.integration.impl.SimpleSTValueResolver;
 class MuleVariableResolver extends SimpleSTValueResolver
 {
     private static final long serialVersionUID = -4957789619105599831L;
-    private String name;
+    protected String name;
 
     public MuleVariableResolver(String name, Object value, Class<?> type)
     {
         super(value, type);
+        this.name = name;
     }
 
     @Override
