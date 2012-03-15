@@ -263,4 +263,9 @@ public class DefaultInboundEndpoint extends AbstractEndpoint implements InboundE
     {
         return getConnector().createDefaultRedeliveryPolicy(maxRedelivery);
     }
+    
+    public FlowConstruct getFlowConstruct()
+    {
+        return flowConstruct;
+    }
 }
