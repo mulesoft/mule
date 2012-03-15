@@ -156,8 +156,6 @@ public class GraphTransformerResolver implements TransformerResolver
 
         List<List<TransformationEdge>> transformationPaths = findTransformationPaths(source, target, visited);
 
-        logger.error("Transformation paths: " + transformationPaths);
-
         transformers = createTransformers(transformationPaths);
 
         return transformers;
@@ -210,7 +208,10 @@ public class GraphTransformerResolver implements TransformerResolver
 
 
         transformationPaths = findTransformationPaths(source, target, visited);
-        logger.error("TransformationPaths: " + transformationPaths);
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("TransformationPaths: " + transformationPaths);
+        }
 
         return transformationPaths;
     }
