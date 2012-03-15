@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xsi:schemaLocation="
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+       http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+
+    <custom-transformer name="AtoBConverter" class="org.mule.test.transformers.GraphTransformerResolutionTestCase$AtoBConverter"/>
+
+    <custom-transformer name="BtoCConverter" class="org.mule.test.transformers.GraphTransformerResolutionTestCase$BtoCConverter"/>
+
+    <flow name="StringEchoService">
+        <vm:inbound-endpoint path="testInput" exchange-pattern="request-response"/>
+        <auto-transformer returnClass="org.mule.test.transformers.GraphTransformerResolutionTestCase$C"/>
+        <echo-component/>
+    </flow>
+</mule>
