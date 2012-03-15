@@ -401,7 +401,7 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
             TransactionalMessageProcessorsFactoryBean.class));
         registerMuleBeanDefinitionParser("logger", new ChildDefinitionParser("messageProcessor",
             LoggerMessageProcessor.class));
-        registerMuleBeanDefinitionParser("el-execute", new ChildDefinitionParser("messageProcessor",
+        registerMuleBeanDefinitionParser("eval", new ChildDefinitionParser("messageProcessor",
             ExpressionLanguageExecutor.class));
 
         // Message Sources

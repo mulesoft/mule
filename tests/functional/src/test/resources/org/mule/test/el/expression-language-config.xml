@@ -17,7 +17,7 @@
 
     <flow name="flow">
         <test:assert expression="#[payload == 'foo']" />
-        <el-execute expression="#[payload='bar']" />
+        <eval expression="#[payload='bar']" />
         <test:assert expression="#[payload == 'bar']" />
     </flow>
 

@@ -202,7 +202,7 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="el-execute" substitutionGroup="abstract-message-processor">
+    <xsd:element name="eval" substitutionGroup="abstract-message-processor">
         <xsd:complexType>
             <xsd:complexContent>
                 <xsd:extension base="abstractMessageProcessorType">
