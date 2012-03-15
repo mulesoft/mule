@@ -73,7 +73,7 @@ public class ServletMuleMessageFactory extends AbstractMuleMessageFactory
          * 3. The content type is application/x-www-form-urlencoded.
          * 4. The servlet has made an initial call of any of the getParameter family of meth-
          *    ods on the request object.
-         * 
+         *
          * If the conditions are not met and the post form data is not included in the
          * parameter set, the post data must still be available to the servlet via the request
          * object's input stream. If the conditions are met, post form data will no longer be
@@ -153,14 +153,17 @@ public class ServletMuleMessageFactory extends AbstractMuleMessageFactory
             if (index > -1)
             {
                 int semicolonIndex = contentType.lastIndexOf(";");
+                String encoding;
                 if (semicolonIndex > index)
                 {
-                    message.setEncoding(contentType.substring(index + 8, semicolonIndex));
+                    encoding = contentType.substring(index + 8, semicolonIndex);
                 }
                 else
                 {
-                    message.setEncoding(contentType.substring(index + 8));
+                    encoding = contentType.substring(index + 8);
                 }
+                // some stacks send quotes around the charset encoding
+                message.setEncoding(encoding.replaceAll("\"", "").trim());
             }
         }
     }
@@ -185,23 +188,23 @@ public class ServletMuleMessageFactory extends AbstractMuleMessageFactory
     protected void setupContentType(HttpServletRequest request, DefaultMuleMessage message)
     {
         String contentType = request.getContentType();
-        
+
         Map<String, Object> properties = new HashMap<String, Object>();
         properties.put(ServletConnector.CONTENT_TYPE_PROPERTY_KEY, contentType);
-     
+
         message.addInboundProperties(properties);
     }
-    
+
     protected void setupCharacterEncoding(HttpServletRequest request, DefaultMuleMessage message)
     {
         String characterEncoding = request.getCharacterEncoding();
-        
+
         Map<String, Object> properties = new HashMap<String, Object>();
         properties.put(ServletConnector.CHARACTER_ENCODING_PROPERTY_KEY, characterEncoding);
-     
+
         message.addInboundProperties(properties);
     }
-    
+
     protected void setupRemoteAddress(HttpServletRequest request, DefaultMuleMessage message)
     {
         message.setInboundProperty(REMOTE_ADDRESS_HEADER, request.getRemoteAddr());
@@ -210,11 +213,11 @@ public class ServletMuleMessageFactory extends AbstractMuleMessageFactory
     protected void setupMessageProperties(HttpServletRequest request, DefaultMuleMessage message)
     {
         Map<String, Object> messageProperties = new HashMap<String, Object>();
-        
+
         copyParameters(request, messageProperties);
         copyAttributes(request, messageProperties);
         copyHeaders(request, messageProperties);
-        
+
         message.addInboundProperties(messageProperties);
     }
 
@@ -234,7 +237,7 @@ public class ServletMuleMessageFactory extends AbstractMuleMessageFactory
                         value = ((Object[]) value)[0];
                     }
                 }
-                
+
                 messageProperties.put(key, value);
             }
         }
@@ -248,14 +251,14 @@ public class ServletMuleMessageFactory extends AbstractMuleMessageFactory
             messageProperties.put(key, request.getAttribute(key));
         }
     }
-    
+
     protected void copyHeaders(HttpServletRequest request, Map<String, Object> messageProperties)
     {
         for (Enumeration<?> e = request.getHeaderNames(); e.hasMoreElements();)
         {
             String key = (String)e.nextElement();
             String realKey = key;
-            
+
             if (key.startsWith(HttpConstants.X_PROPERTY_PREFIX))
             {
                 realKey = key.substring(2);
