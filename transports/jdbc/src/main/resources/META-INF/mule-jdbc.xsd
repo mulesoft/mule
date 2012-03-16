@@ -88,7 +88,7 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="queryTimeout" type="xsd:int" default="-1">
+                <xsd:attribute name="queryTimeout" type="mule:substitutableInt" default="-1">
                     <xsd:annotation>
                         <xsd:documentation>
                         The timeout in seconds that will be used as a query timeout for the SQL statement
@@ -119,7 +119,7 @@
                                 <xsd:documentation>The delay in milliseconds that will be used during two subsequent polls to the database.</xsd:documentation>
                         </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="queryTimeout" type="xsd:int" default="-1">
+                <xsd:attribute name="queryTimeout" type="mule:substitutableInt" default="-1">
                     <xsd:annotation>
                         <xsd:documentation>
                         The timeout in seconds that will be used as a query timeout for the SQL statement
@@ -145,7 +145,7 @@
                     <xsd:element ref="abstract-query" minOccurs="0" maxOccurs="unbounded"/>
                 </xsd:sequence>
                 <xsd:attributeGroup ref="addressAttributes"/>
-                <xsd:attribute name="queryTimeout" type="xsd:int" default="-1">
+                <xsd:attribute name="queryTimeout" type="mule:substitutableInt" default="-1">
                     <xsd:annotation>
                         <xsd:documentation>
                         The timeout in seconds that will be used as a query timeout for the SQL statement
@@ -170,7 +170,7 @@
                                 <xsd:documentation>The delay in milliseconds that will be used during two subsequent polls to the database.</xsd:documentation>
                         </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="queryTimeout" type="xsd:int" default="-1">
+                <xsd:attribute name="queryTimeout" type="mule:substitutableInt" default="-1">
                     <xsd:annotation>
                         <xsd:documentation>
                         The timeout in seconds that will be used as a query timeout for the SQL statement
