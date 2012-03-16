@@ -106,7 +106,8 @@ public class JdbcConnector extends AbstractConnector
             }
             else
             {
-                queryRunner = new QueryRunner();
+                // Fix for MULE-5825 (Mariano Capurro) -> Adding dataSource parameter
+                queryRunner = new QueryRunner(dataSource);
             }
         }
     }
