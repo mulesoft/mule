@@ -44,7 +44,7 @@ public class EchoTestCase extends FunctionalTestCase
         MuleClient client = new MuleClient(muleContext);
         Map<String, String> props = new HashMap<String, String>();
         props.put("http.method", "GET");
-        MuleMessage result = client.send("http://localhost:8082/" + MESSAGE, "", props);
+        MuleMessage result = client.send("http://localhost:8084/" + MESSAGE, "", props);
         assertNotNull(result);
         assertFalse(result.getPayload() instanceof NullPayload);
         assertEquals("/" + MESSAGE, result.getPayloadAsString());

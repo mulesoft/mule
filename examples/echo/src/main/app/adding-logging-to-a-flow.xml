@@ -13,13 +13,13 @@ http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/cor
 		When a request is received, the echo component simply returns whatever was sent as part of the request. The logger component logs the message payload.
 
         The flow is invoked by going to the URL in your browser - 
-            http://localhost:8082/your_message.
+            http://localhost:8084/your_message.
 			
     </description>
 
     <flow name="EchoFlow">
         <http:inbound-endpoint host="localhost"
-            port="8082" keep-alive="false" doc:name="HTTP"
+            port="8084" keep-alive="false" doc:name="HTTP"
             doc:description="Process HTTP reqests or responses." />
         <logger message="About to echo #[message:payload]" level="INFO" />
         <echo-component />

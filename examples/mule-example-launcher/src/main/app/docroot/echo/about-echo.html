@@ -13,7 +13,7 @@ This example shows how to add message processing components, in this example Log
 
 <p class="example-title">Under the Hood</p>
 <p class="example-text">
-The Mule flow created a HTTP server for accepting incoming requests. The flow is invoked by going to the URL in your browser http://localhost:8082/echo. When a request is received, the echo component simply returns whatever was sent as part of the request.
+The Mule flow created a HTTP server for accepting incoming requests. The flow is invoked by going to the URL in your browser http://localhost:8084/echo. When a request is received, the echo component simply returns whatever was sent as part of the request.
 Additionally a Logger message processor demonstrates how different processors can be sequenced in a Flow. And the #[payload] expression is used to log the payload of the request. The expression is evaluated for every message received at runtime.
 </p>
 

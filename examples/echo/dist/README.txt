@@ -18,7 +18,7 @@ Simply copy the pre-built application archive (mule-example-adding-logging-to-a-
 
 To access the webapps go to
 
-    http://localhost:8082/<your_message>
+    http://localhost:8084/<your_message>
 
 Mule app will return <your_message> back, additionally will log your message in the application log ($MULE_HOME/logs/mule-echo.log).
 
