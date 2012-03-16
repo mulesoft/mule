@@ -19,8 +19,8 @@ http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/cor
 
     <flow name="EchoFlow">
         <http:inbound-endpoint host="localhost"
-            port="8084" keep-alive="false" doc:name="HTTP"
-            doc:description="Process HTTP reqests or responses." />
+            port="8084" doc:name="HTTP"
+            doc:description="Process HTTP requests or responses." />
         <logger message="About to echo #[message:payload]" level="INFO" />
         <echo-component />
     </flow>
