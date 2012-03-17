@@ -56,12 +56,12 @@ import org.w3c.dom.Document;
  * The {@link MuleEvent} sent to the next message processor is the same that arrived
  * to foreach.
  */
-public class ForeachMessageProcessor extends AbstractMessageProcessorOwner implements Initialisable, InterceptingMessageProcessor
+public class Foreach extends AbstractMessageProcessorOwner implements Initialisable, InterceptingMessageProcessor
 {
 
     public static final String ROOT_MESSAGE_PROPERTY = "rootMessage";
     public static final String COUNTER_PROPERTY = "counter";
-    private static final String XPATH_PREFIX = "#[xpath";
+    private static final String XPATH_PREFIX = "xpath";
 
     protected Log logger = LogFactory.getLog(getClass());
 
@@ -181,7 +181,7 @@ public class ForeachMessageProcessor extends AbstractMessageProcessorOwner imple
     private String checkEvaluator(String expression)
     {
         String result = expression;
-        if (expression.startsWith(XPATH_PREFIX))
+        if (expression.startsWith(XPATH_PREFIX+":"))
         {
             result = "#[xpath-branch" + expression.substring(expression.indexOf(':'));
         }

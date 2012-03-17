@@ -147,7 +147,7 @@ import org.mule.routing.CollectionSplitter;
 import org.mule.routing.ExpressionMessageInfoMapping;
 import org.mule.routing.ExpressionSplitter;
 import org.mule.routing.FirstSuccessful;
-import org.mule.routing.ForeachMessageProcessor;
+import org.mule.routing.Foreach;
 import org.mule.routing.ForwardingCatchAllStrategy;
 import org.mule.routing.IdempotentMessageFilter;
 import org.mule.routing.IdempotentSecureHashMessageFilter;
@@ -542,7 +542,7 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("map-splitter", new SplitterDefinitionParser(MapSplitter.class));
         registerBeanDefinitionParser("message-chunk-splitter", new SplitterDefinitionParser(MessageChunkSplitter.class));
         registerBeanDefinitionParser("custom-splitter", new SplitterDefinitionParser());
-        registerBeanDefinitionParser("foreach", new ChildDefinitionParser("messageProcessor", ForeachMessageProcessor.class));
+        registerBeanDefinitionParser("foreach", new ChildDefinitionParser("messageProcessor", Foreach.class));
 
         // Routing: Routing Message Processors
 
