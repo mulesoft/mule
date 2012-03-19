@@ -17,6 +17,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
@@ -25,6 +26,7 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.construct.FlowConstruct;
+import org.mule.api.expression.ExpressionManager;
 import org.mule.message.DefaultExceptionPayload;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
@@ -41,7 +43,6 @@ import org.mockito.Mockito;
 
 public class GroovyExpressionEvaluatorTestCase extends AbstractMuleContextTestCase
 {
-
     @Test
     public void testWithExpressions()
     {
@@ -136,36 +137,37 @@ public class GroovyExpressionEvaluatorTestCase extends AbstractMuleContextTestCa
     {
         Apple apple = new Apple();
         muleContext.getRegistry().registerObject("name.with.dots", apple);
-        Object result = muleContext.getExpressionManager().evaluate(
-            "#[groovy:registry.lookupObject('name.with.dots')]", Mockito.mock(MuleMessage.class));
+        Object result = evaluate("#[groovy:registry.lookupObject('name.with.dots')]");
 
         assertNotNull(result);
         assertSame(apple, result);
 
         // try various map-style access in groovy for simpler syntax
-        result = muleContext.getExpressionManager().evaluate("#[groovy:registry.'name.with.dots']",
-            Mockito.mock(MuleMessage.class));
+        result = evaluate("#[groovy:registry.'name.with.dots']");
         assertNotNull(result);
         assertSame(apple, result);
 
-        result = muleContext.getExpressionManager().evaluate("#[groovy:registry['name.with.dots']]",
-            Mockito.mock(MuleMessage.class));
+        result = evaluate("#[groovy:registry['name.with.dots']]");
         assertNotNull(result);
         assertSame(apple, result);
 
-        result = muleContext.getExpressionManager().evaluate("#[groovy:registry.'name.with.dots'.washed]",
-            Mockito.mock(MuleMessage.class));
+        result = evaluate("#[groovy:registry.'name.with.dots'.washed]");
         assertNotNull(result);
         assertEquals(false, result);
+    }
+
+    private Object evaluate(String expression)
+    {
+        ExpressionManager expressionManager = muleContext.getExpressionManager();
+        MuleEvent event = mock(MuleEvent.class);
+        return expressionManager.evaluate(expression, event);
     }
 
     @Test
     public void muleContext() throws Exception
     {
-        assertSame(
-            muleContext,
-            muleContext.getExpressionManager().evaluate("#[groovy:muleContext]",
-                Mockito.mock(MuleMessage.class)));
+        Object result = evaluate("#[groovy:muleContext]");
+        assertSame(muleContext, result);
     }
 
     @Test
@@ -364,17 +366,17 @@ public class GroovyExpressionEvaluatorTestCase extends AbstractMuleContextTestCa
     class MyClassClassLoader extends ClassLoader
     {
         @Override
-        protected Class<?> findClass(String name) throws ClassNotFoundException
+        protected Class<?> findClass(String className) throws ClassNotFoundException
         {
-            if (name.equals("MyClass"))
+            if (className.equals("MyClass"))
             {
-                ClassWriter cw = new ClassWriter(true);
+                ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
                 cw.visit(Opcodes.V1_5, Opcodes.ACC_PUBLIC, "MyClass", null, "java/lang/Object", null);
-                return defineClass(name, cw.toByteArray(), 0, cw.toByteArray().length);
+                return defineClass(className, cw.toByteArray(), 0, cw.toByteArray().length);
             }
             else
             {
-                return super.findClass(name);
+                return super.findClass(className);
             }
         }
     }

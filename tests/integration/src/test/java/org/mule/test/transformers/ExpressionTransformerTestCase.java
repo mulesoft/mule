@@ -34,7 +34,7 @@ public class ExpressionTransformerTestCase extends AbstractMuleContextTestCase
     /**
      * See: MULE-4797 GroovyExpressionEvaluator script is unable to load user classes when used with hot
      * deployment.
-     * 
+     *
      * @throws TransformerException
      */
     @Test
@@ -115,7 +115,7 @@ public class ExpressionTransformerTestCase extends AbstractMuleContextTestCase
         transformer.setMuleContext(muleContext);
         transformer.setReturnSourceIfNull(true);
         ExpressionConfig config = new ExpressionConfig("null", null, null);
-        
+
         // MVL doesn't return NullPayload but rather null.  So 'optional' needs to be true.
         ExpressionArgument argument = new ExpressionArgument("test", config, true);
         argument.setMuleContext(muleContext);
@@ -133,17 +133,17 @@ public class ExpressionTransformerTestCase extends AbstractMuleContextTestCase
     class MyClassClassLoader extends ClassLoader
     {
         @Override
-        protected Class<?> findClass(String name) throws ClassNotFoundException
+        protected Class<?> findClass(String className) throws ClassNotFoundException
         {
-            if (name.equals("org.MyClass"))
+            if (className.equals("org.MyClass"))
             {
-                ClassWriter cw = new ClassWriter(true);
+                ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
                 cw.visit(Opcodes.V1_5, Opcodes.ACC_PUBLIC, "org/MyClass", null, "java/lang/Object", null);
-                return defineClass(name, cw.toByteArray(), 0, cw.toByteArray().length);
+                return defineClass(className, cw.toByteArray(), 0, cw.toByteArray().length);
             }
             else
             {
-                return super.findClass(name);
+                return super.findClass(className);
             }
         }
     }
