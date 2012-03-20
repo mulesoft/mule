@@ -19,4 +19,9 @@
         connector-ref="jmsConnector2" exchange-pattern="one-way">
     </endpoint>
 
+    <endpoint name="out3NotSupported" address="jms://out3"
+            connector-ref="jmsConnector2" exchange-pattern="one-way">
+        <jms:transaction action="NOT_SUPPORTED"/>
+    </endpoint>
+
 </mule>
