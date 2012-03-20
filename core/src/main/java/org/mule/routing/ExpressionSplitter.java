@@ -110,7 +110,7 @@ public class ExpressionSplitter extends AbstractSplitter
     public void setEvaluator(String evaluator)
     {
         // Switch to XPath node since we want the Dom nodes not the value of the node
-        if (evaluator.equals("xpath"))
+        if (evaluator != null && evaluator.equals("xpath"))
         {
             evaluator = "xpath-node";
         }

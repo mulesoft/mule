@@ -40,23 +40,19 @@ import org.apache.commons.logging.LogFactory;
 import org.w3c.dom.Document;
 
 /**
- * The <code>Foreach</code> MessageProcessor allows iterating over a collection
- * payload, or any collection obtained by an expression, generating a message for
- * each element.
+` * The <code>Foreach</code> MessageProcessor allows iterating over a collection payload, or any collection
+ * obtained by an expression, generating a message for each element.
  * <p>
- * The number of the message being processed is stored in
- * <code>#[variable:counter]</code> and the root message is store in
- * <code>#[variable:rootMessage]</code>. Both variables may be renamed by means of
- * {@link #setCounterVariableName(String)} and
- * {@link #setRootMessageVariableName(String)}.
+ * The number of the message being processed is stored in <code>#[variable:counter]</code> and the root
+ * message is store in <code>#[variable:rootMessage]</code>. Both variables may be renamed by means of
+ * {@link #setCounterVariableName(String)} and {@link #setRootMessageVariableName(String)}.
  * <p>
- * Defining a groupSize greater than one, allows iterating over collections of
- * elements of the specified size.
+ * Defining a groupSize greater than one, allows iterating over collections of elements of the specified size.
  * <p>
- * The {@link MuleEvent} sent to the next message processor is the same that arrived
- * to foreach.
+ * The {@link MuleEvent} sent to the next message processor is the same that arrived to foreach.
  */
-public class Foreach extends AbstractMessageProcessorOwner implements Initialisable, InterceptingMessageProcessor
+public class Foreach extends AbstractMessageProcessorOwner
+    implements Initialisable, InterceptingMessageProcessor
 {
 
     public static final String ROOT_MESSAGE_PROPERTY = "rootMessage";
@@ -70,6 +66,7 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
     private AbstractMessageSequenceSplitter splitter;
     private MessageProcessor next;
     private String collectionExpression;
+    private ExpressionConfig expressionConfig = new ExpressionConfig();
     private int batchSize;
     private String rootMessageVariableName;
     private String counterVariableName;
@@ -79,7 +76,9 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
     @Override
     public MuleEvent process(MuleEvent event) throws MuleException
     {
-        String parentMessageProp = rootMessageVariableName != null ? rootMessageVariableName : ROOT_MESSAGE_PROPERTY;
+        String parentMessageProp = rootMessageVariableName != null
+                                                                  ? rootMessageVariableName
+                                                                  : ROOT_MESSAGE_PROPERTY;
         boolean transformed = transformPayloadIfNeeded(event);
         event.getMessage().setInvocationProperty(parentMessageProp, event.getMessage());
         ownedMessageProcessor.process(event);
@@ -94,7 +93,15 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
     {
         boolean transformed = false;
         MuleMessage message = event.getMessage();
-        if (collectionExpression != null && collectionExpression.startsWith(XPATH_PREFIX) && message.getPayload() instanceof String)
+        if (expressionConfig.getEvaluator() != null
+            && expressionConfig.getEvaluator().startsWith(XPATH_PREFIX)
+            && message.getPayload() instanceof String)
+        {
+            message.setPayload(xml2dom.transform(message.getPayload()));
+            transformed = true;
+        }
+        else if (expressionConfig.getEvaluator() == null
+                 && expressionConfig.getExpression().matches("^xpath\\(.+\\)$"))
         {
             message.setPayload(xml2dom.transform(message.getPayload()));
             transformed = true;
@@ -141,16 +148,18 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
     {
         if (collectionExpression != null)
         {
-            ExpressionConfig config = new ExpressionConfig();
-            config.setExpression(checkEvaluator(collectionExpression));
-            splitter = new ExpressionSplitter(config);
+            expressionConfig.setExpression(collectionExpression);
+            checkEvaluator(expressionConfig);
+            splitter = new ExpressionSplitter(expressionConfig);
             if (collectionExpression.startsWith(XPATH_PREFIX))
             {
                 DataType<Document> docType = new SimpleDataType<Document>(Document.class);
                 try
                 {
-                    xml2dom = muleContext.getRegistry().lookupTransformer(DataTypeFactory.XML_STRING, docType);
-                    dom2xml = muleContext.getRegistry().lookupTransformer(docType, DataTypeFactory.XML_STRING);
+                    xml2dom = muleContext.getRegistry()
+                        .lookupTransformer(DataTypeFactory.XML_STRING, docType);
+                    dom2xml = muleContext.getRegistry()
+                        .lookupTransformer(docType, DataTypeFactory.XML_STRING);
                 }
                 catch (TransformerException e)
                 {
@@ -169,7 +178,8 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
 
         try
         {
-            this.ownedMessageProcessor = new DefaultMessageProcessorChainBuilder().chain(messageProcessors).build();
+            this.ownedMessageProcessor = new DefaultMessageProcessorChainBuilder().chain(messageProcessors)
+                .build();
         }
         catch (MuleException e)
         {
@@ -178,17 +188,16 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
         super.initialise();
     }
 
-    private String checkEvaluator(String expression)
+    private void checkEvaluator(ExpressionConfig expressionConfig)
     {
-        String result = expression;
-        if (expression.startsWith(XPATH_PREFIX+":"))
+        if (expressionConfig.getEvaluator() != null
+            && expressionConfig.getEvaluator().startsWith(XPATH_PREFIX + ":"))
         {
-            result = "#[xpath-branch" + expression.substring(expression.indexOf(':'));
+            expressionConfig.setEvaluator("xpath-branch");
         }
-        return result;
     }
 
-    public void setCollection(String expression)
+    public void setCollectionExpression(String expression)
     {
         this.collectionExpression = expression;
     }
@@ -232,5 +241,3 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
 
     }
 }
-
-
