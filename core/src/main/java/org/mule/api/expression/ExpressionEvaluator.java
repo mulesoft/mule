@@ -20,6 +20,8 @@ import org.mule.api.NamedObject;
  *
  * These objects are used to execute property expressions (usually on the
  * current message) at runtime to extracta dynamic value.
+ * 
+ * ExpressionEvaluator names most contain only letters, dashes or underscores.
  */
 public interface ExpressionEvaluator extends NamedObject
 {

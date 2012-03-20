@@ -14,8 +14,6 @@ import org.mule.api.expression.ExpressionManager;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.util.StringUtils;
 
-import java.util.regex.Pattern;
-
 /**
  * A simple configuration object for holding the common Expression evaluator configuration. The
  * {@link #getFullExpression(ExpressionManager)} will return the evaluator and expression information in a
@@ -77,7 +75,7 @@ public class ExpressionConfig
             // Attempt to work out if the expression uses an evaluator. This doesn't catch all cases, any
             // other cases will be caught during validation.
             String candidateEvaluator = expressionString.substring(0, i);
-            if (!candidateEvaluator.matches("^[^:'" + Pattern.quote("?") + Pattern.quote("(") + "]+$"))
+            if (!candidateEvaluator.matches("^[\\w-_]+$"))
             {
                 this.expression = expressionString;
             }
