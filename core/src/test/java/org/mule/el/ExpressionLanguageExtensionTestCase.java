@@ -17,6 +17,7 @@ import org.mule.api.el.ExpressionLanguage;
 import org.mule.api.el.ExpressionLanguageContext;
 import org.mule.api.el.ExpressionLanguageExtension;
 import org.mule.api.el.ExpressionLanguageFunction;
+import org.mule.api.el.VariableAssignmentCallback;
 import org.mule.api.expression.ExpressionRuntimeException;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.registry.RegistrationException;
@@ -34,6 +35,9 @@ import org.junit.Test;
 
 public class ExpressionLanguageExtensionTestCase extends AbstractELTestCase
 {
+
+    private String a = "hi";
+    private String b = "hi";
 
     public ExpressionLanguageExtensionTestCase(Variant variant)
     {
@@ -77,22 +81,23 @@ public class ExpressionLanguageExtensionTestCase extends AbstractELTestCase
         Assert.assertEquals("hi", expressionLanguage.evaluate("a"));
     }
 
-    @Test
+    @Test(expected = ExpressionRuntimeException.class)
     public void assignValueToVariable() throws RegistrationException, InitialisationException
     {
-        Assert.assertEquals("1", expressionLanguage.evaluate("a=1"));
+        expressionLanguage.evaluate("a='1'");
     }
 
     @Test
-    public void finalVariable() throws RegistrationException, InitialisationException
+    public void mutableVariable() throws RegistrationException, InitialisationException
     {
         Assert.assertEquals("hi", expressionLanguage.evaluate("b"));
     }
 
     @Test
-    public void assignValueToFinalVariable() throws RegistrationException, InitialisationException
+    public void assignValueToMutableVariable() throws RegistrationException, InitialisationException
     {
-        assertImmutableVariable("b=1");
+        Assert.assertEquals("hi", expressionLanguage.evaluate("b='1'"));
+        Assert.assertEquals("1", b);
     }
 
     @Test
@@ -162,8 +167,15 @@ public class ExpressionLanguageExtensionTestCase extends AbstractELTestCase
             {
                 throw new RuntimeException(e);
             }
-            context.addVariable("a", "hi");
-            context.addFinalVariable("b", "hi");
+            context.addVariable("a", a);
+            context.addVariable("b", b, new VariableAssignmentCallback<String>()
+            {
+                @Override
+                public void assignValue(String name, String value, String newValue)
+                {
+                    b = newValue;
+                }
+            });
             context.addVariable("appShortcut", context.getVariable("app"));
             context.addAlias("p", "message.payload");
             context.declareFunction("f", new ExpressionLanguageFunction()

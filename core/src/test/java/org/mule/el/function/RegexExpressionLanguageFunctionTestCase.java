@@ -20,7 +20,6 @@ import org.mule.api.el.ExpressionExecutor;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transformer.TransformerException;
 import org.mule.el.context.MessageContext;
-import org.mule.el.function.RegexExpressionLanguageFuntion;
 import org.mule.el.mvel.MVELExpressionExecutor;
 import org.mule.el.mvel.MVELExpressionLanguageContext;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -222,7 +221,7 @@ public class RegexExpressionLanguageFunctionTestCase extends AbstractMuleTestCas
     {
         MuleMessage message = Mockito.mock(MuleMessage.class);
         Mockito.when(message.getPayload(Mockito.any(Class.class))).thenReturn(payload);
-        context.addFinalVariable("message", new MessageContext(message));
+        context.addVariable("message", new MessageContext(message));
     }
 
 }
