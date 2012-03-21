@@ -46,6 +46,6 @@ public class LaxSedaStageInterceptingMessageProcessor extends SedaStageIntercept
     @Override
     protected boolean isProcessAsync(MuleEvent event) throws MessagingException
     {
-        return doThreading && !event.isSynchronous();
+        return doThreading && !event.isSynchronous() && !event.isTransacted();
     }
 }
