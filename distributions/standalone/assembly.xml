@@ -396,6 +396,9 @@
                 <exclude>xerces:xml-serializer</exclude>
                 <exclude>xalan:xalan</exclude>
 
+                <!-- lib/per-app -->
+                <exclude>org.mvel:mvel2</exclude>
+
                 <!-- Distributed separately in profiler pack -->
                 <exclude>com.yourkit:yjp-controller-api-redist</exclude>
 
@@ -433,6 +436,15 @@
                 <include>xerces:xercesImpl</include>
                 <include>xerces:xml-serializer</include>
                 <include>xalan:xalan</include>
+            </includes>
+        </dependencySet>
+
+        <dependencySet>
+            <outputDirectory>lib/mule/per-app</outputDirectory>
+            <useStrictFiltering>true</useStrictFiltering>
+            <scope>runtime</scope>
+            <includes>
+                <include>org.mvel:mvel2</include>
             </includes>
         </dependencySet>
 
