@@ -32,7 +32,8 @@ public class XMLExpressionLanguageEnrichmentDom4jTestCase extends AbstractELTest
     {
         MuleMessage message = new DefaultMuleMessage("<root/>", muleContext);
         message.setPayload(message.getPayload(Document.class));
-        evaluate("xpath('/root').text='myText'", message);
+        evaluate("xpath('/root').setText('myText')", message);
+        evaluate("xpath('/root').setText('myText')", message);
         assertTrue(message.getPayloadAsString().contains("<root>myText</root>"));
     }
 
@@ -41,7 +42,8 @@ public class XMLExpressionLanguageEnrichmentDom4jTestCase extends AbstractELTest
     {
         MuleMessage message = new DefaultMuleMessage("<root/>", muleContext);
         message.setPayload(message.getPayload(Document.class));
-        evaluate("xpath('/root').text=1", message);
+        evaluate("xpath('/root').setText(1)", message);
+        evaluate("xpath('/root').setText(1)", message);
         assertTrue(message.getPayloadAsString().contains("<root>1</root>"));
     }
 
@@ -50,7 +52,8 @@ public class XMLExpressionLanguageEnrichmentDom4jTestCase extends AbstractELTest
     {
         MuleMessage message = new DefaultMuleMessage("<root attr=\"1\"/>", muleContext);
         message.setPayload(message.getPayload(Document.class));
-        evaluate("xpath('/root').text=xpath('/root/@attr')", message);
+        evaluate("xpath('/root').setText(xpath('/root/@attr'))", message);
+        evaluate("xpath('/root').setText(xpath('/root/@attr'))", message);
         assertTrue(message.getPayloadAsString().contains("<root attr=\"1\">1</root>"));
     }
 
@@ -59,80 +62,9 @@ public class XMLExpressionLanguageEnrichmentDom4jTestCase extends AbstractELTest
     {
         MuleMessage message = new DefaultMuleMessage("<root>oldText</root>", muleContext);
         message.setPayload(message.getPayload(Document.class));
-        evaluate("xpath('/root').text='myText'", message);
+        evaluate("xpath('/root').setText('myText')", message);
+        evaluate("xpath('/root').setText('myText')", message);
         assertTrue(message.getPayloadAsString().contains("<root>myText</root>"));
-    }
-
-    @Test
-    public void replaceElementTextInt() throws Exception
-    {
-        MuleMessage message = new DefaultMuleMessage("<root>oldText</root>", muleContext);
-        message.setPayload(message.getPayload(Document.class));
-        evaluate("xpath('/root').text=1", message);
-        assertTrue(message.getPayloadAsString().contains("<root>1</root>"));
-    }
-
-    @Test
-    public void replaceElementTextNode() throws Exception
-    {
-        MuleMessage message = new DefaultMuleMessage("<root attr=\"1\">oldText</root>", muleContext);
-        message.setPayload(message.getPayload(Document.class));
-        evaluate("xpath('/root').text=xpath('/root/@attr')", message);
-        assertTrue(message.getPayloadAsString().contains("<root attr=\"1\">1</root>"));
-    }
-
-    @Test
-    public void updateAttributeValue() throws Exception
-    {
-        MuleMessage message = new DefaultMuleMessage("<root attr=\"oldValue\"/>", muleContext);
-        message.setPayload(message.getPayload(Document.class));
-        evaluate("xpath('/root/@attr').text='newValue'", message);
-        assertTrue(message.getPayloadAsString().contains("<root attr=\"newValue\"/>"));
-    }
-
-    @Test
-    public void updateAttributeValueInt() throws Exception
-    {
-        MuleMessage message = new DefaultMuleMessage("<root attr=\"oldValue\"/>", muleContext);
-        message.setPayload(message.getPayload(Document.class));
-        evaluate("xpath('/root/@attr').text=1", message);
-        assertTrue(message.getPayloadAsString().contains("<root attr=\"1\"/>"));
-    }
-
-    @Test
-    public void updateAttributeValueNode() throws Exception
-    {
-        MuleMessage message = new DefaultMuleMessage("<root other=\"1\" attr=\"oldValue\"/>", muleContext);
-        message.setPayload(message.getPayload(Document.class));
-        evaluate("xpath('/root/@attr').text=xpath('/root/@other')", message);
-        assertTrue(message.getPayloadAsString().contains("<root other=\"1\" attr=\"1\"/>"));
-    }
-
-    @Test
-    public void updateAttributeValueAlternative() throws Exception
-    {
-        MuleMessage message = new DefaultMuleMessage("<root attr=\"oldValue\"/>", muleContext);
-        message.setPayload(message.getPayload(Document.class));
-        evaluate("xpath('/root').attributes['attr']='newValue'", message);
-        assertTrue(message.getPayloadAsString().contains("<root attr=\"newValue\"/>"));
-    }
-
-    @Test
-    public void updateAttributeValueAlternativeInt() throws Exception
-    {
-        MuleMessage message = new DefaultMuleMessage("<root attr=\"oldValue\"/>", muleContext);
-        message.setPayload(message.getPayload(Document.class));
-        evaluate("xpath('/root').attributes['attr']=1", message);
-        assertTrue(message.getPayloadAsString().contains("<root attr=\"1\"/>"));
-    }
-
-    @Test
-    public void updateAttributeValueAlternativeNode() throws Exception
-    {
-        MuleMessage message = new DefaultMuleMessage("<root other=\"1\" attr=\"oldValue\"/>", muleContext);
-        message.setPayload(message.getPayload(Document.class));
-        evaluate("xpath('/root').attributes['attr']=xpath('/root/@other')", message);
-        assertTrue(message.getPayloadAsString().contains("<root other=\"1\" attr=\"1\"/>"));
     }
 
     @Test
@@ -140,7 +72,8 @@ public class XMLExpressionLanguageEnrichmentDom4jTestCase extends AbstractELTest
     {
         MuleMessage message = new DefaultMuleMessage("<root/>", muleContext);
         message.setPayload(message.getPayload(Document.class));
-        evaluate("xpath('/root').attributes['newAttr']='attrValue'", message);
+        evaluate("xpath('/root').addAttribute('newAttr','attrValue')", message);
+        evaluate("xpath('/root').addAttribute('newAttr','attrValue')", message);
         assertTrue(message.getPayloadAsString().contains("<root newAttr=\"attrValue\"/>"));
     }
 
@@ -149,7 +82,8 @@ public class XMLExpressionLanguageEnrichmentDom4jTestCase extends AbstractELTest
     {
         MuleMessage message = new DefaultMuleMessage("<root/>", muleContext);
         message.setPayload(message.getPayload(Document.class));
-        evaluate("xpath('/root').attributes['newAttr']=1", message);
+        evaluate("xpath('/root').addAttribute('newAttr',1)", message);
+        evaluate("xpath('/root').addAttribute('newAttr',1)", message);
         assertTrue(message.getPayloadAsString().contains("<root newAttr=\"1\"/>"));
     }
 
@@ -158,8 +92,36 @@ public class XMLExpressionLanguageEnrichmentDom4jTestCase extends AbstractELTest
     {
         MuleMessage message = new DefaultMuleMessage("<root other=\"1\"/>", muleContext);
         message.setPayload(message.getPayload(Document.class));
-        evaluate("xpath('/root').attributes['newAttr']=xpath('/root/@other')", message);
+        evaluate("xpath('/root').addAttribute('newAttr',xpath('/root/@other'))", message);
+        evaluate("xpath('/root').addAttribute('newAttr',xpath('/root/@other'))", message);
         assertTrue(message.getPayloadAsString().contains("<root other=\"1\" newAttr=\"1\"/>"));
+    }
+
+    @Test
+    public void updateAttributeValue() throws Exception
+    {
+        MuleMessage message = new DefaultMuleMessage("<root attr=\"oldValue\"/>", muleContext);
+        message.setPayload(message.getPayload(Document.class));
+        evaluate("xpath('/root/@attr').setText('newValue')", message);
+        assertTrue(message.getPayloadAsString().contains("<root attr=\"newValue\"/>"));
+    }
+
+    @Test
+    public void updateAttributeValueInt() throws Exception
+    {
+        MuleMessage message = new DefaultMuleMessage("<root attr=\"oldValue\"/>", muleContext);
+        message.setPayload(message.getPayload(Document.class));
+        evaluate("xpath('/root/@attr').setText('1')", message);
+        assertTrue(message.getPayloadAsString().contains("<root attr=\"1\"/>"));
+    }
+
+    @Test
+    public void updateAttributeValueNode() throws Exception
+    {
+        MuleMessage message = new DefaultMuleMessage("<root other=\"1\" attr=\"oldValue\"/>", muleContext);
+        message.setPayload(message.getPayload(Document.class));
+        evaluate("xpath('/root/@attr').setText(xpath('/root/@other'))", message);
+        assertTrue(message.getPayloadAsString().contains("<root other=\"1\" attr=\"1\"/>"));
     }
 
 }

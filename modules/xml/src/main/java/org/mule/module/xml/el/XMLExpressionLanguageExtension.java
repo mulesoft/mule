@@ -18,9 +18,6 @@ import org.mule.api.el.ExpressionLanguageFunction;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 
-import org.dom4j.Element;
-import org.mvel2.integration.PropertyHandlerFactory;
-
 public class XMLExpressionLanguageExtension extends org.mule.el.mvel.DataConversion
     implements ExpressionLanguageExtension, MuleContextAware, Initialisable
 {
@@ -38,15 +35,6 @@ public class XMLExpressionLanguageExtension extends org.mule.el.mvel.DataConvers
     @Override
     public void configureContext(ExpressionLanguageContext context)
     {
-        if (!PropertyHandlerFactory.hasPropertyHandler(DOM4JElementPropertyHandler.class))
-        {
-            PropertyHandlerFactory.registerPropertyHandler(Element.class, new DOM4JElementPropertyHandler());
-        }
-        if (!PropertyHandlerFactory.hasPropertyHandler(W3CElementPropertyHandler.class))
-        {
-            PropertyHandlerFactory.registerPropertyHandler(org.w3c.dom.Element.class,
-                new W3CElementPropertyHandler());
-        }
         addConversionHandler(String.class, conversionHandler);
         context.declareFunction("xpath", xpathFunction);
     }
