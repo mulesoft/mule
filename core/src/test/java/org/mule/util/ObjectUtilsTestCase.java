@@ -135,66 +135,66 @@ public class ObjectUtilsTestCase extends AbstractMuleTestCase
     public void testLongConversion() throws Exception
     {
         Object value = "123";
-        assertEquals(123, ObjectUtils.getLong(value, -1));
+        assertEquals(123, ObjectUtils.getLong(value, -1l));
 
         value = "xyz";
-        assertEquals(-1, ObjectUtils.getLong(value, -1));
+        assertEquals(-1, ObjectUtils.getLong(value, -1l));
 
         value = new Integer(6);
-        assertEquals(6, ObjectUtils.getLong(value, -1));
+        assertEquals(6, ObjectUtils.getLong(value, -1l));
 
         value = new Double(63.4);
-        assertEquals(63, ObjectUtils.getLong(value, -1));
+        assertEquals(63, ObjectUtils.getLong(value, -1l));
 
         value = new Float(-163.2);
-        assertEquals(-163, ObjectUtils.getLong(value, -1));
+        assertEquals(-163, ObjectUtils.getLong(value, -1l));
 
         value = null;
-        assertEquals(-1, ObjectUtils.getLong(value, -1));
+        assertEquals(-1, ObjectUtils.getLong(value, -1l));
     }
 
     @Test
     public void testFloatConversion() throws Exception
     {
         Object value = "123.34";
-        assertEquals(123.34, ObjectUtils.getFloat(value, -1), 0.1f);
+        assertEquals(123.34, ObjectUtils.getFloat(value, -1f), 0.1f);
 
         value = "xyz";
-        assertEquals(-1, ObjectUtils.getFloat(value, -1), 0.1f);
+        assertEquals(-1, ObjectUtils.getFloat(value, -1f), 0.1f);
 
         value = new Integer(6);
-        assertEquals(6, ObjectUtils.getFloat(value, -1), 0.1f);
+        assertEquals(6, ObjectUtils.getFloat(value, -1f), 0.1f);
 
         value = new Double(63.4);
-        assertEquals(63.4, ObjectUtils.getFloat(value, -1), 0.1f);
+        assertEquals(63.4, ObjectUtils.getFloat(value, -1f), 0.1f);
 
         value = new Float(-163.2);
-        assertEquals(-163.2, ObjectUtils.getFloat(value, -1), 0.1f);
+        assertEquals(-163.2, ObjectUtils.getFloat(value, -1f), 0.1f);
 
         value = null;
-        assertEquals(-1, ObjectUtils.getFloat(value, -1), 0.1f);
+        assertEquals(-1, ObjectUtils.getFloat(value, -1f), 0.1f);
     }
 
     @Test
     public void testDoubleConversion() throws Exception
     {
         Object value = "123.34";
-        assertEquals(123.34, ObjectUtils.getDouble(value, -1), 0.1d);
+        assertEquals(123.34, ObjectUtils.getDouble(value, -1.0), 0.1d);
 
         value = "xyz";
-        assertEquals(-1, ObjectUtils.getDouble(value, -1), 0.1d);
+        assertEquals(-1, ObjectUtils.getDouble(value, -1.0), 0.1d);
 
         value = new Integer(6);
-        assertEquals(6, ObjectUtils.getDouble(value, -1), 0.1d);
+        assertEquals(6, ObjectUtils.getDouble(value, -1.0), 0.1d);
 
         value = new Double(63.4);
-        assertEquals(63.4, ObjectUtils.getDouble(value, -1), 0.1d);
+        assertEquals(63.4, ObjectUtils.getDouble(value, -1.0), 0.1d);
 
         value = new Float(-163.2);
-        assertEquals(-163.2, ObjectUtils.getDouble(value, -1), 0.1d);
+        assertEquals(-163.2, ObjectUtils.getDouble(value, -1.0), 0.1d);
 
         value = null;
-        assertEquals(-1, ObjectUtils.getDouble(value, -1), 0.1d);
+        assertEquals(-1, ObjectUtils.getDouble(value, -1.0), 0.1d);
     }
 
     @Test

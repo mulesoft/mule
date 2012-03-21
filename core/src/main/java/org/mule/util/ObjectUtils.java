@@ -73,7 +73,7 @@ public class ObjectUtils extends org.apache.commons.lang.ObjectUtils
      * @param defaultValue the default to use if null or of incorrect type
      * @return the value as a boolean, or the defaultValue
      */
-    public static boolean getBoolean(final Object answer, boolean defaultValue)
+    public static boolean getBoolean(final Object answer, Boolean defaultValue)
     {
         if (answer != null)
         {
@@ -113,7 +113,7 @@ public class ObjectUtils extends org.apache.commons.lang.ObjectUtils
      * @param defaultValue the default to use if null or of incorrect type
      * @return the value as a byte, or the defaultValue
      */
-    public static byte getByte(final Object answer, byte defaultValue)
+    public static byte getByte(final Object answer, Byte defaultValue)
     {
         if (answer == null)
         {
@@ -150,7 +150,7 @@ public class ObjectUtils extends org.apache.commons.lang.ObjectUtils
      * @param defaultValue the default to use if null or of incorrect type
      * @return the value as a short, or the defaultValue
      */
-    public static short getShort(final Object answer, short defaultValue)
+    public static short getShort(final Object answer, Short defaultValue)
     {
         if (answer == null)
         {
@@ -187,7 +187,7 @@ public class ObjectUtils extends org.apache.commons.lang.ObjectUtils
      * @param defaultValue the default to use if null or of incorrect type
      * @return the value as a int, or the defaultValue
      */
-    public static int getInt(final Object answer, int defaultValue)
+    public static int getInt(final Object answer, Integer defaultValue)
     {
         if (answer == null)
         {
@@ -224,7 +224,7 @@ public class ObjectUtils extends org.apache.commons.lang.ObjectUtils
      * @param defaultValue the default to use if null or of incorrect type
      * @return the value as a long, or the defaultValue
      */
-    public static long getLong(final Object answer, long defaultValue)
+    public static long getLong(final Object answer, Long defaultValue)
     {
         if (answer == null)
         {
@@ -262,7 +262,7 @@ public class ObjectUtils extends org.apache.commons.lang.ObjectUtils
      * @param defaultValue the default to use if null or of incorrect type
      * @return the value as a float, or the defaultValue
      */
-    public static float getFloat(final Object answer, float defaultValue)
+    public static float getFloat(final Object answer, Float defaultValue)
     {
         if (answer == null)
         {
@@ -300,7 +300,7 @@ public class ObjectUtils extends org.apache.commons.lang.ObjectUtils
      * @param defaultValue the default to use if null or of incorrect type
      * @return the value as a double, or the defaultValue
      */
-    public static double getDouble(final Object answer, double defaultValue)
+    public static double getDouble(final Object answer, Double defaultValue)
     {
         if (answer == null)
         {
