@@ -24,7 +24,7 @@ class EventVariableResolverFactory extends MessageVariableResolverFactory
     public EventVariableResolverFactory(ParserContext parserContext, MuleContext muleContext, MuleEvent event)
     {
         super(parserContext, muleContext, event.getMessage());
-        addFinalVariable("flow", new FlowContext(event.getFlowConstruct()));
+        addVariable("flow", new FlowContext(event.getFlowConstruct()));
     }
 
     public static class FlowContext

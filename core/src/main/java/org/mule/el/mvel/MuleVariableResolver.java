@@ -10,18 +10,24 @@
 
 package org.mule.el.mvel;
 
+import org.mule.api.el.VariableAssignmentCallback;
+import org.mule.config.i18n.CoreMessages;
+
+import org.mvel2.ImmutableElementException;
 import org.mvel2.integration.VariableResolverFactory;
 import org.mvel2.integration.impl.SimpleSTValueResolver;
 
-class MuleVariableResolver extends SimpleSTValueResolver
+class MuleVariableResolver<T> extends SimpleSTValueResolver
 {
     private static final long serialVersionUID = -4957789619105599831L;
     protected String name;
+    protected VariableAssignmentCallback<T> assignmentCallback;
 
-    public MuleVariableResolver(String name, Object value, Class<?> type)
+    public MuleVariableResolver(String name, T value, Class<?> type, VariableAssignmentCallback<T> callback)
     {
         super(value, type);
         this.name = name;
+        this.assignmentCallback = callback;
     }
 
     @Override
@@ -30,8 +36,24 @@ class MuleVariableResolver extends SimpleSTValueResolver
         return name;
     }
 
-    public Object getValue(VariableResolverFactory variableResolverFactory)
+    @SuppressWarnings("unchecked")
+    public T getValue(VariableResolverFactory variableResolverFactory)
     {
-        return getValue();
+        return (T) getValue();
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public void setValue(Object value)
+    {
+        if (assignmentCallback != null)
+        {
+            assignmentCallback.assignValue(name, (T) getValue(), (T) value);
+        }
+        else
+        {
+            throw new ImmutableElementException(CoreMessages.expressionFinalVariableCannotBeAssignedValue(
+                name).getMessage());
+        }
     }
 }

@@ -24,9 +24,9 @@ public interface ExpressionLanguageContext
 
     void importStaticMethod(String name, Method method);
 
-    void addVariable(String name, Object value);
+    <T> void addVariable(String name, T value);
 
-    void addFinalVariable(String name, Object value);
+    <T> void addVariable(String name, T value, VariableAssignmentCallback<T> assignmentCallback);
 
     void addAlias(String alias, String expression);
 

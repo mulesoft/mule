@@ -26,9 +26,9 @@ class StaticVariableResolverFactory extends MVELExpressionLanguageContext
     public StaticVariableResolverFactory(ParserContext parserContext, MuleContext muleContext)
     {
         super(parserContext, muleContext);
-        addFinalVariable("server", new ServerContext());
-        addFinalVariable("mule", new MuleInstanceContext(muleContext));
-        addFinalVariable("app", new AppContext(muleContext));
+        addVariable("server", new ServerContext());
+        addVariable("mule", new MuleInstanceContext(muleContext));
+        addVariable("app", new AppContext(muleContext));
         declareFunction("regex", new RegexExpressionLanguageFuntion());
     }
 

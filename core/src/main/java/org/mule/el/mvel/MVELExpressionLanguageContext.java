@@ -13,6 +13,7 @@ package org.mule.el.mvel;
 import org.mule.api.MuleContext;
 import org.mule.api.el.ExpressionLanguageContext;
 import org.mule.api.el.ExpressionLanguageFunction;
+import org.mule.api.el.VariableAssignmentCallback;
 
 import java.lang.reflect.Method;
 import java.util.Collections;
@@ -101,19 +102,17 @@ public class MVELExpressionLanguageContext extends BaseVariableResolverFactory
      * @see org.mule.el.mvel.MuleVariableResolverFactory#addVariable(java.lang.String, java.lang.Object)
      */
     @Override
-    public void addVariable(String name, Object value)
+    public <T> void addVariable(String name, T value)
     {
-        addResolver(name, new MuleVariableResolver(name, value, value != null ? value.getClass() : null));
+        addResolver(name, new MuleVariableResolver<T>(name, value, value != null ? value.getClass() : null,
+            null));
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.mule.el.mvel.MuleVariableResolverFactory#addFinalVariable(java.lang.String, java.lang.Object)
-     */
     @Override
-    public void addFinalVariable(String name, Object value)
+    public <T> void addVariable(String name, T value, VariableAssignmentCallback<T> assignmentCallback)
     {
-        addResolver(name, new MuleFinalVariableResolver(name, value, value != null ? value.getClass() : null));
+        addResolver(name, new MuleVariableResolver<T>(name, value, value != null ? value.getClass() : null,
+            assignmentCallback));
     }
 
     @SuppressWarnings("unchecked")
@@ -261,8 +260,9 @@ public class MVELExpressionLanguageContext extends BaseVariableResolverFactory
             variableResolvers.put(name, resolver);
         }
     }
-    
-    MVELExpressionLanguageContext getParentContext(){
+
+    MVELExpressionLanguageContext getParentContext()
+    {
         return this;
     }
 }

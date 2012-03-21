@@ -10,7 +10,7 @@
 
 package org.mule.el.mvel;
 
-class MuleAliasVariableResolver extends MuleVariableResolver
+class MuleAliasVariableResolver extends MuleVariableResolver<Object>
 {
     private static final long serialVersionUID = -4957789619105599831L;
     private String expression;
@@ -19,7 +19,7 @@ class MuleAliasVariableResolver extends MuleVariableResolver
 
     public MuleAliasVariableResolver(String name, String expression, MVELExpressionLanguageContext context)
     {
-        super(name, null, null);
+        super(name, null, null, null);
         this.expression = expression;
         this.context = context;
         this.executor = new MVELExpressionExecutor(context.parserContext);
