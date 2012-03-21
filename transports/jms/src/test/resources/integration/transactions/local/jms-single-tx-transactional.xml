@@ -80,9 +80,7 @@
         <transactional>
             <outbound-endpoint ref="out1"/>
             <outbound-endpoint ref="out2"/>
-            <outbound-endpoint ref="out3">
-                <jms:transaction action="NOT_SUPPORTED"/>
-            </outbound-endpoint>
+            <outbound-endpoint ref="out3NotSupported"/>
         </transactional>
     </flow>
 
@@ -90,9 +88,7 @@
         <append-string-transformer message=" i"/>
         <transactional>
             <outbound-endpoint ref="out1"/>
-            <outbound-endpoint ref="out3">
-                <jms:transaction action="NOT_SUPPORTED"/>
-            </outbound-endpoint>
+            <outbound-endpoint ref="out3NotSupported"/>
             <outbound-endpoint ref="out2"/>
             <test:component throwException="true"/>
         </transactional>
