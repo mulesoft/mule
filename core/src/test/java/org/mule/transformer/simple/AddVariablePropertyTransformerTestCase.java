@@ -80,7 +80,7 @@ public class AddVariablePropertyTransformerTestCase extends AbstractMuleTestCase
     @Test
     public void testAddVariable() throws InitialisationException, TransformerException
     {
-        addVariableTransformer.setKey(PLAIN_STRING_KEY);
+        addVariableTransformer.setIdentifier(PLAIN_STRING_KEY);
         addVariableTransformer.setValue(PLAIN_STRING_VALUE);
         addVariableTransformer.initialise();
         addVariableTransformer.transform(mockMessage, ENCODING);
@@ -90,7 +90,7 @@ public class AddVariablePropertyTransformerTestCase extends AbstractMuleTestCase
     @Test
     public void testAddVariableWithExpressionValue() throws InitialisationException, TransformerException
     {
-        addVariableTransformer.setKey(PLAIN_STRING_KEY);
+        addVariableTransformer.setIdentifier(PLAIN_STRING_KEY);
         addVariableTransformer.setValue(EXPRESSION);
         addVariableTransformer.initialise();
         addVariableTransformer.transform(mockMessage, ENCODING);
@@ -100,7 +100,7 @@ public class AddVariablePropertyTransformerTestCase extends AbstractMuleTestCase
     @Test
     public void testAddVariableWithExpressionKey() throws InitialisationException, TransformerException
     {
-        addVariableTransformer.setKey(EXPRESSION);
+        addVariableTransformer.setIdentifier(EXPRESSION);
         addVariableTransformer.setValue(PLAIN_STRING_VALUE);
         addVariableTransformer.initialise();
         addVariableTransformer.transform(mockMessage, ENCODING);
@@ -110,7 +110,7 @@ public class AddVariablePropertyTransformerTestCase extends AbstractMuleTestCase
     @Test(expected = IllegalArgumentException.class)
     public void testAddVariableWithNullKey() throws InitialisationException, TransformerException
     {
-        addVariableTransformer.setKey(null);
+        addVariableTransformer.setIdentifier(null);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -122,7 +122,7 @@ public class AddVariablePropertyTransformerTestCase extends AbstractMuleTestCase
     @Test
     public void testAddVariableWithNullExpressionKeyResult() throws InitialisationException, TransformerException
     {
-        addVariableTransformer.setKey(NULL_EXPRESSION);
+        addVariableTransformer.setIdentifier(NULL_EXPRESSION);
         addVariableTransformer.setValue(PLAIN_STRING_VALUE);
         addVariableTransformer.initialise();
         addVariableTransformer.transform(mockMessage, ENCODING);
@@ -132,7 +132,7 @@ public class AddVariablePropertyTransformerTestCase extends AbstractMuleTestCase
     @Test
     public void testAddVariableWithNullExpressionValueResult() throws InitialisationException, TransformerException
     {
-        addVariableTransformer.setKey(PLAIN_STRING_KEY);
+        addVariableTransformer.setIdentifier(PLAIN_STRING_KEY);
         addVariableTransformer.setValue(NULL_EXPRESSION);
         addVariableTransformer.initialise();
         addVariableTransformer.transform(mockMessage, ENCODING);

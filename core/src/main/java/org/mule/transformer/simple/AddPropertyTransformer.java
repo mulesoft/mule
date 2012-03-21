@@ -19,4 +19,9 @@ public class AddPropertyTransformer extends AbstractAddVariablePropertyTransform
     {
         return PropertyScope.OUTBOUND;
     }
+
+    public void setPropertyName(String propertyName)
+    {
+        this.setIdentifier(propertyName);
+    }
 }

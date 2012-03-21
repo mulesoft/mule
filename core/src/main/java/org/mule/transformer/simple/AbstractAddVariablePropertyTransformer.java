@@ -21,7 +21,7 @@ import org.mule.util.AttributeEvaluator;
 
 public abstract class AbstractAddVariablePropertyTransformer extends AbstractMessageTransformer
 {
-    private AttributeEvaluator keyEvaluator;
+    private AttributeEvaluator identifierEvaluator;
     private AttributeEvaluator valueEvaluator;
 
     public AbstractAddVariablePropertyTransformer()
@@ -34,14 +34,14 @@ public abstract class AbstractAddVariablePropertyTransformer extends AbstractMes
     public void initialise() throws InitialisationException
     {
         super.initialise();
-        keyEvaluator.initialize(muleContext.getExpressionManager());
+        identifierEvaluator.initialize(muleContext.getExpressionManager());
         valueEvaluator.initialize(muleContext.getExpressionManager());
     }
 
     @Override
     public Object transformMessage(MuleMessage message, String outputEncoding) throws TransformerException
     {
-        Object keyValue = keyEvaluator.resolveValue(message);
+        Object keyValue = identifierEvaluator.resolveValue(message);
         String key = (keyValue == null ? null : keyValue.toString());
         if (key == null)
         {
@@ -68,18 +68,18 @@ public abstract class AbstractAddVariablePropertyTransformer extends AbstractMes
     public Object clone() throws CloneNotSupportedException
     {
         AbstractAddVariablePropertyTransformer clone = (AbstractAddVariablePropertyTransformer) super.clone();
-        clone.setKey(this.keyEvaluator.getRawValue());
+        clone.setIdentifier(this.identifierEvaluator.getRawValue());
         clone.setValue(this.valueEvaluator.getRawValue());
         return clone;
     }
 
-    public void setKey(String key)
+    public void setIdentifier(String identifier)
     {
-        if (key == null)
+        if (identifier == null)
         {
             throw new IllegalArgumentException("Key must not be null");
         }
-        this.keyEvaluator = new AttributeEvaluator(key);
+        this.identifierEvaluator = new AttributeEvaluator(identifier);
     }
 
     public void setValue(String value)

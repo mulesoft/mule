@@ -39,34 +39,34 @@
     </scripting:transformer>
 
     <flow name="addProperty" processingStrategy="synchronous">
-        <add-property key="prop" value="#[string:some value]"/>
+        <set-property propertyName="prop" value="#[string:some value]"/>
         <test:assert expression="#[groovy:message.getOutboundProperty('prop').equals('some value')]"/>
     </flow>
     
     <flow name="addPropertyUsingExpressionKey" processingStrategy="synchronous">
         <transformer ref="addOutboundProperty"/>
         <transformer ref="addInvocationProperty"/>
-        <add-property key="#[header:OUTBOUND:outPropKey]" value="#[header:INVOCATION:invPropKey]"/>
+        <set-property propertyName="#[header:OUTBOUND:outPropKey]" value="#[header:INVOCATION:invPropKey]"/>
         <test:assert expression="#[groovy:message.getOutboundProperty('outPropValue').equals('invPropValue')]"/>
     </flow>
 
     <flow name="removeProperty" processingStrategy="synchronous">
         <transformer ref="addOutboundProperty"/>
-        <remove-property key="outPropKey" />
+        <remove-property propertyName="outPropKey" />
         <test:assert expression="#[groovy:message.getOutboundProperty('outPropKey') == null]"/>
     </flow>
 
     <flow name="removePropertyUsingExpression" processingStrategy="synchronous">
         <transformer ref="addOutboundProperty"/>
         <transformer ref="addOutboundPropertyName"/>
-        <remove-property key="#[header:OUTBOUND:outPropKeyName]" />
+        <remove-property propertyName="#[header:OUTBOUND:outPropKeyName]" />
         <test:assert expression="#[groovy:message.getOutboundProperty('outPropKey') == null]"/>
     </flow>
     
     <flow name="removePropertyUsingRegex" processingStrategy="synchronous">
         <transformer ref="addOutboundProperty"/>
         <transformer ref="addOutboundProperty2"/>
-        <remove-property key="out*" />
+        <remove-property propertyName="out*" />
         <test:assert expression="#[groovy:message.getOutboundProperty('outPropKey') == null]"/>
         <test:assert expression="#[groovy:message.getOutboundProperty('outPropKey2') == null]"/>
     </flow>
@@ -74,7 +74,7 @@
     <flow name="removeAllProperties" processingStrategy="synchronous">
         <transformer ref="addOutboundProperty"/>
         <transformer ref="addOutboundProperty2"/>
-        <remove-property key="*" />
+        <remove-property propertyName="*" />
         <test:assert expression="#[groovy:message.getOutboundProperty('outPropKey') == null]"/>
         <test:assert expression="#[groovy:message.getOutboundProperty('outPropKey2') == null]"/>
     </flow>
@@ -82,7 +82,7 @@
     <flow name="copyProperties">
         <transformer ref="addInboundProperty"/>
         <transformer ref="addInboundProperty2"/>
-        <copy-properties key="inbPropKey"/>
+        <copy-properties propertyName="inbPropKey"/>
         <test:assert expression="#[groovy:message.getOutboundProperty('inbPropKey').equals('inbPropValue')]"/>
         <test:assert expression="#[groovy:message.getOutboundProperty('inbPropKey2') == null]"/>
     </flow>
@@ -90,14 +90,14 @@
     <flow name="copyPropertiesUsingExpression">
         <transformer ref="addInboundProperty"/>
         <transformer ref="addInboundProperty2"/>
-        <copy-properties key="#[string:inbPropKey]"/>
+        <copy-properties propertyName="#[string:inbPropKey]"/>
         <test:assert expression="#[groovy:message.getOutboundProperty('inbPropKey').equals('inbPropValue')]"/>
     </flow>
 
     <flow name="copyPropertiesUsingRegex">
         <transformer ref="addInboundProperty"/>
         <transformer ref="addInboundProperty2"/>
-        <copy-properties key=".*2$"/>
+        <copy-properties propertyName=".*2$"/>
         <test:assert expression="#[groovy:message.getOutboundProperty('inbPropKey') == null]"/>
         <test:assert expression="#[groovy:message.getOutboundProperty('inbPropKey2').equals('inbPropValue2')]"/>
     </flow>
@@ -105,7 +105,7 @@
     <flow name="copyAllProperties">
         <transformer ref="addInboundProperty"/>
         <transformer ref="addInboundProperty2"/>
-        <copy-properties key="*"/>
+        <copy-properties propertyName="*"/>
         <test:assert expression="#[groovy:message.getOutboundProperty('inbPropKey').equals('inbPropValue')]"/>
         <test:assert expression="#[groovy:message.getOutboundProperty('inbPropKey2').equals('inbPropValue2')]"/>
     </flow>

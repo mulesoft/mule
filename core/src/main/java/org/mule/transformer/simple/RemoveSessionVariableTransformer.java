@@ -19,4 +19,9 @@ public class RemoveSessionVariableTransformer extends AbstractRemoveVariableProp
         return PropertyScope.SESSION;
     }
 
+    public void setVariableName(String variableName)
+    {
+        this.setIdentifier(variableName);
+    }
+
 }

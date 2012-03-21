@@ -31,6 +31,8 @@ import org.mule.management.stats.ProcessingTime;
 import org.mule.processor.strategy.SynchronousProcessingStrategy;
 import org.mule.security.MuleCredentials;
 import org.mule.session.DefaultMuleSession;
+import org.mule.transaction.TransactionCollection;
+import org.mule.transaction.TransactionCoordination;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transport.DefaultReplyToHandler;
 import org.mule.util.CaseInsensitiveHashMap;
@@ -826,7 +828,7 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
     @Override
     public boolean isTransacted()
     {
-        return transacted;
+        return transacted || TransactionCoordination.getInstance().getTransaction() != null;
     }
 
     @Override

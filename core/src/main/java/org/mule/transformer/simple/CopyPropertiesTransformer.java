@@ -18,7 +18,7 @@ import org.mule.util.AttributeEvaluator;
 
 public class CopyPropertiesTransformer extends AbstractMessageTransformer
 {
-    private AttributeEvaluator keyEvaluator;
+    private AttributeEvaluator propertyNameEvaluator;
 
     public CopyPropertiesTransformer()
     {
@@ -30,15 +30,15 @@ public class CopyPropertiesTransformer extends AbstractMessageTransformer
     public void initialise() throws InitialisationException
     {
         super.initialise();
-        this.keyEvaluator.initialize(muleContext.getExpressionManager());
+        this.propertyNameEvaluator.initialize(muleContext.getExpressionManager());
     }
 
     @Override
     public Object transformMessage(MuleMessage message, String outputEncoding) throws TransformerException
     {
-        if (keyEvaluator.isExpression() || keyEvaluator.isPlainText())
+        if (propertyNameEvaluator.isExpression() || propertyNameEvaluator.isPlainText())
         {
-            Object keyValue = keyEvaluator.resolveValue(message);
+            Object keyValue = propertyNameEvaluator.resolveValue(message);
             if (keyValue != null)
             {
                 String propertyName = keyValue.toString();
@@ -61,7 +61,7 @@ public class CopyPropertiesTransformer extends AbstractMessageTransformer
         {
             for (String inboundPropertyName : message.getInboundPropertyNames())
             {
-                if (keyEvaluator.matches(inboundPropertyName))
+                if (propertyNameEvaluator.matches(inboundPropertyName))
                 {
                     message.setOutboundProperty(inboundPropertyName,message.getInboundProperty(inboundPropertyName));
                 }
@@ -74,17 +74,17 @@ public class CopyPropertiesTransformer extends AbstractMessageTransformer
     public Object clone() throws CloneNotSupportedException
     {
         CopyPropertiesTransformer clone = (CopyPropertiesTransformer) super.clone();
-        clone.setKey(this.keyEvaluator.getRawValue());
+        clone.setPropertyName(this.propertyNameEvaluator.getRawValue());
         return clone;
     }
 
-    public void setKey(String key)
+    public void setPropertyName(String propertyName)
     {
-        if (key == null)
+        if (propertyName == null)
         {
-            throw new IllegalArgumentException("Null key not supported");
+            throw new IllegalArgumentException("Null propertyName not supported");
         }
-        this.keyEvaluator = new AttributeEvaluator(key).enableRegexSupport();
+        this.propertyNameEvaluator = new AttributeEvaluator(propertyName).enableRegexSupport();
     }
 
 }

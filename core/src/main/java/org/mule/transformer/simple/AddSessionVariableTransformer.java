@@ -20,4 +20,9 @@ public class AddSessionVariableTransformer extends AbstractAddVariablePropertyTr
         return PropertyScope.SESSION;
     }
 
+    public void setVariableName(String variableName)
+    {
+        this.setIdentifier(variableName);
+    }
+
 }

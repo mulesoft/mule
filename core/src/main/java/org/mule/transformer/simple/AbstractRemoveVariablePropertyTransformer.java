@@ -22,7 +22,7 @@ import org.mule.util.AttributeEvaluator;
 
 public abstract class AbstractRemoveVariablePropertyTransformer extends AbstractMessageTransformer
 {
-    private AttributeEvaluator keyEvaluator;
+    private AttributeEvaluator identifierEvaluator;
 
     public AbstractRemoveVariablePropertyTransformer()
     {
@@ -34,15 +34,15 @@ public abstract class AbstractRemoveVariablePropertyTransformer extends Abstract
     public void initialise() throws InitialisationException
     {
         super.initialise();
-        this.keyEvaluator.initialize(muleContext.getExpressionManager());
+        this.identifierEvaluator.initialize(muleContext.getExpressionManager());
     }
 
     @Override
     public Object transformMessage(MuleMessage message, String outputEncoding) throws TransformerException
     {
-        if (keyEvaluator.isPlainText() || keyEvaluator.isExpression())
+        if (identifierEvaluator.isPlainText() || identifierEvaluator.isExpression())
         {
-            Object keyValue = keyEvaluator.resolveValue(message);
+            Object keyValue = identifierEvaluator.resolveValue(message);
             if (keyValue != null)
             {
                 message.removeProperty(keyValue.toString(), getScope());
@@ -57,7 +57,7 @@ public abstract class AbstractRemoveVariablePropertyTransformer extends Abstract
             final Set<String> propertyNames = new HashSet<String>(message.getPropertyNames(getScope()));
             for (String key : propertyNames)
             {
-                if (keyEvaluator.matches(key))
+                if (identifierEvaluator.matches(key))
                 {
                     if (logger.isDebugEnabled())
                     {
@@ -74,17 +74,17 @@ public abstract class AbstractRemoveVariablePropertyTransformer extends Abstract
     public Object clone() throws CloneNotSupportedException
     {
         AbstractRemoveVariablePropertyTransformer clone = (AbstractRemoveVariablePropertyTransformer) super.clone();
-        clone.setKey(this.keyEvaluator.getRawValue());
+        clone.setIdentifier(this.identifierEvaluator.getRawValue());
         return clone;
     }
 
-    public void setKey(String key)
+    public void setIdentifier(String identifier)
     {
-        if (key == null)
+        if (identifier == null)
         {
-            throw new IllegalArgumentException("Remove with null key is not supported");
+            throw new IllegalArgumentException("Remove with null identifier is not supported");
         }
-        this.keyEvaluator = new AttributeEvaluator(key).enableRegexSupport();
+        this.identifierEvaluator = new AttributeEvaluator(identifier).enableRegexSupport();
     }
 
     public abstract PropertyScope getScope();

@@ -31,27 +31,27 @@
     </message-properties-transformer>
 
     <flow name="addSessionVariableFlow" processingStrategy="synchronous">
-        <add-session-variable key="prop" value="#[string:some value]"/>
+        <set-session-variable variableName="prop" value="#[string:some value]"/>
         <test:assert expression="#[groovy:message.getSessionProperty('prop').equals('some value')]"/>
     </flow>
 
     <flow name="addSessionVariableUsingExpressionKeyFlow" processingStrategy="synchronous">
         <transformer ref="addSessionVariable"/>
         <transformer ref="addInvocationVariable"/>
-        <add-variable key="#[header:SESSION:sesVarKey]" value="#[header:INVOCATION:invVarKey]"/>
+        <set-session-variable variableName="#[header:SESSION:sesVarKey]" value="#[header:INVOCATION:invVarKey]"/>
         <test:assert expression="#[groovy:message.getSessionProperty('sesVarValue').equals('invVarValue')]"/>
     </flow>
 
     <flow name="removeSessionVariableFlow" processingStrategy="synchronous">
         <transformer ref="addSessionVariable"/>
-        <remove-variable key="sesVarKey" />
+        <remove-session-variable variableName="sesVarKey" />
         <test:assert expression="#[groovy:message.getSessionProperty('sesVarKey') == null]"/>
     </flow>
 
     <flow name="removeSessionVariableUsingExpressionFlow" processingStrategy="synchronous">
         <transformer ref="addSessionVariable"/>
         <transformer ref="addSessionVariableName"/>
-        <remove-variable key="#[header:SESSION:sesVarKeyName]"/>
+        <remove-session-variable variableName="#[header:SESSION:sesVarKeyName]"/>
         <test:assert expression="#[groovy:message.getSessionProperty('sesVarKey') == null]"/>
     </flow>
     
@@ -59,7 +59,7 @@
         <transformer ref="addSessionVariable"/>
         <transformer ref="addSessionVariable2"/>
         <transformer ref="addAnotherSessionVariable"/>
-        <remove-session-variable key="ses*"/>
+        <remove-session-variable variableName="ses*"/>
         <test:assert expression="#[groovy:message.getSessionProperty('sesPropKey') == null]"/>
         <test:assert expression="#[groovy:message.getSessionProperty('sesPropKey2') == null]"/>
         <test:assert expression="#[groovy:message.getSessionProperty('anotherSessionVarKey') != null]"/>
@@ -69,7 +69,7 @@
         <transformer ref="addSessionVariable"/>
         <transformer ref="addSessionVariable2"/>
         <transformer ref="addAnotherSessionVariable"/>
-        <remove-variable key="*" />
+        <remove-session-variable variableName="*" />
         <test:assert expression="#[groovy:message.getSessionProperty('invPropKey') == null]"/>
         <test:assert expression="#[groovy:message.getSessionProperty('invPropKey2') == null]"/>
         <test:assert expression="#[groovy:message.getSessionProperty('anotherSessionVarKey') == null]"/>

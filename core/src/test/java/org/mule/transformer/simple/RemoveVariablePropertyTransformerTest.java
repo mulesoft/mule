@@ -78,7 +78,7 @@ public class RemoveVariablePropertyTransformerTest extends AbstractMuleTestCase
     @Test
     public void testRemoveVariable() throws InitialisationException, TransformerException
     {
-        removeVariableTransformer.setKey(PLAIN_STRING_KEY);
+        removeVariableTransformer.setIdentifier(PLAIN_STRING_KEY);
         removeVariableTransformer.initialise();
         removeVariableTransformer.transform(mockMessage, ENCODING);
         verify(mockMessage).removeProperty(PLAIN_STRING_KEY, scope);
@@ -87,7 +87,7 @@ public class RemoveVariablePropertyTransformerTest extends AbstractMuleTestCase
     @Test
     public void testRemoveVariableUsingExpression() throws InitialisationException, TransformerException
     {
-        removeVariableTransformer.setKey(EXPRESSION);
+        removeVariableTransformer.setIdentifier(EXPRESSION);
         removeVariableTransformer.initialise();
         removeVariableTransformer.transform(mockMessage, ENCODING);
         verify(mockMessage).removeProperty(EXPRESSION_VALUE, scope);
@@ -96,13 +96,13 @@ public class RemoveVariablePropertyTransformerTest extends AbstractMuleTestCase
     @Test(expected = IllegalArgumentException.class)
     public void testRemoveVariableNullKey() throws InitialisationException, TransformerException
     {
-        removeVariableTransformer.setKey(null);
+        removeVariableTransformer.setIdentifier(null);
     }
 
     @Test //Don't fail.
     public void testRemoveVariableExpressionKeyNullValue() throws InitialisationException, TransformerException
     {
-        removeVariableTransformer.setKey(NULL_EXPRESSION);
+        removeVariableTransformer.setIdentifier(NULL_EXPRESSION);
         removeVariableTransformer.initialise();
         removeVariableTransformer.transform(mockMessage, ENCODING);
     }
@@ -111,7 +111,7 @@ public class RemoveVariablePropertyTransformerTest extends AbstractMuleTestCase
     public void testRemoveVariableWithRegexExpression() throws InitialisationException, TransformerException
     {
         Mockito.when(mockMessage.getPropertyNames(scope)).thenReturn(new HashSet<String>(Arrays.asList("MULE_ID","MULE_CORRELATION_ID","SomeVar","MULE_GROUP_ID")));
-        removeVariableTransformer.setKey("MULE_(.*)");
+        removeVariableTransformer.setIdentifier("MULE_(.*)");
         removeVariableTransformer.initialise();
         removeVariableTransformer.transform(mockMessage, ENCODING);
         verify(mockMessage).removeProperty("MULE_ID", scope);

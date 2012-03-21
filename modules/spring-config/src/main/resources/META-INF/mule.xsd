@@ -4150,17 +4150,18 @@
         </xsd:complexContent>
     </xsd:complexType>
     
-    <xsd:element name="add-property" type="addPropertyType" substitutionGroup="abstract-transformer">
+    <xsd:element name="set-property" type="setPropertyType" substitutionGroup="abstract-transformer">
         <xsd:annotation>
             <xsd:documentation>
                 A transformer that adds outbound message properties.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
-    <xsd:complexType name="addPropertyType">
+    <xsd:complexType name="setPropertyType">
         <xsd:complexContent>
             <xsd:extension base="commonTransformerType">
-                <xsd:attributeGroup ref="keyValueAttributes"/>
+                <xsd:attribute name="propertyName" type="attributeType" use="required"/>
+                <xsd:attribute name="value" type="attributeType" use="required"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
@@ -4175,7 +4176,7 @@
     <xsd:complexType name="removePropertyType">
         <xsd:complexContent>
             <xsd:extension base="commonTransformerType">
-                <xsd:attribute name="key" type="attributeType"/>
+                <xsd:attribute name="propertyName" type="attributeType"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
@@ -4190,22 +4191,23 @@
     <xsd:complexType name="copyPropertiesType">
         <xsd:complexContent>
             <xsd:extension base="commonTransformerType">
-                <xsd:attribute name="key" type="attributeType" use="required"/>
+                <xsd:attribute name="propertyName" type="attributeType" use="required"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="add-variable" type="addVariableType" substitutionGroup="abstract-transformer">
+    <xsd:element name="set-variable" type="setVariableType" substitutionGroup="abstract-transformer">
         <xsd:annotation>
             <xsd:documentation>
                 A transformer that adds variables.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
-    <xsd:complexType name="addVariableType">
+    <xsd:complexType name="setVariableType">
         <xsd:complexContent>
             <xsd:extension base="commonTransformerType">
-                <xsd:attributeGroup ref="keyValueAttributes"/>
+                <xsd:attribute name="variableName" type="attributeType" use="required"/>
+                <xsd:attribute name="value" type="attributeType" use="required"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
@@ -4220,12 +4222,12 @@
     <xsd:complexType name="removeVariableType">
         <xsd:complexContent>
             <xsd:extension base="commonTransformerType">
-                <xsd:attribute name="key" type="attributeType"/>
+                <xsd:attribute name="variableName" type="attributeType"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="add-session-variable" type="addVariableType" substitutionGroup="abstract-transformer">
+    <xsd:element name="set-session-variable" type="setVariableType" substitutionGroup="abstract-transformer">
         <xsd:annotation>
             <xsd:documentation>
                 A transformer that adds session variables.
@@ -4241,17 +4243,19 @@
         </xsd:annotation>
     </xsd:element>
 
-    <xsd:element name="add-attachment" type="addAttachmentType" substitutionGroup="abstract-transformer">
+    <xsd:element name="set-attachment" type="setAttachmentType" substitutionGroup="abstract-transformer">
         <xsd:annotation>
             <xsd:documentation>
                 A transformer that adds an attachment to the outbound scope.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
-    <xsd:complexType name="addAttachmentType">
+    <xsd:complexType name="setAttachmentType">
         <xsd:complexContent>
             <xsd:extension base="commonTransformerType">
-                <xsd:attributeGroup ref="keyValueContentTypeAttributes"/>
+                <xsd:attribute name="attachmentName" type="attributeType" use="required"/>
+                <xsd:attribute name="value" type="attributeType" use="required"/>
+                <xsd:attribute name="contentType" type="attributeType" use="required"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
@@ -4266,7 +4270,7 @@
     <xsd:complexType name="removeAttachmentType">
         <xsd:complexContent>
             <xsd:extension base="commonTransformerType">
-                <xsd:attribute name="key" type="attributeType"/>
+                <xsd:attribute name="attachmentName" type="attributeType"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
@@ -4281,7 +4285,7 @@
     <xsd:complexType name="copyAttachmentType">
         <xsd:complexContent>
             <xsd:extension base="commonTransformerType">
-                <xsd:attribute name="key" type="attributeType"/>
+                <xsd:attribute name="attachmentName" type="attributeType"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
@@ -7638,23 +7642,6 @@
     <xsd:simpleType name="attributeType">
         <xsd:restriction base="xsd:string"/>
     </xsd:simpleType>
-
-    <xsd:attributeGroup name="keyNewKeyAttributes">
-        <xsd:attribute name="key" type="attributeType" use="required"/>
-        <xsd:attribute name="newKey" type="attributeType" use="required"/>
-    </xsd:attributeGroup>
-
-    <xsd:attributeGroup name="keyValueAttributes">
-        <xsd:attribute name="key" type="attributeType" use="required"/>
-        <xsd:attribute name="value" type="attributeType" use="required"/>
-    </xsd:attributeGroup>
-
-
-    <xsd:attributeGroup name="keyValueContentTypeAttributes">
-        <xsd:attribute name="key" type="attributeType" use="required"/>
-        <xsd:attribute name="value" type="attributeType" use="required"/>
-        <xsd:attribute name="contentType" type="attributeType" use="required"/>
-    </xsd:attributeGroup>
 
     <!--==============================================================-->
     <!--   Connector support                                          -->

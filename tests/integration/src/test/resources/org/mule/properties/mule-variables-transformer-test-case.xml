@@ -33,27 +33,27 @@
     </message-properties-transformer>
 
     <flow name="addVariable" processingStrategy="synchronous">
-        <add-variable key="prop" value="#[string:some value]"/>
+        <set-variable variableName="prop" value="#[string:some value]"/>
         <test:assert expression="#[groovy:message.getInvocationProperty('prop').equals('some value')]"/>
     </flow>
 
     <flow name="addVariableUsingExpressionKey" processingStrategy="synchronous">
         <transformer ref="addInvocationVariable"/>
         <transformer ref="addSessionVariable"/>
-        <add-variable key="#[header:INVOCATION:invVarKey]" value="#[header:SESSION:sesVarKey]"/>
+        <set-variable variableName="#[header:INVOCATION:invVarKey]" value="#[header:SESSION:sesVarKey]"/>
         <test:assert expression="#[groovy:message.getInvocationProperty('invVarValue').equals('sesVarValue')]"/>
     </flow>
 
     <flow name="removeVariable" processingStrategy="synchronous">
         <transformer ref="addInvocationVariable"/>
-        <remove-variable key="invVarKey" />
+        <remove-variable variableName="invVarKey" />
         <test:assert expression="#[groovy:message.getInvocationProperty('invVarKey') == null]"/>
     </flow>
 
     <flow name="removeVariableUsingExpression" processingStrategy="synchronous">
         <transformer ref="addInvocationVariable"/>
         <transformer ref="addInvocationVariableName"/>
-        <remove-variable key="#[header:INVOCATION:invVarKeyName]"/>
+        <remove-variable variableName="#[header:INVOCATION:invVarKeyName]"/>
         <test:assert expression="#[groovy:message.getInvocationProperty('invVarKey') == null]"/>
     </flow>
     
@@ -61,7 +61,7 @@
         <transformer ref="addInvocationVariable"/>
         <transformer ref="addInvocationVariable2"/>
         <transformer ref="addAnotherInvocationVariable"/>
-        <remove-variable key="inv*"/>
+        <remove-variable variableName="inv*"/>
         <test:assert expression="#[groovy:message.getInvocationProperty('invVarKey') == null]"/>
         <test:assert expression="#[groovy:message.getInvocationProperty('invVarKey2') == null]"/>
         <test:assert expression="#[groovy:message.getInvocationProperty('anotherInvVarKey') != null]"/>
@@ -70,7 +70,7 @@
     <flow name="removeAllVariables" processingStrategy="synchronous">
         <transformer ref="addInvocationVariable"/>
         <transformer ref="addInvocationVariable2"/>
-        <remove-variable key="*" />
+        <remove-variable variableName="*" />
         <test:assert expression="#[groovy:message.getInvocationProperty('invVarKey') == null]"/>
         <test:assert expression="#[groovy:message.getInvocationProperty('invVarKey2') == null]"/>
     </flow>

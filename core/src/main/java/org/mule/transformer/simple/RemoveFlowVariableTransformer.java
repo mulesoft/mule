@@ -18,4 +18,9 @@ public class RemoveFlowVariableTransformer extends AbstractRemoveVariablePropert
     {
         return PropertyScope.INVOCATION;
     }
+
+    public void setVariableName(String variableName)
+    {
+        this.setIdentifier(variableName);
+    }
 }

@@ -9,6 +9,10 @@
  */
 package org.mule.properties;
 
+import javax.activation.DataHandler;
+import java.util.Arrays;
+import java.util.HashMap;
+
 import org.junit.Test;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
@@ -85,11 +89,36 @@ public class AttachmentTransformerTestCase extends FunctionalTestCase
     {
         runScenario("enrichAttachmentWithoutContentType");
     }
+    
+    @Test
+    public void testCopyAttachments() throws Exception
+    {
+        runScenario("copyAttachments");
+    }
+
+    @Test
+    public void testCopyAttachmentsWithWildcard() throws Exception
+    {
+        runScenario("copyAttachmentsWithWildcard");
+    }
+
+    @Test
+    public void testCopyAttachmentsWithRegex() throws Exception
+    {
+        runScenario("copyAttachmentsWithRegex");
+    }
 
 
     public void runScenario(String flowName) throws Exception
     {
-        MuleMessage message = new DefaultMuleMessage("data", muleContext);
+        DataHandler attach = new DataHandler("attachContent","plain/text");
+        DataHandler attach2 = new DataHandler("attachContent","plain/text");
+        DataHandler attach22 = new DataHandler("attachContent","plain/text");
+        HashMap<String, DataHandler> attachments = new HashMap<String, DataHandler>();
+        attachments.put("attach",attach);
+        attachments.put("attach2",attach2);
+        attachments.put("attach22",attach22);
+        MuleMessage message = new DefaultMuleMessage("data", null, attachments,muleContext);
         DefaultMuleEvent event = new DefaultMuleEvent(message, getTestInboundEndpoint(""), getTestService());
         Flow flow = (Flow) getFlowConstruct(flowName);
         flow.process(event);

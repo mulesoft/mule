@@ -18,4 +18,9 @@ public class RemovePropertyTransformer extends AbstractRemoveVariablePropertyTra
     {
         return PropertyScope.OUTBOUND;
     }
+    
+    public void setPropertyName(String propertyName)
+    {
+        this.setIdentifier(propertyName);
+    }
 }

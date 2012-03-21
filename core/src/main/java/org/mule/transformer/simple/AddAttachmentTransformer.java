@@ -20,7 +20,7 @@ import org.mule.util.AttributeEvaluator;
 
 public class AddAttachmentTransformer extends AbstractMessageTransformer
 {
-    private AttributeEvaluator keyEvaluator;
+    private AttributeEvaluator nameEvaluator;
     private AttributeEvaluator valueEvaluator;
     private AttributeEvaluator contentTypeEvaluator;
 
@@ -34,7 +34,7 @@ public class AddAttachmentTransformer extends AbstractMessageTransformer
     public void initialise() throws InitialisationException
     {
         super.initialise();
-        keyEvaluator.initialize(muleContext.getExpressionManager());
+        nameEvaluator.initialize(muleContext.getExpressionManager());
         valueEvaluator.initialize(muleContext.getExpressionManager());
         contentTypeEvaluator.initialize(muleContext.getExpressionManager());
     }
@@ -44,7 +44,7 @@ public class AddAttachmentTransformer extends AbstractMessageTransformer
     {
         try
         {
-            Object keyValue = keyEvaluator.resolveValue(message);
+            Object keyValue = nameEvaluator.resolveValue(message);
             if (keyValue == null)
             {
                 logger.error("Setting Null attachment key is not supported, this entry is being ignored");
@@ -78,14 +78,14 @@ public class AddAttachmentTransformer extends AbstractMessageTransformer
     public Object clone() throws CloneNotSupportedException
     {
         AddAttachmentTransformer clone = (AddAttachmentTransformer) super.clone();
-        clone.setName(this.keyEvaluator.getRawValue());
+        clone.setName(this.nameEvaluator.getRawValue());
         clone.setValue(this.valueEvaluator.getRawValue());
         return clone;
     }
 
-    public void setKey(String key)
+    public void setAttachmentName(String attachmentName)
     {
-        this.keyEvaluator = new AttributeEvaluator(key).enableRegexSupport();
+        this.nameEvaluator = new AttributeEvaluator(attachmentName).enableRegexSupport();
     }
 
     public void setValue(String value)

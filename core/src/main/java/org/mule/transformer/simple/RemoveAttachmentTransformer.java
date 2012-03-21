@@ -21,7 +21,7 @@ import org.mule.util.AttributeEvaluator;
 
 public class RemoveAttachmentTransformer extends AbstractMessageTransformer
 {
-    private AttributeEvaluator keyEvaluator;
+    private AttributeEvaluator nameEvaluator;
 
     public RemoveAttachmentTransformer()
     {
@@ -33,7 +33,7 @@ public class RemoveAttachmentTransformer extends AbstractMessageTransformer
     public void initialise() throws InitialisationException
     {
         super.initialise();
-        keyEvaluator.initialize(muleContext.getExpressionManager());
+        nameEvaluator.initialize(muleContext.getExpressionManager());
     }
 
     @Override
@@ -41,9 +41,9 @@ public class RemoveAttachmentTransformer extends AbstractMessageTransformer
     {
         try
         {
-            if (keyEvaluator.isExpression() || keyEvaluator.isPlainText())
+            if (nameEvaluator.isExpression() || nameEvaluator.isPlainText())
             {
-                Object keyValue = keyEvaluator.resolveValue(message);
+                Object keyValue = nameEvaluator.resolveValue(message);
                 if (keyValue != null)
                 {
                     String name = keyValue.toString();
@@ -59,7 +59,7 @@ public class RemoveAttachmentTransformer extends AbstractMessageTransformer
                 final Set<String> attachmentNames = new HashSet<String>(message.getOutboundAttachmentNames());
                 for (String attachmentName : attachmentNames)
                 {
-                    if (keyEvaluator.matches(attachmentName))
+                    if (nameEvaluator.matches(attachmentName))
                     {
                         message.removeOutboundAttachment(attachmentName);
                     }
@@ -77,13 +77,13 @@ public class RemoveAttachmentTransformer extends AbstractMessageTransformer
     public Object clone() throws CloneNotSupportedException
     {
         RemoveAttachmentTransformer clone = (RemoveAttachmentTransformer) super.clone();
-        clone.setKey(this.keyEvaluator.getRawValue());
+        clone.setAttachmentName(this.nameEvaluator.getRawValue());
         return clone;
     }
 
-    public void setKey(String key)
+    public void setAttachmentName(String attachmentName)
     {
-        this.keyEvaluator = new AttributeEvaluator(key).enableRegexSupport();
+        this.nameEvaluator = new AttributeEvaluator(attachmentName).enableRegexSupport();
     }
 
 }

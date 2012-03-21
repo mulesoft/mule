@@ -20,7 +20,7 @@ import org.mule.util.AttributeEvaluator;
 
 public class CopyAttachmentsTransformer extends AbstractMessageTransformer
 {
-    private AttributeEvaluator keyEvaluator;
+    private AttributeEvaluator attachmentNameEvaluator;
 
     public CopyAttachmentsTransformer()
     {
@@ -32,7 +32,7 @@ public class CopyAttachmentsTransformer extends AbstractMessageTransformer
     public void initialise() throws InitialisationException
     {
         super.initialise();
-        this.keyEvaluator.initialize(muleContext.getExpressionManager());
+        this.attachmentNameEvaluator.initialize(muleContext.getExpressionManager());
     }
 
     @Override
@@ -40,9 +40,9 @@ public class CopyAttachmentsTransformer extends AbstractMessageTransformer
     {
         try
         {
-            if (keyEvaluator.isExpression() || keyEvaluator.isPlainText())
+            if (attachmentNameEvaluator.isExpression() || attachmentNameEvaluator.isPlainText())
             {
-                String attachmentName = keyEvaluator.resolveValue(message).toString();
+                String attachmentName = attachmentNameEvaluator.resolveValue(message).toString();
                 DataHandler inboundAttachment = message.getInboundAttachment(attachmentName);
                 message.addOutboundAttachment(attachmentName, inboundAttachment);
             }
@@ -50,7 +50,7 @@ public class CopyAttachmentsTransformer extends AbstractMessageTransformer
             {
                 for (String inboundAttachmentName : message.getInboundAttachmentNames())
                 {
-                    if (keyEvaluator.matches(inboundAttachmentName))
+                    if (attachmentNameEvaluator.matches(inboundAttachmentName))
                     {
                         message.addOutboundAttachment(inboundAttachmentName,message.getInboundAttachment(inboundAttachmentName));
                     }
@@ -68,13 +68,13 @@ public class CopyAttachmentsTransformer extends AbstractMessageTransformer
     public Object clone() throws CloneNotSupportedException
     {
         CopyAttachmentsTransformer clone = (CopyAttachmentsTransformer) super.clone();
-        clone.setKey(this.keyEvaluator.getRawValue());
+        clone.setAttachmentName(this.attachmentNameEvaluator.getRawValue());
         return clone;
     }
 
-    public void setKey(String key)
+    public void setAttachmentName(String attachmentName)
     {
-        this.keyEvaluator = new AttributeEvaluator(key).enableRegexSupport();
+        this.attachmentNameEvaluator = new AttributeEvaluator(attachmentName).enableRegexSupport();
     }
 
 }

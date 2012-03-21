@@ -55,7 +55,7 @@ public class CopyPropertiesTransformerTest extends AbstractMuleTestCase
     {
         CopyPropertiesTransformer copyPropertiesTransformer = new CopyPropertiesTransformer();
         copyPropertiesTransformer.setMuleContext(mockMuleContext);
-        copyPropertiesTransformer.setKey(INBOUND_PROPERTY_KEY);
+        copyPropertiesTransformer.setPropertyName(INBOUND_PROPERTY_KEY);
         copyPropertiesTransformer.initialise();
         when(mockMuleMessage.getInboundProperty(INBOUND_PROPERTY_KEY)).thenReturn(PROPERTY_VALUE);
         copyPropertiesTransformer.transform(mockMuleMessage, ENCODING);
@@ -68,7 +68,7 @@ public class CopyPropertiesTransformerTest extends AbstractMuleTestCase
     {
         CopyPropertiesTransformer copyPropertiesTransformer = new CopyPropertiesTransformer();
         copyPropertiesTransformer.setMuleContext(mockMuleContext);
-        copyPropertiesTransformer.setKey(INBOUND_PROPERTY_KEY);
+        copyPropertiesTransformer.setPropertyName(INBOUND_PROPERTY_KEY);
         copyPropertiesTransformer.initialise();
         when(mockMuleMessage.getInboundProperty(INBOUND_PROPERTY_KEY)).thenReturn(null);
         copyPropertiesTransformer.transform(mockMuleMessage, ENCODING);
@@ -80,7 +80,7 @@ public class CopyPropertiesTransformerTest extends AbstractMuleTestCase
     {
         CopyPropertiesTransformer copyPropertiesTransformer = new CopyPropertiesTransformer();
         copyPropertiesTransformer.setMuleContext(mockMuleContext);
-        copyPropertiesTransformer.setKey("MULE_(.*)");
+        copyPropertiesTransformer.setPropertyName("MULE_(.*)");
         copyPropertiesTransformer.initialise();
         when(mockMuleMessage.getInboundPropertyNames()).thenReturn(new HashSet<String>(Arrays.asList("MULE_ID", "MULE_CORRELATION_ID", "SomeVar", "MULE_GROUP_ID")));
         when(mockMuleMessage.getInboundProperty("MULE_ID")).thenReturn(PROPERTY_VALUE);
