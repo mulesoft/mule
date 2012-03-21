@@ -924,7 +924,6 @@
 /mule-standalone-${productVersion}/lib/opt/mail-1.4.3.jar
 /mule-standalone-${productVersion}/lib/opt/mockito-all-1.9.0.jar
 /mule-standalone-${productVersion}/lib/opt/msv-core-2011.1.jar
-/mule-standalone-${productVersion}/lib/opt/mvel2-2.0.19.jar
 /mule-standalone-${productVersion}/lib/opt/mx4j-impl-2.1.1-osgi.jar
 /mule-standalone-${productVersion}/lib/opt/mx4j-jmx-2.1.1-osgi.jar
 /mule-standalone-${productVersion}/lib/opt/mx4j-remote-2.1.1-osgi.jar
@@ -989,6 +988,10 @@
 /mule-standalone-${productVersion}/lib/user/README.txt
 /mule-standalone-${productVersion}/lib/user/xmlunit-1.1.jar
 
+#
+# /lib/per-app
+#
+/mule-standalone-${productVersion}/lib/per-app/mvel2-2.0.19.jar
 
 #
 # /lib/logs
