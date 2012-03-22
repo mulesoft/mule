@@ -187,7 +187,7 @@ public class ExpressionManagerTestCase extends AbstractMuleContextTestCase
     public void testEvaluateOrParseSingleExpression()
     {
         Object result = muleContext.getExpressionManager().evaluateOrParse("#[2]", (MuleMessage) null);
-        //assertTrue(result instanceof Integer);
+        assertTrue(result instanceof Integer);
         assertEquals(2, result);
     }
 
