@@ -991,6 +991,7 @@
 #
 # /lib/per-app
 #
+/mule-standalone-${productVersion}/lib/per-app
 /mule-standalone-${productVersion}/lib/per-app/mvel2-2.0.19.jar
 
 #
