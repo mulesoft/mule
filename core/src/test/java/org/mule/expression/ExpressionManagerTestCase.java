@@ -182,4 +182,37 @@ public class ExpressionManagerTestCase extends AbstractMuleContextTestCase
         assertTrue(muleContext.getExpressionManager().evaluateBoolean("#[2>1]", null, (MuleMessage) null,
             false, false));
     }
+
+    @Test
+    public void testEvaluateOrParseSingleExpression()
+    {
+        Object result = muleContext.getExpressionManager().evaluateOrParse("#[2]", (MuleMessage) null);
+        //assertTrue(result instanceof Integer);
+        assertEquals(2, result);
+    }
+
+    @Test
+    public void testEvaluateOrParseStringWithEmbeddedExpressions()
+    {
+        Object result = muleContext.getExpressionManager().evaluateOrParse("1#[2]3#[4]5", (MuleMessage) null);
+        assertTrue(result instanceof String);
+        assertEquals("12345", result);
+    }
+
+    @Test
+    public void testEvaluateOrParseStringWithExpressionAtStartAndEnd()
+    {
+        Object result = muleContext.getExpressionManager().evaluateOrParse("#[1]234#[5]", (MuleMessage) null);
+        assertTrue(result instanceof String);
+        assertEquals("12345", result);
+    }
+
+    @Test
+    public void testEvaluateOrParseStringWithTwoSubsequentExpresions()
+    {
+        Object result = muleContext.getExpressionManager().evaluateOrParse("#[1]#[2]", (MuleMessage) null);
+        assertTrue(result instanceof String);
+        assertEquals("12", result);
+    }
+
 }
