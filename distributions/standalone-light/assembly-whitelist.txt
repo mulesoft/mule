@@ -334,10 +334,10 @@
 /mule-standalone-nodocs-${productVersion}/lib/user/xmlunit-1.1.jar
 
 #
-# /lib/per-app
+# /lib/mule/per-app
 #
-/mule-standalone-nodocs-${productVersion}/lib/per-app
-/mule-standalone-nodocs-${productVersion}/lib/per-app/mvel2-2.0.19.jar
+/mule-standalone-nodocs-${productVersion}/lib/mule/per-app
+/mule-standalone-nodocs-${productVersion}/lib/mule/per-app/mvel2-2.0.19.jar
 
 #
 # /lib/logs
