@@ -336,7 +336,8 @@
 #
 # /lib/per-app
 #
-/mule-standalone-nodocs-${productVersion}/lib/opt/mvel2-2.0.19.jar
+/mule-standalone-nodocs-${productVersion}/lib/per-app
+/mule-standalone-nodocs-${productVersion}/lib/per-app/mvel2-2.0.19.jar
 
 #
 # /lib/logs
