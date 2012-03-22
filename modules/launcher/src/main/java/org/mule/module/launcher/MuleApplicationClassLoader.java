@@ -58,6 +58,8 @@ public class MuleApplicationClassLoader extends FineGrainedControlClassLoader
 
     private String appName;
 
+    private String libraryPath;
+
     public MuleApplicationClassLoader(String appName, ClassLoader parentCl)
     {
         this(appName, parentCl, Collections.<String>emptySet());
@@ -78,6 +80,7 @@ public class MuleApplicationClassLoader extends FineGrainedControlClassLoader
 
             File libDir = new File(parentFile, PATH_LIBRARY);
             addJars(appName, libDir, true);
+            libraryPath = libDir.getAbsolutePath();
 
             // Add per-app mule modules (if any)
             File libs = new File(muleHome, PATH_LIBRARY);
@@ -199,5 +202,23 @@ public class MuleApplicationClassLoader extends FineGrainedControlClassLoader
     public interface ShutdownListener
     {
         void execute();
+    }
+
+    @Override
+    protected String findLibrary(String name)
+    {
+        String parentResolvedPath = super.findLibrary(name);
+
+        if (null == parentResolvedPath)
+        {
+            final File library = new File(libraryPath, System.mapLibraryName(name));
+
+            if (library.exists())
+            {
+                parentResolvedPath = library.getAbsolutePath();
+            }
+        }
+
+        return parentResolvedPath;
     }
 }
