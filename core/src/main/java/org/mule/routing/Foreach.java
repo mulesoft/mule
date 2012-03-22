@@ -93,6 +93,10 @@ public class Foreach extends AbstractMessageProcessorOwner
     {
         boolean transformed = false;
         MuleMessage message = event.getMessage();
+        if (collectionExpression == null)
+        {
+            return false;
+        }
         if (expressionConfig.getEvaluator() != null
             && expressionConfig.getEvaluator().startsWith(XPATH_PREFIX)
             && message.getPayload() instanceof String)
