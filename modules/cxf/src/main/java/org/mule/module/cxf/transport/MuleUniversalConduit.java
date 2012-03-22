@@ -326,7 +326,7 @@ public class MuleUniversalConduit extends AbstractConduit
             return target.getAddress().getValue();
         }
 
-        return endpoint.getAddress().toString();
+        return endpoint.getAddress();
     }
 
     public void onClose(final Message m) throws IOException

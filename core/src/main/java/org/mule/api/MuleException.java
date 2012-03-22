@@ -15,6 +15,7 @@ import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 
 import org.mule.config.DefaultMuleConfiguration;
 import org.mule.config.ExceptionHelper;
@@ -181,9 +182,9 @@ public abstract class MuleException extends Exception
         // ").append(getMessageCode()).append(SystemUtils.LINE_SEPARATOR);
 
         Map info = ExceptionHelper.getExceptionInfo(this);
-        for (Iterator iterator = info.keySet().iterator(); iterator.hasNext();)
+        for( Map.Entry entry : (Set<Map.Entry>)info.entrySet() )
         {
-            String s = (String) iterator.next();
+            String s = (String) entry.getKey();
             int pad = 22 - s.length();
             buf.append(s);
             if (pad > 0)
@@ -191,7 +192,7 @@ public abstract class MuleException extends Exception
                 buf.append(StringUtils.repeat(' ', pad));
             }
             buf.append(": ");
-            buf.append(info.get(s)).append(SystemUtils.LINE_SEPARATOR);
+            buf.append(entry.getValue()).append(SystemUtils.LINE_SEPARATOR);
         }
 
         // print exception stack

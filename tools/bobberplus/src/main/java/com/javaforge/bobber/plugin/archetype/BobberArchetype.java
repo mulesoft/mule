@@ -31,12 +31,7 @@ import java.io.Writer;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.StringTokenizer;
+import java.util.*;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
@@ -195,12 +190,8 @@ public class BobberArchetype
         addParamToContext("package", packageName, context);
         addParamToContext("packagePath", StringUtils.replace(packageName, ".", "/"), context);
 
-        for (Iterator iterator = parameters.keySet().iterator(); iterator.hasNext();)
-        {
-            String key = (String) iterator.next();
-
-            Object value = parameters.get(key);
-            addParamToContext(key, value, context);
+        for(Map.Entry entry : (Set<Map.Entry>)parameters.entrySet()) {
+            addParamToContext((String)entry.getKey(), entry.getValue(), context);
         }
 
         //add in the specified system properties

@@ -100,7 +100,7 @@ public class TextFileObjectStore extends InMemoryObjectStore<String>
             }
 
             StringBuffer buf = new StringBuffer();
-            buf.append(id).append("=").append(item.toString()).append(IOUtils.LINE_SEPARATOR);
+            buf.append(id).append("=").append(item).append(IOUtils.LINE_SEPARATOR);
             output.write(buf.toString().getBytes());
         }
         catch (IOException iox)

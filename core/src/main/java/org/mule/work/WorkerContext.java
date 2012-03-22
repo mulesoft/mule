@@ -326,39 +326,7 @@ public class WorkerContext implements Work
             }
             else
             {
-                // try {
-                // long transactionTimeout =
-                // executionContext.getDefaultTransactionTimeout();
-                // //translate -1 value to 0 to indicate default transaction
-                // timeout.
-                // transactionContextManager.begin(executionContext.getXid(),
-                // transactionTimeout == -1 ? 0 : transactionTimeout);
-                // } catch (XAException e) {
-                // throw new WorkCompletedException("Transaction import failed
-                // for xid " + executionContext.getXid(),
-                // WorkCompletedException.TX_RECREATE_FAILED).initCause(e);
-                // } catch (InvalidTransactionException e) {
-                // throw new WorkCompletedException("Transaction import failed
-                // for xid " + executionContext.getXid(),
-                // WorkCompletedException.TX_RECREATE_FAILED).initCause(e);
-                // } catch (SystemException e) {
-                // throw new WorkCompletedException("Transaction import failed
-                // for xid " + executionContext.getXid(),
-                // WorkCompletedException.TX_RECREATE_FAILED).initCause(e);
-                // } catch (ImportedTransactionActiveException e) {
-                // throw new WorkCompletedException("Transaction already active
-                // for xid " + executionContext.getXid(),
-                // WorkCompletedException.TX_CONCURRENT_WORK_DISALLOWED);
-                // }
-                try
-                {
-                    worker.run();
-                }
-                finally
-                {
-                    // transactionContextManager.end(executionContext.getXid());
-                }
-
+                worker.run();
             }
             workListener.workCompleted(new WorkEvent(this, WorkEvent.WORK_COMPLETED, worker, null));
         }
