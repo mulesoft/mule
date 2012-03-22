@@ -7,7 +7,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.module.xml.expression;
+
+import org.mule.api.MuleMessage;
+import org.mule.api.transformer.TransformerException;
 
 import org.jaxen.JaxenException;
 import org.jaxen.XPath;
@@ -26,11 +30,17 @@ public class BeanPayloadExpressionEvaluator extends AbstractXPathExpressionEvalu
 
     protected Object extractResultFromNode(Object result)
     {
-        if(result instanceof org.jaxen.javabean.Element)
+        if (result instanceof org.jaxen.javabean.Element)
         {
-            return ((org.jaxen.javabean.Element)result).getObject();
+            return ((org.jaxen.javabean.Element) result).getObject();
         }
         return result;
+    }
+
+    @Override
+    protected Object getPayloadForXPath(MuleMessage message) throws TransformerException
+    {
+        return message.getPayload();
     }
 
     /** {@inheritDoc} */

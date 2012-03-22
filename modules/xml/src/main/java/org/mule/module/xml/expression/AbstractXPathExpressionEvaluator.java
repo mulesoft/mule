@@ -20,6 +20,7 @@ import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.registry.RegistrationException;
+import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.context.notification.MuleContextNotification;
 import org.mule.module.xml.i18n.XmlMessages;
@@ -111,12 +112,7 @@ public abstract class AbstractXPathExpressionEvaluator implements ExpressionEval
     {
         try
         {
-            Object payload = message.getPayload();
-            //we need to convert to a Dom if its an XML string
-            if(!(payload instanceof Node || payload instanceof org.dom4j.Node))
-            {
-                payload = message.getPayload(DataTypeFactory.create(Document.class));
-            }
+            Object payload = getPayloadForXPath(message);
 
             List<?> result;
 
@@ -147,6 +143,17 @@ public abstract class AbstractXPathExpressionEvaluator implements ExpressionEval
         {
             throw new MuleRuntimeException(XmlMessages.failedToProcessXPath(expression), e);
         }
+    }
+
+    protected Object getPayloadForXPath(MuleMessage message) throws TransformerException
+    {
+        Object payload = message.getPayload();
+        //we need to convert to a Dom if its an XML string
+        if(!(payload instanceof Node || payload instanceof org.dom4j.Node))
+        {
+            payload = message.getPayload(DataTypeFactory.create(Document.class));
+        }
+        return payload;
     }
 
     protected void addNamespaces(NamespaceManager manager, XPath xpath)
