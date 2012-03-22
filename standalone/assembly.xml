@@ -440,7 +440,7 @@
         </dependencySet>
 
         <dependencySet>
-            <outputDirectory>lib/per-app</outputDirectory>
+            <outputDirectory>lib/mule/per-app</outputDirectory>
             <useStrictFiltering>true</useStrictFiltering>
             <scope>runtime</scope>
             <includes>
