@@ -10,6 +10,7 @@
 
 package org.mule;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -19,22 +20,24 @@ import static org.mockito.Mockito.when;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.transformer.DataType;
-import org.mule.api.transformer.TransformerException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.transformer.TestConverter;
 import org.mule.transformer.TestTransformer;
 import org.mule.transformer.TransformerBuilder;
+import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transformer.types.SimpleDataType;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
 
 @SmallTest
 public class DefaultMuleMessageTransformationTestCase extends AbstractMuleTestCase
 {
 
     private MuleContext muleContext;
+    private DataTypeConversionResolver conversionResolver;
 
     private class A
     {
@@ -61,7 +64,8 @@ public class DefaultMuleMessageTransformationTestCase extends AbstractMuleTestCa
     {
         // Configures a converter resolver that does nothing
         muleContext = mock(MuleContext.class);
-        when(muleContext.getDataTypeConverterResolver()).thenReturn(mock(DataTypeConversionResolver.class));
+        conversionResolver = mock(DataTypeConversionResolver.class);
+        when(muleContext.getDataTypeConverterResolver()).thenReturn(conversionResolver);
     }
 
     private static final DataType<Object> dataTypeB = new SimpleDataType<Object>(B.class);
@@ -69,7 +73,7 @@ public class DefaultMuleMessageTransformationTestCase extends AbstractMuleTestCa
     private static final DataType<Object> dataTypeD = new SimpleDataType<Object>(D.class);
 
     @Test
-    public void failsOnConverterWhenSourceAndReturnTypeDoesNotMatch() throws MuleException
+    public void failsOnConverterWhenSourceAndReturnTypeDoesNotMatchAndThereIsNoImplicitConversion() throws MuleException
     {
         // Converter(B->C), payload A: FAIL
         TestConverter converter1 = new TransformerBuilder().from(dataTypeB).to(dataTypeC).returning(new C()).boundTo(muleContext).buildConverter(1);
@@ -81,10 +85,28 @@ public class DefaultMuleMessageTransformationTestCase extends AbstractMuleTestCa
             message.applyTransformers(null, converter1);
             fail("Transformation is supposed to fail");
         }
-        catch (TransformerException expected)
+        catch (IllegalArgumentException expected)
         {
         }
         assertFalse(converter1.wasExecuted());
+    }
+
+    @Test
+    public void appliesImplicitConversionOnConverterWhenSourceAndReturnTypeDoesNotMatch() throws MuleException
+    {
+        // Converter(C->D), payload B: uses implicit conversion B->C
+        TestConverter converter1 = new TransformerBuilder().from(dataTypeC).to(dataTypeD).returning(new D()).boundTo(muleContext).buildConverter(1);
+        TestConverter converter2 = new TransformerBuilder().from(dataTypeB).to(dataTypeC).returning(new C()).boundTo(muleContext).buildConverter(1);
+
+        when(conversionResolver.resolve(Mockito.any(DataType.class), Mockito.anyList())).thenReturn(converter2);
+
+        DefaultMuleMessage message = new DefaultMuleMessage(new B(), muleContext);
+
+        message.applyTransformers(null, converter1);
+
+        assertTrue(message.getPayload() instanceof D);
+        assertTrue(converter1.wasExecuted());
+        assertTrue(converter2.wasExecuted());
     }
 
     @Test
@@ -126,7 +148,7 @@ public class DefaultMuleMessageTransformationTestCase extends AbstractMuleTestCa
             message.applyTransformers(null, converter1, converter2);
             fail("Transformation is supposed to fail");
         }
-        catch (TransformerException expected)
+        catch (IllegalArgumentException expected)
         {
         }
         assertFalse(converter1.wasExecuted());
@@ -461,5 +483,42 @@ public class DefaultMuleMessageTransformationTestCase extends AbstractMuleTestCa
         {
         }
         assertFalse(transformer1.wasExecuted());
+    }
+
+    @Test
+    public void failsWhenNoImplicitConversionAvailable() throws MuleException
+    {
+        TestTransformer transformer = new TransformerBuilder().from(DataTypeFactory.BYTE_ARRAY).to(DataTypeFactory.STRING).returning("bar").boundTo(muleContext).build();
+
+        when(conversionResolver.resolve(Mockito.any(DataType.class), Mockito.anyList())).thenReturn(null);
+
+        DefaultMuleMessage message = new DefaultMuleMessage("TEST", muleContext);
+
+        try
+        {
+            message.applyTransformers(null, transformer);
+            fail("Transformation is supposed to fail");
+        }
+        catch (IllegalArgumentException expected)
+        {
+        }
+        assertFalse(transformer.wasExecuted());
+    }
+
+    @Test
+    public void appliesImplicitConversionWhenAvailable() throws MuleException
+    {
+        TestTransformer transformer = new TransformerBuilder().from(DataTypeFactory.BYTE_ARRAY).to(DataTypeFactory.STRING).returning("bar").boundTo(muleContext).build();
+        TestConverter converter = new TransformerBuilder().from(DataTypeFactory.STRING).to(DataTypeFactory.BYTE_ARRAY).returning("bar".getBytes()).boundTo(muleContext).buildConverter(1);
+
+        when(conversionResolver.resolve(Mockito.any(DataType.class), Mockito.anyList())).thenReturn(converter);
+
+        DefaultMuleMessage message = new DefaultMuleMessage("TEST", muleContext);
+
+        message.applyTransformers(null, transformer);
+
+        assertEquals("bar", message.getPayload());
+        assertTrue(transformer.wasExecuted());
+        assertTrue(converter.wasExecuted());
     }
 }

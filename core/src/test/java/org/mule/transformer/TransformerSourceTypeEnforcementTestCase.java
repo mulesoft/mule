@@ -69,7 +69,6 @@ public class TransformerSourceTypeEnforcementTestCase extends AbstractMuleTestCa
     public void rejectsBadInputUsingDefaultEnforcement() throws TransformerException
     {
         AbstractTransformer transformer = createDummyTransformer(true);
-        //setTransformationEnforcement(true);
 
         try
         {
@@ -79,8 +78,6 @@ public class TransformerSourceTypeEnforcementTestCase extends AbstractMuleTestCa
         catch (TransformerException expected)
         {
         }
-
-        //Mockito.verify(muleConfiguration, times(1)).useExtendedTransformations();
     }
 
     @Test

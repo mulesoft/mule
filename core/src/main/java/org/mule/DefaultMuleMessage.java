@@ -1351,13 +1351,12 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     {
         if (!transformers.isEmpty())
         {
-            boolean checkPayloadTypeAfterTransformations = false;
-
-            for (Transformer transformer : transformers)
+            for (int index = 0; index < transformers.size(); index++)
             {
+                Transformer transformer = transformers.get(index);
+
                 Class<?> srcCls = getPayload().getClass();
                 DataType<?> originalSourceType = DataTypeFactory.create(srcCls);
-                checkPayloadTypeAfterTransformations = false;
 
                 if (transformer.isSourceDataTypeSupported(originalSourceType))
                 {
@@ -1372,24 +1371,22 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
 
                     if (useExtendedTransformations())
                     {
-                        if (transformer instanceof DiscoverableTransformer)
+                        if (canSkipTransformer(transformers, index))
                         {
-                            logger.debug("Skipping converter: " + transformer);
-                            checkPayloadTypeAfterTransformations = true;
+                            continue;
+                        }
+
+                        // Resolves implicit conversion if possible
+                        Transformer implicitTransformer = muleContext.getDataTypeConverterResolver().resolve(originalSourceType, transformer.getSourceDataTypes());
+
+                        if (implicitTransformer != null)
+                        {
+                            transformMessage(event, implicitTransformer);
+                            transformMessage(event, transformer);
                         }
                         else
                         {
-                            Transformer implicitTransformer = muleContext.getDataTypeConverterResolver().resolve(originalSourceType, transformer.getSourceDataTypes());
-
-                            if (implicitTransformer != null)
-                            {
-                                transformMessage(event, implicitTransformer);
-                                transformMessage(event, transformer);
-                            }
-                            else
-                            {
-                                throw new IllegalArgumentException("Cannot apply transformer " + transformer + " on source payload: " + srcCls);
-                            }
+                            throw new IllegalArgumentException("Cannot apply transformer " + transformer + " on source payload: " + srcCls);
                         }
                     }
                     else if (!transformer.isIgnoreBadInput())
@@ -1402,13 +1399,41 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
                     }
                 }
             }
+        }
+    }
 
-            if (checkPayloadTypeAfterTransformations)
+    private boolean canSkipTransformer(List<? extends Transformer> transformers, int index)
+    {
+        Transformer transformer = transformers.get(index);
+
+        boolean skipConverter = false;
+
+        if (transformer instanceof DiscoverableTransformer)
+        {
+            if (index == transformers.size() - 1)
             {
-               Transformer transformer = transformers.get(transformers.size() -1);
-               TransformerUtils.checkTransformerReturnClass(transformer, payload);
+                try
+                {
+                    TransformerUtils.checkTransformerReturnClass(transformer, payload);
+                    skipConverter = true;
+                }
+                catch (TransformerException e)
+                {
+                    // Converter cannot be skipped
+                }
+            }
+            else
+            {
+                skipConverter= true;
             }
         }
+
+        if (skipConverter)
+        {
+            logger.debug("Skipping converter: " + transformer);
+        }
+
+        return skipConverter;
     }
 
     private boolean useExtendedTransformations()
