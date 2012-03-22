@@ -33,6 +33,7 @@ import sun.net.www.HeaderParser;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -282,5 +283,15 @@ public class HttpMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTe
         assertTrue(((List)value3).contains("value3"));
         assertTrue(((List)value3).contains("value4"));
 
+    }
+
+    @Test
+    public void testProcessWsdlQueryParam() throws UnsupportedEncodingException
+    {
+        HttpMuleMessageFactory messageFactory = new HttpMuleMessageFactory(null);
+
+        Map<String, Object> processedParams = messageFactory.processQueryParams("http://localhost:8080/resources?wsdl", "UTF-8");
+        assertTrue(processedParams.containsKey("wsdl"));
+        assertNull(processedParams.get("wsdl"));
     }
 }

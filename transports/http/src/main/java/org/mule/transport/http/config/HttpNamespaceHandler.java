@@ -31,11 +31,11 @@ import org.mule.transport.http.HttpConstants;
 import org.mule.transport.http.HttpPollingConnector;
 import org.mule.transport.http.builder.HttpCookiesDefinitionParser;
 import org.mule.transport.http.builder.HttpResponseDefinitionParser;
+import org.mule.transport.http.components.HttpResponseBuilder;
 import org.mule.transport.http.components.RestServiceWrapper;
 import org.mule.transport.http.components.StaticResourceMessageProcessor;
 import org.mule.transport.http.filters.HttpBasicAuthenticationFilter;
 import org.mule.transport.http.filters.HttpRequestWildcardFilter;
-import org.mule.transport.http.transformers.HttpResponseTransformer;
 import org.mule.transport.http.transformers.HttpClientMethodResponseToObject;
 import org.mule.transport.http.transformers.HttpRequestBodyToParamMap;
 import org.mule.transport.http.transformers.HttpResponseToString;
@@ -74,7 +74,7 @@ public class HttpNamespaceHandler extends AbstractMuleNamespaceHandler
         registerMuleBeanDefinitionParser("static-resource-handler",
                 new MessageProcessorDefinitionParser(StaticResourceMessageProcessor.class));
 
-        registerBeanDefinitionParser("response-builder", new MessageProcessorDefinitionParser(HttpResponseTransformer.class));
+        registerBeanDefinitionParser("response-builder", new MessageProcessorDefinitionParser(HttpResponseBuilder.class));
         registerMuleBeanDefinitionParser("header", new ChildMapEntryDefinitionParser("headers", "name", "value")).addCollection("headers");
         registerMuleBeanDefinitionParser("set-cookie", new HttpCookiesDefinitionParser("cookie", CookieWrapper.class)).registerPreProcessor(new CheckExclusiveAttributes(new String[][] {new String[] {"maxAge"}, new String[] {"expiryDate"}}));
         registerMuleBeanDefinitionParser("body", new TextDefinitionParser("body"));

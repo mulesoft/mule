@@ -433,7 +433,7 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="response-builder" substitutionGroup="mule:abstract-transformer">
+    <xsd:element name="response-builder" substitutionGroup="mule:abstract-message-processor">
         <xsd:annotation>
             <xsd:documentation>
                 HTTP response
@@ -441,14 +441,14 @@
         </xsd:annotation>
         <xsd:complexType>
             <xsd:complexContent>
-                <xsd:extension base="mule:abstractTransformerType">
+                <xsd:extension base="mule:abstractMessageProcessorType">
                     <xsd:sequence>
                         <xsd:element name="cache-control" minOccurs="0" maxOccurs="1" type="cacheControlType"/>
                         <xsd:element name="expires" minOccurs="0" maxOccurs="1" type="headerType"/>
                         <xsd:element name="location" minOccurs="0" maxOccurs="1" type="headerType"/>
                         <xsd:element name="set-cookie" minOccurs="0" maxOccurs="unbounded" type="cookieType"/>
                         <xsd:element name="header" minOccurs="0" maxOccurs="unbounded" type="mule:nameValueType"/>
-                        <xsd:element name="body" minOccurs="0" maxOccurs="1" type="xsd:string"/>
+                        <xsd:element ref="mule:abstract-transformer" minOccurs="0" maxOccurs="1"/>
                     </xsd:sequence>
                     <xsd:attribute name="status" type="statusType">
                         <xsd:annotation>

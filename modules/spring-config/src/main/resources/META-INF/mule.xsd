@@ -4467,6 +4467,50 @@
         </xsd:complexContent>
     </xsd:complexType>
 
+    <xsd:element name="parse-template" type="parseTemplateTransformerType" substitutionGroup="abstract-transformer">
+        <xsd:annotation>
+            <xsd:documentation>
+                A transformer that parses a template in a given location
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="parseTemplateTransformerType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractTransformerType">
+                <xsd:attribute name="location" type="xsd:string" use="required">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The location of the template. The order in which the transformer will attempt to load the file are: from the file system, from a URL or from the classpath.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="set-payload" type="setPayloadTransformerType" substitutionGroup="abstract-transformer">
+        <xsd:annotation>
+            <xsd:documentation>
+                A transformer that sets the paylaod with the provided value
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="setPayloadTransformerType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractTransformerType">
+                <xsd:attribute name="value" type="xsd:string" use="required">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The value to be set on the payload. Supports expressions.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
     <xsd:element name="encrypt-transformer" type="encryptionTransformerType" substitutionGroup="abstract-transformer">
         <xsd:annotation>
             <xsd:documentation>

@@ -219,6 +219,7 @@ import org.mule.transformer.simple.CombineCollectionsTransformer;
 import org.mule.transformer.simple.CopyAttachmentsTransformer;
 import org.mule.transformer.simple.CopyPropertiesTransformer;
 import org.mule.transformer.simple.HexStringToByteArray;
+import org.mule.transformer.simple.ParseTemplateTransformer;
 import org.mule.transformer.simple.MapToBean;
 import org.mule.transformer.simple.ObjectToByteArray;
 import org.mule.transformer.simple.ObjectToString;
@@ -227,6 +228,7 @@ import org.mule.transformer.simple.RemoveFlowVariableTransformer;
 import org.mule.transformer.simple.RemovePropertyTransformer;
 import org.mule.transformer.simple.RemoveSessionVariableTransformer;
 import org.mule.transformer.simple.SerializableToByteArray;
+import org.mule.transformer.simple.SetPayloadTransformer;
 import org.mule.transformer.simple.StringAppendTransformer;
 import org.mule.util.store.InMemoryObjectStore;
 import org.mule.util.store.ManagedObjectStore;
@@ -348,6 +350,8 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("serializable-to-byte-array-transformer", new MessageProcessorDefinitionParser(SerializableToByteArray.class));
         registerBeanDefinitionParser("byte-array-to-string-transformer", new MessageProcessorDefinitionParser(ObjectToString.class));
         registerBeanDefinitionParser("string-to-byte-array-transformer", new MessageProcessorDefinitionParser(ObjectToByteArray.class));
+        registerBeanDefinitionParser("parse-template", new MessageProcessorDefinitionParser(ParseTemplateTransformer.class));
+        registerBeanDefinitionParser("set-payload", new MessageProcessorDefinitionParser(SetPayloadTransformer.class));
 
         registerBeanDefinitionParser("append-string-transformer", new MessageProcessorDefinitionParser(StringAppendTransformer.class));
 

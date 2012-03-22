@@ -8,12 +8,23 @@
  * LICENSE.txt file.
  */
 
-package org.mule.transport.http.transformers;
+package org.mule.transport.http.components;
 
+import org.mule.api.DefaultMuleException;
+import org.mule.api.MuleEvent;
+import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
+import org.mule.api.construct.FlowConstructAware;
+import org.mule.api.context.MuleContextAware;
+import org.mule.api.lifecycle.Initialisable;
+import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.processor.InterceptingMessageProcessor;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transformer.TransformerException;
+import org.mule.processor.AbstractMessageProcessorOwner;
 import org.mule.transformer.AbstractMessageTransformer;
+import org.mule.transformer.AbstractTransformer;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transport.http.CacheControlHeader;
 import org.mule.transport.http.CookieHelper;
@@ -29,58 +40,89 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.TimeZone;
 
 import org.apache.commons.httpclient.Cookie;
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpVersion;
 import org.apache.commons.httpclient.ProtocolException;
 
-public class HttpResponseTransformer extends AbstractMessageTransformer
+public class HttpResponseBuilder extends AbstractMessageProcessorOwner
+    implements Initialisable, MessageProcessor
 {
     private Map<String, String> headers = new HashMap<String, String>();
     private List<CookieWrapper> cookies = new ArrayList<CookieWrapper>();
-    private String body;
     private String contentType;
     private String status;
     private String version;
     private CacheControlHeader cacheControl;
+    private boolean propagateMuleProperties = false;
+    private AbstractTransformer bodyTransformer;
+    private SimpleDateFormat dateFormatter;
 
-    public HttpResponseTransformer()
+    private List<MessageProcessor> ownedMessageProcessor = new ArrayList<MessageProcessor>();
+
+    @Override
+    public void initialise() throws InitialisationException
     {
-        registerSourceType(DataTypeFactory.OBJECT);
-        setReturnDataType(DataTypeFactory.create(HttpResponse.class));
+        super.initialise();
+        dateFormatter = new SimpleDateFormat(HttpConstants.DATE_FORMAT, Locale.US);
+        dateFormatter.setTimeZone(TimeZone.getTimeZone("GMT"));
     }
 
     @Override
-    public Object transformMessage(MuleMessage msg, String outputEncoding) throws TransformerException
+    public MuleEvent process(MuleEvent event) throws MuleException
     {
+        MuleMessage msg = event.getMessage();
+
+        HttpResponse httpResponse = getHttpResponse(msg);
+
+        propagateMessageProperties(httpResponse, msg);
+        checkVersion(msg);
+        setStatus(httpResponse, msg);
+        setContentType(httpResponse, msg);
+        setHeaders(httpResponse, msg);
+        setCookies(httpResponse, msg);
+        setCacheControl(httpResponse, msg);
+        String date = new SimpleDateFormat(HttpConstants.DATE_FORMAT, Locale.US).format(new Date());
+        httpResponse.setHeader(new Header(HttpConstants.HEADER_DATE, date));
+        setBody(httpResponse, msg, event);
+
+        msg.setPayload(httpResponse);
+        return event;
+    }
+
+    @Override
+    protected List<MessageProcessor> getOwnedMessageProcessors()
+    {
+        return ownedMessageProcessor;
+    }
+
+    private void setBody(HttpResponse response, MuleMessage message, MuleEvent event) throws MuleException
+    {
+        if(bodyTransformer != null)
+        {
+            message.applyTransformers(event, bodyTransformer);
+        }
+
         try
         {
-            HttpResponse httpResponse = getHttpResponse(msg);
-
-            propagateMessageProperties(httpResponse, msg);
-            checkVersion(msg);
-            setStatus(httpResponse, msg);
-            setContentType(httpResponse, msg);
-            setHeaders(httpResponse, msg);
-            setCookies(httpResponse, msg);
-            setCacheControl(httpResponse, msg);
-            String date = new SimpleDateFormat(HttpConstants.DATE_FORMAT, Locale.US).format(new Date());
-            httpResponse.setHeader(new Header(HttpConstants.HEADER_DATE, date));
-            setBody(httpResponse, msg);
-            return httpResponse;
+            response.setBody(message);
         }
         catch(Exception e)
         {
-            throw new TransformerException(this, e);
+            throw new DefaultMuleException(e);
         }
     }
 
     private void propagateMessageProperties(HttpResponse response, MuleMessage message)
     {
         copyOutboundProperties(response, message);
-        copyCorrelationIdProperties(response, message);
-        copyReplyToProperty(response, message);
+        if(propagateMuleProperties)
+        {
+            copyCorrelationIdProperties(response, message);
+            copyReplyToProperty(response, message);
+        }
     }
 
     private void copyCorrelationIdProperties(HttpResponse response, MuleMessage message)
@@ -114,7 +156,10 @@ public class HttpResponseTransformer extends AbstractMessageTransformer
             {
                 if(isMuleProperty(headerName))
                 {
-                    addMuleHeader(response, headerName, headerValue);
+                    if(propagateMuleProperties)
+                    {
+                        addMuleHeader(response, headerName, headerValue);
+                    }
                 }
                 else if(isMultiValueCookie(headerName, headerValue))
                 {
@@ -192,26 +237,7 @@ public class HttpResponseTransformer extends AbstractMessageTransformer
         }
     }
 
-    protected void setBody(HttpResponse response, MuleMessage message) throws TransformerException
-    {
-        try
-        {
-            if(body != null)
-            {
-                response.setBody(muleContext.getExpressionManager().parse(body, message));
-            }
-            else
-            {
-                response.setBody(message);
-            }
-        }
-        catch(Exception e)
-        {
-            throw new TransformerException(this, e);
-        }
-    }
-
-    protected void setCookies(HttpResponse response, MuleMessage message) throws TransformerException
+    protected void setCookies(HttpResponse response, MuleMessage message) throws MuleException
     {
         if(!cookies.isEmpty())
         {
@@ -226,7 +252,7 @@ public class HttpResponseTransformer extends AbstractMessageTransformer
                 }
                 catch(Exception e)
                 {
-                    throw new TransformerException(this, e);
+                    throw new DefaultMuleException(e);
                 }
 
             }
@@ -241,7 +267,14 @@ public class HttpResponseTransformer extends AbstractMessageTransformer
             {
                 String name = evaluate(headerName, message);
                 String value = headers.get(headerName);
-                response.setHeader(new Header(name, evaluate(value, message)));
+                if(HttpConstants.HEADER_LOCATION.equals(name))
+                {
+                    response.setHeader(new Header(name, parse(value, message)));
+                }
+                else
+                {
+                    response.setHeader(new Header(name, evaluate(value, message)));
+                }
             }
         }
     }
@@ -255,7 +288,7 @@ public class HttpResponseTransformer extends AbstractMessageTransformer
         }
     }
 
-    private void setStatus(HttpResponse response, MuleMessage message) throws TransformerException
+    private void setStatus(HttpResponse response, MuleMessage message) throws MuleException
     {
         if(status != null)
         {
@@ -265,7 +298,7 @@ public class HttpResponseTransformer extends AbstractMessageTransformer
             }
             catch(ProtocolException e)
             {
-                throw new TransformerException(this, e);
+                throw new DefaultMuleException(e);
             }
         }
     }
@@ -280,6 +313,11 @@ public class HttpResponseTransformer extends AbstractMessageTransformer
         response.setHeader(new Header(HttpConstants.HEADER_CONTENT_TYPE, evaluate(contentType, message)));
     }
 
+    private String parse(String value, MuleMessage message)
+    {
+        return muleContext.getExpressionManager().parse(value, message);
+    }
+
     private String evaluate(String value, MuleMessage message)
     {
         Object realValue = value;
@@ -289,8 +327,15 @@ public class HttpResponseTransformer extends AbstractMessageTransformer
             realValue = muleContext.getExpressionManager().evaluate(value.toString(), message);
         }
 
+        if(realValue instanceof Date)
+        {
+            return dateFormatter.format(realValue);
+        }
+
         return String.valueOf(realValue);
     }
+
+
 
     private String getDefaultContentType(MuleMessage message)
     {
@@ -308,10 +353,6 @@ public class HttpResponseTransformer extends AbstractMessageTransformer
         this.headers.putAll(headers);
     }
 
-    public void setBody(String body)
-    {
-        this.body = body;
-    }
 
     public void setStatus(String status)
     {
@@ -347,5 +388,17 @@ public class HttpResponseTransformer extends AbstractMessageTransformer
     {
         return version;
     }
+
+    public void setPropagateMuleProperties(boolean propagateMuleProperties)
+    {
+        this.propagateMuleProperties = propagateMuleProperties;
+    }
+
+    public void setMessageProcessor(MessageProcessor messageProcessor)
+    {
+        this.bodyTransformer = (AbstractTransformer) messageProcessor;
+        ownedMessageProcessor.add(bodyTransformer);
+    }
+
 
 }

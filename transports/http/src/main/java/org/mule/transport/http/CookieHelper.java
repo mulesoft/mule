@@ -115,7 +115,7 @@ public class CookieHelper
      */
     protected static final Log logger = LogFactory.getLog(CookieHelper.class);
 
-	private static final String EXPIRE_PATTERN = "EEE, d-MMM-yyyy HH:mm:ss z";
+	public static final String EXPIRE_PATTERN = "EEE, d-MMM-yyyy HH:mm:ss z";
     private static final SimpleDateFormat EXPIRE_FORMATTER;
 
     static

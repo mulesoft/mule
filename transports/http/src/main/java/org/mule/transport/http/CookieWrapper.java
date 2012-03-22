@@ -17,17 +17,17 @@ import org.mule.api.expression.ExpressionManager;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
+import java.util.TimeZone;
 
 import org.apache.commons.httpclient.Cookie;
 import org.apache.commons.httpclient.NameValuePair;
 
 public class CookieWrapper extends NameValuePair
 {
-    private static final String COOKIE_EXPIRY_DATE_FORMAT = "EEE, dd MMM yyyy hh:mm:ss zzz";
-
     private String domain;
     private String path;
-    private String expiryDate;
+    private Object expiryDate;
     private String maxAge;
     private String secure;
     private String version;
@@ -38,7 +38,10 @@ public class CookieWrapper extends NameValuePair
         setValue((String) evaluate(getValue(), message, expressionManager));
         this.domain = (String) evaluate(domain, message, expressionManager);
         this.path = (String) evaluate(path, message, expressionManager);
-        this.expiryDate = (String) evaluate(expiryDate, message, expressionManager);
+        if(expiryDate != null)
+        {
+            this.expiryDate = evaluate(expiryDate.toString(), message, expressionManager);
+        }
         if(maxAge != null)
         {
             this.maxAge = String.valueOf(evaluate(maxAge, message, expressionManager));
@@ -91,10 +94,15 @@ public class CookieWrapper extends NameValuePair
         return cookie;
     }
 
-    private Date getExpiryDateFromString(String expiryDate) throws ParseException
+    private Date getExpiryDateFromString(Object expiryDate) throws ParseException
     {
-        SimpleDateFormat format = new SimpleDateFormat(COOKIE_EXPIRY_DATE_FORMAT);
-        return format.parse(expiryDate);
+        if(expiryDate instanceof String)
+        {
+            SimpleDateFormat format = new SimpleDateFormat(CookieHelper.EXPIRE_PATTERN, Locale.US);
+            format.setTimeZone(TimeZone.getTimeZone("GMT"));
+            return format.parse((String) expiryDate);
+        }
+        return (Date) expiryDate;
     }
 
 
