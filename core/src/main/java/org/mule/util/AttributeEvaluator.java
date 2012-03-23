@@ -155,18 +155,6 @@ public class AttributeEvaluator
         }
     }
 
-    public String resolveStringValue(MuleMessage message)
-    {
-        if (isRegularExpression())
-        {
-            throw new IllegalStateException("attribute is a regular expression");
-        }
-        else
-        {
-            return expressionManager.parse(attributeValue, message);
-        }
-    }
-
     public String getRawValue()
     {
         return attributeValue;

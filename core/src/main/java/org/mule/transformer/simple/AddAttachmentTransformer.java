@@ -9,14 +9,14 @@
  */
 package org.mule.transformer.simple;
 
+import java.text.MessageFormat;
+
 import org.mule.api.MuleMessage;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transformer.TransformerException;
 import org.mule.transformer.AbstractMessageTransformer;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.AttributeEvaluator;
-
-import java.text.MessageFormat;
 
 public class AddAttachmentTransformer extends AbstractMessageTransformer
 {
@@ -44,7 +44,7 @@ public class AddAttachmentTransformer extends AbstractMessageTransformer
     {
         try
         {
-            String keyValue = nameEvaluator.resolveStringValue(message);
+            Object keyValue = nameEvaluator.resolveValue(message);
             if (keyValue == null)
             {
                 logger.error("Setting Null attachment key is not supported, this entry is being ignored");
@@ -61,7 +61,7 @@ public class AddAttachmentTransformer extends AbstractMessageTransformer
                 }
                 else
                 {
-                    String contentType = contentTypeEvaluator.resolveStringValue(message);
+                    String contentType = contentTypeEvaluator.resolveValue(message).toString();
                     message.addOutboundAttachment(key,value,contentType);
                 }
             }

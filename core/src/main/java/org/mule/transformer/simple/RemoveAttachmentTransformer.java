@@ -43,7 +43,7 @@ public class RemoveAttachmentTransformer extends AbstractMessageTransformer
         {
             if (!nameEvaluator.isRegularExpression())
             {
-                String keyValue = nameEvaluator.resolveStringValue(message);
+                Object keyValue = nameEvaluator.resolveValue(message);
                 if (keyValue != null)
                 {
                     String name = keyValue.toString();

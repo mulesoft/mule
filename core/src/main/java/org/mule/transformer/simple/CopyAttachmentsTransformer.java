@@ -9,14 +9,14 @@
  */
 package org.mule.transformer.simple;
 
+import javax.activation.DataHandler;
+
 import org.mule.api.MuleMessage;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transformer.TransformerException;
 import org.mule.transformer.AbstractMessageTransformer;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.AttributeEvaluator;
-
-import javax.activation.DataHandler;
 
 public class CopyAttachmentsTransformer extends AbstractMessageTransformer
 {
@@ -42,7 +42,7 @@ public class CopyAttachmentsTransformer extends AbstractMessageTransformer
         {
             if (!attachmentNameEvaluator.isRegularExpression())
             {
-                String attachmentName = attachmentNameEvaluator.resolveStringValue(message);
+                String attachmentName = attachmentNameEvaluator.resolveValue(message).toString();
                 DataHandler inboundAttachment = message.getInboundAttachment(attachmentName);
                 message.addOutboundAttachment(attachmentName, inboundAttachment);
             }
