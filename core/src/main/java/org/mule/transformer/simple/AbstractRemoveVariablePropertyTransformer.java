@@ -42,7 +42,7 @@ public abstract class AbstractRemoveVariablePropertyTransformer extends Abstract
     {
         if (!identifierEvaluator.isRegularExpression())
         {
-            Object keyValue = identifierEvaluator.resolveValue(message);
+            String keyValue = identifierEvaluator.resolveStringValue(message);
             if (keyValue != null)
             {
                 message.removeProperty(keyValue.toString(), getScope());

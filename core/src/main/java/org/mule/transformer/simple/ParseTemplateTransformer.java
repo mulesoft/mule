@@ -45,7 +45,7 @@ public class ParseTemplateTransformer extends AbstractMessageTransformer
     @Override
     public Object transformMessage(MuleMessage message, String outputEncoding) throws TransformerException
     {
-        Object locationValue = locationEvaluator.resolveValue(message);
+        String locationValue = locationEvaluator.resolveStringValue(message);
         if(locationValue == null)
         {
             throw new IllegalArgumentException("Location cannot be null");

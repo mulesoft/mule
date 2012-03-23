@@ -39,6 +39,12 @@ public class MuleSessionVariablesTransformerTestCase extends FunctionalTestCase
     }
 
     @Test
+    public void testAddVariableWithParsedStringKey() throws Exception
+    {
+        runScenario("addVariableWithParsedStringKeyFlow");
+    }
+    
+    @Test
     public void testRemoveVariable() throws Exception
     {
         runScenario("removeSessionVariableFlow");
@@ -48,6 +54,12 @@ public class MuleSessionVariablesTransformerTestCase extends FunctionalTestCase
     public void testRemoveVariableUsingExpression() throws Exception
     {
         runScenario("removeSessionVariableUsingExpressionFlow");
+    }
+
+    @Test
+    public void testRemoveVariableUsingParsedString() throws Exception
+    {
+        runScenario("removeSessionVariableUsingParsedStringFlow");
     }
 
     @Test

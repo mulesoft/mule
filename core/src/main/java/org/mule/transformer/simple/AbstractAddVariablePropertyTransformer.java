@@ -9,8 +9,6 @@
  */
 package org.mule.transformer.simple;
 
-import java.text.MessageFormat;
-
 import org.mule.api.MuleMessage;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transformer.TransformerException;
@@ -18,6 +16,8 @@ import org.mule.api.transport.PropertyScope;
 import org.mule.transformer.AbstractMessageTransformer;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.AttributeEvaluator;
+
+import java.text.MessageFormat;
 
 public abstract class AbstractAddVariablePropertyTransformer extends AbstractMessageTransformer
 {
@@ -41,7 +41,7 @@ public abstract class AbstractAddVariablePropertyTransformer extends AbstractMes
     @Override
     public Object transformMessage(MuleMessage message, String outputEncoding) throws TransformerException
     {
-        Object keyValue = identifierEvaluator.resolveValue(message);
+        String keyValue = identifierEvaluator.resolveStringValue(message);
         String key = (keyValue == null ? null : keyValue.toString());
         if (key == null)
         {
