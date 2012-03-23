@@ -9,6 +9,9 @@
  */
 package org.mule.transformer.simple;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.mule.api.MuleMessage;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transformer.TransformerException;
@@ -16,9 +19,6 @@ import org.mule.api.transport.PropertyScope;
 import org.mule.transformer.AbstractMessageTransformer;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.AttributeEvaluator;
-
-import java.util.HashSet;
-import java.util.Set;
 
 public abstract class AbstractRemoveVariablePropertyTransformer extends AbstractMessageTransformer
 {
@@ -40,7 +40,7 @@ public abstract class AbstractRemoveVariablePropertyTransformer extends Abstract
     @Override
     public Object transformMessage(MuleMessage message, String outputEncoding) throws TransformerException
     {
-        if (!identifierEvaluator.isRegularExpression())
+        if (identifierEvaluator.isPlainText() || identifierEvaluator.isExpression())
         {
             Object keyValue = identifierEvaluator.resolveValue(message);
             if (keyValue != null)

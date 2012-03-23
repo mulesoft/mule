@@ -288,4 +288,27 @@ public interface ExpressionManager
      */
     public boolean isExpression(String string);
 
+    /**
+     * If the value is a single expression then evaluate the expression and return the same type returned by
+     * the expression evaluation. If the value is a string with embedded expressions then it is parsed.
+     * 
+     * @param expression
+     * @param message
+     * @return
+     * @throws ExpressionRuntimeException
+     */
+    @Deprecated
+    public Object evaluateOrParse(String expression, MuleMessage message) throws ExpressionRuntimeException;
+
+    /**
+     * If the value is a single expression then evaluate the expression and return the same type returned by
+     * the expression evaluation. If the value is a string with embedded expressions then it is parsed.
+     * 
+     * @param expression
+     * @param event
+     * @return
+     * @throws ExpressionRuntimeException
+     */
+    public Object evaluateOrParse(String expression, MuleEvent event) throws ExpressionRuntimeException;
+
 }

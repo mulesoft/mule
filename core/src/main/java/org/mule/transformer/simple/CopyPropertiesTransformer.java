@@ -36,7 +36,7 @@ public class CopyPropertiesTransformer extends AbstractMessageTransformer
     @Override
     public Object transformMessage(MuleMessage message, String outputEncoding) throws TransformerException
     {
-        if (!propertyNameEvaluator.isRegularExpression())
+        if (propertyNameEvaluator.isExpression() || propertyNameEvaluator.isPlainText())
         {
             Object keyValue = propertyNameEvaluator.resolveValue(message);
             if (keyValue != null)

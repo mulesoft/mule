@@ -674,4 +674,36 @@ public class DefaultExpressionManager implements ExpressionManager, MuleContextA
     {
         this.expressionLanguage = expressionLanguage;
     }
+
+    @Override
+    public Object evaluateOrParse(String expression, MuleMessage message) throws ExpressionRuntimeException
+    {
+        if (isSingleExpression(expression))
+        {
+            return evaluate(expression, message);
+        }
+        else
+        {
+            return parse(expression, message);
+        }
+    }
+
+    @Override
+    public Object evaluateOrParse(String expression, MuleEvent event) throws ExpressionRuntimeException
+    {
+        if (isSingleExpression(expression))
+        {
+            return evaluate(expression, event);
+        }
+        else
+        {
+            return parse(expression, event);
+        }
+    }
+
+    private boolean isSingleExpression(String expression)
+    {
+        Pattern pattern = Pattern.compile("^#\\[[^#\\[]\\]$");
+        return pattern.matcher(expression).matches();
+    }
 }
