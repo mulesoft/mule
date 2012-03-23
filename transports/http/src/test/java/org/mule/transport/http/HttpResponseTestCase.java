@@ -122,7 +122,7 @@ public class HttpResponseTestCase extends FunctionalTestCase
         properties.put("domain", "localhost");
         properties.put("path", "/");
         properties.put("secure", true);
-        properties.put("expiryDate", "Fri, 12-Dec-2014 17:00:00 GMT");
+        properties.put("expiryDate", "Fri, 12 Dec 2014 17:00:00 GMT");
         properties.put("maxAge", "1000");
         return properties;
 

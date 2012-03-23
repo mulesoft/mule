@@ -15,17 +15,11 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
-import org.mule.api.construct.FlowConstructAware;
-import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.processor.InterceptingMessageProcessor;
 import org.mule.api.processor.MessageProcessor;
-import org.mule.api.transformer.TransformerException;
 import org.mule.processor.AbstractMessageProcessorOwner;
-import org.mule.transformer.AbstractMessageTransformer;
 import org.mule.transformer.AbstractTransformer;
-import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transport.http.CacheControlHeader;
 import org.mule.transport.http.CookieHelper;
 import org.mule.transport.http.CookieWrapper;
@@ -220,7 +214,7 @@ public class HttpResponseBuilder extends AbstractMessageProcessorOwner
     {
         if(cacheControl != null)
         {
-            cacheControl.evaluate(message, muleContext.getExpressionManager());
+            cacheControl.parse(message, muleContext.getExpressionManager());
             String cacheControlValue = cacheControl.toString();
             if(!"".equals(cacheControlValue))
             {
@@ -245,7 +239,7 @@ public class HttpResponseBuilder extends AbstractMessageProcessorOwner
             {
                 try
                 {
-                    cookie.evaluate(message, muleContext.getExpressionManager());
+                    cookie.parse(message, muleContext.getExpressionManager());
                     response.addHeader(new Header(HttpConstants.HEADER_COOKIE_SET,
                                                    CookieHelper.formatCookieForASetCookieHeader(cookie.createCookie())));
 
@@ -265,15 +259,15 @@ public class HttpResponseBuilder extends AbstractMessageProcessorOwner
         {
             for(String headerName : headers.keySet())
             {
-                String name = evaluate(headerName, message);
+                String name = parse(headerName, message);
                 String value = headers.get(headerName);
-                if(HttpConstants.HEADER_LOCATION.equals(name))
+                if(HttpConstants.HEADER_EXPIRES.equals(name))
                 {
-                    response.setHeader(new Header(name, parse(value, message)));
+                    response.setHeader(new Header(name, evaluateDate(value, message)));
                 }
                 else
                 {
-                    response.setHeader(new Header(name, evaluate(value, message)));
+                    response.setHeader(new Header(name, parse(value, message)));
                 }
             }
         }
@@ -294,7 +288,7 @@ public class HttpResponseBuilder extends AbstractMessageProcessorOwner
         {
             try
             {
-                response.setStatusLine(HttpVersion.parse(version), Integer.valueOf(evaluate(status, message)));
+                response.setStatusLine(HttpVersion.parse(version), Integer.valueOf(parse(status, message)));
             }
             catch(ProtocolException e)
             {
@@ -310,21 +304,25 @@ public class HttpResponseBuilder extends AbstractMessageProcessorOwner
             contentType = getDefaultContentType(message);
 
         }
-        response.setHeader(new Header(HttpConstants.HEADER_CONTENT_TYPE, evaluate(contentType, message)));
+        response.setHeader(new Header(HttpConstants.HEADER_CONTENT_TYPE, parse(contentType, message)));
     }
 
     private String parse(String value, MuleMessage message)
     {
-        return muleContext.getExpressionManager().parse(value, message);
+        if(value != null)
+        {
+            return muleContext.getExpressionManager().parse(value, message);
+        }
+        return value;
     }
 
-    private String evaluate(String value, MuleMessage message)
+    private String evaluateDate(String value, MuleMessage message)
     {
         Object realValue = value;
 
-        if (value != null && muleContext.getExpressionManager().isExpression(value.toString()))
+        if (value != null && muleContext.getExpressionManager().isExpression(value))
         {
-            realValue = muleContext.getExpressionManager().evaluate(value.toString(), message);
+            realValue = muleContext.getExpressionManager().evaluate(value, message);
         }
 
         if(realValue instanceof Date)

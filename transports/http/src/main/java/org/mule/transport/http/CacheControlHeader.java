@@ -42,17 +42,14 @@ public class CacheControlHeader
      * @param message MuleMessage
      * @param expressionManager
      */
-    public void evaluate(MuleMessage message, ExpressionManager expressionManager)
+    public void parse(MuleMessage message, ExpressionManager expressionManager)
     {
-        directive = (String) evaluate(directive, message, expressionManager);
+        directive = parse(directive, message, expressionManager);
         checkDirective(directive);
-        noCache = String.valueOf(evaluate(noCache, message, expressionManager));
-        noStore = String.valueOf(evaluate(noStore, message, expressionManager));
-        mustRevalidate = String.valueOf(evaluate(mustRevalidate, message, expressionManager));
-        if(maxAge != null)
-        {
-            maxAge = String.valueOf(evaluate(maxAge, message, expressionManager));
-        }
+        noCache = parse(noCache, message, expressionManager);
+        noStore = parse(noStore, message, expressionManager);
+        mustRevalidate = parse(mustRevalidate, message, expressionManager);
+        maxAge = parse(maxAge, message, expressionManager);
     }
 
     private void checkDirective(String directive)
@@ -96,11 +93,11 @@ public class CacheControlHeader
         return value;
     }
 
-    private Object evaluate(String value, MuleMessage message, ExpressionManager expressionManager)
+    private String parse(String value, MuleMessage message, ExpressionManager expressionManager)
     {
-        if(value != null && expressionManager.isExpression(value))
+        if(value != null)
         {
-            return expressionManager.evaluate(value, message);
+            return expressionManager.parse(value, message);
         }
         return value;
     }

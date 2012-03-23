@@ -32,37 +32,38 @@ public class CookieWrapper extends NameValuePair
     private String secure;
     private String version;
 
-    public void evaluate(MuleMessage message, ExpressionManager expressionManager)
+    public void parse(MuleMessage message, ExpressionManager expressionManager)
     {
-        setName((String) evaluate(getName(), message, expressionManager));
-        setValue((String) evaluate(getValue(), message, expressionManager));
-        this.domain = (String) evaluate(domain, message, expressionManager);
-        this.path = (String) evaluate(path, message, expressionManager);
+        setName(parse(getName(), message, expressionManager));
+        setValue(parse(getValue(), message, expressionManager));
+        this.domain = parse(domain, message, expressionManager);
+        this.path = parse(path, message, expressionManager);
         if(expiryDate != null)
         {
-            this.expiryDate = evaluate(expiryDate.toString(), message, expressionManager);
+            this.expiryDate = evaluateDate(expiryDate, message, expressionManager);
         }
-        if(maxAge != null)
-        {
-            this.maxAge = String.valueOf(evaluate(maxAge, message, expressionManager));
-        }
-        if(secure != null)
-        {
-            this.secure = String.valueOf(evaluate(secure, message, expressionManager));
-        }
-        if(version != null)
-        {
-            this.version = String.valueOf(evaluate(version, message, expressionManager));
-        }
+        this.maxAge = parse(maxAge, message, expressionManager);
+        this.secure = parse(secure, message, expressionManager);
+        this.version = parse(version, message, expressionManager);
     }
 
-    private Object evaluate(String value, MuleMessage message, ExpressionManager expressionManager)
+    private String parse(String value, MuleMessage message, ExpressionManager expressionManager)
     {
-        if(value != null && expressionManager.isExpression(value))
+        if(value != null)
         {
-            return expressionManager.evaluate(value, message);
+            return expressionManager.parse(value, message);
         }
         return value;
+    }
+
+    private Object evaluateDate(Object date, MuleMessage message, ExpressionManager expressionManager)
+    {
+
+        if(date != null && date instanceof String && expressionManager.isExpression(date.toString()))
+        {
+            return expressionManager.evaluate(date.toString(), message);
+        }
+        return date;
     }
 
     public Cookie createCookie() throws ParseException
@@ -75,7 +76,7 @@ public class CookieWrapper extends NameValuePair
 
         if(expiryDate != null)
         {
-            cookie.setExpiryDate(getExpiryDateFromString(expiryDate));
+            cookie.setExpiryDate(formatExpiryDate(expiryDate));
         }
 
         if(maxAge != null && expiryDate == null)
@@ -91,14 +92,15 @@ public class CookieWrapper extends NameValuePair
         {
             cookie.setVersion(Integer.valueOf(version));
         }
+
         return cookie;
     }
 
-    private Date getExpiryDateFromString(Object expiryDate) throws ParseException
+    private Date formatExpiryDate(Object expiryDate) throws ParseException
     {
         if(expiryDate instanceof String)
         {
-            SimpleDateFormat format = new SimpleDateFormat(CookieHelper.EXPIRE_PATTERN, Locale.US);
+            SimpleDateFormat format = new SimpleDateFormat(HttpConstants.DATE_FORMAT, Locale.US);
             format.setTimeZone(TimeZone.getTimeZone("GMT"));
             return format.parse((String) expiryDate);
         }
@@ -116,7 +118,7 @@ public class CookieWrapper extends NameValuePair
         this.path = path;
     }
 
-    public void setExpiryDate(String expiryDate)
+    public void setExpiryDate(Object expiryDate)
     {
         this.expiryDate = expiryDate;
     }

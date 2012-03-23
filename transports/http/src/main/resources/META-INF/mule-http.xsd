@@ -443,11 +443,41 @@
             <xsd:complexContent>
                 <xsd:extension base="mule:abstractMessageProcessorType">
                     <xsd:sequence>
-                        <xsd:element name="cache-control" minOccurs="0" maxOccurs="1" type="cacheControlType"/>
-                        <xsd:element name="expires" minOccurs="0" maxOccurs="1" type="headerType"/>
-                        <xsd:element name="location" minOccurs="0" maxOccurs="1" type="headerType"/>
-                        <xsd:element name="set-cookie" minOccurs="0" maxOccurs="unbounded" type="cookieType"/>
-                        <xsd:element name="header" minOccurs="0" maxOccurs="unbounded" type="mule:nameValueType"/>
+                        <xsd:element name="cache-control" minOccurs="0" maxOccurs="1" type="cacheControlType">
+                            <xsd:annotation>
+                                <xsd:documentation>
+                                    The Cache-Control is used to specify directives that MUST be obeyed by all caching mechanisms along the request/response chain.
+                                </xsd:documentation>
+                            </xsd:annotation>
+                        </xsd:element>
+                        <xsd:element name="expires" minOccurs="0" maxOccurs="1" type="headerType">
+                            <xsd:annotation>
+                                <xsd:documentation>
+                                    Specifies when the cookie expires. It must be specified in the form Wdy, DD Mon YYYY HH:MM:SS GMT
+                                </xsd:documentation>
+                            </xsd:annotation>
+                        </xsd:element>
+                        <xsd:element name="location" minOccurs="0" maxOccurs="1" type="headerType">
+                            <xsd:annotation>
+                                <xsd:documentation>
+                                    The Location is used to redirect the recipient to a location other than the Request-URI for completion of the request or identification of a new resource.
+                                </xsd:documentation>
+                            </xsd:annotation>
+                        </xsd:element>
+                        <xsd:element name="set-cookie" minOccurs="0" maxOccurs="unbounded" type="cookieType">
+                            <xsd:annotation>
+                                <xsd:documentation>
+                                    Allows to configure one or more cookies.
+                                </xsd:documentation>
+                            </xsd:annotation>
+                        </xsd:element>
+                        <xsd:element name="header" minOccurs="0" maxOccurs="unbounded" type="mule:nameValueType">
+                            <xsd:annotation>
+                                <xsd:documentation>
+                                    Allows to configure HTTP headers providing the name and value of each header.
+                                </xsd:documentation>
+                            </xsd:annotation>
+                        </xsd:element>
                         <xsd:element ref="mule:abstract-transformer" minOccurs="0" maxOccurs="1"/>
                     </xsd:sequence>
                     <xsd:attribute name="status" type="statusType">
@@ -480,10 +510,34 @@
     <xsd:complexType name="cookieType">
         <xsd:complexContent>
             <xsd:extension base="mule:annotatedType">
-                <xsd:attribute name="name" type="xsd:string" use="required"/>
-                <xsd:attribute name="value" type="xsd:string" use="required"/>
-                <xsd:attribute name="domain" type="xsd:string" use="optional"/>
-                <xsd:attribute name="path" type="xsd:string" use="optional"/>
+                <xsd:attribute name="name" type="xsd:string" use="required">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Indicates the name of the cookie.It supports expressions
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="value" type="xsd:string" use="required">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Indicates the value of the cookie. It supports expressions.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="domain" type="xsd:string" use="optional">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Indicates the domain scope of the cookie. It supports expressions.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="path" type="xsd:string" use="optional">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Indicates the path scope of the cookie. It supports expressions.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
                 <xsd:attribute name="expiryDate" type="xsd:string" use="optional">
                     <xsd:annotation>
                         <xsd:documentation>
@@ -498,8 +552,20 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="secure" type="mule:substitutableBoolean" use="optional" default="false"/>
-                <xsd:attribute name="version" type="mule:substitutableInt" use="optional"/>
+                <xsd:attribute name="secure" type="mule:substitutableBoolean" use="optional" default="false">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            A boolean to specify that the cookie communication should be limited to encrypted transmission. It's fault by default.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="version" type="mule:substitutableInt" use="optional">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                             Sets the version of the cookie specification to which this cookie conforms.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
