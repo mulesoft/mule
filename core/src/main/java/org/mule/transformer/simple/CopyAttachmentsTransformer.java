@@ -40,22 +40,22 @@ public class CopyAttachmentsTransformer extends AbstractMessageTransformer
     {
         try
         {
-            if (!attachmentNameEvaluator.isRegularExpression())
+            if (true)
             {
                 String attachmentName = attachmentNameEvaluator.resolveValue(message).toString();
                 DataHandler inboundAttachment = message.getInboundAttachment(attachmentName);
                 message.addOutboundAttachment(attachmentName, inboundAttachment);
             }
-            else
-            {
-                for (String inboundAttachmentName : message.getInboundAttachmentNames())
-                {
-                    if (attachmentNameEvaluator.matches(inboundAttachmentName))
-                    {
-                        message.addOutboundAttachment(inboundAttachmentName,message.getInboundAttachment(inboundAttachmentName));
-                    }
-                }
-            }
+//            else
+//            {
+//                for (String inboundAttachmentName : message.getInboundAttachmentNames())
+//                {
+//                    if (attachmentNameEvaluator.matches(inboundAttachmentName))
+//                    {
+//                        message.addOutboundAttachment(inboundAttachmentName,message.getInboundAttachment(inboundAttachmentName));
+//                    }
+//                }
+//            }
         }
         catch (Exception e)
         {
@@ -74,7 +74,7 @@ public class CopyAttachmentsTransformer extends AbstractMessageTransformer
 
     public void setAttachmentName(String attachmentName)
     {
-        this.attachmentNameEvaluator = new AttributeEvaluator(attachmentName).enableRegexSupport();
+        this.attachmentNameEvaluator = new AttributeEvaluator(attachmentName);
     }
 
 }

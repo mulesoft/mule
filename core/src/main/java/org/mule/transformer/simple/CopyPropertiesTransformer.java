@@ -36,7 +36,7 @@ public class CopyPropertiesTransformer extends AbstractMessageTransformer
     @Override
     public Object transformMessage(MuleMessage message, String outputEncoding) throws TransformerException
     {
-        if (!propertyNameEvaluator.isRegularExpression())
+        if (true)
         {
             Object keyValue = propertyNameEvaluator.resolveValue(message);
             if (keyValue != null)
@@ -57,16 +57,16 @@ public class CopyPropertiesTransformer extends AbstractMessageTransformer
                 logger.info("Key expression return null, no property will be copied");
             }
         }
-        else
-        {
-            for (String inboundPropertyName : message.getInboundPropertyNames())
-            {
-                if (propertyNameEvaluator.matches(inboundPropertyName))
-                {
-                    message.setOutboundProperty(inboundPropertyName,message.getInboundProperty(inboundPropertyName));
-                }
-            }
-        }
+//        else
+//        {
+//            for (String inboundPropertyName : message.getInboundPropertyNames())
+//            {
+//                if (propertyNameEvaluator.matches(inboundPropertyName))
+//                {
+//                    message.setOutboundProperty(inboundPropertyName,message.getInboundProperty(inboundPropertyName));
+//                }
+//            }
+//        }
         return message;
     }
 
@@ -84,7 +84,7 @@ public class CopyPropertiesTransformer extends AbstractMessageTransformer
         {
             throw new IllegalArgumentException("Null propertyName not supported");
         }
-        this.propertyNameEvaluator = new AttributeEvaluator(propertyName).enableRegexSupport();
+        this.propertyNameEvaluator = new AttributeEvaluator(propertyName);
     }
 
 }

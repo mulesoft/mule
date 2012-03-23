@@ -38,22 +38,8 @@ public class AttributeEvaluatorTestCase extends AbstractMuleTestCase
         AttributeEvaluator attributeEvaluator = new AttributeEvaluator("attributeEvaluator");
         Mockito.when(mockExpressionManager.isExpression("attributeEvaluator")).thenReturn(false);
         attributeEvaluator.initialize(mockExpressionManager);
-        assertThat(attributeEvaluator.isParse(), is(true));
-        assertThat(attributeEvaluator.isRegularExpression(), is(false));
-        assertThat(attributeEvaluator.isEval(), is(false));
-    }
-
-    @Test
-    public void testRegularExpressionValue()
-    {
-        String regexAttribute = "attributeEvaluator*";
-        AttributeEvaluator attributeEvaluator = new AttributeEvaluator(regexAttribute);
-        attributeEvaluator.enableRegexSupport();
-        Mockito.when(mockExpressionManager.isExpression(regexAttribute)).thenReturn(false);
-        attributeEvaluator.initialize(mockExpressionManager);
-        assertThat(attributeEvaluator.isParse(), is(false));
-        assertThat(attributeEvaluator.isRegularExpression(), is(true));
-        assertThat(attributeEvaluator.isEval(), is(false));
+        assertThat(attributeEvaluator.isString(), is(true));
+        assertThat(attributeEvaluator.isExpression(), is(false));
     }
 
     @Test
@@ -63,9 +49,8 @@ public class AttributeEvaluatorTestCase extends AbstractMuleTestCase
         when(mockExpressionManager.isExpression(attributeValue)).thenReturn(true);
         AttributeEvaluator attributeEvaluator = new AttributeEvaluator(attributeValue);
         attributeEvaluator.initialize(mockExpressionManager);
-        assertThat(attributeEvaluator.isParse(), is(false));
-        assertThat(attributeEvaluator.isRegularExpression(), is(false));
-        assertThat(attributeEvaluator.isEval(), is(true));
+        assertThat(attributeEvaluator.isString(), is(false));
+        assertThat(attributeEvaluator.isExpression(), is(true));
     }
 
     @Test
@@ -76,74 +61,8 @@ public class AttributeEvaluatorTestCase extends AbstractMuleTestCase
         Mockito.when(mockExpressionManager.isExpression(attributeValue)).thenReturn(true);
         AttributeEvaluator attributeEvaluator = new AttributeEvaluator(attributeValue);
         attributeEvaluator.initialize(mockExpressionManager);
-        assertThat(attributeEvaluator.isParse(), is(false));
-        assertThat(attributeEvaluator.isRegularExpression(), is(false));
-        assertThat(attributeEvaluator.isEval(), is(true));
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void testNotRegularExpressionAndCallMatches()
-    {
-        String attributeValue = "#[eval:express]";
-        when(mockExpressionManager.isExpression(attributeValue)).thenReturn(true);
-        AttributeEvaluator attributeEvaluator = new AttributeEvaluator(attributeValue);
-        attributeEvaluator.initialize(mockExpressionManager);
-        attributeEvaluator.matches("some string");
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void testNotRegularExpressionAndCallGetRegexPattern()
-    {
-        String attributeValue = "#[eval:express]";
-        when(mockExpressionManager.isExpression(attributeValue)).thenReturn(true);
-        AttributeEvaluator attributeEvaluator = new AttributeEvaluator(attributeValue);
-        attributeEvaluator.initialize(mockExpressionManager);
-        attributeEvaluator.getRegexPattern();
-    }
-
-    @Test
-    public void testSimpleRegularExpression()
-    {
-        AttributeEvaluator attributeEvaluator = new AttributeEvaluator("*");
-        attributeEvaluator.enableRegexSupport();
-        attributeEvaluator.initialize(mockExpressionManager);
-        assertThat(attributeEvaluator.matches("some"), is(true));
-        assertThat(attributeEvaluator.matches("me"), is(true));
-        assertThat(attributeEvaluator.matches("mean"), is(true));
-    }
-
-    @Test
-    public void testSimpleRegularExpressionStartWith()
-    {
-        AttributeEvaluator attributeEvaluator = new AttributeEvaluator("*me");
-        attributeEvaluator.enableRegexSupport();
-        attributeEvaluator.initialize(mockExpressionManager);
-        assertThat(attributeEvaluator.matches("some"), is(true));
-        assertThat(attributeEvaluator.matches("me"), is(true));
-        assertThat(attributeEvaluator.matches("mean"), is(false));
-    }
-
-    @Test
-    public void testSimpleRegularExpressionEndsWith()
-    {
-        AttributeEvaluator attributeEvaluator = new AttributeEvaluator("me*");
-        attributeEvaluator.enableRegexSupport();
-        attributeEvaluator.initialize(mockExpressionManager);
-        assertThat(attributeEvaluator.matches("some"), is(false));
-        assertThat(attributeEvaluator.matches("me"), is(true));
-        assertThat(attributeEvaluator.matches("mean"), is(true));
-    }
-
-    @Test
-    public void testComplexRegularExpression()
-    {
-        AttributeEvaluator attributeEvaluator = new AttributeEvaluator(".*2$");
-        attributeEvaluator.enableRegexSupport();
-        attributeEvaluator.initialize(mockExpressionManager);
-        assertThat(attributeEvaluator.matches("4352"), is(true));
-        assertThat(attributeEvaluator.matches("noNumber"), is(false));
-        assertThat(attributeEvaluator.matches("anything2"), is(true));
-        assertThat(attributeEvaluator.matches("some2text"), is(false));
+        assertThat(attributeEvaluator.isString(), is(false));
+        assertThat(attributeEvaluator.isExpression(), is(true));
     }
 
     @Test
@@ -151,9 +70,8 @@ public class AttributeEvaluatorTestCase extends AbstractMuleTestCase
     {
         AttributeEvaluator attributeEvaluator = new AttributeEvaluator("1#[2]3#[4]5");
         attributeEvaluator.initialize(mockExpressionManager);
-        assertThat(attributeEvaluator.isParse(), is(true));
-        assertThat(attributeEvaluator.isRegularExpression(), is(false));
-        assertThat(attributeEvaluator.isEval(), is(false));
+        assertThat(attributeEvaluator.isString(), is(true));
+        assertThat(attributeEvaluator.isExpression(), is(false));
     }
 
     @Test
@@ -161,9 +79,8 @@ public class AttributeEvaluatorTestCase extends AbstractMuleTestCase
     {
         AttributeEvaluator attributeEvaluator = new AttributeEvaluator("#[1]234#[5]");
         attributeEvaluator.initialize(mockExpressionManager);
-        assertThat(attributeEvaluator.isParse(), is(true));
-        assertThat(attributeEvaluator.isRegularExpression(), is(false));
-        assertThat(attributeEvaluator.isEval(), is(false));
+        assertThat(attributeEvaluator.isString(), is(true));
+        assertThat(attributeEvaluator.isExpression(), is(false));
     }
 
     @Test
@@ -171,9 +88,8 @@ public class AttributeEvaluatorTestCase extends AbstractMuleTestCase
     {
         AttributeEvaluator attributeEvaluator = new AttributeEvaluator("#[1]#[2]");
         attributeEvaluator.initialize(mockExpressionManager);
-        assertThat(attributeEvaluator.isParse(), is(true));
-        assertThat(attributeEvaluator.isRegularExpression(), is(false));
-        assertThat(attributeEvaluator.isEval(), is(false));
+        assertThat(attributeEvaluator.isString(), is(true));
+        assertThat(attributeEvaluator.isExpression(), is(false));
     }
 
 }

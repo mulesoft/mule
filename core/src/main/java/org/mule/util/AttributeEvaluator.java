@@ -12,14 +12,8 @@ package org.mule.util;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.expression.ExpressionManager;
-import org.mule.routing.filters.WildcardFilter;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.regex.Pattern;
-
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.Predicate;
 
 /**
  * This class acts as a wrapper for configuration attributes that support simple text, expression or regular
@@ -28,19 +22,14 @@ import org.apache.commons.collections.Predicate;
 public class AttributeEvaluator
 {
     private static final Pattern SINGLE_EXPRESSION_REGEX_PATTERN = Pattern.compile("^#\\[[^(#\\[)]*\\]$");
-    private static final Collection regexSpecialCharacters = Arrays.asList("\\", "$", "^", ".", "*", "?",
-        "[", "]");
-    private WildcardFilter regexWildcardFilter;
-    private boolean enableRegexSupport = false;
 
     private enum AttributeType
     {
-        EXPRESSION, STRING, REGEX
+        EXPRESSION, STRING
     }
 
     private final String attributeValue;
     private ExpressionManager expressionManager;
-    private Pattern regexPattern;
     private AttributeType attributeType;
 
     public AttributeEvaluator(String attributeValue)
@@ -60,11 +49,6 @@ public class AttributeEvaluator
         {
             this.attributeType = AttributeType.EXPRESSION;
         }
-        else if (enableRegexSupport && hasRegexCharactersAndCompiles())
-        {
-            this.attributeType = AttributeType.REGEX;
-            this.regexWildcardFilter = new WildcardFilter(this.attributeValue);
-        }
         else
         {
             this.attributeType = AttributeType.STRING;
@@ -76,76 +60,19 @@ public class AttributeEvaluator
         return expression != null && SINGLE_EXPRESSION_REGEX_PATTERN.matcher(expression).matches();
     }
 
-    private boolean hasRegexCharactersAndCompiles()
-    {
-        boolean hasRegexCharacters = CollectionUtils.find(regexSpecialCharacters, new Predicate()
-        {
-            @Override
-            public boolean evaluate(Object object)
-            {
-                return attributeValue.contains((CharSequence) object);
-            }
-        }) != null;
-        boolean compiles = false;
-        boolean hasWildcards = false;
-        if (hasRegexCharacters)
-        {
-            try
-            {
-                this.regexPattern = Pattern.compile(attributeValue);
-                compiles = true;
-            }
-            catch (Exception e)
-            {
-            }
-            hasWildcards = attributeValue.startsWith("*") || attributeValue.endsWith("*");
-        }
-        return (hasRegexCharacters && compiles) || (hasRegexCharacters && hasWildcards);
-    }
-
-    public boolean isRegularExpression()
-    {
-        return attributeType.equals(AttributeType.REGEX);
-    }
-
-    public boolean isEval()
+    public boolean isExpression()
     {
         return attributeType.equals(AttributeType.EXPRESSION);
     }
 
-    public boolean isParse()
+    public boolean isString()
     {
         return attributeType.equals(AttributeType.STRING);
     }
 
-    public boolean matches(String value)
-    {
-        validateStateIsRegularExpression();
-        return (this.regexPattern != null ? this.regexPattern.matcher(value).matches() : false)
-               || this.regexWildcardFilter.accept(value);
-    }
-
-    public Pattern getRegexPattern()
-    {
-        validateStateIsRegularExpression();
-        return regexPattern;
-    }
-
-    private void validateStateIsRegularExpression()
-    {
-        if (!isRegularExpression())
-        {
-            throw new IllegalStateException("attribute is not a regular expression");
-        }
-    }
-
     public Object resolveValue(MuleMessage message)
     {
-        if (isRegularExpression())
-        {
-            throw new IllegalStateException("attribute is a regular expression");
-        }
-        if (isEval())
+        if (isExpression())
         {
             return expressionManager.evaluate(attributeValue, message);
         }
@@ -158,11 +85,5 @@ public class AttributeEvaluator
     public String getRawValue()
     {
         return attributeValue;
-    }
-
-    public AttributeEvaluator enableRegexSupport()
-    {
-        enableRegexSupport = true;
-        return this;
     }
 }

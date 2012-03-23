@@ -16,9 +16,6 @@ import org.mule.transformer.AbstractMessageTransformer;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.AttributeEvaluator;
 
-import java.util.HashSet;
-import java.util.Set;
-
 public class RemoveAttachmentTransformer extends AbstractMessageTransformer
 {
     private AttributeEvaluator nameEvaluator;
@@ -41,7 +38,7 @@ public class RemoveAttachmentTransformer extends AbstractMessageTransformer
     {
         try
         {
-            if (!nameEvaluator.isRegularExpression())
+            if (true)
             {
                 Object keyValue = nameEvaluator.resolveValue(message);
                 if (keyValue != null)
@@ -54,17 +51,17 @@ public class RemoveAttachmentTransformer extends AbstractMessageTransformer
                     logger.info("Attachment key expression return null, no attachment will be removed");
                 }
             }
-            else
-            {
-                final Set<String> attachmentNames = new HashSet<String>(message.getOutboundAttachmentNames());
-                for (String attachmentName : attachmentNames)
-                {
-                    if (nameEvaluator.matches(attachmentName))
-                    {
-                        message.removeOutboundAttachment(attachmentName);
-                    }
-                }
-            }
+//            else
+//            {
+//                final Set<String> attachmentNames = new HashSet<String>(message.getOutboundAttachmentNames());
+//                for (String attachmentName : attachmentNames)
+//                {
+//                    if (nameEvaluator.matches(attachmentName))
+//                    {
+//                        message.removeOutboundAttachment(attachmentName);
+//                    }
+//                }
+//            }
             return message;
         }
         catch (Exception e)
@@ -83,7 +80,7 @@ public class RemoveAttachmentTransformer extends AbstractMessageTransformer
 
     public void setAttachmentName(String attachmentName)
     {
-        this.nameEvaluator = new AttributeEvaluator(attachmentName).enableRegexSupport();
+        this.nameEvaluator = new AttributeEvaluator(attachmentName);
     }
 
 }
