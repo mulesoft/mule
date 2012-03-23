@@ -18,6 +18,7 @@ import org.mule.DefaultMessageCollection;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleMessageCollection;
+import org.mule.api.expression.RequiredValueException;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.functional.FlowAssert;
 import org.mule.tck.junit4.FunctionalTestCase;
@@ -258,19 +259,119 @@ public class ForeachTestCase extends FunctionalTestCase
     }
 
     @Test
+    public void testVariableScope() throws Exception
+    {
+        final Collection<String> payload = new ArrayList<String>();
+        payload.add("pedro");
+        payload.add("rodolfo");
+        payload.add("roque");
+        MuleMessage parent = new DefaultMuleMessage(payload, muleContext);
+
+        MuleMessage result = client.send("vm://input-13", parent);
+        assertTrue("Counter variable should not be visible outside foreach scope.",
+                result.getExceptionPayload() != null &&
+                result.getExceptionPayload().getException().getCause() instanceof RequiredValueException);
+    }
+
+    @Test
+    public void testTwoOneAfterAnother() throws Exception
+    {
+        final Collection<String> payload = new ArrayList<String>();
+        payload.add("rosa");
+        payload.add("maria");
+        payload.add("florencia");
+        MuleMessage parent = new DefaultMuleMessage(payload, muleContext);
+
+        MuleMessage result = client.send("vm://input-14", parent);
+        assertTrue(result.getPayload() instanceof Collection);
+        Collection<?> resultPayload = (Collection<?>) result.getPayload();
+        assertEquals(3, resultPayload.size());
+        assertSame(payload, resultPayload);
+
+        assertEquals(3, result.getInboundProperty("msg-total-messages"));
+    }
+
+    @Test
+    public void testNestedConfig() throws Exception
+    {
+        final ArrayList<ArrayList<String>> payload = createNestedPayload();
+        MuleMessage parent = new DefaultMuleMessage(payload, muleContext);
+
+        MuleMessage result = client.send("vm://input-15", parent);
+        assertTrue(result.getPayload() instanceof Collection);
+        Collection<?> resultPayload = (Collection<?>) result.getPayload();
+        assertEquals(3, resultPayload.size());
+        assertSame(payload, resultPayload);
+
+        MuleMessage out;
+        for(int i = 0; i < payload.size(); i++)
+        {
+            for(int j = 0; j < payload.get(i).size(); j++)
+            {
+                out = client.request("vm://out", getTestTimeoutSecs());
+                assertTrue(out.getPayload() instanceof String);
+                assertEquals(payload.get(i).get(j), out.getPayload());
+            }
+        }
+    }
+
+    @Test
+    public void testNestedCounters() throws Exception
+    {
+        final ArrayList<ArrayList<String>> payload = createNestedPayload();
+        MuleMessage parent = new DefaultMuleMessage(payload, muleContext);
+
+        MuleMessage result = client.send("vm://input-16", parent);
+        assertTrue(result.getPayload() instanceof Collection);
+        Collection<?> resultPayload = (Collection<?>) result.getPayload();
+        assertEquals(3, resultPayload.size());
+        assertSame(payload, resultPayload);
+
+        MuleMessage out;
+        for(int i = 0; i < payload.size(); i++)
+        {
+            for(int j = 0; j < payload.get(i).size(); j++)
+            {
+                out = client.request("vm://out", getTestTimeoutSecs());
+                assertEquals("The nested counters are not consistent.", j+1, out.getInboundProperty("j"));
+            }
+            out = client.request("vm://out", getTestTimeoutSecs());
+            assertEquals("The nested counters are not consistent", i+1, out.getInboundProperty("i"));
+        }
+    }
+    
+    private ArrayList<ArrayList<String>> createNestedPayload()
+    {
+        final ArrayList<ArrayList<String>> payload = new ArrayList<ArrayList<String>>();
+        final ArrayList<String> elem1 = new ArrayList<String>();
+        final ArrayList<String> elem2 = new ArrayList<String>();
+        final ArrayList<String> elem3 = new ArrayList<String>();
+        elem1.add("a1");
+        elem1.add("a2");
+        elem1.add("a3");
+        elem2.add("b1");
+        elem2.add("b2");
+        elem3.add("c1");
+        payload.add(elem1);
+        payload.add(elem2);
+        payload.add(elem3);
+        
+        return payload;
+    }
+
+    @Test
     public void testPropertiesRestored() throws Exception
     {
         String[] payload = {"uno", "dos", "tres"};
         MuleMessage parent = new DefaultMuleMessage(payload, muleContext);
 
-        MuleMessage result = client.send("vm://input-13", parent);
+        MuleMessage result = client.send("vm://input-17", parent);
         assertTrue(result.getPayload() instanceof String[]);
         String[] resultPayload = (String[]) result.getPayload();
         assertEquals(payload.length, resultPayload.length);
         assertSame(payload, resultPayload);
         FlowAssert.verify("foreach-properties-restored");
     }
-
 }
 
 
