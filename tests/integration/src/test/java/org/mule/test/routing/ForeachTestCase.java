@@ -257,6 +257,20 @@ public class ForeachTestCase extends FunctionalTestCase
         FlowAssert.verify("array-expression-config");
     }
 
+    @Test
+    public void testPropertiesRestored() throws Exception
+    {
+        String[] payload = {"uno", "dos", "tres"};
+        MuleMessage parent = new DefaultMuleMessage(payload, muleContext);
+
+        MuleMessage result = client.send("vm://input-13", parent);
+        assertTrue(result.getPayload() instanceof String[]);
+        String[] resultPayload = (String[]) result.getPayload();
+        assertEquals(payload.length, resultPayload.length);
+        assertSame(payload, resultPayload);
+        FlowAssert.verify("foreach-properties-restored");
+    }
+
 }
 
 

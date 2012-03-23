@@ -79,12 +79,38 @@ public class Foreach extends AbstractMessageProcessorOwner
         String parentMessageProp = rootMessageVariableName != null
                                                                   ? rootMessageVariableName
                                                                   : ROOT_MESSAGE_PROPERTY;
+        Object previousCounterVar = null;
+        Object previousRootMessageVar = null;
+        if (event.getFlowVariableNames().contains(counterVariableName))
+        {
+            previousCounterVar = event.getFlowVariable(counterVariableName);
+        }
+        if (event.getFlowVariableNames().contains(parentMessageProp))
+        {
+            previousRootMessageVar = event.getFlowVariable(parentMessageProp);
+        }
         boolean transformed = transformPayloadIfNeeded(event);
         event.getMessage().setInvocationProperty(parentMessageProp, event.getMessage());
         ownedMessageProcessor.process(event);
         if (transformed)
         {
             transformBack(event);
+        }
+        if (previousCounterVar != null)
+        {
+            event.setFlowVariable(counterVariableName, previousCounterVar);
+        }
+        else
+        {
+            event.removeFlowVariable(counterVariableName);
+        }
+        if (previousRootMessageVar != null)
+        {
+            event.setFlowVariable(parentMessageProp, previousRootMessageVar);
+        }
+        else
+        {
+            event.removeFlowVariable(parentMessageProp);
         }
         return processNext(event);
     }
