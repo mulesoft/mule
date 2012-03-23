@@ -9,9 +9,18 @@
  */
 package org.mule.transformer.simple;
 
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
+
+import org.mule.api.MuleContext;
+import org.mule.api.MuleMessage;
+import org.mule.api.expression.ExpressionManager;
+import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.transformer.TransformerException;
+import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.size.SmallTest;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -21,14 +30,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Matchers;
 import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.invocation.InvocationOnMock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleMessage;
-import org.mule.api.expression.ExpressionManager;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.transformer.TransformerException;
-import org.mule.tck.junit4.AbstractMuleTestCase;
-import org.mule.tck.size.SmallTest;
+import org.mockito.stubbing.Answer;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
@@ -48,6 +53,16 @@ public class CopyPropertiesTransformerTest extends AbstractMuleTestCase
     public void setUp() throws Exception
     {
         when(mockMuleContext.getExpressionManager()).thenReturn(mockExpressionManager);
+        Mockito.when(mockExpressionManager.parse(anyString(), Mockito.any(MuleMessage.class))).thenAnswer(
+            new Answer<String>()
+            {
+                @Override
+                public String answer(InvocationOnMock invocation) throws Throwable
+                {
+
+                    return (String) invocation.getArguments()[0];
+                }
+            });
     }
 
     @Test

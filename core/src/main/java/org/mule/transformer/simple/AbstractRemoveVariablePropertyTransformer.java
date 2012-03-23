@@ -40,7 +40,7 @@ public abstract class AbstractRemoveVariablePropertyTransformer extends Abstract
     @Override
     public Object transformMessage(MuleMessage message, String outputEncoding) throws TransformerException
     {
-        if (identifierEvaluator.isPlainText() || identifierEvaluator.isExpression())
+        if (!identifierEvaluator.isRegularExpression())
         {
             Object keyValue = identifierEvaluator.resolveValue(message);
             if (keyValue != null)

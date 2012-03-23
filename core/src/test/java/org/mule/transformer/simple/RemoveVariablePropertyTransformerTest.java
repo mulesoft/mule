@@ -9,7 +9,17 @@
  */
 package org.mule.transformer.simple;
 
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.verify;
+
+import org.mule.api.MuleContext;
+import org.mule.api.MuleMessage;
+import org.mule.api.expression.ExpressionManager;
+import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.transformer.TransformerException;
+import org.mule.api.transport.PropertyScope;
+import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.size.SmallTest;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -21,14 +31,8 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.mockito.Mockito;
 import org.mockito.internal.verification.VerificationModeFactory;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleMessage;
-import org.mule.api.expression.ExpressionManager;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.transformer.TransformerException;
-import org.mule.api.transport.PropertyScope;
-import org.mule.tck.junit4.AbstractMuleTestCase;
-import org.mule.tck.size.SmallTest;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 
 @RunWith(Parameterized.class)
 @SmallTest
@@ -68,10 +72,17 @@ public class RemoveVariablePropertyTransformerTest extends AbstractMuleTestCase
     public void setUpTest()
     {
         Mockito.when(mockMuleContext.getExpressionManager()).thenReturn(mockExpressionManager);
-        Mockito.when(mockExpressionManager.isExpression(EXPRESSION)).thenReturn(true);
+        Mockito.when(mockExpressionManager.parse(anyString(), Mockito.any(MuleMessage.class))).thenAnswer(
+            new Answer<String>()
+            {
+                @Override
+                public String answer(InvocationOnMock invocation) throws Throwable
+                {
+
+                    return (String) invocation.getArguments()[0];
+                }
+            });
         Mockito.when(mockExpressionManager.evaluate(EXPRESSION, mockMessage)).thenReturn(EXPRESSION_VALUE);
-        Mockito.when(mockExpressionManager.isExpression(NULL_EXPRESSION)).thenReturn(true);
-        Mockito.when(mockExpressionManager.evaluate(NULL_EXPRESSION,mockMessage)).thenReturn(NULL_EXPRESSION_VALUE);
         removeVariableTransformer.setMuleContext(mockMuleContext);
     }
 

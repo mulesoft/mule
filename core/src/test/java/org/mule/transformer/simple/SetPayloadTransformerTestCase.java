@@ -12,6 +12,7 @@ package org.mule.transformer.simple;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -27,6 +28,9 @@ import org.mule.transport.NullPayload;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 
 @SmallTest
 public class SetPayloadTransformerTestCase extends AbstractMuleTestCase
@@ -49,6 +53,16 @@ public class SetPayloadTransformerTestCase extends AbstractMuleTestCase
         mockMuleMessage = mock(MuleMessage.class);
 
         when(mockMuleContext.getExpressionManager()).thenReturn(mockExpressionManager);
+        Mockito.when(mockExpressionManager.parse(anyString(), Mockito.any(MuleMessage.class))).thenAnswer(
+            new Answer<String>()
+            {
+                @Override
+                public String answer(InvocationOnMock invocation) throws Throwable
+                {
+
+                    return (String) invocation.getArguments()[0];
+                }
+            });
     }
 
     @Test
@@ -56,8 +70,6 @@ public class SetPayloadTransformerTestCase extends AbstractMuleTestCase
     {
         setPayloadTransformer.setValue(null);
         setPayloadTransformer.initialise();
-
-        when(mockExpressionManager.isExpression(null)).thenReturn(false);
 
         Object response = setPayloadTransformer.transformMessage(mockMuleMessage, "UTF-8");
         assertTrue(response instanceof NullPayload);
