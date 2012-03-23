@@ -21,6 +21,9 @@
         <test:component/>
         <default-exception-strategy>
             <commit-transaction exception-pattern="java.io.*"/>
+            <jms:outbound-endpoint queue="out">
+                <jms:transaction action="ALWAYS_JOIN"/>
+            </jms:outbound-endpoint>
         </default-exception-strategy>
     </flow>
 

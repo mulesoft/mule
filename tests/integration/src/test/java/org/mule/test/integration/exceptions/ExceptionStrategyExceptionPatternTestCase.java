@@ -100,12 +100,10 @@ public class ExceptionStrategyExceptionPatternTestCase extends AbstractServiceAn
         {
             fail("exception should be thrown");
         }
-        if (!commitLatch.await(TIMEOUT, TimeUnit.MILLISECONDS))
-        {
-            fail("transaction should be commit");
-        }
+        MuleMessage muleMessage = client.request("jms://out", TIMEOUT);
+        assertThat(muleMessage, IsNull.notNullValue());
     }
-    
+
     @Test
     public void testThrowExceptionAndRollback() throws Exception
     {
@@ -117,9 +115,7 @@ public class ExceptionStrategyExceptionPatternTestCase extends AbstractServiceAn
         {
             fail("exception should be thrown");
         }
-        if (!rollbackLatch.await(TIMEOUT, TimeUnit.MILLISECONDS))
-        {
-            fail("transaction should be rolled back");
-        }
+        MuleMessage muleMessage = client.request("jms://out", TIMEOUT);
+        assertThat(muleMessage, IsNull.nullValue());
     }
 }
