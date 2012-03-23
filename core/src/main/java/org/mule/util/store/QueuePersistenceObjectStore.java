@@ -320,4 +320,20 @@ public class QueuePersistenceObjectStore<T extends Serializable> extends Abstrac
     {
         muleContext = context;
     }
+
+    public void removeUnhealthyFiles() throws ObjectStoreException
+    {
+        List<Serializable> keys = allKeys();
+        for (Serializable key : keys)
+        {
+            QueueKey qkey = (QueueKey) key;
+            String fileName = storeDirectory + File.separator + qkey.queueName + File.separator + qkey.id + FILE_EXTENSION;
+            File file = new File(fileName);
+            if (file.length() == 0)
+            {
+                FileUtils.deleteQuietly(file);
+                logger.info("Removing zero size file: " + file.getAbsolutePath());
+            }
+        }
+    }
 }

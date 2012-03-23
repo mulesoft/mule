@@ -10,6 +10,7 @@
 package org.mule.util.queue;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.LinkedList;
 
 /**
@@ -136,5 +137,16 @@ public class DefaultQueueInfoDelegate implements TransientQueueInfoDelegate
     public int getSize()
     {
         return list.size();
+    }
+
+    @Override
+    public boolean addAll(Collection<? extends Serializable> items)
+    {
+        synchronized (list)
+        {
+            boolean result = list.addAll(items);
+            list.notifyAll();
+            return result;
+        }
     }
 }

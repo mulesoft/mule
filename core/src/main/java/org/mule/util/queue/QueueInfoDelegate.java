@@ -12,6 +12,7 @@ package org.mule.util.queue;
 import org.mule.api.store.ObjectStoreException;
 
 import java.io.Serializable;
+import java.util.Collection;
 
 /**
  * A QueueInfo delegates the actual work of processing its queue to one of these.
@@ -47,4 +48,13 @@ public interface QueueInfoDelegate
      * Return the size of the queue
      */
     int getSize();
+
+    /**
+     * Appends all of the elements in the specified collection to the queue (optional
+     * operation).
+     * 
+     * @param items to be added to the queue
+     * @return <tt>true</tt> if this queue changed as a result of the call
+     */
+    boolean addAll(Collection<? extends Serializable> items);
 }

@@ -131,11 +131,10 @@ public class QueuePersistenceObjectStoreTestCase extends AbstractObjectStoreCont
     @Test
     public void testListExistingFiles() throws Exception
     {
-        String id = UUID.getUUID();
-        File storeFile = createStoreFile(id);
-        FileUtils.touch(storeFile);
-
         QueuePersistenceObjectStore<Serializable> store = getObjectStore();
+
+        String id = UUID.getUUID();
+        createAndPopulateStoreFile(id, TEST_MESSAGE);
 
         List<Serializable> allKeys = store.allKeys();
         assertEquals(1, allKeys.size());
