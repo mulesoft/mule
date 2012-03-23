@@ -7,28 +7,36 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.util;
+
+import org.mule.api.MuleMessage;
+import org.mule.api.expression.ExpressionManager;
+import org.mule.routing.filters.WildcardFilter;
 
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.regex.Pattern;
 
-import org.apache.commons.collections.*;
 import org.apache.commons.collections.CollectionUtils;
-import org.mule.api.MuleMessage;
-import org.mule.api.expression.ExpressionManager;
-import org.mule.routing.filters.WildcardFilter;
+import org.apache.commons.collections.Predicate;
 
 /**
- * This class acts as a wrapper for configuration attributes that support
- * simple text, expression or regular expressions. It can be extended to support other cases too.
+ * This class acts as a wrapper for configuration attributes that support simple text, expression or regular
+ * expressions. It can be extended to support other cases too.
  */
 public class AttributeEvaluator
 {
-    private static final Collection regexSpecialCharacters = Arrays.asList("\\", "$", "^", ".", "*", "?", "[", "]");
+    private static final Pattern SINGLE_EXPRESSION_REGEX_PATTERN = Pattern.compile("^#\\[[^(#\\[)]*\\]$");
+    private static final Collection regexSpecialCharacters = Arrays.asList("\\", "$", "^", ".", "*", "?",
+        "[", "]");
     private WildcardFilter regexWildcardFilter;
     private boolean enableRegexSupport = false;
-    private enum AttributeType { PLAIN_TEXT, REGEX, EXPRESSION }
+
+    private enum AttributeType
+    {
+        EVAL, PARSE, REGEX
+    }
 
     private final String attributeValue;
     private ExpressionManager expressionManager;
@@ -39,7 +47,7 @@ public class AttributeEvaluator
     {
         this.attributeValue = attributeValue;
     }
-    
+
     public void initialize(final ExpressionManager expressionManager)
     {
         this.expressionManager = expressionManager;
@@ -48,9 +56,9 @@ public class AttributeEvaluator
 
     private void resolveAttributeType()
     {
-        if (expressionManager.isExpression(this.attributeValue))
+        if (isSingleExpression(attributeValue))
         {
-            this.attributeType = AttributeType.EXPRESSION;
+            this.attributeType = AttributeType.EVAL;
         }
         else if (enableRegexSupport && hasRegexCharactersAndCompiles())
         {
@@ -59,13 +67,18 @@ public class AttributeEvaluator
         }
         else
         {
-            this.attributeType = AttributeType.PLAIN_TEXT;
+            this.attributeType = AttributeType.PARSE;
         }
+    }
+
+    private boolean isSingleExpression(String expression)
+    {
+        return SINGLE_EXPRESSION_REGEX_PATTERN.matcher(expression).matches();
     }
 
     private boolean hasRegexCharactersAndCompiles()
     {
-        boolean hasRegexCharacters = CollectionUtils.find(regexSpecialCharacters,new Predicate()
+        boolean hasRegexCharacters = CollectionUtils.find(regexSpecialCharacters, new Predicate()
         {
             @Override
             public boolean evaluate(Object object)
@@ -95,20 +108,21 @@ public class AttributeEvaluator
         return attributeType.equals(AttributeType.REGEX);
     }
 
-    public boolean isExpression()
+    public boolean isEval()
     {
-        return attributeType.equals(AttributeType.EXPRESSION);
+        return attributeType.equals(AttributeType.EVAL);
     }
 
-    public boolean isPlainText()
+    public boolean isParse()
     {
-        return attributeType.equals(AttributeType.PLAIN_TEXT);
+        return attributeType.equals(AttributeType.PARSE);
     }
-    
+
     public boolean matches(String value)
     {
         validateStateIsRegularExpression();
-        return (this.regexPattern != null ? this.regexPattern.matcher(value).matches() : false) || this.regexWildcardFilter.accept(value);
+        return (this.regexPattern != null ? this.regexPattern.matcher(value).matches() : false)
+               || this.regexWildcardFilter.accept(value);
     }
 
     public Pattern getRegexPattern()
@@ -131,13 +145,13 @@ public class AttributeEvaluator
         {
             throw new IllegalStateException("attribute is a regular expression");
         }
-        if (isExpression())
+        if (isEval())
         {
-            return expressionManager.evaluate(attributeValue,message);
+            return expressionManager.evaluate(attributeValue, message);
         }
         else
         {
-            return getRawValue();
+            return expressionManager.parse(attributeValue, message);
         }
     }
 

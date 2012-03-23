@@ -9,15 +9,15 @@
  */
 package org.mule.transformer.simple;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import org.mule.api.MuleMessage;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transformer.TransformerException;
 import org.mule.transformer.AbstractMessageTransformer;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.AttributeEvaluator;
+
+import java.util.HashSet;
+import java.util.Set;
 
 public class RemoveAttachmentTransformer extends AbstractMessageTransformer
 {
@@ -41,7 +41,7 @@ public class RemoveAttachmentTransformer extends AbstractMessageTransformer
     {
         try
         {
-            if (nameEvaluator.isExpression() || nameEvaluator.isPlainText())
+            if (!nameEvaluator.isRegularExpression())
             {
                 Object keyValue = nameEvaluator.resolveValue(message);
                 if (keyValue != null)

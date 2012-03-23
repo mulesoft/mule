@@ -40,7 +40,7 @@ public class CopyAttachmentsTransformer extends AbstractMessageTransformer
     {
         try
         {
-            if (attachmentNameEvaluator.isExpression() || attachmentNameEvaluator.isPlainText())
+            if (!attachmentNameEvaluator.isRegularExpression())
             {
                 String attachmentName = attachmentNameEvaluator.resolveValue(message).toString();
                 DataHandler inboundAttachment = message.getInboundAttachment(attachmentName);
