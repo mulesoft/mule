@@ -47,7 +47,6 @@ import org.mule.config.spring.parsers.generic.NameTransferDefinitionParser;
 import org.mule.config.spring.parsers.generic.NamedDefinitionParser;
 import org.mule.config.spring.parsers.generic.OrphanDefinitionParser;
 import org.mule.config.spring.parsers.generic.ParentDefinitionParser;
-import org.mule.config.spring.parsers.generic.TextDefinitionParser;
 import org.mule.config.spring.parsers.processors.CheckExclusiveAttributes;
 import org.mule.config.spring.parsers.processors.CheckExclusiveAttributesAndChildren;
 import org.mule.config.spring.parsers.processors.CheckRequiredAttributesWhenNoChildren;
@@ -68,6 +67,7 @@ import org.mule.config.spring.parsers.specific.FilterDefinitionParser;
 import org.mule.config.spring.parsers.specific.FilterRefDefinitionParser;
 import org.mule.config.spring.parsers.specific.FlowDefinitionParser;
 import org.mule.config.spring.parsers.specific.FlowRefDefinitionParser;
+import org.mule.config.spring.parsers.specific.GlobalFunctionsDefintionParser;
 import org.mule.config.spring.parsers.specific.GlobalPropertyDefinitionParser;
 import org.mule.config.spring.parsers.specific.IgnoreObjectMethodsDefinitionParser;
 import org.mule.config.spring.parsers.specific.ImportMapEntryDefinitionParser;
@@ -259,7 +259,7 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("threading-profile", new ThreadingProfileDefinitionParser("threadingProfile", MuleProperties.OBJECT_DEFAULT_SERVICE_THREADING_PROFILE));
         registerBeanDefinitionParser("custom-agent", new DefaultNameMuleOrphanDefinitionParser());
         registerBeanDefinitionParser("expression-language", new ExpressionLanguageDefinitionParser());
-        registerBeanDefinitionParser("global-functions", new TextDefinitionParser("globalFunctionsString"));
+        registerBeanDefinitionParser("global-functions", new GlobalFunctionsDefintionParser("globalFunctionsString"));
         registerMuleBeanDefinitionParser("alias", new ChildMapEntryDefinitionParser("aliases")).addAlias("name", "key").addAlias("expression", "value");
         registerMuleBeanDefinitionParser("import", new ImportMapEntryDefinitionParser("import"));
 

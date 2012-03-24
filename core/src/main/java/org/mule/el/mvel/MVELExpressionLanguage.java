@@ -23,7 +23,9 @@ import org.mule.api.transformer.DataType;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.expression.DefaultExpressionManager;
 import org.mule.transformer.types.DataTypeFactory;
+import org.mule.util.IOUtils;
 
+import java.io.IOException;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
@@ -60,6 +62,7 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
 
     // Configuration
     protected String globalFunctionsString;
+    protected String globalFunctionsFile;
     protected Map<String, Function> globalFunctions = new HashMap<String, Function>();
     protected Map<String, String> aliases = new HashMap<String, String>();
     protected Map<String, Class<?>> imports = new HashMap<String, Class<?>>();
@@ -78,6 +81,21 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
         parserContext = createParserContext();
         expressionExecutor = new MVELExpressionExecutor(parserContext);
 
+        // Global functions defined in external file
+        if (globalFunctionsFile != null)
+        {
+            try
+            {
+                globalFunctions.putAll(CompilerTools.extractAllDeclaredFunctions(new ExpressionCompiler(
+                    IOUtils.getResourceAsString(globalFunctionsFile, getClass())).compile()));
+            }
+            catch (IOException e)
+            {
+                throw new InitialisationException(CoreMessages.failedToLoad(globalFunctionsFile), e, this);
+            }
+        }
+
+        // Global functions defined in configuration file (take precedence over functions in file)
         globalFunctions.putAll(CompilerTools.extractAllDeclaredFunctions(new ExpressionCompiler(
             globalFunctionsString).compile()));
 
@@ -309,6 +327,11 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
     public void addAlias(String name, String expression)
     {
         this.aliases.put(name, expression);
+    }
+
+    public void setGlobalFunctionsFile(String globalFunctionsFile)
+    {
+        this.globalFunctionsFile = globalFunctionsFile;
     }
 
 }

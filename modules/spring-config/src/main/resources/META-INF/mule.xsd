@@ -1177,7 +1177,7 @@
                                     <xsd:sequence>
                                         <xsd:element minOccurs="0" maxOccurs="unbounded" name="import">
                                             <xsd:complexType>
-                                                <xsd:attribute name="name" use="optional" type="nonBlankString" />
+                                                <xsd:attribute name="name" type="nonBlankString" />
                                                 <xsd:attribute name="class" use="required" type="substitutableClass" />
                                             </xsd:complexType>
                                         </xsd:element>
@@ -1187,7 +1187,11 @@
                                                 <xsd:attribute name="expression" use="required" type="nonBlankString" />
                                             </xsd:complexType>
                                         </xsd:element>
-                                        <xsd:element minOccurs="0" maxOccurs="1" name="global-functions" />
+                                        <xsd:element minOccurs="0" maxOccurs="1" name="global-functions" >
+                                            <xsd:complexType mixed="true">
+                                                <xsd:attribute name="src" type="nonBlankString" />
+                                            </xsd:complexType>
+                                        </xsd:element>
                                     </xsd:sequence>
                                     <xsd:attribute name="autoResolveVariables" default="true" type="substitutableBoolean" />
                                 </xsd:extension>

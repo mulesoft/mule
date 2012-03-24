@@ -12,7 +12,7 @@
             <import class="org.mule.util.StringUtils" />
             <import class="java.text.DateFormat" />
             <alias name="appName" expression="app.name" />
-            <global-functions>
+            <global-functions src="org/mule/test/el/functions.txt">
                 def echo(text) {text}
                 def hello() {'Hello '+appName+'!'}
                 def appendPayload() {payload+'appended'}

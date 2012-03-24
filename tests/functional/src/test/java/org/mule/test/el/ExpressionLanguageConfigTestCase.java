@@ -76,8 +76,18 @@ public class ExpressionLanguageConfigTestCase extends FunctionalTestCase
     @Test
     public void testExpressionLanguageGlobalFunction()
     {
+        // NOTE: This indirectly asserts that echo() function defined in config file rather than external
+        // function definition file is being used (otherwise hiOTHER' would be returned
+
         assertEquals("hi", el.evaluate("echo('hi')"));
         assertEquals("hi", em.evaluate("echo('hi')", (MuleMessage) null));
+    }
+
+    @Test
+    public void testExpressionLanguageGlobalFunctionFromFile()
+    {
+        assertEquals("hi", el.evaluate("echo2('hi')"));
+        assertEquals("hi", em.evaluate("echo2('hi')", (MuleMessage) null));
     }
 
     @Test
