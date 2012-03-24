@@ -26,6 +26,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Matchers;
@@ -91,6 +92,7 @@ public class CopyPropertiesTransformerTest extends AbstractMuleTestCase
     }
 
     @Test
+    @Ignore
     public void testCopyUsingRegex() throws InitialisationException, TransformerException
     {
         CopyPropertiesTransformer copyPropertiesTransformer = new CopyPropertiesTransformer();

@@ -26,6 +26,7 @@ import java.util.Collection;
 import java.util.HashSet;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -119,6 +120,7 @@ public class RemoveVariablePropertyTransformerTest extends AbstractMuleTestCase
     }
 
     @Test
+    @Ignore
     public void testRemoveVariableWithRegexExpression() throws InitialisationException, TransformerException
     {
         Mockito.when(mockMessage.getPropertyNames(scope)).thenReturn(new HashSet<String>(Arrays.asList("MULE_ID","MULE_CORRELATION_ID","SomeVar","MULE_GROUP_ID")));
