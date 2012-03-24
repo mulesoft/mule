@@ -70,6 +70,7 @@ import org.mule.config.spring.parsers.specific.FlowDefinitionParser;
 import org.mule.config.spring.parsers.specific.FlowRefDefinitionParser;
 import org.mule.config.spring.parsers.specific.GlobalPropertyDefinitionParser;
 import org.mule.config.spring.parsers.specific.IgnoreObjectMethodsDefinitionParser;
+import org.mule.config.spring.parsers.specific.ImportMapEntryDefinitionParser;
 import org.mule.config.spring.parsers.specific.InboundRouterDefinitionParser;
 import org.mule.config.spring.parsers.specific.InterceptorDefinitionParser;
 import org.mule.config.spring.parsers.specific.InterceptorStackDefinitionParser;
@@ -219,10 +220,10 @@ import org.mule.transformer.simple.CombineCollectionsTransformer;
 import org.mule.transformer.simple.CopyAttachmentsTransformer;
 import org.mule.transformer.simple.CopyPropertiesTransformer;
 import org.mule.transformer.simple.HexStringToByteArray;
-import org.mule.transformer.simple.ParseTemplateTransformer;
 import org.mule.transformer.simple.MapToBean;
 import org.mule.transformer.simple.ObjectToByteArray;
 import org.mule.transformer.simple.ObjectToString;
+import org.mule.transformer.simple.ParseTemplateTransformer;
 import org.mule.transformer.simple.RemoveAttachmentTransformer;
 import org.mule.transformer.simple.RemoveFlowVariableTransformer;
 import org.mule.transformer.simple.RemovePropertyTransformer;
@@ -260,7 +261,7 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("expression-language", new ExpressionLanguageDefinitionParser());
         registerBeanDefinitionParser("global-functions", new TextDefinitionParser("globalFunctionsString"));
         registerMuleBeanDefinitionParser("alias", new ChildMapEntryDefinitionParser("aliases")).addAlias("name", "key").addAlias("expression", "value");
-        registerMuleBeanDefinitionParser("import", new ChildMapEntryDefinitionParser("import")).addAlias("name", "key").addAlias("class", "value");
+        registerMuleBeanDefinitionParser("import", new ImportMapEntryDefinitionParser("import"));
 
         // Exception Strategies
         registerBeanDefinitionParser("default-exception-strategy", new ExceptionStrategyDefinitionParser(DefaultMessagingExceptionStrategy.class));

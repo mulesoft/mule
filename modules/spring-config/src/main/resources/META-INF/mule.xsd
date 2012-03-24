@@ -1177,7 +1177,7 @@
                                     <xsd:sequence>
                                         <xsd:element minOccurs="0" maxOccurs="unbounded" name="import">
                                             <xsd:complexType>
-                                                <xsd:attribute name="name" use="required" type="nonBlankString" />
+                                                <xsd:attribute name="name" use="optional" type="nonBlankString" />
                                                 <xsd:attribute name="class" use="required" type="substitutableClass" />
                                             </xsd:complexType>
                                         </xsd:element>

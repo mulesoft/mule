@@ -9,9 +9,14 @@
     <configuration>
         <expression-language autoResolveVariables="false">
             <import name="loc" class="java.util.Locale" />
+            <import class="org.mule.util.StringUtils" />
+            <import class="java.text.DateFormat" />
             <alias name="appName" expression="app.name" />
             <global-functions>
+                def echo(text) {text}
                 def hello() {'Hello '+appName+'!'}
+                def appendPayload() {payload+'appended'}
+                def reversePayload() {StringUtils.reverse(payload)}
             </global-functions>
         </expression-language>
     </configuration>
@@ -20,8 +25,7 @@
         <test:assert expression="#[payload == 'foo']" />
         <eval expression="#[payload='bar']" />
         <test:assert expression="#[payload == 'bar']" />
-        <test:assert expression="#[loc is java.util.Locale]" />
-        <eval expression="#[System.out.println(loc.getName())]" />
+        <test:assert expression="#[loc.getName().equals('java.util.Locale')]" />
     </flow>
 
 </mule>

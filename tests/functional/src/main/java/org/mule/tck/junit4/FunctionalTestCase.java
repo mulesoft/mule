@@ -34,6 +34,7 @@ import org.mule.util.IOUtils;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.junit.After;
 import org.junit.Before;
 
 /**
@@ -185,7 +186,7 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase
         FlowAssert.verify(flowName);
     }
     
-    @Before
+    @After
     public final void clearFlowAssertions() throws Exception
     {
         FlowAssert.reset();
