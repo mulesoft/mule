@@ -94,14 +94,6 @@
         <test:assert expression="#[groovy:message.getOutboundProperty('inbPropKey').equals('inbPropValue')]"/>
     </flow>
 
-    <flow name="copyPropertiesUsingRegex">
-        <transformer ref="addInboundProperty"/>
-        <transformer ref="addInboundProperty2"/>
-        <copy-properties propertyName=".*2$"/>
-        <test:assert expression="#[groovy:message.getOutboundProperty('inbPropKey') == null]"/>
-        <test:assert expression="#[groovy:message.getOutboundProperty('inbPropKey2').equals('inbPropValue2')]"/>
-    </flow>
-
     <flow name="copyAllProperties">
         <transformer ref="addInboundProperty"/>
         <transformer ref="addInboundProperty2"/>

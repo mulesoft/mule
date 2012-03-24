@@ -15,10 +15,12 @@ import org.mule.api.transformer.TransformerException;
 import org.mule.transformer.AbstractMessageTransformer;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.AttributeEvaluator;
+import org.mule.util.WildcardAttributeEvaluator;
 
 public class CopyPropertiesTransformer extends AbstractMessageTransformer
 {
     private AttributeEvaluator propertyNameEvaluator;
+    private WildcardAttributeEvaluator wildcardPropertyNameEvaluator;
 
     public CopyPropertiesTransformer()
     {
@@ -34,9 +36,20 @@ public class CopyPropertiesTransformer extends AbstractMessageTransformer
     }
 
     @Override
-    public Object transformMessage(MuleMessage message, String outputEncoding) throws TransformerException
+    public Object transformMessage(final MuleMessage message, String outputEncoding) throws TransformerException
     {
-        if (true)
+        if (wildcardPropertyNameEvaluator.hasWildcards())
+        {
+            wildcardPropertyNameEvaluator.processValues(message.getInboundPropertyNames(),new WildcardAttributeEvaluator.MatchCallback()
+            {
+                @Override
+                public void processMatch(String matchedValue)
+                {
+                    message.setOutboundProperty(matchedValue,message.getInboundProperty(matchedValue));
+                }
+            });
+        }
+        else
         {
             Object keyValue = propertyNameEvaluator.resolveValue(message);
             if (keyValue != null)
@@ -57,16 +70,6 @@ public class CopyPropertiesTransformer extends AbstractMessageTransformer
                 logger.info("Key expression return null, no property will be copied");
             }
         }
-//        else
-//        {
-//            for (String inboundPropertyName : message.getInboundPropertyNames())
-//            {
-//                if (propertyNameEvaluator.matches(inboundPropertyName))
-//                {
-//                    message.setOutboundProperty(inboundPropertyName,message.getInboundProperty(inboundPropertyName));
-//                }
-//            }
-//        }
         return message;
     }
 
@@ -85,6 +88,7 @@ public class CopyPropertiesTransformer extends AbstractMessageTransformer
             throw new IllegalArgumentException("Null propertyName not supported");
         }
         this.propertyNameEvaluator = new AttributeEvaluator(propertyName);
+        this.wildcardPropertyNameEvaluator = new WildcardAttributeEvaluator(propertyName);
     }
 
 }

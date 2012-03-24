@@ -16,10 +16,12 @@ import org.mule.api.transport.PropertyScope;
 import org.mule.transformer.AbstractMessageTransformer;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.AttributeEvaluator;
+import org.mule.util.WildcardAttributeEvaluator;
 
 public abstract class AbstractRemoveVariablePropertyTransformer extends AbstractMessageTransformer
 {
     private AttributeEvaluator identifierEvaluator;
+    private WildcardAttributeEvaluator wildcardAttributeEvaluator;
 
     public AbstractRemoveVariablePropertyTransformer()
     {
@@ -35,9 +37,24 @@ public abstract class AbstractRemoveVariablePropertyTransformer extends Abstract
     }
 
     @Override
-    public Object transformMessage(MuleMessage message, String outputEncoding) throws TransformerException
+    public Object transformMessage(final MuleMessage message, String outputEncoding) throws TransformerException
     {
-        if (true)
+        if (wildcardAttributeEvaluator.hasWildcards())
+        {
+            wildcardAttributeEvaluator.processValues(message.getPropertyNames(getScope()),new WildcardAttributeEvaluator.MatchCallback()
+            {
+                @Override
+                public void processMatch(String matchedValue)
+                {
+                    message.removeProperty(matchedValue,getScope());
+                    if (logger.isDebugEnabled())
+                    {
+                        logger.debug(String.format("Removing property: '%s' from scope: '%s'", matchedValue, getScope().getScopeName()));
+                    }
+                }
+            });    
+        }
+        else
         {
             Object keyValue = identifierEvaluator.resolveValue(message);
             if (keyValue != null)
@@ -49,21 +66,6 @@ public abstract class AbstractRemoveVariablePropertyTransformer extends Abstract
                 logger.info("Key expression return null, no property will be removed");
             }
         }
-//        else
-//        {
-//            final Set<String> propertyNames = new HashSet<String>(message.getPropertyNames(getScope()));
-//            for (String key : propertyNames)
-//            {
-//                if (identifierEvaluator.matches(key))
-//                {
-//                    if (logger.isDebugEnabled())
-//                    {
-//                        logger.debug(String.format("Removing property: '%s' from scope: '%s'", key, getScope().getScopeName()));
-//                    }
-//                    message.removeProperty(key, getScope());
-//                }
-//            }
-//        }
         return message;
     }
 
@@ -82,6 +84,7 @@ public abstract class AbstractRemoveVariablePropertyTransformer extends Abstract
             throw new IllegalArgumentException("Remove with null identifier is not supported");
         }
         this.identifierEvaluator = new AttributeEvaluator(identifier);
+        this.wildcardAttributeEvaluator = new WildcardAttributeEvaluator(identifier);
     }
 
     public abstract PropertyScope getScope();

@@ -92,24 +92,15 @@ public class AttachmentTransformerTestCase extends FunctionalTestCase
     }
     
     @Test
-    @Ignore
     public void testCopyAttachments() throws Exception
     {
         runScenario("copyAttachments");
     }
 
     @Test
-    @Ignore
     public void testCopyAttachmentsWithWildcard() throws Exception
     {
         runScenario("copyAttachmentsWithWildcard");
-    }
-
-    @Test
-    @Ignore
-    public void testCopyAttachmentsWithRegex() throws Exception
-    {
-        runScenario("copyAttachmentsWithRegex");
     }
 
 

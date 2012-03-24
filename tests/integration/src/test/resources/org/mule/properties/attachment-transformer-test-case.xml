@@ -130,11 +130,4 @@
         <test:assert expression="#[groovy:message.getOutboundAttachment('attach22') != null]"/>
     </flow>
 
-    <flow name="copyAttachmentsWithRegex" processingStrategy="synchronous">
-        <copy-attachments attachmentName="^2$"/>
-        <test:assert expression="#[groovy:message.getOutboundAttachment('attach') != null]"/>
-        <test:assert expression="#[groovy:message.getOutboundAttachment('attach2') == null]"/>
-        <test:assert expression="#[groovy:message.getOutboundAttachment('attach22') == null]"/>
-    </flow>
-
 </mule>

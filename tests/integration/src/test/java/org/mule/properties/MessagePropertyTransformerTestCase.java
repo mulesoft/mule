@@ -75,12 +75,6 @@ public class MessagePropertyTransformerTestCase extends FunctionalTestCase
     }
 
     @Test
-    public void testCopyPropertiesUsingRegex() throws Exception
-    {
-        runScenario("copyPropertiesUsingRegex");
-    }
-
-    @Test
     public void testCopyAllProperties() throws Exception
     {
         runScenario("copyAllProperties");
