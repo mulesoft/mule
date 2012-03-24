@@ -87,14 +87,8 @@ public class ImportMapEntryDefinitionParser extends ChildMapEntryDefinitionParse
             }
             else
             {
-                try
-                {
-                    importName = Class.forName((String) importClassName).getSimpleName();
-                }
-                catch (ClassNotFoundException e)
-                {
-                    throw new RuntimeException(e);
-                }
+                importName = importClassName.substring(importClassName.lastIndexOf(".") + 1,
+                    importClassName.length());
             }
 
             oldValue.put(importName, importClassName);
