@@ -19,7 +19,6 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.processor.InterceptingMessageProcessor;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transformer.DataType;
-import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.expression.ExpressionConfig;
 import org.mule.processor.AbstractMessageProcessorOwner;
@@ -27,7 +26,6 @@ import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.routing.outbound.AbstractMessageSequenceSplitter;
 import org.mule.routing.outbound.CollectionMessageSequence;
 import org.mule.transformer.types.DataTypeFactory;
-import org.mule.transformer.types.SimpleDataType;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -70,8 +68,7 @@ public class Foreach extends AbstractMessageProcessorOwner
     private int batchSize;
     private String rootMessageVariableName;
     private String counterVariableName;
-    private Transformer xml2dom;
-    private Transformer dom2xml;
+    private boolean xpathCollection;
 
     @Override
     public MuleEvent process(MuleEvent event) throws MuleException
@@ -89,12 +86,17 @@ public class Foreach extends AbstractMessageProcessorOwner
         {
             previousRootMessageVar = event.getFlowVariable(parentMessageProp);
         }
-        boolean transformed = transformPayloadIfNeeded(event);
-        event.getMessage().setInvocationProperty(parentMessageProp, event.getMessage());
+        MuleMessage message = event.getMessage();
+        boolean transformed = false;
+        if (xpathCollection)
+        {
+            transformed = transformPayloadIfNeeded(message);
+        }
+        message.setInvocationProperty(parentMessageProp, message);
         ownedMessageProcessor.process(event);
         if (transformed)
         {
-            transformBack(event);
+            transformBack(message);
         }
         if (previousCounterVar != null)
         {
@@ -115,33 +117,20 @@ public class Foreach extends AbstractMessageProcessorOwner
         return processNext(event);
     }
 
-    private boolean transformPayloadIfNeeded(MuleEvent event) throws TransformerException
+    private boolean transformPayloadIfNeeded(MuleMessage message) throws TransformerException
     {
-        boolean transformed = false;
-        MuleMessage message = event.getMessage();
-        if (collectionExpression == null)
+        Object payload = message.getPayload();
+        if (payload instanceof Document || "org.dom4j.Document".equals(payload.getClass().getName()))
         {
             return false;
         }
-        if (expressionConfig.getEvaluator() != null
-            && expressionConfig.getEvaluator().startsWith(XPATH_PREFIX)
-            && message.getPayload() instanceof String)
-        {
-            message.setPayload(xml2dom.transform(message.getPayload()));
-            transformed = true;
-        }
-        else if (expressionConfig.getEvaluator() == null
-                 && expressionConfig.getExpression().matches("^xpath\\(.+\\)$"))
-        {
-            message.setPayload(xml2dom.transform(message.getPayload()));
-            transformed = true;
-        }
-        return transformed;
+        message.setPayload(message.getPayload(DataTypeFactory.create(Document.class)));
+        return true;
     }
 
-    private void transformBack(MuleEvent event) throws TransformerException
+    private void transformBack(MuleMessage message) throws TransformerException
     {
-        event.getMessage().setPayload(dom2xml.transform(event.getMessage().getPayload()));
+        message.setPayload(message.getPayload(DataType.STRING_DATA_TYPE));
     }
 
     protected MuleEvent processNext(MuleEvent event) throws MuleException
@@ -181,20 +170,13 @@ public class Foreach extends AbstractMessageProcessorOwner
             expressionConfig.setExpression(collectionExpression);
             checkEvaluator(expressionConfig);
             splitter = new ExpressionSplitter(expressionConfig);
-            if (collectionExpression.startsWith(XPATH_PREFIX))
+            if (expressionConfig.getEvaluator() != null && expressionConfig.getEvaluator().startsWith(XPATH_PREFIX))
             {
-                DataType<Document> docType = new SimpleDataType<Document>(Document.class);
-                try
-                {
-                    xml2dom = muleContext.getRegistry()
-                        .lookupTransformer(DataTypeFactory.XML_STRING, docType);
-                    dom2xml = muleContext.getRegistry()
-                        .lookupTransformer(docType, DataTypeFactory.XML_STRING);
-                }
-                catch (TransformerException e)
-                {
-                    throw new InitialisationException(e, this);
-                }
+                xpathCollection = true;
+            }
+            else if (expressionConfig.getEvaluator() == null && expressionConfig.getExpression().matches("^xpath\\(.+\\)$"))
+            {
+                xpathCollection = true;
             }
         }
         else
@@ -220,8 +202,7 @@ public class Foreach extends AbstractMessageProcessorOwner
 
     private void checkEvaluator(ExpressionConfig expressionConfig)
     {
-        if (expressionConfig.getEvaluator() != null
-            && expressionConfig.getEvaluator().startsWith(XPATH_PREFIX + ":"))
+        if (expressionConfig.getEvaluator() != null && expressionConfig.getEvaluator().startsWith(XPATH_PREFIX))
         {
             expressionConfig.setEvaluator("xpath-branch");
         }

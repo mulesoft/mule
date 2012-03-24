@@ -23,11 +23,13 @@ import org.mule.module.client.MuleClient;
 import org.mule.tck.functional.FlowAssert;
 import org.mule.tck.junit4.FunctionalTestCase;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.kahadb.util.ByteArrayInputStream;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -227,12 +229,30 @@ public class ForeachTestCase extends FunctionalTestCase
         assertEquals(names.size(), result.getInboundProperty("totalMessages"));
     }
 
+    static String sampleXml = "<PurchaseOrder>" + "<Address><Name>Ellen Adams</Name></Address>" + "<Items>"
+                              + "<Item PartNumber=\"872-AA\"><Price>140</Price></Item>"
+                        + "<Item PartNumber=\"926-AA\"><Price>35</Price></Item>" + "</Items>" + "</PurchaseOrder>";
+
     @Test
     public void testXmlUpdate() throws Exception
     {
-        String xml = "<PurchaseOrder>" + "<Address><Name>Ellen Adams</Name></Address>" + "<Items>" + "<Item PartNumber=\"872-AA\"><Price>140</Price></Item>"
-                     + "<Item PartNumber=\"926-AA\"><Price>35</Price></Item>" + "</Items>" + "</PurchaseOrder>";
-        client.send("vm://input-10", xml, null);
+        client.send("vm://input-10", sampleXml, null);
+        FlowAssert.verify("process-order-update");
+    }
+
+    @Test
+    public void testXmlUpdateByteArray() throws Exception
+    {
+        byte[] xmlba = sampleXml.getBytes();
+        client.send("vm://input-10", xmlba, null);
+        FlowAssert.verify("process-order-update");
+    }
+
+    @Test
+    public void testXmlUpdateInputStream() throws Exception
+    {
+        InputStream xmlis = new ByteArrayInputStream(sampleXml.getBytes());
+        client.send("vm://input-10", xmlis, null);
         FlowAssert.verify("process-order-update");
     }
 
