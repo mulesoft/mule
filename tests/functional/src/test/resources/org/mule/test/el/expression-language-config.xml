@@ -8,7 +8,7 @@
 
     <configuration>
         <expression-language autoResolveVariables="false">
-            <import name="loc" class="java.util.Lcale" />
+            <import name="loc" class="java.util.Locale" />
             <import class="org.mule.util.StringUtils" />
             <import class="java.text.DateFormat" />
             <alias name="appName" expression="app.name" />
