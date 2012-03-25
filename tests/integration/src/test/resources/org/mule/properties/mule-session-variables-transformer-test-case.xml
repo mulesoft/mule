@@ -65,7 +65,7 @@
     <flow name="removeSessionVariableUsingParsedStringFlow" processingStrategy="synchronous">
         <transformer ref="addSessionVariable"/>
         <transformer ref="addSessionVariableName"/>
-        <remove-session-variable variableName="ses#[string:Var]key]"/>
+        <remove-session-variable variableName="ses#[string:Var]key"/>
         <test:assert expression="#[groovy:message.getSessionProperty('sesVarKey') == null]"/>
     </flow>
 
