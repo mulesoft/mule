@@ -19,7 +19,7 @@ import org.mule.context.notification.MessageProcessorNotification;
 /**
  * Intercepts MessageProcessor execution to fire before and after notifications
  */
-public class MessageProcessorNotificationExecutionInterceptor implements MessageProcessorExecutionInterceptor
+class MessageProcessorNotificationExecutionInterceptor implements MessageProcessorExecutionInterceptor
 {
     private ServerNotificationHandler notificationHandler;
     private MessageProcessorExecutionInterceptor next;
