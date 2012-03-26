@@ -35,5 +35,17 @@
         <append-string-transformer message="y" />
         <append-string-transformer message="z" />
     </sub-flow>
+    
+    <flow name="flow2">
+        <flow-ref name="sub-flow-#[letter]" />
+    </flow>
+
+    <sub-flow name="sub-flow-A">
+        <append-string-transformer message="A" />
+    </sub-flow>
+
+    <sub-flow name="sub-flow-B">
+        <append-string-transformer message="B" />
+    </sub-flow>
 
 </mule>
