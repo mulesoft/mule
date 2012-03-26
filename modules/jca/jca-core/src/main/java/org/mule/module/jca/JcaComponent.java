@@ -132,7 +132,7 @@ public class JcaComponent extends AbstractJavaComponent implements WorkListener
                         {
                             Message message = JcaMessages.cannotAllocateManagedInstance();
                             logger.error(message);
-                            throw new MessagingException(event, e, JcaComponent.this);
+                            throw new MessagingException(event, e);
                         }
                         return null;
                     }

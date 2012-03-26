@@ -12,7 +12,7 @@ package org.mule.processor.chain;
 
 import org.mule.MessageExchangePattern;
 import org.mule.OptimizedRequestContext;
-import org.mule.api.MuleContext;
+import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.component.Component;
@@ -23,7 +23,7 @@ import org.mule.api.processor.MessageProcessorChain;
 import org.mule.api.processor.RequestReplyReplierMessageProcessor;
 import org.mule.api.transformer.Transformer;
 import org.mule.construct.Flow;
-import org.mule.execution.MessageProcessorExecutionTemplate;
+import org.mule.context.notification.MessageProcessorNotification;
 import org.mule.routing.MessageFilter;
 
 import java.util.Arrays;
@@ -88,20 +88,37 @@ public class DefaultMessageProcessorChain extends AbstractMessageProcessorChain
             {
                 nextProcessor = processorIterator.next();
             }
-            
+            fireNotification(event.getFlowConstruct(), event, processor,
+                MessageProcessorNotification.MESSAGE_PROCESSOR_PRE_INVOKE);
+
             if (flowConstruct instanceof Flow && nextProcessor != null
-                    && processorMayReturnNull(processor))
+                && processorMayReturnNull(processor))
             {
                 copy = OptimizedRequestContext.criticalSetEvent(currentEvent);
             }
 
-            resultEvent = MessageProcessorExecutionTemplate.createExecutionTemplate(currentEvent.getMuleContext().getNotificationManager()).execute(processor,currentEvent);
+            try 
+            {
+                resultEvent = processor.process(currentEvent);
+            }
+            catch (MessagingException e)
+            {
+                throw e;
+            }
+            catch (Exception e)
+            {
+                throw new MessagingException(currentEvent,e);
+            }
 
             if (resultWasNull && processor instanceof RequestReplyReplierMessageProcessor)
             {
                 // reply-to processing should not resurrect a dead event
                 resultEvent = null;
             }
+
+            fireNotification(event.getFlowConstruct(), resultEvent, processor,
+                MessageProcessorNotification.MESSAGE_PROCESSOR_POST_INVOKE);
+
 
             if (resultEvent != null)
             {

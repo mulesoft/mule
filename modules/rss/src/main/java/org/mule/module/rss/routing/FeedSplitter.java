@@ -87,7 +87,7 @@ public class FeedSplitter extends AbstractSplitter
         }
         catch (MuleException e)
         {
-            throw new MessagingException(e.getI18nMessage(), event, e, this);
+            throw new MessagingException(e.getI18nMessage(), event, e);
         }
     }
 

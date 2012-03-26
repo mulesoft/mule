@@ -71,7 +71,7 @@ public class ServiceInternalMessageProcessor extends AbstractInterceptingMessage
             }
             else
             {
-                throw new MessagingException(event, e, this);
+                throw new MessagingException(event, e);
             }
         }
     }

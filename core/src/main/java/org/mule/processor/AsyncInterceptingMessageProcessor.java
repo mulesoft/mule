@@ -128,7 +128,7 @@ public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessa
         {
             throw new MessagingException(
                 CoreMessages.createStaticMessage("Unable to process a synchonrous event asyncronously"),
-                event, this);
+                event);
         }
         return doThreading && !event.isSynchronous();
     }
@@ -143,7 +143,7 @@ public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessa
         catch (Exception e)
         {
             new MessagingException(CoreMessages.errorSchedulingMessageProcessorForAsyncInvocation(next),
-                event, e, this);
+                event, e);
         }
     }
 
@@ -173,7 +173,7 @@ public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessa
                             throw e;
                         } catch (Exception e)
                         {
-                            throw new MessagingException(event, e, next);
+                            throw new MessagingException(event, e);
                         }
                         return null;
                     }

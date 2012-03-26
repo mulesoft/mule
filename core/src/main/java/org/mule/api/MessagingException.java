@@ -10,13 +10,10 @@
 
 package org.mule.api;
 
-import org.mule.api.execution.ExecutionCallback;
-import org.mule.api.processor.MessageProcessor;
 import org.mule.config.ExceptionHelper;
 import org.mule.config.MuleManifest;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.Message;
-import org.mule.endpoint.inbound.InboundEndpointMimeTypeCheckingMessageProcessor;
 import org.mule.routing.filters.RegExFilter;
 import org.mule.routing.filters.WildcardFilter;
 import org.mule.transport.NullPayload;
@@ -48,7 +45,6 @@ public class MessagingException extends MuleException
 
     private boolean causeRollback;
     private boolean handled;
-    private MessageProcessor failingMessageProcessor;
 
     /**
      * @deprecated use MessagingException(Message, MuleEvent)
@@ -67,15 +63,6 @@ public class MessagingException extends MuleException
         super();
         this.event = event;
         this.muleMessage = (event != null ? event.getMessage() : null);
-        setMessage(generateMessage(message));
-    }
-
-    public MessagingException(Message message, MuleEvent event, MessageProcessor failingMessageProcessor)
-    {
-        super();
-        this.event = event;
-        this.muleMessage = (event != null ? event.getMessage() : null);
-        this.failingMessageProcessor = failingMessageProcessor;
         setMessage(generateMessage(message));
     }
 
@@ -99,29 +86,11 @@ public class MessagingException extends MuleException
         setMessage(generateMessage(message));
     }
 
-    public MessagingException(Message message, MuleEvent event, Throwable cause, MessageProcessor failingMessageProcessor)
-    {
-        super(cause);
-        this.event = event;
-        this.muleMessage = (event != null ? event.getMessage() : null);
-        this.failingMessageProcessor = failingMessageProcessor;
-        setMessage(generateMessage(message));
-    }
-
     public MessagingException(MuleEvent event, Throwable cause)
     {
         super(cause);
         this.event = event;
         this.muleMessage = (event != null ? event.getMessage() : null);
-        setMessage(generateMessage(getI18nMessage()));
-    }
-
-    public MessagingException(MuleEvent event, Throwable cause, MessageProcessor failingMessageProcessor)
-    {
-        super(cause);
-        this.event = event;
-        this.muleMessage = (event != null ? event.getMessage() : null);
-        this.failingMessageProcessor = failingMessageProcessor;
         setMessage(generateMessage(getI18nMessage()));
     }
 
@@ -342,14 +311,6 @@ public class MessagingException extends MuleException
     public boolean handled()
     {
         return handled;
-    }
-
-    /**
-     * @return MessageProcessor that causes the failure
-     */
-    public MessageProcessor getFailingMessageProcessor()
-    {
-        return failingMessageProcessor;
     }
 }
 

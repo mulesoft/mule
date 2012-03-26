@@ -208,7 +208,7 @@ public class WSProxy extends AbstractConfigurationPattern
             {
                 throw new MessagingException(
                     MessageFactory.createStaticMessage("Impossible to retrieve WSDL for proxied service"),
-                    event, e, this);
+                    event, e);
             }
         }
 
