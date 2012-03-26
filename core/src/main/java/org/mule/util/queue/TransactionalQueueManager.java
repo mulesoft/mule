@@ -61,7 +61,7 @@ public class TransactionalQueueManager extends AbstractXAResourceManager impleme
     @Override
     public synchronized void setQueueConfiguration(String queueName, QueueConfiguration config)
     {
-        getQueue(queueName, config);
+        getQueue(queueName, config).setConfig(config);
         addStore(config.objectStore);
     }
 
