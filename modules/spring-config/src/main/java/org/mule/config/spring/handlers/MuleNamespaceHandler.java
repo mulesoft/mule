@@ -47,6 +47,7 @@ import org.mule.config.spring.parsers.generic.NameTransferDefinitionParser;
 import org.mule.config.spring.parsers.generic.NamedDefinitionParser;
 import org.mule.config.spring.parsers.generic.OrphanDefinitionParser;
 import org.mule.config.spring.parsers.generic.ParentDefinitionParser;
+import org.mule.config.spring.parsers.processors.CheckExclusiveAttributeAndText;
 import org.mule.config.spring.parsers.processors.CheckExclusiveAttributes;
 import org.mule.config.spring.parsers.processors.CheckExclusiveAttributesAndChildren;
 import org.mule.config.spring.parsers.processors.CheckRequiredAttributesWhenNoChildren;
@@ -61,6 +62,7 @@ import org.mule.config.spring.parsers.specific.DefaultNameMuleOrphanDefinitionPa
 import org.mule.config.spring.parsers.specific.DefaultThreadingProfileDefinitionParser;
 import org.mule.config.spring.parsers.specific.ExceptionStrategyDefinitionParser;
 import org.mule.config.spring.parsers.specific.ExceptionTXFilterDefinitionParser;
+import org.mule.config.spring.parsers.specific.ExpressionComponentDefintionParser;
 import org.mule.config.spring.parsers.specific.ExpressionLanguageDefinitionParser;
 import org.mule.config.spring.parsers.specific.ExpressionTransformerDefinitionParser;
 import org.mule.config.spring.parsers.specific.FilterDefinitionParser;
@@ -107,7 +109,7 @@ import org.mule.config.spring.parsers.specific.endpoint.support.ChildEndpointDef
 import org.mule.config.spring.parsers.specific.endpoint.support.OrphanEndpointDefinitionParser;
 import org.mule.config.spring.util.SpringBeanLookup;
 import org.mule.context.notification.ListenerSubscriptionPair;
-import org.mule.el.ExpressionLanguageExecutor;
+import org.mule.el.ExpressionLanguageComponent;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.enricher.MessageEnricher;
 import org.mule.enricher.MessageEnricher.EnrichExpressionPair;
@@ -407,8 +409,9 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
             TransactionalMessageProcessorsFactoryBean.class));
         registerMuleBeanDefinitionParser("logger", new ChildDefinitionParser("messageProcessor",
             LoggerMessageProcessor.class));
-        registerMuleBeanDefinitionParser("eval", new ChildDefinitionParser("messageProcessor",
-            ExpressionLanguageExecutor.class));
+        registerMuleBeanDefinitionParser("expression-component",
+            new ExpressionComponentDefintionParser("messageProcessor", ExpressionLanguageComponent.class)).registerPreProcessor(
+            new CheckExclusiveAttributeAndText("file"));
 
         // Message Sources
         registerBeanDefinitionParser("custom-source", new ChildDefinitionParser("messageSource", null, MessageSource.class));

@@ -23,8 +23,10 @@
 
     <flow name="flow">
         <test:assert expression="#[payload == 'foo']" />
-        <eval expression="#[payload='bar']" />
+        <expression-component>payload='bar'</expression-component>
         <test:assert expression="#[payload == 'bar']" />
+        <expression-component file="org/mule/test/el/component.txt" />
+        <test:assert expression="#[payload == 'bar2']" />
         <test:assert expression="#[loc.getName().equals('java.util.Locale')]" />
     </flow>
 

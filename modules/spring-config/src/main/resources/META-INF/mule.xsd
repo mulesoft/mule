@@ -202,11 +202,11 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="eval" substitutionGroup="abstract-message-processor">
+    <xsd:element name="expression-component" substitutionGroup="abstract-mixed-content-message-processor">
         <xsd:complexType>
-            <xsd:complexContent>
-                <xsd:extension base="abstractMessageProcessorType">
-                    <xsd:attribute name="expression" use="required"/>
+            <xsd:complexContent mixed="true">
+                <xsd:extension base="abstractMixedContentMessageProcessorType">
+                    <xsd:attribute name="file" use="optional"/>
                 </xsd:extension>
             </xsd:complexContent>
         </xsd:complexType>
@@ -434,6 +434,21 @@
         </xsd:complexContent>
     </xsd:complexType>
 
+    <xsd:element name="abstract-mixed-content-message-processor" abstract="true" type="abstractMixedContentMessageProcessorType" >
+        <xsd:annotation>
+            <xsd:documentation>
+                A placeholder for message processor elements.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:complexType name="abstractMixedContentMessageProcessorType">
+        <xsd:complexContent>
+            <xsd:extension base="annotatedMixedContentType"/>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+
+
     <xsd:element name="abstract-observer-message-processor" abstract="true" type="abstractObserverMessageProcessorType" substitutionGroup="abstract-message-processor">
         <xsd:annotation>
             <xsd:documentation>
@@ -463,6 +478,7 @@
                     </xsd:documentation>
                 </xsd:annotation>
             </xsd:element>
+            <xsd:element ref="abstract-mixed-content-message-processor"/>
         </xsd:choice>
     </xsd:group>
 
@@ -3408,6 +3424,7 @@
             <xsd:element ref="abstract-observer-message-processor"/>
             <xsd:element ref="processor"/>
             <xsd:element ref="custom-processor"/>
+            <xsd:element ref="abstract-mixed-content-message-processor"/>
         </xsd:choice>
     </xsd:group>
 
