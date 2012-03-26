@@ -137,7 +137,6 @@ public class RetrieveMessageReceiver extends AbstractPollingMessageReceiver impl
                     {
                         break;
                     }
-                    processedMessages.add(messages[i]);
                     try
                     {
                         if (!messages[i].getFlags().contains(Flags.Flag.DELETED)
@@ -151,6 +150,10 @@ public class RetrieveMessageReceiver extends AbstractPollingMessageReceiver impl
 
                                 if (castConnector().isDeleteReadMessages())
                                 {
+                                    if (moveToFolder != null)
+                                    {
+                                        folder.copyMessages(new Message[]{messages[i]}, moveToFolder);
+                                    }
                                     // Mark as deleted
                                     messages[i].setFlag(Flags.Flag.DELETED, true);
                                 }
@@ -161,15 +164,19 @@ public class RetrieveMessageReceiver extends AbstractPollingMessageReceiver impl
                                         Flags.Flag flag = castConnector().getDefaultProcessMessageAction();
                                         if (flag != null)
                                         {
+                                            if(flag == Flags.Flag.DELETED && moveToFolder != null)
+                                            {
+                                                folder.copyMessages(new Message[]{messages[i]}, moveToFolder);
+                                            }
                                             messages[i].setFlag(flag, true);
                                         }
                                     }
                                     else
                                     {
-                                        messages[i].setFlag(Flags.Flag.SEEN, false);
+                                        messages[i].setFlag(Flags.Flag.SEEN, true);
+                                        processedMessages.add(messages[i]);
                                     }
                                 }
-
                                 routeMessage(message);
                             }
                             catch (org.mule.api.MessagingException e)
@@ -202,7 +209,7 @@ public class RetrieveMessageReceiver extends AbstractPollingMessageReceiver impl
                         throw forwarded;
                     }
                 }
-                // Lets move all messages in one go
+                // Copy processed messages that have not been deleted (the deleted were already moved)
                 if (moveToFolder != null)
                 {
                     folder.copyMessages(processedMessages.toArray(new Message[processedMessages.size()]), moveToFolder);
