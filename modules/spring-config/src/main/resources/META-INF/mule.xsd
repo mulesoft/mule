@@ -1189,7 +1189,7 @@
                                         </xsd:element>
                                         <xsd:element minOccurs="0" maxOccurs="1" name="global-functions" >
                                             <xsd:complexType mixed="true">
-                                                <xsd:attribute name="src" type="nonBlankString" />
+                                                <xsd:attribute name="file" type="nonBlankString" />
                                             </xsd:complexType>
                                         </xsd:element>
                                     </xsd:sequence>
