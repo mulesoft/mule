@@ -49,7 +49,7 @@ public class CatchMessagingExceptionStrategyTestCase
     private Exception mockException;
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     private MuleEvent mockMuleEvent;
-    @Mock
+    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     private MuleMessage mockMuleMessage;
     @Mock
     private StreamCloserService mockStreamCloserService;
@@ -105,7 +105,7 @@ public class CatchMessagingExceptionStrategyTestCase
     public void testHandleExceptionWithMessageProcessorsChangingEvent() throws Exception
     {
         MuleEvent lastEventCreated = mock(MuleEvent.class,Answers.RETURNS_DEEP_STUBS.get());
-        catchMessagingExceptionStrategy.setMessageProcessors(asList(createChagingEventMessageProcessor(mock(MuleEvent.class)), createChagingEventMessageProcessor(lastEventCreated)));
+        catchMessagingExceptionStrategy.setMessageProcessors(asList(createChagingEventMessageProcessor(mock(MuleEvent.class,Answers.RETURNS_DEEP_STUBS.get())), createChagingEventMessageProcessor(lastEventCreated)));
         catchMessagingExceptionStrategy.initialise();
         MuleEvent exceptionHandlingResult = catchMessagingExceptionStrategy.handleException(mockException, mockMuleEvent);
         assertThat(exceptionHandlingResult, Is.is(lastEventCreated));
