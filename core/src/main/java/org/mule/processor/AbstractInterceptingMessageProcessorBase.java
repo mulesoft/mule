@@ -43,8 +43,6 @@ public abstract class AbstractInterceptingMessageProcessorBase
     protected Log logger = LogFactory.getLog(getClass());
 
     protected ServerNotificationHandler notificationHandler;
-    private MessageProcessorExecutionTemplate messageProcessorExecutorWithoutNotifications;
-    private MessageProcessorExecutionTemplate messageProcessorExecutorWithNotifications;
     protected MuleContext muleContext;
     private final Map<QName, Object> annotations = new ConcurrentHashMap<QName, Object>();
 
@@ -56,8 +54,6 @@ public abstract class AbstractInterceptingMessageProcessorBase
         {
             ((DefaultMessageProcessorChain) next).setMuleContext(context);
         }
-        this.messageProcessorExecutorWithNotifications = MessageProcessorExecutionTemplate.createExecutionTemplate(muleContext.getNotificationManager());
-        this.messageProcessorExecutorWithoutNotifications = MessageProcessorExecutionTemplate.createExceptionTransformerExecutionTemplate();
     }
 
     public final MessageProcessor getListener()
@@ -94,7 +90,8 @@ public abstract class AbstractInterceptingMessageProcessorBase
                 logger.trace("Invoking next MessageProcessor: '" + next.getClass().getName() + "' ");
             }
 
-            MessageProcessorExecutionTemplate executionTemplateToUse = (!(next instanceof MessageProcessorChain)) ? messageProcessorExecutorWithNotifications : messageProcessorExecutorWithoutNotifications;
+            MessageProcessorExecutionTemplate executionTemplateToUse = (!(next instanceof MessageProcessorChain)) ? MessageProcessorExecutionTemplate.createExecutionTemplate(event.getMuleContext().getNotificationManager())
+                    : MessageProcessorExecutionTemplate.createExceptionTransformerExecutionTemplate();
 
             try
             {

@@ -73,7 +73,6 @@ public class InterceptingChainLifecycleWrapper extends AbstractMessageProcessorC
         {
             ((MuleContextAware) chain).setMuleContext(context);
         }
-        messageProcessorExecutionTemplate = MessageProcessorExecutionTemplate.createExecutionTemplate(muleContext.getNotificationManager());
     }
 
     @Override
@@ -84,7 +83,7 @@ public class InterceptingChainLifecycleWrapper extends AbstractMessageProcessorC
             return null;
         }
 
-        return messageProcessorExecutionTemplate.execute(new MessageProcessor()
+        return MessageProcessorExecutionTemplate.createExecutionTemplate(event.getMuleContext().getNotificationManager()).execute(new MessageProcessor()
         {
             @Override
             public MuleEvent process(MuleEvent event) throws MuleException

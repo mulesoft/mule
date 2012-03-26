@@ -32,8 +32,7 @@ import java.util.List;
 
 public class DefaultMessageProcessorChain extends AbstractMessageProcessorChain
 {
-    private MessageProcessorExecutionTemplate messageProcessorExecutionTemplate;
-    
+
     protected DefaultMessageProcessorChain(List<MessageProcessor> processors)
     {   
         super(null, processors);
@@ -95,8 +94,8 @@ public class DefaultMessageProcessorChain extends AbstractMessageProcessorChain
             {
                 copy = OptimizedRequestContext.criticalSetEvent(currentEvent);
             }
-            
-            resultEvent = messageProcessorExecutionTemplate.execute(processor,currentEvent);
+
+            resultEvent = MessageProcessorExecutionTemplate.createExecutionTemplate(currentEvent.getMuleContext().getNotificationManager()).execute(processor,currentEvent);
 
             if (resultWasNull && processor instanceof RequestReplyReplierMessageProcessor)
             {
@@ -154,10 +153,4 @@ public class DefaultMessageProcessorChain extends AbstractMessageProcessorChain
         }
     }
 
-    @Override
-    public void setMuleContext(MuleContext context)
-    {
-        super.setMuleContext(context);
-        this.messageProcessorExecutionTemplate = MessageProcessorExecutionTemplate.createExecutionTemplate(muleContext.getNotificationManager());
-    }
 }
