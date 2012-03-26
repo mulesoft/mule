@@ -228,5 +228,4 @@ public interface ImmutableEndpoint extends Serializable, NamedObject
 
     boolean isDisableTransportTransformer();
 
-    boolean propagateSession();
 }

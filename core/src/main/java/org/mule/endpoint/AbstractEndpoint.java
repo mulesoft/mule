@@ -82,8 +82,6 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint, Disposable,
     
     private MessageProcessor messageProcessorChain;
 
-    p
-
     /**
      * The name for the endpoint
      */
