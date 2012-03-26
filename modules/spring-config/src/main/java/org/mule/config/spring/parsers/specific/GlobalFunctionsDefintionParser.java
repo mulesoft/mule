@@ -19,7 +19,7 @@ import org.w3c.dom.Element;
 public class GlobalFunctionsDefintionParser extends TextDefinitionParser
 {
 
-    private static String FUNCTION_FILE_ATTRIBUTE_NAME = "src";
+    private static String FUNCTION_FILE_ATTRIBUTE_NAME = "file";
 
     public GlobalFunctionsDefintionParser(String setterMethod)
     {
