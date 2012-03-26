@@ -63,7 +63,7 @@ public class QueueInfo
         if (delegate == null || (config != null && !hadConfig))
         {
             QueueInfoDelegate newDelegate = factory != null ? factory.createDelegate(this, muleContext) : new DefaultQueueInfoDelegate(capacity);
-            delegateCanTake = this.delegate instanceof TakingQueueInfoDelegate;
+            delegateCanTake = newDelegate instanceof TakingQueueInfoDelegate;
             if (delegate != null && delegate instanceof DefaultQueueInfoDelegate)
             {
                 newDelegate.addAll(((DefaultQueueInfoDelegate) delegate).list);
