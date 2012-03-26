@@ -23,12 +23,11 @@ import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
-import org.mule.api.construct.FlowConstruct;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.context.notification.ServerNotificationHandler;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorChain;
-import org.mule.context.notification.MessageProcessorNotification;
+import org.mule.execution.MessageProcessorExecutionTemplate;
 import org.mule.processor.chain.DefaultMessageProcessorChain;
 import org.mule.util.ObjectUtils;
 
@@ -44,7 +43,8 @@ public abstract class AbstractInterceptingMessageProcessorBase
     protected Log logger = LogFactory.getLog(getClass());
 
     protected ServerNotificationHandler notificationHandler;
-
+    private MessageProcessorExecutionTemplate messageProcessorExecutorWithoutNotifications;
+    private MessageProcessorExecutionTemplate messageProcessorExecutorWithNotifications;
     protected MuleContext muleContext;
     private final Map<QName, Object> annotations = new ConcurrentHashMap<QName, Object>();
 
@@ -56,6 +56,8 @@ public abstract class AbstractInterceptingMessageProcessorBase
         {
             ((DefaultMessageProcessorChain) next).setMuleContext(context);
         }
+        this.messageProcessorExecutorWithNotifications = MessageProcessorExecutionTemplate.createExecutionTemplate(muleContext.getNotificationManager());
+        this.messageProcessorExecutorWithoutNotifications = MessageProcessorExecutionTemplate.createExceptionTransformerExecutionTemplate();
     }
 
     public final MessageProcessor getListener()
@@ -92,35 +94,17 @@ public abstract class AbstractInterceptingMessageProcessorBase
                 logger.trace("Invoking next MessageProcessor: '" + next.getClass().getName() + "' ");
             }
 
-            boolean fireNotification = !(next instanceof MessageProcessorChain);
+            MessageProcessorExecutionTemplate executionTemplateToUse = (!(next instanceof MessageProcessorChain)) ? messageProcessorExecutorWithNotifications : messageProcessorExecutorWithoutNotifications;
 
-            if (fireNotification)
-            {
-                // note that we're firing event for the next in chain, not this MP
-                fireNotification(event.getFlowConstruct(), event, next,
-                    MessageProcessorNotification.MESSAGE_PROCESSOR_PRE_INVOKE);
-            }
-            final MuleEvent result;
             try
             {
-                result = next.process(event);
+                return executionTemplateToUse.execute(next,event);
             }
             catch (MessagingException e)
             {
                 event.getSession().setValid(false);
                 throw e;
             }
-            catch (Exception e)
-            {
-                event.getSession().setValid(false);
-                throw new MessagingException(event,e);
-            }
-            if (fireNotification)
-            {
-                fireNotification(event.getFlowConstruct(), result, next,
-                    MessageProcessorNotification.MESSAGE_PROCESSOR_POST_INVOKE);
-            }
-            return result;
         }
     }
 
@@ -133,15 +117,6 @@ public abstract class AbstractInterceptingMessageProcessorBase
     public String toString()
     {
         return ObjectUtils.toString(this);
-    }
-
-    protected void fireNotification(FlowConstruct flowConstruct, MuleEvent event, MessageProcessor processor, int action)
-    {
-        if (notificationHandler != null
-            && notificationHandler.isNotificationEnabled(MessageProcessorNotification.class))
-        {
-            notificationHandler.fireNotification(new MessageProcessorNotification(flowConstruct, event, processor, action));
-        }
     }
 
     public final Object getAnnotation(QName name)

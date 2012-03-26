@@ -260,7 +260,7 @@ public class CxfOutboundMessageProcessor extends AbstractInterceptingMessageProc
 
         if (method == null)
         {
-            throw new MessagingException(CxfMessages.noOperationWasFoundOrSpecified(), event);
+            throw new MessagingException(CxfMessages.noOperationWasFoundOrSpecified(), event, this);
         }
         return method;
     }

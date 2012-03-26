@@ -12,7 +12,7 @@ package org.mule.processor.chain;
 
 import org.mule.MessageExchangePattern;
 import org.mule.OptimizedRequestContext;
-import org.mule.api.MessagingException;
+import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.component.Component;
@@ -23,7 +23,7 @@ import org.mule.api.processor.MessageProcessorChain;
 import org.mule.api.processor.RequestReplyReplierMessageProcessor;
 import org.mule.api.transformer.Transformer;
 import org.mule.construct.Flow;
-import org.mule.context.notification.MessageProcessorNotification;
+import org.mule.execution.MessageProcessorExecutionTemplate;
 import org.mule.routing.MessageFilter;
 
 import java.util.Arrays;
@@ -32,7 +32,8 @@ import java.util.List;
 
 public class DefaultMessageProcessorChain extends AbstractMessageProcessorChain
 {
-
+    private MessageProcessorExecutionTemplate messageProcessorExecutionTemplate;
+    
     protected DefaultMessageProcessorChain(List<MessageProcessor> processors)
     {   
         super(null, processors);
@@ -88,37 +89,20 @@ public class DefaultMessageProcessorChain extends AbstractMessageProcessorChain
             {
                 nextProcessor = processorIterator.next();
             }
-            fireNotification(event.getFlowConstruct(), event, processor,
-                MessageProcessorNotification.MESSAGE_PROCESSOR_PRE_INVOKE);
-
+            
             if (flowConstruct instanceof Flow && nextProcessor != null
-                && processorMayReturnNull(processor))
+                    && processorMayReturnNull(processor))
             {
                 copy = OptimizedRequestContext.criticalSetEvent(currentEvent);
             }
-
-            try 
-            {
-                resultEvent = processor.process(currentEvent);
-            }
-            catch (MessagingException e)
-            {
-                throw e;
-            }
-            catch (Exception e)
-            {
-                throw new MessagingException(currentEvent,e);
-            }
+            
+            resultEvent = messageProcessorExecutionTemplate.execute(processor,currentEvent);
 
             if (resultWasNull && processor instanceof RequestReplyReplierMessageProcessor)
             {
                 // reply-to processing should not resurrect a dead event
                 resultEvent = null;
             }
-
-            fireNotification(event.getFlowConstruct(), resultEvent, processor,
-                MessageProcessorNotification.MESSAGE_PROCESSOR_POST_INVOKE);
-
 
             if (resultEvent != null)
             {
@@ -170,4 +154,10 @@ public class DefaultMessageProcessorChain extends AbstractMessageProcessorChain
         }
     }
 
+    @Override
+    public void setMuleContext(MuleContext context)
+    {
+        super.setMuleContext(context);
+        this.messageProcessorExecutionTemplate = MessageProcessorExecutionTemplate.createExecutionTemplate(muleContext.getNotificationManager());
+    }
 }

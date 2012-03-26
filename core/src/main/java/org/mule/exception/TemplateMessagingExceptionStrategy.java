@@ -56,7 +56,15 @@ public abstract class TemplateMessagingExceptionStrategy extends AbstractExcepti
         }
         catch (Exception e)
         {
-            MessagingException messagingException = new MessagingException(event, e);
+            MessagingException messagingException;
+            if (e instanceof MessagingException)
+            {
+                messagingException = (MessagingException) e;
+            }
+            else 
+            {
+                messagingException = new MessagingException(event, e); 
+            }
             try
             {
                 logger.error("Exception during exception strategy execution");

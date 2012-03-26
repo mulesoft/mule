@@ -60,12 +60,12 @@ public class InboundEndpointMimeTypeCheckingMessageProcessor implements MessageP
                     if (!messageMimeType.equals(endpointMimeType))
                     {
                         throw new MessagingException(
-                            CoreMessages.unexpectedMIMEType(messageMimeType, endpointMimeType), event);
+                            CoreMessages.unexpectedMIMEType(messageMimeType, endpointMimeType), event, this);
                     }
                 }
                 catch (MimeTypeParseException ex)
                 {
-                    throw new MessagingException(CoreMessages.illegalMIMEType(contentType), event, ex);
+                    throw new MessagingException(CoreMessages.illegalMIMEType(contentType), event, ex, this);
                 }
             }
         }

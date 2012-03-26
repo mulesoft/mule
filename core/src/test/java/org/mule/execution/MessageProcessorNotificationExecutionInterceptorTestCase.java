@@ -1,0 +1,124 @@
+/*
+ * $Id$
+ * --------------------------------------------------------------------------------------
+ * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ *
+ * The software in this package is published under the terms of the CPAL v1.0
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ */
+package org.mule.execution;
+
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertThat;
+import org.mule.api.MessagingException;
+import org.mule.api.MuleEvent;
+import org.mule.api.MuleException;
+import org.mule.api.context.notification.ServerNotification;
+import org.mule.api.processor.MessageProcessor;
+import org.mule.context.notification.MessageProcessorNotification;
+import org.mule.context.notification.ServerNotificationManager;
+import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.size.SmallTest;
+import java.util.ArrayList;
+import java.util.List;
+import org.hamcrest.core.Is;
+import org.hamcrest.core.IsNull;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Answers;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.stubbing.Answer;
+
+@SmallTest
+@RunWith(MockitoJUnitRunner.class)
+public class MessageProcessorNotificationExecutionInterceptorTestCase extends AbstractMuleTestCase
+{
+    @Mock
+    private ServerNotificationManager mockNotificationManager;
+    @Mock
+    private MessageProcessorExecutionInterceptor mockNextInterceptor;
+    @Mock
+    private MessageProcessor mockMessageProcessor;
+    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+    private MuleEvent mockMuleEvent;
+    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+    private MuleEvent mockResultMuleEvent;
+    @Mock
+    private MessagingException mockMessagingException;
+    private MessageProcessorNotificationExecutionInterceptor messageProcessorNotificationExecutionInterceptor;
+
+    @Before
+    public void setUpTest()
+    {
+        messageProcessorNotificationExecutionInterceptor = new MessageProcessorNotificationExecutionInterceptor(mockNotificationManager, mockNextInterceptor);
+    }
+
+    @Test
+    public void testExecutionSuccessfully() throws MuleException
+    {
+        final List<ServerNotification> serverNotifications = new ArrayList<ServerNotification>();
+        Mockito.when(mockMessageProcessor.process(mockMuleEvent)).thenReturn(mockResultMuleEvent);
+        Mockito.when(mockNextInterceptor.execute(mockMessageProcessor, mockMuleEvent)).thenReturn(mockResultMuleEvent);
+        Mockito.when(mockNotificationManager.isNotificationEnabled(MessageProcessorNotification.class)).thenReturn(true);
+        Mockito.doAnswer(new Answer<Object>()
+                {
+                    @Override
+                    public Object answer(InvocationOnMock invocationOnMock) throws Throwable
+                    {
+                        serverNotifications.add((ServerNotification) invocationOnMock.getArguments()[0]);
+                        return null;
+                    }
+                }).when(mockNotificationManager).fireNotification(Mockito.any(ServerNotification.class));
+        MuleEvent result = messageProcessorNotificationExecutionInterceptor.execute(mockMessageProcessor, mockMuleEvent);
+        assertThat(result, is(mockResultMuleEvent));
+        assertThat(serverNotifications.size(),Is.is(2));
+        MessageProcessorNotification beforeMessageProcessorNotification = (MessageProcessorNotification) serverNotifications.get(0);
+        MessageProcessorNotification afterMessageProcessorNotification = (MessageProcessorNotification) serverNotifications.get(1);
+        assertThat(beforeMessageProcessorNotification.getAction(), is(MessageProcessorNotification.MESSAGE_PROCESSOR_PRE_INVOKE));
+        assertThat(beforeMessageProcessorNotification.getProcessor(), is(mockMessageProcessor));
+        assertThat(beforeMessageProcessorNotification.getExceptionThrown(), IsNull.nullValue());
+        assertThat(afterMessageProcessorNotification.getAction(), is(MessageProcessorNotification.MESSAGE_PROCESSOR_POST_INVOKE));
+        assertThat(afterMessageProcessorNotification.getProcessor(), is(mockMessageProcessor));
+        assertThat(afterMessageProcessorNotification.getExceptionThrown(), IsNull.nullValue());
+    }
+    
+    @Test
+    public void testExecutionFailure() throws MuleException
+    {
+        final List<ServerNotification> serverNotifications = new ArrayList<ServerNotification>();
+        Mockito.when(mockNextInterceptor.execute(mockMessageProcessor, mockMuleEvent)).thenThrow(mockMessagingException);
+        Mockito.when(mockNotificationManager.isNotificationEnabled(MessageProcessorNotification.class)).thenReturn(true);
+        Mockito.doAnswer(new Answer<Object>()
+                {
+                    @Override
+                    public Object answer(InvocationOnMock invocationOnMock) throws Throwable
+                    {
+                        serverNotifications.add((ServerNotification) invocationOnMock.getArguments()[0]);
+                        return null;
+                    }
+                }).when(mockNotificationManager).fireNotification(Mockito.any(ServerNotification.class));
+        MuleEvent result = null;
+        try
+        {
+            result = messageProcessorNotificationExecutionInterceptor.execute(mockMessageProcessor, mockMuleEvent);
+            org.junit.Assert.fail("Exception should be thrown");
+        }
+        catch (MessagingException e)
+        {
+        }
+        assertThat(serverNotifications.size(),Is.is(2));
+        MessageProcessorNotification beforeMessageProcessorNotification = (MessageProcessorNotification) serverNotifications.get(0);
+        MessageProcessorNotification afterMessageProcessorNotification = (MessageProcessorNotification) serverNotifications.get(1);
+        assertThat(beforeMessageProcessorNotification.getAction(), is(MessageProcessorNotification.MESSAGE_PROCESSOR_PRE_INVOKE));
+        assertThat(beforeMessageProcessorNotification.getProcessor(), is(mockMessageProcessor));
+        assertThat(beforeMessageProcessorNotification.getExceptionThrown(), IsNull.nullValue());
+        assertThat(afterMessageProcessorNotification.getAction(), is(MessageProcessorNotification.MESSAGE_PROCESSOR_POST_INVOKE));
+        assertThat(afterMessageProcessorNotification.getProcessor(), is(mockMessageProcessor));
+        assertThat(afterMessageProcessorNotification.getExceptionThrown(), Is.is(mockMessagingException));
+    }
+}
