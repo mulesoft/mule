@@ -23,7 +23,6 @@ import org.mule.api.transformer.TransformerException;
 import org.mule.tck.size.SmallTest;
 import org.mule.util.IOUtils;
 
-import java.beans.Expression;
 import java.io.IOException;
 
 import org.junit.Before;
@@ -36,17 +35,14 @@ public class ParseTemplateTransformerTestCase
     private static final String INVALID_LOCATION = "wrong_error.html";
 
     private ParseTemplateTransformer parseTemplateTransformer;
-    private MuleMessage mockMuleMessage;
-    private MuleContext mockMuleContext;
-    private ExpressionManager mockExpressionManager;
+    private MuleMessage mockMuleMessage = mock(MuleMessage.class);
+    private MuleContext mockMuleContext = mock(MuleContext.class);
+    private ExpressionManager mockExpressionManager = mock(ExpressionManager.class);
 
     @Before
     public void setUp()
     {
         parseTemplateTransformer = new ParseTemplateTransformer();
-        mockMuleMessage = mock(MuleMessage.class);
-        mockMuleContext = mock(MuleContext.class);
-        mockExpressionManager = mock(ExpressionManager.class);
         parseTemplateTransformer.setMuleContext(mockMuleContext);
 
         when(mockMuleContext.getExpressionManager()).thenReturn(mockExpressionManager);
@@ -94,6 +90,5 @@ public class ParseTemplateTransformerTestCase
         assertNotNull(response);
         assertEquals("Parsed", response);
     }
-
 
 }
