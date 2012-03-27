@@ -10,6 +10,10 @@
 
 package org.mule.config.spring.factories;
 
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -30,64 +34,57 @@ import org.springframework.context.ApplicationContext;
 public class FlowRefFactoryBeanTestCase extends AbstractMuleTestCase
 {
 
-    private MuleEvent result;
-    private MessageProcessor target;
-    private ApplicationContext applicationContext;
-    private MuleContext muleContext;
-    private ExpressionManager expressionManager;
+    private MuleEvent result = mock(MuleEvent.class);
+    private MessageProcessor target= mock(MessageProcessor.class);
+    private ApplicationContext applicationContext = mock(ApplicationContext.class);
+    private MuleContext muleContext = mock(MuleContext.class);
+    private ExpressionManager expressionManager = mock(ExpressionManager.class);
 
     @Before
     public void setup() throws MuleException
     {
-        muleContext = Mockito.mock(MuleContext.class);
-        expressionManager = Mockito.mock(ExpressionManager.class);
-        Mockito.when(muleContext.getExpressionManager()).thenReturn(expressionManager);
-        Mockito.when(expressionManager.isExpression(Mockito.anyString())).thenReturn(true);
-        result = Mockito.mock(MuleEvent.class);
-        target = Mockito.mock(MessageProcessor.class);
-        Mockito.when(target.process(Mockito.any(MuleEvent.class))).thenReturn(result);
-        applicationContext = Mockito.mock(ApplicationContext.class);
+        when(muleContext.getExpressionManager()).thenReturn(expressionManager);
+        when(expressionManager.isExpression(Mockito.anyString())).thenReturn(true);
+        when(target.process(Mockito.any(MuleEvent.class))).thenReturn(result);
     }
 
     @Test
     public void testStaticFlowRef() throws Exception
     {
-        Mockito.when(expressionManager.isExpression(Mockito.anyString())).thenReturn(false);
-        Mockito.when(applicationContext.getBean(Mockito.eq("staticReferencedFlow"))).thenReturn(target);
+        when(expressionManager.isExpression(Mockito.anyString())).thenReturn(false);
+        when(applicationContext.getBean(Mockito.eq("staticReferencedFlow"))).thenReturn(target);
 
         FlowRefFactoryBean flowRefFactoryBean = new FlowRefFactoryBean();
         flowRefFactoryBean.setName("staticReferencedFlow");
         flowRefFactoryBean.setApplicationContext(applicationContext);
         flowRefFactoryBean.setMuleContext(muleContext);
         flowRefFactoryBean.initialise();
-        Assert.assertEquals(target, flowRefFactoryBean.getObject());
+        assertEquals(target, flowRefFactoryBean.getObject());
     }
 
     @Test
     public void testDynamicFlowRef() throws Exception
     {
-        Mockito.when(expressionManager.isExpression(Mockito.anyString())).thenReturn(true);
+        when(expressionManager.isExpression(Mockito.anyString())).thenReturn(true);
 
-        Mockito.when(
-            expressionManager.parse(Mockito.eq("dynamicReferencedFlow"), Mockito.any(MuleEvent.class)))
+        when(expressionManager.parse(Mockito.eq("dynamicReferencedFlow"), Mockito.any(MuleEvent.class)))
             .thenReturn("parsedDynamicReferencedFlow");
 
-        Mockito.when(applicationContext.getBean(Mockito.eq("parsedDynamicReferencedFlow")))
-            .thenReturn(target);
+        when(applicationContext.getBean(Mockito.eq("parsedDynamicReferencedFlow"))).thenReturn(target);
+
         FlowRefFactoryBean flowRefFactoryBean = new FlowRefFactoryBean();
         flowRefFactoryBean.setName("dynamicReferencedFlow");
         flowRefFactoryBean.setApplicationContext(applicationContext);
         flowRefFactoryBean.setMuleContext(muleContext);
         flowRefFactoryBean.initialise();
         Assert.assertNotSame(target, flowRefFactoryBean.getObject());
-        Assert.assertSame(result,
-            ((MessageProcessor) flowRefFactoryBean.getObject()).process(Mockito.mock(MuleEvent.class)));
+        Assert.assertSame(result, flowRefFactoryBean.getObject().process(mock(MuleEvent.class)));
     }
 
     @Test(expected = MuleRuntimeException.class)
-    public void testStaticFlowRefDoesntExist() throws Exception
+    public void testStaticFlowRefDoesNotExist() throws Exception
     {
-        Mockito.when(expressionManager.isExpression(Mockito.anyString())).thenReturn(false);
+        when(expressionManager.isExpression(Mockito.anyString())).thenReturn(false);
 
         FlowRefFactoryBean flowRefFactoryBean = new FlowRefFactoryBean();
         flowRefFactoryBean.setName("nonExistant");
@@ -98,10 +95,10 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleTestCase
     }
 
     @Test(expected = MuleRuntimeException.class)
-    public void testDynamiccFlowRefDoesntExist() throws Exception
+    public void testDynamicFlowRefDoesNotExist() throws Exception
     {
-        Mockito.when(expressionManager.isExpression(Mockito.anyString())).thenReturn(true);
-        Mockito.when(expressionManager.parse(Mockito.eq("nonExistant"), Mockito.any(MuleEvent.class)))
+        when(expressionManager.isExpression(Mockito.anyString())).thenReturn(true);
+        when(expressionManager.parse(Mockito.eq("nonExistant"), Mockito.any(MuleEvent.class)))
             .thenReturn("other");
 
         FlowRefFactoryBean flowRefFactoryBean = new FlowRefFactoryBean();
@@ -109,7 +106,7 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleTestCase
         flowRefFactoryBean.setApplicationContext(applicationContext);
         flowRefFactoryBean.setMuleContext(muleContext);
         flowRefFactoryBean.initialise();
-        ((MessageProcessor) flowRefFactoryBean.getObject()).process(Mockito.mock(MuleEvent.class));
+        flowRefFactoryBean.getObject().process(mock(MuleEvent.class));
     }
 
 }
