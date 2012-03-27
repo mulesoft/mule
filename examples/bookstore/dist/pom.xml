@@ -12,7 +12,7 @@
     <description>Bookstore Example App</description>
 
     <properties>
-        <muleVersion>3.3-RC1-SNAPSHOT</muleVersion>
+        <muleVersion>3.4-M1-SNAPSHOT</muleVersion>
     </properties>
 
     <dependencies>
