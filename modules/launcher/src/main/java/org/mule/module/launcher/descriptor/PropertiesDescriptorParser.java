@@ -36,8 +36,7 @@ public class PropertiesDescriptorParser implements DescriptorParser
 
     public ApplicationDescriptor parse(File descriptor) throws IOException
     {
-        final Properties p = new Properties();
-        p.load(new FileInputStream(descriptor));
+        final Properties p = loadProperties(descriptor);
 
         ApplicationDescriptor d = new ApplicationDescriptor();
         d.setEncoding(p.getProperty(PROPERTY_ENCODING));
@@ -66,6 +65,24 @@ public class PropertiesDescriptorParser implements DescriptorParser
         d.setPriviledged(BooleanUtils.toBoolean(p.getProperty(PROPERTY_PRIVILEDGED, Boolean.FALSE.toString())));
 
         return d;
+    }
+
+    private Properties loadProperties(File descriptor) throws IOException
+    {
+        Properties p = new Properties();
+        FileInputStream fileInputStream = new FileInputStream(descriptor);
+
+        try
+        {
+            p.load(fileInputStream);
+        }
+        finally
+        {
+
+            fileInputStream.close();
+        }
+
+        return p;
     }
 
     public String getSupportedFormat()
