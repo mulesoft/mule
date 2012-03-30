@@ -4329,7 +4329,6 @@
             <xsd:enumeration value="process"/>
             <xsd:enumeration value="string"/>
             <xsd:enumeration value="variable"/>
-            <xsd:enumeration value="wildcard"/>
             <xsd:enumeration value="xpath"/>
             <xsd:enumeration value="xpath2"/>
             <xsd:enumeration value="xpath-node"/>
@@ -4337,7 +4336,7 @@
         </xsd:restriction>
     </xsd:simpleType>
 
-    <xsd:simpleType  name="expressionFilterEvaluators">
+    <xsd:simpleType name="expressionFilterEvaluators">
         <xsd:restriction base="substitutableName">
             <xsd:enumeration value="header"/>
             <xsd:enumeration value="payload-type"/>
@@ -4354,6 +4353,24 @@
             <xsd:enumeration value="variable"/>
         </xsd:restriction>
     </xsd:simpleType>
+
+
+    <xsd:simpleType name="whenExpressionEvaluators">
+        <xsd:union>
+            <xsd:simpleType>
+                <xsd:restriction base="standardExpressionEvaluators"/>
+            </xsd:simpleType>
+            <xsd:simpleType>
+                <xsd:restriction base="substitutableName">
+                    <xsd:enumeration value="payload-type"/>
+                    <xsd:enumeration value="exception-type"/>
+                    <xsd:enumeration value="wildcard"/>
+                    <xsd:enumeration value="regex"/>
+                </xsd:restriction>
+            </xsd:simpleType>
+        </xsd:union>
+    </xsd:simpleType>
+
 
     <xsd:simpleType name="standardExpressionEnrichers">
         <xsd:restriction base="substitutableName">
@@ -5459,7 +5476,7 @@
                  no expression is specified -->
             <xsd:group ref="messageProcessorOrOutboundEndpoint" minOccurs="1" maxOccurs="unbounded" />
           </xsd:sequence>
-          <xsd:attribute name="evaluator" use="optional" type="expressionFilterEvaluators">
+          <xsd:attribute name="evaluator" use="optional" type="whenExpressionEvaluators">
               <xsd:annotation>
                   <xsd:documentation>The expression evaluator to use. Expression evaluators must be registered with the ExpressionEvaluatorManager before they can be used. Using the custom evaluator allows you to define your own evaluator with the 'custom-evaluator' attribute. Note that some evaluators such as xpath, groovy, and bean are loaded from other Mule modules (XML and Scripting, respectively). These modules must be on your classpath before the evaluator can be used.
                   </xsd:documentation>
