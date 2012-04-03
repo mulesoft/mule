@@ -151,7 +151,8 @@ public class SystemUtils extends org.apache.commons.lang.SystemUtils
 
     public static boolean isSunJDK()
     {
-        return SystemUtils.JAVA_VM_VENDOR.toUpperCase().indexOf("SUN") != -1;
+        return SystemUtils.JAVA_VM_VENDOR.toUpperCase().indexOf("SUN") != -1
+               || SystemUtils.JAVA_VM_VENDOR.toUpperCase().indexOf("ORACLE") != -1;
     }
 
     public static boolean isAppleJDK()

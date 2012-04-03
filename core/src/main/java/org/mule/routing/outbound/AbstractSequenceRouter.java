@@ -72,7 +72,7 @@ public abstract class AbstractSequenceRouter extends FilteringOutboundRouter
                     {
                         throw new MessagingException(
                                 CoreMessages.cannotCopyStreamPayload(message.getPayload().getClass().getName()),
-                                event);
+                                event, this);
                     }
 
                     MuleMessage clonedMessage = cloneMessage(message);

@@ -249,7 +249,7 @@ public class SedaStageInterceptingMessageProcessor extends AsyncInterceptingMess
                             // thread we need to use the copy created in AsyncMessageProcessorWorker
                             // constructor.
                             OptimizedRequestContext.unsafeSetEvent(work.getEvent());
-                            throw new MessagingException(work.getEvent(), e);
+                            throw new MessagingException(work.getEvent(), e, SedaStageInterceptingMessageProcessor.this);
                         }
                         return null;
                     }

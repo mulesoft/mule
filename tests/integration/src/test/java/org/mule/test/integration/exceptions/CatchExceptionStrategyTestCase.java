@@ -9,9 +9,10 @@
  */
 package org.mule.test.integration.exceptions;
 
+import org.codehaus.jackson.JsonNode;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.hamcrest.core.Is;
 import org.hamcrest.core.IsNull;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
@@ -92,7 +93,11 @@ public class CatchExceptionStrategyTestCase extends AbstractServiceAndFlowTestCa
         LocalMuleClient client = muleContext.getClient();
         MuleMessage response = client.send(endpointUri, JSON_REQUEST, null, TIMEOUT);
         assertThat(response, IsNull.<Object>notNullValue());
-        assertThat(response.getPayloadAsString(), Is.is(JSON_RESPONSE));
+        // compare the structure and values but not the attributes' order
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode actualJsonNode = mapper.readTree(response.getPayloadAsString());
+        JsonNode expectedJsonNode = mapper.readTree(JSON_RESPONSE);
+        assertThat(actualJsonNode, Is.is(expectedJsonNode));
     }
 
 

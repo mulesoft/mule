@@ -19,6 +19,8 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.expression.ExpressionConfig;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -61,10 +63,14 @@ public class ExpressionSplitter extends AbstractSplitter
         Object result = event.getMuleContext()
             .getExpressionManager()
             .evaluate(config.getFullExpression(expressionManager), event);
-        if (result instanceof List<?>)
+        if (result instanceof Object[])
+        {
+            result = Arrays.asList((Object[]) result);
+        }
+        if (result instanceof Collection<?>)
         {
             List<MuleMessage> messages = new ArrayList<MuleMessage>();
-            for (Object object : (List<?>) result)
+            for (Object object : (Collection<?>) result)
             {
                 messages.add(new DefaultMuleMessage(object, muleContext));
             }
@@ -88,6 +94,7 @@ public class ExpressionSplitter extends AbstractSplitter
         }
         else
         {
+            logger.info("The expression does not evaluate to a type that can be split: " + result.getClass().getName());
             return Collections.<MuleMessage> singletonList(new DefaultMuleMessage(result, muleContext));
         }
     }

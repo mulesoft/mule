@@ -27,7 +27,7 @@ public class PropertyEditorTextToValueTransformerTestCase extends AbstractTransf
     @Override
     public Transformer getRoundTripTransformer() throws Exception
     {
-        return new PropertyEditorValueToTextTransformer((PropertyEditor) Class.forName("sun.beans.editors.BoolEditor").newInstance(), Boolean.class);
+        return new PropertyEditorValueToTextTransformer(getBooleanPropertyEditor(), Boolean.class);
     }
 
     @Override
@@ -39,7 +39,23 @@ public class PropertyEditorTextToValueTransformerTestCase extends AbstractTransf
     @Override
     public Transformer getTransformer() throws Exception
     {
-        return new PropertyEditorTextToValueTransformer((PropertyEditor) Class.forName("sun.beans.editors.BoolEditor").newInstance(), Boolean.class);
+        return new PropertyEditorTextToValueTransformer(getBooleanPropertyEditor(), Boolean.class);
+    }
+    
+    private PropertyEditor getBooleanPropertyEditor() throws Exception {
+        PropertyEditor editor = null;
+        
+        try
+        {
+            // try first with java 7 package name
+            editor = (PropertyEditor) Class.forName("sun.beans.editors.BooleanEditor").newInstance();
+        }
+        catch (ClassNotFoundException e)
+        {
+            // if that doesn't exist, try with java 6 and lower package name
+            editor = (PropertyEditor) Class.forName("sun.beans.editors.BoolEditor").newInstance();   
+        }
+        return editor;
     }
 
 }

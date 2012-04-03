@@ -9,6 +9,8 @@
  */
 package org.mule.test.integration.exceptions;
 
+import org.codehaus.jackson.JsonNode;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.hamcrest.core.Is;
 import org.hamcrest.core.IsNull;
 import org.junit.Test;
@@ -42,7 +44,11 @@ public class CatchExceptionStrategyFlowRefTestCase extends FunctionalTestCase
     {
         LocalMuleClient client = muleContext.getClient();
         MuleMessage response = client.send("vm://inExceptionBlock", JSON_REQUEST, null, TIMEOUT);
-        assertThat(response.getPayloadAsString(), is(JSON_RESPONSE));
+        // compare the structure and values but not the attributes' order
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode actualJsonNode = mapper.readTree(response.getPayloadAsString());
+        JsonNode expectedJsonNode = mapper.readTree(JSON_RESPONSE);
+        assertThat(actualJsonNode, is(expectedJsonNode));
     }
 
     @Test
@@ -50,7 +56,11 @@ public class CatchExceptionStrategyFlowRefTestCase extends FunctionalTestCase
     {
         LocalMuleClient client = muleContext.getClient();
         MuleMessage response = client.send("vm://inTxWithException", JSON_REQUEST, null, TIMEOUT);
-        assertThat(response.getPayloadAsString(), is(JSON_RESPONSE));
+        // compare the structure and values but not the attributes' order
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode actualJsonNode = mapper.readTree(response.getPayloadAsString());
+        JsonNode expectedJsonNode = mapper.readTree(JSON_RESPONSE);
+        assertThat(actualJsonNode, is(expectedJsonNode));
     }
 
     public static class VerifyTransactionNotResolvedProcessor implements MessageProcessor

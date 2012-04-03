@@ -9,6 +9,8 @@
  */
 package org.mule.test.integration.exceptions;
 
+import org.codehaus.jackson.JsonNode;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.hamcrest.core.IsNot;
 import org.hamcrest.core.IsNull;
 import org.junit.Test;
@@ -43,7 +45,11 @@ public class ReferenceExceptionStrategyTestCase extends FunctionalTestCase
         LocalMuleClient client = muleContext.getClient();
         MuleMessage response = client.send("vm://in", JSON_REQUEST, null, 5000);
         assertThat(response, IsNull.<Object>notNullValue());
-        assertThat(response.getPayloadAsString(), is(JSON_RESPONSE));
+        // compare the structure and values but not the attributes' order
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode actualJsonNode = mapper.readTree(response.getPayloadAsString());
+        JsonNode expectedJsonNode = mapper.readTree(JSON_RESPONSE);
+        assertThat(actualJsonNode, is(expectedJsonNode));
     }
 
     @Test

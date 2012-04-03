@@ -100,7 +100,7 @@ public class IBeanBinding implements InterfaceBinding
         }
         catch (MuleException e)
         {
-            throw new MessagingException(e.getI18nMessage(), event, e);
+            throw new MessagingException(e.getI18nMessage(), event, e, endpoint);
         }
     }
 

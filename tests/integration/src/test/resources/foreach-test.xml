@@ -254,4 +254,38 @@
         <test:assert expression="#[rootMessage == 'world']" />
     </flow>
 
+    <flow name="mvel-list">
+        <vm:inbound-endpoint path="input-18" exchange-pattern="request-response"/>
+        <foreach collection="#[['foo', 'bar']]">
+            <test:component/>
+            <vm:outbound-endpoint path="out"/>
+        </foreach>
+    </flow>
+
+    <flow name="mvel-map">
+        <vm:inbound-endpoint path="input-19" exchange-pattern="request-response"/>
+        <foreach collection="#[['key1' : 'val1', 'key2':'val2']]">
+            <test:component/>
+            <logger level="ERROR" message="message-#[counter]: #[payload]"/>
+            <vm:outbound-endpoint path="out"/>
+        </foreach>
+    </flow>
+
+    <flow name="mvel-collection">
+        <vm:inbound-endpoint path="input-20" exchange-pattern="request-response"/>
+        <foreach collection="#[['key1' : 'val1', 'key2':'val2'].values()]">
+            <test:component/>
+            <vm:outbound-endpoint path="out"/>
+        </foreach>
+    </flow>
+
+    <flow name="mvel-array">
+        <vm:inbound-endpoint path="input-21" exchange-pattern="request-response"/>
+        <foreach collection="#[{'foo', 'bar'}]">
+            <test:component/>
+            <test:assert expression="#[payload instanceof String]"  message="hoal"/>
+            <logger level="ERROR" message="message-#[counter]: #[payload]"/>
+            <vm:outbound-endpoint path="out"/>
+        </foreach>
+    </flow>
 </mule>

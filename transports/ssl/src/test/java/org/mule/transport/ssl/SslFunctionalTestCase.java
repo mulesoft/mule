@@ -10,6 +10,10 @@
 
 package org.mule.transport.ssl;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.api.MuleMessage;
 import org.mule.api.service.Service;
 import org.mule.module.client.MuleClient;
@@ -22,10 +26,6 @@ import org.mule.tck.testmodels.mule.TestSedaService;
 
 import org.junit.Rule;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 public class SslFunctionalTestCase extends FunctionalTestCase 
 {
@@ -44,6 +44,14 @@ public class SslFunctionalTestCase extends FunctionalTestCase
     protected String getConfigResources()
     {
         return "ssl-functional-test.xml";
+    }
+
+    @Override
+    protected boolean isExcluded()
+    {
+        // exclude these tests if we're running in Java 7 because ssl is broken in
+        // the jdk
+        return super.isExcluded() || System.getProperty("java.version").matches("1\\.7\\..*");
     }
 
     @Test
