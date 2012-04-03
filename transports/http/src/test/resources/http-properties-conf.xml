@@ -12,6 +12,9 @@
 
     <flow name="testProperties" processingStrategy="synchronous">
         <http:inbound-endpoint address="http://localhost:${port1}/resources" exchange-pattern="request-response"/>
+        <set-property propertyName="http.relative.path" value="#[message.inboundProperties['http.relative.path']]"/>
+        <set-property propertyName="http.context.uri" value="#[message.inboundProperties['http.context.uri']]"/>
+
         <choice>
             <when evaluator="groovy" expression="message.getInboundProperty('http.relative.path') == 'client'">
                 <choice>

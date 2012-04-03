@@ -45,7 +45,6 @@ public class HttpPropertiesTestCase extends FunctionalTestCase
         new HttpClient().executeMethod(httpGet);
         String result =  httpGet.getResponseBodyAsString();
         assertEquals("Retrieving client with id = 1", result);
-        FlowAssert.verify("testProperties");
     }
 
 
@@ -59,6 +58,8 @@ public class HttpPropertiesTestCase extends FunctionalTestCase
         MuleMessage response = client.send("http://localhost:" + dynamicPort.getNumber() + "/resources/client", "name=John&lastname=Galt", properties);
 
         assertNotNull(response);
+        assertEquals("client", response.getInboundProperty("http.relative.path"));
+        assertEquals("http://localhost:" + dynamicPort.getNumber() + "/resources", response.getInboundProperty("http.context.uri"));
         assertEquals("Storing client with name = John and lastname = Galt", response.getPayloadAsString());
     }
 
