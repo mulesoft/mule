@@ -287,6 +287,10 @@ public class HttpMessageReceiver extends TcpMessageReceiver
                                            contextPath,
                                            PropertyScope.INBOUND);
 
+                message.setProperty(HttpConnector.HTTP_CONTEXT_URI_PROPERTY,
+                                    receiver.getEndpointURI().getAddress(),
+                                    PropertyScope.INBOUND);
+
                 message.setProperty(HttpConnector.HTTP_RELATIVE_PATH_PROPERTY,
                                     processRelativePath(contextPath, path),
                                     PropertyScope.INBOUND);

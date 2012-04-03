@@ -110,6 +110,13 @@ public class HttpConnector extends TcpConnector
     public static final String HTTP_CONTEXT_PATH_PROPERTY = HTTP_PREFIX + "context.path";
 
     /**
+     * The context URI of the endpoint being accessed. This is the address that the
+     * HTTP endpoint is listening on. It includes: [scheme]://[host]:[port][http.context.path]
+     */
+    public static final String HTTP_CONTEXT_URI_PROPERTY = HTTP_PREFIX + "context.uri";
+
+
+    /**
      * The relative path of the URI being accessed in relation to the context path
      */
     public static final String HTTP_RELATIVE_PATH_PROPERTY = HTTP_PREFIX + "relative.path";
