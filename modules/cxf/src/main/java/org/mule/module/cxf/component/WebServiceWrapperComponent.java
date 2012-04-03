@@ -19,6 +19,7 @@ import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.module.cxf.endpoint.CxfEndpointBuilder;
 
+@Deprecated
 public class WebServiceWrapperComponent extends AbstractWebServiceWrapperComponent
 {
     private String wsdlPort;
