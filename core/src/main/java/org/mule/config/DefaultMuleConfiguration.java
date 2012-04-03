@@ -152,6 +152,8 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
 
     private boolean useExtendedTransformations = DEFAULT_TRANSFORMATION_RESOLVE_NON_DIRECT;
 
+    private boolean flowEndingWithOneWayEndpointReturnsNull;
+
     /**
      * Generic string/string map of properties in addition to standard Mule props.
      * Used as an extension point e.g. in MMC.
@@ -670,6 +672,17 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
         return useExtendedTransformations;
     }
 
+    public void setFlowEndingWithOneWayEndpointReturnsNull(boolean flowEndingWithOneWayEndpointReturnsNull)
+    {
+        this.flowEndingWithOneWayEndpointReturnsNull = flowEndingWithOneWayEndpointReturnsNull;
+    }
+
+    @Override
+    public boolean isFlowEndingWithOneWayEndpointReturnsNull()
+    {
+        return flowEndingWithOneWayEndpointReturnsNull;
+    }
+
     public void setDefaultExceptionStrategyName(String defaultExceptionStrategyName)
     {
         this.defaultExceptionStrategyName = defaultExceptionStrategyName;
@@ -693,6 +706,7 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
         result = prime * result + responseTimeout;
         result = prime * result + shutdownTimeout;
         result = prime * result + (useExtendedTransformations ? 1231 : 1237);
+        result = prime * result + (flowEndingWithOneWayEndpointReturnsNull ? 1231 : 1237);
         result = prime * result + (synchronous ? 1231 : 1237);
         result = prime * result + ((systemModelType == null) ? 0 : systemModelType.hashCode());
         result = prime * result + ((workingDirectory == null) ? 0 : workingDirectory.hashCode());
@@ -789,6 +803,10 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
         {
             return false;
         }
+        if (flowEndingWithOneWayEndpointReturnsNull != other.flowEndingWithOneWayEndpointReturnsNull)
+        {
+            return false;
+        }
         if (synchronous != other.synchronous)
         {
             return false;
@@ -823,5 +841,4 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
 
         return true;
     }
-
 }
