@@ -392,6 +392,87 @@ public class ForeachTestCase extends FunctionalTestCase
         assertSame(payload, resultPayload);
         FlowAssert.verify("foreach-properties-restored");
     }
+
+
+
+    @Test
+    public void testMVELList() throws Exception
+    {
+        MuleMessage parent = new DefaultMuleMessage(null, muleContext);
+        client.send("vm://input-18", parent);
+
+        MuleMessage out = client.request("vm://out", getTestTimeoutSecs());
+        assertTrue(out.getPayload() instanceof String);
+        String outPayload = (String) out.getPayload();
+        assertEquals("foo", outPayload);
+
+        out = client.request("vm://out", getTestTimeoutSecs());
+        assertTrue(out.getPayload() instanceof String);
+        outPayload = (String) out.getPayload();
+        assertEquals("bar", outPayload);
+    }
+
+    @Test
+    public void testMVELMap() throws Exception
+    {
+        MuleMessage parent = new DefaultMuleMessage(null, muleContext);
+        client.send("vm://input-19", parent);
+
+        Map<String,String> m = new HashMap();
+        m.put("key1", "val1");
+        m.put("key2", "val2");
+
+        MuleMessage out = client.request("vm://out", getTestTimeoutSecs());
+        assertTrue(out.getPayload() instanceof String);
+        String outPayload = (String) out.getPayload();
+        assertTrue(m.containsValue(outPayload));
+
+        out = client.request("vm://out", getTestTimeoutSecs());
+        assertTrue(out.getPayload() instanceof String);
+        outPayload = (String) out.getPayload();
+        assertTrue(m.containsValue(outPayload));
+    }
+
+    @Test
+    public void testMVELCollection() throws Exception
+    {
+        MuleMessage parent = new DefaultMuleMessage(null, muleContext);
+        client.send("vm://input-20", parent);
+
+        Map<String,String> m = new HashMap();
+        m.put("key1", "val1");
+        m.put("key2", "val2");
+
+        MuleMessage out = client.request("vm://out", getTestTimeoutSecs());
+        assertTrue(out.getPayload() instanceof String);
+        String outPayload = (String) out.getPayload();
+        assertTrue(m.containsValue(outPayload));
+
+        out = client.request("vm://out", getTestTimeoutSecs());
+        assertTrue(out.getPayload() instanceof String);
+        outPayload = (String) out.getPayload();
+        assertTrue(m.containsValue(outPayload));
+    }
+
+    @Test
+    public void testMVELArray() throws Exception
+    {
+        MuleMessage parent = new DefaultMuleMessage(null, muleContext);
+
+        client.send("vm://input-21", parent);
+
+        MuleMessage out = client.request("vm://out", getTestTimeoutSecs());
+        assertTrue(out.getPayload() instanceof String);
+        String outPayload = (String) out.getPayload();
+
+        assertEquals("foo", outPayload);
+        FlowAssert.verify("mvel-array");
+
+        out = client.request("vm://out", getTestTimeoutSecs());
+        assertTrue(out.getPayload() instanceof String);
+        outPayload = (String) out.getPayload();
+        assertEquals("bar", outPayload);
+    }
 }
 
 
