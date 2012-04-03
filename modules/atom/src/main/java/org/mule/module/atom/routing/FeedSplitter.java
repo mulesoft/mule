@@ -92,7 +92,7 @@ public class FeedSplitter extends AbstractSplitter
         }
         catch (TransformerException e)
         {
-            throw new MessagingException(e.getI18nMessage(), event, e);
+            throw new MessagingException(e.getI18nMessage(), event, e, this);
         }
     }
 

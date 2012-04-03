@@ -13,6 +13,7 @@ package org.mule.context.notification;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.MessageExchangePattern;
+import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.NameableObject;
 import org.mule.api.construct.FlowConstruct;
@@ -39,14 +40,15 @@ public class MessageProcessorNotification extends ServerNotification implements 
     }
 
     private static ThreadLocal<String> lastRootMessageId = new ThreadLocal<String>();
+    private MessagingException exceptionThrown;
 
     public MessageProcessorNotification(FlowConstruct flowConstruct,
                                         MuleEvent event,
                                         MessageProcessor processor,
-                                        int action)
+                                        MessagingException exceptionThrown, int action)
     {
         super(produceEvent(event, flowConstruct), action, flowConstruct != null ? flowConstruct.getName() : null);
-
+        this.exceptionThrown = exceptionThrown;
         this.processor = processor;
     }
 
@@ -106,5 +108,10 @@ public class MessageProcessorNotification extends ServerNotification implements 
         {
             return null;
         }
+    }
+
+    public MessagingException getExceptionThrown()
+    {
+        return exceptionThrown;
     }
 }

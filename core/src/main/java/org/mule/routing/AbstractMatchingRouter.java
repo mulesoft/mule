@@ -90,7 +90,7 @@ public class AbstractMatchingRouter implements MatchingRouter, AnnotatedObject
             {
                 if (((DefaultMuleMessage) message).isConsumable())
                 {
-                    throw new MessagingException(CoreMessages.cannotCopyStreamPayload(message.getPayload().getClass().getName()), event);
+                    throw new MessagingException(CoreMessages.cannotCopyStreamPayload(message.getPayload().getClass().getName()), event, this);
                 }
                 eventToRoute = OptimizedRequestContext.criticalSetEvent(event);
             }

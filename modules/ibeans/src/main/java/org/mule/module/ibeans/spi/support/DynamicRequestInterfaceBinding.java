@@ -50,7 +50,7 @@ public class DynamicRequestInterfaceBinding extends DefaultRequestInterfaceBindi
         }
         catch (Exception e)
         {
-            throw new MessagingException(CoreMessages.failedToInvoke("inboundEndpoint.request()"), event, e);
+            throw new MessagingException(CoreMessages.failedToInvoke("inboundEndpoint.request()"), event, e, this);
         }
     }
 }

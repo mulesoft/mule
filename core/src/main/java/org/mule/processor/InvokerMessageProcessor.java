@@ -179,7 +179,7 @@ public class InvokerMessageProcessor implements MessageProcessor, Initialisable,
         }
         catch (Exception e)
         {
-            throw new MessagingException(CoreMessages.failedToInvoke(object.toString()), event, e);
+            throw new MessagingException(CoreMessages.failedToInvoke(object.toString()), event, e, this);
         }
         return resultEvent;
     }
@@ -205,7 +205,7 @@ public class InvokerMessageProcessor implements MessageProcessor, Initialisable,
         }
         catch (TransformerException e)
         {
-            throw new MessagingException(event, e);
+            throw new MessagingException(event, e, this);
         }
     }
 

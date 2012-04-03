@@ -83,7 +83,7 @@ public class DefaultOutboundRouterCollection implements OutboundRouterCollection
                 {
                     throw new MessagingException(CoreMessages.cannotCopyStreamPayload(message.getPayload()
                         .getClass()
-                        .getName()), event);
+                        .getName()), event, this);
                 }
                 outboundRouterMessage = new DefaultMuleMessage(message.getPayload(), message, muleContext);
             }

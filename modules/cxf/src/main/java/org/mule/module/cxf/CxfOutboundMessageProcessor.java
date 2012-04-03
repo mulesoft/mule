@@ -10,7 +10,6 @@
 
 package org.mule.module.cxf;
 
-import org.mule.api.DefaultMuleException;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -20,12 +19,10 @@ import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.DispatchException;
 import org.mule.config.ExceptionHelper;
 import org.mule.config.i18n.MessageFactory;
-import org.mule.message.DefaultExceptionPayload;
 import org.mule.module.cxf.i18n.CxfMessages;
 import org.mule.module.cxf.security.WebServiceSecurityException;
 import org.mule.processor.AbstractInterceptingMessageProcessor;
 import org.mule.transport.http.HttpConnector;
-import org.mule.transport.http.HttpConstants;
 import org.mule.util.TemplateParser;
 
 import java.lang.reflect.InvocationTargetException;
@@ -260,7 +257,7 @@ public class CxfOutboundMessageProcessor extends AbstractInterceptingMessageProc
 
         if (method == null)
         {
-            throw new MessagingException(CxfMessages.noOperationWasFoundOrSpecified(), event);
+            throw new MessagingException(CxfMessages.noOperationWasFoundOrSpecified(), event, this);
         }
         return method;
     }

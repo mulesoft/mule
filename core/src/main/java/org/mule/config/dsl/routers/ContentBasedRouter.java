@@ -38,9 +38,13 @@ public class ContentBasedRouter extends AbstractOutboundRouter
                     return target.process(event);
                 }
             }
+            catch (MessagingException e)
+            {
+                throw e;
+            }
             catch (MuleException e)
             {
-                throw new MessagingException(e.getI18nMessage(), theEvent, e);
+                throw new MessagingException(e.getI18nMessage(), theEvent, e, this);
             }
         }
         //TODO
