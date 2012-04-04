@@ -14,8 +14,6 @@ import static org.junit.Assert.assertEquals;
 
 import org.mule.api.MuleMessage;
 
-import org.junit.Ignore;
-
 public class OneWayOutboundReturningEventTestCase extends OneWayOutboundTestCase
 {
 
@@ -38,16 +36,14 @@ public class OneWayOutboundReturningEventTestCase extends OneWayOutboundTestCase
     }
 
     @Override
-    @Ignore
     public void oneWayOutboundAfterComponent() throws Exception
     {
-        super.oneWayOutboundAfterComponent();
+        // Overrides test just to ignore it
     }
 
     @Override
-    @Ignore
     public void oneWayOutbound() throws Exception
     {
-        super.oneWayOutbound();
+        // Overrides test just to ignore it
     }
 }
