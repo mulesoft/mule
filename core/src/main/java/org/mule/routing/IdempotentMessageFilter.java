@@ -20,9 +20,7 @@ import org.mule.api.expression.ExpressionManager;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.routing.RoutingException;
-import org.mule.api.store.ObjectAlreadyExistsException;
-import org.mule.api.store.ObjectStore;
-import org.mule.api.store.ObjectStoreManager;
+import org.mule.api.store.*;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.processor.AbstractFilteringMessageProcessor;
 import org.mule.util.concurrent.ThreadNameHelper;
@@ -81,26 +79,7 @@ public class IdempotentMessageFilter extends AbstractFilteringMessageProcessor i
     @Override
     protected MuleEvent processNext(MuleEvent event) throws MuleException
     {
-        String id = getIdForEvent(event);
-        String value = getValueForEvent(event);
-        try
-        {
-            try
-            {
-                store.store(id, value);
-            }
-            catch (ObjectAlreadyExistsException ex)
-            {
-                // another thread got in ahead of us
-                logger.debug("Possible duplicate message due to race condition: " + id);
-            }
-            return super.processNext(event);
-        }
-        catch (Exception e)
-        {
-            throw new RoutingException(CoreMessages.failedToWriteMessageToStore(id, storePrefix),
-                event, this, e);
-        }
+        return super.processNext(event);
     }
 
     protected String getValueForEvent(MuleEvent event) throws MessagingException
@@ -136,7 +115,42 @@ public class IdempotentMessageFilter extends AbstractFilteringMessageProcessor i
     @Override
     protected boolean accept(MuleEvent event)
     {
-        return event != null && acceptMessageForFlowConstruct(event) && isNewMessage(event);
+        if(event != null && acceptMessageForFlowConstruct(event) && isNewMessage(event))
+        {
+            try
+            {
+                String id = getIdForEvent(event);
+                String value = getValueForEvent(event);
+                try
+                {
+                    store.store(id, value);
+                    return true;
+                }
+                catch (ObjectAlreadyExistsException ex)
+                {
+                    return false;
+                }
+                catch (ObjectStoreNotAvaliableException e)
+                {
+                    logger.error("ObjectStore not available: " + e.getMessage());
+                    return false;
+                }
+                catch (ObjectStoreException e)
+                {
+                    logger.warn("ObjectStore exception: " + e.getMessage());
+                    return false;
+                }
+            }
+            catch (MessagingException e)
+            {
+                logger.warn("Could not retrieve Id or Value for event: " + e.getMessage());
+                return false;
+            }
+        }
+        else
+        {
+            return false;
+        }
     }
 
     protected boolean acceptMessageForFlowConstruct(MuleEvent event)
