@@ -21,7 +21,7 @@ import java.util.regex.Pattern;
  */
 public class AttributeEvaluator
 {
-    private static final Pattern SINGLE_EXPRESSION_REGEX_PATTERN = Pattern.compile("^#\\[[^(#\\[)]*\\]$");
+    private static final Pattern SINGLE_EXPRESSION_REGEX_PATTERN = Pattern.compile("^#\\[(?:(?!#\\[).)*\\]$");
 
     private enum AttributeType
     {
