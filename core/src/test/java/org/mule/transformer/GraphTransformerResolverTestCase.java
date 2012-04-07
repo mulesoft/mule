@@ -36,7 +36,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 @SmallTest
-public class GraphTransformerResolverTest
+public class GraphTransformerResolverTestCase
 {
 
     private static final DataType XML_DATA_TYPE = mock(DataType.class, "XML_DATA_TYPE");
