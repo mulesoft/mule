@@ -709,6 +709,39 @@ public class GraphTransformerResolverTestCase
         assertContainsCompositeTransformer(transformers, inputStreamToJson, jsonToString, stringToXml);
     }
 
+    @Test
+    public void managesTransformationCycles() throws Exception
+    {
+        /*
+        A= INPUT_STREAM_DATA_TYPE
+        B= STRING_DATA_TYPE
+        C= JSON_DATA_TYPE
+
+        A->B
+        B->C
+        B->A
+        C->A
+        C->B
+         */
+        Transformer inputStreamToString = new MockConverterBuilder().named("inputStreamToString").from(INPUT_STREAM_DATA_TYPE).to(STRING_DATA_TYPE).build();
+        Transformer stringToJson = new MockConverterBuilder().named("stringToJson").from(STRING_DATA_TYPE).to(JSON_DATA_TYPE).build();
+        Transformer stringToInputStream = new MockConverterBuilder().named("stringToInputStream").from(STRING_DATA_TYPE).to(INPUT_STREAM_DATA_TYPE).build();
+        Transformer jsonToInputStream = new MockConverterBuilder().named("jsonToInputStream").from(JSON_DATA_TYPE).to(INPUT_STREAM_DATA_TYPE).build();
+        Transformer jsonToString = new MockConverterBuilder().named("jsonToXml").from(JSON_DATA_TYPE).to(STRING_DATA_TYPE).build();
+
+        GraphTransformerResolver graphResolver = new GraphTransformerResolver();
+        graphResolver.transformerChange(inputStreamToString, TransformerResolver.RegistryAction.ADDED);
+        graphResolver.transformerChange(stringToJson, TransformerResolver.RegistryAction.ADDED);
+        graphResolver.transformerChange(stringToInputStream, TransformerResolver.RegistryAction.ADDED);
+        graphResolver.transformerChange(jsonToString, TransformerResolver.RegistryAction.ADDED);
+        graphResolver.transformerChange(jsonToInputStream, TransformerResolver.RegistryAction.ADDED);
+
+        List<Transformer> transformers = graphResolver.lookupTransformers(INPUT_STREAM_DATA_TYPE, JSON_DATA_TYPE);
+
+        assertEquals(1, transformers.size());
+        assertContainsCompositeTransformer(transformers, inputStreamToString, stringToJson);
+    }
+
     private void assertContainsCompositeTransformer(List<Transformer> transformers, Transformer... composedTransformers)
     {
         //To change body of created methods use File | Settings | File Templates.
