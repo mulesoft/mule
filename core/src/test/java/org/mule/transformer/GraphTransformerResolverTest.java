@@ -22,12 +22,12 @@ import static org.mockito.Mockito.mock;
 
 import org.mule.api.registry.ResolverException;
 import org.mule.api.registry.TransformerResolver;
-import org.mule.api.transformer.Converter;
 import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.Transformer;
 import org.mule.tck.size.SmallTest;
+import org.mule.transformer.builder.MockConverterBuilder;
+import org.mule.transformer.builder.MockTransformerBuilder;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
@@ -65,7 +65,7 @@ public class GraphTransformerResolverTest
     @Test
     public void ignoresTransformerAdded()
     {
-        Transformer xmlToJson = createMockTransformer(JSON_DATA_TYPE, "", XML_DATA_TYPE);
+        Transformer xmlToJson = new MockTransformerBuilder().from(XML_DATA_TYPE).to(JSON_DATA_TYPE).build();
 
         GraphTransformerResolver graphResolver = new GraphTransformerResolver();
         graphResolver.transformerChange(xmlToJson, TransformerResolver.RegistryAction.ADDED);
@@ -77,7 +77,7 @@ public class GraphTransformerResolverTest
     @Test
     public void ignoresTransformerRemoved()
     {
-        Transformer xmlToJson = createMockTransformer(JSON_DATA_TYPE, "", XML_DATA_TYPE);
+        Transformer xmlToJson = new MockTransformerBuilder().from(XML_DATA_TYPE).to(JSON_DATA_TYPE).build();
 
         GraphTransformerResolver graphResolver = new GraphTransformerResolver();
         graphResolver.transformerChange(xmlToJson, TransformerResolver.RegistryAction.ADDED);
@@ -90,7 +90,7 @@ public class GraphTransformerResolverTest
     @Test
     public void processesConverterAdded()
     {
-        Transformer xmlToJson = createMockConverter(JSON_DATA_TYPE, "", XML_DATA_TYPE);
+        Transformer xmlToJson = new MockConverterBuilder().from(XML_DATA_TYPE).to(JSON_DATA_TYPE).build();
 
         GraphTransformerResolver graphResolver = new GraphTransformerResolver();
         graphResolver.transformerChange(xmlToJson, TransformerResolver.RegistryAction.ADDED);
@@ -107,7 +107,7 @@ public class GraphTransformerResolverTest
     @Test
     public void ignoresConverterAddedTwice()
     {
-        Transformer xmlToJson = createMockConverter(JSON_DATA_TYPE, "", XML_DATA_TYPE);
+        Transformer xmlToJson = new MockConverterBuilder().from(XML_DATA_TYPE).to(JSON_DATA_TYPE).build();
 
         GraphTransformerResolver graphResolver = new GraphTransformerResolver();
         graphResolver.transformerChange(xmlToJson, TransformerResolver.RegistryAction.ADDED);
@@ -125,7 +125,7 @@ public class GraphTransformerResolverTest
     @Test
     public void processesConverterAddedWithMultipleSourceTypes()
     {
-        Transformer xmlToJson = createMockConverter(JSON_DATA_TYPE, "", XML_DATA_TYPE, INPUT_STREAM_DATA_TYPE);
+        Transformer xmlToJson = new MockConverterBuilder().from(XML_DATA_TYPE, INPUT_STREAM_DATA_TYPE).to(JSON_DATA_TYPE).build();
 
         GraphTransformerResolver graphResolver = new GraphTransformerResolver();
         graphResolver.transformerChange(xmlToJson, TransformerResolver.RegistryAction.ADDED);
@@ -146,7 +146,7 @@ public class GraphTransformerResolverTest
     @Test
     public void processesConverterRemoved()
     {
-        Transformer xmlToJson = createMockConverter(JSON_DATA_TYPE, "", XML_DATA_TYPE);
+        Transformer xmlToJson = new MockConverterBuilder().from(XML_DATA_TYPE).to(JSON_DATA_TYPE).build();
 
         GraphTransformerResolver graphResolver = new GraphTransformerResolver();
         graphResolver.transformerChange(xmlToJson, TransformerResolver.RegistryAction.ADDED);
@@ -159,8 +159,8 @@ public class GraphTransformerResolverTest
     @Test
     public void ignoresRemovingConverterThatWasNeverAdded()
     {
-        Transformer xmlToJson = createMockConverter(1, JSON_DATA_TYPE, "", XML_DATA_TYPE);
-        Transformer betterXmlToJson = createMockConverter(2, JSON_DATA_TYPE, "", XML_DATA_TYPE);
+        Transformer xmlToJson = new MockConverterBuilder().from(XML_DATA_TYPE).to(JSON_DATA_TYPE).weighting(1).build();
+        Transformer betterXmlToJson = new MockConverterBuilder().from(XML_DATA_TYPE).to(JSON_DATA_TYPE).weighting(2).build();
 
         GraphTransformerResolver graphResolver = new GraphTransformerResolver();
         graphResolver.transformerChange(xmlToJson, TransformerResolver.RegistryAction.ADDED);
@@ -177,7 +177,7 @@ public class GraphTransformerResolverTest
     @Test
     public void processesConverterRemovedWithMultipleSourceTypes()
     {
-        Transformer xmlToJson = createMockConverter(JSON_DATA_TYPE, "", XML_DATA_TYPE, INPUT_STREAM_DATA_TYPE);
+        Transformer xmlToJson = new MockConverterBuilder().from(XML_DATA_TYPE, INPUT_STREAM_DATA_TYPE).to(JSON_DATA_TYPE).build();
 
         GraphTransformerResolver graphResolver = new GraphTransformerResolver();
         graphResolver.transformerChange(xmlToJson, TransformerResolver.RegistryAction.ADDED);
@@ -190,8 +190,8 @@ public class GraphTransformerResolverTest
     @Test
     public void multipleConvertersFromSameSourceToResultTypes()
     {
-        Transformer xmlToJson = createMockConverter(JSON_DATA_TYPE, "", XML_DATA_TYPE);
-        Transformer betterXmlToJson = createMockConverter(JSON_DATA_TYPE, "", XML_DATA_TYPE);
+        Transformer xmlToJson = new MockConverterBuilder().from(XML_DATA_TYPE).to(JSON_DATA_TYPE).build();
+        Transformer betterXmlToJson = new MockConverterBuilder().from(XML_DATA_TYPE).to(JSON_DATA_TYPE).build();
 
         GraphTransformerResolver graphResolver = new GraphTransformerResolver();
         graphResolver.transformerChange(xmlToJson, TransformerResolver.RegistryAction.ADDED);
@@ -212,8 +212,8 @@ public class GraphTransformerResolverTest
     @Test
     public void removesFirstDuplicateConverterAdded()
     {
-        Transformer xmlToJson = createMockConverter(JSON_DATA_TYPE, "", XML_DATA_TYPE);
-        Transformer betterXmlToJson = createMockConverter(JSON_DATA_TYPE, "", XML_DATA_TYPE);
+        Transformer xmlToJson = new MockConverterBuilder().from(XML_DATA_TYPE).to(JSON_DATA_TYPE).build();
+        Transformer betterXmlToJson = new MockConverterBuilder().from(XML_DATA_TYPE).to(JSON_DATA_TYPE).build();
 
         GraphTransformerResolver graphResolver = new GraphTransformerResolver();
         graphResolver.transformerChange(xmlToJson, TransformerResolver.RegistryAction.ADDED);
@@ -233,8 +233,8 @@ public class GraphTransformerResolverTest
     @Test
     public void removesSecondDuplicateConverterAdded()
     {
-        Transformer xmlToJson = createMockConverter(JSON_DATA_TYPE, "", XML_DATA_TYPE);
-        Transformer betterXmlToJson = createMockConverter(JSON_DATA_TYPE, "", XML_DATA_TYPE);
+        Transformer xmlToJson = new MockConverterBuilder().from(XML_DATA_TYPE).to(JSON_DATA_TYPE).build();
+        Transformer betterXmlToJson = new MockConverterBuilder().from(XML_DATA_TYPE).to(JSON_DATA_TYPE).build();
 
         GraphTransformerResolver graphResolver = new GraphTransformerResolver();
         graphResolver.transformerChange(xmlToJson, TransformerResolver.RegistryAction.ADDED);
@@ -254,8 +254,8 @@ public class GraphTransformerResolverTest
     @Test
     public void multipleConvertersFromDifferentSourceToSameResultTypes()
     {
-        Transformer xmlToJson = createMockConverter(JSON_DATA_TYPE, "", XML_DATA_TYPE);
-        Transformer objectToJson = createMockConverter(JSON_DATA_TYPE, "", INPUT_STREAM_DATA_TYPE);
+        Transformer xmlToJson = new MockConverterBuilder().from(XML_DATA_TYPE).to(JSON_DATA_TYPE).build();
+        Transformer objectToJson = new MockConverterBuilder().from(INPUT_STREAM_DATA_TYPE).to(JSON_DATA_TYPE).build();
 
         GraphTransformerResolver graphResolver = new GraphTransformerResolver();
         graphResolver.transformerChange(xmlToJson, TransformerResolver.RegistryAction.ADDED);
@@ -276,8 +276,8 @@ public class GraphTransformerResolverTest
     @Test
     public void removeFirstAddedConverterWithDifferentSourceToSameResultTypes()
     {
-        Transformer xmlToJson = createMockConverter(JSON_DATA_TYPE, "", XML_DATA_TYPE);
-        Transformer objectToJson = createMockConverter(JSON_DATA_TYPE, "", INPUT_STREAM_DATA_TYPE);
+        Transformer xmlToJson = new MockConverterBuilder().from(XML_DATA_TYPE).to(JSON_DATA_TYPE).build();
+        Transformer objectToJson = new MockConverterBuilder().from(INPUT_STREAM_DATA_TYPE).to(JSON_DATA_TYPE).build();
 
         GraphTransformerResolver graphResolver = new GraphTransformerResolver();
         graphResolver.transformerChange(xmlToJson, TransformerResolver.RegistryAction.ADDED);
@@ -299,8 +299,8 @@ public class GraphTransformerResolverTest
     @Test
     public void removeSecondAddedConverterWithDifferentSourceToSameResultTypes()
     {
-        Transformer xmlToJson = createMockConverter(JSON_DATA_TYPE, "", XML_DATA_TYPE);
-        Transformer objectToJson = createMockConverter(JSON_DATA_TYPE, "", INPUT_STREAM_DATA_TYPE);
+        Transformer xmlToJson = new MockConverterBuilder().from(XML_DATA_TYPE).to(JSON_DATA_TYPE).build();
+        Transformer objectToJson = new MockConverterBuilder().from(INPUT_STREAM_DATA_TYPE).to(JSON_DATA_TYPE).build();
 
         GraphTransformerResolver graphResolver = new GraphTransformerResolver();
         graphResolver.transformerChange(xmlToJson, TransformerResolver.RegistryAction.ADDED);
@@ -332,7 +332,7 @@ public class GraphTransformerResolverTest
     @Test
     public void noTransformerToReturnDataTypeFound() throws ResolverException
     {
-        Transformer xmlToJson = createMockTransformer(JSON_DATA_TYPE, "", XML_DATA_TYPE);
+        Transformer xmlToJson = new MockTransformerBuilder().from(XML_DATA_TYPE).to(JSON_DATA_TYPE).build();
 
         GraphTransformerResolver graphResolver = new GraphTransformerResolver();
         graphResolver.transformerChange(xmlToJson, TransformerResolver.RegistryAction.ADDED);
@@ -347,8 +347,8 @@ public class GraphTransformerResolverTest
     {
         DataType mockStringDataType = mock(DataType.class);
 
-        Transformer xmlToJson = createMockConverter(JSON_DATA_TYPE, "", XML_DATA_TYPE);
-        Transformer inputStreamToXml = createMockConverter(XML_DATA_TYPE, "", INPUT_STREAM_DATA_TYPE);
+        Transformer xmlToJson = new MockConverterBuilder().from(XML_DATA_TYPE).to(JSON_DATA_TYPE).build();
+        Transformer inputStreamToXml = new MockConverterBuilder().from(INPUT_STREAM_DATA_TYPE).to(XML_DATA_TYPE).build();
 
         GraphTransformerResolver graphResolver = new GraphTransformerResolver();
         graphResolver.transformerChange(inputStreamToXml, TransformerResolver.RegistryAction.ADDED);
@@ -362,7 +362,7 @@ public class GraphTransformerResolverTest
     @Test
     public void resolvesDirectTransformation() throws ResolverException
     {
-        Transformer xmlToJson = createMockConverter(JSON_DATA_TYPE, "xmlToJson", XML_DATA_TYPE);
+        Transformer xmlToJson = new MockConverterBuilder().named("xmlToJson").from(XML_DATA_TYPE).to(JSON_DATA_TYPE).build();
 
         GraphTransformerResolver graphResolver = new GraphTransformerResolver();
         graphResolver.transformerChange(xmlToJson, TransformerResolver.RegistryAction.ADDED);
@@ -375,8 +375,8 @@ public class GraphTransformerResolverTest
     @Test
     public void resolvesMultipleDirectTransformationAddingBetterTransformerFirst() throws ResolverException
     {
-        Transformer betterXmlToJson = createMockConverter(2, JSON_DATA_TYPE, "betterXmlToJson", XML_DATA_TYPE);
-        Transformer xmlToJson = createMockConverter(1, JSON_DATA_TYPE, "xmlToJson", XML_DATA_TYPE);
+        Transformer betterXmlToJson = new MockConverterBuilder().named("betterXmlToJson").from(XML_DATA_TYPE).to(JSON_DATA_TYPE).weighting(2).build();
+        Transformer xmlToJson = new MockConverterBuilder().named("xmlToJson").from(XML_DATA_TYPE).to(JSON_DATA_TYPE).weighting(1).build();
 
         GraphTransformerResolver graphResolver = new GraphTransformerResolver();
         graphResolver.transformerChange(betterXmlToJson, TransformerResolver.RegistryAction.ADDED);
@@ -390,9 +390,8 @@ public class GraphTransformerResolverTest
     @Test
     public void resolvesMultipleDirectTransformationAddingBetterTransformerLast() throws ResolverException
     {
-        Transformer betterXmlToJson = createMockConverter(2, JSON_DATA_TYPE, "betterXmlToJson", XML_DATA_TYPE);
-        Transformer xmlToJson = createMockConverter(1, JSON_DATA_TYPE, "xmlToJson", XML_DATA_TYPE);
-
+        Transformer betterXmlToJson = new MockConverterBuilder().named("betterXmlToJson").from(XML_DATA_TYPE).to(JSON_DATA_TYPE).weighting(2).build();
+        Transformer xmlToJson = new MockConverterBuilder().named("xmlToJson").from(XML_DATA_TYPE).to(JSON_DATA_TYPE).weighting(1).build();
 
         GraphTransformerResolver graphResolver = new GraphTransformerResolver();
         graphResolver.transformerChange(xmlToJson, TransformerResolver.RegistryAction.ADDED);
@@ -406,8 +405,8 @@ public class GraphTransformerResolverTest
     @Test
     public void resolvesTransformationChain() throws ResolverException
     {
-        Transformer xmlToJson = createMockConverter(JSON_DATA_TYPE, "", XML_DATA_TYPE);
-        Transformer inputStreamToXml = createMockConverter(XML_DATA_TYPE, "", INPUT_STREAM_DATA_TYPE);
+        Transformer xmlToJson = new MockConverterBuilder().from(XML_DATA_TYPE).to(JSON_DATA_TYPE).build();
+        Transformer inputStreamToXml = new MockConverterBuilder().from(INPUT_STREAM_DATA_TYPE).to(XML_DATA_TYPE).build();
 
         GraphTransformerResolver graphResolver = new GraphTransformerResolver();
         graphResolver.transformerChange(inputStreamToXml, TransformerResolver.RegistryAction.ADDED);
@@ -425,8 +424,8 @@ public class GraphTransformerResolverTest
     @Test
     public void cachesResolvedTransformer() throws ResolverException
     {
-        Transformer xmlToJson = createMockConverter(JSON_DATA_TYPE, "", XML_DATA_TYPE);
-        Transformer inputStreamToXml = createMockConverter(XML_DATA_TYPE, "", INPUT_STREAM_DATA_TYPE);
+        Transformer xmlToJson = new MockConverterBuilder().from(XML_DATA_TYPE).to(JSON_DATA_TYPE).build();
+        Transformer inputStreamToXml = new MockConverterBuilder().from(INPUT_STREAM_DATA_TYPE).to(XML_DATA_TYPE).build();
 
         GraphTransformerResolver graphResolver = new GraphTransformerResolver();
         graphResolver.transformerChange(inputStreamToXml, TransformerResolver.RegistryAction.ADDED);
@@ -441,9 +440,9 @@ public class GraphTransformerResolverTest
     @Test
     public void resolvesTransformationChainWithMultipleEdgesFromSource() throws ResolverException
     {
-        Transformer xmlToJson = createMockConverter(1, JSON_DATA_TYPE, "xmlToJson", XML_DATA_TYPE);
-        Transformer betterXmlToJson = createMockConverter(2, JSON_DATA_TYPE, "betterXmlToJson", XML_DATA_TYPE);
-        Transformer inputStreamToXml = createMockConverter(1, XML_DATA_TYPE, "inputStreamToXml", INPUT_STREAM_DATA_TYPE);
+        Transformer xmlToJson = new MockConverterBuilder().named("xmlToJson").from(XML_DATA_TYPE).to(JSON_DATA_TYPE).weighting(1).build();
+        Transformer betterXmlToJson = new MockConverterBuilder().named("betterXmlToJson").from(XML_DATA_TYPE).to(JSON_DATA_TYPE).weighting(2).build();
+        Transformer inputStreamToXml = new MockConverterBuilder().named("inputStreamToXml").from(INPUT_STREAM_DATA_TYPE).to(XML_DATA_TYPE).weighting(1).build();
 
         GraphTransformerResolver graphResolver = new GraphTransformerResolver();
         graphResolver.transformerChange(betterXmlToJson, TransformerResolver.RegistryAction.ADDED);
@@ -462,9 +461,9 @@ public class GraphTransformerResolverTest
     @Test
     public void resolvesTransformationChainWithMultipleEdgesToResult() throws ResolverException
     {
-        Transformer xmlToJson = createMockConverter(1, JSON_DATA_TYPE, "", XML_DATA_TYPE);
-        Transformer inputStreamToXml = createMockConverter(1, XML_DATA_TYPE, "", INPUT_STREAM_DATA_TYPE);
-        Transformer mockBetterTransformerinputStreamToXml = createMockConverter(2, XML_DATA_TYPE, "", INPUT_STREAM_DATA_TYPE);
+        Transformer xmlToJson = new MockConverterBuilder().from(XML_DATA_TYPE).to(JSON_DATA_TYPE).weighting(1).build();
+        Transformer inputStreamToXml = new MockConverterBuilder().from(INPUT_STREAM_DATA_TYPE).to(XML_DATA_TYPE).weighting(1).build();
+        Transformer mockBetterTransformerinputStreamToXml = new MockConverterBuilder().from(INPUT_STREAM_DATA_TYPE).to(XML_DATA_TYPE).weighting(2).build();
 
         GraphTransformerResolver graphResolver = new GraphTransformerResolver();
         graphResolver.transformerChange(inputStreamToXml, TransformerResolver.RegistryAction.ADDED);
@@ -483,10 +482,10 @@ public class GraphTransformerResolverTest
     @Test
     public void resolvesTransformationChainWithMultipleEdges() throws ResolverException
     {
-        Transformer xmlToJson = createMockConverter(1, JSON_DATA_TYPE, "xmlToJson", XML_DATA_TYPE);
-        Transformer betterXmlToJson = createMockConverter(2, JSON_DATA_TYPE, "betterXmlToJson", XML_DATA_TYPE);
-        Transformer inputStreamToXml = createMockConverter(1, XML_DATA_TYPE, "inputStreamToXml", INPUT_STREAM_DATA_TYPE);
-        Transformer mockBetterTransformerInputStreamToXml = createMockConverter(2, XML_DATA_TYPE, "mockBetterTransformerInputStreamToXml", INPUT_STREAM_DATA_TYPE);
+        Transformer xmlToJson = new MockConverterBuilder().named("xmlToJson").from(XML_DATA_TYPE).to(JSON_DATA_TYPE).weighting(1).build();
+        Transformer betterXmlToJson = new MockConverterBuilder().named("betterXmlToJson").from(XML_DATA_TYPE).to(JSON_DATA_TYPE).weighting(2).build();
+        Transformer inputStreamToXml = new MockConverterBuilder().named("inputStreamToXml").from(INPUT_STREAM_DATA_TYPE).to(XML_DATA_TYPE).weighting(1).build();
+        Transformer mockBetterTransformerInputStreamToXml = new MockConverterBuilder().named("mockBetterTransformerInputStreamToXml").from(INPUT_STREAM_DATA_TYPE).to(XML_DATA_TYPE).weighting(2).build();
 
         GraphTransformerResolver graphResolver = new GraphTransformerResolver();
         graphResolver.transformerChange(mockBetterTransformerInputStreamToXml, TransformerResolver.RegistryAction.ADDED);
@@ -506,8 +505,8 @@ public class GraphTransformerResolverTest
     @Test
     public void clearsCacheWhenAddsTransformer() throws ResolverException
     {
-        Transformer xmlToJson = createMockConverter(JSON_DATA_TYPE, "xmlToJson", XML_DATA_TYPE);
-        Transformer inputStreamToXml = createMockConverter(XML_DATA_TYPE, "inputStreamToXml", INPUT_STREAM_DATA_TYPE);
+        Transformer xmlToJson = new MockConverterBuilder().named("xmlToJson").from(XML_DATA_TYPE).to(JSON_DATA_TYPE).build();
+        Transformer inputStreamToXml = new MockConverterBuilder().named("inputStreamToXml").from(INPUT_STREAM_DATA_TYPE).to(XML_DATA_TYPE).build();
 
         GraphTransformerResolver graphResolver = new GraphTransformerResolver();
         graphResolver.transformerChange(inputStreamToXml, TransformerResolver.RegistryAction.ADDED);
@@ -516,7 +515,7 @@ public class GraphTransformerResolverTest
         Transformer transformer1 = graphResolver.resolve(INPUT_STREAM_DATA_TYPE, JSON_DATA_TYPE);
         assertNotNull(transformer1);
 
-        Transformer xmlToString = createMockConverter(STRING_DATA_TYPE, "xmlToString", XML_DATA_TYPE);
+        Transformer xmlToString = new MockConverterBuilder().named("xmlToString").from(XML_DATA_TYPE).to(STRING_DATA_TYPE).build();
         graphResolver.transformerChange(xmlToString, TransformerResolver.RegistryAction.ADDED);
 
         Transformer transformer2 = graphResolver.resolve(INPUT_STREAM_DATA_TYPE, JSON_DATA_TYPE);
@@ -526,9 +525,9 @@ public class GraphTransformerResolverTest
     @Test
     public void clearsCacheWhenRemovesTransformer() throws ResolverException
     {
-        Transformer xmlToJson = createMockConverter(JSON_DATA_TYPE, "", XML_DATA_TYPE);
+        Transformer xmlToJson = new MockConverterBuilder().from(XML_DATA_TYPE).to(JSON_DATA_TYPE).build();
 
-        Transformer inputStreamToXml = createMockConverter(XML_DATA_TYPE, "", INPUT_STREAM_DATA_TYPE);
+        Transformer inputStreamToXml = new MockConverterBuilder().from(INPUT_STREAM_DATA_TYPE).to(XML_DATA_TYPE).build();
 
         GraphTransformerResolver graphResolver = new GraphTransformerResolver();
         graphResolver.transformerChange(inputStreamToXml, TransformerResolver.RegistryAction.ADDED);
@@ -545,11 +544,10 @@ public class GraphTransformerResolverTest
         assertNull(transformer);
     }
 
-
     @Test
     public void lookupTransformersNoSourceInGraph() throws Exception
     {
-        Transformer inputStreamToXml = createMockConverter(XML_DATA_TYPE, "", INPUT_STREAM_DATA_TYPE);
+        Transformer inputStreamToXml = new MockConverterBuilder().from(INPUT_STREAM_DATA_TYPE).to(XML_DATA_TYPE).build();
 
         GraphTransformerResolver graphResolver = new GraphTransformerResolver();
         graphResolver.transformerChange(inputStreamToXml, TransformerResolver.RegistryAction.ADDED);
@@ -562,7 +560,7 @@ public class GraphTransformerResolverTest
     @Test
     public void lookupTransformersNoTargetInGraph() throws Exception
     {
-        Transformer inputStreamToXml = createMockConverter(XML_DATA_TYPE, "", INPUT_STREAM_DATA_TYPE);
+        Transformer inputStreamToXml = new MockConverterBuilder().from(INPUT_STREAM_DATA_TYPE).to(XML_DATA_TYPE).build();
 
         GraphTransformerResolver graphResolver = new GraphTransformerResolver();
         graphResolver.transformerChange(inputStreamToXml, TransformerResolver.RegistryAction.ADDED);
@@ -575,7 +573,7 @@ public class GraphTransformerResolverTest
     @Test
     public void lookupTransformersOneMatchingDirectTransformer() throws Exception
     {
-        Transformer inputStreamToXml = createMockConverter(XML_DATA_TYPE, "", INPUT_STREAM_DATA_TYPE);
+        Transformer inputStreamToXml = new MockConverterBuilder().from(INPUT_STREAM_DATA_TYPE).to(XML_DATA_TYPE).build();
 
         GraphTransformerResolver graphResolver = new GraphTransformerResolver();
         graphResolver.transformerChange(inputStreamToXml, TransformerResolver.RegistryAction.ADDED);
@@ -589,8 +587,8 @@ public class GraphTransformerResolverTest
     @Test
     public void lookupTransformersTwoMatchingDirectTransformers() throws Exception
     {
-        Transformer inputStreamToXml = createMockConverter(XML_DATA_TYPE, "", INPUT_STREAM_DATA_TYPE);
-        Transformer betterInputStreamToXml = createMockConverter(XML_DATA_TYPE, "", INPUT_STREAM_DATA_TYPE);
+        Transformer inputStreamToXml = new MockConverterBuilder().from(INPUT_STREAM_DATA_TYPE).to(XML_DATA_TYPE).build();
+        Transformer betterInputStreamToXml = new MockConverterBuilder().from(INPUT_STREAM_DATA_TYPE).to(XML_DATA_TYPE).build();
 
         GraphTransformerResolver graphResolver = new GraphTransformerResolver();
         graphResolver.transformerChange(inputStreamToXml, TransformerResolver.RegistryAction.ADDED);
@@ -617,10 +615,10 @@ public class GraphTransformerResolverTest
         B->D
         C->D
          */
-        Transformer inputStreamToString = createMockConverter(STRING_DATA_TYPE, "inputStreamToString", INPUT_STREAM_DATA_TYPE);
-        Transformer inputStreamToJson = createMockConverter(JSON_DATA_TYPE, "inputStreamToJson", INPUT_STREAM_DATA_TYPE);
-        Transformer jsonToXml = createMockConverter(XML_DATA_TYPE, "jsonToXml", JSON_DATA_TYPE);
-        Transformer stringToXml = createMockConverter(XML_DATA_TYPE, "stringToXml", STRING_DATA_TYPE);
+        Transformer inputStreamToString = new MockConverterBuilder().named("inputStreamToString").from(INPUT_STREAM_DATA_TYPE).to(STRING_DATA_TYPE).build();
+        Transformer inputStreamToJson = new MockConverterBuilder().named("inputStreamToJson").from(INPUT_STREAM_DATA_TYPE).to(JSON_DATA_TYPE).build();
+        Transformer jsonToXml = new MockConverterBuilder().named("jsonToXml").from(JSON_DATA_TYPE).to(XML_DATA_TYPE).build();
+        Transformer stringToXml = new MockConverterBuilder().named("stringToXml").from(STRING_DATA_TYPE).to(XML_DATA_TYPE).build();
 
         GraphTransformerResolver graphResolver = new GraphTransformerResolver();
         graphResolver.transformerChange(inputStreamToString, TransformerResolver.RegistryAction.ADDED);
@@ -634,7 +632,6 @@ public class GraphTransformerResolverTest
         assertContainsCompositeTransformer(transformers, inputStreamToString, stringToXml);
         assertContainsCompositeTransformer(transformers, inputStreamToJson, jsonToXml);
     }
-
 
     @Test
     public void lookupTransformersMatchingNonDirectTransformers2() throws Exception
@@ -651,11 +648,11 @@ public class GraphTransformerResolverTest
         B->D
         C->D
          */
-        Transformer inputStreamToString = createMockConverter(STRING_DATA_TYPE, "inputStreamToString", INPUT_STREAM_DATA_TYPE);
-        Transformer inputStreamToJson = createMockConverter(JSON_DATA_TYPE, "inputStreamToJson", INPUT_STREAM_DATA_TYPE);
-        Transformer jsonToXml = createMockConverter(XML_DATA_TYPE, "jsonToXml", JSON_DATA_TYPE);
-        Transformer stringToXml = createMockConverter(XML_DATA_TYPE, "stringToXml", STRING_DATA_TYPE);
-        Transformer stringToJson = createMockConverter(JSON_DATA_TYPE, "stringToJson", STRING_DATA_TYPE);
+        Transformer inputStreamToString = new MockConverterBuilder().named("inputStreamToString").from(INPUT_STREAM_DATA_TYPE).to(STRING_DATA_TYPE).build();
+        Transformer inputStreamToJson = new MockConverterBuilder().named("inputStreamToJson").from(INPUT_STREAM_DATA_TYPE).to(JSON_DATA_TYPE).build();
+        Transformer jsonToXml = new MockConverterBuilder().named("jsonToXml").from(JSON_DATA_TYPE).to(XML_DATA_TYPE).build();
+        Transformer stringToXml = new MockConverterBuilder().named("stringToXml").from(STRING_DATA_TYPE).to(XML_DATA_TYPE).build();
+        Transformer stringToJson = new MockConverterBuilder().named("stringToJson").from(STRING_DATA_TYPE).to(JSON_DATA_TYPE).build();
 
         GraphTransformerResolver graphResolver = new GraphTransformerResolver();
         graphResolver.transformerChange(inputStreamToString, TransformerResolver.RegistryAction.ADDED);
@@ -688,12 +685,12 @@ public class GraphTransformerResolverTest
         C->D
         C->D
          */
-        Transformer inputStreamToString = createMockConverter(STRING_DATA_TYPE, "inputStreamToString", INPUT_STREAM_DATA_TYPE);
-        Transformer inputStreamToJson = createMockConverter(JSON_DATA_TYPE, "inputStreamToJson", INPUT_STREAM_DATA_TYPE);
-        Transformer jsonToXml = createMockConverter(XML_DATA_TYPE, "jsonToXml", JSON_DATA_TYPE);
-        Transformer jsonToString = createMockConverter(STRING_DATA_TYPE, "jsonToXml", JSON_DATA_TYPE);
-        Transformer stringToXml = createMockConverter(XML_DATA_TYPE, "stringToXml", STRING_DATA_TYPE);
-        Transformer stringToJson = createMockConverter(JSON_DATA_TYPE, "stringToJson", STRING_DATA_TYPE);
+        Transformer inputStreamToString = new MockConverterBuilder().named("inputStreamToString").from(INPUT_STREAM_DATA_TYPE).to(STRING_DATA_TYPE).build();
+        Transformer inputStreamToJson = new MockConverterBuilder().named("inputStreamToJson").from(INPUT_STREAM_DATA_TYPE).to(JSON_DATA_TYPE).build();
+        Transformer jsonToXml = new MockConverterBuilder().named("jsonToXml").from(JSON_DATA_TYPE).to(XML_DATA_TYPE).build();
+        Transformer jsonToString = new MockConverterBuilder().named("jsonToXml").from(JSON_DATA_TYPE).to(STRING_DATA_TYPE).build();
+        Transformer stringToXml = new MockConverterBuilder().named("stringToXml").from(STRING_DATA_TYPE).to(XML_DATA_TYPE).build();
+        Transformer stringToJson = new MockConverterBuilder().named("stringToJson").from(STRING_DATA_TYPE).to(JSON_DATA_TYPE).build();
 
         GraphTransformerResolver graphResolver = new GraphTransformerResolver();
         graphResolver.transformerChange(inputStreamToString, TransformerResolver.RegistryAction.ADDED);
@@ -711,7 +708,6 @@ public class GraphTransformerResolverTest
         assertContainsCompositeTransformer(transformers, inputStreamToString, stringToJson, jsonToXml);
         assertContainsCompositeTransformer(transformers, inputStreamToJson, jsonToString, stringToXml);
     }
-
 
     private void assertContainsCompositeTransformer(List<Transformer> transformers, Transformer... composedTransformers)
     {
@@ -746,62 +742,6 @@ public class GraphTransformerResolverTest
         fail("Transformer list does not contain a composite transformer with: " + composedTransformers);
     }
 
-    private Transformer createMockTransformer(DataType returnType, String name, DataType... sourceTypes)
-    {
-
-        Transformer transformer;
-        if (name == null || name.isEmpty())
-        {
-
-            transformer = mock(Transformer.class);
-        }
-        else {
-            transformer = mock(Transformer.class, name);
-        }
-
-        doReturn(returnType).when(transformer).getReturnDataType();
-        doReturn(Arrays.asList(sourceTypes)).when(transformer).getSourceDataTypes();
-
-        return transformer;
-    }
-
-    private Transformer createMockConverter(DataType returnType, String name, DataType... sourceTypes)
-    {
-        MockConverter converter;
-        if (name == null || name.isEmpty())
-        {
-
-            converter = mock(MockConverter.class);
-        }
-        else {
-            converter = mock(MockConverter.class, name);
-        }
-
-        doReturn(returnType).when(converter).getReturnDataType();
-        doReturn(Arrays.asList(sourceTypes)).when(converter).getSourceDataTypes();
-
-        return converter;
-    }
-
-    private Transformer createMockConverter(int weight, DataType returnType, String name, DataType... sourceTypes)
-    {
-        MockConverter converter;
-        if (name == null || name.isEmpty())
-        {
-
-            converter = mock(MockConverter.class);
-        }
-        else {
-            converter = mock(MockConverter.class, name);
-        }
-
-        doReturn(returnType).when(converter).getReturnDataType();
-        doReturn(Arrays.asList(sourceTypes)).when(converter).getSourceDataTypes();
-        doReturn(weight).when(converter).getPriorityWeighting();
-
-        return converter;
-    }
-
     private void assertContainsTransformer(Set<GraphTransformerResolver.TransformationEdge> transformationEdges, Transformer transformer)
     {
         for (GraphTransformerResolver.TransformationEdge edge : transformationEdges)
@@ -815,8 +755,4 @@ public class GraphTransformerResolverTest
         fail(String.format("Transformation edges %s do not contain expected transformer %s", transformationEdges, transformer));
     }
 
-    private interface MockConverter extends Transformer, Converter
-    {
-
-    }
 }

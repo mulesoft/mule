@@ -18,8 +18,8 @@ import org.mule.api.MuleMessage;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.ThreadSafeAccess;
 import org.mule.api.config.MuleProperties;
+import org.mule.api.transformer.Converter;
 import org.mule.api.transformer.DataType;
-import org.mule.api.transformer.DiscoverableTransformer;
 import org.mule.api.transformer.MessageTransformer;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
@@ -1408,7 +1408,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
 
         boolean skipConverter = false;
 
-        if (transformer instanceof DiscoverableTransformer)
+        if (transformer instanceof Converter)
         {
             if (index == transformers.size() - 1)
             {

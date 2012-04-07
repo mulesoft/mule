@@ -11,7 +11,6 @@
 package org.mule;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
@@ -20,11 +19,12 @@ import static org.mockito.Mockito.when;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.transformer.DataType;
+import org.mule.api.transformer.Transformer;
+import org.mule.api.transformer.TransformerException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
-import org.mule.transformer.TestConverter;
-import org.mule.transformer.TestTransformer;
-import org.mule.transformer.TransformerBuilder;
+import org.mule.transformer.builder.MockConverterBuilder;
+import org.mule.transformer.builder.MockTransformerBuilder;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transformer.types.SimpleDataType;
 
@@ -35,9 +35,6 @@ import org.mockito.Mockito;
 @SmallTest
 public class DefaultMuleMessageTransformationTestCase extends AbstractMuleTestCase
 {
-
-    private MuleContext muleContext;
-    private DataTypeConversionResolver conversionResolver;
 
     private class A
     {
@@ -59,12 +56,12 @@ public class DefaultMuleMessageTransformationTestCase extends AbstractMuleTestCa
 
     }
 
+    private MuleContext muleContext = mock(MuleContext.class);
+    private DataTypeConversionResolver conversionResolver = mock(DataTypeConversionResolver.class);
+
     @Before
     public void setUp() throws Exception
     {
-        // Configures a converter resolver that does nothing
-        muleContext = mock(MuleContext.class);
-        conversionResolver = mock(DataTypeConversionResolver.class);
         when(muleContext.getDataTypeConverterResolver()).thenReturn(conversionResolver);
     }
 
@@ -76,7 +73,7 @@ public class DefaultMuleMessageTransformationTestCase extends AbstractMuleTestCa
     public void failsOnConverterWhenSourceAndReturnTypeDoesNotMatchAndThereIsNoImplicitConversion() throws MuleException
     {
         // Converter(B->C), payload A: FAIL
-        TestConverter converter1 = new TransformerBuilder().from(dataTypeB).to(dataTypeC).returning(new C()).boundTo(muleContext).buildConverter(1);
+        Transformer converter1 = new MockConverterBuilder().from(dataTypeB).to(dataTypeC).build();
 
         DefaultMuleMessage message = new DefaultMuleMessage(new A(), muleContext);
 
@@ -88,15 +85,15 @@ public class DefaultMuleMessageTransformationTestCase extends AbstractMuleTestCa
         catch (IllegalArgumentException expected)
         {
         }
-        assertFalse(converter1.wasExecuted());
+        verifyTransformerNotExecuted(converter1);
     }
 
     @Test
     public void appliesImplicitConversionOnConverterWhenSourceAndReturnTypeDoesNotMatch() throws MuleException
     {
         // Converter(C->D), payload B: uses implicit conversion B->C
-        TestConverter converter1 = new TransformerBuilder().from(dataTypeC).to(dataTypeD).returning(new D()).boundTo(muleContext).buildConverter(1);
-        TestConverter converter2 = new TransformerBuilder().from(dataTypeB).to(dataTypeC).returning(new C()).boundTo(muleContext).buildConverter(1);
+        Transformer converter1 = new MockConverterBuilder().from(dataTypeC).to(dataTypeD).returning(new D()).build();
+        Transformer converter2 = new MockConverterBuilder().from(dataTypeB).to(dataTypeC).returning(new C()).build();
 
         when(conversionResolver.resolve(Mockito.any(DataType.class), Mockito.anyList())).thenReturn(converter2);
 
@@ -105,42 +102,42 @@ public class DefaultMuleMessageTransformationTestCase extends AbstractMuleTestCa
         message.applyTransformers(null, converter1);
 
         assertTrue(message.getPayload() instanceof D);
-        assertTrue(converter1.wasExecuted());
-        assertTrue(converter2.wasExecuted());
+        verifyTransformerExecuted(converter1);
+        verifyTransformerExecuted(converter2);
     }
 
     @Test
     public void appliesConverter() throws MuleException
     {
         // Converter(B->C), payload B: OK
-        TestConverter converter1 = new TransformerBuilder().from(dataTypeB).to(dataTypeC).returning(new C()).boundTo(muleContext).buildConverter(1);
+        Transformer converter1 = new MockConverterBuilder().from(dataTypeB).to(dataTypeC).returning(new C()).build();
 
         DefaultMuleMessage message = new DefaultMuleMessage(new B(), muleContext);
         message.applyTransformers(null, converter1);
 
         assertTrue(message.getPayload() instanceof C);
-        assertTrue(converter1.wasExecuted());
+        verifyTransformerExecuted(converter1);
     }
 
     @Test
     public void skipsConverterThatDoesNotMatchWhenOriginalPayloadMatchesExpectedOutputType() throws MuleException
     {
         // Converter(B->C), payload C: OK - skips transformer but C is the expected output type -> OK
-        TestConverter converter1 = new TransformerBuilder().from(dataTypeB).to(dataTypeC).returning(new C()).boundTo(muleContext).buildConverter(1);
+        Transformer converter1 = new MockConverterBuilder().from(dataTypeB).to(dataTypeC).build();
 
         DefaultMuleMessage message = new DefaultMuleMessage(new C(), muleContext);
         message.applyTransformers(null, converter1);
 
         assertTrue(message.getPayload() instanceof C);
-        assertFalse(converter1.wasExecuted());
+        verifyTransformerNotExecuted(converter1);
     }
 
     @Test
     public void failsTransformationUsingConverterWhenSourceAndReturnTypeDoesNotMatch2() throws MuleException
     {
         // Converter(B -> C) Converter(C->D), payload A: FAIL
-        TestConverter converter1 = new TransformerBuilder().from(dataTypeB).to(dataTypeC).returning(new C()).boundTo(muleContext).buildConverter(1);
-        TestConverter converter2 = new TransformerBuilder().from(dataTypeC).to(dataTypeD).returning(new D()).boundTo(muleContext).buildConverter(1);
+        Transformer converter1 = new MockConverterBuilder().from(dataTypeB).to(dataTypeC).build();
+        Transformer converter2 = new MockConverterBuilder().from(dataTypeC).to(dataTypeD).build();
 
         DefaultMuleMessage message = new DefaultMuleMessage(new A(), muleContext);
         try
@@ -151,61 +148,61 @@ public class DefaultMuleMessageTransformationTestCase extends AbstractMuleTestCa
         catch (IllegalArgumentException expected)
         {
         }
-        assertFalse(converter1.wasExecuted());
-        assertFalse(converter2.wasExecuted());
+        verifyTransformerNotExecuted(converter1);
+        verifyTransformerNotExecuted(converter2);
     }
 
     @Test
     public void appliesBothConverters() throws MuleException
     {
         // Converter(B -> C) Converter(C->D), payload B: converts B->C, C->D
-        TestConverter converter1 = new TransformerBuilder().from(dataTypeB).to(dataTypeC).returning(new C()).boundTo(muleContext).buildConverter(1);
-        TestConverter converter2 = new TransformerBuilder().from(dataTypeC).to(dataTypeD).returning(new D()).boundTo(muleContext).buildConverter(1);
+        Transformer converter1 = new MockConverterBuilder().from(dataTypeB).to(dataTypeC).returning(new C()).build();
+        Transformer converter2 = new MockConverterBuilder().from(dataTypeC).to(dataTypeD).returning(new D()).build();
 
         DefaultMuleMessage message = new DefaultMuleMessage(new B(), muleContext);
         message.applyTransformers(null, converter1, converter2);
 
         assertTrue(message.getPayload() instanceof D);
-        assertTrue(converter1.wasExecuted());
-        assertTrue(converter2.wasExecuted());
+        verifyTransformerExecuted(converter1);
+        verifyTransformerExecuted(converter2);
     }
 
     @Test
     public void skipsFirstConverterAppliesSecond() throws MuleException
     {
         // Converter(B -> C) Converter(C->D), payload C: skips converter(B->C), applies Converter(C->D)
-        TestConverter converter1 = new TransformerBuilder().from(dataTypeB).to(dataTypeC).returning(new C()).boundTo(muleContext).buildConverter(1);
-        TestConverter converter2 = new TransformerBuilder().from(dataTypeC).to(dataTypeD).returning(new D()).boundTo(muleContext).buildConverter(1);
+        Transformer converter1 = new MockConverterBuilder().from(dataTypeB).to(dataTypeC).build();
+        Transformer converter2 = new MockConverterBuilder().from(dataTypeC).to(dataTypeD).returning(new D()).build();
 
         DefaultMuleMessage message = new DefaultMuleMessage(new C(), muleContext);
         message.applyTransformers(null, converter1, converter2);
 
         assertTrue(message.getPayload() instanceof D);
-        assertFalse(converter1.wasExecuted());
-        assertTrue(converter2.wasExecuted());
+        verifyTransformerNotExecuted(converter1);
+        verifyTransformerExecuted(converter2);
     }
 
     @Test
     public void skipBothConvertersButPayloadMatchesExpectedOutputType() throws MuleException
     {
         // Converter(B -> C) Converter(C->D), payload D: skips converter(B-C), skips converter(C->D), but D is the expected output type -> OK
-        TestConverter converter1 = new TransformerBuilder().from(dataTypeB).to(dataTypeC).returning(new C()).boundTo(muleContext).buildConverter(1);
-        TestConverter converter2 = new TransformerBuilder().from(dataTypeC).to(dataTypeD).returning(new D()).boundTo(muleContext).buildConverter(1);
+        Transformer converter1 = new MockConverterBuilder().from(dataTypeB).to(dataTypeC).build();
+        Transformer converter2 = new MockConverterBuilder().from(dataTypeC).to(dataTypeD).build();
 
         DefaultMuleMessage message = new DefaultMuleMessage(new D(), muleContext);
         message.applyTransformers(null, converter1, converter2);
 
         assertTrue(message.getPayload() instanceof D);
-        assertFalse(converter1.wasExecuted());
-        assertFalse(converter2.wasExecuted());
+        verifyTransformerNotExecuted(converter1);
+        verifyTransformerNotExecuted(converter2);
     }
 
     @Test
     public void failsTransformerIgnoringNonMatchingConverter() throws MuleException
     {
         // Transformer(B -> D) Converter(C->D), payload A: FAIL
-        TestTransformer transformer1 = new TransformerBuilder().from(dataTypeB).to(dataTypeD).returning(new D()).boundTo(muleContext).build();
-        TestConverter converter2 = new TransformerBuilder().from(dataTypeC).to(dataTypeD).returning(new D()).boundTo(muleContext).buildConverter(1);
+        Transformer transformer1 = new MockTransformerBuilder().from(dataTypeB).to(dataTypeD).build();
+        Transformer converter2 = new MockConverterBuilder().from(dataTypeC).to(dataTypeD).build();
 
         DefaultMuleMessage message = new DefaultMuleMessage(new A(), muleContext);
         try
@@ -216,31 +213,31 @@ public class DefaultMuleMessageTransformationTestCase extends AbstractMuleTestCa
         catch (IllegalArgumentException expected)
         {
         }
-        assertFalse(transformer1.wasExecuted());
-        assertFalse(converter2.wasExecuted());
+        verifyTransformerNotExecuted(transformer1);
+        verifyTransformerNotExecuted(converter2);
     }
 
     @Test
     public void appliesTransformerSkipsConverter() throws MuleException
     {
         // Transformer(B -> D) Converter(C->D), payload B: converts B->D, skips converter C->D, resulting output is of the expected type -> OK
-        TestTransformer transformer1 = new TransformerBuilder().from(dataTypeB).to(dataTypeD).returning(new D()).boundTo(muleContext).build();
-        TestConverter converter2 = new TransformerBuilder().from(dataTypeC).to(dataTypeD).returning(new D()).boundTo(muleContext).buildConverter(1);
+        Transformer transformer1 = new MockTransformerBuilder().from(dataTypeB).to(dataTypeD).returning(new D()).build();
+        Transformer converter2 = new MockConverterBuilder().from(dataTypeC).to(dataTypeD).build();
 
         DefaultMuleMessage message = new DefaultMuleMessage(new B(), muleContext);
         message.applyTransformers(null, transformer1, converter2);
 
         assertTrue(message.getPayload() instanceof D);
-        assertTrue(transformer1.wasExecuted());
-        assertFalse(converter2.wasExecuted());
+        verifyTransformerExecuted(transformer1);
+        verifyTransformerNotExecuted(converter2);
     }
 
     @Test
     public void failsTransformerIgnoringMatchingConverter() throws MuleException
     {
         // Transformer(B -> D) Converter(C->D), payload C: FAIL
-        TestTransformer transformer1 = new TransformerBuilder().from(dataTypeB).to(dataTypeD).returning(new D()).boundTo(muleContext).build();
-        TestConverter converter2 = new TransformerBuilder().from(dataTypeC).to(dataTypeD).returning(new D()).boundTo(muleContext).buildConverter(1);
+        Transformer transformer1 = new MockTransformerBuilder().from(dataTypeB).to(dataTypeD).build();
+        Transformer converter2 = new MockConverterBuilder().from(dataTypeC).to(dataTypeD).build();
 
         DefaultMuleMessage message = new DefaultMuleMessage(new C(), muleContext);
         try
@@ -251,16 +248,16 @@ public class DefaultMuleMessageTransformationTestCase extends AbstractMuleTestCa
         catch (IllegalArgumentException expected)
         {
         }
-        assertFalse(transformer1.wasExecuted());
-        assertFalse(converter2.wasExecuted());
+        verifyTransformerNotExecuted(transformer1);
+        verifyTransformerNotExecuted(converter2);
     }
 
     @Test
     public void failsTransformerIgnoringMatchingConverterWhenOriginalPayloadMatchesExpectedOutputType() throws MuleException
     {
         // Transformer(B -> D) Converter(C->D), payload D: FAIL
-        TestTransformer transformer1 = new TransformerBuilder().from(dataTypeB).to(dataTypeD).returning(new D()).boundTo(muleContext).build();
-        TestConverter converter2 = new TransformerBuilder().from(dataTypeC).to(dataTypeD).returning(new D()).boundTo(muleContext).buildConverter(1);
+        Transformer transformer1 = new MockTransformerBuilder().from(dataTypeB).to(dataTypeD).build();
+        Transformer converter2 = new MockConverterBuilder().from(dataTypeC).to(dataTypeD).build();
 
         DefaultMuleMessage message = new DefaultMuleMessage(new D(), muleContext);
         try
@@ -271,16 +268,16 @@ public class DefaultMuleMessageTransformationTestCase extends AbstractMuleTestCa
         catch (IllegalArgumentException expected)
         {
         }
-        assertFalse(transformer1.wasExecuted());
-        assertFalse(converter2.wasExecuted());
+        verifyTransformerNotExecuted(transformer1);
+        verifyTransformerNotExecuted(converter2);
     }
 
     @Test
     public void skipsConverterFailsOnTransformer() throws MuleException
     {
         // Converter(B -> D) Transformer(C->D), payload A: FAIL
-        TestConverter converter1 = new TransformerBuilder().from(dataTypeB).to(dataTypeD).returning(new D()).boundTo(muleContext).buildConverter(1);
-        TestTransformer transformer2 = new TransformerBuilder().from(dataTypeC).to(dataTypeD).returning(new D()).boundTo(muleContext).build();
+        Transformer converter1 = new MockConverterBuilder().from(dataTypeB).to(dataTypeD).build();
+        Transformer transformer2 = new MockTransformerBuilder().from(dataTypeC).to(dataTypeD).build();
 
         DefaultMuleMessage message = new DefaultMuleMessage(new A(), muleContext);
 
@@ -292,16 +289,16 @@ public class DefaultMuleMessageTransformationTestCase extends AbstractMuleTestCa
         catch (IllegalArgumentException expected)
         {
         }
-        assertFalse(converter1.wasExecuted());
-        assertFalse(transformer2.wasExecuted());
+        verifyTransformerNotExecuted(converter1);
+        verifyTransformerNotExecuted(transformer2);
     }
 
     @Test
     public void appliesConverterFailsOnTransformer() throws MuleException
     {
         // Converter(B -> D) Transformer(C->D), payload B: converts B-> D, cannot apply transformer -> FAIL
-        TestConverter converter1 = new TransformerBuilder().from(dataTypeB).to(dataTypeD).returning(new D()).boundTo(muleContext).buildConverter(1);
-        TestTransformer transformer2 = new TransformerBuilder().from(dataTypeC).to(dataTypeD).returning(new D()).boundTo(muleContext).build();
+        Transformer converter1 = new MockConverterBuilder().from(dataTypeB).to(dataTypeD).returning(new D()).build();
+        Transformer transformer2 = new MockTransformerBuilder().from(dataTypeC).to(dataTypeD).build();
 
         DefaultMuleMessage message = new DefaultMuleMessage(new B(), muleContext);
         try
@@ -312,31 +309,31 @@ public class DefaultMuleMessageTransformationTestCase extends AbstractMuleTestCa
         catch (IllegalArgumentException expected)
         {
         }
-        assertTrue(converter1.wasExecuted());
-        assertFalse(transformer2.wasExecuted());
+        verifyTransformerExecuted(converter1);
+        verifyTransformerNotExecuted(transformer2);
     }
 
     @Test
     public void skipsConverterAppliesTransformer() throws MuleException
     {
         // Converter(B -> D) Transformer(C->D), payload C: skips converter, transforms C to D -> OK
-        TestConverter converter1 = new TransformerBuilder().from(dataTypeB).to(dataTypeD).returning(new D()).boundTo(muleContext).buildConverter(1);
-        TestTransformer transformer2 = new TransformerBuilder().from(dataTypeC).to(dataTypeD).returning(new D()).boundTo(muleContext).build();
+        Transformer converter1 = new MockConverterBuilder().from(dataTypeB).to(dataTypeD).build();
+        Transformer transformer2 = new MockTransformerBuilder().from(dataTypeC).to(dataTypeD).returning(new D()).build();
 
         DefaultMuleMessage message = new DefaultMuleMessage(new C(), muleContext);
         message.applyTransformers(null, converter1, transformer2);
 
         assertTrue(message.getPayload() instanceof D);
-        assertFalse(converter1.wasExecuted());
-        assertTrue(transformer2.wasExecuted());
+        verifyTransformerNotExecuted(converter1);
+        verifyTransformerExecuted(transformer2);
     }
 
     @Test
     public void skipsConverterFailsOnTransformerWhenOriginalPayloadMatchesExpectedOutputType() throws MuleException
     {
         // Converter(B -> D) Transformer(C->D), payload D: FAIL
-        TestConverter converter1 = new TransformerBuilder().from(dataTypeB).to(dataTypeD).returning(new D()).boundTo(muleContext).buildConverter(1);
-        TestTransformer transformer2 = new TransformerBuilder().from(dataTypeC).to(dataTypeD).returning(new D()).boundTo(muleContext).build();
+        Transformer converter1 = new MockConverterBuilder().from(dataTypeB).to(dataTypeD).build();
+        Transformer transformer2 = new MockTransformerBuilder().from(dataTypeC).to(dataTypeD).build();
 
         DefaultMuleMessage message = new DefaultMuleMessage(new D(), muleContext);
         try
@@ -347,16 +344,16 @@ public class DefaultMuleMessageTransformationTestCase extends AbstractMuleTestCa
         catch (IllegalArgumentException expected)
         {
         }
-        assertFalse(converter1.wasExecuted());
-        assertFalse(transformer2.wasExecuted());
+        verifyTransformerNotExecuted(converter1);
+        verifyTransformerNotExecuted(transformer2);
     }
 
     @Test
     public void failsOnFirstTransformer() throws MuleException
     {
         // Transformer(B ->D) Transformer(C->D), payload A: FAIL
-        TestTransformer transformer1 = new TransformerBuilder().from(dataTypeB).to(dataTypeD).returning(new D()).boundTo(muleContext).build();
-        TestTransformer transformer2 = new TransformerBuilder().from(dataTypeC).to(dataTypeD).returning(new D()).boundTo(muleContext).build();
+        Transformer transformer1 = new MockTransformerBuilder().from(dataTypeB).to(dataTypeD).build();
+        Transformer transformer2 = new MockTransformerBuilder().from(dataTypeC).to(dataTypeD).build();
 
         DefaultMuleMessage message = new DefaultMuleMessage(new A(), muleContext);
 
@@ -368,16 +365,16 @@ public class DefaultMuleMessageTransformationTestCase extends AbstractMuleTestCa
         catch (IllegalArgumentException expected)
         {
         }
-        assertFalse(transformer1.wasExecuted());
-        assertFalse(transformer2.wasExecuted());
+        verifyTransformerNotExecuted(transformer1);
+        verifyTransformerNotExecuted(transformer2);
     }
 
     @Test
     public void appliesFirstTransformerFailsOnSecondTransformer() throws MuleException
     {
         // Transformer(B ->D) Transformer(C->D), payload B: applies first transformer, cannot apply second transformer -> FAIL
-        TestTransformer transformer1 = new TransformerBuilder().from(dataTypeB).to(dataTypeD).returning(new D()).boundTo(muleContext).build();
-        TestTransformer transformer2 = new TransformerBuilder().from(dataTypeC).to(dataTypeD).returning(new D()).boundTo(muleContext).build();
+        Transformer transformer1 = new MockTransformerBuilder().from(dataTypeB).to(dataTypeD).returning(new D()).build();
+        Transformer transformer2 = new MockTransformerBuilder().from(dataTypeC).to(dataTypeD).build();
 
         DefaultMuleMessage message = new DefaultMuleMessage(new B(), muleContext);
 
@@ -389,16 +386,16 @@ public class DefaultMuleMessageTransformationTestCase extends AbstractMuleTestCa
         catch (IllegalArgumentException expected)
         {
         }
-        assertTrue(transformer1.wasExecuted());
-        assertFalse(transformer2.wasExecuted());
+        verifyTransformerExecuted(transformer1);
+        verifyTransformerNotExecuted(transformer2);
     }
 
     @Test
     public void failsOnFirstTransformerIgnoresSecondTransformer() throws MuleException
     {
         // Transformer(B ->D) Transformer(C->D), payload C: FAIL
-        TestTransformer transformer1 = new TransformerBuilder().from(dataTypeB).to(dataTypeD).returning(new D()).boundTo(muleContext).build();
-        TestTransformer transformer2 = new TransformerBuilder().from(dataTypeC).to(dataTypeD).returning(new D()).boundTo(muleContext).build();
+        Transformer transformer1 = new MockTransformerBuilder().from(dataTypeB).to(dataTypeD).build();
+        Transformer transformer2 = new MockTransformerBuilder().from(dataTypeC).to(dataTypeD).build();
 
         DefaultMuleMessage message = new DefaultMuleMessage(new C(), muleContext);
 
@@ -410,16 +407,16 @@ public class DefaultMuleMessageTransformationTestCase extends AbstractMuleTestCa
         catch (IllegalArgumentException expected)
         {
         }
-        assertFalse(transformer1.wasExecuted());
-        assertFalse(transformer2.wasExecuted());
+        verifyTransformerNotExecuted(transformer1);
+        verifyTransformerNotExecuted(transformer2);
     }
 
     @Test
     public void failsOnFirstTransformerIgnoresSecondTransformerWhenOriginalPayloadMatchesExpectedOutputType() throws MuleException
     {
         // Transformer(B ->D) Transformer(C->D), payload D: FAIL
-        TestTransformer transformer1 = new TransformerBuilder().from(dataTypeB).to(dataTypeD).returning(new D()).boundTo(muleContext).build();
-        TestTransformer transformer2 = new TransformerBuilder().from(dataTypeC).to(dataTypeD).returning(new D()).boundTo(muleContext).build();
+        Transformer transformer1 = new MockTransformerBuilder().from(dataTypeB).to(dataTypeD).build();
+        Transformer transformer2 = new MockTransformerBuilder().from(dataTypeC).to(dataTypeD).build();
 
         DefaultMuleMessage message = new DefaultMuleMessage(new D(), muleContext);
 
@@ -431,15 +428,15 @@ public class DefaultMuleMessageTransformationTestCase extends AbstractMuleTestCa
         catch (IllegalArgumentException expected)
         {
         }
-        assertFalse(transformer1.wasExecuted());
-        assertFalse(transformer2.wasExecuted());
+        verifyTransformerNotExecuted(transformer1);
+        verifyTransformerNotExecuted(transformer2);
     }
 
     @Test
     public void failsOnTransformerWhenSourceAndReturnTypeDoesNotMatch() throws MuleException
     {
         // Transformer(B->C), payload A: FAIL
-        TestTransformer transformer1 = new TransformerBuilder().from(dataTypeB).to(dataTypeC).returning(new C()).boundTo(muleContext).build();
+        Transformer transformer1 = new MockTransformerBuilder().from(dataTypeB).to(dataTypeC).build();
 
         DefaultMuleMessage message = new DefaultMuleMessage(new A(), muleContext);
 
@@ -451,27 +448,27 @@ public class DefaultMuleMessageTransformationTestCase extends AbstractMuleTestCa
         catch (IllegalArgumentException expected)
         {
         }
-        assertFalse(transformer1.wasExecuted());
+        verifyTransformerNotExecuted(transformer1);
     }
 
     @Test
     public void appliesTransformer() throws MuleException
     {
         // Transformer(B->C), payload B: OK
-        TestTransformer transformer1 = new TransformerBuilder().from(dataTypeB).to(dataTypeC).returning(new C()).boundTo(muleContext).build();
+        Transformer transformer1 = new MockTransformerBuilder().from(dataTypeB).to(dataTypeC).returning(new C()).build();
 
         DefaultMuleMessage message = new DefaultMuleMessage(new B(), muleContext);
         message.applyTransformers(null, transformer1);
 
         assertTrue(message.getPayload() instanceof C);
-        assertTrue(transformer1.wasExecuted());
+        verifyTransformerExecuted(transformer1);
     }
 
     @Test
     public void failsOnTransformerWhenOriginalPayloadMatchesExpectedOutputType() throws MuleException
     {
         // Transformer(B->C), payload C: FAIL
-        TestTransformer transformer1 = new TransformerBuilder().from(dataTypeB).to(dataTypeC).returning(new C()).boundTo(muleContext).build();
+        Transformer transformer1 = new MockTransformerBuilder().from(dataTypeB).to(dataTypeC).build();
 
         DefaultMuleMessage message = new DefaultMuleMessage(new C(), muleContext);
         try
@@ -482,13 +479,13 @@ public class DefaultMuleMessageTransformationTestCase extends AbstractMuleTestCa
         catch (IllegalArgumentException expected)
         {
         }
-        assertFalse(transformer1.wasExecuted());
+        verifyTransformerNotExecuted(transformer1);
     }
 
     @Test
     public void failsWhenNoImplicitConversionAvailable() throws MuleException
     {
-        TestTransformer transformer = new TransformerBuilder().from(DataTypeFactory.BYTE_ARRAY).to(DataTypeFactory.STRING).returning("bar").boundTo(muleContext).build();
+        Transformer transformer = new MockTransformerBuilder().from(DataTypeFactory.BYTE_ARRAY).to(DataTypeFactory.STRING).build();
 
         when(conversionResolver.resolve(Mockito.any(DataType.class), Mockito.anyList())).thenReturn(null);
 
@@ -502,14 +499,14 @@ public class DefaultMuleMessageTransformationTestCase extends AbstractMuleTestCa
         catch (IllegalArgumentException expected)
         {
         }
-        assertFalse(transformer.wasExecuted());
+        verifyTransformerNotExecuted(transformer);
     }
 
     @Test
     public void appliesImplicitConversionWhenAvailable() throws MuleException
     {
-        TestTransformer transformer = new TransformerBuilder().from(DataTypeFactory.BYTE_ARRAY).to(DataTypeFactory.STRING).returning("bar").boundTo(muleContext).build();
-        TestConverter converter = new TransformerBuilder().from(DataTypeFactory.STRING).to(DataTypeFactory.BYTE_ARRAY).returning("bar".getBytes()).boundTo(muleContext).buildConverter(1);
+        Transformer transformer = new MockTransformerBuilder().from(DataTypeFactory.BYTE_ARRAY).to(DataTypeFactory.STRING).returning("bar").build();
+        Transformer converter = new MockConverterBuilder().from(DataTypeFactory.STRING).to(DataTypeFactory.BYTE_ARRAY).returning("bar".getBytes()).build();
 
         when(conversionResolver.resolve(Mockito.any(DataType.class), Mockito.anyList())).thenReturn(converter);
 
@@ -518,7 +515,17 @@ public class DefaultMuleMessageTransformationTestCase extends AbstractMuleTestCa
         message.applyTransformers(null, transformer);
 
         assertEquals("bar", message.getPayload());
-        assertTrue(transformer.wasExecuted());
-        assertTrue(converter.wasExecuted());
+        verifyTransformerExecuted(transformer);
+        verifyTransformerExecuted(converter);
+    }
+
+    private void verifyTransformerNotExecuted(Transformer converter1) throws TransformerException
+    {
+        Mockito.verify(converter1, Mockito.times(0)).transform(Mockito.any(Object.class));
+    }
+
+    private void verifyTransformerExecuted(Transformer converter1) throws TransformerException
+    {
+        Mockito.verify(converter1, Mockito.times(1)).transform(Mockito.any(Object.class));
     }
 }

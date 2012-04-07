@@ -18,8 +18,8 @@ import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.registry.ResolverException;
 import org.mule.api.registry.TransformerResolver;
+import org.mule.api.transformer.Converter;
 import org.mule.api.transformer.DataType;
-import org.mule.api.transformer.DiscoverableTransformer;
 import org.mule.api.transformer.Transformer;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.transformer.GraphTransformerResolver;
@@ -198,7 +198,7 @@ public class TypeBasedTransformerResolver implements TransformerResolver, MuleCo
 
     public void transformerChange(Transformer transformer, RegistryAction registryAction)
     {
-        if (transformer instanceof DiscoverableTransformer)
+        if (transformer instanceof Converter)
         {
             graphTransformerResolver.transformerChange(transformer, registryAction);
             exactTransformerCache.clear();

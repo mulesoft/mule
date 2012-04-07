@@ -34,8 +34,8 @@ import org.mule.api.registry.ServiceException;
 import org.mule.api.registry.ServiceType;
 import org.mule.api.registry.TransformerResolver;
 import org.mule.api.service.Service;
+import org.mule.api.transformer.Converter;
 import org.mule.api.transformer.DataType;
-import org.mule.api.transformer.DiscoverableTransformer;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.Connector;
@@ -296,7 +296,7 @@ public class MuleRegistryHelper implements MuleRegistry
             // The transformer must have the DiscoveryTransformer interface if we are
             // going to
             // find it here
-            if (!(t instanceof DiscoverableTransformer))
+            if (!(t instanceof Converter))
             {
                 continue;
             }
@@ -446,7 +446,7 @@ public class MuleRegistryHelper implements MuleRegistry
 
     protected void notifyTransformerResolvers(Transformer t, TransformerResolver.RegistryAction action)
     {
-        if (t instanceof DiscoverableTransformer)
+        if (t instanceof Converter)
         {
             Collection<TransformerResolver> resolvers = lookupObjects(TransformerResolver.class);
             for (TransformerResolver resolver : resolvers)
