@@ -45,7 +45,14 @@ public class ProxyServiceFactoryBean extends ReflectionServiceFactoryBean
         ignoredClasses.add("javax.rmi.CORBA.Stub");
         setIgnoredClasses(ignoredClasses);
     }
-    
+
+
+    @Override
+    protected void initializeFaultInterceptors()
+    {
+        getService().getOutFaultInterceptors().add(new ProxyFaultOutInterceptor());
+    }
+
     @Override
     protected void initializeWSDLOperations()
     {
