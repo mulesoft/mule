@@ -27,22 +27,17 @@ public abstract class AbstractMockConverterBuilder<T extends AbstractMockConvert
     }
 
     @Override
-    public Transformer build()
+    public Converter build()
     {
         Transformer converter = super.build();
-        doReturn(weight).when((MockConverter) converter).getPriorityWeighting();
+        doReturn(weight).when((Converter) converter).getPriorityWeighting();
 
-        return converter;
+        return (Converter) converter;
     }
 
     @Override
     protected Class<? extends Transformer> getClassToMock()
     {
-        return MockConverter.class;
-    }
-
-    private interface MockConverter extends Transformer, Converter
-    {
-
+        return Converter.class;
     }
 }

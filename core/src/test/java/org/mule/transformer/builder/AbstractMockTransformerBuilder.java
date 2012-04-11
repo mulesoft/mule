@@ -70,10 +70,16 @@ public abstract class AbstractMockTransformerBuilder<T extends AbstractMockTrans
             doReturn(name).when(transformer).getName();
         }
 
-        doReturn(resultDataType).when(transformer).getReturnDataType();
-        doReturn(Arrays.asList(sourceDataTypes)).when(transformer).getSourceDataTypes();
+        if (resultDataType != null)
+        {
+            doReturn(resultDataType).when(transformer).getReturnDataType();
+        }
+        if (sourceDataTypes != null)
+        {
+            doReturn(Arrays.asList(sourceDataTypes)).when(transformer).getSourceDataTypes();
 
-        when(transformer.isSourceDataTypeSupported(Matchers.<DataType<?>>argThat(new SupportsSourceDataType()))).thenReturn(true);
+            when(transformer.isSourceDataTypeSupported(Matchers.<DataType<?>>argThat(new SupportsSourceDataType()))).thenReturn(true);
+        }
         try
         {
             doReturn(value).when(transformer).transform(Mockito.any(Object.class));

@@ -22,9 +22,9 @@ import org.mule.api.transformer.Converter;
 import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.Transformer;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.transformer.GraphTransformerResolver;
 import org.mule.transformer.TransformerChain;
 import org.mule.transformer.TransformerWeighting;
+import org.mule.transformer.graph.GraphTransformerResolver;
 import org.mule.transformer.simple.ObjectToByteArray;
 import org.mule.transformer.simple.ObjectToString;
 import org.mule.transformer.types.SimpleDataType;
@@ -56,7 +56,7 @@ public class TypeBasedTransformerResolver implements TransformerResolver, MuleCo
 
     protected Map<String, Transformer> exactTransformerCache = new ConcurrentHashMap/*<String, Transformer>*/(8);
 
-    protected GraphTransformerResolver graphTransformerResolver = new GraphTransformerResolver();
+    protected TransformerResolver graphTransformerResolver = new GraphTransformerResolver();
 
     public void setMuleContext(MuleContext context)
     {
