@@ -10,8 +10,9 @@
 
 package org.mule.routing;
 
-import com.mockobjects.dynamic.Mock;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
@@ -25,44 +26,47 @@ import org.mule.api.store.ObjectStoreException;
 import org.mule.tck.MuleTestUtils;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
+import com.mockobjects.dynamic.Mock;
+
 import java.io.Serializable;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.CountDownLatch;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import org.junit.Test;
 
 public class IdempotentMessageFilterMule6079TestCase extends AbstractMuleContextTestCase
 {
+
     private Service service;
-    private InboundEndpoint endpoint1;
+    private InboundEndpoint inboundEndpoint;
     private Mock session;
     private ObjectStore<String> objectStore;
-    private IdempotentMessageFilter ir;
+    private IdempotentMessageFilter idempotentMessageFilter;
     private Integer processedEvents = 0;
+    private Boolean errorHappenedInChildThreads = false;
 
     /*
      * This test admits two execution paths, note that the implementation of objectStore can lock on the await call of
      * the latch, to avoid this a countDown call was added to contains method, since there is a trace that locks
      * otherwise. See implementation of IdempotentMessageFilter.isNewMessage to understand the trace.
      */
-    @Test //test for MULE-6079
+    @Test
     public void testRaceConditionOnAcceptAndProcess() throws Exception
     {
-        endpoint1 = getTestInboundEndpoint("Test1Provider", "test://Test1Provider?exchangePattern=one-way");
+        inboundEndpoint = getTestInboundEndpoint("Test", "test://Test?exchangePattern=one-way");
         session = MuleTestUtils.getMockSession();
         service = getTestService();
         session.matchAndReturn("getFlowConstruct", service);
         CountDownLatch cdl = new CountDownLatch(2);
 
-        objectStore = new ObjectStoreWithLatch(cdl);
-        ir = new IdempotentMessageFilter();
-        ir.setIdExpression("#[header:id]");
-        ir.setFlowConstruct(service);
-        ir.setThrowOnUnaccepted(false);
-        ir.setStorePrefix("foo");
-        ir.setStore(objectStore);
+        objectStore = new RaceConditionEnforcingObjectStore(cdl);
+        idempotentMessageFilter = new IdempotentMessageFilter();
+        idempotentMessageFilter.setIdExpression("#[header:id]");
+        idempotentMessageFilter.setFlowConstruct(service);
+        idempotentMessageFilter.setThrowOnUnaccepted(false);
+        idempotentMessageFilter.setStorePrefix("foo");
+        idempotentMessageFilter.setStore(objectStore);
 
         Thread t1 = new Thread(new TestForRaceConditionRunnable(), "thread1");
         Thread t2 = new Thread(new TestForRaceConditionRunnable(), "thread2");
@@ -70,31 +74,39 @@ public class IdempotentMessageFilterMule6079TestCase extends AbstractMuleContext
         t2.start();
         t1.join(5000);
         t2.join(5000);
-        assertEquals("Two equal messages were processed by IdempotentMessageFilter", new Integer(1), processedEvents);
+        assertFalse("Exception in child threads", errorHappenedInChildThreads);
+        assertEquals("None or more than one message was processed by IdempotentMessageFilter",
+                     new Integer(1), processedEvents);
     }
 
     private class TestForRaceConditionRunnable implements Runnable
     {
-        public TestForRaceConditionRunnable() {}
+
+        public TestForRaceConditionRunnable()
+        {
+        }
 
         @Override
         public void run()
         {
             MuleMessage okMessage = new DefaultMuleMessage("OK", muleContext);
             okMessage.setOutboundProperty("id", "1");
-            MuleEvent event = new DefaultMuleEvent(okMessage, endpoint1, (MuleSession) session.proxy());
+            MuleEvent event = new DefaultMuleEvent(okMessage, inboundEndpoint, (MuleSession) session.proxy());
 
             try
             {
-                event = ir.process(event);
+                event = idempotentMessageFilter.process(event);
             }
             catch (Throwable e)
             {
                 e.printStackTrace();
-                fail("An exception occurred, this should not happen. ");
+                synchronized (errorHappenedInChildThreads)
+                {
+                    errorHappenedInChildThreads = true;
+                }
             }
-            
-            if(event != null)
+
+            if (event != null)
             {
                 synchronized (processedEvents)  // shared
                 {
@@ -103,44 +115,45 @@ public class IdempotentMessageFilterMule6079TestCase extends AbstractMuleContext
             }
         }
     }
-    
-    private class ObjectStoreWithLatch implements ObjectStore<String>
+
+    private class RaceConditionEnforcingObjectStore implements ObjectStore<String>
     {
+
         protected CountDownLatch barrier;
         Map<Serializable, String> map = new TreeMap<Serializable, String>();
 
-        public ObjectStoreWithLatch(CountDownLatch latch)
+        public RaceConditionEnforcingObjectStore(CountDownLatch latch)
         {
             barrier = latch;
         }
 
         @Override
-        public boolean contains(Serializable key) throws ObjectStoreException 
+        public boolean contains(Serializable key) throws ObjectStoreException
         {
-            if(key == null)
+            if (key == null)
             {
                 throw new ObjectStoreException();
             }
-            boolean res;
+            boolean containsKey;
             synchronized (this)
             {
                 // avoiding deadlock with the latch (locks if the element was already added to map, see definition of
                 // IdempotentMessageFilter.isNewMessage definition, if the element is added, it wont enter the
                 // objectStore.store method, and will lock.
-                res = map.containsKey(key);
-                if(res)
+                containsKey = map.containsKey(key);
+                if (containsKey)
                 {
                     barrier.countDown();
                 }
             }
-            return res;
+            return containsKey;
         }
 
         @Override
-        public void store(Serializable key, String value) throws ObjectStoreException 
+        public void store(Serializable key, String value) throws ObjectStoreException
         {
             boolean wasAdded;
-            if(key == null)
+            if (key == null)
             {
                 throw new ObjectStoreException();
             }
@@ -153,42 +166,36 @@ public class IdempotentMessageFilterMule6079TestCase extends AbstractMuleContext
             try
             {
                 barrier.await();
-            } catch (Exception e) {
-                fail("InterruptedException, this should not happen.");
             }
-            if(wasAdded)
+            catch (Exception e)
+            {
+                synchronized (errorHappenedInChildThreads)
+                {
+                    errorHappenedInChildThreads = true;
+                }
+            }
+            if (wasAdded)
             {
                 throw new ObjectAlreadyExistsException();
             }
         }
 
         @Override
-        public String retrieve(Serializable key) throws ObjectStoreException 
+        public String retrieve(Serializable key) throws ObjectStoreException
         {
-            if(key == null)
-            {
-                throw new ObjectStoreException();
-            }
-            return map.get(key);
+            return null;
         }
 
         @Override
-        public String remove(Serializable key) throws ObjectStoreException 
+        public String remove(Serializable key) throws ObjectStoreException
         {
-            if(key == null)
-            {
-                throw new ObjectStoreException();
-            }
-            String ret = map.get(key);
-            map.remove(key);
-            return ret;
+            return null;
         }
 
         @Override
-        public boolean isPersistent() 
+        public boolean isPersistent()
         {
             return false;
         }
     }
 }
-
