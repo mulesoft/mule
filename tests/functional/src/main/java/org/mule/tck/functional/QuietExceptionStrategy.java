@@ -14,21 +14,16 @@ import org.mule.api.MuleEvent;
 import org.mule.api.exception.RollbackSourceCallback;
 import org.mule.exception.AbstractMessagingExceptionStrategy;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 /**
  * Restrict exceptions to debug log messages
  */
 public class QuietExceptionStrategy extends AbstractMessagingExceptionStrategy
 {
-    protected transient Log logger = LogFactory.getLog(getClass());
-
     public QuietExceptionStrategy()
     {
         super(null);
     }
-    
+
     @Override
     protected void doHandleException(Exception e, MuleEvent event, RollbackSourceCallback rollbackMethod)
     {
