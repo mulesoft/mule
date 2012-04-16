@@ -61,7 +61,7 @@ public class ExpressionSplitter extends AbstractSplitter
             List<MuleMessage> messages = new ArrayList<MuleMessage>();
             for (Object object : (List<?>) result)
             {
-                messages.add(new DefaultMuleMessage(object, event.getMessage(), muleContext));
+                messages.add(new DefaultMuleMessage(object, muleContext));
             }
             return messages;
         }
@@ -71,7 +71,7 @@ public class ExpressionSplitter extends AbstractSplitter
         }
         else
         {
-            return Collections.<MuleMessage> singletonList(new DefaultMuleMessage(result, event.getMessage(), muleContext));
+            return Collections.<MuleMessage> singletonList(new DefaultMuleMessage(result, muleContext));
         }
     }
 

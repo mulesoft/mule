@@ -44,7 +44,7 @@ public class MapSplitter extends AbstractSplitter
             Set<Map.Entry<?, ?>> set = ((Map) message.getPayload()).entrySet();
             for (Entry<?, ?> entry : set)
             {
-                MuleMessage splitMessage = new DefaultMuleMessage(entry.getValue(), event.getMessage(), muleContext);
+                MuleMessage splitMessage = new DefaultMuleMessage(entry.getValue(), muleContext);
                 splitMessage.setInvocationProperty(MAP_ENTRY_KEY, entry.getKey());
                 list.add(splitMessage);
             }
