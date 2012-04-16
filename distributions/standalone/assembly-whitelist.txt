@@ -718,7 +718,7 @@
 /mule-standalone-${productVersion}/lib/boot/libwrapper-solaris-sparc-64.so
 /mule-standalone-${productVersion}/lib/boot/libwrapper-solaris-x86-32.so
 /mule-standalone-${productVersion}/lib/boot/commons-cli-1.2.jar
-/mule-standalone-${productVersion}/lib/boot/log4j-1.2.14.jar
+/mule-standalone-${productVersion}/lib/boot/log4j-1.2.16.jar
 /mule-standalone-${productVersion}/lib/boot/mule-module-boot-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/boot/mule-module-logging-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/boot/mule-module-reboot-${productVersion}.jar
