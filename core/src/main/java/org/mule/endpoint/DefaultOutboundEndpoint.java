@@ -11,6 +11,7 @@
 package org.mule.endpoint;
 
 import org.mule.MessageExchangePattern;
+import org.mule.VoidMuleEvent;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -92,7 +93,16 @@ public class DefaultOutboundEndpoint extends AbstractEndpoint implements Outboun
 
     public MuleEvent process(MuleEvent event) throws MuleException
     {
-        return getMessageProcessorChain(event.getFlowConstruct()).process(event);
+        MuleEvent result = getMessageProcessorChain(event.getFlowConstruct()).process(event);
+        // A filter in a one-way outbound endpoint (sync or async) should not filter the flow.
+        if (!getExchangePattern().hasResponse())
+        {
+            return VoidMuleEvent.getInstance();
+        }
+        else
+        {
+            return result;
+        }
     }
 
     @Override

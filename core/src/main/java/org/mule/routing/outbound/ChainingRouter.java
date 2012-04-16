@@ -11,6 +11,7 @@
 package org.mule.routing.outbound;
 
 import org.mule.DefaultMuleEvent;
+import org.mule.VoidMuleEvent;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
@@ -75,8 +76,14 @@ public class ChainingRouter extends FilteringOutboundRouter
                 if (!lastEndpointInChain)
                 {
                     MuleEvent endpointResult = sendRequest(resultToReturn, intermediaryResult, endpoint, true);
-                    resultToReturn = endpointResult != null ? endpointResult : resultToReturn;
-                    MuleMessage localResult = endpointResult == null ? null : endpointResult.getMessage();
+                    resultToReturn = endpointResult != null
+                                     && VoidMuleEvent.getInstance().equals(endpointResult)
+                                                                                          ? endpointResult
+                                                                                          : resultToReturn;
+                    MuleMessage localResult = endpointResult == null
+                                              || VoidMuleEvent.getInstance().equals(endpointResult)
+                                                                                                   ? null
+                                                                                                   : endpointResult.getMessage();
                     // Need to propagate correlation info and replyTo, because there
                     // is no guarantee that an external system will preserve headers
                     // (in fact most will not)

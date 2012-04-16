@@ -10,6 +10,13 @@
 
 package org.mule.transport.http;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import org.mule.MessageExchangePattern;
 import org.mule.api.MuleMessage;
 import org.mule.api.transport.MessageTypeNotSupportedException;
@@ -29,14 +36,6 @@ import org.apache.commons.httpclient.HttpVersion;
 import org.apache.commons.httpclient.StatusLine;
 import org.apache.commons.httpclient.URI;
 import org.junit.Test;
-import sun.net.www.HeaderParser;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 public class HttpMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTestCase
 {

@@ -19,6 +19,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import org.mule.MessageExchangePattern;
+import org.mule.VoidMuleEvent;
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
@@ -205,7 +206,7 @@ public class AsyncInterceptingMessageProcessorTestCase extends AbstractMuleConte
         assertEquals(event.getMessageAsString(), target.sensedEvent.getMessageAsString());
         assertNotSame(Thread.currentThread(), target.thread);
 
-        assertNull(result);
+        assertSame(VoidMuleEvent.getInstance(), result);
         assertNull(exceptionThrown);
     }
 

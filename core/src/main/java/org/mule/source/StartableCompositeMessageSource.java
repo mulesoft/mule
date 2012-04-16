@@ -10,10 +10,12 @@
 
 package org.mule.source;
 
+import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.construct.FlowConstructAware;
+import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
@@ -22,6 +24,7 @@ import org.mule.api.lifecycle.LifecycleException;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.api.source.ClusterizableMessageSource;
 import org.mule.api.source.CompositeMessageSource;
 import org.mule.api.source.MessageSource;
 import org.mule.config.i18n.CoreMessages;
@@ -46,7 +49,7 @@ import org.apache.commons.logging.LogFactory;
  * <li>Message will only be received from endpoints if the connector is also started.
  */
 public class StartableCompositeMessageSource
-    implements CompositeMessageSource, Lifecycle, FlowConstructAware
+    implements CompositeMessageSource, Lifecycle, FlowConstructAware, MuleContextAware
 {
     protected static final Log log = LogFactory.getLog(StartableCompositeMessageSource.class);
 
@@ -57,28 +60,45 @@ public class StartableCompositeMessageSource
     protected AtomicBoolean starting = new AtomicBoolean(false);
     protected FlowConstruct flowConstruct;
     private final MessageProcessor internalListener = new InternalMessageProcessor();
+    protected MuleContext muleContext;
 
     public void addSource(MessageSource source) throws MuleException
     {
+        MessageSource messageSource = source;
+
+        if (messageSource instanceof ClusterizableMessageSource)
+        {
+            messageSource = new ClusterizableMessageSourceWrapper((ClusterizableMessageSource) messageSource);
+        }
+
         synchronized (sources)
         {
-            sources.add(source);
+            sources.add(messageSource);
         }
         source.setListener(internalListener);
         if (initialised.get())
         {
-            if (source instanceof FlowConstructAware)
-            {
-                ((FlowConstructAware) source).setFlowConstruct(flowConstruct);
-            }
-            if (source instanceof Initialisable)
-            {
-                ((Initialisable) source).initialise();
-            }
+            initializeComposedMessageSource(messageSource);
         }
         if (started.get() && source instanceof Startable)
         {
             ((Startable) source).start();
+        }
+    }
+
+    private void initializeComposedMessageSource(MessageSource messageSource) throws InitialisationException
+    {
+        if (messageSource instanceof FlowConstructAware)
+        {
+            ((FlowConstructAware) messageSource).setFlowConstruct(flowConstruct);
+        }
+        if (messageSource instanceof MuleContextAware)
+        {
+            ((MuleContextAware) messageSource).setMuleContext(muleContext);
+        }
+        if (messageSource instanceof Initialisable)
+        {
+            ((Initialisable) messageSource).initialise();
         }
     }
 
@@ -120,14 +140,7 @@ public class StartableCompositeMessageSource
         {
             for (MessageSource source : sources)
             {
-                if (source instanceof FlowConstructAware)
-                {
-                    ((FlowConstructAware) source).setFlowConstruct(flowConstruct);
-                }
-                if (source instanceof Initialisable)
-                {
-                    ((Initialisable) source).initialise();
-                }
+                initializeComposedMessageSource(source);
             }
         }
         initialised.set(true);
@@ -208,6 +221,12 @@ public class StartableCompositeMessageSource
     {
         return String.format("%s [listener=%s, sources=%s, started=%s]", getClass().getSimpleName(),
             listener, sources, started);
+    }
+
+    @Override
+    public void setMuleContext(MuleContext context)
+    {
+        muleContext = context;
     }
 
     private class InternalMessageProcessor implements MessageProcessor

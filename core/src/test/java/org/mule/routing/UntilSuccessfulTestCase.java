@@ -10,6 +10,14 @@
 
 package org.mule.routing;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import org.mule.VoidMuleEvent;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.endpoint.EndpointBuilder;
@@ -22,13 +30,6 @@ import org.mule.util.store.SimpleMemoryObjectStore;
 import java.io.ByteArrayInputStream;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase
 {
@@ -102,7 +103,7 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase
         untilSuccessful.start();
 
         final MuleEvent testEvent = getTestEvent("test_data");
-        assertNull(untilSuccessful.process(testEvent));
+        assertSame(VoidMuleEvent.getInstance(), untilSuccessful.process(testEvent));
         ponderUntilEventProcessed(testEvent);
     }
 
@@ -113,7 +114,7 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase
         untilSuccessful.start();
 
         final MuleEvent testEvent = getTestEvent(new ByteArrayInputStream("test_data".getBytes()));
-        assertNull(untilSuccessful.process(testEvent));
+        assertSame(VoidMuleEvent.getInstance(), untilSuccessful.process(testEvent));
         ponderUntilEventProcessed(testEvent);
     }
 
@@ -137,7 +138,7 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase
         untilSuccessful.start();
 
         final MuleEvent testEvent = getTestEvent("test_data");
-        assertNull(untilSuccessful.process(testEvent));
+        assertSame(VoidMuleEvent.getInstance(), untilSuccessful.process(testEvent));
         ponderUntilEventProcessed(testEvent);
     }
 
@@ -150,7 +151,7 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase
         untilSuccessful.start();
 
         final MuleEvent testEvent = getTestEvent("ERROR");
-        assertNull(untilSuccessful.process(testEvent));
+        assertSame(VoidMuleEvent.getInstance(), untilSuccessful.process(testEvent));
         ponderUntilEventAborted(testEvent);
     }
 
@@ -162,7 +163,7 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase
         untilSuccessful.start();
 
         final MuleEvent testEvent = getTestEvent("ERROR");
-        assertNull(untilSuccessful.process(testEvent));
+        assertSame(VoidMuleEvent.getInstance(), untilSuccessful.process(testEvent));
         ponderUntilEventAborted(testEvent);
     }
 
@@ -178,7 +179,7 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase
         untilSuccessful.start();
 
         final MuleEvent testEvent = getTestEvent("ERROR");
-        assertNull(untilSuccessful.process(testEvent));
+        assertSame(VoidMuleEvent.getInstance(), untilSuccessful.process(testEvent));
         ponderUntilEventAborted(testEvent);
 
         verify(dlqEndpoint).process(any(MuleEvent.class));
@@ -193,7 +194,7 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase
         untilSuccessful.start();
 
         final MuleEvent testEvent = getTestEvent("ERROR");
-        assertNull(untilSuccessful.process(testEvent));
+        assertSame(VoidMuleEvent.getInstance(), untilSuccessful.process(testEvent));
         ponderUntilEventProcessed(testEvent);
         assertEquals(targetMessageProcessor.getEventCount(), untilSuccessful.getMaxRetries() + 1);
     }

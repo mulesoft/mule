@@ -256,7 +256,7 @@ public class DefaultMuleEventContext implements MuleEventContext
             DefaultMuleEvent eventToSend = new DefaultMuleEvent(message,
                 MessageExchangePattern.REQUEST_RESPONSE, service, session);
             MuleEvent event = service.sendEvent(eventToSend);
-            return event == null ? null : event.getMessage();
+            return event == null || VoidMuleEvent.getInstance().equals(event) ? null : event.getMessage();
         }
         else
         {

@@ -10,7 +10,7 @@
     <vm:endpoint name="inbound2" path="/foo2" />
 
     <flow name="foo" processingStrategy="synchronous">
-        <inbound-endpoint ref="inbound" />
+        <inbound-endpoint ref="inbound" exchange-pattern="request-response"/>
         <append-string-transformer message=" bar" />
         <message-properties-transformer
             scope="outbound">

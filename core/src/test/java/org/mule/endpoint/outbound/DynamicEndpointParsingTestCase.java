@@ -9,7 +9,14 @@
  */
 package org.mule.endpoint.outbound;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import org.mule.MessageExchangePattern;
+import org.mule.VoidMuleEvent;
 import org.mule.api.MuleEvent;
 import org.mule.api.endpoint.EndpointException;
 import org.mule.api.endpoint.MalformedEndpointException;
@@ -22,12 +29,6 @@ import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 public class DynamicEndpointParsingTestCase extends AbstractMuleContextTestCase
 {
@@ -103,7 +104,7 @@ public class DynamicEndpointParsingTestCase extends AbstractMuleContextTestCase
         event.getMessage().setOutboundProperty("host", "localhost");
 
         MuleEvent response = endpoint.process(event);
-        assertNull(response);
+        assertSame(VoidMuleEvent.getInstance(), response);
 
         // Now test set on the endpoint
         endpoint = createRequestResponseEndpoint("test://#[header:host]:#[header:port]?exchangePattern=REQUEST_RESPONSE");

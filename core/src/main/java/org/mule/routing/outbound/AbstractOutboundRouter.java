@@ -12,7 +12,13 @@ package org.mule.routing.outbound;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
-import org.mule.api.*;
+import org.mule.VoidMuleEvent;
+import org.mule.api.DefaultMuleException;
+import org.mule.api.MessagingException;
+import org.mule.api.MuleContext;
+import org.mule.api.MuleEvent;
+import org.mule.api.MuleException;
+import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.construct.FlowConstructAware;
@@ -32,8 +38,8 @@ import org.mule.api.routing.RoutingException;
 import org.mule.api.transaction.TransactionConfig;
 import org.mule.api.transport.DispatchException;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.management.stats.RouterStatistics;
 import org.mule.execution.TransactionalExecutionTemplate;
+import org.mule.management.stats.RouterStatistics;
 import org.mule.processor.AbstractMessageProcessorOwner;
 import org.mule.routing.CorrelationMode;
 import org.mule.routing.DefaultRouterResultsHandler;
@@ -189,7 +195,7 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
             }
         }
 
-        if (result != null)
+        if (result != null && !VoidMuleEvent.getInstance().equals(result))
         {
             MuleMessage resultMessage = result.getMessage();
             if (logger.isTraceEnabled())

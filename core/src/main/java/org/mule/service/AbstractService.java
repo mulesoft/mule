@@ -12,7 +12,14 @@ package org.mule.service;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.RequestContext;
-import org.mule.api.*;
+import org.mule.VoidMuleEvent;
+import org.mule.api.AnnotatedObject;
+import org.mule.api.DefaultMuleException;
+import org.mule.api.MessagingException;
+import org.mule.api.MuleContext;
+import org.mule.api.MuleEvent;
+import org.mule.api.MuleException;
+import org.mule.api.MuleRuntimeException;
 import org.mule.api.component.Component;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.construct.FlowConstructAware;
@@ -36,6 +43,7 @@ import org.mule.api.routing.MessageInfoMapping;
 import org.mule.api.routing.OutboundRouterCollection;
 import org.mule.api.routing.RouterStatisticsRecorder;
 import org.mule.api.service.Service;
+import org.mule.api.source.ClusterizableMessageSource;
 import org.mule.api.source.MessageSource;
 import org.mule.component.simple.PassThroughComponent;
 import org.mule.config.i18n.CoreMessages;
@@ -49,6 +57,7 @@ import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.routing.MuleMessageInfoMapping;
 import org.mule.routing.outbound.DefaultOutboundRouterCollection;
 import org.mule.service.processor.ServiceAsyncRequestReplyRequestor;
+import org.mule.source.ClusterizableMessageSourceWrapper;
 import org.mule.util.ClassUtils;
 
 import java.util.Collections;
@@ -551,7 +560,14 @@ public abstract class AbstractService implements Service, MessageProcessor, Anno
 
     public void setMessageSource(MessageSource inboundMessageSource)
     {
-        this.messageSource = inboundMessageSource;
+        if (messageSource instanceof ClusterizableMessageSource)
+        {
+            this.messageSource = new ClusterizableMessageSourceWrapper(muleContext, (ClusterizableMessageSource) inboundMessageSource, this);
+        }
+        else
+        {
+            this.messageSource = inboundMessageSource;
+        }
     }
 
     public MessageProcessor getOutboundMessageProcessor()
@@ -666,7 +682,7 @@ public abstract class AbstractService implements Service, MessageProcessor, Anno
                 public MuleEvent process() throws Exception
                 {
                     MuleEvent result = messageProcessorChain.process(newEvent);
-                    if (result != null)
+                    if (result != null  && !VoidMuleEvent.getInstance().equals(result))
                     {
                         result.getMessage().release();
                         return new DefaultMuleEvent(result, event.getFlowConstruct());

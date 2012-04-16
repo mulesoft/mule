@@ -12,6 +12,7 @@ package org.mule.routing.outbound;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
+import org.mule.VoidMuleEvent;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -33,6 +34,11 @@ public class TransformerRouter extends AbstractOutboundRouter
     @Override
     public MuleEvent route(MuleEvent event) throws MessagingException
     {
+        if (event == null || VoidMuleEvent.getInstance().equals(event))
+        {
+            return event;
+        }
+        
         MuleMessage message = event.getMessage();
 
         if (transformer != null)

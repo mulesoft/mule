@@ -10,6 +10,7 @@
 
 package org.mule.module.cxf;
 
+import org.mule.VoidMuleEvent;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
@@ -112,7 +113,7 @@ public class MuleInvoker implements Invoker
             responseEvent = null;
         }
 
-        if (responseEvent != null)
+        if (responseEvent != null && !VoidMuleEvent.getInstance().equals(responseEvent))
         {
             exchange.put(CxfConstants.MULE_EVENT, responseEvent);
             MuleMessage resMessage = responseEvent.getMessage();

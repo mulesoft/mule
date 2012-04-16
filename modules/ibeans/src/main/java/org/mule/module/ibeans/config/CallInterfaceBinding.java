@@ -10,6 +10,7 @@
 package org.mule.module.ibeans.config;
 
 import org.mule.DefaultMuleEvent;
+import org.mule.VoidMuleEvent;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
@@ -71,7 +72,7 @@ public class CallInterfaceBinding implements InterfaceBinding, MessageProcessor
         }
 
         MuleEvent result = process(new DefaultMuleEvent(message, endpoint.getExchangePattern(), flow, session));
-        if (result != null)
+        if (result != null  && !VoidMuleEvent.getInstance().equals(result))
         {
             return result.getMessage();
         }

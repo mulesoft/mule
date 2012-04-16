@@ -12,6 +12,7 @@ package org.mule.routing;
 
 import org.mule.DefaultMessageCollection;
 import org.mule.DefaultMuleEvent;
+import org.mule.VoidMuleEvent;
 import org.mule.OptimizedRequestContext;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
@@ -51,13 +52,21 @@ public class DefaultRouterResultsHandler implements RouterResultsHandler
         else if (results.size() == 1)
         {
             MuleEvent event = results.get(0);
-            if (event != null && event.getMessage() != null)
+            if (event == null)
+            {
+                return null;
+            }
+            else if (event instanceof VoidMuleEvent)
+            {
+                return event;
+            }
+            else if (event != null && event.getMessage() != null)
             {
                 return event;
             }
             else
             {
-                return null;
+                return VoidMuleEvent.getInstance();
             }
         }
         else
@@ -67,13 +76,14 @@ public class DefaultRouterResultsHandler implements RouterResultsHandler
                 {
                     public boolean evaluate(Object object)
                     {
-                        return object != null && ((MuleEvent) object).getMessage() != null;
+                        return object != null && ((MuleEvent) object).getMessage() != null
+                               && !VoidMuleEvent.getInstance().equals(object);
                     }
                 });
 
             if (nonNullResults.size() == 0)
             {
-                return null;
+                return VoidMuleEvent.getInstance();
             }
             else if (nonNullResults.size() == 1)
             {

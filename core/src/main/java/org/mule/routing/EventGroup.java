@@ -12,6 +12,7 @@ package org.mule.routing;
 
 import org.mule.DefaultMessageCollection;
 import org.mule.DefaultMuleEvent;
+import org.mule.VoidMuleEvent;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -443,13 +444,13 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
             }
             else
             {
-                return null;
+                return VoidMuleEvent.getInstance();
             }
         }
         catch (ObjectStoreException e)
         {
             // Nothing to do...
-            return null;
+            return VoidMuleEvent.getInstance();
         }
     }
 

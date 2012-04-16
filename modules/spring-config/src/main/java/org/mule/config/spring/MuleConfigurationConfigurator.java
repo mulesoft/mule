@@ -67,6 +67,7 @@ public class MuleConfigurationConfigurator implements MuleContextAware, SmartFac
             defaultConfig.setDefaultTransactionTimeout(config.getDefaultTransactionTimeout());
             defaultConfig.setShutdownTimeout(config.getShutdownTimeout());
             defaultConfig.setUseExtendedTransformations(config.useExtendedTransformations());
+            defaultConfig.setFlowEndingWithOneWayEndpointReturnsNull(config.isFlowEndingWithOneWayEndpointReturnsNull());
             defaultConfig.setDefaultExceptionStrategyName(config.getDefaultExceptionStrategyName());
             validateDefaultExceptionStrategy();
             return configuration;
@@ -136,5 +137,10 @@ public class MuleConfigurationConfigurator implements MuleContextAware, SmartFac
     public void setUseExtendedTransformations(boolean resolveNonDirectTransformations)
     {
         config.setUseExtendedTransformations(resolveNonDirectTransformations);
+    }
+
+    public void setFlowEndingWithOneWayEndpointReturnsNull(boolean flowEndingWithOneWayEndpointReturnsNull)
+    {
+        config.setFlowEndingWithOneWayEndpointReturnsNull(flowEndingWithOneWayEndpointReturnsNull);
     }
 }

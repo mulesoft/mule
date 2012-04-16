@@ -9,6 +9,7 @@
  */
 package org.mule.exception;
 
+import org.mule.VoidMuleEvent;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
@@ -46,7 +47,7 @@ public abstract class TemplateMessagingExceptionStrategy extends AbstractExcepti
             processOutboundRouterStatistics(flowConstruct);
             event = afterRouting(exception, event);
             markExceptionAsHandledIfRequired(exception);
-            if (event != null)
+            if (event != null && !VoidMuleEvent.getInstance().equals(event))
             {
                 processReplyTo(event, exception);
                 closeStream(event.getMessage());

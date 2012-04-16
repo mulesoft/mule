@@ -11,6 +11,7 @@
 package org.mule.enricher;
 
 import org.mule.DefaultMuleEvent;
+import org.mule.VoidMuleEvent;
 import org.mule.OptimizedRequestContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -41,7 +42,7 @@ public class MessageEnricher extends AbstractMessageProcessorOwner implements Me
 
 
 
-        if (enrichmentEvent != null)
+        if (enrichmentEvent != null && !VoidMuleEvent.getInstance().equals(enrichmentEvent))
         {
             for (EnrichExpressionPair pair : enrichExpressionPairs)
             {

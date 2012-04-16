@@ -12,6 +12,7 @@ package org.mule.routing.outbound;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
+import org.mule.VoidMuleEvent;
 import org.mule.RequestContext;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
@@ -64,7 +65,7 @@ public abstract class AbstractMessageSequenceSplitter extends AbstractIntercepti
             else
             {
                 logger.warn("Splitter returned no results. If this is not expected, please check your split expression");
-                return null;
+                return VoidMuleEvent.getInstance();
             }
         }
         else
@@ -130,7 +131,7 @@ public abstract class AbstractMessageSequenceSplitter extends AbstractIntercepti
             }
             message.propagateRootId(originalEvent.getMessage());
             MuleEvent resultEvent = processNext(RequestContext.setEvent(new DefaultMuleEvent(message, originalEvent, currentEvent.getSession())));
-            if (resultEvent != null)
+            if (resultEvent != null && !VoidMuleEvent.getInstance().equals(resultEvent))
             {
                 currentEvent = resultEvent;
                 resultEvents.add(resultEvent);

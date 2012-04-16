@@ -10,19 +10,20 @@
 
 package org.mule.test.integration.transaction;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.transport.NullPayload;
 
 import java.util.Arrays;
 import java.util.Collection;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 
 public class VmXaTransactionsPersistentQueueTestCase extends AbstractServiceAndFlowTestCase
 {
@@ -53,6 +54,6 @@ public class VmXaTransactionsPersistentQueueTestCase extends AbstractServiceAndF
 
         assertNotNull(msg);
         assertNull(msg.getExceptionPayload());
-        assertEquals("Wrong message returned", TEST_MESSAGE + " Received", msg.getPayload());
+        assertEquals(NullPayload.getInstance(), msg.getPayload());
     }
 }

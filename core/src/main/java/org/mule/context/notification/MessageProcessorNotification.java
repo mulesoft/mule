@@ -13,6 +13,7 @@ package org.mule.context.notification;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.MessageExchangePattern;
+import org.mule.VoidMuleEvent;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.NameableObject;
@@ -93,7 +94,7 @@ public class MessageProcessorNotification extends ServerNotification implements 
     private static MuleEvent produceEvent(MuleEvent sourceEvent, FlowConstruct flowConstruct)
     {
         String rootId = lastRootMessageId.get();
-        if (sourceEvent != null)
+        if (sourceEvent != null && !VoidMuleEvent.getInstance().equals(sourceEvent))
         {
             lastRootMessageId.set(sourceEvent.getMessage().getMessageRootId());
             return sourceEvent;

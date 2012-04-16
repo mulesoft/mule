@@ -38,8 +38,6 @@ public class TransformerUtils
 
     public static final String COMMA = ",";
 
-    public static final Boolean DEFAULT_TRANSFORMER_ENFORCEMENT = Boolean.TRUE;
-
     private static Log logger = LogFactory.getLog(AbstractTransformer.class);
 
     public static void initialiseAllTransformers(List<Transformer> transformers) throws InitialisationException
@@ -189,23 +187,18 @@ public class TransformerUtils
 
         if (transformer.getReturnDataType() != null)
         {
+            DataType<?> dt = DataTypeFactory.create(value.getClass());
+            if (!transformer.getReturnDataType().isCompatibleWith(dt))
             {
-                if (transformer.getReturnDataType() != null)
-                {
-                    DataType<?> dt = DataTypeFactory.create(value.getClass());
-                    if (!transformer.getReturnDataType().isCompatibleWith(dt))
-                    {
-                        throw new TransformerException(
-                                CoreMessages.transformUnexpectedType(dt, transformer.getReturnDataType()),
-                                transformer);
-                    }
-                }
+                throw new TransformerException(
+                        CoreMessages.transformUnexpectedType(dt, transformer.getReturnDataType()),
+                        transformer);
             }
+        }
 
-            if (logger.isDebugEnabled())
-            {
-                logger.debug("The transformed value is of expected type. Type is: " + ClassUtils.getSimpleName(value.getClass()));
-            }
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("The transformed value is of expected type. Type is: " + ClassUtils.getSimpleName(value.getClass()));
         }
     }
 }

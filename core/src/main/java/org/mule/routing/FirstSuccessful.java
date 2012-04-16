@@ -10,6 +10,7 @@
 
 package org.mule.routing;
 
+import org.mule.VoidMuleEvent;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -63,7 +64,7 @@ public class FirstSuccessful extends AbstractOutboundRouter
                 MuleEvent toProcess = cloneEventForRoutinng(event, mp);
                 returnEvent = mp.process(toProcess);
 
-                if (returnEvent == null)
+                if (returnEvent == null || VoidMuleEvent.getInstance().equals(returnEvent))
                 {
                     failed = false;
                 }

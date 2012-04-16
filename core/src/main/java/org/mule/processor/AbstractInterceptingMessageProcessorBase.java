@@ -10,14 +10,7 @@
 
 package org.mule.processor;
 
-import java.util.Collections;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
-import javax.xml.namespace.QName;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.mule.VoidMuleEvent;
 import org.mule.api.AnnotatedObject;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
@@ -30,6 +23,15 @@ import org.mule.api.processor.MessageProcessorChain;
 import org.mule.execution.MessageProcessorExecutionTemplate;
 import org.mule.processor.chain.DefaultMessageProcessorChain;
 import org.mule.util.ObjectUtils;
+
+import java.util.Collections;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+import javax.xml.namespace.QName;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Abstract implementation that provides the infrastructure for intercepting message processors.
@@ -85,6 +87,10 @@ public abstract class AbstractInterceptingMessageProcessorBase
             }
             return null;
         }
+        else if (VoidMuleEvent.getInstance().equals(event))
+        {
+            return event;
+        }
         else
         {
             if (logger.isTraceEnabled())
@@ -131,5 +137,10 @@ public abstract class AbstractInterceptingMessageProcessorBase
     {
         annotations.clear();
         annotations.putAll(newAnnotations);
+    }
+    
+    protected boolean isEventValid(MuleEvent event)
+    {
+        return event != null && !VoidMuleEvent.getInstance().equals(event);
     }
 }

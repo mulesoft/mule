@@ -11,6 +11,7 @@
 package org.mule.routing.outbound;
 
 import org.mule.DefaultMuleMessage;
+import org.mule.VoidMuleEvent;
 import org.mule.api.ExceptionPayload;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -104,7 +105,7 @@ public class ExceptionBasedRouter extends ExpressionRecipientList
                 {
                     MuleMessage resultMessage = null;
                     result = sendRequest(event, request, endpoint, true);
-                    if (result != null)
+                    if (result != null && !VoidMuleEvent.getInstance().equals(result))
                     {
                         resultMessage = result.getMessage();
                     }

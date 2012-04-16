@@ -10,6 +10,7 @@
 
 package org.mule.routing.requestreply;
 
+import org.mule.VoidMuleEvent;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.config.MuleProperties;
@@ -37,7 +38,8 @@ public abstract class AbstractReplyToPropertyRequestReplyReplier extends Abstrac
             // Allow components to stop processing of the ReplyTo property (e.g. CXF)
             final String replyToStop = resultEvent.getMessage().getInvocationProperty(
                     MuleProperties.MULE_REPLY_TO_STOP_PROPERTY);
-            if (resultEvent != null && !BooleanUtils.toBoolean(replyToStop))
+            if (resultEvent != null && !VoidMuleEvent.getInstance().equals(resultEvent)
+                && !BooleanUtils.toBoolean(replyToStop))
             {
                 // reply-to processing should not resurrect a dead event
                 processReplyTo(event, resultEvent, replyToHandler, replyTo);

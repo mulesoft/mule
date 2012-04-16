@@ -13,6 +13,7 @@ package org.mule.module.client.remoting;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.MessageExchangePattern;
+import org.mule.VoidMuleEvent;
 import org.mule.RequestContext;
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleContext;
@@ -194,7 +195,9 @@ public class RemoteDispatcherComponent implements Callable, Initialisable
             if (context.getExchangePattern().hasResponse())
             {
                 MuleEvent resultEvent = ((MessageProcessor) flowConstruct).process(event);
-                result = resultEvent == null ? null : resultEvent.getMessage();
+                result = resultEvent == null || VoidMuleEvent.getInstance().equals(resultEvent)
+                                                                                               ? null
+                                                                                               : resultEvent.getMessage();
                 if (result == null)
                 {
                     return null;
@@ -242,7 +245,7 @@ public class RemoteDispatcherComponent implements Callable, Initialisable
 
                 endpoint = managementContext.getEndpointFactory().getOutboundEndpoint(endpointBuilder);
                 result = context.sendEvent(action.getMessage(), endpoint);
-                if (result == null)
+                if (result == null || VoidMuleEvent.getInstance().equals(result))
                 {
                     return null;
                 }
@@ -344,7 +347,7 @@ public class RemoteDispatcherComponent implements Callable, Initialisable
     protected Object handleException(MuleMessage result, Throwable e)
     {
         logger.error("Failed to process admin request: " + e.getMessage(), e);
-        if (result == null)
+        if (result == null || VoidMuleEvent.getInstance().equals(result))
         {
             result = new DefaultMuleMessage(NullPayload.getInstance(), (Map) null, muleContext);
         }

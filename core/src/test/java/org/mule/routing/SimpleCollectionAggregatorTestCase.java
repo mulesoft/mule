@@ -13,12 +13,14 @@ package org.mule.routing;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
 import org.mule.DefaultMessageCollection;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.MessageExchangePattern;
+import org.mule.VoidMuleEvent;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleMessageCollection;
@@ -80,7 +82,7 @@ public class SimpleCollectionAggregatorTestCase extends AbstractMuleContextTestC
 
         assertNull(router.process(event1));
         assertNull(router.process(event2));
-        assertNull(router.process(event3));
+        assertSame(VoidMuleEvent.getInstance(), router.process(event3));
 
         assertNotNull(sensingMessageProcessor.event);
         MuleMessage nextMessage = sensingMessageProcessor.event.getMessage();
@@ -127,7 +129,7 @@ public class SimpleCollectionAggregatorTestCase extends AbstractMuleContextTestC
         MuleEvent event1 = new DefaultMuleEvent(message1, endpoint, testService);
 
         MuleEvent resultEvent = router.process(event1);
-        assertNull(resultEvent);
+        assertSame(VoidMuleEvent.getInstance(), resultEvent);
 
         assertNotNull(sensingMessageProcessor.event);
         MuleMessage nextMessage = sensingMessageProcessor.event.getMessage();

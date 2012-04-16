@@ -10,6 +10,7 @@
 
 package org.mule.config.spring.parsers.specific;
 
+import org.mule.api.context.notification.ClusterNodeNotificationListener;
 import org.mule.api.context.notification.ComponentMessageNotificationListener;
 import org.mule.api.context.notification.ConnectionNotificationListener;
 import org.mule.api.context.notification.CustomNotificationListener;
@@ -100,6 +101,7 @@ public class NotificationDefinitionParser extends ChildMapEntryDefinitionParser
         INTERFACE_MAP.put("EXCEPTION", ExceptionNotificationListener.class.getName());
         INTERFACE_MAP.put("TRANSACTION", TransactionNotificationListener.class.getName());
         INTERFACE_MAP.put("ROUTING", RoutingNotificationListener.class.getName());
+        INTERFACE_MAP.put("CLUSTER-NODE", ClusterNodeNotificationListener.class.getName());
         
         // Deprecated
         EVENT_MAP.put("MESSAGE", EndpointMessageNotification.class.getName());

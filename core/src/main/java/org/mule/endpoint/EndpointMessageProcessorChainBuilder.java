@@ -16,14 +16,12 @@ import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
 
-public class EndpointMessageProcessorChainBuilder extends
-    DefaultMessageProcessorChainBuilder
+public class EndpointMessageProcessorChainBuilder extends DefaultMessageProcessorChainBuilder
 {
 
     protected ImmutableEndpoint endpoint;
 
-    public EndpointMessageProcessorChainBuilder(ImmutableEndpoint endpoint,
-                                                            FlowConstruct flowConstruct)
+    public EndpointMessageProcessorChainBuilder(ImmutableEndpoint endpoint, FlowConstruct flowConstruct)
     {
         super(flowConstruct);
         this.endpoint = endpoint;

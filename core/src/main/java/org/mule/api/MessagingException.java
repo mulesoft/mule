@@ -10,6 +10,7 @@
 
 package org.mule.api;
 
+import org.mule.VoidMuleEvent;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.config.ExceptionHelper;
 import org.mule.config.MuleManifest;
@@ -64,7 +65,7 @@ public class MessagingException extends MuleException
     {
         super();
         this.event = event;
-        this.muleMessage = (event != null ? event.getMessage() : null);
+        extractMuleMessage(event);
         setMessage(generateMessage(message));
     }
 
@@ -72,7 +73,7 @@ public class MessagingException extends MuleException
     {
         super();
         this.event = event;
-        this.muleMessage = (event != null ? event.getMessage() : null);
+        extractMuleMessage(event);
         this.failingMessageProcessor = failingMessageProcessor;
         setMessage(generateMessage(message));
     }
@@ -93,7 +94,7 @@ public class MessagingException extends MuleException
     {
         super(cause);
         this.event = event;
-        this.muleMessage = (event != null ? event.getMessage() : null);
+        extractMuleMessage(event);
         setMessage(generateMessage(message));
     }
 
@@ -101,7 +102,7 @@ public class MessagingException extends MuleException
     {
         super(cause);
         this.event = event;
-        this.muleMessage = (event != null ? event.getMessage() : null);
+        extractMuleMessage(event);
         this.failingMessageProcessor = failingMessageProcessor;
         setMessage(generateMessage(message));
     }
@@ -110,7 +111,7 @@ public class MessagingException extends MuleException
     {
         super(cause);
         this.event = event;
-        this.muleMessage = (event != null ? event.getMessage() : null);
+        extractMuleMessage(event);
         setMessage(generateMessage(getI18nMessage()));
     }
 
@@ -118,7 +119,7 @@ public class MessagingException extends MuleException
     {
         super(cause);
         this.event = event;
-        this.muleMessage = (event != null ? event.getMessage() : null);
+        extractMuleMessage(event);
         this.failingMessageProcessor = failingMessageProcessor;
         setMessage(generateMessage(getI18nMessage()));
     }
@@ -170,7 +171,9 @@ public class MessagingException extends MuleException
      */
     public MuleEvent getEvent()
     {
-        return processedEvent != null ? processedEvent : event;
+        return processedEvent != null && !VoidMuleEvent.getInstance().equals(processedEvent)
+                                                                                            ? processedEvent
+                                                                                            : event;
     }
 
     /**
@@ -180,7 +183,7 @@ public class MessagingException extends MuleException
      */
     public void setProcessedEvent(MuleEvent processedEvent)
     {
-        if (processedEvent != null)
+        if (processedEvent != null && !VoidMuleEvent.getInstance().equals(processedEvent))
         {
             this.processedEvent = processedEvent;
             this.muleMessage = this.processedEvent.getMessage();
@@ -348,6 +351,13 @@ public class MessagingException extends MuleException
     public MessageProcessor getFailingMessageProcessor()
     {
         return failingMessageProcessor;
+    }
+    
+    protected void extractMuleMessage(MuleEvent event)
+    {
+        this.muleMessage = event == null || VoidMuleEvent.getInstance().equals(event)
+                                                                                     ? null
+                                                                                      : event.getMessage();
     }
 }
 

@@ -38,7 +38,7 @@ public class OutboundResponsePropertiesMessageProcessor extends AbstractIntercep
     {
         MuleEvent responseEvent = processNext(event);
 
-        if (responseEvent != null)
+        if (isEventValid(responseEvent))
         {
             // Properties which should be carried over from the request message
             // to the response message

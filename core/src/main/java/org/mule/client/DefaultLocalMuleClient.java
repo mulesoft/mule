@@ -13,6 +13,7 @@ package org.mule.client;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.MessageExchangePattern;
+import org.mule.VoidMuleEvent;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -144,7 +145,7 @@ public class DefaultLocalMuleClient implements LocalMuleClient
 
     protected MuleMessage returnMessage(MuleEvent event)
     {
-        if (event != null)
+        if (event != null && !VoidMuleEvent.getInstance().equals(event))
         {
             return event.getMessage();
         }

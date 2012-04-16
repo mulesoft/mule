@@ -11,6 +11,7 @@
 package org.mule.transport;
 
 import org.mule.MessageExchangePattern;
+import org.mule.VoidMuleEvent;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
@@ -2622,7 +2623,8 @@ public abstract class AbstractConnector implements Connector, WorkListener
                 // We need to invoke notification message processor with request
                 // message only after successful send/dispatch
                 notificationMessageProcessor.dispatchNotification(beginNotification);
-                notificationMessageProcessor.process(result != null ? result : event);
+                notificationMessageProcessor.process((result != null && !VoidMuleEvent.getInstance().equals(
+                    result)) ? result                                                                                                  : event);
                 return result;
 
             }

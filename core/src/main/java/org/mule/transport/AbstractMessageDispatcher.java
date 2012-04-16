@@ -11,6 +11,7 @@
 package org.mule.transport;
 
 import org.mule.DefaultMuleEvent;
+import org.mule.VoidMuleEvent;
 import org.mule.RequestContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -96,7 +97,7 @@ public abstract class AbstractMessageDispatcher extends AbstractTransportMessage
             else
             {
                 doDispatch(event);
-                return null;
+                return VoidMuleEvent.getInstance();
             }
         }
         catch (MuleException muleException)

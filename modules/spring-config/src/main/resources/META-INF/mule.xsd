@@ -1246,7 +1246,14 @@
                 <xsd:attribute name="useExtendedTransformations" type="substitutableBoolean" default="true">
                     <xsd:annotation>
                         <xsd:documentation>
-                            (As of Mule 3.3) Enables/disable extended transformation support: enforcement of transformations, implicit transformations and no direct transformer lookup.
+                            (As of Mule 3.3) Enable/disable extended transformation support: enforcement of transformations, implicit transformations and no direct transformer lookup.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="flowEndingWithOneWayEndpointReturnsNull" type="substitutableBoolean" default="false">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            (As of Mule 3.3) Modifies the behavior of one-way outbound endpoints when they are the last element inside a request-response flow. When true the value returned by the endpoint will be null, otherwise will be an echo of the received event.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>

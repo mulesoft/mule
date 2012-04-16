@@ -10,6 +10,7 @@
 
 package org.mule.service;
 
+import org.mule.VoidMuleEvent;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -50,7 +51,7 @@ public class ForwardingConsumer extends MessageFilter
             try
             {
                 MuleEvent resultEvent = processor.process(event);
-                if (resultEvent != null)
+                if (resultEvent != null && !VoidMuleEvent.getInstance().equals(resultEvent))
                 {
                     return resultEvent;
                 }

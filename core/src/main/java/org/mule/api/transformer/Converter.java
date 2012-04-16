@@ -11,10 +11,10 @@
 package org.mule.api.transformer;
 
 /**
- * Marker for {@link Transformer} that are data type converters, ie: convert
+ * Defines a {@link Transformer} that is a data type converters, ie: convert
  * data from a type to another without modifying the meaning of the data.
  */
-public interface Converter
+public interface Converter extends Transformer
 {
 
     int MAX_PRIORITY_WEIGHTING = 10;

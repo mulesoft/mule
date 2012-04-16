@@ -55,5 +55,7 @@ public class SchemaDefaultsTestCase extends AbstractMuleContextTestCase
                 .intValue());
         assertEquals(muleContext.getConfiguration().useExtendedTransformations(), Boolean.parseBoolean(
                      configurationType.valueOf("xsd:complexContent/xsd:extension/xsd:attribute[@name='useExtendedTransformations']/@default")));
+        assertEquals(muleContext.getConfiguration().isFlowEndingWithOneWayEndpointReturnsNull(), Boolean.parseBoolean(
+                configurationType.valueOf("xsd:complexContent/xsd:extension/xsd:attribute[@name='flowEndingWithOneWayEndpointReturnsNull']/@default")));
     }
 }

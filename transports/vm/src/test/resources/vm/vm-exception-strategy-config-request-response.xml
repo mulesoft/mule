@@ -17,7 +17,7 @@
 
         <service name="dlqExceptionInboundEndpoint">
             <inbound>
-                <vm:inbound-endpoint path="in1">
+                <vm:inbound-endpoint path="in1" exchange-pattern="request-response">
                     <custom-transformer
                             class="org.mule.transport.vm.functional.transactions.VmExceptionStrategyRequestResponseTestCase$FailingTransformer"/>
                     <vm:transaction action="ALWAYS_BEGIN"/>
@@ -41,7 +41,7 @@
 
         <service name="dlqExceptionInboundEndpointResponse">
             <inbound>
-                <vm:inbound-endpoint path="in2">
+                <vm:inbound-endpoint path="in2" exchange-pattern="request-response">
                     <response>
                         <custom-transformer
                                 class="org.mule.transport.vm.functional.transactions.VmExceptionStrategyRequestResponseTestCase$FailingTransformer"/>

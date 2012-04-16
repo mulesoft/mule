@@ -10,6 +10,7 @@
 
 package org.mule.service.processor;
 
+import org.mule.VoidMuleEvent;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -51,7 +52,7 @@ public class ServiceInternalMessageProcessor extends AbstractInterceptingMessage
 
                 // Allow components to stop processing of the ReplyTo property (e.g.
                 // CXF)
-                if (resultEvent != null && replyTo != null)
+                if (resultEvent != null && !VoidMuleEvent.getInstance().equals(resultEvent) && replyTo != null)
                 {
                     String replyToStop = resultEvent.getMessage().getInvocationProperty(MuleProperties.MULE_REPLY_TO_STOP_PROPERTY);
                     if (!event.getExchangePattern().hasResponse() || !BooleanUtils.toBoolean(replyToStop))

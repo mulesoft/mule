@@ -10,18 +10,19 @@
 
 package org.mule.routing;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+
 import org.mule.MessageExchangePattern;
+import org.mule.VoidMuleEvent;
 import org.mule.api.MuleEvent;
 import org.mule.routing.filters.EqualsFilter;
 import org.mule.tck.SensingNullMessageProcessor;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
 
 public class MessageFilterTestCase extends AbstractMuleContextTestCase
 {
@@ -89,7 +90,7 @@ public class MessageFilterTestCase extends AbstractMuleContextTestCase
         MuleEvent resultEvent = mp.process(inEvent);
 
         assertNull(out.event);
-        assertNull(resultEvent);
+        assertSame(VoidMuleEvent.getInstance(), resultEvent);
         assertNotNull(unaccepted.event);
         assertSame(inEvent, unaccepted.event);
     }

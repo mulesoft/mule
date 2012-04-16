@@ -567,7 +567,7 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("first-successful", new ChildDefinitionParser("messageProcessor", FirstSuccessful.class));
         registerBeanDefinitionParser("until-successful", new ChildDefinitionParser("messageProcessor", UntilSuccessful.class));
         registerBeanDefinitionParser("round-robin", new ChildDefinitionParser("messageProcessor", RoundRobin.class));
-        registerBeanDefinitionParser("dead-letter-queue", new ChildDefinitionParser("deadLetterQueue", MessageProcessorFilterPairFactoryBean.class));
+        registerMuleBeanDefinitionParser("dead-letter-queue", new ParentDefinitionParser()).addAlias("messageProcessor", "deadLetterQueue");
 
         registerBeanDefinitionParser("custom-router", new ChildDefinitionParser("messageProcessor"));
 

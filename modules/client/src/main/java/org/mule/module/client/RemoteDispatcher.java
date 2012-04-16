@@ -13,6 +13,7 @@ package org.mule.module.client;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.MessageExchangePattern;
+import org.mule.VoidMuleEvent;
 import org.mule.RequestContext;
 import org.mule.api.FutureMessageResult;
 import org.mule.api.MuleContext;
@@ -111,7 +112,7 @@ public class RemoteDispatcher implements Disposable
 
         MuleEvent resultEvent = syncServerEndpoint.process(new DefaultMuleEvent(msg,
             MessageExchangePattern.REQUEST_RESPONSE, new MuleClientFlowConstruct(muleContext)));
-        if (resultEvent != null)
+        if (resultEvent != null && !VoidMuleEvent.getInstance().equals(resultEvent))
         {
             result = resultEvent.getMessage();
         }
@@ -383,7 +384,7 @@ public class RemoteDispatcher implements Disposable
         try
         {
             MuleEvent resultEvent = serverEndpoint.process(event);
-            if (resultEvent != null)
+            if (resultEvent != null && !VoidMuleEvent.getInstance().equals(resultEvent))
             {
                 result = resultEvent.getMessage();
             }

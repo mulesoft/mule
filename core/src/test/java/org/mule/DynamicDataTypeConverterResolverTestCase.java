@@ -21,8 +21,7 @@ import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
-import org.mule.transformer.TestConverter;
-import org.mule.transformer.TransformerBuilder;
+import org.mule.transformer.builder.MockConverterBuilder;
 import org.mule.transformer.types.DataTypeFactory;
 
 import java.util.ArrayList;
@@ -56,7 +55,7 @@ public class DynamicDataTypeConverterResolverTestCase extends AbstractMuleTestCa
     @Test
     public void findsExpectedConverter() throws TransformerException
     {
-        TestConverter expectedConverter = new TransformerBuilder().from(DataTypeFactory.BYTE_ARRAY).to(DataTypeFactory.STRING).buildConverter(1);
+        Transformer expectedConverter = new MockConverterBuilder().from(DataTypeFactory.BYTE_ARRAY).to(DataTypeFactory.STRING).build();
 
         when(muleContext.getRegistry()).thenReturn(muleRegistry);
         when(muleRegistry.lookupTransformer(DataTypeFactory.BYTE_ARRAY, DataTypeFactory.STRING)).thenReturn(expectedConverter);

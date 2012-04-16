@@ -92,4 +92,13 @@ public class AttributeEvaluatorTestCase extends AbstractMuleTestCase
         assertThat(attributeEvaluator.isExpression(), is(false));
     }
 
+    @Test
+    public void testParenthesesInExpression()
+    {
+        AttributeEvaluator attributeEvaluator = new AttributeEvaluator("#[(1)]");
+        attributeEvaluator.initialize(mockExpressionManager);
+        assertThat(attributeEvaluator.isString(), is(false));
+        assertThat(attributeEvaluator.isExpression(), is(true));
+    }
+
 }

@@ -13,6 +13,7 @@ package org.mule.module.client;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.MessageExchangePattern;
+import org.mule.VoidMuleEvent;
 import org.mule.api.FutureMessageResult;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
@@ -322,7 +323,9 @@ public class MuleClient implements Disposable
         }
 
         MuleEvent resultEvent = service.sendEvent(event);
-        MuleMessage result = resultEvent == null ? null : resultEvent.getMessage();
+        MuleMessage result = resultEvent == null || VoidMuleEvent.getInstance().equals(resultEvent)
+                                                                                                   ? null
+                                                                                                   : resultEvent.getMessage();
         if (logger.isDebugEnabled())
         {
             logger.debug("Result of MuleClient sendDirect is: "
@@ -620,7 +623,7 @@ public class MuleClient implements Disposable
         MuleEvent event = getEvent(message, MessageExchangePattern.REQUEST_RESPONSE);
 
         MuleEvent response = endpoint.process(event);
-        if (response != null)
+        if (response != null && !VoidMuleEvent.getInstance().equals(response))
         {
             return response.getMessage();
         }

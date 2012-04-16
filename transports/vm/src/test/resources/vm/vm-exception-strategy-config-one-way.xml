@@ -41,7 +41,7 @@
 
         <service name="dlqExceptionInboundEndpointResponse">
             <inbound>
-                <vm:inbound-endpoint path="in2">
+                <vm:inbound-endpoint path="in2" exchange-pattern="request-response">
                     <response>
                         <custom-transformer
                                 class="org.mule.transport.vm.functional.transactions.VmExceptionStrategyOneWayTestCase$FailingTransformer"/>

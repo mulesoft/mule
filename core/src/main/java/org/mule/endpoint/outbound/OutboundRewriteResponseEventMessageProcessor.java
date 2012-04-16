@@ -11,6 +11,7 @@
 package org.mule.endpoint.outbound;
 
 import org.mule.DefaultMuleEvent;
+import org.mule.VoidMuleEvent;
 import org.mule.OptimizedRequestContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -22,7 +23,7 @@ public class OutboundRewriteResponseEventMessageProcessor implements MessageProc
 {
     public MuleEvent process(MuleEvent event) throws MuleException
     {
-        if (event != null)
+        if (event != null && !VoidMuleEvent.getInstance().equals(event))
         { // See MULE-2692
             // RM* This actually performs the function of adding properties from the
             // request to the response message I think this could be done without the

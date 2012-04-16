@@ -10,6 +10,7 @@
 
 package org.mule.routing;
 
+import org.mule.VoidMuleEvent;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.routing.RoutingException;
@@ -51,7 +52,7 @@ public class ServiceCatchAllStrategy extends AbstractCatchAllStrategy
                     statistics.incrementRoutedMessage(event.getMessageSourceName());
                 }
                 ((Service) event.getFlowConstruct()).dispatchEvent(event);
-                return null;
+                return VoidMuleEvent.getInstance();
             }
         }
         catch (MuleException e)
