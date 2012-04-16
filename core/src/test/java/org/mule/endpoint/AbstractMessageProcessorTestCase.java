@@ -52,11 +52,23 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
+
 public abstract class AbstractMessageProcessorTestCase extends AbstractMuleContextTestCase
 {
     protected static final String TEST_URI = "test://myTestUri";
     protected static String RESPONSE_MESSAGE = "response-message";
     protected static MuleMessage responseMessage;
+    protected Answer<MuleEvent> echoEventAnswer = new Answer<MuleEvent>()
+    {
+        @Override
+        public MuleEvent answer(InvocationOnMock invocation) throws Throwable
+        {
+            return (MuleEvent) invocation.getArguments()[0];
+        }
+    };
+
 
     @Override
     protected void doSetUp() throws Exception

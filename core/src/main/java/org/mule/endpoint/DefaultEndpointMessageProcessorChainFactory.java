@@ -117,62 +117,75 @@ public class DefaultEndpointMessageProcessorChainFactory implements EndpointMess
         }
         requestChainBuilder.chain(endpoint.getMessageProcessors());
         
-        // -- INVOKE SERVICE --
+        // -- INVOKE FLOW --
         if (target == null)
         {
             throw new ConfigurationException(MessageFactory.createStaticMessage("No listener (target) has been set for this endpoint"));
         }
         requestChainBuilder.chain(target);
 
-        // -- RESPONSE CHAIN --
-        DefaultMessageProcessorChainBuilder responseChainBuilder = new EndpointMessageProcessorChainBuilder(endpoint, flowConstruct);
-        responseChainBuilder.setName("InboundEndpoint '" + endpoint.getEndpointURI().getUri() + "' response chain");
-        // Default MPs
-        responseChainBuilder.chain(createInboundResponseMessageProcessors(endpoint));
-        // Configured MPs (if any)
-        responseChainBuilder.chain(endpoint.getResponseMessageProcessors());
+        if (!endpoint.getExchangePattern().hasResponse())
+        {
+            return requestChainBuilder.build();
+        }
+        else
+        {
+            // -- RESPONSE CHAIN --
+            DefaultMessageProcessorChainBuilder responseChainBuilder = new EndpointMessageProcessorChainBuilder(endpoint, flowConstruct);
+            responseChainBuilder.setName("InboundEndpoint '" + endpoint.getEndpointURI().getUri() + "' response chain");
+            // Default MPs
+            responseChainBuilder.chain(createInboundResponseMessageProcessors(endpoint));
+            // Configured MPs (if any)
+            responseChainBuilder.chain(endpoint.getResponseMessageProcessors());
 
-        // Compose request and response chains. We do this so that if the request
-        // chain returns early the response chain is still invoked.
-        DefaultMessageProcessorChainBuilder compositeChainBuilder = new EndpointMessageProcessorChainBuilder(endpoint, flowConstruct);
-        compositeChainBuilder.setName("InboundEndpoint '"+ endpoint.getEndpointURI().getUri() +"' composite request/response chain");
-        compositeChainBuilder.chain(requestChainBuilder.build(), responseChainBuilder.build());
-        return compositeChainBuilder.build();
+            // -- COMPOSITE REQUEST/RESPONSE CHAIN --
+            // Compose request and response chains. We do this so that if the request
+            // chain returns early the response chain is still invoked.
+            DefaultMessageProcessorChainBuilder compositeChainBuilder = new EndpointMessageProcessorChainBuilder(endpoint, flowConstruct);
+            compositeChainBuilder.setName("InboundEndpoint '"+ endpoint.getEndpointURI().getUri() +"' composite request/response chain");
+            compositeChainBuilder.chain(requestChainBuilder.build(), responseChainBuilder.build());
+            return compositeChainBuilder.build();
+        }
     }
 
     public MessageProcessor createOutboundMessageProcessorChain(OutboundEndpoint endpoint, FlowConstruct flowConstruct, MessageProcessor target) throws MuleException
     {
         // -- REQUEST CHAIN --
-        DefaultMessageProcessorChainBuilder outboundChainBuilder = new EndpointMessageProcessorChainBuilder(endpoint, flowConstruct);
-        outboundChainBuilder.setName("OutboundEndpoint '" + endpoint.getEndpointURI().getUri() + "' request chain");
+        DefaultMessageProcessorChainBuilder requestChainBuilder = new EndpointMessageProcessorChainBuilder(endpoint, flowConstruct);
+        requestChainBuilder.setName("OutboundEndpoint '" + endpoint.getEndpointURI().getUri() + "' request chain");
         // Default MPs
-        outboundChainBuilder.chain(createOutboundMessageProcessors(endpoint));
+        requestChainBuilder.chain(createOutboundMessageProcessors(endpoint));
         // Configured MPs (if any)
-        outboundChainBuilder.chain(endpoint.getMessageProcessors());
+        requestChainBuilder.chain(endpoint.getMessageProcessors());
         
-        // -- OUTBOUND ROUTER --
+        // -- INVOKE MESSAGE DISPATCHER --
         if (target == null)
         {
             throw new ConfigurationException(MessageFactory.createStaticMessage("No listener (target) has been set for this endpoint"));
         }
-        outboundChainBuilder.chain(target);
+        requestChainBuilder.chain(target);
         
-        // -- RESPONSE CHAIN --
-        DefaultMessageProcessorChainBuilder responseChainBuilder = new EndpointMessageProcessorChainBuilder(endpoint, flowConstruct);
-        responseChainBuilder.setName("OutboundEndpoint '" + endpoint.getEndpointURI().getUri() + "' response chain");
-        // Default MPs
-        responseChainBuilder.chain(createOutboundResponseMessageProcessors(endpoint));
-        // Configured MPs (if any)
-        responseChainBuilder.chain(endpoint.getResponseMessageProcessors());
-
-        // Compose request and response chains. We do this so that if the request
-        // chain returns early the response chain is still invoked.
-        DefaultMessageProcessorChainBuilder compositeChainBuilder = new EndpointMessageProcessorChainBuilder(endpoint, flowConstruct);
-        compositeChainBuilder.setName("OutboundEndpoint '" + endpoint.getEndpointURI().getUri() + "' composite request/response chain");
-        compositeChainBuilder.chain(outboundChainBuilder.build(), responseChainBuilder.build());
-        return compositeChainBuilder.build();
-    }
+        if (!endpoint.getExchangePattern().hasResponse())
+        {
+            return requestChainBuilder.build();
+        }
+        else
+        {
+            // -- RESPONSE CHAIN --
+            DefaultMessageProcessorChainBuilder responseChainBuilder = new EndpointMessageProcessorChainBuilder(endpoint, flowConstruct);
+            responseChainBuilder.setName("OutboundEndpoint '" + endpoint.getEndpointURI().getUri() + "' response chain");
+            // Default MPs
+            responseChainBuilder.chain(createOutboundResponseMessageProcessors(endpoint));
+            // Configured MPs (if any)
+            responseChainBuilder.chain(endpoint.getResponseMessageProcessors());
     
+            // Compose request and response chains. We do this so that if the request
+            // chain returns early the response chain is still invoked.
+            DefaultMessageProcessorChainBuilder compositeChainBuilder = new EndpointMessageProcessorChainBuilder(endpoint, flowConstruct);
+            compositeChainBuilder.setName("OutboundEndpoint '" + endpoint.getEndpointURI().getUri() + "' composite request/response chain");
+            compositeChainBuilder.chain(requestChainBuilder.build(), responseChainBuilder.build());
+            return compositeChainBuilder.build();
+        }
+    }
 }
-
 

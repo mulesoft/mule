@@ -16,6 +16,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
@@ -29,6 +30,7 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.filter.Filter;
 import org.mule.api.routing.filter.FilterUnacceptedException;
 import org.mule.api.security.EndpointSecurityFilter;
+import org.mule.api.transformer.Transformer;
 import org.mule.context.notification.EndpointMessageNotification;
 import org.mule.context.notification.SecurityNotification;
 import org.mule.endpoint.AbstractEndpoint;
@@ -45,6 +47,7 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
+import org.mockito.Mockito;
 
 public class InboundEndpointTestCase extends AbstractMessageProcessorTestCase
 {
@@ -69,7 +72,12 @@ public class InboundEndpointTestCase extends AbstractMessageProcessorTestCase
     @Test
     public void testDefaultFlowSync() throws Exception
     {
-        endpoint = createTestInboundEndpoint(null, null, null, null,
+        Transformer reqTransformer = mock(Transformer.class);
+        Mockito.when(reqTransformer.process(Mockito.any(MuleEvent.class))).then(echoEventAnswer);
+        Transformer resTransformer = mock(Transformer.class);
+        Mockito.when(resTransformer.process(Mockito.any(MuleEvent.class))).then(echoEventAnswer);
+
+        endpoint = createTestInboundEndpoint(null, null, reqTransformer, resTransformer,
             MessageExchangePattern.REQUEST_RESPONSE, null);
         endpoint.setListener(inboundListener);
         requestEvent = createTestRequestEvent(endpoint);
@@ -77,6 +85,9 @@ public class InboundEndpointTestCase extends AbstractMessageProcessorTestCase
 
         MessageProcessor mpChain = ((AbstractEndpoint) endpoint).getMessageProcessorChain(requestEvent.getFlowConstruct());
         result = mpChain.process(requestEvent);
+        
+        Mockito.verify(reqTransformer, Mockito.times(1)).process(Mockito.any(MuleEvent.class));
+        Mockito.verify(resTransformer, Mockito.times(1)).process(Mockito.any(MuleEvent.class));
 
         assertMessageSentSame(true);
         assertEquals(responseEvent.getMessage(), result.getMessage());
@@ -85,7 +96,12 @@ public class InboundEndpointTestCase extends AbstractMessageProcessorTestCase
     @Test
     public void testDefaultFlowAsync() throws Exception
     {
-        endpoint = createTestInboundEndpoint(null, null, null, null,
+        Transformer reqTransformer = mock(Transformer.class);
+        Mockito.when(reqTransformer.process(Mockito.any(MuleEvent.class))).then(echoEventAnswer);
+        Transformer resTransformer = mock(Transformer.class);
+        Mockito.when(resTransformer.process(Mockito.any(MuleEvent.class))).then(echoEventAnswer);
+
+        endpoint = createTestInboundEndpoint(null, null, reqTransformer, resTransformer,
             MessageExchangePattern.ONE_WAY, null);
         endpoint.setListener(inboundListener);
         requestEvent = createTestRequestEvent(endpoint);
@@ -93,6 +109,9 @@ public class InboundEndpointTestCase extends AbstractMessageProcessorTestCase
 
         MessageProcessor mpChain = ((AbstractEndpoint) endpoint).getMessageProcessorChain(requestEvent.getFlowConstruct());
         result = mpChain.process(requestEvent);
+        
+        Mockito.verify(reqTransformer, Mockito.times(1)).process(Mockito.any(MuleEvent.class));
+        Mockito.verify(resTransformer, Mockito.never()).process(Mockito.any(MuleEvent.class));
 
         assertMessageSentSame(false);
         assertEquals(responseEvent.getMessage(), result.getMessage());
