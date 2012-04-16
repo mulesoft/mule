@@ -76,7 +76,7 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractMuleContextTe
         assertNotSame(event, target.sensedEvent);
         assertEquals(event.getMessageAsString(), target.sensedEvent.getMessageAsString());
 
-        assertSame(VoidMuleEvent.getInstance(), result);
+        assertSame(event, result);
         assertNull(exceptionThrown);
         assertNotSame(Thread.currentThread(), target.thread);
     }
@@ -96,7 +96,7 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractMuleContextTe
         assertNotSame(event, target.sensedEvent);
         assertEquals(event.getMessageAsString(), target.sensedEvent.getMessageAsString());
 
-        assertSame(VoidMuleEvent.getInstance(), result);
+        assertSame(event, result);
         assertNull(exceptionThrown);
         assertNotSame(Thread.currentThread(), target.thread);
     }
