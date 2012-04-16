@@ -71,9 +71,7 @@ public class JdkVersionUtilsTestCase extends AbstractMuleTestCase
 	@Test
 	public void testRecommendedJdkVersion()
 	{
-		assertTrue(JdkVersionUtils.isRecommendedJdkVersion());
 		// recommended
-		assertTrue(JdkVersionUtils.isRecommendedJdkVersion());
 		setJdkVersion("1.6");
 		assertTrue(JdkVersionUtils.isRecommendedJdkVersion());
 		setJdkVersion("1.7");
@@ -86,11 +84,6 @@ public class JdkVersionUtilsTestCase extends AbstractMuleTestCase
 		assertFalse(JdkVersionUtils.isRecommendedJdkVersion());
 		setJdkVersion("1.6.0_5");
 		assertFalse(JdkVersionUtils.isRecommendedJdkVersion());
-	}
-	
-	@Override
-	public int getTestTimeoutSecs() {
-		return 999999;
 	}
 	
 	@Test
