@@ -200,4 +200,9 @@ public class ClusterizableMessageSourceWrapper implements MessageSource, Lifecyc
             ((MuleContextAware) messageSource).setMuleContext(muleContext);
         }
     }
+
+    public boolean isStarted()
+    {
+        return started;
+    }
 }
