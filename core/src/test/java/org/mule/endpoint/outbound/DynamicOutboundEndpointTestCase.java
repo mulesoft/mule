@@ -11,6 +11,7 @@
 package org.mule.endpoint.outbound;
 
 import org.mule.MessageExchangePattern;
+import org.mule.VoidMuleEvent;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
@@ -47,6 +48,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -98,7 +100,7 @@ public class DynamicOutboundEndpointTestCase extends AbstractMessageProcessorTes
         MuleEvent result = endpoint.process(testOutboundEvent);
 
         assertEventDispatched();
-        assertNull(result);
+        assertSame(VoidMuleEvent.getInstance(), result);
         assertMessageSentEqual(MyMessageDispatcherFactory.dispatcher.sensedDispatchEvent);
     }
 

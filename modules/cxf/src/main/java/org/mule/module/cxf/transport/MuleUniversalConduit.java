@@ -14,6 +14,7 @@ import static org.apache.cxf.message.Message.DECOUPLED_CHANNEL_MESSAGE;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
+import org.mule.VoidMuleEvent;
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
@@ -153,7 +154,7 @@ public class MuleUniversalConduit extends AbstractConduit
         
         OutboundEndpoint ep = null;
         
-        if (event == null || decoupled)
+        if (event == null || VoidMuleEvent.getInstance().equals(event) || decoupled)
         {
             // we've got an out of band WS-RM message or a message from a standalone client
             MuleContext muleContext = configuration.getMuleContext();
@@ -250,7 +251,7 @@ public class MuleUniversalConduit extends AbstractConduit
 
             MuleEvent resEvent = processNext(reqEvent, m.getExchange(), endpoint);
 
-            if (resEvent == null)
+            if (resEvent == null || VoidMuleEvent.getInstance().equals(resEvent))
             {
                 m.getExchange().put(ClientImpl.FINISHED, Boolean.TRUE);
                 return;

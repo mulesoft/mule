@@ -9,6 +9,7 @@
  */
 package org.mule.exception;
 
+import org.mule.VoidMuleEvent;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.construct.FlowConstruct;
@@ -69,7 +70,7 @@ public class RedeliveryExceeded implements MessageProcessor, FlowConstructAware,
         if (!messageProcessors.isEmpty()) {
             result = configuredMessageProcessors.process(event);
         }
-        if (result != null)
+        if (result != null && !VoidMuleEvent.getInstance().equals(result))
         {
             result.getMessage().setExceptionPayload(null);
         }

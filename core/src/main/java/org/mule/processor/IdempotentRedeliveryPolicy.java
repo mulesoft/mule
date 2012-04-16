@@ -15,6 +15,7 @@ import org.mule.api.exception.MessageRedeliveredException;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Startable;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.api.store.ObjectAlreadyExistsException;
 import org.mule.api.store.ObjectStoreException;
 import org.mule.config.i18n.CoreMessages;
@@ -288,5 +289,10 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy
     public void setIdExpression(String idExpression)
     {
         this.idExpression = idExpression;
+    }
+    
+    public void setMessageProcessor(MessageProcessor processor)
+    {
+        this.deadLetterQueue = processor;
     }
 }

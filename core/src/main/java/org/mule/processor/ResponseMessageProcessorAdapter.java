@@ -10,6 +10,7 @@
 
 package org.mule.processor;
 
+import org.mule.VoidMuleEvent;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.ThreadSafeAccess;
@@ -49,7 +50,7 @@ public class ResponseMessageProcessorAdapter extends AbstractResponseMessageProc
     @Override
     protected MuleEvent processResponse(MuleEvent event) throws MuleException
     {
-        if (responseProcessor == null || event == null)
+        if (responseProcessor == null || !isEventValid(event))
         {
             return event;
         }
@@ -57,7 +58,7 @@ public class ResponseMessageProcessorAdapter extends AbstractResponseMessageProc
         {
             MuleEvent copy = (MuleEvent) ((ThreadSafeAccess) event).newThreadCopy();
             MuleEvent result = responseProcessor.process(event);
-            if (result == null)
+            if (result == null || VoidMuleEvent.getInstance().equals(result))
             {
                 // If <response> returns null then it acts as an implicit branch like in flows, the different
                 // here is that what's next, it's not another message processor that follows this one in the

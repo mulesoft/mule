@@ -14,6 +14,7 @@ import java.util.Collections;
 
 import org.apache.commons.lang.Validate;
 import org.mule.MessageExchangePattern;
+import org.mule.VoidMuleEvent;
 import org.mule.RequestContext;
 import org.mule.api.ExceptionPayload;
 import org.mule.api.MuleContext;
@@ -255,7 +256,7 @@ public class Validator extends AbstractConfigurationPattern
 
     private static ExceptionPayload getExceptionPayload(MuleEvent event)
     {
-        if (event == null)
+        if (event == null || VoidMuleEvent.getInstance().equals(event))
         {
             return null;
         }

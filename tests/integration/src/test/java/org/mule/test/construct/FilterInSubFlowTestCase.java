@@ -17,7 +17,6 @@ import org.mule.api.MuleMessage;
 import org.mule.api.client.LocalMuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class FilterInSubFlowTestCase extends FunctionalTestCase
@@ -38,7 +37,6 @@ public class FilterInSubFlowTestCase extends FunctionalTestCase
     }
 
     @Test
-    @Ignore("Depends on MULE-6146")
     public void filterOnSubFlow() throws MuleException
     {
         LocalMuleClient client = muleContext.getClient();

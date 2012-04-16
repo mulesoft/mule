@@ -10,20 +10,21 @@
 
 package org.mule.processor;
 
+import org.mule.VoidMuleEvent;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.config.ThreadingProfile;
 import org.mule.api.context.WorkManager;
 import org.mule.api.context.WorkManagerSource;
+import org.mule.api.execution.ExecutionCallback;
+import org.mule.api.execution.ExecutionTemplate;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.execution.TransactionalErrorHandlingExecutionTemplate;
 import org.mule.interceptor.ProcessingTimeInterceptor;
-import org.mule.api.execution.ExecutionCallback;
-import org.mule.api.execution.ExecutionTemplate;
 import org.mule.transaction.MuleTransactionConfig;
 import org.mule.work.AbstractMuleEventWork;
 import org.mule.work.MuleWorkManager;
@@ -87,7 +88,7 @@ public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessa
         else if (isProcessAsync(event))
         {
             processNextAsync(event);
-            return null;
+            return VoidMuleEvent.getInstance();
         }
         else
         {
@@ -175,7 +176,7 @@ public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessa
                         {
                             throw new MessagingException(event, e, next);
                         }
-                        return null;
+                        return VoidMuleEvent.getInstance();
                     }
                 });
             }

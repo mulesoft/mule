@@ -10,6 +10,7 @@
 
 package org.mule.routing;
 
+import org.mule.VoidMuleEvent;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -83,7 +84,7 @@ public class MessageFilter extends AbstractFilteringMessageProcessor implements 
             return true;
         }
 
-        if (event != null)
+        if (event != null && !VoidMuleEvent.getInstance().equals(event))
         {
             return filter.accept(event.getMessage());
         }

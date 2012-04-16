@@ -14,11 +14,13 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import org.mule.MessageExchangePattern;
 import org.mule.RequestContext;
+import org.mule.VoidMuleEvent;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -107,7 +109,7 @@ public class OutboundEndpointTestCase extends AbstractMessageProcessorTestCase
 
         dispacher.latch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS);
         assertMessageSentSame(false);
-        assertNull(result);
+        assertSame(VoidMuleEvent.getInstance(), result);
     }
 
     @Test

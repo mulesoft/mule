@@ -10,6 +10,7 @@
 
 package org.mule.transport.http;
 
+import org.mule.VoidMuleEvent;
 import org.mule.api.ExceptionPayload;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -329,7 +330,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
         OutboundEndpoint out = new EndpointURIEndpointBuilder(locationHeader.getValue(),
             connector.getMuleContext()).buildOutboundEndpoint();
         MuleEvent result = out.process(event);
-        if (result != null)
+        if (result != null && !VoidMuleEvent.getInstance().equals(result))
         {
             return result.getMessage();
         }

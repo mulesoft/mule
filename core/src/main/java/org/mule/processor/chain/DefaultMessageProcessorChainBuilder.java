@@ -83,9 +83,7 @@ public class DefaultMessageProcessorChainBuilder extends AbstractMessageProcesso
                     }
                     else
                     {
-                        final DefaultMessageProcessorChain chain = new DefaultMessageProcessorChain(
-                            "(inner iterating chain) of " + name, new ArrayList<MessageProcessor>(tempList));
-                        interceptingProcessor.setListener(chain);
+                        interceptingProcessor.setListener(createInnerChain(tempList));
                     }
                 }
                 tempList = new LinkedList<MessageProcessor>(Collections.singletonList(processor));
@@ -100,12 +98,23 @@ public class DefaultMessageProcessorChainBuilder extends AbstractMessageProcesso
         // Create the final chain using the current tempList after reserve iteration is complete. This temp
         // list contains the first n processors in the chain that are not intercepting.. with processor n+1
         // having been injected as the listener of processor n
-        final DefaultMessageProcessorChain chain = new DefaultMessageProcessorChain(name,
-            new ArrayList<MessageProcessor>(tempList));
+        final DefaultMessageProcessorChain chain = createOuterChain(tempList);
 
         // Wrap with something that can apply lifecycle to all processors which are otherwise not visable from
         // DefaultMessageProcessorChain
         return new InterceptingChainLifecycleWrapper(chain, processors, "wrapper for " + name);
+    }
+
+    protected DefaultMessageProcessorChain createInnerChain(LinkedList<MessageProcessor> tempList)
+    {
+        return new DefaultMessageProcessorChain("(inner iterating chain) of " + name,
+            new ArrayList<MessageProcessor>(tempList));
+    }
+
+    protected DefaultMessageProcessorChain createOuterChain(LinkedList<MessageProcessor> tempList)
+    {
+        return new DefaultMessageProcessorChain("(inner iterating chain) of " + name,
+            new ArrayList<MessageProcessor>(tempList));
     }
 
     public DefaultMessageProcessorChainBuilder chain(MessageProcessor... processors)

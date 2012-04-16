@@ -10,7 +10,13 @@
 
 package org.mule.routing.outbound;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.DefaultMuleMessage;
+import org.mule.VoidMuleEvent;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleMessageCollection;
@@ -26,11 +32,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 
 public class SequenceRouterTestCase extends AbstractMuleContextTestCase
 {
@@ -92,7 +93,7 @@ public class SequenceRouterTestCase extends AbstractMuleContextTestCase
 
         MuleEvent result = router.route(new OutboundRoutingTestEvent(message, (MuleSession)session.proxy(), muleContext));
 
-        assertNull(result);
+        assertSame(VoidMuleEvent.getInstance(), result);
     }
 
     @Test

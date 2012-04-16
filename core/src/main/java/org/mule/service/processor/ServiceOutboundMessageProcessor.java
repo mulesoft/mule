@@ -12,6 +12,7 @@ package org.mule.service.processor;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
+import org.mule.VoidMuleEvent;
 import org.mule.RequestContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -52,7 +53,7 @@ public class ServiceOutboundMessageProcessor extends AbstractInterceptingMessage
             return event;
         }
 
-        else if (event != null && !syncNullPayload)
+        else if (event != null && !VoidMuleEvent.getInstance().equals(event) && !syncNullPayload)
         {
             if (!(service.getOutboundMessageProcessor() instanceof OutboundRouterCollection)
                 || (service.getOutboundMessageProcessor() instanceof OutboundRouterCollection && ((OutboundRouterCollection) service.getOutboundMessageProcessor()).hasEndpoints()))
@@ -71,7 +72,7 @@ public class ServiceOutboundMessageProcessor extends AbstractInterceptingMessage
 
                 MuleEvent outboundResult = processNext(outboundEvent);
 
-                if (outboundResult != null)
+                if (outboundResult != null && !VoidMuleEvent.getInstance().equals(outboundResult))
                 {
                     event = outboundResult;
                 }

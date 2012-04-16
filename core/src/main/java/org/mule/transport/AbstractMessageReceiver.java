@@ -13,6 +13,7 @@ package org.mule.transport;
 import org.mule.DefaultMuleEvent;
 import org.mule.OptimizedRequestContext;
 import org.mule.ResponseOutputStream;
+import org.mule.VoidMuleEvent;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
@@ -189,7 +190,9 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
         }
 
         MuleEvent resultEvent = listener.process(muleEvent);
-        if (resultEvent != null && resultEvent.getMessage() != null
+        if (resultEvent != null
+            && !VoidMuleEvent.getInstance().equals(resultEvent)
+            && resultEvent.getMessage() != null
             && resultEvent.getMessage().getExceptionPayload() != null
             && resultEvent.getMessage().getExceptionPayload().getException() instanceof FilterUnacceptedException)
         {
@@ -197,7 +200,8 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
             return muleEvent;
         }
 
-        if (endpoint.getExchangePattern().hasResponse() && resultEvent != null)
+        if (endpoint.getExchangePattern().hasResponse() && resultEvent != null
+            && !VoidMuleEvent.getInstance().equals(resultEvent))
         {
             // Do not propagate security context back to caller
             MuleSession resultSession = new DefaultMuleSession(resultEvent.getSession());

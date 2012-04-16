@@ -9,6 +9,7 @@
  */
 package org.mule.module.ibeans.spi.support;
 
+import org.mule.VoidMuleEvent;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -162,7 +163,7 @@ public class CallOutboundEndpoint extends org.mule.endpoint.DynamicOutboundEndpo
     public MuleEvent process(MuleEvent event) throws MuleException
     {
         MuleEvent result = super.process(event);
-        if (result != null)
+        if (result != null && !VoidMuleEvent.getInstance().equals(result))
         {
             result.getMessage().setProperty(CHANNEL.CALL_URI_PROPERTY, result.getMessageSourceURI().toString(), PropertyScope.OUTBOUND);
         }

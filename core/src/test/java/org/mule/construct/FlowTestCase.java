@@ -10,7 +10,13 @@
 
 package org.mule.construct;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.fail;
+
 import org.mule.MessageExchangePattern;
+import org.mule.VoidMuleEvent;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.processor.MessageProcessor;
@@ -23,11 +29,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.fail;
 
 public class FlowTestCase extends AbstractFlowConstuctTestCase
 {
@@ -79,7 +80,7 @@ public class FlowTestCase extends AbstractFlowConstuctTestCase
             MessageExchangePattern.ONE_WAY, muleContext));
         Thread.sleep(50);
 
-        assertNull(response);
+        assertSame(VoidMuleEvent.getInstance(), response);
 
         assertEquals("helloabc", sensingMessageProcessor.event.getMessageAsString());
         assertNotSame(Thread.currentThread(), sensingMessageProcessor.event.getMessage().getOutboundProperty(

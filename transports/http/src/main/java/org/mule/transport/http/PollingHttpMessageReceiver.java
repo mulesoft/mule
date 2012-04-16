@@ -13,6 +13,7 @@ package org.mule.transport.http;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.MessageExchangePattern;
+import org.mule.VoidMuleEvent;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
@@ -120,7 +121,7 @@ public class PollingHttpMessageReceiver extends AbstractPollingMessageReceiver
 
         MuleEvent result = outboundEndpoint.process(event);
         MuleMessage message = null;
-        if (result != null)
+        if (result != null && !VoidMuleEvent.getInstance().equals(result))
         {
             message = result.getMessage();
         }

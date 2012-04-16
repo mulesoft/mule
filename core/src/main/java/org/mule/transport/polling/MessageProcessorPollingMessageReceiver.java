@@ -12,6 +12,7 @@ package org.mule.transport.polling;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
+import org.mule.VoidMuleEvent;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
@@ -125,7 +126,7 @@ public class MessageProcessorPollingMessageReceiver extends AbstractPollingMessa
     // null and payload is not NullPayload
     protected boolean isNewMessage(MuleEvent sourceEvent)
     {
-        if (sourceEvent != null && sourceEvent.getMessage() != null)
+        if (sourceEvent != null && !VoidMuleEvent.getInstance().equals(sourceEvent) && sourceEvent.getMessage() != null)
         {
             MuleMessage message = sourceEvent.getMessage();
             if (message.getPayload().equals(NullPayload.getInstance()))

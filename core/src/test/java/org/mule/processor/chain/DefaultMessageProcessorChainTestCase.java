@@ -10,8 +10,16 @@
 
 package org.mule.processor.chain;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
+import org.mule.VoidMuleEvent;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.lifecycle.InitialisationException;
@@ -26,12 +34,6 @@ import org.mule.transformer.simple.StringAppendTransformer;
 import org.mule.util.ObjectUtils;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 
 public class DefaultMessageProcessorChainTestCase extends AbstractMuleContextTestCase
 {
@@ -75,7 +77,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleContextTes
     {
         DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
         builder.chain(new AppendingMP("1"), new AppendingMP("2"), new AppendingMP("3"), new ReturnNullMP());
-        assertNull(builder.build().process(getTestEventUsingFlow("0")));
+        assertSame(VoidMuleEvent.getInstance(), builder.build().process(getTestEventUsingFlow("0")));
     }
 
     @Test
@@ -226,7 +228,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleContextTes
             new AppendingMP("1"),
             new DefaultMessageProcessorChainBuilder().chain(new AppendingMP("a"), new AppendingMP("b"),
                 new ReturnNullMP()).build(), new AppendingMP("2"));
-        assertNull(builder.build().process(getTestEventUsingFlow("0")));
+        assertSame(VoidMuleEvent.getInstance(), builder.build().process(getTestEventUsingFlow("0")));
     }
 
     @Test
@@ -520,7 +522,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleContextTes
             {
                 intermediateEvent = next.process(intermediateEvent);
             }
-            if (intermediateEvent != null)
+            if (intermediateEvent != null && !VoidMuleEvent.getInstance().equals(intermediateEvent))
             {
                 return new DefaultMuleEvent(new DefaultMuleMessage(intermediateEvent.getMessageAsString()
                                                                    + "after" + appendString, muleContext),
@@ -552,7 +554,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleContextTes
         {
             this.event = event;
             event.getMessage().setPayload("RUBBISH");
-            return null;
+            return VoidMuleEvent.getInstance();
         }
     }
 
@@ -560,7 +562,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleContextTes
     {
         public MuleEvent process(MuleEvent event) throws MuleException
         {
-            return null;
+            return VoidMuleEvent.getInstance();
         }
     }
 

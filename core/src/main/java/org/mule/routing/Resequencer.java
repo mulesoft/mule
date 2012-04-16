@@ -10,6 +10,7 @@
 
 package org.mule.routing;
 
+import org.mule.VoidMuleEvent;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -73,9 +74,9 @@ public class Resequencer extends AbstractAggregator
     public MuleEvent process(MuleEvent event) throws MuleException
     {
         MuleEvent result = eventCorrelator.process(event);
-        if (result == null)
+        if (!isEventValid(result))
         {
-            return null;
+            return result;
         }
         MuleEvent last = null;
         for (MuleEvent muleEvent : (MuleEvent[]) result.getMessage().getPayload())

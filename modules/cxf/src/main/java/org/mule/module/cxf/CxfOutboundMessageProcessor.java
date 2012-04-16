@@ -10,6 +10,7 @@
 
 package org.mule.module.cxf;
 
+import org.mule.VoidMuleEvent;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -40,7 +41,6 @@ import javax.xml.namespace.QName;
 import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Holder;
 
-import org.apache.commons.httpclient.HttpException;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.frontend.MethodDispatcher;
@@ -379,6 +379,10 @@ public class CxfOutboundMessageProcessor extends AbstractInterceptingMessageProc
         if (transportResponse == null)
         {
             return null;
+        }
+        if (VoidMuleEvent.getInstance().equals(transportResponse))
+        {
+            return transportResponse;
         }
 
         // Otherwise we may have a response!

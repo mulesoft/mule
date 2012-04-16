@@ -12,7 +12,14 @@ package org.mule.service;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.RequestContext;
-import org.mule.api.*;
+import org.mule.VoidMuleEvent;
+import org.mule.api.AnnotatedObject;
+import org.mule.api.DefaultMuleException;
+import org.mule.api.MessagingException;
+import org.mule.api.MuleContext;
+import org.mule.api.MuleEvent;
+import org.mule.api.MuleException;
+import org.mule.api.MuleRuntimeException;
 import org.mule.api.component.Component;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.construct.FlowConstructAware;
@@ -675,7 +682,7 @@ public abstract class AbstractService implements Service, MessageProcessor, Anno
                 public MuleEvent process() throws Exception
                 {
                     MuleEvent result = messageProcessorChain.process(newEvent);
-                    if (result != null)
+                    if (result != null  && !VoidMuleEvent.getInstance().equals(result))
                     {
                         result.getMessage().release();
                         return new DefaultMuleEvent(result, event.getFlowConstruct());

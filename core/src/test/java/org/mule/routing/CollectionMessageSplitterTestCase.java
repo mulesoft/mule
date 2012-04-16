@@ -12,6 +12,7 @@ package org.mule.routing;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -20,6 +21,7 @@ import static org.mockito.Mockito.when;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
+import org.mule.VoidMuleEvent;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
@@ -136,7 +138,7 @@ public class CollectionMessageSplitterTestCase extends AbstractMuleContextTestCa
         CollectionSplitter splitter = new CollectionSplitter();
         splitter.setMuleContext(muleContext);
         DefaultMuleEvent event = new DefaultMuleEvent(toSplit, getTestInboundEndpoint("ep"), fc, session);
-        assertNull(splitter.process(event));
+        assertSame(VoidMuleEvent.getInstance(), splitter.process(event));
     }
 
     @Test

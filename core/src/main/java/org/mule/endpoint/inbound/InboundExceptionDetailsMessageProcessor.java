@@ -10,6 +10,7 @@
 
 package org.mule.endpoint.inbound;
 
+import org.mule.VoidMuleEvent;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
@@ -44,7 +45,7 @@ public class InboundExceptionDetailsMessageProcessor implements MessageProcessor
 
     public MuleEvent process(MuleEvent event) throws MuleException
     {
-        if (event != null)
+        if (event != null && !VoidMuleEvent.getInstance().equals(event))
         {
             MuleMessage resultMessage = event.getMessage();
             if (resultMessage != null)

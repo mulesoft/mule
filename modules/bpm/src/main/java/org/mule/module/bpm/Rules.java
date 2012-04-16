@@ -13,6 +13,7 @@ package org.mule.module.bpm;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.MessageExchangePattern;
+import org.mule.VoidMuleEvent;
 import org.mule.RequestContext;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
@@ -161,7 +162,7 @@ public class Rules implements Initialisable, Disposable, MessageService
         MuleEvent resultEvent = ep.process(event);
         
         MuleMessage response = null;
-        if (resultEvent != null)
+        if (resultEvent != null && !VoidMuleEvent.getInstance().equals(resultEvent))
         {
             response = resultEvent.getMessage();
             if (response.getExceptionPayload() != null)

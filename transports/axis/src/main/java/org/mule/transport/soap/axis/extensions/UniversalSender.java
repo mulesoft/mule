@@ -13,6 +13,7 @@ package org.mule.transport.soap.axis.extensions;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.MessageExchangePattern;
+import org.mule.VoidMuleEvent;
 import org.mule.RequestContext;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
@@ -227,7 +228,7 @@ public class UniversalSender extends BasicHandler
                     MessageExchangePattern.REQUEST_RESPONSE, null, session);
                 MuleMessage result = null;
                 MuleEvent resultEvent = syncEndpoint.process(dispatchEvent);
-                if (resultEvent != null)
+                if (resultEvent != null && !VoidMuleEvent.getInstance().equals(resultEvent))
                 {
                     result = resultEvent.getMessage();
                 }

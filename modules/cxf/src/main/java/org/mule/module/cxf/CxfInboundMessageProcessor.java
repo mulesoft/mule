@@ -10,6 +10,7 @@
 
 package org.mule.module.cxf;
 
+import org.mule.VoidMuleEvent;
 import org.mule.api.DefaultMuleException;
 import org.mule.api.ExceptionPayload;
 import org.mule.api.MuleEvent;
@@ -298,7 +299,8 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
 
             // If there isn't one, there was probably a fault, so use the original
             // event
-            if (responseEvent == null || !event.getExchangePattern().hasResponse())
+            if (responseEvent == null || VoidMuleEvent.getInstance().equals(responseEvent)
+                || !event.getExchangePattern().hasResponse())
             {
                 return null;
             }

@@ -51,7 +51,7 @@ public final class RequestContext
     public static MuleEventContext getEventContext()
     {
         MuleEvent event = getEvent();
-        if (event != null)
+        if (event != null && !VoidMuleEvent.getInstance().equals(event))
         {
             return new DefaultMuleEventContext(event);
         }

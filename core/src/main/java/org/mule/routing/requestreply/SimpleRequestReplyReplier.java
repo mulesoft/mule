@@ -10,6 +10,7 @@
 
 package org.mule.routing.requestreply;
 
+import org.mule.VoidMuleEvent;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.processor.MessageProcessor;
@@ -25,7 +26,7 @@ public class SimpleRequestReplyReplier extends AbstractInterceptingMessageProces
     public MuleEvent process(MuleEvent event) throws MuleException
     {
         replyMessageProcessor.process(processNext(event));
-        return null;
+        return VoidMuleEvent.getInstance();
     }
 
     public void setReplyProcessor(MessageProcessor replyMessageProcessor)

@@ -13,6 +13,7 @@ package org.mule.module.jca;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.MessageExchangePattern;
+import org.mule.VoidMuleEvent;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -104,7 +105,7 @@ public class DefaultMuleConnection implements MuleConnection
         try
         {
             MuleEvent resultEvent = endpoint.process(event);
-            if (resultEvent != null)
+            if (resultEvent != null && !VoidMuleEvent.getInstance().equals(resultEvent))
             {
                 return resultEvent.getMessage();
             }

@@ -10,6 +10,7 @@
 
 package org.mule.routing.outbound;
 
+import org.mule.VoidMuleEvent;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
@@ -128,7 +129,7 @@ public class EndpointSelector extends FilteringOutboundRouter
                             endpointName), event, null);
                 }
                 MuleEvent result = sendRequest(event, message, ep, true);
-                if (result != null)
+                if (result != null && !VoidMuleEvent.getInstance().equals(result))
                 {
                     results.add(result);
                 }

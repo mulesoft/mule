@@ -10,11 +10,9 @@
 
 package org.mule.routing;
 
-import java.io.Serializable;
-import java.util.concurrent.TimeUnit;
-
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
+import org.mule.VoidMuleEvent;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -36,6 +34,9 @@ import org.mule.retry.policies.SimpleRetryPolicyTemplate;
 import org.mule.routing.filters.ExpressionFilter;
 import org.mule.routing.outbound.AbstractOutboundRouter;
 import org.mule.util.SystemUtils;
+
+import java.io.Serializable;
+import java.util.concurrent.TimeUnit;
 
 /**
  * UntilSuccessful attempts to route a message to the message processor it contains in an asynchronous manner. Routing
@@ -210,7 +211,7 @@ public class UntilSuccessful extends AbstractOutboundRouter
 
             if (ackExpression == null)
             {
-                return null;
+                return VoidMuleEvent.getInstance();
             }
 
             final Object ackResponsePayload = muleContext.getExpressionManager().evaluate(ackExpression,
@@ -384,7 +385,7 @@ public class UntilSuccessful extends AbstractOutboundRouter
             throw new MuleRuntimeException(me);
         }
 
-        if (returnEvent == null)
+        if (returnEvent == null || VoidMuleEvent.getInstance().equals(returnEvent))
         {
             return;
         }

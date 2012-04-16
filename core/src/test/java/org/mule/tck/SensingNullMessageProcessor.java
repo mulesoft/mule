@@ -10,6 +10,7 @@
 
 package org.mule.tck;
 
+import org.mule.VoidMuleEvent;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.processor.MessageProcessor;
@@ -51,7 +52,7 @@ public class SensingNullMessageProcessor implements MessageProcessor
             }
             else
             {
-                return null;
+                return VoidMuleEvent.getInstance();
             }
         }
     }

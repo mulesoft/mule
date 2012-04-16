@@ -12,6 +12,7 @@ package org.mule.processor.chain;
 
 import org.mule.MessageExchangePattern;
 import org.mule.OptimizedRequestContext;
+import org.mule.VoidMuleEvent;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -32,7 +33,7 @@ import java.util.List;
 
 public class DefaultMessageProcessorChain extends AbstractMessageProcessorChain
 {
-    private MessageProcessorExecutionTemplate messageProcessorExecutionTemplate = MessageProcessorExecutionTemplate.createExecutionTemplate();
+    protected MessageProcessorExecutionTemplate messageProcessorExecutionTemplate = MessageProcessorExecutionTemplate.createExecutionTemplate();
     
     protected DefaultMessageProcessorChain(List<MessageProcessor> processors)
     {   
@@ -90,13 +91,12 @@ public class DefaultMessageProcessorChain extends AbstractMessageProcessorChain
                 nextProcessor = processorIterator.next();
             }
             
-            if (flowConstruct instanceof Flow && nextProcessor != null
-                    && processorMayReturnNull(processor))
+            if (flowConstruct instanceof Flow && nextProcessor != null && processorMayReturnNull(processor))
             {
                 copy = OptimizedRequestContext.criticalSetEvent(currentEvent);
             }
-            
-            resultEvent = messageProcessorExecutionTemplate.execute(processor,currentEvent);
+
+            resultEvent = messageProcessorExecutionTemplate.execute(processor, currentEvent);
 
             if (resultWasNull && processor instanceof RequestReplyReplierMessageProcessor)
             {
@@ -104,31 +104,38 @@ public class DefaultMessageProcessorChain extends AbstractMessageProcessorChain
                 resultEvent = null;
             }
 
-            if (resultEvent != null)
+            if (resultEvent != null && !VoidMuleEvent.getInstance().equals(resultEvent))
             {
                 resultWasNull = false;
                 currentEvent = resultEvent;
             }
-            else if (flowConstruct instanceof Flow && nextProcessor != null)
+            else if (VoidMuleEvent.getInstance().equals(resultEvent))
             {
-                resultWasNull = true;
-                // // In a flow when a MessageProcessor returns null the next
-                // processor acts as an implicit
-                // // branch receiving a copy of the message used for previous
-                // MessageProcessor
-                if (copy != null)
+                if (flowConstruct instanceof Flow && nextProcessor != null)
                 {
-                    currentEvent = copy;
+                    resultWasNull = true;
+                    // // In a flow when a MessageProcessor returns null the next
+                    // processor acts as an implicit
+                    // // branch receiving a copy of the message used for previous
+                    // MessageProcessor
+                    if (copy != null)
+                    {
+                        currentEvent = copy;
+                    }
+                    else
+                    {
+                        // this should not happen
+                        currentEvent = OptimizedRequestContext.criticalSetEvent(currentEvent);
+                    }
                 }
                 else
                 {
-                    // this should not happen
-                    currentEvent = OptimizedRequestContext.criticalSetEvent(currentEvent);
+                    // But in a service we don't do any implicit branching.
+                    return VoidMuleEvent.getInstance();
                 }
             }
-            else
+            else if (resultEvent == null)
             {
-                // But in a service we don't do any implicit branching.
                 return null;
             }
             processor = nextProcessor;
