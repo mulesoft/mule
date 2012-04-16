@@ -11,6 +11,7 @@
 package org.mule.processor;
 
 import org.mule.DefaultMuleEvent;
+import org.mule.VoidMuleEvent;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -113,7 +114,7 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
                 (MuleMessage)((ThreadSafeAccess)event.getMessage()).newThreadCopy(), event, false);
             target.process(newEvent);
         }
-        return event;
+        return VoidMuleEvent.getInstance();
     }
 
     public void setDelegate(MessageProcessor delegate)
