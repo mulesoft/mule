@@ -44,6 +44,8 @@ public class ClusterizableMessageSourceWrapper implements MessageSource, Lifecyc
     private final ClusterizableMessageSource messageSource;
     private MuleContext muleContext;
     private FlowConstruct flowConstruct;
+    private final Object lock = new Object();
+    private boolean started;
 
     public ClusterizableMessageSourceWrapper(ClusterizableMessageSource messageSource)
     {
@@ -77,21 +79,29 @@ public class ClusterizableMessageSourceWrapper implements MessageSource, Lifecyc
     @Override
     public void start() throws MuleException
     {
-        if (messageSource instanceof Startable)
+        synchronized (lock)
         {
-            if (muleContext.isPrimaryPollingInstance())
+            if (!started)
             {
-                if (logger.isInfoEnabled())
+                if (messageSource instanceof Startable)
                 {
-                    logger.info("Starting clusterizable message source");
-                }
-                ((Startable) messageSource).start();
-            }
-            else
-            {
-                if (logger.isDebugEnabled())
-                {
-                    logger.debug("Clusterizable message source no started on secondary cluster node");
+                    if (muleContext.isPrimaryPollingInstance())
+                    {
+                        if (logger.isInfoEnabled())
+                        {
+                            logger.info("Starting clusterizable message source");
+                        }
+                        ((Startable) messageSource).start();
+
+                        started = true;
+                    }
+                    else
+                    {
+                        if (logger.isDebugEnabled())
+                        {
+                            logger.debug("Clusterizable message source no started on secondary cluster node");
+                        }
+                    }
                 }
             }
         }
@@ -100,11 +110,16 @@ public class ClusterizableMessageSourceWrapper implements MessageSource, Lifecyc
     @Override
     public void stop() throws MuleException
     {
-        unregisterNotificationListener();
-
-        if (messageSource instanceof Stoppable)
+        synchronized (lock)
         {
-            ((Stoppable) messageSource).stop();
+            if (started)
+            {
+                if (messageSource instanceof Stoppable)
+                {
+                    ((Stoppable) messageSource).stop();
+                }
+                started = false;
+            }
         }
     }
 
@@ -115,6 +130,8 @@ public class ClusterizableMessageSourceWrapper implements MessageSource, Lifecyc
         {
             ((Disposable) messageSource).dispose();
         }
+
+        unregisterNotificationListener();
     }
 
     @Override
