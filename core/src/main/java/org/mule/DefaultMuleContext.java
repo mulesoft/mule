@@ -59,9 +59,11 @@ import org.mule.transport.DefaultPollingController;
 import org.mule.transport.PollingController;
 import org.mule.util.ApplicationShutdownSplashScreen;
 import org.mule.util.ApplicationStartupSplashScreen;
+import org.mule.util.JdkVersionUtils;
 import org.mule.util.ServerShutdownSplashScreen;
 import org.mule.util.ServerStartupSplashScreen;
 import org.mule.util.SplashScreen;
+import org.mule.util.SystemUtils;
 import org.mule.util.UUID;
 import org.mule.util.queue.QueueManager;
 
@@ -183,6 +185,16 @@ public class DefaultMuleContext implements MuleContext
         if (workManager == null)
         {
             throw new MuleRuntimeException(CoreMessages.objectIsNull("workManager"));
+        }
+        
+        try
+        {
+        	JdkVersionUtils.validateJdk();
+        }
+        catch (RuntimeException e)
+        {
+        	throw new InitialisationException(CoreMessages.invalidJdk(SystemUtils.JAVA_VERSION, 
+        			SystemUtils.JAVA_VENDOR, JdkVersionUtils.getSupportedJdks()), this);
         }
 
         try

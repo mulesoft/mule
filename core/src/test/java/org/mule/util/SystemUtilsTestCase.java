@@ -16,6 +16,7 @@ import org.mule.tck.size.SmallTest;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
 
 import org.junit.Test;
 

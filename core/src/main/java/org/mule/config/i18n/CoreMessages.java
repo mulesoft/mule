@@ -1384,4 +1384,9 @@ public class CoreMessages extends MessageFactory
         return factory.createMessage(BUNDLE_PATH, 340);
     }
 
+    public static Message invalidJdk(String jdkVersion, String jdkVendor, String validJdks)
+    {
+        return factory.createMessage(BUNDLE_PATH, 341, jdkVersion, jdkVendor, validJdks);
+    }
+
 }

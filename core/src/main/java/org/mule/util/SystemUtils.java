@@ -164,6 +164,9 @@ public class SystemUtils extends org.apache.commons.lang.SystemUtils
     {
         return SystemUtils.JAVA_VM_VENDOR.toUpperCase().indexOf("IBM") != -1;
     }
+    
+    public static final boolean IS_JAVA_1_7 = (JAVA_VERSION_TRIMMED != null) 
+    		&& JAVA_VERSION_TRIMMED.startsWith("1.7");
 
     // TODO MULE-1947 Command-line arguments should be handled exclusively by the bootloader
 
