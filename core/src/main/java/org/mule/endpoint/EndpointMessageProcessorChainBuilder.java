@@ -14,9 +14,9 @@ import org.mule.api.MuleException;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.processor.MessageProcessor;
-import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
+import org.mule.processor.chain.SimpleMessageProcessorChainBuilder;
 
-public class EndpointMessageProcessorChainBuilder extends DefaultMessageProcessorChainBuilder
+public class EndpointMessageProcessorChainBuilder extends SimpleMessageProcessorChainBuilder
 {
 
     protected ImmutableEndpoint endpoint;

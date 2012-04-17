@@ -22,6 +22,9 @@
             </when>
             <when expression="org.mule.tck.testmodels.fruit.Banana" evaluator="payload-type">
                 <vm:outbound-endpoint path="service2.queue" exchange-pattern="one-way"/>
+                <message-filter>
+                	<expression-filter expression="false"/>
+                </message-filter>
             </when>
             <when expression="org.mule.tck.testmodels.fruit.Orange" evaluator="payload-type">
                 <vm:outbound-endpoint path="service3.queue" exchange-pattern="request-response"/>

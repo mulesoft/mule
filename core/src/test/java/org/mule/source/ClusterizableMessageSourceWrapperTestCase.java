@@ -61,8 +61,20 @@ public class ClusterizableMessageSourceWrapperTestCase extends AbstractMuleTestC
     }
 
     @Test
+    public void ignoresStopIfNoStarted() throws Exception
+    {
+        wrapper.stop();
+
+        verify(messageSource, times(0)).stop();
+    }
+
+    @Test
     public void delegatesStop() throws Exception
     {
+        when(muleContext.isPrimaryPollingInstance()).thenReturn(true);
+        wrapper.setMuleContext(muleContext);
+
+        wrapper.start();
         wrapper.stop();
 
         verify(messageSource, times(1)).stop();
@@ -135,13 +147,24 @@ public class ClusterizableMessageSourceWrapperTestCase extends AbstractMuleTestC
     }
 
     @Test
-    public void unregistersListenerOnStop() throws Exception
+    public void ignoresStartWhenWrappedMessageSourceIsAlreadyStarted() throws Exception
+    {
+        when(muleContext.isPrimaryPollingInstance()).thenReturn(true);
+        wrapper.setMuleContext(muleContext);
+
+        wrapper.start();
+        wrapper.start();
+
+        verify(messageSource, times(1)).start();
+    }
+
+    @Test
+    public void unregistersListenerOnDispose() throws Exception
     {
         wrapper.setMuleContext(muleContext);
 
-        wrapper.stop();
+        wrapper.dispose();
 
-        verify(messageSource, times(1)).stop();
         verify(muleContext, times(1)).unregisterListener(wrapper);
     }
 

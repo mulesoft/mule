@@ -13,11 +13,13 @@ package org.mule.processor.chain;
 import org.mule.MessageExchangePattern;
 import org.mule.OptimizedRequestContext;
 import org.mule.VoidMuleEvent;
+import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.component.Component;
 import org.mule.api.construct.FlowConstruct;
+import org.mule.api.construct.Pipeline;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorChain;
@@ -34,9 +36,9 @@ import java.util.List;
 public class DefaultMessageProcessorChain extends AbstractMessageProcessorChain
 {
     protected MessageProcessorExecutionTemplate messageProcessorExecutionTemplate = MessageProcessorExecutionTemplate.createExecutionTemplate();
-    
+
     protected DefaultMessageProcessorChain(List<MessageProcessor> processors)
-    {   
+    {
         super(null, processors);
     }
 
@@ -69,8 +71,53 @@ public class DefaultMessageProcessorChain extends AbstractMessageProcessorChain
     {
         return new DefaultMessageProcessorChainBuilder().chain(messageProcessors).build();
     }
-    
+
     protected MuleEvent doProcess(MuleEvent event) throws MuleException
+    {
+        if (muleContext != null && muleContext.getConfiguration().isFlowEndingWithOneWayEndpointReturnsNull())
+        {
+            return doProcessFlowEndingWithOneWayEndpointReturnsNull(event);
+        }
+        else
+        {
+            FlowConstruct flowConstruct = event.getFlowConstruct();
+            MuleEvent copy = null;
+            for (int i = 0; i < processors.size(); i++)
+            {
+                MessageProcessor processor = processors.get(i);
+                if (flowConstruct instanceof Flow && processorMayReturnNull(processor))
+                {
+                    copy = OptimizedRequestContext.criticalSetEvent(event);
+                }
+
+                event = messageProcessorExecutionTemplate.execute(processor, event);
+
+                if (VoidMuleEvent.getInstance().equals(event))
+                {
+                    if (flowConstruct instanceof Pipeline)
+                    {
+                        event = copy;
+                    }
+                    else
+                    {
+                        // But in a service we don't do any implicit branching.
+                        return null;
+                    }
+                }
+                else if (event == null)
+                {
+                    return null;
+                }
+            }
+            return event;
+        }
+    }
+
+    /*
+     * Using old implementation 100% as is.
+     */
+    private MuleEvent doProcessFlowEndingWithOneWayEndpointReturnsNull(MuleEvent event)
+        throws MessagingException
     {
         FlowConstruct flowConstruct = event.getFlowConstruct();
         MuleEvent currentEvent = event;
@@ -90,7 +137,7 @@ public class DefaultMessageProcessorChain extends AbstractMessageProcessorChain
             {
                 nextProcessor = processorIterator.next();
             }
-            
+
             if (flowConstruct instanceof Flow && nextProcessor != null && processorMayReturnNull(processor))
             {
                 copy = OptimizedRequestContext.criticalSetEvent(currentEvent);

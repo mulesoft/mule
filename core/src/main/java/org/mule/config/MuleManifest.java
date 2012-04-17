@@ -97,6 +97,16 @@ public class MuleManifest
         return getManifestProperty("Dev-List-Email");
     }
 
+	public static String getSupportedJdks()
+	{
+		return getManifestProperty("Supported-Jdks");
+	}
+
+	public static String getRecommndedJdks()
+	{
+		return getManifestProperty("Recommended-Jdks");
+	}
+
     public static Manifest getManifest()
     {
         if (manifest == null)
@@ -120,6 +130,20 @@ public class MuleManifest
                             {
                                 URL url = e.nextElement();
                                 if ((url.toExternalForm().indexOf("mule-core") > -1 && url.toExternalForm()
+                                    .indexOf("tests.jar") < 0)
+                                    || url.toExternalForm().matches(".*mule.*-.*-embedded.*\\.jar.*"))
+                                {
+                                    return url;
+                                }
+                            }
+                            // if we haven't found a valid manifest yet, maybe we're running tests
+                            String pathSeparator = System.getProperty("file.separator");
+                            String testManifestPath = "core" + pathSeparator + "target" + pathSeparator + "test-classes";
+                            e = MuleConfiguration.class.getClassLoader().getResources("META-INF/MANIFEST.MF");
+                            while (e.hasMoreElements())
+                            {
+                                URL url = e.nextElement();
+                                if ((url.toExternalForm().indexOf(testManifestPath) > -1 && url.toExternalForm()
                                     .indexOf("tests.jar") < 0)
                                     || url.toExternalForm().matches(".*mule.*-.*-embedded.*\\.jar.*"))
                                 {

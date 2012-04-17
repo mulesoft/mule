@@ -28,6 +28,7 @@ import org.mule.context.DefaultMuleContextBuilder;
 import org.mule.context.DefaultMuleContextFactory;
 import org.mule.util.ClassUtils;
 import org.mule.util.IOUtils;
+import org.mule.util.JdkVersionUtils;
 import org.mule.util.MuleUrlStreamHandlerFactory;
 import org.mule.util.PropertiesUtils;
 import org.mule.util.StringMessageUtils;
@@ -165,6 +166,18 @@ public class MuleServer implements Runnable
 
     protected void init(String[] args) throws IllegalArgumentException
     {
+    	// validate the JDK version/vendor
+    	try
+    	{
+    		JdkVersionUtils.validateJdk();
+    	}
+    	catch (RuntimeException e)
+    	{
+    		System.out.println(CoreMessages.invalidJdk(SystemUtils.JAVA_VERSION, SystemUtils.JAVA_VENDOR, 
+    				JdkVersionUtils.getSupportedJdks()));
+            System.exit(-1);
+    	}
+    	
         Map<String, Object> commandlineOptions;
 
         try

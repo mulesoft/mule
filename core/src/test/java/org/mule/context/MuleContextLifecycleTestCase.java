@@ -16,6 +16,7 @@ import org.mule.api.context.MuleContextBuilder;
 import org.mule.api.context.notification.MuleContextNotificationListener;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
+import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.LifecycleException;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
@@ -23,6 +24,7 @@ import org.mule.api.security.SecurityManager;
 import org.mule.config.builders.DefaultsConfigurationBuilder;
 import org.mule.context.notification.MuleContextNotification;
 import org.mule.lifecycle.MuleContextLifecycleManager;
+import org.mule.util.JdkVersionUtils;
 import org.mule.util.UUID;
 import org.mule.util.queue.QueueManager;
 
@@ -41,6 +43,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import static org.mule.tck.MuleAssert.assertTrue;
 
 public class MuleContextLifecycleTestCase 
@@ -452,5 +455,45 @@ public class MuleContextLifecycleTestCase
                     break;
             }
         }
+    }
+    
+    @Test(expected=InitialisationException.class)
+    public void testIsInValidJdk() throws InitialisationException
+    {
+    	try
+    	{
+    		JdkVersionUtils.validateJdk();
+    	}
+    	catch (RuntimeException e)
+    	{
+    		fail("Jdk version or vendor is invalid. Update the valid versions");
+    	}
+    	
+    	String javaVersion = System.setProperty("java.version", "1.5.0_12");
+    	try
+    	{
+	    	try
+	    	{
+	    		JdkVersionUtils.validateJdk();
+	    		fail("Test is invalid because the Jdk version or vendor is supposed to now be invalid");
+	    	}
+	    	catch (RuntimeException e)
+	    	{
+	    		// expected
+	    	}
+	    	
+	        MuleContext ctx = ctxBuilder.buildMuleContext();
+	        assertFalse(ctx.isInitialised());
+	        assertFalse(ctx.isInitialising());
+	        assertFalse(ctx.isStarted());
+	        assertFalse(ctx.isDisposed());
+	        assertFalse(ctx.isDisposing());
+	
+	        ctx.initialise();
+    	}
+    	finally
+    	{
+    		System.setProperty("java.version", javaVersion);
+    	}
     }
 }

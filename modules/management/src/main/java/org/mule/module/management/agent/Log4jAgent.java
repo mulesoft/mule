@@ -82,7 +82,10 @@ public class Log4jAgent extends AbstractAgent
             for (ObjectInstance objectInstance : log4jMBeans)
             {
                 ObjectName theName = objectInstance.getObjectName();
-                mBeanServer.unregisterMBean(theName);
+                if (mBeanServer.isRegistered(theName))
+                {
+                    mBeanServer.unregisterMBean(theName);
+                }
             }
         }
     }

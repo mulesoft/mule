@@ -10,6 +10,14 @@
 
 package org.mule.test.construct;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+import org.mule.VoidMuleEvent;
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -28,13 +36,6 @@ import org.mule.transport.vm.VMMessageDispatcherFactory;
 import org.mule.transport.vm.VMMessageReceiver;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 public class FlowDefaultProcessingStrategyTestCase extends FunctionalTestCase
 {
@@ -149,7 +150,7 @@ public class FlowDefaultProcessingStrategyTestCase extends FunctionalTestCase
         MuleClient client = muleContext.getClient();
 
         MuleMessage response = client.send("vm://requestresponse-oneway-in", "a", null);
-        assertNull(response);
+        assertEquals("a", response.getPayload());
 
         MuleMessage result = client.request("vm://requestresponse-oneway-out", RECEIVE_TIMEOUT);
 
@@ -268,7 +269,9 @@ public class FlowDefaultProcessingStrategyTestCase extends FunctionalTestCase
             {
                 message.setOutboundProperty("receiver-thread", Thread.currentThread().getName());
                 MuleEvent event = routeMessage(message);
-                MuleMessage returnedMessage = event == null ? null : event.getMessage();
+                MuleMessage returnedMessage = (event == null || VoidMuleEvent.getInstance().equals(event))
+                                                                                                          ? null
+                                                                                                          : event.getMessage();
                 /**
                  * if (returnedMessage != null) { returnedMessage = returnedMessage.createInboundMessage(); }
                  **/

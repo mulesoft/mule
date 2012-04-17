@@ -35,15 +35,4 @@ public class OneWayOutboundReturningEventTestCase extends OneWayOutboundTestCase
         assertEquals("TEST processed", response.getPayload());
     }
 
-    @Override
-    public void oneWayOutboundAfterComponent() throws Exception
-    {
-        // Overrides test just to ignore it
-    }
-
-    @Override
-    public void oneWayOutbound() throws Exception
-    {
-        // Overrides test just to ignore it
-    }
 }
