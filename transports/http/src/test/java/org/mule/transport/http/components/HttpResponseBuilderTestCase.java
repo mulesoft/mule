@@ -14,6 +14,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -158,8 +159,12 @@ public class HttpResponseBuilderTestCase extends AbstractMuleTestCase
         headers.put("Location", HEADER_LOCATION);
         httpResponseBuilder.setHeaders(headers);
 
+        when(mockExpressionManager.parse("Cache-Control", mockMuleMessage)).thenReturn("Cache-Control");
+        when(mockExpressionManager.parse("Expires", mockMuleMessage)).thenReturn("Expires");
+        when(mockExpressionManager.parse("Location", mockMuleMessage)).thenReturn("Location");
         when(mockExpressionManager.parse(HEADER_CACHE_CONTROL, mockMuleMessage)).thenReturn("max-age=3600");
-        when(mockExpressionManager.parse(HEADER_EXPIRES, mockMuleMessage)).thenReturn("Thu, 01 Dec 1994 16:00:00 GMT");
+        when(mockExpressionManager.isExpression(HEADER_EXPIRES)).thenReturn(true);
+        when(mockExpressionManager.evaluate(HEADER_EXPIRES, mockMuleMessage)).thenReturn("Thu, 01 Dec 1994 16:00:00 GMT");
         when(mockExpressionManager.parse(HEADER_LOCATION, mockMuleMessage)).thenReturn("http://localhost:8080");
 
         HttpResponse response = new HttpResponse();
@@ -435,6 +440,7 @@ public class HttpResponseBuilderTestCase extends AbstractMuleTestCase
 
         Date now = new Date();
 
+        when(mockExpressionManager.parse("Expires", mockMuleMessage)).thenReturn("Expires");
         when(mockExpressionManager.isExpression("#[now]")).thenReturn(true);
         when(mockExpressionManager.evaluate("#[now]", mockMuleMessage)).thenReturn(now);
 
@@ -520,8 +526,10 @@ public class HttpResponseBuilderTestCase extends AbstractMuleTestCase
             if(headerName.equals(header.getName()))
             {
                 assertEquals(expectedValue, header.getValue());
+                return;
             }
         }
+        fail(String.format("Didn't find header: %s=%s", headerName, expectedValue));
     }
 
     private void mockParse()
