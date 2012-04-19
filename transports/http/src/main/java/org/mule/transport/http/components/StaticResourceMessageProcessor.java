@@ -46,6 +46,7 @@ public class StaticResourceMessageProcessor implements MessageProcessor, Initial
     private String defaultFile = "index.html";
     private MimetypesFileTypeMap mimeTypes;
 
+    @Override
     public void initialise() throws InitialisationException
     {
         mimeTypes = new MimetypesFileTypeMap();
@@ -53,6 +54,7 @@ public class StaticResourceMessageProcessor implements MessageProcessor, Initial
         mimeTypes.addMimeTypes("text/css css");
     }
 
+    @Override
     public MuleEvent process(MuleEvent event) throws MuleException
     {
         if (StringUtils.isEmpty(resourceBase))
@@ -84,27 +86,17 @@ public class StaticResourceMessageProcessor implements MessageProcessor, Initial
             return resultEvent;
         }
 
-
         InputStream in = null;
         try
         {
             in = new FileInputStream(file);
-            byte[] buffer;
-
-            if (in == null)
-            {
-                resultEvent = new DefaultMuleEvent(new DefaultMuleMessage(NullPayload.getInstance(), event.getMuleContext()), event);
-                resultEvent.getMessage().setOutboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, String.valueOf(HttpConstants.SC_NOT_FOUND));
-                return resultEvent;
-            }
 
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             IOUtils.copyLarge(in, baos);
 
-            buffer = baos.toByteArray();
+            byte[] buffer = baos.toByteArray();
 
             String mimetype = mimeTypes.getContentType(file);
-
             if (mimetype == null)
             {
                 mimetype = DEFAULT_MIME_TYPE;
@@ -114,13 +106,11 @@ public class StaticResourceMessageProcessor implements MessageProcessor, Initial
             resultEvent.getMessage().setOutboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, String.valueOf(HttpConstants.SC_OK));
             resultEvent.getMessage().setOutboundProperty(HttpConstants.HEADER_CONTENT_TYPE, mimetype);
             resultEvent.getMessage().setOutboundProperty(HttpConstants.HEADER_CONTENT_LENGTH, buffer.length);
-
-
-        } catch (IOException e)
+        }
+        catch (IOException e)
         {
             throw new ResourceNotFoundException(HttpMessages.fileNotFound(resourceBase + path),event);
         }
-
 
         return resultEvent;
     }
