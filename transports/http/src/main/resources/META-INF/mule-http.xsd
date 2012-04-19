@@ -388,6 +388,7 @@
             <xsd:enumeration value="OPTIONS"/>
             <xsd:enumeration value="GET"/>
             <xsd:enumeration value="HEAD"/>
+            <xsd:enumeration value="PATCH"/>
             <xsd:enumeration value="POST"/>
             <xsd:enumeration value="PUT"/>
             <xsd:enumeration value="TRACE"/>

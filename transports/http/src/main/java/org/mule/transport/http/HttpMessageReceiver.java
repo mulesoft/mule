@@ -43,9 +43,7 @@ import org.mule.util.monitor.Expirable;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.SocketAddress;
-import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import javax.resource.spi.work.Work;
@@ -253,7 +251,8 @@ public class HttpMessageReceiver extends TcpMessageReceiver
                     || method.equals(HttpConstants.METHOD_PUT)
                     || method.equals(HttpConstants.METHOD_DELETE)
                     || method.equals(HttpConstants.METHOD_TRACE)
-                    || method.equals(HttpConstants.METHOD_CONNECT))
+                    || method.equals(HttpConstants.METHOD_CONNECT)
+                    || method.equals(HttpConstants.METHOD_PATCH))
             {
                 return doRequest(request);
             }

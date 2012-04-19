@@ -54,15 +54,15 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
      */
     public static final int ERROR_STATUS_CODE_RANGE_START = 400;
     public static final int REDIRECT_STATUS_CODE_RANGE_START = 300;
-    protected final HttpConnector connector;
+    protected final HttpConnector httpConnector;
     private volatile HttpClient client = null;
     private final Transformer sendTransformer;
 
     public HttpClientMessageDispatcher(OutboundEndpoint endpoint)
     {
         super(endpoint);
-        this.connector = (HttpConnector) endpoint.getConnector();
-        List<Transformer> ts = connector.getDefaultOutboundTransformers(null);
+        this.httpConnector = (HttpConnector) endpoint.getConnector();
+        List<Transformer> ts = httpConnector.getDefaultOutboundTransformers(null);
         if (ts.size() == 1)
         {
             this.sendTransformer = ts.get(0);
@@ -70,7 +70,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
         else if (ts.size() == 0)
         {
             this.sendTransformer = new ObjectToHttpClientMethodRequest();
-            this.sendTransformer.setMuleContext(connector.getMuleContext());
+            this.sendTransformer.setMuleContext(httpConnector.getMuleContext());
             this.sendTransformer.setEndpoint(endpoint);
         }
         else
@@ -91,7 +91,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
     {
         if (client == null)
         {
-            client = connector.doClientConnect();
+            client = httpConnector.doClientConnect();
         }
     }
 
@@ -105,7 +105,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
     protected void doDispatch(MuleEvent event) throws Exception
     {
         HttpMethod httpMethod = getMethod(event);
-        connector.setupClientAuthorization(event, httpMethod, client, endpoint);
+        httpConnector.setupClientAuthorization(event, httpMethod, client, endpoint);
 
         try
         {
@@ -196,7 +196,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
         // here is ok even though it is not ideal.
         client.getHttpConnectionManager().getParams().setConnectionTimeout(endpoint.getResponseTimeout());
         client.getHttpConnectionManager().getParams().setSoTimeout(endpoint.getResponseTimeout());
-        
+
         MuleMessage msg = event.getMessage();
         setPropertyFromEndpoint(event, msg, HttpConnector.HTTP_CUSTOM_HEADERS_MAP_PROPERTY);
 
@@ -262,7 +262,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
     protected MuleMessage doSend(MuleEvent event) throws Exception
     {
         HttpMethod httpMethod = getMethod(event);
-        connector.setupClientAuthorization(event, httpMethod, client, endpoint);
+        httpConnector.setupClientAuthorization(event, httpMethod, client, endpoint);
 
         httpMethod.getParams().setParameter(HttpMethodParams.RETRY_HANDLER, new MuleHttpMethodRetryHandler());
         boolean releaseConn = false;
@@ -327,7 +327,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
             throw new HttpResponseException(method.getStatusText(), method.getStatusCode());
         }
         OutboundEndpoint out = new EndpointURIEndpointBuilder(locationHeader.getValue(),
-            connector.getMuleContext()).buildOutboundEndpoint();
+            httpConnector.getMuleContext()).buildOutboundEndpoint();
         MuleEvent result = out.process(event);
         if (result != null)
         {
@@ -358,7 +358,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
         String disableCheck = event.getMessage().getInvocationProperty(HttpConnector.HTTP_DISABLE_STATUS_CODE_EXCEPTION_CHECK);
         if (disableCheck == null)
         {
-            disableCheck = event.getMessage().getOutboundProperty(HttpConnector.HTTP_DISABLE_STATUS_CODE_EXCEPTION_CHECK); 
+            disableCheck = event.getMessage().getOutboundProperty(HttpConnector.HTTP_DISABLE_STATUS_CODE_EXCEPTION_CHECK);
         }
         return httpMethod.getStatusCode() >= ERROR_STATUS_CODE_RANGE_START
                 && !BooleanUtils.toBoolean(disableCheck);
@@ -372,10 +372,10 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
         int port = uri.getPort();
         HostConfiguration config = new HostConfiguration();
         config.setHost(host, port, protocol);
-        if (StringUtils.isNotBlank(connector.getProxyHostname()))
+        if (StringUtils.isNotBlank(httpConnector.getProxyHostname()))
         {
             // add proxy support
-            config.setProxy(connector.getProxyHostname(), connector.getProxyPort());
+            config.setProxy(httpConnector.getProxyHostname(), httpConnector.getProxyPort());
         }
         return config;
     }

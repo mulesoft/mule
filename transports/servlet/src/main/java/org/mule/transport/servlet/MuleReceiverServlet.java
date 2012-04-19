@@ -24,6 +24,7 @@ import org.mule.endpoint.DynamicURIInboundEndpoint;
 import org.mule.endpoint.MuleEndpointURI;
 import org.mule.routing.filters.WildcardFilter;
 import org.mule.transport.http.HttpConnector;
+import org.mule.transport.http.HttpConstants;
 import org.mule.transport.http.HttpMessageReceiver;
 import org.mule.transport.http.i18n.HttpMessages;
 import org.mule.transport.service.TransportFactory;
@@ -51,7 +52,7 @@ public class MuleReceiverServlet extends AbstractReceiverServlet
     private static final long serialVersionUID = 6631307373079767439L;
 
     protected ServletConnector connector = null;
-    
+
     private boolean useCachedHttpServletRequest = false;
 
     @Override
@@ -157,24 +158,45 @@ public class MuleReceiverServlet extends AbstractReceiverServlet
     {
         // template method
     }
-    
+
+
+    // The service() method cannot be overriden blindly as explained below.
+    //
+    // Until we use a version of the servlet spec that supports the PATCH method, we
+    // have to override service() nevertheless to avoid super's implementation
+    // barfing on a PATCH request.
+    @Override
+    protected void service(HttpServletRequest request, HttpServletResponse response)
+        throws ServletException, IOException
+    {
+        String method = request.getMethod();
+        if (method.equalsIgnoreCase(HttpConstants.METHOD_PATCH))
+        {
+            doAllMethods(request, response);
+        }
+        else
+        {
+            super.service(request, response);
+        }
+    }
+
     // We cannot override the service method and maintain MuleRESTServletReceiver
     // functionality. See MULE-4806.
-    
+
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
         throws ServletException, IOException
     {
         doAllMethods(req, resp);
     }
-    
+
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
         throws ServletException, IOException
     {
         doAllMethods(req, resp);
     }
-    
+
     @Override
     protected void doHead(HttpServletRequest req, HttpServletResponse resp)
         throws ServletException, IOException
@@ -216,7 +238,7 @@ public class MuleReceiverServlet extends AbstractReceiverServlet
                 request = new CachedHttpServletRequest(request);
             }
             MessageReceiver receiver = getReceiverForURI(request);
-            
+
             MuleMessage requestMessage = receiver.createMuleMessage(request);
             requestMessage.setProperty(HttpConnector.HTTP_METHOD_PROPERTY, request.getMethod(), PropertyScope.INBOUND);
 
@@ -317,13 +339,13 @@ public class MuleReceiverServlet extends AbstractReceiverServlet
         url.append(":");
         url.append(httpServletRequest.getServerPort());
         url.append(httpServletRequest.getServletPath());
-        
+
         String pathInfo = httpServletRequest.getPathInfo();
         if (pathInfo != null)
         {
             url.append(pathInfo);
         }
-        
+
         String queryString = httpServletRequest.getQueryString();
         if (queryString != null)
         {
