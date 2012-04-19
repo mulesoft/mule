@@ -10,7 +10,6 @@
 
 package org.mule.transport.http.functional;
 
-import org.mule.module.client.MuleClient;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.http.HttpConstants;
 import org.mule.util.concurrent.Latch;
@@ -20,6 +19,7 @@ import java.util.StringTokenizer;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+
 import org.junit.ClassRule;
 import org.junit.Test;
 
@@ -28,7 +28,6 @@ import static org.junit.Assert.assertTrue;
 
 public class HttpOutboundTestCase extends AbstractMockHttpServerTestCase
 {
-
     @ClassRule
     public static DynamicPort dynamicPort = new DynamicPort("port1");
 
@@ -94,10 +93,15 @@ public class HttpOutboundTestCase extends AbstractMockHttpServerTestCase
         sendHttpRequest("vm://doTrace", HttpConstants.METHOD_TRACE);
     }
 
+    @Test
+    public void testOutboundPatch() throws Exception
+    {
+        sendHttpRequest("vm://doPatch", HttpConstants.METHOD_PATCH);
+    }
+
     private void sendHttpRequest(String endpoint, String expectedHttpMethod) throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
-        client.dispatch(endpoint, TEST_MESSAGE, null);
+        muleContext.getClient().dispatch(endpoint, TEST_MESSAGE, null);
 
         assertTrue(testLatch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS));
         assertEquals(expectedHttpMethod, httpMethod);

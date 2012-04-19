@@ -33,7 +33,7 @@ public class HttpsClientMessageDispatcher extends HttpClientMessageDispatcher
     {        
         HostConfiguration hostConfig = new MuleHostConfiguration(super.getHostConfig(uri));
 
-        HttpsConnector httpsConnector = (HttpsConnector) connector;
+        HttpsConnector httpsConnector = (HttpsConnector) httpConnector;
         SSLSocketFactory factory = httpsConnector.getSslSocketFactory();
         ProtocolSocketFactory protocolSocketFactory = new MuleSecureProtocolSocketFactory(factory);
         Protocol protocol = new Protocol(uri.getScheme().toLowerCase(), protocolSocketFactory, 443);

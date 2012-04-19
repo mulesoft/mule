@@ -23,6 +23,7 @@ import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transport.NullPayload;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
+import org.mule.transport.http.PatchMethod;
 import org.mule.transport.http.StreamPayloadRequestEntity;
 import org.mule.transport.http.i18n.HttpMessages;
 import org.mule.util.IOUtils;
@@ -115,6 +116,10 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer
             else if (HttpConstants.METHOD_TRACE.equalsIgnoreCase(method))
             {
                 httpMethod = createTraceMethod(msg);
+            }
+            else if (HttpConstants.METHOD_PATCH.equalsIgnoreCase(method))
+            {
+                httpMethod = createPatchMethod(msg);
             }
             else
             {
@@ -297,6 +302,12 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer
         return new TraceMethod(uri.toString());
     }
 
+    protected HttpMethod createPatchMethod(MuleMessage message) throws Exception
+    {
+        URI uri = getURI(message);
+        return new PatchMethod(uri.toString());
+    }
+
     protected URI getURI(MuleMessage message) throws URISyntaxException, TransformerException
     {
         String endpointAddress = message.getOutboundProperty(MuleProperties.MULE_ENDPOINT_PROPERTY, null);
@@ -440,9 +451,9 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer
 
         for (final Iterator<String> iterator = msg.getOutboundAttachmentNames().iterator(); iterator.hasNext(); i++)
         {
-            final String name = iterator.next();
-            String fileName = name;
-            final DataHandler dh = msg.getOutboundAttachment(name);
+            final String attachmentNames = iterator.next();
+            String fileName = attachmentNames;
+            final DataHandler dh = msg.getOutboundAttachment(attachmentNames);
             if (dh.getDataSource() instanceof StringDataSource)
             {
                 final StringDataSource ds = (StringDataSource) dh.getDataSource();
