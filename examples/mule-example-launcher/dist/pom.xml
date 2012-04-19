@@ -12,7 +12,7 @@
     <description>Launches simple examples from within a web application</description>
 
     <properties>
-        <muleVersion>3.3.0-RC3-SNAPSHOT</muleVersion>
+        <muleVersion>3.3.0-RC4-SNAPSHOT</muleVersion>
     </properties>
 
     <build>
