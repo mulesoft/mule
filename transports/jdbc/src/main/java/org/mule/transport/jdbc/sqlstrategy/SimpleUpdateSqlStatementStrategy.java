@@ -54,8 +54,6 @@ public  class SimpleUpdateSqlStatementStrategy implements SqlStatementStrategy
         Object[] paramValues = connector.getParams(endpoint, paramNames, new DefaultMuleMessage(
             event.getMessage().getPayload(), message, event.getMuleContext()), endpoint.getEndpointURI().getAddress());
 
-        Transaction tx = TransactionCoordination.getInstance().getTransaction();
-
         if (logger.isDebugEnabled())
         {
             logger.debug("SQL UPDATE: " + sql + ", params = " + ArrayUtils.toString(paramValues));
