@@ -86,8 +86,7 @@ public abstract class AbstractInboundMessageProcessorBuilder implements MuleCont
     private List<String> schemaLocations;
     private String onException = CxfConstants.CREATE_SOAP_FAULT;
     private final Map<QName, Object> annotations = new ConcurrentHashMap<QName, Object>();
-    private MuleSecurityManagerValidator securityManager;
-    
+
     private WsSecurity wsSecurity;
 
     @Override
@@ -281,11 +280,6 @@ public abstract class AbstractInboundMessageProcessorBuilder implements MuleCont
 
     private void setSecurityConfig(ServerFactoryBean sfb)
     {
-        if(securityManager != null)
-        {
-            properties.put(SecurityConstants.USERNAME_TOKEN_VALIDATOR, securityManager);
-        }
-
         if(wsSecurity != null)
         {
             if(wsSecurity.getCustomValidator() != null && !wsSecurity.getCustomValidator().isEmpty())
@@ -520,12 +514,6 @@ public abstract class AbstractInboundMessageProcessorBuilder implements MuleCont
         annotations.clear();
         annotations.putAll(newAnnotations);
     }
-
-    public void setSecurityManager(MuleSecurityManagerValidator securityManager)
-    {
-        this.securityManager = securityManager;
-    }
-    
     
     public void setWsSecurity(WsSecurity wsSecurity)
     {

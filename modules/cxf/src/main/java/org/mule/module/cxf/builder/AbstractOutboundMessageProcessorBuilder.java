@@ -68,7 +68,6 @@ public abstract class AbstractOutboundMessageProcessorBuilder
     protected String address;
     protected String operation;
     protected String decoupledEndpoint;
-    private MuleSecurityManagerValidator securityManager;
 
     private WsSecurity wsSecurity;
 
@@ -226,11 +225,6 @@ public abstract class AbstractOutboundMessageProcessorBuilder
 
     private void setSecurityProperties()
     {
-        if(securityManager != null)
-        {
-            properties.put(SecurityConstants.USERNAME_TOKEN_VALIDATOR, securityManager);
-        }
-
         if(wsSecurity != null)
         {
             if(wsSecurity.getCustomValidator() != null && !wsSecurity.getCustomValidator().isEmpty())
@@ -411,11 +405,6 @@ public abstract class AbstractOutboundMessageProcessorBuilder
     public void setMuleContext(MuleContext context)
     {
         muleContext = context;
-    }
-
-    public void setSecurityManager(MuleSecurityManagerValidator securityManager)
-    {
-        this.securityManager = securityManager;
     }
 
     public void setWsSecurity(WsSecurity wsSecurity)

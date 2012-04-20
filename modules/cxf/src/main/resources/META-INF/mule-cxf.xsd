@@ -318,13 +318,6 @@
 
     <xsd:group name="commonConfiguration">
         <xsd:sequence>
-            <xsd:element ref="mule-security-manager" minOccurs="0">
-                <xsd:annotation>
-                    <xsd:documentation>
-                        Bridges together the Mule security manager and WSS4J through a Validator object.
-                    </xsd:documentation>
-                </xsd:annotation>
-            </xsd:element>
             <xsd:element ref="ws-security" minOccurs="0">
                 <xsd:annotation>
                     <xsd:documentation>
