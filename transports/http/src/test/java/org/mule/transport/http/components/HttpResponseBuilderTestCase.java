@@ -13,7 +13,6 @@ package org.mule.transport.http.components;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
@@ -34,7 +33,6 @@ import org.mule.transport.http.CookieWrapper;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
 import org.mule.transport.http.HttpResponse;
-import org.mule.transport.http.components.HttpResponseBuilder;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -476,6 +474,31 @@ public class HttpResponseBuilderTestCase extends AbstractMuleTestCase
 
         String expectedCookieValue = "test=test; Expires=" + httpCookieFormatter.format(now);
         validateHeader(response.getHeaders(), HttpConstants.HEADER_COOKIE_SET, expectedCookieValue);
+    }
+
+    @Test
+    public void testHttpResponseSetBodyWithHttpResponsePayload() throws Exception
+    {
+        HttpResponseBuilder httpResponseBuilder = createHttpResponseBuilder();
+        HttpResponse response = new HttpResponse();
+        response.setBody(HTTP_BODY);
+
+        when(mockMuleMessage.getPayload()).thenReturn(response);
+
+        httpResponseBuilder.setBody(response, mockMuleMessage, mockEvent);
+        assertEquals(HTTP_BODY, response.getBodyAsString());
+    }
+
+    @Test
+    public void testHttpResponseSetBody() throws Exception
+    {
+        HttpResponseBuilder httpResponseBuilder = createHttpResponseBuilder();
+        HttpResponse response = new HttpResponse();
+
+        when(mockMuleMessage.getPayload()).thenReturn(HTTP_BODY);
+
+        httpResponseBuilder.setBody(response, mockMuleMessage, mockEvent);
+        assertEquals(HTTP_BODY, response.getBodyAsString());
     }
 
     private CookieWrapper createCookie(String name, String value, String domain, String path, String expiryDate, String secure, String version)

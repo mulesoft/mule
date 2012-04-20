@@ -92,7 +92,7 @@ public class HttpResponseBuilder extends AbstractMessageProcessorOwner
         return ownedMessageProcessor;
     }
 
-    private void setBody(HttpResponse response, MuleMessage message, MuleEvent event) throws MuleException
+    protected void setBody(HttpResponse response, MuleMessage message, MuleEvent event) throws MuleException
     {
         if(bodyTransformer != null)
         {
@@ -101,7 +101,11 @@ public class HttpResponseBuilder extends AbstractMessageProcessorOwner
 
         try
         {
-            response.setBody(message);
+            // If the payload is already HttpResponse then it already has the body set
+            if(!(message.getPayload() instanceof HttpResponse))
+            {
+                response.setBody(message);
+            }
         }
         catch(Exception e)
         {
