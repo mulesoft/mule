@@ -10,6 +10,7 @@
 
 package org.mule.module.launcher.descriptor;
 
+import org.mule.util.PropertiesUtils;
 import org.mule.util.StringUtils;
 
 import java.io.File;
@@ -19,9 +20,6 @@ import java.util.Properties;
 
 import org.apache.commons.lang.BooleanUtils;
 
-/**
- *
- */
 public class PropertiesDescriptorParser implements DescriptorParser
 {
     protected static final String PROPERTY_ENCODING = "encoding";
@@ -36,7 +34,7 @@ public class PropertiesDescriptorParser implements DescriptorParser
 
     public ApplicationDescriptor parse(File descriptor) throws IOException
     {
-        final Properties p = loadProperties(descriptor);
+        final Properties p = PropertiesUtils.loadProperties(new FileInputStream(descriptor));
 
         ApplicationDescriptor d = new ApplicationDescriptor();
         d.setEncoding(p.getProperty(PROPERTY_ENCODING));
@@ -65,24 +63,6 @@ public class PropertiesDescriptorParser implements DescriptorParser
         d.setPriviledged(BooleanUtils.toBoolean(p.getProperty(PROPERTY_PRIVILEDGED, Boolean.FALSE.toString())));
 
         return d;
-    }
-
-    private Properties loadProperties(File descriptor) throws IOException
-    {
-        Properties p = new Properties();
-        FileInputStream fileInputStream = new FileInputStream(descriptor);
-
-        try
-        {
-            p.load(fileInputStream);
-        }
-        finally
-        {
-
-            fileInputStream.close();
-        }
-
-        return p;
     }
 
     public String getSupportedFormat()
