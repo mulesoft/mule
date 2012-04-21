@@ -18,7 +18,11 @@ import org.mule.api.MuleMessage;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.routing.filter.Filter;
 import org.mule.api.transport.PropertyScope;
+import org.mule.expression.ExceptionTypeExpressionEvaluator;
 import org.mule.expression.ExpressionConfig;
+import org.mule.expression.PayloadTypeExpressionEvaluator;
+import org.mule.expression.RegexExpressionEvaluator;
+import org.mule.expression.WilcardExpressionEvaluator;
 import org.mule.util.StringUtils;
 
 import java.text.MessageFormat;
@@ -148,15 +152,15 @@ public class ExpressionFilter implements Filter, MuleContextAware
                 delegateFilter = new MessagePropertyFilter(PropertyScope.INVOCATION_NAME + ":"
                                                            + config.getExpression());
             }
-            else if (config.getEvaluator().equals("regex"))
+            else if (config.getEvaluator().equals(RegexExpressionEvaluator.NAME))
             {
                 delegateFilter = new RegExFilter(config.getExpression());
             }
-            else if (config.getEvaluator().equals("wildcard"))
+            else if (config.getEvaluator().equals(WilcardExpressionEvaluator.NAME))
             {
                 delegateFilter = new WildcardFilter(config.getExpression());
             }
-            else if (config.getEvaluator().equals("payload-type"))
+            else if (config.getEvaluator().equals(PayloadTypeExpressionEvaluator.NAME))
             {
                 try
                 {
@@ -169,7 +173,7 @@ public class ExpressionFilter implements Filter, MuleContextAware
                     throw iae;
                 }
             }
-            else if (config.getEvaluator().equals("exception-type"))
+            else if (config.getEvaluator().equals(ExceptionTypeExpressionEvaluator.NAME))
             {
                 try
                 {
