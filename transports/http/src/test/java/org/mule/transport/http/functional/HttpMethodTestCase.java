@@ -10,12 +10,11 @@
 
 package org.mule.transport.http.functional;
 
-import static org.junit.Assert.assertEquals;
-
 import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.module.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.transport.http.HttpConstants;
+import org.mule.transport.http.PatchMethod;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -28,22 +27,24 @@ import org.apache.commons.httpclient.methods.HeadMethod;
 import org.apache.commons.httpclient.methods.OptionsMethod;
 import org.apache.commons.httpclient.methods.PutMethod;
 import org.apache.commons.httpclient.methods.TraceMethod;
-import org.junit.Rule;
+import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
+import static org.junit.Assert.assertEquals;
+
 public class HttpMethodTestCase extends AbstractServiceAndFlowTestCase
 {
+    @ClassRule
+    public static DynamicPort dynamicPort = new DynamicPort("port1");
 
-    private HttpMethodBase method;
-    private MuleClient muleClient = null;
-
-    @Rule
-    public DynamicPort dynamicPort = new DynamicPort("port1");
+    private HttpClient client;
 
     public HttpMethodTestCase(ConfigVariant variant, String configResources)
     {
         super(variant, configResources);
+        setDisposeContextPerClass(true);
+        client = new HttpClient();
     }
 
     @Parameters
@@ -53,93 +54,92 @@ public class HttpMethodTestCase extends AbstractServiceAndFlowTestCase
             {ConfigVariant.SERVICE, "http-method-test-service.xml"},
             {ConfigVariant.FLOW, "http-method-test-flow.xml"}
         });
-    }      
-
-    @Override
-    protected void doSetUp() throws Exception
-    {
-        super.doSetUp();
-        muleClient = new MuleClient(muleContext);
     }
 
     @Test
     public void testHead() throws Exception
     {
-        HttpClient client = new HttpClient();
-        method = new HeadMethod(((InboundEndpoint) muleClient.getMuleContext().getRegistry().lookupObject("inHttpIn")).getAddress());
+        HeadMethod method = new HeadMethod(getHttpEndpointAddress());
         int statusCode = client.executeMethod(method);
-        assertEquals(Integer.toString(HttpStatus.SC_OK), Integer.toString(statusCode));
-
+        assertEquals(HttpStatus.SC_OK, statusCode);
     }
 
     @Test
     public void testOptions() throws Exception
     {
-        HttpClient client = new HttpClient();
-        method = new OptionsMethod(((InboundEndpoint) muleClient.getMuleContext().getRegistry().lookupObject("inHttpIn")).getAddress());
+        OptionsMethod method = new OptionsMethod(getHttpEndpointAddress());
         int statusCode = client.executeMethod(method);
-        assertEquals(Integer.toString(HttpStatus.SC_OK), Integer.toString(statusCode));
+        assertEquals(HttpStatus.SC_OK, statusCode);
     }
 
     @Test
     public void testPut() throws Exception
     {
-        HttpClient client = new HttpClient();
-        method = new PutMethod(((InboundEndpoint) muleClient.getMuleContext().getRegistry().lookupObject("inHttpIn")).getAddress());
+        PutMethod method = new PutMethod(getHttpEndpointAddress());
         int statusCode = client.executeMethod(method);
-        assertEquals(Integer.toString(HttpStatus.SC_OK), Integer.toString(statusCode));
+        assertEquals(HttpStatus.SC_OK, statusCode);
     }
 
     @Test
     public void testDelete() throws Exception
     {
-        HttpClient client = new HttpClient();
-        method = new DeleteMethod(((InboundEndpoint) muleClient.getMuleContext().getRegistry().lookupObject("inHttpIn")).getAddress());
+        DeleteMethod method = new DeleteMethod(getHttpEndpointAddress());
         int statusCode = client.executeMethod(method);
-        assertEquals(Integer.toString(HttpStatus.SC_OK), Integer.toString(statusCode));
+        assertEquals(HttpStatus.SC_OK, statusCode);
     }
 
     @Test
     public void testTrace() throws Exception
     {
-        HttpClient client = new HttpClient();
-        method = new TraceMethod(((InboundEndpoint) muleClient.getMuleContext().getRegistry().lookupObject("inHttpIn")).getAddress());
+        TraceMethod method = new TraceMethod(getHttpEndpointAddress());
         int statusCode = client.executeMethod(method);
-        assertEquals(Integer.toString(HttpStatus.SC_OK), Integer.toString(statusCode));
+        assertEquals(HttpStatus.SC_OK, statusCode);
     }
 
     @Test
     public void testConnect() throws Exception
     {
-        HttpClient client = new HttpClient();
-        method = new HttpMethodBase(((InboundEndpoint) muleClient.getMuleContext().getRegistry().lookupObject("inHttpIn")).getAddress())
-        {
-            @Override
-            public String getName()
-            {
-                return "CONNECT";
-            }
-        };
+        CustomHttpMethod method = new CustomHttpMethod(HttpConstants.METHOD_CONNECT, getHttpEndpointAddress());
         int statusCode = client.executeMethod(method);
-        assertEquals(Integer.toString(HttpStatus.SC_OK), Integer.toString(statusCode));
+        assertEquals(HttpStatus.SC_OK, statusCode);
+    }
+
+    @Test
+    public void testPatch() throws Exception
+    {
+        PatchMethod method = new PatchMethod(getHttpEndpointAddress());
+        int statusCode = client.executeMethod(method);
+        assertEquals(HttpStatus.SC_OK, statusCode);
     }
 
     @Test
     public void testFoo() throws Exception
     {
-        HttpClient client = new HttpClient();
-        method = new HttpMethodBase(((InboundEndpoint) muleClient.getMuleContext().getRegistry().lookupObject("inHttpIn")).getAddress())
-        {
-            @Override
-            public String getName()
-            {
-                return "FOO";
-            }
-        };
+        CustomHttpMethod method = new CustomHttpMethod("FOO", getHttpEndpointAddress());
         int statusCode = client.executeMethod(method);
-        assertEquals(Integer.toString(HttpStatus.SC_BAD_REQUEST), Integer.toString(statusCode));
+        assertEquals(HttpStatus.SC_BAD_REQUEST, statusCode);
     }
 
+    private String getHttpEndpointAddress()
+    {
+        InboundEndpoint httpEndpoint = muleContext.getRegistry().lookupObject("inHttpIn");
+        return httpEndpoint.getAddress();
+    }
+
+    private static class CustomHttpMethod extends HttpMethodBase
+    {
+        private final String method;
+
+        public CustomHttpMethod(String method, String url)
+        {
+            super(url);
+            this.method = method;
+        }
+
+        @Override
+        public String getName()
+        {
+            return method;
+        }
+    }
 }
-
-

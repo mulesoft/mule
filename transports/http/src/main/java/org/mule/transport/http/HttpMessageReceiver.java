@@ -244,7 +244,8 @@ public class HttpMessageReceiver extends TcpMessageReceiver
                     || method.equals(HttpConstants.METHOD_PUT)
                     || method.equals(HttpConstants.METHOD_DELETE)
                     || method.equals(HttpConstants.METHOD_TRACE)
-                    || method.equals(HttpConstants.METHOD_CONNECT))
+                    || method.equals(HttpConstants.METHOD_CONNECT)
+                    || method.equals(HttpConstants.METHOD_PATCH))
             {
                 return doRequest(request);
             }
