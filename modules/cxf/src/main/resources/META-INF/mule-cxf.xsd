@@ -103,7 +103,7 @@
             <xsd:extension base="mule:abstractInterceptingMessageProcessorType">
                 <xsd:sequence>
                     <xsd:element name="schemaLocations" type="schemasType" minOccurs="0"/>
-                    
+                    <xsd:element ref="ws-security" minOccurs="0" maxOccurs="1"/>
                     <xsd:group ref="commonConfiguration"/>
                 </xsd:sequence>
             
@@ -189,7 +189,10 @@
     <xsd:complexType name="outboundType">
         <xsd:complexContent>
             <xsd:extension base="mule:abstractInterceptingMessageProcessorType">
-                <xsd:group ref="commonConfiguration"/>
+                <xsd:sequence>
+                    <xsd:element name="ws-security" type="wsSecurityClient" minOccurs="0" maxOccurs="1"/>
+                    <xsd:group ref="commonConfiguration"/>
+                </xsd:sequence>
                 <xsd:attributeGroup ref="commonAttributes"/>
             </xsd:extension>
         </xsd:complexContent>
@@ -318,13 +321,6 @@
 
     <xsd:group name="commonConfiguration">
         <xsd:sequence>
-            <xsd:element ref="ws-security" minOccurs="0">
-                <xsd:annotation>
-                    <xsd:documentation>
-                        Enables and configures WS-Security
-                    </xsd:documentation>
-                </xsd:annotation>                
-            </xsd:element>
             <xsd:element ref="properties" minOccurs="0">
                 <xsd:annotation>
                     <xsd:documentation>
@@ -595,34 +591,85 @@
             </xsd:complexContent>
         </xsd:complexType>
     </xsd:element>
-        
-    <xsd:element name="ws-security" substitutionGroup="mule:abstract-extension">
-        <xsd:complexType>
-            <xsd:complexContent>
-                <xsd:extension base="mule:abstractExtensionType">
-                    <xsd:sequence>
-                        <xsd:element ref="mule-security-manager" minOccurs="0" maxOccurs="1"/>
-                        <xsd:element ref="ws-config" minOccurs="0" maxOccurs="1"/>
-                        <xsd:element ref="ws-custom-validator" minOccurs="0" maxOccurs="1"/>
-                    </xsd:sequence>
-                    <xsd:attribute name="name" type="xsd:string">
+
+    <xsd:complexType name="wsSecurityService">
+        <xsd:complexContent>
+            <xsd:extension base="wsSecurityBase">
+                <xsd:sequence>
+                    <xsd:element ref="mule-security-manager" minOccurs="0" maxOccurs="1">
                         <xsd:annotation>
                             <xsd:documentation>
-                                Name of the WS-Security configuration
+                                A WSS4J Password validator which verifies username/password combinations against the Mule security manager.
                             </xsd:documentation>
                         </xsd:annotation>
-                    </xsd:attribute>
-                    <xsd:attribute name="ref" type="xsd:string">
+                    </xsd:element>
+                    <xsd:element ref="ws-config" minOccurs="0" maxOccurs="1">
                         <xsd:annotation>
                             <xsd:documentation>
-                                Reference to a WS-Security configuration
+                                A map containing the WSS4J configuration. The entry key and value should map to the text strings in WSS4J's WSHandlerConstants and WSConstants.
+                                The key is the name of the element respecting Mule's naming format, it will be afterwards transformed to CamelCase to map the
+                                corresponding constants, e.g. password-callback-class will map to the constant passwordCallbackClass.
                             </xsd:documentation>
                         </xsd:annotation>
-                    </xsd:attribute>
-                </xsd:extension>
-            </xsd:complexContent>
-        </xsd:complexType>    
+                    </xsd:element>
+                    <xsd:element ref="ws-custom-validator" minOccurs="0" maxOccurs="1">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                A list of validators that allows to override the default validators used to validate a received security token.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                </xsd:sequence>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="wsSecurityClient">
+        <xsd:complexContent>
+            <xsd:extension base="wsSecurityBase">
+                <xsd:sequence>
+                    <xsd:element ref="ws-config" minOccurs="0" maxOccurs="1">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                A map containing the WSS4J configuration. The entry key and value should map to the text strings in WSS4J's WSHandlerConstants and WSConstants.
+                                The key is the name of the element respecting Mule's naming format, it will be afterwards transformed to CamelCase to map the
+                                corresponding constants, e.g. password-callback-class will map to the constant passwordCallbackClass.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                </xsd:sequence>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="ws-security" substitutionGroup="mule:abstract-extension" type="wsSecurityService">
+        <xsd:annotation>
+            <xsd:documentation>
+                Configuration to enable WS-Security
+            </xsd:documentation>
+        </xsd:annotation>
     </xsd:element>
+
+    <xsd:complexType name="wsSecurityBase">
+        <xsd:complexContent>
+            <xsd:extension base="mule:abstractExtensionType">
+                <xsd:attribute name="name" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Name of the WS-Security configuration
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="ref" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Reference to a WS-Security configuration
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
 
     <xsd:element name="ws-config">
         <xsd:complexType>

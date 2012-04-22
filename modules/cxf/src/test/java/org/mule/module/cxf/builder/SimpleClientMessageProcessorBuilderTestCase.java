@@ -13,11 +13,9 @@ package org.mule.module.cxf.builder;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 import org.mule.module.cxf.CxfOutboundMessageProcessor;
 import org.mule.module.cxf.config.WsSecurity;
-import org.mule.module.cxf.support.MuleSecurityManagerValidator;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.api.MuleException;
 
@@ -27,10 +25,8 @@ import java.util.Map;
 
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.message.Message;
-import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor;
 import org.apache.ws.security.handler.WSHandlerConstants;
-import org.apache.ws.security.validate.NoOpValidator;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -51,8 +47,6 @@ public class SimpleClientMessageProcessorBuilderTestCase extends AbstractMuleCon
     {
         WsSecurity wsSecurity = new WsSecurity();
         addConfigProperties(wsSecurity);
-        addCustomValidator(wsSecurity);
-        addSecurityManager(wsSecurity);
 
         simpleClientMessageProcessorBuilder.setWsSecurity(wsSecurity);
         simpleClientMessageProcessorBuilder.setServiceClass(SERVICE_CLASS.getClass());
@@ -67,12 +61,6 @@ public class SimpleClientMessageProcessorBuilderTestCase extends AbstractMuleCon
         assertFalse(wss4jProperties.isEmpty());
 
         assertEquals(WSHandlerConstants.USERNAME_TOKEN, wss4jProperties.get(WSHandlerConstants.ACTION));
-
-        Map<String, Object> properties = simpleClientMessageProcessorBuilder.getProperties();
-        assertNotNull(properties);
-
-        assertTrue(properties.get(SecurityConstants.USERNAME_TOKEN_VALIDATOR) instanceof MuleSecurityManagerValidator);
-        assertTrue(properties.get(SecurityConstants.TIMESTAMP_TOKEN_VALIDATOR) instanceof NoOpValidator);
 
     }
 
@@ -95,19 +83,5 @@ public class SimpleClientMessageProcessorBuilderTestCase extends AbstractMuleCon
 
         wsSecurity.setConfigProperties(configProperties);
     }
-
-    private void addSecurityManager(WsSecurity wsSecurity)
-    {
-        wsSecurity.setSecurityManager(new MuleSecurityManagerValidator());
-    }
-
-    private void addCustomValidator(WsSecurity wsSecurity)
-    {
-        Map<String, Object> customValidator = new HashMap<String, Object>();
-        customValidator.put(SecurityConstants.TIMESTAMP_TOKEN_VALIDATOR, new NoOpValidator());
-
-        wsSecurity.setCustomValidator(customValidator);
-    }
-
 
 }

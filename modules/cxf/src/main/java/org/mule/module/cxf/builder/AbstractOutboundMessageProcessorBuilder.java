@@ -26,7 +26,6 @@ import org.mule.module.cxf.CxfPayloadToArguments;
 import org.mule.module.cxf.config.WsSecurity;
 import org.mule.module.cxf.support.MuleHeadersInInterceptor;
 import org.mule.module.cxf.support.MuleHeadersOutInterceptor;
-import org.mule.module.cxf.support.MuleSecurityManagerValidator;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -41,7 +40,6 @@ import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.message.Message;
-import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor;
 
 public abstract class AbstractOutboundMessageProcessorBuilder 
@@ -89,8 +87,6 @@ public abstract class AbstractOutboundMessageProcessorBuilder
         // which I don't know about, but may depend on it) can use it when creating a Client -- DD
         BusFactory.setThreadDefaultBus(getBus());
        
-        setSecurityProperties();
-
         try
         {
             client = createClient();
@@ -220,29 +216,6 @@ public abstract class AbstractOutboundMessageProcessorBuilder
             client.getInFaultInterceptors().add(new MuleHeadersInInterceptor());
             client.getOutInterceptors().add(new MuleHeadersOutInterceptor());
             client.getOutFaultInterceptors().add(new MuleHeadersOutInterceptor());
-        }
-    }
-
-    private void setSecurityProperties()
-    {
-        if(wsSecurity != null)
-        {
-            if(wsSecurity.getCustomValidator() != null && !wsSecurity.getCustomValidator().isEmpty())
-            {
-                if(wsSecurity.getCustomValidator() != null && !wsSecurity.getCustomValidator().isEmpty())
-                {
-                    for(Map.Entry<String, Object> entry : wsSecurity.getCustomValidator().entrySet())
-                    {
-                        properties.put(entry.getKey(), entry.getValue());
-                    }
-                }
-            }
-
-            if(wsSecurity.getSecurityManager() != null)
-            {
-                properties.put(SecurityConstants.USERNAME_TOKEN_VALIDATOR, wsSecurity.getSecurityManager());
-            }
-
         }
     }
 
