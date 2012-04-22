@@ -53,8 +53,7 @@ public class SAMLValidatorTestCase extends FunctionalTestCase
         assertEquals("Hello me", received.getPayloadAsString());
     }
 
-    // It fails with the keystore in bamboo
-    @Ignore
+    @Test
     public void testSAMLSignedAssertion() throws Exception
     {
         MuleMessage request = new DefaultMuleMessage("me", (Map<String, Object>) null, muleContext);
@@ -71,7 +70,7 @@ public class SAMLValidatorTestCase extends FunctionalTestCase
         {
             WSPasswordCallback pc = (WSPasswordCallback) callbacks[0];
 
-            pc.setPassword("keyStorePassword");
+            pc.setPassword("secret");
         }
 
     }
