@@ -65,11 +65,22 @@ public class ChoiceMessagingExceptionStrategy extends AbstractMuleObjectOwner<Me
         validateConfiguredExceptionStrategies();
     }
 
-    private void addDefaultExceptionStrategyIfRequired()
+    private void addDefaultExceptionStrategyIfRequired() throws InitialisationException
     {
         if (!exceptionListeners.get(exceptionListeners.size()-1).acceptsAll())
         {
-            this.exceptionListeners.add(new MessagingExceptionStrategyAcceptorDelegate(getMuleContext().getDefaultExceptionStrategy()));
+            MessagingExceptionHandler defaultExceptionStrategy;
+            try
+            {
+                defaultExceptionStrategy = getMuleContext().getDefaultExceptionStrategy();
+            }
+            catch (Exception e)
+            {
+                throw new InitialisationException(CoreMessages.createStaticMessage("Failure initializing " +
+                        "choice-exception-strategy. If choice-exception-strategy is defined as default one " +
+                        "check that last exception strategy inside choice catchs all"), e, this);
+            }
+            this.exceptionListeners.add(new MessagingExceptionStrategyAcceptorDelegate(defaultExceptionStrategy));
         }
     }
 
