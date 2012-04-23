@@ -20,9 +20,14 @@ public class SystemProperty extends ExternalResource
 {
 
     private final String name;
-    private final String value;
+    private String value;
     private boolean initialized;
     private String oldValue;
+
+    public SystemProperty(String name)
+    {
+        this(name, null);
+    }
 
     public SystemProperty(String name, String value)
     {
@@ -38,8 +43,7 @@ public class SystemProperty extends ExternalResource
             throw new IllegalArgumentException("System property was already initialized");
         }
 
-        oldValue = System.getProperty(name);
-        System.setProperty(name, value);
+        oldValue = System.setProperty(name, getValue());
         initialized = true;
     }
 
@@ -51,12 +55,13 @@ public class SystemProperty extends ExternalResource
             throw new IllegalArgumentException("System property was not initialized");
         }
 
-        cleanSystemProperty();
+        doCleanUp();
+        restoreOldValue();
 
         initialized = false;
     }
 
-    protected void cleanSystemProperty()
+    protected void restoreOldValue()
     {
         if (oldValue == null)
         {
@@ -72,4 +77,14 @@ public class SystemProperty extends ExternalResource
     {
         return name;
     }
+
+    protected void doCleanUp()
+    {
+        // Nothing to do
+    };
+
+    public String getValue()
+    {
+        return value;
+    };
 }

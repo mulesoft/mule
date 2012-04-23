@@ -10,10 +10,6 @@
 
 package org.mule.tck.junit4.rule;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.junit.rules.ExternalResource;
-
 /**
  * Defines a socket port number that will be dynamically assigned as an
  * external resource. The instance will check that the port has been released
@@ -31,7 +27,7 @@ import org.junit.rules.ExternalResource;
  *     public static DynamicPort dynamicPort = new DynamicPort("server_port");
  * </pre>
  */
-public class DynamicPort extends ExternalResource
+public class DynamicPort extends SystemProperty
 {
 
     public static final String MIN_PORT_SYSTEM_PROPERTY = "mule.test.minPort";
@@ -68,11 +64,7 @@ public class DynamicPort extends ExternalResource
     }
 
 
-    protected Log logger = LogFactory.getLog(getClass());
-
-    private final String name;
     private int number;
-    private boolean initialized = false;
 
     /**
      * Creates a dynamic port resource for a given port name.
@@ -83,60 +75,30 @@ public class DynamicPort extends ExternalResource
      */
     public DynamicPort(String name)
     {
-        this.name = name;
+        super(name);
     }
 
-    /**
-     * Initializes the dynamic port.
-     * <p/>
-     * NOTE: this method was made public in order to support the usage of
-     * static dynamic ports because current JUnit version does not support
-     * class rules.
-     *
-     * @throws Throwable
-     */
     @Override
-    public void before() throws Throwable
+    public String getValue()
     {
-        if (initialized)
+        String value = super.getValue();
+        if (value == null)
         {
-            throw new IllegalArgumentException("Dynamic port was already initialized");
+            number = freePortFinder.find();
+            value = Integer.toString(number);
         }
 
-        number = freePortFinder.find();
-        System.setProperty(name, String.valueOf(number));
-        initialized = true;
+        return value;
     }
 
-    /**
-     * Checks that the port has been released. For now if it was not released it
-     * just logs a message so we can track the problem.
-     * <p/>
-     * NOTE: this method was made public in order to support the usage of
-     * static dynamic ports because current JUnit version does not support
-     * class rules.
-     *
-     * @throws Throwable
-     */
     @Override
-    public void after()
+    protected void doCleanUp()
     {
-        if (!initialized)
-        {
-            throw new IllegalArgumentException("Dynamic port was not initialized");
-        }
-
         freePortFinder.releasePort(number);
-        initialized = false;
     }
 
     public int getNumber()
     {
         return number;
-    }
-
-    public String getName()
-    {
-        return name;
     }
 }
