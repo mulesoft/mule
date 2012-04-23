@@ -79,7 +79,7 @@ public class DynamicPort extends SystemProperty
     }
 
     @Override
-    protected String getValue()
+    public String getValue()
     {
         String value = super.getValue();
         if (value == null)
