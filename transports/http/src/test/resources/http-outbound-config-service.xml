@@ -11,10 +11,10 @@
           http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
     <model>
-        <!-- 
+        <!--
             HTTP method CONNECT is missing here because it's not supported by the HttpClientMessageDispatcher
          -->
-         
+
         <service name="OutboundDelete">
             <inbound>
                 <vm:inbound-endpoint path="doDelete" exchange-pattern="one-way"/>
@@ -94,6 +94,18 @@
             <outbound>
                 <pass-through-router>
                     <http:outbound-endpoint address="http://localhost:${port1}/" method="TRACE"
+                        exchange-pattern="one-way"/>
+                </pass-through-router>
+            </outbound>
+        </service>
+
+        <service name="OutboundPatch">
+            <inbound>
+                <vm:inbound-endpoint path="doPatch" exchange-pattern="one-way"/>
+            </inbound>
+            <outbound>
+                <pass-through-router>
+                    <http:outbound-endpoint address="http://localhost:${port1}/" method="PATCH"
                         exchange-pattern="one-way"/>
                 </pass-through-router>
             </outbound>

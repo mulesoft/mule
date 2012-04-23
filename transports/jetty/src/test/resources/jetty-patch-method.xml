@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:jetty="http://www.mulesoft.org/schema/mule/jetty"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+    xsi:schemaLocation="
+        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
+        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+        http://www.mulesoft.org/schema/mule/jetty http://www.mulesoft.org/schema/mule/jetty/current/mule-jetty.xsd">
+
+    <flow name="PatchWithCustomComponent">
+        <jetty:inbound-endpoint address="http://0.0.0.0:${port1}/component"/>
+        <test:component/>
+    </flow>
+</mule>

@@ -13,6 +13,10 @@ package org.mule.transport.http.functional;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.transport.http.HttpConstants;
+import org.mule.util.concurrent.Latch;
+
 import java.io.BufferedReader;
 import java.util.Arrays;
 import java.util.Collection;
@@ -23,14 +27,9 @@ import java.util.concurrent.TimeUnit;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.junit4.rule.DynamicPort;
-import org.mule.transport.http.HttpConstants;
-import org.mule.util.concurrent.Latch;
 
 public class HttpOutboundTestCase extends AbstractMockHttpServerTestCase
 {
-
     @ClassRule
     public static DynamicPort dynamicPort = new DynamicPort("port1");
 
@@ -46,8 +45,10 @@ public class HttpOutboundTestCase extends AbstractMockHttpServerTestCase
     @Parameters
     public static Collection<Object[]> parameters()
     {
-        return Arrays.asList(new Object[][]{{ConfigVariant.SERVICE, "http-outbound-config-service.xml"},
-            {ConfigVariant.FLOW, "http-outbound-config-flow.xml"}});
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "http-outbound-config-service.xml"},
+            {ConfigVariant.FLOW, "http-outbound-config-flow.xml"}
+        });
     }
 
     @Override
@@ -98,10 +99,15 @@ public class HttpOutboundTestCase extends AbstractMockHttpServerTestCase
         sendHttpRequest("vm://doTrace", HttpConstants.METHOD_TRACE);
     }
 
+    @Test
+    public void testOutboundPatch() throws Exception
+    {
+        sendHttpRequest("vm://doPatch", HttpConstants.METHOD_PATCH);
+    }
+
     private void sendHttpRequest(String endpoint, String expectedHttpMethod) throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
-        client.dispatch(endpoint, TEST_MESSAGE, null);
+        muleContext.getClient().dispatch(endpoint, TEST_MESSAGE, null);
 
         assertTrue(testLatch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS));
         assertEquals(expectedHttpMethod, httpMethod);
