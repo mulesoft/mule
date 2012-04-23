@@ -10,7 +10,6 @@
 
 package org.mule.el.context;
 
-
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Calendar;
@@ -52,12 +51,12 @@ public class ServerContextTestCase extends AbstractELTestCase
     @Test
     public void javaSystemProperties()
     {
-        Assert.assertEquals(System.getProperties(), evaluate("server.java.properties"));
+        Assert.assertEquals(System.getProperties(), evaluate("server.systemProperties"));
     }
 
     public void assignValueToJavaSystemProperties()
     {
-        assertImmutableVariable("server.java.properties='1'");
+        assertImmutableVariable("server.systemProperties='1'");
     }
 
     @Test
@@ -74,62 +73,40 @@ public class ServerContextTestCase extends AbstractELTestCase
     @Test
     public void fileSeperator()
     {
-        Assert.assertEquals(System.getProperty("file.separator"), evaluate("server.fileSeperator"));
+        Assert.assertEquals(System.getProperty("file.separator"), evaluate("server.fileSeparator"));
     }
 
     public void assignValueToFileseperator()
     {
-        assertImmutableVariable("server.fileSeperator='1'");
-    }
-
-    @Test
-    public void user()
-    {
-        Assert.assertEquals(System.getProperty("user.name"), evaluate("server.user"));
-    }
-
-    public void assignValueUser()
-    {
-        assertImmutableVariable("server.user='1'");
-    }
-
-    @Test
-    public void os()
-    {
-        evaluate("server.os");
-    }
-
-    public void assignValueToOs()
-    {
-        assertImmutableVariable("server.os='1'");
+        assertImmutableVariable("server.fileSeparator='1'");
     }
 
     @Test
     public void osName()
     {
-        Assert.assertEquals(System.getProperty("os.name"), evaluate("server.os.name"));
+        Assert.assertEquals(System.getProperty("os.name"), evaluate("server.osName"));
     }
 
     public void assignValueToOsName()
     {
-        assertImmutableVariable("server.os.name='1'");
+        assertImmutableVariable("server.osName='1'");
     }
 
     @Test
     public void osArch()
     {
-        Assert.assertEquals(System.getProperty("os.arch"), evaluate("server.os.arch"));
+        Assert.assertEquals(System.getProperty("os.arch"), evaluate("server.osArch"));
     }
 
     public void assignValueToOsArch()
     {
-        assertImmutableVariable("server.os.arch='1'");
+        assertImmutableVariable("server.osArch='1'");
     }
 
     @Test
     public void osVersion()
     {
-        Assert.assertEquals(System.getProperty("os.version"), evaluate("server.os.version"));
+        Assert.assertEquals(System.getProperty("os.version"), evaluate("server.osVersion"));
     }
 
     public void assignValueToOsVersion()
@@ -138,36 +115,25 @@ public class ServerContextTestCase extends AbstractELTestCase
     }
 
     @Test
-    public void java()
-    {
-        evaluate("server.java");
-    }
-
-    public void assignValueToJava()
-    {
-        assertImmutableVariable("server.java='1'");
-    }
-
-    @Test
     public void javaVersion()
     {
-        Assert.assertEquals(System.getProperty("java.version"), evaluate("server.java.version"));
+        Assert.assertEquals(System.getProperty("java.version"), evaluate("server.javaVersion"));
     }
 
     public void assignValueToJavaVersion()
     {
-        assertImmutableVariable("server.java.version='1'");
+        assertImmutableVariable("server.javaVersion='1'");
     }
 
     @Test
     public void javaVendor()
     {
-        Assert.assertEquals(System.getProperty("java.vendor"), evaluate("server.java.vendor"));
+        Assert.assertEquals(System.getProperty("java.vendor"), evaluate("server.javaVendor"));
     }
 
     public void assignValueToJavaVendor()
     {
-        assertImmutableVariable("server.java.vendor='1'");
+        assertImmutableVariable("server.javaVendor='1'");
     }
 
     @Test
@@ -201,6 +167,39 @@ public class ServerContextTestCase extends AbstractELTestCase
     public void assignValueToLocal()
     {
         assertImmutableVariable("server.locale='1'");
+    }
+
+    @Test
+    public void userName()
+    {
+        Assert.assertEquals(System.getProperty("user.name"), evaluate("server.userName"));
+    }
+
+    public void assignValueToUserName()
+    {
+        assertImmutableVariable("server.userName='1'");
+    }
+
+    @Test
+    public void userHome()
+    {
+        Assert.assertEquals(System.getProperty("user.home"), evaluate("server.userHome"));
+    }
+
+    public void assignValueToUserHome()
+    {
+        assertImmutableVariable("server.userHome='1'");
+    }
+
+    @Test
+    public void userDir()
+    {
+        Assert.assertEquals(System.getProperty("user.dir"), evaluate("server.userDir"));
+    }
+
+    public void assignValueToUseDir()
+    {
+        assertImmutableVariable("server.userDir='1'");
     }
 
 }

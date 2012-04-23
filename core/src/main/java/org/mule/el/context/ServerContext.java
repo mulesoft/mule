@@ -19,22 +19,24 @@ import java.util.Properties;
 import java.util.TimeZone;
 
 /**
- * Exposes information about 
+ * Exposes information about both the physical server and Java Runtime Environment (JRE) that Mule is running on:
  * 
- * <li> <b>env</b>             <i>Map of enviroment variables </i>
- * <li> <b>fileseperator</b>   <i></i>
- * <li> <b>host</b>            <i></i>
- * <li> <b>ip</b>              <i></i>
- * <li> <b>locale</b>          <i></i>
- * <li> <b>java.properties</b> <i>Map of Java system properties</i>
- * <li> <b>java.version</b>    <i></i>
- * <li> <b>java.vendor</b>     <i></i>
- * <li> <b>os.name</b>         <i></i>
- * <li> <b>os.arch</b>         <i></i>
- * <li> <b>os.version</b>      <i></i>
- * <li> <b>timezone</b>        <i></i>
- * <li> <b>tmpdir</b>          <i></i>
- * <li> <b>user</b>            <i></i>
+ * <li> <b>env</b>              <i>Map of Operating System environment variables </i>
+ * <li> <b>fileSeparator</b>    <i>Character that separates components of a file path. This is "/" on UNIX and "\" on Windows.</i>
+ * <li> <b>host</b>             <i>Fully qualified domain name for the server</i>
+ * <li> <b>ip</b>               <i>The IP address of the server</i>
+ * <li> <b>locale</b>           <i>The default locale (java.util.Locale) of the JRE.  Can be used language (locale.language), country (locale.country) and  </i>
+ * <li> <b>javaVersion</b>      <i>JRE version</i>
+ * <li> <b>javaVendor</b>       <i>JRE vendor name</i>
+ * <li> <b>osName</b>           <i>Operating System name</i>
+ * <li> <b>osArch</b>           <i>Operating System architecture</i>
+ * <li> <b>osVersion</b>        <i>Operating System version</i>
+ * <li> <b>systemProperties</b> <i>Map of Java system properties</i>
+ * <li> <b>timeZone</b>         <i>Default TimeZone (java.util.TimeZone) of the JRE.</i>
+ * <li> <b>tmpDir</b>           <i>Temporary directory for use by the JRE</i>
+ * <li> <b>userName</b>         <i>User name</i>
+ * <li> <b>userHome</b>         <i>User home directory</i>
+ * <li> <b>userDir</b>          <i>User working directory</i>
  */
 public class ServerContext
 {
@@ -49,16 +51,6 @@ public class ServerContext
         return InetAddress.getLocalHost().getHostAddress();
     }
 
-    public static OperatingSystemContext getOs() throws UnknownHostException
-    {
-        return new OperatingSystemContext();
-    }
-
-    public static JAVARuntimeContext getJava()
-    {
-        return new JAVARuntimeContext();
-    }
-
     public static TimeZone getTimeZone()
     {
         return Calendar.getInstance().getTimeZone();
@@ -69,70 +61,64 @@ public class ServerContext
         return Locale.getDefault();
     }
 
-    public String getTmpDir()
+    public static String getTmpDir()
     {
         return System.getProperty("java.io.tmpdir");
     }
 
-    public String getFileSeperator()
+    public static String getFileSeparator()
     {
         return System.getProperty("file.separator");
     }
 
-    public String getUser()
-    {
-        return System.getProperty("user.name");
-    }
-
-    public Map<String, String> getEnv()
+    public static Map<String, String> getEnv()
     {
         return System.getenv();
     }
 
-    public static class OperatingSystemContext
+    public static Properties getSystemProperties()
     {
-        public String getName()
-        {
-            return System.getProperty("os.name");
-        }
-
-        public String getArch()
-        {
-            return System.getProperty("os.arch");
-        }
-
-        public String getVersion()
-        {
-            return System.getProperty("os.version");
-        }
-
-        public String toString()
-        {
-            return getName() + " (" + getVersion() + ", " + getArch() + ")";
-        }
+        return System.getProperties();
     }
 
-    public static class JAVARuntimeContext
+    public static String getOsName()
     {
-        public String getVersion()
-        {
-            return System.getProperty("java.version");
-        }
-
-        public String getVendor()
-        {
-            return System.getProperty("java.vendor");
-        }
-
-        public Properties getProperties()
-        {
-            return System.getProperties();
-        }
-
-        public String toString()
-        {
-            return getVersion() + " (" + getVendor() + ")";
-        }
+        return System.getProperty("os.name");
     }
 
+    public static String getOsArch()
+    {
+        return System.getProperty("os.arch");
+    }
+
+    public  static String getOsVersion()
+    {
+        return System.getProperty("os.version");
+    }
+
+    public static String getJavaVersion()
+    {
+        return System.getProperty("java.version");
+    }
+
+    public static String getJavaVendor()
+    {
+        return System.getProperty("java.vendor");
+    }
+
+    public static String getUserName()
+    {
+        return System.getProperty("user.name");
+    }
+
+    public static String getUserHome()
+    {
+        return System.getProperty("user.home");
+    }
+
+    public static String getUserDir()
+    {
+        return System.getProperty("user.dir");
+    }
+    
 }
