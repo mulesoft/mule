@@ -12,6 +12,8 @@ package org.mule.module.jersey;
 
 import org.mule.api.MuleContext;
 import org.mule.api.component.JavaComponent;
+import org.mule.api.object.ObjectFactory;
+import org.mule.component.BindingUtils;
 
 import com.sun.jersey.core.spi.component.ComponentContext;
 import com.sun.jersey.core.spi.component.ioc.IoCComponentProvider;
@@ -64,7 +66,11 @@ public class MuleComponentProviderFactory implements IoCComponentProviderFactory
             {
                 try
                 {
-                    return selected.getObjectFactory().getInstance(muleContext);
+                    ObjectFactory objectFactory = selected.getObjectFactory();
+                    Object instance = objectFactory.getInstance(muleContext);
+                    BindingUtils.configureBinding(selected, instance);
+
+                    return instance;
                 }
                 catch (Exception e)
                 {
