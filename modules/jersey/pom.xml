@@ -38,6 +38,11 @@
             <version>${project.version}</version>
             <optional>true</optional>
         </dependency>
+        <dependency>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-vm</artifactId>
+            <version>${version}</version>
+        </dependency>
 
         <!--
             Jersey versions and exclusions are managed via a top-level depencencyManagement.
