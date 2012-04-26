@@ -331,7 +331,7 @@ public class URIBuilder implements AnnotatedObject
         }
         if (null != path)
         {
-            if (! atStart)
+            if (!atStart && !path.startsWith("/"))
             {
                 buffer.append("/");
             }
