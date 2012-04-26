@@ -117,5 +117,19 @@ public class URIBuilderTestCase extends AbstractMuleTestCase
         endpointURI = uri.getEndpoint();
         assertEquals("test://bar?aname=zvalue&aname=bvalue&aname=cvalue&dname=dvalue", endpointURI.getUri().toString());
     }
-    
+
+    @Test
+    public void testConstructAddress()
+    {
+        URIBuilder uri = new URIBuilder();
+        uri.setHost("localhost");
+        uri.setPort(8080);
+        uri.setProtocol("http");
+        uri.setPath("/test");
+
+        String result = uri.getEncodedConstructor();
+        assertEquals("http://localhost:8080/test", result);
+    }
+
+
 }
