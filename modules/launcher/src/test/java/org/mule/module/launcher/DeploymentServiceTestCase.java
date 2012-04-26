@@ -325,6 +325,26 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         assertEquals("2", applications.get(2).getAppName());
     }
 
+    @Test
+    public void testDeploysAppJustOnce() throws Exception
+    {
+        final URL url = getClass().getResource("/dummy-app.zip");
+        assertNotNull("Test app file not found " + url, url);
+        addAppArchive(url);
+
+        Map<String, Object> startupOptions = new HashMap<String, Object>();
+        startupOptions.put("app", "dummy-app:dummy-app:dummy-app");
+        StartupContext.get().setStartupOptions(startupOptions);
+
+        deploymentService.start();
+
+        assertTrue("Deployer never invoked", deployLatch.await(LATCH_TIMEOUT, TimeUnit.MILLISECONDS));
+        assertAppsDir(NONE, new String[] {"dummy-app"}, true);
+
+        List<Application> applications = deploymentService.getApplications();
+        assertEquals(1, applications.size());
+    }
+
     private void assertNoDeploymentInvoked()
     {
         //TODO(pablo.kraan): look for a better way to test this
