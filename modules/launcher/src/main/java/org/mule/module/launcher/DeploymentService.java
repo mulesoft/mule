@@ -11,7 +11,6 @@
 package org.mule.module.launcher;
 
 import static org.mule.util.SplashScreen.miniSplash;
-
 import org.mule.MuleCoreExtension;
 import org.mule.config.StartupContext;
 import org.mule.config.i18n.MessageFactory;
@@ -39,6 +38,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executors;
@@ -141,6 +141,8 @@ public class DeploymentService
             apps = appString.split(":");
         }
 
+        apps = removeDuplicateAppNames(apps);
+
         for (String app : apps)
         {
             final Application a;
@@ -214,6 +216,21 @@ public class DeploymentService
                 logger.info(miniSplash("Mule is up and running in a fixed app set mode"));
             }
         }
+    }
+
+    private String[] removeDuplicateAppNames(String[] apps)
+    {
+        List<String> appNames = new LinkedList<String>();
+
+        for (String appName : apps)
+        {
+            if (!appNames.contains(appName))
+            {
+                appNames.add(appName);
+            }
+        }
+
+        return appNames.toArray(ArrayUtils.EMPTY_STRING_ARRAY);
     }
 
     protected void scheduleChangeMonitor(File appsDir)
