@@ -29,8 +29,7 @@ public class ${ModuleName}ConnectorFactoryTestCase extends AbstractMuleContextTe
     @Test
     public void createFromFactory() throws Exception
     {
-        InboundEndpoint endpoint = muleContext.getRegistry()
-                .lookupEndpointFactory().getInboundEndpoint(getEndpointURI());
+        InboundEndpoint endpoint = muleContext.getEndpointFactory().getInboundEndpoint(getEndpointURI());
         assertNotNull(endpoint);
         assertNotNull(endpoint.getConnector());
         assertTrue(endpoint.getConnector() instanceof ${ModuleName}Connector);
