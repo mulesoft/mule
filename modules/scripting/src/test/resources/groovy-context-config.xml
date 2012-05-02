@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xmlns:scripting="http://www.mulesoft.org/schema/mule/scripting"
+      xsi:schemaLocation="
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+       http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd
+       http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
+
+    <message-properties-transformer name="addOutboundProperty">
+        <add-message-property key="outPropKey" value="outPropValue"/>
+    </message-properties-transformer>
+
+    <message-properties-transformer name="addOutboundPropertyName">
+        <add-message-property key="outPropKeyName" value="outPropKey"/>
+    </message-properties-transformer>
+
+    <message-properties-transformer name="addOutboundProperty2">
+        <add-message-property key="outPropKey2" value="outPropValue2"/>
+    </message-properties-transformer>
+
+    <message-properties-transformer scope="invocation" name="addInvocationProperty">
+        <add-message-property key="variable" value="invocationValue"/>
+    </message-properties-transformer>
+
+    <message-properties-transformer scope="session" name="addSessionProperty">
+        <add-message-property key="variable" value="sessionValue"/>
+    </message-properties-transformer>
+
+    <scripting:transformer name="addInboundProperty">
+        <scripting:script engine="groovy">
+            message.setProperty('inbPropKey','inbPropValue',org.mule.api.transport.PropertyScope.INBOUND);
+            message
+        </scripting:script>
+    </scripting:transformer>
+
+    <scripting:transformer name="addInboundProperty2">
+        <scripting:script engine="groovy">
+            message.setProperty('inbPropKey2','inbPropValue2',org.mule.api.transport.PropertyScope.INBOUND);
+            message
+        </scripting:script>
+    </scripting:transformer>
+
+    <flow name="sessionVariable" processingStrategy="synchronous">
+        <transformer ref="addSessionProperty"/>
+        <logger level="WARN" message="session variable 'variable': #[groovy:variable]" />
+    </flow>
+
+    <flow name="flowVariable" processingStrategy="synchronous">
+        <transformer ref="addInvocationProperty"/>
+        <logger level="WARN" message="flow variable 'variable': #[groovy:variable]" />
+    </flow>
+
+    <flow name="flowShadowsSessionVariable" processingStrategy="synchronous">
+        <transformer ref="addSessionProperty"/>
+        <transformer ref="addInvocationProperty"/>
+        <test:assert expression="#[groovy:variable.equals('invocationValue')]"/>
+    </flow>
+
+    <flow name="noVariable" processingStrategy="synchronous">
+        <logger level="WARN" message="flow variable 'variable': #[groovy:variable]" />
+    </flow>
+
+    <flow name="flowVars" processingStrategy="synchronous">
+        <transformer ref="addSessionProperty"/>
+        <transformer ref="addInvocationProperty"/>
+        <logger level="WARN" message="flow variables: #[groovy:flowVars]" />
+        <test:assert expression="#[groovy:flowVars instanceof Map]"/>
+        <test:assert expression="#[groovy:((Map) flowVars).size() == 1]"/>
+        <test:assert expression="#[groovy:((Map) flowVars).get('variable').equals('invocationValue')]"/>
+    </flow>
+
+    <flow name="sessionVars" processingStrategy="synchronous">
+        <transformer ref="addSessionProperty"/>
+        <transformer ref="addInvocationProperty"/>
+        <logger level="WARN" message="session variables: #[groovy:sessionVars]" />
+        <logger level="WARN" message="session variables size: #[groovy:((Map) sessionVars).size()]" />
+        <test:assert expression="#[groovy:sessionVars instanceof Map]"/>
+        <test:assert expression="#[groovy:((Map) sessionVars).size() == 1]"/>
+        <test:assert expression="#[groovy:((Map) sessionVars).get('variable').equals('sessionValue')]"/>
+    </flow>
+
+    <flow name="flowVar" processingStrategy="synchronous">
+        <transformer ref="addSessionProperty"/>
+        <transformer ref="addInvocationProperty"/>
+        <logger level="WARN" message="flow variable: #[groovy:flowVars['variable']]" />
+        <test:assert expression="#[groovy:flowVars['variable'].equals('invocationValue')]"/>
+    </flow>
+
+    <flow name="emptyFlowVar" processingStrategy="synchronous">
+        <transformer ref="addSessionProperty"/>
+        <logger level="WARN" message="flow variable: #[groovy:flowVars" />
+        <test:assert expression="#[groovy:flowVars.isEmpty()]"/>
+    </flow>
+
+    <flow name="noFlowVar" processingStrategy="synchronous">
+        <transformer ref="addSessionProperty"/>
+        <logger level="WARN" message="flow variable: #[groovy:flowVars['variable']]" />
+        <test:assert expression="#[groovy:flowVars['variable'] == null]"/>
+    </flow>
+
+    <flow name="sessionVar" processingStrategy="synchronous">
+        <transformer ref="addSessionProperty"/>
+        <transformer ref="addInvocationProperty"/>
+        <logger level="WARN" message="flow variable: #[groovy:sessionVars['variable']]" />
+        <test:assert expression="#[groovy:sessionVars['variable'].equals('sessionValue')]"/>
+    </flow>
+
+    <flow name="emptySessionVar" processingStrategy="synchronous">
+        <transformer ref="addInvocationProperty"/>
+        <logger level="WARN" message="flow variable: #[groovy:sessionVars" />
+        <test:assert expression="#[groovy:sessionVars.isEmpty()]"/>
+    </flow>
+
+    <flow name="noSessionVar" processingStrategy="synchronous">
+        <transformer ref="addInvocationProperty"/>
+        <logger level="WARN" message="flow variable: #[groovy:sessionVars['variable']]" />
+        <test:assert expression="#[groovy:sessionVars['variable'] == null]"/>
+    </flow>
+
+    <flow name="exceptionFlow" processingStrategy="synchronous">
+        <test:component throwException="true" exceptionToThrow="java.io.IOException" exceptionText="boom"/>
+        <catch-exception-strategy>
+            <logger level="WARN" message="flow variable: #[groovy:exception]" />
+            <test:assert expression="#[groovy:exception != null]"/>
+        </catch-exception-strategy>
+    </flow>
+
+    <flow name="noException" processingStrategy="synchronous">
+        <logger level="WARN" message="flow variable: #[groovy:exception]" />
+        <test:assert expression="#[groovy:exception == null]"/>
+    </flow>
+
+    <flow name="flowVarLegacy" processingStrategy="synchronous">
+        <transformer ref="addSessionProperty"/>
+        <transformer ref="addInvocationProperty"/>
+        <logger level="WARN" message="flow variable: #[groovy:flowVars['variable']]" />
+        <test:assert expression="#[groovy:flowVars['variable'].equals(message.getInvocationProperty('variable'))]"/>
+    </flow>
+
+    <flow name="exceptionFlowLegacy" processingStrategy="synchronous">
+        <test:component throwException="true" exceptionToThrow="java.io.IOException" exceptionText="boom"/>
+        <catch-exception-strategy>
+            <logger level="WARN" message="flow variable: #[groovy:exception]" />
+            <logger level="WARN" message="flow variable: #[groovy:message.getExceptionPayload().getException().getCause()]" />
+            <test:assert expression="#[groovy:exception == message.getExceptionPayload().getException()]"/>
+        </catch-exception-strategy>
+    </flow>
+</mule>
