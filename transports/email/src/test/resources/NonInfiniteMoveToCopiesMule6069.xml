@@ -1,26 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:spring="http://www.springframework.org/schema/beans"
-       xmlns:imap="http://www.mulesoft.org/schema/mule/imap"
-       xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
-       xsi:schemaLocation="
-       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:imap="http://www.mulesoft.org/schema/mule/imap"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xsi:schemaLocation="
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
        http://www.mulesoft.org/schema/mule/imap http://www.mulesoft.org/schema/mule/imap/3.2/mule-imap.xsd
        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.2/mule-vm.xsd">
 
-    <imap:connector name="imapConnector" moveToFolder="processed" deleteReadMessages="false"
-    	checkFrequency="200">
-	    <service-overrides messageReceiver="org.mule.transport.email.functional.RetrieveMessageReceiverPollCounter" />
-    	
-  	</imap:connector>
+    <imap:connector name="imapConnector" moveToFolder="processed" deleteReadMessages="false" checkFrequency="200">
+        <service-overrides messageReceiver="org.mule.transport.email.functional.RetrieveMessageReceiverPollCounter"/>
+    </imap:connector>
 
     <flow name="relay">
-    
         <imap:inbound-endpoint user="bob" password="password" host="localhost" port="${port1}"
-        						disableTransportTransformer="true"/>
+                               disableTransportTransformer="true"/>
         <vm:outbound-endpoint path="receive" exchange-pattern="one-way"/>
     </flow>
-
 </mule>
