@@ -10,6 +10,11 @@
 
 package org.mule.util.store;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.registry.RegistrationException;
 import org.mule.api.store.ListableObjectStore;
@@ -21,13 +26,6 @@ import org.mule.api.store.ObjectStoreManager;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
 
 public class ManagedStoresTestCase extends AbstractMuleContextTestCase
 {
@@ -81,7 +79,7 @@ public class ManagedStoresTestCase extends AbstractMuleContextTestCase
         assertTrue(baseStore instanceof QueuePersistenceObjectStore);
         assertSame(baseStore,
             muleContext.getRegistry().lookupObject(MuleProperties.OBJECT_STORE_DEFAULT_PERSISTENT_NAME));
-        testObjectStore(store, false);
+        testObjectStore(store);
         testObjectStoreExpiry(manager.getObjectStore("persistenceExpPart1", true, -1, 500, 200));
         testObjectStoreMaxEntries((ListableObjectStore) manager.getObjectStore("persistenceMaxPart1", true,
             10, 10000, 200));
@@ -131,12 +129,6 @@ public class ManagedStoresTestCase extends AbstractMuleContextTestCase
 
     private void testObjectStore(ListableObjectStore store) throws ObjectStoreException
     {
-        testObjectStore(store, true);
-    }
-
-    private void testObjectStore(ListableObjectStore store, boolean removeReturnsObject)
-        throws ObjectStoreException
-    {
         ObjectStoreException e = null;
         store.store("key1", "value1");
         assertEquals("value1", store.retrieve("key1"));
@@ -153,15 +145,9 @@ public class ManagedStoresTestCase extends AbstractMuleContextTestCase
         e = null;
         assertEquals(1, store.allKeys().size());
         assertEquals("key1", store.allKeys().get(0));
-        if (removeReturnsObject)
-        {
-            assertEquals("value1", store.remove("key1"));
-        }
-        else
-        {
-            assertNull(store.remove("key1"));
-        }
+        assertEquals("value1", store.remove("key1"));
         assertFalse(store.contains("key1"));
+
         try
         {
             store.retrieve("key1");
