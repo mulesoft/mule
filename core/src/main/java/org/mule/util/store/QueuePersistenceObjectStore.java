@@ -41,10 +41,7 @@ import org.apache.commons.lang.SerializationException;
  * This is an {@link ObjectStore} implementation that is to be used to persist
  * messages on Mule's internal queues. Note that this is a specialized implementation
  * of the {@link ObjectStore} interface which hard-codes the location of the
- * persistence folder to <code>$MULE_HOME/.mule/queuestore</code>. It also breaks the
- * contract defined in the {@link ObjectStore} javadocs as it does not load and
- * return the stored object when deleting and entry - the calling code does not care
- * about the removed object anyway.
+ * persistence folder to <code>$MULE_HOME/.mule/queuestore</code>.
  * </p>
  * <p>
  * This implementation uses <a href=
@@ -292,11 +289,10 @@ public class QueuePersistenceObjectStore<T extends Serializable> extends Abstrac
     protected T doRemove(Serializable key) throws ObjectStoreException
     {
         File storeFile = createStoreFile(key);
+        T storedValue = deserialize(storeFile);
         deleteStoreFile(storeFile);
 
-        // we can safely return null here to avoid loading the message - the calling code
-        // discards the returned object anyway (see TransactionalQueueManager#doRemove)
-        return null;
+        return storedValue;
     }
 
     protected void deleteStoreFile(File file) throws ObjectStoreException
