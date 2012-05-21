@@ -85,7 +85,7 @@ public class PersistentStore6007TestCase extends FunctionalTestCase
             {
                 MuleMessage msg = new DefaultMuleMessage(str, muleContext);
                 MuleEvent event = new DefaultMuleEvent(msg, MessageExchangePattern.ONE_WAY, new DefaultMuleSession(muleContext));
-                events.put(UntilSuccessful.EventStoreKey.buildFor(event), event);
+                events.put(UntilSuccessful.buildQueueKey(event), event);
             }
         } 
 

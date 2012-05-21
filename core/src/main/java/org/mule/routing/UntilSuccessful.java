@@ -10,9 +10,6 @@
 
 package org.mule.routing;
 
-import java.io.Serializable;
-import java.util.concurrent.TimeUnit;
-
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MessagingException;
@@ -35,7 +32,11 @@ import org.mule.retry.async.AsynchronousRetryTemplate;
 import org.mule.retry.policies.SimpleRetryPolicyTemplate;
 import org.mule.routing.filters.ExpressionFilter;
 import org.mule.routing.outbound.AbstractOutboundRouter;
-import org.mule.util.SystemUtils;
+import org.mule.util.queue.QueueKey;
+import org.mule.util.store.QueuePersistenceObjectStore;
+
+import java.io.Serializable;
+import java.util.concurrent.TimeUnit;
 
 /**
  * UntilSuccessful attempts to route a message to the message processor it contains in an asynchronous manner. Routing
@@ -46,48 +47,6 @@ import org.mule.util.SystemUtils;
  */
 public class UntilSuccessful extends AbstractOutboundRouter
 {
-    public static class EventStoreKey implements Serializable
-    {
-        private static final long serialVersionUID = 1L;
-        private final String value;
-
-        private EventStoreKey(final String value)
-        {
-            this.value = value;
-        }
-
-        public static EventStoreKey buildFor(final MuleEvent muleEvent)
-        {
-            // the key is built in way to prevent UntilSuccessful workers across a cluster to compete for the same
-            // events over a shared object store
-            String key = muleEvent.getFlowConstruct() + "@"
-                + muleEvent.getMuleContext().getClusterId() + ":" + muleEvent.getId();
-            return new EventStoreKey(SystemUtils.legalizeFileName(key));
-        }
-
-        @Override
-        public String toString()
-        {
-            return value;
-        }
-
-        @Override
-        public int hashCode()
-        {
-            return value.hashCode();
-        }
-
-        @Override
-        public boolean equals(final Object obj)
-        {
-            if (!(obj instanceof EventStoreKey))
-            {
-                return false;
-            }
-
-            return value.equals(((EventStoreKey) obj).value);
-        }
-    }
 
     public static final String PROCESS_ATTEMPT_COUNT_PROPERTY_NAME = "process.attempt.count";
 
@@ -174,7 +133,9 @@ public class UntilSuccessful extends AbstractOutboundRouter
                                                                                  + ackExpression), this);
         }
 
-        eventKeyPrefix = flowConstruct.getName() + "@" + muleContext.getClusterId() + ":";
+        String flowName = flowConstruct.getName();
+        String clusterId = muleContext.getClusterId();
+        eventKeyPrefix = flowName + "-" + clusterId + "-";
     }
 
     @Override
@@ -205,7 +166,7 @@ public class UntilSuccessful extends AbstractOutboundRouter
 
         try
         {
-            final EventStoreKey eventStoreKey = storeEvent(event);
+            final Serializable eventStoreKey = storeEvent(event);
             scheduleForProcessing(eventStoreKey);
 
             if (ackExpression == null)
@@ -232,7 +193,7 @@ public class UntilSuccessful extends AbstractOutboundRouter
         {
             try
             {
-                scheduleForProcessing((EventStoreKey) eventStoreKey);
+                scheduleForProcessing(eventStoreKey);
             }
             catch (final Exception e)
             {
@@ -243,7 +204,7 @@ public class UntilSuccessful extends AbstractOutboundRouter
         }
     }
 
-    private void scheduleForProcessing(final EventStoreKey eventStoreKey) throws Exception
+    private void scheduleForProcessing(final Serializable eventStoreKey) throws Exception
     {
         final RetryCallback callback = new RetryCallback()
         {
@@ -283,7 +244,7 @@ public class UntilSuccessful extends AbstractOutboundRouter
         retryPolicyTemplate.execute(callback, muleContext.getWorkManager());
     }
 
-    private EventStoreKey storeEvent(final MuleEvent event) throws ObjectStoreException
+    private Serializable storeEvent(final MuleEvent event) throws ObjectStoreException
     {
         final MuleMessage message = event.getMessage();
         final Integer deliveryAttemptCount = message.getInvocationProperty(
@@ -291,17 +252,25 @@ public class UntilSuccessful extends AbstractOutboundRouter
         return storeEvent(event, deliveryAttemptCount);
     }
 
-    private EventStoreKey storeEvent(final MuleEvent event, final int deliveryAttemptCount)
+    private Serializable storeEvent(final MuleEvent event, final int deliveryAttemptCount)
         throws ObjectStoreException
     {
         final MuleMessage message = event.getMessage();
         message.setInvocationProperty(PROCESS_ATTEMPT_COUNT_PROPERTY_NAME, deliveryAttemptCount);
-        final EventStoreKey eventStoreKey = EventStoreKey.buildFor(event);
+        final Serializable eventStoreKey = buildQueueKey(event);
         objectStore.store(eventStoreKey, event);
         return eventStoreKey;
     }
 
-    private void incrementProcessAttemptCountOrRemoveFromStore(final EventStoreKey eventStoreKey)
+    public static Serializable buildQueueKey(final MuleEvent muleEvent)
+    {
+        // the key is built in way to prevent UntilSuccessful workers across a cluster to compete for the same
+        // events over a shared object store
+        String key = muleEvent.getFlowConstruct() + "-" + muleEvent.getMuleContext().getClusterId() + "-" + muleEvent.getId();
+        return new QueueKey(QueuePersistenceObjectStore.DEFAULT_QUEUE_STORE, key);
+    }
+
+    private void incrementProcessAttemptCountOrRemoveFromStore(final Serializable eventStoreKey)
     {
         try
         {
@@ -348,7 +317,7 @@ public class UntilSuccessful extends AbstractOutboundRouter
         }
     }
 
-    private void removeFromStore(final EventStoreKey eventStoreKey)
+    private void removeFromStore(final Serializable eventStoreKey)
     {
         try
         {
@@ -360,7 +329,7 @@ public class UntilSuccessful extends AbstractOutboundRouter
         }
     }
 
-    private void retrieveAndProcessEvent(final EventStoreKey eventStoreKey) throws ObjectStoreException
+    private void retrieveAndProcessEvent(final Serializable eventStoreKey) throws ObjectStoreException
     {
         final MuleEvent persistedEvent = objectStore.retrieve(eventStoreKey);
         final MuleEvent mutableEvent = threadSafeCopy(persistedEvent);
