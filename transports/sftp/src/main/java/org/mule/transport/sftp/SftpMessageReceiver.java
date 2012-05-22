@@ -51,7 +51,7 @@ public class SftpMessageReceiver extends AbstractPollingMessageReceiver
     {
         if (logger.isDebugEnabled())
         {
-            logger.debug("Pooling. Called at endpoint " + endpoint.getEndpointURI());
+            logger.debug("Polling. Called at endpoint " + endpoint.getEndpointURI());
         }
         try
         {
@@ -61,14 +61,14 @@ public class SftpMessageReceiver extends AbstractPollingMessageReceiver
             {
                 if (logger.isDebugEnabled())
                 {
-                    logger.debug("Pooling. No matching files found at endpoint " + endpoint.getEndpointURI());
+                    logger.debug("Polling. No matching files found at endpoint " + endpoint.getEndpointURI());
                 }
             }
             else
             {
                 if (logger.isDebugEnabled())
                 {
-                    logger.debug("Pooling. " + files.length + " files found at " + endpoint.getEndpointURI()
+                    logger.debug("Polling. " + files.length + " files found at " + endpoint.getEndpointURI()
                                  + ":" + Arrays.toString(files));
                 }
                 for (String file : files)
@@ -81,7 +81,7 @@ public class SftpMessageReceiver extends AbstractPollingMessageReceiver
                 }
                 if (logger.isDebugEnabled())
                 {
-                    logger.debug("Pooling. Routed all " + files.length + " files found at "
+                    logger.debug("Polling. Routed all " + files.length + " files found at "
                                  + endpoint.getEndpointURI());
                 }
             }
