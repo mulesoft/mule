@@ -48,7 +48,6 @@ import org.apache.commons.logging.LogFactory;
  */
 public class RestServiceWrapper extends AbstractComponent
 {
-
     public static final String DELETE = HttpConstants.METHOD_DELETE;
     public static final String GET = HttpConstants.METHOD_GET;
     public static final String CONTENT_TYPE_VALUE = "application/x-www-form-urlencoded";
@@ -189,11 +188,15 @@ public class RestServiceWrapper extends AbstractComponent
             setRESTParams(urlBuffer, event.getMessage(), request, requiredParams, false, null);
             setRESTParams(urlBuffer, event.getMessage(), request, optionalParams, true, null);
         }
-        else
         // if post
+        else
         {
+            if (event.getMessage().getOutboundProperty(HttpConstants.HEADER_CONTENT_TYPE) == null)
+            {
+                event.getMessage().setOutboundProperty(HttpConstants.HEADER_CONTENT_TYPE, CONTENT_TYPE_VALUE);
+            }
+
             StringBuffer requestBodyBuffer = new StringBuffer();
-            event.getMessage().setOutboundProperty(HttpConstants.HEADER_CONTENT_TYPE, CONTENT_TYPE_VALUE);
             setRESTParams(urlBuffer, event.getMessage(), request, requiredParams, false, requestBodyBuffer);
             setRESTParams(urlBuffer, event.getMessage(), request, optionalParams, true, requestBodyBuffer);
             requestBody = requestBodyBuffer.toString();
@@ -213,7 +216,7 @@ public class RestServiceWrapper extends AbstractComponent
             new DefaultMuleMessage(requestBody, event.getMessage(), muleContext), outboundEndpoint);
         if (isErrorPayload(result))
         {
-            handleException(new RestServiceException(CoreMessages.failedToInvokeRestService(tempUrl), 
+            handleException(new RestServiceException(CoreMessages.failedToInvokeRestService(tempUrl),
                 event), result);
         }
 

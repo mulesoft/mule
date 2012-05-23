@@ -66,8 +66,27 @@
             </inbound>
             <echo-component/>
         </service>
+
+        <service name="PreserveRequestContentTypeHeader">
+            <inbound>
+                <vm:inbound-endpoint name="restServiceEndpoint4" path="restservice4" exchange-pattern="request-response">
+                    <message-properties-transformer>
+                        <add-message-property key="Content-Type" value="foo/bar"/>
+                    </message-properties-transformer>
+                </vm:inbound-endpoint>
+            </inbound>
+            <!-- Tests that the content type is not overwritten by RestServiceWrapper -->
+            <http:rest-service-component serviceUrl="http://localhost:${port2}/echo" httpMethod="POST"/>
+        </service>
+
+        <service name="SendBackContentType">
+            <inbound>
+                <http:inbound-endpoint address="http://localhost:${port2}/echo"/>
+            </inbound>
+            <component class="org.mule.transport.http.components.RestServiceWrapperFunctionalTestCase$CopyContentTypeFromRequest"/>
+        </service>
     </model>
-    
+
     <flow name="flow">
         <vm:inbound-endpoint path="toFlow" exchange-pattern="request-response"/>
         <http:rest-service-component serviceUrl="http://localhost:${port1}" httpMethod="POST">
