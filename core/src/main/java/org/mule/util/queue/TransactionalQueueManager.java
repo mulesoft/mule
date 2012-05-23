@@ -137,10 +137,6 @@ public class TransactionalQueueManager extends AbstractXAResourceManager impleme
         {
             try
             {
-                if (store instanceof QueuePersistenceObjectStore)
-                {
-                    ((QueuePersistenceObjectStore) store).removeUnhealthyFiles();
-                }
                 List<Serializable> keys = store.allKeys();
                 for (Serializable key : keys)
                 {
