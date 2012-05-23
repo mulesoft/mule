@@ -95,6 +95,10 @@ public class QueuePersistenceObjectStore<T extends Serializable> extends Abstrac
         {
             createStoreDirectory(storeDirectory);
         }
+        else
+        {
+            removeUnhealthyFiles();
+        }
     }
 
     private void initStoreDirectory() throws ObjectStoreException
@@ -317,7 +321,7 @@ public class QueuePersistenceObjectStore<T extends Serializable> extends Abstrac
         muleContext = context;
     }
 
-    public void removeUnhealthyFiles() throws ObjectStoreException
+    private void removeUnhealthyFiles() throws ObjectStoreException
     {
         List<Serializable> keys = allKeys();
         for (Serializable key : keys)

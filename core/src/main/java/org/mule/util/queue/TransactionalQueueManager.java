@@ -137,14 +137,10 @@ public class TransactionalQueueManager extends AbstractXAResourceManager impleme
         {
             try
             {
-                if (store instanceof QueuePersistenceObjectStore)
-                {
-                    ((QueuePersistenceObjectStore) store).removeUnhealthyFiles();
-                }
                 List<Serializable> keys = store.allKeys();
                 for (Serializable key : keys)
                 {
-                    // It may contain events that aren;t part of a queue MULE-6007
+                    // It may contain events that aren't part of a queue MULE-6007
                     if (key instanceof QueueKey)
                     {
                         QueueKey queueKey = (QueueKey) key;
