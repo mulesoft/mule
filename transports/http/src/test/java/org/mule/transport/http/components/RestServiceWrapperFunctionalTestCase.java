@@ -13,11 +13,13 @@ package org.mule.transport.http.components;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
+import org.mule.api.lifecycle.Callable;
 import org.mule.component.ComponentException;
-import org.mule.module.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.transport.http.HttpConstants;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -33,11 +35,15 @@ public class RestServiceWrapperFunctionalTestCase extends AbstractServiceAndFlow
     protected static String TEST_REQUEST = "Test Http Request";
 
     @Rule
-    public DynamicPort dynamicPort = new DynamicPort("port1");
+    public DynamicPort port1 = new DynamicPort("port1");
+
+    @Rule
+    public DynamicPort port2 = new DynamicPort("port2");
 
     public RestServiceWrapperFunctionalTestCase(ConfigVariant variant, String configResources)
     {
         super(variant, configResources);
+        setDisposeContextPerClass(true);
     }
 
     @Parameters
@@ -47,7 +53,7 @@ public class RestServiceWrapperFunctionalTestCase extends AbstractServiceAndFlow
             {ConfigVariant.SERVICE, "http-rest-service-wrapper-functional-test-service.xml"},
             {ConfigVariant.FLOW, "http-rest-service-wrapper-functional-test-flow.xml"}
         });
-    }      
+    }
 
     @Test
     public void testErrorExpressionOnRegexFilterFail() throws Exception
@@ -61,29 +67,28 @@ public class RestServiceWrapperFunctionalTestCase extends AbstractServiceAndFlow
     @Test
     public void testErrorExpressionOnRegexFilterPass() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
-        MuleMessage result = client.send("restServiceEndpoint2", TEST_REQUEST, null);
+        MuleMessage result = muleContext.getClient().send("restServiceEndpoint2", TEST_REQUEST, null);
         assertEquals("echo=" + TEST_REQUEST,result.getPayloadAsString());
     }
 
     @Test
     public void testRequiredParameters() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
         Map<String, Object> props = new HashMap<String, Object>();
         props.put("baz-header", "baz");
         props.put("bar-optional-header", "bar");
-        MuleMessage result = client.send("restServiceEndpoint3", null, props);
+
+        MuleMessage result = muleContext.getClient().send("restServiceEndpoint3", null, props);
         assertEquals("foo=boo&faz=baz&far=bar",result.getPayloadAsString());
     }
 
     @Test
     public void testOptionalParametersMissing() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
         Map<String, Object> props = new HashMap<String, Object>();
         props.put("baz-header", "baz");
-        MuleMessage result = client.send("restServiceEndpoint3", null, props);
+
+        MuleMessage result = muleContext.getClient().send("restServiceEndpoint3", null, props);
         assertEquals("foo=boo&faz=baz",result.getPayloadAsString());
     }
 
@@ -101,11 +106,25 @@ public class RestServiceWrapperFunctionalTestCase extends AbstractServiceAndFlow
     @Test
     public void testRestServiceComponentInFlow() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
-        
-        MuleMessage result = client.send("vm://toFlow", TEST_REQUEST, null);
+        MuleMessage result = muleContext.getClient().send("vm://toFlow", TEST_REQUEST, null);
         assertNotNull(result);
         assertEquals("echo=Test Http Request", result.getPayloadAsString());
     }
-    
+
+    @Test
+    public void restServiceComponentShouldPreserveContentTypeOnIncomingMessage() throws Exception
+    {
+        MuleMessage result = muleContext.getClient().send("vm://restservice4", TEST_REQUEST, null);
+        assertNotNull(result);
+        assertEquals("foo/bar", result.getPayloadAsString());
+    }
+
+    public static class CopyContentTypeFromRequest implements Callable
+    {
+        @Override
+        public Object onCall(MuleEventContext eventContext) throws Exception
+        {
+            return eventContext.getMessage().getInboundProperty(HttpConstants.HEADER_CONTENT_TYPE);
+        }
+    }
 }
