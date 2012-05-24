@@ -23,6 +23,8 @@ import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.testmodels.mule.TestSedaService;
+import org.mule.util.JdkVersionUtils;
+import org.mule.util.JdkVersionUtils.JdkVersion;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -51,7 +53,8 @@ public class SslFunctionalTestCase extends FunctionalTestCase
     {
         // exclude these tests if we're running in Java 7 because ssl is broken in
         // the jdk
-        return super.isExcluded() || System.getProperty("java.version").matches("1\\.7\\..*");
+        return super.isExcluded() || System.getProperty("java.version").matches("1\\.7\\..*")
+        		|| JdkVersionUtils.getJdkVersion().compareTo(new JdkVersion("1.6.0_26")) > 0;
     }
 
     @Test

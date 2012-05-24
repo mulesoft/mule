@@ -76,7 +76,7 @@ public class JsonBeanRoundTripTestCase extends AbstractTransformerTestCase
     public boolean compareResults(Object expected, Object result)
     {
         //MULE-4879 field ordering is not guaranteed by the JVM so we cannot compare result strings
-        if(expected instanceof String)
+        if(expected instanceof String || expected instanceof byte[])
         {
             try
             {

@@ -21,6 +21,8 @@ import org.mule.module.json.transformers.ObjectToJson;
 import org.mule.module.json.transformers.XmlToJson;
 import org.mule.tck.junit4.FunctionalTestCase;
 
+import org.codehaus.jackson.JsonNode;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -82,7 +84,11 @@ public class JsonNamespaceHandlerTestCase extends FunctionalTestCase
 
         String result = (String)serializer.transform(fc);
         assertNotNull(result);
-        assertEquals(JsonBeanRoundTripTestCase.JSON_STRING, result);
+        // compare the structure and values but not the attributes' order
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode actualJsonNode = mapper.readTree(result);
+        JsonNode expectedJsonNode = mapper.readTree(JsonBeanRoundTripTestCase.JSON_STRING);
+        assertEquals(actualJsonNode, expectedJsonNode);
 
         FruitCollection result2 = (FruitCollection)deserializer.transform(result);
         assertNotNull(result2);
