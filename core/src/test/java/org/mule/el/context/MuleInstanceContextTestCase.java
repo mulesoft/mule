@@ -33,7 +33,7 @@ public class MuleInstanceContextTestCase extends AbstractELTestCase
 
     public void assignValueToMuleVersion()
     {
-        assertImmutableVariable("mule.version='1'");
+        assertFinalProperty("mule.version='1'");
     }
 
     @Test
@@ -44,7 +44,7 @@ public class MuleInstanceContextTestCase extends AbstractELTestCase
 
     public void assignValueToHomeDir()
     {
-        assertImmutableVariable("mule.home='1'");
+        assertFinalProperty("mule.home='1'");
     }
 
     @Test
@@ -55,7 +55,7 @@ public class MuleInstanceContextTestCase extends AbstractELTestCase
 
     public void assignValueToClusterId()
     {
-        assertImmutableVariable("mule.clusterId='1'");
+        assertFinalProperty("mule.clusterId='1'");
     }
 
     @Test
@@ -66,7 +66,7 @@ public class MuleInstanceContextTestCase extends AbstractELTestCase
 
     public void assignValueToNodeId()
     {
-        assertImmutableVariable("mule.nodeId='1'");
+        assertFinalProperty("mule.nodeId='1'");
     }
 
 }

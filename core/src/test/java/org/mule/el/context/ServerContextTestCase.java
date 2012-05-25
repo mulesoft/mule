@@ -34,7 +34,7 @@ public class ServerContextTestCase extends AbstractELTestCase
 
     public void assignValueToHost()
     {
-        assertImmutableVariable("server.host='1'");
+        assertFinalProperty("server.host='1'");
     }
 
     @Test
@@ -43,9 +43,10 @@ public class ServerContextTestCase extends AbstractELTestCase
         Assert.assertEquals(InetAddress.getLocalHost().getHostAddress(), evaluate("server.ip"));
     }
 
+    @Test
     public void assignValueToIp()
     {
-        assertImmutableVariable("server.ip='1'");
+        assertFinalProperty("server.ip='1'");
     }
 
     @Test
@@ -54,9 +55,10 @@ public class ServerContextTestCase extends AbstractELTestCase
         Assert.assertEquals(System.getProperties(), evaluate("server.systemProperties"));
     }
 
+    @Test
     public void assignValueToJavaSystemProperties()
     {
-        assertImmutableVariable("server.systemProperties='1'");
+        assertFinalProperty("server.systemProperties='1'");
     }
 
     @Test
@@ -65,9 +67,10 @@ public class ServerContextTestCase extends AbstractELTestCase
         Assert.assertEquals(System.getProperty("java.io.tmpdir"), evaluate("server.tmpDir"));
     }
 
+    @Test
     public void assignValueToTmpdir()
     {
-        assertImmutableVariable("server.tmpDir='1'");
+        assertFinalProperty("server.tmpDir='1'");
     }
 
     @Test
@@ -76,9 +79,10 @@ public class ServerContextTestCase extends AbstractELTestCase
         Assert.assertEquals(System.getProperty("file.separator"), evaluate("server.fileSeparator"));
     }
 
+    @Test
     public void assignValueToFileseperator()
     {
-        assertImmutableVariable("server.fileSeparator='1'");
+        assertFinalProperty("server.fileSeparator='1'");
     }
 
     @Test
@@ -87,9 +91,10 @@ public class ServerContextTestCase extends AbstractELTestCase
         Assert.assertEquals(System.getProperty("os.name"), evaluate("server.osName"));
     }
 
+    @Test
     public void assignValueToOsName()
     {
-        assertImmutableVariable("server.osName='1'");
+        assertFinalProperty("server.osName='1'");
     }
 
     @Test
@@ -98,9 +103,10 @@ public class ServerContextTestCase extends AbstractELTestCase
         Assert.assertEquals(System.getProperty("os.arch"), evaluate("server.osArch"));
     }
 
+    @Test
     public void assignValueToOsArch()
     {
-        assertImmutableVariable("server.osArch='1'");
+        assertFinalProperty("server.osArch='1'");
     }
 
     @Test
@@ -109,9 +115,10 @@ public class ServerContextTestCase extends AbstractELTestCase
         Assert.assertEquals(System.getProperty("os.version"), evaluate("server.osVersion"));
     }
 
+    @Test
     public void assignValueToOsVersion()
     {
-        assertImmutableVariable("server.os.version='1'");
+        assertFinalProperty("server.os.version='1'");
     }
 
     @Test
@@ -120,9 +127,10 @@ public class ServerContextTestCase extends AbstractELTestCase
         Assert.assertEquals(System.getProperty("java.version"), evaluate("server.javaVersion"));
     }
 
+    @Test
     public void assignValueToJavaVersion()
     {
-        assertImmutableVariable("server.javaVersion='1'");
+        assertFinalProperty("server.javaVersion='1'");
     }
 
     @Test
@@ -131,9 +139,10 @@ public class ServerContextTestCase extends AbstractELTestCase
         Assert.assertEquals(System.getProperty("java.vendor"), evaluate("server.javaVendor"));
     }
 
+    @Test
     public void assignValueToJavaVendor()
     {
-        assertImmutableVariable("server.javaVendor='1'");
+        assertFinalProperty("server.javaVendor='1'");
     }
 
     @Test
@@ -142,9 +151,10 @@ public class ServerContextTestCase extends AbstractELTestCase
         Assert.assertEquals(System.getenv(), evaluate("server.env"));
     }
 
+    @Test
     public void assignValueToEnv()
     {
-        assertImmutableVariable("server.env='1'");
+        assertFinalProperty("server.env='1'");
     }
 
     @Test
@@ -153,9 +163,10 @@ public class ServerContextTestCase extends AbstractELTestCase
         Assert.assertEquals(Calendar.getInstance().getTimeZone(), evaluate("server.timeZone"));
     }
 
+    @Test
     public void assignValueToTimeZone()
     {
-        assertImmutableVariable("server.timeZone='1'");
+        assertFinalProperty("server.timeZone='1'");
     }
 
     @Test
@@ -164,9 +175,10 @@ public class ServerContextTestCase extends AbstractELTestCase
         Assert.assertEquals(Locale.getDefault(), evaluate("server.locale"));
     }
 
+    @Test
     public void assignValueToLocal()
     {
-        assertImmutableVariable("server.locale='1'");
+        assertFinalProperty("server.locale='1'");
     }
 
     @Test
@@ -175,9 +187,10 @@ public class ServerContextTestCase extends AbstractELTestCase
         Assert.assertEquals(System.getProperty("user.name"), evaluate("server.userName"));
     }
 
+    @Test
     public void assignValueToUserName()
     {
-        assertImmutableVariable("server.userName='1'");
+        assertFinalProperty("server.userName='1'");
     }
 
     @Test
@@ -186,9 +199,10 @@ public class ServerContextTestCase extends AbstractELTestCase
         Assert.assertEquals(System.getProperty("user.home"), evaluate("server.userHome"));
     }
 
+    @Test
     public void assignValueToUserHome()
     {
-        assertImmutableVariable("server.userHome='1'");
+        assertFinalProperty("server.userHome='1'");
     }
 
     @Test
@@ -197,9 +211,10 @@ public class ServerContextTestCase extends AbstractELTestCase
         Assert.assertEquals(System.getProperty("user.dir"), evaluate("server.userDir"));
     }
 
+    @Test
     public void assignValueToUseDir()
     {
-        assertImmutableVariable("server.userDir='1'");
+        assertFinalProperty("server.userDir='1'");
     }
 
 }
