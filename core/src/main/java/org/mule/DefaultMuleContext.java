@@ -140,6 +140,8 @@ public class DefaultMuleContext implements MuleContext
 
     private SingleResourceTransactionFactoryManager singleResourceTransactionFactoryManager = new SingleResourceTransactionFactoryManager();
 
+    private TransactionManager transactionManager;
+
     public DefaultMuleContext(MuleConfiguration config,
                               WorkManager workManager,
                               WorkListener workListener,
@@ -557,27 +559,30 @@ public class DefaultMuleContext implements MuleContext
      */
     public TransactionManager getTransactionManager()
     {
-        TransactionManager transactionManager = (TransactionManager) registryBroker.lookupObject(MuleProperties.OBJECT_TRANSACTION_MANAGER);
         if (transactionManager == null)
         {
-            Collection temp = registryBroker.lookupObjects(TransactionManagerFactory.class);
-            if (temp.size() > 0)
+            transactionManager = (TransactionManager) registryBroker.lookupObject(MuleProperties.OBJECT_TRANSACTION_MANAGER);
+            if (transactionManager == null)
             {
-                try
-                {
-                    transactionManager = (((TransactionManagerFactory) temp.iterator().next()).create(config));
-                }
-                catch (Exception e)
-                {
-                    throw new MuleRuntimeException(CoreMessages.failedToCreate("transaction manager"), e);
-                }
-            }
-            else
-            {
-                temp = registryBroker.lookupObjects(TransactionManager.class);
+                Collection temp = registryBroker.lookupObjects(TransactionManagerFactory.class);
                 if (temp.size() > 0)
                 {
-                    transactionManager = (((TransactionManager) temp.iterator().next()));
+                    try
+                    {
+                        transactionManager = (((TransactionManagerFactory) temp.iterator().next()).create(config));
+                    }
+                    catch (Exception e)
+                    {
+                        throw new MuleRuntimeException(CoreMessages.failedToCreate("transaction manager"), e);
+                    }
+                }
+                else
+                {
+                    temp = registryBroker.lookupObjects(TransactionManager.class);
+                    if (temp.size() > 0)
+                    {
+                        transactionManager = (((TransactionManager) temp.iterator().next()));
+                    }
                 }
             }
         }
