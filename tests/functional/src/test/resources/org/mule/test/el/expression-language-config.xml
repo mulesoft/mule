@@ -23,7 +23,7 @@
 
     <flow name="flow">
         <test:assert expression="#[payload == 'foo']" />
-        <expression-component>payload='bar'</expression-component>
+        <expression-component>payload='bar';a='1';b=payload+a</expression-component>
         <test:assert expression="#[payload == 'bar']" />
         <expression-component file="org/mule/test/el/component.txt" />
         <test:assert expression="#[payload == 'bar2']" />

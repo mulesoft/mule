@@ -36,7 +36,7 @@ public class AppContextTestCase extends AbstractELTestCase
 
     public void assignValueToName()
     {
-        assertImmutableVariable("app.name='1'");
+        assertFinalProperty("app.name='1'");
     }
 
     @Test
@@ -47,7 +47,7 @@ public class AppContextTestCase extends AbstractELTestCase
 
     public void assignValueToEncoding()
     {
-        assertImmutableVariable("app.encoding='1'");
+        assertFinalProperty("app.encoding='1'");
     }
 
     @Test
@@ -58,7 +58,7 @@ public class AppContextTestCase extends AbstractELTestCase
 
     public void assignValueToWorkDir()
     {
-        assertImmutableVariable("app.workDir='1'");
+        assertFinalProperty("app.workDir='1'");
     }
 
     @Test
@@ -69,7 +69,7 @@ public class AppContextTestCase extends AbstractELTestCase
 
     public void assignValueToStandalone()
     {
-        assertImmutableVariable("app.standalone='1'");
+        assertFinalProperty("app.standalone='1'");
     }
 
     @Test
@@ -80,7 +80,7 @@ public class AppContextTestCase extends AbstractELTestCase
 
     public void assignValueToRegistry()
     {
-        assertImmutableVariable("app.registy='1'");
+        assertFinalProperty("app.registy='1'");
     }
 
     @Test

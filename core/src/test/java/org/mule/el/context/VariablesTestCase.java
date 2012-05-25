@@ -20,7 +20,6 @@ import org.mule.MessageExchangePattern;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.construct.FlowConstruct;
-import org.mule.api.expression.ExpressionRuntimeException;
 import org.mule.api.transport.PropertyScope;
 
 import java.util.Map;
@@ -180,15 +179,22 @@ public class VariablesTestCase extends AbstractELTestCase
         assertEquals("bar", event.getFlowVariable("foo"));
     }
 
-    @Test(expected = ExpressionRuntimeException.class)
-    public void assignValueToNewVariable() throws Exception
+    @Test
+    public void assignValueToLocalVariable() throws Exception
     {
         MuleMessage message = new DefaultMuleMessage("", muleContext);
         MuleEvent event = new DefaultMuleEvent(message, MessageExchangePattern.ONE_WAY,
             Mockito.mock(FlowConstruct.class));
-        evaluate("foo='bar'", message);
-        // Value is not assigned, not sure why this doesn't fail.
+        evaluate("localVar='bar'", message);
         assertNull(event.getFlowVariable("foo"));
     }
 
+    @Test
+    public void localVariable() throws Exception
+    {
+        MuleMessage message = new DefaultMuleMessage("", muleContext);
+        MuleEvent event = new DefaultMuleEvent(message, MessageExchangePattern.ONE_WAY,
+            Mockito.mock(FlowConstruct.class));
+        assertEquals("bar", evaluate("localVar='bar';localVar", message));
+    }
 }
