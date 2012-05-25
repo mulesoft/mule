@@ -92,8 +92,25 @@ public class MVELExpressionLanguageContext extends BaseVariableResolverFactory
     @Override
     public VariableResolver createVariable(String name, Object value, Class<?> type)
     {
-        VariableResolver vr = getVariableResolver(name);
-        vr.setValue(value);
+        VariableResolver vr;
+
+        try
+        {
+            vr = getVariableResolver(name);
+        }
+        catch (UnresolveablePropertyException e)
+        {
+            vr = null;
+        }
+
+        if (vr != null)
+        {
+            vr.setValue(value);
+        }
+        else
+        {
+            addResolver(name, vr = new MuleVariableResolver(name, value, type, null));
+        }
         return vr;
     }
 
