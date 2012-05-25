@@ -14,8 +14,10 @@ import org.mule.api.MuleContext;
 import org.mule.config.MuleManifest;
 
 /**
+ * Expose information about the Mule instance:
+ * 
  * <li> <b>clusterid</b>       <i>Cluster ID</i>
- * <li> <b>home</b>            <i>Mule home directory</i>
+ * <li> <b>home</b>            <i>Home directory</i>
  * <li> <b>nodeid</b>          <i>Cluster Node ID</i>
  * <li> <b>version</b>         <i>Mule Version</i>
  */
@@ -29,7 +31,7 @@ public class MuleInstanceContext
         this.muleContext = muleContext;
     }
 
-    public String getVersion()
+    public static String getVersion()
     {
         return MuleManifest.getProductVersion();
     }
