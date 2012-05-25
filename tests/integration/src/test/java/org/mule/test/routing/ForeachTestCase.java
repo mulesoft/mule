@@ -10,6 +10,7 @@
 
 package org.mule.test.routing;
 
+import static junit.framework.Assert.assertNotNull;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
@@ -19,6 +20,7 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleMessageCollection;
 import org.mule.api.expression.RequiredValueException;
+import org.mule.api.transport.PropertyScope;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.functional.FlowAssert;
 import org.mule.tck.junit4.FunctionalTestCase;
@@ -472,6 +474,15 @@ public class ForeachTestCase extends FunctionalTestCase
         assertTrue(out.getPayload() instanceof String);
         outPayload = (String) out.getPayload();
         assertEquals("bar", outPayload);
+    }
+
+    @Test
+    public void testRequestReply() throws Exception
+    {
+        MuleMessage parent = new DefaultMuleMessage(null, muleContext);
+        MuleMessage msg = client.send("vm://input-22", parent);
+        assertNotNull(msg);
+        assertEquals(msg.getProperty("processedMessages", PropertyScope.SESSION), "0123");
     }
 }
 
