@@ -8,14 +8,13 @@
  * LICENSE.txt file.
  */
 
-package org.mule.config.spring.factories;
+package org.mule.api.store;
 
-import org.mule.api.config.MuleProperties;
+import java.io.Serializable;
 
-public class DefaultMemoryQueueStoreFactoryBean extends ObjectStoreFromRegistryFactoryBean
+/**
+ * Defines a <{@link ListableObjectStore} to store data for event queues.
+ */
+public interface QueueObjectStore<T extends Serializable> extends ListableObjectStore<T>
 {
-    public DefaultMemoryQueueStoreFactoryBean()
-    {
-        super(MuleProperties.QUEUE_STORE_DEFAULT_IN_MEMORY_NAME);
-    }
 }

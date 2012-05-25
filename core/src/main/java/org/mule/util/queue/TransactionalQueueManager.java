@@ -15,14 +15,15 @@ import org.mule.api.context.MuleContextAware;
 import org.mule.api.store.ListableObjectStore;
 import org.mule.api.store.ObjectStore;
 import org.mule.api.store.ObjectStoreException;
+import org.mule.api.store.QueueObjectStore;
 import org.mule.util.UUID;
-import org.mule.util.store.QueuePersistenceObjectStore;
 import org.mule.util.xa.AbstractTransactionContext;
 import org.mule.util.xa.AbstractXAResourceManager;
 import org.mule.util.xa.ResourceManagerException;
 import org.mule.util.xa.ResourceManagerSystemException;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -43,7 +44,7 @@ public class TransactionalQueueManager extends AbstractXAResourceManager impleme
 
     private QueueConfiguration defaultQueueConfiguration;
     private MuleContext muleContext;
-    private Set<ListableObjectStore> stores = new HashSet<ListableObjectStore>();
+    private Set<QueueObjectStore> stores = new HashSet<QueueObjectStore>();
 
     @Override
     public synchronized QueueSession getQueueSession()
@@ -90,8 +91,8 @@ public class TransactionalQueueManager extends AbstractXAResourceManager impleme
     @Override
     protected void doStart() throws ResourceManagerSystemException
     {
-        findAllStores();
-        for (ListableObjectStore store: stores)
+        Collection<ListableObjectStore> listableObjectStores = findAllListableObjectStores();
+        for (ListableObjectStore store: listableObjectStores)
         {
             try
             {
@@ -107,8 +108,8 @@ public class TransactionalQueueManager extends AbstractXAResourceManager impleme
     @Override
     protected boolean shutdown(int mode, long timeoutMSecs)
     {
-        findAllStores();
-        for (ListableObjectStore store: stores)
+        Collection<ListableObjectStore> listableObjectStores = findAllListableObjectStores();
+        for (ListableObjectStore store: listableObjectStores)
         {
             try
             {
@@ -132,9 +133,14 @@ public class TransactionalQueueManager extends AbstractXAResourceManager impleme
     @Override
     protected void recover() throws ResourceManagerSystemException
     {
-        findAllStores();
-        for (ListableObjectStore store: stores)
+        findAllQueueStores();
+        for (QueueObjectStore store: stores)
         {
+            if (!store.isPersistent())
+            {
+                continue;
+            }
+
             try
             {
                 List<Serializable> keys = store.allKeys();
@@ -211,11 +217,17 @@ public class TransactionalQueueManager extends AbstractXAResourceManager impleme
         context.doRollback();
     }
 
-    protected synchronized void findAllStores()
+    protected Collection<ListableObjectStore> findAllListableObjectStores()
+    {
+        Collection<ListableObjectStore> listableObjectStores = muleContext.getRegistry().lookupByType(ListableObjectStore.class).values();
+        return  listableObjectStores;
+    }
+
+    protected synchronized void findAllQueueStores()
     {
         if (muleContext != null)
         {
-            for (ListableObjectStore store: muleContext.getRegistry().lookupByType(ListableObjectStore.class).values())
+            for (QueueObjectStore store: muleContext.getRegistry().lookupByType(QueueObjectStore.class).values())
             {
                 addStore(store);
             }
@@ -235,6 +247,11 @@ public class TransactionalQueueManager extends AbstractXAResourceManager impleme
 
     private void addStore(ListableObjectStore<?> store)
     {
-        stores.add(store);
+        if (!(store instanceof QueueObjectStore))
+        {
+            throw new IllegalArgumentException("Store must implements QueueObjectStore");
+        }
+
+        stores.add((QueueObjectStore) store);
     }
 }

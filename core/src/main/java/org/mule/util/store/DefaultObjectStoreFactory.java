@@ -10,6 +10,7 @@
 package org.mule.util.store;
 
 import org.mule.api.store.ObjectStore;
+import org.mule.api.store.QueueObjectStore;
 
 import java.io.Serializable;
 
@@ -21,4 +22,8 @@ public interface DefaultObjectStoreFactory
     ObjectStore<Serializable> createDefaultInMemoryObjectStore();
 
     ObjectStore<Serializable> createDefaultPersistentObjectStore();
+
+    QueueObjectStore<Serializable> createDefaultInMemoryQueueStore();
+
+    QueueObjectStore<Serializable> createDefaultPersistentQueueStore();
 }
