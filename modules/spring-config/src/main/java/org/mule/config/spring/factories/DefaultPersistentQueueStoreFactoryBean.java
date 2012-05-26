@@ -16,6 +16,6 @@ public class DefaultPersistentQueueStoreFactoryBean extends ObjectStoreFromRegis
 {
     public DefaultPersistentQueueStoreFactoryBean()
     {
-        super(MuleProperties.OBJECT_STORE_DEFAULT_PERSISTENT_NAME);
+        super(MuleProperties.QUEUE_STORE_DEFAULT_PERSISTENT_NAME);
     }
 }

@@ -10,17 +10,17 @@
 
 package org.mule.module.scripting.builders;
 
+import static org.junit.Assert.fail;
 import org.mule.api.MuleException;
 import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.config.MuleProperties;
 import org.mule.tck.AbstractScriptConfigBuilderTestCase;
+import org.mule.util.store.QueueObjectStoreAdapter;
 import org.mule.util.store.QueuePersistenceObjectStore;
 import org.mule.util.store.SimpleMemoryObjectStore;
 
 import java.io.Serializable;
 import java.util.Properties;
-
-import static org.junit.Assert.fail;
 
 public class GroovyScriptConfigurationBuilderTestCase extends AbstractScriptConfigBuilderTestCase
 {
@@ -49,8 +49,11 @@ public class GroovyScriptConfigurationBuilderTestCase extends AbstractScriptConf
     {
         Properties superProps = super.getStartUpProperties();
         Properties props = superProps == null ? new Properties() : new Properties(superProps);
+        props.put(MuleProperties.QUEUE_STORE_DEFAULT_IN_MEMORY_NAME, new QueueObjectStoreAdapter<Serializable>(new SimpleMemoryObjectStore<Serializable>()));
+        props.put(MuleProperties.QUEUE_STORE_DEFAULT_PERSISTENT_NAME, new QueueObjectStoreAdapter<Serializable>(new QueuePersistenceObjectStore<Serializable>()));
         props.put(MuleProperties.OBJECT_STORE_DEFAULT_IN_MEMORY_NAME, new SimpleMemoryObjectStore<Serializable>());
         props.put(MuleProperties.OBJECT_STORE_DEFAULT_PERSISTENT_NAME, new QueuePersistenceObjectStore<Serializable>());
+
         return props;
     }
 }

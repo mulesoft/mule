@@ -10,8 +10,14 @@
 
 package org.mule.util.queue;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.util.concurrent.Latch;
+import org.mule.util.store.QueueObjectStoreAdapter;
 import org.mule.util.store.SimpleMemoryObjectStore;
 import org.mule.util.xa.AbstractResourceManager;
 
@@ -21,12 +27,6 @@ import java.util.Random;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 
 public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMuleContextTestCase
 {
@@ -288,7 +288,7 @@ public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMu
     {
         final TransactionalQueueManager mgr = createQueueManager();
         mgr.start();
-        mgr.setDefaultQueueConfiguration(new QueueConfiguration(2, new SimpleMemoryObjectStore()));
+        mgr.setDefaultQueueConfiguration(new QueueConfiguration(2, new QueueObjectStoreAdapter<Serializable>(new SimpleMemoryObjectStore())));
 
         final Latch latch = new Latch();
 
@@ -676,7 +676,7 @@ public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMu
     {
 
         final TransactionalQueueManager mgr = createQueueManager();
-        mgr.setDefaultQueueConfiguration(new QueueConfiguration(1, new SimpleMemoryObjectStore()));
+        mgr.setDefaultQueueConfiguration(new QueueConfiguration(1, new QueueObjectStoreAdapter<Serializable>(new SimpleMemoryObjectStore())));
         try
         {
             mgr.start();
