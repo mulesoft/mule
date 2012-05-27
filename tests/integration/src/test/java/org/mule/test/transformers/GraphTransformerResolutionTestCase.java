@@ -12,9 +12,11 @@ package org.mule.test.transformers;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+
 import org.mule.api.MuleMessage;
 import org.mule.api.client.LocalMuleClient;
 import org.mule.api.transformer.DiscoverableTransformer;
+import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transformer.AbstractTransformer;
@@ -66,6 +68,11 @@ public class GraphTransformerResolutionTestCase extends FunctionalTestCase
     @Test
     public void resolvesNonDirectTransformation() throws Exception
     {
+        Transformer aToB = new AtoBConverter();
+        Transformer btoC = new BtoCConverter();
+        muleContext.getRegistry().registerTransformer(aToB);
+        muleContext.getRegistry().registerTransformer(btoC);
+
         LocalMuleClient client = muleContext.getClient();
         MuleMessage response = client.send("vm://testInput", new A("Hello"), null);
         assertTrue(response.getPayload() instanceof C);
