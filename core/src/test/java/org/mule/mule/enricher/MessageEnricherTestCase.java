@@ -23,6 +23,8 @@ import org.mule.enricher.MessageEnricher.EnrichExpressionPair;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.transformer.simple.StringAppendTransformer;
 
+import junit.framework.Assert;
+
 import org.junit.Test;
 
 public class MessageEnricherTestCase extends AbstractMuleContextTestCase
@@ -43,7 +45,7 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase
             }
         });
         enricher.initialise();
-        
+
         MuleMessage result = enricher.process(getTestEvent("")).getMessage();
         assertEquals("test", result.getOutboundProperty("myHeader"));
         assertEquals("", result.getPayload());
@@ -91,8 +93,8 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase
         MuleMessage result = enricher.process(getTestEvent("")).getMessage();
 
         assertNull(result.getOutboundProperty("myHeader"));
-        assertEquals("test2",result.getOutboundProperty("myHeader2"));
-        assertEquals("test3",result.getOutboundProperty("myHeader3"));
+        assertEquals("test2", result.getOutboundProperty("myHeader2"));
+        assertEquals("test3", result.getOutboundProperty("myHeader3"));
 
         assertEquals("", result.getPayload());
     }
@@ -118,8 +120,8 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase
         MuleEvent event = getTestEvent("");
         RequestContext.setEvent(event);
 
-        assertEquals("test append", enricher.process(getTestEvent("")).getMessage().getOutboundProperty(
-            "myHeader"));
+        assertEquals("test append",
+            enricher.process(getTestEvent("")).getMessage().getOutboundProperty("myHeader"));
     }
 
     @Test
@@ -135,10 +137,177 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase
                 return null;
             }
         });
-        
+
         MuleMessage result = enricher.process(getTestEvent("")).getMessage();
         assertNull(result.getOutboundProperty("myHeader"));
         assertEquals("", result.getPayload());
     }
-    
+
+    @Test
+    public void propogateMessage() throws Exception
+    {
+        MessageEnricher enricher = new MessageEnricher();
+        enricher.addEnrichExpressionPair(new EnrichExpressionPair("#[header:myHeader]"));
+        enricher.setEnrichmentMessageProcessor(new MessageProcessor()
+        {
+            public MuleEvent process(MuleEvent event) throws MuleException
+            {
+                event.getMessage().setPayload("enriched");
+                return event;
+            }
+        });
+        MuleEvent in = getTestEvent("");
+        in.getMessage().setOutboundProperty("foo", "bar");
+        MuleEvent out = enricher.process(in);
+        Assert.assertSame(in, out);
+        Assert.assertSame(in.getMessage(), out.getMessage());
+        assertEquals(in.getMessage().getUniqueId(), out.getMessage().getUniqueId());
+        assertEquals(in.getMessage().getPropertyNames(), out.getMessage().getPropertyNames());
+        assertEquals("bar", out.getMessage().getOutboundProperty("foo"));
+        assertEquals(in.getMessage().getPayload(), out.getMessage().getPayload());
+    }
+
+    @Test
+    public void propogateVariables() throws Exception
+    {
+        MessageEnricher enricher = new MessageEnricher();
+        enricher.addEnrichExpressionPair(new EnrichExpressionPair("#[header:myHeader]"));
+        enricher.setEnrichmentMessageProcessor(new MessageProcessor()
+        {
+            public MuleEvent process(MuleEvent event) throws MuleException
+            {
+                event.getMessage().setPayload("enriched");
+                return event;
+            }
+        });
+        MuleEvent in = getTestEvent("");
+        in.getSession().setProperty("sessionFoo", "bar");
+        in.getMessage().setInvocationProperty("flowFoo", "bar");
+
+        MuleEvent out = enricher.process(in);
+
+        assertEquals("bar", out.getSession().getProperty("sessionFoo"));
+        assertEquals("bar", out.getMessage().getInvocationProperty("flowFoo"));
+    }
+
+    @Test
+    public void doNotImplicityEnrichMessagePayload() throws Exception
+    {
+        MessageEnricher enricher = new MessageEnricher();
+        enricher.addEnrichExpressionPair(new EnrichExpressionPair("#[header:myHeader]"));
+        enricher.setEnrichmentMessageProcessor(new MessageProcessor()
+        {
+            public MuleEvent process(MuleEvent event) throws MuleException
+            {
+                event.getMessage().setPayload("enriched");
+                return event;
+            }
+        });
+        MuleEvent in = getTestEvent("");
+
+        MuleEvent out = enricher.process(in);
+
+        assertEquals("", out.getMessage().getPayload());
+    }
+
+    @Test
+    public void doNotImplicityEnrichMessageProperties() throws Exception
+    {
+        MessageEnricher enricher = new MessageEnricher();
+        enricher.addEnrichExpressionPair(new EnrichExpressionPair("#[header:myHeader]"));
+        enricher.setEnrichmentMessageProcessor(new MessageProcessor()
+        {
+            public MuleEvent process(MuleEvent event) throws MuleException
+            {
+                event.getMessage().setOutboundProperty("foo", "bar");
+                return event;
+            }
+        });
+        MuleEvent in = getTestEvent("");
+
+        MuleEvent out = enricher.process(in);
+
+        assertNull(out.getMessage().getOutboundProperty("foo"));
+    }
+
+    @Test
+    public void doNotImplicityEnrichFlowVariable() throws Exception
+    {
+        MessageEnricher enricher = new MessageEnricher();
+        enricher.addEnrichExpressionPair(new EnrichExpressionPair("#[header:myHeader]"));
+        enricher.setEnrichmentMessageProcessor(new MessageProcessor()
+        {
+            public MuleEvent process(MuleEvent event) throws MuleException
+            {
+                event.getMessage().setInvocationProperty("flowFoo", "bar");
+                return event;
+            }
+        });
+        MuleEvent in = getTestEvent("");
+
+        MuleEvent out = enricher.process(in);
+
+        assertNull(out.getMessage().getInvocationProperty("flowFoo"));
+    }
+
+    @Test
+    public void doNotImplicityEnrichSessionVariable() throws Exception
+    {
+        MessageEnricher enricher = new MessageEnricher();
+        enricher.addEnrichExpressionPair(new EnrichExpressionPair("#[header:myHeader]"));
+        enricher.setEnrichmentMessageProcessor(new MessageProcessor()
+        {
+            public MuleEvent process(MuleEvent event) throws MuleException
+            {
+                event.getSession().setProperty("sessionFoo", "bar");
+                return event;
+            }
+        });
+        MuleEvent in = getTestEvent("");
+
+        MuleEvent out = enricher.process(in);
+
+        assertNull(out.getSession().getProperty("sessionFoo"));
+    }
+
+    @Test
+    public void enrichFlowVariable() throws Exception
+    {
+        MessageEnricher enricher = new MessageEnricher();
+        enricher.addEnrichExpressionPair(new EnrichExpressionPair("#[variable:foo]"));
+        enricher.setEnrichmentMessageProcessor(new MessageProcessor()
+        {
+            public MuleEvent process(MuleEvent event) throws MuleException
+            {
+                event.getMessage().setPayload("bar");
+                return event;
+            }
+        });
+        MuleEvent in = getTestEvent("");
+
+        MuleEvent out = enricher.process(in);
+
+        assertEquals("bar", out.getMessage().getInvocationProperty("foo"));
+    }
+
+    @Test
+    public void enrichSessionVariable() throws Exception
+    {
+        MessageEnricher enricher = new MessageEnricher();
+        enricher.addEnrichExpressionPair(new EnrichExpressionPair("#[sessionVars['foo']]"));
+        enricher.setEnrichmentMessageProcessor(new MessageProcessor()
+        {
+            public MuleEvent process(MuleEvent event) throws MuleException
+            {
+                event.getMessage().setPayload("bar");
+                return event;
+            }
+        });
+        MuleEvent in = getTestEvent("");
+
+        MuleEvent out = enricher.process(in);
+
+        assertEquals("bar", out.getSessionVariable("foo"));
+    }
+
 }
