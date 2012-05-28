@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.util.store;
 
 import org.mule.api.store.ObjectStore;
@@ -19,7 +20,8 @@ import java.io.Serializable;
  */
 public class DefaultObjectStoreFactoryBean
 {
-    private static DefaultObjectStoreFactory delegate;
+
+    private static DefaultObjectStoreFactory delegate = new MuleDefaultObjectStoreFactory();
 
     /**
      * Do not instantiate
@@ -31,47 +33,38 @@ public class DefaultObjectStoreFactoryBean
     /**
      * Set a delegate to create the object stores in a non-default way
      */
-    public static void setDelegate(DefaultObjectStoreFactory theDelegate)
+    public static void setDelegate(DefaultObjectStoreFactory factory)
     {
-        delegate = theDelegate;
+        if (delegate == null)
+        {
+            throw new IllegalArgumentException("Object store factory cannot be null");
+        }
+
+        delegate = factory;
     }
 
     public static ObjectStore<Serializable> createDefaultInMemoryObjectStore()
     {
-        ObjectStore<Serializable> store;
-        if (delegate != null)
-        {
-            return delegate.createDefaultInMemoryObjectStore();
-        }
-        return new SimpleMemoryObjectStore<Serializable>();
+        return delegate.createDefaultInMemoryObjectStore();
     }
 
     public static ObjectStore<Serializable> createDefaultPersistentObjectStore()
     {
-        if (delegate != null)
-        {
-            return delegate.createDefaultPersistentObjectStore();
-        }
-        return new QueuePersistenceObjectStore<Serializable>();
+        return delegate.createDefaultPersistentObjectStore();
     }
 
     public static QueueObjectStore<Serializable> createDefaultInMemoryQueueStore()
     {
-        if (delegate != null)
-        {
-            return delegate.createDefaultInMemoryQueueStore();
-        }
-
-        return new QueueObjectStoreAdapter<Serializable>(new SimpleMemoryObjectStore<Serializable>());
+        return delegate.createDefaultInMemoryQueueStore();
     }
 
     public static QueueObjectStore<Serializable> createDefaultPersistentQueueStore()
     {
-        if (delegate != null)
-        {
-            return delegate.createDefaultPersistentQueueStore();
-        }
+        return delegate.createDefaultPersistentQueueStore();
+    }
 
-        return new QueueObjectStoreAdapter<Serializable>(new QueuePersistenceObjectStore<Serializable>());
+    public static Object createDefaultUserObjectStore()
+    {
+        return delegate.createDefaultUserObjectStore();
     }
 }

@@ -26,4 +26,6 @@ public interface DefaultObjectStoreFactory
     QueueObjectStore<Serializable> createDefaultInMemoryQueueStore();
 
     QueueObjectStore<Serializable> createDefaultPersistentQueueStore();
+
+    ObjectStore<Serializable> createDefaultUserObjectStore();
 }

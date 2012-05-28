@@ -69,6 +69,7 @@ public class DefaultsConfigurationBuilder extends AbstractConfigurationBuilder
         registry.registerObject(MuleProperties.OBJECT_STORE_DEFAULT_PERSISTENT_NAME, DefaultObjectStoreFactoryBean.createDefaultPersistentObjectStore());
         registry.registerObject(MuleProperties.QUEUE_STORE_DEFAULT_IN_MEMORY_NAME, DefaultObjectStoreFactoryBean.createDefaultInMemoryQueueStore());
         registry.registerObject(MuleProperties.QUEUE_STORE_DEFAULT_PERSISTENT_NAME, DefaultObjectStoreFactoryBean.createDefaultPersistentQueueStore());
+        registry.registerObject(MuleProperties.DEFAULT_USER_OBJECT_STORE_NAME, DefaultObjectStoreFactoryBean.createDefaultUserObjectStore());
         registry.registerObject(MuleProperties.OBJECT_STORE_MANAGER, new MuleObjectStoreManager());
 
         registry.registerObject(MuleProperties.OBJECT_MULE_ENDPOINT_FACTORY, new DefaultEndpointFactory());
