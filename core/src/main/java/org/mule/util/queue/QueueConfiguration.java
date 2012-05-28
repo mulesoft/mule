@@ -11,22 +11,22 @@
 package org.mule.util.queue;
 
 import org.mule.api.MuleContext;
-import org.mule.api.store.QueueObjectStore;
+import org.mule.api.store.QueueStore;
 
 import java.io.Serializable;
 
 public class QueueConfiguration
 {
     protected final int capacity;
-    protected final QueueObjectStore<Serializable> objectStore;
+    protected final QueueStore<Serializable> objectStore;
 
-    public QueueConfiguration(MuleContext context, int capacity, QueueObjectStore<Serializable> objectStore)
+    public QueueConfiguration(MuleContext context, int capacity, QueueStore<Serializable> objectStore)
     {
         this.capacity = capacity;
         this.objectStore = objectStore;
     }
 
-    public QueueConfiguration(int capacity, QueueObjectStore<Serializable> objectStore)
+    public QueueConfiguration(int capacity, QueueStore<Serializable> objectStore)
     {
         this.capacity = capacity;
         this.objectStore = objectStore;

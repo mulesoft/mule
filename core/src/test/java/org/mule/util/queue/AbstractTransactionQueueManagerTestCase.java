@@ -17,7 +17,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.util.concurrent.Latch;
-import org.mule.util.store.QueueObjectStoreAdapter;
+import org.mule.util.store.QueueStoreAdapter;
 import org.mule.util.store.SimpleMemoryObjectStore;
 import org.mule.util.xa.AbstractResourceManager;
 
@@ -288,7 +288,7 @@ public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMu
     {
         final TransactionalQueueManager mgr = createQueueManager();
         mgr.start();
-        mgr.setDefaultQueueConfiguration(new QueueConfiguration(2, new QueueObjectStoreAdapter<Serializable>(new SimpleMemoryObjectStore())));
+        mgr.setDefaultQueueConfiguration(new QueueConfiguration(2, new QueueStoreAdapter<Serializable>(new SimpleMemoryObjectStore())));
 
         final Latch latch = new Latch();
 
@@ -676,7 +676,7 @@ public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMu
     {
 
         final TransactionalQueueManager mgr = createQueueManager();
-        mgr.setDefaultQueueConfiguration(new QueueConfiguration(1, new QueueObjectStoreAdapter<Serializable>(new SimpleMemoryObjectStore())));
+        mgr.setDefaultQueueConfiguration(new QueueConfiguration(1, new QueueStoreAdapter<Serializable>(new SimpleMemoryObjectStore())));
         try
         {
             mgr.start();

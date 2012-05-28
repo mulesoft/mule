@@ -14,7 +14,7 @@ import org.mule.api.MuleContext;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.store.ListableObjectStore;
 import org.mule.api.store.ObjectStoreException;
-import org.mule.api.store.QueueObjectStore;
+import org.mule.api.store.QueueStore;
 
 import java.io.Serializable;
 import java.util.List;
@@ -22,12 +22,12 @@ import java.util.List;
 /**
  * Adapts a {@link ListableObjectStore} to make it useful to store event queues.
  */
-public class QueueObjectStoreAdapter<T extends Serializable> implements QueueObjectStore<T>, MuleContextAware
+public class QueueStoreAdapter<T extends Serializable> implements QueueStore<T>, MuleContextAware
 {
 
     private final ListableObjectStore<T> store;
 
-    public QueueObjectStoreAdapter(ListableObjectStore<T> store)
+    public QueueStoreAdapter(ListableObjectStore<T> store)
     {
         this.store = store;
     }

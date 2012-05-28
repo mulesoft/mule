@@ -11,7 +11,7 @@
 package org.mule.util.store;
 
 import org.mule.api.store.ObjectStore;
-import org.mule.api.store.QueueObjectStore;
+import org.mule.api.store.QueueStore;
 
 import java.io.Serializable;
 
@@ -53,12 +53,12 @@ public class DefaultObjectStoreFactoryBean
         return delegate.createDefaultPersistentObjectStore();
     }
 
-    public static QueueObjectStore<Serializable> createDefaultInMemoryQueueStore()
+    public static QueueStore<Serializable> createDefaultInMemoryQueueStore()
     {
         return delegate.createDefaultInMemoryQueueStore();
     }
 
-    public static QueueObjectStore<Serializable> createDefaultPersistentQueueStore()
+    public static QueueStore<Serializable> createDefaultPersistentQueueStore()
     {
         return delegate.createDefaultPersistentQueueStore();
     }

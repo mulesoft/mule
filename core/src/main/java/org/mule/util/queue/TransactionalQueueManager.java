@@ -15,7 +15,7 @@ import org.mule.api.context.MuleContextAware;
 import org.mule.api.store.ListableObjectStore;
 import org.mule.api.store.ObjectStore;
 import org.mule.api.store.ObjectStoreException;
-import org.mule.api.store.QueueObjectStore;
+import org.mule.api.store.QueueStore;
 import org.mule.util.UUID;
 import org.mule.util.xa.AbstractTransactionContext;
 import org.mule.util.xa.AbstractXAResourceManager;
@@ -43,7 +43,7 @@ public class TransactionalQueueManager extends AbstractXAResourceManager impleme
 
     private QueueConfiguration defaultQueueConfiguration;
     private MuleContext muleContext;
-    private Set<QueueObjectStore> queueObjectStores = new HashSet<QueueObjectStore>();
+    private Set<QueueStore> queueObjectStores = new HashSet<QueueStore>();
     private Set<ListableObjectStore> listableObjectStores = new HashSet<ListableObjectStore>();
 
     @Override
@@ -134,7 +134,7 @@ public class TransactionalQueueManager extends AbstractXAResourceManager impleme
     protected void recover() throws ResourceManagerSystemException
     {
         findAllQueueStores();
-        for (QueueObjectStore store: queueObjectStores)
+        for (QueueStore store: queueObjectStores)
         {
             if (!store.isPersistent())
             {
@@ -232,7 +232,7 @@ public class TransactionalQueueManager extends AbstractXAResourceManager impleme
     {
         if (muleContext != null)
         {
-            for (QueueObjectStore store: muleContext.getRegistry().lookupByType(QueueObjectStore.class).values())
+            for (QueueStore store: muleContext.getRegistry().lookupByType(QueueStore.class).values())
             {
                 addStore(store);
             }
@@ -252,9 +252,9 @@ public class TransactionalQueueManager extends AbstractXAResourceManager impleme
 
     private void addStore(ListableObjectStore<?> store)
     {
-        if (store instanceof QueueObjectStore)
+        if (store instanceof QueueStore)
         {
-            queueObjectStores.add((QueueObjectStore) store);
+            queueObjectStores.add((QueueStore) store);
         }
         listableObjectStores.add(store);
     }

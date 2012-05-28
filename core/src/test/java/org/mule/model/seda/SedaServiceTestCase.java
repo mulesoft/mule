@@ -23,7 +23,7 @@ import org.mule.api.config.ThreadingProfile;
 import org.mule.api.lifecycle.Callable;
 import org.mule.api.registry.RegistrationException;
 import org.mule.api.service.Service;
-import org.mule.api.store.QueueObjectStore;
+import org.mule.api.store.QueueStore;
 import org.mule.component.DefaultJavaComponent;
 import org.mule.component.SimpleCallableJavaComponent;
 import org.mule.config.ChainedThreadingProfile;
@@ -87,7 +87,7 @@ public class SedaServiceTestCase extends AbstractServiceTestCase
         muleContext.getRegistry().registerObject(MuleProperties.OBJECT_QUEUE_MANAGER,
             mockTransactionalQueueManager);
 
-        QueueObjectStore<Serializable> objectStore =
+        QueueStore<Serializable> objectStore =
             muleContext.getRegistry().lookupObject(MuleProperties.QUEUE_STORE_DEFAULT_PERSISTENT_NAME);
         service.setQueueProfile(new QueueProfile(capacity, objectStore));
 
