@@ -38,10 +38,4 @@ public class PreservePayloadExceptionStrategy extends AbstractMessagingException
     {
         return processException(e, event, null);
     }
-
-    @Override
-    public MuleEvent handleException(Exception e, MuleEvent event, RollbackSourceCallback rollbackCallback) // 1
-    {
-        return processException(e, event, rollbackCallback);
-    }
 }
