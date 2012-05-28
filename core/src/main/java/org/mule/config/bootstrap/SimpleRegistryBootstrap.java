@@ -10,6 +10,7 @@
 package org.mule.config.bootstrap;
 
 import org.mule.api.MuleContext;
+import org.mule.api.MuleException;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
@@ -17,11 +18,14 @@ import org.mule.api.registry.MuleRegistry;
 import org.mule.api.registry.ObjectProcessor;
 import org.mule.api.registry.RegistrationException;
 import org.mule.api.registry.Registry;
+import org.mule.api.registry.TransformerResolver;
 import org.mule.api.transaction.TransactionFactory;
+import org.mule.api.transformer.Converter;
 import org.mule.api.transformer.DiscoverableTransformer;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.util.StreamCloser;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.registry.MuleRegistryHelper;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.ClassUtils;
 import org.mule.util.ExceptionUtils;
@@ -178,6 +182,7 @@ public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
         try
         {
             registerUnnamedObjects(unnamedObjects, context.getRegistry());
+            registerTransformers((MuleRegistryHelper) context.getRegistry());
             registerTransformers(transformers, context.getRegistry());
             registerObjects(namedObjects, context.getRegistry());
             registerTransactionFactories(singleTransactionFactories, context);
@@ -309,6 +314,15 @@ public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
 
             name = null;
             returnClass = null;
+        }
+    }
+
+    private void registerTransformers(MuleRegistryHelper registry) throws MuleException
+    {
+        Map<String, Converter> converters = registry.lookupByType(Converter.class);
+        for (Converter converter : converters.values())
+        {
+            registry.notifyTransformerResolvers(converter, TransformerResolver.RegistryAction.ADDED);
         }
     }
 

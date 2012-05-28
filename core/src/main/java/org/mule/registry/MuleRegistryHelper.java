@@ -444,7 +444,7 @@ public class MuleRegistryHelper implements MuleRegistry
         notifyTransformerResolvers(transformer, TransformerResolver.RegistryAction.ADDED);
     }
 
-    protected void notifyTransformerResolvers(Transformer t, TransformerResolver.RegistryAction action)
+    public void notifyTransformerResolvers(Transformer t, TransformerResolver.RegistryAction action)
     {
         if (t instanceof Converter)
         {
