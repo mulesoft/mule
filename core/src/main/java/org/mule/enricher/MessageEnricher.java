@@ -26,12 +26,12 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * The <code>Message Enricher</code> allows the current message to be augmented using data from an seperate
+ * The <code>Message Enricher</code> allows the current message to be augmented using data from a seperate
  * resource.
  * <p>
- * The Mule implementation the <i>Enrichment Resource</i> can be any Message Procesor. This allows you to not
- * only use a JDBC endpoint directly but also call our to a remote service via HTPP or even use a referenced
- * another flow or sub-flow.
+ * The Mule implementation the <i>Enrichment Resource</i> can be any Message Processor. This allows you to not
+ * only use a JDBC endpoint directly but also call out to a remote service via HTTP or even reference another
+ * flow or sub-flow.
  * <p>
  * The Message Processor that implements the <i>Enrichment Resource</i> is invoked with a copy of the current
  * message along with any flow or session variables that are present. Invocation of the this message processor
@@ -42,8 +42,11 @@ import java.util.List;
  * The <i>Enrichment Resource</i> should always return a result. If it doesn't then the Enricher will simply
  * leave the message untouched.
  * <p>
- * The way in which the messgae is enriched (or modified) is by explicity confiugureing mappings (source ->
- * target) between the result from the Enrichment Resource and the message using of Mule Expressions.
+ * The way in which the message is enriched (or modified) is by explicitly configuring mappings (source ->
+ * target) between the result from the Enrichment Resource and the message using of Mule Expressions. Mule
+ * Expressions are used to both select the value to be extracted from result that comes back from the enrichment
+ * resource (source) and to define where this value to be inserted into the message (target). The default
+ * 'source' if it's not configured is the payload of the result from the enrichment resource..
  * <p>
  * <b>EIP Reference:</b> <a
  * href="http://eaipatterns.com/DataEnricher.html">http://eaipatterns.com/DataEnricher.html<a/>
