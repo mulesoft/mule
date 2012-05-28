@@ -10,6 +10,7 @@
 
 package org.mule.transport.servlet;
 
+import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
@@ -386,5 +387,40 @@ public class MuleReceiverServlet extends AbstractReceiverServlet
     protected Map<Object, MessageReceiver> getReceivers()
     {
         return connector.getReceivers();
+    }
+
+    @Override
+    protected void handleException(Throwable t, String message, HttpServletResponse response)
+    {
+        MuleEvent responseEvent = null;
+        if (t instanceof MessagingException)
+        {
+            MuleEvent event = ((MessagingException) t).getEvent();
+            responseEvent = event.getFlowConstruct().getExceptionListener().handleException((Exception) t, event);
+            if (responseEvent != null && responseEvent.getMessage().getExceptionPayload() != null
+                && responseEvent.getMessage().getExceptionPayload().getException() instanceof MessagingException)
+            {
+                message = responseEvent.getMessage().getExceptionPayload().getException().getMessage();
+            }
+            if (responseEvent != null && responseEvent.getMessage().getExceptionPayload() == null)
+            {
+                try
+                {
+                    writeResponse(response, responseEvent.getMessage());
+                    return;
+                }
+                catch (Exception e)
+                {
+                    logger.error("Failed to write on response: " + e.getMessage(), e);
+                }
+            }
+
+        }
+        else if (t instanceof Exception)
+        {
+            connector.getMuleContext().getExceptionListener().handleException((Exception) t);
+        }
+
+        super.handleException(t, message, response);
     }
 }

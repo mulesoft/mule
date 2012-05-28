@@ -11,6 +11,7 @@
 package org.mule.transport.servlet;
 
 import org.mule.RequestContext;
+import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
@@ -249,11 +250,28 @@ public abstract class AbstractReceiverServlet extends HttpServlet
         response.setStatus(code);
         try
         {
-            response.sendError(code, message + ": " + exception.getMessage());
+            String errorMessage = message + ": " + exception.getMessage();
+            if (exception instanceof MessagingException && ((MessagingException) exception).getEvent() != null)
+            {
+                MessagingException me = (MessagingException) exception;
+                writeErrorResponseFromMessage(response, me.getEvent().getMessage(), code, errorMessage);
+            }
+            else
+            {
+                response.sendError(code, errorMessage);
+            }
         }
-        catch (IOException e)
+        catch (Exception e)
         {
             logger.error("Failed to sendError on response: " + e.getMessage(), e);
         }
     }
+
+    protected void writeErrorResponseFromMessage(HttpServletResponse servletResponse, MuleMessage message, int errorCode, String errorMessage) throws Exception
+    {
+        HttpResponse httpResponse = convertToHttpResponse(message);
+        setHttpHeadersOnServletResponse(httpResponse, servletResponse);
+        servletResponse.sendError(errorCode, errorMessage);
+    }
+
 }
