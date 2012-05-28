@@ -32,6 +32,11 @@
             <artifactId>mule-transport-vm</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-scripting</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
         <!-- test dependencies -->
         <dependency>

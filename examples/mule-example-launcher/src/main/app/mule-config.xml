@@ -25,6 +25,7 @@
 
     <json:json-to-object-transformer name="JsonToObject"/>
 	<mxml:xslt-transformer name="RssToHtml" xsl-file="${app.home}/mf-xml-to-html.xslt"/>
+    <custom-transformer name="ObjectToFeed" class="org.mule.module.atom.transformers.ObjectToFeed"/>
 
     <flow name="ajaxProxyFlow">
         <ajax:inbound-endpoint channel="/examples/ajaxproxy" connector-ref="ajaxServer" transformer-refs="JsonToObject"/>
@@ -36,7 +37,7 @@
     <flow name="listMuleForgeExamples">
         <http:inbound-endpoint address="http://localhost:18083/list" connector-ref="HttpConnector" responseTransformer-refs="RssToHtml" exchange-pattern="request-response"/>
 		<http:outbound-endpoint connector-ref="HttpConnector" address="http://www.mulesoft.org/muleforge/feeds/examples-rss.xml" exchange-pattern="request-response"/>
-		<rss:object-to-feed-transformer/> 
+		<transformer ref="ObjectToFeed"/>
         <component>
             <singleton-object class="org.mule.example.launcher.rss.EntryReceiver"/>
         </component>
