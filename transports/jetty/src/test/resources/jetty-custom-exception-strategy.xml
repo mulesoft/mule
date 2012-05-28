@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:jetty="http://www.mulesoft.org/schema/mule/jetty"
+       xmlns:http="http://www.mulesoft.org/schema/mule/http"
+       xmlns:test="http://www.mulesoft.org/schema/mule/test"
+    xsi:schemaLocation="
+       http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/3.2/mule-test.xsd
+       http://www.mulesoft.org/schema/mule/jetty http://www.mulesoft.org/schema/mule/jetty/3.2/mule-jetty.xsd
+       http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/3.2/mule-http.xsd
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd">
+
+    <flow name="jettyFlow">
+        <jetty:inbound-endpoint address="http://localhost:${port1}/test" />
+        <response>
+            <http:message-to-http-response-transformer />
+        </response>
+        <expression-transformer evaluator="string" expression="PAYLOAD BEFORE EXCEPTION" />
+        <test:component throwException="true" />
+        <custom-exception-strategy class="org.mule.transport.servlet.jetty.functional.PreservePayloadExceptionStrategy">
+            <logger level="INFO"/>
+        </custom-exception-strategy>
+    </flow>
+    
+</mule>
