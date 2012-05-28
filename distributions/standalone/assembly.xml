@@ -105,47 +105,22 @@
                 <exclude>geomail/**</exclude>
                 <!-- Legacy LoanBroker example, used for testing only -->
                 <exclude>loanbroker-legacy/**</exclude>
+                <!-- Exclude examples that are not Studio compliant -->
+                <exclude>cep/**</exclude>
+                <exclude>errorhandler/**</exclude>
+                <exclude>loanbroker-bpm/**</exclude>
+                <exclude>loanbroker-simple/**</exclude>
+                <exclude>notifications/**</exclude>
                 <exclude>webapp/**</exclude>
             </excludes>
         </fileSet>
 
         <fileSet>
-            <directory>../../examples/cep/dist</directory>
-            <outputDirectory>examples/cep</outputDirectory>
-            <fileMode>0644</fileMode>
-        </fileSet>
-        <fileSet>
             <directory>../../examples/echo/dist</directory>
             <outputDirectory>examples/echo</outputDirectory>
             <fileMode>0644</fileMode>
         </fileSet>
-        <fileSet>
-            <directory>../../examples/errorhandler/dist</directory>
-            <outputDirectory>examples/errorhandler</outputDirectory>
-            <fileMode>0644</fileMode>
-        </fileSet>
-        <!--
-            dependencySet decided to omit 'hidden' files like ".empty".
-            Manually include these for consistent cross-platform layout (e.g. linux build
-            may skip empty dirs).
-        -->
-        <fileSet>
-            <directory>../../examples/errorhandler/src/main/app/test-data/in</directory>
-            <outputDirectory>examples/errorhandler/src/main/app/test-data/in</outputDirectory>
-            <fileMode>0644</fileMode>
-        </fileSet>
-        <fileSet>
-            <directory>../../examples/errorhandler/src/main/app/test-data/exceptions</directory>
-            <outputDirectory>examples/errorhandler/src/main/app/test-data/exceptions</outputDirectory>
-            <fileMode>0644</fileMode>
-        </fileSet>
-        <!--
-        <fileSet>
-            <directory>../../examples/geomail/dist</directory>
-            <outputDirectory>examples/geomail</outputDirectory>
-            <fileMode>0644</fileMode>
-        </fileSet>
-        -->
+
         <fileSet>
             <directory>../../examples/gpswalker/dist</directory>
             <outputDirectory>examples/gpswalker</outputDirectory>
@@ -156,36 +131,7 @@
             <outputDirectory>examples/hello</outputDirectory>
             <fileMode>0644</fileMode>
         </fileSet>
-        <fileSet>
-            <directory>../../examples/loanbroker-simple/dist</directory>
-            <outputDirectory>examples/loanbroker-simple</outputDirectory>
-            <fileMode>0644</fileMode>
-        </fileSet>
-        <fileSet>
-            <directory>../../examples/loanbroker-bpm/dist</directory>
-            <outputDirectory>examples/loanbroker-bpm</outputDirectory>
-            <fileMode>0644</fileMode>
-        </fileSet>
-        <fileSet>
-            <directory>../../examples/notifications/dist</directory>
-            <outputDirectory>examples/notifications</outputDirectory>
-            <fileMode>0644</fileMode>
-        </fileSet>
-        <!--
-            dependencySet decided to omit 'hidden' files like ".empty".
-            Manually include these for consistent cross-platform layout (e.g. linux build
-            may skip empty dirs).
-        -->
-        <fileSet>
-            <directory>../../examples/notifications/src/test/java</directory>
-            <outputDirectory>examples/notifications/src/test/java</outputDirectory>
-            <fileMode>0644</fileMode>
-        </fileSet>
-        <fileSet>
-            <directory>../../examples/notifications/src/test/resources</directory>
-            <outputDirectory>examples/notifications/src/test/resources</outputDirectory>
-            <fileMode>0644</fileMode>
-        </fileSet>
+
         <fileSet>
             <directory>../../examples/scripting/dist</directory>
             <outputDirectory>examples/scripting</outputDirectory>
@@ -364,14 +310,9 @@
                 <exclude>org.mule.patterns:mule-pattern-core</exclude>
                 <exclude>org.mule.examples:mule-examples-all</exclude>
                 <exclude>org.mule.examples:mule-example-bookstore</exclude>
-                <exclude>org.mule.examples:mule-example-cep</exclude>
                 <exclude>org.mule.examples:mule-example-echo</exclude>
-                <exclude>org.mule.examples:mule-example-errorhandler</exclude>
                 <exclude>org.mule.examples:mule-example-gpswalker</exclude>
                 <exclude>org.mule.examples:mule-example-hello</exclude>
-                <exclude>org.mule.examples:mule-example-loanbroker-bpm</exclude>
-                <exclude>org.mule.examples:mule-example-loanbroker-simple</exclude>
-                <exclude>org.mule.examples:mule-example-notifications</exclude>
                 <exclude>org.mule.examples:mule-example-scripting</exclude>
                 <exclude>org.mule.examples:mule-example-stockquote</exclude>
                 <exclude>org.mule.examples:mule-example-launcher</exclude>
@@ -446,14 +387,6 @@
             </includes>
         </dependencySet>
         <dependencySet>
-            <outputDirectory>examples/cep</outputDirectory>
-            <useStrictFiltering>true</useStrictFiltering>
-            <fileMode>0644</fileMode>
-            <includes>
-                <include>org.mule.examples:mule-example-cep</include>
-            </includes>
-        </dependencySet>
-        <dependencySet>
             <outputDirectory>examples/echo</outputDirectory>
             <useStrictFiltering>true</useStrictFiltering>
             <fileMode>0644</fileMode>
@@ -470,30 +403,6 @@
             </includes>
         </dependencySet>
         <dependencySet>
-            <outputDirectory>examples/errorhandler</outputDirectory>
-            <useStrictFiltering>true</useStrictFiltering>
-            <fileMode>0644</fileMode>
-            <includes>
-                <include>org.mule.examples:mule-example-errorhandler</include>
-            </includes>
-        </dependencySet>
-        <dependencySet>
-            <outputDirectory>examples/loanbroker-bpm</outputDirectory>
-            <useStrictFiltering>true</useStrictFiltering>
-            <fileMode>0644</fileMode>
-            <includes>
-                <include>org.mule.examples:mule-example-loanbroker-bpm</include>
-            </includes>
-        </dependencySet>
-        <dependencySet>
-            <outputDirectory>examples/loanbroker-simple</outputDirectory>
-            <useStrictFiltering>true</useStrictFiltering>
-            <fileMode>0644</fileMode>
-            <includes>
-                <include>org.mule.examples:mule-example-loanbroker-simple</include>
-            </includes>
-        </dependencySet>
-        <dependencySet>
             <outputDirectory>examples/scripting</outputDirectory>
             <useStrictFiltering>true</useStrictFiltering>
             <fileMode>0644</fileMode>
@@ -507,14 +416,6 @@
             <fileMode>0644</fileMode>
             <includes>
                 <include>org.mule.examples:mule-example-gpswalker</include>
-            </includes>
-        </dependencySet>
-        <dependencySet>
-            <outputDirectory>examples/notifications</outputDirectory>
-            <useStrictFiltering>true</useStrictFiltering>
-            <fileMode>0644</fileMode>
-            <includes>
-                <include>org.mule.examples:mule-example-notifications</include>
             </includes>
         </dependencySet>
         <dependencySet>
