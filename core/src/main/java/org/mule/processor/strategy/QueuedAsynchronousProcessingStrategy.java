@@ -13,7 +13,7 @@ package org.mule.processor.strategy;
 import org.mule.api.MuleContext;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.config.ThreadingProfile;
-import org.mule.api.store.QueueObjectStore;
+import org.mule.api.store.QueueStore;
 import org.mule.config.QueueProfile;
 import org.mule.management.stats.QueueStatistics;
 import org.mule.management.stats.QueueStatisticsAware;
@@ -37,7 +37,7 @@ public class QueuedAsynchronousProcessingStrategy extends AsynchronousProcessing
 
     protected Integer queueTimeout;
     protected Integer maxQueueSize = 0;
-    protected QueueObjectStore<Serializable> queueStore = null;
+    protected QueueStore<Serializable> queueStore = null;
     protected QueueStatistics queueStatistics;
 
     @Override
@@ -81,12 +81,12 @@ public class QueuedAsynchronousProcessingStrategy extends AsynchronousProcessing
         this.maxQueueSize = maxQueueSize;
     }
 
-    public QueueObjectStore<Serializable> getQueueStore()
+    public QueueStore<Serializable> getQueueStore()
     {
         return queueStore;
     }
 
-    public void setQueueStore(QueueObjectStore<Serializable> queueStore)
+    public void setQueueStore(QueueStore<Serializable> queueStore)
     {
         this.queueStore = queueStore;
     }

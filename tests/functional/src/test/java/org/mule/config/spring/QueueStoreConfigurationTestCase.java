@@ -15,7 +15,7 @@ import static org.junit.Assert.assertTrue;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.processor.ProcessingStrategy;
 import org.mule.api.store.ListableObjectStore;
-import org.mule.api.store.QueueObjectStore;
+import org.mule.api.store.QueueStore;
 import org.mule.config.QueueProfile;
 import org.mule.construct.Flow;
 import org.mule.construct.flow.DefaultFlowProcessingStrategy;
@@ -76,7 +76,7 @@ public class QueueStoreConfigurationTestCase extends FunctionalTestCase
     {
         SedaService service = lookupService("serviceExplicitObjectStore");
         QueueProfile queueProfile = service.getQueueProfile();
-        assertTrue(queueProfile.getObjectStore() instanceof TestObjectStore);
+        assertTrue(queueProfile.getObjectStore() instanceof TestQueueStore);
     }
 
     @Test
@@ -124,7 +124,7 @@ public class QueueStoreConfigurationTestCase extends FunctionalTestCase
         assertEquals(defaultPersistentObjectStore, objectStore);
     }
     
-    public static class TestObjectStore extends SimpleMemoryObjectStore<Serializable> implements QueueObjectStore<Serializable>
+    public static class TestQueueStore extends SimpleMemoryObjectStore<Serializable> implements QueueStore<Serializable>
     {
         // no custom methods
     }
