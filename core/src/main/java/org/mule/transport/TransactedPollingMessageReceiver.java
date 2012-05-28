@@ -17,10 +17,10 @@ import org.mule.api.MuleMessage;
 import org.mule.api.config.ThreadingProfile;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.api.lifecycle.CreateException;
-import org.mule.api.transport.Connector;
 import org.mule.api.execution.ExecutionCallback;
 import org.mule.api.execution.ExecutionTemplate;
+import org.mule.api.lifecycle.CreateException;
+import org.mule.api.transport.Connector;
 
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -113,6 +113,7 @@ public abstract class TransactedPollingMessageReceiver extends AbstractPollingMe
         {
             if (hasNoMessages())
             {
+                Thread.sleep(50);
                 return;
             }
             // Receive messages and process them in a single transaction
