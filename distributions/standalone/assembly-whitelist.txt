@@ -740,9 +740,3 @@
 /mule-standalone-${productVersion}/src/mule-${productVersion}-src.zip
 /mule-standalone-${productVersion}/src/README.txt
 
-
-#
-# BORRAR
-#
-
-/mule-standalone-${productVersion}/examples/mule-example-launcher/src/main/app/docroot/cep
