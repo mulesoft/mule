@@ -11,8 +11,8 @@
 package org.mule.enricher;
 
 import org.mule.DefaultMuleEvent;
-import org.mule.VoidMuleEvent;
 import org.mule.OptimizedRequestContext;
+import org.mule.VoidMuleEvent;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
@@ -25,6 +25,29 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * The <code>Message Enricher</code> allows the current message to be augmented using data from an seperate
+ * resource.
+ * <p>
+ * The Mule implementation the <i>Enrichment Resource</i> can be any Message Procesor. This allows you to not
+ * only use a JDBC endpoint directly but also call our to a remote service via HTPP or even use a referenced
+ * another flow or sub-flow.
+ * <p>
+ * The Message Processor that implements the <i>Enrichment Resource</i> is invoked with a copy of the current
+ * message along with any flow or session variables that are present. Invocation of the this message processor
+ * is done in a separate context to the main flow such that any modification to the message (and it's
+ * properties and attachments) or flow or session variables will not be reflected in the flow where the
+ * enricher is configured.
+ * <p>
+ * The <i>Enrichment Resource</i> should always return a result. If it doesn't then the Enricher will simply
+ * leave the message untouched.
+ * <p>
+ * The way in which the messgae is enriched (or modified) is by explicity confiugureing mappings (source ->
+ * target) between the result from the Enrichment Resource and the message using of Mule Expressions.
+ * <p>
+ * <b>EIP Reference:</b> <a
+ * href="http://eaipatterns.com/DataEnricher.html">http://eaipatterns.com/DataEnricher.html<a/>
+ */
 public class MessageEnricher extends AbstractMessageProcessorOwner implements MessageProcessor
 {
 
@@ -40,8 +63,6 @@ public class MessageEnricher extends AbstractMessageProcessorOwner implements Me
         MuleEvent enrichmentEvent = enrichmentProcessor.process(enricherEvent);
         OptimizedRequestContext.unsafeSetEvent(event);
 
-
-
         if (enrichmentEvent != null && !VoidMuleEvent.getInstance().equals(enrichmentEvent))
         {
             for (EnrichExpressionPair pair : enrichExpressionPairs)
@@ -49,7 +70,6 @@ public class MessageEnricher extends AbstractMessageProcessorOwner implements Me
                 enrich(event.getMessage(), enrichmentEvent.getMessage(), pair.getSource(), pair.getTarget(),
                     expressionManager);
             }
-            event = new DefaultMuleEvent(event.getMessage(), event, enrichmentEvent.getSession());
         }
         return event;
     }

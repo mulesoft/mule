@@ -10,11 +10,16 @@
 
 package org.mule.el;
 
+import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
+import org.mule.MessageExchangePattern;
 import org.mule.api.MuleContext;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.registry.MuleRegistry;
+import org.mule.config.DefaultMuleConfiguration;
+import org.mule.construct.Flow;
 import org.mule.expression.DefaultExpressionManager;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -36,14 +41,16 @@ public class ExpressionLanguageEnrichmentTestCase extends AbstractMuleTestCase
 {
 
     protected DefaultExpressionManager expressionManager;
+    protected MuleContext muleContext;
 
     @SuppressWarnings("unchecked")
     @Before
     public void setup() throws InitialisationException
     {
         expressionManager = new DefaultExpressionManager();
-        MuleContext muleContext = Mockito.mock(MuleContext.class);
+        muleContext = Mockito.mock(MuleContext.class);
         MuleRegistry muleRegistry = Mockito.mock(MuleRegistry.class);
+        Mockito.when(muleContext.getConfiguration()).thenReturn(new DefaultMuleConfiguration());
         Mockito.when(muleContext.getRegistry()).thenReturn(muleRegistry);
         Mockito.when(muleRegistry.lookupObjectsForLifecycle(Mockito.any(Class.class))).thenReturn(
             Collections.<Object> emptyList());
@@ -95,6 +102,26 @@ public class ExpressionLanguageEnrichmentTestCase extends AbstractMuleTestCase
         MuleMessage message = new DefaultMuleMessage("foo", Mockito.mock(MuleContext.class));
         expressionManager.enrich("message.outboundAttachments.foo", message, dataHandler);
         Assert.assertEquals(dataHandler, message.getOutboundAttachment("foo"));
+    }
+
+    @Test
+    public void enrichFlowVariable() throws Exception
+    {
+        MuleEvent event = new DefaultMuleEvent(new DefaultMuleMessage("", muleContext),
+            MessageExchangePattern.ONE_WAY, new Flow("flow", muleContext));
+        expressionManager.enrich("flowVars['foo']", event, "bar");
+        Assert.assertEquals("bar", event.getFlowVariable("foo"));
+        Assert.assertNull(event.getSessionVariable("foo"));
+    }
+
+    @Test
+    public void enrichSessionVariable() throws Exception
+    {
+        MuleEvent event = new DefaultMuleEvent(new DefaultMuleMessage("", muleContext),
+            MessageExchangePattern.ONE_WAY, new Flow("flow", muleContext));
+        expressionManager.enrich("sessionVars['foo']", event, "bar");
+        Assert.assertEquals("bar", event.getSessionVariable("foo"));
+        Assert.assertNull(event.getFlowVariable("foo"));
     }
 
     @Test
