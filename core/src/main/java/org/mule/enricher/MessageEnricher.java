@@ -43,7 +43,10 @@ import java.util.List;
  * leave the message untouched.
  * <p>
  * The way in which the message is enriched (or modified) is by explicitly configuring mappings (source ->
- * target) between the result from the Enrichment Resource and the message using of Mule Expressions.
+ * target) between the result from the Enrichment Resource and the message using of Mule Expressions. Mule
+ * Expressions are used to both select the value to be extracted from result that comes back from the enrichment
+ * resource (source) and to define where this value to be inserted into the message (target). The default
+ * 'source' if it's not configured is the payload of the result from the enrichment resource..
  * <p>
  * <b>EIP Reference:</b> <a
  * href="http://eaipatterns.com/DataEnricher.html">http://eaipatterns.com/DataEnricher.html<a/>
