@@ -4,11 +4,13 @@
       xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
       xmlns:http="http://www.mulesoft.org/schema/mule/http"
       xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xmlns:script="http://www.mulesoft.org/schema/mule/scripting"
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
 
        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
-       http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+       http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+       http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd">
 
     <catch-exception-strategy name="global-catch" when="#[exception.causedBy(java.lang.ArithmeticException)]">
         <append-string-transformer message=" global catch es"/>
@@ -41,6 +43,13 @@
             </catch-exception-strategy>
             <catch-exception-strategy when="#[exception.causeMatches('*FinishesWithException')]">
                 <append-string-transformer message=" catch-8"/>
+            </catch-exception-strategy>
+            <catch-exception-strategy when="#[exception.causeMatches('*FinishesWithSomethingElse')]">
+		        <script:component>
+		            <script:script engine="groovy">
+		                return "$payload groovified"
+		            </script:script>
+		        </script:component>
             </catch-exception-strategy>
             <catch-exception-strategy when="#[exception.causeMatches('*') &amp;&amp; !exception.causedBy(java.lang.ArithmeticException) &amp;&amp; !exception.causedBy(org.mule.api.registry.ResolverException)]">
                 <append-string-transformer message=" catch-9"/>

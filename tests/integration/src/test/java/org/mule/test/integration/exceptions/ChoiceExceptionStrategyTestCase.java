@@ -97,6 +97,12 @@ public class ChoiceExceptionStrategyTestCase extends FunctionalTestCase
     {
         callVmAndThrowException(new AnotherTotallyDifferentKindOfException(), "0 catch-9");
     }
+    
+    @Test
+    public void testMatchesCorrectExceptionStrategyUsingFinishesWithSomethingElse() throws Exception
+    {
+        callVmAndThrowException(new ThisExceptionFinishesWithSomethingElse(), "0 groovified");
+    }
 
     @Test
     public void testMatchesCorrectExceptionUsingNoCause() throws Exception
@@ -152,6 +158,10 @@ public class ChoiceExceptionStrategyTestCase extends FunctionalTestCase
     }
 
     public static class ThisExceptionFinishesWithException extends Exception
+    {
+    }
+
+    public static class ThisExceptionFinishesWithSomethingElse extends Exception
     {
     }
 

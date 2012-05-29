@@ -100,6 +100,28 @@ public class CatchExceptionStrategyTestCase extends AbstractServiceAndFlowTestCa
         assertThat(actualJsonNode, Is.is(expectedJsonNode));
     }
 
+    public static final String MESSAGE = "some message";
+    public static final String MESSAGE_EXPECTED = "some message consumed successfully";
+    
+	@Test
+	public void testCatchWithComponent() throws Exception
+	{
+	    LocalMuleClient client = muleContext.getClient();
+	    client.dispatch("vm://in2","some message",null);
+        MuleMessage result = client.send("vm://in2", MESSAGE, null, TIMEOUT);
+        assertThat(result,IsNull.<Object>notNullValue());
+        assertThat(result.getPayloadAsString(), Is.is(MESSAGE + " Caught"));
+	}
+
+    @Test
+    public void testFullyDefinedCatchExceptionStrategyWithComponent() throws Exception
+    {
+        LocalMuleClient client = muleContext.getClient();
+        MuleMessage result = null;
+        result = client.send("vm://in3", MESSAGE, null, TIMEOUT);
+        assertThat(result,IsNull.<Object>notNullValue());
+        assertThat(result.getPayloadAsString(), Is.is(MESSAGE + " apt1 apt2 groovified"));
+    }
 
     public static class LoadNewsProcessor implements MessageProcessor
     {
