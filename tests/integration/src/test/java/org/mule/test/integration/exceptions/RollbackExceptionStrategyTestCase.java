@@ -127,6 +127,45 @@ public class RollbackExceptionStrategyTestCase extends AbstractServiceAndFlowTes
         assertThat(dlqMessage.getPayloadAsString(), is(MESSAGE_EXPECTED));
     }
 
+	@Test
+	public void testRollbackWithComponent() throws Exception
+	{
+	    final CountDownLatch latch = new CountDownLatch(EXPECTED_DELIVERED_TIMES);
+	    LocalMuleClient client = muleContext.getClient();
+	    muleContext.registerListener(new ExceptionNotificationListener<ExceptionNotification>() {
+	        @Override
+	        public void onNotification(ExceptionNotification notification)
+	        {
+	            latch.countDown();
+	        }
+	    });
+	    client.dispatch("vm://in5","some message",null);
+	    if (!latch.await(TIMEOUT, TimeUnit.MILLISECONDS))
+	    {
+	        fail("message should have been delivered at least 5 times");
+	    }
+        MuleMessage result = client.send("vm://in5", MESSAGE, null, TIMEOUT);
+        assertThat(result,IsNull.<Object>notNullValue());
+        assertThat(result.getPayloadAsString(),is(MESSAGE + " Rolled Back"));
+	}
+
+    @Test
+    public void testFullyDefinedRollbackExceptionStrategyWithComponent() throws Exception
+    {
+        LocalMuleClient client = muleContext.getClient();
+        MuleMessage result = null;
+        for (int i = 1; i <= EXPECTED_SHORT_DELIVERED_TIMES; i++)
+        {
+            result = client.send("vm://in6", MESSAGE, null, TIMEOUT);
+            assertThat(result,IsNull.<Object>notNullValue());
+            assertThat(result.getExceptionPayload(),IsNull.<Object>notNullValue());
+            assertThat(result.getPayloadAsString(),is(MESSAGE + " apt1 apt2 apt3"));
+        }
+        result = client.send("vm://in6", MESSAGE, null, TIMEOUT);
+        assertThat(result,IsNull.<Object>notNullValue());
+        assertThat(result.getPayloadAsString(),is(MESSAGE + " apt4 groovified"));
+    }
+
     @Test
     public void testRedeliveryExhaustedNoTransaction() throws Exception
     {

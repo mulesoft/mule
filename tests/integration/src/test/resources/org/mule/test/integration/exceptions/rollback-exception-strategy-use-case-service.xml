@@ -9,6 +9,7 @@
       xmlns:tcp="http://www.mulesoft.org/schema/mule/tcp"
       xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
       xmlns:json="http://www.mulesoft.org/schema/mule/json"
+      xmlns:script="http://www.mulesoft.org/schema/mule/scripting"
       xsi:schemaLocation="
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
@@ -18,7 +19,8 @@
        http://www.mulesoft.org/schema/mule/https http://www.mulesoft.org/schema/mule/https/current/mule-https.xsd
        http://www.mulesoft.org/schema/mule/tcp http://www.mulesoft.org/schema/mule/tcp/current/mule-tcp.xsd
        http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd
-       http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/current/mule-json.xsd">
+       http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/current/mule-json.xsd
+       http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd">
 
     <https:connector name="httpsConnector">
         <https:tls-client path="clientKeystore" storePassword="mulepassword"/>
@@ -48,6 +50,44 @@
             </inbound>
             <test:component throwException="true"/>
             <rollback-exception-strategy/>
+            <threading-profile doThreading="false"/>
+        </service>
+        
+        <service name="rollbackWithComponent">
+            <inbound>
+                <vm:inbound-endpoint path="in5">
+                    <vm:transaction action="ALWAYS_BEGIN"/>
+                </vm:inbound-endpoint>
+            </inbound>
+            <test:component throwException="true"/>
+            <rollback-exception-strategy>
+            	<script:component>
+            		<script:script engine="groovy">
+                		return "$payload Rolled Back"
+            		</script:script>
+            	</script:component>
+            </rollback-exception-strategy>
+            <threading-profile doThreading="false"/>
+        </service>
+
+        <service name="fullyDefinedRollbackExceptionStrategyWithComponent">
+            <inbound>
+                <vm:inbound-endpoint path="in6" exchange-pattern="request-response"/>
+                <append-string-transformer message=" apt1"/>
+            </inbound>
+            <test:component throwException="true"/>
+            <rollback-exception-strategy maxRedeliveryAttempts="${shortMaxRedelivery}">
+                <append-string-transformer message=" apt2"/>
+                <append-string-transformer message=" apt3"/>
+                <on-redelivery-attempts-exceeded>
+                    <append-string-transformer message=" apt4"/>
+                    <script:component>
+			            <script:script engine="groovy">
+			                return "$payload groovified"
+			            </script:script>
+			        </script:component>
+                </on-redelivery-attempts-exceeded>
+            </rollback-exception-strategy>
             <threading-profile doThreading="false"/>
         </service>
 

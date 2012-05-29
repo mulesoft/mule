@@ -12,6 +12,7 @@ package org.mule.config.spring.parsers;
 import org.mule.api.MuleContext;
 import org.mule.api.component.Component;
 import org.mule.api.config.MuleProperties;
+import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.routing.OutboundRouter;
@@ -273,6 +274,7 @@ public abstract class AbstractMuleBeanDefinitionParser extends AbstractBeanDefin
             && !OutboundRouterCollection.class.isAssignableFrom(beanClass)
             && !OutboundRouter.class.isAssignableFrom(beanClass)
             && !AbstractExceptionListener.class.isAssignableFrom(beanClass)
+            && !MessagingExceptionHandler.class.isAssignableFrom(beanClass)
             && !MessageEnricher.class.isAssignableFrom(beanClass)
             && !Transformer.class.isAssignableFrom(beanClass))
         {

@@ -105,6 +105,38 @@
                 <json:object-to-json-transformer/>
             </catch-exception-strategy>
         </service>
+        
+        <service name="catchWithComponent">
+            <inbound>
+                <vm:inbound-endpoint path="in2">
+                    <vm:transaction action="ALWAYS_BEGIN"/>
+                </vm:inbound-endpoint>
+            </inbound>
+            <test:component throwException="true"/>
+            <catch-exception-strategy>
+            	<script:component>
+            		<script:script engine="groovy">
+                		return "$payload Caught"
+            		</script:script>
+            	</script:component>
+            </catch-exception-strategy>
+        </service>
+
+        <service name="fullyDefinedCatchExceptionStrategyWithComponent">
+            <inbound>
+                <vm:inbound-endpoint path="in3" exchange-pattern="request-response"/>
+                <append-string-transformer message=" apt1"/>
+            </inbound>
+            <test:component throwException="true"/>
+            <catch-exception-strategy>
+                <append-string-transformer message=" apt2"/>
+                <script:component>
+		            <script:script engine="groovy">
+		                return "$payload groovified"
+		            </script:script>
+		        </script:component>
+            </catch-exception-strategy>
+        </service>
 
     </model>
 
