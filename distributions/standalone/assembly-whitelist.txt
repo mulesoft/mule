@@ -248,6 +248,7 @@
 # /examples/foreach
 #
 /mule-standalone-${productVersion}/examples/foreach
+/mule-standalone-${productVersion}/examples/foreach/README.txt
 /mule-standalone-${productVersion}/examples/foreach/mule-example-foreach-${productVersion}.zip
 /mule-standalone-${productVersion}/examples/foreach/pom.xml
 /mule-standalone-${productVersion}/examples/foreach/src
