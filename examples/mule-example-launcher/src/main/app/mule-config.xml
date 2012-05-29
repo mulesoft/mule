@@ -23,12 +23,11 @@
 	<http:connector name="HttpConnector"/>
 	<file:connector name="FileDeployer" outputAppend="false" workDirectory="${app.home}"/>
 
-    <json:json-to-object-transformer name="JsonToObject"/>
 	<mxml:xslt-transformer name="RssToHtml" xsl-file="${app.home}/mf-xml-to-html.xslt"/>
     <custom-transformer name="ObjectToFeed" class="org.mule.module.atom.transformers.ObjectToFeed"/>
 
     <flow name="ajaxProxyFlow">
-        <ajax:inbound-endpoint channel="/examples/ajaxproxy" connector-ref="ajaxServer" transformer-refs="JsonToObject"/>
+        <ajax:inbound-endpoint channel="/examples/ajaxproxy" connector-ref="ajaxServer"/>
         <component>
             <singleton-object class="org.mule.example.launcher.SimpleHTTPClient"/>
         </component>

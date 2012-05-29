@@ -19,7 +19,7 @@ import org.mule.util.SystemUtils
 exampleLauncherAppUrl = "http://localhost:18082/examples/"
 
 // list of examples that should be deployed as part of the launcher example application
-enabledExamples = ['mule-example-launcher', 'hello', 'echo', 'loanbroker-simple', 'errorhandler', 'stockquote', 'scripting', 'bookstore', 'loanbroker-bpm', 'notifications', 'gpswalker', 'cep']
+enabledExamples = ['mule-example-launcher', 'hello', 'echo', 'stockquote', 'scripting', 'bookstore', 'gpswalker']
 
 //------------------------------------------
 
