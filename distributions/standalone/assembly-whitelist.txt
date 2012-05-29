@@ -587,7 +587,8 @@
 /mule-standalone-${productVersion}/lib/opt/abdera-spring-0.4.0-incubating.jar
 /mule-standalone-${productVersion}/lib/opt/activation-1.1-osgi.jar
 /mule-standalone-${productVersion}/lib/opt/annotations-api-6.0.29.jar
-/mule-standalone-${productVersion}/lib/opt/ant-1.6.5.jar
+/mule-standalone-${productVersion}/lib/opt/ant-1.7.0.jar
+/mule-standalone-${productVersion}/lib/opt/ant-launcher-1.7.0.jar
 /mule-standalone-${productVersion}/lib/opt/antlr-3.1.1.jar
 /mule-standalone-${productVersion}/lib/opt/aopalliance-1.0.jar
 /mule-standalone-${productVersion}/lib/opt/asm-3.1-osgi.jar
