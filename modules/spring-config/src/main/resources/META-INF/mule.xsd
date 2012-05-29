@@ -1246,14 +1246,21 @@
                 <xsd:attribute name="useExtendedTransformations" type="substitutableBoolean" default="true">
                     <xsd:annotation>
                         <xsd:documentation>
-                            (As of Mule 3.3) Enable/disable extended transformation support: enforcement of transformations, implicit transformations and no direct transformer lookup.
+                            Backwards Compatabilty Flag: Used to disable the new extended transformation support introduced in Mule 3.3 including enforcement of transformations, implicit transformations and no direct transformer lookup.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
                 <xsd:attribute name="flowEndingWithOneWayEndpointReturnsNull" type="substitutableBoolean" default="false">
                     <xsd:annotation>
                         <xsd:documentation>
-                            (As of Mule 3.3) Modifies the behavior of one-way outbound endpoints when they are the last element inside a request-response flow. When true the value returned by the endpoint will be null, otherwise will be an echo of the received event.
+                            Backwards Compatabilty Flag: Used to revert to Mule 3.2 behaviour of one-way outbound endpoints when they are the last element inside a request-response flow. When true the value returned by the endpoint will be null, otherwise will be an echo of the received event.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="enricherPropagatesSessionVariableChanges" type="substitutableBoolean" default="false">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Backwards Compatabilty Flag:  Used to revert to Mule 3.1/3.2 behaviour of the message enricher so that session variables added or modified within an enricher are propagated up into the flow where the enricher is used.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>

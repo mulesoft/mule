@@ -85,4 +85,7 @@ public interface MuleConfiguration
     boolean useExtendedTransformations();
 
     boolean isFlowEndingWithOneWayEndpointReturnsNull();
+    
+    boolean isEnricherPropagatesSessionVariableChanges();
+
 }

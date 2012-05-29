@@ -153,6 +153,8 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
     private boolean useExtendedTransformations = DEFAULT_TRANSFORMATION_RESOLVE_NON_DIRECT;
 
     private boolean flowEndingWithOneWayEndpointReturnsNull;
+    
+    private boolean enricherPropagatesSessionVariableChanges;
 
     /**
      * Generic string/string map of properties in addition to standard Mule props.
@@ -687,6 +689,16 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
     {
         this.defaultExceptionStrategyName = defaultExceptionStrategyName;
     }
+    
+    public boolean isEnricherPropagatesSessionVariableChanges()
+    {
+        return enricherPropagatesSessionVariableChanges;
+    }
+
+    public void setEnricherPropagatesSessionVariableChanges(boolean enricherPropagatesSessionVariableChanges)
+    {
+        this.enricherPropagatesSessionVariableChanges = enricherPropagatesSessionVariableChanges;
+    }
 
     @Override
     public int hashCode()
@@ -841,4 +853,5 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
 
         return true;
     }
+
 }

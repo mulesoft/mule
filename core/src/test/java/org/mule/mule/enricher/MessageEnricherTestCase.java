@@ -18,6 +18,7 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.config.DefaultMuleConfiguration;
 import org.mule.enricher.MessageEnricher;
 import org.mule.enricher.MessageEnricher.EnrichExpressionPair;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -34,6 +35,7 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase
     public void testEnrichHeaderWithPayload() throws Exception
     {
         MessageEnricher enricher = new MessageEnricher();
+        enricher.setMuleContext(muleContext);
         enricher.addEnrichExpressionPair(new EnrichExpressionPair("#[header:myHeader]"));
         enricher.setEnrichmentMessageProcessor(new MessageProcessor()
         {
@@ -55,6 +57,7 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase
     public void testEnrichHeaderWithHeader() throws Exception
     {
         MessageEnricher enricher = new MessageEnricher();
+        enricher.setMuleContext(muleContext);
         enricher.addEnrichExpressionPair(new EnrichExpressionPair("#[header:header1]", "#[header:myHeader]"));
         enricher.setEnrichmentMessageProcessor(new MessageProcessor()
         {
@@ -75,6 +78,7 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase
     public void testEnrichHeadersMToN() throws Exception
     {
         MessageEnricher enricher = new MessageEnricher();
+        enricher.setMuleContext(muleContext);
         enricher.addEnrichExpressionPair(new EnrichExpressionPair("#[header:header1]", "#[header:myHeader1]"));
         enricher.addEnrichExpressionPair(new EnrichExpressionPair("#[header:header2]", "#[header:myHeader2]"));
         enricher.addEnrichExpressionPair(new EnrichExpressionPair("#[header:header3]", "#[header:myHeader3]"));
@@ -105,6 +109,7 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase
         muleContext.getRegistry().registerObject("appender", new StringAppendTransformer(" append"));
 
         MessageEnricher enricher = new MessageEnricher();
+        enricher.setMuleContext(muleContext);
         enricher.addEnrichExpressionPair(new EnrichExpressionPair("#[process:appender:#[header:header1]]",
             "#[header:myHeader]"));
         enricher.setEnrichmentMessageProcessor(new MessageProcessor()
@@ -128,6 +133,7 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase
     public void testEnrichWithNullResponse() throws Exception
     {
         MessageEnricher enricher = new MessageEnricher();
+        enricher.setMuleContext(muleContext);
         enricher.addEnrichExpressionPair(new EnrichExpressionPair("#[header:myHeader]"));
         enricher.setEnrichmentMessageProcessor(new MessageProcessor()
         {
@@ -147,6 +153,7 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase
     public void propogateMessage() throws Exception
     {
         MessageEnricher enricher = new MessageEnricher();
+        enricher.setMuleContext(muleContext);
         enricher.addEnrichExpressionPair(new EnrichExpressionPair("#[header:myHeader]"));
         enricher.setEnrichmentMessageProcessor(new MessageProcessor()
         {
@@ -168,9 +175,36 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase
     }
 
     @Test
+    public void propogateMessagePropagateSession() throws Exception
+    {
+        ((DefaultMuleConfiguration) muleContext.getConfiguration()).setEnricherPropagatesSessionVariableChanges(true);
+        MessageEnricher enricher = new MessageEnricher();
+        enricher.setMuleContext(muleContext);
+        enricher.addEnrichExpressionPair(new EnrichExpressionPair("#[header:myHeader]"));
+        enricher.setEnrichmentMessageProcessor(new MessageProcessor()
+        {
+            public MuleEvent process(MuleEvent event) throws MuleException
+            {
+                event.getMessage().setPayload("enriched");
+                return event;
+            }
+        });
+        MuleEvent in = getTestEvent("");
+        in.getMessage().setOutboundProperty("foo", "bar");
+        MuleEvent out = enricher.process(in);
+        Assert.assertNotSame(in, out);
+        Assert.assertSame(in.getMessage(), out.getMessage());
+        assertEquals(in.getMessage().getUniqueId(), out.getMessage().getUniqueId());
+        assertEquals(in.getMessage().getPropertyNames(), out.getMessage().getPropertyNames());
+        assertEquals("bar", out.getMessage().getOutboundProperty("foo"));
+        assertEquals("", out.getMessage().getPayload());
+    }
+
+    @Test
     public void propogateVariables() throws Exception
     {
         MessageEnricher enricher = new MessageEnricher();
+        enricher.setMuleContext(muleContext);
         enricher.addEnrichExpressionPair(new EnrichExpressionPair("#[header:myHeader]"));
         enricher.setEnrichmentMessageProcessor(new MessageProcessor()
         {
@@ -194,6 +228,7 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase
     public void doNotImplicityEnrichMessagePayload() throws Exception
     {
         MessageEnricher enricher = new MessageEnricher();
+        enricher.setMuleContext(muleContext);
         enricher.addEnrichExpressionPair(new EnrichExpressionPair("#[header:myHeader]"));
         enricher.setEnrichmentMessageProcessor(new MessageProcessor()
         {
@@ -214,6 +249,7 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase
     public void doNotImplicityEnrichMessageProperties() throws Exception
     {
         MessageEnricher enricher = new MessageEnricher();
+        enricher.setMuleContext(muleContext);
         enricher.addEnrichExpressionPair(new EnrichExpressionPair("#[header:myHeader]"));
         enricher.setEnrichmentMessageProcessor(new MessageProcessor()
         {
@@ -234,6 +270,7 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase
     public void doNotImplicityEnrichFlowVariable() throws Exception
     {
         MessageEnricher enricher = new MessageEnricher();
+        enricher.setMuleContext(muleContext);
         enricher.addEnrichExpressionPair(new EnrichExpressionPair("#[header:myHeader]"));
         enricher.setEnrichmentMessageProcessor(new MessageProcessor()
         {
@@ -254,6 +291,7 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase
     public void doNotImplicityEnrichSessionVariable() throws Exception
     {
         MessageEnricher enricher = new MessageEnricher();
+        enricher.setMuleContext(muleContext);
         enricher.addEnrichExpressionPair(new EnrichExpressionPair("#[header:myHeader]"));
         enricher.setEnrichmentMessageProcessor(new MessageProcessor()
         {
@@ -271,9 +309,32 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase
     }
 
     @Test
+    public void propogateSession() throws Exception
+    {
+        ((DefaultMuleConfiguration) muleContext.getConfiguration()).setEnricherPropagatesSessionVariableChanges(true);
+        MessageEnricher enricher = new MessageEnricher();
+        enricher.setMuleContext(muleContext);
+        enricher.addEnrichExpressionPair(new EnrichExpressionPair("#[header:myHeader]"));
+        enricher.setEnrichmentMessageProcessor(new MessageProcessor()
+        {
+            public MuleEvent process(MuleEvent event) throws MuleException
+            {
+                event.getSession().setProperty("sessionFoo", "bar");
+                return event;
+            }
+        });
+        MuleEvent in = getTestEvent("");
+
+        MuleEvent out = enricher.process(in);
+
+        assertEquals("bar", out.getSession().getProperty("sessionFoo"));
+    }
+
+    @Test
     public void enrichFlowVariable() throws Exception
     {
         MessageEnricher enricher = new MessageEnricher();
+        enricher.setMuleContext(muleContext);
         enricher.addEnrichExpressionPair(new EnrichExpressionPair("#[variable:foo]"));
         enricher.setEnrichmentMessageProcessor(new MessageProcessor()
         {
@@ -294,6 +355,7 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase
     public void enrichSessionVariable() throws Exception
     {
         MessageEnricher enricher = new MessageEnricher();
+        enricher.setMuleContext(muleContext);
         enricher.addEnrichExpressionPair(new EnrichExpressionPair("#[sessionVars['foo']]"));
         enricher.setEnrichmentMessageProcessor(new MessageProcessor()
         {

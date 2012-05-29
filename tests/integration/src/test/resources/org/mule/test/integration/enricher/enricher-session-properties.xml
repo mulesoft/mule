@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xsi:schemaLocation="
+          http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+          http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+
+
+	<description>
+		MP called within an enricher can change session properties and those
+		changes should be reflected after executing the enricher.
+	</description>
+
+	<configuration enricherPropagatesSessionVariableChanges="true" />
+
+	<flow name="mainFlow" >
+
+		<inbound-endpoint address="vm://in" exchange-pattern="request-response"/>
+
+		<message-properties-transformer scope="session">
+			<add-message-property key="mainFlowSessionProperty" value="someValue"/>
+		</message-properties-transformer>
+
+		<enricher target="#[variable:enrichedContent]" >
+			<flow-ref name="subFlow"/>
+		</enricher>
+
+        <custom-processor class="org.mule.test.integration.enricher.EnricherSessionPropertiesTestCase$Spy"/>
+
+	</flow>
+
+	<flow name="subFlow">
+
+        <append-string-transformer message=" received by subflow"/>
+
+        <http:outbound-endpoint path="someplace" host="localhost" port="${port1}"/>
+
+        <byte-array-to-string-transformer/>
+	</flow>
+
+    <flow name="httpFlow">
+        <http:inbound-endpoint path="someplace" host="localhost" port="${port1}" exchange-pattern="request-response"/>
+
+        <message-properties-transformer scope="session">
+            <add-message-property key="subFlowSessionProperty" value="someValue"/>
+        </message-properties-transformer>
+    </flow>
+
+</mule>
