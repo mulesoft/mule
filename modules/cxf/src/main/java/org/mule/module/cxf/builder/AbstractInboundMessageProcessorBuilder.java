@@ -84,7 +84,6 @@ public abstract class AbstractInboundMessageProcessorBuilder implements MuleCont
     private Map<String,Object> properties = new HashMap<String, Object>();
     private boolean validationEnabled;
     private List<String> schemaLocations;
-    private String onException = CxfConstants.CREATE_SOAP_FAULT;
     private final Map<QName, Object> annotations = new ConcurrentHashMap<QName, Object>();
 
     private WsSecurity wsSecurity;
@@ -487,16 +486,6 @@ public abstract class AbstractInboundMessageProcessorBuilder implements MuleCont
     public void setSchemaLocations(List<String> schemaLocations)
     {
         this.schemaLocations = schemaLocations;
-    }
-
-    public String getOnException()
-    {
-        return this.onException;
-    }
-
-    public void setOnException(String onException)
-    {
-        this.onException = onException;
     }
 
     public final Object getAnnotation(QName name)
