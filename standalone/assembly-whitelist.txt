@@ -220,6 +220,46 @@
 /mule-standalone-${productVersion}/examples/hello/src/test/resources
 /mule-standalone-${productVersion}/examples/hello/src/test/resources/log4j.properties
 
+#
+# /examples/flight-reservation
+#
+/mule-standalone-${productVersion}/examples/flight-reservation
+/mule-standalone-${productVersion}/examples/flight-reservation/README.txt
+/mule-standalone-${productVersion}/examples/flight-reservation/mule-example-flight-reservation-${productVersion}.zip
+/mule-standalone-${productVersion}/examples/flight-reservation/pom.xml
+/mule-standalone-${productVersion}/examples/flight-reservation/src
+/mule-standalone-${productVersion}/examples/flight-reservation/src/main
+/mule-standalone-${productVersion}/examples/flight-reservation/src/main/app
+/mule-standalone-${productVersion}/examples/flight-reservation/src/main/app/mule-config.xml
+/mule-standalone-${productVersion}/examples/flight-reservation/src/main/java
+/mule-standalone-${productVersion}/examples/flight-reservation/src/main/java/org
+/mule-standalone-${productVersion}/examples/flight-reservation/src/main/java/org/mule
+/mule-standalone-${productVersion}/examples/flight-reservation/src/main/java/org/mule/example
+/mule-standalone-${productVersion}/examples/flight-reservation/src/main/java/org/mule/example/Flight.java
+/mule-standalone-${productVersion}/examples/flight-reservation/src/main/java/org/mule/example/FlightUnavailableException.java
+/mule-standalone-${productVersion}/examples/flight-reservation/src/main/java/org/mule/example/ReservationRequest.java
+/mule-standalone-${productVersion}/examples/flight-reservation/src/main/java/org/mule/example/ReservationResponse.java
+/mule-standalone-${productVersion}/examples/flight-reservation/src/main/resources
+/mule-standalone-${productVersion}/examples/flight-reservation/src/test
+/mule-standalone-${productVersion}/examples/flight-reservation/src/test/java
+/mule-standalone-${productVersion}/examples/flight-reservation/src/test/resources
+
+#
+# /examples/foreach
+#
+/mule-standalone-${productVersion}/examples/foreach
+/mule-standalone-${productVersion}/examples/foreach/mule-example-foreach-${productVersion}.zip
+/mule-standalone-${productVersion}/examples/foreach/pom.xml
+/mule-standalone-${productVersion}/examples/foreach/src
+/mule-standalone-${productVersion}/examples/foreach/src/main
+/mule-standalone-${productVersion}/examples/foreach/src/main/app
+/mule-standalone-${productVersion}/examples/foreach/src/main/app/mule-config.xml
+/mule-standalone-${productVersion}/examples/foreach/src/main/java
+/mule-standalone-${productVersion}/examples/foreach/src/main/resources
+/mule-standalone-${productVersion}/examples/foreach/src/test
+/mule-standalone-${productVersion}/examples/foreach/src/test/java
+/mule-standalone-${productVersion}/examples/foreach/src/test/resources
+/mule-standalone-${productVersion}/examples/foreach/src/main/resources/derby.properties
 
 
 #
