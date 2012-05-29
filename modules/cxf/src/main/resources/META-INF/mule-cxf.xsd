@@ -295,19 +295,6 @@
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
-        <xsd:attribute name="onException">
-            <xsd:annotation>
-                <xsd:documentation>
-                    The onException attribute controls whether the service should return SoapFault or invoke Mule exception strategy if there's an exception thrown by the web service component. 
-                </xsd:documentation>
-            </xsd:annotation>
-            <xsd:simpleType>
-                <xsd:restriction base="xsd:string">
-                    <xsd:enumeration value="CREATE_SOAP_FAULT"/>
-                    <xsd:enumeration value="INVOKE_EXCEPTION_STRATEGY"/>
-                </xsd:restriction>
-            </xsd:simpleType>    
-        </xsd:attribute>   
         <xsd:attribute name="validationEnabled" type="mule:substitutableBoolean">
             <xsd:annotation>
                 <xsd:documentation>
