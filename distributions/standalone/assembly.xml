@@ -131,7 +131,16 @@
             <outputDirectory>examples/hello</outputDirectory>
             <fileMode>0644</fileMode>
         </fileSet>
-
+        <fileSet>
+            <directory>../../examples/flight-reservation/dist</directory>
+            <outputDirectory>examples/flight-reservation</outputDirectory>
+            <fileMode>0644</fileMode>
+        </fileSet>
+        <fileSet>
+            <directory>../../examples/foreach/dist</directory>
+            <outputDirectory>examples/foreach</outputDirectory>
+            <fileMode>0644</fileMode>
+        </fileSet>
         <fileSet>
             <directory>../../examples/scripting/dist</directory>
             <outputDirectory>examples/scripting</outputDirectory>
@@ -313,6 +322,8 @@
                 <exclude>org.mule.examples:mule-example-echo</exclude>
                 <exclude>org.mule.examples:mule-example-gpswalker</exclude>
                 <exclude>org.mule.examples:mule-example-hello</exclude>
+                <exclude>org.mule.examples:mule-example-flight-reservation</exclude>
+                <exclude>org.mule.examples:mule-example-foreach</exclude>
                 <exclude>org.mule.examples:mule-example-scripting</exclude>
                 <exclude>org.mule.examples:mule-example-stockquote</exclude>
                 <exclude>org.mule.examples:mule-example-launcher</exclude>
@@ -400,6 +411,22 @@
             <fileMode>0644</fileMode>
             <includes>
                 <include>org.mule.examples:mule-example-hello</include>
+            </includes>
+        </dependencySet>
+        <dependencySet>
+            <outputDirectory>examples/flight-reservation</outputDirectory>
+            <useStrictFiltering>true</useStrictFiltering>
+            <fileMode>0644</fileMode>
+            <includes>
+                <include>org.mule.examples:mule-example-flight-reservation</include>
+            </includes>
+        </dependencySet>
+        <dependencySet>
+            <outputDirectory>examples/foreach</outputDirectory>
+            <useStrictFiltering>true</useStrictFiltering>
+            <fileMode>0644</fileMode>
+            <includes>
+                <include>org.mule.examples:mule-example-foreach</include>
             </includes>
         </dependencySet>
         <dependencySet>
