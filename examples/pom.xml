@@ -23,6 +23,8 @@
         <module>hello</module>
         <module>loanbroker-bpm</module>
         <module>loanbroker-simple</module>
+        <module>flight-reservation</module>
+        <module>foreach</module>
         <module>notifications</module>
         <module>scripting</module>
         <module>stockquote</module>

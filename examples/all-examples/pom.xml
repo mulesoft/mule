@@ -65,5 +65,17 @@
             <version>${project.version}</version>
             <type>zip</type>
         </dependency>
+        <dependency>
+            <groupId>org.mule.examples</groupId>
+            <artifactId>mule-example-flight-reservation</artifactId>
+            <version>${project.version}</version>
+            <type>zip</type>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.examples</groupId>
+            <artifactId>mule-example-foreach</artifactId>
+            <version>${project.version}</version>
+            <type>zip</type>
+        </dependency>
     </dependencies>
 </project>

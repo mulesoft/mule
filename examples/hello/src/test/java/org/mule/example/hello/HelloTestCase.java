@@ -31,7 +31,6 @@ public class HelloTestCase extends FunctionalTestCase
     public void testHelloVM() throws Exception
     {
         MuleClient client = muleContext.getClient();
-        client.send("vm://greeter", "Ross", null);
         MuleMessage response = client.send("vm://greeter", "Ross", null);
         assertNotNull(response);
         assertTrue(response.getPayloadAsString().contains("Ross"));
