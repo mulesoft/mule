@@ -131,6 +131,36 @@
             <artifactId>mule-examples-all</artifactId>
             <version>${project.version}</version>
             <type>pom</type>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.mule.examples</groupId>
+                    <artifactId>mule-example-cep</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.mule.examples</groupId>
+                    <artifactId>mule-example-errorhandler</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.mule.examples</groupId>
+                    <artifactId>mule-example-geomail</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.mule.examples</groupId>
+                    <artifactId>mule-example-loanbroker-bpm</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.mule.examples</groupId>
+                    <artifactId>mule-example-loanbroker-legacy</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.mule.examples</groupId>
+                    <artifactId>mule-example-loanbroker-simple</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.mule.examples</groupId>
+                    <artifactId>mule-example-notifications</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <!-- Include all Mule Modules -->
         <dependency>
@@ -244,27 +274,6 @@
             <artifactId>mule-tools-anttasks</artifactId>
             <version>${project.version}</version>
             <type>jar</type>
-        </dependency>
-        
-        
-        <!--
-            Activemq is a transitive dependency from the errorhandler example.
-            Make sure it doesn't end up in the standalone distro.
-        -->
-        <dependency>
-            <groupId>org.apache.activemq</groupId>
-            <artifactId>activemq-core</artifactId>
-            <scope>provided</scope>
-        </dependency>
-
-        <!--
-            derby is a transitive dependency from the loanbroker-bpm example.
-            Make sure it doesn't end up in the standalone distro.
-        -->
-        <dependency>
-            <groupId>org.apache.derby</groupId>
-            <artifactId>derby</artifactId>
-            <scope>provided</scope>
         </dependency>
 
         <!--

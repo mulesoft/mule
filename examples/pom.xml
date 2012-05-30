@@ -13,7 +13,7 @@
     <description>Mule Example Applications</description>
 
     <modules>
-        <module>all-examples</module>
+       <module>all-examples</module>
         <module>bookstore</module>
         <module>cep</module>
         <module>echo</module>

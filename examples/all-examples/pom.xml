@@ -37,12 +37,6 @@
         </dependency>
         <dependency>
             <groupId>org.mule.examples</groupId>
-            <artifactId>mule-example-errorhandler</artifactId>
-            <version>${project.version}</version>
-            <type>zip</type>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.examples</groupId>
             <artifactId>mule-example-gpswalker</artifactId>
             <version>${project.version}</version>
             <type>zip</type>
@@ -50,30 +44,6 @@
         <dependency>
             <groupId>org.mule.examples</groupId>
             <artifactId>mule-example-hello</artifactId>
-            <version>${project.version}</version>
-            <type>zip</type>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.examples</groupId>
-            <artifactId>mule-example-loanbroker-bpm</artifactId>
-            <version>${project.version}</version>
-            <type>zip</type>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.apache.derby</groupId>
-                    <artifactId>derby</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.examples</groupId>
-            <artifactId>mule-example-loanbroker-simple</artifactId>
-            <version>${project.version}</version>
-            <type>zip</type>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.examples</groupId>
-            <artifactId>mule-example-notifications</artifactId>
             <version>${project.version}</version>
             <type>zip</type>
         </dependency>
