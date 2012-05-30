@@ -1,0 +1,50 @@
+/*
+ * $Id$
+ * --------------------------------------------------------------------------------------
+ * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ *
+ * The software in this package is published under the terms of the CPAL v1.0
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ */
+
+package org.mule.util.store;
+
+import org.mule.api.store.ObjectStore;
+import org.mule.api.store.QueueObjectStore;
+
+import java.io.Serializable;
+
+public class MuleDefaultObjectStoreFactory implements DefaultObjectStoreFactory
+{
+
+    @Override
+    public ObjectStore<Serializable> createDefaultInMemoryObjectStore()
+    {
+        return new SimpleMemoryObjectStore<Serializable>();
+    }
+
+    @Override
+    public ObjectStore<Serializable> createDefaultPersistentObjectStore()
+    {
+        return new QueuePersistenceObjectStore<Serializable>();
+    }
+
+    @Override
+    public QueueObjectStore<Serializable> createDefaultInMemoryQueueStore()
+    {
+        return new QueueObjectStoreAdapter<Serializable>(new SimpleMemoryObjectStore<Serializable>());
+    }
+
+    @Override
+    public QueueObjectStore<Serializable> createDefaultPersistentQueueStore()
+    {
+        return new QueueObjectStoreAdapter<Serializable>(new QueuePersistenceObjectStore<Serializable>());
+    }
+
+    @Override
+    public ObjectStore<Serializable> createDefaultUserObjectStore()
+    {
+        return new SimpleMemoryObjectStore<Serializable>();
+    }
+}
