@@ -10,6 +10,10 @@
 
 package org.mule;
 
+import static junit.framework.Assert.assertNotNull;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import org.mule.api.MuleContext;
 import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.config.ConfigurationException;
@@ -36,11 +40,6 @@ import java.util.Properties;
 import javax.resource.spi.work.WorkListener;
 
 import org.junit.Test;
-
-import static junit.framework.Assert.assertNotNull;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 
 public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase
 {
@@ -174,6 +173,7 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase
         assertNotNull(context.getRegistry().lookupObject(MuleProperties.OBJECT_QUEUE_MANAGER));
         assertNotNull(context.getRegistry().lookupObject(MuleProperties.OBJECT_SECURITY_MANAGER));
         assertNotNull(context.getRegistry().lookupObject(MuleProperties.OBJECT_STORE_DEFAULT_IN_MEMORY_NAME));
+        assertNotNull(context.getRegistry().lookupObject(MuleProperties.QUEUE_STORE_DEFAULT_IN_MEMORY_NAME));
         assertNotNull(context.getRegistry().lookupObject(MuleProperties.OBJECT_SYSTEM_MODEL));
         assertNotNull(context.getRegistry().lookupObject(MuleProperties.OBJECT_MULE_ENDPOINT_FACTORY));
         assertNotNull(context.getRegistry().lookupObject(MuleProperties.OBJECT_MULE_SIMPLE_REGISTRY_BOOTSTRAP));
@@ -185,6 +185,7 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase
         assertNull(context.getRegistry().lookupObject(MuleProperties.OBJECT_QUEUE_MANAGER));
         assertNull(context.getRegistry().lookupObject(MuleProperties.OBJECT_SECURITY_MANAGER));
         assertNull(context.getRegistry().lookupObject(MuleProperties.OBJECT_STORE_DEFAULT_IN_MEMORY_NAME));
+        assertNull(context.getRegistry().lookupObject(MuleProperties.QUEUE_STORE_DEFAULT_IN_MEMORY_NAME));
         assertNull(context.getRegistry().lookupObject(MuleProperties.OBJECT_SYSTEM_MODEL));
         assertNull(context.getRegistry().lookupObject(MuleProperties.OBJECT_MULE_ENDPOINT_FACTORY));
         assertNull(context.getRegistry().lookupObject(MuleProperties.OBJECT_MULE_SIMPLE_REGISTRY_BOOTSTRAP));

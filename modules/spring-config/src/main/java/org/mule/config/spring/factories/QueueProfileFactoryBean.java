@@ -13,7 +13,7 @@ package org.mule.config.spring.factories;
 import org.mule.api.MuleContext;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.context.MuleContextAware;
-import org.mule.api.store.ListableObjectStore;
+import org.mule.api.store.QueueObjectStore;
 import org.mule.config.QueueProfile;
 
 import java.io.Serializable;
@@ -24,7 +24,7 @@ public class QueueProfileFactoryBean extends AbstractFactoryBean<QueueProfile> i
 {
     private int maxOutstandingMessages;
     private MuleContext muleContext;
-    private ListableObjectStore<Serializable> queueStore;
+    private QueueObjectStore<Serializable> queueStore;
 
     @Override
     public Class<?> getObjectType()
@@ -35,11 +35,10 @@ public class QueueProfileFactoryBean extends AbstractFactoryBean<QueueProfile> i
     @Override
     protected QueueProfile createInstance() throws Exception
     {
-        ListableObjectStore<Serializable> objectStore = queueStore;
+        QueueObjectStore<Serializable> objectStore = queueStore;
         if (objectStore == null)
         {
-            objectStore =
-                muleContext.getRegistry().lookupObject(MuleProperties.OBJECT_STORE_DEFAULT_IN_MEMORY_NAME);
+            objectStore = muleContext.getRegistry().lookupObject(MuleProperties.QUEUE_STORE_DEFAULT_IN_MEMORY_NAME);
         }
 
         return new QueueProfile(getMaxOutstandingMessages(), objectStore);
@@ -61,12 +60,12 @@ public class QueueProfileFactoryBean extends AbstractFactoryBean<QueueProfile> i
         this.maxOutstandingMessages = maxOutstandingMessages;
     }
 
-    public void setQueueStore(ListableObjectStore<Serializable> queueStore)
+    public void setQueueStore(QueueObjectStore<Serializable> queueStore)
     {
         this.queueStore = queueStore;
     }
 
-    public ListableObjectStore<Serializable> getQueueStore()
+    public QueueObjectStore<Serializable> getQueueStore()
     {
         return queueStore;
     }

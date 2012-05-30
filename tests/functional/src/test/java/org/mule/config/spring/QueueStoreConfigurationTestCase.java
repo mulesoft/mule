@@ -10,9 +10,12 @@
 
 package org.mule.config.spring;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.processor.ProcessingStrategy;
 import org.mule.api.store.ListableObjectStore;
+import org.mule.api.store.QueueObjectStore;
 import org.mule.config.QueueProfile;
 import org.mule.construct.Flow;
 import org.mule.construct.flow.DefaultFlowProcessingStrategy;
@@ -24,9 +27,6 @@ import org.mule.util.store.SimpleMemoryObjectStore;
 import java.io.Serializable;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 public class QueueStoreConfigurationTestCase extends FunctionalTestCase
 {
@@ -113,18 +113,18 @@ public class QueueStoreConfigurationTestCase extends FunctionalTestCase
     private void assertObjectStoreIsDefaultMemoryObjectStore(ListableObjectStore<Serializable> objectStore)
     {
         Object defaultMemoryObjectStore = 
-            muleContext.getRegistry().lookupObject(MuleProperties.OBJECT_STORE_DEFAULT_IN_MEMORY_NAME);
+            muleContext.getRegistry().lookupObject(MuleProperties.QUEUE_STORE_DEFAULT_IN_MEMORY_NAME);
         assertEquals(defaultMemoryObjectStore, objectStore);
     }
     
     private void assertObjectStoreIsDefaultPersistentObjectStore(ListableObjectStore<Serializable> objectStore)
     {
         Object defaultPersistentObjectStore = 
-            muleContext.getRegistry().lookupObject(MuleProperties.OBJECT_STORE_DEFAULT_PERSISTENT_NAME);
+            muleContext.getRegistry().lookupObject(MuleProperties.QUEUE_STORE_DEFAULT_PERSISTENT_NAME);
         assertEquals(defaultPersistentObjectStore, objectStore);
     }
     
-    public static class TestObjectStore extends SimpleMemoryObjectStore<Serializable>
+    public static class TestObjectStore extends SimpleMemoryObjectStore<Serializable> implements QueueObjectStore<Serializable>
     {
         // no custom methods
     }

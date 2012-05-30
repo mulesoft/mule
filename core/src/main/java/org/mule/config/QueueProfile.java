@@ -15,6 +15,7 @@ import org.mule.api.config.MuleProperties;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.store.ListableObjectStore;
+import org.mule.api.store.QueueObjectStore;
 import org.mule.util.queue.QueueConfiguration;
 import org.mule.util.queue.QueueManager;
 
@@ -28,16 +29,16 @@ import java.io.Serializable;
 public class QueueProfile
 {
     private int maxOutstandingMessages = 0;
-    private ListableObjectStore<Serializable> objectStore;
+    private QueueObjectStore<Serializable> objectStore;
     
     public static QueueProfile newInstancePersistingToDefaultMemoryQueueStore(MuleContext muleContext)
     {
-        ListableObjectStore<Serializable> defaultMemoryObjectStore =
-            muleContext.getRegistry().lookupObject(MuleProperties.OBJECT_STORE_DEFAULT_IN_MEMORY_NAME);
+        QueueObjectStore<Serializable> defaultMemoryObjectStore =
+            muleContext.getRegistry().lookupObject(MuleProperties.QUEUE_STORE_DEFAULT_IN_MEMORY_NAME);
         return new QueueProfile(defaultMemoryObjectStore);
     }
 
-    public QueueProfile(ListableObjectStore<Serializable> objectStore)
+    public QueueProfile(QueueObjectStore<Serializable> objectStore)
     {
         this.objectStore = objectStore;
     }
@@ -49,7 +50,7 @@ public class QueueProfile
         this.objectStore = queueProfile.objectStore;
     }
 
-    public QueueProfile(int maxOutstandingMessages, ListableObjectStore<Serializable> objectStore)
+    public QueueProfile(int maxOutstandingMessages, QueueObjectStore<Serializable> objectStore)
     {
         this.maxOutstandingMessages = maxOutstandingMessages;
         this.objectStore = objectStore;
@@ -93,12 +94,12 @@ public class QueueProfile
         return objectStore;
     }
 
-    public void setQueueStore(ListableObjectStore<Serializable> objectStore)
+    public void setQueueStore(QueueObjectStore<Serializable> objectStore)
     {
         this.objectStore = objectStore;
     }
 
-    public void addQueueStore(ListableObjectStore<Serializable> objectStore)
+    public void addQueueStore(QueueObjectStore<Serializable> objectStore)
     {
         this.objectStore = objectStore;
     }
