@@ -331,7 +331,7 @@ public abstract class AbstractComponent implements Component, MuleContextAware, 
             sb.append(flowConstruct.getName());
             sb.append(".");
         }
-        sb.append("commponent");
+        sb.append("component");
         if (!(flowConstruct instanceof Service || flowConstruct instanceof SimpleService))
         {
             sb.append(".");
