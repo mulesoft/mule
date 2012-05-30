@@ -16,7 +16,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import org.mule.api.MuleMessage;
 import org.mule.api.store.ObjectStoreException;
-import org.mule.api.store.QueueObjectStore;
+import org.mule.api.store.QueueStore;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.util.store.SimpleMemoryObjectStore;
@@ -116,7 +116,7 @@ public class VMFunctionalTestCase extends AbstractServiceAndFlowTestCase
         assertNull(secondMessage);
     }
 
-    public static class CustomObjectStore<T extends Serializable> extends SimpleMemoryObjectStore<T> implements QueueObjectStore<T>
+    public static class CustomObjectStore<T extends Serializable> extends SimpleMemoryObjectStore<T> implements QueueStore<T>
     {
         static int count;
 

@@ -50,7 +50,7 @@
             </inbound>
             <echo-component/>
             <queue-profile>
-                <custom-queue-store class="org.mule.config.spring.QueueStoreConfigurationTestCase$TestObjectStore"/>
+                <custom-queue-store class="org.mule.config.spring.QueueStoreConfigurationTestCase$TestQueueStore"/>
             </queue-profile>
         </service>
     </model>

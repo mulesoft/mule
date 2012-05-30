@@ -11,7 +11,7 @@
 package org.mule.util.store;
 
 import org.mule.api.store.ObjectStore;
-import org.mule.api.store.QueueObjectStore;
+import org.mule.api.store.QueueStore;
 
 import java.io.Serializable;
 
@@ -31,15 +31,15 @@ public class MuleDefaultObjectStoreFactory implements DefaultObjectStoreFactory
     }
 
     @Override
-    public QueueObjectStore<Serializable> createDefaultInMemoryQueueStore()
+    public QueueStore<Serializable> createDefaultInMemoryQueueStore()
     {
-        return new QueueObjectStoreAdapter<Serializable>(new SimpleMemoryObjectStore<Serializable>());
+        return new QueueStoreAdapter<Serializable>(new SimpleMemoryObjectStore<Serializable>());
     }
 
     @Override
-    public QueueObjectStore<Serializable> createDefaultPersistentQueueStore()
+    public QueueStore<Serializable> createDefaultPersistentQueueStore()
     {
-        return new QueueObjectStoreAdapter<Serializable>(new QueuePersistenceObjectStore<Serializable>());
+        return new QueueStoreAdapter<Serializable>(new QueuePersistenceObjectStore<Serializable>());
     }
 
     @Override

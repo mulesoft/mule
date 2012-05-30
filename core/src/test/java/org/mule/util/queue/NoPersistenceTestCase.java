@@ -10,7 +10,7 @@
 
 package org.mule.util.queue;
 
-import org.mule.util.store.QueueObjectStoreAdapter;
+import org.mule.util.store.QueueStoreAdapter;
 import org.mule.util.store.SimpleMemoryObjectStore;
 
 import java.io.Serializable;
@@ -21,7 +21,7 @@ public class NoPersistenceTestCase extends AbstractTransactionQueueManagerTestCa
     protected TransactionalQueueManager createQueueManager() throws Exception
     {
         TransactionalQueueManager mgr = new TransactionalQueueManager();
-        mgr.setDefaultQueueConfiguration(new QueueConfiguration(0, new QueueObjectStoreAdapter<Serializable>(new SimpleMemoryObjectStore<Serializable>())));
+        mgr.setDefaultQueueConfiguration(new QueueConfiguration(0, new QueueStoreAdapter<Serializable>(new SimpleMemoryObjectStore<Serializable>())));
         return mgr;
     }
 

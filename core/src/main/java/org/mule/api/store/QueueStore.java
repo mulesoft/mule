@@ -15,6 +15,6 @@ import java.io.Serializable;
 /**
  * Defines a <{@link ListableObjectStore} to store data for event queues.
  */
-public interface QueueObjectStore<T extends Serializable> extends ListableObjectStore<T>
+public interface QueueStore<T extends Serializable> extends ListableObjectStore<T>
 {
 }
