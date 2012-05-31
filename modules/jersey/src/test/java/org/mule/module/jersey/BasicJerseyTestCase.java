@@ -96,7 +96,7 @@ public class BasicJerseyTestCase extends AbstractServiceAndFlowTestCase
     @Test
     public void testThrowException() throws Exception
     {
-        callThrowException(500, "Failed to invoke JerseyResourcesComponent{helloWorldResource.commponent}. Component that caused exception is: JerseyResourcesComponent{helloWorldResource.commponent}. Message payload is of type: String");
+        callThrowException(500, "Failed to invoke JerseyResourcesComponent{helloWorldResource.component}. Component that caused exception is: JerseyResourcesComponent{helloWorldResource.component}. Message payload is of type: String");
     }
 
     protected void callThrowException(Integer expectedErrorCode, String expectedData) throws Exception
