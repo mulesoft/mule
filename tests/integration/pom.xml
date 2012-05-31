@@ -127,7 +127,7 @@
 
         <!-- Used by ServerTools.java -->
         <dependency>
-            <groupId>ant</groupId>
+            <groupId>org.apache.ant</groupId>
             <artifactId>ant</artifactId>
         </dependency>
 

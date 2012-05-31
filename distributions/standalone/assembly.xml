@@ -351,9 +351,6 @@
                 <!-- Distributed separately in profiler pack -->
                 <exclude>com.yourkit:yjp-controller-api-redist</exclude>
 
-                <!-- We don't redistribute Ant -->
-                <exclude>org.apache.ant:ant</exclude>
-                <exclude>org.apache.ant:ant-launcher</exclude>
             </excludes>
         </dependencySet>
 

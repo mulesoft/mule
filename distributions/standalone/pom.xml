@@ -330,9 +330,10 @@
         </dependency>
         <!-- re-add our ant dependency as it gets transitively excluded by jetty's jsp support -->
         <dependency>
-            <groupId>ant</groupId>
+            <groupId>org.apache.ant</groupId>
             <artifactId>ant</artifactId>
             <version>${antVersion}</version>
+
         </dependency>
         <dependency>
             <groupId>xalan</groupId>

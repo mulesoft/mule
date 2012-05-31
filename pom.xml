@@ -82,7 +82,7 @@
         <jdk7Name>JavaSE-1.7</jdk7Name>
 
         <activemqVersion>5.5.0</activemqVersion>
-        <antVersion>1.6.5</antVersion>
+        <antVersion>1.7.0</antVersion>
         <antlrVersion>3.1.1</antlrVersion>
         <asmVersion>3.1</asmVersion>
         <bshVersion>2.0b4</bshVersion>
@@ -891,7 +891,7 @@
                 </exclusions>
             </dependency>
             <dependency>
-                <groupId>ant</groupId>
+                <groupId>org.apache.ant</groupId>
                 <artifactId>ant</artifactId>
                 <version>${antVersion}</version>
             </dependency>
