@@ -14,6 +14,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertFalse;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
@@ -25,6 +26,8 @@ import org.mule.api.transport.PropertyScope;
 import org.mule.construct.Flow;
 import org.mule.tck.functional.FlowAssert;
 import org.mule.transport.vm.VMMessageDispatcher;
+import org.mule.api.client.MuleClient;
+import org.mule.transport.NullPayload;
 
 import org.junit.After;
 import org.junit.Ignore;
@@ -221,6 +224,20 @@ public class SessionPropertiesTestCase extends org.mule.tck.junit4.FunctionalTes
         assertEquals("value2NEW", result.getSession().getProperty("key2"));
         assertEquals("value3", result.getSession().getProperty("key3"));
         assertNull(result.getSession().getProperty("nonSerializableBean"));
+    }
+
+    @Test
+    @Ignore
+    public void requestReplyWithJms() throws Exception
+    {
+        MuleClient client = muleContext.getClient();
+        MuleMessage result = client.send("vm://inReqReplyJms", "some data", null);
+
+        assertNotNull(result);
+        assertNull(result.getExceptionPayload());
+        assertFalse(result.getPayload() instanceof NullPayload);
+
+        assertEquals(result.getPayloadAsString(), "test");
     }
 
     @Test
