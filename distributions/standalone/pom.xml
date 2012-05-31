@@ -277,6 +277,26 @@
         </dependency>
 
         <!--
+            Activemq is a transitive dependency from the errorhandler example.
+            Make sure it doesn't end up in the standalone distro.
+        -->
+        <dependency>
+            <groupId>org.apache.activemq</groupId>
+            <artifactId>activemq-core</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <!--
+            derby is a transitive dependency from the loanbroker-bpm example.
+            Make sure it doesn't end up in the standalone distro.
+        -->
+        <dependency>
+            <groupId>org.apache.derby</groupId>
+            <artifactId>derby</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <!--
             Exclude the transitive dependencies of the scripting example
          -->
         <dependency>

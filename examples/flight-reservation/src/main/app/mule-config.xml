@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:json="http://www.mulesoft.org/schema/mule/json"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:scripting="http://www.mulesoft.org/schema/mule/scripting"
+      xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+      xmlns:core="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      version="EE-3.3.0" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/current/mule-json.xsd
+http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+
+    <flow name="makeReservation" doc:name="makeReservation">
+        <http:inbound-endpoint exchange-pattern="request-response" host="localhost" port="9092" path="reservation" doc:name="HTTP Endpoint"/>
+        <object-to-string-transformer doc:name="Object to String"/>
+        <json:json-to-object-transformer returnClass="org.mule.example.ReservationRequest" doc:name="JSON to ReservationRequest"/>
+        <set-session-variable variableName="reservationRequest" value="#[payload]" doc:name="Save original request in Session"/>
+        <expression-transformer expression="#[new org.mule.example.ReservationResponse()]" doc:name="Set ReservationResponse payload"/>
+        <scripting:component doc:name="Add request flight to response">
+            <scripting:script engine="Groovy">
+                <scripting:text><![CDATA[payload.setFlights(reservationRequest.flights)
+payload]]></scripting:text>
+            </scripting:script>
+        </scripting:component>
+        <set-variable variableName="totalPrice" value="#[0]" doc:name="Initialize totalPrice"/>
+        <foreach collection="#[payload.flights]" doc:name="Foreach on flights">
+            <scripting:transformer doc:name="Search flight availability">
+                <scripting:script engine="Groovy">
+                    <scripting:text><![CDATA[if (payload.flightNumber.endsWith('3'))
+   throw new org.mule.example.FlightUnavailableException()
+else
+   payload]]></scripting:text>
+                </scripting:script>
+            </scripting:transformer>
+            <vm:outbound-endpoint exchange-pattern="request-response" path="acquireSeatsInfoQueue" doc:name="Acquire Seats Info"/>
+            <vm:outbound-endpoint exchange-pattern="request-response" path="acquireFlightPrice" doc:name="Acquire Flight Price"/>
+            <set-variable variableName="totalPrice" value="#[totalPrice + payload.ticketPrice]" doc:name="Add price to totalPrice"/>
+        </foreach>
+        <scripting:transformer doc:name="Add total price to reservation">
+            <scripting:script engine="Groovy">
+                <scripting:text><![CDATA[payload.totalPrice = flowVars['totalPrice']
+payload]]></scripting:text>
+            </scripting:script>
+        </scripting:transformer>
+        <json:object-to-json-transformer doc:name="Object to JSON"/>
+        <choice-exception-strategy>
+            <catch-exception-strategy when="#[exception.causedBy(org.mule.example.FlightUnavailableException)]">
+                <scripting:transformer doc:name="Add no availability error">
+                    <scripting:script engine="Groovy">
+                        <scripting:text><![CDATA[def payload = new org.mule.example.ReservationResponse()
+payload.addError('There is no availability for the selected flight')
+payload]]></scripting:text>
+                    </scripting:script>
+                </scripting:transformer>
+                <flow-ref name="CommonErrorTransformers" doc:name="common error handling"/>
+            </catch-exception-strategy>
+            <catch-exception-strategy>
+                <scripting:transformer doc:name="Add exception message">
+                    <scripting:script engine="Groovy">
+                        <scripting:text><![CDATA[def payload = new org.mule.example.ReservationResponse()
+payload.addError(exception.message)
+payload]]></scripting:text>
+                    </scripting:script>
+                </scripting:transformer>
+                <set-property propertyName="http.status" value="500" doc:name="Set http status 500"/>
+                <flow-ref name="CommonErrorTransformers" doc:name="common error handling"/>
+            </catch-exception-strategy>
+        </choice-exception-strategy>
+    </flow>
+    <flow name="acquireSeatsInfo" doc:name="acquireSeatsInfo">
+        <vm:inbound-endpoint exchange-pattern="request-response" path="acquireSeatsInfoQueue" doc:name="acquireSeatsInfo"/>
+        <scripting:component doc:name="Aquire seats info service">
+            <scripting:script engine="Groovy">
+                <scripting:text><![CDATA[if (payload.flightNumber.endsWith('2'))
+   payload.seatInfo = '20'
+else
+   throw new Exception()
+payload]]></scripting:text>
+            </scripting:script>
+        </scripting:component>
+        <catch-exception-strategy>
+            <scripting:transformer doc:name="Add no seat info avaiable message">
+                <scripting:script engine="Groovy">
+                    <scripting:text><![CDATA[payload.seatInfo = 'No seat info available'
+payload]]></scripting:text>
+                </scripting:script>
+            </scripting:transformer>
+        </catch-exception-strategy>
+    </flow>
+    <flow name="acquireFlightPrice" doc:name="acquireFlightPrice">
+        <vm:inbound-endpoint exchange-pattern="request-response" path="acquireFlightPrice" doc:name="acquireFlightPrice"/>
+        <scripting:component doc:name="acquireFlightPrice">
+            <scripting:script engine="Groovy">
+                <scripting:text><![CDATA[payload.ticketPrice = Integer.valueOf(payload.flightNumber) * 11
+payload]]></scripting:text>
+            </scripting:script>
+        </scripting:component>
+    </flow>
+    <sub-flow name="CommonErrorTransformers" doc:name="CommonErrorTransformers">
+        <scripting:transformer doc:name="Add original request">
+            <scripting:script engine="Groovy">
+                <scripting:text><![CDATA[if (!payload.errors.isEmpty())
+   payload.originalRequest = reservationRequest
+payload]]></scripting:text>
+            </scripting:script>
+        </scripting:transformer>
+        <json:object-to-json-transformer doc:name="Object to JSON"/>
+    </sub-flow>
+</mule>
