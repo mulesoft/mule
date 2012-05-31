@@ -8,11 +8,9 @@
        default-init-method="initialise">
     <!-- Marker for MULE-4813-->
 
+    <bean name="_muleNotificationManager" class="org.mule.config.spring.ServerNotificationManagerConfigurator"/>
 
     <bean name="_muleSimpleRegistryBootstrap" class="org.mule.config.bootstrap.SimpleRegistryBootstrap"/>
-
-    <bean name="_muleNotificationManager"
-          class="org.mule.config.spring.ServerNotificationManagerConfigurator"/>
 
     <bean name="_muleAnnotationsProcessor" class="org.mule.config.spring.processors.DecoratingFlowAnnotationsBeanProcessor"/>
 
