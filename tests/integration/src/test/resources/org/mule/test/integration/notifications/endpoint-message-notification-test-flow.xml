@@ -21,8 +21,10 @@
         <notification-listener ref="notificationLogger"/>
     </notifications>
 
+    <vm:endpoint name="input"  path="in-1" exchange-pattern="request-response" connector-ref="direct"/>
+
     <flow name="service-1">
-        <vm:inbound-endpoint path="in-1" exchange-pattern="request-response" connector-ref="direct"/>
+        <vm:inbound-endpoint ref="input"/>
         <echo-component/>
     </flow>
 

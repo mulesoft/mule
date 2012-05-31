@@ -21,11 +21,13 @@
         <notification-listener ref="notificationLogger"/>
     </notifications>
 
+    <vm:endpoint name="input"  path="in-1" exchange-pattern="request-response" connector-ref="direct"/>
+
     <model name="the-model">
 
         <service name="service-1">
             <inbound>
-                <vm:inbound-endpoint path="in-1" exchange-pattern="request-response" connector-ref="direct"/>
+                <vm:inbound-endpoint ref="input"/>
             </inbound>
             <echo-component/>
         </service>
