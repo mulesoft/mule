@@ -23,14 +23,13 @@ public class OptimisedNotificationHandler implements ServerNotificationHandler
     private ServerNotificationHandler delegate;
     private Class type;
     private boolean dynamic = false;
-    private boolean enabled = false;
+    private volatile Boolean enabled = null;
 
     public OptimisedNotificationHandler(ServerNotificationHandler delegate, Class type)
     {
         this.delegate = delegate;
         this.type = type;
         dynamic = delegate.isNotificationDynamic();
-        enabled = delegate.isNotificationEnabled(type);
     }
 
     public boolean isNotificationDynamic()
@@ -56,6 +55,11 @@ public class OptimisedNotificationHandler implements ServerNotificationHandler
     {
         if ((!dynamic) && type.isAssignableFrom(notfnClass))
         {
+            if (enabled == null)
+            {
+                enabled = delegate.isNotificationEnabled(notfnClass);
+            }
+
             return enabled;
         }
         else
