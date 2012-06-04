@@ -5191,15 +5191,19 @@
                     </xsd:group>
                     <xsd:element name="on-redelivery-attempts-exceeded" minOccurs="0">
                         <xsd:complexType>
-                            <xsd:sequence>
-                                <xsd:group ref="messageProcessorOrOutboundEndpoint" minOccurs="0" maxOccurs="unbounded">
-                                    <xsd:annotation>
-                                        <xsd:documentation>Destination to which the message will be sent in case that max redelivery attempts configured is exceeded, this
-                                            could be any sequence of outbound endpoint, router, or message processor.
-                                        </xsd:documentation>
-                                    </xsd:annotation>
-                                </xsd:group>
-                            </xsd:sequence>
+                            <xsd:complexContent>
+                                <xsd:extension base="annotatedType">
+                                    <xsd:sequence>
+                                        <xsd:group ref="messageProcessorOrOutboundEndpoint" minOccurs="0" maxOccurs="unbounded">
+                                            <xsd:annotation>
+                                                <xsd:documentation>Destination to which the message will be sent in case that max redelivery attempts configured is exceeded, this
+                                                    could be any sequence of outbound endpoint, router, or message processor.
+                                                </xsd:documentation>
+                                            </xsd:annotation>
+                                        </xsd:group>
+                                    </xsd:sequence>
+                                </xsd:extension>
+                            </xsd:complexContent>
                         </xsd:complexType>
                     </xsd:element>
                 </xsd:sequence>
