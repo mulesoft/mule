@@ -223,11 +223,16 @@
 /mule-standalone-${productVersion}/examples/flight-reservation
 /mule-standalone-${productVersion}/examples/flight-reservation/README.txt
 /mule-standalone-${productVersion}/examples/flight-reservation/mule-example-flight-reservation-${productVersion}.zip
+/mule-standalone-${productVersion}/examples/flight-reservation/README.txt
 /mule-standalone-${productVersion}/examples/flight-reservation/pom.xml
 /mule-standalone-${productVersion}/examples/flight-reservation/src
 /mule-standalone-${productVersion}/examples/flight-reservation/src/main
 /mule-standalone-${productVersion}/examples/flight-reservation/src/main/app
+/mule-standalone-${productVersion}/examples/flight-reservation/src/main/app/docroot
 /mule-standalone-${productVersion}/examples/flight-reservation/src/main/app/mule-config.xml
+/mule-standalone-${productVersion}/examples/flight-reservation/src/main/app/docroot/flight-reservation.css
+/mule-standalone-${productVersion}/examples/flight-reservation/src/main/app/docroot/flight-reservation.js
+/mule-standalone-${productVersion}/examples/flight-reservation/src/main/app/docroot/index.html
 /mule-standalone-${productVersion}/examples/flight-reservation/src/main/java
 /mule-standalone-${productVersion}/examples/flight-reservation/src/main/java/org
 /mule-standalone-${productVersion}/examples/flight-reservation/src/main/java/org/mule
@@ -258,6 +263,8 @@
 /mule-standalone-${productVersion}/examples/foreach/src/test/java
 /mule-standalone-${productVersion}/examples/foreach/src/test/resources
 /mule-standalone-${productVersion}/examples/foreach/src/main/resources/derby.properties
+/mule-standalone-${productVersion}/examples/foreach/src/main/resources/foreach_error.html
+/mule-standalone-${productVersion}/examples/foreach/src/main/resources/foreach_info.html
 
 
 #
