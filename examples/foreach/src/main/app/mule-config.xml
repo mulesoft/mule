@@ -20,40 +20,38 @@ http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/cor
     <jdbc:connector name="JDBCConnector" dataSource-ref="Derby_Data_Source" validateConnections="true" queryTimeout="-1" pollingFrequency="0" doc:name="JDBCConnector">
         <jdbc:query key="allcars" value="SELECT * FROM cars"/>
     </jdbc:connector>
-    <jms:activemq-connector name="JMSConnector"/>
-    <flow name="process">
+    <jms:activemq-connector name="JMSConnector" doc:name="Active MQ"/>
+    <flow name="process" doc:name="process">
         <http:inbound-endpoint exchange-pattern="request-response" host="localhost" port="9091" path="process" doc:name="HTTP Endpoint"/>
         <jdbc:outbound-endpoint exchange-pattern="request-response" queryKey="allcars" responseTimeout="10000" mimeType="text/plain" queryTimeout="-1" connector-ref="JDBCConnector" doc:name="Database (JDBC)"/>
         <foreach doc:name="Foreach">
             <choice doc:name="Choice">
                 <when expression="payload['MODEL_YEAR'] &lt; 2001">
                     <processor-chain>
-						<scripting:transformer doc:name="Set payload type">
-                    		<scripting:script engine="Groovy">
-                        		<scripting:text><![CDATA[payload['TYPE']='20th century car']]></scripting:text>
-							</scripting:script>
-						</scripting:transformer>
+                        <expression-component doc:name="Set payload type">payload['TYPE']='20th century car'</expression-component>
                         <jms:outbound-endpoint queue="in" doc:name="JMS"/>
                     </processor-chain>
                 </when>
                 <otherwise>
                     <processor-chain>
-                    	<scripting:transformer doc:name="Set payload type">
-                    		<scripting:script engine="Groovy">
-                        		<scripting:text><![CDATA[payload['TYPE']='21st century car']]></scripting:text>
-							</scripting:script>
-						</scripting:transformer>
+                        <expression-component doc:name="Set payload type">payload['TYPE']='21st century car'</expression-component>
                         <file:outbound-endpoint path="/tmp" responseTimeout="10000" doc:name="File"/>
                     </processor-chain>
                 </otherwise>
             </choice>
         </foreach>
-        <expression-transformer evaluator="string" expression="#[payload.size()] cars where processed: #[payload]" doc:name="Expression"/>
-        <catch-exception-strategy>
-            <expression-transformer expression="#[string:you need to populate the db first]" doc:name="DB is not populated"/>
+        <set-payload value="#[payload.size()] cars where processed: #[payload]" doc:name="Set response"/>
+        <http:response-builder contentType="text/html" doc:name="HTTP Response Builder">
+        	<parse-template location="foreach_info.html" doc:name="Parse Template"/>
+        </http:response-builder>
+        <catch-exception-strategy doc:name="Catch Exception Strategy">
+            <set-payload value="You need to populate the Database first" doc:name="DB is not populated"/>
+            <http:response-builder status="500" contentType="text/html" doc:name="HTTP Response Builder">
+                <parse-template location="foreach_error.html" doc:name="Parse Template"/>
+            </http:response-builder>
         </catch-exception-strategy>
     </flow>
-    <flow name="populate">
+    <flow name="populate" doc:name="populate">
         <http:inbound-endpoint exchange-pattern="request-response" host="localhost" port="9091" path="populate" doc:name="HTTP Endpoint"/>
         <scripting:component doc:name="Script to populate DB">
             <scripting:script engine="Groovy">
@@ -62,12 +60,18 @@ qr = jdbcConnector.getQueryRunner();
 conn = jdbcConnector.getConnection();
 qr.update(conn, "CREATE TABLE cars (model varchar(256), model_year integer)");
 qr.update(conn, "INSERT INTO cars values('Ford Sierra', 1982)");
-qr.update(conn, "INSERT INTO cars values('Opel Astra', 2001)");
-return "db populated";]]></scripting:text>
+qr.update(conn, "INSERT INTO cars values('Opel Astra', 2001)");]]></scripting:text>
             </scripting:script>
         </scripting:component>
-        <catch-exception-strategy>
-            <expression-transformer expression="#[string:db already populated]" doc:name="DB Already populated"/>
+        <set-payload value="Successfully populated the database" doc:name="Set Payload"/>
+        <http:response-builder contentType="text/html" doc:name="HTTP Response Builder">
+            <parse-template location="foreach_info.html" doc:name="Parse Template"/>
+        </http:response-builder>
+        <catch-exception-strategy doc:name="Catch Exception Strategy">
+            <set-payload value="DB already populated" doc:name="Database Already populated"/>
+            <http:response-builder status="500" contentType="text/html" doc:name="HTTP Response Builder">
+                <parse-template location="foreach_error.html" doc:name="Parse Template"/>
+            </http:response-builder>
         </catch-exception-strategy>
     </flow>
 </mule>

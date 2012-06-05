@@ -5,10 +5,12 @@
       xmlns:spring="http://www.springframework.org/schema/beans"
       xmlns:http="http://www.mulesoft.org/schema/mule/http"
       xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:servlet="http://www.mulesoft.org/schema/mule/servlet"
       xsi:schemaLocation="
         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
         http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
         http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+        http://www.mulesoft.org/schema/mule/servlet http://www.mulesoft.org/schema/mule/servlet/current/mule-servlet.xsd
         http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
 
 
@@ -40,7 +42,7 @@
     <flow name="HelloWorld" doc:name="HelloWorld">
         <composite-source>
             <http:inbound-endpoint exchange-pattern="request-response" host="localhost" port="8888" doc:name="Http Endpoint"/>
-            <inbound-endpoint exchange-pattern="request-response" address="servlet://name"  doc:name="Servlet Endpoint"/>
+            <servlet:inbound-endpoint path="name"  doc:name="Servlet Endpoint"/>
         </composite-source>
         <message-filter doc:name="Filter favicon">
             <not-filter>
