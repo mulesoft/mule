@@ -37,12 +37,6 @@
             exchange-pattern="request-response" doc:name="Http Endpoint">
         </http:inbound-endpoint>
 
-		<message-filter doc:name="Filter favicon">
-            <not-filter>
-                <wildcard-filter pattern="/favicon.ico"/>
-            </not-filter>
-		</message-filter>
-
 		<transformer ref="HttpRequestToMap" doc:name="Transform HttpRequest tp Map"/>
 
         <choice>
