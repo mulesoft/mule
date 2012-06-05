@@ -4,8 +4,10 @@
 This example demonstrates how to use Foreach to add information to each message in a collection. It also takes
 advantage of other features added in Mule 3.3 such as:
 
+    - New set-payload and parse-template transformers
     - Catch Exception Strategy
     - Mule Expressions
+    - HTTP Response Builder
 
 For more information, refer to 
 http://www.mulesoft.org/documentation/display/MULE3EXAMPLES/Foreach+Example
@@ -19,7 +21,7 @@ open the following URL in your browser:
 
     http://localhost:9091/populate
 
-You should see a message indicating that the DB has been populated. Next enter the following URL:
+You should see a message indicating that the Database has been populated. Next enter the following URL:
 
     http://localhost:9091/process
 
