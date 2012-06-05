@@ -18,6 +18,7 @@ import org.mule.api.lifecycle.Startable;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.store.ObjectAlreadyExistsException;
 import org.mule.api.store.ObjectStoreException;
+import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.transformer.simple.ByteArrayToHexString;
 import org.mule.transformer.simple.ObjectToByteArray;
@@ -147,6 +148,11 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy
         try
         {
             messageId = getIdForEvent(event);
+        }
+        catch (TransformerException e)
+        {
+            logger.warn("The message cannot be processed because the digest could not be generated. Either make the payload serializable or use an expression.");
+            return null;
         }
         catch (Exception ex)
         {
