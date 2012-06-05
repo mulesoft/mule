@@ -34,6 +34,9 @@ import javax.resource.spi.work.Work;
  */
 public abstract class TransactedPollingMessageReceiver extends AbstractPollingMessageReceiver
 {
+    /** time to sleep when there are no messages in the queue to avoid busy waiting **/
+    private static final long NO_MESSAGES_SLEEP_TIME = Long.parseLong(System.getProperty("mule.vm.pollingSleepWaitTime", "50"));
+
     /** determines whether messages will be received in a transaction template */
     private boolean receiveMessagesInTransaction = true;
 
@@ -113,7 +116,10 @@ public abstract class TransactedPollingMessageReceiver extends AbstractPollingMe
         {
             if (hasNoMessages())
             {
-                Thread.sleep(50);
+                if (NO_MESSAGES_SLEEP_TIME > 0)
+                {
+                    Thread.sleep(NO_MESSAGES_SLEEP_TIME);
+                }
                 return;
             }
             // Receive messages and process them in a single transaction
