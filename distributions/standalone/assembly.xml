@@ -157,16 +157,6 @@
             <fileMode>0644</fileMode>
         </fileSet>
 
-        <!--
-        ============================
-            Mule Examples: Mule Example Launcher
-        ============================
-        -->
-        <fileSet>
-            <directory>../../examples/mule-example-launcher/dist</directory>
-            <outputDirectory>examples/mule-example-launcher</outputDirectory>
-            <fileMode>0644</fileMode>
-        </fileSet>
     </fileSets>
 
     <!--
@@ -326,7 +316,6 @@
                 <exclude>org.mule.examples:mule-example-foreach</exclude>
                 <exclude>org.mule.examples:mule-example-scripting</exclude>
                 <exclude>org.mule.examples:mule-example-stockquote</exclude>
-                <exclude>org.mule.examples:mule-example-launcher</exclude>
                 <exclude>org.mule.tools:mule-tools-anttasks</exclude>
 
                 <!-- lib/user -->
@@ -448,14 +437,6 @@
             <fileMode>0644</fileMode>
             <includes>
                 <include>org.mule.examples:mule-example-stockquote</include>
-            </includes>
-        </dependencySet>
-        <dependencySet>
-            <outputDirectory>examples/mule-example-launcher</outputDirectory>
-            <useStrictFiltering>true</useStrictFiltering>
-            <fileMode>0644</fileMode>
-            <includes>
-                <include>org.mule.examples:mule-example-launcher</include>
             </includes>
         </dependencySet>
     </dependencySets>

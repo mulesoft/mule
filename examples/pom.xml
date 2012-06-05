@@ -29,6 +29,5 @@
         <module>scripting</module>
         <module>stockquote</module>
         <module>loanbroker-legacy</module>
-        <module>mule-example-launcher</module>
     </modules>
 </project>
