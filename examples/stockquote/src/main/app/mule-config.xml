@@ -36,11 +36,6 @@
 
     <flow name="HTTP_input" doc:name="HTTP input">
         <http:inbound-endpoint exchange-pattern="request-response" host="localhost" port="${port1}" path="stockquote" responseTransformer-refs="ObjectToString" doc:name="HTTP Endpoint"/>
-        <message-filter doc:name="Filter favicon">
-            <not-filter>
-                <wildcard-filter pattern="/favicon.ico" caseSensitive="true"/>
-            </not-filter>
-        </message-filter>
         <http:body-to-parameter-map-transformer doc:name="Body to Parameter Map"/>
         <choice doc:name="Choice">
             <when expression="payload.method == 'REST'" evaluator="groovy">
