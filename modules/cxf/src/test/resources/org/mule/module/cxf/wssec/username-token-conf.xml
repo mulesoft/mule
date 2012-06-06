@@ -11,17 +11,17 @@
 
     <cxf:ws-security name="outboundConfig">
         <cxf:ws-config>
-            <cxf:action value="UsernameToken"/>
-            <cxf:user value="joe"/>
-            <cxf:password-type value="PasswordDigest"/>
-            <cxf:password-callback-class value="org.mule.module.cxf.wssec.ClientPasswordCallback"/>
+            <cxf:property key="action" value="UsernameToken"/>
+            <cxf:property key="user" value="joe"/>
+            <cxf:property key="passwordType" value="PasswordDigest"/>
+            <cxf:property key="passwordCallbackClass" value="org.mule.module.cxf.wssec.ClientPasswordCallback"/>
         </cxf:ws-config>
     </cxf:ws-security>
 
     <cxf:ws-security name="inboundConfig">
         <cxf:ws-config>
-            <cxf:action value="UsernameToken"/>
-            <cxf:password-callback-class value="org.mule.module.cxf.wssec.ServerPasswordCallback"/>
+            <cxf:property key="action" value="UsernameToken"/>
+            <cxf:property key="passwordCallbackClass" value="org.mule.module.cxf.wssec.ServerPasswordCallback"/>
         </cxf:ws-config>
     </cxf:ws-security>
 

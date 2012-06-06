@@ -663,7 +663,7 @@
             <xsd:complexContent>
                 <xsd:extension base="mule:annotatedType">
                     <xsd:sequence>
-                        <xsd:any minOccurs="0" maxOccurs="unbounded" processContents="lax"/>
+                        <xsd:element name="property" minOccurs="0" maxOccurs="unbounded" type="mule:keyValueType"/>
                     </xsd:sequence>
                 </xsd:extension>
             </xsd:complexContent>

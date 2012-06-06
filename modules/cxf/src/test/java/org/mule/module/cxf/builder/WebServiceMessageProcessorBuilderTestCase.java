@@ -17,6 +17,7 @@ import static org.junit.Assert.assertTrue;
 
 import org.mule.api.MuleException;
 import org.mule.module.cxf.CxfInboundMessageProcessor;
+import org.mule.module.cxf.config.WsConfig;
 import org.mule.module.cxf.config.WsSecurity;
 import org.mule.module.cxf.support.MuleSecurityManagerValidator;
 import org.mule.module.cxf.testmodels.Echo;
@@ -113,7 +114,7 @@ public class WebServiceMessageProcessorBuilderTestCase extends AbstractMuleConte
         Map<String, Object> configProperties = new HashMap<String, Object>();
         configProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.USERNAME_TOKEN);
         
-        wsSecurity.setConfigProperties(configProperties);
+        wsSecurity.setWsConfig(new WsConfig(configProperties));
     }
 
     private void addSecurityManager(WsSecurity wsSecurity)

@@ -18,10 +18,10 @@
                               wsdlLocation="classpath:/wsdl/hello_world.wsdl" operation="greetMe">
                 <cxf:ws-security>
                     <cxf:ws-config>
-                        <cxf:action value="UsernameToken"/>
-                        <cxf:user value="joe"/>
-                        <cxf:password-type value="PasswordText"/>
-                        <cxf:password-callback-class value="org.mule.module.cxf.wssec.ClientPasswordCallback"/>
+                        <cxf:property key="action" value="UsernameToken"/>
+                        <cxf:property key="user" value="joe"/>
+                        <cxf:property key="passwordType" value="PasswordText"/>
+                        <cxf:property key="passwordCallbackClass" value="org.mule.module.cxf.wssec.ClientPasswordCallback"/>
                     </cxf:ws-config>
                 </cxf:ws-security>
             </cxf:jaxws-client>
@@ -33,7 +33,7 @@
             <cxf:jaxws-service serviceClass="org.mule.module.cxf.wssec.GreeterWithLatch">
                 <cxf:ws-security>
                     <cxf:ws-config>
-                        <cxf:action value="UsernameToken"/>
+                        <cxf:property key="action" value="UsernameToken"/>
                     </cxf:ws-config>
                     <cxf:ws-custom-validator>
                         <cxf:username-token-validator ref="usernameTokenValidator" />

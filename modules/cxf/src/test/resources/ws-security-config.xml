@@ -22,10 +22,10 @@
     <cxf:ws-security name="config1">
         <cxf:mule-security-manager/>
         <cxf:ws-config>
-            <cxf:action value="UsernameToken"/>
-            <cxf:user value="joe"/>
-            <cxf:password-type value="PasswordText"/>
-            <cxf:password-callback-class value="org.mule.module.cxf.wssec.ClientPasswordCallback"/>
+            <cxf:property key="action" value="UsernameToken"/>
+            <cxf:property key="user" value="joe"/>
+            <cxf:property key="passwordType" value="PasswordText"/>
+            <cxf:property key="passwordCallbackClass" value="org.mule.module.cxf.wssec.ClientPasswordCallback"/>
         </cxf:ws-config>
         <cxf:ws-custom-validator>
             <cxf:username-token-validator ref="noOp"/>
@@ -34,18 +34,18 @@
 
     <cxf:ws-security name="config2">
         <cxf:ws-config>
-            <cxf:action value="Timestamp Signature Encrypt"/>
-            <cxf:user value="joe"/>
-            <cxf:signature-prop-file value="org/mule/module/cxf/wssec/wssecurity.properties" />
-            <cxf:encryption-prop-file value="org/mule/module/cxf/wssec/wssecurity.properties" />
-            <cxf:encryption-user value="joe"/>
-            <cxf:password-callback-ref value="clientPasswordCallback"/>
+            <cxf:property key="action" value="Timestamp Signature Encrypt"/>
+            <cxf:property key="user" value="joe"/>
+            <cxf:property key="signaturePropFile" value="org/mule/module/cxf/wssec/wssecurity.properties" />
+            <cxf:property key="encryptionPropFile" value="org/mule/module/cxf/wssec/wssecurity.properties" />
+            <cxf:property key="encryptionUser" value="joe"/>
+            <cxf:property key="passwordCallbackRef" value-ref="clientPasswordCallback"/>
         </cxf:ws-config>
     </cxf:ws-security>
 
     <cxf:ws-security name="customTimestampConfig">
         <cxf:ws-config>
-            <cxf:action value="Timestamp"/>
+            <cxf:property key="action" value="Timestamp"/>
         </cxf:ws-config>
         <cxf:ws-custom-validator>
             <cxf:timestamp-token-validator ref="noOp"/>
@@ -54,7 +54,7 @@
 
     <cxf:ws-security name="customSAML1Config">
         <cxf:ws-config>
-            <cxf:action value="UsernameToken"/>
+            <cxf:property key="action" value="UsernameToken"/>
         </cxf:ws-config>
         <cxf:ws-custom-validator>
             <cxf:saml1-token-validator ref="noOp"/>
@@ -63,7 +63,7 @@
 
     <cxf:ws-security name="customSAML2Config">
         <cxf:ws-config>
-            <cxf:action value="UsernameToken"/>
+            <cxf:property key="action" value="UsernameToken"/>
         </cxf:ws-config>
         <cxf:ws-custom-validator>
             <cxf:saml2-token-validator ref="noOp"/>
@@ -72,7 +72,7 @@
 
     <cxf:ws-security name="customSignatureConfig">
         <cxf:ws-config>
-            <cxf:action value="Signature"/>
+            <cxf:property key="action" value="Signature"/>
         </cxf:ws-config>
         <cxf:ws-custom-validator>
             <cxf:signature-token-validator ref="noOp"/>
@@ -81,7 +81,7 @@
 
     <cxf:ws-security name="customBSTConfig">
         <cxf:ws-config>
-            <cxf:action value="Signature"/>
+            <cxf:property key="action" value="Signature"/>
         </cxf:ws-config>
         <cxf:ws-custom-validator>
             <cxf:bst-token-validator ref="noOp"/>
@@ -90,7 +90,7 @@
 
     <cxf:ws-security name="customMultipleConfig">
         <cxf:ws-config>
-            <cxf:action value="Signature"/>
+            <cxf:property key="action" value="Signature"/>
         </cxf:ws-config>
         <cxf:ws-custom-validator>
             <cxf:username-token-validator ref="noOp"/>

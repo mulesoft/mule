@@ -20,9 +20,9 @@
                               wsdlLocation="classpath:/wsdl/hello_world.wsdl" operation="greetMe">
                 <cxf:ws-security>
                     <cxf:ws-config>
-                        <cxf:action value="SAMLTokenUnsigned"/>
-                        <cxf:saml-prop-file value="org/mule/module/cxf/wssec/saml2.properties"/>
-                        <cxf:saml-callback-ref value="saml2CallbackHandler" />
+                        <cxf:property key="action" value="SAMLTokenUnsigned"/>
+                        <cxf:property key="samlPropFile" value="org/mule/module/cxf/wssec/saml2.properties"/>
+                        <cxf:property key="samlCallbackRef" value-ref="saml2CallbackHandler" />
                     </cxf:ws-config>
                 </cxf:ws-security>
             </cxf:jaxws-client>
@@ -34,7 +34,7 @@
             <cxf:jaxws-service serviceClass="org.mule.module.cxf.wssec.GreeterWithLatch">
                 <cxf:ws-security>
                     <cxf:ws-config>
-                        <cxf:action value="SAMLTokenUnsigned"/>
+                        <cxf:property key="action" value="SAMLTokenUnsigned"/>
                     </cxf:ws-config>
                     <cxf:ws-custom-validator>
                         <cxf:saml1-token-validator ref="samlCustomValidator" />
@@ -55,12 +55,12 @@
                               wsdlLocation="classpath:/wsdl/hello_world.wsdl" operation="greetMe">
                 <cxf:ws-security>
                     <cxf:ws-config>
-                        <cxf:action value="SAMLTokenSigned"/>
-                        <cxf:saml-prop-file value="org/mule/module/cxf/wssec/saml2.properties"/>
-                        <cxf:signature-key-identifier value="DirectReference"/>
-                        <cxf:user value="joe"/>
-                        <cxf:password-callback-ref value="passwordCallbackHandler" />
-                        <cxf:saml-callback-ref value="saml2CallbackHandler" />
+                        <cxf:property key="action" value="SAMLTokenSigned"/>
+                        <cxf:property key="samlPropFile" value="org/mule/module/cxf/wssec/saml2.properties"/>
+                        <cxf:property key="signatureKeyIdentifier" value="DirectReference"/>
+                        <cxf:property key="user" value="joe"/>
+                        <cxf:property key="passwordCallbackRef" value-ref="passwordCallbackHandler" />
+                        <cxf:property key="samlCallbackRef" value-ref="saml2CallbackHandler" />
                     </cxf:ws-config>
                 </cxf:ws-security>
             </cxf:jaxws-client>
@@ -72,8 +72,8 @@
             <cxf:jaxws-service serviceClass="org.mule.module.cxf.wssec.GreeterWithLatch">
                 <cxf:ws-security>
                     <cxf:ws-config>
-                        <cxf:action value="SAMLTokenUnsigned Signature"/>
-                        <cxf:signature-prop-file value="org/mule/module/cxf/wssec/wssecurity.properties" />
+                        <cxf:property key="action" value="SAMLTokenUnsigned Signature"/>
+                        <cxf:property key="signaturePropFile" value="org/mule/module/cxf/wssec/wssecurity.properties" />
                     </cxf:ws-config>
                     <cxf:ws-custom-validator>
                         <cxf:saml1-token-validator ref="samlCustomValidator" />

@@ -12,13 +12,14 @@ package org.mule.module.cxf.config;
 
 import org.mule.module.cxf.support.MuleSecurityManagerValidator;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class WsSecurity
 {
     String name;
     WsSecurity ref;
-    Map<String, Object> configProperties;
+    WsConfig wsConfig;
     MuleSecurityManagerValidator securityManager;
     Map<String, Object> customValidator;
 
@@ -31,14 +32,23 @@ public class WsSecurity
     {
         return ref;
     }
-    
+
+    public void setWsConfig(WsConfig wsConfig)
+    {
+        this.wsConfig = wsConfig;
+    }
+
     public Map<String, Object> getConfigProperties()
     {
         if(ref != null)
         {
             return ref.getConfigProperties();
         }
-        return configProperties;
+        if(wsConfig != null)
+        {
+            return wsConfig.getConfigProperties();
+        }
+        return new HashMap<String, Object>();
     }
     
     public MuleSecurityManagerValidator getSecurityManager()
@@ -62,11 +72,6 @@ public class WsSecurity
             return ref.getName();
         }
         return name;
-    }
-    
-    public void setConfigProperties(Map<String, Object> configProperties)
-    {
-        this.configProperties = configProperties;
     }
 
     public void setSecurityManager(MuleSecurityManagerValidator securityManager)
