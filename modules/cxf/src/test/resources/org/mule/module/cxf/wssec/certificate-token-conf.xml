@@ -12,18 +12,18 @@
     
     <cxf:ws-security name="outboundConfig">
         <cxf:ws-config>
-            <cxf:action value="Signature" />
-            <cxf:user value="joe" />
-            <cxf:signature-prop-file value="org/mule/module/cxf/wssec/wssecurity.properties" />
-            <cxf:password-callback-class value="org.mule.module.cxf.wssec.ClientPasswordCallback" />
+            <cxf:property key="action" value="Signature" />
+            <cxf:property key="user" value="joe" />
+            <cxf:property key="signaturePropFile" value="org/mule/module/cxf/wssec/wssecurity.properties" />
+            <cxf:property key="passwordCallbackClass" value="org.mule.module.cxf.wssec.ClientPasswordCallback" />
         </cxf:ws-config>
     </cxf:ws-security>
 
     <cxf:ws-security name="inboundConfig">
         <cxf:ws-config>
-            <cxf:action value="Signature" />
-            <cxf:signature-prop-file value="org/mule/module/cxf/wssec/wssecurity.properties" />
-            <cxf:password-callback-class value="org.mule.module.cxf.wssec.ServerPasswordCallback" />
+            <cxf:property key="action" value="Signature" />
+            <cxf:property key="signaturePropFile" value="org/mule/module/cxf/wssec/wssecurity.properties" />
+            <cxf:property key="passwordCallbackClass" value="org.mule.module.cxf.wssec.ServerPasswordCallback" />
         </cxf:ws-config>
     </cxf:ws-security>
 
