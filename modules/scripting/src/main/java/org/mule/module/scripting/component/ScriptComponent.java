@@ -72,6 +72,8 @@ public class ScriptComponent extends AbstractComponent
         {
             // leave this catch block in place to help debug classloading issues
             throw e;
+        } finally {
+            bindings.clear();
         }
     }
 

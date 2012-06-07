@@ -37,6 +37,8 @@ public class ScriptTransformer extends AbstractMessageTransformer
         catch (ScriptException e)
         {
             throw new TransformerException(this, e);
+        } finally {
+            bindings.clear();
         }
     }
 
