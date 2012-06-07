@@ -41,7 +41,6 @@ import net.sf.saxon.javax.xml.xquery.XQItemType;
 import net.sf.saxon.javax.xml.xquery.XQPreparedExpression;
 import net.sf.saxon.javax.xml.xquery.XQResultSequence;
 import net.sf.saxon.xqj.SaxonXQDataSource;
-
 import org.apache.commons.pool.BasePoolableObjectFactory;
 import org.apache.commons.pool.impl.GenericObjectPool;
 import org.dom4j.io.DOMWriter;
@@ -238,7 +237,7 @@ public class XQueryTransformer extends AbstractXmlTransformer implements Disposa
                     // clear transformation parameters before returning transformer to the
                     // pool
                     //TODO find out what the scope is for bound variables, there doesn't seem to be a way to unbind them
-
+                    unbindParameters(transformer);
                     transformerPool.returnObject(transformer);
                 }
             }
@@ -302,13 +301,33 @@ public class XQueryTransformer extends AbstractXmlTransformer implements Disposa
     }
 
     /**
+     * Removes any parameter bindings from the transformer, replacing them with empty strings
+     *
+     * @param transformer the transformer to remove properties from
+     */
+    protected void unbindParameters(XQPreparedExpression transformer) throws XQException
+    {
+        // Replace transformation parameters with null values
+        if (contextProperties != null)
+        {
+            for (Iterator i = contextProperties.entrySet().iterator(); i.hasNext(); )
+            {
+                Map.Entry parameter = (Map.Entry) i.next();
+                String key = (String) parameter.getKey();
+
+                transformer.bindAtomicValue(new QName(key), "", connection.createAtomicItemType(XQItemType.XQBASETYPE_STRING));
+            }
+        }
+    }
+
+    /**
      * Returns the InputSource corresponding to xqueryFile or xquery
      *
      * @param src
      * @param transformer
      * @throws net.sf.saxon.javax.xml.xquery.XQException
      *
-     * @throws org.mule.umo.transformer.TransformerException
+     * @throws Exception
      *
      */
     protected void bindDocument(Object src, XQPreparedExpression transformer) throws Exception

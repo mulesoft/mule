@@ -64,6 +64,9 @@ public abstract class AbstractScriptExpressionEvaluator implements ExpressionEva
         {
             throw new MuleRuntimeException(e);
         }
+        finally {
+            bindings.clear();
+        }
     }
 
     /**
