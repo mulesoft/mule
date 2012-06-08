@@ -10,6 +10,10 @@
 
 package org.mule.util;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.ArrayList;
@@ -19,11 +23,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 public class TemplateParserTestCase extends AbstractMuleTestCase
 {
@@ -183,6 +182,25 @@ public class TemplateParserTestCase extends AbstractMuleTestCase
 
         String result = tp.parse(props, template);
         assertEquals("Some String with value1 and value2 in it", result);
+    }
+
+    @Test
+    public void muleParserManagesPipeCharacter()
+    {
+        TemplateParser tp = TemplateParser.createMuleStyleParser();
+
+        final String expectedResult = "Hello|Hi";
+
+        String result = tp.parse(null, "#[evaluator: 'Hello|Hi']", new TemplateParser.TemplateCallback()
+        {
+            public Object match(String token)
+            {
+
+                return expectedResult;
+            }
+        });
+
+        assertEquals(expectedResult, result);
     }
 
     @Test

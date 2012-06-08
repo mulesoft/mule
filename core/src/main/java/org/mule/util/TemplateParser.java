@@ -278,6 +278,7 @@ public final class TemplateParser
                     case '#':
                     case '*':
                     case '?':
+                    case '|':
                         buffer.append("\\");
                         //$FALL-THROUGH$ to append original character
                     default:
