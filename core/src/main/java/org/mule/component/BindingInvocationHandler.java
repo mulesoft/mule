@@ -161,6 +161,10 @@ public class BindingInvocationHandler implements InvocationHandler
         {
             return reply;
         }
+        else if (reply.getPayload() == NullPayload.getInstance() && !bindingMethod.getReturnType().isInstance(reply.getPayload()))
+        {
+            return null;
+        }
         else
         {
             return reply.getPayload();
