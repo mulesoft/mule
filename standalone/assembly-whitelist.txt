@@ -278,6 +278,7 @@
 /mule-standalone-${productVersion}/examples/scripting/src
 /mule-standalone-${productVersion}/examples/scripting/src/main
 /mule-standalone-${productVersion}/examples/scripting/src/main/app
+/mule-standalone-${productVersion}/examples/scripting/src/main/app/mule-app.properties
 /mule-standalone-${productVersion}/examples/scripting/src/main/app/mule-config.xml
 /mule-standalone-${productVersion}/examples/scripting/src/main/java
 /mule-standalone-${productVersion}/examples/scripting/src/main/java/org
