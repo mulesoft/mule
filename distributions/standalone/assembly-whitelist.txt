@@ -550,6 +550,7 @@
 /mule-standalone-${productVersion}/examples/mule-example-launcher/src/main/app/docroot/notifications/run-notifications.html
 /mule-standalone-${productVersion}/examples/mule-example-launcher/src/main/app/docroot/scripting
 /mule-standalone-${productVersion}/examples/mule-example-launcher/src/main/app/docroot/scripting/about-scripting.html
+/mule-standalone-${productVersion}/examples/mule-example-launcher/src/main/app/docroot/scripting/mule-app.properties
 /mule-standalone-${productVersion}/examples/mule-example-launcher/src/main/app/docroot/scripting/mule-config.xml
 /mule-standalone-${productVersion}/examples/mule-example-launcher/src/main/app/docroot/scripting/run-scripting.html
 /mule-standalone-${productVersion}/examples/mule-example-launcher/src/main/app/docroot/stockquote
@@ -629,6 +630,7 @@
 /mule-standalone-${productVersion}/examples/scripting/src
 /mule-standalone-${productVersion}/examples/scripting/src/main
 /mule-standalone-${productVersion}/examples/scripting/src/main/app
+/mule-standalone-${productVersion}/examples/scripting/src/main/app/mule-app.properties
 /mule-standalone-${productVersion}/examples/scripting/src/main/app/mule-config.xml
 /mule-standalone-${productVersion}/examples/scripting/src/main/java
 /mule-standalone-${productVersion}/examples/scripting/src/main/java/org

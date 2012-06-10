@@ -10,16 +10,20 @@
 
 package org.mule.example.scripting;
 
+import static org.junit.Assert.assertEquals;
 import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.GetMethod;
+import org.junit.Rule;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
 
 public class ScriptingExampleTestCase extends FunctionalTestCase
 {
+
+    @Rule
+    public DynamicPort port = new DynamicPort("httpPort");
 
     @Override
     protected String getConfigResources()
@@ -41,8 +45,8 @@ public class ScriptingExampleTestCase extends FunctionalTestCase
     
     private void runTest(double amount, String currency, String expectedResult) throws Exception
     {
-        String url = String.format("http://localhost:47493/change-machine?amount=%1f&currency=%2s",
-            amount, currency);
+        String url = String.format("http://localhost:" + port.getNumber() + "/change-machine?amount=%1f&currency=%2s",
+                                   amount, currency);
         GetMethod httpGet = new GetMethod(url);
         new HttpClient().executeMethod(httpGet);
         String result =  httpGet.getResponseBodyAsString();
