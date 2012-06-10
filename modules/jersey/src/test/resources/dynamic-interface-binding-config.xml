@@ -16,7 +16,8 @@
         <jersey:resources>
             <component class="org.mule.module.jersey.HelloWorldComponent">
                 <binding interface="org.mule.module.jersey.HelloWorldInterface">
-                    <vm:outbound-endpoint path="transformationIn" exchange-pattern="request-response"/>
+                    <!-- Uses an expression to force a dynamic endpoint -->
+                    <vm:outbound-endpoint address="vm://#[string:transformationIn]" exchange-pattern="request-response"/>
                 </binding>
             </component>
         </jersey:resources>
