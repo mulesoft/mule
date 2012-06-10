@@ -65,7 +65,7 @@ public class BindingInvocationHandler implements InvocationHandler
         {
             routers.put(router.getMethod(), router);
         }
-        muleContext = router.getEndpoint().getConnector().getMuleContext();
+        muleContext = router.getEndpoint().getMuleContext();
     }
 
     @Override

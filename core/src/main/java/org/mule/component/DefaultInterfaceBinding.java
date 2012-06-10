@@ -91,6 +91,7 @@ public class DefaultInterfaceBinding implements InterfaceBinding
             outboundRouter = new OutboundPassThroughRouter();
             outboundRouter.addRoute((OutboundEndpoint) e);
             outboundRouter.setTransactionConfig(e.getTransactionConfig());
+            outboundRouter.setMuleContext(e.getMuleContext());
         }
         else
         {
