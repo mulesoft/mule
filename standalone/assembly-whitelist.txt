@@ -550,7 +550,6 @@
 /mule-standalone-${productVersion}/examples/mule-example-launcher/src/main/app/docroot/notifications/run-notifications.html
 /mule-standalone-${productVersion}/examples/mule-example-launcher/src/main/app/docroot/scripting
 /mule-standalone-${productVersion}/examples/mule-example-launcher/src/main/app/docroot/scripting/about-scripting.html
-/mule-standalone-${productVersion}/examples/mule-example-launcher/src/main/app/docroot/scripting/mule-app.properties
 /mule-standalone-${productVersion}/examples/mule-example-launcher/src/main/app/docroot/scripting/mule-config.xml
 /mule-standalone-${productVersion}/examples/mule-example-launcher/src/main/app/docroot/scripting/run-scripting.html
 /mule-standalone-${productVersion}/examples/mule-example-launcher/src/main/app/docroot/stockquote
