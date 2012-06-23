@@ -416,11 +416,14 @@ public class CxfOutboundMessageProcessor extends AbstractInterceptingMessageProc
         List<Object> responseWithHolders = new ArrayList<Object>();
         responseWithHolders.add(response);
 
-        for(Object arg : args)
+        if(args != null)
         {
-            if(arg instanceof Holder)
+            for(Object arg : args)
             {
-                responseWithHolders.add(arg);
+                if(arg instanceof Holder)
+                {
+                    responseWithHolders.add(arg);
+                }
             }
         }
 
