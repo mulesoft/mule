@@ -21,6 +21,7 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorBuilder;
 import org.mule.api.processor.MessageProcessorChainBuilder;
 import org.mule.api.processor.ProcessingStrategy;
+import org.mule.api.source.ClusterizableMessageSource;
 import org.mule.api.source.CompositeMessageSource;
 import org.mule.api.source.MessageSource;
 import org.mule.config.i18n.CoreMessages;
@@ -30,6 +31,7 @@ import org.mule.processor.AbstractInterceptingMessageProcessor;
 import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.processor.strategy.AsynchronousProcessingStrategy;
 import org.mule.processor.strategy.SynchronousProcessingStrategy;
+import org.mule.source.ClusterizableMessageSourceWrapper;
 
 import java.util.Collections;
 import java.util.List;
@@ -108,7 +110,14 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     @Override
     public void setMessageSource(MessageSource messageSource)
     {
-        this.messageSource = messageSource;
+        if (messageSource instanceof ClusterizableMessageSource)
+        {
+            this.messageSource = new ClusterizableMessageSourceWrapper(muleContext, (ClusterizableMessageSource) messageSource, this);
+        }
+        else
+        {
+            this.messageSource = messageSource;
+        }
     }
 
     @Override

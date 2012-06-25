@@ -17,6 +17,7 @@ import org.mule.api.config.MuleConfiguration;
 import org.mule.api.config.ThreadingProfile;
 import org.mule.api.context.MuleContextBuilder;
 import org.mule.api.context.WorkManager;
+import org.mule.api.context.notification.ClusterNodeNotificationListener;
 import org.mule.api.context.notification.ConnectionNotificationListener;
 import org.mule.api.context.notification.CustomNotificationListener;
 import org.mule.api.context.notification.ExceptionNotificationListener;
@@ -32,6 +33,7 @@ import org.mule.api.lifecycle.LifecycleManager;
 import org.mule.config.DefaultMuleConfiguration;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.MessageFactory;
+import org.mule.context.notification.ClusterNodeNotification;
 import org.mule.context.notification.ConnectionNotification;
 import org.mule.context.notification.CustomNotification;
 import org.mule.context.notification.ExceptionNotification;
@@ -255,6 +257,7 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder
                                    ExceptionNotification.class);
         manager.addInterfaceToType(TransactionNotificationListener.class,
                                    TransactionNotification.class);
+        manager.addInterfaceToType(ClusterNodeNotificationListener.class, ClusterNodeNotification.class);
         return manager;
     }
 

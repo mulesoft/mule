@@ -39,6 +39,7 @@ import org.mule.api.routing.MessageInfoMapping;
 import org.mule.api.routing.OutboundRouterCollection;
 import org.mule.api.routing.RouterStatisticsRecorder;
 import org.mule.api.service.Service;
+import org.mule.api.source.ClusterizableMessageSource;
 import org.mule.api.source.MessageSource;
 import org.mule.component.simple.PassThroughComponent;
 import org.mule.config.i18n.CoreMessages;
@@ -52,6 +53,7 @@ import org.mule.routing.MuleMessageInfoMapping;
 import org.mule.routing.outbound.DefaultOutboundRouterCollection;
 import org.mule.service.processor.ServiceAsyncRequestReplyRequestor;
 import org.mule.session.DefaultMuleSession;
+import org.mule.source.ClusterizableMessageSourceWrapper;
 import org.mule.util.ClassUtils;
 
 import java.util.Collections;
@@ -554,7 +556,14 @@ public abstract class AbstractService implements Service, MessageProcessor, Anno
 
     public void setMessageSource(MessageSource inboundMessageSource)
     {
-        this.messageSource = inboundMessageSource;
+        if (messageSource instanceof ClusterizableMessageSource)
+        {
+            this.messageSource = new ClusterizableMessageSourceWrapper(muleContext, (ClusterizableMessageSource) inboundMessageSource, this);
+        }
+        else
+        {
+            this.messageSource = inboundMessageSource;
+        }
     }
 
     public MessageProcessor getOutboundMessageProcessor()
