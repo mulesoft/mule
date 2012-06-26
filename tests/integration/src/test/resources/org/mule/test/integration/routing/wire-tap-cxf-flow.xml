@@ -2,11 +2,13 @@
 <mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:spring="http://www.springframework.org/schema/beans"
     xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf" xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+    xmlns:test="http://www.mulesoft.org/schema/mule/test"
     xmlns:stdio="http://www.mulesoft.org/schema/mule/stdio"
     xsi:schemaLocation="
         http://www.mulesoft.org/schema/mule/stdio http://www.mulesoft.org/schema/mule/stdio/3.2/mule-stdio.xsd
         http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/3.2/mule-cxf.xsd
         http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.2/mule-vm.xsd
+        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
         http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd">
 
@@ -31,14 +33,7 @@
         
             <vm:inbound-endpoint path="ToTapper"
                 exchange-pattern="one-way" />
-        
-        <!-- Something is utterly broken with the entry point resolving in 
-            this case. From the stacktrace it seems that the wrong Java method is looked 
-            up. Hardcoding the lookup makes things work for this test. -->
-        <component
-            class="org.mule.tck.testmodels.services.TestServiceComponent">
-            <callable-entry-point-resolver />
-        </component>
+            <test:component/>
     </flow>
 
 </mule>
