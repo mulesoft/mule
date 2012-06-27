@@ -52,7 +52,13 @@ import org.apache.commons.logging.LogFactory;
  * address must contain no cxf or axis endpoints, just plain http endpoints. Even
  * the inbound endpoint of the WSProxyService must be residing on an http protocol
  * (with no cxf or axis).
+ *
+ * @deprecated
+ *    WSProxyService only works for Services, to proxy web services in flows use
+ *    CXF's proxy service and client message processors or the ws proxy pattern.
+ *
  */
+@Deprecated
 public class WSProxyService implements Callable, ServiceAware, Initialisable
 {
 
