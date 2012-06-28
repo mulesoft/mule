@@ -126,14 +126,14 @@ public class ProxyTestCase extends FunctionalTestCase
         MuleMessage result = client.send(url, msg, null);
         String resString = result.getPayloadAsString();
         assertTrue(resString.indexOf("Schema validation error on message") != -1);
-        
-        String valid = 
+
+        String valid =
             "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">"
             + "<soap:Body> " +
                     "<echo xmlns=\"http://www.muleumo.org\">" +
                     "  <echo>test</echo>" +
-                    "</echo>" 
-            + "</soap:Body>" 
+                    "</echo>"
+            + "</soap:Body>"
             + "</soap:Envelope>";
         result = client.send(url, valid, null);
         resString = result.getPayloadAsString();
@@ -200,7 +200,7 @@ public class ProxyTestCase extends FunctionalTestCase
     }
 
     @Test
-    public void testProxyWithDatabinding() throws Exception 
+    public void testProxyWithDatabinding() throws Exception
     {
         String msg = "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">"
             + "<soap:Body><greetMe xmlns=\"http://apache.org/hello_world_soap_http/types\"><requestType>Dan</requestType></greetMe>" +
@@ -213,7 +213,7 @@ public class ProxyTestCase extends FunctionalTestCase
     }
 
     @Test
-    public void testProxyWithFault() throws Exception 
+    public void testProxyWithFault() throws Exception
     {
         String msg = "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">"
             + "<soap:Body><invalid xmlns=\"http://apache.org/hello_world_soap_http/types\"><requestType>Dan</requestType></invalid>" +
@@ -230,7 +230,7 @@ public class ProxyTestCase extends FunctionalTestCase
     }
 
     @Test
-    public void testProxyWithIntermediateTransform() throws Exception 
+    public void testProxyWithIntermediateTransform() throws Exception
     {
         String msg = "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">"
             + "<soap:Body><greetMe xmlns=\"http://apache.org/hello_world_soap_http/types\"><requestType>Dan</requestType></greetMe>" +
@@ -243,7 +243,7 @@ public class ProxyTestCase extends FunctionalTestCase
     }
 
     @Test
-    public void testSoapActionRouting() throws Exception 
+    public void testSoapActionRouting() throws Exception
     {
         String msg = "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">"
             + "<soap:Body> <test xmlns=\"http://foo\"></test>" + "</soap:Body>" + "</soap:Envelope>";
@@ -319,6 +319,21 @@ public class ProxyTestCase extends FunctionalTestCase
         MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/services/CDATAService", msg, null);
         assertNotNull(result);
         assertTrue(result.getPayloadAsString().contains("![CDATA["));
+    }
+
+    /** MULE-6159: Proxy service fails when WSDL has faults **/
+    @Test
+    public void testProxyWithSoapFault() throws Exception
+    {
+        MuleClient client = new MuleClient(muleContext);
+
+        String proxyFaultMsg = "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">"
+            + "<soap:Body><greetMe xmlns=\"http://apache.org/hello_world_fault/types\"><requestType>Dan</requestType></greetMe>" +
+                    "</soap:Body>" + "</soap:Envelope>";
+
+        MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/proxyFault", proxyFaultMsg, null);
+        String resString = result.getPayloadAsString();
+        assertTrue(resString.contains("ERROR"));
     }
 
     protected String prepareOneWayTestMessage()
