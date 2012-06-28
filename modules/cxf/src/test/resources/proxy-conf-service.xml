@@ -6,6 +6,7 @@
        xmlns:cxf-core="http://cxf.apache.org/core"
        xmlns:mule-xml="http://www.mulesoft.org/schema/mule/xml"
        xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+       xmlns:script="http://www.mulesoft.org/schema/mule/scripting"
        xmlns:test="http://www.mulesoft.org/schema/mule/test"
        xsi:schemaLocation="
                http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
@@ -14,6 +15,7 @@
                http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/current/mule-xml.xsd
                http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
                http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+               http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/3.2/mule-scripting.xsd
                http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd">
 
     <mule-xml:xslt-transformer xsl-file="proxy.xsl" name="TestXslt" returnClass="org.mule.module.xml.transformer.DelayedResult"/>
@@ -337,5 +339,22 @@
                 <singleton-object class="org.mule.module.cxf.testmodels.AsyncService"/>
             </component>
         </service>
+
+        <service name="proxyWithSoapFault">
+            <inbound>
+                <inbound-endpoint address="http://localhost:${port1}/proxyFault" exchange-pattern="request-response">
+                       <cxf:proxy-service service="SOAPService" wsdlLocation="classpath:/wsdl/hello_world_fault.wsdl" port="SoapPort"
+                          namespace="http://apache.org/intfault" payload="envelope" validationEnabled="false"/>
+                </inbound-endpoint>
+            </inbound>
+            <script:component>
+               <script:script engine="groovy">
+                 throw new RuntimeException("ERROR");
+               </script:script>
+            </script:component>
+        </service>
+
     </model>
+
+
 </mule>
