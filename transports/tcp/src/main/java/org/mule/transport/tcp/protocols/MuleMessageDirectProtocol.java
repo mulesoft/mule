@@ -10,6 +10,10 @@
 
 package org.mule.transport.tcp.protocols;
 
+import org.mule.api.MuleContext;
+import org.mule.api.context.MuleContextAware;
+import org.mule.transformer.wire.SerializedMuleMessageWireFormat;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -20,19 +24,26 @@ import java.io.OutputStream;
  * IDs in order to be able to aggregate messages after chunking.  Data are read until
  * no more are (momentarily) available.
  */
-public class MuleMessageDirectProtocol extends DirectProtocol
+public class MuleMessageDirectProtocol extends DirectProtocol implements MuleContextAware
 {
+
+    private final SerializedMuleMessageWireFormat wireFormat = new SerializedMuleMessageWireFormat();
+    private final MuleMessageWorker messageWorker = new MuleMessageWorker(wireFormat);
 
     @Override
     public Object read(InputStream is) throws IOException
     {
-        return MuleMessageWorker.doRead(super.read(is));
+        return messageWorker.doRead(super.read(is));
     }
 
     @Override
     public void write(OutputStream os, Object data) throws IOException
     {
-        super.write(os, MuleMessageWorker.doWrite());
+        super.write(os, messageWorker.doWrite());
     }
 
+    public void setMuleContext(MuleContext context)
+    {
+        wireFormat.setMuleContext(context);
+    }
 }
