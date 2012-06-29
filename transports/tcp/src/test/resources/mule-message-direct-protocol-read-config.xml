@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:tcp="http://www.mulesoft.org/schema/mule/tcp"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xsi:schemaLocation="
+          http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+          http://www.mulesoft.org/schema/mule/tcp http://www.mulesoft.org/schema/mule/tcp/current/mule-tcp.xsd
+          http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+
+    <tcp:connector name="tcpConnector" validateConnections="false">
+        <tcp:direct-protocol payloadOnly="false"/>
+    </tcp:connector>
+
+    <flow name="server">
+        <tcp:inbound-endpoint address="tcp://localhost:${port}"
+                              exchange-pattern="request-response"
+                              connector-ref="tcpConnector"/>
+        <vm:outbound-endpoint path="testOut"/>
+    </flow>
+</mule>

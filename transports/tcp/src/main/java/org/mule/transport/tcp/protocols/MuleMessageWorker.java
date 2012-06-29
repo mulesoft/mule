@@ -14,7 +14,6 @@ import org.mule.DefaultMuleMessage;
 import org.mule.RequestContext;
 import org.mule.api.MuleException;
 import org.mule.api.transformer.wire.WireFormat;
-import org.mule.transformer.wire.SerializedMuleMessageWireFormat;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -27,19 +26,18 @@ import java.io.InputStream;
  */
 class MuleMessageWorker
 {
-    private static WireFormat wireFormat = new SerializedMuleMessageWireFormat();
 
-    private MuleMessageWorker()
+    private final WireFormat wireFormat;
+
+    MuleMessageWorker(WireFormat wireFormat)
     {
-        // no-op
-
+        this.wireFormat = wireFormat;
     }
 
-    public static byte[] doWrite() throws IOException
+    public byte[] doWrite() throws IOException
     {
         //TODO fix the api here so there is no need to use the RequestContext
         DefaultMuleMessage msg = (DefaultMuleMessage) RequestContext.getEvent().getMessage();
-        wireFormat.setMuleContext(RequestContext.getEvent().getMuleContext());
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try
         {
@@ -52,18 +50,21 @@ class MuleMessageWorker
         return baos.toByteArray();
     }
 
-    public static Object doRead(Object message) throws IOException
+    public Object doRead(Object message) throws IOException
     {
-        if(message==null) return null;
-        
-        InputStream in;
-        if(message instanceof byte[])
+        if (message == null)
         {
-            in = new ByteArrayInputStream((byte[])message);
+            return null;
+        }
+
+        InputStream in;
+        if (message instanceof byte[])
+        {
+            in = new ByteArrayInputStream((byte[]) message);
         }
         else
         {
-            in = (InputStream)message;
+            in = (InputStream) message;
         }
 
         try
