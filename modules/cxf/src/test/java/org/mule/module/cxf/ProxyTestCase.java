@@ -293,6 +293,18 @@ public class ProxyTestCase extends FunctionalTestCase
         assertTrue(resString.contains(doGoogleSearch));
     }
 
+    /**
+     * MULE-6188: ReversibleXMLStreamReader throw NPE after reset because current event is null.
+     * @throws Exception
+     */
+    @Test
+    public void testProxyEnvelopeWithXsltTransformation() throws Exception
+    {
+        MuleClient client = new MuleClient(muleContext);
+        MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/services/envelope-xslt-proxy", msg, null);
+        assertTrue(result.getPayloadAsString().contains(msg));
+    }
+
 
     @Test
     public void testProxyCDATA() throws Exception
