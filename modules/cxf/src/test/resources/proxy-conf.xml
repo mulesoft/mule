@@ -214,6 +214,18 @@
                 </pass-through-router>
             </outbound>
         </service>
+
+        <service name="proxyEnvelopeWithXSLTTransformation">
+            <inbound>
+                <inbound-endpoint address="http://localhost:${port1}/services/envelope-xslt-proxy"
+                                  exchange-pattern="request-response">
+                    <cxf:proxy-service payload="envelope"/>
+                    <response>
+                        <mule-xml:dom-to-xml-transformer returnClass="java.lang.String"/>
+                    </response>
+                </inbound-endpoint>
+            </inbound>
+        </service>
         
         <service name="serverClientProxyWithWsdl">
             <inbound>

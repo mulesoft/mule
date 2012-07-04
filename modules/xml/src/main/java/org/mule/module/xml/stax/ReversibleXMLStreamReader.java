@@ -11,6 +11,7 @@
 package org.mule.module.xml.stax;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import javanet.staxutils.events.AttributeEvent;
@@ -148,7 +149,7 @@ public class ReversibleXMLStreamReader extends DelegateXMLStreamReader
                 events.add(createStartElementEvent());
                 break;
             case XMLStreamConstants.END_ELEMENT :
-                events.add(new EndElementEvent(getName(), getNamespaces().iterator(), getLocation()));
+                events.add(new EndElementEventX(getName(), getNamespaces()));
                 break;
             case XMLStreamConstants.CDATA :
                 events.add(new CDataEvent(getText(), getLocation()));
@@ -367,7 +368,7 @@ public class ReversibleXMLStreamReader extends DelegateXMLStreamReader
         {
             if (current == null)
             {
-                return START_DOCUMENT;
+                return -1;
             }
             return current.getEventType();
         }
@@ -443,7 +444,14 @@ public class ReversibleXMLStreamReader extends DelegateXMLStreamReader
     {
         if (replay)
         {
-            return ((StartElementEventX) current).getNamespaceList().size();
+            if(isStartElement())
+            {
+                return ((StartElementEventX) current).getNamespaceList().size();
+            }
+            else
+            {
+                return ((EndElementEventX) current).getNamespaceList().size();
+            }
         }
         else
         {
@@ -455,9 +463,18 @@ public class ReversibleXMLStreamReader extends DelegateXMLStreamReader
     {
         if (replay)
         {
-            Namespace ns = (Namespace) ((StartElementEventX) current).getNamespaceList().get(arg0);
-            
-            return ns.getPrefix();
+            if(isStartElement())
+            {
+                Namespace ns = (Namespace) ((StartElementEventX) current).getNamespaceList().get(arg0);
+
+                return ns.getPrefix();
+            }
+            else
+            {
+                Namespace ns = ((EndElementEventX) current).getNamespaceList().get(arg0);
+
+                return ns.getPrefix();
+            }
         }
         else
         {
@@ -717,7 +734,7 @@ public class ReversibleXMLStreamReader extends DelegateXMLStreamReader
     {
         if (replay)
         {
-            return current.isStartElement();
+            return current != null && current.isStartElement();
         }
         else
         {
