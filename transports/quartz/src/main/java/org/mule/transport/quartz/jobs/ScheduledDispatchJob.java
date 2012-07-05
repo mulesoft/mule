@@ -10,7 +10,6 @@
 
 package org.mule.transport.quartz.jobs;
 
-import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.config.MuleProperties;
 import org.mule.module.client.MuleClient;
@@ -22,12 +21,10 @@ import java.io.Serializable;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.quartz.Job;
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
-import org.quartz.SchedulerContext;
-import org.quartz.SchedulerException;
+import org.quartz.StatefulJob;
 
 /**
  * Will dispatch the current message to a Mule endpoint at a later time.
@@ -55,6 +52,12 @@ public class ScheduledDispatchJob extends AbstractJob implements Serializable
         {
             throw new JobExecutionException(
                 QuartzMessages.missingJobDetail(QuartzConnector.PROPERTY_JOB_CONFIG).getMessage());
+        }
+
+        if (this instanceof StatefulJob)
+        {
+            // Forces synchronous processing for the generated event
+            jobDataMap.put(MuleProperties.MULE_FORCE_SYNC_PROPERTY, Boolean.TRUE);
         }
 
         try

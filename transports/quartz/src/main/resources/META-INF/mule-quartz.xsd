@@ -139,6 +139,7 @@
                         Determines if the job is persistent. If so, the job detail state will be persisted for each
                         request.  More importantly, each job triggered will execute sequentially. If the Job takes longer
                         than the next trigger the next job will wait for the current job to execute.
+                        Deprecated: use job's stateful attribute if provided.
                     </xsd:documentation>
                 </xsd:annotation>
             </xsd:attribute>
@@ -172,7 +173,7 @@
     </xsd:element>
     <xsd:complexType name="eventGenerateJobType">
         <xsd:complexContent>
-            <xsd:extension base="abstractJobType">
+            <xsd:extension base="abstractStatefulJobType">
                 <xsd:sequence>
                     <xsd:element name="payload" type="mule:dataReferenceType" minOccurs="0" maxOccurs="1">
                         <xsd:annotation>
@@ -195,7 +196,7 @@
     </xsd:element>
     <xsd:complexType name="endpointPollingJobType">
         <xsd:complexContent>
-            <xsd:extension base="abstractJobType">
+            <xsd:extension base="abstractStatefulJobType">
                 <xsd:sequence minOccurs="1" maxOccurs="1">
                     <xsd:element name="job-endpoint" type="endpointRefType">
                         <xsd:annotation>
@@ -218,7 +219,7 @@
     </xsd:element>
     <xsd:complexType name="scheduledDispatchJobType">
         <xsd:complexContent>
-            <xsd:extension base="abstractJobType">
+            <xsd:extension base="abstractStatefulJobType">
                 <xsd:sequence minOccurs="1" maxOccurs="1">
                     <xsd:element name="job-endpoint" type="endpointRefType">
                         <xsd:annotation>
@@ -288,6 +289,21 @@
         </xsd:attribute>
     </xsd:complexType>
 
+    <xsd:complexType name="abstractStatefulJobType">
+        <xsd:complexContent>
+          <xsd:extension base="abstractJobType">
+            <xsd:attribute name="stateful" type="xsd:boolean">
+                <xsd:annotation>
+                    <xsd:documentation>
+                        Determines if the job is persistent. If so, the job detail state will be persisted for each
+                        request.  More importantly, each job triggered will execute sequentially. If the Job takes longer
+                        than the next trigger the next job will wait for the current job to execute.
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:attribute>
+        </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
 
     <xsd:attributeGroup name="addressAttributes">
         <xsd:attribute name="jobName" type="xsd:string">
