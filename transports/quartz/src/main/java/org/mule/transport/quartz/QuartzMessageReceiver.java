@@ -10,12 +10,16 @@
 
 package org.mule.transport.quartz;
 
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
+import org.mule.api.MuleMessage;
+import org.mule.api.config.MuleProperties;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.EndpointException;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.transport.Connector;
+import org.mule.api.transport.PropertyScope;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.transport.AbstractMessageReceiver;
 import org.mule.transport.quartz.config.JobConfig;
@@ -23,6 +27,7 @@ import org.mule.transport.quartz.i18n.QuartzMessages;
 import org.mule.transport.quartz.jobs.CustomJobConfig;
 import org.mule.transport.quartz.jobs.EventGeneratorJobConfig;
 
+import java.io.OutputStream;
 import java.util.Date;
 
 import org.quartz.CronTrigger;
@@ -32,6 +37,7 @@ import org.quartz.JobDetail;
 import org.quartz.ObjectAlreadyExistsException;
 import org.quartz.Scheduler;
 import org.quartz.SimpleTrigger;
+import org.quartz.StatefulJob;
 import org.quartz.Trigger;
 
 /**
@@ -45,6 +51,7 @@ public class QuartzMessageReceiver extends AbstractMessageReceiver
     public static final String QUARTZ_CONNECTOR_PROPERTY = "mule.quartz.connector";
 
     private final QuartzConnector connector;
+    private boolean isStateful;
 
     public QuartzMessageReceiver(Connector connector, FlowConstruct flowConstruct, InboundEndpoint endpoint)
             throws CreateException
@@ -60,6 +67,18 @@ public class QuartzMessageReceiver extends AbstractMessageReceiver
     }
 
     @Override
+    protected MuleEvent createMuleEvent(MuleMessage message, OutputStream outputStream) throws MuleException
+    {
+        if (isStateful)
+        {
+            // Forces synchronous processing for the generated event
+            message.setProperty(MuleProperties.MULE_FORCE_SYNC_PROPERTY, Boolean.TRUE, PropertyScope.INBOUND);
+        }
+
+        return super.createMuleEvent(message, outputStream);
+    }
+
+    @Override
     protected void doStart() throws MuleException
     {
         try
@@ -71,10 +90,12 @@ public class QuartzMessageReceiver extends AbstractMessageReceiver
             {
                 throw new IllegalArgumentException(CoreMessages.objectIsNull(QuartzConnector.PROPERTY_JOB_CONFIG).getMessage());
             }
-            
+
             JobDetail jobDetail = new JobDetail();
             jobDetail.setName(endpoint.getEndpointURI().getAddress());
-            jobDetail.setJobClass(jobConfig.getJobClass());
+            Class<? extends Job> jobClass = jobConfig.getJobClass();
+            jobDetail.setJobClass(jobClass);
+            isStateful = StatefulJob.class.isAssignableFrom(jobClass);
             JobDataMap jobDataMap = new JobDataMap();
             jobDataMap.put(QUARTZ_RECEIVER_PROPERTY, this.getReceiverKey());
             jobDataMap.put(QUARTZ_CONNECTOR_PROPERTY, this.connector.getName());
@@ -85,7 +106,7 @@ public class QuartzMessageReceiver extends AbstractMessageReceiver
                 jobDataMap.put(QuartzConnector.PROPERTY_PAYLOAD, ((EventGeneratorJobConfig) jobConfig).getPayload());
             }
             jobDataMap.put(QuartzConnector.PROPERTY_JOB_CONFIG, jobConfig);
-            
+
             Job job = null;
             if (jobConfig instanceof CustomJobConfig)
             {
@@ -95,11 +116,11 @@ public class QuartzMessageReceiver extends AbstractMessageReceiver
             if (job != null)
             {
                 jobDataMap.put(QuartzConnector.PROPERTY_JOB_OBJECT, job);
-                jobDetail.setJobClass(jobConfig.getJobClass());
+                jobDetail.setJobClass(jobClass);
             }
 
             jobDetail.setJobDataMap(jobDataMap);
-            
+
             Trigger trigger;
             String cronExpression = (String)endpoint.getProperty(QuartzConnector.PROPERTY_CRON_EXPRESSION);
             String repeatInterval = (String)endpoint.getProperty(QuartzConnector.PROPERTY_REPEAT_INTERVAL);

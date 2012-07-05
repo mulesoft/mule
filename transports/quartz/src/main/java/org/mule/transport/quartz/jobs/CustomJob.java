@@ -10,8 +10,6 @@
 
 package org.mule.transport.quartz.jobs;
 
-import org.mule.api.MuleContext;
-import org.mule.api.config.MuleProperties;
 import org.mule.transport.quartz.QuartzConnector;
 import org.mule.transport.quartz.i18n.QuartzMessages;
 
@@ -19,8 +17,6 @@ import org.quartz.Job;
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
-import org.quartz.SchedulerContext;
-import org.quartz.SchedulerException;
 
 /**
  * Extracts the Job object to invoke from the context. The Job itself can be

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:quartz="http://www.mulesoft.org/schema/mule/quartz"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="
+          http://www.mulesoft.org/schema/mule/quartz http://www.mulesoft.org/schema/mule/quartz/current/mule-quartz.xsd
+          http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+          http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+
+    <quartz:endpoint jobName="testJob1" repeatInterval="1" repeatCount="-1" name="testEndpoint"/>
+
+    <vm:connector name="vmQueueConnector"/>
+
+    <flow name="quartz-statefulFlow">
+        <quartz:inbound-endpoint ref="testEndpoint">
+            <quartz:endpoint-polling-job stateful="true">
+                <quartz:job-endpoint address="vm://testInput"/>
+            </quartz:endpoint-polling-job>
+        </quartz:inbound-endpoint>
+
+        <component>
+            <singleton-object class="org.mule.transport.quartz.QuartzStatefulEndpointPollingTestCase$BlockingComponent"/>
+        </component>
+    </flow>
+</mule>
