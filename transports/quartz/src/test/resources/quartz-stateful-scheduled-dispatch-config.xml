@@ -1,0 +1,30 @@
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:quartz="http://www.mulesoft.org/schema/mule/quartz"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="
+          http://www.mulesoft.org/schema/mule/quartz http://www.mulesoft.org/schema/mule/quartz/current/mule-quartz.xsd
+          http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+          http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+
+    <vm:connector name="vmQueueConnector"/>
+
+    <quartz:endpoint jobName="testJob1" repeatInterval="1" repeatCount="-1" name="schedulerEndpoint">
+        <quartz:scheduled-dispatch-job stateful="true">
+            <quartz:job-endpoint address="vm://quartz.in"/>
+        </quartz:scheduled-dispatch-job>
+    </quartz:endpoint>
+
+    <flow name="quartzSchedulingService">
+        <inbound-endpoint address="vm://testInput"/>
+        <outbound-endpoint ref="schedulerEndpoint"/>
+    </flow>
+
+    <flow name="quartz-statefulFlow">
+        <vm:inbound-endpoint path="quartz.in"/>
+
+        <component>
+            <singleton-object class="org.mule.transport.quartz.QuartzStatefulScheduledDispatchTestCase$BlockingComponent"/>
+        </component>
+    </flow>
+</mule>
