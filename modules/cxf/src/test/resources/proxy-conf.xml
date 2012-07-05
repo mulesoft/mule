@@ -36,6 +36,7 @@
             validationEnabled="true"
             payload="envelope">
         </cxf:proxy-service>
+        <mule-xml:dom-to-xml-transformer returnClass="java.lang.String"/>
         <static-component>
             <return-data>&lt;echoResponse xmlns="http://www.muleumo.org"&gt;&lt;echo&gt;test&lt;/echo&gt;&lt;/echoResponse&gt;</return-data>
         </static-component>
@@ -53,6 +54,7 @@
             validationEnabled="true"
             payload="body">
         </cxf:proxy-service>
+        <mule-xml:dom-to-xml-transformer returnClass="java.lang.String"/>
         <static-component>
             <return-data>&lt;echoResponse xmlns="http://www.muleumo.org"&gt;&lt;echo&gt;test&lt;/echo&gt;&lt;/echoResponse&gt;</return-data>
         </static-component>
@@ -73,6 +75,7 @@
                 <cxf:schemaLocation>localWsdl-schema.xsd</cxf:schemaLocation>
             </cxf:schemaLocations>
         </cxf:proxy-service>
+        <mule-xml:dom-to-xml-transformer returnClass="java.lang.String"/>
         <static-component>
             <return-data>&lt;echoResponse xmlns="http://www.muleumo.org"&gt;&lt;echo&gt;test&lt;/echo&gt;&lt;/echoResponse&gt;</return-data>
         </static-component>

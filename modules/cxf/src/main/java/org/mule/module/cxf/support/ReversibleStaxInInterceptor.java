@@ -10,21 +10,14 @@
 
 package org.mule.module.cxf.support;
 
-import org.mule.module.xml.stax.ReversibleXMLStreamReader;
-
-import javax.xml.stream.XMLStreamReader;
-
-import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.StaxInInterceptor;
-import org.apache.cxf.message.Message;
-import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 
 /**
  * Resets the ReversibleXMLStreamReader so the person receiving it can start back
  * at the beginning of the stream.
  */
-public class ReversibleStaxInInterceptor extends AbstractPhaseInterceptor<Message>
+public class ReversibleStaxInInterceptor extends ReversibleStaxInterceptor
 {
 
     public ReversibleStaxInInterceptor()
@@ -33,20 +26,6 @@ public class ReversibleStaxInInterceptor extends AbstractPhaseInterceptor<Messag
         getAfter().add(StreamClosingInterceptor.class.getName());
         getAfter().add(StaxInInterceptor.class.getName());
     }
-
-    public void handleMessage(Message message) throws Fault
-    {
-        XMLStreamReader reader = message.getContent(XMLStreamReader.class);
-        
-        if (reader != null) 
-        {
-            ReversibleXMLStreamReader reversible = new ReversibleXMLStreamReader(reader);
-            reversible.setTracking(true);
-            message.setContent(XMLStreamReader.class, reversible);
-            message.setContent(ReversibleXMLStreamReader.class, reversible);
-        }
-    }
-
 
 }
 
