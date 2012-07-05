@@ -20,6 +20,7 @@ import org.mule.module.cxf.support.ProxyService;
 import org.mule.module.cxf.support.ProxyServiceFactoryBean;
 import org.mule.module.cxf.support.ResetStaxInterceptor;
 import org.mule.module.cxf.support.ReversibleStaxInInterceptor;
+import org.mule.module.cxf.support.ReversibleValidatingInterceptor;
 
 import org.apache.cxf.binding.soap.interceptor.RPCOutInterceptor;
 import org.apache.cxf.binding.soap.interceptor.SoapOutInterceptor;
@@ -98,6 +99,14 @@ public class ProxyServiceMessageProcessorBuilder extends AbstractInboundMessageP
         if (isProxyEnvelope()) 
         {
             sfb.getInInterceptors().add(new ReversibleStaxInInterceptor());
+            sfb.getInInterceptors().add(new ResetStaxInterceptor());
+        }
+        /* Even if the payload is body, if validation is enabled, then we need to use a ReversibleXMLStreamReader to
+         * avoid the message from being consumed during schema validation.
+         */
+        else if(isValidationEnabled())
+        {
+            sfb.getInInterceptors().add(new ReversibleValidatingInterceptor());
             sfb.getInInterceptors().add(new ResetStaxInterceptor());
         }
     }
