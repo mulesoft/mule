@@ -87,19 +87,18 @@ public class ProxyTestCase extends AbstractServiceAndFlowTestCase
         });
     }
 
-    @Test
-    public void testServerWithEcho() throws Exception
-    {
+   @Test
+   public void testServerWithEcho() throws Exception
+   {
         MuleClient client = new MuleClient(muleContext);
         MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/services/Echo", msg, null);
         String resString = result.getPayloadAsString();
-//        System.out.println(resString);
         assertTrue(resString.indexOf("<test xmlns=\"http://foo\"> foo </test>") != -1);
-    }
+   }
 
    @Test
-    public void testServerClientProxy() throws Exception
-    {
+   public void testServerClientProxy() throws Exception
+   {
         String msg = "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">"
                      + "<soap:Body> <foo xmlns=\"http://foo\"></foo>" + "</soap:Body>" + "</soap:Envelope>";
 
@@ -108,14 +107,14 @@ public class ProxyTestCase extends AbstractServiceAndFlowTestCase
         String resString = result.getPayloadAsString();
 
         assertTrue(resString.indexOf("<foo xmlns=\"http://foo\"") != -1);
-    }
+   }
 
 
-    @Test
-    public void testProxyBodyValidation() throws Exception
-    {
+   @Test
+   public void testProxyBodyValidation() throws Exception
+   {
         doTestProxyValidation("http://localhost:" + dynamicPort.getNumber() + "/services/proxyBodyWithValidation");
-    }
+   }
 
    @Test
    public void testProxyBodyValidationWithExternalSchema() throws Exception
@@ -129,8 +128,8 @@ public class ProxyTestCase extends AbstractServiceAndFlowTestCase
         doTestProxyValidation("http://localhost:" + dynamicPort.getNumber() + "/services/proxyEnvelopeWithValidation");
    }
 
-    public void doTestProxyValidation(String url) throws Exception
-    {
+   public void doTestProxyValidation(String url) throws Exception
+   {
         MuleClient client = new MuleClient(muleContext);
         MuleMessage result = client.send(url, msg, null);
         String resString = result.getPayloadAsString();
@@ -147,7 +146,7 @@ public class ProxyTestCase extends AbstractServiceAndFlowTestCase
         result = client.send(url, valid, null);
         resString = result.getPayloadAsString();
         assertTrue(resString.contains("<echoResponse xmlns=\"http://www.muleumo.org\">"));
-    }
+   }
 
    @Test
    public void testServerClientProxyWithWsdl() throws Exception
@@ -288,6 +287,17 @@ public class ProxyTestCase extends AbstractServiceAndFlowTestCase
 
         AsyncService component = (AsyncService) getComponent("asyncService");
         assertTrue(component.getLatch().await(10000, TimeUnit.MILLISECONDS));
+   }
+
+   @Test
+   public void testOneWayDispatchWithException() throws Exception
+   {
+        MuleClient client = new MuleClient(muleContext);
+        client.dispatch("http://localhost:" + dynamicPort.getNumber() + "/services/onewayexception", prepareOneWayTestMessage(),
+            prepareOneWayTestProperties());
+
+        MuleMessage resp = client.request("vm://exception", RECEIVE_TIMEOUT);
+        assertNotNull(resp);
    }
 
    /**

@@ -355,14 +355,27 @@
         </script:component>
     </flow>
 
-
-
     <flow name="proxyEnvelopeWithXSLTTransformation">
         <inbound-endpoint address="http://localhost:${port1}/services/envelope-xslt-proxy"
                           exchange-pattern="request-response">
             <cxf:proxy-service payload="envelope"/>
         </inbound-endpoint>
         <mule-xml:dom-to-xml-transformer returnClass="java.lang.String"/>
+    </flow>
+
+    <flow name="testOneWayException">
+        <inbound-endpoint address="http://localhost:${port1}/services/onewayexception"
+            exchange-pattern="request-response">
+            <cxf:proxy-service onException="INVOKE_EXCEPTION_STRATEGY"/>
+        </inbound-endpoint>
+        <script:component>
+            <script:script engine="groovy">
+                throw new RuntimeException("ERROR");
+            </script:script>
+        </script:component>
+        <default-exception-strategy>
+            <vm:outbound-endpoint path="exception" exchange-pattern="one-way"/>
+        </default-exception-strategy>
     </flow>
 
 </mule>

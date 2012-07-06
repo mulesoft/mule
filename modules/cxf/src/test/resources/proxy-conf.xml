@@ -352,5 +352,7 @@
                 <singleton-object class="org.mule.module.cxf.testmodels.AsyncService"/>
             </component>
         </service>
+
+
     </model>
 </mule>
