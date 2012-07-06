@@ -365,5 +365,23 @@
                 <singleton-object class="org.mule.module.cxf.testmodels.AsyncService"/>
             </component>
         </service>
+
+        <service name="testOneWayException">
+            <inbound>
+                <inbound-endpoint address="http://localhost:${port1}/services/onewayexception"
+                    exchange-pattern="request-response">
+                    <cxf:proxy-service onException="INVOKE_EXCEPTION_STRATEGY"/>
+                </inbound-endpoint>
+            </inbound>
+            <script:component>
+                <script:script engine="groovy">
+                    throw new RuntimeException("ERROR");
+                </script:script>
+            </script:component>
+            <default-exception-strategy>
+                <vm:outbound-endpoint path="exception" exchange-pattern="one-way"/>
+            </default-exception-strategy>
+        </service>
+
     </model>
 </mule>

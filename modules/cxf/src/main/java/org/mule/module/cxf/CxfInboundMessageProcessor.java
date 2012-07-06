@@ -12,6 +12,7 @@ package org.mule.module.cxf;
 
 import org.mule.api.DefaultMuleException;
 import org.mule.api.ExceptionPayload;
+import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
@@ -292,9 +293,7 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
             // get the response event
             MuleEvent responseEvent = (MuleEvent) exchange.get(CxfConstants.MULE_EVENT);
 
-            // If there isn't one, there was probably a fault, so use the original
-            // event
-            if (responseEvent == null || !event.getEndpoint().getExchangePattern().hasResponse())
+            if (responseEvent == null)
             {
                 return null;
             }
@@ -321,8 +320,14 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
                 Object o = exchange.get(Exception.class);
                 if (o != null && o instanceof Exception)
                 {
-                    throw new DefaultMuleException((Exception)o);
+                    muleResMsg.setPayload(getSoapFaultMessage(muleResMsg));
+                    throw new MessagingException(responseEvent, (Exception)o);
                 }
+            }
+
+            if(!event.getEndpoint().getExchangePattern().hasResponse())
+            {
+                return null;
             }
 
             return responseEvent;
@@ -338,6 +343,18 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
     public MuleEvent processNext(MuleEvent event) throws MuleException
     {
         return super.processNext(event);
+    }
+
+    private Object getSoapFaultMessage(MuleMessage message)
+    {
+        try
+        {
+            return message.getPayloadAsString();
+        }
+        catch(Exception e)
+        {
+            return message.getPayload();
+        }
     }
 
     protected OutputHandler getRessponseOutputHandler(final MessageImpl m)
