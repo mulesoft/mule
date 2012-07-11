@@ -53,6 +53,11 @@ public class PollingHttpMessageReceiver extends AbstractPollingMessageReceiver
         setupFromConnector(connector);
     }
 
+    @Override
+    protected boolean pollOnPrimaryInstanceOnly() {
+        return true;
+    }
+
     protected void setupFromConnector(Connector connector) throws CreateException
     {
         if (!(connector instanceof HttpPollingConnector))
