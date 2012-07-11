@@ -12,9 +12,9 @@ package org.mule.transport.vm;
 
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.transport.MessageReceiver;
-import org.mule.transport.AbstractMessageReceiverTestCase;
+import org.mule.transport.AbstractMessageReceiverTemplateTestCase;
 
-public class VMMessageReceiverTestCase extends AbstractMessageReceiverTestCase
+public class VMMessageReceiverTestCase extends AbstractMessageReceiverTemplateTestCase
 {
     VMMessageReceiver receiver;
 

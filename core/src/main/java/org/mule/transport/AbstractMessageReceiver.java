@@ -14,6 +14,7 @@ import org.mule.DefaultMuleEvent;
 import org.mule.MessageExchangePattern;
 import org.mule.OptimizedRequestContext;
 import org.mule.ResponseOutputStream;
+import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
@@ -25,6 +26,7 @@ import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.lifecycle.Startable;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.filter.FilterUnacceptedException;
 import org.mule.api.transaction.Transaction;
@@ -34,6 +36,7 @@ import org.mule.api.transport.MessageReceiver;
 import org.mule.api.transport.PropertyScope;
 import org.mule.api.transport.ReplyToHandler;
 import org.mule.context.notification.EndpointMessageNotification;
+import org.mule.lifecycle.PrimaryNodeLifecycleNotificationListener;
 import org.mule.session.DefaultMuleSession;
 import org.mule.session.LegacySessionHandler;
 import org.mule.transaction.TransactionCoordination;
@@ -82,6 +85,7 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
     protected List<Transformer> defaultResponseTransformers;
     
     protected ReplyToHandler replyToHandler;
+    private PrimaryNodeLifecycleNotificationListener primaryNodeLifecycleNotificationListener;
 
     /**
      * Creates the Message Receiver
@@ -135,7 +139,26 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
         defaultResponseTransformers = connector.getDefaultResponseTransformers(endpoint);
 
         replyToHandler = getReplyToHandler();
-        
+
+        if (!shouldConsumeInEveryNode() && !flowConstruct.getMuleContext().isPrimaryPollingInstance())
+        {
+            primaryNodeLifecycleNotificationListener = new PrimaryNodeLifecycleNotificationListener(new Startable() {
+                @Override
+                public void start() throws MuleException {
+                    if (AbstractMessageReceiver.this.isStarted())
+                    {
+                        try {
+                            AbstractMessageReceiver.this.doConnect();
+                        } catch (Exception e) {
+                            throw new DefaultMuleException(e);
+                        }
+                        AbstractMessageReceiver.this.doStart();
+                    }
+                }
+            },flowConstruct.getMuleContext());
+            primaryNodeLifecycleNotificationListener.register();
+        }
+
         super.initialise();
     }
 
@@ -374,11 +397,61 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
     {
         this.listener = null;
         this.flowConstruct = null;
+        if (primaryNodeLifecycleNotificationListener != null)
+        {
+            primaryNodeLifecycleNotificationListener.unregister();
+        }
         super.doDispose();
     }
     
     protected ReplyToHandler getReplyToHandler()
     {
         return ((AbstractConnector) endpoint.getConnector()).getReplyToHandler(endpoint);
+    }
+
+    /**
+     * Determines whether to start or not the MessageSource base on the running node state.
+     *
+     * @return false if this MessageSource should be stated only in the primary node, true if it should be started in every node.
+     */
+    public boolean shouldConsumeInEveryNode()
+    {
+        return true;
+    }
+
+    @Override
+    final protected void connectHandler() throws Exception {
+        if (shouldConsumeInEveryNode() || getFlowConstruct().getMuleContext().isPrimaryPollingInstance())
+        {
+            if (logger.isInfoEnabled())
+            {
+                logger.info("Connecting clusterizable message receiver");
+            }
+            doConnect();
+        }
+        else
+        {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Clusterizable message receiver not connected on this node");
+            }
+        }
+    }
+
+    @Override
+    final protected void doStartHandler() throws MuleException {
+        if (shouldConsumeInEveryNode() || getFlowConstruct().getMuleContext().isPrimaryPollingInstance())
+        {
+            if (logger.isInfoEnabled())
+            {
+                logger.info("Starting clusterizable message receiver");
+            }
+            doStart();
+        }
+        else
+        {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Clusterizable message receiver not started on this node");
+            }
+        }
     }
 }

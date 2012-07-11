@@ -10,17 +10,21 @@
 
 package org.mule.source;
 
+import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
+import org.mockito.Mockito;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import org.mule.api.MuleContext;
-import org.mule.api.construct.FlowConstruct;
 import org.mule.api.lifecycle.Lifecycle;
-import org.mule.api.lifecycle.LifecycleState;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.source.ClusterizableMessageSource;
 import org.mule.context.notification.ClusterNodeNotification;
+import org.mule.lifecycle.PrimaryNodeLifecycleNotificationListener;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import org.junit.Test;
@@ -45,6 +49,10 @@ public class ClusterizableMessageSourceWrapperTestCase extends AbstractMuleTestC
     @Test
     public void delegatesDispose() throws Exception
     {
+        wrapper.setMuleContext(muleContext);
+
+        wrapper.initialise();
+
         wrapper.dispose();
 
         verify(messageSource, times(1)).dispose();
@@ -85,7 +93,7 @@ public class ClusterizableMessageSourceWrapperTestCase extends AbstractMuleTestC
 
         wrapper.initialise();
 
-        verify(muleContext, times(1)).registerListener(wrapper);
+        verify(muleContext, times(1)).registerListener(Mockito.any(PrimaryNodeLifecycleNotificationListener.class));
     }
 
     @Test
@@ -114,16 +122,16 @@ public class ClusterizableMessageSourceWrapperTestCase extends AbstractMuleTestC
     public void ignoresMessageSourceOnNotificationIfFlowIsStopped() throws Exception
     {
         when(muleContext.isPrimaryPollingInstance()).thenReturn(true);
-        LifecycleState lifecycleState = mock(LifecycleState.class);
-        when(lifecycleState.isStarted()).thenReturn(false);
-        FlowConstruct flowConstruct = mock(FlowConstruct.class);
-        when(flowConstruct.getLifecycleState()).thenReturn(lifecycleState);
-
         wrapper.setMuleContext(muleContext);
-        wrapper.setFlowConstruct(flowConstruct);
+        Mockito.doAnswer(new Answer<Void>() {
+            @Override
+            public Void answer(InvocationOnMock invocationOnMock) throws Throwable {
+                ((PrimaryNodeLifecycleNotificationListener) invocationOnMock.getArguments()[0]).onNotification(new ClusterNodeNotification("",1));
+                return null;
+            }
+        }).when(muleContext).registerListener(isA(PrimaryNodeLifecycleNotificationListener.class));
 
-        wrapper.onNotification(mock(ClusterNodeNotification.class));
-
+        wrapper.initialise();
         verify(messageSource, times(0)).start();
     }
 
@@ -131,16 +139,17 @@ public class ClusterizableMessageSourceWrapperTestCase extends AbstractMuleTestC
     public void startsMessageSourceOnNotificationIfFlowIsStarted() throws Exception
     {
         when(muleContext.isPrimaryPollingInstance()).thenReturn(true);
-        LifecycleState lifecycleState = mock(LifecycleState.class);
-        when(lifecycleState.isStarted()).thenReturn(true);
-        FlowConstruct flowConstruct = mock(FlowConstruct.class);
-        when(flowConstruct.getLifecycleState()).thenReturn(lifecycleState);
-
         wrapper.setMuleContext(muleContext);
-        wrapper.setFlowConstruct(flowConstruct);
+        Mockito.doAnswer(new Answer<Void>() {
+            @Override
+            public Void answer(InvocationOnMock invocationOnMock) throws Throwable {
+                ((PrimaryNodeLifecycleNotificationListener) invocationOnMock.getArguments()[0]).onNotification(new ClusterNodeNotification("",1));
+                return null;
+            }
+        }).when(muleContext).registerListener(isA(PrimaryNodeLifecycleNotificationListener.class));
 
-        wrapper.onNotification(mock(ClusterNodeNotification.class));
-
+        wrapper.start();
+        wrapper.initialise();
         verify(messageSource, times(1)).start();
     }
 
@@ -160,10 +169,9 @@ public class ClusterizableMessageSourceWrapperTestCase extends AbstractMuleTestC
     public void unregistersListenerOnDispose() throws Exception
     {
         wrapper.setMuleContext(muleContext);
-
+        wrapper.initialise();
         wrapper.dispose();
-
-        verify(muleContext, times(1)).unregisterListener(wrapper);
+        verify(muleContext, times(1)).unregisterListener(isA(PrimaryNodeLifecycleNotificationListener.class));
     }
 
     private interface TestMessageSource extends ClusterizableMessageSource, Lifecycle

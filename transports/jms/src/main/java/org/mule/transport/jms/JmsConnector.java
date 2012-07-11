@@ -14,6 +14,7 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.construct.FlowConstruct;
+import org.mule.api.context.notification.ClusterNodeNotificationListener;
 import org.mule.api.context.notification.ConnectionNotificationListener;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
@@ -26,6 +27,7 @@ import org.mule.api.transport.ReplyToHandler;
 import org.mule.config.ExceptionHelper;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
+import org.mule.context.notification.ClusterNodeNotification;
 import org.mule.context.notification.ConnectionNotification;
 import org.mule.context.notification.NotificationException;
 import org.mule.routing.MessageFilter;
@@ -448,6 +450,27 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
 
 
         return connection;
+    }
+
+    @Override
+    public void connect() throws Exception {
+        if (muleContext.isPrimaryPollingInstance() || clientId == null)
+        {
+            super.connect();
+        }
+        else
+        {
+            muleContext.registerListener(new ClusterNodeNotificationListener<ClusterNodeNotification>() {
+                @Override
+                public void onNotification(ClusterNodeNotification notification) {
+                    try {
+                        JmsConnector.this.connect();
+                    } catch (Exception e) {
+                        throw new MuleRuntimeException(e);
+                    }
+                }
+            });
+        }
     }
 
     public void onException(JMSException jmsException)

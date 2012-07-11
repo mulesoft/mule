@@ -10,7 +10,6 @@
 
 package org.mule.transport.jms;
 
-import org.mule.MessageExchangePattern;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleException;
 import org.mule.api.construct.FlowConstruct;
@@ -21,7 +20,6 @@ import org.mule.api.lifecycle.LifecycleException;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionException;
 import org.mule.api.transport.Connector;
-import org.mule.api.transport.ReplyToHandler;
 import org.mule.transaction.TransactionCollection;
 import org.mule.transport.AbstractMessageReceiver;
 import org.mule.transport.AbstractReceiverWorker;
@@ -58,6 +56,8 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
 
     private final JmsConnector jmsConnector;
 
+    final boolean isTopic;
+
     public MultiConsumerJmsMessageReceiver(Connector connector, FlowConstruct flowConstruct, InboundEndpoint endpoint)
             throws CreateException
     {
@@ -65,7 +65,7 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
 
         jmsConnector = (JmsConnector) connector;
 
-        final boolean isTopic = jmsConnector.getTopicResolver().isTopic(endpoint, true);
+        isTopic = jmsConnector.getTopicResolver().isTopic(endpoint, true);
         if (isTopic && jmsConnector.getNumberOfConsumers() != 1)
         {
             if (logger.isInfoEnabled())
@@ -152,13 +152,18 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
             }
         }
         consumers.clear();
-            }
+    }
 
     @Override
     protected void doDispose()
     {
         logger.debug("doDispose()");
-            }
+    }
+
+    @Override
+    public boolean shouldConsumeInEveryNode() {
+        return !this.isTopic;
+    }
 
     private class SubReceiver implements MessageListener
     {

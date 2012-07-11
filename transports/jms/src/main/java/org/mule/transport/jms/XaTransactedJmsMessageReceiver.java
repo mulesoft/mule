@@ -49,6 +49,12 @@ public class XaTransactedJmsMessageReceiver extends TransactedPollingMessageRece
     protected final ThreadContextLocal context = new ThreadContextLocal();
     protected final long timeout;
     private final AtomicReference<RedeliveryHandler> redeliveryHandler = new AtomicReference<RedeliveryHandler>();
+    private final boolean topic;
+
+    @Override
+    public boolean shouldConsumeInEveryNode() {
+        return !this.topic;
+    }
 
     /**
      * Holder receiving the session and consumer for this thread.
@@ -105,7 +111,7 @@ public class XaTransactedJmsMessageReceiver extends TransactedPollingMessageRece
             this.reuseSession);
 
         // Do extra validation, XA Topic & reuse are incompatible. See MULE-2622
-        boolean topic = this.connector.getTopicResolver().isTopic(getEndpoint());
+        topic = this.connector.getTopicResolver().isTopic(getEndpoint());
         if (topic && (reuseConsumer || reuseSession))
         {
             logger.warn("Destination " + getEndpoint().getEndpointURI() + " is a topic and XA transaction was " +

@@ -10,9 +10,7 @@
 
 package org.mule.transport.jms;
 
-import org.mule.MessageExchangePattern;
 import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.InboundEndpoint;
@@ -21,7 +19,6 @@ import org.mule.api.lifecycle.LifecycleException;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionException;
 import org.mule.api.transport.Connector;
-import org.mule.api.transport.ReplyToHandler;
 import org.mule.transport.AbstractMessageReceiver;
 import org.mule.transport.AbstractReceiverWorker;
 import org.mule.transport.ConnectException;
@@ -55,12 +52,14 @@ public class JmsMessageReceiver extends AbstractMessageReceiver implements Messa
     protected MessageConsumer consumer;
     protected Session session;
     protected boolean startOnConnect = false;
+    private final boolean topic;
 
     public JmsMessageReceiver(Connector connector, FlowConstruct flowConstruct, InboundEndpoint endpoint)
             throws CreateException
     {
         super(connector, flowConstruct, endpoint);
         this.connector = (JmsConnector) connector;
+        topic = this.connector.getTopicResolver().isTopic(endpoint);
 
         try
         {
@@ -97,6 +96,11 @@ public class JmsMessageReceiver extends AbstractMessageReceiver implements Messa
         {
             throw new MuleRuntimeException(e);
         }
+    }
+
+    @Override
+    public boolean shouldConsumeInEveryNode() {
+        return !this.topic;
     }
 
     protected  class JmsWorker extends AbstractReceiverWorker
@@ -233,8 +237,6 @@ public class JmsMessageReceiver extends AbstractMessageReceiver implements Messa
             {
                 session = this.connector.getSession(endpoint);
             }
-
-            boolean topic = connector.getTopicResolver().isTopic(endpoint);
 
             // Create destination
             Destination dest = jmsSupport.createDestination(session, endpoint);

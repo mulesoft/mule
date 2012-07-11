@@ -215,13 +215,19 @@ public abstract class AbstractTransportMessageHandler<O> implements Connectable,
             logger.debug("Connecting: " + this);
         }
 
-        doConnect();
+        connectHandler();
         connected.set(true);
 
         if (logger.isDebugEnabled())
         {
             logger.debug("Connected: " + getConnectionDescription());
         }
+    }
+
+    //TODO - This template method belongs to AbstractMessageReceiver. Not possible to move it in mule 3.x - bc compatibility.
+    protected void connectHandler() throws Exception
+    {
+        this.doConnect();
     }
 
     public RetryContext validateConnection(RetryContext retryContext)
@@ -311,11 +317,15 @@ public abstract class AbstractTransportMessageHandler<O> implements Connectable,
 
         lifecycleManager.fireStartPhase(new LifecycleCallback<O>()
         {
-            public void onTransition(String phaseName, O object) throws MuleException
-            {
-                doStart();
+            public void onTransition(String phaseName, O object) throws MuleException {
+                doStartHandler();
             }
         });
+    }
+
+    protected void doStartHandler() throws MuleException
+    {
+        doStart();
     }
 
     public final void stop() throws MuleException

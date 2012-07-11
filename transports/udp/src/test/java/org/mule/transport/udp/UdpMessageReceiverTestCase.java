@@ -16,11 +16,11 @@ import org.mule.api.service.Service;
 import org.mule.api.transport.MessageReceiver;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.service.ServiceCompositeMessageSource;
-import org.mule.transport.AbstractMessageReceiverTestCase;
+import org.mule.transport.AbstractMessageReceiverTemplateTestCase;
 
 import com.mockobjects.dynamic.Mock;
 
-public class UdpMessageReceiverTestCase extends AbstractMessageReceiverTestCase
+public class UdpMessageReceiverTestCase extends AbstractMessageReceiverTemplateTestCase
 {
     @Override
     public MessageReceiver getMessageReceiver() throws Exception

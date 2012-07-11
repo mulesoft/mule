@@ -15,11 +15,11 @@ import org.mule.api.service.Service;
 import org.mule.api.transport.MessageReceiver;
 import org.mule.service.ServiceCompositeMessageSource;
 import org.mule.transport.AbstractConnector;
-import org.mule.transport.AbstractMessageReceiverTestCase;
+import org.mule.transport.AbstractMessageReceiverTemplateTestCase;
 
 import com.mockobjects.dynamic.Mock;
 
-public class MulticastMessageReceiverTestCase extends AbstractMessageReceiverTestCase
+public class MulticastMessageReceiverTestCase extends AbstractMessageReceiverTemplateTestCase
 {
     public MessageReceiver getMessageReceiver() throws Exception
     {
