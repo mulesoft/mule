@@ -90,28 +90,25 @@ public class ClusterizableMessageSourceWrapper implements MessageSource, Lifecyc
     {
         synchronized (lock)
         {
-            if (!started)
+            if (messageSource instanceof Startable)
             {
-                if (messageSource instanceof Startable)
+                if (muleContext.isPrimaryPollingInstance())
                 {
-                    if (muleContext.isPrimaryPollingInstance())
+                    if (logger.isInfoEnabled())
                     {
-                        if (logger.isInfoEnabled())
-                        {
-                            logger.info("Starting clusterizable message source");
-                        }
-                        ((Startable) messageSource).start();
+                        logger.info("Starting clusterizable message source");
                     }
-                    else
+                    ((Startable) messageSource).start();
+                }
+                else
+                {
+                    if (logger.isDebugEnabled())
                     {
-                        if (logger.isDebugEnabled())
-                        {
-                            logger.debug("Clusterizable message source no started on secondary cluster node");
-                        }
+                        logger.debug("Clusterizable message source no started on secondary cluster node");
                     }
                 }
-                started = true;
             }
+            started = true;
         }
     }
 
