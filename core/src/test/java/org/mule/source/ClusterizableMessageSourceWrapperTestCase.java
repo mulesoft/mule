@@ -136,20 +136,22 @@ public class ClusterizableMessageSourceWrapperTestCase extends AbstractMuleTestC
     }
 
     @Test
-    public void startsMessageSourceOnNotificationIfFlowIsStarted() throws Exception
+    public void startsMessageSourceOnNotificationIfMessageSourceIsStarted() throws Exception
     {
-        when(muleContext.isPrimaryPollingInstance()).thenReturn(true);
+        when(muleContext.isPrimaryPollingInstance()).thenReturn(false);
         wrapper.setMuleContext(muleContext);
+        final PrimaryNodeLifecycleNotificationListener[] primaryNodeLifecycleNotificationListener = new PrimaryNodeLifecycleNotificationListener[1];
         Mockito.doAnswer(new Answer<Void>() {
             @Override
             public Void answer(InvocationOnMock invocationOnMock) throws Throwable {
-                ((PrimaryNodeLifecycleNotificationListener) invocationOnMock.getArguments()[0]).onNotification(new ClusterNodeNotification("",1));
+                primaryNodeLifecycleNotificationListener[0] = (PrimaryNodeLifecycleNotificationListener) invocationOnMock.getArguments()[0];
                 return null;
             }
         }).when(muleContext).registerListener(isA(PrimaryNodeLifecycleNotificationListener.class));
-
-        wrapper.start();
         wrapper.initialise();
+        wrapper.start();
+        when(muleContext.isPrimaryPollingInstance()).thenReturn(true);
+        primaryNodeLifecycleNotificationListener[0].onNotification(new ClusterNodeNotification("", 1));
         verify(messageSource, times(1)).start();
     }
 

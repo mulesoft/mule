@@ -45,6 +45,7 @@ public class ClusterizableMessageSourceWrapper implements MessageSource, Lifecyc
     private FlowConstruct flowConstruct;
     private final Object lock = new Object();
     private boolean started;
+    private boolean messageSourceStarted;
 
     public ClusterizableMessageSourceWrapper(ClusterizableMessageSource messageSource)
     {
@@ -90,6 +91,10 @@ public class ClusterizableMessageSourceWrapper implements MessageSource, Lifecyc
     {
         synchronized (lock)
         {
+            if (messageSourceStarted)
+            {
+                return;
+            }
             if (messageSource instanceof Startable)
             {
                 if (muleContext.isPrimaryPollingInstance())
@@ -99,6 +104,7 @@ public class ClusterizableMessageSourceWrapper implements MessageSource, Lifecyc
                         logger.info("Starting clusterizable message source");
                     }
                     ((Startable) messageSource).start();
+                    messageSourceStarted = true;
                 }
                 else
                 {
@@ -124,6 +130,7 @@ public class ClusterizableMessageSourceWrapper implements MessageSource, Lifecyc
                     ((Stoppable) messageSource).stop();
                 }
                 started = false;
+                messageSourceStarted = false;
             }
         }
     }
