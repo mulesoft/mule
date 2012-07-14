@@ -10,6 +10,9 @@
 
 package org.mule.transformer;
 
+import org.mule.DefaultMessageCollection;
+import org.mule.DefaultMuleEvent;
+import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -40,7 +43,6 @@ import javax.activation.MimeTypeParseException;
 import javax.xml.transform.stream.StreamSource;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -112,7 +114,20 @@ public abstract class AbstractTransformer implements Transformer
         {
             try
             {
-                event.getMessage().applyTransformers(event, this);
+                MuleMessage message = event.getMessage();
+                message.applyTransformers(event, this);
+                if (message instanceof DefaultMessageCollection)
+                {
+                    if (((DefaultMessageCollection) message).isInvalidatedPayload())
+                    {
+                        if (logger.isDebugEnabled())
+                        {
+                            logger.debug("Transformed message is an invalidated message collection. Creating new message with payload: " + event.getMessage().getPayload());
+                        }
+                        MuleMessage newMessage = new DefaultMuleMessage(message.getPayload(), message, message.getMuleContext());
+                        event = new DefaultMuleEvent(newMessage, event);
+                    }
+                }
             }
             catch (TransformerException e)
             {

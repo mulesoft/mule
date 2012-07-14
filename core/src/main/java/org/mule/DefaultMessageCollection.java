@@ -41,10 +41,13 @@ public class DefaultMessageCollection extends DefaultMuleMessage implements Mule
 {
     private List messageList = new CopyOnWriteArrayList();
 
+    private boolean invalidatedPayload;
+
     public DefaultMessageCollection(MuleContext muleContext)
     {
         //This will be a collection of payloads
         super(new CopyOnWriteArrayList(), muleContext);
+        invalidatedPayload = false;
     }
 
     /**
@@ -55,20 +58,38 @@ public class DefaultMessageCollection extends DefaultMuleMessage implements Mule
     public DefaultMessageCollection(DefaultMessageCollection msg, MuleContext muleContext)
     {
         this(muleContext);
-        for (int i = 0; i < msg.getMessagesAsArray().length; i++)
+        if (!msg.invalidatedPayload)
         {
-            addMessage(msg.getMessagesAsArray()[i]);
+            for (int i = 0; i < msg.getMessagesAsArray().length; i++)
+            {
+                addMessage(msg.getMessagesAsArray()[i]);
+            }
+        }
+        else
+        {
+            invalidatedPayload = true;
+        }
+
+    }
+
+    protected void checkValidPayload()
+    {
+        if (invalidatedPayload)
+        {
+            throw new IllegalStateException("Payload was invalidated calling setPayload and the message is not collection anymore.");
         }
     }
 
     public void addMessage(MuleMessage message)
     {
+        checkValidPayload();
         getMessageList().add(message);
         getPayloadList().add(message.getPayload());
     }
 
     public MuleMessage[] getMessagesAsArray()
     {
+        checkValidPayload();
         List list = getMessageList();
         MuleMessage[] messages = new MuleMessage[list.size()];
         messages = (MuleMessage[])list.toArray(messages);
@@ -77,6 +98,7 @@ public class DefaultMessageCollection extends DefaultMuleMessage implements Mule
 
     public Object[] getPayloadsAsArray()
     {
+        checkValidPayload();
         List list = getPayloadList();
         Object[] payloads = new Object[list.size()];
         payloads = list.toArray(payloads);
@@ -85,28 +107,32 @@ public class DefaultMessageCollection extends DefaultMuleMessage implements Mule
 
     public void removedMessage(MuleMessage message)
     {
+        checkValidPayload();
         getMessageList().remove(message);
         getPayloadList().remove(message.getPayload());
     }
 
     public void addMessage(MuleMessage message, int index)
     {
+        checkValidPayload();
         getMessageList().add(index, message);
         getPayloadList().add(index, message.getPayload());
     }
 
     public void addMessages(MuleEvent[] events)
     {
+        checkValidPayload();
         for (int i = 0; i < events.length; i++)
         {
             MuleEvent event = events[i];
-           addMessage(event.getMessage());
+            addMessage(event.getMessage());
         }
     }
 
     public void addMessages(List messages)
     {
-        for (Iterator iterator = messages.iterator(); iterator.hasNext();)
+        checkValidPayload();
+        for (Iterator iterator = messages.iterator(); iterator.hasNext(); )
         {
             MuleMessage message = (MuleMessage) iterator.next();
             addMessage(message);
@@ -115,6 +141,7 @@ public class DefaultMessageCollection extends DefaultMuleMessage implements Mule
 
     public void addMessages(MuleMessage[] messages)
     {
+        checkValidPayload();
         for (int i = 0; i < messages.length; i++)
         {
             addMessage(messages[i]);
@@ -123,17 +150,34 @@ public class DefaultMessageCollection extends DefaultMuleMessage implements Mule
 
     public MuleMessage getMessage(int index)
     {
-        return (MuleMessage)getMessageList().get(index);
+        checkValidPayload();
+        return (MuleMessage) getMessageList().get(index);
     }
 
     protected List getMessageList()
     {
+        checkValidPayload();
         return messageList;
     }
 
     protected List getPayloadList()
     {
-        return (List)getPayload();
+        checkValidPayload();
+        return (List) getPayload();
+    }
+
+    @Override
+    public synchronized void setPayload(Object payload)
+    {
+        if (this.getPayload() == payload)
+        {
+            return;
+        }
+        else
+        {
+            super.setPayload(payload);
+            invalidatedPayload = true;
+        }
     }
 
     /**
@@ -145,18 +189,26 @@ public class DefaultMessageCollection extends DefaultMuleMessage implements Mule
     @Override
     public Object getPayload(Class outputType) throws TransformerException
     {
-        DataType outputDataType = DataTypeFactory.create(outputType);
-        List results = new ArrayList(getMessageList().size());
-        for (Iterator iterator = getMessageList().iterator(); iterator.hasNext();)
+        if (invalidatedPayload)
         {
-            MuleMessage message = (MuleMessage) iterator.next();
-            results.add(message.getPayload(outputDataType));
+            return super.getPayload(outputType);
         }
-        return results;
+        else
+        {
+            DataType outputDataType = DataTypeFactory.create(outputType);
+            List results = new ArrayList(getMessageList().size());
+            for (Iterator iterator = getMessageList().iterator(); iterator.hasNext(); )
+            {
+                MuleMessage message = (MuleMessage) iterator.next();
+                results.add(message.getPayload(outputDataType));
+            }
+            return results;
+        }
     }
 
     public int size()
     {
+        checkValidPayload();
         return getMessageList().size();
     }
 
@@ -166,7 +218,14 @@ public class DefaultMessageCollection extends DefaultMuleMessage implements Mule
     @Override
     public byte[] getPayloadAsBytes() throws Exception
     {
-        throw new UnsupportedOperationException("getPayloadAsBytes(), use getPayload(DataType.BYTE_ARRAY_DATA_TYPE)");
+        if (invalidatedPayload)
+        {
+            return super.getPayloadAsBytes();
+        }
+        else
+        {
+            throw new UnsupportedOperationException("getPayloadAsBytes(), use getPayload(DataType.BYTE_ARRAY_DATA_TYPE)");
+        }
     }
 
     /**
@@ -175,8 +234,14 @@ public class DefaultMessageCollection extends DefaultMuleMessage implements Mule
     @Override
     public String getPayloadAsString(String encoding) throws Exception
     {
-        throw new UnsupportedOperationException("getPayloadAsString(), use getPayload(DataType.STRING_DATA_TYPE)");
-
+        if (invalidatedPayload)
+        {
+            return super.getPayloadAsString(encoding);
+        }
+        else
+        {
+            throw new UnsupportedOperationException("getPayloadAsString(), use getPayload(DataType.STRING_DATA_TYPE)");
+        }
     }
 
     /**
@@ -185,7 +250,14 @@ public class DefaultMessageCollection extends DefaultMuleMessage implements Mule
     @Override
     public String getPayloadForLogging(String encoding)
     {
-       return "[This is a message collection]";
+        if (invalidatedPayload)
+        {
+            return super.getPayloadForLogging(encoding);
+        }
+        else
+        {
+            return "[This is a message collection]";
+        }
     }
 
     /**
@@ -194,15 +266,22 @@ public class DefaultMessageCollection extends DefaultMuleMessage implements Mule
     @Override
     public String getPayloadForLogging()
     {
-       return "[This is a message collection]";
+        if (invalidatedPayload)
+        {
+            return super.getPayloadForLogging();
+        }
+        else
+        {
+            return "[This is a message collection]";
+        }
     }
 
-    
     /**
      * We need to overload this if we find we want to make this class available to users, but the copy will be expensive;
      */
     public ThreadSafeAccess newThreadCopy()
     {
+        checkValidPayload();
         return new DefaultMessageCollection(this, muleContext);
     }
 
@@ -212,13 +291,26 @@ public class DefaultMessageCollection extends DefaultMuleMessage implements Mule
     @Override
     public MuleMessage createInboundMessage() throws Exception
     {
-        DefaultMessageCollection newMessage = new DefaultMessageCollection(getMuleContext());
-        MuleMessage[] messages = getMessagesAsArray();
-        for (MuleMessage message : messages)
+        if (invalidatedPayload)
         {
-            newMessage.addMessage(message.createInboundMessage());
+            return super.createInboundMessage();
         }
-        copyToInbound(newMessage);
-        return newMessage;
+        else
+        {
+            DefaultMessageCollection newMessage = new DefaultMessageCollection(getMuleContext());
+            MuleMessage[] messages = getMessagesAsArray();
+            for (MuleMessage message : messages)
+            {
+                newMessage.addMessage(message.createInboundMessage());
+            }
+            copyToInbound(newMessage);
+
+            return newMessage;
+        }
+    }
+
+    public boolean isInvalidatedPayload()
+    {
+        return invalidatedPayload;
     }
 }
