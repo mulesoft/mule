@@ -52,13 +52,12 @@ public class FileEncodingFunctionalTestCase extends AbstractFileFunctionalTestCa
     private File createDataFile(File folder, String encoding, final String testMessage) throws Exception
     {
         // Creates a temp file with the required data
-        File tempFolder = new File(".mule");
-        File temp = File.createTempFile("mule-file-test-", ".txt", tempFolder);
-        temp.deleteOnExit();
+        File temp = File.createTempFile("mule-file-test-", ".txt");
         FileUtils.writeStringToFile(temp, testMessage, encoding);
 
         // Copies temp file to target
         File target = new File(folder, temp.getName());
+        target.deleteOnExit();
         FileUtils.renameFile(temp, target);
 
         return target;
