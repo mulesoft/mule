@@ -10,6 +10,8 @@
 
 package org.mule.transport.file;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.util.FileUtils;
@@ -17,9 +19,6 @@ import org.mule.util.FileUtils;
 import java.io.File;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 public class FileEncodingFunctionalTestCase extends AbstractFileFunctionalTestCase
 {
@@ -52,9 +51,15 @@ public class FileEncodingFunctionalTestCase extends AbstractFileFunctionalTestCa
 
     private File createDataFile(File folder, String encoding, final String testMessage) throws Exception
     {
-        File target = File.createTempFile("mule-file-test-", ".txt", folder);
-        target.deleteOnExit();
-        FileUtils.writeStringToFile(target, testMessage, encoding);
+        // Creates a temp file with the required data
+        File tempFolder = new File(".mule");
+        File temp = File.createTempFile("mule-file-test-", ".txt", tempFolder);
+        temp.deleteOnExit();
+        FileUtils.writeStringToFile(temp, testMessage, encoding);
+
+        // Copies temp file to target
+        File target = new File(folder, temp.getName());
+        FileUtils.renameFile(temp, target);
 
         return target;
     }
