@@ -132,11 +132,16 @@ public abstract class AbstractFileFunctionalTestCase extends AbstractServiceAndF
     
     protected File createDataFile(File folder, final String testMessage, String encoding) throws Exception
     {
-        File target = File.createTempFile("mule-file-test-", ".txt", folder);
+        File temp = File.createTempFile("mule-file-test-", ".txt");
+        FileUtils.writeStringToFile(temp, testMessage, encoding);
+
+        // Copies temp file to target
+        File target = new File(folder, temp.getName());
         target.deleteOnExit();
-        FileUtils.writeStringToFile(target, testMessage, encoding);
+        FileUtils.renameFile(temp, target);
 
         return target;
+
     }
 
     protected File createFolder(String name)
