@@ -15,14 +15,14 @@ import org.mule.api.lifecycle.CreateException;
 import org.mule.api.service.Service;
 import org.mule.api.transport.MessageReceiver;
 import org.mule.tck.testmodels.fruit.Orange;
-import org.mule.transport.AbstractMessageReceiverTemplateTestCase;
+import org.mule.transport.AbstractMessageReceiverTestCase;
 
 import org.junit.Test;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-public class StdioMessageReceiverTestCase extends AbstractMessageReceiverTemplateTestCase
+public class StdioMessageReceiverTestCase extends AbstractMessageReceiverTestCase
 {
 
     @Test

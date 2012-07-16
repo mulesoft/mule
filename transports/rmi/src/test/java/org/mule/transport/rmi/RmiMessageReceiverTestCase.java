@@ -15,7 +15,7 @@ import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
-import org.mule.transport.AbstractMessageReceiverTemplateTestCase;
+import org.mule.transport.AbstractMessageReceiverTestCase;
 import org.mule.util.concurrent.Latch;
 
 import java.rmi.Naming;
@@ -44,7 +44,7 @@ import static org.junit.Assert.assertTrue;
  *
  * @author Yuen-Chi Lian
  */
-public class RmiMessageReceiverTestCase extends AbstractMessageReceiverTemplateTestCase
+public class RmiMessageReceiverTestCase extends AbstractMessageReceiverTestCase
 {
     private static Log LOGGER = LogFactory.getLog(RmiMessageReceiverTestCase.class);
 

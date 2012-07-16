@@ -14,11 +14,11 @@ import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.service.Service;
 import org.mule.api.transport.MessageReceiver;
 import org.mule.service.ServiceCompositeMessageSource;
-import org.mule.transport.AbstractMessageReceiverTemplateTestCase;
+import org.mule.transport.AbstractMessageReceiverTestCase;
 
 import com.mockobjects.dynamic.Mock;
 
-public class SslMessageReceiverTestCase extends AbstractMessageReceiverTemplateTestCase
+public class SslMessageReceiverTestCase extends AbstractMessageReceiverTestCase
 {
     public MessageReceiver getMessageReceiver() throws Exception
     {

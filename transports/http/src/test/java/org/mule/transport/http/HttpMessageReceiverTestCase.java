@@ -16,13 +16,13 @@ import org.mule.api.service.Service;
 import org.mule.api.transport.MessageReceiver;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.service.ServiceCompositeMessageSource;
-import org.mule.transport.AbstractMessageReceiverTemplateTestCase;
+import org.mule.transport.AbstractMessageReceiverTestCase;
 import org.mule.transport.http.transformers.MuleMessageToHttpResponse;
 import org.mule.util.CollectionUtils;
 
 import com.mockobjects.dynamic.Mock;
 
-public class HttpMessageReceiverTestCase extends AbstractMessageReceiverTemplateTestCase
+public class HttpMessageReceiverTestCase extends AbstractMessageReceiverTestCase
 {
     public MessageReceiver getMessageReceiver() throws Exception
     {

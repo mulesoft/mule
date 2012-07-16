@@ -52,7 +52,8 @@ public class PrimaryNodeLifecycleNotificationListener implements ClusterNodeNoti
     }
 
     @Override
-    public void onNotification(ServerNotification notification) {
+    public void onNotification(ServerNotification notification)
+    {
         try
         {
             if (startMeOnPrimaryNodeNotification instanceof LifecycleState)
@@ -63,10 +64,7 @@ public class PrimaryNodeLifecycleNotificationListener implements ClusterNodeNoti
                 }
                 else
                 {
-                    if (logger.isDebugEnabled())
-                    {
-                        logger.debug("Not starting Startable since it's not in started state");
-                    }
+                    logStartableNotStartedMessage();
                 }
             }
             else if (startMeOnPrimaryNodeNotification instanceof LifecycleStateEnabled)
@@ -77,10 +75,7 @@ public class PrimaryNodeLifecycleNotificationListener implements ClusterNodeNoti
                 }
                 else
                 {
-                    if (logger.isDebugEnabled())
-                    {
-                        logger.debug("Not starting Startable since it's not in started state");
-                    }
+                    logStartableNotStartedMessage();
                 }
             }
             else 
@@ -91,6 +86,14 @@ public class PrimaryNodeLifecycleNotificationListener implements ClusterNodeNoti
         catch (MuleException e)
         {
             throw new RuntimeException("Error starting wrapped message source", e);
+        }
+    }
+
+    private void logStartableNotStartedMessage()
+    {
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("Not starting Startable since it's not in started state");
         }
     }
 

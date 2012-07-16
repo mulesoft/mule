@@ -21,7 +21,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
-public abstract class AbstractMessageReceiverTemplateTestCase extends AbstractMuleContextTestCase
+public abstract class AbstractMessageReceiverTestCase extends AbstractMuleContextTestCase
 {
     protected Service service;
     protected InboundEndpoint endpoint;

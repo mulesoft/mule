@@ -14,14 +14,14 @@ import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.service.Service;
 import org.mule.api.transport.MessageReceiver;
 import org.mule.tck.MuleTestUtils;
-import org.mule.transport.AbstractMessageReceiverTemplateTestCase;
+import org.mule.transport.AbstractMessageReceiverTestCase;
 import org.mule.util.FileUtils;
 
 import com.mockobjects.dynamic.Mock;
 
 import java.io.File;
 
-public class FileMessageReceiverTestCase extends AbstractMessageReceiverTemplateTestCase
+public class FileMessageReceiverTestCase extends AbstractMessageReceiverTestCase
 {
     File read = FileUtils.newFile("testcasedata/read");
     File move = FileUtils.newFile("testcasedata/move");
