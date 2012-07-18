@@ -56,6 +56,8 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
 
     private final JmsConnector jmsConnector;
 
+    final boolean isTopic;
+
     public MultiConsumerJmsMessageReceiver(Connector connector, FlowConstruct flowConstruct, InboundEndpoint endpoint)
             throws CreateException
     {
@@ -63,7 +65,7 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
 
         jmsConnector = (JmsConnector) connector;
 
-        final boolean isTopic = jmsConnector.getTopicResolver().isTopic(endpoint, true);
+        isTopic = jmsConnector.getTopicResolver().isTopic(endpoint, true);
         if (isTopic && jmsConnector.getNumberOfConsumers() != 1)
         {
             if (logger.isInfoEnabled())
@@ -150,13 +152,18 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
             }
         }
         consumers.clear();
-            }
+    }
 
     @Override
     protected void doDispose()
     {
         logger.debug("doDispose()");
-            }
+    }
+
+    @Override
+    public boolean shouldConsumeInEveryNode() {
+        return !this.isTopic;
+    }
 
     private class SubReceiver implements MessageListener
     {

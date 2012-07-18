@@ -58,7 +58,7 @@ public class ClusterizableMessageSourceFlowTestCase extends FunctionalTestCase
         Flow test1 = (Flow) muleContext.getRegistry().get("test1");
         ClusterizableMessageSourceWrapper messageSource = (ClusterizableMessageSourceWrapper) test1.getMessageSource();
         assertTrue(test1.isStarted());
-        assertFalse(messageSource.isStarted());
+        assertTrue(messageSource.isStarted());
     }
 
     @Test
@@ -66,13 +66,16 @@ public class ClusterizableMessageSourceFlowTestCase extends FunctionalTestCase
     {
         TestPollingController pollingController = new TestPollingController();
         ((DefaultMuleContext) muleContext).setPollingController(pollingController);
+
         muleContext.start();
 
         Flow test1 = (Flow) muleContext.getRegistry().get("test1");
         ClusterizableMessageSourceWrapper messageSource = (ClusterizableMessageSourceWrapper) test1.getMessageSource();
 
+        messageSource.initialise();
+
         pollingController.isPrimary=true;
-        messageSource.onNotification(new ClusterNodeNotification("primary", ClusterNodeNotification.PRIMARY_CLUSTER_NODE_SELECTED));
+        muleContext.fireNotification(new ClusterNodeNotification("primary", ClusterNodeNotification.PRIMARY_CLUSTER_NODE_SELECTED));
 
         LocalMuleClient client = muleContext.getClient();
         MuleMessage response = client.request("vm://testOut", 5000);

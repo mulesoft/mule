@@ -54,8 +54,9 @@ public class TransactedSingleResourceJmsMessageReceiver extends AbstractMessageR
 
     /** determines whether Multiple receivers are created to improve throughput */
     protected boolean useMultipleReceivers = true;
+    private final boolean topic;
 
-    
+
     public TransactedSingleResourceJmsMessageReceiver(Connector connector,
                                                       FlowConstruct flowConstruct,
                                                       InboundEndpoint endpoint) throws CreateException
@@ -64,7 +65,7 @@ public class TransactedSingleResourceJmsMessageReceiver extends AbstractMessageR
         super(connector, flowConstruct, endpoint);
 
         this.connector = (JmsConnector) connector;
-
+        topic = this.connector.getTopicResolver().isTopic(endpoint);
         // TODO check which properties being set in the TransecteJmsMessage receiver
         // are needed...
 
@@ -98,8 +99,6 @@ public class TransactedSingleResourceJmsMessageReceiver extends AbstractMessageR
             }
 
             // Create destination
-            boolean topic = connector.getTopicResolver().isTopic(endpoint);
-
             Destination dest = jmsSupport.createDestination(session, endpoint);
             // Extract jms selector
             String selector = null;
@@ -284,5 +283,10 @@ public class TransactedSingleResourceJmsMessageReceiver extends AbstractMessageR
             MuleMessage messageToRoute = createMuleMessage(message, encoding);
             routeMessage(messageToRoute);
         }
+    }
+
+    @Override
+    public boolean shouldConsumeInEveryNode() {
+        return !this.topic;
     }
 }
