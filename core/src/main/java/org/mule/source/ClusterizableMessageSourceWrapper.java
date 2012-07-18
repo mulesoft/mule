@@ -15,8 +15,6 @@ import org.mule.api.MuleException;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.construct.FlowConstructAware;
 import org.mule.api.context.MuleContextAware;
-import org.mule.api.context.notification.ClusterNodeNotificationListener;
-import org.mule.api.context.notification.ServerNotification;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
@@ -26,26 +24,28 @@ import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.source.ClusterizableMessageSource;
 import org.mule.api.source.MessageSource;
-import org.mule.context.notification.NotificationException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.mule.lifecycle.PrimaryNodeLifecycleNotificationListener;
 
 /**
  * Wraps a {@link ClusterizableMessageSource} in order to manage the lifecycle
  * of the wrapped instance differently depending if the node is primary or not
  * inside a cluster. Non clustered nodes are always primary.
  */
-public class ClusterizableMessageSourceWrapper implements MessageSource, Lifecycle, ClusterNodeNotificationListener, MuleContextAware, FlowConstructAware
+public class ClusterizableMessageSourceWrapper implements MessageSource, Lifecycle,  MuleContextAware, FlowConstructAware
 {
 
     protected static final Log logger = LogFactory.getLog(ClusterizableMessageSourceWrapper.class);
 
+    private PrimaryNodeLifecycleNotificationListener primaryNodeLifecycleNotificationListener;
     private final ClusterizableMessageSource messageSource;
     private MuleContext muleContext;
     private FlowConstruct flowConstruct;
     private final Object lock = new Object();
     private boolean started;
+    private boolean messageSourceStarted;
 
     public ClusterizableMessageSourceWrapper(ClusterizableMessageSource messageSource)
     {
@@ -68,7 +68,17 @@ public class ClusterizableMessageSourceWrapper implements MessageSource, Lifecyc
     @Override
     public void initialise() throws InitialisationException
     {
-        registerNotificationListener();
+        primaryNodeLifecycleNotificationListener = new PrimaryNodeLifecycleNotificationListener(new Startable() {
+            @Override
+            public void start() throws MuleException {
+                if (ClusterizableMessageSourceWrapper.this.isStarted())
+                {
+                    ClusterizableMessageSourceWrapper.this.start();
+                }
+            }
+        },muleContext);
+
+        primaryNodeLifecycleNotificationListener.register();
 
         if (messageSource instanceof Initialisable)
         {
@@ -81,29 +91,30 @@ public class ClusterizableMessageSourceWrapper implements MessageSource, Lifecyc
     {
         synchronized (lock)
         {
-            if (!started)
+            if (messageSourceStarted)
             {
-                if (messageSource instanceof Startable)
+                return;
+            }
+            if (messageSource instanceof Startable)
+            {
+                if (muleContext.isPrimaryPollingInstance())
                 {
-                    if (muleContext.isPrimaryPollingInstance())
+                    if (logger.isInfoEnabled())
                     {
-                        if (logger.isInfoEnabled())
-                        {
-                            logger.info("Starting clusterizable message source");
-                        }
-                        ((Startable) messageSource).start();
-
-                        started = true;
+                        logger.info("Starting clusterizable message source");
                     }
-                    else
+                    ((Startable) messageSource).start();
+                    messageSourceStarted = true;
+                }
+                else
+                {
+                    if (logger.isDebugEnabled())
                     {
-                        if (logger.isDebugEnabled())
-                        {
-                            logger.debug("Clusterizable message source no started on secondary cluster node");
-                        }
+                        logger.debug("Clusterizable message source no started on secondary cluster node");
                     }
                 }
             }
+            started = true;
         }
     }
 
@@ -119,6 +130,7 @@ public class ClusterizableMessageSourceWrapper implements MessageSource, Lifecyc
                     ((Stoppable) messageSource).stop();
                 }
                 started = false;
+                messageSourceStarted = false;
             }
         }
     }
@@ -131,54 +143,9 @@ public class ClusterizableMessageSourceWrapper implements MessageSource, Lifecyc
             ((Disposable) messageSource).dispose();
         }
 
-        unregisterNotificationListener();
+        primaryNodeLifecycleNotificationListener.unregister();
     }
 
-    @Override
-    public void onNotification(ServerNotification notification)
-    {
-        if (flowConstruct != null && flowConstruct.getLifecycleState().isStarted())
-        {
-            try
-            {
-                start();
-            }
-            catch (MuleException e)
-            {
-                throw new RuntimeException("Error starting wrapped message source", e);
-            }
-        }
-        else
-        {
-            if (logger.isDebugEnabled())
-            {
-                logger.debug("Clusterizable message source no started on stopped flow");
-            }
-        }
-    }
-
-    protected void registerNotificationListener()
-    {
-        try
-        {
-            if (muleContext != null)
-            {
-                muleContext.registerListener(this);
-            }
-        }
-        catch (NotificationException e)
-        {
-            throw new RuntimeException("Unable to register listener", e);
-        }
-    }
-
-    protected void unregisterNotificationListener()
-    {
-        if (muleContext != null)
-        {
-            muleContext.unregisterListener(this);
-        }
-    }
 
     @Override
     public void setFlowConstruct(FlowConstruct flowConstruct)
