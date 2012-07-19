@@ -97,7 +97,8 @@ public class PrimaryNodeLifecycleNotificationListener implements ClusterNodeNoti
         }
     }
 
-    public void unregister() {
+    public void unregister()
+    {
         muleContext.unregisterListener(this);
     }
 }

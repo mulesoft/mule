@@ -460,12 +460,17 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
         }
         else
         {
-            muleContext.registerListener(new ClusterNodeNotificationListener<ClusterNodeNotification>() {
+            muleContext.registerListener(new ClusterNodeNotificationListener<ClusterNodeNotification>()
+            {
                 @Override
-                public void onNotification(ClusterNodeNotification notification) {
-                    try {
+                public void onNotification(ClusterNodeNotification notification)
+                {
+                    try
+                    {
                         JmsConnector.this.connect();
-                    } catch (Exception e) {
+                    }
+                    catch (Exception e)
+                    {
                         throw new MuleRuntimeException(e);
                     }
                 }

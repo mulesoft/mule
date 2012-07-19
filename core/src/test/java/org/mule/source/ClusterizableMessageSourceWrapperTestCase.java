@@ -123,9 +123,11 @@ public class ClusterizableMessageSourceWrapperTestCase extends AbstractMuleTestC
     {
         when(muleContext.isPrimaryPollingInstance()).thenReturn(true);
         wrapper.setMuleContext(muleContext);
-        Mockito.doAnswer(new Answer<Void>() {
+        Mockito.doAnswer(new Answer<Void>()
+        {
             @Override
-            public Void answer(InvocationOnMock invocationOnMock) throws Throwable {
+            public Void answer(InvocationOnMock invocationOnMock) throws Throwable
+            {
                 ((PrimaryNodeLifecycleNotificationListener) invocationOnMock.getArguments()[0]).onNotification(new ClusterNodeNotification("",1));
                 return null;
             }
@@ -141,9 +143,11 @@ public class ClusterizableMessageSourceWrapperTestCase extends AbstractMuleTestC
         when(muleContext.isPrimaryPollingInstance()).thenReturn(false);
         wrapper.setMuleContext(muleContext);
         final PrimaryNodeLifecycleNotificationListener[] primaryNodeLifecycleNotificationListener = new PrimaryNodeLifecycleNotificationListener[1];
-        Mockito.doAnswer(new Answer<Void>() {
+        Mockito.doAnswer(new Answer<Void>()
+        {
             @Override
-            public Void answer(InvocationOnMock invocationOnMock) throws Throwable {
+            public Void answer(InvocationOnMock invocationOnMock) throws Throwable
+            {
                 primaryNodeLifecycleNotificationListener[0] = (PrimaryNodeLifecycleNotificationListener) invocationOnMock.getArguments()[0];
                 return null;
             }

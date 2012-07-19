@@ -317,7 +317,8 @@ public abstract class AbstractTransportMessageHandler<O> implements Connectable,
 
         lifecycleManager.fireStartPhase(new LifecycleCallback<O>()
         {
-            public void onTransition(String phaseName, O object) throws MuleException {
+            public void onTransition(String phaseName, O object) throws MuleException
+            {
                 doStartHandler();
             }
         });

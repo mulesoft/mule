@@ -161,7 +161,8 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
     }
 
     @Override
-    public boolean shouldConsumeInEveryNode() {
+    public boolean shouldConsumeInEveryNode()
+    {
         return !this.isTopic;
     }
 
