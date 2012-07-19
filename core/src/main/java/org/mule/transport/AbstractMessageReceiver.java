@@ -85,7 +85,7 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
 
     protected List<Transformer> defaultInboundTransformers;
     protected List<Transformer> defaultResponseTransformers;
-    
+
     protected ReplyToHandler replyToHandler;
     private PrimaryNodeLifecycleNotificationListener primaryNodeLifecycleNotificationListener;
 
@@ -144,14 +144,19 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
 
         if (!shouldConsumeInEveryNode() && !flowConstruct.getMuleContext().isPrimaryPollingInstance())
         {
-            primaryNodeLifecycleNotificationListener = new PrimaryNodeLifecycleNotificationListener(new Startable() {
+            primaryNodeLifecycleNotificationListener = new PrimaryNodeLifecycleNotificationListener(new Startable()
+            {
                 @Override
-                public void start() throws MuleException {
+                public void start() throws MuleException
+                {
                     if (AbstractMessageReceiver.this.isStarted())
                     {
-                        try {
+                        try
+                        {
                             AbstractMessageReceiver.this.doConnect();
-                        } catch (Exception e) {
+                        }
+                        catch (Exception e)
+                        {
                             throw new DefaultMuleException(e);
                         }
                         AbstractMessageReceiver.this.doStart();
@@ -426,7 +431,7 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
         }
         super.doDispose();
     }
-    
+
     protected ReplyToHandler getReplyToHandler()
     {
         return ((AbstractConnector) endpoint.getConnector()).getReplyToHandler(endpoint);
@@ -448,7 +453,8 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
     }
 
     @Override
-    final protected void connectHandler() throws Exception {
+    final protected void connectHandler() throws Exception
+    {
         if (shouldConsumeInEveryNode() || getFlowConstruct().getMuleContext().isPrimaryPollingInstance())
         {
             if (logger.isInfoEnabled())
@@ -459,14 +465,16 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
         }
         else
         {
-            if (logger.isDebugEnabled()) {
+            if (logger.isDebugEnabled())
+            {
                 logger.debug("Clusterizable message receiver not connected on this node");
             }
         }
     }
 
     @Override
-    final protected void doStartHandler() throws MuleException {
+    final protected void doStartHandler() throws MuleException
+    {
         if (shouldConsumeInEveryNode() || getFlowConstruct().getMuleContext().isPrimaryPollingInstance())
         {
             if (logger.isInfoEnabled())
@@ -477,7 +485,8 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
         }
         else
         {
-            if (logger.isDebugEnabled()) {
+            if (logger.isDebugEnabled())
+            {
                 logger.debug("Clusterizable message receiver not started on this node");
             }
         }
