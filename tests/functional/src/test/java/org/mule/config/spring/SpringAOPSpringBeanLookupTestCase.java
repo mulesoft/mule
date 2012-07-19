@@ -14,7 +14,7 @@ import static org.junit.Assert.assertTrue;
 
 import org.mule.api.component.JavaComponent;
 import org.mule.api.object.ObjectFactory;
-import org.mule.construct.SimpleFlowConstruct;
+import org.mule.construct.Flow;
 import org.mule.tck.junit4.FunctionalTestCase;
 
 import org.junit.Test;
@@ -98,14 +98,12 @@ public class SpringAOPSpringBeanLookupTestCase extends FunctionalTestCase
 
     private ObjectFactory getPrototypeSpringObjectFactory() throws Exception
     {
-        return ((JavaComponent) ((SimpleFlowConstruct) getFlowConstruct("flow")).getMessageProcessors()
-            .get(0)).getObjectFactory();
+        return ((JavaComponent)((Flow)getFlowConstruct("flow")).getMessageProcessors().get(0)).getObjectFactory();
     }
 
     private ObjectFactory getSingletonSpringObjectFactory() throws Exception
     {
-        return ((JavaComponent) ((SimpleFlowConstruct) getFlowConstruct("flow")).getMessageProcessors()
-            .get(1)).getObjectFactory();
+        return ((JavaComponent)((Flow)getFlowConstruct("flow")).getMessageProcessors().get(1)).getObjectFactory();
     }
 
 }
