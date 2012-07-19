@@ -193,6 +193,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
                         if (e instanceof MessagingException)
                         {
                             MuleEvent event = ((MessagingException) e).getEvent();
+                            httpStatus = event.getMessage().getOutboundProperty(HttpConnector.HTTP_STATUS_PROPERTY) != null ? Integer.valueOf(event.getMessage().getOutboundProperty(HttpConnector.HTTP_STATUS_PROPERTY).toString()) : httpStatus;
                             conn.writeResponse(buildFailureResponse(event, e.getMessage(),httpStatus));
                         }
                         else
