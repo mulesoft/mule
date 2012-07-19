@@ -286,7 +286,8 @@ public class TransactedSingleResourceJmsMessageReceiver extends AbstractMessageR
     }
 
     @Override
-    public boolean shouldConsumeInEveryNode() {
+    public boolean shouldConsumeInEveryNode()
+    {
         return !this.topic;
     }
 }

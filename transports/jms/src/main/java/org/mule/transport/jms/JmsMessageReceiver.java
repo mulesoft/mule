@@ -99,7 +99,8 @@ public class JmsMessageReceiver extends AbstractMessageReceiver implements Messa
     }
 
     @Override
-    public boolean shouldConsumeInEveryNode() {
+    public boolean shouldConsumeInEveryNode()
+    {
         return !this.topic;
     }
 
