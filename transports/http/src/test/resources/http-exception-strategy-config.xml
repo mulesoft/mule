@@ -18,4 +18,10 @@
         <test:component throwException="true"/>
     </flow>
 
+    <flow name="flowWithtCESAndStatusCode">
+        <http:inbound-endpoint port="${port1}" host="localhost" path="flowWithtCESAndStatusCode" exchange-pattern="request-response"/>
+        <test:component throwException="true"/>
+        <custom-exception-strategy class="org.mule.transport.http.functional.HttpExceptionStrategyTestCase$CustomExceptionStrategy"/>
+    </flow>
+
 </mule>

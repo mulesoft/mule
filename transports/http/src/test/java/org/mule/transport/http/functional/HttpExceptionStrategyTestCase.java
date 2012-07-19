@@ -9,8 +9,12 @@
  */
 package org.mule.transport.http.functional;
 
+import org.hamcrest.core.Is;
 import org.mule.api.ExceptionPayload;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
+import org.mule.api.exception.RollbackSourceCallback;
+import org.mule.exception.AbstractMessagingExceptionStrategy;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.NullPayload;
@@ -48,5 +52,23 @@ public class HttpExceptionStrategyTestCase extends FunctionalTestCase
         assertThat(response.getPayloadAsString(), not(TEST_MESSAGE));
         assertThat(response.getExceptionPayload(), notNullValue()); //to be fixed
         assertThat(response.getExceptionPayload(), instanceOf(ExceptionPayload.class)); //to be review/fixed
+    }
+
+    @Test
+    public void testCustomStatusCodeOnExceptionWithCustomExceptionStrategy() throws Exception
+    {
+        String url = String.format("http://localhost:%d/flowWithtCESAndStatusCode", port1.getNumber());
+        MuleMessage response = muleContext.getClient().send(url, TEST_MESSAGE, null, TIMEOUT);
+        assertThat(response, notNullValue());
+        assertThat(response.<String>getInboundProperty("http.status"), Is.is("403"));
+    }
+
+    public static class CustomExceptionStrategy extends AbstractMessagingExceptionStrategy
+    {
+        public MuleEvent handleException(Exception ex, MuleEvent event)
+        {
+            event.getMessage().setOutboundProperty("http.status","403");
+            return event;
+        }
     }
 }
