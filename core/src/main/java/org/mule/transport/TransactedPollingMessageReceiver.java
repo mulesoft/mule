@@ -34,13 +34,19 @@ import javax.resource.spi.work.Work;
  */
 public abstract class TransactedPollingMessageReceiver extends AbstractPollingMessageReceiver
 {
-    /** time to sleep when there are no messages in the queue to avoid busy waiting **/
+    /**
+     * time to sleep when there are no messages in the queue to avoid busy waiting *
+     */
     private static final long NO_MESSAGES_SLEEP_TIME = Long.parseLong(System.getProperty("mule.vm.pollingSleepWaitTime", "50"));
 
-    /** determines whether messages will be received in a transaction template */
+    /**
+     * determines whether messages will be received in a transaction template
+     */
     private boolean receiveMessagesInTransaction = true;
 
-    /** determines whether Multiple receivers are created to improve throughput */
+    /**
+     * determines whether Multiple receivers are created to improve throughput
+     */
     private boolean useMultipleReceivers = true;
 
     public TransactedPollingMessageReceiver(Connector connector,
@@ -110,63 +116,70 @@ public abstract class TransactedPollingMessageReceiver extends AbstractPollingMe
     @Override
     public void poll() throws Exception
     {
-        ExecutionTemplate<MuleEvent> pt = createExecutionTemplate();
-
-        if (this.isReceiveMessagesInTransaction())
+        try
         {
-            if (hasNoMessages())
+            ExecutionTemplate<MuleEvent> pt = createExecutionTemplate();
+
+            if (this.isReceiveMessagesInTransaction())
             {
-                if (NO_MESSAGES_SLEEP_TIME > 0)
+                if (hasNoMessages())
                 {
-                    Thread.sleep(NO_MESSAGES_SLEEP_TIME);
-                }
-                return;
-            }
-            // Receive messages and process them in a single transaction
-            // Do not enable threading here, but several workers
-            // may have been started
-            ExecutionCallback<MuleEvent> cb = new ExecutionCallback<MuleEvent>()
-            {
-                @Override
-                public MuleEvent process() throws Exception
-                {
-                    // this is not ideal, but jdbc receiver returns a list of maps, not List<MuleMessage>
-                    List messages = getMessages();
-                    if (messages != null && messages.size() > 0)
+                    if (NO_MESSAGES_SLEEP_TIME > 0)
                     {
-                        for (Object message : messages)
+                        Thread.sleep(NO_MESSAGES_SLEEP_TIME);
+                    }
+                    return;
+                }
+                // Receive messages and process them in a single transaction
+                // Do not enable threading here, but several workers
+                // may have been started
+                ExecutionCallback<MuleEvent> cb = new ExecutionCallback<MuleEvent>()
+                {
+                    @Override
+                    public MuleEvent process() throws Exception
+                    {
+                        // this is not ideal, but jdbc receiver returns a list of maps, not List<MuleMessage>
+                        List messages = getMessages();
+                        if (messages != null && messages.size() > 0)
                         {
-                            processMessage(message);
+                            for (Object message : messages)
+                            {
+                                processMessage(message);
+                            }
+                        }
+                        return null;  //To change body of implemented methods use File | Settings | File Templates.
+                    }
+                };
+                pt.execute(cb);
+            }
+            else
+            {
+                // Receive messages and launch a worker for each message
+                List messages = getMessages();
+                if (messages != null && messages.size() > 0)
+                {
+                    final CountDownLatch countdown = new CountDownLatch(messages.size());
+                    for (Object message : messages)
+                    {
+                        try
+                        {
+                            this.getWorkManager().scheduleWork(
+                                    new MessageProcessorWorker(pt, countdown, message));
+                        }
+                        catch (Exception e)
+                        {
+                            countdown.countDown();
+                            throw e;
                         }
                     }
-                    return null;  //To change body of implemented methods use File | Settings | File Templates.
+                    countdown.await();
                 }
-            };
-            pt.execute(cb);
-        }
-        else
-        {
-            // Receive messages and launch a worker for each message
-            List messages = getMessages();
-            if (messages != null && messages.size() > 0)
-            {
-                final CountDownLatch countdown = new CountDownLatch(messages.size());
-                for (Object message : messages)
-                {
-                    try
-                    {
-                        this.getWorkManager().scheduleWork(
-                                new MessageProcessorWorker(pt, countdown, message));
-                    }
-                    catch (Exception e)
-                    {
-                        countdown.countDown();
-                        throw e;
-                    }
-                }
-                countdown.await();
             }
+        }    catch (Exception e)
+        {
+            logger.error(e);
         }
+
     }
 
     /**
@@ -174,7 +187,7 @@ public abstract class TransactedPollingMessageReceiver extends AbstractPollingMe
      */
     protected boolean hasNoMessages()
     {
-        return  false;
+        return false;
     }
 
     protected class MessageProcessorWorker implements Work, ExecutionCallback<MuleEvent>

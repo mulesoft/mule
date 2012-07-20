@@ -70,6 +70,15 @@ public class RollbackMessagingExceptionStrategy extends TemplateMessagingExcepti
         return (exception instanceof MessageRedeliveredException);
     }
 
+    /**
+     * Always accept MessageRedeliveryException exceptions if this rollback exception strategy handles redelivery.
+     */
+    @Override
+    protected boolean acceptsEvent(MuleEvent event)
+    {
+        return event.getMessage().getExceptionPayload().getException() instanceof MessageRedeliveredException && this.hasMaxRedeliveryAttempts();
+    }
+
     @Override
     protected MuleEvent route(MuleEvent event, Exception t)
     {
@@ -87,6 +96,10 @@ public class RollbackMessagingExceptionStrategy extends TemplateMessagingExcepti
                 {
                     logFatal(event, t);
                 }
+            }
+            else
+            {
+                logger.info("Message redelivery exhausted. No redelivery exhausted actions configured. Message consumed.");
             }
         }
         else
