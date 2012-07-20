@@ -25,17 +25,34 @@ import org.mule.api.el.ExpressionLanguageExtension;
 import org.mule.api.expression.InvalidExpressionException;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.registry.RegistrationException;
+import org.mule.api.transformer.DataType;
 import org.mule.config.MuleManifest;
 import org.mule.el.context.AppContext;
 import org.mule.el.context.MessageContext;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.transformer.types.DataTypeFactory;
 
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.net.URI;
+import java.net.URL;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.regex.Pattern;
+
+import javax.activation.DataHandler;
+import javax.activation.MimeType;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -316,6 +333,32 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase
         assertEquals("Hello World!", evaluate("hello()"));
     }
 
+    @Test
+    public void defaultImports() throws InitialisationException, ClassNotFoundException, IOException
+    {
+        // java.io.*
+        assertEquals(InputStream.class, evaluate(InputStream.class.getSimpleName()));
+        assertEquals(FileReader.class, evaluate(FileReader.class.getSimpleName()));
+        // java.lang.*
+        assertEquals(Object.class, evaluate(Object.class.getSimpleName()));
+        assertEquals(System.class, evaluate(System.class.getSimpleName()));
+        // java.net.*
+        assertEquals(URI.class, evaluate(URI.class.getSimpleName()));
+        assertEquals(URL.class, evaluate(URL.class.getSimpleName()));
+        // java.util.*
+        assertEquals(Collection.class, evaluate(Collection.class.getSimpleName()));
+        assertEquals(List.class, evaluate(List.class.getSimpleName()));
+
+        assertEquals(BigDecimal.class, evaluate(BigDecimal.class.getSimpleName()));
+        assertEquals(BigInteger.class, evaluate(BigInteger.class.getSimpleName()));
+        assertEquals(DataHandler.class, evaluate(DataHandler.class.getSimpleName()));
+        assertEquals(MimeType.class, evaluate(MimeType.class.getSimpleName()));
+        assertEquals(Pattern.class, evaluate(Pattern.class.getSimpleName()));
+        assertEquals(DataType.class, evaluate(DataType.class.getSimpleName()));
+        assertEquals(DataTypeFactory.class, evaluate(DataTypeFactory.class.getSimpleName()));
+
+    }
+
     protected Object evaluate(String expression)
     {
         if (variant.equals(Variant.EXPRESSION_WITH_DELIMITER))
@@ -420,6 +463,62 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase
         {
             return "Hello World!";
         };
+    }
+
+    /**
+     * Scans all classes accessible from the context class loader which belong to the given package and
+     * subpackages.
+     * 
+     * @param packageName The base package
+     * @return The classes
+     * @throws ClassNotFoundException
+     * @throws IOException
+     */
+    private static Class[] getClasses(String packageName) throws ClassNotFoundException, IOException
+    {
+        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+        assert classLoader != null;
+        String path = packageName.replace('.', '/');
+        Enumeration<URL> resources = classLoader.getResources(path);
+        List<File> dirs = new ArrayList<File>();
+        while (resources.hasMoreElements())
+        {
+            URL resource = resources.nextElement();
+            dirs.add(new File(resource.getFile()));
+        }
+        ArrayList<Class> classes = new ArrayList<Class>();
+        for (File directory : dirs)
+        {
+            classes.addAll(findClasses(directory, packageName));
+        }
+        return classes.toArray(new Class[classes.size()]);
+    }
+
+    /**
+     * Recursive method used to find all classes in a given directory and subdirs.
+     * 
+     * @param directory The base directory
+     * @param packageName The package name for classes found inside the base directory
+     * @return The classes
+     * @throws ClassNotFoundException
+     */
+    private static List<Class> findClasses(File directory, String packageName) throws ClassNotFoundException
+    {
+        List<Class> classes = new ArrayList<Class>();
+        if (!directory.exists())
+        {
+            return classes;
+        }
+        File[] files = directory.listFiles();
+        for (File file : files)
+        {
+            if (file.getName().endsWith(".class"))
+            {
+                classes.add(Class.forName(packageName + '.'
+                                          + file.getName().substring(0, file.getName().length() - 6)));
+            }
+        }
+        return classes;
     }
 
 }

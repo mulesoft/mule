@@ -26,13 +26,10 @@ import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.IOUtils;
 
 import java.io.IOException;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Date;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.regex.Pattern;
 
 import javax.activation.DataHandler;
@@ -268,30 +265,22 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
         parserContext.getParserConfiguration().setClassLoader(null);
 
         // defaults imports
-        parserContext.addImport(Date.class);
-        parserContext.addImport(Collection.class);
-        parserContext.addImport(List.class);
-        parserContext.addImport(Map.class);
-        parserContext.addImport(Set.class);
-        parserContext.addImport(Boolean.class);
-        parserContext.addImport(Byte.class);
-        parserContext.addImport(Character.class);
-        parserContext.addImport(Float.class);
-        parserContext.addImport(Enum.class);
-        parserContext.addImport(Integer.class);
-        parserContext.addImport(Long.class);
-        parserContext.addImport(Math.class);
-        parserContext.addImport(Number.class);
-        parserContext.addImport(Object.class);
-        parserContext.addImport(Short.class);
-        parserContext.addImport(String.class);
-        parserContext.addImport(System.class);
-        parserContext.addImport(Calendar.class);
+
+        // JRE
+        parserContext.addPackageImport("java.io");
+        parserContext.addPackageImport("java.lang");
+        parserContext.addPackageImport("java.net");
+        parserContext.addPackageImport("java.util");
+        
+        parserContext.addImport(BigDecimal.class);
+        parserContext.addImport(BigInteger.class);
         parserContext.addImport(DataHandler.class);
-        parserContext.addImport(DataType.class);
-        parserContext.addImport(DataTypeFactory.class);
         parserContext.addImport(MimeType.class);
         parserContext.addImport(Pattern.class);
+        
+        // Mule
+        parserContext.addImport(DataType.class);
+        parserContext.addImport(DataTypeFactory.class);
     }
 
     public void setGlobalFunctionsString(String globalFunctionsString)
