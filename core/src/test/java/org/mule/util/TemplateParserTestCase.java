@@ -14,10 +14,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
-
-import com.sun.org.apache.xalan.internal.xsltc.compiler.Template;
 
 import java.util.ArrayList;
 import java.util.Collections;
