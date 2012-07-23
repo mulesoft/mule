@@ -206,6 +206,25 @@ public class TemplateParserTestCase extends AbstractMuleTestCase
     }
 
     @Test
+    public void muleParserManagesConcatenation()
+    {
+        TemplateParser tp = TemplateParser.createMuleStyleParser();
+
+        final String expectedResult = "'hi'+'world'";
+
+        String result = tp.parse(null, "#['hi'+'world']", new TemplateParser.TemplateCallback()
+        {
+            public Object match(String token)
+            {
+
+                return expectedResult;
+            }
+        });
+
+        assertEquals(expectedResult, result);
+    }
+
+    @Test
     public void muleParserDefaultConfiguration()
     {
         TemplateParser tp = TemplateParser.createMuleStyleParser();

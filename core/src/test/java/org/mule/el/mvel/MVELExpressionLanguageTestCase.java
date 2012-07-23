@@ -88,6 +88,7 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase
         // Literals
         assertEquals("hi", evaluate("'hi'"));
         assertEquals(4, evaluate("2*2"));
+        assertEquals("hiho", evaluate("'hi'+'ho'"));
 
         // Static context
         assertEquals(Calendar.getInstance().getTimeZone(), evaluate("server.timeZone"));
