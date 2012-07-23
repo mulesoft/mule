@@ -17,6 +17,8 @@ import static org.junit.Assert.assertTrue;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
+import com.sun.org.apache.xalan.internal.xsltc.compiler.Template;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -202,6 +204,38 @@ public class TemplateParserTestCase extends AbstractMuleTestCase
             }
         });
 
+        assertEquals(expectedResult, result);
+    }
+
+    @Test
+    public void muleParserManagesNestedSquareBrackets()
+    {
+        TemplateParser tp = TemplateParser.createMuleStyleParser();
+        final String expectedResult = "zero[one[two[three[four[five]]]]]";
+        String result = tp.parse(null, "#[zero[one[two[three[four[five]]]]]]", new TemplateParser.TemplateCallback()
+        {
+            @Override
+            public Object match(String token)
+            {
+                return expectedResult;
+            }
+        });
+        assertEquals(expectedResult, result);
+    }
+
+    @Test
+    public void muleParserManagesNestedExpressions()
+    {
+        TemplateParser tp = TemplateParser.createMuleStyleParser();
+        final String expectedResult = "zero#[one#[two#[three#[four#[five]]]]]";
+        String result = tp.parse(null, "#[zero#[one#[two#[three#[four#[five]]]]]]", new TemplateParser.TemplateCallback()
+        {
+            @Override
+            public Object match(String token)
+            {
+                return expectedResult;
+            }
+        });
         assertEquals(expectedResult, result);
     }
 

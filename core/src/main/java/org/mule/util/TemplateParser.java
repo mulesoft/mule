@@ -45,12 +45,9 @@ public final class TemplateParser
         // Such a complex regex is needed to support nested expressions, otherwise we
         // have to do this manually or using an ANTLR grammar etc.
 
-        // Support for 3 levels (2 nested)
+        // Support for 6 levels (5 nested)
         patterns.put(WIGGLY_MULE_TEMPLATE_STYLE, new PatternInfo(WIGGLY_MULE_TEMPLATE_STYLE,
-            "#\\[((?:#\\[(?:#\\[.*?\\]|\\[.*?\\]|.)*?\\]|\\[.*?\\]|.)*?)\\]", "#[", "]"));
-
-        // Support for 2 levels (1 nested)
-        // "#\\[((?:#\\[.*?\\]|\\[.*?\\]|.)*?)\\]"
+            "#\\[((?:#?\\[(?:#?\\[(?:#?\\[(?:#?\\[(?:#?\\[.*?\\]|.)*?\\]|.)*?\\]|.)*?\\]|.)*?\\]|.)*?)\\]", "#[", "]"));
     }
 
     /**
