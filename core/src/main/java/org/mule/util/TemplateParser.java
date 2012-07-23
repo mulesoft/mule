@@ -165,7 +165,7 @@ public final class TemplateParser
             }
             else
             {
-                String matchRegex = escape(match);
+                String matchRegex = Pattern.quote(match);
                 String valueString = value.toString();
                 //need to escape $ as they resolve into group references, escaping them was not enough
                 //This smells a bit like a hack, but one way or another these characters need to be escaped
@@ -248,44 +248,6 @@ public final class TemplateParser
             map.put(entry.getKey(), parse(callback, entry.getValue().toString()));
         }
         return map;
-    }
-
-    private String escape(String string)
-    {
-        int length = string.length();
-        if (length == 0)
-        {
-            // nothing to do
-            return string;
-        }
-        else
-        {
-            StringBuffer buffer = new StringBuffer(length * 2);
-            for (int i = 0; i < length; i++)
-            {
-                char currentCharacter = string.charAt(i);
-                switch (currentCharacter)
-                {
-                    case '[':
-                    case ']':
-                    case '{':
-                    case '}':
-                    case '(':
-                    case ')':
-                    case '$':
-                    case '#':
-                    case '*':
-                    case '?':
-                    case '|':
-                    case '+':
-                        buffer.append("\\");
-                        //$FALL-THROUGH$ to append original character
-                    default:
-                        buffer.append(currentCharacter);
-                }
-            }
-            return buffer.toString();
-        }
     }
 
     public PatternInfo getStyle()
