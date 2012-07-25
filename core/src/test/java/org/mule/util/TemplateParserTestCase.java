@@ -258,6 +258,24 @@ public class TemplateParserTestCase extends AbstractMuleTestCase
     }
 
     @Test
+    public void muleParserManagesNullExpressions()
+    {
+        TemplateParser tp = TemplateParser.createMuleStyleParser();
+
+        final String expectedResult = "null";
+
+        String result = tp.parse(null, "#[expression that returns null]", new TemplateParser.TemplateCallback()
+        {
+            public Object match(String token)
+            {
+                return null;
+            }
+        });
+
+        assertEquals(expectedResult, result);
+    }
+
+    @Test
     public void muleParserDefaultConfiguration()
     {
         TemplateParser tp = TemplateParser.createMuleStyleParser();
