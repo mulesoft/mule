@@ -15,6 +15,7 @@ import org.mule.api.context.MuleContextAware;
 import org.mule.config.i18n.CoreMessages;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -29,7 +30,21 @@ public class PropertyPlaceholderProcessor extends PropertyPlaceholderConfigurer 
 {
     private MuleContext muleContext;
     private Map factories = new HashMap();
-    
+
+    public PropertyPlaceholderProcessor()
+    {
+        try
+        {
+            Field field = PropertyPlaceholderConfigurer.class.getDeclaredField("valueSeparator");
+            field.setAccessible(true);
+            field.set(this, null);
+        }
+        catch (Exception e)
+        {
+            throw new RuntimeException("Spring version not supported.");
+        }
+
+    }
 
     @Override
     protected Properties mergeProperties() throws IOException
