@@ -26,12 +26,7 @@ public class ExpressionRecipientList extends AbstractRecipientList
     public static final String DEFAULT_SELECTOR_EVALUATOR = "header";
     public static final String DEFAULT_SELECTOR_EXPRESSION = DEFAULT_SELECTOR_PROPERTY;
 
-    private ExpressionConfig expressionConfig;
-
-    public ExpressionRecipientList()
-    {
-        expressionConfig = new ExpressionConfig(DEFAULT_SELECTOR_EXPRESSION, DEFAULT_SELECTOR_EVALUATOR, null);
-    }
+    protected ExpressionConfig expressionConfig = new ExpressionConfig();
 
     @Override
     protected List getRecipients(MuleEvent event) throws CouldNotRouteOutboundMessageException
@@ -67,10 +62,6 @@ public class ExpressionRecipientList extends AbstractRecipientList
 
     public String getFullExpression()
     {
-        if (getEvaluator().equalsIgnoreCase("custom"))
-        {
-            setEvaluator(getCustomEvaluator());
-        }
         return expressionConfig.getFullExpression(muleContext.getExpressionManager());
     }
 
