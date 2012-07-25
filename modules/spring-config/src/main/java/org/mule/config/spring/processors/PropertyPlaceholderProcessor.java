@@ -29,7 +29,11 @@ public class PropertyPlaceholderProcessor extends PropertyPlaceholderConfigurer 
 {
     private MuleContext muleContext;
     private Map factories = new HashMap();
-    
+
+    public PropertyPlaceholderProcessor()
+    {
+        setValueSeparator(null);
+    }
 
     @Override
     protected Properties mergeProperties() throws IOException
