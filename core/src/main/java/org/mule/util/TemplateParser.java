@@ -33,6 +33,7 @@ public final class TemplateParser
     public static final String WIGGLY_MULE_TEMPLATE_STYLE = "mule";
 
     private static final String DOLLAR_ESCAPE = "@@@";
+    private static final String NULL_AS_STRING = "null";
 
     private static final Map<String, PatternInfo> patterns = new HashMap<String, PatternInfo>();
 
@@ -150,6 +151,10 @@ public final class TemplateParser
             if (callback != null)
             {
                 value = callback.match(propname);
+                if (value == null)
+                {
+                    value = NULL_AS_STRING;
+                }
             }
             else if (newProps != null)
             {
