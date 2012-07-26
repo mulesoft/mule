@@ -52,7 +52,7 @@ public class InboundAttachmentMapContext extends AbstractMapContext<String, Data
     @Override
     public Set<String> keySet()
     {
-        return message.getInboundPropertyNames();
+        return message.getInboundAttachmentNames();
     }
 
     @Override

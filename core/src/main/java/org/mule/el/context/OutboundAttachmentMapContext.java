@@ -1,5 +1,5 @@
 /*
- * $Id: OutboundAttachmentMapContext.java 23971 2012-03-08 00:48:02Z dfeist $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  *
@@ -62,7 +62,7 @@ public class OutboundAttachmentMapContext extends AbstractMapContext<String, Dat
     @Override
     public Set<String> keySet()
     {
-        return message.getOutboundPropertyNames();
+        return message.getOutboundAttachmentNames();
     }
 
     @Override
