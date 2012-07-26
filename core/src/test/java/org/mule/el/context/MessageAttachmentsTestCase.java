@@ -11,17 +11,22 @@
 package org.mule.el.context;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 
+import java.util.Collection;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 import javax.activation.DataHandler;
 
 import junit.framework.Assert;
 
+import org.apache.commons.collections.keyvalue.DefaultMapEntry;
 import org.junit.Test;
 import org.mockito.Mockito;
 
@@ -123,7 +128,6 @@ public class MessageAttachmentsTestCase extends AbstractELTestCase
     public void inboundSize() throws Exception
     {
         DefaultMuleMessage message = new DefaultMuleMessage("", muleContext);
-        Mockito.mock(DataHandler.class);
         message.addInboundAttachment("foo", Mockito.mock(DataHandler.class));
         message.addInboundAttachment("bar", Mockito.mock(DataHandler.class));
         assertEquals(2, evaluate("message.inboundAttachments.size()", message));
@@ -133,7 +137,6 @@ public class MessageAttachmentsTestCase extends AbstractELTestCase
     public void inboundKeySet() throws Exception
     {
         DefaultMuleMessage message = new DefaultMuleMessage("", muleContext);
-        Mockito.mock(DataHandler.class);
         message.addInboundAttachment("foo", Mockito.mock(DataHandler.class));
         message.addInboundAttachment("bar", Mockito.mock(DataHandler.class));
         assertEquals("foo", evaluate("message.inboundAttachments.keySet().toArray()[0]", message));
@@ -144,7 +147,6 @@ public class MessageAttachmentsTestCase extends AbstractELTestCase
     public void inboundContainsKey() throws Exception
     {
         DefaultMuleMessage message = new DefaultMuleMessage("", muleContext);
-        Mockito.mock(DataHandler.class);
         message.addInboundAttachment("foo", Mockito.mock(DataHandler.class));
         Assert.assertTrue((Boolean)evaluate("message.inboundAttachments.containsKey('foo')", message));
         Assert.assertFalse((Boolean)evaluate("message.inboundAttachments.containsKey('bar')", message));
@@ -153,27 +155,50 @@ public class MessageAttachmentsTestCase extends AbstractELTestCase
     @Test
     public void inboundContainsValue() throws Exception
     {
-        assertUnsupportedOperation("message.inboundAttachments.containsValue('bar')",
-            Mockito.mock(MuleMessage.class));
+        DefaultMuleMessage message = new DefaultMuleMessage("", muleContext);
+        DataHandler valA = Mockito.mock(DataHandler.class);
+        message.addInboundAttachment("foo", valA);
+        message.setPayload(valA);
+        assertTrue((Boolean)evaluate("message.inboundAttachments.containsValue(payload)", message));
+        assertFalse((Boolean)evaluate("message.inboundAttachments.containsValue('bar')", message));
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     public void inboundEntrySet() throws Exception
     {
-        assertUnsupportedOperation("message.inboundAttachments.entrySet()", Mockito.mock(MuleMessage.class));
+        DefaultMuleMessage message = new DefaultMuleMessage("", muleContext);
+        DataHandler valA = Mockito.mock(DataHandler.class);
+        DataHandler valB = Mockito.mock(DataHandler.class);
+        message.addInboundAttachment("foo", valA);
+        message.addInboundAttachment("bar", valB);
+        Set<Map.Entry<String, DataHandler>> entrySet = (Set<Entry<String, DataHandler>>)evaluate(
+            "message.inboundAttachments.entrySet()", message);
+        assertEquals(2, entrySet.size());
+        entrySet.contains(new DefaultMapEntry("foo", valA));
+        entrySet.contains(new DefaultMapEntry("bar", valB));
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     public void inboundValues() throws Exception
     {
-        assertUnsupportedOperation("message.inboundAttachments.values()", Mockito.mock(MuleMessage.class));
+        DefaultMuleMessage message = new DefaultMuleMessage("", muleContext);
+        DataHandler valA = Mockito.mock(DataHandler.class);
+        DataHandler valB = Mockito.mock(DataHandler.class);
+        message.addInboundAttachment("foo", valA);
+        message.addInboundAttachment("bar", valB);
+        Collection<DataHandler> values = (Collection<DataHandler>)evaluate(
+            "message.inboundAttachments.values()", message);
+        assertEquals(2, values.size());
+        values.contains(valA);
+        values.contains(valB);
     }
 
     @Test
     public void inboundIsEmpty() throws Exception
     {
         DefaultMuleMessage message = new DefaultMuleMessage("", muleContext);
-        Mockito.mock(DataHandler.class);
         Assert.assertTrue((Boolean)evaluate("message.inboundAttachments.isEmpty()", message));
         message.addInboundAttachment("foo", Mockito.mock(DataHandler.class));
         message.addInboundAttachment("bar", Mockito.mock(DataHandler.class));
@@ -199,7 +224,6 @@ public class MessageAttachmentsTestCase extends AbstractELTestCase
     public void outboundClear() throws Exception
     {
         DefaultMuleMessage message = new DefaultMuleMessage("", muleContext);
-        Mockito.mock(DataHandler.class);
         message.addOutboundAttachment("foo", Mockito.mock(DataHandler.class));
         message.addOutboundAttachment("bar", Mockito.mock(DataHandler.class));
         evaluate("message.outboundAttachments.clear()", message);
@@ -210,7 +234,6 @@ public class MessageAttachmentsTestCase extends AbstractELTestCase
     public void outboundSize() throws Exception
     {
         DefaultMuleMessage message = new DefaultMuleMessage("", muleContext);
-        Mockito.mock(DataHandler.class);
         message.addOutboundAttachment("foo", Mockito.mock(DataHandler.class));
         message.addOutboundAttachment("bar", Mockito.mock(DataHandler.class));
         assertEquals(2, evaluate("message.outboundAttachments.size()", message));
@@ -220,7 +243,6 @@ public class MessageAttachmentsTestCase extends AbstractELTestCase
     public void outboundKeySet() throws Exception
     {
         DefaultMuleMessage message = new DefaultMuleMessage("", muleContext);
-        Mockito.mock(DataHandler.class);
         message.addOutboundAttachment("foo", Mockito.mock(DataHandler.class));
         message.addOutboundAttachment("bar", Mockito.mock(DataHandler.class));
         assertEquals("foo", evaluate("message.outboundAttachments.keySet().toArray()[0]", message));
@@ -231,7 +253,6 @@ public class MessageAttachmentsTestCase extends AbstractELTestCase
     public void outboundContainsKey() throws Exception
     {
         DefaultMuleMessage message = new DefaultMuleMessage("", muleContext);
-        Mockito.mock(DataHandler.class);
         message.addOutboundAttachment("foo", Mockito.mock(DataHandler.class));
         Assert.assertTrue((Boolean)evaluate("message.outboundAttachments.containsKey('foo')", message));
         Assert.assertFalse((Boolean)evaluate("message.outboundAttachments.containsKey('bar')", message));
@@ -240,27 +261,50 @@ public class MessageAttachmentsTestCase extends AbstractELTestCase
     @Test
     public void outboundContainsValue() throws Exception
     {
-        assertUnsupportedOperation("message.inboundAttachments.containsValue('bar')",
-            Mockito.mock(MuleMessage.class));
+        DefaultMuleMessage message = new DefaultMuleMessage("", muleContext);
+        DataHandler valA = Mockito.mock(DataHandler.class);
+        message.addOutboundAttachment("foo", valA);
+        message.setPayload(valA);
+        Assert.assertTrue((Boolean)evaluate("message.outboundAttachments.containsValue(payload)", message));
+        Assert.assertFalse((Boolean)evaluate("message.outboundAttachments.containsValue('bar')", message));
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     public void outboundEntrySet() throws Exception
     {
-        assertUnsupportedOperation("message.inboundAttachments.entrySet()", Mockito.mock(MuleMessage.class));
+        DefaultMuleMessage message = new DefaultMuleMessage("", muleContext);
+        DataHandler valA = Mockito.mock(DataHandler.class);
+        DataHandler valB = Mockito.mock(DataHandler.class);
+        message.addOutboundAttachment("foo", valA);
+        message.addOutboundAttachment("bar", valB);
+        Set<Map.Entry<String, DataHandler>> entrySet = (Set<Entry<String, DataHandler>>)evaluate(
+            "message.outboundAttachments.entrySet()", message);
+        assertEquals(2, entrySet.size());
+        entrySet.contains(new DefaultMapEntry("foo", valA));
+        entrySet.contains(new DefaultMapEntry("bar", valB));
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     public void outboundValues() throws Exception
     {
-        assertUnsupportedOperation("message.inboundAttachments.values()", Mockito.mock(MuleMessage.class));
+        DefaultMuleMessage message = new DefaultMuleMessage("", muleContext);
+        DataHandler valA = Mockito.mock(DataHandler.class);
+        DataHandler valB = Mockito.mock(DataHandler.class);
+        message.addOutboundAttachment("foo", valA);
+        message.addOutboundAttachment("bar", valB);
+        Collection<DataHandler> values = (Collection<DataHandler>)evaluate(
+            "message.outboundAttachments.values()", message);
+        assertEquals(2, values.size());
+        values.contains(valA);
+        values.contains(valB);
     }
 
     @Test
     public void outboundIsEmpty() throws Exception
     {
         DefaultMuleMessage message = new DefaultMuleMessage("", muleContext);
-        Mockito.mock(DataHandler.class);
         Assert.assertTrue((Boolean)evaluate("message.outboundAttachments.isEmpty()", message));
         message.addOutboundAttachment("foo", Mockito.mock(DataHandler.class));
         message.addOutboundAttachment("bar", Mockito.mock(DataHandler.class));
@@ -283,7 +327,6 @@ public class MessageAttachmentsTestCase extends AbstractELTestCase
     public void outboundInboundRemove() throws Exception
     {
         DefaultMuleMessage message = new DefaultMuleMessage("", muleContext);
-        Mockito.mock(DataHandler.class);
         message.addOutboundAttachment("foo", Mockito.mock(DataHandler.class));
         Assert.assertFalse((Boolean)evaluate("message.outboundAttachments.isEmpty()", message));
         evaluate("message.outboundAttachments.remove('foo')", message);

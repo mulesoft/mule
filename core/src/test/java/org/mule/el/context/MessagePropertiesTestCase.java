@@ -17,12 +17,16 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.transport.PropertyScope;
 
+import java.util.Collection;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 import javax.activation.DataHandler;
 
 import junit.framework.Assert;
 
+import org.apache.commons.collections.keyvalue.DefaultMapEntry;
 import org.junit.Test;
 import org.mockito.Mockito;
 
@@ -151,21 +155,38 @@ public class MessagePropertiesTestCase extends AbstractELTestCase
     @Test
     public void inboundContainsValue() throws Exception
     {
-        assertUnsupportedOperation("message.inboundProperties.containsValue('bar'))",
-            Mockito.mock(MuleMessage.class));
+        DefaultMuleMessage message = new DefaultMuleMessage("", muleContext);
+        message.setInboundProperty("foo", "abc");
+        Assert.assertTrue((Boolean)evaluate("message.inboundProperties.containsValue('abc')", message));
+        Assert.assertFalse((Boolean)evaluate("message.inboundProperties.containsValue('xyz')", message));
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     public void inboundEntrySet() throws Exception
     {
-        assertUnsupportedOperation("message.inboundProperties.entrySet())", Mockito.mock(MuleMessage.class));
-
+        DefaultMuleMessage message = new DefaultMuleMessage("", muleContext);
+        message.setInboundProperty("foo", "abc");
+        message.setInboundProperty("bar", "xyz");
+        Set<Map.Entry<String, Object>> entrySet = (Set<Entry<String, Object>>)evaluate(
+            "message.inboundProperties.entrySet()", message);
+        assertEquals(2, entrySet.size());
+        entrySet.contains(new DefaultMapEntry("foo", "abc"));
+        entrySet.contains(new DefaultMapEntry("bar", "xyz"));
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     public void inboundValues() throws Exception
     {
-        assertUnsupportedOperation("message.inboundProperties.values())", Mockito.mock(MuleMessage.class));
+        DefaultMuleMessage message = new DefaultMuleMessage("", muleContext);
+        message.setInboundProperty("foo", "abc");
+        message.setInboundProperty("bar", "xyz");
+        Collection<DataHandler> values = (Collection<DataHandler>)evaluate(
+            "message.inboundProperties.values()", message);
+        assertEquals(2, values.size());
+        values.contains("abc");
+        values.contains("xyz");
     }
 
     @Test
@@ -232,20 +253,38 @@ public class MessagePropertiesTestCase extends AbstractELTestCase
     @Test
     public void outboundContainsValue() throws Exception
     {
-        assertUnsupportedOperation("message.outboundProperties.containsValue('bar')",
-            Mockito.mock(MuleMessage.class));
+        DefaultMuleMessage message = new DefaultMuleMessage("", muleContext);
+        message.setOutboundProperty("foo", "abc");
+        Assert.assertTrue((Boolean)evaluate("message.outboundProperties.containsValue('abc')", message));
+        Assert.assertFalse((Boolean)evaluate("message.outboundProperties.containsValue('xyz')", message));
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     public void outboundEntrySet() throws Exception
     {
-        assertUnsupportedOperation("message.outboundProperties.entrySet()", Mockito.mock(MuleMessage.class));
+        DefaultMuleMessage message = new DefaultMuleMessage("", muleContext);
+        message.setOutboundProperty("foo", "abc");
+        message.setOutboundProperty("bar", "xyz");
+        Set<Map.Entry<String, Object>> entrySet = (Set<Entry<String, Object>>)evaluate(
+            "message.outboundProperties.entrySet()", message);
+        assertEquals(2, entrySet.size());
+        entrySet.contains(new DefaultMapEntry("foo", "abc"));
+        entrySet.contains(new DefaultMapEntry("bar", "xyz"));
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     public void outboundValues() throws Exception
     {
-        assertUnsupportedOperation("message.outboundProperties.values()", Mockito.mock(MuleMessage.class));
+        DefaultMuleMessage message = new DefaultMuleMessage("", muleContext);
+        message.setOutboundProperty("foo", "abc");
+        message.setOutboundProperty("bar", "xyz");
+        Collection<DataHandler> values = (Collection<DataHandler>)evaluate(
+            "message.outboundProperties.values()", message);
+        assertEquals(2, values.size());
+        values.contains("abc");
+        values.contains("xyz");
     }
 
     @Test

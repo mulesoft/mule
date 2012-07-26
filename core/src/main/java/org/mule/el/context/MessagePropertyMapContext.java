@@ -28,23 +28,6 @@ public class MessagePropertyMapContext extends AbstractMapContext<String, Object
     }
 
     @Override
-    public void clear()
-    {
-        if (PropertyScope.INBOUND.equals(propertyScope))
-        {
-            throw new UnsupportedOperationException(CoreMessages.inboundMessagePropertiesImmutable()
-                .getMessage());
-        }
-        message.clearProperties(propertyScope);
-    }
-
-    @Override
-    public boolean containsKey(Object key)
-    {
-        return message.getPropertyNames(propertyScope).contains(key);
-    }
-
-    @Override
     public Object get(Object key)
     {
         if (!(key instanceof String))
@@ -52,12 +35,6 @@ public class MessagePropertyMapContext extends AbstractMapContext<String, Object
             return null;
         }
         return message.getProperty((String) key, propertyScope);
-    }
-
-    @Override
-    public Set<String> keySet()
-    {
-        return message.getPropertyNames(propertyScope);
     }
 
     @Override
@@ -93,6 +70,23 @@ public class MessagePropertyMapContext extends AbstractMapContext<String, Object
         {
             return message.removeProperty((String) key, propertyScope);
         }
+    }
+
+    @Override
+    public Set<String> keySet()
+    {
+        return message.getPropertyNames(propertyScope);
+    }
+
+    @Override
+    public void clear()
+    {
+        if (PropertyScope.INBOUND.equals(propertyScope))
+        {
+            throw new UnsupportedOperationException(CoreMessages.inboundMessagePropertiesImmutable()
+                .getMessage());
+        }
+        message.clearProperties(propertyScope);
     }
 
 }

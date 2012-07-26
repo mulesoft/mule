@@ -27,28 +27,6 @@ public class OutboundAttachmentMapContext extends AbstractMapContext<String, Dat
     }
 
     @Override
-    public void clear()
-    {
-        for (String name : message.getOutboundAttachmentNames())
-        {
-            try
-            {
-                message.removeOutboundAttachment(name);
-            }
-            catch (Exception e)
-            {
-                throw new MuleRuntimeException(e);
-            }
-        }
-    }
-
-    @Override
-    public boolean containsKey(Object key)
-    {
-        return message.getOutboundAttachmentNames().contains(key);
-    }
-
-    @Override
     public DataHandler get(Object key)
     {
         if (!(key instanceof String))
@@ -57,12 +35,6 @@ public class OutboundAttachmentMapContext extends AbstractMapContext<String, Dat
         }
 
         return message.getOutboundAttachment((String) key);
-    }
-
-    @Override
-    public Set<String> keySet()
-    {
-        return message.getOutboundAttachmentNames();
     }
 
     @Override
@@ -98,6 +70,12 @@ public class OutboundAttachmentMapContext extends AbstractMapContext<String, Dat
             throw new RuntimeException(e);
         }
         return previousValue;
+    }
+
+    @Override
+    public Set<String> keySet()
+    {
+        return message.getOutboundAttachmentNames();
     }
 
 }

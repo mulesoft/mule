@@ -27,19 +27,6 @@ public class InboundAttachmentMapContext extends AbstractMapContext<String, Data
     }
 
     @Override
-    public void clear()
-    {
-        throw new UnsupportedOperationException(CoreMessages.inboundMessageAttachmentsImmutable()
-            .getMessage());
-    }
-
-    @Override
-    public boolean containsKey(Object key)
-    {
-        return message.getInboundAttachmentNames().contains(key);
-    }
-
-    @Override
     public DataHandler get(Object key)
     {
         if (!(key instanceof String))
@@ -47,12 +34,6 @@ public class InboundAttachmentMapContext extends AbstractMapContext<String, Data
             return null;
         }
         return message.getInboundAttachment((String) key);
-    }
-
-    @Override
-    public Set<String> keySet()
-    {
-        return message.getInboundAttachmentNames();
     }
 
     @Override
@@ -66,6 +47,19 @@ public class InboundAttachmentMapContext extends AbstractMapContext<String, Data
     public DataHandler remove(Object key)
     {
         throw new UnsupportedOperationException(CoreMessages.inboundMessageAttachmentsImmutable(key)
+            .getMessage());
+    }
+
+    @Override
+    public Set<String> keySet()
+    {
+        return message.getInboundAttachmentNames();
+    }
+
+    @Override
+    public void clear()
+    {
+        throw new UnsupportedOperationException(CoreMessages.inboundMessageAttachmentsImmutable()
             .getMessage());
     }
 }
