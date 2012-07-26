@@ -58,6 +58,8 @@ public class DefaultMuleDeployer implements MuleDeployer
         }
         catch (Throwable t)
         {
+            app.dispose();
+
             if (t instanceof DeploymentException)
             {
                 // re-throw as is
