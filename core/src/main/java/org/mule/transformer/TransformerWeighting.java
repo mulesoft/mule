@@ -15,6 +15,8 @@ import org.mule.api.transformer.Transformer;
 
 import java.util.List;
 
+import org.apache.commons.beanutils.MethodUtils;
+
 /**
  * Given a {@link org.mule.api.transformer.Transformer} instance, an input class and output class
  * this object will create a weighting for a transformer. This weighthing can be used compare one transformer with
@@ -58,56 +60,53 @@ public class TransformerWeighting implements Comparable
     }
 
     /**
-     * THis is a very basic algorithm for creating a match rating for two classes.  An offset weighting
+     * This is a very basic algorithm for creating a match rating for two classes. An offset weighting
      * can also be passed in. Where w is weighting,
+     * if the classes are not assignable but the src is a primitive type, the w for the corresponding object type wil be returned,
      * if the classes match exactly, w+1 is returned,
      * if the classes are assignable and there is a direct equality to an interface on the class, w+2  is returned,
-     * if the classes are assignable but no direct interface match, w+3 is returned
-     * If the dest type is Object.class then w+4is returned. This is because matching on object will yeild a lot of options
-     * putting those that use the Object.class generic type should get pushed down the list
-     * If there a super class, that will get matched using the above criteria
+     * If there a super class, that will get matched using the above criteria but using w = w + 1
      * If there is no match -1 is returned
      *
-     * @param weighting an offset weighting, by defualt -1 should be used
+     * @param weighting an offset weighting, by default -1 should be used
      * @param src the src class being matched
      * @param dest the destination class to match to
      * @return a weighting where 0 would be an exact match, -1 would be no match and a positive integer that defines how close the match is
      */
     protected int getWeighting(int weighting, Class src, Class dest)
     {
-        int x = weighting + 1;
-        //If we are getting a match for object.class, we need to put it at the bottom of
-        //the matching list
-        if(dest.equals(Object.class))
+        if (!dest.isAssignableFrom(src))
         {
-            return x + 3;
+            if (src.isPrimitive())
+            {
+                return getWeighting(weighting, MethodUtils.getPrimitiveWrapper(src), dest);
+            }
+
+            return -1;
         }
 
         if (dest.equals(src))
         {
-            return x;
+            return weighting + 1;
         }
-        else if (!dest.isAssignableFrom(src))
-        {
-            return -1;
-        }
-        else if (src.getInterfaces().length > 0)
+
+        if (dest.isInterface() && src.getInterfaces().length > 0)
         {
             for (int i = 0; i < src.getInterfaces().length; i++)
             {
                 Class aClass = src.getInterfaces()[i];
                 if (dest.equals(aClass))
                 {
-                    return x + 1;
+                    return weighting + 2;
                 }
             }
-            return x + 2;
         }
-        else if (src.getSuperclass() != null)
-        {
-            return getWeighting(x, src.getSuperclass(), dest);
 
+        if (src.getSuperclass() != null)
+        {
+            return getWeighting(weighting + 1, src.getSuperclass(), dest);
         }
+
         return -1;
     }
 
