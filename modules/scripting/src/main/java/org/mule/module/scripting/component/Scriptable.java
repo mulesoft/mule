@@ -12,6 +12,7 @@ package org.mule.module.scripting.component;
 
 import org.mule.DefaultMuleEventContext;
 import org.mule.DefaultMuleMessage;
+import org.mule.api.ExceptionPayload;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
@@ -240,11 +241,12 @@ public class Scriptable implements Initialisable, MuleContextAware
         bindings.put("flowVars", new MesssagePropertyMap(message, PropertyScope.INVOCATION));
         bindings.put("sessionVars", new MesssagePropertyMap(message, PropertyScope.SESSION));
 
+        Throwable exception = null;
         if (message.getExceptionPayload() != null)
         {
-            bindings.put("exception",
-                ExceptionHelper.getNonMuleException(message.getExceptionPayload().getException()));
+            exception = ExceptionHelper.getNonMuleException(message.getExceptionPayload().getException());
         }
+        bindings.put("exception", exception);
     }
 
     private void populateVariablesInOrder(Bindings bindings, MuleMessage message)

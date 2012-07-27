@@ -110,7 +110,6 @@ public class GroovyContextTestCase extends FunctionalTestCase
     }
 
     @Test
-    @Ignore(value = "See MULE-6209")
     public void noException() throws Exception
     {
         runScenario("noException");
