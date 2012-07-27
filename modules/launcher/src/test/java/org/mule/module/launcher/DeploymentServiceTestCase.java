@@ -17,7 +17,13 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-
+import static org.junit.Assert.fail;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import org.mule.MuleCoreExtension;
 import org.mule.api.MuleContext;
 import org.mule.api.component.JavaComponent;
@@ -36,7 +42,6 @@ import org.mule.tck.probe.Prober;
 import org.mule.util.CollectionUtils;
 import org.mule.util.FileUtils;
 import org.mule.util.StringUtils;
-import org.mule.util.concurrent.Latch;
 
 import java.io.File;
 import java.io.IOException;
@@ -47,7 +52,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.io.filefilter.DirectoryFileFilter;
 import org.junit.Test;
@@ -60,10 +64,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     protected File muleHome;
     protected File appsDir;
     protected DeploymentService deploymentService;
-    // these latches are re-created during the test, thus need to be declared volatile
-    protected volatile Latch deployLatch;
-    protected volatile Latch installLatch;
-    protected volatile Latch undeployLatch;
+    protected DeploymentListener deploymentListener;
 
     @Override
     protected void doSetUp() throws Exception
@@ -78,11 +79,9 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
         new File(muleHome, "lib/shared/default").mkdirs();
 
+        deploymentListener = mock(DeploymentListener.class);
         deploymentService = new DeploymentService(new HashMap<Class<? extends MuleCoreExtension>, MuleCoreExtension>());
-        deploymentService.setDeployer(new TestDeployer());
-        installLatch = new Latch();
-        deployLatch = new Latch();
-        undeployLatch = new Latch();
+        deploymentService.addDeploymentListener(deploymentListener);
     }
 
     @Override
@@ -111,7 +110,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
         deploymentService.start();
 
-        assertTrue("Deployer never invoked", deployLatch.await(LATCH_TIMEOUT, TimeUnit.MILLISECONDS));
+        assertDeploymentSuccess(deploymentListener, "priviledged-dummy-app");
 
         assertAppsDir(NONE, new String[] {"priviledged-dummy-app"}, true);
 
@@ -136,8 +135,8 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
         deploymentService.start();
 
-        // a basic latch isn't ideal here, as there are 2 apps to deploy
-        assertTrue("Deployer never invoked", deployLatch.await(LATCH_TIMEOUT, TimeUnit.MILLISECONDS));
+        assertDeploymentSuccess(deploymentListener, "priviledged-dummy-app");
+        assertDeploymentSuccess(deploymentListener, "dummy-app");
 
         assertAppsDir(NONE, new String[] {"dummy-app", "priviledged-dummy-app"}, true);
 
@@ -168,7 +167,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
         deploymentService.start();
 
-        assertTrue("Deployer never invoked", deployLatch.await(LATCH_TIMEOUT, TimeUnit.MILLISECONDS));
+        assertDeploymentSuccess(deploymentListener, "dummy-app");
 
         assertAppsDir(NONE, new String[] {"dummy-app"}, true);
 
@@ -192,15 +191,16 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
         deploymentService.start();
 
-        assertTrue("Deployer never invoked", deployLatch.await(LATCH_TIMEOUT, TimeUnit.MILLISECONDS));
+        assertDeploymentSuccess(deploymentListener, "dummy-app");
+
         assertAppsDir(NONE, new String[] {"dummy-app"}, true);
         assertEquals("Application has not been properly registered with Mule", 1, deploymentService.getApplications().size());
 
-        // set up a new deployment latch (can't reuse the old one)
-        deployLatch = new Latch();
+        reset(deploymentListener);
         addAppArchive(url);
-        assertTrue("Undeploy never invoked", undeployLatch.await(LATCH_TIMEOUT, TimeUnit.MILLISECONDS));
-        assertTrue("Deployer never invoked", deployLatch.await(LATCH_TIMEOUT, TimeUnit.MILLISECONDS));
+
+        assertUndeploymentSuccess(deploymentListener, "dummy-app");
+        assertDeploymentSuccess(deploymentListener, "dummy-app");
         assertEquals("Application has not been properly registered with Mule", 1, deploymentService.getApplications().size());
         assertAppsDir(NONE, new String[]{"dummy-app"}, true);
     }
@@ -229,10 +229,8 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
         deploymentService.start();
 
-        assertTrue("Install never invoked", installLatch.await(LATCH_TIMEOUT, TimeUnit.MILLISECONDS));
-
-        // Resets the latch to detect a new attempt to deploy the zip file
-        installLatch = new Latch();
+        assertDeploymentFailure(deploymentListener, "broken-app.zip");
+        reset(deploymentListener);
 
         // let the file system's write-behind cache commit the delete operation?
         Thread.sleep(1000);
@@ -249,7 +247,14 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         assertTrue("Invalid lastModified value for file URL.", zombie.getValue() != -1);
 
         // Checks that the invalid zip was not deployed again
-        assertFalse("Install was invoked again for the broken application file", installLatch.await(LATCH_TIMEOUT, TimeUnit.MILLISECONDS));
+        try
+        {
+            assertDeploymentFailure(deploymentListener, "broken-app.zip");
+            fail("Install was invoked again for the broken application file");
+        }
+        catch (AssertionError expected)
+        {
+        }
     }
 
     @Test
@@ -259,14 +264,8 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         assertNotNull("Test app file not found " + url, url);
         addAppArchive(url, "app with spaces.zip");
 
-        try
-        {
-            deploymentService.start();
-        }
-        catch (DeploymentInitException e)
-        {
-            assertTrue(e.getMessage().contains("may not contain spaces"));
-        }
+        deploymentService.start();
+        assertDeploymentFailure(deploymentListener, "app with spaces.zip");
 
         // zip stays intact, no app dir created
         assertAppsDir(new String[] {"app with spaces.zip"}, NONE, true);
@@ -288,13 +287,14 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
         deploymentService.start();
 
-        assertTrue("Deployer never invoked", deployLatch.await(LATCH_TIMEOUT, TimeUnit.MILLISECONDS));
-        deployLatch = new Latch();
+        assertDeploymentSuccess(deploymentListener, "empty-app.zip");
+        reset(deploymentListener);
+
         assertAppsDir(NONE, new String[] {"empty-app.zip"}, true);
         assertEquals("Application has not been properly registered with Mule", 1, deploymentService.getApplications().size());
 
         // Checks that the empty-app.zip folder is not processed as a zip file
-        assertNoDeploymentInvoked();
+        assertNoDeploymentInvoked(deploymentListener);
     }
 
     @Test
@@ -312,8 +312,9 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
         deploymentService.start();
 
-        assertTrue("Deployer never invoked", deployLatch.await(LATCH_TIMEOUT, TimeUnit.MILLISECONDS));
-
+        assertDeploymentSuccess(deploymentListener, "1");
+        assertDeploymentSuccess(deploymentListener, "2");
+        assertDeploymentSuccess(deploymentListener, "3");
         assertAppsDir(NONE, new String[] {"1", "2", "3"}, true);
 
         // When apps are passed as -app app1:app2:app3 the startup order matters
@@ -338,14 +339,87 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
         deploymentService.start();
 
-        assertTrue("Deployer never invoked", deployLatch.await(LATCH_TIMEOUT, TimeUnit.MILLISECONDS));
+        assertDeploymentSuccess(deploymentListener, "dummy-app");
         assertAppsDir(NONE, new String[] {"dummy-app"}, true);
 
         List<Application> applications = deploymentService.getApplications();
         assertEquals(1, applications.size());
     }
 
-    private void assertNoDeploymentInvoked()
+    private void assertDeploymentSuccess(final DeploymentListener listener, final String appName)
+    {
+        Prober prober = new PollingProber(LATCH_TIMEOUT, 100);
+        prober.check(new Probe()
+        {
+            public boolean isSatisfied()
+            {
+                try{
+                    verify(listener, times(1)).onDeploymentSuccess(appName);
+                    return true;
+                }
+                catch (AssertionError e)
+                {
+                    return false;
+                }
+            }
+
+            public String describeFailure()
+            {
+                return "Failed to deploy application: " + appName;
+            }
+        });
+    }
+
+
+    private void assertUndeploymentSuccess(final DeploymentListener listener, final String appName)
+    {
+        Prober prober = new PollingProber(LATCH_TIMEOUT, 100);
+        prober.check(new Probe()
+        {
+            public boolean isSatisfied()
+            {
+                try{
+                    verify(listener, times(1)).onUndeploymentSuccess(appName);
+                    return true;
+                }
+                catch (AssertionError e)
+                {
+                    return false;
+                }
+            }
+
+            public String describeFailure()
+            {
+                return "Failed to undeploy application: " + appName;
+            }
+        });
+    }
+
+    private void assertDeploymentFailure(final DeploymentListener listener, final String appName)
+    {
+        Prober prober = new PollingProber(LATCH_TIMEOUT, 100);
+        prober.check(new Probe()
+        {
+            public boolean isSatisfied()
+            {
+                try{
+                    verify(listener, times(1)).onDeploymentFailure(eq(appName), any(Throwable.class));
+                    return true;
+                }
+                catch (AssertionError e)
+                {
+                    return false;
+                }
+            }
+
+            public String describeFailure()
+            {
+                return "Application deployment was supposed to fail for: " + appName;
+            }
+        });
+    }
+
+    private void assertNoDeploymentInvoked(final DeploymentListener deploymentListener)
     {
         //TODO(pablo.kraan): look for a better way to test this
         boolean invoked;
@@ -356,12 +430,14 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
             {
                 public boolean isSatisfied()
                 {
-                    return deploymentService.getZombieMap().size() == 1;
+                    verify(deploymentListener, times(1)).onDeploymentStart(any(String.class));
+
+                    return true;
                 }
 
                 public String describeFailure()
                 {
-                    return "App was never redeployed";
+                    return "No deployment has started";
                 }
             });
 
@@ -369,10 +445,10 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         }
         catch (AssertionError e)
         {
-           invoked = false;
+            invoked = false;
         }
 
-        assertFalse("Deployer was invoked", invoked);
+        assertFalse("Deployer was started", invoked);
     }
 
     /**
@@ -420,50 +496,5 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         final File tempFile = new File(appsDir, tempFileName);
         FileUtils.copyURLToFile(url, tempFile);
         tempFile.renameTo(new File(StringUtils.removeEnd(tempFile.getAbsolutePath(), ".part")));
-    }
-
-
-    private class TestDeployer implements MuleDeployer
-    {
-
-        final DefaultMuleDeployer delegate;
-
-        public TestDeployer()
-        {
-            delegate = new DefaultMuleDeployer();
-            delegate.setApplicationFactory(deploymentService.getAppFactory());
-        }
-
-        @Override
-        public void deploy(Application app)
-        {
-            System.out.println("DeploymentServiceTestCase$TestDeployer.deploy");
-            delegate.deploy(app);
-            deployLatch.release();
-        }
-
-        @Override
-        public void undeploy(Application app)
-        {
-            System.out.println("DeploymentServiceTestCase$TestDeployer.undeploy");
-            delegate.undeploy(app);
-            undeployLatch.release();
-        }
-
-        @Override
-        public Application installFromAppDir(String packedMuleAppFileName) throws IOException
-        {
-            installLatch.release();
-            System.out.println("DeploymentServiceTestCase$TestDeployer.installFromAppDir");
-            return delegate.installFromAppDir(packedMuleAppFileName);
-        }
-
-        @Override
-        public Application installFrom(URL url) throws IOException
-        {
-            installLatch.release();
-            System.out.println("DeploymentServiceTestCase$TestDeployer.installFrom");
-            return delegate.installFrom(url);
-        }
     }
 }
