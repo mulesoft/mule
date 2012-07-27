@@ -58,8 +58,9 @@ import org.junit.Test;
 
 public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 {
-    protected static final int LATCH_TIMEOUT = 20000;
+    protected static final int DEPLOYMENT_TIMEOUT = 20000;
     protected static final String[] NONE = new String[0];
+    protected static final int ONE_HOUR_IN_MILLISECONDS = 3600000;
 
     protected File muleHome;
     protected File appsDir;
@@ -346,9 +347,27 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         assertEquals(1, applications.size());
     }
 
+    @Test
+    public void testTracksAppConfigUpdateTime() throws Exception
+    {
+        final URL url = getClass().getResource("/dummy-app.zip");
+        File appFolder = new File(appsDir.getPath(), "dummy-app");
+        FileUtils.unzip(new File(url.toURI()), appFolder);
+
+        // Sets a modification time in the future
+        File configFile = new File(appFolder, "mule-config.xml");
+        configFile.setLastModified(System.currentTimeMillis() + ONE_HOUR_IN_MILLISECONDS);
+
+        deploymentService.start();
+        assertDeploymentSuccess(deploymentListener, "dummy-app");
+        reset(deploymentListener);
+
+        assertNoDeploymentInvoked(deploymentListener);
+    }
+
     private void assertDeploymentSuccess(final DeploymentListener listener, final String appName)
     {
-        Prober prober = new PollingProber(LATCH_TIMEOUT, 100);
+        Prober prober = new PollingProber(DEPLOYMENT_TIMEOUT, 100);
         prober.check(new Probe()
         {
             public boolean isSatisfied()
@@ -373,7 +392,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
     private void assertUndeploymentSuccess(final DeploymentListener listener, final String appName)
     {
-        Prober prober = new PollingProber(LATCH_TIMEOUT, 100);
+        Prober prober = new PollingProber(DEPLOYMENT_TIMEOUT, 100);
         prober.check(new Probe()
         {
             public boolean isSatisfied()
@@ -397,7 +416,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
     private void assertDeploymentFailure(final DeploymentListener listener, final String appName)
     {
-        Prober prober = new PollingProber(LATCH_TIMEOUT, 100);
+        Prober prober = new PollingProber(DEPLOYMENT_TIMEOUT, 100);
         prober.check(new Probe()
         {
             public boolean isSatisfied()
@@ -430,9 +449,15 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
             {
                 public boolean isSatisfied()
                 {
-                    verify(deploymentListener, times(1)).onDeploymentStart(any(String.class));
-
-                    return true;
+                    try
+                    {
+                        verify(deploymentListener, times(1)).onDeploymentStart(any(String.class));
+                        return true;
+                    }
+                    catch (AssertionError e)
+                    {
+                        return false;
+                    }
                 }
 
                 public String describeFailure()
@@ -448,7 +473,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
             invoked = false;
         }
 
-        assertFalse("Deployer was started", invoked);
+        assertFalse("A deployment was started", invoked);
     }
 
     /**
