@@ -13,16 +13,19 @@ package org.mule.module.launcher;
 import java.io.File;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 public abstract class AbstractFileWatcher implements Runnable
 {
+
     protected Log logger = LogFactory.getLog(getClass());
 
-    private long timeStamp;
     private Collection<File> files;
+    private Map<File, Long> timestamps = new HashMap<File, Long>();
 
     public AbstractFileWatcher(File file)
     {
@@ -32,28 +35,32 @@ public abstract class AbstractFileWatcher implements Runnable
     public AbstractFileWatcher(Collection<File> files)
     {
         this.files = files;
-        this.timeStamp = System.currentTimeMillis();
+
+        for (File file : files)
+        {
+            timestamps.put(file, file.lastModified());
+        }
     }
 
     @Override
     public final void run()
     {
-        long lastTimeStamp = timeStamp;
         File latestFile = null;
 
         for (File file : files)
         {
-            long timestamp = file.lastModified();
-            if (timestamp > lastTimeStamp)
+            long originalTimestamp = timestamps.get(file);
+            long currentTimestamp = file.lastModified();
+
+            if (originalTimestamp != currentTimestamp)
             {
-                lastTimeStamp = timeStamp;
+                timestamps.put(file, currentTimestamp);
                 latestFile = file;
             }
         }
 
         if (latestFile != null)
         {
-            this.timeStamp = lastTimeStamp;
             try
             {
                 onChange(latestFile);
