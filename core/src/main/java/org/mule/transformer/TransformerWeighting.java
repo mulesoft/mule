@@ -62,8 +62,9 @@ public class TransformerWeighting implements Comparable
     /**
      * This is a very basic algorithm for creating a match rating for two classes. An offset weighting
      * can also be passed in. Where w is weighting,
-     * if the classes are not assignable but the src is a primitive type, the w for the corresponding object type wil be returned,
-     * if the classes match exactly, w+1 is returned,
+     * if the classes are not assignable but the src is a primitive type, the w for the corresponding object type will be returned, otherwise return -1
+     * if the classes match exactly and dest is Object then w+3 is returned
+     * if the classes match exactly and dest is not Object then w+1 is returned
      * if the classes are assignable and there is a direct equality to an interface on the class, w+2  is returned,
      * If there a super class, that will get matched using the above criteria but using w = w + 1
      * If there is no match -1 is returned
@@ -87,7 +88,14 @@ public class TransformerWeighting implements Comparable
 
         if (dest.equals(src))
         {
-            return weighting + 1;
+            if (dest.equals(Object.class))
+            {
+                return weighting + 3;
+            }
+            else
+            {
+                return weighting + 1;
+            }
         }
 
         if (dest.isInterface() && src.getInterfaces().length > 0)
