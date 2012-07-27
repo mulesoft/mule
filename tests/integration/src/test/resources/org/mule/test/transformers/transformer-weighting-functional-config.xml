@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:file="http://www.mulesoft.org/schema/mule/file"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="
+          http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+          http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd
+          http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+
+    <file:file-to-string-transformer name="trans"/>
+
+    <flow name="test">
+        <vm:inbound-endpoint path="testInput" exchange-pattern="request-response"/>
+
+        <auto-transformer returnClass="org.w3c.dom.Document"/>
+        <auto-transformer returnClass="java.lang.String"/>
+    </flow>
+</mule>
+
