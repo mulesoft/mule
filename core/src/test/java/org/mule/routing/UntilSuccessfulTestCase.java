@@ -208,6 +208,14 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase
         untilSuccessful.start();
         ponderUntilEventProcessed(testEvent);
     }
+    
+    @Test
+    public void testPlainTextAckExpression() throws Exception
+    {
+        untilSuccessful.setAckExpression("ACK");
+        untilSuccessful.initialise();
+        untilSuccessful.start();
+    }
 
     private void ponderUntilEventProcessed(final MuleEvent testEvent)
         throws InterruptedException, MuleException

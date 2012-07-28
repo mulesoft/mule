@@ -10,12 +10,9 @@
 
 package org.mule.construct;
 
-import java.util.Collections;
-
-import org.apache.commons.lang.Validate;
 import org.mule.MessageExchangePattern;
-import org.mule.VoidMuleEvent;
 import org.mule.RequestContext;
+import org.mule.VoidMuleEvent;
 import org.mule.api.ExceptionPayload;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
@@ -39,6 +36,10 @@ import org.mule.processor.AbstractInterceptingMessageProcessor;
 import org.mule.processor.ResponseMessageProcessorAdapter;
 import org.mule.routing.ChoiceRouter;
 import org.mule.util.StringUtils;
+
+import java.util.Collections;
+
+import org.apache.commons.lang.Validate;
 
 public class Validator extends AbstractConfigurationPattern
 {
@@ -166,7 +167,8 @@ public class Validator extends AbstractConfigurationPattern
 
     private void validateExpression(String expression) throws FlowConstructInvalidException
     {
-        if (!muleContext.getExpressionManager().isExpression(expression))
+        if (muleContext.getExpressionManager().isExpression(expression)
+            && muleContext.getExpressionManager().isValidExpression(expression))
         {
             throw new FlowConstructInvalidException(
                 MessageFactory.createStaticMessage("Invalid expression in Validator: " + expression), this);
