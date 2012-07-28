@@ -10,8 +10,6 @@
 
 package org.mule.construct;
 
-import static org.junit.Assert.assertEquals;
-
 import org.mule.MessageExchangePattern;
 import org.mule.api.MuleEvent;
 import org.mule.api.endpoint.OutboundEndpoint;
@@ -22,6 +20,8 @@ import org.mule.tck.MuleTestUtils;
 import java.util.Collections;
 
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 public class ValidatorTestCase extends AbstractFlowConstuctTestCase
 {
@@ -66,8 +66,8 @@ public class ValidatorTestCase extends AbstractFlowConstuctTestCase
     {
         validator.initialise();
         validator.start();
-        final MuleEvent response = directInboundMessageSource.process(MuleTestUtils.getTestEvent("abc",
-            muleContext));
+        final MuleEvent response = directInboundMessageSource.process(MuleTestUtils.getTestEvent(
+            "abc", muleContext));
 
         assertEquals("BAD:abc", response.getMessageAsString());
     }
@@ -105,18 +105,4 @@ public class ValidatorTestCase extends AbstractFlowConstuctTestCase
 
         assertEquals("ERROR:123", response.getMessageAsString());
     }
-
-    @Test
-    public void testPlainTextAckExpression() throws Exception
-    {
-        final OutboundEndpoint failingOutboundEndpoint = MuleTestUtils.getTestOutboundEndpoint(
-            MessageExchangePattern.REQUEST_RESPONSE, muleContext, "test://AlwaysFail", testConnector);
-
-        validator = new Validator("test-validator", muleContext, directInboundMessageSource,
-            failingOutboundEndpoint, new PayloadTypeFilter(Integer.class), "GOOD", "BAR", "ERROR");
-
-        validator.initialise();
-        validator.start();
-    }
-
 }

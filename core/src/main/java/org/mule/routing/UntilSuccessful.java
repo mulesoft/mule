@@ -20,7 +20,6 @@ import org.mule.api.MuleMessage;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.EndpointException;
-import org.mule.api.expression.InvalidExpressionException;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.retry.RetryCallback;
@@ -129,17 +128,10 @@ public class UntilSuccessful extends AbstractOutboundRouter
         }
         failureExpressionFilter.setMuleContext(muleContext);
 
-        if (ackExpression != null && muleContext.getExpressionManager().isExpression(ackExpression))
+        if ((ackExpression != null) && (!muleContext.getExpressionManager().isExpression(ackExpression)))
         {
-            try
-            {
-                muleContext.getExpressionManager().validateExpression(ackExpression);
-            }
-            catch (InvalidExpressionException iee)
-            {
-                throw new InitialisationException(
-                    MessageFactory.createStaticMessage("Invalid ackExpression: " + ackExpression), this);
-            }
+            throw new InitialisationException(MessageFactory.createStaticMessage("Invalid ackExpression: "
+                                                                                 + ackExpression), this);
         }
 
         String flowName = flowConstruct.getName();
