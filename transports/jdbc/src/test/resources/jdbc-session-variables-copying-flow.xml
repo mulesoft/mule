@@ -13,7 +13,7 @@
     <jdbc:derby-data-source name="jdbcDataSource" url="jdbc:derby:muleEmbeddedDB;create=true"/>
 
     <jdbc:connector name="jdbcConnector" pollingFrequency="1000" dataSource-ref="jdbcDataSource" queryTimeout="3000">
-        <service-overrides sessionHandler="org.mule.session.SerializeAndEncodeSessionHandler"/>
+        <service-overrides sessionHandler="org.mule.session.NullSessionHandler"/>
         <jdbc:query key="getTest" value="SELECT ID, TYPE, DATA, ACK, RESULT FROM TEST WHERE TYPE = #[type] AND ACK IS NULL"/>
     </jdbc:connector>
 

@@ -26,10 +26,10 @@ import java.util.Collection;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
-public class JdbcSessionVarablesCopyingTestCase extends AbstractJdbcFunctionalTestCase
+public class JdbcSessionVariablesCopyingTestCase extends AbstractJdbcFunctionalTestCase
 {
 
-    public JdbcSessionVarablesCopyingTestCase(ConfigVariant variant, String configResources)
+    public JdbcSessionVariablesCopyingTestCase(ConfigVariant variant, String configResources)
     {
         super(variant, configResources);
     }
