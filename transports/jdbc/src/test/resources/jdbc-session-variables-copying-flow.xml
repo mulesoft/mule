@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:spring="http://www.springframework.org/schema/beans" 
+    xmlns:jdbc="http://www.mulesoft.org/schema/mule/jdbc"
+    xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+    xsi:schemaLocation="
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+       http://www.mulesoft.org/schema/mule/jdbc http://www.mulesoft.org/schema/mule/jdbc/current/mule-jdbc.xsd
+       http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+    <jdbc:derby-data-source name="jdbcDataSource" url="jdbc:derby:muleEmbeddedDB;create=true"/>
+
+    <jdbc:connector name="jdbcConnector" pollingFrequency="1000" dataSource-ref="jdbcDataSource" queryTimeout="3000">
+        <service-overrides sessionHandler="org.mule.session.NullSessionHandler"/>
+        <jdbc:query key="getTest" value="SELECT ID, TYPE, DATA, ACK, RESULT FROM TEST WHERE TYPE = #[type] AND ACK IS NULL"/>
+    </jdbc:connector>
+
+    <flow name="testService">
+        <vm:inbound-endpoint path="in" exchange-pattern="request-response"/>
+        <message-properties-transformer scope="session">
+            <add-message-property key="test" value="test" />
+        </message-properties-transformer>
+        <jdbc:outbound-endpoint queryKey="getTest" exchange-pattern="request-response"/>
+    </flow>
+
+</mule>
