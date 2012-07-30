@@ -14,6 +14,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import org.mule.api.MuleMessage;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.transport.http.HttpResponse;
 
@@ -26,7 +27,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 @SmallTest
-public class MuleMessageToHttpResponseTestCase
+public class MuleMessageToHttpResponseTestCase extends AbstractMuleTestCase
 {
 
     @Test
