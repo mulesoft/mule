@@ -43,16 +43,26 @@ public class ApplicationAwareRepositorySelector implements RepositorySelector
     // note that this is a direct log4j logger declaration, not a clogging one
     protected Logger logger = Logger.getLogger(getClass());
 
+    protected final ThreadLocal<LoggerRepository> repositoryUnderConstruction = new ThreadLocal<LoggerRepository>();
+
     @Override
     public LoggerRepository getLoggerRepository()
     {
         final ClassLoader ccl = Thread.currentThread().getContextClassLoader();
 
-        LoggerRepository repository = cache.getLoggerRepository(ccl);
+        LoggerRepository repository = repositoryUnderConstruction.get();
+        if (repository != null)
+        {
+            return repository;
+        }
+
+        repository = cache.getLoggerRepository(ccl);
         if (repository == null)
         {
             final RootLogger root = new RootLogger(Level.INFO);
             repository = new Hierarchy(root);
+
+            repositoryUnderConstruction.set(repository);
 
             try
             {
@@ -118,19 +128,27 @@ public class ApplicationAwareRepositorySelector implements RepositorySelector
                 }
 
                 final LoggerRepository previous = cache.storeLoggerRepository(ccl, repository);
+
+                // Checks if repository was already initialized in a different thread
                 if (previous != null)
                 {
                     repository = previous;
                 }
-
-                if (configWatchDog != null)
+                else
                 {
-                    configWatchDog.start();
+                    if (configWatchDog != null)
+                    {
+                        configWatchDog.start();
+                    }
                 }
             }
             catch (IOException e)
             {
                 throw new RuntimeException(e);
+            }
+            finally
+            {
+                repositoryUnderConstruction.remove();
             }
         }
 
