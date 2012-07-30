@@ -285,6 +285,11 @@ public class MuleMessageToHttpResponse extends AbstractMessageTransformer
         //attach the outbound properties to the message
         for (String headerName : msg.getOutboundPropertyNames())
         {
+            if (response.getFirstHeader(headerName) != null)
+            {
+                //keep headers already set
+                continue;
+            }
             Object v = msg.getOutboundProperty(headerName);
             if (v != null)
             {
