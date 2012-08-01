@@ -21,14 +21,18 @@ import org.hamcrest.core.IsNull;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
+import org.mule.api.MuleEvent;
+import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.LocalMuleClient;
 import org.mule.api.context.notification.ExceptionNotificationListener;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.context.notification.ExceptionNotification;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.http.HttpConnector;
 import org.mule.util.CharSetUtils;
+import org.mule.util.concurrent.Latch;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -37,7 +41,7 @@ import java.util.concurrent.TimeUnit;
 
 public class RollbackExceptionStrategyTestCase extends AbstractServiceAndFlowTestCase
 {
-    public static final int TIMEOUT = 500000;
+    public static final int TIMEOUT = 5000;
     public static final String JSON_REQUEST = "{\"userId\":\"15\"}";
     public static final int MAX_REDELIVERY = 4;
     public static final int EXPECTED_DELIVERED_TIMES = MAX_REDELIVERY + 1;
@@ -305,6 +309,29 @@ public class RollbackExceptionStrategyTestCase extends AbstractServiceAndFlowTes
             fail("message should have been delivered at least 5 times");
         }
         assertThat(deliveredTimes.intValue(),is(EXPECTED_DELIVERED_TIMES));
+    }
+
+    @Test
+    public void testRollbackExceptionStrategyCatchMessageRedeliveryDespiteChoiceConfiguration() throws Exception
+    {
+        LocalMuleClient client = muleContext.getClient();
+        client.dispatch("vm://in7","some message",null);
+        if (!CallMessageProcessor.latch.await(TIMEOUT, TimeUnit.MILLISECONDS))
+        {
+            fail("custom message processor wasn't call");
+        }
+    }
+
+    public static class CallMessageProcessor implements MessageProcessor
+    {
+        public static Latch latch = new Latch();
+
+        @Override
+        public MuleEvent process(MuleEvent event) throws MuleException
+        {
+            latch.release();
+            return event;
+        }
     }
 
 }

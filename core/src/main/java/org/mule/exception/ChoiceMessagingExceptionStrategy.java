@@ -91,6 +91,32 @@ public class ChoiceMessagingExceptionStrategy extends AbstractMuleObjectOwner<Me
 
     private void validateConfiguredExceptionStrategies()
     {
+        validateOnlyLastAcceptsAll();
+        validateOnlyOneHandlesRedelivery();
+    }
+
+    private void validateOnlyOneHandlesRedelivery()
+    {
+        boolean rollbackWithRedelivery = false;
+        for (int i = 0; i < exceptionListeners.size(); i++)
+        {
+             MessagingExceptionHandler messagingExceptionHandler = exceptionListeners.get(i);
+             if (messagingExceptionHandler instanceof MessagingExceptionStrategyAcceptorDelegate) {
+                 messagingExceptionHandler = ((MessagingExceptionStrategyAcceptorDelegate)messagingExceptionHandler).getExceptionListener();
+             }
+             if (messagingExceptionHandler instanceof RollbackMessagingExceptionStrategy && ((RollbackMessagingExceptionStrategy)messagingExceptionHandler).hasMaxRedeliveryAttempts())
+             {
+                if (rollbackWithRedelivery)
+                {
+                    throw new MuleRuntimeException(CoreMessages.createStaticMessage("Only one rollback exception strategy inside <choice-exception-strategy> can handle message redelivery."));
+                }
+                rollbackWithRedelivery = true;
+             }
+        }
+    }
+
+    private void validateOnlyLastAcceptsAll()
+    {
         for (int i = 0; i < exceptionListeners.size()-1; i++)
         {
              MessagingExceptionHandlerAcceptor messagingExceptionHandlerAcceptor = exceptionListeners.get(i);

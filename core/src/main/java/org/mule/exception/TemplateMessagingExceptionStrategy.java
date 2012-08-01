@@ -168,7 +168,20 @@ public abstract class TemplateMessagingExceptionStrategy extends AbstractExcepti
 
     public boolean accept(MuleEvent event)
     {
-        return acceptsAll() || muleContext.getExpressionManager().evaluateBoolean(when, event);
+        return acceptsAll() || acceptsEvent(event) || muleContext.getExpressionManager().evaluateBoolean(when, event);
+    }
+
+    /**
+     * Determines if the exception strategy should process or not a message inside a choice exception strategy.
+     *
+     * Useful for exception strategies which ALWAYS must accept certain types of events despite when condition is not true.
+     *
+     * @param event   The MuleEvent being processed
+     * @return  true if it should process the exception for the current event, false otherwise.
+     */
+    protected boolean acceptsEvent(MuleEvent event)
+    {
+        return false;
     }
 
     @Override

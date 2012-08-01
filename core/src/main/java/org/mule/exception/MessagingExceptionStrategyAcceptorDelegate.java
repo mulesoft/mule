@@ -59,4 +59,9 @@ public class MessagingExceptionStrategyAcceptorDelegate extends AbstractMuleObje
     protected List<MessagingExceptionHandler> getOwnedObjects() {
         return Arrays.asList(delegate);
     }
+
+    public MessagingExceptionHandler getExceptionListener()
+    {
+        return this.delegate;
+    }
 }
