@@ -69,7 +69,9 @@ public class Flow extends AbstractPipeline implements MessageProcessor
         }
         catch (Exception e)
         {
-            return getExceptionListener().handleException(e, newEvent);
+            MuleEvent resultEvent = getExceptionListener().handleException(e, newEvent);
+            event.getSession().merge(resultEvent.getSession());
+            return resultEvent;
         }
         finally
         {

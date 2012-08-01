@@ -432,8 +432,7 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
             if (size() > 0)
             {
 
-                DefaultMuleEvent muleEvent = new DefaultMuleEvent(toMessageCollection(),
-                    events.retrieve(events.allKeys().get(0)));
+                DefaultMuleEvent muleEvent = new DefaultMuleEvent(toMessageCollection(), findLastEvent());
                 if (getCommonRootId() != null)
                 {
                     muleEvent.getMessage().setMessageRootId(commonRootId);
@@ -450,6 +449,26 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
             // Nothing to do...
             return null;
         }
+    }
+
+    private MuleEvent findLastEvent() throws ObjectStoreException
+    {
+        MuleEvent lastEvent = null;
+        Integer lastArrival = 0;
+
+        for (Serializable key : events.allKeys())
+        {
+            MuleEvent event = events.retrieve(key);
+            Integer arrival = event.getMessage().getInvocationProperty(MULE_ARRIVAL_ORDER_PROPERTY, -1);
+            if (arrival > lastArrival)
+            {
+                lastArrival = arrival;
+                lastEvent = event;
+            }
+        }
+
+        return lastEvent;
+        //return events.retrieve(events.allKeys().get(0));
     }
 
     private ObjectStoreManager getObjectStoreManager()
