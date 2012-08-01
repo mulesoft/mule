@@ -306,8 +306,7 @@ public class EventGroup implements Comparable<EventGroup>, Serializable
     {
         if (events.size() > 0)
         {
-
-            return new DefaultMuleEvent(toMessageCollection(), events.get(0));
+            return new DefaultMuleEvent(toMessageCollection(), events.get(events.size() -1));
         }
         else
         {
