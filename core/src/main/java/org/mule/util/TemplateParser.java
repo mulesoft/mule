@@ -33,24 +33,22 @@ public final class TemplateParser
     public static final String WIGGLY_MULE_TEMPLATE_STYLE = "mule";
 
     private static final String DOLLAR_ESCAPE = "@@@";
+    private static final String NULL_AS_STRING = "null";
 
     private static final Map<String, PatternInfo> patterns = new HashMap<String, PatternInfo>();
 
     static
     {
-        patterns.put(ANT_TEMPLATE_STYLE, new PatternInfo(ANT_TEMPLATE_STYLE, "\\$\\{[^\\}]+\\}", "${", "}"));
-        patterns.put(SQUARE_TEMPLATE_STYLE, new PatternInfo(SQUARE_TEMPLATE_STYLE, "\\[[^\\]]+\\]", "[", "]"));
-        patterns.put(CURLY_TEMPLATE_STYLE, new PatternInfo(CURLY_TEMPLATE_STYLE, "\\{[^\\}]+\\}", "{", "}"));
+        patterns.put(ANT_TEMPLATE_STYLE, new PatternInfo(ANT_TEMPLATE_STYLE, "\\$\\{[^\\{\\}]+\\}", "${", "}"));
+        patterns.put(SQUARE_TEMPLATE_STYLE, new PatternInfo(SQUARE_TEMPLATE_STYLE, "\\[[^\\[\\]]+\\]", "[", "]"));
+        patterns.put(CURLY_TEMPLATE_STYLE, new PatternInfo(CURLY_TEMPLATE_STYLE, "\\{[^\\{\\}}]+\\}", "{", "}"));
 
         // Such a complex regex is needed to support nested expressions, otherwise we
         // have to do this manually or using an ANTLR grammar etc.
 
-        // Support for 3 levels (2 nested)
+        // Support for 6 levels (5 nested)
         patterns.put(WIGGLY_MULE_TEMPLATE_STYLE, new PatternInfo(WIGGLY_MULE_TEMPLATE_STYLE,
-            "#\\[((?:#\\[(?:#\\[.*?\\]|\\[.*?\\]|.)*?\\]|\\[.*?\\]|.)*?)\\]", "#[", "]"));
-
-        // Support for 2 levels (1 nested)
-        // "#\\[((?:#\\[.*?\\]|\\[.*?\\]|.)*?)\\]"
+        "#\\[((?:#?\\[(?:#?\\[(?:#?\\[(?:#?\\[(?:#?\\[.*?\\]|[^\\[\\]])*?\\]|[^\\[\\]])*?\\]|[^\\[\\]])*?\\]|[^\\[\\]])*?\\]|[^\\[\\]])*?)\\]", "#[", "]"));
     }
 
     /**
@@ -153,6 +151,10 @@ public final class TemplateParser
             if (callback != null)
             {
                 value = callback.match(propname);
+                if (value == null)
+                {
+                    value = NULL_AS_STRING;
+                }
             }
             else if (newProps != null)
             {
@@ -168,7 +170,7 @@ public final class TemplateParser
             }
             else
             {
-                String matchRegex = escape(match);
+                String matchRegex = Pattern.quote(match);
                 String valueString = value.toString();
                 //need to escape $ as they resolve into group references, escaping them was not enough
                 //This smells a bit like a hack, but one way or another these characters need to be escaped
@@ -252,43 +254,6 @@ public final class TemplateParser
         return map;
     }
 
-    private String escape(String string)
-    {
-        int length = string.length();
-        if (length == 0)
-        {
-            // nothing to do
-            return string;
-        }
-        else
-        {
-            StringBuffer buffer = new StringBuffer(length * 2);
-            for (int i = 0; i < length; i++)
-            {
-                char currentCharacter = string.charAt(i);
-                switch (currentCharacter)
-                {
-                    case '[':
-                    case ']':
-                    case '{':
-                    case '}':
-                    case '(':
-                    case ')':
-                    case '$':
-                    case '#':
-                    case '*':
-                    case '?':
-                    case '|':
-                        buffer.append("\\");
-                        //$FALL-THROUGH$ to append original character
-                    default:
-                        buffer.append(currentCharacter);
-                }
-            }
-            return buffer.toString();
-        }
-    }
-
     public PatternInfo getStyle()
     {
         return style;
@@ -347,7 +312,7 @@ public final class TemplateParser
             this.prefix = prefix;
             if (suffix.length() != 1)
             {
-                throw new IllegalArgumentException("Suffic can only be one character long: " + suffix);
+                throw new IllegalArgumentException("Suffix can only be one character long: " + suffix);
             }
             this.suffix = suffix;
         }
@@ -379,100 +344,34 @@ public final class TemplateParser
 
         public void validate(String expression) throws IllegalArgumentException
         {
-            Stack<Character> openDelimiterStack = new Stack<Character>();
-
-            int charCount = expression.length();
-            int index = 0;
-            char nextChar = ' ';
-            char preDelim = 0;
-            char open;
-            char close;
-            boolean inExpression = false;
-            int expressionCount = 0;
-            if (prefix.length() == 2)
+            String currentExpression = expression;
+            int lastMatchIdx = 0;
+            while (lastMatchIdx < expression.length())
             {
-                preDelim = prefix.charAt(0);
-                open = prefix.charAt(1);
-            }
-            else
-            {
-                open = prefix.charAt(0);
-            }
-            close = suffix.charAt(0);
-
-            for (; index < charCount; index++)
-            {
-                nextChar = expression.charAt(index);
-                if (preDelim != 0 && nextChar == preDelim)
+                int start = currentExpression.indexOf(prefix);
+                if (start == -1)
                 {
-                    //escaped
-                    if (inExpression)
-                    {
-                        if (index < charCount && expression.charAt(index + 1) == open)
-                        {
-                            throw new IllegalArgumentException(String.format("Character %s at position %s suggests an expression inside an expression", open, index));
-                        }
-                    }
-                    else if (openDelimiterStack.isEmpty())
-                    {
-                        openDelimiterStack.push(nextChar);
-                        nextChar = expression.charAt(++index);
-                        if (nextChar != open)
-                        {
-                            throw new IllegalArgumentException(String.format("Character %s at position %s must appear immediately after %s", open, index, preDelim));
-                        }
-                        inExpression = true;
-
-                    }
-                    else
-                    {
-                        throw new IllegalArgumentException(String.format("Character %s at position %s appears out of sequence. Character cannot appear after %s", nextChar, index, openDelimiterStack.pop()));
-                    }
+                    //no more expressions to validate
+                    break;
                 }
-
-                if (nextChar == open)
+                lastMatchIdx += start;
+                currentExpression = currentExpression.substring(start);
+                Matcher m = getPattern().matcher(currentExpression);
+                boolean found = m.find();
+                if (found)
                 {
-                    if (preDelim == 0 || inExpression)
+                    if (!currentExpression.startsWith(m.group()))
                     {
-                        openDelimiterStack.push(nextChar);
+                        throw new IllegalArgumentException("Invalid Expression");
                     }
-                    //Check the stack size to avoid out of bounds
-                    else if (openDelimiterStack.size() == 1 && openDelimiterStack.peek().equals(preDelim))
-                    {
-                        openDelimiterStack.push(nextChar);
-                    }
-                    else
-                    {
-                        throw new IllegalArgumentException(String.format("Character %s at position %s appears out of sequence. Character cannot appear after %s", nextChar, index, preDelim));
-                    }
+                    int matchSize = m.group().length();
+                    lastMatchIdx += matchSize;
+                    currentExpression = currentExpression.substring(matchSize);
                 }
-                else if (nextChar == close)
+                else
                 {
-                    if (openDelimiterStack.isEmpty())
-                    {
-                        throw new IllegalArgumentException(String.format("Character %s at position %s appears out of sequence", nextChar, index));
-                    }
-                    else
-                    {
-                        openDelimiterStack.pop();
-                        if (preDelim != 0 && openDelimiterStack.peek() == preDelim)
-                        {
-                            openDelimiterStack.pop();
-                        }
-
-
-                        if (openDelimiterStack.isEmpty())
-                        {
-                            inExpression = false;
-                            expressionCount++;
-                            //throw new IllegalArgumentException(String.format("Character %s at position %s appears out of sequence", nextChar, index));
-                        }
-                    }
+                    throw new IllegalArgumentException("Invalid Expression");
                 }
-            }
-            if (expressionCount == 0)
-            {
-                throw new IllegalArgumentException("Not an expression: " + expression);
             }
         }
 
