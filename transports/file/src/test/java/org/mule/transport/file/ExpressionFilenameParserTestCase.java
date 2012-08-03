@@ -73,7 +73,7 @@ public class ExpressionFilenameParserTestCase extends AbstractMuleContextTestCas
         assertEquals("Test8_bar.txt", result);
 
         result = parser.getFilename(message, "Test9_#[header:xxx?].txt");
-        assertEquals("Test9_#[header:xxx?].txt", result);
+        assertEquals("Test9_null.txt", result);
 
         try
         {
@@ -124,7 +124,7 @@ public class ExpressionFilenameParserTestCase extends AbstractMuleContextTestCas
         }
 
         result = parser.getFilename(message, "Test9_[header:xxx?].txt");
-        assertEquals("Test9_[header:xxx?].txt", result);
+        assertEquals("Test9_null.txt", result);
     }
 
     private void assertDatestampWithYearMonthAndDayMatches(String result)

@@ -63,9 +63,9 @@ public class TemplateParserTestCase extends AbstractMuleTestCase
     public void squareBracesParserShouldValidateExpressionDelimiters()
     {
         TemplateParser tp = TemplateParser.createSquareBracesStyleParser();
-        assertTrue(tp.isValid("[][]"));
-        assertTrue(tp.isValid("[[]]"));
-        assertFalse(tp.isValid("[[][]"));
+        assertTrue(tp.isValid("[1][2]"));
+        assertFalse(tp.isValid("[[1]2]"));
+        assertFalse(tp.isValid("[[1][2]"));
     }
 
     @Test
@@ -81,13 +81,15 @@ public class TemplateParserTestCase extends AbstractMuleTestCase
     public void antParserShouldValidateExpressionDelimiters()
     {
         TemplateParser tp = TemplateParser.createAntStyleParser();
-        assertTrue(tp.isValid("${}"));
-        assertTrue(tp.isValid("${}${}"));
-        assertFalse(tp.isValid("${}&{}"));
-        assertFalse(tp.isValid("{}${}"));
-        assertTrue(tp.isValid("${$}${}"));
-        assertFalse(tp.isValid("${${}}${}"));
-        assertFalse(tp.isValid("$ {}"));
+        assertTrue(tp.isValid("${1}"));
+        assertTrue(tp.isValid("${1}${2}"));
+        assertTrue(tp.isValid("${1}&{2}"));
+        assertTrue(tp.isValid("{1}${2}"));
+        assertTrue(tp.isValid("${$}${1}"));
+        assertTrue(tp.isValid("$ {1}"));
+
+        assertFalse(tp.isValid("${${1}}${2}"));
+        assertFalse(tp.isValid("${{1}${2}"));
     }
 
     @Test
@@ -204,6 +206,78 @@ public class TemplateParserTestCase extends AbstractMuleTestCase
     }
 
     @Test
+    public void muleParserManagesNestedSquareBrackets()
+    {
+        TemplateParser tp = TemplateParser.createMuleStyleParser();
+        final String expectedResult = "zero[one[two[three[four[five]]]]]";
+        String expression = "#[zero[one[two[three[four[five]]]]]]";
+        assertTrue(tp.isValid(expression));
+        String result = tp.parse(null, expression, new TemplateParser.TemplateCallback()
+        {
+            public Object match(String token)
+            {
+                return expectedResult;
+            }
+        });
+        assertEquals(expectedResult, result);
+    }
+
+    @Test
+    public void muleParserManagesNestedExpressions()
+    {
+        TemplateParser tp = TemplateParser.createMuleStyleParser();
+        final String expectedResult = "zero#[one#[two#[three#[four#[five]]]]]";
+        String expression = "#[zero#[one#[two#[three#[four#[five]]]]]]";
+        assertTrue(tp.isValid(expression));
+        String result = tp.parse(null, expression, new TemplateParser.TemplateCallback()
+        {
+            public Object match(String token)
+            {
+                return expectedResult;
+            }
+        });
+        assertEquals(expectedResult, result);
+    }
+
+    @Test
+    public void muleParserManagesConcatenation()
+    {
+        TemplateParser tp = TemplateParser.createMuleStyleParser();
+
+        final String expectedResult = "'hi'+'world'";
+
+        String result = tp.parse(null, "#['hi'+'world']", new TemplateParser.TemplateCallback()
+        {
+            public Object match(String token)
+            {
+
+                return expectedResult;
+            }
+        });
+
+        assertEquals(expectedResult, result);
+    }
+
+    @Test
+    public void muleParserManagesNullExpressions()
+    {
+        TemplateParser tp = TemplateParser.createMuleStyleParser();
+
+        final String expectedResult = "null";
+
+        String result = tp.parse(null, "#[expression that returns null]", new TemplateParser.TemplateCallback()
+        {
+            public Object match(String token)
+            {
+                return null;
+            }
+        });
+
+        assertEquals(expectedResult, result);
+    }
+
+
+    @Test
     public void muleParserDefaultConfiguration()
     {
         TemplateParser tp = TemplateParser.createMuleStyleParser();
@@ -219,17 +293,20 @@ public class TemplateParserTestCase extends AbstractMuleTestCase
 
         assertTrue(tp.isValid("#[]"));
         assertTrue(tp.isValid("#[]   #[]"));
-        assertFalse(tp.isValid("#[]&[]"));
-        assertFalse(tp.isValid("[]$[]#"));
+        assertTrue(tp.isValid("#[]&[]"));
+        assertTrue(tp.isValid("[]$[]#"));
         assertTrue(tp.isValid("#[#]#[]"));
-        assertFalse(tp.isValid("#[#[]]#[]"));
-        assertFalse(tp.isValid("# []"));
+        assertTrue(tp.isValid("#[#[]]#[]"));
+        assertTrue(tp.isValid("# []"));
+
+        //can't have unbalanced brackets
+        assertFalse(tp.isValid("#[#[]#[]"));
+        assertFalse(tp.isValid("#[[][]"));
 
         assertTrue(tp.isValid("#[foo:blah[4] = 'foo']"));
         assertTrue(tp.isValid("#[foo:blah[4] = '#foo']"));
-        assertFalse(tp.isValid("#[foo:blah4] = '#foo']"));
-        //Can't have embedded
-        assertFalse(tp.isValid("#[foo:blah = '#[foo]']"));
+        assertTrue(tp.isValid("#[foo:blah4] = '#foo']"));
+        assertTrue(tp.isValid("#[foo:blah = '#[foo]']"));
     }
 
     private Map<String, Object> buildMap()

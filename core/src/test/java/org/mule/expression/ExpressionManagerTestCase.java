@@ -83,8 +83,8 @@ public class ExpressionManagerTestCase extends AbstractMuleContextTestCase
         assertFalse(muleContext.getExpressionManager().isValidExpression("user"));
 
        assertFalse(muleContext.getExpressionManager().isValidExpression("http://#[bean:user:#[bean:password]@#[header:host]:#[header:port]/foo/bar"));
-       assertFalse(muleContext.getExpressionManager().isValidExpression("http://#[bean:user]:##[bean:password]@#[header:host]:#[header:port]/foo/bar"));
-       assertFalse(muleContext.getExpressionManager().isValidExpression("http://#[bean:user]]:##[bean:password]@#[header:host]:#[header:port]/foo/bar"));
+       assertTrue(muleContext.getExpressionManager().isValidExpression("http://#[bean:user]:##[bean:password]@#[header:host]:#[header:port]/foo/bar"));
+       assertTrue(muleContext.getExpressionManager().isValidExpression("http://#[bean:user]]:##[bean:password]@#[header:host]:#[header:port]/foo/bar"));
        assertFalse(muleContext.getExpressionManager().isValidExpression("http://#[bean:user]:#[[bean:password]@#[header:host]:#[header:port]/foo/bar"));
        assertTrue(muleContext.getExpressionManager().isValidExpression("http://#[bean:user]:#[#bean:password]@#[header:host]:#[header:port]/foo/bar"));
     }
