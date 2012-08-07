@@ -203,6 +203,16 @@ public class FlowConfigurationFunctionalTestCase extends FunctionalTestCase
     }
 
     @Test
+    public void testSplitNoParts() throws Exception
+    {
+        String MESSAGE = "<Order></Order>";
+        MuleMessage result = muleContext.getClient().send("vm://split-no-parts-in", MESSAGE, null);
+
+        assertNotNull(result);
+        assertEquals(result.getPayload(), MESSAGE);
+    }
+
+    @Test
     public void testSplitAggregateListFlow() throws Exception
     {
         final Apple apple = new Apple();
