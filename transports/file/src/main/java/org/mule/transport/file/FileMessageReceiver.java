@@ -41,6 +41,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.commons.collections.comparators.ReverseComparator;
 
@@ -358,6 +359,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
     {
         try
         {
+            final AtomicBoolean exceptionWasThrown = new AtomicBoolean(false);
             executionTemplate.execute(new ExecutionCallback<MuleEvent>()
             {
                 @Override
@@ -369,18 +371,27 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
                         // stream is closed
                         finalMessage.setOutboundProperty(FileConnector.PROPERTY_FILENAME, sourceFile.getName());
                         FileMessageReceiver.this.routeMessage(finalMessage);
-                    } catch (Exception e)
+                    }
+                    catch (Exception e)
                     {
                         //ES will try to close stream but FileMessageReceiver is the one that must close it.
+                        exceptionWasThrown.set(true);
                         originalPayload.setStreamProcessingError(true);
                         throw e;
                     }
                     return null;
                 }
             });
+            //Exception thrown but handled, consume inbound message.
+            if (exceptionWasThrown.get())
+            {
+                originalPayload.setStreamProcessingError(false);
+                originalPayload.close();
+            }
         }
         catch (MessagingException e)
         {
+            //This code is only used by default-exception-estrategy which re-throws exception despite commit.
             if (!e.causedRollback())
             {
                 try

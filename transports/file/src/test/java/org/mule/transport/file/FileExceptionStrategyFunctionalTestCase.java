@@ -14,19 +14,28 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mule.api.MuleEvent;
+import org.mule.api.MuleEventContext;
 import org.mule.api.MuleException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.construct.Flow;
 import org.mule.exception.DefaultMessagingExceptionStrategy;
+import org.mule.tck.functional.EventCallback;
+import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.probe.PollingProber;
+import org.mule.tck.probe.Probe;
+import org.mule.tck.probe.Prober;
 import org.mule.util.FileUtils;
 import org.mule.util.concurrent.Latch;
 
 import java.io.File;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 
 public class FileExceptionStrategyFunctionalTestCase extends FunctionalTestCase
 {
@@ -37,6 +46,7 @@ public class FileExceptionStrategyFunctionalTestCase extends FunctionalTestCase
     protected File inputDir;
     private Flow flow;
     private File inputFile;
+    private PollingProber pollingProber = new PollingProber(5000, 200);
 
     @Override
     protected String getConfigResources()
@@ -102,6 +112,111 @@ public class FileExceptionStrategyFunctionalTestCase extends FunctionalTestCase
         assertThat(workDirFile.exists(), is(false));
     }
 
+    @Test
+    public void testConsumeFileWithExAndCatch() throws Exception
+    {
+        inputDir = new File(".mule/temp/input-streaming-catch");
+        inputFile = createDataFile(inputDir, "test1.txt");
+        pollingProber.check(new Probe()
+        {
+            @Override
+            public boolean isSatisfied()
+            {
+                return !inputFile.exists();
+            }
+
+            @Override
+            public String describeFailure()
+            {
+                return "input file should be deleted";
+            }
+        });
+    }
+
+    @Test
+    public void testConsumeFileWithExAndRollback() throws Exception
+    {
+        final CountDownLatch countDownLatch = new CountDownLatch(2);
+        FunctionalTestComponent ftc = getFunctionalTestComponent("consumeFileWithStreamingAndRollback");
+        ftc.setEventCallback(new EventCallback()
+        {
+            @Override
+            public void eventReceived(MuleEventContext context, Object component) throws Exception
+            {
+                countDownLatch.countDown();
+                throw new RuntimeException();
+            }
+        });
+        inputDir = new File(".mule/temp/input-streaming-rollback");
+        inputFile = createDataFile(inputDir, "test1.txt");
+
+        if (!countDownLatch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS))
+        {
+            fail("file should not be consumed");
+        }
+    }
+
+    @Test
+    public void testConsumeFileWithExAndRollbackWithRedelivery() throws Exception
+    {
+        final CountDownLatch countDownLatch = new CountDownLatch(3);
+        FunctionalTestComponent ftc = getFunctionalTestComponent("consumeFileWithStreamingAndRollbackWithRedelivery");
+        ftc.setEventCallback(new EventCallback()
+        {
+            @Override
+            public void eventReceived(MuleEventContext context, Object component) throws Exception
+            {
+                countDownLatch.countDown();
+                throw new RuntimeException();
+            }
+        });
+        inputDir = new File(".mule/temp/input-streaming-rollback-with-redelivery");
+        inputFile = createDataFile(inputDir, "test1.txt");
+        if (!countDownLatch.await(100000, TimeUnit.MILLISECONDS))
+        {
+            fail("file should not be consumed at this point");
+        }
+        pollingProber.check(new Probe()
+        {
+            @Override
+            public boolean isSatisfied()
+            {
+                return !inputFile.exists();
+            }
+
+            @Override
+            public String describeFailure()
+            {
+                return "input file should be deleted";
+            }
+        });
+    }
+    
+    @Test
+    public void testConsumeFileWithAsynchronousProcessingStrategy() throws Exception
+    {
+        inputDir = new File(".mule/temp/input-streaming-and-async-processing-strategy");
+        inputFile = createDataFile(inputDir, "test1.txt");
+        BeforeCloseStream.releaseLatch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS);
+        assertThat(inputFile.exists(),is(true));
+        BeforeCloseStream.awaitLatch.release();
+        AfterCloseStream.releaseLatch.await(RECEIVE_TIMEOUT,TimeUnit.MILLISECONDS);
+        pollingProber.check(new Probe()
+        {
+            @Override
+            public boolean isSatisfied()
+            {
+                return !inputFile.exists();
+            }
+
+            @Override
+            public String describeFailure()
+            {
+                return "input file should be deleted";
+            }
+        });
+    }
+
     private void attacheLatchCountdownProcessor(String flowName)
     {
         flow = (Flow) muleContext.getRegistry().lookupFlowConstruct(flowName);
@@ -140,6 +255,41 @@ public class FileExceptionStrategyFunctionalTestCase extends FunctionalTestCase
         FileUtils.writeStringToFile(target, testMessage, encoding);
 
         return target;
+    }
+
+    public static class BeforeCloseStream implements MessageProcessor
+    {
+        public static Latch releaseLatch = new Latch();
+        public static Latch awaitLatch = new Latch();
+        public File file;
+        
+        @Override
+        public MuleEvent process(MuleEvent event) throws MuleException
+        {
+            releaseLatch.release();
+            try
+            {
+                awaitLatch.await(RECEIVE_TIMEOUT,TimeUnit.MILLISECONDS);
+            }
+            catch (InterruptedException e)
+            {
+                throw new RuntimeException(e);
+            }
+            return event;
+        }
+    }
+
+    public static class AfterCloseStream implements MessageProcessor
+    {
+        public static Latch releaseLatch = new Latch();
+        public File file;
+        
+        @Override
+        public MuleEvent process(MuleEvent event) throws MuleException
+        {
+            releaseLatch.release();
+            return event;
+        }
     }
 
 }
