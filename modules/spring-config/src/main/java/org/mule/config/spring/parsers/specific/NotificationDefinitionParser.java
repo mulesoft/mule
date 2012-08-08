@@ -39,6 +39,7 @@ import org.mule.context.notification.ManagementNotification;
 import org.mule.context.notification.MessageProcessorNotification;
 import org.mule.context.notification.ModelNotification;
 import org.mule.context.notification.MuleContextNotification;
+import org.mule.context.notification.PipelineMessageNotification;
 import org.mule.context.notification.RegistryNotification;
 import org.mule.context.notification.RoutingNotification;
 import org.mule.context.notification.SecurityNotification;
@@ -85,6 +86,7 @@ public class NotificationDefinitionParser extends ChildMapEntryDefinitionParser
         EVENT_MAP.put("EXCEPTION", ExceptionNotification.class.getName());
         EVENT_MAP.put("TRANSACTION", TransactionNotification.class.getName());
         EVENT_MAP.put("ROUTING", RoutingNotification.class.getName());
+        EVENT_MAP.put("PIPELINE-MESSAGE", PipelineMessageNotification.class.getName());
 
         INTERFACE_MAP = new HashMap();
         INTERFACE_MAP.put("CONTEXT", MuleContextNotificationListener.class.getName());
@@ -102,6 +104,7 @@ public class NotificationDefinitionParser extends ChildMapEntryDefinitionParser
         INTERFACE_MAP.put("TRANSACTION", TransactionNotificationListener.class.getName());
         INTERFACE_MAP.put("ROUTING", RoutingNotificationListener.class.getName());
         INTERFACE_MAP.put("CLUSTER-NODE", ClusterNodeNotificationListener.class.getName());
+        INTERFACE_MAP.put("PIPELINE-MESSAGE", PipelineMessageNotification.class.getName());
         
         // Deprecated
         EVENT_MAP.put("MESSAGE", EndpointMessageNotification.class.getName());

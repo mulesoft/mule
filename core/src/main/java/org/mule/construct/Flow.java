@@ -11,8 +11,8 @@
 package org.mule.construct;
 
 import org.mule.DefaultMuleEvent;
-import org.mule.VoidMuleEvent;
 import org.mule.RequestContext;
+import org.mule.VoidMuleEvent;
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
@@ -113,8 +113,8 @@ public class Flow extends AbstractPipeline implements MessageProcessor
     @Override
     protected void configurePostProcessors(MessageProcessorChainBuilder builder) throws MuleException
     {
-        super.configurePostProcessors(builder);
         builder.chain(new AsyncReplyToPropertyRequestReplyReplier());
+        super.configurePostProcessors(builder);
     }
 
     /**
