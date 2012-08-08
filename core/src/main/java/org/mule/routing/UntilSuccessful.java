@@ -27,7 +27,9 @@ import org.mule.api.retry.RetryNotifier;
 import org.mule.api.retry.RetryPolicyTemplate;
 import org.mule.api.store.ListableObjectStore;
 import org.mule.api.store.ObjectStoreException;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
+import org.mule.retry.RetryPolicyExhaustedException;
 import org.mule.retry.async.AsynchronousRetryTemplate;
 import org.mule.retry.policies.SimpleRetryPolicyTemplate;
 import org.mule.routing.filters.ExpressionFilter;
@@ -302,18 +304,24 @@ public class UntilSuccessful extends AbstractOutboundRouter
     {
         if (dlqMP == null)
         {
-            logger.info("Retry attempts exhausted and no DLQ defined, dropping message: " + event);
+            logger.info("Retry attempts exhausted and no DLQ defined");
+            RetryPolicyExhaustedException retryPolicyExhaustedException = new RetryPolicyExhaustedException(CoreMessages.createStaticMessage("until-successful retries exhausted"), this);
+            event.getFlowConstruct().getExceptionListener().handleException(new MessagingException(event,retryPolicyExhaustedException),event);
             return;
         }
 
+        logger.info("Retry attempts exhausted, routing message to DLQ: " + dlqMP);
         try
         {
-            logger.info("Retry attempts exhausted, routing message to DLQ: " + dlqMP);
             dlqMP.process(mutableEvent);
         }
-        catch (final MuleException me)
+        catch (MessagingException e)
         {
-            logger.error("Failed to route message to DLQ: " + dlqMP + ", dropping message: " + event, me);
+            event.getFlowConstruct().getExceptionListener().handleException(e,event);
+        }
+        catch (Exception e)
+        {
+            event.getFlowConstruct().getExceptionListener().handleException(new MessagingException(event,e),event);
         }
     }
 

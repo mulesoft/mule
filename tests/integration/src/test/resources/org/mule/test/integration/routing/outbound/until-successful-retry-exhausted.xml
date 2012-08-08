@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:spring="http://www.springframework.org/schema/beans"
+    xmlns:test="http://www.mulesoft.org/schema/mule/test"
+	xsi:schemaLocation="
+        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/3.2/mule-test.xsd">
+
+	<spring:bean id="objectStore"
+		class="org.mule.util.store.SimpleMemoryObjectStore" />
+
+	<flow name="retryExhausted">
+		<until-successful objectStore-ref="objectStore" maxRetries="1" secondsBetweenRetries="1">
+			<test:component throwException="true"/>
+		</until-successful>
+		<default-exception-strategy/>
+	</flow>
+</mule>
