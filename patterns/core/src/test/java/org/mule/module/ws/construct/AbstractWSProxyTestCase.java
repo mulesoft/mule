@@ -100,7 +100,7 @@ public abstract class AbstractWSProxyTestCase extends AbstractFlowConstuctTestCa
         });
 
         final MuleEvent event = MuleTestUtils.getTestEvent("hello", muleContext);
-        event.getMessage().setProperty("http.request", "test://foo?WSDL", PropertyScope.INBOUND);
+        event.getMessage().setProperty("http.request", "test://foo?wsdl", PropertyScope.INBOUND);
         final MuleEvent response = directInboundMessageSource.process(event);
 
         assertEquals("fake_wsdl " + InetAddress.getLocalHost().getHostName(), response.getMessageAsString());
