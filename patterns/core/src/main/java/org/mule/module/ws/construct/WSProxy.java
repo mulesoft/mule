@@ -166,6 +166,9 @@ public class WSProxy extends AbstractConfigurationPattern
         private static final String HTTP_REQUEST = "http.request";
         private static final String WSDL_PARAM_1 = "?wsdl";
         private static final String WSDL_PARAM_2 = "&wsdl";
+        // Web Services can also serve Schemas
+        private static final String XSD_PARAM_1 = "?xsd=";
+        private static final String XSD_PARAM_2 = "&xsd=";
         private static final String LOCALHOST = "localhost";
         
         protected final Log logger = LogFactory.getLog(WSProxy.class);
@@ -178,9 +181,9 @@ public class WSProxy extends AbstractConfigurationPattern
 
         public MuleEvent process(final MuleEvent event) throws MuleException
         {
-            if (isWsdlRequest(event))
+            if (isWsdlOrXSDRequest(event))
             {
-                return buildWsdlResult(event);
+                return buildWsdlOrXSDResult(event);
             }
 
             if (logger.isDebugEnabled())
@@ -191,7 +194,7 @@ public class WSProxy extends AbstractConfigurationPattern
             return event;
         }
 
-        private MuleEvent buildWsdlResult(final MuleEvent event) throws MuleException
+        private MuleEvent buildWsdlOrXSDResult(final MuleEvent event) throws MuleException
         {
             try
             {
@@ -245,7 +248,7 @@ public class WSProxy extends AbstractConfigurationPattern
             return wsdlContents;
         }
 
-        private boolean isWsdlRequest(final MuleEvent event) throws MuleException
+        private boolean isWsdlOrXSDRequest(final MuleEvent event) throws MuleException
         {
             // retrieve the original HTTP request. This will be used to check if the
             // user asked for the WSDL or a service method.
@@ -259,9 +262,11 @@ public class WSProxy extends AbstractConfigurationPattern
 
             final String lowerHttpRequest = httpRequest.toLowerCase();
 
-            // check if the inbound request contains the WSDL parameter
+            // check if the inbound request contains the WSDL or XSD parameter
             return (lowerHttpRequest.indexOf(WSDL_PARAM_1) != -1)
-                   || (lowerHttpRequest.indexOf(WSDL_PARAM_2) != -1);
+                   || (lowerHttpRequest.indexOf(WSDL_PARAM_2) != -1)
+                    || (lowerHttpRequest.indexOf(XSD_PARAM_1) != -1)
+                    || (lowerHttpRequest.indexOf(XSD_PARAM_2) != -1);
         }
 
         protected abstract String getWsdlContents(MuleEvent event) throws Exception;
@@ -365,7 +370,7 @@ public class WSProxy extends AbstractConfigurationPattern
                             .getExpressionManager()
                             .parse(wsAddress, event, true);
 
-                        return makeWsdlAddress(resolvedWsAddress);
+                        return makeWsdlOrXSDAddress(resolvedWsAddress, event.getMessage());
                     }
                 };
 
@@ -373,29 +378,38 @@ public class WSProxy extends AbstractConfigurationPattern
             }
             else
             {
-                final String wsdlAddress = makeWsdlAddress(wsAddress);
-
                 wsdlAddressProvider = new WsdlAddressProvider()
                 {
                     public String get(final MuleEvent event)
                     {
-                        return wsdlAddress;
+                        return makeWsdlOrXSDAddress(wsAddress, event.getMessage());
                     }
                 };
 
-                logger.info("Setting WSDL address to: " + wsdlAddress);
+                logger.info("Setting WSDL address for: " + wsAddress);
             }
         }
 
-        private static String makeWsdlAddress(final String wsAddress)
+        private static String makeWsdlOrXSDAddress(final String wsAddress, MuleMessage message)
         {
-            return StringUtils.substringBefore(wsAddress, "?").concat("?wsdl");
+            String request = message.getInboundProperty("http.request");
+            String address = StringUtils.substringBefore(wsAddress, "?") + "?";
+            // Parameters should be propagated, wsdl=1 or xsd=1 are valid
+            if(request != null && request.indexOf("?") > -1)
+            {
+                String queryString = StringUtils.substringAfter(request, "?");
+                return address.concat(queryString);
+            }
+            else
+            {
+                return address.concat("wsdl");
+            }
         }
 
         @Override
         protected String getWsdlContents(final MuleEvent event) throws Exception
         {
-            final String wsdlAddress = wsdlAddressProvider.get(event);
+            String wsdlAddress = wsdlAddressProvider.get(event);
             String wsdlString;
 
             final MuleContext muleContext = event.getMuleContext();
