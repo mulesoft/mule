@@ -92,6 +92,10 @@ public class ExpressionSplitter extends AbstractSplitter
         {
             return Collections.singletonList((MuleMessage) result);
         }
+        else if (result == null)
+        {
+            return new ArrayList();
+        }
         else
         {
             logger.info("The expression does not evaluate to a type that can be split: " + result.getClass().getName());

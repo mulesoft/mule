@@ -98,6 +98,11 @@
         <vm:outbound-endpoint path="split-aggregate-out" exchange-pattern="one-way" />
     </flow>
     
+    <flow name="split-no-parts">
+        <vm:inbound-endpoint path="split-no-parts-in" exchange-pattern="request-response" />
+        <splitter evaluator="xpath" expression="//Order/item" enableCorrelation="ALWAYS" />
+    </flow>
+
     <flow name="split-aggregate-singleton-list">
         <vm:inbound-endpoint path="split-aggregate-singleton-list-in" exchange-pattern="one-way" />
         <collection-splitter />
