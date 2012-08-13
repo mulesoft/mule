@@ -31,31 +31,61 @@ public class PipelineMessageNotificationTestCase extends AbstractNotificationTes
     public void doTest() throws Exception
     {
         final MuleClient client = new MuleClient(muleContext);
-        assertNotNull(client.send("vm://in-1", "hello sweet world", null));
-        client.dispatch("vm://in-2", "goodbye cruel world", null);
-        client.request("vm://out-2", RECEIVE_TIMEOUT);
+        assertNotNull(client.send("vm://rr", "hello sweet world", null));
+        assertNotNull(client.send("vm://rrException", "hello sweet world", null));
+        assertNotNull(client.send("vm://rrResponseException", "hello sweet world", null));
+        client.dispatch("vm://ow", "goodbye cruel world", null);
+        client.dispatch("vm://owException", "goodbye cruel world", null);
     }
 
     @Override
     public RestrictedNode getSpecification()
     {
-        return new Node().serial(
-            new Node(PipelineMessageNotification.class, PipelineMessageNotification.REQUEST_PROCESS_BEGIN))
+        return new Node()
+            // Request-Response
             .serial(
-                new Node(PipelineMessageNotification.class, PipelineMessageNotification.REQUEST_PROCESS_END))
+                new Node(PipelineMessageNotification.class, PipelineMessageNotification.PROCESS_BEGIN))
             .serial(
-                new Node(PipelineMessageNotification.class, PipelineMessageNotification.RESPONSE_PROCESS_END).serial(
-                    new Node(PipelineMessageNotification.class,
-                        PipelineMessageNotification.REQUEST_PROCESS_BEGIN)).serial(
-                    new Node(PipelineMessageNotification.class,
-                        PipelineMessageNotification.REQUEST_PROCESS_END)));
+                new Node(PipelineMessageNotification.class, PipelineMessageNotification.PROCESS_REQUEST_END))
+            .serial(
+                new Node(PipelineMessageNotification.class, PipelineMessageNotification.PROCESS_RESPONSE_END))
+            .serial(
+                new Node(PipelineMessageNotification.class, PipelineMessageNotification.PROCESS_END))
+            // Request-Response Request Exception
+            .serial(
+                new Node(PipelineMessageNotification.class, PipelineMessageNotification.PROCESS_BEGIN))
+            .serial(
+                new Node(PipelineMessageNotification.class, PipelineMessageNotification.PROCESS_EXCEPTION))
+            .serial(
+                new Node(PipelineMessageNotification.class, PipelineMessageNotification.PROCESS_END))
+            // Request-Response Response Exception
+            .serial(
+                new Node(PipelineMessageNotification.class, PipelineMessageNotification.PROCESS_BEGIN))
+            .serial(
+                new Node(PipelineMessageNotification.class, PipelineMessageNotification.PROCESS_REQUEST_END))
+            .serial(
+                new Node(PipelineMessageNotification.class, PipelineMessageNotification.PROCESS_EXCEPTION))
+            .serial(
+                new Node(PipelineMessageNotification.class, PipelineMessageNotification.PROCESS_END))
+            // One-Way
+            .serial(
+                new Node(PipelineMessageNotification.class, PipelineMessageNotification.PROCESS_BEGIN))
+            .serial(
+                new Node(PipelineMessageNotification.class, PipelineMessageNotification.PROCESS_END)
+                .parallel(new Node(PipelineMessageNotification.class, PipelineMessageNotification.PROCESS_REQUEST_END))
+            // One-Way Request Exception
+            .serial(
+                new Node(PipelineMessageNotification.class, PipelineMessageNotification.PROCESS_BEGIN))
+            .serial(
+                new Node(PipelineMessageNotification.class, PipelineMessageNotification.PROCESS_END)
+                .parallel(new Node(PipelineMessageNotification.class, PipelineMessageNotification.PROCESS_EXCEPTION))));
+
     }
 
     @Override
     public void validateSpecification(RestrictedNode spec) throws Exception
     {
         // TODO Auto-generated method stub
-
     }
 
     @Parameters

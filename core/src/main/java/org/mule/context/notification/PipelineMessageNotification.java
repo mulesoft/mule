@@ -23,19 +23,23 @@ public class PipelineMessageNotification extends ServerNotification implements B
 
     private static final long serialVersionUID = 6065691696506216248L;
 
-    public static final int REQUEST_RECEIVED = PIPELINE_MESSAGE_EVENT_ACTION_START_RANGE + 1;
-    public static final int REQUEST_PROCESS_BEGIN = PIPELINE_MESSAGE_EVENT_ACTION_START_RANGE + 2;
-    public static final int REQUEST_PROCESS_END = PIPELINE_MESSAGE_EVENT_ACTION_START_RANGE + 3;
-    public static final int RESPONSE_PROCESS_END = PIPELINE_MESSAGE_EVENT_ACTION_START_RANGE + 4;
-    public static final int RESPONSE_SENT = PIPELINE_MESSAGE_EVENT_ACTION_START_RANGE + 5;
+    // public static final int REQUEST_RECEIVED = PIPELINE_MESSAGE_EVENT_ACTION_START_RANGE + 1;
+    public static final int PROCESS_BEGIN = PIPELINE_MESSAGE_EVENT_ACTION_START_RANGE + 2;
+    public static final int PROCESS_REQUEST_END = PIPELINE_MESSAGE_EVENT_ACTION_START_RANGE + 3;
+    public static final int PROCESS_RESPONSE_END = PIPELINE_MESSAGE_EVENT_ACTION_START_RANGE + 4;
+    public static final int PROCESS_END = PIPELINE_MESSAGE_EVENT_ACTION_START_RANGE + 5;
+    public static final int PROCESS_EXCEPTION = PIPELINE_MESSAGE_EVENT_ACTION_START_RANGE + 6;
+    // public static final int RESPONSE_SENT = PIPELINE_MESSAGE_EVENT_ACTION_START_RANGE + 7;
 
     static
     {
-        registerAction("pipeline request message recieved", REQUEST_RECEIVED);
-        registerAction("pipeline process request message", REQUEST_PROCESS_BEGIN);
-        registerAction("pipeline request message processing complete", REQUEST_PROCESS_END);
-        registerAction("pipeline response message processing complete", RESPONSE_PROCESS_END);
-        registerAction("pipeline response message sent", RESPONSE_SENT);
+        // registerAction("pipeline request message recieved", REQUEST_RECEIVED);
+        registerAction("pipeline process begin", PROCESS_BEGIN);
+        registerAction("pipeline request message processing complete", PROCESS_REQUEST_END);
+        registerAction("pipeline response message processing complete", PROCESS_RESPONSE_END);
+        registerAction("pipeline process end", PROCESS_END);
+        registerAction("pipeline exception when processing", PROCESS_EXCEPTION);
+        // registerAction("pipeline response message sent", RESPONSE_SENT);
     }
 
     public PipelineMessageNotification(Pipeline pipeline, MuleEvent event, int action)

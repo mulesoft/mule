@@ -10,6 +10,7 @@
 
 package org.mule.construct;
 
+import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -92,17 +93,34 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
             {
                 muleContext.getNotificationManager().fireNotification(
                     new PipelineMessageNotification(AbstractPipeline.this, event,
-                        PipelineMessageNotification.REQUEST_PROCESS_BEGIN));
+                        PipelineMessageNotification.PROCESS_BEGIN));
 
-                MuleEvent result = processNext(event);
+                MuleEvent result = null;
 
-                if (event.getExchangePattern().hasResponse())
+                try
+                {
+                    result = processNext(event);
+                    if (event.getExchangePattern().hasResponse() && result != null)
+                    {
+                        muleContext.getNotificationManager().fireNotification(
+                            new PipelineMessageNotification(AbstractPipeline.this, result,
+                                PipelineMessageNotification.PROCESS_RESPONSE_END));
+                    }
+                    return result;
+                }
+                catch (MessagingException me)
+                {
+                    muleContext.getNotificationManager().fireNotification(
+                        new PipelineMessageNotification(AbstractPipeline.this, event,
+                            PipelineMessageNotification.PROCESS_EXCEPTION));
+                    throw me;
+                }
+                finally
                 {
                     muleContext.getNotificationManager().fireNotification(
                         new PipelineMessageNotification(AbstractPipeline.this, result,
-                            PipelineMessageNotification.RESPONSE_PROCESS_END));
+                            PipelineMessageNotification.PROCESS_END));
                 }
-                return result;
             }
         });
     }
@@ -116,7 +134,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
             {
                 muleContext.getNotificationManager().fireNotification(
                     new PipelineMessageNotification(AbstractPipeline.this, event,
-                        PipelineMessageNotification.REQUEST_PROCESS_END));
+                        PipelineMessageNotification.PROCESS_REQUEST_END));
                 return event;
             }
         });

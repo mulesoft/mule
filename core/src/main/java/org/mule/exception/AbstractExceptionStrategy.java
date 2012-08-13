@@ -11,9 +11,6 @@
 package org.mule.exception;
 
 import org.mule.api.MuleContext;
-import org.mule.api.security.SecurityException;
-import org.mule.context.notification.ExceptionNotification;
-import org.mule.context.notification.SecurityNotification;
 
 /**
  * This is the base class for exception strategies which contains several helper methods.  However, you should 
@@ -28,21 +25,6 @@ public abstract class AbstractExceptionStrategy extends AbstractExceptionListene
     public AbstractExceptionStrategy(MuleContext muleContext)
     {
         setMuleContext(muleContext);
-    }
-
-    protected void fireNotification(Exception ex)
-    {
-        if (enableNotifications)
-        {
-            if (ex instanceof SecurityException)
-            {
-                fireNotification(new SecurityNotification((SecurityException) ex, SecurityNotification.SECURITY_AUTHENTICATION_FAILED));
-            }
-            else
-            {
-                fireNotification(new ExceptionNotification(ex));
-            }
-        }
     }
 
 }
