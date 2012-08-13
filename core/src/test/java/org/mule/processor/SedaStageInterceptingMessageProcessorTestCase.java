@@ -237,6 +237,7 @@ public class SedaStageInterceptingMessageProcessorTestCase extends AsyncIntercep
         SedaStageInterceptingMessageProcessor mp = new SedaStageInterceptingMessageProcessor("name", "name",
             queueProfile, queueTimeout, muleContext.getDefaultThreadingProfile(), queueStatistics,
             muleContext);
+        mp.setMuleContext(muleContext);
         mp.setListener(listener);
         return mp;
     }
