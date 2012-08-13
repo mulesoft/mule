@@ -221,7 +221,7 @@ public class RegexExpressionLanguageFunctionTestCase extends AbstractMuleTestCas
     {
         MuleMessage message = Mockito.mock(MuleMessage.class);
         Mockito.when(message.getPayload(Mockito.any(Class.class))).thenReturn(payload);
-        context.addVariable("message", new MessageContext(message));
+        context.addFinalVariable("message", new MessageContext(message));
     }
 
 }

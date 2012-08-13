@@ -28,6 +28,8 @@ public interface ExpressionLanguageContext
 
     <T> void addVariable(String name, T value, VariableAssignmentCallback<T> assignmentCallback);
 
+    <T> void addFinalVariable(String name, T value);
+
     void addAlias(String alias, String expression);
 
     void declareFunction(String name, ExpressionLanguageFunction function);

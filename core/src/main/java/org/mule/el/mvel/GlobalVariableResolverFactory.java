@@ -46,7 +46,7 @@ class GlobalVariableResolverFactory extends MVELExpressionLanguageContext
         }
         for (Entry<String, Function> function : el.globalFunctions.entrySet())
         {
-            addVariable(function.getKey(), function.getValue());
+            addFinalVariable(function.getKey(), function.getValue());
         }
     }
 

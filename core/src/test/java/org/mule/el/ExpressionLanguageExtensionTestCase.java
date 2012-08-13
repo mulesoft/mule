@@ -81,10 +81,16 @@ public class ExpressionLanguageExtensionTestCase extends AbstractELTestCase
         Assert.assertEquals("hi", expressionLanguage.evaluate("a"));
     }
 
-    @Test(expected = ExpressionRuntimeException.class)
+    @Test
     public void assignValueToVariable() throws RegistrationException, InitialisationException
     {
         expressionLanguage.evaluate("a='1'");
+    }
+
+    @Test(expected = ExpressionRuntimeException.class)
+    public void assignValueToFinalVariable() throws RegistrationException, InitialisationException
+    {
+        expressionLanguage.evaluate("final='1'");
     }
 
     @Test
@@ -177,6 +183,7 @@ public class ExpressionLanguageExtensionTestCase extends AbstractELTestCase
                 }
             });
             context.addVariable("appShortcut", context.getVariable("app"));
+            context.addFinalVariable("final", "final");
             context.addAlias("p", "message.payload");
             context.declareFunction("f", new ExpressionLanguageFunction()
             {

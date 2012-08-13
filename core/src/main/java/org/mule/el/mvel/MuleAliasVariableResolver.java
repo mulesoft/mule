@@ -36,7 +36,7 @@ class MuleAliasVariableResolver extends MuleVariableResolver<Object>
     {
         MVELExpressionLanguageContext newContext = new MVELExpressionLanguageContext(context);
         expression = expression + "= ___value";
-        newContext.addVariable("___value", value);
+        newContext.addFinalVariable("___value", value);
         executor.execute(expression, newContext);
     }
 }

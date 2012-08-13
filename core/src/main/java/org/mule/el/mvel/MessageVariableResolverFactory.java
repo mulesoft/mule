@@ -32,7 +32,7 @@ class MessageVariableResolverFactory extends MVELExpressionLanguageContext
 
         if (message != null)
         {
-            addVariable("message", new MessageContext(message));
+            addFinalVariable("message", new MessageContext(message));
 
             // We need payload top-level for compatibility with payload expression evaluator without ':'
             addVariable("payload", message.getPayload(), new VariableAssignmentCallback()
@@ -47,15 +47,15 @@ class MessageVariableResolverFactory extends MVELExpressionLanguageContext
             // Only add exception is present
             if (message.getExceptionPayload() != null)
             {
-                addVariable("exception", message.getExceptionPayload().getException());
+                addFinalVariable("exception", message.getExceptionPayload().getException());
             }
             else
             {
-                addVariable("exception", null);
+                addFinalVariable("exception", null);
             }
 
-            addVariable("flowVars", new MessagePropertyMapContext(message, PropertyScope.INVOCATION));
-            addVariable("sessionVars", new MessagePropertyMapContext(message, PropertyScope.SESSION));
+            addFinalVariable("flowVars", new MessagePropertyMapContext(message, PropertyScope.INVOCATION));
+            addFinalVariable("sessionVars", new MessagePropertyMapContext(message, PropertyScope.SESSION));
         }
     }
 }
