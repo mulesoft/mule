@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:spring="http://www.springframework.org/schema/beans" xmlns:test="http://www.mulesoft.org/schema/mule/test"
-    xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+    xmlns:vm="http://www.mulesoft.org/schema/mule/vm" xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
     xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+       http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/3.2/mule-jms.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
     <vm:endpoint path="addSessionPropertiesFlowEndpoint" exchange-pattern="request-response" name="addSessionPropertiesFlowEndpoint" />
@@ -145,6 +146,27 @@
         <catch-exception-strategy>
             <test:assert expression="#[header:SESSION:P1]" />
         </catch-exception-strategy>
+    </flow>
+    
+    <jms:activemq-connector name="activeMQ" brokerURL="vm://localhost" validateConnections="true"/>
+    
+    <flow name="main">
+        <vm:inbound-endpoint path="inReqReplyJms" exchange-pattern="request-response" />
+        <message-properties-transformer scope="session">
+            <add-message-property key="testProperty" value="test" />
+        </message-properties-transformer>
+        <request-reply>
+            <jms:outbound-endpoint queue="outReqReply" />
+            <jms:inbound-endpoint queue="waitReqReply" />
+        </request-reply>
+
+        <expression-transformer evaluator="header" expression="SESSION:testProperty" />
+    </flow>
+    
+    <flow name="second">
+        <jms:inbound-endpoint queue="outReqReply" />
+        <logger />
+        <jms:outbound-endpoint queue="waitReqReply" />
     </flow>
     
 </mule>
