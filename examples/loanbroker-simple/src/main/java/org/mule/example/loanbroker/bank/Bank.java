@@ -10,15 +10,11 @@
 
 package org.mule.example.loanbroker.bank;
 
-import org.mule.api.endpoint.ImmutableEndpoint;
-import org.mule.api.service.Service;
-import org.mule.api.service.ServiceAware;
 import org.mule.example.loanbroker.message.LoanBrokerQuoteRequest;
 import org.mule.example.loanbroker.model.LoanQuote;
-import org.mule.service.ServiceCompositeMessageSource;
 
 import java.io.Serializable;
-import java.util.List;
+import java.util.Arrays;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -28,12 +24,17 @@ import org.apache.commons.logging.LogFactory;
  * quotes.
  */
 
-public class Bank implements ServiceAware, Serializable, BankService
+public class Bank implements Serializable, BankService
 {
+
     /**
      * Serial version
      */
     private static final long serialVersionUID = 4108271137166107769L;
+
+    private static final int PLATINUM_PROFILE_INDEX = 0;
+    private static final int GOLD_PROFILE_INDEX = 1;
+    private static final int BASIC_PROFILE_INDEX = 2;
 
     /**
      * logger used by this class
@@ -41,56 +42,43 @@ public class Bank implements ServiceAware, Serializable, BankService
     protected static final Log logger = LogFactory.getLog(Bank.class);
 
     private String bankName;
-    private double primeRate;
-    
-    /**
-     * Incoming endpoint for the bank, this is used to create a static recipient list based on a list of banks.
-     */
-    private String endpoint;
+    private final double[] rates;
 
     public Bank()
     {
-        this.primeRate = Math.random() * 10;
-    }
-
-    public Bank(String bankname)
-    {
-        this();
-        this.bankName = bankname;
-
-        // For simplicity, the endpoint for the bank is the same as the bank's name.
-        this.endpoint = bankName;
-    }
-
-    // TODO This method doesn't help us with the Static Recipient list because the list of banks is created 
-    // programatically in DefaultLenderService (they should be looked up from the config/registry).
-    public void setService(Service service)
-    {
-        this.bankName = service.getName(); 
-
-        if (!(service.getMessageSource() instanceof ServiceCompositeMessageSource))
-        {
-            throw new IllegalStateException("Only 'ServiceCompositeMessageSource' is supported");
-        }
-
-        List endpoints = ((ServiceCompositeMessageSource) service.getMessageSource()).getEndpoints();
-        if ((endpoints == null) || (endpoints.size() != 1))
-        {
-            throw new IllegalArgumentException("Bank is expected to have exactly 1 incoming endpoint.");
-        }
-        // TODO This gives us the endpoint the bank is listening on, but the endpoint for sending to the bank 
-        // is different in the ESB config ("Bank1In" vs. "Bank1")
-        this.endpoint = ((ImmutableEndpoint) endpoints.get(0)).getName();
+        rates = new double[] {Math.random() * 10, Math.random() * 10, Math.random() * 10};
+        Arrays.sort(rates);
     }
 
     public LoanQuote getLoanQuote(LoanBrokerQuoteRequest request)
     {
         LoanQuote quote = new LoanQuote();
         quote.setBankName(getBankName());
-        quote.setInterestRate(primeRate);
+        int creditScore = request.getCreditProfile().getCreditScore();
+        quote.setInterestRate(getCreditScoreRate(creditScore));
         logger.info("Returning Rate is: " + quote);
 
         return quote;
+    }
+
+    private double getCreditScoreRate(int creditScore)
+    {
+        // 300 <= creditScore < 900, higher values means better customer credit profile
+        int index;
+        if (creditScore < 500)
+        {
+            index = BASIC_PROFILE_INDEX;
+        }
+        else if (creditScore < 700)
+        {
+            index = GOLD_PROFILE_INDEX;
+        }
+        else
+        {
+            index = PLATINUM_PROFILE_INDEX;
+        }
+
+        return rates[index];
     }
 
     public String getBankName()
@@ -101,24 +89,5 @@ public class Bank implements ServiceAware, Serializable, BankService
     public void setBankName(String bankName)
     {
         this.bankName = bankName;
-    }
-
-    public double getPrimeRate()
-    {
-        return primeRate;
-    }
-
-    public void setPrimeRate(double primeRate)
-    {
-        this.primeRate = primeRate;
-    }
-
-    public String getEndpoint()
-    {
-        return endpoint;
-    }
-    public void setEndpoint(String endpoint)
-    {
-        this.endpoint = endpoint;
     }
 }

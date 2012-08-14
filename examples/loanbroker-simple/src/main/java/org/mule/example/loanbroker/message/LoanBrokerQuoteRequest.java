@@ -10,7 +10,6 @@
 
 package org.mule.example.loanbroker.message;
 
-import org.mule.example.loanbroker.bank.Bank;
 import org.mule.example.loanbroker.model.CreditProfile;
 import org.mule.example.loanbroker.model.LoanQuote;
 
@@ -34,7 +33,7 @@ public class LoanBrokerQuoteRequest implements Serializable
     private CreditProfile creditProfile;
 
     /** A list of lenders for this request */
-    private Bank[] lenders;
+    //private Bank[] lenders;
 
     /** A loan quote from a bank */
     private LoanQuote loanQuote;
@@ -42,16 +41,6 @@ public class LoanBrokerQuoteRequest implements Serializable
     public LoanBrokerQuoteRequest()
     {
         super();
-    }
-
-    public Bank[] getLenders()
-    {
-        return lenders;
-    }
-
-    public void setLenders(Bank[] lenders)
-    {
-        this.lenders = lenders;
     }
 
     public CustomerQuoteRequest getCustomerRequest()

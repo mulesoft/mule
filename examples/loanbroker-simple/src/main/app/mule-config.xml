@@ -1,158 +1,212 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+<mule xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:spring="http://www.springframework.org/schema/beans"
-      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
-      xmlns:script="http://www.mulesoft.org/schema/mule/scripting"
       xmlns:http="http://www.mulesoft.org/schema/mule/http"
       xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
-      xmlns:pattern="http://www.mulesoft.org/schema/mule/pattern"
       xsi:schemaLocation="
-        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
-        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
-        http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd
-        http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd
-        http://www.mulesoft.org/schema/mule/pattern http://www.mulesoft.org/schema/mule/pattern/current/mule-pattern.xsd
-        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+          http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+          http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd
+          http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd " version="EE-3.3.0">
 
     <description>
         This Synchronous variant of loan broker example is modeled on the Enterprise integration Patterns book sample.
         See: http://www.eaipatterns.com/ComposedMessagingExample.html
     </description>
 
-    <!-- Flows and Services -->
-
     <!--
          The main loan broker flow that:
            i) Receives a customer request
            ii) Performs a lookup of the customer credit profile using a component binding
-           iii) Determines the bank that should be used to request quotes using 'DefaultLender'
-           iv) Uses an recipient list router to send quote requests to the selected banks and aggregates responses
-           v) Selects the lowest quote from the list of quotes returned using the 'LowestQuoteProcessor'
+           iii) Determines the bank that should be used to request quotes
+           iv) Sends the request to the selected banks and aggregates responses
+           v) Selects the lowest quote from the list of quotes
+           vi) Returns the response to the client
      -->
-    <flow name="loan-broker-sync">
-        <composite-source>
-            <inbound-endpoint ref="HttpUrlCustomerRequests"/>
-            <!-- This endpoint is used by a test case to post java objects directly -->
-            <inbound-endpoint ref="CustomerRequests"/>
-        </composite-source>
+    <flow name="loan-broker-sync" doc:name="loan-broker-sync">
+        <http:inbound-endpoint address="http://0.0.0.0:11081" exchange-pattern="request-response" doc:name="HTTP"/>
 
-        <component class="org.mule.example.loanbroker.DefaultLoanBroker">
-            <binding interface="org.mule.example.loanbroker.creditagency.CreditAgencyService">
-                <outbound-endpoint ref="CreditAgency" />
-            </binding>
-        </component>
-        <expression-filter expression="payload.lenders.endpoint!=null" evaluator="groovy" />
-        <recipient-list evaluator="groovy" expression="payload.lenders.endpoint" />
-        <custom-processor class="org.mule.example.loanbroker.processor.LowestQuoteProcessor" />
+        <expression-component doc:name="createLoanBrokerRequest">
+            import org.mule.example.loanbroker.message.CustomerQuoteRequest;
+            import org.mule.example.loanbroker.model.Customer;
+
+            customerName = message.inboundProperties['name'] == null ? "Muley" : message.inboundProperties['ssn'];
+            ssn = message.inboundProperties['ssn'] == null ? 1234 : Integer.parseInt(message.inboundProperties['ssn']);
+            amount = message.inboundProperties['amount'] == null ? 20000 : Integer.parseInt(message.inboundProperties['amount']);
+            term = message.inboundProperties['term'] == null ? 48 : Integer.parseInt(message.inboundProperties['term']);
+
+            c = new Customer(customerName,  ssn);
+            payload = new CustomerQuoteRequest(c, amount, term);
+        </expression-component>
+
+        <flow-ref name="getCustomerCreditProfile" doc:name="getCustomerCreditProfile"/>
+        <flow-ref name="getBanksToContact" doc:name="getBanksToContact"/>
+        <flow-ref name="getLoanQuotes" doc:name="getLoanQuotes"/>
+        <flow-ref name="getLowestLoanQuote" doc:name="getLowestLoanQuote"/>
+
+        <object-to-string-transformer doc:name="Object to String"/>
+
+        <catch-exception-strategy>
+            <expression-component>payload="Error processing loan request"</expression-component>
+        </catch-exception-strategy>
     </flow>
+
+    <!-- Obtains the customer credit profile and returns it as a flow variable 'creditProfile' -->
+    <sub-flow name="getCustomerCreditProfile" doc:name="getCustomerCreditProfile">
+        <enricher target="#[flowVars['creditProfile']]" source="#[payload]" doc:name="Enrich with creditProfile">
+            <processor-chain doc:name="contactCreditAgency">
+                <set-payload value="#[payload.customer]" doc:name="customer"/>
+                <cxf:jaxws-client serviceClass="org.mule.example.loanbroker.creditagency.CreditAgencyService" operation="getCreditProfile" doc:name="getCreditProfile"/>
+                <http:outbound-endpoint address="http://localhost:18080/mule/TheCreditAgencyService" doc:name="HTTP"/>
+            </processor-chain>
+        </enricher>
+        <logger level="WARN" message="Credit profile: #[flowVars['creditProfile']]" doc:name="creditProfile"/>
+    </sub-flow>
+
+    <!-- Obtains the list of banks to contact and returns it as a flow variable 'banks' -->
+    <sub-flow name="getBanksToContact" doc:name="getBanksToContact">
+        <choice doc:name="Choice">
+            <when expression="payload.getLoanAmount() &gt;= 20000">
+                <set-variable variableName="banks" value="#[[new java.net.URI('http://localhost:10080/mule/TheBank1'), new java.net.URI('http://localhost:20080/mule/TheBank2')]]" doc:name="bank1, bank2"/>
+            </when>
+            <when expression="payload.getLoanAmount() &gt;= 10000 || payload.getLoanAmount() &lt;= 19999">
+                <set-variable variableName="banks" value="#[[new java.net.URI('http://localhost:30080/mule/TheBank3'), new java.net.URI('http://localhost:40080/mule/TheBank4')]]" doc:name="bank3,bank4"/>
+            </when>
+            <otherwise>
+                <set-variable variableName="banks" value="#[[new java.net.URI('http://localhost:50080/mule/TheBank5')]]" doc:name="bank5"/>
+            </otherwise>
+        </choice>
+        <logger level="WARN" message="Banks to contact: #[flowVars['banks']]" doc:name="banks"/>
+    </sub-flow>
+
+    <!-- Contacts each bank and collects the responses saving the result as a flow var 'quotes'-->
+    <sub-flow name="getLoanQuotes" doc:name="getLoanQuotes">
+        <set-variable variableName="quotes" value="#[new java.util.LinkedList()]" doc:name="create empty quotes"/>
+
+        <foreach collection="#[flowVars['banks']]" doc:name="Foreach">
+            <set-variable variableName="bankUri" value="#[payload]" doc:name="bankUri"/>
+
+            <enricher target="#[flowVars['quote']]" doc:name="Message Enricher">
+                <processor-chain doc:name="Processor Chain">
+                    <expression-component doc:name="create LoanBrokerLoanRequest">
+                        import org.mule.example.loanbroker.message.LoanBrokerQuoteRequest;
+
+                        LoanBrokerQuoteRequest bqr = new LoanBrokerQuoteRequest();
+                        bqr.setCreditProfile(flowVars['creditProfile']);
+                        payload = bqr;
+                    </expression-component>
+
+                    <flow-ref name="getLoanQuote" doc:name="getLoanQuote"/>
+                </processor-chain>
+            </enricher>
+            <logger level="WARN" message="LoanQuote from #[flowVars['bankUri']]: #[flowVars['quote']]" doc:name="quote"/>
+
+            <expression-component doc:name="Expression">quotes.add(flowVars['quote'])</expression-component>
+        </foreach>
+
+        <logger level="WARN" message="Loan quotes: #[flowVars['quotes']]" doc:name="quotes"/>
+    </sub-flow>
+
+    <!-- Returns a loan quote from one bank -->
+    <sub-flow name="getLoanQuote" doc:name="getLoanQuote">
+        <cxf:jaxws-client serviceClass="org.mule.example.loanbroker.bank.BankService" operation="getLoanQuote" doc:name="getLoanQuote"/>
+        <http:outbound-endpoint address="http://#[flowVars['bankUri'].getHost()]:#[flowVars['bankUri'].getPort()]#[flowVars['bankUri'].getPath()]" doc:name="HTTP"/>
+    </sub-flow>
+
+    <!-- Returns the loan quote with the lowest interest rate -->
+    <sub-flow name="getLowestLoanQuote" doc:name="getLowestLoanQuote">
+        <expression-component doc:name="findLowestLoanQuote">
+            <![CDATA[
+            import org.mule.example.loanbroker.model.LoanQuote;
+
+            LoanQuote lowestQuote = null;
+
+            for (Object current : (List) flowVars['quotes'])
+            {
+                LoanQuote loanQuote = (LoanQuote) current;
+                if (lowestQuote == null)
+                {
+                    lowestQuote = loanQuote;
+                }
+                else if (loanQuote.getInterestRate() < lowestQuote.getInterestRate())
+                {
+                    lowestQuote = loanQuote;
+                }
+            }
+
+            payload = lowestQuote;
+            ]]>
+        </expression-component>
+        <logger level="WARN" message="Lowest loan quote: #[payload]" doc:name="lowestQuote"/>
+    </sub-flow>
+
+    <!--
+       MOCK SERVICES
+    -->
 
     <!--
         The credit agency service will get the credit profile for a customer
      -->
-    <pattern:simple-service name="TheCreditAgencyService" address="http://localhost:18080/mule/TheCreditAgencyService"
-                    component-class="org.mule.example.loanbroker.creditagency.DefaultCreditAgency" type="jax-ws" />
+    <flow name="TheCreditAgencyService" doc:name="TheCreditAgencyService">
+        <http:inbound-endpoint address="http://localhost:18080/mule/TheCreditAgencyService" exchange-pattern="request-response" doc:name="HTTP"/>
+        <cxf:jaxws-service serviceClass="org.mule.example.loanbroker.creditagency.DefaultCreditAgency" doc:name="SOAP"/>
+        <component doc:name="creditAgency">
+            <singleton-object class="org.mule.example.loanbroker.creditagency.DefaultCreditAgency"/>
+        </component>
+    </flow>
 
     <!--
-        These are mock bank services that represent remote bank loan services. One or more of these are
+        These are mock bank flows that represent remote bank loan services. One or more of these are
         invoked synchronously by the loan broker.
     -->
-    <pattern:simple-service name="abstractBank" abstract="true" type="jax-ws"/>
-    <pattern:simple-service name="bank1" parent="abstractBank" address="http://localhost:10080/mule/TheBank1">
-        <component>
+    <flow name="Bank1Flow" doc:name="Bank1Flow">
+        <http:inbound-endpoint address="http://localhost:10080/mule/TheBank1" exchange-pattern="request-response" doc:name="HTTP"/>
+        <cxf:jaxws-service serviceClass="org.mule.example.loanbroker.bank.Bank" doc:name="SOAP"/>
+        <component doc:name="Bank 1">
             <singleton-object class="org.mule.example.loanbroker.bank.Bank">
                 <property key="bankName" value="Bank #1"/>
             </singleton-object>
         </component>
-    </pattern:simple-service>
-    <pattern:simple-service name="bank2" parent="abstractBank" address="http://localhost:20080/mule/TheBank2">
-        <component>
+    </flow>
+
+    <flow name="Bank2Flow" doc:name="Bank2Flow">
+        <http:inbound-endpoint address="http://localhost:20080/mule/TheBank2" exchange-pattern="request-response" doc:name="HTTP"/>
+        <cxf:jaxws-service serviceClass="org.mule.example.loanbroker.bank.Bank" doc:name="SOAP"/>
+
+        <component doc:name="Bank 2">
             <singleton-object class="org.mule.example.loanbroker.bank.Bank">
                 <property key="bankName" value="Bank #2"/>
             </singleton-object>
         </component>
-    </pattern:simple-service>
-    <pattern:simple-service name="bank3" parent="abstractBank" address="http://localhost:30080/mule/TheBank3">
-        <component>
+    </flow>
+
+    <flow name="Bank3Flow" doc:name="Bank3Flow">
+        <http:inbound-endpoint address="http://localhost:30080/mule/TheBank3" exchange-pattern="request-response" doc:name="HTTP"/>
+        <cxf:jaxws-service serviceClass="org.mule.example.loanbroker.bank.Bank" doc:name="SOAP"/>
+        <component doc:name="Bank 3">
             <singleton-object class="org.mule.example.loanbroker.bank.Bank">
                 <property key="bankName" value="Bank #3"/>
             </singleton-object>
         </component>
-    </pattern:simple-service>
-    <pattern:simple-service name="bank4" parent="abstractBank" address="http://localhost:40080/mule/TheBank4">
-        <component>
+    </flow>
+
+    <flow name="Bank4Flow" doc:name="Bank4Flow">
+        <http:inbound-endpoint address="http://localhost:40080/mule/TheBank4" exchange-pattern="request-response" doc:name="HTTP"/>
+        <cxf:jaxws-service serviceClass="org.mule.example.loanbroker.bank.Bank" doc:name="SOAP"/>
+        <component doc:name="Bank 4">
             <singleton-object class="org.mule.example.loanbroker.bank.Bank">
                 <property key="bankName" value="Bank #4"/>
             </singleton-object>
         </component>
-    </pattern:simple-service>
-    <pattern:simple-service name="bank5" parent="abstractBank" address="http://localhost:50080/mule/TheBank5">
-        <component>
+    </flow>
+
+    <flow name="Bank5Flow" doc:name="Bank5Flow">
+        <http:inbound-endpoint address="http://localhost:50080/mule/TheBank5" exchange-pattern="request-response" doc:name="HTTP"/>
+        <cxf:jaxws-service serviceClass="org.mule.example.loanbroker.bank.Bank" doc:name="SOAP"/>
+        <component doc:name="Bank 5">
             <singleton-object class="org.mule.example.loanbroker.bank.Bank">
                 <property key="bankName" value="Bank #5"/>
             </singleton-object>
         </component>
-    </pattern:simple-service>
-
-    <!--  Global Endpoints -->
-
-    <http:endpoint name="CustomerRequests" address="http://localhost:11080" exchange-pattern="request-response">
-        <byte-array-to-object-transformer/>
-    </http:endpoint>
-
-    <http:endpoint name="HttpUrlCustomerRequests" address="http://0.0.0.0:11081"
-                   exchange-pattern="request-response">
-        <!-- Translate request params into properties map -->
-        <http:body-to-parameter-map-transformer name="HttpRequestToMap"/>
-        <!-- Create java objects for the LoanBroker requests-->
-        <script:transformer>
-            <script:script engine="groovy">
-                import org.mule.example.loanbroker.message.*
-                import org.mule.example.loanbroker.model.*
-
-                //println "\n\n\n\n$payload"
-
-                // remember 'payload' is a Map/String,String/ from the previous transformer
-                def customerName = payload.name ?: "Muley" // fallback to defaults if no value provided in url
-                def ssn = (payload.ssn ?: 1234) as Integer
-                def amount = (payload.amount ?: 20000) as Integer
-                def term = (payload.term ?: 48) as Integer
-
-                def c = new Customer(customerName,  ssn)
-                result = new CustomerQuoteRequest(c, amount, term)
-            </script:script>
-        </script:transformer>
-        <response>
-            <!--
-                If there's an exception payload, return a short message to the requestor, otherwise original payload
-            -->
-            <expression-transformer>
-                <return-argument evaluator="groovy" expression="message.exceptionPayload?.message ?: payload"/>
-            </expression-transformer>
-            <object-to-string-transformer/>
-        </response>
-    </http:endpoint>
-
-    <endpoint name="CreditAgency" address="http://localhost:18080/mule/TheCreditAgencyService?method=getCreditProfile"
-              exchange-pattern="request-response">
-        <cxf:jaxws-client serviceClass="org.mule.example.loanbroker.creditagency.CreditAgencyService" />
-    </endpoint>
-
-    <http:endpoint name="Bank1" address="http://localhost:10080/mule/TheBank1?method=getLoanQuote">
-        <cxf:jaxws-client serviceClass="org.mule.example.loanbroker.bank.BankService" />
-    </http:endpoint>
-    <http:endpoint name="Bank2" address="http://localhost:20080/mule/TheBank2?method=getLoanQuote">
-        <cxf:jaxws-client serviceClass="org.mule.example.loanbroker.bank.BankService" />
-    </http:endpoint>
-    <http:endpoint name="Bank3" address="http://localhost:30080/mule/TheBank3?method=getLoanQuote">
-        <cxf:jaxws-client serviceClass="org.mule.example.loanbroker.bank.BankService" />
-    </http:endpoint>
-    <http:endpoint name="Bank4" address="http://localhost:40080/mule/TheBank4?method=getLoanQuote">
-        <cxf:jaxws-client serviceClass="org.mule.example.loanbroker.bank.BankService" />
-    </http:endpoint>
-    <http:endpoint name="Bank5" address="http://localhost:50080/mule/TheBank5?method=getLoanQuote">
-        <cxf:jaxws-client serviceClass="org.mule.example.loanbroker.bank.BankService" />
-    </http:endpoint>
-
+    </flow>
 </mule>
