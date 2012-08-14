@@ -41,6 +41,9 @@
     <flow name="service-5">
         <vm:inbound-endpoint path="owException" exchange-pattern="one-way" />
         <expression-component>hola</expression-component>
+        <catch-exception-strategy>
+            <vm:outbound-endpoint path="owException-out" exchange-pattern="one-way" />
+        </catch-exception-strategy>
     </flow>
 
 </mule>

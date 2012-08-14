@@ -35,7 +35,9 @@ public class PipelineMessageNotificationTestCase extends AbstractNotificationTes
         assertNotNull(client.send("vm://rrException", "hello sweet world", null));
         assertNotNull(client.send("vm://rrResponseException", "hello sweet world", null));
         client.dispatch("vm://ow", "goodbye cruel world", null);
+        client.request("vm://ow-out", RECEIVE_TIMEOUT);
         client.dispatch("vm://owException", "goodbye cruel world", null);
+        client.request("vm://owException-out", RECEIVE_TIMEOUT);
     }
 
     @Override
