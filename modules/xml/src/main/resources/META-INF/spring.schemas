@@ -1,2 +1,4 @@
+http\://www.mulesoft.org/schema/mule/xml/3.1/mule-xml.xsd=META-INF/mule-xml.xsd
+http\://www.mulesoft.org/schema/mule/xml/3.2/mule-xml.xsd=META-INF/mule-xml.xsd
 http\://www.mulesoft.org/schema/mule/xml/3.3/mule-xml.xsd=META-INF/mule-xml.xsd
 http\://www.mulesoft.org/schema/mule/xml/current/mule-xml.xsd=META-INF/mule-xml.xsd
