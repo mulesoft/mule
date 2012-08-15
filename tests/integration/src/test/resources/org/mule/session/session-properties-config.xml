@@ -10,7 +10,11 @@
        http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/3.2/mule-jms.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd">
 
-    <vm:endpoint path="addSessionPropertiesFlowEndpoint" exchange-pattern="request-response" name="addSessionPropertiesFlowEndpoint" />
+    <vm:connector name="VMConnector"/>
+    <vm:connector name="nullSessionHandlerVMConnector">
+        <service-overrides sessionHandler="org.mule.session.NullSessionHandler"/>
+    </vm:connector>
+    <vm:endpoint path="addSessionPropertiesFlowEndpoint" exchange-pattern="request-response" name="addSessionPropertiesFlowEndpoint" connector-ref="VMConnector"/>
 
     <flow name="A" processingStrategy="synchronous">
         <expression-transformer evaluator="header" expression="SESSION:key" />
@@ -31,10 +35,10 @@
         <message-properties-transformer scope="session">
             <mule:add-message-property key="key1" value="value1" />
         </message-properties-transformer>
-        <vm:outbound-endpoint path="D-in" exchange-pattern="request-response"/>
+        <vm:outbound-endpoint path="D-in" exchange-pattern="request-response" connector-ref="VMConnector"/>
     </flow>
     <flow name="D" processingStrategy="synchronous">
-        <vm:inbound-endpoint path="D-in" exchange-pattern="request-response"/>
+        <vm:inbound-endpoint path="D-in" exchange-pattern="request-response" connector-ref="VMConnector"/>
         <response>
             <message-properties-transformer scope="session">
                 <mule:add-message-property key="key4" value="value4" />
@@ -43,42 +47,42 @@
         <message-properties-transformer scope="session">
             <mule:add-message-property key="key2" value="value2" />
         </message-properties-transformer>
-        <vm:outbound-endpoint path="E-in" exchange-pattern="request-response"/>
+        <vm:outbound-endpoint path="E-in" exchange-pattern="request-response" connector-ref="VMConnector"/>
     </flow>
     <flow name="E">
-        <vm:inbound-endpoint path="E-in" exchange-pattern="request-response"/>
+        <vm:inbound-endpoint path="E-in" exchange-pattern="request-response" connector-ref="VMConnector"/>
         <message-properties-transformer scope="session">
             <mule:add-message-property key="key3" value="value3" />
         </message-properties-transformer>
     </flow>
 
     <flow name="PassthroughFlow">
-        <vm:outbound-endpoint path="passthrough-bridge" exchange-pattern="one-way"/>
+        <vm:outbound-endpoint path="passthrough-bridge" exchange-pattern="one-way" connector-ref="VMConnector"/>
     </flow>
     <flow name="PassthroughBFlow">
-        <vm:inbound-endpoint path="passthrough-bridge" exchange-pattern="one-way"/>
-        <vm:outbound-endpoint path="PassthroughFlow-out" exchange-pattern="one-way"/>
+        <vm:inbound-endpoint path="passthrough-bridge" exchange-pattern="one-way" connector-ref="VMConnector"/>
+        <vm:outbound-endpoint path="PassthroughFlow-out" exchange-pattern="one-way" connector-ref="VMConnector"/>
     </flow>
 
     <flow name="OneWaySessionPropertySettingChain">
         <message-properties-transformer scope="session">
             <mule:add-message-property key="key1" value="value1" />
         </message-properties-transformer>
-        <vm:outbound-endpoint path="G-in" exchange-pattern="one-way"/>
+        <vm:outbound-endpoint path="G-in" exchange-pattern="one-way" connector-ref="VMConnector"/>
     </flow>
     <flow name="G">
-        <vm:inbound-endpoint path="G-in" exchange-pattern="one-way"/>
+        <vm:inbound-endpoint path="G-in" exchange-pattern="one-way" connector-ref="VMConnector"/>
         <message-properties-transformer scope="session">
             <mule:add-message-property key="key2" value="value2" />
         </message-properties-transformer>
-        <vm:outbound-endpoint path="H-in" exchange-pattern="one-way"/>
+        <vm:outbound-endpoint path="H-in" exchange-pattern="one-way" connector-ref="VMConnector"/>
     </flow>
     <flow name="H">
-        <vm:inbound-endpoint path="H-in" exchange-pattern="one-way"/>
+        <vm:inbound-endpoint path="H-in" exchange-pattern="one-way" connector-ref="VMConnector"/>
         <message-properties-transformer scope="session">
             <mule:add-message-property key="key3" value="value3" />
         </message-properties-transformer>
-        <vm:outbound-endpoint path="H-out" exchange-pattern="one-way"/>
+        <vm:outbound-endpoint path="H-out" exchange-pattern="one-way" connector-ref="VMConnector"/>
     </flow>
 
     <flow name="FlowRefWithSessionProperties" processingStrategy="synchronous">
@@ -108,23 +112,33 @@
             <add-message-property key="nonSerializableBean" value-ref="nonSerializableBean"/>
         </message-properties-transformer>
     </flow>
-
+    
     <flow name="requestResponseFlow" processingStrategy="synchronous">
-        <logger/>
         <request-reply timeout="5000">
-            <vm:outbound-endpoint path="out" exchange-pattern="one-way"/>
-            <vm:inbound-endpoint path="in" exchange-pattern="one-way"/>
+            <vm:outbound-endpoint path="out" exchange-pattern="one-way" connector-ref="VMConnector"/>
+            <vm:inbound-endpoint path="in" exchange-pattern="one-way" connector-ref="VMConnector"/>
         </request-reply>
     </flow>
     <flow name="addSessionPropertiesFlowOneWay" processingStrategy="synchronous">
-        <vm:inbound-endpoint path="out" exchange-pattern="one-way"/>
+        <vm:inbound-endpoint path="out" exchange-pattern="one-way" connector-ref="VMConnector"/>
         <message-properties-transformer scope="session">
             <add-message-property key="keyNonSerializable" value="val"/>
             <add-message-property key="KEY2" value="value2NEW"/>
             <add-message-property key="key3" value="value3"/>
             <add-message-property key="nonSerializableBean" value-ref="nonSerializableBean"/>
         </message-properties-transformer>
-        <vm:outbound-endpoint path="in" exchange-pattern="one-way"/>
+        <vm:outbound-endpoint path="in" exchange-pattern="one-way" connector-ref="VMConnector"/>
+    </flow>
+
+    <flow name="requestResponseNoSessionPropagationFlow" processingStrategy="synchronous">
+        <request-reply timeout="5000">
+            <vm:outbound-endpoint path="out2" exchange-pattern="one-way" connector-ref="VMConnector"/>
+            <vm:inbound-endpoint path="in2?connector=nullSessionHandlerVMConnector" exchange-pattern="one-way" connector-ref="VMConnector"/>
+        </request-reply>
+    </flow>
+    <flow name="noSessionPropagationFlow" processingStrategy="synchronous">
+        <vm:inbound-endpoint path="out2" exchange-pattern="one-way" connector-ref="nullSessionHandlerVMConnector"/>
+        <echo-component/>
     </flow>
 
     <spring:bean name="nonSerializableBean" class="java.lang.Object"/>
@@ -137,25 +151,6 @@
         <default-exception-strategy>
             <test:assert expression="#[header:SESSION:P2]" />
         </default-exception-strategy>
-    </flow>
-
-    <jms:activemq-connector name="activeMQ" brokerURL="vm://localhost" validateConnections="true"/>
-    <flow name="main">
-        <vm:inbound-endpoint path="inReqReplyJms" exchange-pattern="request-response"/>
-        <message-properties-transformer scope="session">
-            <add-message-property key="testProperty" value="test"/>
-        </message-properties-transformer>
-        <request-reply>
-            <jms:outbound-endpoint queue="outReqReply"/>
-            <jms:inbound-endpoint queue="waitReqReply"/>
-        </request-reply>
-
-        <expression-transformer evaluator="header" expression="SESSION:testProperty"/>
-    </flow>
-    <flow name="second">
-        <jms:inbound-endpoint queue="outReqReply"/>
-        <logger/>
-        <jms:outbound-endpoint queue="waitReqReply"/>
     </flow>
 
 </mule>

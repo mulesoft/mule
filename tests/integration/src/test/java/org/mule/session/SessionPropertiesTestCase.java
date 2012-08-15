@@ -14,7 +14,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertFalse;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
@@ -26,8 +25,6 @@ import org.mule.api.transport.PropertyScope;
 import org.mule.construct.Flow;
 import org.mule.tck.functional.FlowAssert;
 import org.mule.transport.vm.VMMessageDispatcher;
-import org.mule.api.client.MuleClient;
-import org.mule.transport.NullPayload;
 
 import org.junit.After;
 import org.junit.Ignore;
@@ -114,7 +111,8 @@ public class SessionPropertiesTestCase extends org.mule.tck.junit4.FunctionalTes
         Flow flowA = (Flow)muleContext.getRegistry().lookupFlowConstruct("OneWaySessionPropertySettingChain");
         flowA.process(event);
 
-        MuleMessage out = muleContext.getClient().request("vm://H-out", RECEIVE_TIMEOUT);
+        MuleMessage out = muleContext.getClient()
+            .request("vm://H-out?connector=VMConnector", RECEIVE_TIMEOUT);
 
         assertNotNull(out);
         assertEquals("value", out.getProperty("key", PropertyScope.SESSION));
@@ -137,7 +135,8 @@ public class SessionPropertiesTestCase extends org.mule.tck.junit4.FunctionalTes
         Flow flow = (Flow)muleContext.getRegistry().lookupFlowConstruct("PassthroughFlow");
         flow.process(event);
 
-        MuleMessage out = muleContext.getClient().request("vm://PassthroughFlow-out", RECEIVE_TIMEOUT);
+        MuleMessage out = muleContext.getClient().request("vm://PassthroughFlow-out?connector=VMConnector",
+            RECEIVE_TIMEOUT);
 
         assertNotNull(out);
         // Mule 3.1 uses async without queues, so there are no issues with
@@ -214,8 +213,7 @@ public class SessionPropertiesTestCase extends org.mule.tck.junit4.FunctionalTes
         event.getSession().setProperty("key", "value");
         event.getSession().setProperty("key2", "value2");
 
-        MuleEvent result = ((Flow)muleContext.getRegistry().lookupFlowConstruct(
-            "requestResponseFlow")).process(event);
+        MuleEvent result = ((Flow)muleContext.getRegistry().lookupFlowConstruct("requestResponseFlow")).process(event);
 
         assertNotNull(result);
         assertNotSame(event, result);
@@ -227,17 +225,28 @@ public class SessionPropertiesTestCase extends org.mule.tck.junit4.FunctionalTes
     }
 
     @Test
-    @Ignore
-    public void requestReplyWithJms() throws Exception
+    public void requestReplyNoSessionPropagationSessionMerge() throws Exception
     {
-        MuleClient client = muleContext.getClient();
-        MuleMessage result = client.send("vm://inReqReplyJms", "some data", null);
+        MuleMessage message = new DefaultMuleMessage("data", muleContext);
+        MuleEvent event = new DefaultMuleEvent(message, getTestInboundEndpoint(""), getTestSession(
+            getTestService(), muleContext));
+
+        Object nonSerializable = new Object();
+        event.getSession().setProperty("keyNonSerializable", nonSerializable);
+        event.getSession().setProperty("keyNonSerializable2", nonSerializable);
+        event.getSession().setProperty("key", "value");
+        event.getSession().setProperty("key2", "value2");
+
+        MuleEvent result = ((Flow)muleContext.getRegistry().lookupFlowConstruct(
+            "requestResponseNoSessionPropagationFlow")).process(event);
 
         assertNotNull(result);
-        assertNull(result.getExceptionPayload());
-        assertFalse(result.getPayload() instanceof NullPayload);
-
-        assertEquals(result.getPayloadAsString(), "test");
+        assertNotSame(event, result);
+        assertEquals(nonSerializable, result.getSession().getProperty("keyNonSerializable"));
+        assertEquals(nonSerializable, result.getSession().getProperty("keyNonSerializable2"));
+        assertEquals("value", result.getSession().getProperty("key"));
+        assertEquals("value2", result.getSession().getProperty("key2"));
+        assertNull(result.getSession().getProperty("nonSerializableBean"));
     }
 
     @Test
