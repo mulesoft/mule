@@ -92,8 +92,12 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
 
             if (resultEvent != null)
             {
-                // Merge async-reply session properties with exiting session properties
-                event.getSession().merge(resultEvent.getSession());
+                // If result has MULE_SESSION property then merge session properties returned with existing
+                // session properties. See MULE-5852
+                if (resultEvent.getMessage().getInboundProperty(MuleProperties.MULE_SESSION_PROPERTY) != null)
+                {
+                    event.getSession().merge(resultEvent.getSession());
+                }
                 resultEvent = org.mule.RequestContext.setEvent(new DefaultMuleEvent(resultEvent.getMessage(),
                     event));
             }
