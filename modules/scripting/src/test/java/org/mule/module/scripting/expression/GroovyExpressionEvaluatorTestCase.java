@@ -22,11 +22,13 @@ import static org.mockito.Mockito.mock;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.MessageExchangePattern;
+import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.expression.ExpressionManager;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.message.DefaultExceptionPayload;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
@@ -312,6 +314,19 @@ public class GroovyExpressionEvaluatorTestCase extends AbstractMuleContextTestCa
         RuntimeException rte = new RuntimeException();
         message.setExceptionPayload(new DefaultExceptionPayload(rte));
         assertEquals(rte, muleContext.getExpressionManager().evaluate("#[groovy:exception]", message));
+    }
+
+    /**
+     * See MULE-6211
+     */
+    @Test
+    public void muleException() throws Exception
+    {
+        MuleMessage message = new DefaultMuleMessage("", muleContext);
+        RuntimeException rte = new RuntimeException();
+        MessagingException me = new MessagingException(CoreMessages.version(), message, rte);
+        message.setExceptionPayload(new DefaultExceptionPayload(me));
+        assertEquals(me, muleContext.getExpressionManager().evaluate("#[groovy:exception]", message));
     }
 
     @Test
