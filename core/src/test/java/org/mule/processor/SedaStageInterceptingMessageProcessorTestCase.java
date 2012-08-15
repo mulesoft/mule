@@ -94,10 +94,12 @@ public class SedaStageInterceptingMessageProcessorTestCase extends
     @Test
     public void testProcessOneWayThreadWaitTimeout() throws Exception
     {
+        final int threadTimeout = 20;
         ThreadingProfile threadingProfile = new ChainedThreadingProfile(
             muleContext.getDefaultThreadingProfile());
-        threadingProfile.setThreadWaitTimeout(500);
-        threadingProfile.setMaxThreadsActive(2);
+        threadingProfile.setThreadWaitTimeout(threadTimeout);
+        // Need 3 threads: 1 for polling, 2 to process work successfully without timeout
+        threadingProfile.setMaxThreadsActive(3);
         threadingProfile.setPoolExhaustedAction(ThreadingProfile.WHEN_EXHAUSTED_WAIT);
         threadingProfile.setMuleContext(muleContext);
 
@@ -106,7 +108,7 @@ public class SedaStageInterceptingMessageProcessorTestCase extends
         {
             public MuleEvent answer(InvocationOnMock invocation) throws Throwable
             {
-                Thread.sleep(500);
+                Thread.sleep(threadTimeout * 2);
                 return (MuleEvent) invocation.getArguments()[0];
             }
         });
