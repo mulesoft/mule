@@ -113,7 +113,8 @@ public class SessionPropertiesTestCase extends org.mule.tck.junit4.FunctionalTes
             "OneWaySessionPropertySettingChain");
         flowA.process(event);
 
-        MuleMessage out = muleContext.getClient().request("vm://H-out", RECEIVE_TIMEOUT);
+        MuleMessage out = muleContext.getClient()
+            .request("vm://H-out?connector=VMConnector", RECEIVE_TIMEOUT);
 
         assertNotNull(out);
         assertEquals("value", out.getProperty("key", PropertyScope.SESSION));
@@ -138,7 +139,8 @@ public class SessionPropertiesTestCase extends org.mule.tck.junit4.FunctionalTes
             "PassthroughFlow");
         flow.process(event);
 
-        MuleMessage out = muleContext.getClient().request("vm://PassthroughFlow-out", RECEIVE_TIMEOUT);
+        MuleMessage out = muleContext.getClient().request("vm://PassthroughFlow-out?connector=VMConnector",
+            RECEIVE_TIMEOUT);
 
         assertNotNull(out);
         // Mule 3.1 uses async without queues, so there are no issues with
@@ -224,6 +226,31 @@ public class SessionPropertiesTestCase extends org.mule.tck.junit4.FunctionalTes
         assertEquals(nonSerializable, result.getSession().getProperty("keyNonSerializable2"));
         assertEquals("value2NEW", result.getSession().getProperty("key2"));
         assertEquals("value3", result.getSession().getProperty("key3"));
+        assertNull(result.getSession().getProperty("nonSerializableBean"));
+    }
+
+    @Test
+    public void requestReplyNoSessionPropagationSessionMerge() throws Exception
+    {
+        MuleMessage message = new DefaultMuleMessage("data", muleContext);
+        MuleEvent event = new DefaultMuleEvent(message, getTestInboundEndpoint(""), getTestSession(
+            getTestService(), muleContext));
+
+        Object nonSerializable = new Object();
+        event.getSession().setProperty("keyNonSerializable", nonSerializable);
+        event.getSession().setProperty("keyNonSerializable2", nonSerializable);
+        event.getSession().setProperty("key", "value");
+        event.getSession().setProperty("key2", "value2");
+
+        MuleEvent result = ((SimpleFlowConstruct) muleContext.getRegistry().lookupFlowConstruct(
+            "requestResponseNoSessionPropagationFlow")).process(event);
+
+        assertNotNull(result);
+        assertNotSame(event, result);
+        assertEquals(nonSerializable, result.getSession().getProperty("keyNonSerializable"));
+        assertEquals(nonSerializable, result.getSession().getProperty("keyNonSerializable2"));
+        assertEquals("value", result.getSession().getProperty("key"));
+        assertEquals("value2", result.getSession().getProperty("key2"));
         assertNull(result.getSession().getProperty("nonSerializableBean"));
     }
 

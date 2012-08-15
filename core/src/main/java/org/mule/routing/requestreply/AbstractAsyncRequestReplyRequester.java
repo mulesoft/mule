@@ -15,6 +15,7 @@ import org.mule.RequestContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessageCollection;
+import org.mule.api.config.MuleProperties;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.construct.FlowConstructAware;
 import org.mule.api.processor.MessageProcessor;
@@ -173,8 +174,12 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
                 throw new IllegalStateException("Response MuleEvent is null");
             }
 
-            // Merge async-reply session properties with exiting session properties
-            event.getSession().merge(result.getSession());
+            // If result has MULE_SESSION property then merge session properties returned with existing
+            // session properties.  See MULE-5852
+            if (result.getMessage().getInboundProperty(MuleProperties.MULE_SESSION_PROPERTY) != null)
+            {
+                event.getSession().merge(result.getSession());
+            }
             
             // Copy event because the async-reply message was received by a different
             // receiver thread (or the senders dispatcher thread in case of vm
