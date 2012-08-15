@@ -41,6 +41,7 @@ import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthPolicy;
 import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.params.HttpConnectionManagerParams;
+import org.apache.commons.httpclient.util.IdleConnectionTimeoutThread;
 
 /**
  * <code>HttpConnector</code> provides a way of receiving and sending http requests
@@ -151,6 +152,10 @@ public class HttpConnector extends TcpConnector
 
     protected HttpConnectionManager clientConnectionManager;
 
+    private IdleConnectionTimeoutThread connectionCleaner;
+
+    private boolean disableCleanupThread;
+
     public HttpConnector(MuleContext context)
     {
         super(context);
@@ -163,6 +168,16 @@ public class HttpConnector extends TcpConnector
         if (clientConnectionManager == null)
         {
             clientConnectionManager = new MultiThreadedHttpConnectionManager();
+            String prop = System.getProperty("mule.http.disableCleanupThread");
+            disableCleanupThread = prop != null && prop.equals("true");
+            if (!disableCleanupThread)
+            {
+                connectionCleaner = new IdleConnectionTimeoutThread();
+                connectionCleaner.setName("HttpClient-connection-cleaner-" + getName());
+                connectionCleaner.addConnectionManager(clientConnectionManager);
+                connectionCleaner.start();
+            }
+
             HttpConnectionManagerParams params = new HttpConnectionManagerParams();
             if (getSendBufferSize() != INT_VALUE_NOT_SET)
             {
@@ -186,6 +201,16 @@ public class HttpConnector extends TcpConnector
             params.setDefaultMaxConnectionsPerHost(dispatchers.getMaxTotal());
             clientConnectionManager.setParams(params);
         }
+    }
+
+    @Override
+    protected void doDispose()
+    {
+        if (!disableCleanupThread)
+        {
+            connectionCleaner.shutdown();
+        }
+        super.doDispose();
     }
 
     @Override
