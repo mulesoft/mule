@@ -85,7 +85,7 @@ public class DefaultMessageCollection extends DefaultMuleMessage implements Mule
                     }
                     else
                     {
-                        addMessage(new DefaultMuleMessage(currentMsg, muleContext));
+                        addMessage(new DefaultMuleMessage(currentMsg, currentMsg, muleContext));
                     }
                 }
                 else
