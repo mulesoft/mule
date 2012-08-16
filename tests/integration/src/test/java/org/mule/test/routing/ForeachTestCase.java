@@ -186,7 +186,6 @@ public class ForeachTestCase extends FunctionalTestCase
     public void testMessageCollectionConfiguration() throws Exception
     {
         MuleMessageCollection msgCollection = new DefaultMessageCollection(muleContext);
-        msgCollection.setInvocationProperty("totalMessages", 0);
         for (int i = 0; i < 10; i++)
         {
             MuleMessage msg = new DefaultMuleMessage("message-" + i, muleContext);
@@ -198,6 +197,21 @@ public class ForeachTestCase extends FunctionalTestCase
         assertEquals(10, result.getInboundProperty("totalMessages"));
         assertEquals(msgCollection.getPayload(), result.getPayload());
         FlowAssert.verify("message-collection-config");
+    }
+
+    @Test
+    public void testMessageCollectionConfigurationOneWay() throws Exception
+    {
+        MuleMessageCollection msgCollection = new DefaultMessageCollection(muleContext);
+        for (int i = 0; i < 10; i++)
+        {
+            MuleMessage msg = new DefaultMuleMessage("message-" + i, muleContext);
+            msg.setProperty("out", "out" + (i+1), PropertyScope.OUTBOUND);
+            msgCollection.addMessage(msg);
+        }
+
+        client.dispatch("vm://input-71", msgCollection);
+        FlowAssert.verify("message-collection-config-one-way");
     }
 
     @Test
