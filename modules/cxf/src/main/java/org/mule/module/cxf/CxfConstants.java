@@ -44,4 +44,7 @@ public class CxfConstants
     
     public static final String CREATE_SOAP_FAULT = "CREATE_SOAP_FAULT";
     public static final String INVOKE_EXCEPTION_STRATEGY = "INVOKE_EXCEPTION_STRATEGY";
+
+    public static final String UNWRAP_MULE_EXCEPTIONS = "unwrapMuleExceptions";
+
 }

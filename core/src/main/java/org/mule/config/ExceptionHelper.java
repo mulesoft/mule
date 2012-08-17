@@ -579,4 +579,23 @@ public final class ExceptionHelper
         return t;
 
     }
+
+    public static Throwable getNonMuleException(Throwable t)
+    {
+        if (!(t instanceof MuleException))
+        {
+            return t;
+        }
+        Throwable cause = t;
+        while (cause != null)
+        {
+            cause = getExceptionReader(cause).getCause(cause);
+            // address some misbehaving exceptions, avoid endless loop
+            if (t == cause || !(cause instanceof MuleException))
+            {
+                break;
+            }
+        }
+        return cause instanceof MuleException ? null : cause;
+    }
 }
