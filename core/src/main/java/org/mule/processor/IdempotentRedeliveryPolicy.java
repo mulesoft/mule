@@ -11,27 +11,27 @@ package org.mule.processor;
 
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
+import org.mule.api.config.MuleProperties;
 import org.mule.api.exception.MessageRedeliveredException;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.processor.MessageProcessor;
-import org.mule.api.store.ObjectAlreadyExistsException;
+import org.mule.api.store.ObjectStore;
 import org.mule.api.store.ObjectStoreException;
+import org.mule.api.store.ObjectStoreManager;
 import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.transformer.simple.ByteArrayToHexString;
 import org.mule.transformer.simple.ObjectToByteArray;
-import org.mule.util.store.AbstractMonitoredObjectStore;
-import org.mule.util.store.InMemoryObjectStore;
+import org.mule.util.store.ObjectStorePartition;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.InputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.concurrent.atomic.AtomicInteger;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Implement a retry policy for Mule.  This is similar to JMS retry policies that will redeliver a message a maximum
@@ -49,7 +49,7 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy
     private boolean useSecureHash;
     private String messageDigestAlgorithm;
     private String idExpression;
-    private AbstractMonitoredObjectStore<AtomicInteger> store;
+    private ObjectStore<AtomicInteger> store;
 
     @Override
     public void initialise() throws InitialisationException
@@ -98,15 +98,11 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy
         store = createStore();
     }
 
-    private AbstractMonitoredObjectStore<AtomicInteger> createStore() throws InitialisationException
+    private ObjectStore<AtomicInteger> createStore() throws InitialisationException
     {
-        AbstractMonitoredObjectStore s = new InMemoryObjectStore<AtomicInteger>();
-        s.setName(flowConstruct.getName() + "." + getClass().getName());
-        s.setMaxEntries(-1);
-        s.setEntryTTL(60 * 5 * 1000);
-        s.setExpirationInterval(6000);
-        s.initialise();
-        return s;
+        ObjectStoreManager objectStoreManager = (ObjectStoreManager) muleContext.getRegistry().get(
+                                MuleProperties.OBJECT_STORE_MANAGER);
+        return objectStoreManager.getObjectStore(flowConstruct.getName() + "." + getClass().getName(), false, -1,  60 * 5 * 1000, 6000 );
     }
 
 
@@ -117,7 +113,17 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy
 
         if (store != null)
         {
-            store.dispose();
+            if (store instanceof ObjectStorePartition)
+            {
+                try
+                {
+                    ((ObjectStorePartition)store).close();
+                }
+                catch (ObjectStoreException e)
+                {
+                    logger.warn("error closing object store: " + e.getMessage(), e);
+                }
+            }
             store = null;
         }
 
@@ -161,7 +167,7 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy
 
         if (!exceptionSeen)
         {
-            counter = getCounter(messageId, null, false);
+            counter = findCounter(messageId);
             tooMany = counter != null && counter.get() > maxRedeliveryCount;
         }
 
@@ -192,59 +198,56 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy
         try
         {
             MuleEvent returnEvent = processNext(event);
-            counter = getCounter(messageId, counter, false);
+            counter = findCounter(messageId);
             if (counter != null)
             {
-                counter.set(0);
+                resetCounter(messageId);
             }
             return returnEvent;
         }
         catch (MuleException ex)
         {
-            incrementCounter(messageId, counter);
+            incrementCounter(messageId);
             throw ex;
         }
         catch (RuntimeException ex)
         {
-            incrementCounter(messageId, counter);
+            incrementCounter(messageId);
             throw ex;
         }
     }
 
-
-    private AtomicInteger incrementCounter(String messageId, AtomicInteger counter) throws ObjectStoreException
+    private void resetCounter(String messageId) throws ObjectStoreException
     {
-        counter = getCounter(messageId,  counter, true);
-        counter.incrementAndGet();
-        return counter;
+        store.remove(messageId);
+        store.store(messageId, new AtomicInteger());
     }
 
-    private AtomicInteger getCounter(String messageId, AtomicInteger counter, boolean create) throws ObjectStoreException
+    public AtomicInteger findCounter(String messageId) throws ObjectStoreException
     {
-        if (counter != null)
-        {
-            return counter;
-        }
         boolean counterExists = store.contains(messageId);
         if (counterExists)
         {
             return store.retrieve(messageId);
         }
-        if (create)
-        {
-            try
-            {
-                counter = new AtomicInteger();
-                store.store(messageId, counter);
-            }
-            catch (ObjectAlreadyExistsException e)
-            {
-                counter = store.retrieve(messageId);
-            }
-        }
-        return counter;
+        return null;
     }
 
+    private AtomicInteger incrementCounter(String messageId) throws ObjectStoreException
+    {
+        AtomicInteger counter = findCounter(messageId);
+        if (counter == null)
+        {
+            counter = new AtomicInteger();
+        }
+        else
+        {
+            store.remove(messageId);
+        }
+        counter.incrementAndGet();
+        store.store(messageId,counter);
+        return counter;
+    }
 
     private String getIdForEvent(MuleEvent event) throws Exception
     {
@@ -302,3 +305,4 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy
         this.deadLetterQueue = processor;
     }
 }
+
