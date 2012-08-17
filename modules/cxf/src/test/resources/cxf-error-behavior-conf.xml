@@ -30,8 +30,8 @@
         <http:inbound-endpoint address="http://localhost:${port1}/testUnwrapException"/>
         <cxf:jaxws-service serviceClass="org.mule.module.cxf.example.HelloWorld"/>
         <component class="org.mule.module.cxf.example.HelloWorldImpl" />
-        <message-properties-transformer>
-            <add-message-property key="unwrapMuleExceptions" value="true"/>
+        <message-properties-transformer scope="invocation">
+            <add-message-property key="unwrapMuleExceptions" value="true" />
         </message-properties-transformer>
         <scripting:transformer>
             <scripting:script engine="groovy">
