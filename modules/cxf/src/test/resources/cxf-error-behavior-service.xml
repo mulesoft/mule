@@ -3,6 +3,7 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:spring="http://www.springframework.org/schema/beans"
        xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
+       xmlns:scripting="http://www.mulesoft.org/schema/mule/scripting"
        xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
        xmlns:http="http://www.mulesoft.org/schema/mule/http"
     xsi:schemaLocation="
@@ -10,6 +11,7 @@
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
        http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd
        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+       http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/3.2/mule-scripting.xsd
        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
     <custom-transformer name="throwsException" class="org.mule.module.cxf.CxfErrorBehaviorTestCase$CxfTransformerThrowsExceptions"/>
@@ -34,6 +36,21 @@
                 </inbound-endpoint>
             </inbound>
             <component class="org.mule.module.cxf.example.HelloWorldImpl"/>
+        </service>
+
+        <service name="FlowWithExceptionUnwrapped">
+            <inbound>
+                <inbound-endpoint address="http://localhost:${port1}/testUnwrapException" exchange-pattern="request-response">
+                    <cxf:jaxws-service serviceClass="org.mule.module.cxf.example.HelloWorld"/>
+                    <set-property propertyName="unwrapMuleExceptions" value="true"/>
+                    <scripting:transformer>
+                        <scripting:script engine="groovy">
+                            throw new IllegalArgumentException("Illegal argument!!");
+                        </scripting:script>
+                    </scripting:transformer>
+                </inbound-endpoint>
+            </inbound>
+            <component class="org.mule.module.cxf.example.HelloWorldImpl" />
         </service>
 
         <service name="FlowSimpleServiceFault">
@@ -128,6 +145,22 @@
             </outbound>
         </service>
 
+        <service name="FlowJaxWsProxyWithUnwrapFault">
+            <inbound>
+                <inbound-endpoint address="http://localhost:${port1}/testUnwrapProxyFault"
+                                  exchange-pattern="request-response">
+                    <cxf:jaxws-service serviceClass="org.mule.module.cxf.example.HelloWorld"/>
+                </inbound-endpoint>
+            </inbound>
+            <component class="org.mule.module.cxf.example.HelloWorldImpl" />
+            <outbound>
+                <pass-through-router>
+                    <outbound-endpoint address="http://localhost:${port1}/testUnwrapException">
+                        <cxf:jaxws-client serviceClass="org.mule.module.cxf.example.HelloWorld" operation="sayHi"/>
+                    </outbound-endpoint>
+                </pass-through-router>
+            </outbound>
+        </service>
     </model>
 
 </mule>

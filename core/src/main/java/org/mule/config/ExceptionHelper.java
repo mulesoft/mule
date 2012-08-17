@@ -343,25 +343,6 @@ public final class ExceptionHelper
         return DefaultMuleConfiguration.fullStackTraces ? root : sanitize(root);
     }
 
-    public static Throwable getNonMuleException(Throwable t)
-    {
-        if (!(t instanceof MuleException))
-        {
-            return t;
-        }
-        Throwable cause = t;
-        while (cause != null)
-        {
-            cause = getExceptionReader(cause).getCause(cause);
-            // address some misbehaving exceptions, avoid endless loop
-            if (t == cause || !(cause instanceof MuleException))
-            {
-                break;
-            }
-        }
-        return cause instanceof MuleException ? null : cause;
-    }
-
     public static Throwable sanitizeIfNeeded(Throwable t)
     {
         return DefaultMuleConfiguration.fullStackTraces ? t : sanitize(t);
@@ -618,9 +599,28 @@ public final class ExceptionHelper
         return t;
 
     }
-    
+
     public static interface ExceptionEvaluator<T> 
     {
         T evaluate(Throwable e);
+    }
+
+    public static Throwable getNonMuleException(Throwable t)
+    {
+        if (!(t instanceof MuleException))
+        {
+            return t;
+        }
+        Throwable cause = t;
+        while (cause != null)
+        {
+            cause = getExceptionReader(cause).getCause(cause);
+            // address some misbehaving exceptions, avoid endless loop
+            if (t == cause || !(cause instanceof MuleException))
+            {
+                break;
+            }
+        }
+        return cause instanceof MuleException ? null : cause;
     }
 }
