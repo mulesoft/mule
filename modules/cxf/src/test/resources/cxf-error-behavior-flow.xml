@@ -47,7 +47,7 @@
         <http:inbound-endpoint address="http://localhost:${port1}/testUnwrapException"/>
         <cxf:jaxws-service serviceClass="org.mule.module.cxf.example.HelloWorld"/>
         <component class="org.mule.module.cxf.example.HelloWorldImpl" />
-        <set-property propertyName="unwrapMuleExceptions" value="true"/>
+        <set-variable variableName="unwrapMuleExceptions" value="true"/>
         <scripting:transformer>
             <scripting:script engine="groovy">
                 throw new IllegalArgumentException("Illegal argument!!");
