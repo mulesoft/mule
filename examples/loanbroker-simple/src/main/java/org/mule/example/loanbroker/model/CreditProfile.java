@@ -30,6 +30,12 @@ public class CreditProfile implements Serializable
         super();
     }
 
+    @Override
+    public String toString()
+    {
+        return "creditScore: " + creditScore + ", creditHistory: " + creditHistory;
+    }
+
     public int getCreditScore()
     {
         return creditScore;

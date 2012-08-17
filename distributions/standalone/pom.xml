@@ -154,10 +154,6 @@
                 </exclusion>
                 <exclusion>
                     <groupId>org.mule.examples</groupId>
-                    <artifactId>mule-example-loanbroker-simple</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.mule.examples</groupId>
                     <artifactId>mule-example-notifications</artifactId>
                 </exclusion>
             </exclusions>
