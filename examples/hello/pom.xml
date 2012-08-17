@@ -24,11 +24,6 @@
         </dependency>
         <dependency>
             <groupId>org.mule.transports</groupId>
-            <artifactId>mule-transport-servlet</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-vm</artifactId>
             <version>${project.version}</version>
         </dependency>
