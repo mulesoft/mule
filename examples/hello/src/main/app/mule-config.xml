@@ -2,17 +2,12 @@
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:spring="http://www.springframework.org/schema/beans"
       xmlns:http="http://www.mulesoft.org/schema/mule/http"
       xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
-      xmlns:servlet="http://www.mulesoft.org/schema/mule/servlet"
       xsi:schemaLocation="
-        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
         http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
         http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
-        http://www.mulesoft.org/schema/mule/servlet http://www.mulesoft.org/schema/mule/servlet/current/mule-servlet.xsd
         http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
-
 
     <description>
     This configuration uses an HTTP endpoint to receive requests.
@@ -22,13 +17,6 @@
     To invoke the Hello service over HTTP, hit the following URL in your browser:
 
         http://localhost:8888?name=Ross
-
-    To invoke the Hello service via a Servlet, submit a web form such as:
-
-        <form method="POST" action="/mule-examples/rest?endpoint=greeter">
-            <input type="text" name="payload"/>
-            <input type="submit" value="POST" />
-        </form>
     -->
 
     <custom-transformer class="org.mule.example.hello.StringToNameString" name="StringToNameString" doc:name="Java"/>
@@ -36,14 +24,11 @@
     <custom-transformer class="org.mule.example.hello.ChatStringToString" name="ChatStringToString" doc:name="Java"/>
     <custom-transformer class="org.mule.example.hello.HttpRequestToNameString" name="HttpRequestToNameString" doc:name="Java"/>
     <custom-transformer class="org.mule.example.hello.ExceptionToString" name="ExceptionToString" doc:name="Java"/>
-    <custom-transformer class="org.mule.transport.servlet.transformers.HttpRequestToParameter" name="HttpRequestToParameter" doc:name="Java"/>
     <custom-transformer class="org.mule.transformer.simple.ObjectToString" name="ObjectToString" doc:name="Java"/>
 
     <flow name="HelloWorld" doc:name="HelloWorld">
-        <composite-source>
-            <http:inbound-endpoint exchange-pattern="request-response" host="localhost" port="8888" doc:name="Http Endpoint"/>
-            <servlet:inbound-endpoint path="name"  doc:name="Servlet Endpoint"/>
-        </composite-source>
+        <http:inbound-endpoint exchange-pattern="request-response" host="localhost" port="8888" doc:name="Http Endpoint"/>
+
         <message-filter doc:name="Filter favicon">
             <not-filter>
                 <wildcard-filter pattern="/favicon.ico" caseSensitive="true"/>
