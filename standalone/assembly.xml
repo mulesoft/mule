@@ -109,7 +109,6 @@
                 <exclude>cep/**</exclude>
                 <exclude>errorhandler/**</exclude>
                 <exclude>loanbroker-bpm/**</exclude>
-                <exclude>loanbroker-simple/**</exclude>
                 <exclude>notifications/**</exclude>
                 <exclude>webapp/**</exclude>
             </excludes>
@@ -139,6 +138,11 @@
         <fileSet>
             <directory>../../examples/foreach/dist</directory>
             <outputDirectory>examples/foreach</outputDirectory>
+            <fileMode>0644</fileMode>
+        </fileSet>
+        <fileSet>
+            <directory>../../examples/loanbroker-simple/dist</directory>
+            <outputDirectory>examples/loanbroker-simple</outputDirectory>
             <fileMode>0644</fileMode>
         </fileSet>
         <fileSet>
@@ -314,6 +318,7 @@
                 <exclude>org.mule.examples:mule-example-hello</exclude>
                 <exclude>org.mule.examples:mule-example-flight-reservation</exclude>
                 <exclude>org.mule.examples:mule-example-foreach</exclude>
+                <exclude>org.mule.examples:mule-example-loanbroker-simple</exclude>
                 <exclude>org.mule.examples:mule-example-scripting</exclude>
                 <exclude>org.mule.examples:mule-example-stockquote</exclude>
                 <exclude>org.mule.tools:mule-tools-anttasks</exclude>
@@ -413,6 +418,14 @@
             <fileMode>0644</fileMode>
             <includes>
                 <include>org.mule.examples:mule-example-foreach</include>
+            </includes>
+        </dependencySet>
+        <dependencySet>
+            <outputDirectory>examples/loanbroker-simple</outputDirectory>
+            <useStrictFiltering>true</useStrictFiltering>
+            <fileMode>0644</fileMode>
+            <includes>
+                <include>org.mule.examples:mule-example-loanbroker-simple</include>
             </includes>
         </dependencySet>
         <dependencySet>
