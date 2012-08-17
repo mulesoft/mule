@@ -190,7 +190,7 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy
             counter = findCounter(messageId);
             if (counter != null)
             {
-                counter.set(0);
+                resetCounter(messageId);
             }
             return returnEvent;
         }
@@ -205,7 +205,13 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy
             throw ex;
         }
     }
-    
+
+    private void resetCounter(String messageId) throws ObjectStoreException
+    {
+        store.remove(messageId);
+        store.store(messageId,new AtomicInteger());
+    }
+
     public AtomicInteger findCounter(String messageId) throws ObjectStoreException
     {
         boolean counterExists = store.contains(messageId);
