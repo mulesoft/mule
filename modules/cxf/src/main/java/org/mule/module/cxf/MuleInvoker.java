@@ -19,11 +19,14 @@ import org.mule.api.execution.ExecutionCallback;
 import org.mule.api.transport.PropertyScope;
 import org.mule.component.ComponentException;
 import org.mule.execution.ErrorHandlingExecutionTemplate;
+import org.mule.config.ExceptionHelper;
 import org.mule.transport.NullPayload;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.List;
+
+import javax.script.ScriptException;
 
 import org.apache.cxf.frontend.MethodDispatcher;
 import org.apache.cxf.helpers.CastUtils;
@@ -95,9 +98,22 @@ public class MuleInvoker implements Invoker
             exchange.put(CxfConstants.MULE_EVENT, event);
 
             Throwable cause = e;
-            if (e instanceof ComponentException) {
+
+            // See MULE-6329
+            if(Boolean.valueOf((String) event.getMessage().getOutboundProperty(CxfConstants.UNWRAP_MULE_EXCEPTIONS)))
+            {
+                cause = ExceptionHelper.getNonMuleException(e);
+                // Exceptions thrown from a ScriptComponent or a ScriptTransformer are going to be wrapped on a
+                // ScriptException
+                if(cause instanceof ScriptException && cause.getCause() != null)
+                {
+                    cause = cause.getCause();
+                }
+            }
+            else if(e instanceof ComponentException) {
                 cause = e.getCause();
             }
+
             throw new Fault(cause);
         }
         catch (Exception e)

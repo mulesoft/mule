@@ -38,22 +38,22 @@ import org.junit.runners.Parameterized;
 
 public class CxfErrorBehaviorTestCase extends AbstractServiceAndFlowTestCase
 {
-    private static final String requestPayload =
-        "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\"\n" +
-            "           xmlns:hi=\"http://example.cxf.module.mule.org/\">\n" +
-            "<soap:Body>\n" +
-            "<hi:sayHi>\n" +
-            "    <arg0>Hello</arg0>\n" +
-            "</hi:sayHi>\n" +
-            "</soap:Body>\n" +
-            "</soap:Envelope>";
-
     private static final String requestFaultPayload =
         "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\"\n" +
             "           xmlns:hi=\"http://cxf.module.mule.org/\">\n" +
             "<soap:Body>\n" +
             "<hi:sayHi>\n" +
             "    <arg0></arg0>\n" +
+            "</hi:sayHi>\n" +
+            "</soap:Body>\n" +
+            "</soap:Envelope>";
+
+    private static final String requestPayload =
+            "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\"\n" +
+            "           xmlns:hi=\"http://example.cxf.module.mule.org/\">\n" +
+            "<soap:Body>\n" +
+            "<hi:sayHi>\n" +
+            "    <arg0>hi</arg0>\n" +
             "</hi:sayHi>\n" +
             "</soap:Body>\n" +
             "</soap:Envelope>";
@@ -110,6 +110,17 @@ public class CxfErrorBehaviorTestCase extends AbstractServiceAndFlowTestCase
     }
 
     @Test
+    public void testUnwrapException() throws Exception
+    {
+        MuleMessage request = new DefaultMuleMessage(requestPayload, (Map<String,Object>)null, muleContext);
+        MuleClient client = new MuleClient(muleContext);
+        MuleMessage response = client.send("http://localhost:" + dynamicPort.getNumber() + "/testUnwrapException", request);
+        assertNotNull(response);
+        assertTrue(response.getPayloadAsString().contains("Illegal argument!!"));
+        assertEquals(String.valueOf(HttpConstants.SC_INTERNAL_SERVER_ERROR), response.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY));
+    }
+
+    @Test
     public void testClientWithSOAPFault() throws Exception
     {
         MuleMessage request = new DefaultMuleMessage("hello", (Map<String,Object>)null, muleContext);
@@ -150,6 +161,15 @@ public class CxfErrorBehaviorTestCase extends AbstractServiceAndFlowTestCase
         MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/testProxyWithTransformerException", requestPayload, null);
         String resString = result.getPayloadAsString();
         assertTrue(resString.contains("TransformerException"));
+        assertEquals(String.valueOf(HttpConstants.SC_INTERNAL_SERVER_ERROR), result.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY));
+    }
+    @Test
+    public void testServerClientJaxwsWithUnwrapFault() throws Exception
+    {
+        MuleClient client = new MuleClient(muleContext);
+        MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/testUnwrapProxyFault", requestPayload, null);
+        String resString = result.getPayloadAsString();
+        assertTrue(resString.contains("Illegal argument!!"));
         assertEquals(String.valueOf(HttpConstants.SC_INTERNAL_SERVER_ERROR), result.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY));
     }
 
