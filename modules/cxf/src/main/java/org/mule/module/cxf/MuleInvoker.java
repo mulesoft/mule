@@ -100,7 +100,7 @@ public class MuleInvoker implements Invoker
             Throwable cause = e;
 
             // See MULE-6329
-            if(Boolean.valueOf((String) event.getMessage().getOutboundProperty(CxfConstants.UNWRAP_MULE_EXCEPTIONS)))
+            if(Boolean.valueOf((String) event.getMessage().getInvocationProperty(CxfConstants.UNWRAP_MULE_EXCEPTIONS)))
             {
                 cause = ExceptionHelper.getNonMuleException(e);
                 // Exceptions thrown from a ScriptComponent or a ScriptTransformer are going to be wrapped on a
