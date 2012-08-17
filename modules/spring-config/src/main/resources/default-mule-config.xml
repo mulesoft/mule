@@ -58,6 +58,8 @@
     
     <bean name="_muleObjectStoreManager" class="org.mule.util.store.MuleObjectStoreManager"/>
 
+    <bean name="_defaultObjectStoreLocker" class="org.mule.util.lock.MuleServerEntryLocker"/>
+
     <bean name="_muleSecurityManager" class="org.mule.security.MuleSecurityManager"/>
 
     <bean name="_muleProperties" class="java.util.HashMap"/>

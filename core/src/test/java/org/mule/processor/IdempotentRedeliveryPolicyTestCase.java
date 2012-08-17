@@ -40,7 +40,7 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.util.SerializationUtils;
 import org.mule.util.concurrent.Latch;
-import org.mule.util.store.MuleServerEntryLocker;
+import org.mule.util.lock.MuleServerEntryLocker;
 
 import java.io.Serializable;
 import java.util.HashMap;

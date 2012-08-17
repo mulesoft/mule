@@ -15,6 +15,7 @@ import org.mule.api.store.ObjectStore;
 import org.mule.api.store.ObjectStoreException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.util.concurrent.Latch;
+import org.mule.util.lock.MuleServerEntryLocker;
 
 import java.io.Serializable;
 import java.util.ArrayList;

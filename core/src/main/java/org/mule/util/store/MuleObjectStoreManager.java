@@ -27,6 +27,7 @@ import org.mule.api.store.ObjectStoreManager;
 import org.mule.api.store.PartitionableExpirableObjectStore;
 import org.mule.api.store.PartitionableObjectStore;
 import org.mule.util.concurrent.DaemonThreadFactory;
+import org.mule.util.lock.MuleEntryLocker;
 
 import java.io.Serializable;
 import java.util.List;

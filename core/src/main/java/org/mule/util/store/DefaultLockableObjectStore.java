@@ -12,6 +12,7 @@ package org.mule.util.store;
 import org.mule.api.store.LockableObjectStore;
 import org.mule.api.store.ObjectStore;
 import org.mule.api.store.ObjectStoreException;
+import org.mule.util.lock.MuleEntryLocker;
 
 import java.io.Serializable;
 
