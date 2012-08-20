@@ -21,6 +21,7 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.expression.ExpressionManager;
+import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -75,6 +76,9 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleTestCase
 
         Mockito.verify(targetFlow, Mockito.times(1)).process(Mockito.any(MuleEvent.class));
         Mockito.verify(targetFlow, Mockito.never()).initialise();
+
+        flowRefFactoryBean.dispose();
+        Mockito.verify(targetSubFlow, Mockito.never()).dispose();
     }
 
     @Test
@@ -104,6 +108,9 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleTestCase
 
         Mockito.verify(targetFlow, Mockito.times(2)).process(Mockito.any(MuleEvent.class));
         Mockito.verify(targetFlow, Mockito.never()).initialise();
+
+        flowRefFactoryBean.dispose();
+        Mockito.verify(targetSubFlow, Mockito.never()).dispose();
     }
 
     @Test
@@ -128,6 +135,9 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleTestCase
 
         Mockito.verify(targetSubFlow, Mockito.times(2)).process(Mockito.any(MuleEvent.class));
         Mockito.verify(targetSubFlow, Mockito.never()).initialise();
+
+        flowRefFactoryBean.dispose();
+        Mockito.verify(targetSubFlow, Mockito.never()).dispose();
     }
 
     @Test
@@ -157,6 +167,9 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleTestCase
 
         Mockito.verify(targetSubFlow, Mockito.times(2)).process(Mockito.any(MuleEvent.class));
         Mockito.verify(targetSubFlow, Mockito.times(1)).initialise();
+
+        flowRefFactoryBean.dispose();
+        Mockito.verify(targetSubFlow, Mockito.times(1)).dispose();
     }
 
     @Test(expected = MuleRuntimeException.class)
@@ -187,11 +200,11 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleTestCase
         flowRefFactoryBean.getObject().process(mock(MuleEvent.class));
     }
 
-    interface InitializableMessageProcessor extends MessageProcessor, Initialisable
+    interface InitializableMessageProcessor extends MessageProcessor, Initialisable, Disposable
     {
     }
 
-    interface ProcessableFlowConstruct extends MessageProcessor, FlowConstruct, Initialisable
+    interface ProcessableFlowConstruct extends MessageProcessor, FlowConstruct, Initialisable, Disposable
     {
     }
 

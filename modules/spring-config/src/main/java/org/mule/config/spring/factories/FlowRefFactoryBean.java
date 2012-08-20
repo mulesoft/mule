@@ -16,6 +16,7 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.context.MuleContextAware;
+import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.processor.MessageProcessor;
@@ -30,7 +31,8 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
 public class FlowRefFactoryBean
-    implements FactoryBean<MessageProcessor>, ApplicationContextAware, MuleContextAware, Initialisable
+    implements FactoryBean<MessageProcessor>, ApplicationContextAware, MuleContextAware, Initialisable,
+    Disposable
 {
     private String refName;
     private ApplicationContext applicationContext;
@@ -53,8 +55,21 @@ public class FlowRefFactoryBean
         else if (!muleContext.getExpressionManager().isExpression(refName))
         {
             // No need to initialize because message processor will be injected into and managed by parent
-            referencedMessageProcessor = getReferencedMessageProcessor(refName, false);
+            referencedMessageProcessor = lookupReferencedFlowInApplicationContext(refName);
         }
+    }
+
+    @Override
+    public void dispose()
+    {
+        for (MessageProcessor processor : referenceCache.values())
+        {
+            if (processor instanceof Disposable)
+            {
+                ((Disposable) processor).dispose();
+            }
+        }
+        referenceCache = null;
     }
 
     @Override
@@ -66,21 +81,11 @@ public class FlowRefFactoryBean
         }
         else
         {
-            return new MessageProcessor()
-            {
-                @Override
-                public MuleEvent process(MuleEvent event) throws MuleException
-                {
-                    // Need to initialize because message processor won't be managed by parent
-                    MessageProcessor dynamicMessageProcessor = getReferencedMessageProcessor(
-                        muleContext.getExpressionManager().parse(refName, event), true);
-                    return dynamicMessageProcessor.process(event);
-                }
-            };
+            return createDynamicReferenceMessageProcessor(refName);
         }
     }
 
-    protected MessageProcessor getReferencedMessageProcessor(String name, boolean initialise)
+    protected MessageProcessor createDynamicReferenceMessageProcessor(String name)
         throws InitialisationException
     {
         if (name == null)
@@ -89,34 +94,66 @@ public class FlowRefFactoryBean
         }
         else if (!referenceCache.containsKey(name))
         {
-            final MessageProcessor springReferencedProcessor = ((MessageProcessor) applicationContext.getBean(name));
-            MessageProcessor lifecycleDecoupledReference = springReferencedProcessor;
-            if (springReferencedProcessor == null)
+            MessageProcessor dynamicReference = new MessageProcessor()
             {
-                throw new MuleRuntimeException(CoreMessages.objectIsNull(name));
-            }
-            else if (springReferencedProcessor instanceof FlowConstruct)
-            {
-                // If a FlowConstuct is reference then decouple life-cycle/injection
-                lifecycleDecoupledReference = new MessageProcessor()
+                @Override
+                public MuleEvent process(MuleEvent event) throws MuleException
                 {
-                    @Override
-                    public MuleEvent process(MuleEvent event) throws MuleException
-                    {
-                        return springReferencedProcessor.process(event);
-                    }
-                };
-            }
-            else if (initialise)
-            {
-                if (lifecycleDecoupledReference instanceof Initialisable)
-                {
-                    ((Initialisable) lifecycleDecoupledReference).initialise();
+                    // Need to initialize because message processor won't be managed by parent
+                    MessageProcessor dynamicMessageProcessor = getReferencedFlow(muleContext.getExpressionManager()
+                        .parse(refName, event));
+                    return dynamicMessageProcessor.process(event);
                 }
+            };
+            if (dynamicReference instanceof Initialisable)
+            {
+                ((Initialisable) dynamicReference).initialise();
             }
-            referenceCache.putIfAbsent(name, lifecycleDecoupledReference);
+            referenceCache.putIfAbsent(name, dynamicReference);
         }
-        return (MessageProcessor) referenceCache.get(name);
+        return referenceCache.get(name);
+    }
+
+    protected MessageProcessor getReferencedFlow(String name) throws InitialisationException
+    {
+        if (name == null)
+        {
+            throw new MuleRuntimeException(CoreMessages.objectIsNull(name));
+        }
+        else if (!referenceCache.containsKey(name))
+        {
+            MessageProcessor processor = lookupReferencedFlowInApplicationContext(name);
+            if (processor instanceof Initialisable)
+            {
+                ((Initialisable) processor).initialise();
+            }
+            referenceCache.putIfAbsent(name, processor);
+        }
+        return referenceCache.get(name);
+    }
+
+    protected MessageProcessor lookupReferencedFlowInApplicationContext(String name)
+    {
+        final MessageProcessor referencedFlow = ((MessageProcessor) applicationContext.getBean(name));
+        if (referencedFlow == null)
+        {
+            throw new MuleRuntimeException(CoreMessages.objectIsNull(name));
+        }
+        if (referencedFlow instanceof FlowConstruct)
+        {
+            return new MessageProcessor()
+            {
+                @Override
+                public MuleEvent process(MuleEvent event) throws MuleException
+                {
+                    return referencedFlow.process(event);
+                }
+            };
+        }
+        else
+        {
+            return referencedFlow;
+        }
     }
 
     @Override
