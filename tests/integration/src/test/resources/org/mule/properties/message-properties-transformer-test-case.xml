@@ -24,6 +24,12 @@
         <add-message-property key="invPropKey" value="invPropValue"/>
     </message-properties-transformer>
 
+    <set-property name="setPropGlobal" propertyName="prop" value="#[string:some value]"/>
+
+    <remove-property name="remPropGlobal" propertyName="out*" />
+
+    <copy-properties name="copyPropGlobal" propertyName="#[string:inbPropKey]"/>
+
     <scripting:transformer name="addInboundProperty">
         <scripting:script engine="groovy">
             message.setProperty('inbPropKey','inbPropValue',org.mule.api.transport.PropertyScope.INBOUND);
@@ -39,7 +45,7 @@
     </scripting:transformer>
 
     <flow name="addProperty" processingStrategy="synchronous">
-        <set-property propertyName="prop" value="#[string:some value]"/>
+        <transformer ref="setPropGlobal"/>
         <test:assert expression="#[groovy:message.getOutboundProperty('prop').equals('some value')]"/>
     </flow>
     
@@ -66,7 +72,7 @@
     <flow name="removePropertyUsingRegex" processingStrategy="synchronous">
         <transformer ref="addOutboundProperty"/>
         <transformer ref="addOutboundProperty2"/>
-        <remove-property propertyName="out*" />
+        <transformer ref="remPropGlobal"/>
         <test:assert expression="#[groovy:message.getOutboundProperty('outPropKey') == null]"/>
         <test:assert expression="#[groovy:message.getOutboundProperty('outPropKey2') == null]"/>
     </flow>
@@ -90,7 +96,7 @@
     <flow name="copyPropertiesUsingExpression">
         <transformer ref="addInboundProperty"/>
         <transformer ref="addInboundProperty2"/>
-        <copy-properties propertyName="#[string:inbPropKey]"/>
+        <transformer ref="copyPropGlobal"/>
         <test:assert expression="#[groovy:message.getOutboundProperty('inbPropKey').equals('inbPropValue')]"/>
     </flow>
 

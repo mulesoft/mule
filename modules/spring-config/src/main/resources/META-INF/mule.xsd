@@ -4195,7 +4195,7 @@
     </xsd:element>
     <xsd:complexType name="setPropertyType">
         <xsd:complexContent>
-            <xsd:extension base="commonTransformerType">
+            <xsd:extension base="commonMessagePartTransformerType">
                 <xsd:attribute name="propertyName" type="attributeType" use="required"/>
                 <xsd:attribute name="value" type="attributeType" use="required"/>
             </xsd:extension>
@@ -4211,7 +4211,7 @@
     </xsd:element>
     <xsd:complexType name="removePropertyType">
         <xsd:complexContent>
-            <xsd:extension base="commonTransformerType">
+            <xsd:extension base="commonMessagePartTransformerType">
                 <xsd:attribute name="propertyName" type="attributeType" use="required"/>
             </xsd:extension>
         </xsd:complexContent>
@@ -4226,7 +4226,7 @@
     </xsd:element>
     <xsd:complexType name="copyPropertiesType">
         <xsd:complexContent>
-            <xsd:extension base="commonTransformerType">
+            <xsd:extension base="commonMessagePartTransformerType">
                 <xsd:attribute name="propertyName" type="attributeType" use="required"/>
             </xsd:extension>
         </xsd:complexContent>
@@ -4241,9 +4241,23 @@
     </xsd:element>
     <xsd:complexType name="setVariableType">
         <xsd:complexContent>
-            <xsd:extension base="commonTransformerType">
+            <xsd:extension base="commonMessagePartTransformerType">
                 <xsd:attribute name="variableName" type="attributeType" use="required"/>
                 <xsd:attribute name="value" type="attributeType" use="required"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="commonMessagePartTransformerType">
+        <xsd:complexContent>
+            <xsd:extension base="commonTransformerType">
+                <xsd:attribute name="name" type="substitutableName">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Identifies the transformer so that other elements can reference it. Required if the transformer is defined at the global level.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
@@ -4257,7 +4271,7 @@
     </xsd:element>
     <xsd:complexType name="removeVariableType">
         <xsd:complexContent>
-            <xsd:extension base="commonTransformerType">
+            <xsd:extension base="commonMessagePartTransformerType">
                 <xsd:attribute name="variableName" type="attributeType" use="required"/>
             </xsd:extension>
         </xsd:complexContent>
@@ -4288,7 +4302,7 @@
     </xsd:element>
     <xsd:complexType name="setAttachmentType">
         <xsd:complexContent>
-            <xsd:extension base="commonTransformerType">
+            <xsd:extension base="commonMessagePartTransformerType">
                 <xsd:attribute name="attachmentName" type="attributeType" use="required"/>
                 <xsd:attribute name="value" type="attributeType" use="required"/>
                 <xsd:attribute name="contentType" type="attributeType" use="required"/>
@@ -4305,7 +4319,7 @@
     </xsd:element>
     <xsd:complexType name="removeAttachmentType">
         <xsd:complexContent>
-            <xsd:extension base="commonTransformerType">
+            <xsd:extension base="commonMessagePartTransformerType">
                 <xsd:attribute name="attachmentName" type="attributeType" use="required"/>
             </xsd:extension>
         </xsd:complexContent>
@@ -4320,7 +4334,7 @@
     </xsd:element>
     <xsd:complexType name="copyAttachmentType">
         <xsd:complexContent>
-            <xsd:extension base="commonTransformerType">
+            <xsd:extension base="commonMessagePartTransformerType">
                 <xsd:attribute name="attachmentName" type="attributeType" use="required"/>
             </xsd:extension>
         </xsd:complexContent>
