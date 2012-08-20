@@ -14,11 +14,13 @@ import org.mule.api.MuleContext;
 import org.mule.api.el.ExpressionLanguageContext;
 import org.mule.api.el.ExpressionLanguageFunction;
 import org.mule.api.el.VariableAssignmentCallback;
+import org.mule.config.i18n.CoreMessages;
 
 import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.Map;
 
+import org.mvel2.ImmutableElementException;
 import org.mvel2.ParserContext;
 import org.mvel2.UnresolveablePropertyException;
 import org.mvel2.ast.Function;
@@ -132,6 +134,20 @@ public class MVELExpressionLanguageContext extends BaseVariableResolverFactory
             assignmentCallback));
     }
 
+    @Override
+    public <T> void addFinalVariable(String name, T value)
+    {
+        addVariable(name, value, new VariableAssignmentCallback<T>()
+        {
+            @Override
+            public void assignValue(String name, T value, T newValue)
+            {
+                throw new ImmutableElementException(
+                    CoreMessages.expressionFinalVariableCannotBeAssignedValue(name).getMessage());
+            }
+        });
+    }
+
     @SuppressWarnings("unchecked")
     @Override
     public <T> T getVariable(String name)
@@ -212,7 +228,7 @@ public class MVELExpressionLanguageContext extends BaseVariableResolverFactory
     @Override
     public void declareFunction(String name, ExpressionLanguageFunction function)
     {
-        addVariable(name, new MVELFunctionAdaptor(name, function));
+        addFinalVariable(name, new MVELFunctionAdaptor(name, function));
     }
 
     @SuppressWarnings("serial")
@@ -282,4 +298,5 @@ public class MVELExpressionLanguageContext extends BaseVariableResolverFactory
     {
         return this;
     }
+
 }

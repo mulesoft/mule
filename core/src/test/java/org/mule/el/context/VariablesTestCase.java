@@ -11,7 +11,6 @@
 package org.mule.el.context;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import org.mule.DefaultMuleEvent;
@@ -186,7 +185,18 @@ public class VariablesTestCase extends AbstractELTestCase
         MuleEvent event = new DefaultMuleEvent(message, MessageExchangePattern.ONE_WAY,
             Mockito.mock(FlowConstruct.class));
         evaluate("localVar='bar'", message);
-        assertNull(event.getFlowVariable("foo"));
+    }
+
+    /**
+     * See MULE-6381
+     */
+    @Test
+    public void reassignValueToLocalVariable() throws Exception
+    {
+        MuleMessage message = new DefaultMuleMessage("", muleContext);
+        MuleEvent event = new DefaultMuleEvent(message, MessageExchangePattern.ONE_WAY,
+            Mockito.mock(FlowConstruct.class));
+        evaluate("localVar='bar';localVar='bar2'", message);
     }
 
     @Test

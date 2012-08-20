@@ -11,9 +11,7 @@
 package org.mule.el.mvel;
 
 import org.mule.api.el.VariableAssignmentCallback;
-import org.mule.config.i18n.CoreMessages;
 
-import org.mvel2.ImmutableElementException;
 import org.mvel2.integration.VariableResolverFactory;
 import org.mvel2.integration.impl.SimpleSTValueResolver;
 
@@ -52,8 +50,7 @@ class MuleVariableResolver<T> extends SimpleSTValueResolver
         }
         else
         {
-            throw new ImmutableElementException(CoreMessages.expressionFinalVariableCannotBeAssignedValue(
-                name).getMessage());
+            super.setValue(value);
         }
     }
 }
