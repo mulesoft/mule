@@ -32,6 +32,10 @@
         <add-message-property key="sesVarKey2" value="sesVarValue2"/>
     </message-properties-transformer>
 
+    <set-variable name="setVarGlobal" variableName="#[header:INVOCATION:invVarKey]" value="#[header:SESSION:sesVarKey]"/>
+
+    <remove-variable name="remVarGlobal" variableName="invVarKey" />
+
     <flow name="addVariable" processingStrategy="synchronous">
         <set-variable variableName="prop" value="#[string:some value]"/>
         <test:assert expression="#[groovy:message.getInvocationProperty('prop').equals('some value')]"/>
@@ -40,13 +44,13 @@
     <flow name="addVariableUsingExpressionKey" processingStrategy="synchronous">
         <transformer ref="addInvocationVariable"/>
         <transformer ref="addSessionVariable"/>
-        <set-variable variableName="#[header:INVOCATION:invVarKey]" value="#[header:SESSION:sesVarKey]"/>
+        <transformer ref="setVarGlobal"/>
         <test:assert expression="#[groovy:message.getInvocationProperty('invVarValue').equals('sesVarValue')]"/>
     </flow>
 
     <flow name="removeVariable" processingStrategy="synchronous">
         <transformer ref="addInvocationVariable"/>
-        <remove-variable variableName="invVarKey" />
+        <transformer ref="remVarGlobal"/>
         <test:assert expression="#[groovy:message.getInvocationProperty('invVarKey') == null]"/>
     </flow>
 

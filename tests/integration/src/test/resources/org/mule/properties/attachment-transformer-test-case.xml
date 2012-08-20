@@ -24,6 +24,12 @@
     <message-properties-transformer scope="session" name="addSessionProperty2">
         <add-message-property key="sesPropKey2" value="sesPropValue2"/>
     </message-properties-transformer>
+    
+    <set-attachment name="setAttachGlobal" attachmentName="#[header:INVOCATION:invPropKey]" value="#[header:SESSION:sesPropKey]" contentType="text/plain"/>
+    
+    <remove-attachment name="remAttachGlobal" attachmentName="#[string:attach]"/>
+    
+    <copy-attachments name="copyAttachGlobal" attachmentName="*2"/>
    
     <flow name="addAttachment" processingStrategy="synchronous">
         <set-attachment attachmentName="attach" value="#[string:some value]" contentType="text/plain"/>
@@ -33,7 +39,7 @@
     <flow name="addAttachmentUsingExpressionKey" processingStrategy="synchronous">
         <transformer ref="addInvocationProperty"/>
         <transformer ref="addSessionProperty"/>
-        <set-attachment attachmentName="#[header:INVOCATION:invPropKey]" value="#[header:SESSION:sesPropKey]" contentType="text/plain"/>
+        <transformer ref="setAttachGlobal"/>
         <test:assert expression="#[groovy:message.getOutboundAttachment('invPropValue') != null]"/>
         <test:assert expression="#[groovy:message.getOutboundAttachment('invPropValue').getContentType().equals('text/plain')]"/>
     </flow>
@@ -54,7 +60,7 @@
     <flow name="removeAttachmentUsingExpression" processingStrategy="synchronous">
         <set-attachment attachmentName="attach" value="#[string:some value]" contentType="text/plain"/>
         <set-attachment attachmentName="attach2" value="#[string:some value]" contentType="text/plain"/>
-        <remove-attachment attachmentName="#[string:attach]"/>
+        <transformer ref="remAttachGlobal"/>
         <test:assert expression="#[groovy:message.getOutboundAttachment('attach') == null]"/>
         <test:assert expression="#[groovy:message.getOutboundAttachment('attach2') != null]"/>
     </flow>
@@ -124,7 +130,7 @@
     </flow>
 
     <flow name="copyAttachmentsWithWildcard" processingStrategy="synchronous">
-        <copy-attachments attachmentName="*2"/>
+        <transformer ref="copyAttachGlobal"/>
         <test:assert expression="#[groovy:message.getOutboundAttachment('attach') == null]"/>
         <test:assert expression="#[groovy:message.getOutboundAttachment('attach2') != null]"/>
         <test:assert expression="#[groovy:message.getOutboundAttachment('attach22') != null]"/>
