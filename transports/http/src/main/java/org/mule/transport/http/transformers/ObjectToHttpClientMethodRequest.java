@@ -79,6 +79,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer
         registerSourceType(DataTypeFactory.INPUT_STREAM);
         registerSourceType(DataTypeFactory.create(OutputHandler.class));
         registerSourceType(DataTypeFactory.create(NullPayload.class));
+        registerSourceType(DataTypeFactory.create(Map.class));
     }
 
     @Override
