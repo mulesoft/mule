@@ -29,13 +29,12 @@ http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/cor
         <expression-component doc:name="Add request flight to response">payload.setFlights(reservationRequest.flights)</expression-component>
         <set-variable variableName="totalPrice" value="#[0]" doc:name="Initialize totalPrice"/>
         <foreach collection="#[payload.flights]" doc:name="Foreach on flights">
-            <logger message="Before throw exception" level="ERROR" doc:name="Logger"/>
             <scripting:transformer doc:name="Search flight availability">
                 <scripting:script engine="Groovy">
                     <scripting:text><![CDATA[if (payload.flightNumber.endsWith('3'))
    throw new org.mule.example.FlightUnavailableException()
 else
-   payload]]></scripting:text>
+   payload]]>       </scripting:text>
                 </scripting:script>
             </scripting:transformer>
             <vm:outbound-endpoint exchange-pattern="request-response" path="acquireSeatsInfoQueue" doc:name="Acquire Seats Info"/>
@@ -46,7 +45,6 @@ else
         <json:object-to-json-transformer doc:name="Object to JSON"/>
         <choice-exception-strategy doc:name="Choice Exception Strategy">
             <catch-exception-strategy when="#[exception.causedBy(org.mule.example.FlightUnavailableException)]" doc:name="Catch Exception Strategy">
-                <logger message="In Catch Exception" level="ERROR" doc:name="Logger"/>
                 <scripting:transformer doc:name="Add no availability error">
                     <scripting:script engine="Groovy">
                         <scripting:text><![CDATA[def payload = new org.mule.example.ReservationResponse()
@@ -71,7 +69,7 @@ payload]]></scripting:text>
     </flow>
     <flow name="acquireSeatsInfo" doc:name="acquireSeatsInfo">
         <vm:inbound-endpoint exchange-pattern="request-response" path="acquireSeatsInfoQueue" doc:name="acquireSeatsInfo"/>
-        <scripting:component doc:name="Aquire seats info service">
+        <scripting:component doc:name="Acquire seats info service">
             <scripting:script engine="Groovy">
                 <scripting:text><![CDATA[if (payload.flightNumber.endsWith('2'))
    payload.seatInfo = '20A'
@@ -81,7 +79,7 @@ payload]]></scripting:text>
             </scripting:script>
         </scripting:component>
         <catch-exception-strategy doc:name="Catch Exception Strategy">
-            <expression-component doc:name="Add no seat info avaiable message">payload.seatInfo = 'No seat info available'</expression-component>
+            <expression-component doc:name="Add no seat info available message">payload.seatInfo = 'No seat info available'</expression-component>
         </catch-exception-strategy>
     </flow>
     <flow name="acquireFlightPrice" doc:name="acquireFlightPrice">

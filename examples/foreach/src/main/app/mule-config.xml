@@ -40,15 +40,13 @@ http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/cor
                 </otherwise>
             </choice>
         </foreach>
-        <set-payload value="#[payload.size()] cars where processed: #[payload]" doc:name="Set response"/>
-        <http:response-builder contentType="text/html" doc:name="HTTP Response Builder">
-        	<parse-template location="foreach_info.html" doc:name="Parse Template"/>
-        </http:response-builder>
+        <set-payload value="#[payload.size()] cars were processed: #[payload]" doc:name="Set response"/>
+        <parse-template location="foreach_info.html" doc:name="Parse Template"/>
+        <http:response-builder contentType="text/html" doc:name="HTTP Response Builder"/>
         <catch-exception-strategy doc:name="Catch Exception Strategy">
             <set-payload value="You need to populate the Database first" doc:name="DB is not populated"/>
-            <http:response-builder status="500" contentType="text/html" doc:name="HTTP Response Builder">
-                <parse-template location="foreach_error.html" doc:name="Parse Template"/>
-            </http:response-builder>
+            <parse-template location="foreach_error.html" doc:name="Parse Template"/>
+            <http:response-builder status="500" contentType="text/html" doc:name="HTTP Response Builder"/>
         </catch-exception-strategy>
     </flow>
     <flow name="populate" doc:name="populate">
@@ -64,14 +62,12 @@ qr.update(conn, "INSERT INTO cars values('Opel Astra', 2001)");]]></scripting:te
             </scripting:script>
         </scripting:component>
         <set-payload value="Successfully populated the database" doc:name="Set Payload"/>
-        <http:response-builder contentType="text/html" doc:name="HTTP Response Builder">
-            <parse-template location="foreach_info.html" doc:name="Parse Template"/>
-        </http:response-builder>
+        <parse-template location="foreach_info.html" doc:name="Parse Template"/>
+        <http:response-builder contentType="text/html" doc:name="HTTP Response Builder"/>
         <catch-exception-strategy doc:name="Catch Exception Strategy">
             <set-payload value="DB already populated" doc:name="Database Already populated"/>
-            <http:response-builder status="500" contentType="text/html" doc:name="HTTP Response Builder">
-                <parse-template location="foreach_error.html" doc:name="Parse Template"/>
-            </http:response-builder>
+            <parse-template location="foreach_error.html" doc:name="Parse Template"/>
+            <http:response-builder status="500" contentType="text/html" doc:name="HTTP Response Builder"/>
         </catch-exception-strategy>
     </flow>
 </mule>

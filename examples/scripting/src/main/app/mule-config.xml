@@ -2,7 +2,7 @@
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:spring="http://www.springframework.org/schema/beans"
-      xmlns:script="http://www.mulesoft.org/schema/mule/scripting"
+      xmlns:scripting="http://www.mulesoft.org/schema/mule/scripting"
       xmlns:http="http://www.mulesoft.org/schema/mule/http"
       xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
       xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
@@ -19,50 +19,41 @@
         This example demonstrates invoking a JSR-223 script as the service component.
     </description>
 
-    <http:body-to-parameter-map-transformer name="HttpRequestToMap"/>
-
-    <expression-transformer name="ExtractAmount">
-        <return-argument evaluator="map-payload" expression="amount"/>
-    </expression-transformer>
-
-    <custom-transformer name="StringToNumber" class="org.mule.example.scripting.StringToNumber"/>
-
-    <custom-transformer name="DollarsToCents" class="org.mule.example.scripting.SimpleMathTransformer">
+    <http:body-to-parameter-map-transformer name="HttpRequestToMap" doc:name="Body to Parameter Map"/>
+    <custom-transformer name="StringToNumber" class="org.mule.example.scripting.StringToNumber" doc:name="Java"/>
+    <custom-transformer name="DollarsToCents" class="org.mule.example.scripting.SimpleMathTransformer" doc:name="Java">
         <spring:property name="operation" value="multiply"/>
         <spring:property name="factor" value="100"/>
     </custom-transformer>
 
     <flow name="http-inbound">
-        <http:inbound-endpoint host="0.0.0.0" port="${httpPort}" path="change-machine"
-            exchange-pattern="request-response" doc:name="Http Endpoint">
-        </http:inbound-endpoint>
-
+        <http:inbound-endpoint host="0.0.0.0" port="47493" path="change-machine"
+            exchange-pattern="request-response" doc:name="Http Endpoint"/>
 		<transformer ref="HttpRequestToMap" doc:name="Transform HttpRequest tp Map"/>
-
-        <choice>
-            <when expression="payload.currency == 'USD'" evaluator="groovy">
+        <choice doc:name="Choice">
+            <when expression="payload.currency == 'USD'">
                 <processor-chain>
-                    <transformer ref="ExtractAmount" doc:name="Extract Amount"/>
+                    <set-payload value="#[payload['amount']]" doc:name="Extract Amount"/>
                     <transformer ref="StringToNumber" doc:name="String to Number"/>
                     <transformer ref="DollarsToCents" doc:name="Dollars to Cents"/>
-                    <script:component doc:name="USD Currency Script">
-                        <script:script file="greedy.groovy">
+                    <scripting:component doc:name="USD Currency Script">
+                        <scripting:script file="greedy.groovy">
                             <property key="currency" value="USD"/>
-                        </script:script>
-                    </script:component>
+                        </scripting:script>
+                    </scripting:component>
                 </processor-chain>
              </when>
 
-             <when expression="payload.currency == 'GBP'" evaluator="groovy">
+             <when expression="payload.currency == 'GBP'">
                 <processor-chain>
-                    <transformer ref="ExtractAmount" doc:name="Extract Amount"/>
+                    <set-payload value="#[payload['amount']]" doc:name="Extract Amount"/>
                     <transformer ref="StringToNumber" doc:name="String to Number"/>
                     <transformer ref="DollarsToCents" doc:name="Dollars to Cents"/>
-                    <script:component doc:name="GBP Currency Script">
-                        <script:script file="greedy.py">
+                    <scripting:component doc:name="GBP Currency Script">
+                        <scripting:script file="greedy.py">
                             <property key="currency" value="GBP"/>
-                        </script:script>
-                    </script:component>
+                        </scripting:script>
+                    </scripting:component>
                 </processor-chain>
              </when>
         </choice>
