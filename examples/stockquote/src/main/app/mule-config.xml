@@ -29,9 +29,6 @@
     <xm:xslt-transformer xsl-file="xsl/soap-stock.xsl" name="XsltSoap" doc:name="XSLT Transformer"/>
     <xm:xml-to-object-transformer name="XmlToObject" doc:name="XML to Object"/>
     <object-to-string-transformer name="ObjectToString" doc:name="Object to String"/>
-    <expression-transformer name="ExtractSymbol" doc:name="Expression">
-        <return-argument evaluator="map-payload" expression="symbol"/>
-    </expression-transformer>
     <custom-transformer class="org.mule.transformer.codec.XmlEntityDecoder" name="XmlDecoder" doc:name="Java"/>
 
     <flow name="HTTP_input" doc:name="HTTP input">
@@ -57,19 +54,14 @@
         <transformer ref="XmlToObject" doc:name="Xml To Object"/>
     </flow>
     <sub-flow name="REST" doc:name="REST">
-        <transformer ref="ExtractSymbol" doc:name="Extract Symbol"/>
-        <scripting:transformer doc:name="Set POST parameter">
-            <scripting:script engine="groovy">
-            	return "Symbol=" + payload
-            </scripting:script>
-        </scripting:transformer>
+        <set-payload value="Symbol=#[payload['symbol']]" doc:name="Extract Symbol"/>
         <set-property propertyName="Content-Type" value="application/x-www-form-urlencoded" doc:name="Set Content-Type property"/>
         <http:outbound-endpoint address="http://www.webservicex.net/stockquote.asmx/GetQuote" doc:name="Invoke REST service"/>
         <transformer ref="XmlDecoder" doc:name="XmlDecoder transformer"/>
         <transformer ref="XsltRest" doc:name="XsltRest transformer"/>
     </sub-flow>
     <sub-flow name="SOAP" doc:name="SOAP">
-        <transformer ref="ExtractSymbol" doc:name="Extract Symbol"/>
+        <set-payload value="#[payload['symbol']]" doc:name="Extract Symbol"/>
         <flow-ref name="soapClient" doc:name="Soap Client"/>
         <transformer ref="XmlDecoder" doc:name="XmlDecoder transformer"/>
         <transformer ref="XsltSoap" doc:name="XsltSoap transformer"/>
@@ -79,7 +71,7 @@
         <http:outbound-endpoint address="http://www.webservicex.net/stockquote.asmx" doc:name="HTTP endpoint"/>
     </sub-flow>
     <sub-flow name="WSDL" doc:name="WSDL">
-        <transformer ref="ExtractSymbol" doc:name="Extract Symbol"/>
+        <set-payload value="#[payload['symbol']]" doc:name="Extract Symbol"/>
         <outbound-endpoint exchange-pattern="request-response" address="wsdl-cxf:http://www.webservicex.net/stockquote.asmx?WSDL&amp;method=GetQuote" doc:name="Wsdl"/>
         <transformer ref="XmlDecoder" doc:name="XmlDecoder transformer"/>
         <transformer ref="XsltSoap" doc:name="XsltSoap transformer"/>
