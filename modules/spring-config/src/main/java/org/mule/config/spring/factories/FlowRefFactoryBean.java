@@ -21,6 +21,9 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.config.i18n.CoreMessages;
 
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.context.ApplicationContext;
@@ -33,6 +36,7 @@ public class FlowRefFactoryBean
     private ApplicationContext applicationContext;
     private MuleContext muleContext;
     private MessageProcessor referencedMessageProcessor;
+    private ConcurrentMap<String, MessageProcessor> referenceCache = new ConcurrentHashMap<String, MessageProcessor>();
 
     public void setName(String name)
     {
@@ -48,7 +52,8 @@ public class FlowRefFactoryBean
         }
         else if (!muleContext.getExpressionManager().isExpression(refName))
         {
-            referencedMessageProcessor = getReferencedMessageProcessor(refName);
+            // No need to initialize because message processor will be injected into and managed by parent
+            referencedMessageProcessor = getReferencedMessageProcessor(refName, false);
         }
     }
 
@@ -66,37 +71,52 @@ public class FlowRefFactoryBean
                 @Override
                 public MuleEvent process(MuleEvent event) throws MuleException
                 {
-                    MessageProcessor dynamicMessageProcessor = getReferencedMessageProcessor(muleContext.getExpressionManager()
-                        .parse(refName, event));
+                    // Need to initialize because message processor won't be managed by parent
+                    MessageProcessor dynamicMessageProcessor = getReferencedMessageProcessor(
+                        muleContext.getExpressionManager().parse(refName, event), true);
                     return dynamicMessageProcessor.process(event);
                 }
             };
         }
     }
 
-    protected MessageProcessor getReferencedMessageProcessor(String name)
+    protected MessageProcessor getReferencedMessageProcessor(String name, boolean initialise)
+        throws InitialisationException
     {
-        final MessageProcessor processor = ((MessageProcessor) applicationContext.getBean(name));
-        if (processor == null)
+        if (name == null)
         {
             throw new MuleRuntimeException(CoreMessages.objectIsNull(name));
         }
-        else if (processor instanceof FlowConstruct)
+        else if (!referenceCache.containsKey(name))
         {
-            // If a FlowConstuct is reference then decouple lifcycle/injection
-            return new MessageProcessor()
+            final MessageProcessor springReferencedProcessor = ((MessageProcessor) applicationContext.getBean(name));
+            MessageProcessor lifecycleDecoupledReference = springReferencedProcessor;
+            if (springReferencedProcessor == null)
             {
-                @Override
-                public MuleEvent process(MuleEvent event) throws MuleException
+                throw new MuleRuntimeException(CoreMessages.objectIsNull(name));
+            }
+            else if (springReferencedProcessor instanceof FlowConstruct)
+            {
+                // If a FlowConstuct is reference then decouple life-cycle/injection
+                lifecycleDecoupledReference = new MessageProcessor()
                 {
-                    return processor.process(event);
+                    @Override
+                    public MuleEvent process(MuleEvent event) throws MuleException
+                    {
+                        return springReferencedProcessor.process(event);
+                    }
+                };
+            }
+            else if (initialise)
+            {
+                if (lifecycleDecoupledReference instanceof Initialisable)
+                {
+                    ((Initialisable) lifecycleDecoupledReference).initialise();
                 }
-            };
+            }
+            referenceCache.putIfAbsent(name, lifecycleDecoupledReference);
         }
-        else
-        {
-            return processor;
-        }
+        return (MessageProcessor) referenceCache.get(name);
     }
 
     @Override
