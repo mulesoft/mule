@@ -50,7 +50,7 @@ public abstract class AbstractRedeliveryPolicy extends AbstractInterceptingMessa
     @Override
     public void initialise() throws InitialisationException
     {
-        if (maxRedeliveryCount < 0)
+        if (maxRedeliveryCount < 1)
         {
             throw new InitialisationException(
                 CoreMessages.initialisationFailure(
