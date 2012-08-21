@@ -25,6 +25,7 @@ import org.mule.model.seda.SedaModel;
 import org.mule.retry.policies.NoRetryPolicyTemplate;
 import org.mule.security.MuleSecurityManager;
 import org.mule.util.DefaultStreamCloserService;
+import org.mule.util.lock.ServerLockFactory;
 import org.mule.util.queue.QueueManager;
 import org.mule.util.queue.TransactionalQueueManager;
 import org.mule.util.store.DefaultObjectStoreFactoryBean;
@@ -74,6 +75,8 @@ public class DefaultsConfigurationBuilder extends AbstractConfigurationBuilder
 
         registry.registerObject(MuleProperties.OBJECT_MULE_ENDPOINT_FACTORY, new DefaultEndpointFactory());
         registry.registerObject(MuleProperties.OBJECT_MULE_STREAM_CLOSER_SERVICE, new DefaultStreamCloserService());
+
+        registry.registerObject(MuleProperties.OBJECT_LOCK_FACTORY, new ServerLockFactory());
 
         configureThreadingProfiles(registry);
 
