@@ -25,10 +25,13 @@ import org.mule.transformer.simple.ByteArrayToHexString;
 import org.mule.transformer.simple.ObjectToByteArray;
 
 import java.io.InputStream;
+import java.io.Serializable;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.mule.util.lock.Lock;
+import org.mule.util.lock.LockFactory;
 import org.mule.util.store.ObjectStorePartition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,6 +53,7 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy
     private String messageDigestAlgorithm;
     private String idExpression;
     private ObjectStore<AtomicInteger> store;
+    private Lock<Serializable> lock;
 
     @Override
     public void initialise() throws InitialisationException
@@ -94,6 +98,11 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy
 
             }
         }
+
+        String appName = muleContext.getConfiguration().getId();
+        String flowName = flowConstruct.getName();
+        String idrId = String.format("%s-%s-%s",appName,flowName,"idr");
+        lock = ((LockFactory<Serializable>)muleContext.getRegistry().get(MuleProperties.OBJECT_LOCK_FACTORY)).createLock(idrId);
 
         store = createStore();
     }
@@ -165,45 +174,55 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy
             exceptionSeen = true;
         }
 
-        if (!exceptionSeen)
-        {
-            counter = findCounter(messageId);
-            tooMany = counter != null && counter.get() > maxRedeliveryCount;
-        }
-
-        if (tooMany || exceptionSeen)
-        {
-            try
-            {
-                return deadLetterQueue.process(event);
-            }
-            catch (Exception ex)
-            {
-                logger.info("Exception thrown from failed message processing for message " + messageId, ex);
-            }
-            return null;
-        }
-
+        lock.lock(messageId);
         try
         {
-            MuleEvent returnEvent = processNext(event);
-            counter = findCounter(messageId);
-            if (counter != null)
+
+            if (!exceptionSeen)
             {
-                resetCounter(messageId);
+                counter = findCounter(messageId);
+                tooMany = counter != null && counter.get() > maxRedeliveryCount;
             }
-            return returnEvent;
+
+            if (tooMany || exceptionSeen)
+            {
+                try
+                {
+                    return deadLetterQueue.process(event);
+                }
+                catch (Exception ex)
+                {
+                    logger.info("Exception thrown from failed message processing for message " + messageId, ex);
+                }
+                return null;
+            }
+
+            try
+            {
+                MuleEvent returnEvent = processNext(event);
+                counter = findCounter(messageId);
+                if (counter != null)
+                {
+                    resetCounter(messageId);
+                }
+                return returnEvent;
+            }
+            catch (MuleException ex)
+            {
+                incrementCounter(messageId);
+                throw ex;
+            }
+            catch (RuntimeException ex)
+            {
+                incrementCounter(messageId);
+                throw ex;
+            }
         }
-        catch (MuleException ex)
+        finally
         {
-            incrementCounter(messageId);
-            throw ex;
+            lock.unlock(messageId);
         }
-        catch (RuntimeException ex)
-        {
-            incrementCounter(messageId);
-            throw ex;
-        }
+
     }
 
     private void resetCounter(String messageId) throws ObjectStoreException

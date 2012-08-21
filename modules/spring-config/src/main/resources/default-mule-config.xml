@@ -86,6 +86,8 @@
 
     <bean name="_defaultRetryPolicyTemplate" class="org.mule.retry.policies.NoRetryPolicyTemplate"/>
 
+    <bean name="_muleLockFactory" class="org.mule.util.lock.ServerLockFactory"/>
+
     <!-- Default Transformers are now loaded from META-INF/services/org/mule/config/registry-bootstrap.properties so that
     the transformers will be available even when using the TransientRegistry only -->
 
