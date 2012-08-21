@@ -1390,6 +1390,7 @@
             <xsd:enumeration value="MODEL"/>
             <xsd:enumeration value="SERVICE"/>
             <xsd:enumeration value="SECURITY"/>
+            <xsd:enumeration value="ASYNC-MESSAGE"/>
             <xsd:enumeration value="ENDPOINT-MESSAGE"/>
             <xsd:enumeration value="COMPONENT-MESSAGE"/>
             <xsd:enumeration value="PIPELINE-MESSAGE"/>

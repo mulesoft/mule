@@ -8,9 +8,11 @@
 
     <notifications>
         <notification event="PIPELINE-MESSAGE" />
+        <notification event="ASYNC-MESSAGE" />
     </notifications>
 
     <spring:bean name="notificationLogger" class="org.mule.context.notification.PipelineMessageNotificationLogger" />
+    <spring:bean name="notificationLogger2" class="org.mule.context.notification.AsyncMessageNotificationLogger" />
 
     <notifications>
         <notification-listener ref="notificationLogger" />

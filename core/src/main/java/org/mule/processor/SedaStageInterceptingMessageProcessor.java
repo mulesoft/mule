@@ -116,6 +116,7 @@ public class SedaStageInterceptingMessageProcessor extends AsyncInterceptingMess
                 getStageDescription(), event));
         }
         queue.put(event);
+        fireAsyncScheduledNotification(event);
     }
 
     protected MuleEvent dequeue() throws Exception

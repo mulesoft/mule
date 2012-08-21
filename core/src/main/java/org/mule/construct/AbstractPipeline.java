@@ -93,33 +93,24 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
             {
                 muleContext.getNotificationManager().fireNotification(
                     new PipelineMessageNotification(AbstractPipeline.this, event,
-                        PipelineMessageNotification.PROCESS_BEGIN));
+                        PipelineMessageNotification.PROCESS_START));
 
                 MuleEvent result = null;
-
+                MessagingException exceptionThrown = null;
                 try
                 {
-                    result = processNext(event);
-                    if (event.getExchangePattern().hasResponse() && result != null)
-                    {
-                        muleContext.getNotificationManager().fireNotification(
-                            new PipelineMessageNotification(AbstractPipeline.this, result,
-                                PipelineMessageNotification.PROCESS_RESPONSE_END));
-                    }
-                    return result;
+                    return processNext(event);
                 }
                 catch (MessagingException me)
                 {
-                    muleContext.getNotificationManager().fireNotification(
-                        new PipelineMessageNotification(AbstractPipeline.this, event,
-                            PipelineMessageNotification.PROCESS_EXCEPTION));
+                    exceptionThrown = me;
                     throw me;
                 }
                 finally
                 {
                     muleContext.getNotificationManager().fireNotification(
                         new PipelineMessageNotification(AbstractPipeline.this, result,
-                            PipelineMessageNotification.PROCESS_END));
+                            PipelineMessageNotification.PROCESS_COMPLETE, exceptionThrown));
                 }
             }
         });
@@ -134,7 +125,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
             {
                 muleContext.getNotificationManager().fireNotification(
                     new PipelineMessageNotification(AbstractPipeline.this, event,
-                        PipelineMessageNotification.PROCESS_REQUEST_END));
+                        PipelineMessageNotification.PROCESS_END));
                 return event;
             }
         });

@@ -10,17 +10,15 @@
 
 package org.mule.context.notification;
 
-import org.mule.api.context.notification.ServerNotification;
+import org.mule.api.context.notification.AsyncMessageNotificationListener;
 
-import java.util.LinkedList;
 import java.util.List;
 
-public abstract class AbstractNotificationLogger<T extends ServerNotification> implements NotificationLogger
+public class AsyncMessageNotificationLogger extends PipelineAndAsyncMessageNotificationLogger
+    implements AsyncMessageNotificationListener<AsyncMessageNotification>, NotificationLogger
 {
 
-    private LinkedList notifications = new LinkedList();
-
-    public synchronized void onNotification(T notification)
+    public synchronized void onNotification(AsyncMessageNotification notification)
     {
         notifications.addLast(notification);
     }
@@ -29,5 +27,4 @@ public abstract class AbstractNotificationLogger<T extends ServerNotification> i
     {
         return notifications;
     }
-
 }
