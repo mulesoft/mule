@@ -12,6 +12,7 @@ package org.mule.processor;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.config.MuleProperties;
+import org.mule.api.exception.MessageRedeliveredException;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Startable;
@@ -188,7 +189,18 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy
             {
                 try
                 {
-                    return deadLetterQueue.process(event);
+                    if (deadLetterQueue != null)
+                    {
+                        return deadLetterQueue.process(event);
+                    }
+                    else
+                    {
+                        throw new MessageRedeliveredException(messageId,counter.get(),maxRedeliveryCount,null,event);
+                    }
+                }
+                catch (MessageRedeliveredException ex)
+                {
+                    throw ex;
                 }
                 catch (Exception ex)
                 {
