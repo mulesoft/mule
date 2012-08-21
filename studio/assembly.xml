@@ -3,6 +3,7 @@
     <formats>
         <format>tar.gz</format>
     </formats>
+    <includeBaseDirectory>false</includeBaseDirectory>
 
     <fileSets>
         <!-- Copy standard CE distro, excluding a few things -->
