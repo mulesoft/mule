@@ -17,7 +17,7 @@ import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.processor.MessageProcessor;
-import org.mule.api.store.LockableObjectStore;
+import org.mule.api.store.ObjectStore;
 import org.mule.api.store.ObjectStoreException;
 import org.mule.api.store.ObjectStoreManager;
 import org.mule.api.transformer.TransformerException;
@@ -41,11 +41,6 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy
 {
-    private static final boolean OBJECT_STORE_NO_PERSISTENCE = false;
-    private static final int OBJECT_STORE_NO_ENTRY_LIMIT = -1;
-    private static final int OBJECT_STORE_FIVE_MINUTES_TTL = 60 * 5 * 1000;
-    private static final int OBJECT_STORE_EXPIRATION_INTERVAL = 6000;
-
     private final ObjectToByteArray objectToByteArray = new ObjectToByteArray();
     private final ByteArrayToHexString byteArrayToHexString = new ByteArrayToHexString();
 
@@ -54,7 +49,7 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy
     private boolean useSecureHash;
     private String messageDigestAlgorithm;
     private String idExpression;
-    private LockableObjectStore<AtomicInteger> store;
+    private ObjectStore<AtomicInteger> store;
 
     @Override
     public void initialise() throws InitialisationException
@@ -103,12 +98,11 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy
         store = createStore();
     }
 
-    private LockableObjectStore<AtomicInteger> createStore() throws InitialisationException
+    private ObjectStore<AtomicInteger> createStore() throws InitialisationException
     {
         ObjectStoreManager objectStoreManager = (ObjectStoreManager) muleContext.getRegistry().get(
                                 MuleProperties.OBJECT_STORE_MANAGER);
-        return objectStoreManager.getLockableObjectStore(objectStoreManager.getObjectStore(flowConstruct.getName() + "." + getClass().getName(),
-                OBJECT_STORE_NO_PERSISTENCE, OBJECT_STORE_NO_ENTRY_LIMIT, OBJECT_STORE_FIVE_MINUTES_TTL, OBJECT_STORE_EXPIRATION_INTERVAL));
+        return objectStoreManager.getObjectStore(flowConstruct.getName() + "." + getClass().getName(), false, -1,  60 * 5 * 1000, 6000 );
     }
 
 
@@ -171,64 +165,44 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy
             exceptionSeen = true;
         }
 
-        try
+        if (!exceptionSeen)
         {
-            store.lockEntry(messageId);
+            counter = findCounter(messageId);
+            tooMany = counter != null && counter.get() > maxRedeliveryCount;
+        }
 
-            if (!exceptionSeen)
-            {
-                counter = findCounter(messageId);
-                tooMany = counter != null && counter.get() > maxRedeliveryCount;
-            }
-
-            if (tooMany || exceptionSeen)
-            {
-                try
-                {
-                    if (deadLetterQueue != null)
-                    {
-                        return deadLetterQueue.process(event);
-                    }
-                    else
-                    {
-                        throw new MessageRedeliveredException(messageId,counter.get(),maxRedeliveryCount,null,event);
-                    }
-                }
-                catch (MessageRedeliveredException ex)
-                {
-                    throw ex;
-                }
-                catch (Exception ex)
-                {
-                    logger.info("Exception thrown from failed message processing for message " + messageId, ex);
-                }
-                return null;
-            }
-
+        if (tooMany || exceptionSeen)
+        {
             try
             {
-                MuleEvent returnEvent = processNext(event);
-                counter = findCounter(messageId);
-                if (counter != null)
-                {
-                    resetCounter(messageId);
-                }
-                return returnEvent;
+                return deadLetterQueue.process(event);
             }
-            catch (MuleException ex)
+            catch (Exception ex)
             {
-                incrementCounter(messageId);
-                throw ex;
+                logger.info("Exception thrown from failed message processing for message " + messageId, ex);
             }
-            catch (RuntimeException ex)
-            {
-                incrementCounter(messageId);
-                throw ex;
-            }
+            return null;
         }
-        finally
+
+        try
         {
-            store.releaseEntry(messageId);
+            MuleEvent returnEvent = processNext(event);
+            counter = findCounter(messageId);
+            if (counter != null)
+            {
+                resetCounter(messageId);
+            }
+            return returnEvent;
+        }
+        catch (MuleException ex)
+        {
+            incrementCounter(messageId);
+            throw ex;
+        }
+        catch (RuntimeException ex)
+        {
+            incrementCounter(messageId);
+            throw ex;
         }
     }
 

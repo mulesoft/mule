@@ -37,10 +37,4 @@ public interface ObjectStoreManager
      * Delete all objects from the partition
      */
     void disposeStore(ObjectStore<? extends Serializable> store) throws ObjectStoreException;
-
-    /**
-     * Return a LockableObjectStore using the mule default locker and the provided object store.
-     */
-    <T extends LockableObjectStore<? extends Serializable>> T getLockableObjectStore(ObjectStore<? extends Serializable> objectStore);
-
 }
