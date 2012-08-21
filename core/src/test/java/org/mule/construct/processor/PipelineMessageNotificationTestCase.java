@@ -94,13 +94,13 @@ public class PipelineMessageNotificationTestCase extends AbstractMuleTestCase
 
         verify(notificationManager, times(1)).fireNotification(
             argThat(new PipelineMessageNotificiationArgumentMatcher(
-                PipelineMessageNotification.PROCESS_START, false)));
+                PipelineMessageNotification.PROCESS_START, false, event)));
         verify(notificationManager, times(1)).fireNotification(
             argThat(new PipelineMessageNotificiationArgumentMatcher(PipelineMessageNotification.PROCESS_END,
-                false)));
+                false, event)));
         verify(notificationManager, times(1)).fireNotification(
             argThat(new PipelineMessageNotificiationArgumentMatcher(
-                PipelineMessageNotification.PROCESS_COMPLETE, false)));
+                PipelineMessageNotification.PROCESS_COMPLETE, false, event)));
         verify(notificationManager, times(3)).fireNotification(any(PipelineMessageNotification.class));
     }
 
@@ -119,13 +119,13 @@ public class PipelineMessageNotificationTestCase extends AbstractMuleTestCase
 
         verify(notificationManager, times(1)).fireNotification(
             argThat(new PipelineMessageNotificiationArgumentMatcher(
-                PipelineMessageNotification.PROCESS_START, false)));
+                PipelineMessageNotification.PROCESS_START, false, event)));
         verify(notificationManager, times(1)).fireNotification(
             argThat(new PipelineMessageNotificiationArgumentMatcher(PipelineMessageNotification.PROCESS_END,
-                false)));
+                false, event)));
         verify(notificationManager, times(1)).fireNotification(
             argThat(new PipelineMessageNotificiationArgumentMatcher(
-                PipelineMessageNotification.PROCESS_COMPLETE, false)));
+                PipelineMessageNotification.PROCESS_COMPLETE, false, event)));
         verify(notificationManager, times(3)).fireNotification(any(PipelineMessageNotification.class));
     }
 
@@ -160,10 +160,10 @@ public class PipelineMessageNotificationTestCase extends AbstractMuleTestCase
 
         verify(notificationManager, times(1)).fireNotification(
             argThat(new PipelineMessageNotificiationArgumentMatcher(
-                PipelineMessageNotification.PROCESS_START, false)));
+                PipelineMessageNotification.PROCESS_START, false, event)));
         verify(notificationManager, times(1)).fireNotification(
             argThat(new PipelineMessageNotificiationArgumentMatcher(
-                PipelineMessageNotification.PROCESS_COMPLETE, true)));
+                PipelineMessageNotification.PROCESS_COMPLETE, true, event)));
         verify(notificationManager, times(2)).fireNotification(any(PipelineMessageNotification.class));
     }
 
@@ -198,13 +198,13 @@ public class PipelineMessageNotificationTestCase extends AbstractMuleTestCase
         }
         verify(notificationManager, times(1)).fireNotification(
             argThat(new PipelineMessageNotificiationArgumentMatcher(
-                PipelineMessageNotification.PROCESS_START, false)));
+                PipelineMessageNotification.PROCESS_START, false, event)));
         verify(notificationManager, times(1)).fireNotification(
             argThat(new PipelineMessageNotificiationArgumentMatcher(PipelineMessageNotification.PROCESS_END,
-                false)));
+                false, event)));
         verify(notificationManager, times(1)).fireNotification(
             argThat(new PipelineMessageNotificiationArgumentMatcher(
-                PipelineMessageNotification.PROCESS_COMPLETE, true)));
+                PipelineMessageNotification.PROCESS_COMPLETE, true, event)));
         verify(notificationManager, times(3)).fireNotification(any(PipelineMessageNotification.class));
     }
 
@@ -238,10 +238,10 @@ public class PipelineMessageNotificationTestCase extends AbstractMuleTestCase
         }
         verify(notificationManager, times(1)).fireNotification(
             argThat(new PipelineMessageNotificiationArgumentMatcher(
-                PipelineMessageNotification.PROCESS_START, false)));
+                PipelineMessageNotification.PROCESS_START, false, event)));
         verify(notificationManager, times(1)).fireNotification(
             argThat(new PipelineMessageNotificiationArgumentMatcher(
-                PipelineMessageNotification.PROCESS_COMPLETE, true)));
+                PipelineMessageNotification.PROCESS_COMPLETE, true, event)));
         verify(notificationManager, times(2)).fireNotification(any(PipelineMessageNotification.class));
     }
 
@@ -277,16 +277,17 @@ public class PipelineMessageNotificationTestCase extends AbstractMuleTestCase
 
         verify(notificationManager, times(1)).fireNotification(
             argThat(new PipelineMessageNotificiationArgumentMatcher(
-                PipelineMessageNotification.PROCESS_START, false)));
+                PipelineMessageNotification.PROCESS_START, false, event)));
         verify(notificationManager, times(1)).fireNotification(
             argThat(new PipelineMessageNotificiationArgumentMatcher(
-                AsyncMessageNotification.PROCESS_ASYNC_SCHEDULED, false)));
+                AsyncMessageNotification.PROCESS_ASYNC_SCHEDULED, false, event)));
         verify(notificationManager, times(1)).fireNotification(
             argThat(new PipelineMessageNotificiationArgumentMatcher(
-                PipelineMessageNotification.PROCESS_COMPLETE, false)));
+                PipelineMessageNotification.PROCESS_COMPLETE, false, event)));
+        // Event is not same, because it's copied
         verify(notificationManager, times(1)).fireNotification(
             argThat(new PipelineMessageNotificiationArgumentMatcher(
-                AsyncMessageNotification.PROCESS_ASYNC_COMPLETE, false)));
+                AsyncMessageNotification.PROCESS_ASYNC_COMPLETE, false, null)));
         verify(notificationManager, times(4)).fireNotification(any(PipelineMessageNotification.class));
     }
 
@@ -346,11 +347,15 @@ public class PipelineMessageNotificationTestCase extends AbstractMuleTestCase
     {
         private int expectedAction;
         private boolean exceptionExpected;
+        private MuleEvent event;
 
-        public PipelineMessageNotificiationArgumentMatcher(int expectedAction, boolean exceptionExpected)
+        public PipelineMessageNotificiationArgumentMatcher(int expectedAction,
+                                                           boolean exceptionExpected,
+                                                           MuleEvent event)
         {
             this.expectedAction = expectedAction;
             this.exceptionExpected = exceptionExpected;
+            this.event = event;
         }
 
         @Override
@@ -369,11 +374,14 @@ public class PipelineMessageNotificationTestCase extends AbstractMuleTestCase
                     exception = ((AsyncMessageNotification) notification).getException();
 
                 }
-                return expectedAction == notification.getAction() && exception != null;
+                return expectedAction == notification.getAction() && exception != null
+                       && notification.getSource() != null
+                       && (this.event == null || this.event == notification.getSource());
             }
             else
             {
-                return expectedAction == notification.getAction();
+                return expectedAction == notification.getAction() && notification.getSource() != null
+                       && (this.event == null || this.event == notification.getSource());
             }
 
         }
