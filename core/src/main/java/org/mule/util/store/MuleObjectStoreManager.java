@@ -10,8 +10,6 @@
 
 package org.mule.util.store;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.config.MuleProperties;
@@ -20,14 +18,12 @@ import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.store.ListableObjectStore;
-import org.mule.api.store.LockableObjectStore;
 import org.mule.api.store.ObjectStore;
 import org.mule.api.store.ObjectStoreException;
 import org.mule.api.store.ObjectStoreManager;
 import org.mule.api.store.PartitionableExpirableObjectStore;
 import org.mule.api.store.PartitionableObjectStore;
 import org.mule.util.concurrent.DaemonThreadFactory;
-import org.mule.util.lock.MuleEntryLocker;
 
 import java.io.Serializable;
 import java.util.List;
@@ -35,6 +31,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 public class MuleObjectStoreManager
     implements ObjectStoreManager, MuleContextAware, Initialisable, Disposable
@@ -259,21 +258,5 @@ public class MuleObjectStoreManager
                 //there is nothing we can do                
             }
         }
-    }
-
-    @Override
-    public <T extends LockableObjectStore<? extends Serializable>> T getLockableObjectStore(ObjectStore<? extends Serializable> objectStore)
-    {
-        LockableObjectStore lockableObjectStore;
-        if (objectStore instanceof LockableObjectStore)
-        {
-            lockableObjectStore = (LockableObjectStore) objectStore;
-        }
-        else
-        {
-            MuleEntryLocker muleEntryLocker = muleContext.getRegistry().get(MuleProperties.OBJECT_STORE_DEFAULT_LOCKER);
-            lockableObjectStore = new DefaultLockableObjectStore(objectStore, muleEntryLocker);
-        }
-        return (T) lockableObjectStore;
     }
 }
