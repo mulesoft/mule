@@ -27,7 +27,7 @@
     </custom-transformer>
 
     <flow name="http-inbound">
-        <http:inbound-endpoint host="0.0.0.0" port="47493" path="change-machine"
+        <http:inbound-endpoint host="0.0.0.0" port="${httpPort}" path="change-machine"
             exchange-pattern="request-response" doc:name="Http Endpoint"/>
 		<transformer ref="HttpRequestToMap" doc:name="Transform HttpRequest tp Map"/>
         <choice doc:name="Choice">
