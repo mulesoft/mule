@@ -69,18 +69,19 @@ public class SpringBeanLookup extends AbstractObjectFactory implements Applicati
             throw new InitialisationException(
                 MessageFactory.createStaticMessage("ApplicationContext has not been injected."), this);
         }
+
+        // Get instance of spring bean to determine bean type.
+        // We do this because the result of org.springframework.beans.factory.BeanFactory.getType(String) when
+        // used before bean initialization does not always return the same type as afterwards. One specific
+        // case when AOP is used, and the actual bean class is returned before initialization but a proxy
+        // afterwards. This affects both prototype beans and lazy-init singletons.
+        objectClass = applicationContext.getBean(bean).getClass();
     }
 
     @Override
     public void dispose()
     {
         // Not implemented for Spring Beans
-    }
-
-    @Override
-    public Class<?> getObjectClass()
-    {
-        return applicationContext.getType(bean);
     }
 
     @Override

@@ -10,22 +10,19 @@
 
 package org.mule.el.context;
 
+import org.mule.api.MuleRuntimeException;
+
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.collections.keyvalue.DefaultMapEntry;
+
 public abstract class AbstractMapContext<K, V> implements Map<K, V>
 {
-
-    public boolean containsValue(Object value)
-    {
-        throw new UnsupportedOperationException();
-    }
-
-    public Set<java.util.Map.Entry<K, V>> entrySet()
-    {
-        throw new UnsupportedOperationException();
-    }
 
     public void putAll(Map<? extends K, ? extends V> m)
     {
@@ -35,9 +32,20 @@ public abstract class AbstractMapContext<K, V> implements Map<K, V>
         }
     }
 
-    public Collection<V> values()
+    @Override
+    public void clear()
     {
-        throw new UnsupportedOperationException();
+        for (K key : keySet())
+        {
+            try
+            {
+                remove(key);
+            }
+            catch (Exception e)
+            {
+                throw new MuleRuntimeException(e);
+            }
+        }
     }
 
     public int size()
@@ -48,6 +56,48 @@ public abstract class AbstractMapContext<K, V> implements Map<K, V>
     public boolean isEmpty()
     {
         return keySet().isEmpty();
+    }
+
+    @Override
+    public boolean containsKey(Object key)
+    {
+        return keySet().contains(key);
+    }
+
+    @Override
+    public Collection<V> values()
+    {
+        List<V> values = new ArrayList<V>(size());
+        for (K key : keySet())
+        {
+            values.add(get(key));
+        }
+        return values;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public Set<java.util.Map.Entry<K, V>> entrySet()
+    {
+        Set<java.util.Map.Entry<K, V>> entrySet = new HashSet<java.util.Map.Entry<K, V>>();
+        for (K key : keySet())
+        {
+            entrySet.add(new DefaultMapEntry(key, get(key)));
+        }
+        return entrySet;
+    }
+
+    @Override
+    public boolean containsValue(Object value)
+    {
+        for (K key : keySet())
+        {
+            if (value.equals(get(key)))
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
 }

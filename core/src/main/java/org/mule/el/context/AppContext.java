@@ -19,13 +19,10 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Exposes information about the current Mule Application:
- * 
- * <li> <b>encoding</b>        <i>Application default encoding</i>
- * <li> <b>name</b>            <i>Application name</i>
- * <li> <b>registry</b>        <i>Mule registry (as a map)</i>
- * <li> <b>standalone</b>      <i>If Mule is running standalone</i>
- * <li> <b>workdir</b>         <i>Application work directory</i>
+ * Exposes information about the current Mule Application: <li><b>encoding</b> <i>Application default
+ * encoding</i> <li><b>name</b> <i>Application name</i> <li><b>registry</b> <i>Mule registry (as a map)</i>
+ * <li><b>standalone</b> <i>If Mule is running standalone</i> <li><b>workdir</b> <i>Application work
+ * directory</i>
  */
 public class AppContext
 {
@@ -112,14 +109,7 @@ public class AppContext
         {
             for (java.util.Map.Entry<? extends String, ? extends Object> entry : m.entrySet())
             {
-                try
-                {
-                    registry.registerObject(entry.getKey(), entry.getValue());
-                }
-                catch (RegistrationException e)
-                {
-                    throw new MuleRuntimeException(e);
-                }
+                put(entry.getKey(), entry.getValue());
             }
         }
 

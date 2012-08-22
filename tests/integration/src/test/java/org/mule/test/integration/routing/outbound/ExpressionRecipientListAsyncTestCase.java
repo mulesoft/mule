@@ -10,6 +10,9 @@
 
 package org.mule.test.integration.routing.outbound;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
@@ -24,9 +27,6 @@ import java.util.Map;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 public class ExpressionRecipientListAsyncTestCase extends AbstractServiceAndFlowTestCase
 {
     @Parameters
@@ -36,7 +36,9 @@ public class ExpressionRecipientListAsyncTestCase extends AbstractServiceAndFlow
             {ConfigVariant.SERVICE,
                 "org/mule/test/integration/routing/outbound/expression-recipient-list-async-test-service.xml"},
             {ConfigVariant.FLOW,
-                "org/mule/test/integration/routing/outbound/expression-recipient-list-async-test-flow.xml"}});
+                "org/mule/test/integration/routing/outbound/expression-recipient-list-async-test-flow.xml"},
+            {ConfigVariant.FLOW_EL,
+                "org/mule/test/integration/routing/outbound/expression-recipient-list-async-test-flow-el.xml"}});
     }
 
     public ExpressionRecipientListAsyncTestCase(ConfigVariant variant, String configResources)

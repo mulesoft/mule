@@ -23,6 +23,7 @@ import org.mule.api.routing.RoutePathNotFoundException;
 import org.mule.api.routing.RoutingException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
+import org.mule.expression.ExpressionConfig;
 import org.mule.routing.CorrelationMode;
 
 import java.util.ArrayList;
@@ -37,6 +38,12 @@ import java.util.List;
  */
 public class ExceptionBasedRouter extends ExpressionRecipientList
 {
+    
+    public ExceptionBasedRouter()
+    {
+        expressionConfig = new ExpressionConfig(DEFAULT_SELECTOR_EXPRESSION, DEFAULT_SELECTOR_EVALUATOR, null);
+    }
+    
     @Override
     public MuleEvent route(MuleEvent event) throws RoutingException
     {
