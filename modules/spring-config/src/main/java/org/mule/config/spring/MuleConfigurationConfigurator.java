@@ -15,8 +15,8 @@ import org.mule.api.MuleRuntimeException;
 import org.mule.api.config.ConfigurationException;
 import org.mule.api.config.MuleConfiguration;
 import org.mule.api.context.MuleContextAware;
-import org.mule.api.exception.MessagingExceptionHandlerAcceptor;
 import org.mule.api.exception.MessagingExceptionHandler;
+import org.mule.api.exception.MessagingExceptionHandlerAcceptor;
 import org.mule.config.DefaultMuleConfiguration;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
@@ -35,8 +35,8 @@ import org.springframework.beans.factory.SmartFactoryBean;
 public class MuleConfigurationConfigurator implements MuleContextAware, SmartFactoryBean
 {
     private MuleContext muleContext;
-    
-    // We instantiate DefaultMuleConfiguration to make sure we get the default values for 
+
+    // We instantiate DefaultMuleConfiguration to make sure we get the default values for
     // any properties not set by the user.
     private DefaultMuleConfiguration config = new DefaultMuleConfiguration();
 
@@ -69,6 +69,7 @@ public class MuleConfigurationConfigurator implements MuleContextAware, SmartFac
             defaultConfig.setUseExtendedTransformations(config.useExtendedTransformations());
             defaultConfig.setFlowEndingWithOneWayEndpointReturnsNull(config.isFlowEndingWithOneWayEndpointReturnsNull());
             defaultConfig.setDefaultExceptionStrategyName(config.getDefaultExceptionStrategyName());
+            defaultConfig.setEnricherPropagatesSessionVariableChanges(config.isEnricherPropagatesSessionVariableChanges());
             validateDefaultExceptionStrategy();
             return configuration;
         }
@@ -83,17 +84,20 @@ public class MuleConfigurationConfigurator implements MuleContextAware, SmartFac
         String defaultExceptionStrategyName = config.getDefaultExceptionStrategyName();
         if (defaultExceptionStrategyName != null)
         {
-            MessagingExceptionHandler messagingExceptionHandler = muleContext.getRegistry().lookupObject(defaultExceptionStrategyName);
+            MessagingExceptionHandler messagingExceptionHandler = muleContext.getRegistry().lookupObject(
+                defaultExceptionStrategyName);
             if (messagingExceptionHandler == null)
             {
-                throw new MuleRuntimeException(CoreMessages.createStaticMessage(String.format("No global exception strategy defined with name %s.", defaultExceptionStrategyName)));
+                throw new MuleRuntimeException(CoreMessages.createStaticMessage(String.format(
+                    "No global exception strategy defined with name %s.", defaultExceptionStrategyName)));
             }
             if (messagingExceptionHandler instanceof MessagingExceptionHandlerAcceptor)
             {
                 MessagingExceptionHandlerAcceptor messagingExceptionHandlerAcceptor = (MessagingExceptionHandlerAcceptor) messagingExceptionHandler;
                 if (!messagingExceptionHandlerAcceptor.acceptsAll())
                 {
-                    throw new MuleRuntimeException(CoreMessages.createStaticMessage("Default exception strategy must not have expression attribute. It must accept any message."));
+                    throw new MuleRuntimeException(
+                        CoreMessages.createStaticMessage("Default exception strategy must not have expression attribute. It must accept any message."));
                 }
             }
         }
@@ -113,12 +117,12 @@ public class MuleConfigurationConfigurator implements MuleContextAware, SmartFac
     {
         config.setDefaultSynchronousEndpoints(synchronous);
     }
-    
+
     public void setDefaultResponseTimeout(int responseTimeout)
     {
         config.setDefaultResponseTimeout(responseTimeout);
     }
-    
+
     public void setDefaultTransactionTimeout(int defaultTransactionTimeout)
     {
         config.setDefaultTransactionTimeout(defaultTransactionTimeout);
@@ -143,4 +147,10 @@ public class MuleConfigurationConfigurator implements MuleContextAware, SmartFac
     {
         config.setFlowEndingWithOneWayEndpointReturnsNull(flowEndingWithOneWayEndpointReturnsNull);
     }
+
+    public void setEnricherPropagatesSessionVariableChanges(boolean enricherPropagatesSessionVariableChanges)
+    {
+        config.setEnricherPropagatesSessionVariableChanges(enricherPropagatesSessionVariableChanges);
+    }
+
 }
