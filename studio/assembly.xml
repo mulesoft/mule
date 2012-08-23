@@ -25,7 +25,7 @@
             <directory>target/ce-distribution/${communityArtifact}-${version}/src</directory>
             <outputDirectory></outputDirectory>
             <includes>
-                <include>mule-*-src.zip</include>
+                <include>mule-sources-*.zip</include>
             </includes>
         </fileSet>
 
