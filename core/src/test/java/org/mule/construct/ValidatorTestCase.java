@@ -10,31 +10,34 @@
 
 package org.mule.construct;
 
+import static org.junit.Assert.assertEquals;
+
 import org.mule.MessageExchangePattern;
 import org.mule.api.MuleEvent;
 import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transport.Connector;
 import org.mule.routing.filters.PayloadTypeFilter;
 import org.mule.tck.MuleTestUtils;
 
 import java.util.Collections;
 
+import org.junit.Ignore;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
 
 public class ValidatorTestCase extends AbstractFlowConstuctTestCase
 {
     private Validator validator;
     protected Connector testConnector;
+    protected OutboundEndpoint testOutboundEndpoint;
 
     @Override
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
 
-        final OutboundEndpoint testOutboundEndpoint = MuleTestUtils.getTestOutboundEndpoint(
-            MessageExchangePattern.ONE_WAY, muleContext);
+        testOutboundEndpoint = MuleTestUtils.getTestOutboundEndpoint(MessageExchangePattern.ONE_WAY,
+            muleContext);
         testConnector = testOutboundEndpoint.getConnector();
         muleContext.getRegistry().registerConnector(testConnector);
         testConnector.start();
@@ -66,8 +69,8 @@ public class ValidatorTestCase extends AbstractFlowConstuctTestCase
     {
         validator.initialise();
         validator.start();
-        final MuleEvent response = directInboundMessageSource.process(MuleTestUtils.getTestEvent(
-            "abc", muleContext));
+        final MuleEvent response = directInboundMessageSource.process(MuleTestUtils.getTestEvent("abc",
+            muleContext));
 
         assertEquals("BAD:abc", response.getMessageAsString());
     }
@@ -104,5 +107,24 @@ public class ValidatorTestCase extends AbstractFlowConstuctTestCase
             muleContext));
 
         assertEquals("ERROR:123", response.getMessageAsString());
+    }
+
+    @Test
+    public void testMELExpression() throws InitialisationException
+    {
+        validator = new Validator("test-validator", muleContext, directInboundMessageSource,
+            testOutboundEndpoint, new PayloadTypeFilter(Integer.class), "#['hi']", "#['hi']");
+
+        validator.initialise();
+    }
+
+    @Test
+    @Ignore
+    public void testMELExpressionNoDelimiter() throws InitialisationException
+    {
+        validator = new Validator("test-validator", muleContext, directInboundMessageSource,
+            testOutboundEndpoint, new PayloadTypeFilter(Integer.class), "'hi'", "'hi'");
+
+        validator.initialise();
     }
 }
