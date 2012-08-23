@@ -153,9 +153,12 @@ public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessa
 
     protected void fireAsyncScheduledNotification(MuleEvent event)
     {
-        muleContext.getNotificationManager().fireNotification(
-            new AsyncMessageNotification((Pipeline) event.getFlowConstruct(), event,
-                next, AsyncMessageNotification.PROCESS_ASYNC_SCHEDULED));
+        if (event.getFlowConstruct() instanceof Pipeline)
+        {
+            muleContext.getNotificationManager().fireNotification(
+                new AsyncMessageNotification((Pipeline) event.getFlowConstruct(), event, next,
+                    AsyncMessageNotification.PROCESS_ASYNC_SCHEDULED));
+        }
     }
 
     class AsyncMessageProcessorWorker extends AbstractMuleEventWork
