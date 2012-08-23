@@ -99,13 +99,14 @@
                                 log.info('Repackaging sources'.center(80))
                                 log.info '*' * 80
 
-                                def srcFile = new File("${ceDistro}/src/mule-sources-${project.version}.zip")
+                                def srcFile = new File("${ceDistro}/src/mule-${project.version}-src.zip")
+                                def dstFile = new File("${ceDistro}/src/mule-sources-${project.version}.zip")
                                 def tempSrc = "$project.build.directory/temp-src"
                                 ant.unzip(src: srcFile,
                                           dest: tempSrc,
                                           overwrite: true) { patternset(includes:"org/mule/**") }
                                 srcFile.delete()
-                                ant.zip(basedir: tempSrc, destfile: srcFile)
+                                ant.zip(basedir: tempSrc, destfile: dstFile)
 
                             </source>
                         </configuration>
