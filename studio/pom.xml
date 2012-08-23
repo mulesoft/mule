@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.mule.distributions</groupId>
         <artifactId>mule-distributions</artifactId>
-        <version>3.3.1-RC1</version>
+        <version>3.3.1-RC2</version>
     </parent>
     <artifactId>mule-studio</artifactId>
     <!-- Packaging 'pom' ensures that maven does not try to bind a plugin to the
@@ -99,7 +99,7 @@
                                 log.info('Repackaging sources'.center(80))
                                 log.info '*' * 80
 
-                                def srcFile = new File("${ceDistro}/src/mule-${project.version}-src.zip")
+                                def srcFile = new File("${ceDistro}/src/mule-sources-${project.version}.zip")
                                 def tempSrc = "$project.build.directory/temp-src"
                                 ant.unzip(src: srcFile,
                                           dest: tempSrc,
