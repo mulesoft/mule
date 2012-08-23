@@ -10,20 +10,13 @@
 
 package org.mule.context.notification;
 
-import org.mule.api.context.notification.ServerNotification;
-
 import java.util.LinkedList;
 import java.util.List;
 
-public abstract class AbstractNotificationLogger<T extends ServerNotification> implements NotificationLogger
+public class PipelineAndAsyncMessageNotificationLogger implements NotificationLogger
 {
 
-    private LinkedList notifications = new LinkedList();
-
-    public synchronized void onNotification(T notification)
-    {
-        notifications.addLast(notification);
-    }
+    protected static LinkedList notifications = new LinkedList();
 
     public List getNotifications()
     {

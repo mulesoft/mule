@@ -10,6 +10,8 @@
 
 package org.mule.context.notification;
 
+import static org.junit.Assert.fail;
+
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 
@@ -17,27 +19,24 @@ import java.util.Iterator;
 
 import org.junit.Test;
 
-import static org.junit.Assert.fail;
-
 /**
  * Tests must define a "notificationLogger" listener
  */
 public abstract class AbstractNotificationTestCase extends AbstractServiceAndFlowTestCase
 {
-    private AbstractNotificationLogger<? extends ServerNotification> notificationLogger;
+    private NotificationLogger notificationLogger;
 
     public AbstractNotificationTestCase(ConfigVariant variant, String configResources)
     {
         super(variant, configResources);
     }
 
-    @SuppressWarnings("unchecked")
     @Test
     public final void testNotifications() throws Exception
     {
         doTest();
-        notificationLogger = (AbstractNotificationLogger<? extends ServerNotification>) muleContext.getRegistry().lookupObject(
-            "notificationLogger");
+        notificationLogger = (NotificationLogger) muleContext.getRegistry()
+            .lookupObject("notificationLogger");
 
         // Need to explicitly dispose manager here to get disposal notifications
         muleContext.dispose();

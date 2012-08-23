@@ -24,7 +24,7 @@ import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.context.notification.PipelineMessageNotification;
+import org.mule.context.notification.AsyncMessageNotification;
 import org.mule.execution.TransactionalErrorHandlingExecutionTemplate;
 import org.mule.interceptor.ProcessingTimeInterceptor;
 import org.mule.transaction.MuleTransactionConfig;
@@ -142,12 +142,20 @@ public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessa
         {
             workManagerSource.getWorkManager().scheduleWork(new AsyncMessageProcessorWorker(event),
                 WorkManager.INDEFINITE, null, new AsyncWorkListener(next));
+            fireAsyncScheduledNotification(event);
         }
         catch (Exception e)
         {
             new MessagingException(CoreMessages.errorSchedulingMessageProcessorForAsyncInvocation(next),
                 event, e, this);
         }
+    }
+
+    protected void fireAsyncScheduledNotification(MuleEvent event)
+    {
+        muleContext.getNotificationManager().fireNotification(
+            new AsyncMessageNotification((Pipeline) event.getFlowConstruct(), event,
+                next, AsyncMessageNotification.PROCESS_ASYNC_SCHEDULED));
     }
 
     class AsyncMessageProcessorWorker extends AbstractMuleEventWork
@@ -169,19 +177,24 @@ public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessa
                     @Override
                     public MuleEvent process() throws Exception
                     {
+                        MessagingException exceptionThrown = null;
                         try
                         {
                             processNextTimed(event);
                         }
                         catch (MessagingException e)
                         {
-                            firePipelineExceptionNotification(event);
+                            exceptionThrown = e;
                             throw e;
                         }
                         catch (Exception e)
                         {
-                            firePipelineExceptionNotification(event);
-                            throw new MessagingException(event, e, next);
+                            exceptionThrown = new MessagingException(event, e, next);
+                            throw exceptionThrown;
+                        }
+                        finally
+                        {
+                            firePipelineNotification(event, exceptionThrown);
                         }
                         return VoidMuleEvent.getInstance();
                     }
@@ -198,13 +211,13 @@ public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessa
         }
     }
 
-    protected void firePipelineExceptionNotification(MuleEvent event)
+    protected void firePipelineNotification(MuleEvent event, MessagingException exception)
     {
         if (event.getFlowConstruct() instanceof Pipeline)
         {
             muleContext.getNotificationManager().fireNotification(
-                new PipelineMessageNotification((Pipeline) event.getFlowConstruct(), event,
-                    PipelineMessageNotification.PROCESS_EXCEPTION));
+                new AsyncMessageNotification((Pipeline) event.getFlowConstruct(), event,
+                    next, AsyncMessageNotification.PROCESS_ASYNC_COMPLETE, exception));
         }
     }
 

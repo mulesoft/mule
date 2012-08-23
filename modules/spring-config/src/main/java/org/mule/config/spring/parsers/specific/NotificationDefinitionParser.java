@@ -30,6 +30,7 @@ import org.mule.config.spring.parsers.assembly.configuration.PropertyConfigurati
 import org.mule.config.spring.parsers.collection.ChildMapEntryDefinitionParser;
 import org.mule.config.spring.parsers.processors.CheckExclusiveAttributes;
 import org.mule.config.spring.parsers.processors.CheckRequiredAttributes;
+import org.mule.context.notification.AsyncMessageNotification;
 import org.mule.context.notification.ComponentMessageNotification;
 import org.mule.context.notification.ConnectionNotification;
 import org.mule.context.notification.CustomNotification;
@@ -87,6 +88,7 @@ public class NotificationDefinitionParser extends ChildMapEntryDefinitionParser
         EVENT_MAP.put("TRANSACTION", TransactionNotification.class.getName());
         EVENT_MAP.put("ROUTING", RoutingNotification.class.getName());
         EVENT_MAP.put("PIPELINE-MESSAGE", PipelineMessageNotification.class.getName());
+        EVENT_MAP.put("ASYNC-MESSAGE", AsyncMessageNotification.class.getName());
 
         INTERFACE_MAP = new HashMap();
         INTERFACE_MAP.put("CONTEXT", MuleContextNotificationListener.class.getName());
@@ -105,6 +107,7 @@ public class NotificationDefinitionParser extends ChildMapEntryDefinitionParser
         INTERFACE_MAP.put("ROUTING", RoutingNotificationListener.class.getName());
         INTERFACE_MAP.put("CLUSTER-NODE", ClusterNodeNotificationListener.class.getName());
         INTERFACE_MAP.put("PIPELINE-MESSAGE", PipelineMessageNotification.class.getName());
+        INTERFACE_MAP.put("ASYNC-MESSAGE", AsyncMessageNotification.class.getName());
         
         // Deprecated
         EVENT_MAP.put("MESSAGE", EndpointMessageNotification.class.getName());
