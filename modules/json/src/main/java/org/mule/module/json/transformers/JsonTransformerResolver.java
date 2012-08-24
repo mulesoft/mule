@@ -9,6 +9,7 @@
  */
 package org.mule.module.json.transformers;
 
+import org.apache.commons.collections.Predicate;
 import org.mule.api.MuleContext;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Disposable;
@@ -23,8 +24,9 @@ import org.mule.transformer.simple.ObjectToString;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.mule.util.CollectionUtils;
 
-import java.util.List;
+import java.util.Collection;
 import java.util.Map;
 import java.util.WeakHashMap;
 
@@ -105,13 +107,26 @@ public class JsonTransformerResolver implements TransformerResolver, MuleContext
 
             //At this point we know we are dealing with Json, now lets check the registry to see if there is an exact
             //transformer that matches our criteria
-            List<Transformer> ts = muleContext.getRegistry().lookupTransformers(source, result);
+            Collection<Transformer> ts = muleContext.getRegistry().lookupTransformers(source, result);
             //ObjectToString continues to cause pain to auto transforms, here
             //we check explicitly since we want to generate a Json transformer if
             //one does not already exist in the context
-            if (ts.size() == 1 && !(ts.get(0) instanceof ObjectToString))
+            ts = CollectionUtils.select(ts, new Predicate()
             {
-                t = ts.get(0);
+                @Override
+                public boolean evaluate(Object object)
+                {
+                    if (object instanceof ObjectToString)
+                    {
+                        return false;
+                    }
+                    return true;
+                }
+            });
+
+            if (ts.size() == 1)
+            {
+                t = ts.iterator().next();
             }
             else if (marshal)
             {
