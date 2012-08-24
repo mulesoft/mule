@@ -9,8 +9,13 @@
  */
 package org.mule.module.json.transformers;
 
+import org.codehaus.jackson.annotate.JsonAutoDetect;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
+import org.mule.api.annotations.ContainsTransformerMethods;
+import org.mule.api.transformer.DataType;
+import org.mule.api.transformer.Transformer;
+import org.mule.config.transformer.AnnotatedTransformerProxy;
 import org.mule.json.model.EmailAddress;
 import org.mule.json.model.Item;
 import org.mule.json.model.Person;
@@ -25,8 +30,10 @@ import java.util.List;
 
 import org.junit.Test;
 
+import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 
 public class JsonCustomTransformerTestCase extends AbstractMuleContextTestCase
 {
@@ -100,5 +107,54 @@ public class JsonCustomTransformerTestCase extends AbstractMuleContextTestCase
         List<Person> people = message.getPayload(new ListDataType<List<Person>>(Person.class));
         assertNotNull(people);
         assertEquals(2, people.size());
+    }
+    
+    @Test
+    public void testCustomTransformerTakesPrecedence() throws Exception
+    {
+        DataType resultDataType = DataTypeFactory.create(String.class, "application/json");
+        DataType sourceDataType = DataTypeFactory.create(League.class);
+
+        muleContext.getRegistry().registerObject("customTransformer",new TransformerProvider());
+        Transformer transformer = muleContext.getRegistry().lookupTransformer(sourceDataType, resultDataType);
+        
+        assertThat(transformer, org.hamcrest.core.IsInstanceOf.instanceOf(AnnotatedTransformerProxy.class));
+        MuleMessage message = new DefaultMuleMessage(new League(), muleContext);
+        assertThat(message.getPayload(String.class), is(TransformerProvider.RESULT));
+    }
+
+    @JsonAutoDetect
+    public static class League {
+        private String id;
+        private String name;
+
+        public String getId() {
+            return id;
+        }
+
+        public void setId(String id) {
+            this.id = id;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+    }
+
+    @ContainsTransformerMethods
+    public static class TransformerProvider
+    {
+
+        public static final String RESULT = "I am a league";
+
+        @org.mule.api.annotations.Transformer
+        public String convert(League payload)
+        {
+            return RESULT;
+        }
     }
 }
