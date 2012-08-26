@@ -246,7 +246,7 @@ public abstract class AbstractReceiverServlet extends HttpServlet
     protected void handleException(Throwable exception, String message, HttpServletResponse response)
     {
         logger.error("message: " + exception.getMessage(), exception);
-        int code = Integer.valueOf(ExceptionHelper.getErrorMapping("http", exception.getClass()));
+        int code = Integer.valueOf(ExceptionHelper.getErrorMapping("http", exception.getClass(),muleContext));
         response.setStatus(code);
         try
         {
