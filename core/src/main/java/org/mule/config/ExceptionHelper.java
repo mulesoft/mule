@@ -10,6 +10,7 @@
 
 package org.mule.config;
 
+import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.config.ExceptionReader;
@@ -17,9 +18,9 @@ import org.mule.api.registry.ServiceType;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.util.ClassUtils;
 import org.mule.util.MapUtils;
+import org.mule.util.PropertiesUtils;
 import org.mule.util.SpiUtils;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -172,9 +173,9 @@ public final class ExceptionHelper
         }
     }
 
-    private static Properties getErrorMappings(String protocol)
+    private static Properties getErrorMappings(String protocol, MuleContext muleContext)
     {
-        Object m = errorMappings.get(protocol);
+        Object m = errorMappings.get(getErrorMappingCacheKey(protocol,muleContext));
         if (m != null)
         {
             if (m instanceof Properties)
@@ -189,39 +190,21 @@ public final class ExceptionHelper
         else
         {
             String name = SpiUtils.SERVICE_ROOT + ServiceType.EXCEPTION.getPath() + "/" + protocol + "-exception-mappings.properties";
-            InputStream in = ExceptionHelper.class.getClassLoader().getResourceAsStream(name);
-            if (in == null)
-            {
-                errorMappings.put(protocol, "not found");
-                if (logger.isDebugEnabled())
-                {
-                    logger.debug("Failed to load error mappings from: " + name
-                            + " This may be because there are no error code mappings for protocol: "
-                            + protocol);
-                }
-                return null;
-            }
-
-            Properties p = new Properties();
-            try
-            {
-                p.load(in);
-                in.close();
-            }
-            catch (IOException iox)
-            {
-                throw new IllegalArgumentException("Failed to load resource: " + name);
-            }
-
-            errorMappings.put(protocol, p);
+            Properties p = PropertiesUtils.loadAllProperties(name,muleContext.getExecutionClassLoader());
+            errorMappings.put(getErrorMappingCacheKey(protocol, muleContext), p);
             return p;
         }
     }
 
-    public static String getErrorCodePropertyName(String protocol)
+    private static String getErrorMappingCacheKey(String protocol, MuleContext muleContext)
+    {
+        return protocol + "-" + muleContext.getConfiguration().getId();
+    }
+
+    public static String getErrorCodePropertyName(String protocol, MuleContext muleContext)
     {
         protocol = protocol.toLowerCase();
-        Properties mappings = getErrorMappings(protocol);
+        Properties mappings = getErrorMappings(protocol,muleContext);
         if (mappings == null)
         {
             return null;
@@ -229,10 +212,10 @@ public final class ExceptionHelper
         return mappings.getProperty(ERROR_CODE_PROPERTY);
     }
 
-    public static String getErrorMapping(String protocol, Class exception)
+    public static String getErrorMapping(String protocol, Class exception, MuleContext muleContext)
     {
         protocol = protocol.toLowerCase();
-        Properties mappings = getErrorMappings(protocol);
+        Properties mappings = getErrorMappings(protocol, muleContext);
         if (mappings == null)
         {
             logger.info("No mappings found for protocol: " + protocol);

@@ -10,12 +10,17 @@
 
 package org.mule.util;
 
+import org.mule.api.MuleRuntimeException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.Message;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -132,6 +137,47 @@ public final class PropertiesUtils
         }
         
         return loadProperties(url.openStream());
+    }
+
+    /**
+     * Load all properties files in the classpath with the given properties file name.
+     */
+    public static Properties loadAllProperties(String fileName, ClassLoader classLoader)
+    {
+        Properties p = new Properties();
+        List<URL> resourcesUrl = new ArrayList<URL>();
+        Enumeration<URL> resources;
+        try
+        {
+            resources = classLoader.getResources(fileName);
+            while (resources.hasMoreElements())
+            {
+                resourcesUrl.add(resources.nextElement());
+            }
+            Collections.sort(resourcesUrl, new Comparator<URL>()
+            {
+                @Override
+                public int compare(URL url, URL url1)
+                {
+                    if ("file".equals(url.getProtocol()))
+                    {
+                        return 1;
+                    }
+                    return -1;
+                }
+            });
+            for (URL resourceUrl : resourcesUrl)
+            {
+                InputStream in = resourceUrl.openStream();
+                p.load(in);
+                in.close();
+            }
+        } 
+        catch (IOException e)
+        {
+            throw new MuleRuntimeException(CoreMessages.createStaticMessage("Failed to load resource: " + fileName), e);
+        }
+        return p;
     }
     
     public static Properties loadProperties(InputStream is) throws IOException

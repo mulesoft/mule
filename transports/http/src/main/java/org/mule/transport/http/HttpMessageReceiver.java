@@ -193,7 +193,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
                             //InboundExceptionDetailsMessageProcessor
 
                             //Response code mappings are loaded from META-INF/services/org/mule/config/http-exception-mappings.properties
-                            String temp = ExceptionHelper.getErrorMapping(connector.getProtocol(), e.getClass());
+                            String temp = ExceptionHelper.getErrorMapping(connector.getProtocol(), e.getClass(),flowConstruct.getMuleContext());
                             int httpStatus = Integer.valueOf(temp);
 
                             if (e instanceof MessagingException)

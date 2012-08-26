@@ -68,12 +68,12 @@ public class InboundExceptionDetailsMessageProcessor implements MessageProcessor
      */
     protected void setExceptionDetails(MuleMessage message, Connector connector, Throwable exception)
     {
-        String propName = ExceptionHelper.getErrorCodePropertyName(connector.getProtocol());
+        String propName = ExceptionHelper.getErrorCodePropertyName(connector.getProtocol(),connector.getMuleContext());
         // If we dont find a error code property we can assume there are not
         // error code mappings for this connector
         if (propName != null)
         {
-            String code = ExceptionHelper.getErrorMapping(connector.getProtocol(), exception.getClass());
+            String code = ExceptionHelper.getErrorMapping(connector.getProtocol(), exception.getClass(),connector.getMuleContext());
             if (logger.isDebugEnabled())
             {
                 logger.debug("Setting error code for: " + connector.getProtocol() + ", " + propName + "="
