@@ -100,7 +100,6 @@
 /mule-standalone-nodocs-${productVersion}/lib/mule/mule-module-client-${productVersion}.jar
 /mule-standalone-nodocs-${productVersion}/lib/mule/mule-module-cxf-${productVersion}.jar
 /mule-standalone-nodocs-${productVersion}/lib/mule/mule-module-drools-${productVersion}.jar
-/mule-standalone-nodocs-${productVersion}/lib/mule/mule-module-ibeans-${productVersion}.jar
 /mule-standalone-nodocs-${productVersion}/lib/mule/mule-module-jaas-${productVersion}.jar
 /mule-standalone-nodocs-${productVersion}/lib/mule/mule-module-jbossts-${productVersion}.jar
 /mule-standalone-nodocs-${productVersion}/lib/mule/mule-module-jbpm-${productVersion}.jar
@@ -223,8 +222,6 @@
 /mule-standalone-nodocs-${productVersion}/lib/opt/hibernate-commons-annotations-3.2.0.Final.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/hibernate-core-3.6.0.Final.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/hibernate-jpa-2.0-api-1.0.0.Final.jar
-/mule-standalone-nodocs-${productVersion}/lib/opt/ibeans-annotation-api-1.2.jar
-/mule-standalone-nodocs-${productVersion}/lib/opt/ibeans-support-1.2.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/isorelax-20030108.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/jackson-core-asl-1.8.0.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/jackson-jaxrs-1.8.0.jar
@@ -268,7 +265,6 @@
 /mule-standalone-nodocs-${productVersion}/lib/opt/juli-6.0.29.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/livetribe-jsr223-2.0.5.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/mail-1.4.3.jar
-/mule-standalone-nodocs-${productVersion}/lib/opt/mockito-all-1.9.0.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/msv-core-2011.1.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/mvel2-2.0.19.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/mx4j-impl-2.1.1-osgi.jar
@@ -286,7 +282,6 @@
 /mule-standalone-nodocs-${productVersion}/lib/opt/saxon-8.9.0.4-osgi.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/saxon-dom-8.9.0.4-osgi.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/saxon-xqj-8.9.0.4.jar
-/mule-standalone-nodocs-${productVersion}/lib/opt/scribe-1.0.3.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/servlet-api-2.5-20081211.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/smack-3.1.0.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/smackx-3.1.0.jar

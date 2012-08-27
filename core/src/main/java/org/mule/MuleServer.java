@@ -86,11 +86,6 @@ public class MuleServer implements Runnable
     public static final String CLASSNAME_ANNOTATIONS_CONFIG_BUILDER = "org.mule.config.AnnotationsConfigurationBuilder";
 
     /**
-     * If the iBeans module is on the classpath, this config builder can be used to scan for iBeans annotations.
-     */
-    public static final String CLASSNAME_IBEANS_CONFIG_BUILDER = "org.mule.module.ibeans.config.IBeanHolderConfigurationBuilder";
-
-    /**
      * logger used by this class
      */
     private static final Log logger = LogFactory.getLog(MuleServer.class);

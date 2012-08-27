@@ -1,9 +1,0 @@
-# Removed just because it relies on an external service, the MockIBeanTestCase does the same thing but mocked out
-org.mule.module.ibeans.IntegrationBeanAnnotationTestCase
-
-# Something may need updating in ibeans-core, wherever that is
-org.mule.module.ibeans.annotations.ExceptionListenerTestCase
-
-# Broken by RM's commits on 24/9/10
-org.mule.module.ibeans.FlickrSearchTestCase
-org.mule.module.ibeans.FlickrTestCase

@@ -200,7 +200,6 @@ public class DefaultMuleApplication implements Application
 
                 // We need to add this builder before spring so that we can use Mule annotations in Spring or any other builder
                 addAnnotationsConfigBuilderIfPresent(builders);
-                addIBeansConfigurationBuilderIfPackagesConfiguredForScanning(builders);
 
                 builders.add(cfgBuilder);
 
@@ -268,19 +267,6 @@ public class DefaultMuleApplication implements Application
         {
             Object configBuilder = ClassUtils.instanciateClass(
                 MuleServer.CLASSNAME_ANNOTATIONS_CONFIG_BUILDER, ClassUtils.NO_ARGS, getClass());
-            builders.add((ConfigurationBuilder) configBuilder);
-        }
-    }
-
-    protected void addIBeansConfigurationBuilderIfPackagesConfiguredForScanning(List<ConfigurationBuilder> builders)
-        throws Exception
-    {
-        String packagesToScan = descriptor.getPackagesToScan();
-        if (StringUtils.isNotEmpty(packagesToScan))
-        {
-            String[] paths = packagesToScan.split(",");
-            Object configBuilder = ClassUtils.instanciateClass(
-                MuleServer.CLASSNAME_IBEANS_CONFIG_BUILDER, new Object[] { paths }, getClass());
             builders.add((ConfigurationBuilder) configBuilder);
         }
     }

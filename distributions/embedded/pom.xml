@@ -171,11 +171,6 @@
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.mule.modules</groupId>
-                                    <artifactId>mule-module-ibeans</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.mule.modules</groupId>
                                     <artifactId>mule-module-jaas</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
