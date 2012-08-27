@@ -584,12 +584,18 @@ public final class ExceptionHelper
     
     public static void disposeApp(MuleContext muleContext)
     {
+        List<String> entriesToRemove = new ArrayList<String>();
         for (String key : errorMappings.keySet())
         {
             if (key.endsWith(muleContext.getConfiguration().getId()))
             {
-                errorMappings.remove(key);
+                entriesToRemove.add(key);
+
             }
+        }
+        for (String key : entriesToRemove)
+        {
+            errorMappings.remove(key);
         }
     }
 }
