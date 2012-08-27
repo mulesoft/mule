@@ -281,7 +281,6 @@ public class DefaultMuleContext implements MuleContext
 
         notificationManager.dispose();
         workManager.dispose();
-        ExceptionHelper.disposeApp(this);
 
         if ((getStartDate() > 0) && logger.isInfoEnabled())
         {
