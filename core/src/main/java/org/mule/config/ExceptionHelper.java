@@ -66,7 +66,7 @@ public final class ExceptionHelper
     private static Properties errorDocs = new Properties();
     private static Properties errorCodes = new Properties();
     private static Map reverseErrorCodes = null;
-    private static Map errorMappings = new HashMap();
+    private static Map<String,Properties> errorMappings = new HashMap<String,Properties>();
 
     private static int exceptionThreshold = 0;
     private static boolean verbose = true;
@@ -175,7 +175,7 @@ public final class ExceptionHelper
 
     private static Properties getErrorMappings(String protocol, MuleContext muleContext)
     {
-        Object m = errorMappings.get(getErrorMappingCacheKey(protocol,muleContext));
+        Properties m = errorMappings.get(getErrorMappingCacheKey(protocol,muleContext));
         if (m != null)
         {
             if (m instanceof Properties)
@@ -190,7 +190,7 @@ public final class ExceptionHelper
         else
         {
             String name = SpiUtils.SERVICE_ROOT + ServiceType.EXCEPTION.getPath() + "/" + protocol + "-exception-mappings.properties";
-            Properties p = PropertiesUtils.loadAllProperties(name,muleContext.getExecutionClassLoader());
+            Properties p = PropertiesUtils.loadAllProperties(name, muleContext.getExecutionClassLoader());
             errorMappings.put(getErrorMappingCacheKey(protocol, muleContext), p);
             return p;
         }
@@ -580,5 +580,16 @@ public final class ExceptionHelper
             }
         }
         return cause instanceof MuleException ? null : cause;
+    }
+    
+    public static void disposeApp(MuleContext muleContext)
+    {
+        for (String key : errorMappings.keySet())
+        {
+            if (key.endsWith(muleContext.getConfiguration().getId()))
+            {
+                errorMappings.remove(key);
+            }
+        }
     }
 }

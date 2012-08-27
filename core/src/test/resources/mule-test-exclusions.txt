@@ -19,9 +19,6 @@ org.mule.util.TimedSocketTestCase
 # MULE-3670
 org.mule.util.store.TextFileStoreTestCase
 
-# MULE-4078
-org.mule.context.DefaultMuleContextTestCase
-
 #Fails on CE CI server MULE-4008
 org.mule.util.TimedSocketTestCase
 

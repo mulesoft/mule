@@ -11,36 +11,52 @@
 package org.mule.context;
 
 import org.mule.api.MuleContext;
-import org.mule.api.MuleException;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.api.registry.ServiceType;
+import org.mule.config.ExceptionHelper;
 
 import org.junit.Test;
+import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.util.SpiUtils;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertThat;
 
-public class DefaultMuleContextTestCase extends AbstractMuleContextTestCase
+import java.io.File;
+import java.io.FileWriter;
+import java.net.URL;
+
+public class DefaultMuleContextTestCase extends AbstractMuleTestCase
 {
 
+    public static final String INITIAL_VALUE = "500";
+    public static final String VALUE_AFTER_REDEPLOY = "222";
+    public static final String TEST_PROTOCOL = "test2";
+
     @Test
-    public void testDisposal() throws MuleException, InterruptedException
+    public void testClearExceptionHelperCacheForAppWhenDispose() throws Exception
     {
-        int threadsBeforeStart = Thread.activeCount();
         MuleContext ctx = new DefaultMuleContextFactory().createMuleContext();
-        ctx.start();
-        assertTrue(Thread.activeCount() > threadsBeforeStart);
-        ctx.stop();
+        String value = ExceptionHelper.getErrorMapping(TEST_PROTOCOL, IllegalArgumentException.class, ctx);
+        assertThat(value,is(INITIAL_VALUE));
         ctx.dispose();
-        // Check that workManager ("MuleServer") thread no longer exists.
-        assertTrue(Thread.activeCount() == threadsBeforeStart);
-        assertTrue(ctx.isDisposed());
-        assertFalse(ctx.isInitialised());
-        assertFalse(ctx.isStarted());
+        URL url = DefaultMuleContextTestCase.class.getClassLoader().getResource(SpiUtils.SERVICE_ROOT + ServiceType.EXCEPTION.getPath()+ "/" + TEST_PROTOCOL + "-exception-mappings.properties");
+        File exceptionMappingFile = new File(url.getFile());
+        FileWriter fileWriter = null;
+        try 
+        {
+            fileWriter = new FileWriter(exceptionMappingFile);
+            fileWriter.append("\njava.lang.IllegalArgumentException=" + VALUE_AFTER_REDEPLOY);
+        }
+        finally 
+        {
+            if (fileWriter != null)
+            {
+                fileWriter.close();
+            }
+        }
+        ctx.setExecutionClassLoader(getClass().getClassLoader());
+        value = ExceptionHelper.getErrorMapping(TEST_PROTOCOL, IllegalArgumentException.class, ctx);
+        assertThat(value, is(VALUE_AFTER_REDEPLOY));
     }
 
-    @Override
-    protected MuleContext createMuleContext() throws Exception
-    {
-        return null;
-    }
 }
