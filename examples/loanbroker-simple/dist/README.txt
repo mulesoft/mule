@@ -15,16 +15,13 @@ Copy the pre-built application archive (mule-example-loanbroker-simple.zip) to
 the application folder ($MULE_HOME/apps) and start Mule. When Mule is running 
 go to your browser to run it:
 
-    http://localhost:11081
+    http://localhost:11081?name=Muley&amount=20000&term=48&ssn=1234
 
 You should get a response with the name of the bank providing the best deal and 
-its interest rate. There are some default request values built-in for this demo.
+its interest rate.
 
-Now, modify the loan amount requested, and see different banks responding:
-
-    http://localhost:11081/?amount=100
-
-Try different amounts (100, 10000, 20000). Also try invalid numbers to see the 
+Now, modify the loan amount requested, and see different banks responding.
+Try different amounts (100, 10000, 20000). Also try invalid numbers to see the
 error handling in action.
 
 +----------------------+
