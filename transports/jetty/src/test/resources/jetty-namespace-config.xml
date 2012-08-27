@@ -8,9 +8,9 @@
        http://www.mulesoft.org/schema/mule/jetty http://www.mulesoft.org/schema/mule/jetty/3.1/mule-jetty.xsd
        http://www.mulesoft.org/schema/mule/jetty-ssl http://www.mulesoft.org/schema/mule/jetty-ssl/3.1/mule-jetty-ssl.xsd">
 
-    <jetty:connector name="jettyConnector" configFile="jetty-config.xml"/>
+    <jetty:connector name="jettyConnector" configFile="jetty-config.xml" validateConnections="true"/>
 
-    <jetty-ssl:connector name="jettySslConnector">
+    <jetty-ssl:connector name="jettySslConnector" validateConnections="true">
         <jetty-ssl:tls-client path="clientKeystore" storePassword="mulepassword"/>
         <jetty-ssl:tls-key-store path="serverKeystore" keyPassword="mulepassword"
             keyAlias="muleserver" storePassword="mulepassword"/>
