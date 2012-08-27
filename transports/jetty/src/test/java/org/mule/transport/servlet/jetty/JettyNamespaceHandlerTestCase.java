@@ -39,6 +39,8 @@ public class JettyNamespaceHandlerTestCase extends FunctionalTestCase
             (JettyHttpConnector) muleContext.getRegistry().lookupConnector("jettyConnector");
         assertNotNull(connector.getConfigFile());
         assertEquals("jetty-config.xml", connector.getConfigFile());
+        // Test a abstract connector property (MULE-5776)
+        assertTrue(connector.isValidateConnections());
     }
 
     @Test
@@ -57,6 +59,8 @@ public class JettyNamespaceHandlerTestCase extends FunctionalTestCase
         //The full path gets resolved, we're just checking that the property got set
         assertTrue(connector.getTrustStore().endsWith("/trustStore"));
         assertEquals("mulepassword", connector.getTrustStorePassword());
+        // Test a abstract connector property (MULE-5776)
+        assertTrue(connector.isValidateConnections());
     }
 
     /* See MULE-3603
