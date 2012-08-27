@@ -54,6 +54,7 @@ public class DefaultMuleContextTestCase extends AbstractMuleTestCase
                 fileWriter.close();
             }
         }
+        ctx = new DefaultMuleContextFactory().createMuleContext();
         ctx.setExecutionClassLoader(getClass().getClassLoader());
         value = ExceptionHelper.getErrorMapping(TEST_PROTOCOL, IllegalArgumentException.class, ctx);
         assertThat(value, is(VALUE_AFTER_REDEPLOY));
