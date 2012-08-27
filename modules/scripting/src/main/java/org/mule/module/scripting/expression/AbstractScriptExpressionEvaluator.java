@@ -33,10 +33,11 @@ import javax.script.ScriptException;
  */
 public abstract class AbstractScriptExpressionEvaluator implements ExpressionEvaluator, Disposable, MuleContextAware
 {
-    protected Map cache = new WeakHashMap(8);
+    protected Map<String, Scriptable> cache = new WeakHashMap<String, Scriptable>(8);
 
     protected MuleContext muleContext;
 
+    @Override
     public void setMuleContext(MuleContext context)
     {
         this.muleContext = context;
@@ -49,6 +50,7 @@ public abstract class AbstractScriptExpressionEvaluator implements ExpressionEva
      * @param message    the message to extract from
      * @return the result of the extraction or null if the property was not found
      */
+    @Override
     public Object evaluate(String expression, MuleMessage message)
     {
         Scriptable script = getScript(expression);
@@ -71,7 +73,7 @@ public abstract class AbstractScriptExpressionEvaluator implements ExpressionEva
 
     protected Scriptable getScript(String expression)
     {
-        Scriptable script = (Scriptable)cache.get(expression);
+        Scriptable script = cache.get(expression);
         if (script==null)
         {
             script = new Scriptable(muleContext);
@@ -96,6 +98,7 @@ public abstract class AbstractScriptExpressionEvaluator implements ExpressionEva
      * exception is thrown it should just be logged and processing should continue.
      * This method should not throw Runtime exceptions.
      */
+    @Override
     public void dispose()
     {
         cache.clear();

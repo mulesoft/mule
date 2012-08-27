@@ -174,7 +174,7 @@ public class PartitionedInMemoryObjectStore<T extends Serializable> extends Abst
 
         while ((oldestEntry = store.firstEntry()) != null)
         {
-            Long oldestKey = (Long) oldestEntry.getKey();
+            Long oldestKey = oldestEntry.getKey();
             long oldestKeyValue = oldestKey.longValue();
 
             if (TimeUnit.NANOSECONDS.toMillis(now - oldestKeyValue) >= entryTTL)

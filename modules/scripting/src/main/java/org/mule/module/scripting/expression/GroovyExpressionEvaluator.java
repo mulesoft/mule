@@ -22,11 +22,7 @@ public class GroovyExpressionEvaluator extends AbstractScriptExpressionEvaluator
 {
     public static final String NAME = "groovy";
 
-    /**
-     * Gets the name of the object
-     *
-     * @return the name of the object
-     */
+    @Override
     public String getName()
     {
         return NAME;

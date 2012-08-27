@@ -31,7 +31,6 @@ import org.mule.management.stats.ProcessingTime;
 import org.mule.processor.strategy.SynchronousProcessingStrategy;
 import org.mule.security.MuleCredentials;
 import org.mule.session.DefaultMuleSession;
-import org.mule.transaction.TransactionCollection;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transport.DefaultReplyToHandler;
@@ -259,7 +258,7 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
 
     /**
      * A helper constructor used to rewrite an event payload
-     * 
+     *
      * @param message The message to use as the current payload of the event
      * @param rewriteEvent the previous event that will be used as a template for this event
      */
@@ -281,7 +280,7 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
 
     /**
      * A helper constructor used to rewrite an event payload
-     * 
+     *
      * @param message The message to use as the current payload of the event
      * @param rewriteEvent the previous event that will be used as a template for this event
      */
@@ -370,7 +369,7 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
         }
         return transacted
                || exchangePattern.hasResponse()
-               || (Boolean) message.getProperty(MuleProperties.MULE_FORCE_SYNC_PROPERTY,
+               || message.getProperty(MuleProperties.MULE_FORCE_SYNC_PROPERTY,
                    PropertyScope.INBOUND, Boolean.FALSE) || syncProcessingStrategy;
     }
 
@@ -401,7 +400,7 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
      * <li>If the property name appears in the ignoredPropertyOverrides list, then we always set it on the new
      * event
      * </ol>
-     * 
+     *
      * @param key The name of the property to ignore
      * @return true if the property should be ignored, false otherwise
      */
@@ -488,7 +487,7 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
      * if the result of the transformation is a byte array and return that. Otherwise if the the result is a
      * string it will serialized the CONTENTS of the string not the String object. finally it will check if
      * the result is a Serializable object and convert that to an array of bytes.
-     * 
+     *
      * @return a byte[] representation of the message
      * @throws TransformerException if an unsupported encoding is being used or if the result message is not a
      *             String byte[] or Seializable object
@@ -504,7 +503,7 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
     /**
      * Returns the message transformed into it's recognised or expected format and then into a String. The
      * transformer used is the one configured on the endpoint through which this event was received.
-     * 
+     *
      * @return the message transformed into it's recognised or expected format as a Strings.
      * @throws org.mule.api.transformer.TransformerException if a failure occurs in the transformer
      * @see org.mule.api.transformer.Transformer
@@ -523,7 +522,7 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
 
     /**
      * Returns the message contents for logging
-     * 
+     *
      * @param encoding the encoding to use when converting bytes to a string, if necessary
      * @return the message contents as a string
      * @throws org.mule.api.MuleException if the message cannot be converted into a string
@@ -609,7 +608,7 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
 
     /**
      * Determines whether the default processing for this event will be executed
-     * 
+     *
      * @return Returns the stopFurtherProcessing.
      */
     @Override
@@ -624,7 +623,7 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
      * The service has more than one send endpoint configured; the service must dispatch to other prviders
      * programmatically by using the service on the current event 2. The service doesn't send the current
      * event out through a endpoint. i.e. the processing of the event stops in the uMO.
-     * 
+     *
      * @param stopFurtherProcessing The stopFurtherProcessing to set.
      */
     @Override
@@ -684,7 +683,7 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
 
     /**
      * An output stream can optionally be used to write response data to an incoming message.
-     * 
+     *
      * @return an output strem if one has been made available by the message receiver that received the
      *         message
      */
@@ -701,7 +700,7 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
      * {@link org.mule.transformer.wire.SerializationWireFormat},
      * {@link org.mule.transformer.wire.SerializedMuleMessageWireFormat} or the
      * {@link org.mule.transformer.simple.ByteArrayToSerializable} transformer.
-     * 
+     *
      * @param muleContext the current muleContext instance
      * @throws MuleException if there is an error initializing
      */
@@ -749,7 +748,7 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
      * Gets the encoding for this message. First it looks to see if encoding has been set on the endpoint, if
      * not it will check the message itself and finally it will fall back to the Mule global configuration for
      * encoding which cannot be null.
-     * 
+     *
      * @return the encoding for the event
      */
     @Override
@@ -953,22 +952,26 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
         return eventCopy;
     }
 
+    @Override
     public Set<String> getFlowVariableNames()
     {
         return flowVariables.keySet();
     }
 
+    @Override
     public void clearFlowVariables()
     {
         flowVariables.clear();
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public <T> T getFlowVariable(String key)
     {
         return (T) flowVariables.get(key);
     }
 
+    @Override
     public void setFlowVariable(String key, Object value)
     {
         flowVariables.put(key, value);

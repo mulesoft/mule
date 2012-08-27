@@ -10,12 +10,6 @@
 
 package org.mule.el.mvel;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
@@ -62,6 +56,12 @@ import org.junit.runners.Parameterized.Parameters;
 import org.mockito.Mockito;
 import org.mvel2.ParserContext;
 import org.mvel2.ast.Function;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @RunWith(Parameterized.class)
 public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase
@@ -457,19 +457,20 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase
             super("hello", new char[]{}, new char[]{}, 0, parserContext);
         }
 
+        @Override
         public Object call(Object ctx,
                            Object thisValue,
                            org.mvel2.integration.VariableResolverFactory factory,
                            Object[] parms)
         {
             return "Hello World!";
-        };
+        }
     }
 
     /**
      * Scans all classes accessible from the context class loader which belong to the given package and
      * subpackages.
-     * 
+     *
      * @param packageName The base package
      * @return The classes
      * @throws ClassNotFoundException
@@ -497,7 +498,7 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase
 
     /**
      * Recursive method used to find all classes in a given directory and subdirs.
-     * 
+     *
      * @param directory The base directory
      * @param packageName The package name for classes found inside the base directory
      * @return The classes

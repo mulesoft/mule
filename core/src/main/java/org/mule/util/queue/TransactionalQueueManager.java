@@ -228,7 +228,7 @@ public class TransactionalQueueManager extends AbstractXAResourceManager impleme
             for (ListableObjectStore store : muleContext.getRegistry().lookupByType(ListableObjectStore.class).values())
             {
                 addStore(store);
-            };
+            }
         }
     }
 

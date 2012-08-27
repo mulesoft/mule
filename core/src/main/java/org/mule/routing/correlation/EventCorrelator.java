@@ -151,7 +151,7 @@ public class EventCorrelator implements Startable, Stoppable
         {
             if (eventGroups.retrieve(groupId) != null)
             {
-                handleGroupExpiry((EventGroup) eventGroups.retrieve(groupId));
+                handleGroupExpiry(eventGroups.retrieve(groupId));
             }
             else
             {
@@ -311,7 +311,7 @@ public class EventCorrelator implements Startable, Stoppable
     {
         try
         {
-            return (EventGroup) eventGroups.retrieve(groupId);
+            return eventGroups.retrieve(groupId);
         }
         catch (ObjectDoesNotExistException e)
         {
@@ -328,7 +328,7 @@ public class EventCorrelator implements Startable, Stoppable
         }
         catch (ObjectAlreadyExistsException e)
         {
-            return (EventGroup) eventGroups.retrieve((Serializable) group.getGroupId());
+            return eventGroups.retrieve((Serializable) group.getGroupId());
         }
     }
 
@@ -469,6 +469,7 @@ public class EventCorrelator implements Startable, Stoppable
         }
     }
 
+    @Override
     public void start() throws MuleException
     {
         logger.info("Starting event correlator: " + name);
@@ -479,6 +480,7 @@ public class EventCorrelator implements Startable, Stoppable
         }
     }
 
+    @Override
     public void stop() throws MuleException
     {
         logger.info("Stopping event correlator: " + name);
@@ -504,16 +506,17 @@ public class EventCorrelator implements Startable, Stoppable
         /**
          * Removes the elements in expiredAndDispatchedGroups when groupLife is
          * reached
-         * 
+         *
          * @throws ObjectStoreException
          */
+        @Override
         public void expired()
         {
             try
             {
                 for (Serializable o : expiredAndDispatchedGroups.allKeys())
                 {
-                    Long time = (Long) expiredAndDispatchedGroups.retrieve(o);
+                    Long time = expiredAndDispatchedGroups.retrieve(o);
                     if (time + groupTimeToLive < System.currentTimeMillis())
                     {
                         expiredAndDispatchedGroups.remove(o);
@@ -527,6 +530,7 @@ public class EventCorrelator implements Startable, Stoppable
             }
         }
 
+        @Override
         public void doRun()
         {
             List<EventGroup> expired = new ArrayList<EventGroup>(1);
@@ -534,7 +538,7 @@ public class EventCorrelator implements Startable, Stoppable
             {
                 for (Serializable o : eventGroups.allKeys())
                 {
-                    EventGroup group = (EventGroup) eventGroups.retrieve(o);
+                    EventGroup group = eventGroups.retrieve(o);
                     if ((group.getCreated() + getTimeout() * MILLI_TO_NANO_MULTIPLIER) < System.nanoTime())
                     {
                         expired.add(group);

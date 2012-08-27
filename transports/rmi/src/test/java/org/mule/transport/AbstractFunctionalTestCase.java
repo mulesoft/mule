@@ -10,11 +10,6 @@
 
 package org.mule.transport;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 import org.mule.api.MuleMessage;
 import org.mule.api.transport.DispatchException;
 import org.mule.config.i18n.Message;
@@ -26,6 +21,11 @@ import java.util.HashMap;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 public abstract class AbstractFunctionalTestCase extends AbstractServiceAndFlowTestCase
 {
     protected String prefix;
@@ -33,8 +33,8 @@ public abstract class AbstractFunctionalTestCase extends AbstractServiceAndFlowT
     public AbstractFunctionalTestCase(ConfigVariant variant, String configResources)
     {
         super(variant, configResources);
-        
-    }    
+
+    }
 
     // from earlier multiple target test case
 
@@ -52,12 +52,12 @@ public abstract class AbstractFunctionalTestCase extends AbstractServiceAndFlowT
         // send String
         message = client.send("vm://testin", "test matching component first time", null);
         assertNotNull(message);
-        assertEquals((String)message.getPayload(), "emit tsrif tnenopmoc gnihctam tset");
+        assertEquals(message.getPayload(), "emit tsrif tnenopmoc gnihctam tset");
 
         // send String
         message = client.send("vm://testin", "test mathching component second time", null);
         assertNotNull(message);
-        assertEquals((String)message.getPayload(), "emit dnoces tnenopmoc gnihchtam tset");
+        assertEquals(message.getPayload(), "emit dnoces tnenopmoc gnihchtam tset");
 
         // send Integer
         message = client.send("vm://testin", 15, null);
@@ -140,5 +140,5 @@ public abstract class AbstractFunctionalTestCase extends AbstractServiceAndFlowT
         MuleMessage message = new MuleClient(muleContext).send("GoodType", "hello", null);
         assertNotNull(message);
         assertEquals("olleh", message.getPayloadAsString());
-    }   
+    }
 }

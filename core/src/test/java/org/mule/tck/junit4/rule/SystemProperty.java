@@ -81,10 +81,10 @@ public class SystemProperty extends ExternalResource
     protected void doCleanUp()
     {
         // Nothing to do
-    };
+    }
 
     public String getValue()
     {
         return value;
-    };
+    }
 }

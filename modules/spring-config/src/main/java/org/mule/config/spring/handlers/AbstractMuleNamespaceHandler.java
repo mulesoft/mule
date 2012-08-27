@@ -25,8 +25,8 @@ import org.mule.config.spring.parsers.specific.endpoint.TransportEndpointDefinit
 import org.mule.config.spring.parsers.specific.endpoint.TransportGlobalEndpointDefinitionParser;
 import org.mule.config.spring.parsers.specific.endpoint.support.AddressedEndpointDefinitionParser;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
+import org.mule.util.IOUtils;
 
-import javax.xml.namespace.QName;
 import java.io.InputStream;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -34,9 +34,10 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
+import javax.xml.namespace.QName;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mule.util.IOUtils;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.xml.BeanDefinitionParser;
@@ -54,7 +55,7 @@ public abstract class AbstractMuleNamespaceHandler extends NamespaceHandlerSuppo
 {
     public static final String GLOBAL_ENDPOINT = "endpoint";
     public static final String INBOUND_ENDPOINT = "inbound-endpoint";
-    public static final String OUTBOUND_ENDPOINT = "outbound-endpoint"; 
+    public static final String OUTBOUND_ENDPOINT = "outbound-endpoint";
 
     protected transient final Log logger = LogFactory.getLog(getClass());
 
@@ -109,7 +110,8 @@ public abstract class AbstractMuleNamespaceHandler extends NamespaceHandlerSuppo
         {
             super();
         }
-        
+
+        @Override
         public BeanDefinition parse(Element element, ParserContext parserContext)
         {
             return null;
@@ -148,6 +150,7 @@ public abstract class AbstractMuleNamespaceHandler extends NamespaceHandlerSuppo
             return bdp;
         }
 
+        @Override
         public MuleDefinitionParserConfiguration registerPreProcessor(PreProcessor preProcessor)
         {
             for (Iterator bdp = bdps.iterator(); bdp.hasNext();)
@@ -157,6 +160,7 @@ public abstract class AbstractMuleNamespaceHandler extends NamespaceHandlerSuppo
             return this;
         }
 
+        @Override
         public MuleDefinitionParserConfiguration registerPostProcessor(PostProcessor postProcessor)
         {
             for (Iterator bdp = bdps.iterator(); bdp.hasNext();)
@@ -166,6 +170,7 @@ public abstract class AbstractMuleNamespaceHandler extends NamespaceHandlerSuppo
             return this;
         }
 
+        @Override
         public MuleDefinitionParserConfiguration addReference(String propertyName)
         {
             for (Iterator bdp = bdps.iterator(); bdp.hasNext();)
@@ -175,6 +180,7 @@ public abstract class AbstractMuleNamespaceHandler extends NamespaceHandlerSuppo
             return this;
         }
 
+        @Override
         public MuleDefinitionParserConfiguration addMapping(String propertyName, Map mappings)
         {
             for (Iterator bdp = bdps.iterator(); bdp.hasNext();)
@@ -184,6 +190,7 @@ public abstract class AbstractMuleNamespaceHandler extends NamespaceHandlerSuppo
             return this;
         }
 
+        @Override
         public MuleDefinitionParserConfiguration addMapping(String propertyName, String mappings)
         {
             for (Iterator bdp = bdps.iterator(); bdp.hasNext();)
@@ -193,6 +200,7 @@ public abstract class AbstractMuleNamespaceHandler extends NamespaceHandlerSuppo
             return this;
         }
 
+        @Override
         public MuleDefinitionParserConfiguration addMapping(String propertyName, ValueMap mappings)
         {
             for (Iterator bdp = bdps.iterator(); bdp.hasNext();)
@@ -202,6 +210,7 @@ public abstract class AbstractMuleNamespaceHandler extends NamespaceHandlerSuppo
             return this;
         }
 
+        @Override
         public MuleDefinitionParserConfiguration addAlias(String alias, String propertyName)
         {
             for (Iterator bdp = bdps.iterator(); bdp.hasNext();)
@@ -211,6 +220,7 @@ public abstract class AbstractMuleNamespaceHandler extends NamespaceHandlerSuppo
             return this;
         }
 
+        @Override
         public MuleDefinitionParserConfiguration addCollection(String propertyName)
         {
             for (Iterator bdp = bdps.iterator(); bdp.hasNext();)
@@ -220,6 +230,7 @@ public abstract class AbstractMuleNamespaceHandler extends NamespaceHandlerSuppo
             return this;
         }
 
+        @Override
         public MuleDefinitionParserConfiguration addIgnored(String propertyName)
         {
             for (Iterator bdp = bdps.iterator(); bdp.hasNext();)
@@ -229,6 +240,7 @@ public abstract class AbstractMuleNamespaceHandler extends NamespaceHandlerSuppo
             return this;
         }
 
+        @Override
         public MuleDefinitionParserConfiguration removeIgnored(String propertyName)
         {
             for (Iterator bdp = bdps.iterator(); bdp.hasNext();)
@@ -238,6 +250,7 @@ public abstract class AbstractMuleNamespaceHandler extends NamespaceHandlerSuppo
             return this;
         }
 
+        @Override
         public MuleDefinitionParserConfiguration setIgnoredDefault(boolean ignoreAll)
         {
             for (Iterator bdp = bdps.iterator(); bdp.hasNext();)
@@ -247,6 +260,7 @@ public abstract class AbstractMuleNamespaceHandler extends NamespaceHandlerSuppo
             return this;
         }
 
+        @Override
         public MuleDefinitionParserConfiguration addBeanFlag(String flag)
         {
             for (Iterator bdp = bdps.iterator(); bdp.hasNext();)
@@ -256,13 +270,13 @@ public abstract class AbstractMuleNamespaceHandler extends NamespaceHandlerSuppo
             return this;
         }
     }
-    
+
     /**
      * Subclasses can call this to register the supplied {@link BeanDefinitionParser} to
      * handle the specified element. The element name is the local (non-namespace qualified)
      * name.
      */
-    protected void registerDeprecatedBeanDefinitionParser(String elementName, BeanDefinitionParser parser, String deprecationWarning) 
+    protected void registerDeprecatedBeanDefinitionParser(String elementName, BeanDefinitionParser parser, String deprecationWarning)
     {
         if (parser instanceof MuleDefinitionParserConfiguration)
         {
@@ -275,7 +289,7 @@ public abstract class AbstractMuleNamespaceHandler extends NamespaceHandlerSuppo
     {
         AnnotationsBeanDefintionParser()
         {
-            ;
+            super();
         }
 
         @Override

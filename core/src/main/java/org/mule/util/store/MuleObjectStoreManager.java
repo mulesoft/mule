@@ -54,7 +54,8 @@ public class MuleObjectStoreManager
     {
         return this.<T> getObjectStore(name, isPersistent, 0, 0, 0);
     }
-    
+
+    @Override
     @SuppressWarnings({"unchecked"})
     synchronized public <T extends ObjectStore<? extends Serializable>> T getObjectStore(String name,
                                                                                          boolean isPersistent,
@@ -88,7 +89,7 @@ public class MuleObjectStoreManager
             return getMonitorablePartition(name,baseStore,store,entryTTL,maxEntries,expirationInterval);
         }
     }
-    
+
     @SuppressWarnings({"rawtypes", "unchecked"})
     private <T extends ObjectStore<? extends Serializable>> T getPartitionFromBaseObjectStore(ListableObjectStore baseStore, String partitionName)
     {
@@ -98,24 +99,24 @@ public class MuleObjectStoreManager
         }
         else
         {
-            return (T) new PartitionedObjectStoreWrapper(partitionName, muleContext, (ListableObjectStore) baseStore);
+            return (T) new PartitionedObjectStoreWrapper(partitionName, muleContext, baseStore);
         }
     }
-    
+
     private <T extends ObjectStore<? extends Serializable>> T putInStoreMap(String name,T store)
     {
         @SuppressWarnings("unchecked")
         T previous = (T) stores.putIfAbsent(name, store);
         if (previous == null)
         {
-            return (T) store;
+            return store;
         }
         else
         {
             return previous;
         }
     }
-    
+
     @SuppressWarnings({"rawtypes", "unchecked"})
     private <T extends ObjectStore<? extends Serializable>> T getMonitorablePartition(String name,ListableObjectStore baseStore,T store, int entryTTL, int maxEntries, int expirationInterval)
     {
@@ -127,7 +128,7 @@ public class MuleObjectStoreManager
                 Monitor m = new Monitor(name, (PartitionableExpirableObjectStore) baseStore, entryTTL,
                     maxEntries);
                 scheduler.scheduleWithFixedDelay(m, 0, expirationInterval, TimeUnit.MILLISECONDS);
-                return (T) store;
+                return store;
             }
             else
             {
@@ -255,7 +256,7 @@ public class MuleObjectStoreManager
             }
             else
             {
-                //there is nothing we can do                
+                //there is nothing we can do
             }
         }
     }

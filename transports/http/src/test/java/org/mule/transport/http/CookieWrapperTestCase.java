@@ -10,13 +10,6 @@
 
 package org.mule.transport.http;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 import org.mule.api.MuleMessage;
 import org.mule.api.expression.ExpressionManager;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -34,6 +27,13 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @SmallTest
 public class CookieWrapperTestCase extends AbstractMuleTestCase
@@ -180,7 +180,7 @@ public class CookieWrapperTestCase extends AbstractMuleTestCase
                  @Override
                  public Object answer(InvocationOnMock invocation) throws Throwable
                  {
-                     return (String) invocation.getArguments()[0];
+                     return invocation.getArguments()[0];
                  }
              }
          );

@@ -198,7 +198,7 @@ public class DynamicOutboundEndpointTestCase extends AbstractMessageProcessorTes
         assertEquals(outboundEvent.getMessage().getPayload(),
             listener.messageNotificationList.get(0).getSource().getPayload());
         assertEquals(outboundEvent.getMessage().getPayload(),
-            listener.messageNotificationList.get(1).getSource().getPayload());;
+            listener.messageNotificationList.get(1).getSource().getPayload());
     }
 
     @Test
@@ -274,11 +274,13 @@ public class DynamicOutboundEndpointTestCase extends AbstractMessageProcessorTes
         Prober prober = new PollingProber();
         prober.check(new Probe()
         {
+            @Override
             public boolean isSatisfied()
             {
                 return MyMessageDispatcherFactory.dispatcher != null && MyMessageDispatcherFactory.dispatcher.dispatchedEvent;
             }
 
+            @Override
             public String describeFailure()
             {
                 return "Expected dispatcher was not called";
@@ -295,11 +297,13 @@ public class DynamicOutboundEndpointTestCase extends AbstractMessageProcessorTes
         Prober prober = new PollingProber();
         prober.check(new Probe()
         {
+            @Override
             public boolean isSatisfied()
             {
                 return MyMessageDispatcherFactory.dispatcher != null && MyMessageDispatcherFactory.dispatcher.sentEvent;
             }
 
+            @Override
             public String describeFailure()
             {
                 return "Expected dispatcher was not called";

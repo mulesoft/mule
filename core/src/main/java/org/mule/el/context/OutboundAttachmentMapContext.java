@@ -43,7 +43,7 @@ public class OutboundAttachmentMapContext extends AbstractMapContext<String, Dat
         DataHandler previousValue = get(key);
         try
         {
-            message.addOutboundAttachment(key, (DataHandler) value);
+            message.addOutboundAttachment(key, value);
         }
         catch (Exception e)
         {

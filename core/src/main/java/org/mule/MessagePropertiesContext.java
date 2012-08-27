@@ -170,7 +170,7 @@ public class MessagePropertiesContext implements Serializable
     /**
      * Removes a property from all scopes except for SESSION and INBOUND (which is read-only). You may
      * explicitly remove a session property by calling removeProperty(key, PropertyScope.SESSION)
-     * 
+     *
      * @param key the property key to remove
      * @return the removed property value or null if the property did not exist
      */
@@ -191,7 +191,7 @@ public class MessagePropertiesContext implements Serializable
 
     /**
      * Removes a property from the specified property scope.
-     * 
+     *
      * @param key the property key to remove
      * @return the removed property value or null if the property did not exist
      */
@@ -217,7 +217,7 @@ public class MessagePropertiesContext implements Serializable
 
     /**
      * Set a property on the message
-     * 
+     *
      * @param key the key on which to associate the value
      * @param value the property value
      * @deprecated use {@link #setProperty(String, Object, org.mule.api.transport.PropertyScope)}
@@ -231,7 +231,7 @@ public class MessagePropertiesContext implements Serializable
 
     /**
      * Set a property on the message
-     * 
+     *
      * @param key the key on which to associate the value
      * @param value the property value
      * @param scope the scope to se the property on
@@ -410,7 +410,7 @@ public class MessagePropertiesContext implements Serializable
                     "Detected an attempt to set a invocation or session property, "
                                     + "but a MuleEvent hasn't been created using this message yet. Key/value: %s=%s",
                     key, value));
-        };
+        }
 
         @Override
         public Object get(Object key)

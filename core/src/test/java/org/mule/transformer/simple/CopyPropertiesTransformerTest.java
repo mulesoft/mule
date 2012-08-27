@@ -9,11 +9,6 @@
  */
 package org.mule.transformer.simple;
 
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.mockito.internal.verification.VerificationModeFactory.times;
-
 import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.expression.ExpressionManager;
@@ -36,13 +31,18 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
 
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.mockito.internal.verification.VerificationModeFactory.times;
+
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
 public class CopyPropertiesTransformerTest extends AbstractMuleTestCase
 {
     public static final String ENCODING = "encoding";
     public static final String INBOUND_PROPERTY_KEY = "propKey";
-    private static final Object PROPERTY_VALUE = new Object();;
+    private static final Object PROPERTY_VALUE = new Object();
     @Mock
     private MuleContext mockMuleContext;
     @Mock

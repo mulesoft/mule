@@ -10,10 +10,6 @@
 
 package org.mule.routing.outbound;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
 import org.mule.tck.size.SmallTest;
 
 import java.util.ArrayList;
@@ -21,10 +17,13 @@ import java.util.Collection;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 @SmallTest
 public class PartitionedMessageSequenceTestCase
 {
-
     @Test
     public void wrapCollectionMessageSequence()
     {
@@ -48,11 +47,11 @@ public class PartitionedMessageSequenceTestCase
         PartitionedMessageSequence<String> pms = new PartitionedMessageSequence<String>(cms, groupSize);
         assertEquals(2, pms.size());
 
-        Collection<String> batchItem = (Collection<String>) pms.next();
+        Collection<String> batchItem = pms.next();
         assertEquals(groupSize, batchItem.size());
         assertTrue(batchItem.containsAll(group1));
 
-        batchItem = (Collection<String>) pms.next();
+        batchItem = pms.next();
         assertEquals(group2.size(), batchItem.size());
         assertTrue(batchItem.containsAll(group2));
 

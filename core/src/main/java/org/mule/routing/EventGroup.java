@@ -50,7 +50,7 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
     private static final long serialVersionUID = 953739659615692697L;
 
     public static final MuleEvent[] EMPTY_EVENTS_ARRAY = new MuleEvent[0];
-    
+
     public static final String MULE_ARRIVAL_ORDER_PROPERTY = MuleProperties.PROPERTY_PREFIX + "ARRIVAL_ORDER";
 
     transient private ObjectStoreManager objectStoreManager = null;
@@ -221,7 +221,7 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
     {
         return toArray(true);
     }
-    
+
     /**
      * Returns a snapshot of collected events in this group, optionally sorted by their arrival time.
      *
@@ -457,7 +457,7 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
     protected MuleSession getMergedSession() throws ObjectStoreException
     {
         MuleSession session = new DefaultMuleSession(
-            ((MuleEvent) events.retrieve(events.allKeys().get(0))).getSession());
+            events.retrieve(events.allKeys().get(0)).getSession());
         for (Serializable key : events.allKeys())
         {
             MuleEvent event = events.retrieve(key);
@@ -468,7 +468,7 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
         }
         return session;
     }
-    
+
     private ObjectStoreManager getObjectStoreManager()
     {
         if (objectStoreManager == null)
@@ -489,6 +489,7 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
 
     public final class ArrivalOrderMessageComparator implements Comparator<MuleMessage>
     {
+        @Override
         public int compare(MuleMessage message1, MuleMessage message2)
         {
             int val1 = message1.getInvocationProperty(MULE_ARRIVAL_ORDER_PROPERTY, -1);
@@ -500,6 +501,7 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
 
     public final class ArrivalOrderEventComparator implements Comparator<MuleEvent>
     {
+        @Override
         public int compare(MuleEvent event1, MuleEvent event2)
         {
             int val1 = event1.getMessage().getInvocationProperty(MULE_ARRIVAL_ORDER_PROPERTY, -1);
@@ -509,4 +511,3 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
         }
     }
 }
-                        

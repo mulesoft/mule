@@ -9,9 +9,6 @@
  */
 package org.mule.lifecycle;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
-
 import org.mule.api.MuleException;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
@@ -25,6 +22,9 @@ import org.mule.api.lifecycle.Stoppable;
 import org.mule.lifecycle.phases.NotInLifecyclePhase;
 
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 public class LifecycleTransitionTestCase
 {
@@ -51,7 +51,7 @@ public class LifecycleTransitionTestCase
         }
         catch (Exception ex)
         {
-            ;
+            // this exception was expected
         }
         for (int i = 0; i < 5; i++)
         {
@@ -76,7 +76,7 @@ public class LifecycleTransitionTestCase
         }
         catch (Exception ex)
         {
-            ;
+            // this exception was expected
         }
         o.dispose();
         transitions++;
@@ -109,6 +109,7 @@ public class LifecycleTransitionTestCase
 
             registerLifecycleCallback(Initialisable.PHASE_NAME, new LifecycleCallback<ObjectWithLifecycle>()
             {
+                @Override
                 public void onTransition(String phaseName, ObjectWithLifecycle object)
                 {
                     object.doInit();
@@ -116,6 +117,7 @@ public class LifecycleTransitionTestCase
             });
             registerLifecycleCallback(Disposable.PHASE_NAME, new LifecycleCallback<ObjectWithLifecycle>()
             {
+                @Override
                 public void onTransition(String phaseName, ObjectWithLifecycle object)
                 {
                     object.doDispose();
@@ -123,6 +125,7 @@ public class LifecycleTransitionTestCase
             });
             registerLifecycleCallback(Startable.PHASE_NAME, new LifecycleCallback<ObjectWithLifecycle>()
             {
+                @Override
                 public void onTransition(String phaseName, ObjectWithLifecycle object)
                 {
                     object.doStart();
@@ -130,6 +133,7 @@ public class LifecycleTransitionTestCase
             });
             registerLifecycleCallback(Stoppable.PHASE_NAME, new LifecycleCallback<ObjectWithLifecycle>()
             {
+                @Override
                 public void onTransition(String phaseName, ObjectWithLifecycle object)
                 {
                     object.doStop();
