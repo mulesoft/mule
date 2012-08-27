@@ -11,6 +11,8 @@
 package org.mule.routing;
 
 import org.mule.api.MuleEvent;
+import org.mule.api.MuleMessage;
+import org.mule.api.MuleMessageCollection;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.routing.outbound.AbstractMessageSequenceSplitter;
 import org.mule.routing.outbound.ArrayMessageSequence;
@@ -34,7 +36,12 @@ public class CollectionSplitter extends AbstractMessageSequenceSplitter
     @SuppressWarnings("unchecked")
     protected MessageSequence<?> splitMessageIntoSequence(MuleEvent event)
     {
-        Object payload = event.getMessage().getPayload();
+        MuleMessage msg = event.getMessage();
+        if (msg instanceof MuleMessageCollection)
+        {
+            return new ArrayMessageSequence(((MuleMessageCollection) msg).getMessagesAsArray());
+        }
+        Object payload = msg.getPayload();
         if (payload instanceof MessageSequence<?>)
         {
             return ((MessageSequence<?>) payload);

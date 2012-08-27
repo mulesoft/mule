@@ -83,6 +83,7 @@
     <flow name="message-collection-config">
         <vm:inbound-endpoint path="input-7" exchange-pattern="request-response"/>
         <foreach>
+            <test:assert expression="#[message.inboundProperties['out']=='out'+counter]" />
             <test:component/>
             <message-properties-transformer scope="invocation">
             	<add-message-property key="totalMessages" value="#[variable:counter]"/>
