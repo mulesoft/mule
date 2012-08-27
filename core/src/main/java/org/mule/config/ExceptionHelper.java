@@ -14,8 +14,11 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.config.ExceptionReader;
+import org.mule.api.context.notification.MuleContextNotificationListener;
 import org.mule.api.registry.ServiceType;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.context.notification.MuleContextNotification;
+import org.mule.context.notification.NotificationException;
 import org.mule.util.ClassUtils;
 import org.mule.util.MapUtils;
 import org.mule.util.PropertiesUtils;
@@ -76,6 +79,7 @@ public final class ExceptionHelper
     private static Properties errorCodes = new Properties();
     private static Map reverseErrorCodes = null;
     private static Map<String,Properties> errorMappings = new HashMap<String,Properties>();
+    private static Map<String,Boolean> disposeListenerRegistered = new HashMap<String,Boolean>(); 
 
     private static int exceptionThreshold = 0;
     private static boolean verbose = true;
@@ -182,27 +186,52 @@ public final class ExceptionHelper
         }
     }
 
-    private static Properties getErrorMappings(String protocol, MuleContext muleContext)
+    private static Properties getErrorMappings(String protocol, final MuleContext muleContext)
     {
         Properties m = errorMappings.get(getErrorMappingCacheKey(protocol,muleContext));
         if (m != null)
         {
-            if (m instanceof Properties)
-            {
-                return (Properties) m;
-            }
-            else
-            {
-                return null;
-            }
+            return m;
         }
         else
         {
             String name = SpiUtils.SERVICE_ROOT + ServiceType.EXCEPTION.getPath() + "/" + protocol + "-exception-mappings.properties";
             Properties p = PropertiesUtils.loadAllProperties(name, muleContext.getExecutionClassLoader());
             errorMappings.put(getErrorMappingCacheKey(protocol, muleContext), p);
+            registerAppDisposeListener(muleContext);
             return p;
         }
+    }
+
+    private static void registerAppDisposeListener(MuleContext muleContext)
+    {
+        if (!disposeListenerRegistered.containsKey(muleContext.getConfiguration().getId()))
+        {
+            try
+            {
+                muleContext.registerListener(createClearCacheListenerOnContextDispose(muleContext));
+                disposeListenerRegistered.put(muleContext.getConfiguration().getId(),true);
+            }
+            catch (NotificationException e)
+            {
+                throw new MuleRuntimeException(e);
+            }    
+        }
+    }
+
+    private static MuleContextNotificationListener<MuleContextNotification> createClearCacheListenerOnContextDispose(final MuleContext muleContext)
+    {
+        return new MuleContextNotificationListener<MuleContextNotification>() {
+            @Override
+            public void onNotification(MuleContextNotification notification)
+            {
+                if (notification.getAction() == MuleContextNotification.CONTEXT_DISPOSED)
+                {
+                    clearCacheFor(muleContext);
+                    disposeListenerRegistered.remove(notification.getMuleContext().getConfiguration().getId());
+                }
+            }
+        };
     }
 
     private static String getErrorMappingCacheKey(String protocol, MuleContext muleContext)
@@ -616,7 +645,7 @@ public final class ExceptionHelper
         return cause instanceof MuleException ? null : cause;
     }
     
-    public static void disposeApp(MuleContext muleContext)
+    private static void clearCacheFor(MuleContext muleContext)
     {
         List<String> entriesToRemove = new ArrayList<String>();
         for (String key : errorMappings.keySet())
