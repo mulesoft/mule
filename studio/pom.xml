@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.mule.distributions</groupId>
+        <artifactId>mule-distributions</artifactId>
+        <version>3.3.1-SNAPSHOT</version>
+    </parent>
+    <artifactId>mule-studio</artifactId>
+    <!-- Packaging 'pom' ensures that maven does not try to bind a plugin to the
+         'package' phase. We bind the assembly plugin here, that's enough. -->
+    <packaging>pom</packaging>
+    <name>Studio Distribution</name>
+    <description>This distribution is tailored to fit studio requirements</description>
+
+    <properties>
+        <communityDistDir>${project.build.directory}/ce-distribution</communityDistDir>
+        <communityArtifact>mule-standalone</communityArtifact>
+    </properties>
+
+    <build>
+        <!--
+            Keep the plugins ordered by build lifecycle
+            (http://maven.apache.org/guides/introduction/introduction-to-the-lifecycle.html)!
+        -->
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <!--
+                             This has to happen early in the build lifecycle so that plugins running
+                             later in the build lifecycle can work on the unpacked distro.
+                             -->
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>org.mule.distributions</groupId>
+                                    <artifactId>${communityArtifact}</artifactId>
+                                    <version>${project.version}</version>
+                                    <type>zip</type>
+                                    <outputDirectory>${communityDistDir}</outputDirectory>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.codehaus.gmaven</groupId>
+                <artifactId>gmaven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>execute</goal>
+                        </goals>
+                        <configuration>
+                            <source>
+                                import java.util.jar.JarFile
+
+                                log.info '*' * 80
+                                log.info('Removing log4j.properties from jars'.center(80))
+                                log.info '*' * 80
+
+                                def ceDistro = "$project.build.directory/ce-distribution/${communityArtifact}-${project.version}"
+
+                                scanner = ant.fileScanner {
+                                    fileset(dir:"$ceDistro/lib") {
+                                        include(name:"**/*.jar")
+                                    }
+                                }
+
+                                scanner.each{ file->
+                                        jarfile = new JarFile(file)
+                                        jarfile.entries().each{ entry->
+                                                if (entry.name =~ "^log4j.properties") {
+                                                    log.info "$file.name contains $entry.name"
+                                                    def tempDir = "$project.build.directory/temp-$file.name"
+                                                    ant.mkdir(dir: tempDir)
+                                                    ant.unjar(dest: tempDir) { fileset(file: file) }
+                                                    file.delete()
+                                                    ant.jar(
+                                                        basedir: tempDir,
+                                                        destfile: file,
+                                                        excludes: "log4j.properties")
+                                                }
+                                        }
+                                }
+
+
+                                log.info '*' * 80
+                                log.info('Repackaging sources'.center(80))
+                                log.info '*' * 80
+
+                                def srcFile = new File("${ceDistro}/src/mule-${project.version}-src.zip")
+                                if (srcFile.exists()) {
+                                    def dstFile = new File("${ceDistro}/src/mule-sources-${project.version}.zip")
+                                    def tempSrc = "$project.build.directory/temp-src"
+                                    ant.unzip(src: srcFile,
+                                              dest: tempSrc,
+                                              overwrite: true) { patternset(includes:"org/mule/**") }
+                                    ant.zip(basedir: tempSrc, destfile: dstFile)
+                                }
+
+                            </source>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <!--
+                                'attached' ensures there's only a single run bound to m2's lifecycle.
+                                The default 'assembly' goal would run every plugin in this pom twice.
+                            -->
+                            <goal>attached</goal>
+                        </goals>
+                        <configuration>
+                            <finalName>mule-studio-${project.version}</finalName>
+                            <descriptors>
+                                <descriptor>assembly.xml</descriptor>
+                            </descriptors>
+                            <appendAssemblyId>false</appendAssemblyId>
+                            <tarLongFileMode>gnu</tarLongFileMode>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!--
+            <plugin>
+                <groupId>org.mule.tools</groupId>
+                <artifactId>mule-assembly-verifier</artifactId>
+                <configuration>
+                    <projectOutputFile>mule-standalone-nodocs-${project.version}.zip</projectOutputFile>
+                </configuration>
+            </plugin>
+            -->
+
+        </plugins>
+    </build>
+
+    <dependencies>
+        <dependency>
+            <!-- This is the engine for JSR-223 compliance, not the actual implementation -->
+            <groupId>javax.script</groupId>
+            <artifactId>jython-engine</artifactId>
+            <classifier>jdk14</classifier>
+        </dependency>
+        <dependency>
+            <!-- This is the actual language implementation -->
+            <groupId>org.python</groupId>
+            <artifactId>jython</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>javax.script</groupId>
+            <artifactId>jruby-engine</artifactId>
+            <version>1.1</version>
+            <classifier>jdk14</classifier>
+        </dependency>
+        <dependency>
+            <groupId>javax.script</groupId>
+            <artifactId>js-engine</artifactId>
+            <version>1.1</version>
+            <classifier>jdk14</classifier>
+        </dependency>
+        <dependency>
+            <groupId>org.jruby</groupId>
+            <artifactId>jruby-complete</artifactId>
+            <version>1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>rhino</groupId>
+            <artifactId>js</artifactId>
+            <version>1.6R5</version>
+        </dependency>
+    </dependencies>
+
+</project>

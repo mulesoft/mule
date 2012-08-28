@@ -1,0 +1,50 @@
+<assembly>
+    <id>studio</id>
+    <formats>
+        <format>tar.gz</format>
+    </formats>
+    <includeBaseDirectory>false</includeBaseDirectory>
+
+    <fileSets>
+        <!-- Copy standard CE distro, excluding a few things -->
+        <fileSet>
+            <directory>target/ce-distribution/${communityArtifact}-${version}/lib</directory>
+            <outputDirectory></outputDirectory>
+            <fileMode>0644</fileMode>
+            <directoryMode>0755</directoryMode>
+            <includes>
+                <include>**/*.jar</include>
+            </includes>
+            <!--
+            <excludes>
+                <exclude>bin/**</exclude>
+            </excludes>
+            -->
+        </fileSet>
+        <fileSet>
+            <directory>target/ce-distribution/${communityArtifact}-${version}/src</directory>
+            <outputDirectory></outputDirectory>
+            <includes>
+                <include>mule-sources-*.zip</include>
+            </includes>
+        </fileSet>
+
+    </fileSets>
+
+    <!--
+    ============================
+        Libraries
+    ============================
+    -->
+
+    <dependencySets>
+
+        <!-- Scripting pack libraries -->
+        <dependencySet>
+            <outputDirectory>user</outputDirectory>
+            <scope>runtime</scope>
+            <fileMode>0644</fileMode>
+        </dependencySet>
+    </dependencySets>
+
+</assembly>
