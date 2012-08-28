@@ -80,5 +80,9 @@ public class InvalidSchemaValidationTestCase extends AbstractSchemaValidationTes
         }
     }
 
-
+    @Test
+    public void testExpressionPattern() throws SAXException, IOException
+    {
+        doTest("org/mule/config/spring/schema-validation-expression-pattern-test.xml");
+    }
 }
