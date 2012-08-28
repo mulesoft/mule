@@ -72,5 +72,6 @@
         <module>scripting</module>
         <module>standalone</module>
         <module>standalone-light</module>
+        <module>studio</module>
     </modules>
 </project>
