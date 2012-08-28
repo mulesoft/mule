@@ -56,6 +56,17 @@ public class DefaultMessageCollection extends DefaultMuleMessage implements Mule
      */
     public DefaultMessageCollection(DefaultMessageCollection msg, MuleContext muleContext)
     {
+        this(msg, muleContext, false);
+    }
+
+    /**
+     * Performs a shallow or deep copy of the messages
+     * @param msg
+     * @param muleContext
+     * @param deepMessageCopy
+     */
+    public DefaultMessageCollection(DefaultMessageCollection msg, MuleContext muleContext, boolean deepMessageCopy)
+    {
         this(muleContext);
         setUniqueId(msg.getUniqueId());
         setMessageRootId(msg.getMessageRootId());
@@ -65,7 +76,22 @@ public class DefaultMessageCollection extends DefaultMuleMessage implements Mule
         {
             for (int i = 0; i < msg.getMessagesAsArray().length; i++)
             {
-                addMessage(msg.getMessagesAsArray()[i]);
+                MuleMessage currentMsg = msg.getMessagesAsArray()[i];
+                if (deepMessageCopy)
+                {
+                    if (currentMsg instanceof MuleMessageCollection)
+                    {
+                        addMessage(new DefaultMessageCollection((DefaultMessageCollection) currentMsg, muleContext, true));
+                    }
+                    else
+                    {
+                        addMessage(new DefaultMuleMessage(currentMsg, currentMsg, muleContext));
+                    }
+                }
+                else
+                {
+                    addMessage(currentMsg);
+                }
             }
         }
         else
@@ -284,7 +310,7 @@ public class DefaultMessageCollection extends DefaultMuleMessage implements Mule
     public ThreadSafeAccess newThreadCopy()
     {
         checkValidPayload();
-        return new DefaultMessageCollection(this, muleContext);
+        return new DefaultMessageCollection(this, muleContext, true);
     }
 
     /**

@@ -84,14 +84,20 @@
         <vm:inbound-endpoint path="input-7" exchange-pattern="request-response"/>
         <foreach>
             <test:assert expression="#[message.inboundProperties['out']=='out'+counter]" />
-            <test:component/>
-            <message-properties-transformer scope="invocation">
-            	<add-message-property key="totalMessages" value="#[variable:counter]"/>
-            </message-properties-transformer>
+            <set-variable variableName="totalMessages" value="#[counter]"/>
         </foreach>
-        <message-properties-transformer scope="outbound">
-        	<add-message-property key="totalMessages" value="#[variable:totalMessages]"/>
-        </message-properties-transformer>
+        <test:assert expression="#[totalMessages==10]" />
+        <set-property propertyName="totalMessages" value="#[totalMessages]"/>
+    </flow>
+
+    <flow name="message-collection-config-one-way">
+        <vm:inbound-endpoint path="input-71" exchange-pattern="one-way"/>
+        <foreach>
+            <test:assert expression="#[message.inboundProperties['out']=='out'+counter]" />
+            <set-variable variableName="totalMessages" value="#[counter]"/>
+        </foreach>
+        <logger level="WARN" message="variable:totalMessages: #[variable:totalMessages]"/>
+        <test:assert expression="#[totalMessages==10]" />
     </flow>
 
     <flow name="map-config">
