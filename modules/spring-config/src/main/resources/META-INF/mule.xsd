@@ -5045,7 +5045,7 @@
 
     <xsd:complexType name="baseAggregatorRouterType">
         <xsd:complexContent>
-            <xsd:extension base="abstractInboundRouterType">
+            <xsd:extension base="filteredInboundRouterType">
                 <xsd:attribute name="timeout" type="substitutableInt">
                     <xsd:annotation>
                         <xsd:documentation>
