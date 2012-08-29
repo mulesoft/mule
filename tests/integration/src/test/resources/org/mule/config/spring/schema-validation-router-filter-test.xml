@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+      http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+      http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+
+    <model>
+        <service name="out">
+            <inbound>
+                <vm:inbound-endpoint path="VM_TradeAggregation"/>
+                <collection-aggregator-router timeout="300000" failOnTimeout="true">
+                    <payload-type-filter expectedType="java.lang.String"/>
+                </collection-aggregator-router>
+            </inbound>
+            <outbound>
+                <pass-through-router>
+                    <vm:outbound-endpoint path="fileOut"/>
+                </pass-through-router>
+            </outbound>
+        </service>
+    </model>
+
+</mule>
