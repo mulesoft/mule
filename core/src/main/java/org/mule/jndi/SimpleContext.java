@@ -31,44 +31,50 @@ import javax.naming.OperationNotSupportedException;
 public class SimpleContext implements Context
 {
     /** What holds the bindings. */
-    protected Map bindings = new HashMap();
+    protected Map<String, Object> bindings = new HashMap<String, Object>();
 
     /** Context's environment. */
-    private Hashtable environment;
+    private Hashtable<String, Object> environment;
 
     public SimpleContext()
     {
         super();
     }
 
+    @Override
     public Object lookupLink(Name name) throws NamingException
     {
         // unsupported
         return null;
     }
 
+    @Override
     public void rename(Name oldName, Name newName) throws NamingException
     {
         // unsupported
     }
 
+    @Override
     public NameParser getNameParser(Name name) throws NamingException
     {
         // unsupported
         return null;
     }
 
-    public NamingEnumeration list(Name name) throws NamingException
+    @Override
+    public NamingEnumeration<NameClassPair> list(Name name) throws NamingException
     {
         // unsupported
         return null;
     }
 
+    @Override
     public Object lookup(Name name) throws NamingException
     {
         return lookup(name.toString());
     }
 
+    @Override
     public Object lookup(String name) throws NamingException
     {
         Object rc = bindings.get(name);
@@ -79,11 +85,13 @@ public class SimpleContext implements Context
         return rc;
     }
 
+    @Override
     public void bind(Name name, Object obj) throws NamingException
     {
         bind(name.toString(), obj);
     }
 
+    @Override
     public void bind(String name, Object obj) throws NamingException
     {
         if (bindings.containsKey(name))
@@ -93,21 +101,25 @@ public class SimpleContext implements Context
         bindings.put(name, obj);
     }
 
+    @Override
     public void rebind(Name name, Object obj) throws NamingException
     {
         rebind(name.toString(), obj);
     }
 
+    @Override
     public void rebind(String name, Object obj) throws NamingException
     {
         bindings.put(name, obj);
     }
 
+    @Override
     public void unbind(Name name) throws NamingException
     {
         unbind(name.toString());
     }
 
+    @Override
     public void unbind(String name) throws NamingException
     {
         if (bindings.remove(name) == null)
@@ -121,6 +133,7 @@ public class SimpleContext implements Context
         rename(oldName.toString(), newName.toString());
     }
 
+    @Override
     public void rename(String oldName, String newName) throws NamingException
     {
         if (!bindings.containsKey(oldName))
@@ -135,106 +148,124 @@ public class SimpleContext implements Context
         bindings.put(newName, bindings.remove(oldName));
     }
 
-    public NamingEnumeration list(Attributes.Name name) throws NamingException
+    public NamingEnumeration<NameClassPair> list(Attributes.Name name) throws NamingException
     {
         return list(name.toString());
     }
 
-    public NamingEnumeration list(String name) throws NamingException
+    @Override
+    public NamingEnumeration<NameClassPair> list(String name) throws NamingException
     {
         if (name.length() > 0)
         {
             throw new OperationNotSupportedException("subcontexts not supported");
         }
-        final Iterator i = bindings.entrySet().iterator();
-        return new NamingEnumeration()
+
+        final Iterator<Map.Entry<String, Object>> i = bindings.entrySet().iterator();
+        return new NamingEnumeration<NameClassPair>()
         {
-            public Object next()
+            @Override
+            public NameClassPair next()
             {
-                Map.Entry e = (Map.Entry) i.next();
-                return new NameClassPair((String) e.getKey(), e.getValue().getClass().getName());
+                Map.Entry<String, Object> e = i.next();
+                return new NameClassPair(e.getKey(), e.getValue().getClass().getName());
             }
 
+            @Override
             public boolean hasMore()
             {
                 return i.hasNext();
             }
 
+            @Override
             public void close()
             {
                 // noop
             }
 
+            @Override
             public boolean hasMoreElements()
             {
                 return hasMore();
             }
 
-            public Object nextElement()
+            @Override
+            public NameClassPair nextElement()
             {
                 return next();
             }
         };
     }
 
-    public NamingEnumeration listBindings(Name name) throws NamingException
+    @Override
+    public NamingEnumeration<Binding> listBindings(Name name) throws NamingException
     {
         return listBindings(name.toString());
     }
 
-    public NamingEnumeration listBindings(String name) throws NamingException
+    @Override
+    public NamingEnumeration<Binding> listBindings(String name) throws NamingException
     {
         if (name.length() > 0)
         {
             throw new OperationNotSupportedException("subcontexts not supported");
         }
-        final Iterator i = bindings.entrySet().iterator();
-        return new NamingEnumeration()
+
+        final Iterator<Map.Entry<String, Object>> i = bindings.entrySet().iterator();
+        return new NamingEnumeration<Binding>()
         {
-            public Object next()
+            @Override
+            public Binding next()
             {
-                Map.Entry e = (Map.Entry) i.next();
-                return new Binding((String) e.getKey(), e.getValue());
+                Map.Entry<String, Object> e = i.next();
+                return new Binding(e.getKey(), e.getValue());
             }
 
+            @Override
             public boolean hasMore()
             {
                 return i.hasNext();
             }
 
+            @Override
             public void close()
             {
                 // noop
             }
 
+            @Override
             public boolean hasMoreElements()
             {
                 return hasMore();
             }
 
-            public Object nextElement()
+            @Override
+            public Binding nextElement()
             {
                 return next();
             }
-
         };
     }
 
+    @Override
     public void destroySubcontext(Name name) throws NamingException
     {
         destroySubcontext(name.toString());
     }
 
+    @Override
     public void destroySubcontext(String name) throws NamingException
     {
         throw new OperationNotSupportedException("subcontexts not supported");
     }
 
+    @Override
     public Context createSubcontext(Name name) throws NamingException
     {
         return createSubcontext(name.toString());
     }
 
+    @Override
     public Context createSubcontext(String name) throws NamingException
     {
         throw new OperationNotSupportedException("subcontexts not supported");
@@ -245,6 +276,7 @@ public class SimpleContext implements Context
         return lookupLink(name.toString());
     }
 
+    @Override
     public Object lookupLink(String name) throws NamingException
     {
         return lookup(name);
@@ -255,16 +287,19 @@ public class SimpleContext implements Context
         return getNameParser(name.toString());
     }
 
+    @Override
     public NameParser getNameParser(String name)
     {
         throw new UnsupportedOperationException("getNameParser");
     }
 
+    @Override
     public String composeName(String name, String prefix) throws NamingException
     {
         return composeName(new CompositeName(name), new CompositeName(prefix)).toString();
     }
 
+    @Override
     public Name composeName(Name name, Name prefix) throws NamingException
     {
         Name result = (Name) prefix.clone();
@@ -272,41 +307,44 @@ public class SimpleContext implements Context
         return result;
     }
 
+    @Override
     public Object addToEnvironment(String key, Object val)
     {
-        if (environment == null)
-        {
-            environment = new Hashtable();
-        }
+        initEnvironment();
         return environment.put(key, val);
     }
 
+    @Override
     public Object removeFromEnvironment(String key)
     {
-        if (environment == null)
-        {
-            environment = new Hashtable();
-        }
+        initEnvironment();
         return environment.remove(key);
     }
 
-    public Hashtable getEnvironment()
+    @Override
+    public Hashtable<String, Object> getEnvironment()
     {
-        if (environment == null)
-        {
-            environment = new Hashtable();
-        }
+        initEnvironment();
         return environment;
     }
 
+    private void initEnvironment()
+    {
+        if (environment == null)
+        {
+            environment = new Hashtable<String, Object>();
+        }
+    }
+
+    @Override
     public void close()
     {
         // noop
     }
 
+    @Override
     public String getNameInNamespace()
     {
         return "";
     }
-
 }

@@ -69,6 +69,7 @@ public class DefaultReplyToHandler implements ReplyToHandler, Serializable, Dese
         this.muleContext = muleContext;
     }
 
+    @Override
     public void processReplyTo(MuleEvent event, MuleMessage returnMessage, Object replyTo) throws MuleException
     {
         if (logger.isDebugEnabled())
@@ -143,8 +144,7 @@ public class DefaultReplyToHandler implements ReplyToHandler, Serializable, Dese
         return endpoint;
     }
 
-    @SuppressWarnings({"unused", "unchecked"})
-    public void initAfterDeserialisation(MuleContext muleContext) throws MuleException
+    public void initAfterDeserialisation(MuleContext context) throws MuleException
     {
         // this method can be called even on objects that were not serialized. In this case,
         // the temporary holder for serialized data is not initialized and we can just return
@@ -152,7 +152,7 @@ public class DefaultReplyToHandler implements ReplyToHandler, Serializable, Dese
         {
             return;
         }
-        this.muleContext = muleContext;
+        this.muleContext = context;
         logger = LogFactory.getLog(getClass());
         endpointCache = new HashMap<String, ImmutableEndpoint>();
         connector = findConnector();

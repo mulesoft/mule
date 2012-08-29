@@ -704,7 +704,7 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
      * @param muleContext the current muleContext instance
      * @throws MuleException if there is an error initializing
      */
-    @SuppressWarnings({"unused", "unchecked"})
+    @SuppressWarnings({"unused"})
     private void initAfterDeserialisation(MuleContext muleContext) throws MuleException
     {
         if (message instanceof DefaultMuleMessage)

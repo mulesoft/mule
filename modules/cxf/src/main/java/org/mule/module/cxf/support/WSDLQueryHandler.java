@@ -36,25 +36,23 @@ import javax.wsdl.xml.WSDLWriter;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamWriter;
 
-import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.frontend.WSDLQueryException;
-import org.apache.cxf.transport.http.UrlUtilities;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-
-import org.xml.sax.InputSource;
-
 import org.apache.cxf.Bus;
 import org.apache.cxf.catalog.OASISCatalogManager;
+import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.frontend.WSDLQueryException;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.staxutils.StaxUtils;
+import org.apache.cxf.transport.http.UrlUtilities;
 import org.apache.cxf.transports.http.StemMatchingQueryHandler;
 import org.apache.cxf.wsdl.WSDLManager;
 import org.apache.cxf.wsdl11.ResourceManagerWSDLLocator;
 import org.apache.cxf.wsdl11.ServiceWSDLBuilder;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.xml.sax.InputSource;
 
 
 /**
@@ -70,6 +68,7 @@ public class WSDLQueryHandler implements StemMatchingQueryHandler {
         bus = b;
     }
 
+    @Override
     public String getResponseContentType(String baseUri, String ctx) {
         if (baseUri.toLowerCase().contains("?wsdl")
             || baseUri.toLowerCase().contains("?xsd=")) {
@@ -78,6 +77,7 @@ public class WSDLQueryHandler implements StemMatchingQueryHandler {
         return null;
     }
 
+    @Override
     public boolean isRecognizedQuery(String baseUri, String ctx,
                                      EndpointInfo endpointInfo, boolean contextMatchExact) {
         if (baseUri != null
@@ -101,6 +101,7 @@ public class WSDLQueryHandler implements StemMatchingQueryHandler {
         return false;
     }
 
+    @Override
     public void writeResponse(String baseUri, String ctxUri,
                               EndpointInfo endpointInfo, OutputStream os) {
         try {
@@ -392,7 +393,7 @@ public class WSDLQueryHandler implements StemMatchingQueryHandler {
         Types types = def.getTypes();
         if (types != null) {
             for (ExtensibilityElement el
-                : CastUtils.cast((List)types.getExtensibilityElements(), ExtensibilityElement.class)) {
+                : CastUtils.cast(types.getExtensibilityElements(), ExtensibilityElement.class)) {
                 if (el instanceof Schema) {
                     Schema see = (Schema)el;
                     updateSchemaImports(see, doneSchemas, base);
@@ -551,6 +552,7 @@ public class WSDLQueryHandler implements StemMatchingQueryHandler {
         }
     }
 
+    @Override
     public boolean isRecognizedQuery(String baseUri, String ctx, EndpointInfo endpointInfo) {
         return isRecognizedQuery(baseUri, ctx, endpointInfo, false);
     }

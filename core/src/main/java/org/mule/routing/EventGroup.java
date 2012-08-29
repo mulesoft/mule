@@ -177,7 +177,6 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
      * @return an iterator over collected {@link MuleEvent}s.
      * @throws ObjectStoreException
      */
-    @SuppressWarnings("unchecked")
     public Iterator<MuleEvent> iterator() throws ObjectStoreException
     {
         return iterator(true);

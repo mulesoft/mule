@@ -161,7 +161,7 @@ public abstract class GenericTypeResolver
                             Type arg = typeArgs[i];
                             if (arg instanceof TypeVariable)
                             {
-                                arg = getTypeVariableMap(ownerClass).get((TypeVariable) arg);
+                                arg = getTypeVariableMap(ownerClass).get(arg);
                             }
                             result[i] = (arg instanceof Class ? (Class) arg : Object.class);
                         }
