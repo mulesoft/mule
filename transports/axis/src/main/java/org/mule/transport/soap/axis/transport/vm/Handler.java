@@ -21,6 +21,7 @@ import java.net.URLConnection;
  */
 public class Handler extends java.net.URLStreamHandler
 {
+    @Override
     protected URLConnection openConnection(URL url)
     {
         return new VoidURLConnection(url);

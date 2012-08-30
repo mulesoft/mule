@@ -27,7 +27,6 @@ import static org.junit.Assert.assertNotNull;
 
 public class AxisMessageDispatcherTestCase extends AbstractMuleContextTestCase
 {
-
     @Test
     public void testNullParametersInCallAllowed() throws Exception
     {
@@ -43,9 +42,9 @@ public class AxisMessageDispatcherTestCase extends AbstractMuleContextTestCase
 
         MuleMessage msg = event.getMessage();
         assertNotNull(msg);
-        final Map soapMethods = msg.getOutboundProperty(AxisConnector.SOAP_METHODS);
+        final Map<Object, List<String>> soapMethods = msg.getOutboundProperty(AxisConnector.SOAP_METHODS);
         assertEquals(1, soapMethods.size());
-        final List values = (List)soapMethods.get("myTestMethod");
+        final List<String> values = soapMethods.get("myTestMethod");
         assertNotNull(values);
         assertEquals(1, values.size());
         assertEquals("value0;qname{:anyType:http://www.w3.org/2001/XMLSchema};in", values.get(0));

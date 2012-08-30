@@ -29,6 +29,7 @@ public class AxisMuleSession implements org.apache.axis.session.Session
         this.session = session;
     }
 
+    @Override
     public Object get(String string)
     {
         synchronized(lock)
@@ -37,6 +38,7 @@ public class AxisMuleSession implements org.apache.axis.session.Session
         }
     }
 
+    @Override
     public void set(String string, Object object)
     {
         synchronized(lock)
@@ -45,6 +47,7 @@ public class AxisMuleSession implements org.apache.axis.session.Session
         }
     }
 
+    @Override
     public void remove(String string)
     {
         synchronized(lock)
@@ -53,7 +56,8 @@ public class AxisMuleSession implements org.apache.axis.session.Session
         }
     }
 
-    public Enumeration getKeys()
+    @Override
+    public Enumeration<?> getKeys()
     {
         synchronized(lock)
         {
@@ -61,21 +65,25 @@ public class AxisMuleSession implements org.apache.axis.session.Session
         }
     }
 
+    @Override
     public void setTimeout(int i)
     {
          // TODO not supported
     }
 
+    @Override
     public int getTimeout()
     {
         return 0;
     }
 
+    @Override
     public void touch()
     {
         // nothing here to touch
     }
 
+    @Override
     public void invalidate()
     {
         synchronized(lock)
@@ -84,6 +92,7 @@ public class AxisMuleSession implements org.apache.axis.session.Session
         }
     }
 
+    @Override
     public Object getLockObject()
     {
         return lock;

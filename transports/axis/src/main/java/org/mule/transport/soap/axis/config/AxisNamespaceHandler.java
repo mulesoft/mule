@@ -40,7 +40,6 @@ import org.w3c.dom.Element;
  */
 public class AxisNamespaceHandler extends AbstractMuleNamespaceHandler
 {
-
     public static final String PROPERTIES = "properties";
     public static final Map<String, String> USE_MAP = new HashMap<String, String>();
     public static final Map<String, String> STYLE_MAP = new HashMap<String, String>();
@@ -49,14 +48,14 @@ public class AxisNamespaceHandler extends AbstractMuleNamespaceHandler
     {
         USE_MAP.put("LITERAL", Use.LITERAL_STR);
         USE_MAP.put("ENCODED", Use.ENCODED_STR);
-        
+
         STYLE_MAP.put("DOCUMENT", Style.DOCUMENT_STR);
         STYLE_MAP.put("MESSAGE", Style.MESSAGE_STR);
         STYLE_MAP.put("RPC", Style.RPC_STR);
         STYLE_MAP.put("WRAPPED", Style.WRAPPED_STR);
     }
 
-
+    @Override
     public void init()
     {
         registerMetaTransportEndpoints(AxisConnector.AXIS).addMapping(AxisConnector.USE, USE_MAP).addMapping(AxisConnector.STYLE, STYLE_MAP);
@@ -71,13 +70,12 @@ public class AxisNamespaceHandler extends AbstractMuleNamespaceHandler
         registerMuleBeanDefinitionParser("bean-type",
                 new ParentContextDefinitionParser("connector", new ChildListEntryDefinitionParser(AxisMessageReceiver.BEAN_TYPES, "interface"))
                         .otherwise(new NestedListDefinitionParser(PROPERTIES, AxisMessageReceiver.BEAN_TYPES, "interface")));
-        
+
         registerBeanDefinitionParser("wrapper-component", new ComponentDefinitionParser(WebServiceWrapperComponent.class));
     }
 
     private static class SoapParameterDefinitionParser extends ListPropertyDefinitionParser
     {
-
         public static final String PARAMETER = "parameter";
 
         public SoapParameterDefinitionParser()
@@ -85,26 +83,21 @@ public class AxisNamespaceHandler extends AbstractMuleNamespaceHandler
             super(PARAMETER);
             registerPreProcessor(new AttributeConcatenation(PARAMETER, ";", new String[]{PARAMETER, "type", "mode"}));
         }
-
     }
 
     private static class SoapReturnDefinitionParser extends ListPropertyDefinitionParser
     {
-
         public SoapReturnDefinitionParser()
         {
             super(MapEntryCombiner.VALUE);
             registerPreProcessor(new PreProcessor()
             {
+                @Override
                 public void preProcess(PropertyConfiguration config, Element element)
                 {
                     element.setAttribute(MapEntryCombiner.VALUE, "return;" + element.getAttribute("type"));
                 }
             });
         }
-
     }
-
 }
-
-

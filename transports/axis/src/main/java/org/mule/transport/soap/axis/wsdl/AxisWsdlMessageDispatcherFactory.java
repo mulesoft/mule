@@ -20,6 +20,7 @@ import org.mule.transport.AbstractMessageDispatcherFactory;
  */
 public class AxisWsdlMessageDispatcherFactory extends AbstractMessageDispatcherFactory
 {
+    @Override
     public MessageDispatcher create(OutboundEndpoint endpoint) throws MuleException
     {
         return new AxisWsdlMessageDispatcher(endpoint);

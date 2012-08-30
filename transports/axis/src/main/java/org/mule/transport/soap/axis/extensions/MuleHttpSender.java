@@ -113,10 +113,11 @@ public class MuleHttpSender extends BasicHandler
     /**
      * invoke creates a socket connection, sends the request SOAP message and then
      * reads the response SOAP message back from the SOAP server
-     * 
+     *
      * @param msgContext the messsage context
      * @throws AxisFault
      */
+    @Override
     public void invoke(MessageContext msgContext) throws AxisFault
     {
 
@@ -156,7 +157,7 @@ public class MuleHttpSender extends BasicHandler
             }
 
             // Read the response back from the server
-            Hashtable headers = new Hashtable();
+            Hashtable<String, String> headers = new Hashtable<String, String>();
             inp = readHeadersFromSocket(socketHolder, msgContext, inp, headers);
             readFromSocket(socketHolder, msgContext, inp, headers);
         }
@@ -173,7 +174,7 @@ public class MuleHttpSender extends BasicHandler
 
     /**
      * Creates a socket connection to the SOAP server
-     * 
+     *
      * @param protocol "http" for standard, "https" for ssl.
      * @param host host name
      * @param port port to connect to
@@ -190,16 +191,17 @@ public class MuleHttpSender extends BasicHandler
                              StringBuffer otherHeaders,
                              BooleanHolder useFullURL) throws Exception
     {
-        Hashtable options = getOptions();
+        @SuppressWarnings("unchecked")
+        Hashtable<Object, Object> socketFactoryOptions = getOptions();
         if (timeout > 0)
         {
-            if (options == null)
+            if (socketFactoryOptions == null)
             {
-                options = new Hashtable();
+                socketFactoryOptions = new Hashtable<Object, Object>();
             }
-            options.put(DefaultSocketFactory.CONNECT_TIMEOUT, Integer.toString(timeout));
+            socketFactoryOptions.put(DefaultSocketFactory.CONNECT_TIMEOUT, Integer.toString(timeout));
         }
-        SocketFactory factory = SocketFactoryFactory.getFactory(protocol, options);
+        SocketFactory factory = SocketFactoryFactory.getFactory(protocol, socketFactoryOptions);
         if (factory == null)
         {
             throw new IOException(Messages.getMessage("noSocketFactory", protocol));
@@ -232,7 +234,7 @@ public class MuleHttpSender extends BasicHandler
 
     /**
      * Send the soap request message to the server
-     * 
+     *
      * @param msgContext message context
      * @param tmpURL url to connect to
      * @param otherHeaders other headers if any
@@ -626,7 +628,7 @@ public class MuleHttpSender extends BasicHandler
     private InputStream readHeadersFromSocket(SocketHolder sockHolder,
                                               MessageContext msgContext,
                                               InputStream inp,
-                                              Hashtable headers) throws IOException
+                                              Hashtable<String, String> headers) throws IOException
     {
         byte b = 0;
         int len = 0;
@@ -640,7 +642,7 @@ public class MuleHttpSender extends BasicHandler
 
         if (headers == null)
         {
-            headers = new Hashtable();
+            headers = new Hashtable<String, String>();
         }
 
         // Should help performance. Temporary fix only till its all stream
@@ -740,7 +742,7 @@ public class MuleHttpSender extends BasicHandler
 
     /**
      * Reads the SOAP response back from the server
-     * 
+     *
      * @param msgContext message context
      * @throws IOException
      */
@@ -881,7 +883,7 @@ public class MuleHttpSender extends BasicHandler
 
     /**
      * little helper function for cookies
-     * 
+     *
      * @param cookieName
      * @param setCookieName
      * @param headers

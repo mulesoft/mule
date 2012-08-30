@@ -25,10 +25,9 @@ import java.util.Map;
 
 public class WebServiceWrapperComponent extends AbstractWebServiceWrapperComponent
 {
-
     private String use;
     private String style;
-    private Map properties;
+    private Map<String, Object> properties;
 
     @Override
     protected Object doInvoke(MuleEvent event) throws Exception
@@ -47,8 +46,8 @@ public class WebServiceWrapperComponent extends AbstractWebServiceWrapperCompone
         {
             tempUrl = address;
         }
-        MuleMessage message = event.getMessage();
 
+        MuleMessage message = event.getMessage();
         if (properties != null && properties.get(AxisConnector.SOAP_METHODS) != null)
         {
             message.addProperties((Map) properties.get(AxisConnector.SOAP_METHODS));
@@ -101,14 +100,13 @@ public class WebServiceWrapperComponent extends AbstractWebServiceWrapperCompone
         this.style = style;
     }
 
-    public Map getProperties()
+    public Map<String, Object> getProperties()
     {
         return properties;
     }
 
-    public void setProperties(Map properties)
+    public void setProperties(Map<String, Object> properties)
     {
         this.properties = properties;
     }
-
 }

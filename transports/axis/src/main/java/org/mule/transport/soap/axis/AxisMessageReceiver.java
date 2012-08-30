@@ -85,8 +85,8 @@ public class AxisMessageReceiver extends AbstractMessageReceiver
                 "Only the Service flow constuct is supported by the axis transport");
         }
         Service service = (Service) flowConstruct;
-        
-        
+
+
         AxisProperties.setProperty("axis.doAutoTypes", String.valueOf(connector.isDoAutoTypes()));
         String style = (String) endpoint.getProperties().get(AxisConnector.STYLE);
         String use = (String) endpoint.getProperties().get(AxisConnector.USE);
@@ -161,10 +161,10 @@ public class AxisMessageReceiver extends AbstractMessageReceiver
         // or specify the 'allowedMethods' property in the axisOptions property
         String methodNames = "*";
 
-        Map methods = (Map) endpoint.getProperties().get(AxisConnector.SOAP_METHODS);
+        Map<?, ?> methods = (Map<?, ?>) endpoint.getProperties().get(AxisConnector.SOAP_METHODS);
         if (methods != null)
         {
-            Iterator i = methods.keySet().iterator();
+            Iterator<?> i = methods.keySet().iterator();
             StringBuffer buf = new StringBuffer(64);
             while (i.hasNext())
             {
@@ -173,14 +173,14 @@ public class AxisMessageReceiver extends AbstractMessageReceiver
                 SoapMethod method;
                 if (m instanceof List)
                 {
-                    method = new SoapMethod(name, (List) m);
+                    method = new SoapMethod(name, (List<?>) m);
                 }
                 else
                 {
                     method = new SoapMethod(name, (String) m);
                 }
 
-                List namedParameters = method.getNamedParameters();
+                List<?> namedParameters = method.getNamedParameters();
                 ParameterDesc[] parameters = new ParameterDesc[namedParameters.size()];
                 for (int j = 0; j < namedParameters.size(); j++)
                 {

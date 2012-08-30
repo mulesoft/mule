@@ -37,6 +37,7 @@ public class MuleConfigProvider extends SimpleProvider
      * Configure an AxisEngine. Right now just calls the default configuration if
      * there is one, since we don't do anything special.
      */
+    @Override
     public void configureEngine(AxisEngine engine) throws ConfigurationException
     {
         synchronized (this)
@@ -46,19 +47,20 @@ public class MuleConfigProvider extends SimpleProvider
         }
     }
 
-    public Iterator getAxisDeployedServices() throws ConfigurationException
+    public Iterator<?> getAxisDeployedServices() throws ConfigurationException
     {
         return engineConfiguration.getDeployedServices();
     }
 
-    public Iterator getAllDeployedServices() throws ConfigurationException
+    public Iterator<?> getAllDeployedServices() throws ConfigurationException
     {
-        List services = new ArrayList();
-        Iterator iter = engineConfiguration.getDeployedServices();
+        List<Object> services = new ArrayList<Object>();
+        Iterator<?> iter = engineConfiguration.getDeployedServices();
         while (iter.hasNext())
         {
             services.add(iter.next());
         }
+
         iter = super.getDeployedServices();
         while (iter.hasNext())
         {

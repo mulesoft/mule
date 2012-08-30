@@ -52,13 +52,13 @@ public class AxisWsdlMessageDispatcher extends AxisMessageDispatcher
         }
         parser.run(wsdlUrl);
         // Retrieves the defined services
-        Map map = parser.getSymbolTable().getHashMap();
-        List entries = new ArrayList();
-        for (Iterator it = map.entrySet().iterator(); it.hasNext();)
+        Map<?, ?> map = parser.getSymbolTable().getHashMap();
+        List<Object> entries = new ArrayList<Object>();
+        for (Iterator<?> it = map.entrySet().iterator(); it.hasNext();)
         {
-            Map.Entry entry = (Map.Entry)it.next();
-            Vector v = (Vector)entry.getValue();
-            for (Iterator it2 = v.iterator(); it2.hasNext();)
+            Map.Entry<?, ?> entry = (Map.Entry<?, ?>)it.next();
+            Vector<?> v = (Vector<?>)entry.getValue();
+            for (Iterator<?> it2 = v.iterator(); it2.hasNext();)
             {
                 SymTabEntry e = (SymTabEntry)it2.next();
                 if (ServiceEntry.class.isInstance(e))
@@ -73,15 +73,15 @@ public class AxisWsdlMessageDispatcher extends AxisMessageDispatcher
             throw new Exception("Need one and only one service entry, found " + entries.size());
         }
         // Create the axis service
-        Service service = new Service(parser, (QName)entries.get(0));
+        Service axisService = new Service(parser, (QName)entries.get(0));
 
-        service.setEngineConfiguration(clientConfig);
-        service.setEngine(new AxisClient(clientConfig));
+        axisService.setEngineConfiguration(clientConfig);
+        axisService.setEngine(new AxisClient(clientConfig));
 
         // Really the Axis Client service should set this stuff
         event.getMessage().setOutboundProperty(SoapConstants.METHOD_NAMESPACE_PROPERTY,
                                                parser.getCurrentDefinition().getTargetNamespace());
         // Todo how can we autogenerate the named params from the WSDL?
-        return service;
+        return axisService;
     }
 }

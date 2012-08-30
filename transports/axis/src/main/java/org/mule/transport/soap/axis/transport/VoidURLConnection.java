@@ -19,15 +19,14 @@ import java.net.URL;
  */
 public class VoidURLConnection extends java.net.URLConnection
 {
-
     public VoidURLConnection(URL url)
     {
         super(url);
     }
 
+    @Override
     public void connect()
     {
         // nothing to do
     }
-
 }

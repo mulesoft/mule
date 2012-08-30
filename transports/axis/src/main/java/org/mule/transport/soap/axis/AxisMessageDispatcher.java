@@ -61,7 +61,7 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
     protected EngineConfiguration clientConfig;
     protected AxisConnector connector;
     protected Service service;
-    private Map callParameters;
+    private Map<String, SoapMethod> callParameters;
 
     public AxisMessageDispatcher(OutboundEndpoint endpoint)
     {
@@ -180,7 +180,7 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
         call.setTimeout(new Integer(event.getTimeout()));
         setUserCredentials(endpointUri, call);
 
-        Map methodCalls = event.getMessage().getOutboundProperty(AxisConnector.SOAP_METHODS);
+        Map<Object, List<String>> methodCalls = event.getMessage().getOutboundProperty(AxisConnector.SOAP_METHODS);
         if (methodCalls == null && !(method instanceof SoapMethod))
         {
             buildSoapMethods(event, call, method, methodNamespace, args);
@@ -203,7 +203,7 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
             call.addAttachmentPart(part);
         }
     }
-    
+
     protected void setSoapAction(MuleEvent event, EndpointURI endpointUri, Call call)
     {
         // Set custom soap action if set on the event or endpoint
@@ -222,7 +222,7 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
 
     protected void buildSoapMethods(MuleEvent event, Call call, Object method, String methodNamespace, Object[] args)
     {
-        List params = new ArrayList();
+        List<String> params = new ArrayList<String>();
         for (int i = 0; i < args.length; i++)
         {
             if (args[i] == null)
@@ -238,9 +238,9 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
             }
             else if (args[i] instanceof Map && connector.isTreatMapAsNamedParams())
             {
-                for (Iterator iterator = ((Map)args[i]).entrySet().iterator(); iterator.hasNext();)
+                for (Iterator<?> iterator = ((Map<?, ?>)args[i]).entrySet().iterator(); iterator.hasNext();)
                 {
-                    Map.Entry entry = (Map.Entry)iterator.next();
+                    Map.Entry<?, ?> entry = (Map.Entry<?, ?>)iterator.next();
                     if (call.getTypeMapping().getTypeQName(entry.getValue().getClass()) != null)
                     {
                         QName type = call.getTypeMapping().getTypeQName(entry.getValue().getClass());
@@ -277,7 +277,7 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
             }
         }
 
-        HashMap map = new HashMap();
+        Map<Object, List<String>> map = new HashMap<Object, List<String>>();
         map.put(method, params);
         event.getMessage().setOutboundProperty(AxisConnector.SOAP_METHODS, map);
     }
@@ -392,9 +392,10 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
             {
                 if (callParameters == null)
                 {
-                    callParameters = new HashMap();
+                    callParameters = new HashMap<String, SoapMethod>();
                 }
-                callParameters.put(((SoapMethod) method).getName().getLocalPart(), method);
+                SoapMethod soapMethod = (SoapMethod) method;
+                callParameters.put(((SoapMethod) method).getName().getLocalPart(), soapMethod);
             }
         }
         return method;
@@ -532,7 +533,7 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
         SoapMethod soapMethod = (SoapMethod)event.getMessage().removeProperty(MuleProperties.MULE_SOAP_METHOD);
         if (soapMethod == null)
         {
-            soapMethod = (SoapMethod)callParameters.get(method.getLocalPart());
+            soapMethod = callParameters.get(method.getLocalPart());
         }
 
         if (soapMethod != null)
@@ -558,19 +559,18 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
 
     private void loadCallParams(MuleEvent event, String namespace) throws ClassNotFoundException
     {
-        Map methodCalls = event.getMessage().getOutboundProperty(AxisConnector.SOAP_METHODS);
+        Map<Object, List<String>> methodCalls = event.getMessage().getOutboundProperty(AxisConnector.SOAP_METHODS);
         if (methodCalls == null)
         {
             return;
         }
 
-        Map.Entry entry;
         SoapMethod soapMethod;
-        callParameters = new HashMap();
+        callParameters = new HashMap<String, SoapMethod>();
 
         for (Iterator iterator = methodCalls.entrySet().iterator(); iterator.hasNext();)
         {
-            entry = (Map.Entry)iterator.next();
+            Map.Entry entry = (Map.Entry)iterator.next();
             if (StringUtils.isEmpty(namespace))
             {
                 if (entry.getValue() instanceof List)

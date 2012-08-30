@@ -14,7 +14,6 @@ import org.mule.api.MuleContext;
 import org.mule.transport.soap.axis.AxisConnector;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -22,25 +21,24 @@ import java.util.List;
  */
 public class AxisWsdlConnector extends AxisConnector
 {
-
     public AxisWsdlConnector(MuleContext context)
     {
         super(context);
     }
-    
+
+    @Override
     protected void registerProtocols()
     {
         // Default supported schemes, these can be restricted
         // through configuration
 
-        List schemes = new ArrayList();
+        List<String> schemes = new ArrayList<String>();
         schemes.add("http");
         schemes.add("https");
         setSupportedSchemes(schemes);
 
-        for (Iterator iterator = schemes.iterator(); iterator.hasNext();)
+        for (String s : schemes)
         {
-            String s = (String)iterator.next();
             registerSupportedProtocol(s);
         }
         // This allows the generic WSDL provider to created endpoints using this
@@ -49,6 +47,7 @@ public class AxisWsdlConnector extends AxisConnector
         registerSupportedProtocolWithoutPrefix("wsdl:https");
     }
 
+    @Override
     public String getProtocol()
     {
         return "wsdl-axis";
