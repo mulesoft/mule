@@ -45,8 +45,8 @@ public class MuleAjaxServlet extends ContinuationCometdServlet
 
     private ObjectToJson jsonTransformer;
 
-    private Set<Class> ignoreClasses = new HashSet<Class>();
-    private Set<Class> jsonBindings = new HashSet<Class>();
+    private Set<Class<?>> ignoreClasses = new HashSet<Class<?>>();
+    private Set<Class<?>> jsonBindings = new HashSet<Class<?>>();
 
     @Override
     public void init() throws ServletException
@@ -62,7 +62,7 @@ public class MuleAjaxServlet extends ContinuationCometdServlet
         {
             servletConnectorName = (String)getServletContext().getAttribute(MuleServletContextListener.CONNECTOR_NAME);
         }
-        
+
         if (servletConnectorName == null)
         {
             connector = new TransportFactory(muleContext).getConnectorByProtocol(getConnectorProtocol());
@@ -168,7 +168,7 @@ public class MuleAjaxServlet extends ContinuationCometdServlet
             Object data = getData();
             try
             {
-                if(data!=null && !ignoreClasses.contains(data.getClass()))
+                if (data!=null && !ignoreClasses.contains(data.getClass()))
                 {
                     if(jsonBindings.contains(data.getClass()))
                     {
@@ -195,5 +195,4 @@ public class MuleAjaxServlet extends ContinuationCometdServlet
             }
         }
     }
-
 }

@@ -34,7 +34,7 @@ import org.w3c.dom.Element;
 public class ChildEndpointDefinitionParser extends ChildDefinitionParser
 {
 
-    public ChildEndpointDefinitionParser(Class endpoint)
+    public ChildEndpointDefinitionParser(Class<?> endpoint)
     {
         super("messageProcessor", endpoint);
         addIgnored(AbstractMuleBeanDefinitionParser.ATTRIBUTE_REF);
@@ -43,7 +43,7 @@ public class ChildEndpointDefinitionParser extends ChildDefinitionParser
     }
 
     @Override
-    public BeanDefinitionBuilder createBeanDefinitionBuilder(Element element, Class beanClass)
+    public BeanDefinitionBuilder createBeanDefinitionBuilder(Element element, Class<?> beanClass)
     {
         BeanDefinitionBuilder builder = super.createBeanDefinitionBuilder(element, beanClass);
         String global = element.getAttribute(AbstractMuleBeanDefinitionParser.ATTRIBUTE_REF);

@@ -23,7 +23,7 @@ import org.mortbay.cometd.AbstractBayeux;
  */
 public class AjaxMessageDispatcherFactory extends AbstractMessageDispatcherFactory
 {
-
+    @Override
     public MessageDispatcher create(OutboundEndpoint endpoint) throws MuleException
     {
         AjaxMessageDispatcher dispatcher = new AjaxMessageDispatcher(endpoint);
@@ -65,7 +65,6 @@ public class AjaxMessageDispatcherFactory extends AbstractMessageDispatcherFacto
             }
             dispatcher.setBayeux(b);
         }
-
 
         return dispatcher;
     }

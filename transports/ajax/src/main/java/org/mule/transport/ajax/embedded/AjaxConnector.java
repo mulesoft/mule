@@ -30,7 +30,6 @@ import org.mule.transport.servlet.jetty.JettyHttpsConnector;
 import org.mule.util.StringUtils;
 
 import java.net.URL;
-import java.util.EventListener;
 import java.util.Map;
 
 import javax.servlet.Servlet;
@@ -136,11 +135,11 @@ public class AjaxConnector extends JettyHttpsConnector implements BayeuxAware
     private int refsThreshold = INT_VALUE_NOT_SET;
 
     /**
-     * By default, an asynchronous reply to the inbound endpoint is sent back.  This can cause unwanted side effects 
+     * By default, an asynchronous reply to the inbound endpoint is sent back.  This can cause unwanted side effects
      * in some cases, use this attribute to disable.
      */
     private boolean disableReplyTo = false;
-    
+
     private ContinuationCometdServlet servlet;
 
     public AjaxConnector(MuleContext context)
@@ -275,7 +274,6 @@ public class AjaxConnector extends JettyHttpsConnector implements BayeuxAware
     {
         context.addServlet(DefaultServlet.class, ROOT);
         context.addServlet(JarResourceServlet.class, JarResourceServlet.DEFAULT_PATH_SPEC);
-        EventListener[] listeners = context.getEventListeners();
         context.addEventListener(new MuleServletContextListener(muleContext, getName()));
         String base = getResourceBase();
         if (base != null)
@@ -297,11 +295,13 @@ public class AjaxConnector extends JettyHttpsConnector implements BayeuxAware
         }
     }
 
+    @Override
     public AbstractBayeux getBayeux( )
     {
         return servlet.getBayeux();
     }
 
+    @Override
     public void setBayeux(AbstractBayeux bayeux)
     {
         //Ignore
@@ -424,12 +424,12 @@ public class AjaxConnector extends JettyHttpsConnector implements BayeuxAware
         return false;
     }
 
-    public void setDisableReplyTo(boolean disableReplyTo) 
+    public void setDisableReplyTo(boolean disableReplyTo)
     {
         this.disableReplyTo = disableReplyTo;
     }
 
-    public boolean isDisableReplyTo() 
+    public boolean isDisableReplyTo()
     {
         return disableReplyTo;
     }

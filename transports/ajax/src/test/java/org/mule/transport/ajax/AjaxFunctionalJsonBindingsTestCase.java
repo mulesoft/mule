@@ -12,7 +12,6 @@ package org.mule.transport.ajax;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.util.concurrent.Latch;
@@ -41,7 +40,7 @@ import static org.junit.Assert.fail;
 
 public class AjaxFunctionalJsonBindingsTestCase extends AbstractServiceAndFlowTestCase
 {
-    
+
     public AjaxFunctionalJsonBindingsTestCase(ConfigVariant variant, String configResources)
     {
         super(variant, configResources);
@@ -53,7 +52,7 @@ public class AjaxFunctionalJsonBindingsTestCase extends AbstractServiceAndFlowTe
 
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
-   
+
     @Parameters
     public static Collection<Object[]> parameters()
     {
@@ -61,7 +60,7 @@ public class AjaxFunctionalJsonBindingsTestCase extends AbstractServiceAndFlowTe
             {ConfigVariant.SERVICE, "ajax-embedded-functional-json-bindings-test-service.xml"},
             {ConfigVariant.FLOW, "ajax-embedded-functional-json-bindings-test-flow.xml"}
         });
-    }      
+    }
 
     @Override
     protected void doSetUp() throws Exception

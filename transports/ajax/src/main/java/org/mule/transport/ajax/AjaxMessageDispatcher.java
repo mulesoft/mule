@@ -49,18 +49,20 @@ public class AjaxMessageDispatcher extends AbstractMessageDispatcher implements 
         cacheMessages = MapUtils.getBoolean(endpoint.getProperties(), "cacheMessages", false);
         messageCacheSize = MapUtils.getInteger(endpoint.getProperties(), "messageCacheSize", 500);
         channel = endpoint.getEndpointURI().getPath();
-        if(StringUtils.isEmpty(channel) || channel.equals("/"))
+        if (StringUtils.isEmpty(channel) || channel.equals("/"))
         {
             //TODO i18n
             throw new CreateException(AjaxMessages.createStaticMessage("The subscription path cannot be empty or equal '/'"), this);
         }
     }
 
+    @Override
     public AbstractBayeux getBayeux()
     {
         return bayeux;
     }
 
+    @Override
     public void setBayeux(AbstractBayeux bayeux)
     {
         this.bayeux = bayeux;
@@ -84,6 +86,7 @@ public class AjaxMessageDispatcher extends AbstractMessageDispatcher implements 
         return client;
     }
 
+    @Override
     protected void doDispatch(MuleEvent event) throws Exception
     {
         //We have no need for Null messages to be sent to the browser
@@ -105,19 +108,18 @@ public class AjaxMessageDispatcher extends AbstractMessageDispatcher implements 
             {
                 while (!messageCache.isEmpty())
                 {
-                    for (Client client : chan.getSubscribers())
+                    for (Client subscriber : chan.getSubscribers())
                     {
-                        deliver(client, channel, messageCache.remove());
+                        deliver(subscriber, channel, messageCache.remove());
                     }
-                    //deliver(getClient(), channel, messageCache.remove());
                 }
             }
 
             Object data = event.getMessage().getPayload();
             //deliver(getClient(), channel, data);
-            for (Client client : chan.getSubscribers())
+            for (Client subscriber : chan.getSubscribers())
             {
-                deliver(client, channel, data);
+                deliver(subscriber, channel, data);
             }
         }
         else if (cacheMessages)
@@ -131,15 +133,16 @@ public class AjaxMessageDispatcher extends AbstractMessageDispatcher implements 
         }
     }
 
-    protected void deliver(Client client, String channel, Object data)
+    protected void deliver(Client theClient, String channelName, Object data)
     {
         if (logger.isTraceEnabled())
         {
-            logger.trace("Delivering to client id: " + client.getId() + " channel:" + channel);
+            logger.trace("Delivering to client id: " + theClient.getId() + " channel:" + channelName);
         }
-        client.deliver(client, channel, data, null);
+        theClient.deliver(theClient, channelName, data, null);
     }
 
+    @Override
     protected MuleMessage doSend(MuleEvent event) throws Exception
     {
         doDispatch(event);

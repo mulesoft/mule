@@ -27,7 +27,7 @@ import org.cometd.DataFilter;
 import org.mortbay.cometd.AbstractBayeux;
 
 /**
- * A servlet connector that binds to the container and makes a configured 
+ * A servlet connector that binds to the container and makes a configured
  * Bayeux available to dispatchers and receivers.
  */
 public class AjaxServletConnector extends ServletConnector implements BayeuxAware
@@ -41,13 +41,13 @@ public class AjaxServletConnector extends ServletConnector implements BayeuxAwar
     private int interval = INT_VALUE_NOT_SET;
 
     /**
-     * The max client side poll timeout in milliseconds (default 30000). A client 
+     * The max client side poll timeout in milliseconds (default 30000). A client
      * will be removed if a connection is not received in this time.
      */
     private int maxInterval = INT_VALUE_NOT_SET;
 
     /**
-     * The client side poll timeout if multiple connections are detected from the 
+     * The client side poll timeout if multiple connections are detected from the
      * same browser (default 1500).
      */
     private int multiFrameInterval = INT_VALUE_NOT_SET;
@@ -58,13 +58,13 @@ public class AjaxServletConnector extends ServletConnector implements BayeuxAwar
     private int logLevel = INT_VALUE_NOT_SET;
 
     /**
-     * The server side poll timeout in milliseconds (default 250000). This is how long 
+     * The server side poll timeout in milliseconds (default 250000). This is how long
      * the server will hold a reconnect request before responding.
      */
     private int timeout = INT_VALUE_NOT_SET;
 
     /**
-     * If "true" (default) then the server will accept JSON wrapped in a comment and 
+     * If "true" (default) then the server will accept JSON wrapped in a comment and
      * will generate JSON wrapped in a comment. This is a defence against Ajax Hijacking.
      */
     private boolean jsonCommented = true;
@@ -76,7 +76,7 @@ public class AjaxServletConnector extends ServletConnector implements BayeuxAwar
     private String filters;
 
     /**
-     * If true, the current request is made available via the 
+     * If true, the current request is made available via the
      * {@link AbstractBayeux#getCurrentRequest()} method
      */
     private boolean requestAvailable = true;
@@ -87,11 +87,11 @@ public class AjaxServletConnector extends ServletConnector implements BayeuxAwar
      * a single message being sent to multiple clients.
      */
     private int refsThreshold = INT_VALUE_NOT_SET;
-    
+
 
     protected AbstractBayeux bayeux;
 
-    public AjaxServletConnector(MuleContext context) 
+    public AjaxServletConnector(MuleContext context)
     {
         super(context);
         registerSupportedProtocolWithoutPrefix(AjaxConnector.PROTOCOL);
@@ -99,11 +99,13 @@ public class AjaxServletConnector extends ServletConnector implements BayeuxAwar
         setInitialStateStopped(true);
     }
 
+    @Override
     public AbstractBayeux getBayeux()
     {
         return bayeux;
     }
 
+    @Override
     public void setBayeux(AbstractBayeux bayeux) throws MuleException
     {
         this.bayeux = bayeux;
@@ -115,7 +117,7 @@ public class AjaxServletConnector extends ServletConnector implements BayeuxAwar
         if(getTimeout() != AbstractConnector.INT_VALUE_NOT_SET) this.getBayeux().setTimeout(getMultiFrameInterval());
         //Only start once we have this
         this.setInitialStateStopped(false);
-        
+
         for (Object receiver : receivers.values())
         {
             ((AjaxMessageReceiver)receiver).setBayeux(getBayeux());

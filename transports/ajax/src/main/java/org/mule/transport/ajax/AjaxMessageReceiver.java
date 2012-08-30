@@ -93,11 +93,13 @@ public class AjaxMessageReceiver extends AbstractMessageReceiver implements Baye
         }
     }
 
+    @Override
     public AbstractBayeux getBayeux()
     {
         return bayeux;
     }
 
+    @Override
     public void setBayeux(AbstractBayeux bayeux)
     {
         this.bayeux = bayeux;

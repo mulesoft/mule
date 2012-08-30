@@ -15,6 +15,7 @@ import org.mule.transport.ajax.container.AjaxServletConnector;
 
 public class AjaxServletConnectorTestCase extends AbstractConnectorTestCase
 {
+    @Override
     public Connector createConnector() throws Exception
     {
         AjaxServletConnector c = new AjaxServletConnector(muleContext);
@@ -23,11 +24,13 @@ public class AjaxServletConnectorTestCase extends AbstractConnectorTestCase
         return c;
     }
 
+    @Override
     public Object getValidMessage() throws Exception
     {
         return "{\"value1\" : \"foo\", \"value2\" : \"bar\"}";
     }
 
+    @Override
     public String getTestEndpointURI()
     {
         return "ajax-servlet:///service/request";

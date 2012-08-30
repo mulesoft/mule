@@ -29,7 +29,7 @@ import org.mule.transport.ajax.embedded.AjaxConnector;
  */
 public class AjaxNamespaceHandler extends AbstractMuleNamespaceHandler
 {
-
+    @Override
     public void init()
     {
         //Embedded (default) endpoints
@@ -50,19 +50,17 @@ public class AjaxNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("servlet-outbound-endpoint", createServletEndpointParser(getOutboundEndpointFactoryBeanClass()));
     }
 
-
-    protected AddressedEndpointDefinitionParser createServletEndpointParser(Class factoryBean)
+    protected AddressedEndpointDefinitionParser createServletEndpointParser(Class<?> factoryBean)
     {
         AddressedEndpointDefinitionParser parser = new TransportEndpointDefinitionParser(AjaxServletConnector.PROTOCOL, false, factoryBean, new String[]{"channel"}, new String[]{});
         parser.addAlias(AjaxConnector.CHANNEL_PROPERTY, URIBuilder.PATH);
         return parser;
     }
 
-    protected AddressedEndpointDefinitionParser createServletGlobalEndpointParser(Class factoryBean)
+    protected AddressedEndpointDefinitionParser createServletGlobalEndpointParser(Class<?> factoryBean)
     {
         AddressedEndpointDefinitionParser parser = new TransportGlobalEndpointDefinitionParser(AjaxServletConnector.PROTOCOL, false, factoryBean, new String[]{"channel"}, new String[]{});
         parser.addAlias(AjaxConnector.CHANNEL_PROPERTY, URIBuilder.PATH);
         return parser;
     }
-
 }
