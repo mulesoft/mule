@@ -18,6 +18,7 @@ import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.NameableObject;
 import org.mule.api.construct.FlowConstruct;
+import org.mule.api.construct.Pipeline;
 import org.mule.api.context.notification.BlockingServerEvent;
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.api.processor.MessageProcessor;
@@ -114,5 +115,15 @@ public class MessageProcessorNotification extends ServerNotification implements 
     public MessagingException getExceptionThrown()
     {
         return exceptionThrown;
+    }
+
+    public String getProcessorPath()
+    {
+        FlowConstruct fc = getSource().getFlowConstruct();
+        if (! (fc instanceof Pipeline))
+        {
+            return null;
+        }
+        return ((Pipeline) fc).getProcessorPath(processor);
     }
 }

@@ -20,11 +20,12 @@ import org.mule.api.construct.FlowConstructAware;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Lifecycle;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.api.processor.MessageProcessorContainer;
 
 /**
  * An object that owns message processors and delegates startup/shutdown events to them.
  */
-public abstract class AbstractMessageProcessorOwner extends AbstractMuleObjectOwner<MessageProcessor> implements Lifecycle, MuleContextAware, FlowConstructAware, AnnotatedObject
+public abstract class AbstractMessageProcessorOwner extends AbstractMuleObjectOwner<MessageProcessor> implements Lifecycle, MuleContextAware, FlowConstructAware, AnnotatedObject, MessageProcessorContainer
 {
     private final Map<QName, Object> annotations = new ConcurrentHashMap<QName, Object>();
 
@@ -51,5 +52,10 @@ public abstract class AbstractMessageProcessorOwner extends AbstractMuleObjectOw
 
     protected abstract List<MessageProcessor> getOwnedMessageProcessors();
 
+    @Override
+    public List<MessageProcessor> getMessageProcessors()
+    {
+        return getOwnedMessageProcessors();
+    }
 }
 

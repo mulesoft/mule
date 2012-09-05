@@ -34,5 +34,6 @@ public interface Pipeline extends FlowConstruct
     public void setProcessingStrategy(ProcessingStrategy processingStrategy);
 
     public ProcessingStrategy getProcessingStrategy();
-    
+
+    public String getProcessorPath(MessageProcessor processor);
 }

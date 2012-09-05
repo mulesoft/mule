@@ -14,6 +14,7 @@ import org.mule.api.MuleEvent;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.context.notification.ServerNotificationHandler;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.construct.AbstractPipeline;
 import org.mule.context.notification.MessageProcessorNotification;
 import org.mule.context.notification.ServerNotificationManager;
 
@@ -60,7 +61,10 @@ class MessageProcessorNotificationExecutionInterceptor implements MessageProcess
         if (serverNotificationManager != null
             && serverNotificationManager.isNotificationEnabled(MessageProcessorNotification.class))
         {
-            serverNotificationManager.fireNotification(new MessageProcessorNotification(flowConstruct, event, processor, exceptionThrown, action));
+            if (flowConstruct instanceof AbstractPipeline && ((AbstractPipeline) flowConstruct).getProcessorPath(processor) != null)
+            {
+                serverNotificationManager.fireNotification(new MessageProcessorNotification(flowConstruct, event, processor, exceptionThrown, action));
+            }
         }
     }
 }

@@ -186,11 +186,10 @@ public class Foreach extends AbstractMessageProcessorOwner
         splitter.setBatchSize(batchSize);
         splitter.setCounterVariableName(counterVariableName);
         splitter.setMuleContext(muleContext);
-        messageProcessors.add(0, splitter);
 
         try
         {
-            this.ownedMessageProcessor = new DefaultMessageProcessorChainBuilder().chain(messageProcessors)
+            this.ownedMessageProcessor = new DefaultMessageProcessorChainBuilder().chain(splitter).chain(messageProcessors)
                 .build();
         }
         catch (MuleException e)

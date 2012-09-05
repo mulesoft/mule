@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" 
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:spring="http://www.springframework.org/schema/beans" 
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xsi:schemaLocation="
+               http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+
+    <notifications>
+        <notification event="MESSAGE-PROCESSOR"/>
+    </notifications>
+
+    <spring:bean name="notificationLogger" class="org.mule.context.notification.MessageProcessorNotificationLogger"/>
+
+    <notifications>
+        <notification-listener ref="notificationLogger"/>
+    </notifications>
+
+    <flow name="singleMP">
+        <vm:inbound-endpoint path="in-1" exchange-pattern="request-response"/>
+        <logger message="check"/>
+    </flow>
+
+    <flow name="foreach">
+        <vm:inbound-endpoint path="in-2" exchange-pattern="request-response"/>
+        <foreach collection="#[{'one','two'}]">
+            <logger />
+        </foreach>
+    </flow>
+
+    <flow name="processorChain">
+        <vm:inbound-endpoint path="in-3" exchange-pattern="request-response"/>
+        <processor-chain>
+            <logger message="check1"/>
+            <logger message="check2"/>
+        </processor-chain>
+    </flow>
+
+</mule>

@@ -22,6 +22,7 @@ import org.mule.api.lifecycle.LifecycleException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorBuilder;
 import org.mule.api.processor.MessageProcessorChainBuilder;
+import org.mule.api.processor.MessageProcessorContainer;
 import org.mule.api.processor.ProcessingStrategy;
 import org.mule.api.source.ClusterizableMessageSource;
 import org.mule.api.source.CompositeMessageSource;
@@ -39,7 +40,9 @@ import org.mule.processor.strategy.SynchronousProcessingStrategy;
 import org.mule.source.ClusterizableMessageSourceWrapper;
 
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Abstract implementation of {@link AbstractFlowConstruct} that allows a list of {@link MessageProcessor}s
@@ -54,6 +57,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     protected MessageProcessor pipeline;
 
     protected List<MessageProcessor> messageProcessors = Collections.emptyList();
+    private Map<MessageProcessor, String> flowMap;
 
     protected ProcessingStrategy processingStrategy;
     private boolean canProcessMessage = false;
@@ -300,6 +304,45 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
         startIfStartable(pipeline);
         canProcessMessage = true;
         startIfStartable(messageSource);
+        createFlowMap();
+    }
+
+    private void createFlowMap()
+    {
+        if (flowMap != null)
+        {
+            logger.warn("flow map already populated");
+            return;
+        }
+        flowMap = new LinkedHashMap<MessageProcessor, String>();
+        List<MessageProcessor> mps = getMessageProcessors();
+        createFlowMap(mps, "/" + getName() + "/processors/");
+    }
+
+    private void createFlowMap(List<MessageProcessor> processors, String prefix)
+    {
+        int idx = 0;
+        for (MessageProcessor mp : processors)
+        {
+            if (mp == null)
+            {
+                logger.warn("NULL mp!");
+                continue;
+            }
+            String currentPrefix = prefix + idx;
+            flowMap.put(mp, currentPrefix);
+            if (mp instanceof MessageProcessorContainer)
+            {
+                createFlowMap(((MessageProcessorContainer) mp).getMessageProcessors(), currentPrefix + "/");
+            }
+            idx++;
+        }
+    }
+
+    @Override
+    public String getProcessorPath(MessageProcessor processor)
+    {
+        return flowMap.get(processor);
     }
 
     public class ProcessIfPipelineStartedMessageProcessor extends AbstractFilteringMessageProcessor
