@@ -152,6 +152,13 @@ public class Foreach extends AbstractMessageProcessorOwner
     }
 
     @Override
+    public List<MessageProcessor> getMessageProcessors()
+    {
+        //skip the splitter that is added at the beginning
+        return getOwnedMessageProcessors().subList(1, getOwnedMessageProcessors().size());
+    }
+
+    @Override
     public void setListener(MessageProcessor listener)
     {
         next = listener;
@@ -186,10 +193,10 @@ public class Foreach extends AbstractMessageProcessorOwner
         splitter.setBatchSize(batchSize);
         splitter.setCounterVariableName(counterVariableName);
         splitter.setMuleContext(muleContext);
-
+        messageProcessors.add(0, splitter);
         try
         {
-            this.ownedMessageProcessor = new DefaultMessageProcessorChainBuilder().chain(splitter).chain(messageProcessors)
+            this.ownedMessageProcessor = new DefaultMessageProcessorChainBuilder().chain(messageProcessors)
                 .build();
         }
         catch (MuleException e)

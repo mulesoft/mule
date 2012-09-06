@@ -111,9 +111,7 @@
         <message-properties-transformer scope="outbound">
         	<add-message-property key="totalMessages" value="#[variable:totalMessages]"/>
         </message-properties-transformer>
-        <!-- 
         <test:assert expression="#[groovy:totalMessages == 2]" />
-         -->
     </flow>
 
     <flow name="map-expression-config">
@@ -313,5 +311,5 @@
         <vm:inbound-endpoint path="middle" exchange-pattern="one-way"/>
         <vm:outbound-endpoint path="in" exchange-pattern="one-way"/>
     </flow>
-    
+
 </mule>
