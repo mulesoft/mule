@@ -14,6 +14,7 @@ import static org.junit.Assert.assertThat;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
+import org.mule.api.construct.Pipeline;
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.context.notification.MessageProcessorNotification;
@@ -44,6 +45,8 @@ public class MessageProcessorNotificationExecutionInterceptorTestCase extends Ab
     private MessageProcessorExecutionInterceptor mockNextInterceptor;
     @Mock
     private MessageProcessor mockMessageProcessor;
+    @Mock
+    private Pipeline mockPipeline;
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     private MuleEvent mockMuleEvent;
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
@@ -63,7 +66,9 @@ public class MessageProcessorNotificationExecutionInterceptorTestCase extends Ab
     {
         final List<ServerNotification> serverNotifications = new ArrayList<ServerNotification>();
         Mockito.when(mockMessageProcessor.process(mockMuleEvent)).thenReturn(mockResultMuleEvent);
+        Mockito.when(mockPipeline.getProcessorPath(mockMessageProcessor)).thenReturn("hi");
         Mockito.when(mockMuleEvent.getMuleContext().getNotificationManager()).thenReturn(mockNotificationManager);
+        Mockito.when(mockMuleEvent.getFlowConstruct()).thenReturn(mockPipeline);
         Mockito.when(mockNextInterceptor.execute(mockMessageProcessor, mockMuleEvent)).thenReturn(mockResultMuleEvent);
         Mockito.when(mockNotificationManager.isNotificationEnabled(MessageProcessorNotification.class)).thenReturn(true);
         Mockito.doAnswer(new Answer<Object>()
@@ -93,6 +98,8 @@ public class MessageProcessorNotificationExecutionInterceptorTestCase extends Ab
     {
         final List<ServerNotification> serverNotifications = new ArrayList<ServerNotification>();
         Mockito.when(mockNextInterceptor.execute(mockMessageProcessor, mockMuleEvent)).thenThrow(mockMessagingException);
+        Mockito.when(mockPipeline.getProcessorPath(mockMessageProcessor)).thenReturn("hi");
+        Mockito.when(mockMuleEvent.getFlowConstruct()).thenReturn(mockPipeline);
         Mockito.when(mockMuleEvent.getMuleContext().getNotificationManager()).thenReturn(mockNotificationManager);
         Mockito.when(mockNotificationManager.isNotificationEnabled(MessageProcessorNotification.class)).thenReturn(true);
         Mockito.doAnswer(new Answer<Object>()
