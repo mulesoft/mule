@@ -85,4 +85,11 @@ public class InvalidSchemaValidationTestCase extends AbstractSchemaValidationTes
     {
         doTest("org/mule/config/spring/schema-validation-expression-pattern-test.xml");
     }
+
+    @Test
+    public void testRouterWithFilter() throws SAXException, IOException
+    {
+        addSchema("http://www.mulesoft.org/schema/mule/vm","META-INF/mule-vm.xsd");
+        doTest("org/mule/config/spring/schema-validation-router-filter-test.xml");
+    }
 }
