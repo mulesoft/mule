@@ -19,7 +19,6 @@ import org.mule.transformer.types.DataTypeFactory;
  */
 public class StringToNameString extends AbstractTransformer
 {
-
     public StringToNameString()
     {
         super();
@@ -28,9 +27,8 @@ public class StringToNameString extends AbstractTransformer
     }
 
     @Override
-    public Object doTransform(Object src, String encoding) throws TransformerException
+    public Object doTransform(Object src, String outputEncoding) throws TransformerException
     {
         return new NameString((String) src);
     }
-
 }

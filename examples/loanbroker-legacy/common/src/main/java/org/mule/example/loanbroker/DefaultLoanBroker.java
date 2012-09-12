@@ -31,21 +31,24 @@ public class DefaultLoanBroker implements LoanBrokerService
      * logger used by this class
      */
     protected final Log logger = LogFactory.getLog(getClass());
-    
+
     private final AtomicInteger quotes = new AtomicInteger(0);
     private final AtomicInteger requests = new AtomicInteger(0);
     private final AtomicInteger profiles = new AtomicInteger(0);
 
+    @Override
     public Object getLoanQuote(CustomerQuoteRequest request) throws LoanBrokerException
     {
-        int requests = incRequests();
+        int requestNumber = incRequests();
         if (logger.isInfoEnabled())
         {
-            String[] params = new String[] { String.valueOf(requests), 
-                request.getCustomer().getName(), 
-                String.valueOf(request.getCustomer().getSsn()), 
+            String[] params = new String[] {
+                String.valueOf(requestNumber),
+                request.getCustomer().getName(),
+                String.valueOf(request.getCustomer().getSsn()),
                 String.valueOf(request.getLoanAmount()),
-                String.valueOf(request.getLoanDuration()) };
+                String.valueOf(request.getLoanDuration())
+            };
 
             logger.info("\n***** " + LocaleMessage.receivedRequest(params));
         }
@@ -66,25 +69,31 @@ public class DefaultLoanBroker implements LoanBrokerService
 
     public Object receiveCreditProfile(CreditProfile profile)
     {
-        int profiles = incProfiles();
+        int profileNumber = incProfiles();
         if (logger.isInfoEnabled())
         {
-            String[] params = new String[] { String.valueOf(profiles), 
+            String[] params = new String[] {
+                String.valueOf(profileNumber),
                 String.valueOf(profile.getCreditScore()),
-                String.valueOf(profile.getCreditHistory()) };
+                String.valueOf(profile.getCreditHistory())
+            };
 
             logger.info("\n***** " + LocaleMessage.receivedProfile(params));
         }
         return profile;
     }
 
+    @Override
     public Object receiveQuote(LoanQuote quote)
     {
-        int quotes = incQuotes();
+        int quoteNumber = incQuotes();
         if (logger.isInfoEnabled())
         {
-            String[] params = new String[] { String.valueOf(quotes), 
-                quote.toString() };
+            String[] params = new String[] {
+                String.valueOf(quoteNumber),
+                quote.toString()
+            };
+
             logger.info("\n***** " + LocaleMessage.receivedQuote(params));
         }
         return quote;

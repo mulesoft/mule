@@ -25,16 +25,19 @@ public class SenderDaoImpl implements SenderDao
 {
     private EntityManager entityManager;
 
-    public Collection getSenders()
+    @Override
+    public Collection<?> getSenders()
     {
         return getEntityManager().createQuery("SELECT sender FROM Sender sender").getResultList();
     }
 
+    @Override
     public Sender getSender(String senderId)
     {
         return getEntityManager().find(Sender.class, senderId);
     }
 
+    @Override
     public void addSender(Sender sender)
     {
         getEntityManager().persist(sender);

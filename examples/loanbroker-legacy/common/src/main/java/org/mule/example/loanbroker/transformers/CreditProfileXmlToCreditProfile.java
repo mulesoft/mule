@@ -21,16 +21,16 @@ import org.dom4j.DocumentHelper;
 
 public class CreditProfileXmlToCreditProfile extends AbstractTransformer
 {
-
     public CreditProfileXmlToCreditProfile()
     {
+        super();
         registerSourceType(DataTypeFactory.STRING);
         registerSourceType(DataTypeFactory.create(Document.class));
         setReturnDataType(DataTypeFactory.create(CreditProfile.class));
     }
 
     @Override
-    public Object doTransform(Object src, String encoding) throws TransformerException
+    public Object doTransform(Object src, String outputEncoding) throws TransformerException
     {
         Document doc = null;
 
@@ -57,5 +57,4 @@ public class CreditProfileXmlToCreditProfile extends AbstractTransformer
         cp.setCreditScore(Integer.valueOf(score).intValue());
         return cp;
     }
-
 }

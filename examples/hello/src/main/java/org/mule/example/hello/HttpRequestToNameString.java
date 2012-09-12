@@ -22,7 +22,7 @@ import java.net.URLDecoder;
 public class HttpRequestToNameString extends AbstractTransformer
 {
     private static final String NAME_REQUEST_PARAMETER = "name=";
-    
+
     public HttpRequestToNameString()
     {
         super();
@@ -33,22 +33,22 @@ public class HttpRequestToNameString extends AbstractTransformer
     }
 
     @Override
-    public Object doTransform(Object src, String encoding) throws TransformerException
+    public Object doTransform(Object src, String outputEncoding) throws TransformerException
     {
-        return new NameString(extractNameValue(extractRequestQuery(convertRequestToString(src, encoding))));
+        return new NameString(extractNameValue(extractRequestQuery(convertRequestToString(src, outputEncoding))));
     }
-    
-    private String convertRequestToString(Object src, String encoding)
+
+    private String convertRequestToString(Object src, String outputEncoding)
     {
         String srcAsString = null;
-        
+
         if (src instanceof byte[])
         {
-            if (encoding != null)
+            if (outputEncoding != null)
             {
                 try
                 {
-                    srcAsString = new String((byte[])src, encoding);
+                    srcAsString = new String((byte[])src, outputEncoding);
                 }
                 catch (UnsupportedEncodingException ex)
                 {
@@ -76,14 +76,14 @@ public class HttpRequestToNameString extends AbstractTransformer
         {
             srcAsString = src.toString();
         }
-        
+
         return srcAsString;
     }
-    
+
     private String extractRequestQuery(String request)
     {
         String requestQuery = null;
-        
+
         if (request != null && request.length() > 0 && request.indexOf('?') != -1)
         {
             requestQuery = request.substring(request.indexOf('?') + 1).trim();
@@ -91,11 +91,11 @@ public class HttpRequestToNameString extends AbstractTransformer
 
         return requestQuery;
     }
-    
+
     private String extractNameValue(String requestQuery) throws TransformerException
     {
         String nameValue = null;
-        
+
         if (requestQuery != null && requestQuery.length() > 0)
         {
             int nameParameterPos = requestQuery.indexOf(NAME_REQUEST_PARAMETER);
@@ -109,7 +109,7 @@ public class HttpRequestToNameString extends AbstractTransformer
 
                 nameValue = requestQuery.substring(nameParameterPos + NAME_REQUEST_PARAMETER.length(), nextParameterValuePos);
             }
-            
+
             if (nameValue != null && nameValue.length() > 0)
             {
                 try
@@ -127,7 +127,7 @@ public class HttpRequestToNameString extends AbstractTransformer
         {
             nameValue = "";
         }
-        
+
         return nameValue;
     }
 }

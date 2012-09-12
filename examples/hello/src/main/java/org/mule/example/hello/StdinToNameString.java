@@ -28,11 +28,11 @@ public class StdinToNameString extends AbstractTransformer
     }
 
     @Override
-    public Object doTransform(Object src, String encoding) throws TransformerException
+    public Object doTransform(Object src, String outputEncoding) throws TransformerException
     {
         NameString nameString = new NameString();
-        String name = (String) src;
-        nameString.setName(name.replaceAll("\r", "").replaceAll("\n", "").trim());
+        String theName = (String) src;
+        nameString.setName(theName.replaceAll("\r", "").replaceAll("\n", "").trim());
         return nameString;
     }
 }

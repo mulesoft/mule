@@ -25,9 +25,9 @@ import org.mule.routing.correlation.EventCorrelatorCallback;
 public class BankQuotesResponseAggregator extends AbstractAggregator
 {
     @Override
-    protected EventCorrelatorCallback getCorrelatorCallback(MuleContext muleContext)
+    protected EventCorrelatorCallback getCorrelatorCallback(MuleContext context)
     {
-        return new CollectionCorrelatorCallback(muleContext,persistentStores,storePrefix)
+        return new CollectionCorrelatorCallback(context,persistentStores,storePrefix)
         {
             @Override
             public MuleEvent aggregateEvents(EventGroup events) throws AggregationException

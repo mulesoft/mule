@@ -21,7 +21,6 @@ import static org.junit.Assert.assertTrue;
 
 public class VMLoanBrokerSynchronousFunctionalTestCase extends AbstractLoanBrokerTestCase
 {
-
     @Override
     protected String getConfigResources()
     {
@@ -47,10 +46,9 @@ public class VMLoanBrokerSynchronousFunctionalTestCase extends AbstractLoanBroke
         assertComponent(model, "TheBankGateway");
     }
 
-    protected void assertComponent(SedaModel model, String name)
+    protected void assertComponent(SedaModel model, String serviceName)
     {
-        Service service = muleContext.getRegistry().lookupService(name);
-        assertNotNull(name + " missing", service);
+        Service service = muleContext.getRegistry().lookupService(serviceName);
+        assertNotNull(serviceName + " missing", service);
     }
-
 }

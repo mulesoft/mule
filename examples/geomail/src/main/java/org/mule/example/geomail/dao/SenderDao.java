@@ -14,7 +14,7 @@ import java.util.Collection;
 
 public interface SenderDao
 {
-    Collection getSenders();
+    Collection<?> getSenders();
 
     Sender getSender(String senderId);
 

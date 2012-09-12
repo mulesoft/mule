@@ -28,7 +28,7 @@ public class ChatStringToString extends AbstractTransformer
     }
 
     @Override
-    public Object doTransform(Object src, String encoding) throws TransformerException
+    public Object doTransform(Object src, String outputEncoding) throws TransformerException
     {
         ChatString chatString = (ChatString)src;
         return chatString.toString();

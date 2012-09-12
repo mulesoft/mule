@@ -21,15 +21,15 @@ import org.mule.transformer.types.DataTypeFactory;
  */
 public class LoanQuoteRequestToCreditProfileArgs extends AbstractTransformer
 {
-
     public LoanQuoteRequestToCreditProfileArgs()
     {
+        super();
         registerSourceType(DataTypeFactory.create(LoanBrokerQuoteRequest.class));
         setReturnDataType(DataTypeFactory.create(Object[].class));
     }
 
     @Override
-    public Object doTransform(Object src, String encoding) throws TransformerException
+    public Object doTransform(Object src, String outputEncoding) throws TransformerException
     {
         LoanBrokerQuoteRequest request = (LoanBrokerQuoteRequest)src;
         Object[] args = new Object[2];
@@ -37,5 +37,4 @@ public class LoanQuoteRequestToCreditProfileArgs extends AbstractTransformer
         args[1] = new Integer(request.getCustomerRequest().getCustomer().getSsn());
         return args;
     }
-
 }

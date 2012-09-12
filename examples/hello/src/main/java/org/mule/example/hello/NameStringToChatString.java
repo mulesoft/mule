@@ -20,7 +20,6 @@ import org.mule.transformer.types.DataTypeFactory;
  */
 public class NameStringToChatString extends AbstractTransformer
 {
-
     public NameStringToChatString()
     {
         super();
@@ -29,7 +28,7 @@ public class NameStringToChatString extends AbstractTransformer
     }
 
     @Override
-    public Object doTransform(Object src, String encoding) throws TransformerException
+    public Object doTransform(Object src, String outputEncoding) throws TransformerException
     {
         ChatString chatString = new ChatString();
         NameString nameString = (NameString) src;
@@ -37,5 +36,4 @@ public class NameStringToChatString extends AbstractTransformer
         chatString.append(nameString.getName());
         return chatString;
     }
-
 }

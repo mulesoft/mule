@@ -11,6 +11,7 @@
 package org.mule.example.loanbroker.bank;
 
 import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.service.Service;
 import org.mule.api.service.ServiceAware;
 import org.mule.example.loanbroker.LocaleMessage;
@@ -43,7 +44,7 @@ public class Bank implements ServiceAware, Serializable, BankService
 
     private String bankName;
     private double primeRate;
-    
+
     /**
      * Incoming endpoint for the bank, this is used to create a static recipient list based on a list of banks.
      */
@@ -63,27 +64,29 @@ public class Bank implements ServiceAware, Serializable, BankService
         this.endpoint = bankName;
     }
 
-    // TODO This method doesn't help us with the Static Recipient list because the list of banks is created 
+    // TODO This method doesn't help us with the Static Recipient list because the list of banks is created
     // programatically in DefaultLenderService (they should be looked up from the config/registry).
+    @Override
     public void setService(Service service)
     {
-        this.bankName = service.getName(); 
+        this.bankName = service.getName();
 
         if (!(service.getMessageSource() instanceof ServiceCompositeMessageSource))
         {
             throw new IllegalStateException("Only 'ServiceCompositeMessageSource' is supported");
         }
 
-        List endpoints = ((ServiceCompositeMessageSource) service.getMessageSource()).getEndpoints();
+        List<InboundEndpoint> endpoints = ((ServiceCompositeMessageSource) service.getMessageSource()).getEndpoints();
         if ((endpoints == null) || (endpoints.size() != 1))
         {
             throw new IllegalArgumentException("Bank is expected to have exactly 1 incoming endpoint.");
         }
-        // TODO This gives us the endpoint the bank is listening on, but the endpoint for sending to the bank 
+        // TODO This gives us the endpoint the bank is listening on, but the endpoint for sending to the bank
         // is different in the ESB config ("Bank1In" vs. "Bank1")
         this.endpoint = ((ImmutableEndpoint) endpoints.get(0)).getName();
     }
 
+    @Override
     public LoanQuote getLoanQuote(LoanBrokerQuoteRequest request)
     {
         LoanQuote quote = new LoanQuote();

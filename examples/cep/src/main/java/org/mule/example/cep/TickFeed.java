@@ -30,11 +30,12 @@ public class TickFeed implements Initialisable, Callable
 {
     public static final String DATA_FILE = "stocktickstream.dat";
 	private static final MessageFormat lineFormat = new MessageFormat("{0,number,0};{1};{2,number,currency}", Locale.US);
-    
+
     private Iterator<String> lines;
-    
+
     protected transient Log logger = LogFactory.getLog(getClass());
-    
+
+    @Override
     public void initialise() throws InitialisationException
     {
         try
@@ -47,6 +48,7 @@ public class TickFeed implements Initialisable, Callable
         }
     }
 
+    @SuppressWarnings("unchecked")
     private Iterator<String> readStockTickDataFile() throws IOException
     {
         InputStream is = IOUtils.getResourceAsStream(DATA_FILE, TickFeed.class, false, false);
@@ -61,7 +63,8 @@ public class TickFeed implements Initialisable, Callable
             is.close();
         }
     }
-    
+
+    @Override
     public Object onCall(MuleEventContext eventContext) throws Exception
     {
         // If we've gone through the entire datafile, start over again from the beginning.

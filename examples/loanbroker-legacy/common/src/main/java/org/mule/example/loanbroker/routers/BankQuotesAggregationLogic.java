@@ -28,16 +28,16 @@ public class BankQuotesAggregationLogic
      * logger used by this class
      */
     protected static final Log logger = LogFactory.getLog(BankQuotesAggregationLogic.class);
-    
+
     public static MuleEvent aggregateEvents(EventGroup events) throws Exception
     {
         LoanQuote lowestQuote = null;
         LoanQuote quote = null;
         MuleEvent event = null;
 
-        for (Iterator iterator = events.iterator(false); iterator.hasNext();)
+        for (Iterator<MuleEvent> iterator = events.iterator(false); iterator.hasNext();)
         {
-            event = (MuleEvent)iterator.next();
+            event = iterator.next();
             Object o = event.getMessage().getPayload();
             if(o instanceof LoanQuote)
             {

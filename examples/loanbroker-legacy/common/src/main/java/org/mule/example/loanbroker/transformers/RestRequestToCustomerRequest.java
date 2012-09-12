@@ -22,23 +22,23 @@ import org.mule.transformer.types.DataTypeFactory;
  */
 public class RestRequestToCustomerRequest extends AbstractMessageTransformer
 {
-
     public RestRequestToCustomerRequest()
     {
+        super();
         setReturnDataType(DataTypeFactory.create(CustomerQuoteRequest.class));
     }
 
     @Override
     public Object transformMessage(MuleMessage message, String outputEncoding) throws TransformerException
     {
-        String name;
+        String customerName;
         int ssn;
         double amount;
         int duration;
 
         try
         {
-            name = getParam(message, "customerName");
+            customerName = getParam(message, "customerName");
             ssn = Integer.parseInt(getParam(message, "ssn"));
             amount = Double.parseDouble(getParam(message, "loanAmount"));
             duration = Integer.parseInt(getParam(message, "loanDuration"));
@@ -48,17 +48,17 @@ public class RestRequestToCustomerRequest extends AbstractMessageTransformer
             throw new TransformerException(this, e);
         }
 
-        Customer c = new Customer(name, ssn);
+        Customer c = new Customer(customerName, ssn);
         CustomerQuoteRequest request = new CustomerQuoteRequest(c, amount, duration);
         return request;
     }
 
-    protected String getParam(MuleMessage message, String name) throws NullPointerException
+    protected String getParam(MuleMessage message, String propertyName) throws NullPointerException
     {
-        String value = message.getOutboundProperty(name);
+        String value = message.getOutboundProperty(propertyName);
         if (value == null)
         {
-            throw new IllegalArgumentException("Parameter '" + name + "' must be set on the request");
+            throw new IllegalArgumentException("Parameter '" + propertyName + "' must be set on the request");
         }
         return value;
     }
