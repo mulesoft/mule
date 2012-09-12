@@ -22,17 +22,16 @@ import org.mule.util.StringMessageUtils;
  */
 public class DefaultHandler extends AbstractExceptionHandler
 {
-
     public DefaultHandler()
     {
         super();
         registerException(Throwable.class);
     }
 
+    @Override
     public void processException(ErrorMessage message, Throwable t) throws HandlerException
     {
         String msg = LocaleMessage.defaultHandlerMessage();
         System.out.println(StringMessageUtils.getBoilerPlate(msg));
     }
-
 }

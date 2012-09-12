@@ -20,14 +20,13 @@ import org.mule.transformer.types.DataTypeFactory;
  */
 public class ErrorMessageToException extends AbstractTransformer
 {
-
     public ErrorMessageToException()
     {
         registerSourceType(DataTypeFactory.create(ErrorMessage.class));
     }
 
     @Override
-    public Object doTransform(Object src, String encoding) throws TransformerException
+    public Object doTransform(Object src, String outputEncoding) throws TransformerException
     {
         try
         {
@@ -38,5 +37,4 @@ public class ErrorMessageToException extends AbstractTransformer
             throw new TransformerException(this, e);
         }
     }
-
 }

@@ -10,46 +10,47 @@
 
 package org.mule.example.errorhandler;
 
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
 
 /**
  * <code>AbstractExceptionListener</code> TODO (document class)
- * 
+ *
  */
 public abstract class AbstractExceptionHandler implements ExceptionHandler
 {
-
-    protected HashMap registry = new HashMap();
+    protected Set<Class<? extends Throwable>> registry = new HashSet<Class<? extends Throwable>>();
 
     private String endpointName;
 
     protected ErrorManager errorManager = null;
 
-    public void registerException(Class exceptionClass)
+    @Override
+    public void registerException(Class<? extends Throwable> exceptionClass)
     {
-
-        registry.put(exceptionClass, exceptionClass);
-
+        registry.add(exceptionClass);
     }
 
-    public Iterator getRegisteredClasses()
+    @Override
+    public Iterator<Class<? extends Throwable>> getRegisteredClasses()
     {
-        return registry.keySet().iterator();
+        return registry.iterator();
     }
 
-    public void unRegisterException(Class exceptionClass)
+    @Override
+    public void unRegisterException(Class<? extends Throwable> exceptionClass)
     {
         registry.remove(exceptionClass);
-
     }
 
-    public boolean isRegisteredFor(Class exceptionClass)
+    @Override
+    public boolean isRegisteredFor(Class<? extends Throwable> exceptionClass)
     {
-        Class aClass = null;
-        for (Iterator i = getRegisteredClasses(); i.hasNext();)
+        Class<? extends Throwable> aClass = null;
+        for (Iterator<Class<? extends Throwable>> i = getRegisteredClasses(); i.hasNext();)
         {
-            aClass = (Class)i.next();
+            aClass = i.next();
             if (aClass.isAssignableFrom(exceptionClass))
             {
                 return true;
@@ -58,6 +59,7 @@ public abstract class AbstractExceptionHandler implements ExceptionHandler
         return false;
     }
 
+    @Override
     public void onException(ErrorMessage message) throws HandlerException
     {
         Throwable t = null;
@@ -80,36 +82,25 @@ public abstract class AbstractExceptionHandler implements ExceptionHandler
 
     protected abstract void processException(ErrorMessage message, Throwable t) throws HandlerException;
 
-    /**
-     * @return Returns the errorManager.
-     */
+    @Override
     public ErrorManager getErrorManager()
     {
         return errorManager;
     }
 
-    /**
-     * @param errorManager The errorManager to set.
-     */
+    @Override
     public void setErrorManager(ErrorManager errorManager)
     {
         this.errorManager = errorManager;
     }
 
-    /**
-     * @return Returns the endpointName.
-     */
-    public String getendpointName()
+    public String getEndpointName()
     {
         return endpointName;
     }
 
-    /**
-     * @param endpointName The endpointName to set.
-     */
     public void setEndpointName(String endpointName)
     {
         this.endpointName = endpointName;
     }
-
 }

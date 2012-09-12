@@ -30,7 +30,7 @@ public class ErrorManager
     /** logger used by this class */
     private static final Log logger = LogFactory.getLog(ErrorManager.class);
 
-    private Map handlers = new HashMap();
+    private Map<Class<? extends Throwable>, ExceptionHandler> handlers = new HashMap<Class<? extends Throwable>, ExceptionHandler>();
     private ExceptionHandler defaultHandler = null;
 
     public ErrorManager()
@@ -38,38 +38,36 @@ public class ErrorManager
         defaultHandler = new DefaultHandler();
     }
 
-    public void setHandlers(List handlers)
+    public void setHandlers(List<ExceptionHandler> handlers)
     {
-        Iterator handlerIter = handlers.iterator();
-        while (handlerIter.hasNext())
+        for (ExceptionHandler handler : handlers)
         {
-            ExceptionHandler handler = (ExceptionHandler)handlerIter.next();
-            this.addHandler(handler);
+            addHandler(handler);
         }
     }
 
     public void addHandler(ExceptionHandler eh)
     {
-        for (Iterator i = eh.getRegisteredClasses(); i.hasNext();)
+        for (Iterator<Class<? extends Throwable>> i = eh.getRegisteredClasses(); i.hasNext();)
         {
             handlers.put(i.next(), eh);
         }
     }
 
-    public ExceptionHandler getHandler(Class exceptionClass)
+    public ExceptionHandler getHandler(Class<? extends Throwable> exceptionClass)
     {
-        Object obj = handlers.get(exceptionClass);
-        if (obj == null)
+        ExceptionHandler handler = handlers.get(exceptionClass);
+        if (handler == null)
         {
-            obj = handlers.get(Throwable.class);
+            handler = handlers.get(Throwable.class);
         }
 
-        return (ExceptionHandler)obj;
+        return handler;
     }
 
     public void onException(ErrorMessage msg) throws MuleException
     {
-        Class eClass = null;
+        Class<? extends Throwable> eClass = null;
         ExceptionHandler eh = null;
 
         try
@@ -114,6 +112,7 @@ public class ErrorManager
             logger.fatal(LocaleMessage.defaultException(e), e);
             handleFatal(e);
         }
+
         try
         {
             defaultHandler.onException(nestedMsg);
@@ -123,7 +122,6 @@ public class ErrorManager
             logger.fatal(LocaleMessage.defaultHandlerException(e), e);
             handleFatal(e);
         }
-
     }
 
     private void handleFatal(Throwable t)

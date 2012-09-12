@@ -22,13 +22,13 @@ import org.mule.util.StringMessageUtils;
  */
 public class BusinessHandler extends AbstractExceptionHandler
 {
-
     public BusinessHandler()
     {
         super();
         registerException(BusinessException.class);
     }
 
+    @Override
     protected void processException(ErrorMessage message, Throwable t) throws HandlerException
     {
         String msg = LocaleMessage.businessHandlerMessage();

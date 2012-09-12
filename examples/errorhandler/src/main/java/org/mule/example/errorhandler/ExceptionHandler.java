@@ -17,19 +17,17 @@ import java.util.Iterator;
  */
 public interface ExceptionHandler
 {
-
     public ErrorManager getErrorManager();
 
     public void setErrorManager(ErrorManager errorManager);
 
     public void onException(ErrorMessage message) throws HandlerException;
 
-    public void registerException(Class exceptionClass);
+    public void registerException(Class<? extends Throwable> exceptionClass);
 
-    public void unRegisterException(Class exceptionClass);
+    public void unRegisterException(Class<? extends Throwable> exceptionClass);
 
-    public Iterator getRegisteredClasses();
+    public Iterator<Class<? extends Throwable>> getRegisteredClasses();
 
-    public boolean isRegisteredFor(Class exceptionClass);
-
+    public boolean isRegisteredFor(Class<? extends Throwable> exceptionClass);
 }

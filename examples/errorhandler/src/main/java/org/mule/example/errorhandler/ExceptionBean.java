@@ -72,7 +72,7 @@ public class ExceptionBean
             Throwable t = null;
             try
             {
-                Class aClass = ClassUtils.loadClass(exceptionClass, getClass());
+                Class<?> aClass = ClassUtils.loadClass(exceptionClass, getClass());
                 if (cause == null)
                 {
                     t = (Throwable)ClassUtils.instanciateClass(aClass, getDetailMessage());
@@ -81,6 +81,7 @@ public class ExceptionBean
                 {
                     t = (Throwable)ClassUtils.instanciateClass(aClass, getDetailMessage(), cause.toException());
                 }
+
                 if (getStackTrace() != null)
                 {
                     // t.setStackTrace( getStackTrace());
@@ -116,16 +117,10 @@ public class ExceptionBean
         this.cause = cause;
     }
 
-    public String[] /* List */
-    getStackTrace()
+    public String[] getStackTrace()
     {
         return stackTrace;
     }
-
-    // public void addStackTrace(String trace)
-    // {
-    // stackTrace.add(trace);
-    // }
 
     public void setStackTrace(StackTraceElement[] stackTrace)
     {
