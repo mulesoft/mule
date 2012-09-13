@@ -24,6 +24,7 @@ import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorChain;
+import org.mule.api.processor.MessageProcessorContainer;
 import org.mule.endpoint.EndpointAware;
 import org.mule.processor.AbstractInterceptingMessageProcessor;
 import org.mule.util.StringUtils;
@@ -40,7 +41,7 @@ import org.apache.commons.logging.LogFactory;
  * the first in the nested chain.
  */
 public abstract class AbstractMessageProcessorChain extends AbstractInterceptingMessageProcessor
-                                                    implements MessageProcessorChain, Lifecycle, FlowConstructAware, MuleContextAware, EndpointAware
+                                                    implements MessageProcessorChain, Lifecycle, FlowConstructAware, MuleContextAware, EndpointAware, MessageProcessorContainer
 {
     protected final transient Log log = LogFactory.getLog(getClass());
     protected String name;

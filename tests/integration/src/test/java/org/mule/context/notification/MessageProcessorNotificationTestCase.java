@@ -39,7 +39,8 @@ public class MessageProcessorNotificationTestCase extends AbstractNotificationTe
         MuleClient client = new MuleClient(muleContext);
         assertNotNull(client.send("vm://in-1", "test", null));
         assertNotNull(client.send("vm://in-2", "test", null));
-        //assertNotNull(client.send("vm://in-3", "test", null));
+        assertNotNull(client.send("vm://in-3", "test", null));
+        assertNotNull(client.send("vm://in-4", "test", null));
     }
 
     @Override
@@ -50,19 +51,22 @@ public class MessageProcessorNotificationTestCase extends AbstractNotificationTe
                 .serial(new Node(MessageProcessorNotification.class, MessageProcessorNotification.MESSAGE_PROCESSOR_PRE_INVOKE))
                 .serial(new Node(MessageProcessorNotification.class, MessageProcessorNotification.MESSAGE_PROCESSOR_POST_INVOKE))
                 //foreach
-                .serial(new Node(MessageProcessorNotification.class, MessageProcessorNotification.MESSAGE_PROCESSOR_PRE_INVOKE))
-                .serial(new Node(MessageProcessorNotification.class, MessageProcessorNotification.MESSAGE_PROCESSOR_PRE_INVOKE))
+                .serial(new Node(MessageProcessorNotification.class, MessageProcessorNotification.MESSAGE_PROCESSOR_PRE_INVOKE)) //foreach
+                .serial(new Node(MessageProcessorNotification.class, MessageProcessorNotification.MESSAGE_PROCESSOR_PRE_INVOKE))    //logger-loop-1
                 .serial(new Node(MessageProcessorNotification.class, MessageProcessorNotification.MESSAGE_PROCESSOR_POST_INVOKE))
-                .serial(new Node(MessageProcessorNotification.class, MessageProcessorNotification.MESSAGE_PROCESSOR_PRE_INVOKE))
+                .serial(new Node(MessageProcessorNotification.class, MessageProcessorNotification.MESSAGE_PROCESSOR_PRE_INVOKE))    //logger-loop-2
+                .serial(new Node(MessageProcessorNotification.class, MessageProcessorNotification.MESSAGE_PROCESSOR_POST_INVOKE))
+                .serial(new Node(MessageProcessorNotification.class, MessageProcessorNotification.MESSAGE_PROCESSOR_POST_INVOKE))
+                //processorChain
+                .serial(new Node(MessageProcessorNotification.class, MessageProcessorNotification.MESSAGE_PROCESSOR_PRE_INVOKE)) //logger-1
+                .serial(new Node(MessageProcessorNotification.class, MessageProcessorNotification.MESSAGE_PROCESSOR_POST_INVOKE))
+                .serial(new Node(MessageProcessorNotification.class, MessageProcessorNotification.MESSAGE_PROCESSOR_PRE_INVOKE)) //logger-2
+                .serial(new Node(MessageProcessorNotification.class, MessageProcessorNotification.MESSAGE_PROCESSOR_POST_INVOKE))
+                //choice
+                .serial(new Node(MessageProcessorNotification.class, MessageProcessorNotification.MESSAGE_PROCESSOR_PRE_INVOKE)) //choice
+                .serial(new Node(MessageProcessorNotification.class, MessageProcessorNotification.MESSAGE_PROCESSOR_PRE_INVOKE))    //otherwise-logger
                 .serial(new Node(MessageProcessorNotification.class, MessageProcessorNotification.MESSAGE_PROCESSOR_POST_INVOKE))
                 .serial(new Node(MessageProcessorNotification.class, MessageProcessorNotification.MESSAGE_PROCESSOR_POST_INVOKE));
-                //processorChain
-                //.serial(new Node(MessageProcessorNotification.class, MessageProcessorNotification.MESSAGE_PROCESSOR_PRE_INVOKE))
-                //.serial(new Node(MessageProcessorNotification.class, MessageProcessorNotification.MESSAGE_PROCESSOR_PRE_INVOKE))
-                //.serial(new Node(MessageProcessorNotification.class, MessageProcessorNotification.MESSAGE_PROCESSOR_POST_INVOKE))
-                //.serial(new Node(MessageProcessorNotification.class, MessageProcessorNotification.MESSAGE_PROCESSOR_PRE_INVOKE))
-                //.serial(new Node(MessageProcessorNotification.class, MessageProcessorNotification.MESSAGE_PROCESSOR_POST_INVOKE))
-                //.serial(new Node(MessageProcessorNotification.class, MessageProcessorNotification.MESSAGE_PROCESSOR_POST_INVOKE));
     }
 
     @Override

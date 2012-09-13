@@ -25,6 +25,7 @@ import org.mule.api.lifecycle.Lifecycle;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.api.processor.MessageProcessorContainer;
 import org.mule.api.routing.RoutePathNotFoundException;
 import org.mule.api.routing.RouterResultsHandler;
 import org.mule.api.routing.RouterStatisticsRecorder;
@@ -46,7 +47,7 @@ import javax.xml.namespace.QName;
 import org.apache.commons.collections.ListUtils;
 
 public abstract class AbstractSelectiveRouter
-    implements SelectiveRouter, RouterStatisticsRecorder, Lifecycle, FlowConstructAware, MuleContextAware, AnnotatedObject
+    implements SelectiveRouter, RouterStatisticsRecorder, Lifecycle, FlowConstructAware, MuleContextAware, AnnotatedObject, MessageProcessorContainer
 {
     private final List<MessageProcessorFilterPair> conditionalMessageProcessors = new ArrayList<MessageProcessorFilterPair>();
     private MessageProcessor defaultProcessor;
@@ -361,6 +362,18 @@ public abstract class AbstractSelectiveRouter
     {
         annotations.clear();
         annotations.putAll(newAnnotations);
+    }
+
+    @Override
+    public List<MessageProcessor> getMessageProcessors()
+    {
+        List<MessageProcessor> messageProcessors = new ArrayList<MessageProcessor>();
+        for (MessageProcessorFilterPair cmp : conditionalMessageProcessors)
+        {
+            messageProcessors.add(cmp.getMessageProcessor());
+        }
+        messageProcessors.add(defaultProcessor);
+        return messageProcessors;
     }
 
     @Override

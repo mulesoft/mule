@@ -57,7 +57,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     protected MessageProcessor pipeline;
 
     protected List<MessageProcessor> messageProcessors = Collections.emptyList();
-    private Map<MessageProcessor, String> flowMap;
+    private Map<MessageProcessor, String> flowMap = new LinkedHashMap<MessageProcessor, String>();
 
     protected ProcessingStrategy processingStrategy;
     private boolean canProcessMessage = false;
@@ -309,12 +309,11 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
 
     private void createFlowMap()
     {
-        if (flowMap != null)
+        if (!flowMap.isEmpty())
         {
             logger.warn("flow map already populated");
             return;
         }
-        flowMap = new LinkedHashMap<MessageProcessor, String>();
         List<MessageProcessor> mps = getMessageProcessors();
         createFlowMap(mps, "/" + getName() + "/processors/");
     }
@@ -343,6 +342,14 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     public String getProcessorPath(MessageProcessor processor)
     {
         return flowMap.get(processor);
+    }
+
+    @Override
+    public String[] getProcessorPaths()
+    {
+        String[] paths = new String[flowMap.size()];
+        paths = flowMap.values().toArray(paths);
+        return paths;
     }
 
     public class ProcessIfPipelineStartedMessageProcessor extends AbstractFilteringMessageProcessor

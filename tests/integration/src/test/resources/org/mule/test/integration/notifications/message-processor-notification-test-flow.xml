@@ -38,4 +38,19 @@
         </processor-chain>
     </flow>
 
+    <flow name="choice">
+        <vm:inbound-endpoint path="in-4" exchange-pattern="request-response"/>
+        <choice>
+            <when expression="payload == 'test1'">
+                <logger message="check1"/>
+            </when>
+            <when expression="payload == 'test2'">
+                <logger message="check2"/>
+            </when>
+            <otherwise>
+                <logger message="check3"/>
+            </otherwise>
+        </choice>
+    </flow>
+
 </mule>

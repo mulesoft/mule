@@ -12,7 +12,6 @@ package org.mule.config.spring.factories;
 
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorBuilder;
-import org.mule.api.processor.MessageProcessors;
 import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
 
 import java.util.List;
@@ -55,7 +54,7 @@ public class MessageProcessorChainFactoryBean implements FactoryBean
                     "MessageProcessorBuilder should only have MessageProcessor's or MessageProcessorBuilder's configured");
             }
         }
-        return MessageProcessors.lifecyleAwareMessageProcessorWrapper(builder.build());
+        return builder.build();
     }
 
     public boolean isSingleton()

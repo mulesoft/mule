@@ -13,17 +13,14 @@ package org.mule.config.spring.factories;
 import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorBuilder;
-import org.mule.api.processor.MessageProcessors;
-import org.mule.api.transaction.TransactionConfig;
 import org.mule.api.transaction.TransactionFactory;
 import org.mule.processor.DelegateTransactionFactory;
-import org.mule.processor.EndpointTransactionalInterceptingMessageProcessor;
 import org.mule.processor.TransactionalInterceptingMessageProcessor;
 import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
+import org.mule.transaction.MuleTransactionConfig;
 
 import java.util.List;
 
-import org.mule.transaction.MuleTransactionConfig;
 import org.springframework.beans.factory.FactoryBean;
 
 public class TransactionalMessageProcessorsFactoryBean implements FactoryBean
@@ -70,7 +67,7 @@ public class TransactionalMessageProcessorsFactoryBean implements FactoryBean
                     "MessageProcessorBuilder should only have MessageProcessor's or MessageProcessorBuilder's configured");
             }
         }
-        return MessageProcessors.lifecyleAwareMessageProcessorWrapper(builder.build());
+        return builder.build();
     }
 
     protected TransactionFactory getTransactionFactory()
