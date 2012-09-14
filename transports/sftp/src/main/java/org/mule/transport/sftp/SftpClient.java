@@ -10,6 +10,11 @@
 
 package org.mule.transport.sftp;
 
+import static org.mule.transport.sftp.notification.SftpTransportNotification.SFTP_DELETE_ACTION;
+import static org.mule.transport.sftp.notification.SftpTransportNotification.SFTP_GET_ACTION;
+import static org.mule.transport.sftp.notification.SftpTransportNotification.SFTP_PUT_ACTION;
+import static org.mule.transport.sftp.notification.SftpTransportNotification.SFTP_RENAME_ACTION;
+
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.transport.sftp.notification.SftpNotifier;
 
@@ -30,14 +35,8 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Vector;
 
-import org.apache.commons.lang.NotImplementedException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import static org.mule.transport.sftp.notification.SftpTransportNotification.SFTP_DELETE_ACTION;
-import static org.mule.transport.sftp.notification.SftpTransportNotification.SFTP_GET_ACTION;
-import static org.mule.transport.sftp.notification.SftpTransportNotification.SFTP_PUT_ACTION;
-import static org.mule.transport.sftp.notification.SftpTransportNotification.SFTP_RENAME_ACTION;
 
 /**
  * <code>SftpClient</code> Wrapper around jsch sftp library. Provides access to basic
@@ -554,24 +553,30 @@ public class SftpClient
         if (duplicateHandling.equals(SftpConnector.PROPERTY_DUPLICATE_HANDLING_ASS_SEQ_NO))
         {
             filename = createUniqueName(destDir, filename);
-
         }
-        else if (duplicateHandling.equals(SftpConnector.PROPERTY_DUPLICATE_HANDLING_OVERWRITE))
+        else if (duplicateHandling.equals(SftpConnector.PROPERTY_DUPLICATE_HANDLING_THROW_EXCEPTION))
         {
-            // TODO. ML FIX. Implement this!
-            throw new NotImplementedException("Strategy "
-                                              + SftpConnector.PROPERTY_DUPLICATE_HANDLING_OVERWRITE
-                                              + " is not yet implemented");
+            if (fileAlreadyExists(destDir, filename))
+            {
+                throw new IOException("File already exists: " + filename);
+            }
 
         }
-        else
-        {
-            // Nothing to do in the case of
-            // PROPERTY_DUPLICATE_HANDLING_THROW_EXCEPTION, if the file already
-            // exists then an error will be throwed...
-        }
-
         return filename;
+    }
+
+    private boolean fileAlreadyExists(String destDir, String filename) throws IOException
+    {
+        logger.warn("listing files for: " + destDir + "/" + filename);
+        String[] files = listFiles(destDir);
+        for(String file : files)
+        {
+            if (file.equals(filename))
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
     private String createUniqueName(String dir, String path) throws IOException
