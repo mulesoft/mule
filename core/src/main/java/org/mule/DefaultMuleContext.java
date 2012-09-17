@@ -44,7 +44,6 @@ import org.mule.api.store.ListableObjectStore;
 import org.mule.api.transaction.TransactionManagerFactory;
 import org.mule.client.DefaultLocalMuleClient;
 import org.mule.config.DefaultMuleConfiguration;
-import org.mule.config.ExceptionHelper;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.context.notification.MuleContextNotification;
 import org.mule.context.notification.NotificationException;
@@ -192,7 +191,7 @@ public class DefaultMuleContext implements MuleContext
         
         try
         {
-        	JdkVersionUtils.validateJdk();
+        	//JdkVersionUtils.validateJdk();
         }
         catch (RuntimeException e)
         {

@@ -81,14 +81,7 @@ public class DynamicPort extends SystemProperty
     @Override
     public String getValue()
     {
-        String value = super.getValue();
-        if (value == null)
-        {
-            number = freePortFinder.find();
-            value = Integer.toString(number);
-        }
-
-        return value;
+        return Integer.toString(getNumber());
     }
 
     @Override
@@ -99,6 +92,11 @@ public class DynamicPort extends SystemProperty
 
     public int getNumber()
     {
+        if (number == 0)
+        {
+            number = freePortFinder.find();
+        }
+
         return number;
     }
 }

@@ -102,6 +102,7 @@ public class FreePortFinder
         try
         {
             server = new ServerSocket(port);
+            server.setReuseAddress(true);
         }
         catch (IOException e)
         {
