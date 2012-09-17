@@ -191,7 +191,7 @@ public class DefaultMuleContext implements MuleContext
         
         try
         {
-        	//JdkVersionUtils.validateJdk();
+        	JdkVersionUtils.validateJdk();
         }
         catch (RuntimeException e)
         {

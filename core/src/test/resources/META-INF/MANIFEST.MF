@@ -4,10 +4,10 @@ Created-By: Apache Maven
 Built-By: chrismordue
 Build-Jdk: 1.6.0_31
 Specification-Title: Core Configuration Patterns
-Specification-Version: 3.3.9
+Specification-Version: 3.3.0-RC3-SNAPSHOT
 Specification-Vendor: MuleSoft, Inc.
 Implementation-Title: Core Configuration Patterns
-Implementation-Version: 3.3.9
+Implementation-Version: 3.3.0-RC3-SNAPSHOT
 Implementation-Vendor-Id: org.mule.patterns
 Implementation-Vendor: MuleSoft, Inc.
 Build-Date: 2012-Apr-13 16:46:57
