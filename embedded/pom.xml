@@ -289,8 +289,6 @@
                             <appendAssemblyId>true</appendAssemblyId>
                             <archive>
                                 <manifestEntries>
-                                    <!-- TODO: Once we upgrade to newer version of plugin we can specify
-                                         MANIFEST entries here.  MULE-4209.
                                     <More-Info>For more information go to ${productUrl}</More-Info>
                                     <Support>Get commercial support: ${pom.organization.url}/support</Support>
                                     <Description>Mule ESB and Integration Platform</Description>
@@ -299,7 +297,8 @@
                                     <Product-Url>${productUrl}</Product-Url>
                                     <Build-Date>${timestamp}</Build-Date>
                                     <Dev-List-Email>dev@mule.codehaus.org</Dev-List-Email>
-                                    -->
+                                    <Supported-Jdks>[1.6.0,1.7),[1.7.0,1.8)</Supported-Jdks>
+                                    <Recommended-Jdks>[1.6.0_26,1.7),[1.7.0_3,1.8)</Recommended-Jdks>
                                 </manifestEntries>
                             </archive>
                         </configuration>
