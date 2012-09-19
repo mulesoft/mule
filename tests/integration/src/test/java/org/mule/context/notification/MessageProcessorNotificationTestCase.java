@@ -37,10 +37,16 @@ public class MessageProcessorNotificationTestCase extends AbstractNotificationTe
     public void doTest() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
-        assertNotNull(client.send("vm://in-1", "test", null));
-        assertNotNull(client.send("vm://in-2", "test", null));
-        assertNotNull(client.send("vm://in-3", "test", null));
-        assertNotNull(client.send("vm://in-4", "test", null));
+        assertNotNull(client.send("vm://in-single", "test", null));
+        assertNotNull(client.send("vm://in-processorChain", "test", null));
+        assertNotNull(client.send("vm://in-choice", "test", null));
+        assertNotNull(client.send("vm://in-all", "test", null));
+        assertNotNull(client.send("vm://in-foreach", "test", null));
+        assertNotNull(client.send("vm://in-enricher", "test", null));
+        assertNotNull(client.send("vm://in-filter", "test", null));
+        assertNotNull(client.send("vm://in-catch", "test", null));
+        assertNotNull(client.send("vm://in-rollback", "test", null));
+        assertNotNull(client.send("vm://in-choice-es", "test", null));
     }
 
     @Override
@@ -48,25 +54,69 @@ public class MessageProcessorNotificationTestCase extends AbstractNotificationTe
     {
         return new Node()
                 //singleMP
-                .serial(new Node(MessageProcessorNotification.class, MessageProcessorNotification.MESSAGE_PROCESSOR_PRE_INVOKE))
-                .serial(new Node(MessageProcessorNotification.class, MessageProcessorNotification.MESSAGE_PROCESSOR_POST_INVOKE))
-                //foreach
-                .serial(new Node(MessageProcessorNotification.class, MessageProcessorNotification.MESSAGE_PROCESSOR_PRE_INVOKE)) //foreach
-                .serial(new Node(MessageProcessorNotification.class, MessageProcessorNotification.MESSAGE_PROCESSOR_PRE_INVOKE))    //logger-loop-1
-                .serial(new Node(MessageProcessorNotification.class, MessageProcessorNotification.MESSAGE_PROCESSOR_POST_INVOKE))
-                .serial(new Node(MessageProcessorNotification.class, MessageProcessorNotification.MESSAGE_PROCESSOR_PRE_INVOKE))    //logger-loop-2
-                .serial(new Node(MessageProcessorNotification.class, MessageProcessorNotification.MESSAGE_PROCESSOR_POST_INVOKE))
-                .serial(new Node(MessageProcessorNotification.class, MessageProcessorNotification.MESSAGE_PROCESSOR_POST_INVOKE))
+                .serial(prePost())
+
                 //processorChain
-                .serial(new Node(MessageProcessorNotification.class, MessageProcessorNotification.MESSAGE_PROCESSOR_PRE_INVOKE)) //logger-1
-                .serial(new Node(MessageProcessorNotification.class, MessageProcessorNotification.MESSAGE_PROCESSOR_POST_INVOKE))
-                .serial(new Node(MessageProcessorNotification.class, MessageProcessorNotification.MESSAGE_PROCESSOR_PRE_INVOKE)) //logger-2
-                .serial(new Node(MessageProcessorNotification.class, MessageProcessorNotification.MESSAGE_PROCESSOR_POST_INVOKE))
+                .serial(prePost()) //logger-1
+                .serial(prePost()) //logger-2
+
                 //choice
-                .serial(new Node(MessageProcessorNotification.class, MessageProcessorNotification.MESSAGE_PROCESSOR_PRE_INVOKE)) //choice
-                .serial(new Node(MessageProcessorNotification.class, MessageProcessorNotification.MESSAGE_PROCESSOR_PRE_INVOKE))    //otherwise-logger
-                .serial(new Node(MessageProcessorNotification.class, MessageProcessorNotification.MESSAGE_PROCESSOR_POST_INVOKE))
-                .serial(new Node(MessageProcessorNotification.class, MessageProcessorNotification.MESSAGE_PROCESSOR_POST_INVOKE));
+                .serial(pre()) //choice
+                .serial(prePost())    //otherwise-logger
+                .serial(post())
+
+                //all
+                .serial(pre())
+                .serial(prePost())
+                .serial(prePost())
+                .serial(post())
+
+                //foreach
+                .serial(pre()) //foreach
+                .serial(prePost())    //logger-loop-1
+                .serial(prePost())    //logger-loop-2
+                .serial(post())
+
+                //enricher
+                .serial(prePost()) //append-string
+                .serial(pre()) //chain
+                .serial(prePost())
+                .serial(prePost())
+                .serial(post())
+
+                //filter
+                .serial(pre())
+                .serial(prePost())
+                .serial(post())
+
+                //catch-es
+                .serial(prePost())
+                .serial(prePost())
+
+                //rollback-es
+                .serial(prePost())
+                .serial(prePost())
+                .serial(prePost())
+
+                //choice-es
+                .serial(prePost())
+                .serial(prePost())
+                ;
+    }
+
+    private RestrictedNode pre()
+    {
+        return new Node(MessageProcessorNotification.class, MessageProcessorNotification.MESSAGE_PROCESSOR_PRE_INVOKE);
+    }
+
+    private RestrictedNode post()
+    {
+        return new Node(MessageProcessorNotification.class, MessageProcessorNotification.MESSAGE_PROCESSOR_POST_INVOKE);
+    }
+
+    private RestrictedNode prePost()
+    {
+        return new Node().serial(pre()).serial(post());
     }
 
     @Override

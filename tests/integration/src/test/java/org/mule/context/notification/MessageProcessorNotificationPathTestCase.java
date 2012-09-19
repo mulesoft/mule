@@ -32,27 +32,40 @@ public class MessageProcessorNotificationPathTestCase extends FunctionalTestCase
     }
 
     @Test
-    public void singleMP() throws Exception
+    public void components() throws Exception
     {
         testFlowPaths("singleMP", "/0");
-    }
-
-    @Test
-    public void foreach() throws Exception
-    {
-        testFlowPaths("foreach", "/0/0");
-    }
-
-    @Test
-    public void processorChain() throws Exception
-    {
         testFlowPaths("processorChain", "/0/0", "/0/1");
     }
 
     @Test
-    public void choice() throws Exception
+    public void routers() throws Exception
     {
         testFlowPaths("choice", "/0/0/0", "/0/1/0", "/0/2/0");
+        testFlowPaths("all", "/0/0/0", "/0/1/0");
+    }
+
+    @Test
+    public void scopes() throws Exception
+    {
+        testFlowPaths("foreach", "/0/0");
+        testFlowPaths("enricher", "/0/0", "/1/0/0", "/1/0/1");
+        testFlowPaths("until-successful", "/0/0/0", "/0/0/1");
+        //testFlowPaths("async", "/0/0", "/0/1");
+    }
+
+    @Test
+    public void filters() throws Exception
+    {
+        testFlowPaths("filters", "/0", "/1");
+    }
+
+    @Test
+    public void exceptionStrategies() throws Exception
+    {
+        testFlowPaths("catch-es", "/0", "es/0");
+        testFlowPaths("rollback-es", "/0", "es/0", "es/1");
+        testFlowPaths("choice-es", "/0", "es/0", "es/1", "es/2");
     }
 
     private void testFlowPaths(String flowName, String... leaves) throws Exception
@@ -69,10 +82,13 @@ public class MessageProcessorNotificationPathTestCase extends FunctionalTestCase
         String base = "/" + flowName + "/processors";
         for (String leaf : leaves)
         {
-            String prefix = "/";
-            for (String part : leaf.split("/"))
+            if (leaf.startsWith("es/"))
             {
-                if (part.length()==0) continue;
+                base = "/" + flowName + "/es";
+            }
+            String prefix = "/";
+            for (String part : leaf.substring(leaf.indexOf("/") + 1).split("/"))
+            {
                 pathSet.add(base + prefix + part);
                 prefix += part + "/";
             }

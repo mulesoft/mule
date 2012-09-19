@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<mule xmlns="http://www.mulesoft.org/schema/mule/core" 
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:spring="http://www.springframework.org/schema/beans" 
+      xmlns:spring="http://www.springframework.org/schema/beans"
       xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
       xsi:schemaLocation="
                http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
                http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
 
     <notifications>
@@ -18,20 +20,15 @@
         <notification-listener ref="notificationLogger"/>
     </notifications>
 
+    <spring:bean id="objectStore" class="org.mule.util.store.SimpleMemoryObjectStore"/>
+
     <flow name="singleMP">
-        <vm:inbound-endpoint path="in-1" exchange-pattern="request-response"/>
+        <vm:inbound-endpoint path="in-single" exchange-pattern="request-response"/>
         <logger message="check"/>
     </flow>
 
-    <flow name="foreach">
-        <vm:inbound-endpoint path="in-2" exchange-pattern="request-response"/>
-        <foreach collection="#[{'one','two'}]">
-            <logger />
-        </foreach>
-    </flow>
-
     <flow name="processorChain">
-        <vm:inbound-endpoint path="in-3" exchange-pattern="request-response"/>
+        <vm:inbound-endpoint path="in-processorChain" exchange-pattern="request-response"/>
         <processor-chain>
             <logger message="check1"/>
             <logger message="check2"/>
@@ -39,7 +36,7 @@
     </flow>
 
     <flow name="choice">
-        <vm:inbound-endpoint path="in-4" exchange-pattern="request-response"/>
+        <vm:inbound-endpoint path="in-choice" exchange-pattern="request-response"/>
         <choice>
             <when expression="payload == 'test1'">
                 <logger message="check1"/>
@@ -53,4 +50,101 @@
         </choice>
     </flow>
 
+    <flow name="all">
+        <vm:inbound-endpoint path="in-all" exchange-pattern="request-response"/>
+        <all>
+            <processor-chain>
+                <logger/>
+            </processor-chain>
+            <processor-chain>
+                <logger/>
+            </processor-chain>
+        </all>
+    </flow>
+
+    <flow name="foreach">
+        <vm:inbound-endpoint path="in-foreach" exchange-pattern="request-response"/>
+        <foreach collection="#[{'one','two'}]">
+            <logger/>
+        </foreach>
+    </flow>
+
+    <flow name="enricher">
+        <vm:inbound-endpoint path="in-enricher" exchange-pattern="request-response"/>
+        <enricher><!-- no funca sin processor chain -->
+            <append-string-transformer message="Hello"/>
+            <enrich target="#[header:OUTBOUND:helloHeader]"/>
+            <enrich target="#[header:OUTBOUND:helloHeader2]"/>
+        </enricher>
+        <enricher target="#[header:OUTBOUND:echoHeader]" source="#[payload]">
+            <processor-chain>
+                <echo-component/>
+                <echo-component/>
+            </processor-chain>
+        </enricher>
+    </flow>
+
+    <flow name="until-successful">
+        <vm:inbound-endpoint path="in-untils" exchange-pattern="request-response"/>
+        <until-successful objectStore-ref="objectStore">
+            <processor-chain>
+                <logger/>
+                <vm:outbound-endpoint path="out-us" exchange-pattern="request-response"/>
+            </processor-chain>
+        </until-successful>
+    </flow>
+
+<!--
+        <flow name="async">
+            <vm:inbound-endpoint path="in-async" exchange-pattern="request-response"/>
+            <async>
+                <logger message="check1"/>
+                <logger message="check2"/>
+            </async>
+        </flow>
+-->
+
+    <flow name="filters">
+        <vm:inbound-endpoint path="in-filter" exchange-pattern="request-response"/>
+        <payload-type-filter expectedType="java.lang.String"/>
+        <or-filter>
+            <exception-type-filter expectedType="java.lang.Throwable"/>
+            <payload-type-filter expectedType="java.lang.String"/>
+        </or-filter>
+    </flow>
+
+    <flow name="catch-es">
+        <vm:inbound-endpoint path="in-catch" exchange-pattern="request-response"/>
+        <test:component throwException="true" />
+        <catch-exception-strategy>
+            <logger/>
+        </catch-exception-strategy>
+    </flow>
+
+    <flow name="rollback-es">
+        <vm:inbound-endpoint path="in-rollback" exchange-pattern="request-response"/>
+        <test:component throwException="true" />
+        <rollback-exception-strategy>
+            <logger/>
+            <on-redelivery-attempts-exceeded>
+                <echo-component/>
+            </on-redelivery-attempts-exceeded>
+        </rollback-exception-strategy>
+    </flow>
+
+    <flow name="choice-es">
+        <vm:inbound-endpoint path="in-choice-es" exchange-pattern="request-response"/>
+        <test:component throwException="true"/>
+        <choice-exception-strategy>
+            <rollback-exception-strategy when="#[exception.causedBy(java.io.IOException)]" maxRedeliveryAttempts="1">
+                <echo-component/>
+                <on-redelivery-attempts-exceeded>
+                    <logger/>
+                </on-redelivery-attempts-exceeded>
+            </rollback-exception-strategy>
+            <catch-exception-strategy>
+                <echo-component/>
+            </catch-exception-strategy>
+        </choice-exception-strategy>
+    </flow>
 </mule>

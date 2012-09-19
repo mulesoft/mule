@@ -9,26 +9,29 @@
  */
 package org.mule.exception;
 
-import java.util.Collections;
-import java.util.List;
-
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.context.MuleContextAware;
-import org.mule.api.exception.MessagingExceptionHandlerAcceptor;
 import org.mule.api.exception.MessagingExceptionHandler;
+import org.mule.api.exception.MessagingExceptionHandlerAcceptor;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Lifecycle;
+import org.mule.api.processor.MessageProcessor;
+import org.mule.api.processor.MessageProcessorContainer;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.message.DefaultExceptionPayload;
 import org.mule.processor.AbstractMuleObjectOwner;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Selects which exception strategy to execute based on filtering.
  *
  * Exception listeners must implement {@link org.mule.api.exception.MessagingExceptionHandlerAcceptor} to be part of ChoiceMessagingExceptionStrategy
  */
-public class ChoiceMessagingExceptionStrategy extends AbstractMuleObjectOwner<MessagingExceptionHandlerAcceptor> implements MessagingExceptionHandler, MuleContextAware, Lifecycle
+public class ChoiceMessagingExceptionStrategy extends AbstractMuleObjectOwner<MessagingExceptionHandlerAcceptor> implements MessagingExceptionHandler, MuleContextAware, Lifecycle, MessageProcessorContainer
 {
     private List<MessagingExceptionHandlerAcceptor> exceptionListeners;
 
@@ -127,4 +130,17 @@ public class ChoiceMessagingExceptionStrategy extends AbstractMuleObjectOwner<Me
         }
     }
 
+    @Override
+    public List<MessageProcessor> getMessageProcessors()
+    {
+        List<MessageProcessor> mps = new ArrayList<MessageProcessor>();
+        for(MessagingExceptionHandlerAcceptor listener : exceptionListeners)
+        {
+            if (listener instanceof MessageProcessorContainer)
+            {
+                mps.addAll(((MessageProcessorContainer) listener).getMessageProcessors());
+            }
+        }
+        return mps;
+    }
 }

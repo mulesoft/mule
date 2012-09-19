@@ -316,6 +316,11 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
         }
         List<MessageProcessor> mps = getMessageProcessors();
         createFlowMap(mps, "/" + getName() + "/processors/");
+        if (exceptionListener instanceof MessageProcessorContainer)
+        {
+            mps = ((MessageProcessorContainer) exceptionListener).getMessageProcessors();
+            createFlowMap(mps, "/" + getName() + "/es/");
+        }
     }
 
     private void createFlowMap(List<MessageProcessor> processors, String prefix)
