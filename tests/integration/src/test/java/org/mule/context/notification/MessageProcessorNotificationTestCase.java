@@ -96,7 +96,6 @@ public class MessageProcessorNotificationTestCase extends AbstractNotificationTe
                 //rollback-es
                 .serial(prePost())
                 .serial(prePost())
-                .serial(prePost())
 
                 //choice-es
                 .serial(prePost())

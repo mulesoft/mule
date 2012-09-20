@@ -65,12 +65,6 @@ public class RollbackMessagingExceptionStrategy extends TemplateMessagingExcepti
         return messageProcessors;
     }
 
-    @Override
-    public List<MessageProcessor> getMessageProcessors()
-    {
-        return getOwnedMessageProcessors();
-    }
-
     private boolean isRedeliveryExhausted(Exception exception)
     {
         return (exception instanceof MessageRedeliveredException);

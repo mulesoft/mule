@@ -10,6 +10,10 @@
 
 package org.mule.module.xml.config;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorChain;
 import org.mule.construct.Flow;
@@ -19,16 +23,11 @@ import org.mule.routing.MessageFilter;
 import org.mule.routing.filters.logic.NotFilter;
 import org.mule.tck.junit4.FunctionalTestCase;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 public class XmlFilterNamespaceHandlerFlowTestCase extends FunctionalTestCase
 {
@@ -42,17 +41,11 @@ public class XmlFilterNamespaceHandlerFlowTestCase extends FunctionalTestCase
     public void testIsXmlFilter() throws Exception
     {
         Object flow = muleContext.getRegistry().lookupObject("test for xml");
-        Object notXmlSubFlowWrapper;
-        Field f;
         MessageProcessorChain notXmlSubFlow;
         List<MessageProcessor> outEndpoints = new ArrayList<MessageProcessor>(2);
 
         outEndpoints.add(((Flow) flow).getMessageProcessors().get(0));
-        notXmlSubFlowWrapper = muleContext.getRegistry().lookupObject("notXml");
-
-        f = notXmlSubFlowWrapper.getClass().getDeclaredField("delegate");
-        f.setAccessible(true);
-        notXmlSubFlow = (MessageProcessorChain) f.get(notXmlSubFlowWrapper);
+        notXmlSubFlow = muleContext.getRegistry().lookupObject("notXml");
         outEndpoints.add((notXmlSubFlow.getMessageProcessors().get(0)));
 
         assertEquals(2, outEndpoints.size());
