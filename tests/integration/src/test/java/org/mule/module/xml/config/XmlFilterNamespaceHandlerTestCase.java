@@ -82,17 +82,12 @@ public class XmlFilterNamespaceHandlerTestCase extends AbstractServiceAndFlowTes
         }
         else if (serviceFlow instanceof Flow)
         {
-            Object notXmlSubFlowWrapper;
             Field f;
             MessageProcessorChain notXmlSubFlow;
             List<MessageProcessor> outEndpoints = new ArrayList<MessageProcessor>(2);
 
             outEndpoints.add(((Flow) serviceFlow).getMessageProcessors().get(0));
-            notXmlSubFlowWrapper = muleContext.getRegistry().lookupObject("notXml");
-
-            f = notXmlSubFlowWrapper.getClass().getDeclaredField("delegate");
-            f.setAccessible(true);
-            notXmlSubFlow = (MessageProcessorChain) f.get(notXmlSubFlowWrapper);
+            notXmlSubFlow = muleContext.getRegistry().lookupObject("notXml");
             outEndpoints.add((notXmlSubFlow.getMessageProcessors().get(0)));
 
             assertEquals(2, outEndpoints.size());
