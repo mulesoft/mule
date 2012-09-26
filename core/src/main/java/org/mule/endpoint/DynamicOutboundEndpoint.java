@@ -35,9 +35,11 @@ import org.mule.api.transport.Connector;
 import org.mule.api.transport.DispatchException;
 import org.mule.config.i18n.CoreMessages;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.collections.map.LRUMap;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -67,6 +69,9 @@ public class DynamicOutboundEndpoint implements OutboundEndpoint
     private final EndpointBuilder builder;
 
     private final OutboundEndpoint prototypeEndpoint;
+
+    // Caches resolved static endpoints to improve performance
+    private Map<String, OutboundEndpoint> staticEndpoints = Collections.synchronizedMap(new LRUMap(64));
 
     public DynamicOutboundEndpoint(EndpointBuilder builder, String uriTemplate) throws MalformedEndpointException
     {
@@ -136,18 +141,39 @@ public class DynamicOutboundEndpoint implements OutboundEndpoint
     public MuleEvent process(MuleEvent event) throws MuleException
     {
         EndpointURI endpointURIForMessage = getEndpointURIForMessage(event);
-        OutboundEndpoint outboundEndpoint = createStaticEndpoint(endpointURIForMessage);
+        OutboundEndpoint outboundEndpoint = getStaticEndpointFor(endpointURIForMessage);
 
         event = new DefaultMuleEvent(event.getMessage(), outboundEndpoint, event, event.getSession());
 
         return outboundEndpoint.process(event);
     }
 
-    private synchronized OutboundEndpoint createStaticEndpoint(EndpointURI uri) throws DispatchException, EndpointException, InitialisationException
+    private OutboundEndpoint getStaticEndpointFor(EndpointURI uri) throws EndpointException, InitialisationException
     {
-        builder.setURIBuilder(new URIBuilder(uri));
+        OutboundEndpoint outboundEndpoint = staticEndpoints.get(uri.getAddress());
 
-        return builder.buildOutboundEndpoint();
+        if (outboundEndpoint == null)
+        {
+            outboundEndpoint = createStaticEndpoint(uri);
+            staticEndpoints.put(uri.getAddress(), outboundEndpoint);
+        }
+
+        return outboundEndpoint;
+    }
+
+    private OutboundEndpoint createStaticEndpoint(EndpointURI uri) throws EndpointException, InitialisationException
+    {
+        try
+        {
+            EndpointBuilder staticBuilder = (EndpointBuilder) builder.clone();
+            staticBuilder.setURIBuilder(new URIBuilder(uri));
+            return staticBuilder.buildOutboundEndpoint();
+        }
+        catch (CloneNotSupportedException e)
+        {
+            // This cannot happen, because we implement Cloneable
+            throw new IllegalStateException("Unable to clone endpoint builder");
+        }
     }
 
     @Override
