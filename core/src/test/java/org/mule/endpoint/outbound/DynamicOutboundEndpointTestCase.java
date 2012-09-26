@@ -10,11 +10,22 @@
 
 package org.mule.endpoint.outbound;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import org.mule.MessageExchangePattern;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
+import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.registry.ServiceException;
 import org.mule.api.registry.ServiceType;
@@ -42,13 +53,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 /**
  * Tests flow of messages from {@link org.mule.endpoint.DynamicOutboundEndpoint#process(org.mule.api.MuleEvent)} down to
@@ -247,6 +251,28 @@ public class DynamicOutboundEndpointTestCase extends AbstractMessageProcessorTes
     public void testExceptionHandling()
     {
         // TODO
+    }
+
+    @Test
+    public void cachesResolvedStaticEndpoints() throws Exception
+    {
+        OutboundEndpoint prototypeEndpoint = mock(OutboundEndpoint.class);
+        when(prototypeEndpoint.getMuleContext()).thenReturn(muleContext);
+
+        EndpointBuilder staticEndpointBuilder = mock(EndpointBuilder.class);
+        when(staticEndpointBuilder.buildOutboundEndpoint()).thenReturn(prototypeEndpoint);
+
+        EndpointBuilder endpointBuilder = mock(EndpointBuilder.class);
+        when(endpointBuilder.buildOutboundEndpoint()).thenReturn(prototypeEndpoint);
+        when(endpointBuilder.clone()).thenReturn(staticEndpointBuilder);
+
+        DynamicOutboundEndpoint dynamicOutboundEndpoint = new DynamicOutboundEndpoint(endpointBuilder, "test://localhost:#[header:port]");
+
+        testOutboundEvent = createTestOutboundEvent();
+        dynamicOutboundEndpoint.process(testOutboundEvent);
+        dynamicOutboundEndpoint.process(testOutboundEvent);
+
+        verify(endpointBuilder, times(1)).buildOutboundEndpoint();
     }
 
     protected void assertMessageSentEqual(MuleEvent event) throws MuleException
