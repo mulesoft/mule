@@ -19,12 +19,14 @@ import org.mule.api.lifecycle.Lifecycle;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorContainer;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.construct.AbstractPipeline;
 import org.mule.message.DefaultExceptionPayload;
 import org.mule.processor.AbstractMuleObjectOwner;
 
-import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Selects which exception strategy to execute based on filtering.
@@ -131,16 +133,21 @@ public class ChoiceMessagingExceptionStrategy extends AbstractMuleObjectOwner<Me
     }
 
     @Override
-    public List<MessageProcessor> getMessageProcessors()
+    public Map<MessageProcessor, String> getMessageProcessorPaths()
     {
-        List<MessageProcessor> mps = new ArrayList<MessageProcessor>();
+        Map<MessageProcessor, String> mpPaths = new LinkedHashMap<MessageProcessor, String> ();
+        int idx = 0;
         for(MessagingExceptionHandlerAcceptor listener : exceptionListeners)
         {
+            String prefix = "/" + idx;
             if (listener instanceof MessageProcessorContainer)
             {
-                mps.addAll(((MessageProcessorContainer) listener).getMessageProcessors());
+                Map<MessageProcessor, String> children = ((MessageProcessorContainer) listener).getMessageProcessorPaths();
+                AbstractPipeline.prefixMessageProcessorPaths(prefix, children);
+                mpPaths.putAll(children);
             }
+            idx++;
         }
-        return mps;
+        return mpPaths;
     }
 }

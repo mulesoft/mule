@@ -20,6 +20,7 @@ import org.mule.api.processor.InterceptingMessageProcessor;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.TransformerException;
+import org.mule.construct.AbstractPipeline;
 import org.mule.expression.ExpressionConfig;
 import org.mule.processor.AbstractMessageProcessorOwner;
 import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
@@ -152,10 +153,11 @@ public class Foreach extends AbstractMessageProcessorOwner
     }
 
     @Override
-    public List<MessageProcessor> getMessageProcessors()
+    public Map<MessageProcessor, String> getMessageProcessorPaths()
     {
         //skip the splitter that is added at the beginning
-        return getOwnedMessageProcessors().subList(1, getOwnedMessageProcessors().size());
+        List<MessageProcessor> mps = getOwnedMessageProcessors().subList(1, getOwnedMessageProcessors().size());
+        return AbstractPipeline.buildMessageProcessorPaths(mps);
     }
 
     @Override

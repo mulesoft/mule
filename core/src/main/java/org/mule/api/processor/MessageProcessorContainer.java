@@ -10,17 +10,18 @@
 
 package org.mule.api.processor;
 
-import java.util.List;
+import java.util.Map;
 
 /**
  *  Identifies Constructs that contain Message Processors configured by the user.
  */
 public interface MessageProcessorContainer
 {
-
     /**
-     * @return the list of Message Processors configured by the user.
-     * Internal Message Processors are omitted.
+     * Generates a map of the child message processors with the message processor
+     * instance as key and the identifier path as value.
+     *
+     * @return Map with the paths of the child message processors
      */
-    List<MessageProcessor> getMessageProcessors();
+    Map<MessageProcessor, String> getMessageProcessorPaths();
 }

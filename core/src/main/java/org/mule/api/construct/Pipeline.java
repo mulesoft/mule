@@ -11,6 +11,7 @@
 package org.mule.api.construct;
 
 import org.mule.api.processor.MessageProcessor;
+import org.mule.api.processor.MessageProcessorContainer;
 import org.mule.api.processor.ProcessingStrategy;
 import org.mule.api.source.MessageSource;
 
@@ -20,7 +21,7 @@ import java.util.List;
  * A pipeline has an ordered list of {@link MessageProcessor}'s that are invoked in order to processor new
  * messages received from it's {@link MessageSource}
  */
-public interface Pipeline extends FlowConstruct
+public interface Pipeline extends FlowConstruct, MessageProcessorContainer
 {
 
     public void setMessageSource(MessageSource messageSource);
@@ -37,5 +38,4 @@ public interface Pipeline extends FlowConstruct
 
     public String getProcessorPath(MessageProcessor processor);
 
-    public String[] getProcessorPaths();
 }

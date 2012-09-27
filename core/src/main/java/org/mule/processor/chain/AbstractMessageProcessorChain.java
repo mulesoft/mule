@@ -25,12 +25,14 @@ import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorChain;
 import org.mule.api.processor.MessageProcessorContainer;
+import org.mule.construct.AbstractPipeline;
 import org.mule.endpoint.EndpointAware;
 import org.mule.processor.AbstractInterceptingMessageProcessor;
 import org.mule.util.StringUtils;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -182,4 +184,9 @@ public abstract class AbstractMessageProcessorChain extends AbstractIntercepting
         return processors;
     }
 
+    @Override
+    public Map<MessageProcessor, String> getMessageProcessorPaths()
+    {
+        return AbstractPipeline.buildMessageProcessorPaths(getMessageProcessors());
+    }
 }

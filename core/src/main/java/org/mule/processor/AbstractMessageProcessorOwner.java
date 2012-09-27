@@ -9,18 +9,20 @@
  */
 package org.mule.processor;
 
-import javax.xml.namespace.QName;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
 import org.mule.api.AnnotatedObject;
 import org.mule.api.construct.FlowConstructAware;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Lifecycle;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorContainer;
+import org.mule.construct.AbstractPipeline;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+import javax.xml.namespace.QName;
 
 /**
  * An object that owns message processors and delegates startup/shutdown events to them.
@@ -53,9 +55,9 @@ public abstract class AbstractMessageProcessorOwner extends AbstractMuleObjectOw
     protected abstract List<MessageProcessor> getOwnedMessageProcessors();
 
     @Override
-    public List<MessageProcessor> getMessageProcessors()
+    public Map<MessageProcessor, String> getMessageProcessorPaths()
     {
-        return getOwnedMessageProcessors();
+        return AbstractPipeline.buildMessageProcessorPaths(getOwnedMessageProcessors());
     }
 }
 

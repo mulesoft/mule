@@ -11,9 +11,11 @@ package org.mule.context.notification;
 
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.construct.Pipeline;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.tck.junit4.FunctionalTestCase;
 
 import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Set;
 
 import org.junit.Assert;
@@ -35,22 +37,22 @@ public class MessageProcessorNotificationPathTestCase extends FunctionalTestCase
     public void components() throws Exception
     {
         testFlowPaths("singleMP", "/0");
-        testFlowPaths("processorChain", "/0/0", "/0/1");
+        testFlowPaths("processorChain", "/0", "/0/0", "/0/1");
     }
 
     @Test
     public void routers() throws Exception
     {
-        testFlowPaths("choice", "/0/0/0", "/0/1/0", "/0/2/0");
-        testFlowPaths("all", "/0/0/0", "/0/1/0");
+        testFlowPaths("choice", "/0", "/0/0", "/0/0/0", "/0/1", "/0/1/0", "/0/2", "/0/2/0");
+        testFlowPaths("all", "/0", "/0/0", "/0/0/0", "/0/1", "/0/1/0");
     }
 
     @Test
     public void scopes() throws Exception
     {
-        testFlowPaths("foreach", "/0/0");
-        testFlowPaths("enricher", "/0/0", "/1/0/0", "/1/0/1");
-        testFlowPaths("until-successful", "/0/0/0", "/0/0/1");
+        testFlowPaths("foreach", "/0", "/0/0");
+        testFlowPaths("enricher", "/0", "/0/0", "/1", "/1/0", "/1/0/0", "/1/0/1");
+        testFlowPaths("until-successful", "/0", "/0/0", "/0/0/0", "/0/0/1");
         //testFlowPaths("async", "/0/0", "/0/1");
     }
 
@@ -64,34 +66,30 @@ public class MessageProcessorNotificationPathTestCase extends FunctionalTestCase
     public void exceptionStrategies() throws Exception
     {
         testFlowPaths("catch-es", "/0", "es/0");
-        testFlowPaths("rollback-es", "/0", "es/0");
-        testFlowPaths("choice-es", "/0", "es/0", "es/1");
+        testFlowPaths("rollback-es", "/0", "es/0", "es/1");
+        testFlowPaths("choice-es", "/0", "es/0/0", "es/0/1", "es/1/0");
     }
 
-    private void testFlowPaths(String flowName, String... leaves) throws Exception
+    private void testFlowPaths(String flowName, String... nodes) throws Exception
     {
-        String[] expectedPaths = generatePathsFromLeaves(flowName, leaves);
+        String[] expectedPaths = generatePaths(flowName, nodes);
         FlowConstruct flow = getFlowConstruct(flowName);
-        String[] flowPaths = ((Pipeline) flow).getProcessorPaths();
+        Map<MessageProcessor,String> messageProcessorPaths = ((Pipeline) flow).getMessageProcessorPaths();
+        String[] flowPaths = messageProcessorPaths.values().toArray(new String[]{});
         Assert.assertArrayEquals(expectedPaths, flowPaths);
     }
 
-    private String[] generatePathsFromLeaves(String flowName, String[] leaves)
+    private String[] generatePaths(String flowName, String[] nodes)
     {
         Set<String> pathSet = new LinkedHashSet<String>();
         String base = "/" + flowName + "/processors";
-        for (String leaf : leaves)
+        for (String node : nodes)
         {
-            if (leaf.startsWith("es/"))
+            if (node.startsWith("es/"))
             {
-                base = "/" + flowName + "/es";
+                base = "/" + flowName + "/";
             }
-            String prefix = "/";
-            for (String part : leaf.substring(leaf.indexOf("/") + 1).split("/"))
-            {
-                pathSet.add(base + prefix + part);
-                prefix += part + "/";
-            }
+            pathSet.add(base + node);
         }
         return pathSet.toArray(new String[0]);
     }

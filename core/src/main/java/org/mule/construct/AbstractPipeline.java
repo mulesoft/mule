@@ -314,32 +314,64 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
             logger.warn("flow map already populated");
             return;
         }
-        List<MessageProcessor> mps = getMessageProcessors();
-        createFlowMap(mps, "/" + getName() + "/processors/");
-        if (exceptionListener instanceof MessageProcessorContainer)
-        {
-            mps = ((MessageProcessorContainer) exceptionListener).getMessageProcessors();
-            createFlowMap(mps, "/" + getName() + "/es/");
-        }
+        flowMap = getMessageProcessorPaths();
     }
 
-    private void createFlowMap(List<MessageProcessor> processors, String prefix)
+    @Override
+    public Map<MessageProcessor, String> getMessageProcessorPaths()
     {
-        int idx = 0;
-        for (MessageProcessor mp : processors)
+        Map<MessageProcessor, String> result = new LinkedHashMap<MessageProcessor, String>();
+        int index = 0;
+        String base = "/" + getName();
+        for (MessageProcessor mp : getMessageProcessors())
         {
-            if (mp == null)
-            {
-                logger.warn("NULL mp!");
-                continue;
-            }
-            String currentPrefix = prefix + idx;
-            flowMap.put(mp, currentPrefix);
+            String prefix =  base + "/processors/" + index;
+            result.put(mp, prefix);
             if (mp instanceof MessageProcessorContainer)
             {
-                createFlowMap(((MessageProcessorContainer) mp).getMessageProcessors(), currentPrefix + "/");
+                Map<MessageProcessor, String> children = ((MessageProcessorContainer) mp).getMessageProcessorPaths();
+                prefixMessageProcessorPaths(prefix, children);
+                result.putAll(children);
             }
-            idx++;
+            index++;
+        }
+        if (exceptionListener instanceof MessageProcessorContainer)
+        {
+            Map<MessageProcessor, String> esPathMap = ((MessageProcessorContainer) exceptionListener).getMessageProcessorPaths();
+            prefixMessageProcessorPaths(base + "/es", esPathMap);
+            result.putAll(esPathMap);
+        }
+        return result;
+    }
+
+    public static Map<MessageProcessor, String> buildMessageProcessorPaths(List<MessageProcessor> processors)
+    {
+        Map<MessageProcessor, String> result = new LinkedHashMap<MessageProcessor, String>();
+        int index = 0;
+        for (MessageProcessor mp : processors)
+        {
+            String prefix = "/" + index;
+            result.put(mp, prefix);
+            if (mp instanceof MessageProcessorContainer)
+            {
+                Map<MessageProcessor, String> children = ((MessageProcessorContainer) mp).getMessageProcessorPaths();
+                prefixMessageProcessorPaths(prefix, children);
+                result.putAll(children);
+            }
+            index++;
+        }
+        return result;
+    }
+
+    public static void prefixMessageProcessorPaths(String prefix, Map<MessageProcessor, String> pathMap)
+    {
+        if (prefix.endsWith("/"))
+        {
+            prefix = prefix.substring(0, prefix.length() - 1);
+        }
+        for (Map.Entry entry : pathMap.entrySet())
+        {
+            entry.setValue(prefix + entry.getValue());
         }
     }
 
@@ -349,13 +381,6 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
         return flowMap.get(processor);
     }
 
-    @Override
-    public String[] getProcessorPaths()
-    {
-        String[] paths = new String[flowMap.size()];
-        paths = flowMap.values().toArray(paths);
-        return paths;
-    }
 
     public class ProcessIfPipelineStartedMessageProcessor extends AbstractFilteringMessageProcessor
     {
