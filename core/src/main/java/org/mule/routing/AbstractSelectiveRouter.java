@@ -32,8 +32,8 @@ import org.mule.api.routing.RouterStatisticsRecorder;
 import org.mule.api.routing.SelectiveRouter;
 import org.mule.api.routing.filter.Filter;
 import org.mule.config.i18n.MessageFactory;
-import org.mule.construct.AbstractPipeline;
 import org.mule.management.stats.RouterStatistics;
+import org.mule.util.NotificationUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -374,7 +374,7 @@ public abstract class AbstractSelectiveRouter
             messageProcessors.add(cmp.getMessageProcessor());
         }
         messageProcessors.add(defaultProcessor);
-        return AbstractPipeline.buildMessageProcessorPaths(messageProcessors);
+        return NotificationUtils.buildMessageProcessorPaths(messageProcessors);
     }
 
     @Override

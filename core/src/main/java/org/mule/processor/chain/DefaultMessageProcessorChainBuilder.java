@@ -100,6 +100,11 @@ public class DefaultMessageProcessorChainBuilder extends AbstractMessageProcesso
         // having been injected as the listener of processor n
         final DefaultMessageProcessorChain chain = createOuterChain(tempList);
 
+        return buildMessageProcessorChain(chain);
+    }
+
+    protected MessageProcessorChain buildMessageProcessorChain(DefaultMessageProcessorChain chain)
+    {
         // Wrap with something that can apply lifecycle to all processors which are otherwise not visable from
         // DefaultMessageProcessorChain
         return new InterceptingChainLifecycleWrapper(chain, processors, "wrapper for " + name);

@@ -12,6 +12,7 @@ package org.mule.config.spring.factories;
 
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorBuilder;
+import org.mule.api.processor.MessageProcessorChainBuilder;
 import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
 
 import java.util.List;
@@ -36,8 +37,7 @@ public class MessageProcessorChainFactoryBean implements FactoryBean
 
     public Object getObject() throws Exception
     {
-        DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
-        builder.setName("processor chain '"+name+"'");
+        MessageProcessorChainBuilder builder = getBuilderInstance();
         for (Object processor : processors)
         {
             if (processor instanceof MessageProcessor)
@@ -55,6 +55,13 @@ public class MessageProcessorChainFactoryBean implements FactoryBean
             }
         }
         return builder.build();
+    }
+
+    protected MessageProcessorChainBuilder getBuilderInstance()
+    {
+        DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
+        builder.setName("processor chain '"+name+"'");
+        return builder;
     }
 
     public boolean isSingleton()

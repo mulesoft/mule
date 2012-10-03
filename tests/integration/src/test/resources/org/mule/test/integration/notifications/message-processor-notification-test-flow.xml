@@ -113,6 +113,16 @@
         </or-filter>
     </flow>
 
+    <flow name="subflow">
+        <vm:inbound-endpoint path="in-subflow" exchange-pattern="request-response"/>
+        <echo-component/>
+        <flow-ref name="subflow-call"/>
+    </flow>
+
+    <sub-flow name="subflow-call">
+        <logger/>
+    </sub-flow>
+
     <flow name="catch-es">
         <vm:inbound-endpoint path="in-catch" exchange-pattern="request-response"/>
         <test:component throwException="true" />

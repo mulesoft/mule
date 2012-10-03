@@ -15,7 +15,7 @@ import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Lifecycle;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorContainer;
-import org.mule.construct.AbstractPipeline;
+import org.mule.util.NotificationUtils;
 
 import java.util.Collections;
 import java.util.List;
@@ -57,7 +57,7 @@ public abstract class AbstractMessageProcessorOwner extends AbstractMuleObjectOw
     @Override
     public Map<MessageProcessor, String> getMessageProcessorPaths()
     {
-        return AbstractPipeline.buildMessageProcessorPaths(getOwnedMessageProcessors());
+        return NotificationUtils.buildMessageProcessorPaths(getOwnedMessageProcessors());
     }
 }
 

@@ -20,13 +20,13 @@ import org.mule.api.processor.InterceptingMessageProcessor;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.TransformerException;
-import org.mule.construct.AbstractPipeline;
 import org.mule.expression.ExpressionConfig;
 import org.mule.processor.AbstractMessageProcessorOwner;
 import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.routing.outbound.AbstractMessageSequenceSplitter;
 import org.mule.routing.outbound.CollectionMessageSequence;
 import org.mule.transformer.types.DataTypeFactory;
+import org.mule.util.NotificationUtils;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -157,7 +157,7 @@ public class Foreach extends AbstractMessageProcessorOwner
     {
         //skip the splitter that is added at the beginning
         List<MessageProcessor> mps = getOwnedMessageProcessors().subList(1, getOwnedMessageProcessors().size());
-        return AbstractPipeline.buildMessageProcessorPaths(mps);
+        return NotificationUtils.buildMessageProcessorPaths(mps);
     }
 
     @Override

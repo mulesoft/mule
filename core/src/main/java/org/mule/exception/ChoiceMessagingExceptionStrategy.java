@@ -19,9 +19,9 @@ import org.mule.api.lifecycle.Lifecycle;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorContainer;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.construct.AbstractPipeline;
 import org.mule.message.DefaultExceptionPayload;
 import org.mule.processor.AbstractMuleObjectOwner;
+import org.mule.util.NotificationUtils;
 
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -143,7 +143,7 @@ public class ChoiceMessagingExceptionStrategy extends AbstractMuleObjectOwner<Me
             if (listener instanceof MessageProcessorContainer)
             {
                 Map<MessageProcessor, String> children = ((MessageProcessorContainer) listener).getMessageProcessorPaths();
-                AbstractPipeline.prefixMessageProcessorPaths(prefix, children);
+                NotificationUtils.prefixMessageProcessorPaths(prefix, children);
                 mpPaths.putAll(children);
             }
             idx++;

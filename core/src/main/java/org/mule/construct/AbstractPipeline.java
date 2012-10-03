@@ -38,6 +38,7 @@ import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.processor.strategy.AsynchronousProcessingStrategy;
 import org.mule.processor.strategy.SynchronousProcessingStrategy;
 import org.mule.source.ClusterizableMessageSourceWrapper;
+import org.mule.util.NotificationUtils;
 
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -320,59 +321,16 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     @Override
     public Map<MessageProcessor, String> getMessageProcessorPaths()
     {
-        Map<MessageProcessor, String> result = new LinkedHashMap<MessageProcessor, String>();
-        int index = 0;
-        String base = "/" + getName();
-        for (MessageProcessor mp : getMessageProcessors())
-        {
-            String prefix =  base + "/processors/" + index;
-            result.put(mp, prefix);
-            if (mp instanceof MessageProcessorContainer)
-            {
-                Map<MessageProcessor, String> children = ((MessageProcessorContainer) mp).getMessageProcessorPaths();
-                prefixMessageProcessorPaths(prefix, children);
-                result.putAll(children);
-            }
-            index++;
-        }
+        String prefix = "/" + getName() + "/processors";
+        Map<MessageProcessor, String> result = NotificationUtils.buildMessageProcessorPaths(getMessageProcessors(), prefix);
+
         if (exceptionListener instanceof MessageProcessorContainer)
         {
             Map<MessageProcessor, String> esPathMap = ((MessageProcessorContainer) exceptionListener).getMessageProcessorPaths();
-            prefixMessageProcessorPaths(base + "/es", esPathMap);
+            NotificationUtils.prefixMessageProcessorPaths("/" + getName() + "/es", esPathMap);
             result.putAll(esPathMap);
         }
         return result;
-    }
-
-    public static Map<MessageProcessor, String> buildMessageProcessorPaths(List<MessageProcessor> processors)
-    {
-        Map<MessageProcessor, String> result = new LinkedHashMap<MessageProcessor, String>();
-        int index = 0;
-        for (MessageProcessor mp : processors)
-        {
-            String prefix = "/" + index;
-            result.put(mp, prefix);
-            if (mp instanceof MessageProcessorContainer)
-            {
-                Map<MessageProcessor, String> children = ((MessageProcessorContainer) mp).getMessageProcessorPaths();
-                prefixMessageProcessorPaths(prefix, children);
-                result.putAll(children);
-            }
-            index++;
-        }
-        return result;
-    }
-
-    public static void prefixMessageProcessorPaths(String prefix, Map<MessageProcessor, String> pathMap)
-    {
-        if (prefix.endsWith("/"))
-        {
-            prefix = prefix.substring(0, prefix.length() - 1);
-        }
-        for (Map.Entry entry : pathMap.entrySet())
-        {
-            entry.setValue(prefix + entry.getValue());
-        }
     }
 
     @Override
