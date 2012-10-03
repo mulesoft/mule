@@ -43,6 +43,7 @@ public class MessageProcessorNotificationTestCase extends AbstractNotificationTe
         assertNotNull(client.send("vm://in-all", "test", null));
         assertNotNull(client.send("vm://in-foreach", "test", null));
         assertNotNull(client.send("vm://in-enricher", "test", null));
+        assertNotNull(client.send("vm://in-async", "test", null));
         assertNotNull(client.send("vm://in-filter", "test", null));
         assertNotNull(client.send("vm://in-subflow", "test", null));
         assertNotNull(client.send("vm://in-catch", "test", null));
@@ -84,6 +85,11 @@ public class MessageProcessorNotificationTestCase extends AbstractNotificationTe
                 .serial(prePost())
                 .serial(prePost())
                 .serial(post())
+
+                //async
+                .serial(prePost())
+                .serial(prePost())
+                .serial(prePost())
 
                 //filter
                 .serial(pre())

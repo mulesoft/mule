@@ -53,7 +53,7 @@ public class MessageProcessorNotificationPathTestCase extends FunctionalTestCase
         testFlowPaths("foreach", "/0", "/0/0");
         testFlowPaths("enricher", "/0", "/0/0", "/1", "/1/0", "/1/0/0", "/1/0/1");
         testFlowPaths("until-successful", "/0", "/0/0", "/0/0/0", "/0/0/1");
-        //testFlowPaths("async", "/0/0", "/0/1");
+        testFlowPaths("async", "/0", "/0/0", "/0/1");
     }
 
     @Test

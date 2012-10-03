@@ -23,16 +23,19 @@ import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorChainBuilder;
+import org.mule.api.processor.MessageProcessorContainer;
 import org.mule.api.processor.ProcessingStrategy;
 import org.mule.api.processor.ProcessingStrategy.StageNameSource;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.construct.Flow;
 import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
+import org.mule.util.NotificationUtils;
 import org.mule.work.AbstractMuleEventWork;
 import org.mule.work.MuleWorkManager;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -138,6 +141,16 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
     public ProcessingStrategy getProcessingStrategy()
     {
         return processingStrategy;
+    }
+
+    @Override
+    public Map<MessageProcessor, String> getMessageProcessorPaths()
+    {
+        if (delegate instanceof MessageProcessorContainer)
+        {
+            return ((MessageProcessorContainer) delegate).getMessageProcessorPaths();
+        }
+        return NotificationUtils.buildMessageProcessorPaths(Collections.singletonList(delegate));
     }
 
     class AsyncMessageProcessorWorker extends AbstractMuleEventWork

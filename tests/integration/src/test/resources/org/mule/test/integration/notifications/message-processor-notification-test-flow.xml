@@ -71,7 +71,7 @@
 
     <flow name="enricher">
         <vm:inbound-endpoint path="in-enricher" exchange-pattern="request-response"/>
-        <enricher><!-- no funca sin processor chain -->
+        <enricher>
             <append-string-transformer message="Hello"/>
             <enrich target="#[header:OUTBOUND:helloHeader]"/>
             <enrich target="#[header:OUTBOUND:helloHeader2]"/>
@@ -94,15 +94,13 @@
         </until-successful>
     </flow>
 
-<!--
-        <flow name="async">
-            <vm:inbound-endpoint path="in-async" exchange-pattern="request-response"/>
-            <async>
-                <logger message="check1"/>
-                <logger message="check2"/>
-            </async>
-        </flow>
--->
+    <flow name="async">
+        <vm:inbound-endpoint path="in-async" exchange-pattern="request-response"/>
+        <async>
+            <logger message="check1"/>
+            <logger message="check2"/>
+        </async>
+    </flow>
 
     <flow name="filters">
         <vm:inbound-endpoint path="in-filter" exchange-pattern="request-response"/>
@@ -125,7 +123,7 @@
 
     <flow name="catch-es">
         <vm:inbound-endpoint path="in-catch" exchange-pattern="request-response"/>
-        <test:component throwException="true" />
+        <test:component throwException="true"/>
         <catch-exception-strategy>
             <logger/>
         </catch-exception-strategy>
@@ -133,7 +131,7 @@
 
     <flow name="rollback-es">
         <vm:inbound-endpoint path="in-rollback" exchange-pattern="request-response"/>
-        <test:component throwException="true" />
+        <test:component throwException="true"/>
         <rollback-exception-strategy>
             <logger/>
             <on-redelivery-attempts-exceeded>
