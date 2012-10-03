@@ -13,6 +13,7 @@ package org.mule.module.launcher;
 import org.mule.MuleCoreExtension;
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleException;
+import org.mule.api.lifecycle.InitialisationException;
 import org.mule.config.ExceptionHelper;
 import org.mule.config.StartupContext;
 import org.mule.config.i18n.CoreMessages;
@@ -150,10 +151,13 @@ public class MuleContainer
 
         try
         {
-            loadCoreExtensions();
+            coreExtensions = loadCoreExtensions();
 
             // TODO pluggable deployer
             deploymentService = new DeploymentService(coreExtensions);
+
+            initializeCoreExtensions();
+
             deploymentService.start();
         }
         catch (Throwable e)
@@ -162,11 +166,30 @@ public class MuleContainer
         }
     }
 
+    private void initializeCoreExtensions() throws InitialisationException
+    {
+        for (MuleCoreExtension extension : coreExtensions.values())
+        {
+            if (extension instanceof DeploymentServiceAware)
+            {
+                ((DeploymentServiceAware) extension).setDeploymentService(deploymentService);
+            }
+
+            if (extension instanceof MuleCoreExtensionAware)
+            {
+                ((MuleCoreExtensionAware) extension).setMuleCoreExtensions(coreExtensions);
+            }
+
+            extension.initialise();
+        }
+    }
+
     /**
      * Load all core extensions defined in the classpath
      */
-    private void loadCoreExtensions() throws MuleException
+    private Map<Class<? extends MuleCoreExtension>, MuleCoreExtension> loadCoreExtensions() throws MuleException
     {
+        Map<Class<? extends MuleCoreExtension>, MuleCoreExtension> result = new HashMap<Class<? extends MuleCoreExtension>, MuleCoreExtension>();
         Enumeration<?> e = ClassUtils.getResources(SERVICE_PATH + CORE_EXTENSION_PROPERTIES, getClass());
         List<Properties> extensions = new LinkedList<Properties>();
 
@@ -199,8 +222,7 @@ public class MuleContainer
                 try
                 {
                     MuleCoreExtension extension = (MuleCoreExtension) ClassUtils.instanciateClass(extClass);
-                    extension.initialise();
-                    coreExtensions.put(extension.getClass(), extension);
+                    result.put(extension.getClass(), extension);
                 }
                 catch (Exception ex)
                 {
@@ -208,6 +230,8 @@ public class MuleContainer
                 }
             }
         }
+
+        return result;
     }
 
     /**
