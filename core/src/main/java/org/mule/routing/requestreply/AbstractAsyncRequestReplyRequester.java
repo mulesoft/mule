@@ -12,6 +12,7 @@ package org.mule.routing.requestreply;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.RequestContext;
+import org.mule.api.DefaultMuleException;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -38,6 +39,7 @@ import org.mule.routing.EventProcessingThread;
 import org.mule.util.ObjectUtils;
 import org.mule.util.concurrent.Latch;
 import org.mule.util.concurrent.ThreadNameHelper;
+import org.mule.util.store.DeserializationPostInitialisable;
 
 import java.io.Serializable;
 import java.util.List;
@@ -374,7 +376,8 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
                             Latch l = locks.get(correlationId);
                             if (l != null)
                             {
-                                MuleEvent event = (MuleEvent) store.retrieve(correlationId);
+                                MuleEvent event = retrieveEvent(correlationId);
+
                                 MuleEvent previousResult = responseEvents.putIfAbsent(correlationId, event);
                                 if (previousResult != null)
                                 {
@@ -403,6 +406,25 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
             {
                 logger.debug("Error processing async replies", ex);
             }
+        }
+
+        private MuleEvent retrieveEvent(String correlationId) throws ObjectStoreException, DefaultMuleException
+        {
+            MuleEvent event = (MuleEvent) store.retrieve(correlationId);
+
+            if (event.getMuleContext() == null)
+            {
+                try
+                {
+                    DeserializationPostInitialisable.Implementation.init(event, muleContext);
+                }
+                catch (Exception e)
+                {
+                    throw new DefaultMuleException(e);
+                }
+            }
+
+            return event;
         }
     }
 }
