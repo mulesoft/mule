@@ -10,7 +10,13 @@
 
 package org.mule.transport.jdbc;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+import org.mule.api.MuleException;
 import org.mule.api.transport.Connector;
+import org.mule.common.TestResult;
+import org.mule.common.Testable;
 import org.mule.tck.util.MuleDerbyTestUtils;
 import org.mule.transport.AbstractConnectorTestCase;
 
@@ -18,6 +24,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.derby.jdbc.EmbeddedDataSource;
+import org.enhydra.jdbc.standard.StandardDataSource;
+import org.junit.Test;
 
 public class JdbcConnectorTestCase extends AbstractConnectorTestCase
 {
@@ -37,7 +45,7 @@ public class JdbcConnectorTestCase extends AbstractConnectorTestCase
         MuleDerbyTestUtils.cleanupDerbyDb(DATABASE_NAME);
         super.doTearDown();
     }
-    
+
     @Override
     public Connector createConnector() throws Exception
     {
@@ -60,4 +68,54 @@ public class JdbcConnectorTestCase extends AbstractConnectorTestCase
     {
         return "jdbc://test?sql=SELECT * FROM TABLE";
     }
+
+    @Test
+    public void testConnectionConnectorStartedSucess() throws MuleException
+    {
+        getConnector().start();
+        assertTrue(getConnector().isStarted());
+        assertTrue(getConnector().isConnected());
+        assertTrue(getConnector() instanceof Testable);
+        assertTrue(((Testable) getConnector()).test().getStatus() == TestResult.Status.SUCCESS);
+        assertTrue(getConnector().isStarted());
+        assertTrue(getConnector().isConnected());
+    }
+
+    @Test
+    public void testConnectionConnectorStoppedSucess()
+    {
+        assertFalse(getConnector().isStarted());
+        assertFalse(getConnector().isConnected());
+        assertTrue(getConnector() instanceof Testable);
+        assertTrue(((Testable) getConnector()).test().getStatus() == TestResult.Status.SUCCESS);
+        assertFalse(getConnector().isStarted());
+        assertFalse(getConnector().isConnected());
+    }
+
+    @Test
+    public void testConnectionInvalidConfigParamFailure() throws MuleException
+    {
+        ((JdbcConnector) getConnector()).setDataSource(null);
+        assertFalse(getConnector().isStarted());
+        assertFalse(getConnector().isConnected());
+        assertTrue(getConnector() instanceof Testable);
+        assertTrue(((Testable) getConnector()).test().getStatus() == TestResult.Status.FAILURE);
+        System.out.println(((Testable) getConnector()).test().getMessage());
+        assertFalse(getConnector().isStarted());
+        assertFalse(getConnector().isConnected());
+    }
+
+    @Test
+    public void testConnectionUnreachableFailure() throws MuleException
+    {
+        ((JdbcConnector) getConnector()).setDataSource(new StandardDataSource());
+        assertFalse(getConnector().isStarted());
+        assertFalse(getConnector().isConnected());
+        assertTrue(getConnector() instanceof Testable);
+        assertTrue(((Testable) getConnector()).test().getStatus() == TestResult.Status.FAILURE);
+        System.out.println(((Testable) getConnector()).test().getMessage());
+        assertFalse(getConnector().isStarted());
+        assertFalse(getConnector().isConnected());
+    }
+
 }

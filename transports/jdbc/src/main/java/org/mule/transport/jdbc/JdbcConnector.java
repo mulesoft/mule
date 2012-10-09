@@ -24,11 +24,14 @@ import org.mule.api.retry.RetryContext;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionException;
 import org.mule.api.transport.MessageReceiver;
+import org.mule.common.TestResult;
+import org.mule.common.Testable;
 import org.mule.config.ExceptionHelper;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.transport.AbstractConnector;
 import org.mule.transport.ConnectException;
+import org.mule.transport.ConnectorTestResult;
 import org.mule.transport.jdbc.sqlstrategy.DefaultSqlStatementStrategyFactory;
 import org.mule.transport.jdbc.sqlstrategy.SqlStatementStrategyFactory;
 import org.mule.transport.jdbc.xa.DataSourceWrapper;
@@ -49,7 +52,7 @@ import javax.sql.XADataSource;
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.ResultSetHandler;
 
-public class JdbcConnector extends AbstractConnector
+public class JdbcConnector extends AbstractConnector implements Testable
 {
     public static final String JDBC = "jdbc";
 
@@ -61,7 +64,6 @@ public class JdbcConnector extends AbstractConnector
     private static final Pattern STATEMENT_ARGS = TemplateParser.WIGGLY_MULE_TEMPLATE_PATTERN;
 
     private SqlStatementStrategyFactory sqlStatementStrategyFactory = new DefaultSqlStatementStrategyFactory();
-
 
     /* Register the SQL Exception reader if this class gets loaded */
     static
@@ -75,12 +77,12 @@ public class JdbcConnector extends AbstractConnector
     protected DataSource dataSource;
     protected ResultSetHandler resultSetHandler;
     protected QueryRunner queryRunner;
-    
+
     private int queryTimeout;
-    
-    /** 
-     * Should each DB record be received in a separate transaction or should 
-     * there be a single transaction for the entire ResultSet? 
+
+    /**
+     * Should each DB record be received in a separate transaction or should there be a single transaction for
+     * the entire ResultSet?
      */
     protected boolean transactionPerMessage = true;
 
@@ -88,7 +90,7 @@ public class JdbcConnector extends AbstractConnector
     {
         super(context);
     }
-    
+
     protected void doInitialise() throws InitialisationException
     {
         createMultipleTransactedReceivers = false;
@@ -99,7 +101,8 @@ public class JdbcConnector extends AbstractConnector
         }
         if (resultSetHandler == null)
         {
-            resultSetHandler = new org.apache.commons.dbutils.handlers.MapListHandler(new ColumnAliasRowProcessor());
+            resultSetHandler = new org.apache.commons.dbutils.handlers.MapListHandler(
+                new ColumnAliasRowProcessor());
         }
         if (queryRunner == null)
         {
@@ -115,7 +118,8 @@ public class JdbcConnector extends AbstractConnector
         }
     }
 
-    public MessageReceiver createReceiver(FlowConstruct flowConstruct, InboundEndpoint endpoint) throws Exception
+    public MessageReceiver createReceiver(FlowConstruct flowConstruct, InboundEndpoint endpoint)
+        throws Exception
     {
         Map props = endpoint.getProperties();
         if (props != null)
@@ -190,18 +194,20 @@ public class JdbcConnector extends AbstractConnector
             readStmt = readStmt.trim();
         }
 
-        if (!"select".equalsIgnoreCase(readStmt.substring(0, 6)) && !"call".equalsIgnoreCase(readStmt.substring(0, 4)))
+        if (!"select".equalsIgnoreCase(readStmt.substring(0, 6))
+            && !"call".equalsIgnoreCase(readStmt.substring(0, 4)))
         {
-            throw new IllegalArgumentException("Read statement should be a select sql statement or a stored procedure");
+            throw new IllegalArgumentException(
+                "Read statement should be a select sql statement or a stored procedure");
         }
         if (ackStmt != null)
         {
             if (!"insert".equalsIgnoreCase(ackStmt.substring(0, 6))
-                    && !"update".equalsIgnoreCase(ackStmt.substring(0, 6))
-                    && !"delete".equalsIgnoreCase(ackStmt.substring(0, 6)))
+                && !"update".equalsIgnoreCase(ackStmt.substring(0, 6))
+                && !"delete".equalsIgnoreCase(ackStmt.substring(0, 6)))
             {
                 throw new IllegalArgumentException(
-                        "Ack statement should be an insert / update / delete sql statement");
+                    "Ack statement should be an insert / update / delete sql statement");
             }
         }
         return new String[]{readStmt, ackStmt};
@@ -240,7 +246,7 @@ public class JdbcConnector extends AbstractConnector
             }
         }
         logger.debug("Retrieving new connection from data source");
-        
+
         Connection con;
         try
         {
@@ -277,16 +283,15 @@ public class JdbcConnector extends AbstractConnector
         this.transactionPerMessage = transactionPerMessage;
         if (!transactionPerMessage)
         {
-            logger.warn("transactionPerMessage property is set to false so setting createMultipleTransactedReceivers " +
-                    "to false also to prevent creation of multiple JdbcMessageReceivers");
+            logger.warn("transactionPerMessage property is set to false so setting createMultipleTransactedReceivers "
+                        + "to false also to prevent creation of multiple JdbcMessageReceivers");
             setCreateMultipleTransactedReceivers(transactionPerMessage);
         }
     }
 
     /**
-     * Parse the given statement filling the parameter list and return the ready to
-     * use statement.
-     *
+     * Parse the given statement filling the parameter list and return the ready to use statement.
+     * 
      * @param stmt
      * @param params
      */
@@ -302,10 +307,10 @@ public class JdbcConnector extends AbstractConnector
         {
             String key = m.group();
             m.appendReplacement(sb, "?");
-            //Special legacy handling for #[payload]
+            // Special legacy handling for #[payload]
             if (key.equals("#[payload]"))
             {
-                //MULE-3597
+                // MULE-3597
                 logger.error("invalid expression template #[payload]. It should be replaced with #[payload:] to conform with the correct expression syntax. Mule has replaced this for you, but may not in future versions.");
                 key = "#[payload:]";
             }
@@ -316,7 +321,7 @@ public class JdbcConnector extends AbstractConnector
     }
 
     public Object[] getParams(ImmutableEndpoint endpoint, List paramNames, MuleMessage message, String query)
-            throws Exception
+        throws Exception
     {
         Object[] params = new Object[paramNames.size()];
         for (int i = 0; i < paramNames.size(); i++)
@@ -379,8 +384,9 @@ public class JdbcConnector extends AbstractConnector
         }
     }
 
-    /** 
+    /**
      * Verify that we are able to connect to the DataSource (needed for retry policies)
+     * 
      * @param retryContext
      */
     public RetryContext validateConnection(RetryContext retryContext)
@@ -422,9 +428,9 @@ public class JdbcConnector extends AbstractConnector
         // template method
     }
 
-    //////////////////////////////////////////////////////////////////////////////////////
+    // ////////////////////////////////////////////////////////////////////////////////////
     // Getters and Setters
-    //////////////////////////////////////////////////////////////////////////////////////
+    // ////////////////////////////////////////////////////////////////////////////////////
 
     public String getProtocol()
     {
@@ -462,7 +468,7 @@ public class JdbcConnector extends AbstractConnector
     {
         String queryTimeoutAsString = (String) endpoint.getProperty("queryTimeout");
         Integer queryTimeout = -1;
-        
+
         try
         {
             queryTimeout = Integer.valueOf(queryTimeoutAsString);
@@ -471,11 +477,11 @@ public class JdbcConnector extends AbstractConnector
         {
 
         }
-        
+
         if (queryTimeout >= 0)
         {
             ExtendedQueryRunner extendedQueryRunner = new ExtendedQueryRunner(
-                    this.queryRunner.getDataSource(), queryTimeout);
+                this.queryRunner.getDataSource(), queryTimeout);
             return extendedQueryRunner;
         }
         else
@@ -581,4 +587,38 @@ public class JdbcConnector extends AbstractConnector
             throw new DefaultMuleException(e);
         }
     }
+
+    @Override
+    public TestResult test()
+    {
+        if (isConnected())
+        {
+            return new ConnectorTestResult(TestResult.Status.SUCCESS);
+        }
+        Connection con = null;
+        try
+        {
+            con = dataSource.getConnection();
+            return new ConnectorTestResult(TestResult.Status.SUCCESS);
+        }
+        catch (Exception e)
+        {
+            return new ConnectorTestResult(TestResult.Status.FAILURE, e.toString());
+        }
+        finally
+        {
+            if (con != null)
+            {
+                try
+                {
+                    con.close();
+                }
+                catch (SQLException e)
+                {
+                    // eat exception
+                }
+            }
+        }
+    }
+
 }
