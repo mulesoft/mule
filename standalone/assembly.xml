@@ -193,6 +193,7 @@
             <useStrictFiltering>true</useStrictFiltering>
             <includes>
                 <!-- Core -->
+                <include>org.mule.common:mule-common</include>
                 <include>org.mule:mule-core</include>
                 <!-- Transports -->
                 <include>org.mule.transports:mule-transport-ajax</include>
@@ -258,6 +259,7 @@
             <excludes>
                 <!-- lib/mule -->
                 <exclude>org.mule:mule-core</exclude>
+                <exclude>org.mule.common:mule-common</exclude>
                 <exclude>org.mule.transports:mule-transports-all</exclude>
                 <exclude>org.mule.transports:mule-transport-ajax</exclude>
                 <exclude>org.mule.transports:mule-transport-ejb</exclude>
