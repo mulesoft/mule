@@ -762,6 +762,30 @@
         </xsd:complexContent>
     </xsd:complexType>
 
+    <xsd:element name="if" type="ifType" substitutionGroup="abstract-message-processor">
+        <xsd:annotation>
+            <xsd:documentation>
+                Conditionally invokes child message processors if the expression evaluates to true
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:complexType name="ifType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractMessageProcessorType">
+                <xsd:sequence>
+                    <xsd:group ref="messageProcessorOrOutboundEndpoint" maxOccurs="unbounded"/>
+                </xsd:sequence>
+                <xsd:attribute name="expression" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Mule Expression.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
     <xsd:element name="request-reply" type="requestReplyType" substitutionGroup="abstract-message-processor">
         <xsd:annotation>
             <xsd:documentation>
@@ -8007,4 +8031,5 @@
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
+        
 </xsd:schema>
