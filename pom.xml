@@ -1291,14 +1291,6 @@
                 <enabled>true</enabled>
             </snapshots>
         </repository>
-        <repository>
-            <id>mule-ee</id>
-            <name>Mule EE</name>
-            <url>http://dev.ee.mulesource.com/repository/content/repositories/snapshots/</url>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
     </repositories>
 
     <pluginRepositories>

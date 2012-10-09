@@ -139,7 +139,6 @@ import org.mule.object.SingletonObjectFactory;
 import org.mule.processor.IdempotentRedeliveryPolicy;
 import org.mule.processor.InvokerMessageProcessor;
 import org.mule.processor.NullMessageProcessor;
-import org.mule.processor.ConditionalDelegateMessageProcessor;
 import org.mule.processor.strategy.AsynchronousProcessingStrategy;
 import org.mule.processor.strategy.QueuedAsynchronousProcessingStrategy;
 import org.mule.processor.strategy.QueuedThreadPerProcessorProcessingStrategy;
@@ -406,8 +405,6 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
             EnrichExpressionPair.class));
 
         registerBeanDefinitionParser("async", new AsyncMessageProcessorsDefinitionParser());
-        registerBeanDefinitionParser("if", new ChildDefinitionParser("messageProcessor", ConditionalDelegateMessageProcessor.class));
-        
         registerBeanDefinitionParser("transactional", new ChildDefinitionParser("messageProcessor",
             TransactionalMessageProcessorsFactoryBean.class));
         registerMuleBeanDefinitionParser("logger", new ChildDefinitionParser("messageProcessor",
