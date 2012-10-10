@@ -190,7 +190,6 @@
         <!-- Mule libraries -->
         <dependencySet>
             <outputDirectory>lib/mule</outputDirectory>
-            <outputFileNameMapping>${artifact.artifactId}-${artifact.baseVersion}.${artifact.extension}</outputFileNameMapping>
             <useStrictFiltering>true</useStrictFiltering>
             <includes>
                 <!-- Core -->
