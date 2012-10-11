@@ -104,8 +104,8 @@ public class SpringXmlConfigurationMuleArtifactFactory implements XmlConfigurati
         DocumentBuilder builder = factory.newDocumentBuilder();
 
         org.w3c.dom.Document doc1 = builder.newDocument();
-        doc1.adoptNode(element);
-        doc1.appendChild(element);
+        org.w3c.dom.Element importedElement = (org.w3c.dom.Element) doc1.importNode(element, Boolean.TRUE);
+        doc1.appendChild(importedElement);
 
         // Convert w3c document to dom4j document
         DOMReader reader = new DOMReader();
