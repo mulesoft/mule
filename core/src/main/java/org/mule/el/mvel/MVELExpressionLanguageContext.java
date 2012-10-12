@@ -23,11 +23,9 @@ import java.util.Map;
 import org.mvel2.ImmutableElementException;
 import org.mvel2.ParserContext;
 import org.mvel2.UnresolveablePropertyException;
-import org.mvel2.ast.Function;
 import org.mvel2.integration.VariableResolver;
 import org.mvel2.integration.VariableResolverFactory;
 import org.mvel2.integration.impl.BaseVariableResolverFactory;
-import org.mvel2.integration.impl.ClassImportResolverFactory;
 import org.mvel2.integration.impl.SimpleVariableResolverFactory;
 
 public class MVELExpressionLanguageContext extends BaseVariableResolverFactory
@@ -228,36 +226,9 @@ public class MVELExpressionLanguageContext extends BaseVariableResolverFactory
     @Override
     public void declareFunction(String name, ExpressionLanguageFunction function)
     {
-        addFinalVariable(name, new MVELFunctionAdaptor(name, function));
+        addFinalVariable(name, new MVELFunctionAdaptor(name, function, parserContext));
     }
 
-    @SuppressWarnings("serial")
-    private class MVELFunctionAdaptor extends Function
-    {
-        private ExpressionLanguageFunction function;
-
-        public MVELFunctionAdaptor(String name, ExpressionLanguageFunction function)
-        {
-            super(name, new char[]{}, new char[]{}, 0, parserContext);
-            this.function = function;
-        }
-
-        @Override
-        public Object call(Object ctx, Object thisValue, VariableResolverFactory factory, Object[] parms)
-        {
-            if (factory instanceof ClassImportResolverFactory)
-            {
-                factory = factory.getNextFactory();
-            }
-            return function.call(parms, (ExpressionLanguageContext) factory);
-        }
-
-        @Override
-        public void checkArgumentCount(int passing)
-        {
-            // no-op
-        }
-    }
 
     @Override
     public void appendFactory(VariableResolverFactory resolverFactory)
