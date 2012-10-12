@@ -46,7 +46,8 @@ public class SpringXmlConfigurationMuleArtifactFactory implements XmlConfigurati
             addSchemaLocation(rootElement, element, callback);
             for (int i = 0; i < element.getAttributes().getLength(); i++)
             {
-                if (element.getAttributes().item(i).getLocalName().endsWith("-ref"))
+                String attributeName = element.getAttributes().item(i).getLocalName();
+                if (attributeName != null && attributeName.endsWith("-ref"))
                 {
                     org.w3c.dom.Element depenedantElement = callback.getGlobalElement(element.getAttributes()
                         .item(i)
