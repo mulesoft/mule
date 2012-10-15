@@ -43,7 +43,7 @@
     </xsd:element>
     <xsd:complexType name="jettySslConnectorType">
         <xsd:complexContent>
-            <xsd:extension base="mule:abstractConnectorType">
+            <xsd:extension base="mule:connectorType">
                 <xsd:sequence minOccurs="1" maxOccurs="1">
                     <xsd:element minOccurs="0" maxOccurs="1" name="tls-client" type="mule:tlsClientKeyStoreType"/>
                     <xsd:element minOccurs="0" maxOccurs="1" name="tls-key-store" type="mule:tlsKeyStoreType"/>

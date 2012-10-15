@@ -38,7 +38,7 @@
     </xsd:element>
     <xsd:complexType name="jettyConnectorType">
         <xsd:complexContent>
-            <xsd:extension base="mule:abstractConnectorType">
+            <xsd:extension base="mule:connectorType">
                 <xsd:sequence>
                     <xsd:element minOccurs="0" maxOccurs="1" name="webapps" type="webappsType">
                         <xsd:annotation>
