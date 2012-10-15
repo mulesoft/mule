@@ -20,15 +20,15 @@ import org.mule.util.ClassUtils;
 import org.mule.util.IOUtils;
 
 import java.beans.PropertyEditor;
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+
 import org.springframework.beans.PropertyEditorRegistrar;
 import org.springframework.beans.PropertyEditorRegistry;
 
@@ -39,6 +39,7 @@ import org.springframework.beans.PropertyEditorRegistry;
 public class MulePropertyEditorRegistrar implements PropertyEditorRegistrar, MuleContextAware
 {
     private MuleContext muleContext;
+    private Map<Class<?>, Class<PropertyEditor>> customPropertyEditorsCache;
     private static final String CUSTOM_PROPERTY_EDITOR_RESOURCE_NAME = "META-INF/mule.custom-property-editors";
 
     public void setMuleContext(MuleContext context)
@@ -54,6 +55,28 @@ public class MulePropertyEditorRegistrar implements PropertyEditorRegistrar, Mul
             new MessageExchangePatternPropertyEditor());
         registry.registerCustomEditor(Type.class, new SimpleServiceTypePropertyEditor());
         registry.registerCustomEditor(Date.class, new DatePropertyEditor(new SimpleDateFormat("yyyy-MM-dd hh:mm:ss"), new SimpleDateFormat("yyyy-MM-dd"), true));
+
+        if (customPropertyEditorsCache == null)
+        {
+            discoverCustomPropertyEditor();
+        }
+        for (Map.Entry<Class<?>, Class<PropertyEditor>> entry : customPropertyEditorsCache.entrySet())
+        {
+            try
+            {
+                registry.registerCustomEditor(entry.getKey(), ClassUtils.instanciateClass(entry.getValue()));
+            }
+            catch (Exception e)
+            {
+                throw new IllegalStateException("Error loading custom property editors", e);
+            }
+        }
+
+    }
+
+    private void discoverCustomPropertyEditor()
+    {
+        customPropertyEditorsCache = new HashMap<Class<?>, Class<PropertyEditor>>();
 
         // Look for any editors needed by extensions
         try
@@ -71,10 +94,9 @@ public class MulePropertyEditorRegistrar implements PropertyEditorRegistrar, Mul
                     {
                         String target = (String) entry.getKey();
                         String editor = (String) entry.getValue();
-                        registry.registerCustomEditor(
-                                ClassUtils.loadClass(target, getClass()),
-                                (PropertyEditor)ClassUtils.instanciateClass(ClassUtils.loadClass(editor, getClass())));
-
+                        Class<?> requiredType = ClassUtils.loadClass(target, getClass());
+                        Class<PropertyEditor> propertyEditorClass = ClassUtils.loadClass(editor, getClass());
+                        customPropertyEditorsCache.put(requiredType, propertyEditorClass);
                     }
                 }
                 finally
@@ -82,7 +104,7 @@ public class MulePropertyEditorRegistrar implements PropertyEditorRegistrar, Mul
                     IOUtils.closeQuietly(stream);
                 }
             }
-        } 
+        }
         catch (Exception e)
         {
             throw new IllegalStateException("Error loading custom property editors", e);
