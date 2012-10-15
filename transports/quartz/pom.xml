@@ -12,9 +12,9 @@
     <description>A Mule transport for Quartz. This transport supplies a receiver for jobs scheduled with Quartz.</description>
 
     <dependencies>
-       <dependency>
-            <groupId>quartz</groupId>
-            <artifactId>quartz-all</artifactId>
+        <dependency>
+            <groupId>org.quartz-scheduler</groupId>
+            <artifactId>quartz</artifactId>
             <version>${quartzVersion}</version>
         </dependency>
         <!-- The Mule client is needed for EndpointPollingJob and ScheduledDispatchJob -->
