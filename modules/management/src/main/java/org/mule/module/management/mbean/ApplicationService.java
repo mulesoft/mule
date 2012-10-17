@@ -9,14 +9,11 @@
  */
 package org.mule.module.management.mbean;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.api.MuleContext;
-import org.mule.construct.AbstractFlowConstruct;
 import org.mule.management.stats.FlowConstructStatistics;
 
-import javax.management.MBeanServer;
-import javax.management.ObjectName;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * The MBean for application-wide statistics
@@ -35,8 +32,9 @@ public class ApplicationService extends FlowConstructService implements FlowCons
     {
         try
         {
-            statsName = new ObjectName(objectName.getDomain() + ":type=org.mule.Statistics," +
-                statistics.getFlowConstructType() + "=" + getName());
+            statsName = jmxSupport.getObjectName(String.format("%s:type=org.mule.Statistics,%s=%s", objectName.getDomain(), 
+                statistics.getFlowConstructType(), jmxSupport.escape(getName())));
+            
             // unregister old version if exists
             if (this.server.isRegistered(statsName))
             {
