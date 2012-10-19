@@ -12,6 +12,9 @@ package org.mule.module.management.mbean;
 import org.mule.api.MuleContext;
 import org.mule.construct.AbstractFlowConstruct;
 import org.mule.management.stats.FlowConstructStatistics;
+import org.mule.module.management.support.AutoDiscoveryJmxSupportFactory;
+import org.mule.module.management.support.JmxSupport;
+import org.mule.module.management.support.JmxSupportFactory;
 
 import javax.management.MBeanRegistration;
 import javax.management.MBeanServer;
@@ -41,6 +44,10 @@ public class FlowConstructService implements FlowConstructServiceMBean, MBeanReg
     protected ObjectName objectName;
 
     protected MuleContext muleContext;
+    
+    // JmxSupport in order to build MBean's ObjectNames properly.
+    protected JmxSupportFactory jmxSupportFactory = AutoDiscoveryJmxSupportFactory.getInstance();
+    protected JmxSupport jmxSupport = jmxSupportFactory.getJmxSupport();
 
     public FlowConstructService(String type, String name, MuleContext muleContext, FlowConstructStatistics statistics)
     {
@@ -141,8 +148,9 @@ public class FlowConstructService implements FlowConstructServiceMBean, MBeanReg
         {
             if (flow.getStatistics() != null)
             {
-                statsName = new ObjectName(objectName.getDomain() + ":type=org.mule.Statistics," +
-                    flow.getConstructType() + "=" + getName());
+                statsName = jmxSupport.getObjectName(String.format("%s:type=org.mule.Statistics,%s=%s", objectName.getDomain(), 
+                    flow.getConstructType(), jmxSupport.escape(getName())));
+                
                 // unregister old version if exists
                 if (this.server.isRegistered(statsName))
                 {

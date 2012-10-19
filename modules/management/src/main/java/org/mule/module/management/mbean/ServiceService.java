@@ -139,10 +139,9 @@ public class ServiceService extends FlowConstructService implements ServiceServi
         {
             if (getComponent().getStatistics() != null)
             {
-                String quotedName = ObjectName.quote(getName());
-                statsName = new ObjectName(objectName.getDomain() +
-                    ":type=org.mule.Statistics,service=" + quotedName);
-
+                statsName = jmxSupport.getObjectName(String.format("%s:type=org.mule.Statistics,service=%s", objectName.getDomain(), 
+                     jmxSupport.escape(getName())));
+                
                 // unregister old version if exists
                 if (server.isRegistered(statsName))
                 {
