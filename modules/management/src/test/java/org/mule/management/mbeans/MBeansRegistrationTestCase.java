@@ -134,11 +134,11 @@ public class MBeansRegistrationTestCase extends AbstractServiceAndFlowTestCase
     protected List<String> getMBeanClasses() throws MalformedObjectNameException
     {
         Set<ObjectInstance> mbeans = getMBeans();
-        Iterator it = mbeans.iterator();
+        Iterator<ObjectInstance> it = mbeans.iterator();
         List<String> mbeanClasses = new ArrayList<String>();
         while (it.hasNext())
         {
-            mbeanClasses.add(((ObjectInstance) it.next()).getClassName());
+            mbeanClasses.add(it.next().getClassName());
         }
         return mbeanClasses;
     }
