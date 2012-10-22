@@ -40,6 +40,7 @@ import org.mule.util.StringMessageUtils;
 import org.mule.util.concurrent.ThreadNameHelper;
 import org.mule.util.monitor.Expirable;
 import org.mule.util.monitor.ExpiryMonitor;
+import org.mule.util.store.DeserializationPostInitialisable;
 
 import java.io.Serializable;
 import java.text.MessageFormat;
@@ -311,7 +312,19 @@ public class EventCorrelator implements Startable, Stoppable
     {
         try
         {
-            return (EventGroup) eventGroups.retrieve(groupId);
+            EventGroup eventGroup = (EventGroup) eventGroups.retrieve(groupId);
+            if (! eventGroup.isInitialised())
+            {
+                try
+                {
+                    DeserializationPostInitialisable.Implementation.init(eventGroup, muleContext);
+                }
+                catch (Exception e)
+                {
+                    throw new ObjectStoreException(e);
+                }
+            }
+            return eventGroup;
         }
         catch (ObjectDoesNotExistException e)
         {
