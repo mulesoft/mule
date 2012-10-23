@@ -10,12 +10,17 @@
 
 package org.mule.transport.sftp;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.spy;
+
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
-import org.junit.Test;
+import java.io.IOException;
 
-import static org.junit.Assert.assertEquals;
+import org.junit.Test;
 
 /**
  * JUnit test for SftpClient
@@ -25,6 +30,9 @@ import static org.junit.Assert.assertEquals;
 @SmallTest
 public class SftpClientTestCase extends AbstractMuleTestCase
 {
+
+    private final String fileName = "fileName";
+    private final String destDir = "destDir";
 
     @Test
     public void testGetAbsolutePath()
@@ -49,5 +57,33 @@ public class SftpClientTestCase extends AbstractMuleTestCase
         // If the path did not contain any '/' we should not assume it is an relative
         // path
         assertEquals("foo", client.getAbsolutePath("foo"));
+    }
+
+    @Test(expected = IOException.class)
+    public void duplicateHandlingThrowException() throws Exception
+    {
+        getSftpClientSpy().duplicateHandling(destDir, fileName, SftpConnector.PROPERTY_DUPLICATE_HANDLING_THROW_EXCEPTION);
+    }
+
+    @Test
+    public void duplicateHandlingUniqueName() throws Exception
+    {
+        String newName = getSftpClientSpy().duplicateHandling(destDir, fileName, SftpConnector.PROPERTY_DUPLICATE_HANDLING_ASS_SEQ_NO);
+        assertFalse(fileName.equals(newName));
+    }
+
+    @Test
+    public void duplicateHandlingOverwrite() throws Exception
+    {
+        String newName = getSftpClientSpy().duplicateHandling(destDir, fileName, SftpConnector.PROPERTY_DUPLICATE_HANDLING_OVERWRITE);
+        assertEquals(fileName, newName);
+    }
+
+    private SftpClient getSftpClientSpy() throws IOException
+    {
+        SftpClient sftp = new SftpClient("local");
+        SftpClient spy = spy(sftp);
+        doReturn(new String[]{fileName}).when(spy).listFiles(destDir);
+        return spy;
     }
 }
