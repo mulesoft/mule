@@ -11,6 +11,7 @@ package org.mule.transport.http;
 
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.transport.Connector;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.net.URI;
 
@@ -19,7 +20,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-public class HttpsClientMessageDispatcherTestCase
+public class HttpsClientMessageDispatcherTestCase extends AbstractMuleTestCase
 {
 
     @Test
