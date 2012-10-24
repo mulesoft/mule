@@ -486,6 +486,11 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
         this.events = getObjectStoreManager().getObjectStore(storeKey, true);
     }
 
+    public boolean isInitialised()
+    {
+        return muleContext != null;
+    }
+
     public final class ArrivalOrderMessageComparator implements Comparator<MuleMessage>
     {
         @Override
