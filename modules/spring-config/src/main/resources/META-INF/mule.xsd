@@ -1420,6 +1420,7 @@
             <xsd:enumeration value="PIPELINE-MESSAGE"/>
             <xsd:enumeration value="MANAGEMENT"/>
             <xsd:enumeration value="MESSAGE-PROCESSOR"/>
+            <xsd:enumeration value="EXCEPTION-STRATEGY"/>
             <xsd:enumeration value="CONNECTION"/>
             <xsd:enumeration value="REGISTRY"/>
             <xsd:enumeration value="CUSTOM"/>

@@ -19,6 +19,7 @@ import org.mule.api.exception.MessagingExceptionHandlerAcceptor;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorChain;
+import org.mule.context.notification.ExceptionStrategyNotification;
 import org.mule.management.stats.FlowConstructStatistics;
 import org.mule.message.DefaultExceptionPayload;
 import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
@@ -37,6 +38,7 @@ public abstract class TemplateMessagingExceptionStrategy extends AbstractExcepti
     {
         try
         {
+            muleContext.getNotificationManager().fireNotification(new ExceptionStrategyNotification(event, ExceptionStrategyNotification.PROCESS_START));
             FlowConstruct flowConstruct = event.getFlowConstruct();
             fireNotification(exception);
             logException(exception);
@@ -78,6 +80,10 @@ public abstract class TemplateMessagingExceptionStrategy extends AbstractExcepti
             }
             event.getMessage().setExceptionPayload(new DefaultExceptionPayload(messagingException));
             return event;
+        }
+        finally
+        {
+            muleContext.getNotificationManager().fireNotification(new ExceptionStrategyNotification(event, ExceptionStrategyNotification.PROCESS_END));
         }
     }
 
