@@ -22,9 +22,11 @@ import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.execution.ExecutionCallback;
 import org.mule.api.execution.ExecutionTemplate;
+import org.mule.api.registry.MuleRegistry;
 import org.mule.api.transaction.ExternalTransactionAwareTransactionFactory;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionConfig;
+import org.mule.context.notification.ServerNotificationManager;
 import org.mule.exception.CatchMessagingExceptionStrategy;
 import org.mule.exception.DefaultMessagingExceptionStrategy;
 import org.mule.tck.size.SmallTest;
@@ -198,7 +200,11 @@ public class TransactionalErrorHandlingExecutionTemplateTestCase extends Transac
             @Override
             public Object answer(InvocationOnMock invocationOnMock) throws Throwable
             {
-                new CatchMessagingExceptionStrategy().handleException((Exception)invocationOnMock.getArguments()[0],(MuleEvent)invocationOnMock.getArguments()[1]);
+                CatchMessagingExceptionStrategy exceptionStrategy = new CatchMessagingExceptionStrategy();
+                exceptionStrategy.setMuleContext(mockMuleContext);
+                when(mockMuleContext.getNotificationManager()).thenReturn(mock(ServerNotificationManager.class));
+                when(mockMuleContext.getRegistry()).thenReturn(mock(MuleRegistry.class));
+                exceptionStrategy.handleException((Exception) invocationOnMock.getArguments()[0], (MuleEvent) invocationOnMock.getArguments()[1]);
                 return mockResultEvent;
             }
         });
