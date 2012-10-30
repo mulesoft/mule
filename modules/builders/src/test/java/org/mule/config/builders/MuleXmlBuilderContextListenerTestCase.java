@@ -10,6 +10,13 @@
 
 package org.mule.config.builders;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.util.FilenameUtils;
 
 import java.io.File;
@@ -21,13 +28,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.web.context.WebApplicationContext;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-public class MuleXmlBuilderContextListenerTestCase
+public class MuleXmlBuilderContextListenerTestCase extends AbstractMuleTestCase
 {
     private MuleXmlBuilderContextListener listener;
     private ServletContext context;
