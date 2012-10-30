@@ -74,6 +74,8 @@ public class MessageProcessorNotificationPathTestCase extends FunctionalTestCase
         testFlowPaths("catch-es", "/0", "es/0");
         testFlowPaths("rollback-es", "/0", "es/0", "es/1");
         testFlowPaths("choice-es", "/0", "es/0/0", "es/0/1", "es/1/0");
+        testFlowPaths("global-es", "/0", "es/0", "es/1");
+
     }
 
     private void testFlowPaths(String flowName, String... nodes) throws Exception

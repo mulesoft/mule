@@ -155,4 +155,16 @@
             </catch-exception-strategy>
         </choice-exception-strategy>
     </flow>
+
+    <catch-exception-strategy name="Global_Exception_Strategy">
+        <logger level="INFO"/>
+        <logger level="INFO"/>
+    </catch-exception-strategy>
+
+    <flow name="global-es">
+        <vm:inbound-endpoint path="in-global" exchange-pattern="request-response"/>
+        <test:component throwException="true"/>
+        <exception-strategy ref="Global_Exception_Strategy"/>
+    </flow>
+
 </mule>
