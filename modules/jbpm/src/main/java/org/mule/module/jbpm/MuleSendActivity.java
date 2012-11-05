@@ -59,11 +59,6 @@ public class MuleSendActivity extends JpdlActivity implements EventListener
      */
     private String payloadExpression;
 
-    /**
-     * The actual payload (as an object) will be stored here.
-     */
-    private Object payloadObject;
-    
     private static final Log log = Log.getLog(MuleSendActivity.class.getName());
 
     public void execute(ActivityExecution execution) throws Exception
@@ -85,6 +80,7 @@ public class MuleSendActivity extends JpdlActivity implements EventListener
             throw new JbpmException("The Mule MessageService is not available from the ProcessEngine, you may need to add it to your jbpm.cfg.xml file");
         }
 
+        Object payloadObject = null;
         if (payloadExpression == null)
         {
             payloadObject = execution.getVariable(Process.PROCESS_VARIABLE_DATA);
