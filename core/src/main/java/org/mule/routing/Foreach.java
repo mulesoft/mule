@@ -120,7 +120,7 @@ public class Foreach extends AbstractMessageProcessorOwner
     private boolean transformPayloadIfNeeded(MuleMessage message) throws TransformerException
     {
         Object payload = message.getPayload();
-        if (payload instanceof Document || "org.dom4j.Document".equals(payload.getClass().getName()))
+        if (payload instanceof Document || payload.getClass().getName().startsWith("org.dom4j."))
         {
             return false;
         }

@@ -74,7 +74,8 @@ public class XPathExpressionEvaluator extends AbstractXPathExpressionEvaluator
         }
         else if(result instanceof org.w3c.dom.Node)
         {
-            return ((org.w3c.dom.Node)result).getFirstChild().getNodeValue();
+            org.w3c.dom.Node firstChild = ((org.w3c.dom.Node) result).getFirstChild();
+            return firstChild == null ? "" : firstChild.getNodeValue();
         }
         else
         {

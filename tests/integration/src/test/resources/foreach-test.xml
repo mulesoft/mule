@@ -153,6 +153,37 @@
         <test:assert expression="#[groovy:payload instanceof String]" />
     </flow>
 
+    <flow name="process-order-update-is">
+        <vm:inbound-endpoint path="input-10-is" exchange-pattern="request-response"/>
+        <message-properties-transformer scope="invocation">
+            <add-message-property key="total_before" value="#[xpath:sum(//Price)]"/>
+        </message-properties-transformer>
+        <foreach collection="#[xpath:/PurchaseOrder/Items/Item]">
+            <expression-component>
+                price = payload.selectSingleNode("Price");
+                price.text = price.text * 2;
+            </expression-component>
+        </foreach>
+        <set-variable variableName="total_after" value="#[xpath('sum(//Price)')]"/>
+        <test:assert expression="#[flowVars['total_after'] == flowVars['total_before'] * 2]" />
+        <test:assert expression="#[payload instanceof org.dom4j.Document]" />
+    </flow>
+
+    <flow name="process-order-update-mel">
+        <vm:inbound-endpoint path="input-10-mel" exchange-pattern="request-response"/>
+        <set-variable variableName="total_before" value="#[xpath('sum(//Price)')]"/>
+        <mule-xml:xml-to-dom-transformer returnClass="org.dom4j.Document"/>
+        <foreach collection="#[xpath('/PurchaseOrder/Items/Item')]">
+            <expression-component>
+                price = payload.selectSingleNode("Price");
+                price.text = price.text * 2;
+            </expression-component>
+        </foreach>
+        <set-variable variableName="total_after" value="#[xpath('sum(//Price)')]"/>
+        <test:assert expression="#[flowVars['total_after'] == flowVars['total_before'] * 2]" />
+        <test:assert expression="#[payload instanceof org.dom4j.Document]" />
+    </flow>
+
     <flow name="process-json-update">
         <vm:inbound-endpoint path="input-11" exchange-pattern="request-response"/>
         <json:json-to-object-transformer returnClass="java.util.Map"/>
