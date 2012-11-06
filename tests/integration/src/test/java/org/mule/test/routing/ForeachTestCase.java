@@ -270,8 +270,15 @@ public class ForeachTestCase extends FunctionalTestCase
     public void testXmlUpdateInputStream() throws Exception
     {
         InputStream xmlis = new ByteArrayInputStream(sampleXml.getBytes());
-        client.send("vm://input-10", xmlis, null);
-        FlowAssert.verify("process-order-update");
+        client.send("vm://input-10-is", xmlis, null);
+        FlowAssert.verify("process-order-update-is");
+    }
+
+    @Test
+    public void testXmlUpdateMel() throws Exception
+    {
+        client.send("vm://input-10-mel", sampleXml, null);
+        FlowAssert.verify("process-order-update-mel");
     }
 
     @Test
