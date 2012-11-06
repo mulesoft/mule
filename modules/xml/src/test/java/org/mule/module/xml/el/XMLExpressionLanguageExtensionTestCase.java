@@ -11,11 +11,14 @@
 package org.mule.module.xml.el;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.el.context.AbstractELTestCase;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.io.StringBufferInputStream;
 
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -39,6 +42,15 @@ public class XMLExpressionLanguageExtensionTestCase extends AbstractELTestCase
         MuleMessage message = new DefaultMuleMessage("<root foo=\"bar\"/>", muleContext);
         // We use dom4j internally
         assertEquals(DefaultAttribute.class, evaluate("xpath('/root/@foo')", message).getClass());
+    }
+
+    @Test
+    public void xpathFunctionStream() throws Exception
+    {
+        InputStream payload = new ByteArrayInputStream("<root foo=\"bar\"/>".getBytes());
+        MuleMessage message = new DefaultMuleMessage(payload, muleContext);
+        assertEquals(DefaultAttribute.class, evaluate("xpath('/root/@foo')", message).getClass());
+        assertTrue(message.getPayload() instanceof Document);
     }
 
     @Test

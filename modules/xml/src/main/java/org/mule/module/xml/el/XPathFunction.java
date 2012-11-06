@@ -12,6 +12,7 @@ package org.mule.module.xml.el;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleContext;
+import org.mule.api.MuleMessage;
 import org.mule.api.el.ExpressionLanguageContext;
 import org.mule.api.el.ExpressionLanguageFunction;
 import org.mule.el.context.MessageContext;
@@ -30,20 +31,19 @@ class XPathFunction implements ExpressionLanguageFunction
     public Object call(Object[] params, ExpressionLanguageContext context)
     {
         try
-
         {
-            if (params.length == 1)
+            MessageContext ctxMessage = (MessageContext) context.getVariable("message");
+            MuleMessage message = new DefaultMuleMessage(ctxMessage.getPayload(), muleContext);
+            String evaluator = "xpath-branch:";
+            if (params.length != 1)
             {
-                return muleContext.getExpressionManager().evaluate(
-                    "xpath-branch:" + params[0],
-                    new DefaultMuleMessage(((MessageContext) context.getVariable("message")).getPayload(),
-                        muleContext));
+                evaluator = "xpath-node:";
+                message = new DefaultMuleMessage(params[1], muleContext);
             }
-            else
-            {
-                return muleContext.getExpressionManager().evaluate("xpath-node:" + params[0],
-                    new DefaultMuleMessage(params[1], muleContext));
-            }
+            Object result = muleContext.getExpressionManager().evaluate(evaluator + params[0], message);
+            ctxMessage.setPayload(message.getPayload());
+            return result;
+
         }
         catch (Exception e)
         {
