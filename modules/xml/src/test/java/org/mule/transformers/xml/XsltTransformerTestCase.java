@@ -10,12 +10,17 @@
 
 package org.mule.transformers.xml;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.module.xml.transformer.XsltTransformer;
+import org.mule.module.xml.util.LocalURIResolver;
 import org.mule.module.xml.util.XMLTestUtils;
 import org.mule.module.xml.util.XMLUtils;
 import org.mule.transformer.types.DataTypeFactory;
@@ -28,16 +33,14 @@ import java.util.List;
 import java.util.Map;
 
 import javax.xml.stream.XMLStreamReader;
+import javax.xml.transform.URIResolver;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 public class XsltTransformerTestCase extends AbstractXmlTransformerTestCase
 {
+
+    public static final String VALID_XSL_FILENAME = "cdcatalog.xsl";
 
     private String srcData;
     private String resultData;
@@ -54,7 +57,7 @@ public class XsltTransformerTestCase extends AbstractXmlTransformerTestCase
     {
         XsltTransformer transformer = new XsltTransformer();
         transformer.setReturnDataType(DataTypeFactory.STRING);
-        transformer.setXslFile("cdcatalog.xsl");
+        transformer.setXslFile(VALID_XSL_FILENAME);
         transformer.setMaxActiveTransformers(42);
         transformer.setMuleContext(muleContext);
         transformer.initialise();
@@ -128,7 +131,7 @@ public class XsltTransformerTestCase extends AbstractXmlTransformerTestCase
     {
         XsltTransformer t = new XsltTransformer();
         t.setXslTransformerFactory("com.nosuchclass.TransformerFactory");
-        t.setXslFile("cdcatalog.xsl");
+        t.setXslFile(VALID_XSL_FILENAME);
 
         try
         {
@@ -141,7 +144,7 @@ public class XsltTransformerTestCase extends AbstractXmlTransformerTestCase
         }
 
         t = new XsltTransformer();
-        t.setXslFile("cdcatalog.xsl");
+        t.setXslFile(VALID_XSL_FILENAME);
         // try again with JDK default
         t.setXslTransformerFactory(null);
         t.initialise();
@@ -307,23 +310,44 @@ public class XsltTransformerTestCase extends AbstractXmlTransformerTestCase
     public void testInitialiseMustLoadXsltFile_LoadsFromXslFile() throws Exception
     {
         XsltTransformer xsltTransformer = new XsltTransformer();
-        String someExistentFileName = "cdcatalog.xsl";
-        xsltTransformer.setXslFile(someExistentFileName);
+        xsltTransformer.setXslFile(VALID_XSL_FILENAME);
         try
         {
             xsltTransformer.initialise();
             assertNotNull(xsltTransformer.getXslt());
             String someTextThatIsInTheXslFile = "My CD Collection";
             assertTrue("Should contain the text '" + someTextThatIsInTheXslFile + "', because it is in the '"
-                       + someExistentFileName + "' file that we are setting.", xsltTransformer.getXslt()
+                       + VALID_XSL_FILENAME + "' file that we are setting.", xsltTransformer.getXslt()
                 .contains(
                 someTextThatIsInTheXslFile));
         }
         catch (InitialisationException e)
         {
-            fail("Should NOT have thrown an exception because file '" + someExistentFileName
+            fail("Should NOT have thrown an exception because file '" + VALID_XSL_FILENAME
                  + "' DOES exist.");
         }
+    }
+
+    @Test
+    public void testInitialiseUriResolverIfNotSet() throws Exception
+    {
+        XsltTransformer xsltTransformer = new XsltTransformer();
+        xsltTransformer.setXslFile(VALID_XSL_FILENAME);
+
+        xsltTransformer.initialise();
+        assertTrue(xsltTransformer.getUriResolver() instanceof LocalURIResolver);
+    }
+
+    @Test
+    public void testInitialiseMaintainsUriResolverIfSet() throws Exception
+    {
+        XsltTransformer xsltTransformer = new XsltTransformer();
+        xsltTransformer.setXslFile(VALID_XSL_FILENAME);
+
+        URIResolver uriResolver = new LocalURIResolver();
+        xsltTransformer.setUriResolver(uriResolver);
+        xsltTransformer.initialise();
+        assertEquals(uriResolver, xsltTransformer.getUriResolver());
     }
 
 }
