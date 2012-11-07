@@ -10,12 +10,5 @@
 
     <spring:bean name="testResolver" class="org.mule.module.xml.util.LocalURIResolver"/>
 
-    <flow name="FailedFlow">
-        <!-- NOTE: need transformer inside a flow so it's initialized -->
-        <poll frequency="1000">
-            <echo-component/>
-        </poll>
-
-        <mulexml:xslt-transformer name="testTransformer" xsl-file="cdcatalog.xsl" uriResolver-ref="testResolver"/>
-    </flow>
+    <mulexml:xslt-transformer name="testTransformer" xsl-file="cdcatalog.xsl" uriResolver-ref="testResolver"/>
 </mule>
