@@ -119,7 +119,6 @@ public class XsltTransformer extends AbstractXmlTransformer
         transformerPool.setMinIdle(MIN_IDLE_TRANSFORMERS);
         transformerPool.setMaxIdle(MAX_IDLE_TRANSFORMERS);
         transformerPool.setMaxActive(MAX_ACTIVE_TRANSFORMERS);
-        uriResolver = new LocalURIResolver();
         contextProperties = new HashMap<String, Object>();
     }
 
@@ -133,8 +132,13 @@ public class XsltTransformer extends AbstractXmlTransformer
             if (xslFile != null)
             {
                 this.xslt = IOUtils.getResourceAsString(xslFile, getClass());
+            }
+
+            if (uriResolver == null)
+            {
                 this.uriResolver = new LocalURIResolver(xslFile);
             }
+
             transformerPool.addObject();
         }
         catch (Throwable te)
