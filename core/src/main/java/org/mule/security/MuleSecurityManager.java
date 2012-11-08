@@ -48,17 +48,15 @@ public class MuleSecurityManager implements SecurityManager
      */
     protected static final Log logger = LogFactory.getLog(MuleSecurityManager.class);
 
-    @SuppressWarnings("unchecked")
-    private Map<String, SecurityProvider> providers = new ConcurrentHashMap();
-
-    @SuppressWarnings("unchecked")
-    private Map<String, EncryptionStrategy> cryptoStrategies = new ConcurrentHashMap();
+    private Map<String, SecurityProvider> providers = new ConcurrentHashMap<String, SecurityProvider>();
+    private Map<String, EncryptionStrategy> cryptoStrategies = new ConcurrentHashMap<String, EncryptionStrategy>();
 
     public MuleSecurityManager()
     {
         super();
     }
 
+    @Override
     public void initialise() throws InitialisationException
     {
         List<Initialisable> all = new LinkedList<Initialisable>(providers.values());
@@ -67,6 +65,7 @@ public class MuleSecurityManager implements SecurityManager
         LifecycleTransitionResult.initialiseAll(all.iterator());
     }
 
+    @Override
     public Authentication authenticate(Authentication authentication)
         throws SecurityException, SecurityProviderNotFoundException
     {
@@ -107,6 +106,7 @@ public class MuleSecurityManager implements SecurityManager
         throw new SecurityProviderNotFoundException(toTest.getName());
     }
 
+    @Override
     public void addProvider(SecurityProvider provider)
     {
         if (getProvider(provider.getName()) != null)
@@ -116,6 +116,7 @@ public class MuleSecurityManager implements SecurityManager
         providers.put(provider.getName(), provider);
     }
 
+    @Override
     public SecurityProvider getProvider(String name)
     {
         if (name == null)
@@ -125,17 +126,20 @@ public class MuleSecurityManager implements SecurityManager
         return providers.get(name);
     }
 
+    @Override
     public SecurityProvider removeProvider(String name)
     {
         return providers.remove(name);
     }
 
+    @Override
     public Collection<SecurityProvider> getProviders()
     {
         ArrayList<SecurityProvider> providersList = new ArrayList<SecurityProvider>(providers.values());
         return Collections.unmodifiableCollection(providersList);
     }
 
+    @Override
     public void setProviders(Collection<SecurityProvider> providers)
     {
         for (SecurityProvider provider : providers)
@@ -144,6 +148,7 @@ public class MuleSecurityManager implements SecurityManager
         }
     }
 
+    @Override
     public SecurityContext createSecurityContext(Authentication authentication)
         throws UnknownAuthenticationTypeException
     {
@@ -161,27 +166,32 @@ public class MuleSecurityManager implements SecurityManager
         throw new UnknownAuthenticationTypeException(authentication);
     }
 
+    @Override
     public EncryptionStrategy getEncryptionStrategy(String name)
     {
         return cryptoStrategies.get(name);
     }
 
+    @Override
     public void addEncryptionStrategy(EncryptionStrategy strategy)
     {
         cryptoStrategies.put(strategy.getName(), strategy);
     }
 
+    @Override
     public EncryptionStrategy removeEncryptionStrategy(String name)
     {
         return cryptoStrategies.remove(name);
     }
 
+    @Override
     public Collection<EncryptionStrategy> getEncryptionStrategies()
     {
         List<EncryptionStrategy> allStrategies = new ArrayList<EncryptionStrategy>(cryptoStrategies.values());
         return Collections.unmodifiableCollection(allStrategies);
     }
 
+    @Override
     public void setEncryptionStrategies(Collection<EncryptionStrategy> strategies)
     {
         for (EncryptionStrategy strategy : strategies)
