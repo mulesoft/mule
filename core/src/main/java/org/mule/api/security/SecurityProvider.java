@@ -21,7 +21,7 @@ public interface SecurityProvider extends Initialisable, NameableObject
 {
     Authentication authenticate(Authentication authentication) throws SecurityException;
 
-    boolean supports(Class aClass);
+    boolean supports(Class<?> aClass);
 
     SecurityContext createSecurityContext(Authentication auth) throws UnknownAuthenticationTypeException;
 }

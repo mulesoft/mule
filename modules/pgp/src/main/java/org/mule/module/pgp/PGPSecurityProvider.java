@@ -29,7 +29,8 @@ public class PGPSecurityProvider extends AbstractSecurityProvider
     {
         super("pgp");
     }
-    
+
+    @Override
     public Authentication authenticate(Authentication authentication) throws SecurityException
     {
         PGPAuthentication auth = (PGPAuthentication) authentication;
@@ -72,7 +73,7 @@ public class PGPSecurityProvider extends AbstractSecurityProvider
     }
 
     @Override
-    public boolean supports(Class aClass)
+    public boolean supports(Class<?> aClass)
     {
         return PGPAuthentication.class.isAssignableFrom(aClass);
     }
