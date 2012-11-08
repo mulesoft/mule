@@ -11,12 +11,11 @@
 package org.mule.api.transformer;
 
 import org.mule.api.MuleEvent;
-import org.mule.api.processor.MessageProcessor;
 
 /**
  * A transformer intended to transform Mule messages rather than arbitrary objects
  */
-public interface MessageTransformer  extends Transformer, MessageProcessor
+public interface MessageTransformer  extends Transformer
 {
     /**
      * Thransforms the supplied data and returns the result
