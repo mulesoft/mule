@@ -312,7 +312,7 @@ public class EventCorrelator implements Startable, Stoppable
     {
         try
         {
-            EventGroup eventGroup = (EventGroup) eventGroups.retrieve(groupId);
+            EventGroup eventGroup = eventGroups.retrieve(groupId);
             if (! eventGroup.isInitialised())
             {
                 try

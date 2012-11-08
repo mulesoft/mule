@@ -319,7 +319,7 @@ public class MonitoredObjectStoreWrapper<T extends Serializable>
          * @param muleContext the current muleContext instance
          * @throws org.mule.api.MuleException if there is an error initializing
          */
-        @SuppressWarnings({"unused", "unchecked"})
+        @SuppressWarnings({"unused"})
         private void initAfterDeserialisation(MuleContext muleContext) throws MuleException
         {
             if (item instanceof DeserializationPostInitialisable)
