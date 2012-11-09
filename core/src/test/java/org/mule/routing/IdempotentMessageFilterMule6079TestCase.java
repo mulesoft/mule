@@ -12,6 +12,7 @@ package org.mule.routing;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.mockito.Mockito.when;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
@@ -23,10 +24,7 @@ import org.mule.api.service.Service;
 import org.mule.api.store.ObjectAlreadyExistsException;
 import org.mule.api.store.ObjectStore;
 import org.mule.api.store.ObjectStoreException;
-import org.mule.tck.MuleTestUtils;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
-
-import com.mockobjects.dynamic.Mock;
 
 import java.io.Serializable;
 import java.util.Map;
@@ -34,13 +32,13 @@ import java.util.TreeMap;
 import java.util.concurrent.CountDownLatch;
 
 import org.junit.Test;
+import org.mockito.Mockito;
 
 public class IdempotentMessageFilterMule6079TestCase extends AbstractMuleContextTestCase
 {
-
+    private MuleSession session;
     private Service service;
     private InboundEndpoint inboundEndpoint;
-    private Mock session;
     private ObjectStore<String> objectStore;
     private IdempotentMessageFilter idempotentMessageFilter;
     private Integer processedEvents = 0;
@@ -55,9 +53,11 @@ public class IdempotentMessageFilterMule6079TestCase extends AbstractMuleContext
     public void testRaceConditionOnAcceptAndProcess() throws Exception
     {
         inboundEndpoint = getTestInboundEndpoint("Test", "test://Test?exchangePattern=one-way");
-        session = MuleTestUtils.getMockSession();
         service = getTestService();
-        session.matchAndReturn("getFlowConstruct", service);
+
+        session = Mockito.mock(MuleSession.class);
+        when(session.getFlowConstruct()).thenReturn(service);
+
         CountDownLatch cdl = new CountDownLatch(2);
 
         objectStore = new RaceConditionEnforcingObjectStore(cdl);
@@ -81,17 +81,12 @@ public class IdempotentMessageFilterMule6079TestCase extends AbstractMuleContext
 
     private class TestForRaceConditionRunnable implements Runnable
     {
-
-        public TestForRaceConditionRunnable()
-        {
-        }
-
         @Override
         public void run()
         {
             MuleMessage okMessage = new DefaultMuleMessage("OK", muleContext);
             okMessage.setOutboundProperty("id", "1");
-            MuleEvent event = new DefaultMuleEvent(okMessage, inboundEndpoint, (MuleSession) session.proxy());
+            MuleEvent event = new DefaultMuleEvent(okMessage, inboundEndpoint, session);
 
             try
             {
@@ -118,7 +113,6 @@ public class IdempotentMessageFilterMule6079TestCase extends AbstractMuleContext
 
     private class RaceConditionEnforcingObjectStore implements ObjectStore<String>
     {
-
         protected CountDownLatch barrier;
         Map<Serializable, String> map = new TreeMap<Serializable, String>();
 
