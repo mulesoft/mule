@@ -10,50 +10,53 @@
 
 package org.mule.module.spring.transaction;
 
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import org.mule.api.transaction.Transaction;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
-import com.mockobjects.dynamic.C;
-import com.mockobjects.dynamic.Mock;
-
 import org.junit.Test;
 import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
 
 public class SpringTransactionFactoryTestCase extends AbstractMuleContextTestCase
 {
-
     @Test
     public void testCommit() throws Exception
     {
-        Mock mockPTM = new Mock(PlatformTransactionManager.class);
-        Mock mockTS = new Mock(TransactionStatus.class);
-        mockPTM.expectAndReturn("getTransaction", C.same(null), mockTS.proxy());
-        mockPTM.expect("commit", C.same(mockTS.proxy()));
+        TransactionStatus mockTS = mock(TransactionStatus.class);
+
+        PlatformTransactionManager mockPTM = mock(PlatformTransactionManager.class);
+        when(mockPTM.getTransaction(any(TransactionDefinition.class))).thenReturn(mockTS);
 
         SpringTransactionFactory factory = new SpringTransactionFactory();
-        factory.setManager((PlatformTransactionManager)mockPTM.proxy());
+        factory.setManager(mockPTM);
 
         Transaction tx = factory.beginTransaction(muleContext);
-//        TransactionCoordination.getInstance().bindTransaction(tx);
         tx.commit();
+
+        verify(mockPTM).commit(mockTS);
     }
 
     @Test
     public void testRollback() throws Exception
     {
-        Mock mockPTM = new Mock(PlatformTransactionManager.class);
-        Mock mockTS = new Mock(TransactionStatus.class);
-        mockPTM.expectAndReturn("getTransaction", C.same(null), mockTS.proxy());
-        mockPTM.expect("rollback", C.same(mockTS.proxy()));
-        mockTS.expect("setRollbackOnly");
+        TransactionStatus mockTS = mock(TransactionStatus.class);
+
+        PlatformTransactionManager mockPTM = mock(PlatformTransactionManager.class);
+        when(mockPTM.getTransaction(any(TransactionDefinition.class))).thenReturn(mockTS);
 
         SpringTransactionFactory factory = new SpringTransactionFactory();
-        factory.setManager((PlatformTransactionManager)mockPTM.proxy());
+        factory.setManager(mockPTM);
 
         Transaction tx = factory.beginTransaction(muleContext);
-//        TransactionCoordination.getInstance().bindTransaction(tx);
         tx.rollback();
-    }
 
+        verify(mockPTM).rollback(mockTS);
+        verify(mockTS).setRollbackOnly();
+    }
 }

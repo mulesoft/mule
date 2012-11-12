@@ -10,7 +10,8 @@
 
 package org.mule.transport.jdbc.test;
 
-import com.mockobjects.dynamic.Mock;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.io.PrintWriter;
 import java.sql.Connection;
@@ -20,47 +21,51 @@ import javax.sql.DataSource;
 
 public class TestDataSource implements DataSource
 {
-
+    @Override
     public Connection getConnection() throws SQLException
     {
-        Mock mockConnection = new Mock(Connection.class);
-        mockConnection.expectAndReturn("getAutoCommit", false);
-        mockConnection.expect("commit");
-        mockConnection.expect("close");
-
-        return (Connection) mockConnection.proxy();
+        Connection mockConnection = mock(Connection.class);
+        when(mockConnection.getAutoCommit()).thenReturn(false);
+        return mockConnection;
     }
 
+    @Override
     public Connection getConnection(String username, String password) throws SQLException
     {
         return getConnection();
     }
 
+    @Override
     public int getLoginTimeout() throws SQLException
     {
         return 0;
     }
 
+    @Override
     public PrintWriter getLogWriter() throws SQLException
     {
         return null;
     }
 
+    @Override
     public void setLoginTimeout(int seconds) throws SQLException
     {
         // nop
     }
 
+    @Override
     public void setLogWriter(PrintWriter out) throws SQLException
     {
         // nop
     }
 
+    @Override
     public boolean isWrapperFor(Class<?> iface) throws SQLException
     {
         return false;
     }
 
+    @Override
     public <T> T unwrap(Class<T> iface) throws SQLException
     {
         return null;

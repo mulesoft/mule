@@ -10,14 +10,14 @@
 
 package org.mule.transport.file;
 
+import static org.mockito.Mockito.mock;
+
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.service.Service;
+import org.mule.api.transport.Connector;
 import org.mule.api.transport.MessageReceiver;
-import org.mule.tck.MuleTestUtils;
 import org.mule.transport.AbstractMessageReceiverTestCase;
 import org.mule.util.FileUtils;
-
-import com.mockobjects.dynamic.Mock;
 
 import java.io.File;
 
@@ -25,7 +25,6 @@ public class FileMessageReceiverTestCase extends AbstractMessageReceiverTestCase
 {
     File read = FileUtils.newFile("testcasedata/read");
     File move = FileUtils.newFile("testcasedata/move");
-    Mock session = MuleTestUtils.getMockSession();
 
     public void testReceiver() throws Exception
     {
@@ -34,19 +33,22 @@ public class FileMessageReceiverTestCase extends AbstractMessageReceiverTestCase
         // file endpoint functions tests for this
     }
 
+    @Override
     public MessageReceiver getMessageReceiver() throws Exception
     {
-        endpoint.getConnector().start();
-        Mock mockComponent = new Mock(Service.class);
-        mockComponent.expectAndReturn("getInboundRouter", null);
-        mockComponent.expectAndReturn("getResponseRouter", null);
+        Connector connector = endpoint.getConnector();
+        connector.start();
+
+        Service mockComponent = mock(Service.class);
+
         read.deleteOnExit();
         move.deleteOnExit();
 
-        return new FileMessageReceiver(endpoint.getConnector(), (Service)mockComponent.proxy(),
-            endpoint, read.getAbsolutePath(), move.getAbsolutePath(), null, 1000);
+        return new FileMessageReceiver(connector, mockComponent, endpoint,
+            read.getAbsolutePath(), move.getAbsolutePath(), null, 1000);
     }
 
+    @Override
     public InboundEndpoint getEndpoint() throws Exception
     {
         return muleContext.getEndpointFactory().getInboundEndpoint("file://./simple");

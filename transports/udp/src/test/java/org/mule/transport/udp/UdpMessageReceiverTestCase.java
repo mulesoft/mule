@@ -10,28 +10,23 @@
 
 package org.mule.transport.udp;
 
+import static org.mockito.Mockito.mock;
+
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.service.Service;
 import org.mule.api.transport.MessageReceiver;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
-import org.mule.service.ServiceCompositeMessageSource;
 import org.mule.transport.AbstractMessageReceiverTestCase;
-
-import com.mockobjects.dynamic.Mock;
 
 public class UdpMessageReceiverTestCase extends AbstractMessageReceiverTestCase
 {
     @Override
     public MessageReceiver getMessageReceiver() throws Exception
     {
-        endpoint = muleContext.getEndpointFactory().getInboundEndpoint(
-            "udp://localhost:10100");
-        Mock mockComponent = new Mock(Service.class);
-        mockComponent.expect("getResponseRouter");
-        mockComponent.expectAndReturn("getInboundRouter", new ServiceCompositeMessageSource());
-
-        return new UdpMessageReceiver(endpoint.getConnector(), (Service) mockComponent.proxy(), endpoint);
+        endpoint = muleContext.getEndpointFactory().getInboundEndpoint("udp://localhost:10100");
+        Service mockService = mock(Service.class);
+        return new UdpMessageReceiver(endpoint.getConnector(), mockService, endpoint);
     }
 
     @Override
@@ -39,7 +34,7 @@ public class UdpMessageReceiverTestCase extends AbstractMessageReceiverTestCase
     {
         UdpConnector connector = new UdpConnector(muleContext);
         connector.initialise();
-        
+
         EndpointBuilder builder = new EndpointURIEndpointBuilder("udp://localhost:10100", muleContext);
         builder.setConnector(connector);
         return muleContext.getEndpointFactory().getInboundEndpoint(builder);

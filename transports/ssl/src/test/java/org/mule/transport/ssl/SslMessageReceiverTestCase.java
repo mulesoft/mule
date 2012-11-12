@@ -10,24 +10,25 @@
 
 package org.mule.transport.ssl;
 
+import static org.mockito.Mockito.mock;
+
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.service.Service;
+import org.mule.api.transport.Connector;
 import org.mule.api.transport.MessageReceiver;
-import org.mule.service.ServiceCompositeMessageSource;
 import org.mule.transport.AbstractMessageReceiverTestCase;
-
-import com.mockobjects.dynamic.Mock;
 
 public class SslMessageReceiverTestCase extends AbstractMessageReceiverTestCase
 {
+    @Override
     public MessageReceiver getMessageReceiver() throws Exception
     {
-        Mock mockComponent = new Mock(Service.class);
-        mockComponent.expect("getResponseRouter");
-        mockComponent.expectAndReturn("getInboundRouter", new ServiceCompositeMessageSource());
-        return new SslMessageReceiver(endpoint.getConnector(), (Service) mockComponent.proxy(), endpoint);
+        Service mockService = mock(Service.class);
+        Connector connector = endpoint.getConnector();
+        return new SslMessageReceiver(connector, mockService, endpoint);
     }
 
+    @Override
     public InboundEndpoint getEndpoint() throws Exception
     {
         return muleContext.getEndpointFactory().getInboundEndpoint("ssl://localhost:1234");

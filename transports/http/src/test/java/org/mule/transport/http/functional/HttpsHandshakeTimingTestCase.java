@@ -10,6 +10,12 @@
 
 package org.mule.transport.http.functional;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleMessage;
@@ -19,15 +25,11 @@ import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
-import org.mule.config.DefaultMuleConfiguration;
-import org.mule.service.ServiceCompositeMessageSource;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.transport.http.HttpsConnector;
 import org.mule.transport.http.HttpsMessageReceiver;
 import org.mule.transport.ssl.MockHandshakeCompletedEvent;
 import org.mule.transport.ssl.MockSslSocket;
-
-import com.mockobjects.dynamic.Mock;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -41,10 +43,6 @@ import javax.resource.spi.work.Work;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 /**
  * Test for SSL handshake timeouts. Unfortunately, there is no easy way to blackbox-test this
  * as it would require a SSLSocket implementation that could actually add arbitrary delays to
@@ -56,7 +54,6 @@ import static org.junit.Assert.fail;
  */
 public class HttpsHandshakeTimingTestCase extends AbstractMuleContextTestCase
 {
-
     @Test
     public void testHttpsHandshakeExceedsTimeout() throws Exception
     {
@@ -119,22 +116,14 @@ public class HttpsHandshakeTimingTestCase extends AbstractMuleContextTestCase
         HttpsConnector httpsConnector = new HttpsConnector(muleContext);
         httpsConnector.setSslHandshakeTimeout(1000);
 
-        Map<?, ?> properties = Collections.emptyMap();
+        Map<String, Object> properties = Collections.emptyMap();
 
-        Mock mockEndpoint = new Mock(InboundEndpoint.class);
-        mockEndpoint.expectAndReturn("getConnector", httpsConnector);
-        mockEndpoint.expectAndReturn("getEncoding", new DefaultMuleConfiguration().getDefaultEncoding());
-        mockEndpoint.expectAndReturn("getProperties", properties);
-        mockEndpoint.expectAndReturn("getProperties", properties);
-        InboundEndpoint inboundEndpoint = (InboundEndpoint) mockEndpoint.proxy();
+        InboundEndpoint inboundEndpoint = mock(InboundEndpoint.class);
+        when(inboundEndpoint.getConnector()).thenReturn(httpsConnector);
+        when(inboundEndpoint.getProperties()).thenReturn(properties);
 
-        Mock mockService = new Mock(Service.class);
-        mockService.expectAndReturn("getResponseRouter", null);
-        mockService.expectAndReturn("getInboundRouter", new ServiceCompositeMessageSource());
-        Service service = (Service) mockService.proxy();
-
-        MockHttpsMessageReceiver messageReceiver = new MockHttpsMessageReceiver(httpsConnector, service, inboundEndpoint);
-        return messageReceiver;
+        Service service = mock(Service.class);
+        return new MockHttpsMessageReceiver(httpsConnector, service, inboundEndpoint);
     }
 
     private static class MockHttpsMessageReceiver extends HttpsMessageReceiver

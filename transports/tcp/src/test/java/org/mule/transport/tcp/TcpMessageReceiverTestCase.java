@@ -10,26 +10,22 @@
 
 package org.mule.transport.tcp;
 
+import static org.mockito.Mockito.mock;
+
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.service.Service;
 import org.mule.api.transport.MessageReceiver;
-import org.mule.service.ServiceCompositeMessageSource;
 import org.mule.transport.AbstractConnector;
 import org.mule.transport.AbstractMessageReceiverTestCase;
 
-import com.mockobjects.dynamic.Mock;
-
 public class TcpMessageReceiverTestCase extends AbstractMessageReceiverTestCase
 {
-
     @Override
     public MessageReceiver getMessageReceiver() throws Exception
     {
-        Mock mockComponent = new Mock(Service.class);
-        mockComponent.expect("getResponseRouter");
-        mockComponent.expectAndReturn("getInboundRouter", new ServiceCompositeMessageSource());
-        return new TcpMessageReceiver((AbstractConnector)endpoint.getConnector(),
-            (Service)mockComponent.proxy(), endpoint);
+        Service mockService = mock(Service.class);
+        AbstractConnector connector = (AbstractConnector)endpoint.getConnector();
+        return new TcpMessageReceiver(connector, mockService, endpoint);
     }
 
     @Override

@@ -10,6 +10,9 @@
 
 package org.mule.transport.jms;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.RequestContext;
@@ -18,24 +21,15 @@ import org.mule.tck.MuleTestUtils;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.transport.jms.transformers.ObjectToJMSMessage;
 
-import com.mockobjects.constraint.Constraint;
-import com.mockobjects.constraint.IsEqual;
-import com.mockobjects.dynamic.ConstraintMatcher;
-import com.mockobjects.dynamic.FullConstraintMatcher;
-import com.mockobjects.dynamic.Mock;
-
 import javax.jms.Message;
 import javax.jms.TextMessage;
 
 import org.apache.commons.collections.IteratorUtils;
+import org.hamcrest.core.IsEqual;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 public class JmsTransformerTestCase extends AbstractMuleContextTestCase
 {
-
     @Test
     public void testCustomJMSProperty() throws Exception
     {
@@ -97,5 +91,4 @@ public class JmsTransformerTestCase extends AbstractMuleContextTestCase
         // note that we don't verify() the mock since we have no way of knowing
         // whether toString was actually called (environment dependency)
     }
-
 }

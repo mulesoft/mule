@@ -11,18 +11,17 @@
 package org.mule.transport.http;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
 
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.service.Service;
+import org.mule.api.transport.Connector;
 import org.mule.api.transport.MessageReceiver;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
-import org.mule.service.ServiceCompositeMessageSource;
 import org.mule.transport.AbstractMessageReceiverTestCase;
 import org.mule.transport.http.transformers.MuleMessageToHttpResponse;
 import org.mule.util.CollectionUtils;
-
-import com.mockobjects.dynamic.Mock;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -35,15 +34,15 @@ public class HttpMessageReceiverTestCase extends AbstractMessageReceiverTestCase
 
     private HttpMessageReceiver httpMessageReceiver;
 
+    @Override
     public MessageReceiver getMessageReceiver() throws Exception
     {
-        Mock mockComponent = new Mock(Service.class);
-        mockComponent.expect("getResponseRouter");
-        mockComponent.expectAndReturn("getInboundRouter", new ServiceCompositeMessageSource());
-
-        return new HttpMessageReceiver(endpoint.getConnector(), (Service) mockComponent.proxy(), endpoint);
+        Service mockService = mock(Service.class);
+        Connector connector = endpoint.getConnector();
+        return new HttpMessageReceiver(connector, mockService, endpoint);
     }
 
+    @Override
     public InboundEndpoint getEndpoint() throws Exception
     {
         EndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder("http://localhost:6789", muleContext);
@@ -64,17 +63,16 @@ public class HttpMessageReceiverTestCase extends AbstractMessageReceiverTestCase
     {
         assertEquals("client", httpMessageReceiver.processRelativePath(CONTEXT_PATH, CLIENT_PATH));
     }
-    
+
     @Test
     public void testProcessRelativePathSameLevel()
     {
         assertEquals("", httpMessageReceiver.processRelativePath(CONTEXT_PATH, CONTEXT_PATH));
     }
-    
+
     @Test
     public void testProcessResourcePropertyRelativePath()
     {
         assertEquals("client/name", httpMessageReceiver.processRelativePath(CONTEXT_PATH, CLIENT_NAME_PATH));
     }
-
 }
