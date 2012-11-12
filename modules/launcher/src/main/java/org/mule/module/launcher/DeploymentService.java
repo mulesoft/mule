@@ -11,12 +11,11 @@
 package org.mule.module.launcher;
 
 import static org.mule.util.SplashScreen.miniSplash;
-import org.mule.MuleCoreExtension;
 import org.mule.config.StartupContext;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.module.launcher.application.Application;
 import org.mule.module.launcher.application.ApplicationFactory;
-import org.mule.module.launcher.application.PrivilegedApplicationFactory;
+import org.mule.module.launcher.application.DefaultApplicationFactory;
 import org.mule.module.launcher.util.DebuggableReentrantLock;
 import org.mule.module.launcher.util.ElementAddedEvent;
 import org.mule.module.launcher.util.ElementRemovedEvent;
@@ -82,9 +81,9 @@ public class DeploymentService
 
     private CompositeDeploymentListener deploymentListener = new CompositeDeploymentListener();
 
-    public DeploymentService(Map<Class<? extends MuleCoreExtension>, MuleCoreExtension> coreExtensions)
+    public DeploymentService()
     {
-        PrivilegedApplicationFactory appFactory = new PrivilegedApplicationFactory(this, coreExtensions);
+        DefaultApplicationFactory appFactory = new DefaultApplicationFactory();
         appFactory.setDeploymentListener(deploymentListener);
         this.appFactory = appFactory;
 

@@ -40,8 +40,6 @@ public class ApplicationDescriptor
 
     private boolean redeploymentEnabled = true;
 
-    private boolean privileged;
-
     private Set<String> loaderOverride = new HashSet<String>();
 
     private Set<PluginDescriptor> plugins = new HashSet<PluginDescriptor>(0);
@@ -121,34 +119,6 @@ public class ApplicationDescriptor
     public void setRedeploymentEnabled(boolean redeploymentEnabled)
     {
         this.redeploymentEnabled = redeploymentEnabled;
-    }
-
-    /**
-     * @deprecated use {@link #isPrivileged}
-     */
-    @Deprecated
-    public boolean isPriviledged()
-    {
-        return privileged;
-    }
-
-    /**
-     * @deprecated use @{link #setPrivileged}
-     */
-    @Deprecated
-    public void setPriviledged(boolean priviledged)
-    {
-        this.privileged = priviledged;
-    }
-
-    public boolean isPrivileged()
-    {
-        return privileged;
-    }
-
-    public void setPrivileged(boolean privileged)
-    {
-        this.privileged = privileged;
     }
 
     public Set<String> getLoaderOverride()

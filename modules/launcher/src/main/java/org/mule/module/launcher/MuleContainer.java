@@ -154,7 +154,7 @@ public class MuleContainer
             coreExtensions = loadCoreExtensions();
 
             // TODO pluggable deployer
-            deploymentService = new DeploymentService(coreExtensions);
+            deploymentService = new DeploymentService();
 
             initializeCoreExtensions();
 

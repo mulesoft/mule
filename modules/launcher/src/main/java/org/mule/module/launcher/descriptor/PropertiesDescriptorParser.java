@@ -31,9 +31,6 @@ public class PropertiesDescriptorParser implements DescriptorParser
     // support not yet implemented for CL reversal
     protected static final String PROPERTY_CONFIG_RESOURCES = "config.resources";
     protected static final String PROPERTY_REDEPLOYMENT_ENABLED = "redeployment.enabled";
-    // there was a typo in the prop name, but we still support it
-    protected static final String PROPERTY_LEGACY_PRIVILEGED = "priviledged";
-    protected static final String PROPERTY_PRIVILEGED = "privileged";
     protected static final String PROPERTY_LOADER_OVERRIDE = "loader.override";
     protected static final String PROPERTY_SCAN_PACKAGES = "scan.packages";
 
@@ -61,10 +58,6 @@ public class PropertiesDescriptorParser implements DescriptorParser
 
         // supports true (case insensitive), yes, on as positive values
         d.setRedeploymentEnabled(BooleanUtils.toBoolean(p.getProperty(PROPERTY_REDEPLOYMENT_ENABLED, Boolean.TRUE.toString())));
-
-        // fallback to a legacy property name
-        d.setPrivileged(BooleanUtils.toBoolean(p.getProperty(PROPERTY_PRIVILEGED,
-                                                             p.getProperty(PROPERTY_LEGACY_PRIVILEGED, Boolean.FALSE.toString()))));
 
         final String overrideString = p.getProperty(PROPERTY_LOADER_OVERRIDE);
         if (StringUtils.isNotBlank(overrideString))

@@ -14,8 +14,6 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
@@ -24,17 +22,10 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import org.mule.MuleCoreExtension;
-import org.mule.api.MuleContext;
-import org.mule.api.component.JavaComponent;
 import org.mule.api.config.MuleProperties;
-import org.mule.api.construct.FlowConstruct;
 import org.mule.api.registry.MuleRegistry;
 import org.mule.config.StartupContext;
-import org.mule.construct.SimpleService;
 import org.mule.module.launcher.application.Application;
-import org.mule.module.launcher.application.ApplicationWrapper;
-import org.mule.module.launcher.application.PriviledgedMuleApplication;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
@@ -48,7 +39,6 @@ import java.io.IOException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -81,7 +71,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         new File(muleHome, "lib/shared/default").mkdirs();
 
         deploymentListener = mock(DeploymentListener.class);
-        deploymentService = new DeploymentService(new HashMap<Class<? extends MuleCoreExtension>, MuleCoreExtension>());
+        deploymentService = new DeploymentService();
         deploymentService.addDeploymentListener(deploymentListener);
     }
 
@@ -103,63 +93,6 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     }
 
     @Test
-    public void testPriviledgedApp() throws Exception
-    {
-        final URL url = getClass().getResource("/priviledged-dummy-app.zip");
-        assertNotNull("Test app file not found " + url, url);
-        addAppArchive(url);
-
-        deploymentService.start();
-
-        assertDeploymentSuccess(deploymentListener, "priviledged-dummy-app");
-
-        assertAppsDir(NONE, new String[] {"priviledged-dummy-app"}, true);
-
-        final Application app = findApp("priviledged-dummy-app", 1);
-        // now that we're sure it's the app we wanted, assert the registry has everything
-        // a 'privileged' app would have had
-        final Object obj = app.getMuleContext().getRegistry().lookupObject(PriviledgedMuleApplication.REGISTRY_KEY_DEPLOYMENT_SERVICE);
-        assertNotNull("Privileged objects have not been registered", obj);
-        assertTrue(((ApplicationWrapper) app).getDelegate() instanceof PriviledgedMuleApplication);
-    }
-
-    @Test
-    public void testPriviledgedCrossAppAccess() throws Exception
-    {
-        URL url = getClass().getResource("/priviledged-dummy-app.zip");
-        assertNotNull("Test app file not found " + url, url);
-        addAppArchive(url);
-
-        url = getClass().getResource("/dummy-app.zip");
-        assertNotNull("Test app file not found " + url, url);
-        addAppArchive(url);
-
-        deploymentService.start();
-
-        assertDeploymentSuccess(deploymentListener, "priviledged-dummy-app");
-        assertDeploymentSuccess(deploymentListener, "dummy-app");
-
-        assertAppsDir(NONE, new String[] {"dummy-app", "priviledged-dummy-app"}, true);
-
-        final Application privApp = findApp("priviledged-dummy-app", 2);
-        final Application dummyApp = findApp("dummy-app", 2);
-        assertTrue(((ApplicationWrapper) privApp).getDelegate() instanceof PriviledgedMuleApplication);
-
-        final MuleContext muleContext1 = privApp.getMuleContext();
-        System.out.println("muleContext1 = " + muleContext1);
-        assertNotSame(muleContext1, muleContext);
-        assertNotSame(privApp.getDeploymentClassLoader(), dummyApp.getDeploymentClassLoader());
-        final Collection<FlowConstruct> flowConstructs = dummyApp.getMuleContext().getRegistry().lookupObjects(FlowConstruct.class);
-        assertFalse("No FlowConstructs found in the sibling app", flowConstructs.isEmpty());
-        FlowConstruct fc = flowConstructs.iterator().next();
-        assertTrue(fc instanceof SimpleService);
-        SimpleService service = (SimpleService) fc;
-        // note that we don't have this class available to this test directly
-        Class<?> clazz = ((JavaComponent) service.getComponent()).getObjectType();
-        assertEquals("Wrong component implementation class", "org.mule.module.launcher.EchoTest", clazz.getName());
-    }
-
-    @Test
     public void testDeployZipOnStartup() throws Exception
     {
         final URL url = getClass().getResource("/dummy-app.zip");
@@ -175,9 +108,6 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         // just assert no privileged entries were put in the registry
         final Application app = findApp("dummy-app", 1);
         final MuleRegistry registry = app.getMuleContext().getRegistry();
-        final Object obj = registry.lookupObject(PriviledgedMuleApplication.REGISTRY_KEY_DEPLOYMENT_SERVICE);
-        assertNull(obj);
-        assertFalse(((ApplicationWrapper) app).getDelegate() instanceof PriviledgedMuleApplication);
 
         // mule-app.properties from the zip archive must have loaded properly
         assertEquals("mule-app.properties should have been loaded.", "someValue", registry.get("myCustomProp"));
