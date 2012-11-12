@@ -14,6 +14,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.VoidMuleEvent;
@@ -23,7 +24,6 @@ import org.mule.api.MuleMessageCollection;
 import org.mule.api.MuleSession;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
-import org.mule.tck.MuleTestUtils;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import com.mockobjects.dynamic.Mock;
@@ -35,8 +35,7 @@ import org.junit.Test;
 
 public class SequenceRouterTestCase extends AbstractMuleContextTestCase
 {
-
-    private Mock session;
+    private MuleSession session;
     private SequenceRouter router;
     private Mock mockEndpoint1;
     private Mock mockEndpoint2;
@@ -44,13 +43,10 @@ public class SequenceRouterTestCase extends AbstractMuleContextTestCase
     @Override
     protected void doSetUp() throws Exception
     {
-        session = MuleTestUtils.getMockSession();
-        session.matchAndReturn("getFlowConstruct", getTestService());
-        session.matchAndReturn("setFlowConstruct", RouterTestUtils.getArgListCheckerFlowConstruct(), null);
+        session = mock(MuleSession.class);
 
         OutboundEndpoint endpoint1 = getTestOutboundEndpoint("Test1Provider",
                                             "test://Test1Provider?exchangePattern=request-response");
-
         OutboundEndpoint endpoint2 = getTestOutboundEndpoint("Test2Provider",
                                             "test://Test2Provider?exchangePattern=request-response");
         mockEndpoint1 = RouterTestUtils.getMockEndpoint(endpoint1);
@@ -72,9 +68,9 @@ public class SequenceRouterTestCase extends AbstractMuleContextTestCase
         mockEndpoint1.expectAndReturn("process", RouterTestUtils.getArgListCheckerMuleEvent(), event);
         mockEndpoint2.expectAndReturn("process", RouterTestUtils.getArgListCheckerMuleEvent(), event);
 
-        MuleEvent result = router.route(new OutboundRoutingTestEvent(message, (MuleSession)session.proxy(), muleContext));
-
+        MuleEvent result = router.route(new OutboundRoutingTestEvent(message, session, muleContext));
         assertNotNull(result);
+
         MuleMessage resultMessage = result.getMessage();
         assertNotNull(resultMessage);
         assertTrue(resultMessage instanceof MuleMessageCollection);
@@ -91,8 +87,7 @@ public class SequenceRouterTestCase extends AbstractMuleContextTestCase
 
         mockEndpoint1.expectAndReturn("process", RouterTestUtils.getArgListCheckerMuleEvent(), eventWithNullMessage);
 
-        MuleEvent result = router.route(new OutboundRoutingTestEvent(message, (MuleSession)session.proxy(), muleContext));
-
+        MuleEvent result = router.route(new OutboundRoutingTestEvent(message, session, muleContext));
         assertSame(VoidMuleEvent.getInstance(), result);
     }
 
@@ -107,9 +102,7 @@ public class SequenceRouterTestCase extends AbstractMuleContextTestCase
         mockEndpoint1.expectAndReturn("process", RouterTestUtils.getArgListCheckerMuleEvent(), event);
         mockEndpoint2.expectAndReturn("process", RouterTestUtils.getArgListCheckerMuleEvent(), eventWithNullMessage);
 
-        MuleEvent result = router.route(new OutboundRoutingTestEvent(message, (MuleSession)session.proxy(), muleContext));
-
+        MuleEvent result = router.route(new OutboundRoutingTestEvent(message, session, muleContext));
         assertNotNull(result);
-        assertTrue(result instanceof MuleEvent);
     }
 }

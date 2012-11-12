@@ -10,6 +10,11 @@
 
 package org.mule.routing.outbound;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
@@ -17,7 +22,6 @@ import org.mule.api.MuleMessageCollection;
 import org.mule.api.MuleSession;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
-import org.mule.tck.MuleTestUtils;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import com.mockobjects.dynamic.Mock;
@@ -27,10 +31,6 @@ import java.util.List;
 import java.util.StringTokenizer;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 public class MessageSplitterRouterTestCase extends AbstractMuleContextTestCase
 {
@@ -42,10 +42,6 @@ public class MessageSplitterRouterTestCase extends AbstractMuleContextTestCase
     @Test
     public void testMessageSplitterRouter() throws Exception
     {
-        Mock session = MuleTestUtils.getMockSession();
-        session.matchAndReturn("getFlowConstruct", getTestService());
-        session.matchAndReturn("setFlowConstruct", RouterTestUtils.getArgListCheckerFlowConstruct(), null);
-
         //Async targets
         OutboundEndpoint endpoint1 = getTestOutboundEndpoint("Test1Endpoint", "test://endpointUri.1");
         OutboundEndpoint endpoint2 = getTestOutboundEndpoint("Test2Endpoint", "test://endpointUri.2");
@@ -55,11 +51,11 @@ public class MessageSplitterRouterTestCase extends AbstractMuleContextTestCase
         Mock mockendpoint3 = RouterTestUtils.getMockEndpoint(endpoint3);
 
         //Sync targets  org.python.core.__builtin__
-        OutboundEndpoint endpoint4 = getTestOutboundEndpoint("Test4Endpoint", 
+        OutboundEndpoint endpoint4 = getTestOutboundEndpoint("Test4Endpoint",
             "test://endpointUri.4?exchangePattern=request-response");
-        OutboundEndpoint endpoint5 = getTestOutboundEndpoint("Test5Endpoint", 
+        OutboundEndpoint endpoint5 = getTestOutboundEndpoint("Test5Endpoint",
             "test://endpointUri.5?exchangePattern=request-response");
-        OutboundEndpoint endpoint6 = getTestOutboundEndpoint("Test6Endpoint", 
+        OutboundEndpoint endpoint6 = getTestOutboundEndpoint("Test6Endpoint",
             "test://endpointUri.6?exchangePattern=request-response");
         Mock mockendpoint4 = RouterTestUtils.getMockEndpoint(endpoint4);
         Mock mockendpoint5 = RouterTestUtils.getMockEndpoint(endpoint5);
@@ -97,7 +93,9 @@ public class MessageSplitterRouterTestCase extends AbstractMuleContextTestCase
         mockendpoint1.expect("process", RouterTestUtils.getArgListCheckerMuleEvent());
         mockendpoint2.expect("process", RouterTestUtils.getArgListCheckerMuleEvent());
         mockendpoint3.expect("process", RouterTestUtils.getArgListCheckerMuleEvent());
-        router.route(new OutboundRoutingTestEvent(message, (MuleSession) session.proxy(), muleContext));
+
+        MuleSession session = mock(MuleSession.class);
+        router.route(new OutboundRoutingTestEvent(message, session, muleContext));
         mockendpoint1.verify();
         mockendpoint2.verify();
         mockendpoint3.verify();
@@ -115,7 +113,8 @@ public class MessageSplitterRouterTestCase extends AbstractMuleContextTestCase
         mockendpoint4.expectAndReturn("process", RouterTestUtils.getArgListCheckerMuleEvent(), event);
         mockendpoint5.expectAndReturn("process", RouterTestUtils.getArgListCheckerMuleEvent(), event);
         mockendpoint6.expectAndReturn("process", RouterTestUtils.getArgListCheckerMuleEvent(), event);
-        MuleEvent result = router.route(new OutboundRoutingTestEvent(message, (MuleSession) session.proxy(), muleContext));
+
+        MuleEvent result = router.route(new OutboundRoutingTestEvent(message, session, muleContext));
         assertNotNull(result);
         MuleMessage resultMessage = result.getMessage();
         assertNotNull(resultMessage);

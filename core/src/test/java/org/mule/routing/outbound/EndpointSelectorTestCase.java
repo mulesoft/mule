@@ -10,13 +10,16 @@
 
 package org.mule.routing.outbound;
 
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
+
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.RoutingException;
-import org.mule.tck.MuleTestUtils;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import com.mockobjects.dynamic.Mock;
@@ -28,32 +31,27 @@ import java.util.Map;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 public class EndpointSelectorTestCase extends AbstractMuleContextTestCase
 {
+    private MuleSession session;
+    private OutboundEndpoint dest1;
+    private OutboundEndpoint dest2;
+    private OutboundEndpoint dest3;
+    private EndpointSelector router;
+    private Mock mockendpoint1;
+    private Mock mockendpoint2;
+    private Mock mockendpoint3;
+
     public EndpointSelectorTestCase()
     {
         setStartContext(true);
     }
 
-    Mock session;
-    OutboundEndpoint dest1;
-    OutboundEndpoint dest2;
-    OutboundEndpoint dest3;
-    EndpointSelector router;
-    Mock mockendpoint1;
-    Mock mockendpoint2;
-    Mock mockendpoint3;
-
-
     @Override
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
-        session = MuleTestUtils.getMockSession();
-        session.matchAndReturn("getFlowConstruct", getTestService());
+        session = mock(MuleSession.class);
         dest1 = getTestOutboundEndpoint("dest1");
         dest2 = getTestOutboundEndpoint("dest2");
         dest3 = getTestOutboundEndpoint("dest3");
@@ -84,7 +82,7 @@ public class EndpointSelectorTestCase extends AbstractMuleContextTestCase
 
         assertTrue(router.isMatch(message));
         mockendpoint3.expect("process", RouterTestUtils.getArgListCheckerMuleEvent());
-        router.route(new OutboundRoutingTestEvent(message, (MuleSession) session.proxy(), muleContext));
+        router.route(new OutboundRoutingTestEvent(message, session, muleContext));
         mockendpoint3.verify();
     }
 
@@ -103,7 +101,7 @@ public class EndpointSelectorTestCase extends AbstractMuleContextTestCase
 
         assertTrue(router.isMatch(message));
         mockendpoint2.expect("process", RouterTestUtils.getArgListCheckerMuleEvent());
-        router.route(new OutboundRoutingTestEvent(message, (MuleSession) session.proxy(), muleContext));
+        router.route(new OutboundRoutingTestEvent(message, session, muleContext));
         mockendpoint2.verify();
     }
 
@@ -118,7 +116,7 @@ public class EndpointSelectorTestCase extends AbstractMuleContextTestCase
             // this test used to fail at the router; it now fails earlier when the message is
             // constructed.  i don't think this is a problem.
             MuleMessage message = new DefaultMuleMessage("test event", props, muleContext);
-            router.route(new OutboundRoutingTestEvent(message, (MuleSession) session.proxy(), muleContext));
+            router.route(new OutboundRoutingTestEvent(message, session, muleContext));
             fail("Router should have thrown an exception if endpoint was not found.");
         }
         catch (Exception e)
@@ -135,7 +133,7 @@ public class EndpointSelectorTestCase extends AbstractMuleContextTestCase
 
         assertTrue(router.isMatch(message));
         mockendpoint3.expect("process", RouterTestUtils.getArgListCheckerMuleEvent());
-        router.route(new OutboundRoutingTestEvent(message, (MuleSession) session.proxy(), muleContext));
+        router.route(new OutboundRoutingTestEvent(message, session, muleContext));
         mockendpoint3.verify();
     }
 
@@ -146,7 +144,7 @@ public class EndpointSelectorTestCase extends AbstractMuleContextTestCase
 
         try
         {
-            router.route(new OutboundRoutingTestEvent(message, (MuleSession) session.proxy(), muleContext));
+            router.route(new OutboundRoutingTestEvent(message, session, muleContext));
             fail("Router should have thrown an exception if no selector property was set on the message.");
         }
         catch (RoutingException e)

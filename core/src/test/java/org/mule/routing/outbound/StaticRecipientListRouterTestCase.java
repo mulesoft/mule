@@ -10,6 +10,12 @@
 
 package org.mule.routing.outbound;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
+
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -17,7 +23,6 @@ import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
-import org.mule.tck.MuleTestUtils;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import com.mockobjects.dynamic.Mock;
@@ -29,24 +34,18 @@ import java.util.Map;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 public class StaticRecipientListRouterTestCase extends AbstractMuleContextTestCase
 {
     public StaticRecipientListRouterTestCase()
     {
-        setStartContext(true);        
+        setStartContext(true);
     }
 
     @Test
     public void testRecipientListRouterAsync() throws Exception
     {
-        Mock session = MuleTestUtils.getMockSession();
-        session.matchAndReturn("getFlowConstruct", getTestService());
-        
+        MuleSession session = mock(MuleSession.class);
+
         OutboundEndpoint endpoint1 = getTestOutboundEndpoint("Test1Provider");
         assertNotNull(endpoint1);
         Mock mockendpoint1 = RouterTestUtils.getMockEndpoint(endpoint1);
@@ -74,6 +73,7 @@ public class StaticRecipientListRouterTestCase extends AbstractMuleContextTestCa
         final List<Mock> mockEndpoints = new ArrayList<Mock>();
         router.setMockEndpointListener(new MockEndpointListener()
         {
+            @Override
             public void mockEndpointAdded(Mock recipient)
             {
                 mockEndpoints.add(recipient);
@@ -81,7 +81,7 @@ public class StaticRecipientListRouterTestCase extends AbstractMuleContextTestCa
             }
         });
 
-        router.route(new OutboundRoutingTestEvent(message, (MuleSession)session.proxy(), muleContext));
+        router.route(new OutboundRoutingTestEvent(message, session, muleContext));
         for (Mock mockEp : mockEndpoints)
         {
             mockEp.verify();
@@ -92,10 +92,8 @@ public class StaticRecipientListRouterTestCase extends AbstractMuleContextTestCa
     @Test
     public void testRecipientListRouterSync() throws Exception
     {
-        Mock session = MuleTestUtils.getMockSession();
-        session.matchAndReturn("getFlowConstruct", getTestService());
-        session.matchAndReturn("setFlowConstruct", RouterTestUtils.getArgListCheckerFlowConstruct(), null);
-        
+        MuleSession session = mock(MuleSession.class);
+
         OutboundEndpoint endpoint1 = getTestOutboundEndpoint("Test1Provider");
         assertNotNull(endpoint1);
 
@@ -128,7 +126,8 @@ public class StaticRecipientListRouterTestCase extends AbstractMuleContextTestCa
          final List<Mock> mockEndpoints = new ArrayList<Mock>();
          router.setMockEndpointListener(new MockEndpointListener()
          {
-             public void mockEndpointAdded(Mock recipient)
+             @Override
+            public void mockEndpointAdded(Mock recipient)
              {
                  mockEndpoints.add(recipient);
                  recipient.expectAndReturn("process", RouterTestUtils.getArgListCheckerMuleEvent(), event);
@@ -136,20 +135,18 @@ public class StaticRecipientListRouterTestCase extends AbstractMuleContextTestCa
          });
 
         router.getRecipients().add("test://recipient3?exchangePattern=request-response");
-        MuleEvent result = router.route(new OutboundRoutingTestEvent(message, (MuleSession)session.proxy(), muleContext));
+        MuleEvent result = router.route(new OutboundRoutingTestEvent(message, session, muleContext));
         assertNotNull(result);
         MuleMessage resultMessage = result.getMessage();
         assertNotNull(resultMessage);
         assertTrue(resultMessage.getPayload() instanceof List);
         assertEquals(3, ((List)resultMessage.getPayload()).size());
-        session.verify();
-
     }
 
     @Test
     public void testBadRecipientListRouter() throws Exception
     {
-        Mock session = MuleTestUtils.getMockSession();
+        MuleSession session = mock(MuleSession.class);
 
         OutboundEndpoint endpoint1 = getTestOutboundEndpoint("Test1Provider");
         assertNotNull(endpoint1);
@@ -170,14 +167,13 @@ public class StaticRecipientListRouterTestCase extends AbstractMuleContextTestCa
         assertTrue(router.isMatch(message));
         try
         {
-            router.route(new OutboundRoutingTestEvent(message, (MuleSession)session.proxy(), muleContext));
+            router.route(new OutboundRoutingTestEvent(message, session, muleContext));
             fail("Should not allow malformed endpointUri");
         }
         catch (Exception e)
         {
             // ignore
         }
-        session.verify();
     }
 
     /** subclass the router, so that we can mock the targets it creates dynamically.  */

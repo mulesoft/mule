@@ -12,6 +12,7 @@ package org.mule.routing.outbound;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.mockito.Mockito.mock;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
@@ -24,7 +25,6 @@ import org.mule.api.routing.RoutingException;
 import org.mule.routing.AbstractCatchAllStrategy;
 import org.mule.routing.LoggingCatchAllStrategy;
 import org.mule.routing.filters.PayloadTypeFilter;
-import org.mule.tck.MuleTestUtils;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import com.mockobjects.dynamic.Mock;
@@ -38,20 +38,17 @@ public class OutboundMessageRouterTestCase extends AbstractMuleContextTestCase
 {
     public OutboundMessageRouterTestCase()
     {
-        setStartContext(true);        
+        setStartContext(true);
     }
 
     @Test
     public void testOutboundMessageRouter() throws Exception
     {
-        Mock session = MuleTestUtils.getMockSession();
-        session.matchAndReturn("getFlowConstruct", getTestService());
-        
         DefaultOutboundRouterCollection messageRouter = createObject(DefaultOutboundRouterCollection.class);
         messageRouter.setCatchAllStrategy(new LoggingCatchAllStrategy());
         assertNotNull(messageRouter.getCatchAllStrategy());
 
-        OutboundEndpoint endpoint1 = getTestOutboundEndpoint("Test1Provider", 
+        OutboundEndpoint endpoint1 = getTestOutboundEndpoint("Test1Provider",
             "test://Test1Provider?exchangePattern=one-way");
         assertNotNull(endpoint1);
 
@@ -80,21 +77,21 @@ public class OutboundMessageRouterTestCase extends AbstractMuleContextTestCase
         assertEquals(1, messageRouter.getRoutes().size());
         messageRouter.removeRoute(router1);
         assertEquals(0, messageRouter.getRoutes().size());
-        
+
         List<MatchableMessageProcessor> list = new ArrayList<MatchableMessageProcessor>();
         list.add(router1);
         list.add(router2);
         messageRouter.setMessageProcessors(list);
 
-        MuleEvent event = getTestEvent("test event", (MuleSession) session.proxy());
+        MuleSession session = mock(MuleSession.class);
+        MuleEvent event = getTestEvent("test event", session);
 
         mockendpoint1.expect("process",RouterTestUtils.getArgListCheckerMuleEvent());
         messageRouter.process(event);
         mockendpoint1.verify();
 
-        event = getTestEvent(new IllegalArgumentException(), (MuleSession) session.proxy());
-        
-        session.expectAndReturn("getFlowConstruct", getTestService());
+        event = getTestEvent(new IllegalArgumentException(), session);
+
         mockendpoint2.expect("process", RouterTestUtils.getArgListCheckerMuleEvent());
         messageRouter.process(event);
         mockendpoint2.verify();
@@ -107,9 +104,7 @@ public class OutboundMessageRouterTestCase extends AbstractMuleContextTestCase
         messageRouter.addRoute(router3);
 
         // now the message should be routed twice to different targets
-        event = getTestEvent("testing multiple routing", (MuleSession) session.proxy());
-        session.expectAndReturn("getFlowConstruct", getTestService());
-        session.expectAndReturn("getFlowConstruct", getTestService());
+        event = getTestEvent("testing multiple routing", session);
 
         mockendpoint1.expect("process", RouterTestUtils.getArgListCheckerMuleEvent());
         mockendpoint2.expect("process", RouterTestUtils.getArgListCheckerMuleEvent());
