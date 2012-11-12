@@ -21,11 +21,16 @@ import org.mule.tck.MuleTestUtils;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.transport.jms.transformers.ObjectToJMSMessage;
 
+import com.mockobjects.constraint.Constraint;
+import com.mockobjects.constraint.IsEqual;
+import com.mockobjects.dynamic.ConstraintMatcher;
+import com.mockobjects.dynamic.FullConstraintMatcher;
+import com.mockobjects.dynamic.Mock;
+
 import javax.jms.Message;
 import javax.jms.TextMessage;
 
 import org.apache.commons.collections.IteratorUtils;
-import org.hamcrest.core.IsEqual;
 import org.junit.Test;
 
 public class JmsTransformerTestCase extends AbstractMuleContextTestCase
