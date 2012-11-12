@@ -10,6 +10,7 @@
 
 package org.mule.construct;
 
+import org.mule.api.GlobalNameableObject;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
@@ -327,10 +328,25 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
         if (exceptionListener instanceof MessageProcessorContainer)
         {
             Map<MessageProcessor, String> esPathMap = ((MessageProcessorContainer) exceptionListener).getMessageProcessorPaths();
-            NotificationUtils.prefixMessageProcessorPaths("/" + getName() + "/es", esPathMap);
+            NotificationUtils.prefixMessageProcessorPaths(getExceptionStrategyPrefix(), esPathMap);
             result.putAll(esPathMap);
         }
         return result;
+    }
+
+    private String getExceptionStrategyPrefix()
+    {
+        String esPrefix = "/" + getName() + "/es";
+        String globalName = null;
+        if (exceptionListener instanceof GlobalNameableObject)
+        {
+            globalName = ((GlobalNameableObject) exceptionListener).getGlobalName();
+        }
+        if (globalName != null)
+        {
+            esPrefix = "/" + getName() + "/" + globalName + "/es";
+        }
+        return esPrefix;
     }
 
     @Override

@@ -9,6 +9,7 @@
  */
 package org.mule.exception;
 
+import org.mule.api.GlobalNameableObject;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.context.MuleContextAware;
@@ -33,9 +34,22 @@ import java.util.Map;
  *
  * Exception listeners must implement {@link org.mule.api.exception.MessagingExceptionHandlerAcceptor} to be part of ChoiceMessagingExceptionStrategy
  */
-public class ChoiceMessagingExceptionStrategy extends AbstractMuleObjectOwner<MessagingExceptionHandlerAcceptor> implements MessagingExceptionHandler, MuleContextAware, Lifecycle, MessageProcessorContainer
+public class ChoiceMessagingExceptionStrategy extends AbstractMuleObjectOwner<MessagingExceptionHandlerAcceptor>
+        implements MessagingExceptionHandler, MuleContextAware, Lifecycle, MessageProcessorContainer, GlobalNameableObject
 {
     private List<MessagingExceptionHandlerAcceptor> exceptionListeners;
+
+    protected String globalName;
+
+    public String getGlobalName()
+    {
+        return globalName;
+    }
+
+    public void setGlobalName(String globalName)
+    {
+        this.globalName = globalName;
+    }
 
     @Override
     public MuleEvent handleException(Exception exception, MuleEvent event)

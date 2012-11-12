@@ -12,6 +12,7 @@ package org.mule.exception;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
+import org.mule.api.GlobalNameableObject;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
@@ -52,7 +53,7 @@ import org.apache.commons.logging.LogFactory;
  * probably inherit from <code>AbstractMessagingExceptionStrategy</code> (if you are creating a Messaging Exception Strategy) 
  * or <code>AbstractSystemExceptionStrategy</code> (if you are creating a System Exception Strategy) rather than directly from this class.
  */
-public abstract class AbstractExceptionListener extends AbstractMessageProcessorOwner
+public abstract class AbstractExceptionListener extends AbstractMessageProcessorOwner implements GlobalNameableObject
 {
     protected transient Log logger = LogFactory.getLog(getClass());
 
@@ -65,6 +66,18 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
     protected WildcardFilter commitTxFilter;
 
     protected boolean enableNotifications = true;
+
+    protected String globalName;
+
+    public String getGlobalName()
+    {
+        return globalName;
+    }
+
+    public void setGlobalName(String globalName)
+    {
+        this.globalName = globalName;
+    }
 
     protected boolean isRollback(Throwable t)
     {
