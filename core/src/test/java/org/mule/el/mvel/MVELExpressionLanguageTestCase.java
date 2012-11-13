@@ -454,7 +454,7 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase
     {
         public HelloWorldFunction(ParserContext parserContext)
         {
-            super("hello", new char[]{}, new char[]{}, 0, parserContext);
+            super("hello", new char[]{}, 0, 0, 0, 0, 0, parserContext);
         }
 
         @Override

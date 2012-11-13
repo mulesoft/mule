@@ -25,7 +25,7 @@ class MVELFunctionAdaptor extends Function
 
     public MVELFunctionAdaptor(String name, ExpressionLanguageFunction function, ParserContext parserContext)
     {
-        super(name, new char[]{}, new char[]{}, 0, parserContext);
+        super(name, new char[]{}, 0, 0, 0, 0, 0, parserContext);
         this.function = function;
     }
 
