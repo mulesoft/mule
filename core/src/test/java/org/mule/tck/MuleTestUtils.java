@@ -10,7 +10,6 @@
 
 package org.mule.tck;
 
-import org.mule.DefaultMuleContext;
 import org.mule.DefaultMuleEvent;
 import org.mule.MessageExchangePattern;
 import org.mule.RequestContext;
@@ -24,19 +23,14 @@ import org.mule.api.component.JavaComponent;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.endpoint.EndpointBuilder;
-import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.routing.filter.Filter;
 import org.mule.api.service.Service;
-import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionConfig;
-import org.mule.api.transaction.TransactionFactory;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.Connector;
-import org.mule.api.transport.MessageDispatcher;
-import org.mule.api.transport.MessageDispatcherFactory;
 import org.mule.api.transport.MuleMessageFactory;
 import org.mule.component.DefaultJavaComponent;
 import org.mule.construct.Flow;
@@ -638,54 +632,8 @@ public final class MuleTestUtils
         return t;
     }
 
-    public static Mock getMockMessageDispatcher()
-    {
-        return new Mock(MessageDispatcher.class, "umoMessageDispatcher");
-    }
-
-    public static Mock getMockMessageDispatcherFactory()
-    {
-        return new Mock(MessageDispatcherFactory.class, "umoMessageDispatcherFactory");
-    }
-
-    public static Mock getMockConnector()
-    {
-        return new Mock(Connector.class, "umoConnector");
-    }
-
-    public static Mock getMockEvent()
-    {
-        return new Mock(MuleEvent.class, "umoEvent");
-    }
-
-    public static Mock getMockMuleContext()
-    {
-        return new Mock(DefaultMuleContext.class, "muleMuleContext");
-    }
-
-    public static Mock getMockInboundEndpoint()
-    {
-        return new Mock(InboundEndpoint.class, "umoEndpoint");
-    }
-
     public static Mock getMockOutboundEndpoint()
     {
         return new Mock(OutboundEndpoint.class, "umoEndpoint");
     }
-
-    public static Mock getMockEndpointURI()
-    {
-        return new Mock(EndpointURI.class, "umoEndpointUri");
-    }
-
-    public static Mock getMockTransaction()
-    {
-        return new Mock(Transaction.class, "umoTransaction");
-    }
-
-    public static Mock getMockTransactionFactory()
-    {
-        return new Mock(TransactionFactory.class, "umoTransactionFactory");
-    }
-
 }

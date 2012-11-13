@@ -10,30 +10,30 @@
 
 package org.mule.routing;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import org.mule.DefaultMuleEvent;
 import org.mule.api.MuleEvent;
-import org.mule.api.MuleSession;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.routing.RoutingException;
 import org.mule.api.transformer.TransformerException;
-import org.mule.api.transport.MessageDispatcher;
 import org.mule.routing.filters.PayloadTypeFilter;
 import org.mule.routing.outbound.DefaultOutboundRouterCollection;
 import org.mule.routing.outbound.FilteringOutboundRouter;
-import org.mule.tck.MuleTestUtils;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.transformer.AbstractTransformer;
 import org.mule.util.CollectionUtils;
 
-import com.mockobjects.constraint.Constraint;
-import com.mockobjects.dynamic.C;
-import com.mockobjects.dynamic.Mock;
-
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 
 public class CatchAllStrategiesTestCase extends AbstractMuleContextTestCase
 {
@@ -56,20 +56,13 @@ public class CatchAllStrategiesTestCase extends AbstractMuleContextTestCase
     public void testForwardingStrategy() throws Exception
     {
         ForwardingCatchAllStrategy strategy = new ForwardingCatchAllStrategy();
-        Mock endpoint = MuleTestUtils.getMockOutboundEndpoint();
-        Mock dispatcher = new Mock(MessageDispatcher.class);
-        Mock connector = MuleTestUtils.getMockConnector();
+        OutboundEndpoint endpoint = mock(OutboundEndpoint.class);
         MuleEvent event = getTestEvent("UncaughtEvent");
-        strategy.setEndpoint((OutboundEndpoint) endpoint.proxy());
-
-        endpoint.expect("process", C.isA(DefaultMuleEvent.class));
+        strategy.setEndpoint(endpoint);
 
         strategy.process(event);
 
-        endpoint.verify();
-        dispatcher.verify();
-        connector.verify();
-
+        verify(endpoint).process(any(DefaultMuleEvent.class));
         assertNotNull(strategy.getEndpoint());
     }
 
@@ -82,7 +75,6 @@ public class CatchAllStrategiesTestCase extends AbstractMuleContextTestCase
         ForwardingCatchAllStrategy strategy = new ForwardingCatchAllStrategy();
         strategy.setEndpoint(null);
         MuleEvent event = getTestEvent("UncaughtEvent");
-        MuleSession session = getTestSession(getTestService(), muleContext);
 
         try
         {
@@ -103,7 +95,7 @@ public class CatchAllStrategiesTestCase extends AbstractMuleContextTestCase
         }
 
         @Override
-        public Object doTransform(Object src, String encoding) throws TransformerException
+        public Object doTransform(Object src, String outputEncoding) throws TransformerException
         {
             return "Transformed Test Data";
         }
@@ -112,33 +104,29 @@ public class CatchAllStrategiesTestCase extends AbstractMuleContextTestCase
     @Test
     public void testForwardingStrategyWithTransform() throws Exception
     {
-        ForwardingCatchAllStrategy strategy = new ForwardingCatchAllStrategy();
-        strategy.setSendTransformed(true);
-        Mock endpoint = MuleTestUtils.getMockOutboundEndpoint();
-        Mock dispatcher = new Mock(MessageDispatcher.class);
-        Mock connector = MuleTestUtils.getMockConnector();
-        MuleEvent event = getTestEvent("UncaughtEvent");
-        strategy.setEndpoint((OutboundEndpoint) endpoint.proxy());
-
-        endpoint.expectAndReturn("getTransformers", CollectionUtils.singletonList(new TestEventTransformer()));
-        endpoint.expectAndReturn("getTransformers", CollectionUtils.singletonList(new TestEventTransformer()));
-        endpoint.expect("process", new Constraint()
+        OutboundEndpoint endpoint = mock(OutboundEndpoint.class);
+        when(endpoint.getTransformers()).thenReturn(CollectionUtils.singletonList(new TestEventTransformer()));
+        when(endpoint.process(any(MuleEvent.class))).thenAnswer(new Answer<MuleEvent>()
         {
-            public boolean eval(Object object)
+            @Override
+            public MuleEvent answer(InvocationOnMock invocation) throws Throwable
             {
-                if (object instanceof MuleEvent)
-                {
-                    return "Transformed Test Data".equals(((MuleEvent) object).getMessage().getPayload());
-                }
-                return false;
+                assertEquals(1, invocation.getArguments().length);
+                assertTrue(invocation.getArguments()[0] instanceof MuleEvent);
+
+                MuleEvent event = (MuleEvent) invocation.getArguments()[0];
+                assertEquals("Transformed Test Data", event.getMessage().getPayload());
+
+                return null;
             }
         });
 
-        strategy.process(event);
+        ForwardingCatchAllStrategy strategy = new ForwardingCatchAllStrategy();
+        strategy.setSendTransformed(true);
+        strategy.setEndpoint(endpoint);
 
-        endpoint.verify();
-        dispatcher.verify();
-        connector.verify();
+        MuleEvent event = getTestEvent("UncaughtEvent");
+        strategy.process(event);
 
         assertNotNull(strategy.getEndpoint());
     }
@@ -188,8 +176,6 @@ public class CatchAllStrategiesTestCase extends AbstractMuleContextTestCase
         };
         messageRouter.setCatchAllStrategy(strategy);
 
-        MuleSession session = getTestSession(getTestService(), muleContext);
-
         messageRouter.process(getTestEvent("hello"));
         assertEquals(1, catchAllCount[0]);
         assertEquals(0, count1[0]);
@@ -205,5 +191,4 @@ public class CatchAllStrategiesTestCase extends AbstractMuleContextTestCase
         assertEquals(1, count1[0]);
         assertEquals(1, count2[0]);
     }
-
 }
