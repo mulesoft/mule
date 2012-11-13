@@ -31,7 +31,7 @@ import org.mule.module.launcher.ConfigChangeMonitorThreadFactory;
 import org.mule.module.launcher.DefaultMuleSharedDomainClassLoader;
 import org.mule.module.launcher.DeploymentInitException;
 import org.mule.module.launcher.DeploymentListener;
-import org.mule.module.launcher.DeploymentService;
+import org.mule.module.launcher.MuleDeploymentService;
 import org.mule.module.launcher.DeploymentStartException;
 import org.mule.module.launcher.DeploymentStopException;
 import org.mule.module.launcher.GoodCitizenClassLoader;
@@ -66,7 +66,7 @@ public class DefaultMuleApplication implements Application
     protected static final String ANCHOR_FILE_BLURB = "Delete this file while Mule is running to undeploy this app in a clean way.";
 
     protected transient final Log logger = LogFactory.getLog(getClass());
-    protected transient final Log deployLogger = LogFactory.getLog(DeploymentService.class);
+    protected transient final Log deployLogger = LogFactory.getLog(MuleDeploymentService.class);
 
     protected ScheduledExecutorService watchTimer;
 
@@ -204,6 +204,10 @@ public class DefaultMuleApplication implements Application
                 builders.add(cfgBuilder);
 
                 DefaultMuleContextFactory muleContextFactory = new DefaultMuleContextFactory();
+                if (deploymentListener != null)
+                {
+                    muleContextFactory.addListener(new MuleContextDeploymentListener(getAppName(), deploymentListener));
+                }
                 this.muleContext = muleContextFactory.createMuleContext(builders, new ApplicationMuleContextBuilder(descriptor));
 
                 if (descriptor.isRedeploymentEnabled())
@@ -558,4 +562,5 @@ public class DefaultMuleApplication implements Application
             }
         }
     }
+
 }

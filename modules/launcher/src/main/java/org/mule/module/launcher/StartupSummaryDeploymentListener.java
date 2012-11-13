@@ -18,7 +18,7 @@ import org.apache.commons.logging.LogFactory;
 /**
  * Prints application status summary table on Mule startup.
  */
-public class StartupSummaryDeploymentListener implements DeploymentService.StartupListener
+public class StartupSummaryDeploymentListener implements StartupListener
 {
     protected transient final Log logger = LogFactory.getLog(getClass());
 

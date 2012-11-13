@@ -10,6 +10,8 @@
 
 package org.mule.module.launcher;
 
+import org.mule.api.MuleContext;
+
 /**
  * Convenience implementation of DeploymentListener.  Default 
  * method implementations are no-ops.  Sub-classes can implement 
@@ -55,6 +57,24 @@ public class AbstractDeploymentListener implements DeploymentListener
 
     @Override
     public void onUndeploymentFailure(String appName, Throwable cause)
+    {
+        //No-op default
+    }
+
+    @Override
+    public void onMuleContextCreated(String appName, MuleContext context)
+    {
+        //No-op default
+    }
+
+    @Override
+    public void onMuleContextInitialised(String appName, MuleContext context)
+    {
+        //No-op default
+    }
+
+    @Override
+    public void onMuleContextConfigured(String appName, MuleContext context)
     {
         //No-op default
     }

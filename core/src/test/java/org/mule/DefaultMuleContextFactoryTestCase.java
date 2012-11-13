@@ -14,12 +14,18 @@ import static junit.framework.Assert.assertNotNull;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.when;
 import org.mule.api.MuleContext;
 import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.config.ConfigurationException;
 import org.mule.api.config.MuleConfiguration;
 import org.mule.api.config.MuleProperties;
+import org.mule.api.context.MuleContextBuilder;
 import org.mule.api.context.WorkManager;
+import org.mule.api.context.notification.MuleContextListener;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.model.Model;
 import org.mule.config.DefaultMuleConfiguration;
@@ -40,6 +46,7 @@ import java.util.Properties;
 import javax.resource.spi.work.WorkListener;
 
 import org.junit.Test;
+import org.mockito.InOrder;
 
 public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase
 {
@@ -165,6 +172,25 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase
         assertEquals("testValue4", context.getRegistry().lookupObject("testKey4"));
 
         assertNoDefaults(context);
+    }
+
+    @Test
+    public void notifiesMuleContextEvents() throws InitialisationException, ConfigurationException
+    {
+        MuleContextListener listener = mock(MuleContextListener.class);
+        ConfigurationBuilder configurationBuilder = mock(ConfigurationBuilder.class);
+        MuleContext context = mock(MuleContext.class);
+        MuleContextBuilder contextBuilder = mock(MuleContextBuilder.class);
+        when(contextBuilder.buildMuleContext()).thenReturn(context);
+
+        muleContextFactory.addListener(listener);
+
+        muleContextFactory.createMuleContext(configurationBuilder, contextBuilder);
+
+        InOrder inOrder = inOrder(listener);
+        inOrder.verify(listener, times(1)).onCreation(context);
+        inOrder.verify(listener, times(1)).onInitialization(context);
+        inOrder.verify(listener, times(1)).onConfiguration(context);
     }
 
     private void assertDefaults(MuleContext context)

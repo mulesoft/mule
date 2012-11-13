@@ -10,6 +10,8 @@
 
 package org.mule.module.launcher;
 
+import org.mule.api.MuleContext;
+
 /**
  * Defines a listener for deployment events.
  */
@@ -59,4 +61,10 @@ public interface DeploymentListener
      * @param cause       the cause of the failure
      */
     void onUndeploymentFailure(String appName, Throwable cause);
+
+    void onMuleContextCreated(String appName, MuleContext context);
+
+    void onMuleContextInitialised(String appName, MuleContext context);
+
+    void onMuleContextConfigured(String appName, MuleContext context);
 }

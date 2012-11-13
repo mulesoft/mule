@@ -19,19 +19,14 @@ import org.mule.config.StartupContext;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.Message;
 import org.mule.module.launcher.log4j.ApplicationAwareRepositorySelector;
-import org.mule.util.ClassUtils;
 import org.mule.util.MuleUrlStreamHandlerFactory;
 import org.mule.util.StringMessageUtils;
 import org.mule.util.SystemUtils;
 
-import java.net.URL;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -54,10 +49,6 @@ public class MuleContainer
         {"app", "true", "Application to start"}
     };
 
-    public static final String SERVICE_PATH = "META-INF/services/org/mule/config/";
-
-    public static final String CORE_EXTENSION_PROPERTIES = "core-extensions.properties";
-
     /**
      * logger used by this class
      */
@@ -75,8 +66,8 @@ public class MuleContainer
     private static MuleShutdownHook muleShutdownHook;
 
     protected DeploymentService deploymentService;
-
     protected Map<Class<? extends MuleCoreExtension>, MuleCoreExtension> coreExtensions = new HashMap<Class<? extends MuleCoreExtension>, MuleCoreExtension>();
+    protected final MuleCoreExtensionDiscoverer muleCoreExtensionDiscoverer;
 
     static
     {
@@ -95,25 +86,29 @@ public class MuleContainer
      */
     public static void main(String[] args) throws Exception
     {
-        MuleContainer container = new MuleContainer(args);
+        MuleContainer container = new MuleContainer(args, new ClasspathMuleCoreExtensionDiscoverer(), new MuleDeploymentService());
         container.start(true);
     }
 
-    public MuleContainer()
+    public MuleContainer(MuleCoreExtensionDiscoverer muleCoreExtensionDiscoverer, DeploymentService deploymentService)
     {
-        init(new String[0]);
+        this(new String[0], muleCoreExtensionDiscoverer, deploymentService);
     }
 
     /**
      * Configure the server with command-line arguments.
      */
-    public MuleContainer(String[] args) throws IllegalArgumentException
-    {                                                                                                                                                           
+    public MuleContainer(String[] args, MuleCoreExtensionDiscoverer muleCoreExtensionDiscoverer, DeploymentService deploymentService) throws IllegalArgumentException
+    {
+        //TODO(pablo.kraan): remove the args argument and use the already existing setters to set everything needed
+        this.muleCoreExtensionDiscoverer = muleCoreExtensionDiscoverer;
+        this.deploymentService = deploymentService;
         init(args);
     }
 
     protected void init(String[] args) throws IllegalArgumentException
     {
+        //TODO(pablo.kraan): move initialization of others classes outside this method
         Map<String, Object> commandlineOptions;
 
         try
@@ -138,7 +133,7 @@ public class MuleContainer
         StartupContext.get().setStartupOptions(commandlineOptions);
     }
 
-    public void start(boolean registerShutdownHook)
+    public void start(boolean registerShutdownHook) throws MuleException
     {
         if (registerShutdownHook)
         {
@@ -151,10 +146,7 @@ public class MuleContainer
 
         try
         {
-            coreExtensions = loadCoreExtensions();
-
-            // TODO pluggable deployer
-            deploymentService = new DeploymentService();
+            coreExtensions = muleCoreExtensionDiscoverer.discover();
 
             initializeCoreExtensions();
 
@@ -180,58 +172,13 @@ public class MuleContainer
                 ((MuleCoreExtensionAware) extension).setMuleCoreExtensions(coreExtensions);
             }
 
+            if (extension instanceof DeploymentListener)
+            {
+                deploymentService.addDeploymentListener((DeploymentListener) extension);
+            }
+
             extension.initialise();
         }
-    }
-
-    /**
-     * Load all core extensions defined in the classpath
-     */
-    private Map<Class<? extends MuleCoreExtension>, MuleCoreExtension> loadCoreExtensions() throws MuleException
-    {
-        Map<Class<? extends MuleCoreExtension>, MuleCoreExtension> result = new HashMap<Class<? extends MuleCoreExtension>, MuleCoreExtension>();
-        Enumeration<?> e = ClassUtils.getResources(SERVICE_PATH + CORE_EXTENSION_PROPERTIES, getClass());
-        List<Properties> extensions = new LinkedList<Properties>();
-
-        // load ALL of the extension files first
-        while (e.hasMoreElements())
-        {
-            try
-            {
-                URL url = (URL) e.nextElement();
-                if (logger.isDebugEnabled())
-                {
-                    logger.debug("Reading extension file: " + url.toString());
-                }
-                Properties p = new Properties();
-                p.load(url.openStream());
-                extensions.add(p);
-            }
-            catch (Exception ex)
-            {
-                throw new DefaultMuleException("Error loading Mule core extensions", ex);
-            }
-        }
-
-        for (Properties extProps : extensions)
-        {
-            for (Map.Entry entry : extProps.entrySet())
-            {
-                String extName = (String) entry.getKey();
-                String extClass = (String) entry.getValue();
-                try
-                {
-                    MuleCoreExtension extension = (MuleCoreExtension) ClassUtils.instanciateClass(extClass);
-                    result.put(extension.getClass(), extension);
-                }
-                catch (Exception ex)
-                {
-                    throw new DefaultMuleException("Error starting Mule core extension " + extName, ex);
-                }
-            }
-        }
-
-        return result;
     }
 
     /**
@@ -239,7 +186,7 @@ public class MuleContainer
      *
      * @param e the exception that caused the shutdown
      */
-    public void shutdown(Throwable e)
+    public void shutdown(Throwable e) throws MuleException
     {
         Message msg = CoreMessages.fatalErrorWhileRunning();
         MuleException muleException = ExceptionHelper.getRootMuleException(e);
@@ -267,7 +214,7 @@ public class MuleContainer
     /**
      * shutdown the server. This just displays the time the server shut down
      */
-    public void shutdown()
+    public void shutdown() throws MuleException
     {
         logger.info("Mule container shutting down due to normal shutdown request");
 
@@ -275,7 +222,7 @@ public class MuleContainer
         doShutdown();
     }
 
-    protected void doShutdown()
+    protected void doShutdown() throws MuleException
     {
         if (deploymentService != null)
         {
@@ -353,7 +300,14 @@ public class MuleContainer
         @Override
         public void run()
         {
-            doShutdown();
+            try
+            {
+                doShutdown();
+            }
+            catch (MuleException e)
+            {
+                logger.warn("Error shutting down mule container", e);
+            }
         }
     }
 }

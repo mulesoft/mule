@@ -10,14 +10,14 @@
 
 package org.mule.module.launcher;
 
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import org.mule.api.MuleContext;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 
 public class CompositeDeploymentListenerTestCase extends AbstractMuleTestCase
 {
@@ -90,5 +90,35 @@ public class CompositeDeploymentListenerTestCase extends AbstractMuleTestCase
 
         verify(listener1, times(1)).onUndeploymentFailure(APP_NAME, DEPLOYMENT_EXCEPTION);
         verify(listener2, times(1)).onUndeploymentFailure(APP_NAME, DEPLOYMENT_EXCEPTION);
+    }
+
+    @Test
+    public void testNotifiesMuleContextCreated() throws Exception
+    {
+        MuleContext context = mock(MuleContext.class);
+        compositeDeploymentListener.onMuleContextCreated(APP_NAME, context);
+
+        verify(listener1, times(1)).onMuleContextCreated(APP_NAME, context);
+        verify(listener2, times(1)).onMuleContextCreated(APP_NAME, context);
+    }
+
+    @Test
+    public void testNotifiesMuleContextInitialised() throws Exception
+    {
+        MuleContext context = mock(MuleContext.class);
+        compositeDeploymentListener.onMuleContextInitialised(APP_NAME, context);
+
+        verify(listener1, times(1)).onMuleContextInitialised(APP_NAME, context);
+        verify(listener2, times(1)).onMuleContextInitialised(APP_NAME, context);
+    }
+
+    @Test
+    public void testNotifiesMuleContextConfigured() throws Exception
+    {
+        MuleContext context = mock(MuleContext.class);
+        compositeDeploymentListener.onMuleContextConfigured(APP_NAME, context);
+
+        verify(listener1, times(1)).onMuleContextConfigured(APP_NAME, context);
+        verify(listener2, times(1)).onMuleContextConfigured(APP_NAME, context);
     }
 }

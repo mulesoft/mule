@@ -13,6 +13,7 @@ package org.mule.api.context;
 import org.mule.api.MuleContext;
 import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.config.ConfigurationException;
+import org.mule.api.context.notification.MuleContextListener;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.config.builders.DefaultsConfigurationBuilder;
 
@@ -78,4 +79,21 @@ public interface MuleContextFactory
     MuleContext createMuleContext(List<ConfigurationBuilder> configurationBuilders, MuleContextBuilder muleContextBuilder)
         throws InitialisationException, ConfigurationException;
 
+    /**
+     * Adds a listener to be notified of each event related to the creation
+     * of a new {@link MuleContext}
+     *
+     * @param listener listener to add. Must be non null.
+     */
+    void addListener(MuleContextListener listener);
+
+    /**
+     * Removes a listener from the factory.
+     *
+     *
+     * @param listener the listener to remove. After this call, the listener
+     *                 won't receive any notifications from this factory.
+     * @return true if the listener was registered in the factory, false otherwise
+     */
+    boolean removeListener(MuleContextListener listener);
 }

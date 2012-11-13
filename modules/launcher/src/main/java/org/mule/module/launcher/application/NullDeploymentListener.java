@@ -10,6 +10,7 @@
 
 package org.mule.module.launcher.application;
 
+import org.mule.api.MuleContext;
 import org.mule.module.launcher.DeploymentListener;
 
 /**
@@ -45,6 +46,21 @@ public class NullDeploymentListener implements DeploymentListener
 
     @Override
     public void onUndeploymentFailure(String appName, Throwable cause)
+    {
+    }
+
+    @Override
+    public void onMuleContextCreated(String appName, MuleContext context)
+    {
+    }
+
+    @Override
+    public void onMuleContextInitialised(String appName, MuleContext context)
+    {
+    }
+
+    @Override
+    public void onMuleContextConfigured(String appName, MuleContext context)
     {
     }
 }

@@ -10,6 +10,8 @@
 
 package org.mule.module.launcher;
 
+import org.mule.api.MuleContext;
+
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -125,6 +127,54 @@ public class CompositeDeploymentListener implements DeploymentListener
             catch (Throwable t)
             {
                 logNotificationProcessingError(appName, listener, "onUndeploymentFailure", t);
+            }
+        }
+    }
+
+    @Override
+    public void onMuleContextCreated(String appName, MuleContext context)
+    {
+        for (DeploymentListener listener : deploymentListeners)
+        {
+            try
+            {
+                listener.onMuleContextCreated(appName, context);
+            }
+            catch (Throwable t)
+            {
+                logNotificationProcessingError(appName, listener, "onMuleContextCreated", t);
+            }
+        }
+    }
+
+    @Override
+    public void onMuleContextInitialised(String appName, MuleContext context)
+    {
+        for (DeploymentListener listener : deploymentListeners)
+        {
+            try
+            {
+                listener.onMuleContextInitialised(appName, context);
+            }
+            catch (Throwable t)
+            {
+                logNotificationProcessingError(appName, listener, "onMuleContextInitialised", t);
+            }
+        }
+    }
+
+    @Override
+    public void onMuleContextConfigured(String appName, MuleContext context)
+    {
+        for (DeploymentListener listener : deploymentListeners)
+        {
+            try
+            {
+                listener.onMuleContextConfigured(appName, context);
+            }
+            catch (Throwable t)
+            {
+                logNotificationProcessingError(appName, listener, "onMuleContextConfigured", t);
             }
         }
     }

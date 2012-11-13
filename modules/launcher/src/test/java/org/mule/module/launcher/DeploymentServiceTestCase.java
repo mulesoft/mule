@@ -22,6 +22,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import org.mule.api.MuleContext;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.registry.MuleRegistry;
 import org.mule.config.StartupContext;
@@ -54,7 +55,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
     protected File muleHome;
     protected File appsDir;
-    protected DeploymentService deploymentService;
+    protected MuleDeploymentService deploymentService;
     protected DeploymentListener deploymentListener;
 
     @Override
@@ -71,7 +72,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         new File(muleHome, "lib/shared/default").mkdirs();
 
         deploymentListener = mock(DeploymentListener.class);
-        deploymentService = new DeploymentService();
+        deploymentService = new MuleDeploymentService();
         deploymentService.addDeploymentListener(deploymentListener);
     }
 
@@ -295,6 +296,23 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         assertNoDeploymentInvoked(deploymentListener);
     }
 
+    @Test
+    public void receivesMuleContextDeploymentNotifications() throws Exception
+    {
+        // NOTE: need an integration test like this because DefaultMuleApplication
+        // class cannot be unit tested.
+        final URL url = getClass().getResource("/dummy-app.zip");
+        assertNotNull("Test app file not found " + url, url);
+        addAppArchive(url);
+
+        deploymentService.start();
+
+        assertDeploymentSuccess(deploymentListener, "dummy-app");
+        assertMuleContextCreated(deploymentListener, "dummy-app");
+        assertMuleContextInitialized(deploymentListener, "dummy-app");
+        assertMuleContextConfigured(deploymentListener, "dummy-app");
+    }
+
     private void assertDeploymentSuccess(final DeploymentListener listener, final String appName)
     {
         Prober prober = new PollingProber(DEPLOYMENT_TIMEOUT, 100);
@@ -319,6 +337,77 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         });
     }
 
+    private void assertMuleContextCreated(final DeploymentListener listener, final String appName)
+    {
+        Prober prober = new PollingProber(DEPLOYMENT_TIMEOUT, 100);
+        prober.check(new Probe()
+        {
+            public boolean isSatisfied()
+            {
+                try{
+                    verify(listener, times(1)).onMuleContextCreated(eq(appName), any(MuleContext.class));
+                    return true;
+                }
+                catch (AssertionError e)
+                {
+                    return false;
+                }
+            }
+
+            public String describeFailure()
+            {
+                return String .format("Did not received notification '%s' for app '%s'", "onMuleContextCreated", appName);
+            }
+        });
+    }
+
+    private void assertMuleContextInitialized(final DeploymentListener listener, final String appName)
+    {
+        Prober prober = new PollingProber(DEPLOYMENT_TIMEOUT, 100);
+        prober.check(new Probe()
+        {
+            public boolean isSatisfied()
+            {
+                try{
+                    verify(listener, times(1)).onMuleContextInitialised(eq(appName), any(MuleContext.class));
+                    return true;
+                }
+                catch (AssertionError e)
+                {
+                    return false;
+                }
+            }
+
+            public String describeFailure()
+            {
+                return String .format("Did not received notification '%s' for app '%s'", "onMuleContextInitialised", appName);
+            }
+        });
+    }
+
+    private void assertMuleContextConfigured(final DeploymentListener listener, final String appName)
+    {
+        Prober prober = new PollingProber(DEPLOYMENT_TIMEOUT, 100);
+        prober.check(new Probe()
+        {
+            public boolean isSatisfied()
+            {
+                try{
+                    verify(listener, times(1)).onMuleContextConfigured(eq(appName), any(MuleContext.class));
+                    return true;
+                }
+                catch (AssertionError e)
+                {
+                    return false;
+                }
+            }
+
+            public String describeFailure()
+            {
+                return String .format("Did not received notification '%s' for app '%s'", "onMuleContextConfigured", appName);
+            }
+        });
+    }
 
     private void assertUndeploymentSuccess(final DeploymentListener listener, final String appName)
     {
@@ -372,7 +461,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     {
         //TODO(pablo.kraan): look for a better way to test this
         boolean invoked;
-        Prober prober = new PollingProber(DeploymentService.DEFAULT_CHANGES_CHECK_INTERVAL_MS * 2, 100);
+        Prober prober = new PollingProber(MuleDeploymentService.DEFAULT_CHANGES_CHECK_INTERVAL_MS * 2, 100);
         try
         {
             prober.check(new Probe()
@@ -422,7 +511,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
     private void assertAppsDir(String[] expectedZips, String[] expectedApps, boolean performValidation)
     {
-        final String[] actualZips = appsDir.list(DeploymentService.ZIP_APPS_FILTER);
+        final String[] actualZips = appsDir.list(MuleDeploymentService.ZIP_APPS_FILTER);
         if (performValidation) {
             assertArrayEquals("Invalid Mule application archives set", expectedZips, actualZips);
         }
