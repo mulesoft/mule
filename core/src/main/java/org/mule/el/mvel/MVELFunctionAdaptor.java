@@ -16,7 +16,6 @@ import org.mule.api.el.ExpressionLanguageFunction;
 import org.mvel2.ParserContext;
 import org.mvel2.ast.Function;
 import org.mvel2.integration.VariableResolverFactory;
-import org.mvel2.integration.impl.ClassImportResolverFactory;
 
 @SuppressWarnings("serial")
 class MVELFunctionAdaptor extends Function
@@ -32,7 +31,7 @@ class MVELFunctionAdaptor extends Function
     @Override
     public Object call(Object ctx, Object thisValue, VariableResolverFactory factory, Object[] parms)
     {
-        if (factory instanceof ClassImportResolverFactory)
+        while (!(factory instanceof ExpressionLanguageContext) && factory != null)
         {
             factory = factory.getNextFactory();
         }

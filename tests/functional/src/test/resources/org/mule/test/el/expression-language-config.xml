@@ -17,11 +17,13 @@
                 def hello() {'Hello '+appName+'!'}
                 def appendPayload() {payload+'appended'}
                 def reversePayload() {StringUtils.reverse(payload)}
+                def regexWrap(text) {regex(text)}
             </global-functions>
         </expression-language>
     </configuration>
 
     <flow name="flow">
+        <expression-component>regexWrap('hello')</expression-component>
         <test:assert expression="#[payload == 'foo']" />
         <expression-component>payload='bar';a='1';b=payload+a</expression-component>
         <test:assert expression="#[payload == 'bar']" />
