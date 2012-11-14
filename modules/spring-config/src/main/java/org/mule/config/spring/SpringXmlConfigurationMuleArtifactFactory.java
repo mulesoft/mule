@@ -28,11 +28,13 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
+import org.dom4j.Namespace;
+import org.dom4j.QName;
 import org.dom4j.io.DOMReader;
 
 public class SpringXmlConfigurationMuleArtifactFactory implements XmlConfigurationMuleArtifactFactory
 {
-
+	
     @Override
     public MuleArtifact getArtifact(org.w3c.dom.Element element, XmlConfigurationCallback callback)
         throws MuleArtifactFactoryException
@@ -54,8 +56,23 @@ public class SpringXmlConfigurationMuleArtifactFactory implements XmlConfigurati
                         .getNodeValue());
                     if (depenedantElement != null)
                     {
-                        rootElement.add(convert(depenedantElement));
-                        addSchemaLocation(rootElement, depenedantElement, callback);
+                    	// if the element is a spring bean, wrap the element in a top-level spring beans element
+                    	if ("http://www.springframework.org/schema/beans".equals(depenedantElement.getNamespaceURI()))
+                    	{
+                    		String namespaceUri = depenedantElement.getNamespaceURI();
+                    		Namespace namespace = new Namespace(depenedantElement.getPrefix(), namespaceUri);
+                    		Element beans = rootElement.element(new QName("beans", namespace));
+                    		if (beans == null)
+                    		{
+                    			beans = rootElement.addElement("beans", namespaceUri);
+                    		}
+                    		beans.add(convert(depenedantElement));
+                    	}
+                    	else
+                    	{
+	                        rootElement.add(convert(depenedantElement));
+	                        addSchemaLocation(rootElement, depenedantElement, callback);
+                    	}
                     }
                     else
                     {
