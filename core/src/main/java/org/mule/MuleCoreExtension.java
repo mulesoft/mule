@@ -10,14 +10,13 @@
 package org.mule;
 
 import org.mule.api.NamedObject;
-import org.mule.api.lifecycle.Disposable;
-import org.mule.api.lifecycle.Initialisable;
+import org.mule.api.lifecycle.Lifecycle;
 
 /**
  * Allows Mule modules and transports to extend core functionality in an
  * application-independent fashion.
  */
-public interface MuleCoreExtension extends Initialisable, Disposable, NamedObject
+public interface MuleCoreExtension extends Lifecycle, NamedObject
 {
     // no custom methods
 }

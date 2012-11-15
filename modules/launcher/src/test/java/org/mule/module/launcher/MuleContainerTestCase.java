@@ -10,6 +10,7 @@
 
 package org.mule.module.launcher;
 
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -24,6 +25,7 @@ import java.util.Map;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.mockito.InOrder;
 import org.mockito.Mockito;
 
 @SmallTest
@@ -95,6 +97,68 @@ public class MuleContainerTestCase extends AbstractMuleTestCase
         container.start(false);
 
         verify(deploymentService).addDeploymentListener(extension);
+    }
+
+    @Test
+    public void initializeCoreExtensionsBeforeStartingDeploymentService() throws Exception
+    {
+        Map<Class<? extends MuleCoreExtension>, MuleCoreExtension> extensions = new HashMap<Class<? extends MuleCoreExtension>, MuleCoreExtension>();
+        TestDeploymentListenerExtension extension = mock(TestDeploymentListenerExtension.class);
+        extensions.put(TestDeploymentListenerExtension.class, extension);
+        when(extensionDiscoverer.discover()).thenReturn(extensions);
+
+        container.start(false);
+
+        InOrder inOrder = inOrder(extension, deploymentService);
+        inOrder.verify(extension).initialise();
+        inOrder.verify(deploymentService).start();
+    }
+
+    @Test
+    public void startsCoreExtensionsAfterDeploymentService() throws Exception
+    {
+        Map<Class<? extends MuleCoreExtension>, MuleCoreExtension> extensions = new HashMap<Class<? extends MuleCoreExtension>, MuleCoreExtension>();
+        MuleCoreExtension extension = mock(MuleCoreExtension.class);
+        extensions.put(MuleCoreExtension.class, extension);
+        when(extensionDiscoverer.discover()).thenReturn(extensions);
+
+        container.start(false);
+
+        InOrder inOrder = inOrder(extension, deploymentService);
+        inOrder.verify(deploymentService).start();
+        inOrder.verify(extension).start();
+    }
+
+    @Test
+    public void stopsCoreExtensionsBeforeDeploymentService() throws Exception
+    {
+        Map<Class<? extends MuleCoreExtension>, MuleCoreExtension> extensions = new HashMap<Class<? extends MuleCoreExtension>, MuleCoreExtension>();
+        MuleCoreExtension extension = mock(MuleCoreExtension.class);
+        extensions.put(MuleCoreExtension.class, extension);
+        when(extensionDiscoverer.discover()).thenReturn(extensions);
+
+        container.start(false);
+        container.stop();
+
+        InOrder inOrder = inOrder(extension, deploymentService);
+        inOrder.verify(extension).stop();
+        inOrder.verify(deploymentService).stop();
+    }
+
+    @Test
+    public void disposesCoreExtensionsAfterStoppingDeploymentService() throws Exception
+    {
+        Map<Class<? extends MuleCoreExtension>, MuleCoreExtension> extensions = new HashMap<Class<? extends MuleCoreExtension>, MuleCoreExtension>();
+        MuleCoreExtension extension = mock(MuleCoreExtension.class);
+        extensions.put(MuleCoreExtension.class, extension);
+        when(extensionDiscoverer.discover()).thenReturn(extensions);
+
+        container.start(false);
+        container.stop();
+
+        InOrder inOrder = inOrder(extension, deploymentService);
+        inOrder.verify(deploymentService).stop();
+        inOrder.verify(extension).dispose();
     }
 
     public static interface TestDeploymentServiceAwareExtension extends MuleCoreExtension, DeploymentServiceAware

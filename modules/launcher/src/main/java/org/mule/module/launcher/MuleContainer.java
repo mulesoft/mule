@@ -37,16 +37,17 @@ import org.apache.log4j.LogManager;
  */
 public class MuleContainer
 {
+
     public static final String CLI_OPTIONS[][] = {
-        {"builder", "true", "Configuration Builder Type"},
-        {"config", "true", "Configuration File"},
-        {"idle", "false", "Whether to run in idle (unconfigured) mode"},
-        {"main", "true", "Main Class"},
-        {"mode", "true", "Run Mode"},
-        {"props", "true", "Startup Properties"},
-        {"production", "false", "Production Mode"},
-        {"debug", "false", "Configure Mule for JPDA remote debugging."},
-        {"app", "true", "Application to start"}
+            {"builder", "true", "Configuration Builder Type"},
+            {"config", "true", "Configuration File"},
+            {"idle", "false", "Whether to run in idle (unconfigured) mode"},
+            {"main", "true", "Main Class"},
+            {"mode", "true", "Run Mode"},
+            {"props", "true", "Startup Properties"},
+            {"production", "false", "Production Mode"},
+            {"debug", "false", "Configure Mule for JPDA remote debugging."},
+            {"app", "true", "Application to start"}
     };
 
     /**
@@ -146,11 +147,11 @@ public class MuleContainer
 
         try
         {
-            coreExtensions = muleCoreExtensionDiscoverer.discover();
-
             initializeCoreExtensions();
 
             deploymentService.start();
+
+            startCoreExtensions();
         }
         catch (Throwable e)
         {
@@ -158,8 +159,10 @@ public class MuleContainer
         }
     }
 
-    private void initializeCoreExtensions() throws InitialisationException
+    private void initializeCoreExtensions() throws InitialisationException, DefaultMuleException
     {
+        coreExtensions = muleCoreExtensionDiscoverer.discover();
+
         for (MuleCoreExtension extension : coreExtensions.values())
         {
             if (extension instanceof DeploymentServiceAware)
@@ -178,6 +181,14 @@ public class MuleContainer
             }
 
             extension.initialise();
+        }
+    }
+
+    private void startCoreExtensions() throws MuleException
+    {
+        for (MuleCoreExtension extension : coreExtensions.values())
+        {
+            extension.start();
         }
     }
 
@@ -224,11 +235,40 @@ public class MuleContainer
 
     protected void doShutdown() throws MuleException
     {
+        stop();
+
+        System.exit(0);
+    }
+
+    public void stop() throws MuleException
+    {
+        stopMuleCoreExtensions();
+
         if (deploymentService != null)
         {
             deploymentService.stop();
         }
 
+        disposeCoreExtensions();
+    }
+
+    private void stopMuleCoreExtensions()
+    {
+        for (MuleCoreExtension extension : coreExtensions.values())
+        {
+            try
+            {
+                extension.stop();
+            }
+            catch (MuleException e)
+            {
+                logger.warn("Error stopping core extension: " + extension.getName(), e);
+            }
+        }
+    }
+
+    private void disposeCoreExtensions()
+    {
         for (MuleCoreExtension extension : coreExtensions.values())
         {
             try
@@ -237,11 +277,9 @@ public class MuleContainer
             }
             catch (Exception ex)
             {
-                logger.fatal("Error shutting down core extension " + extension.getName());
+                logger.fatal("Error disposing core extension " + extension.getName(), ex);
             }
         }
-
-        System.exit(0);
     }
 
     public Log getLogger()
@@ -292,6 +330,7 @@ public class MuleContainer
      */
     private class MuleShutdownHook extends Thread
     {
+
         public MuleShutdownHook()
         {
             super("Mule.shutdown.hook");
