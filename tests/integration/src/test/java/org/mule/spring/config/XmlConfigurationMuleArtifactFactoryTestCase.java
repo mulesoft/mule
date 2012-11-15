@@ -12,6 +12,7 @@ package org.mule.spring.config;
 
 import org.mule.common.MuleArtifact;
 import org.mule.common.MuleArtifactFactoryException;
+import org.mule.common.TestResult;
 import org.mule.common.Testable;
 import org.mule.common.config.XmlConfigurationCallback;
 import org.mule.common.config.XmlConfigurationMuleArtifactFactory;
@@ -61,6 +62,22 @@ public class XmlConfigurationMuleArtifactFactoryTestCase extends AbstractMuleTes
         Assert.assertTrue(artifact.hasCapability(Testable.class));
         Assert.assertTrue(artifact.getCapability(Testable.class) instanceof Testable);
     }
+    
+    @Test
+    public void testMySqlOK() throws SAXException, IOException, MuleArtifactFactoryException
+    {
+    	String config = "<jdbc:connector name=\"jdbcConnector\" pollingFrequency=\"1000\" dataSource-ref=\"mysqlDatasource\" queryTimeout=\"3000\" xmlns:jdbc=\"http://www.mulesoft.org/schema/mule/jdbc\"/>";
+        Document document = XMLUnit.buildControlDocument(config);
+
+        MuleArtifact artifact = lookupArtifact().getArtifact(document.getDocumentElement(),
+            getXmlConfigurationCallback(true));
+
+        Assert.assertNotNull(artifact);
+        Assert.assertTrue(artifact.hasCapability(Testable.class));
+        Assert.assertTrue(artifact.getCapability(Testable.class) instanceof Testable);
+//    	Testable t = artifact.getCapability(Testable.class);
+//        Assert.assertEquals(TestResult.Status.SUCCESS, t.test().getStatus());
+    }
 
     protected XmlConfigurationCallback getXmlConfigurationCallback(final boolean datasourceConfigured)
     {
@@ -89,6 +106,19 @@ public class XmlConfigurationMuleArtifactFactoryTestCase extends AbstractMuleTes
                     {
                         return XMLUnit.buildControlDocument(
                             "<jdbc:derby-data-source name=\"jdbcDataSource\" url=\"jdbc:derby:muleEmbeddedDB;create=true\"  xmlns:jdbc=\"http://www.mulesoft.org/schema/mule/jdbc\"/>")
+                            .getDocumentElement();
+                    }
+                    catch (Exception e)
+                    {
+                        return null;
+                    }
+                }
+                else if (datasourceConfigured && arg0.equals("mysqlDatasource"))
+                {
+                    try
+                    {
+                        return XMLUnit.buildControlDocument(
+                        	"<jdbc:mysql-data-source name=\"mysqlDatasource\" user=\"myUser\" password=\"secret\" host=\"localhost\" database=\"test\"  port=\"3306\" xmlns:jdbc=\"http://www.mulesoft.org/schema/mule/jdbc\"/>")
                             .getDocumentElement();
                     }
                     catch (Exception e)

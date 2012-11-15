@@ -39,7 +39,7 @@ public class DefaultMuleArtifact implements MuleArtifact
     @Override
     public <T extends Capability> boolean hasCapability(Class<T> arg0)
     {
-        return arg0.isAssignableFrom(arg0);
+        return arg0.isAssignableFrom(object.getClass());
     }
 
 }
