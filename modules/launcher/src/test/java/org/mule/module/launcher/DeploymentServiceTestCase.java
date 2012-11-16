@@ -365,6 +365,22 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         assertNoDeploymentInvoked(deploymentListener);
     }
 
+    @Test
+    public void undeploysStoppedApp() throws Exception
+    {
+        final URL url = getClass().getResource("/dummy-app.zip");
+        assertNotNull("Test app file not found " + url, url);
+        addAppArchive(url);
+
+        deploymentService.start();
+
+        assertDeploymentSuccess(deploymentListener, "dummy-app");
+        final Application app = findApp("dummy-app", 1);
+        app.stop();
+
+        deploymentService.undeploy(app);
+    }
+
     private void assertDeploymentSuccess(final DeploymentListener listener, final String appName)
     {
         Prober prober = new PollingProber(DEPLOYMENT_TIMEOUT, 100);
