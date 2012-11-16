@@ -16,6 +16,7 @@ import org.mule.api.MuleException;
 import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.context.notification.MuleContextNotificationListener;
+import org.mule.api.lifecycle.Stoppable;
 import org.mule.config.builders.AutoConfigurationBuilder;
 import org.mule.config.builders.SimpleConfigurationBuilder;
 import org.mule.config.i18n.CoreMessages;
@@ -382,13 +383,18 @@ public class DefaultMuleApplication implements Application
             }
             return;
         }
-        if (logger.isInfoEnabled())
-        {
-            logger.info(miniSplash(String.format("Stopping app '%s'", descriptor.getAppName())));
-        }
+
         try
         {
-            this.muleContext.stop();
+            if (muleContext.getLifecycleManager().isDirectTransition(Stoppable.PHASE_NAME))
+            {
+                if (logger.isInfoEnabled())
+                {
+                    logger.info(miniSplash(String.format("Stopping app '%s'", descriptor.getAppName())));
+                }
+
+                this.muleContext.stop();
+            }
         }
         catch (MuleException e)
         {
