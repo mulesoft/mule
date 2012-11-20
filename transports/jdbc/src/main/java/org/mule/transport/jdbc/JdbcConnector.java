@@ -24,6 +24,7 @@ import org.mule.api.retry.RetryContext;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionException;
 import org.mule.api.transport.MessageReceiver;
+import org.mule.common.DefaultTestResult;
 import org.mule.common.TestResult;
 import org.mule.common.Testable;
 import org.mule.config.ExceptionHelper;
@@ -31,7 +32,6 @@ import org.mule.config.i18n.MessageFactory;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.transport.AbstractConnector;
 import org.mule.transport.ConnectException;
-import org.mule.transport.ConnectorTestResult;
 import org.mule.transport.jdbc.sqlstrategy.DefaultSqlStatementStrategyFactory;
 import org.mule.transport.jdbc.sqlstrategy.SqlStatementStrategyFactory;
 import org.mule.transport.jdbc.xa.DataSourceWrapper;
@@ -593,17 +593,27 @@ public class JdbcConnector extends AbstractConnector implements Testable
     {
         if (isConnected())
         {
-            return new ConnectorTestResult(TestResult.Status.SUCCESS);
+            return new DefaultTestResult(TestResult.Status.SUCCESS);
         }
         Connection con = null;
         try
         {
             con = dataSource.getConnection();
-            return new ConnectorTestResult(TestResult.Status.SUCCESS);
+            return new DefaultTestResult(TestResult.Status.SUCCESS);
         }
         catch (Exception e)
         {
-            return new ConnectorTestResult(TestResult.Status.FAILURE, e.toString());
+        	// this surely doesn't cover all cases for all kinds of jdbc drivers but it is better than nothing
+        	TestResult.FailureType failureType = TestResult.FailureType.UNSPECIFIED;
+        	if (e.getMessage().contains("Communications link failure"))
+        	{
+        		failureType = TestResult.FailureType.CONNECTION_FAILURE;
+        	}
+        	else if (e.getMessage().contains("Access denied for user"))
+        	{
+        		failureType = TestResult.FailureType.INVALID_CREDENTIALS;
+        	}
+            return new DefaultTestResult(TestResult.Status.FAILURE, e.getMessage(), failureType, e);
         }
         finally
         {
