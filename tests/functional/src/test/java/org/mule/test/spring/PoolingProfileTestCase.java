@@ -10,31 +10,35 @@
 
 package org.mule.test.spring;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-
-import static org.junit.Assert.*;
+import org.mule.api.service.Service;
+import org.mule.component.PooledJavaComponent;
+import org.mule.config.PoolingProfile;
+import org.mule.construct.Flow;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.functional.FunctionalTestComponent;
+import org.mule.tck.probe.PollingProber;
+import org.mule.tck.probe.Probe;
+import org.mule.tck.probe.Prober;
 
 import java.util.Arrays;
 import java.util.Collection;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-import org.mule.api.service.Service;
-import org.mule.component.PooledJavaComponent;
-import org.mule.config.PoolingProfile;
-import org.mule.construct.Flow;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
 
 public class PoolingProfileTestCase  extends AbstractServiceAndFlowTestCase
 {
+
+    private static boolean evicted;
 
     public PoolingProfileTestCase(ConfigVariant variant, String configResources)
     {
         super(variant, configResources);
     }
 
-   
     @Parameters
     public static Collection<Object[]> parameters()
     {
@@ -75,13 +79,35 @@ public class PoolingProfileTestCase  extends AbstractServiceAndFlowTestCase
                 PoolingProfile.INITIALISE_NONE, 3, 4, 5);
     }
 
+    @Test
+    public void testEvictOne()
+    {
+        doTest("evict_one", PoolingProfile.WHEN_EXHAUSTED_WAIT,
+               PoolingProfile.INITIALISE_ALL, 1, 1, 0);
+
+
+        Prober prober = new PollingProber(5000, 50);
+        prober.check(new Probe()
+        {
+            public boolean isSatisfied()
+            {
+                return evicted;
+            }
+
+            public String describeFailure()
+            {
+                return "Pooled component was not evicted";
+            }
+        });
+    }
+
     protected void doTest(String serviceFlow, int exhausted, int initialisation,
                           int active, int idle, long wait)
     {
         Object o = muleContext.getRegistry().lookupObject(serviceFlow);
         assertNotNull(serviceFlow, o);
         
-        PooledJavaComponent pjc = null;
+        PooledJavaComponent pjc;
         
         if(variant.equals(ConfigVariant.SERVICE))
         {
@@ -101,5 +127,16 @@ public class PoolingProfileTestCase  extends AbstractServiceAndFlowTestCase
         assertEquals("active:", active, profile.getMaxActive());
         assertEquals("idle:", idle, profile.getMaxIdle());
         assertEquals("wait:", wait, profile.getMaxWait());
+    }
+
+    public static class EvictablePooledComponent extends FunctionalTestComponent
+    {
+
+        @Override
+        public void dispose()
+        {
+            super.dispose();
+            evicted = true;
+        }
     }
 }
