@@ -94,6 +94,19 @@ public class PoolingProfile
      */
     public static final int DEFAULT_POOL_INITIALISATION_POLICY = INITIALISE_ONE;
 
+    /**
+     * Determines the minimum amount of time an object may sit idle in the pool
+     * before it is eligible for eviction. When non-positive, no objects will
+     * be evicted from the pool due to idle time alone.
+     */
+    public static final int DEFAULT_MIN_EVICTION_MILLIS = 1000 * 60 * 30;
+
+    /**
+     * Determines the number of milliseconds between runs of the object evictor.
+     * When non-positive, no object evictor is executed.
+     */
+    public static final int DEFAULT_EVICTION_INTERVAL_MILLIS = -1;
+
     // map pool exhaustion strings to their respective values
     @SuppressWarnings("unchecked")
     public static final Map<String, Integer> POOL_EXHAUSTED_ACTIONS = new CaseInsensitiveMap()
@@ -134,6 +147,10 @@ public class PoolingProfile
     private int exhaustedAction = DEFAULT_POOL_EXHAUSTED_ACTION;
 
     private int initialisationPolicy = DEFAULT_POOL_INITIALISATION_POLICY;
+
+    private int minEvictionMillis = DEFAULT_MIN_EVICTION_MILLIS;
+
+    private int evictionCheckIntervalMillis = DEFAULT_EVICTION_INTERVAL_MILLIS;
 
     public PoolingProfile()
     {
@@ -226,4 +243,23 @@ public class PoolingProfile
         this.exhaustedAction = exhaustedAction;
     }
 
+    public int getMinEvictionMillis()
+    {
+        return minEvictionMillis;
+    }
+
+    public void setMinEvictionMillis(int minEvictionMillis)
+    {
+        this.minEvictionMillis = minEvictionMillis;
+    }
+
+    public int getEvictionCheckIntervalMillis()
+    {
+        return evictionCheckIntervalMillis;
+    }
+
+    public void setEvictionCheckIntervalMillis(int evictionCheckIntervalMillis)
+    {
+        this.evictionCheckIntervalMillis = evictionCheckIntervalMillis;
+    }
 }

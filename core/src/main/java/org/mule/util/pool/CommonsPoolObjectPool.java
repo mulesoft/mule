@@ -74,6 +74,8 @@ public class CommonsPoolObjectPool implements ObjectPool
             config.maxActive = poolingProfile.getMaxActive();
             config.maxWait = poolingProfile.getMaxWait();
             config.whenExhaustedAction = (byte) poolingProfile.getExhaustedAction();
+            config.minEvictableIdleTimeMillis = poolingProfile.getMinEvictionMillis();
+            config.timeBetweenEvictionRunsMillis = poolingProfile.getEvictionCheckIntervalMillis();
         }
 
         pool = new GenericObjectPool(getPooledObjectFactory(), config);

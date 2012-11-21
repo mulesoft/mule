@@ -7331,7 +7331,16 @@
                         <xsd:documentation>Specifies the number of milliseconds to wait for a pooled component to become available when the pool is exhausted and the exhaustedAction is set to WHEN_EXHAUSTED_WAIT.</xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <!-- <xsd:attribute name="factory" type="xsd:string" default="org.mule.config.pool.CommonsPoolFactory"/> -->
+                <xsd:attribute name="evictionCheckIntervalMillis" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>Specifies the number of milliseconds between runs of the object evictor. When non-positive, no object evictor is executed..</xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="minEvictionMillis" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>Determines the minimum amount of time an object may sit idle in the pool before it is eligible for eviction. When non-positive, no objects will be evicted from the pool due to idle time alone.</xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>

@@ -44,5 +44,17 @@
                     maxIdle="4" maxWait="5" />
             </pooled-component>
         </service>
+
+        <service name="evict_one">
+            <pooled-component>
+                <prototype-object
+                        class="org.mule.test.spring.PoolingProfileTestCase$EvictablePooledComponent">
+                </prototype-object>
+                <pooling-profile exhaustedAction="WHEN_EXHAUSTED_WAIT"
+                                 initialisationPolicy="INITIALISE_ALL" maxActive="1"
+                                 maxIdle="1" maxWait="0"
+                                 minEvictionMillis="500" evictionCheckIntervalMillis="200"/>
+            </pooled-component>
+        </service>
     </model>
 </mule>
