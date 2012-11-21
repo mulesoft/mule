@@ -605,11 +605,12 @@ public class JdbcConnector extends AbstractConnector implements Testable
         {
         	// this surely doesn't cover all cases for all kinds of jdbc drivers but it is better than nothing
         	TestResult.FailureType failureType = TestResult.FailureType.UNSPECIFIED;
-        	if (e.getMessage().contains("Communications link failure"))
+        	String msg = e.getMessage();
+        	if (msg != null && msg.contains("Communications link failure"))
         	{
         		failureType = TestResult.FailureType.CONNECTION_FAILURE;
         	}
-        	else if (e.getMessage().contains("Access denied for user"))
+        	else if (msg != null && msg.contains("Access denied for user"))
         	{
         		failureType = TestResult.FailureType.INVALID_CREDENTIALS;
         	}
