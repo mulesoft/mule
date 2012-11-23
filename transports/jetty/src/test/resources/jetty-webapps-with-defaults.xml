@@ -7,11 +7,11 @@
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
        http://www.mulesoft.org/schema/mule/jetty http://www.mulesoft.org/schema/mule/jetty/current/mule-jetty.xsd">
 
-    <jetty:connector name="jettyConnector">
+    <jetty:connector name="jettyConnector" >
         <!--
             Directory defaults to '${app.home}/webapps', but we have to change it for the maven test here
         -->
-        <jetty:webapps directory="target/webapps"/>
+        <jetty:webapps directory="target/webapps" port="${port1}"/>
     </jetty:connector>
     
 </mule>
