@@ -28,7 +28,7 @@ import org.mule.processor.AbstractMuleObjectOwner;
  *
  * Exception listeners must implement {@link org.mule.api.exception.MessagingExceptionHandlerAcceptor} to be part of ChoiceMessagingExceptionStrategy
  */
-public class ChoiceMessagingExceptionStrategy extends AbstractMuleObjectOwner<MessagingExceptionHandlerAcceptor> implements MessagingExceptionHandler, MuleContextAware, Lifecycle
+public class ChoiceMessagingExceptionStrategy extends AbstractMuleObjectOwner<MessagingExceptionHandlerAcceptor> implements MessagingExceptionHandlerAcceptor, MuleContextAware, Lifecycle
 {
     private List<MessagingExceptionHandlerAcceptor> exceptionListeners;
 
@@ -127,4 +127,15 @@ public class ChoiceMessagingExceptionStrategy extends AbstractMuleObjectOwner<Me
         }
     }
 
+    @Override
+    public boolean accept(MuleEvent event)
+    {
+        return true;
+    }
+
+    @Override
+    public boolean acceptsAll()
+    {
+        return true;
+    }
 }
