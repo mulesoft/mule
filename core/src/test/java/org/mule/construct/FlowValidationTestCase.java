@@ -70,6 +70,7 @@ public class FlowValidationTestCase extends AbstractMuleTestCase
         when(inboundEndpoint.getExchangePattern().hasResponse()).thenReturn(false);
         flow.setExceptionListener(rollbackMessagingExceptionStrategy);
         when(rollbackMessagingExceptionStrategy.hasMaxRedeliveryAttempts()).thenReturn(true);
+        when(rollbackMessagingExceptionStrategy.acceptsAll()).thenReturn(true);
         when(inboundEndpoint.getRedeliveryPolicy()).thenReturn(mockRedeliveryPolicy);
         flow.setMessageSource(inboundEndpoint);
     }
