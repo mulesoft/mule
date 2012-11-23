@@ -11,6 +11,7 @@
 package org.mule.transport.vm;
 
 import org.mule.DefaultMuleMessage;
+import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
@@ -107,6 +108,15 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
                 returnedMessage.release();
             }
             return returnedMessage;
+        }
+        catch (MessagingException e)
+        {
+            MuleEvent exceptionEvent = e.getEvent();
+            if (exceptionEvent == null)
+            {
+                exceptionEvent = createMuleEvent(message, null);
+            }
+            return flowConstruct.getExceptionListener().handleException(e,exceptionEvent).getMessage();
         }
         catch (Exception e)
         {
