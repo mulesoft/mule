@@ -40,6 +40,7 @@ public class SpringXmlConfigurationMuleArtifactFactory implements XmlConfigurati
         throws MuleArtifactFactoryException
     {
 
+    	ConfigResource config = null;
         Document document = DocumentHelper.createDocument();
         Element rootElement = document.addElement("mule", "http://www.mulesoft.org/schema/mule/core");
         try
@@ -77,14 +78,25 @@ public class SpringXmlConfigurationMuleArtifactFactory implements XmlConfigurati
                     else
                     {
                         throw new MuleArtifactFactoryException("Missing dependent xml element "
-                                                               + element.getAttributes()
-                                                                   .item(i)
-                                                                   .getLocalName());
+                        		+ element.getAttributes().item(i).getLocalName()
+                        		+ " with name/id: "
+                        		+ element.getAttributes().item(i).getNodeValue());
                     }
                 }
             }
 
-            ConfigResource config = new ConfigResource("", new StringBufferInputStream(document.asXML()));
+            config = new ConfigResource("", new StringBufferInputStream(document.asXML()));
+        }
+        catch (MuleArtifactFactoryException e) 
+        {
+        	throw e;
+        }
+        catch (Exception e)
+        {
+        	throw new MuleArtifactFactoryException("Error parsing XML", e);
+        }
+        try
+        {
             MuleContextFactory factory = new DefaultMuleContextFactory();
             MuleContext muleContext = factory.createMuleContext(new SpringXmlConfigurationBuilder(
                 new ConfigResource[]{config}));
@@ -94,9 +106,8 @@ public class SpringXmlConfigurationMuleArtifactFactory implements XmlConfigurati
         }
         catch (Exception e)
         {
-            throw new MuleArtifactFactoryException("Error parsing XML", e);
+        	throw new MuleArtifactFactoryException("Error initializing", e);	
         }
-
     }
 
     protected void addSchemaLocation(Element rootElement,
