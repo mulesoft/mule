@@ -67,6 +67,12 @@ public class QuartzMessageReceiver extends AbstractMessageReceiver
     }
 
     @Override
+    public boolean shouldConsumeInEveryNode()
+    {
+        return false;
+    }
+
+    @Override
     protected MuleEvent createMuleEvent(MuleMessage message, OutputStream outputStream) throws MuleException
     {
         if (isStateful)
