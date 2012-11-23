@@ -87,8 +87,13 @@ public class MuleContainer
      */
     public static void main(String[] args) throws Exception
     {
-        MuleContainer container = new MuleContainer(args, new ClasspathMuleCoreExtensionDiscoverer(), new MuleDeploymentService());
+        MuleContainer container = new MuleContainer(args);
         container.start(true);
+    }
+
+    public MuleContainer(String[] args)
+    {
+        this(args, new ClasspathMuleCoreExtensionDiscoverer(), new MuleDeploymentService());
     }
 
     public MuleContainer(MuleCoreExtensionDiscoverer muleCoreExtensionDiscoverer, DeploymentService deploymentService)
