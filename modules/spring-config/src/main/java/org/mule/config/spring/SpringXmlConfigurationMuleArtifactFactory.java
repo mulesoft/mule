@@ -88,6 +88,7 @@ public class SpringXmlConfigurationMuleArtifactFactory implements XmlConfigurati
             MuleContextFactory factory = new DefaultMuleContextFactory();
             MuleContext muleContext = factory.createMuleContext(new SpringXmlConfigurationBuilder(
                 new ConfigResource[]{config}));
+            muleContext.start();
             return new DefaultMuleArtifact(muleContext.getRegistry().lookupObject(
                 element.getAttribute("name")));
         }
