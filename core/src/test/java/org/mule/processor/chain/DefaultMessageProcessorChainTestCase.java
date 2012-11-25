@@ -16,6 +16,7 @@ import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
@@ -25,6 +26,7 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
+import org.mule.api.config.MuleConfiguration;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Lifecycle;
 import org.mule.api.processor.InterceptingMessageProcessor;
@@ -799,12 +801,13 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleTestCase
 
     public MuleEvent getTestEventUsingFlow(Object data) throws Exception
     {
-        MuleEvent event = Mockito.mock(MuleEvent.class);
+        MuleEvent event = mock(MuleEvent.class);
         MuleMessage message = new DefaultMuleMessage(data, muleContext);
         Mockito.when(event.getMessage()).thenReturn(message);
         Mockito.when(event.getExchangePattern()).thenReturn(MessageExchangePattern.REQUEST_RESPONSE);
         Mockito.when(event.getMuleContext()).thenReturn(muleContext);
-        Mockito.when(event.getFlowConstruct()).thenReturn(Mockito.mock(Flow.class));
+        Mockito.when(event.getFlowConstruct()).thenReturn(mock(Flow.class));
+        Mockito.when(muleContext.getConfiguration()).thenReturn(mock(MuleConfiguration.class));
         return event;
     }
 
