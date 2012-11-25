@@ -65,7 +65,7 @@ public class MessageProcessorNotificationPathTestCase extends FunctionalTestCase
     @Test
     public void flowRefs() throws Exception
     {
-        testFlowPaths("subflow", "/0", "/1", "/1/subflow-call/subprocessors/0");
+        testFlowPaths("subflow", "/0", "/1", "/1/subflow-call/subprocessors/0", "/1/subflow-call/subprocessors/1");
     }
 
     @Test

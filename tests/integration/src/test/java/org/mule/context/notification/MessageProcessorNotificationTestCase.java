@@ -99,7 +99,9 @@ public class MessageProcessorNotificationTestCase extends AbstractNotificationTe
                 //subflow
                 .serial(prePost())
                 .serial(pre())
+                .serial(pre())
                 .serial(prePost())
+                .serial(post())
                 .serial(post())
 
                 //catch-es

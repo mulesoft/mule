@@ -30,7 +30,7 @@ public class SubflowInterceptingChainLifecycleWrapper extends InterceptingChainL
     @Override
     public Map<MessageProcessor, String> getMessageProcessorPaths()
     {
-        return NotificationUtils.buildMessageProcessorPaths(getMessageProcessors(), name + "/subprocessors");
+        return NotificationUtils.buildMessageProcessorPaths(processors, name + "/subprocessors");
     }
 
 }

@@ -118,6 +118,7 @@
     </flow>
 
     <sub-flow name="subflow-call">
+        <splitter expression="#[{'one'}]"/>
         <logger/>
     </sub-flow>
 
