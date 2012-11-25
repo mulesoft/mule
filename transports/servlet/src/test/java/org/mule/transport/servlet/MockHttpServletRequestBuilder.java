@@ -10,6 +10,10 @@
 
 package org.mule.transport.servlet;
 
+import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import org.mule.transport.http.HttpConstants;
 
 import java.util.Enumeration;
@@ -23,11 +27,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.collections.iterators.IteratorEnumeration;
-
-import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 public class MockHttpServletRequestBuilder
 {
@@ -46,6 +45,7 @@ public class MockHttpServletRequestBuilder
     public Map<String, Object> headers = new HashMap<String, Object>();
     public String host = "localhost";
     public int localPort = 8080;
+    public String pathInfo;
 
     public HttpServletRequest buildRequest() throws Exception
     {
@@ -64,6 +64,7 @@ public class MockHttpServletRequestBuilder
         when(mockRequest.getContentType()).thenReturn(contentType);
         when(mockRequest.getRemoteAddr()).thenReturn(host);
         when(mockRequest.getHeader(eq(HttpConstants.HEADER_HOST))).thenReturn(host);
+        when(mockRequest.getPathInfo()).thenReturn(pathInfo);
 
         addParameterExpectations(mockRequest);
         addAttributeExpectations(mockRequest);
@@ -86,6 +87,7 @@ public class MockHttpServletRequestBuilder
                 String key = entry.getKey();
                 String[] value = entry.getValue();
                 when(mockRequest.getParameterValues(eq(key))).thenReturn(value);
+                when(mockRequest.getParameter(eq(key))).thenReturn((value.length > 0) ?value[0] : null);
             }
         }
 
