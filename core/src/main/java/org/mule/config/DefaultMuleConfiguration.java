@@ -137,6 +137,12 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
 
     private boolean autoWrapMessageAwareTransform = true;
 
+    /**
+     * Whether transports and processors timeouts should be disabled in order
+     * to allow step debugging of mule flows.
+     */
+    private boolean disableTimeouts = false;
+
     protected transient Log logger = LogFactory.getLog(DefaultMuleConfiguration.class);
 
     private MuleContext muleContext;
@@ -332,6 +338,12 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
         if (p != null)
         {
             validateExpressions = Boolean.valueOf(p);
+        }
+
+        p = System.getProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "timeout.disable");
+        if (p != null)
+        {
+            disableTimeouts = Boolean.valueOf(p);
         }
     }
 
@@ -698,6 +710,12 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
     public void setEnricherPropagatesSessionVariableChanges(boolean enricherPropagatesSessionVariableChanges)
     {
         this.enricherPropagatesSessionVariableChanges = enricherPropagatesSessionVariableChanges;
+    }
+
+    @Override
+    public boolean isDisableTimeouts()
+    {
+        return disableTimeouts;
     }
 
     @Override

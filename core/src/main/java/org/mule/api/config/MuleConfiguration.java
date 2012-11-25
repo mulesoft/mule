@@ -88,4 +88,5 @@ public interface MuleConfiguration
     
     boolean isEnricherPropagatesSessionVariableChanges();
 
+    boolean isDisableTimeouts();
 }

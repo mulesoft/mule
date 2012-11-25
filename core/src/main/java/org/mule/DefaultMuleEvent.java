@@ -662,6 +662,10 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
     @Override
     public int getTimeout()
     {
+        if (getMuleContext().getConfiguration().isDisableTimeouts())
+        {
+            return TIMEOUT_WAIT_FOREVER;
+        }
         if (timeout == TIMEOUT_NOT_SET_VALUE)
         {
             return message.getMuleContext().getConfiguration().getDefaultResponseTimeout();

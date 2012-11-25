@@ -13,6 +13,7 @@ package org.mule.endpoint;
 import org.mule.MessageExchangePattern;
 import org.mule.api.AnnotatedObject;
 import org.mule.api.MuleContext;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.EndpointMessageProcessorChainFactory;
@@ -429,6 +430,10 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint, Disposable,
      */
     public int getResponseTimeout()
     {
+        if (muleContext.getConfiguration().isDisableTimeouts())
+        {
+            return MuleEvent.TIMEOUT_WAIT_FOREVER;
+        }
         return responseTimeout;
     }
 
