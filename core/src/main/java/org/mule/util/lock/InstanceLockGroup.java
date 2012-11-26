@@ -35,14 +35,14 @@ public class InstanceLockGroup implements LockGroup
         LockEntry lockEntry;
         synchronized (lockAccessMonitor)
         {
-            if (this.locks.containsKey(lockId))
+            if (locks.containsKey(lockId))
             {
-                lockEntry = this.locks.get(lockId);
+                lockEntry = locks.get(lockId);
             }
             else
             {
                 lockEntry = new LockEntry(lockProvider.createLock(lockId));
-                this.locks.put(lockId,lockEntry);
+                locks.put(lockId,lockEntry);
             }
             lockEntry.incrementLockCount();
             lockAccessMonitor.notifyAll();
@@ -54,15 +54,16 @@ public class InstanceLockGroup implements LockGroup
     {
         synchronized (lockAccessMonitor)
         {
-            LockEntry lockEntry = this.locks.get(key);
+            LockEntry lockEntry = locks.get(key);
             if (lockEntry != null)
             {
                 lockEntry.decrementLockCount();
                 if (!lockEntry.hasPendingLocks())
                 {
-                    this.locks.remove(key);
+                    locks.remove(key);
                 }
                 lockEntry.getLock().unlock();
+                lockProvider.destroyLock(lockEntry.getLock());
             }
             lockAccessMonitor.notifyAll();
         }
@@ -73,14 +74,14 @@ public class InstanceLockGroup implements LockGroup
         LockEntry lockEntry;
         synchronized (lockAccessMonitor)
         {
-            if (this.locks.containsKey(lockId))
+            if (locks.containsKey(lockId))
             {
-                lockEntry = this.locks.get(lockId);
+                lockEntry = locks.get(lockId);
             }
             else
             {
                 lockEntry = new LockEntry(lockProvider.createLock(lockId));
-                this.locks.put(lockId,lockEntry);
+                locks.put(lockId,lockEntry);
             }
             lockEntry.incrementLockCount();
             lockAccessMonitor.notifyAll();
@@ -93,7 +94,7 @@ public class InstanceLockGroup implements LockGroup
                 lockEntry.decrementLockCount();
                 if (!lockEntry.hasPendingLocks())
                 {
-                    this.locks.remove(lockId);
+                    locks.remove(lockId);
                     lockProvider.destroyLock(lockEntry.getLock());
                 }
             }

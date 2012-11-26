@@ -10,6 +10,10 @@
 package org.mule.util.lock;
 
 
+import org.mockito.Answers;
+import org.mockito.Mockito;
+import org.mockito.internal.verification.VerificationModeFactory;
+import org.mockito.verification.VerificationMode;
 import org.mule.api.store.ObjectAlreadyExistsException;
 import org.mule.api.store.ObjectStore;
 import org.mule.api.store.ObjectStoreException;
@@ -37,6 +41,7 @@ public class InstanceLockGroupTestCase extends AbstractMuleTestCase
     private String sharedKeyB = "B";
     private InstanceLockGroup instanceLockGroup = new InstanceLockGroup(new SingleServerLockProvider());
     private InMemoryObjectStore objectStore  = new InMemoryObjectStore();
+    private LockProvider mockLockProvider;
 
     @Test
     public void testLockUnlock() throws Exception
@@ -49,6 +54,33 @@ public class InstanceLockGroupTestCase extends AbstractMuleTestCase
     {
         testHighConcurrency(true);
     }
+    
+    @Test
+    public void testWhenUnlockThenDestroy() throws Exception
+    {
+        lockUnlockThenDestroy(1);
+    }
+
+    @Test
+    public void testWhenSeveralLockOneUnlockThenDestroy() throws Exception
+    {
+        lockUnlockThenDestroy(5);
+    }
+
+    private void lockUnlockThenDestroy(int lockTimes)
+    {
+        mockLockProvider = Mockito.mock(LockProvider.class, Answers.RETURNS_DEEP_STUBS.get());
+        InstanceLockGroup instanceLockGroup = new InstanceLockGroup(mockLockProvider);
+        for (int i = 0; i < lockTimes; i++)
+        {
+            instanceLockGroup.lock("lockId");
+        }
+        instanceLockGroup.unlock("lockId");
+        Mockito.verify(mockLockProvider, VerificationModeFactory.times(1)).createLock("lockId");
+        Mockito.verify(mockLockProvider,VerificationModeFactory.times(1)).destroyLock(Mockito.any(Lock.class));
+    }
+
+
 
     private void testHighConcurrency(boolean useTryLock) throws InterruptedException, ObjectStoreException
     {
