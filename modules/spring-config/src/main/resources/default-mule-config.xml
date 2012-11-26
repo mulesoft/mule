@@ -94,7 +94,9 @@
         <constructor-arg ref="_muleContext"/>
     </bean>
 
-    <bean name="_muleLockFactory" class="org.mule.util.lock.MuleLockManager"/>
+    <bean name="_muleLockManager" class="org.mule.util.lock.MuleLockManager"/>
+
+    <bean name="_muleLockProvider" class="org.mule.util.lock.SingleServerLockProvider"/>
 
     <!-- Default Transformers are now loaded from META-INF/services/org/mule/config/registry-bootstrap.properties so that
     the transformers will be available even when using the TransientRegistry only -->
