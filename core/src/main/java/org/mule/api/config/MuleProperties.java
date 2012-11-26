@@ -151,7 +151,8 @@ public class MuleProperties
     public static final String OBJECT_MULE_NAMESPACE_MANAGER = "_muleNamespaceManager";
     public static final String OBJECT_CONVERTER_RESOLVER = "_converterResolver";
     public static final String OBJECT_EXPRESSION_LANGUAGE = "_muleExpressionLanguage";
-    public static final String OBJECT_LOCK_FACTORY = "_muleLockFactory";
+    public static final String OBJECT_LOCK_MANAGER = "_muleLockManager";
+    public static final String OBJECT_LOCK_PROVIDER = "_muleLockProvider";
 
     // Not currently used as these need to be instance variables of the MuleContext.
     public static final String OBJECT_WORK_MANAGER = "_muleWorkManager";

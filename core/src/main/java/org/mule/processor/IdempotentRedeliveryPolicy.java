@@ -24,18 +24,17 @@ import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.transformer.simple.ByteArrayToHexString;
 import org.mule.transformer.simple.ObjectToByteArray;
+import org.mule.util.lock.Lock;
 import org.mule.util.store.ObjectStorePartition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.InputStream;
-import java.io.Serializable;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.mule.util.lock.Lock;
-import org.mule.util.lock.LockFactory;
+import org.mule.util.lock.LockManager;
 
 /**
  * Implement a retry policy for Mule.  This is similar to JMS retry policies that will redeliver a message a maximum
@@ -54,7 +53,8 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy
     private String messageDigestAlgorithm;
     private String idExpression;
     private ObjectStore<AtomicInteger> store;
-    private Lock<Serializable> lock;
+    private LockManager lockManager;
+    private String idrId;
 
     @Override
     public void initialise() throws InitialisationException
@@ -102,9 +102,8 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy
 
         String appName = muleContext.getConfiguration().getId();
         String flowName = flowConstruct.getName();
-        String idrId = String.format("%s-%s-%s",appName,flowName,"idr");
-        lock = ((LockFactory<Serializable>)muleContext.getRegistry().get(MuleProperties.OBJECT_LOCK_FACTORY)).createLock(idrId);
-
+        idrId = String.format("%s-%s-%s",appName,flowName,"idr");
+        lockManager = ((LockManager)muleContext.getRegistry().get(MuleProperties.OBJECT_LOCK_MANAGER));
         store = createStore();
     }
 
@@ -175,7 +174,8 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy
             exceptionSeen = true;
         }
 
-        lock.lock(messageId);
+        Lock lock = lockManager.getLock(idrId+"-"+messageId);
+        lock.lock();
         try
         {
 
@@ -232,7 +232,7 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy
         }
         finally
         {
-            lock.unlock(messageId);
+            lock.unlock();
         }
 
     }

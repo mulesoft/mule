@@ -9,17 +9,27 @@
  */
 package org.mule.util.lock;
 
+import org.mule.api.lifecycle.Disposable;
+
 import java.util.concurrent.TimeUnit;
 
 /**
- * Lock to be used for synchronization of access in Mule Components.
+ * Holds reference to all the obtained locks using {@link LockManager} in order
+ * to release memory of no longer referenced locks.
+ *
  */
-public interface Lock
+public interface LockGroup extends Disposable
 {
-    /**
-     * Acquires the lock. Blocks until the lock is acquired
+
+    /*
+     * Gets a lock over the resource identified with lockId
      */
-    void lock();
+    void lock(String lockId);
+
+    /*
+     * Releases lock over the resource identified with lockId
+     */
+    void unlock(String lockId);
 
     /**
      * Tries to acquire the lock for a certain amount of time
@@ -29,10 +39,5 @@ public interface Lock
      * @return true if the lock was successfully acquired, false otherwise
      * @throws java.lang.InterruptedException if thread was interrupted during the lock acquisition
      */
-    boolean tryLock(long timeout, TimeUnit timeUnit) throws InterruptedException;
-
-    /**
-     * Release the lock.
-     */
-    void unlock();
+    boolean tryLock(String lockId, long timeout, TimeUnit timeUnit) throws InterruptedException;
 }

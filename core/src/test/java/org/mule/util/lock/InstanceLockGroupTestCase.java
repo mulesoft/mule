@@ -9,7 +9,7 @@
  */
 package org.mule.util.lock;
 
-import org.junit.Test;
+
 import org.mule.api.store.ObjectAlreadyExistsException;
 import org.mule.api.store.ObjectStore;
 import org.mule.api.store.ObjectStoreException;
@@ -17,6 +17,7 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.util.concurrent.Latch;
 
+import org.junit.Test;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -27,26 +28,37 @@ import java.util.concurrent.TimeUnit;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
-public class ServerLockTestCase extends AbstractMuleTestCase
+public class InstanceLockGroupTestCase extends AbstractMuleTestCase
 {
     public static final int THREAD_COUNT = 100;
     public static final int ITERATIONS_PER_THREAD = 100;
     private Latch threadStartLatch = new Latch();
     private String sharedKeyA = "A";
     private String sharedKeyB = "B";
-    private ServerLock<String> serverLock = new ServerLock<String>();
+    private InstanceLockGroup instanceLockGroup = new InstanceLockGroup(new SingleServerLockProvider());
     private InMemoryObjectStore objectStore  = new InMemoryObjectStore();
 
     @Test
-    public void testHighConcurrency() throws Exception
+    public void testLockUnlock() throws Exception
+    {
+        testHighConcurrency(false);
+    }
+
+    @Test
+    public void testTryLockUnlock() throws Exception
+    {
+        testHighConcurrency(true);
+    }
+
+    private void testHighConcurrency(boolean useTryLock) throws InterruptedException, ObjectStoreException
     {
         List<Thread> threads = new ArrayList<Thread>(THREAD_COUNT);
         for (int i = 0; i < THREAD_COUNT; i++)
         {
-            IncrementKeyValueThread incrementKeyValueThread = new IncrementKeyValueThread(sharedKeyA);
+            IncrementKeyValueThread incrementKeyValueThread = new IncrementKeyValueThread(sharedKeyA,useTryLock);
             threads.add(incrementKeyValueThread);
             incrementKeyValueThread.start();
-            incrementKeyValueThread = new IncrementKeyValueThread(sharedKeyB);
+            incrementKeyValueThread = new IncrementKeyValueThread(sharedKeyB, useTryLock);
             threads.add(incrementKeyValueThread);
             incrementKeyValueThread.start();
         }
@@ -58,15 +70,18 @@ public class ServerLockTestCase extends AbstractMuleTestCase
         assertThat(objectStore.retrieve(sharedKeyA), is(THREAD_COUNT * ITERATIONS_PER_THREAD));
         assertThat(objectStore.retrieve(sharedKeyB), is(THREAD_COUNT * ITERATIONS_PER_THREAD));
     }
-    
+
     public class IncrementKeyValueThread extends Thread
     {
         private String key;
+        private boolean useTryLock;
+        
 
-        public IncrementKeyValueThread(String key)
+        private IncrementKeyValueThread(String key, boolean useTryLock)
         {
             super("Thread-" + key);
             this.key = key;
+            this.useTryLock = useTryLock;
         }
 
         @Override
@@ -81,7 +96,14 @@ public class ServerLockTestCase extends AbstractMuleTestCase
                     {
                         break;
                     }
-                    serverLock.lock(key);
+                    if (useTryLock)
+                    {
+                        while (!instanceLockGroup.tryLock(key,100,TimeUnit.MILLISECONDS));
+                    }
+                    else 
+                    {
+                        instanceLockGroup.lock(key);
+                    }
                     try
                     {
                         Integer value;
@@ -98,7 +120,7 @@ public class ServerLockTestCase extends AbstractMuleTestCase
                     }
                     finally
                     {
-                        serverLock.unlock(key);
+                        instanceLockGroup.unlock(key);
                     }
                 }
             }
