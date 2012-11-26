@@ -10,20 +10,25 @@
 
 package org.mule.transport.servlet.jetty.functional;
 
+import static org.junit.Assert.assertEquals;
 import org.mule.api.MuleMessage;
 import org.mule.api.transport.DispatchException;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import org.junit.Rule;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
 
 public class JettyHttpFunctionalWithQueryTestCase extends FunctionalTestCase
 {
+
+    @Rule
+    public DynamicPort port = new DynamicPort("port1");
+
     @Override
     protected String getConfigResources()
     {
