@@ -132,7 +132,7 @@ public class FineGrainedControlClassLoader extends GoodCitizenClassLoader
         return result;
     }
 
-    protected boolean isOverridden(String name)
+    public boolean isOverridden(String name)
     {
         // find a match
         boolean overrideMatch = false;
@@ -147,7 +147,7 @@ public class FineGrainedControlClassLoader extends GoodCitizenClassLoader
         return overrideMatch;
     }
 
-    protected boolean isBlocked(String name)
+    public boolean isBlocked(String name)
     {
         boolean blockedMatch = false;
         for (String b : blocked)
