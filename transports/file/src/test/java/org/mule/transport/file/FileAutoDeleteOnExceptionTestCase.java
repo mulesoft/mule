@@ -10,19 +10,19 @@
 
 package org.mule.transport.file;
 
+import static org.junit.Assert.assertFalse;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
 import org.mule.tck.probe.Prober;
+import org.mule.tck.probe.file.FileExists;
 
 import java.io.File;
 import java.io.IOException;
 
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.junit.Assert.assertFalse;
 
 public class FileAutoDeleteOnExceptionTestCase extends FunctionalTestCase
 {
@@ -90,27 +90,6 @@ public class FileAutoDeleteOnExceptionTestCase extends FunctionalTestCase
 
         // Checks that the source file was deleted after the exception processing
         assertFalse(target.exists());
-    }
-
-    private static class FileExists implements Probe
-    {
-
-        private final File target;
-
-        public FileExists(File target)
-        {
-            this.target = target;
-        }
-
-        public boolean isSatisfied()
-        {
-            return target.exists();
-        }
-
-        public String describeFailure()
-        {
-            return "File does not exists";
-        }
     }
 
     private static class FlowStopped implements Probe
