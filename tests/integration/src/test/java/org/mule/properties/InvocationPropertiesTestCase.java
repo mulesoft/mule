@@ -42,6 +42,9 @@ public class InvocationPropertiesTestCase extends org.mule.tck.junit4.Functional
     @Rule
     public DynamicPort dynamicPort2 = new DynamicPort("port2");
 
+    @Rule
+    public DynamicPort dynamicPort3 = new DynamicPort("port3");
+
     @Test
     public void setInvocationPropertyUsingAPIGetInFlow() throws Exception
     {
@@ -278,6 +281,13 @@ public class InvocationPropertiesTestCase extends org.mule.tck.junit4.Functional
     public void catchExceptionStrategy() throws Exception
     {
         testFlow("catchExceptionStrategy");
+    }
+
+    @Test
+    public void defaultExceptionStrategyAfterCallSubflow() throws Exception
+    {
+        muleContext.getClient().send("vm://in","test",null,RECEIVE_TIMEOUT);
+        FlowAssert.verify("defaultExceptionStrategyAfterCallingSubflow");
     }
 
     @Override
