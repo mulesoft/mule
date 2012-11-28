@@ -92,6 +92,7 @@ public class EncryptStreamTransformer implements StreamTransformer
             compressedEncryptedOutputStream.close();
             encryptedOutputStream.close();
             armoredOut.close();
+            toBeEncrypted.close();
             return true;
         }
 
