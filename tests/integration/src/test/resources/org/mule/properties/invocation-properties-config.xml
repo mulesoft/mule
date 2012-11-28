@@ -366,4 +366,35 @@
         </catch-exception-strategy>
     </flow>
 
+    <flow name="defaultExceptionStrategyAfterCallingSubflow">
+        <vm:inbound-endpoint path="in" exchange-pattern="request-response"/>
+        <message-properties-transformer scope="invocation">
+            <add-message-property key="P1" value="P1_VALUE"/>
+        </message-properties-transformer>
+        <flow-ref name="TestSubFlow"/>
+        <message-properties-transformer scope="invocation">
+            <add-message-property key="P2" value="P2_VALUE"/>
+        </message-properties-transformer>
+        <message-filter throwOnUnaccepted="true">
+            <payload-type-filter expectedType="java.lang.NoSuchFieldError"/>
+        </message-filter>
+        <default-exception-strategy>
+           <processor-chain>
+               <processor-chain>
+                   <test:assert expression="#[header:INVOCATION:P1]" />
+                   <test:assert expression="#[header:INVOCATION:P2]" />
+               </processor-chain>
+            </processor-chain>
+        </default-exception-strategy>
+    </flow>
+
+    <sub-flow name="TestSubFlow">
+        <http:outbound-endpoint host="localhost" port="${port3}"/>
+    </sub-flow>
+
+    <flow name="TestSubFlowServer">
+        <http:inbound-endpoint host="localhost" port="${port3}"/>
+        <test:component throwException="true"/>
+    </flow>
+
 </mule>
