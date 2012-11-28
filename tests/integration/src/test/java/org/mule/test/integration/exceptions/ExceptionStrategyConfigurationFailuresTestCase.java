@@ -85,10 +85,23 @@ public class ExceptionStrategyConfigurationFailuresTestCase extends AbstractMule
     {
         loadConfiguration("org/mule/test/integration/exceptions/choice-exception-strategy-multiple-rollback.xml");
     }
+
     @Test(expected = ConfigurationException.class)
     public void testChoiceExceptionStrategyWithMultipleHandleRedeliveryExceptionStrategiesWithGlobalAndDefault() throws Exception
     {
         loadConfiguration("org/mule/test/integration/exceptions/choice-exception-strategy-multiple-rollback-global.xml");
+    }
+
+    @Test(expected = ConfigurationException.class)
+    public void testCatchExceptionStrategyWithWhenWithoutChoice() throws Exception
+    {
+        loadConfiguration("org/mule/test/integration/exceptions/when-without-choice-in-catch-es.xml");
+    }
+
+    @Test(expected = ConfigurationException.class)
+    public void testRollbackExceptionStrategyWithWhenWithoutChoice() throws Exception
+    {
+        loadConfiguration("org/mule/test/integration/exceptions/when-without-choice-in-rollback-es.xml");
     }
 
     private void loadConfiguration(String configuration) throws MuleException, InterruptedException

@@ -35,7 +35,7 @@ import java.util.Map;
  * Exception listeners must implement {@link org.mule.api.exception.MessagingExceptionHandlerAcceptor} to be part of ChoiceMessagingExceptionStrategy
  */
 public class ChoiceMessagingExceptionStrategy extends AbstractMuleObjectOwner<MessagingExceptionHandlerAcceptor>
-        implements MessagingExceptionHandler, MuleContextAware, Lifecycle, MessageProcessorContainer, GlobalNameableObject
+        implements MessagingExceptionHandlerAcceptor, MuleContextAware, Lifecycle, MessageProcessorContainer, GlobalNameableObject
 {
     private List<MessagingExceptionHandlerAcceptor> exceptionListeners;
 
@@ -163,5 +163,17 @@ public class ChoiceMessagingExceptionStrategy extends AbstractMuleObjectOwner<Me
             idx++;
         }
         return mpPaths;
+    }
+    
+    @Override
+    public boolean accept(MuleEvent event)
+    {
+        return true;
+    }
+
+    @Override
+    public boolean acceptsAll()
+    {
+        return true;
     }
 }

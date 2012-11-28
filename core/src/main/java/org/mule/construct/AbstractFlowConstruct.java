@@ -18,6 +18,7 @@ import org.mule.api.construct.FlowConstructAware;
 import org.mule.api.construct.FlowConstructInvalidException;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.exception.MessagingExceptionHandler;
+import org.mule.api.exception.MessagingExceptionHandlerAcceptor;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
@@ -29,6 +30,7 @@ import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.MessageInfoMapping;
 import org.mule.api.source.MessageSource;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.lifecycle.EmptyLifecycleCallback;
 import org.mule.management.stats.FlowConstructStatistics;
 import org.mule.routing.MuleMessageInfoMapping;
@@ -281,7 +283,14 @@ public abstract class AbstractFlowConstruct implements FlowConstruct, Lifecycle,
      */
     protected void validateConstruct() throws FlowConstructInvalidException
     {
-        // Empty template method
+        if (exceptionListener instanceof MessagingExceptionHandlerAcceptor)
+        {
+            if (!((MessagingExceptionHandlerAcceptor)exceptionListener).acceptsAll())
+            {
+                throw new FlowConstructInvalidException(CoreMessages.createStaticMessage("Flow exception listener contains and exception strategy that doesn't handle all request," +
+                        " Perhaps there's an exception strategy with a when attribute set but it's not part of a catch exception strategy"),this);
+            }
+        }
     }
 
     protected void injectFlowConstructMuleContext(Object candidate)
