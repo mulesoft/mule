@@ -76,4 +76,9 @@ public class MulticastMessageReceiver extends UdpMessageReceiver
         super.doDispose();
     }
 
+    @Override
+    public boolean shouldConsumeInEveryNode()
+    {
+        return false;
+    }
 }
