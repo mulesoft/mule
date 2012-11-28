@@ -55,12 +55,32 @@ public class XmlConfigurationMuleArtifactFactoryTestCase extends AbstractMuleTes
     {
         Document document = XMLUnit.buildControlDocument("<jdbc:connector name=\"jdbcConnector\" pollingFrequency=\"1000\" dataSource-ref=\"jdbcDataSource\" queryTimeout=\"3000\" xmlns:jdbc=\"http://www.mulesoft.org/schema/mule/jdbc\"/>");
 
-        MuleArtifact artifact = lookupArtifact().getArtifact(document.getDocumentElement(),
-            getXmlConfigurationCallback(true));
-
-        Assert.assertNotNull(artifact);
-        Assert.assertTrue(artifact.hasCapability(Testable.class));
-        Assert.assertTrue(artifact.getCapability(Testable.class) instanceof Testable);
+        {
+        	XmlConfigurationMuleArtifactFactory factory = lookupArtifact();
+        	XmlConfigurationCallback callback = getXmlConfigurationCallback(true); 
+	        MuleArtifact artifact = factory.getArtifact(document.getDocumentElement(),
+	            callback);
+	
+	        Assert.assertNotNull(artifact);
+	        Assert.assertTrue(artifact.hasCapability(Testable.class));
+	        Assert.assertTrue(artifact.getCapability(Testable.class) instanceof Testable);
+			Testable t = artifact.getCapability(Testable.class);
+		    Assert.assertEquals(TestResult.Status.SUCCESS, t.test().getStatus());
+		    factory.returnArtifact(artifact);
+        }
+        {
+        	XmlConfigurationMuleArtifactFactory factory = lookupArtifact();
+        	XmlConfigurationCallback callback = getXmlConfigurationCallback(true); 
+	        MuleArtifact artifact = factory.getArtifact(document.getDocumentElement(),
+	            callback);
+	
+	        Assert.assertNotNull(artifact);
+	        Assert.assertTrue(artifact.hasCapability(Testable.class));
+	        Assert.assertTrue(artifact.getCapability(Testable.class) instanceof Testable);
+			Testable t = artifact.getCapability(Testable.class);
+		    Assert.assertEquals(TestResult.Status.SUCCESS, t.test().getStatus());
+		    factory.returnArtifact(artifact);
+        }
     }
     
 // commented mysql test because mysql.mysql-connector-java/mysql-connector-java-x.jar is not on build path by default
@@ -70,15 +90,33 @@ public class XmlConfigurationMuleArtifactFactoryTestCase extends AbstractMuleTes
 //    {
 //    	String config = "<jdbc:connector name=\"jdbcConnector\" pollingFrequency=\"1000\" dataSource-ref=\"mysqlDatasource\" queryTimeout=\"3000\" xmlns:jdbc=\"http://www.mulesoft.org/schema/mule/jdbc\"/>";
 //        Document document = XMLUnit.buildControlDocument(config);
-//
-//        MuleArtifact artifact = lookupArtifact().getArtifact(document.getDocumentElement(),
-//            getXmlConfigurationCallback(true));
-//
-//        Assert.assertNotNull(artifact);
-//        Assert.assertTrue(artifact.hasCapability(Testable.class));
-//        Assert.assertTrue(artifact.getCapability(Testable.class) instanceof Testable);
-////    	Testable t = artifact.getCapability(Testable.class);
-////        Assert.assertEquals(TestResult.Status.SUCCESS, t.test().getStatus());
+//        
+//        {
+//            XmlConfigurationMuleArtifactFactory factory = lookupArtifact();
+//            XmlConfigurationCallback callback = getXmlConfigurationCallback(true); 
+//	        MuleArtifact artifact = factory.getArtifact(document.getDocumentElement(),
+//	            callback);
+//	
+//	        Assert.assertNotNull(artifact);
+//	        Assert.assertTrue(artifact.hasCapability(Testable.class));
+//	        Assert.assertTrue(artifact.getCapability(Testable.class) instanceof Testable);
+//			Testable t = artifact.getCapability(Testable.class);
+//		    Assert.assertEquals(TestResult.Status.SUCCESS, t.test().getStatus());
+//		    factory.returnArtifact(artifact);
+//        }
+//        {
+//            XmlConfigurationMuleArtifactFactory factory = lookupArtifact();
+//            XmlConfigurationCallback callback = getXmlConfigurationCallback(true); 
+//	        MuleArtifact artifact = factory.getArtifact(document.getDocumentElement(),
+//	            callback);
+//	
+//	        Assert.assertNotNull(artifact);
+//	        Assert.assertTrue(artifact.hasCapability(Testable.class));
+//	        Assert.assertTrue(artifact.getCapability(Testable.class) instanceof Testable);
+//			Testable t = artifact.getCapability(Testable.class);
+//		    Assert.assertEquals(TestResult.Status.SUCCESS, t.test().getStatus());
+//		    factory.returnArtifact(artifact);
+//        }
 //    }
 
     protected XmlConfigurationCallback getXmlConfigurationCallback(final boolean datasourceConfigured)
@@ -108,6 +146,16 @@ public class XmlConfigurationMuleArtifactFactoryTestCase extends AbstractMuleTes
                     {
                         return XMLUnit.buildControlDocument(
                             "<jdbc:derby-data-source name=\"jdbcDataSource\" url=\"jdbc:derby:muleEmbeddedDB;create=true\"  xmlns:jdbc=\"http://www.mulesoft.org/schema/mule/jdbc\"/>")
+                        		
+//                        	"<spring:bean xmlns:spring=\"http://www.springframework.org/schema/beans\" class=\"org.enhydra.jdbc.standard.StandardXADataSource\" destroy-method=\"shutdown\" id=\"jdbcDataSource\" name=\"Bean\">"
+//							+ "<spring:property name=\"driverName\" value=\"org.apache.derby.jdbc.EmbeddedDriver\"/>"
+//							+ "<spring:property name=\"url\" value=\"jdbc:derby:muleEmbeddedDB;create=true\"/>"
+//							+ "</spring:bean>")
+                        		
+//                            	"<spring:bean xmlns:spring=\"http://www.springframework.org/schema/beans\" class=\"com.mchange.v2.c3p0.ComboPooledDataSource\" destroy-method=\"close\" id=\"jdbcDataSource\" name=\"Bean\">"
+//    							+ "<spring:property name=\"driverClass\" value=\"org.apache.derby.jdbc.EmbeddedDriver\"/>"
+//    							+ "<spring:property name=\"jdbcUrl\" value=\"jdbc:derby:muleEmbeddedDB;create=true\"/>"
+//    							+ "</spring:bean>")
                             .getDocumentElement();
                     }
                     catch (Exception e)

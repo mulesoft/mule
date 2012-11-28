@@ -10,6 +10,8 @@
 
 package org.mule.transport.jdbc.config;
 
+import java.lang.reflect.Method;
+
 public class DerbyDataSourceFactoryBean extends AbstractDataSourceFactoryBean
 {
     private static final String DRIVER_CLASS_NAME = "org.apache.derby.jdbc.EmbeddedDriver";
@@ -41,6 +43,19 @@ public class DerbyDataSourceFactoryBean extends AbstractDataSourceFactoryBean
         }
 
         url = buf.toString();
+    }
+    
+    @Override
+    public void destroy() throws Exception {
+    	super.destroy();
+    	// call org.apache.derby.iapi.services.monitor.Monitor.getMonitor().shutdown();
+    	logger.warn("destroying derby data source factory bean", new Exception());
+    	Class clazz = Class.forName("org.apache.derby.iapi.services.monitor.Monitor");
+    	Object monitor = clazz.getMethod("getMonitor", new Class[] {})
+    			.invoke(clazz, new Object[] {});
+    	Method m = monitor.getClass().getMethod("shutdown", new Class[] {});
+    	m.setAccessible(true);
+    	m.invoke(monitor, new Object[] {});
     }
 
     public String getDatabase()

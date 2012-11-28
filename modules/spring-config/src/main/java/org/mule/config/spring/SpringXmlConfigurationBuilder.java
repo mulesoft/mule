@@ -76,7 +76,10 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
     public void unconfigure(MuleContext muleContext)
     {
         registry.dispose();
-        muleContext.removeRegistry(registry);
+        if (muleContext != null)
+        {
+        	muleContext.removeRegistry(registry);
+        }
         registry = null;
         configured = false;
     }

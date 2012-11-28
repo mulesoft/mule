@@ -11,6 +11,7 @@
 package org.mule.config.spring;
 
 import org.mule.api.MuleContext;
+import org.mule.api.MuleException;
 import org.mule.api.context.MuleContextFactory;
 import org.mule.common.MuleArtifact;
 import org.mule.common.MuleArtifactFactoryException;
@@ -20,6 +21,9 @@ import org.mule.config.ConfigResource;
 import org.mule.context.DefaultMuleContextFactory;
 
 import java.io.StringBufferInputStream;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -34,6 +38,9 @@ import org.dom4j.io.DOMReader;
 
 public class SpringXmlConfigurationMuleArtifactFactory implements XmlConfigurationMuleArtifactFactory
 {
+	
+	private Map<MuleArtifact, SpringXmlConfigurationBuilder> builders = new HashMap<MuleArtifact, SpringXmlConfigurationBuilder>();
+	private Map<MuleArtifact, MuleContext> contexts = new HashMap<MuleArtifact, MuleContext>();
 	
     @Override
     public MuleArtifact getArtifact(org.w3c.dom.Element element, XmlConfigurationCallback callback)
@@ -95,21 +102,28 @@ public class SpringXmlConfigurationMuleArtifactFactory implements XmlConfigurati
         {
         	throw new MuleArtifactFactoryException("Error parsing XML", e);
         }
+        MuleContext muleContext = null;
+        SpringXmlConfigurationBuilder builder = null;
         try
         {
-            MuleContextFactory factory = new DefaultMuleContextFactory();
-            MuleContext muleContext = factory.createMuleContext(new SpringXmlConfigurationBuilder(
-                new ConfigResource[]{config}));
+        	MuleContextFactory factory = new DefaultMuleContextFactory();
+            builder = new SpringXmlConfigurationBuilder(
+                    new ConfigResource[]{config});
+            muleContext = factory.createMuleContext(builder);
             muleContext.start();
-            return new DefaultMuleArtifact(muleContext.getRegistry().lookupObject(
+            MuleArtifact artifact = new DefaultMuleArtifact(muleContext.getRegistry().lookupObject(
                 element.getAttribute("name")));
+            builders.put(artifact, builder);
+            contexts.put(artifact, muleContext);
+            return artifact;
         }
         catch (Exception e)
         {
+        	dispose(builder, muleContext);
         	throw new MuleArtifactFactoryException("Error initializing", e);	
         }
     }
-
+    
     protected void addSchemaLocation(Element rootElement,
                                      org.w3c.dom.Element element,
                                      XmlConfigurationCallback callback)
@@ -143,5 +157,49 @@ public class SpringXmlConfigurationMuleArtifactFactory implements XmlConfigurati
 
         return doc2.getRootElement();
     }
+
+	@Override
+	public void returnArtifact(MuleArtifact artifact)
+	{
+		SpringXmlConfigurationBuilder builder = builders.remove(artifact);
+		MuleContext context = contexts.remove(artifact);
+		dispose(builder, context);
+	}
+	
+	private void dispose(SpringXmlConfigurationBuilder builder, MuleContext context)
+	{
+    	if (context != null)
+    	{
+			System.out.println("execute context.dispose");
+    		context.dispose();
+    	}
+		System.out.println("execute delete logger threads");
+    	deleteLoggingThreads();
+	}
+	
+	private void deleteLoggingThreads()
+	{
+		String[] threadsToDelete = {"Mule.log.clogging.ref.handler", "Mule.log.slf4j.ref.handler"};
+		
+		Set<Thread> threadSet = Thread.getAllStackTraces().keySet();
+		Thread[] threadArray = threadSet.toArray(new Thread[threadSet.size()]);
+		for(String threadToDelete : threadsToDelete)
+		{
+			for (Thread t : threadArray)
+			{
+				if (threadToDelete.equals(t.getName()))
+				{
+					try
+					{
+						t.interrupt();
+					}
+					catch (SecurityException e)
+					{
+						// ignore
+					}
+				}
+			}
+		}
+	}
 
 }
