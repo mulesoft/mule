@@ -153,10 +153,9 @@ public class MuleContainer
         try
         {
             initializeCoreExtensions();
+            startCoreExtensions();
 
             deploymentService.start();
-
-            startCoreExtensions();
         }
         catch (Throwable e)
         {
@@ -166,6 +165,8 @@ public class MuleContainer
 
     private void initializeCoreExtensions() throws InitialisationException, DefaultMuleException
     {
+        logger.info("Initializing core extensions");
+
         coreExtensions = muleCoreExtensionDiscoverer.discover();
 
         for (MuleCoreExtension extension : coreExtensions.values())
@@ -191,6 +192,7 @@ public class MuleContainer
 
     private void startCoreExtensions() throws MuleException
     {
+        logger.info("Starting core extensions");
         for (MuleCoreExtension extension : coreExtensions.values())
         {
             extension.start();

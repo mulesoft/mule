@@ -10,8 +10,6 @@
 
 package org.mule.module.launcher;
 
-import org.mule.api.lifecycle.Startable;
-import org.mule.api.lifecycle.Stoppable;
 import org.mule.module.launcher.application.Application;
 
 import java.io.IOException;
@@ -22,7 +20,7 @@ import java.util.concurrent.locks.ReentrantLock;
 /**
  *  Manages deploy of mule applications
  */
-public interface DeploymentService extends Startable, Stoppable
+public interface DeploymentService
 {
 
     /**
@@ -57,4 +55,8 @@ public interface DeploymentService extends Startable, Stoppable
     void undeploy(String appName);
 
     void deploy(URL appArchiveUrl) throws IOException;
+
+    void start();
+
+    void stop();
 }

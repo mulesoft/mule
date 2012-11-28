@@ -115,7 +115,7 @@ public class MuleContainerTestCase extends AbstractMuleTestCase
     }
 
     @Test
-    public void startsCoreExtensionsAfterDeploymentService() throws Exception
+    public void startsCoreExtensionsBeforeDeploymentService() throws Exception
     {
         Map<Class<? extends MuleCoreExtension>, MuleCoreExtension> extensions = new HashMap<Class<? extends MuleCoreExtension>, MuleCoreExtension>();
         MuleCoreExtension extension = mock(MuleCoreExtension.class);
@@ -125,8 +125,8 @@ public class MuleContainerTestCase extends AbstractMuleTestCase
         container.start(false);
 
         InOrder inOrder = inOrder(extension, deploymentService);
-        inOrder.verify(deploymentService).start();
         inOrder.verify(extension).start();
+        inOrder.verify(deploymentService).start();
     }
 
     @Test
