@@ -17,6 +17,8 @@ import java.net.URL;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.Enumeration;
+import java.util.SortedMap;
+import java.util.TreeMap;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
 
@@ -118,46 +120,7 @@ public class MuleManifest
             {
                 // We want to load the MANIFEST.MF from the mule-core jar. Sine we
                 // don't know the version we're using we have to search for the jar on the classpath
-                URL url = AccessController.doPrivileged(new PrivilegedAction<URL>()
-                {
-                    public URL run()
-                    {
-                        try
-                        {
-                            Enumeration<URL> e =
-                                MuleConfiguration.class.getClassLoader().getResources("META-INF/MANIFEST.MF");
-                            while (e.hasMoreElements())
-                            {
-                                URL url = e.nextElement();
-                                if ((url.toExternalForm().indexOf("mule-core") > -1 && url.toExternalForm()
-                                    .indexOf("tests.jar") < 0)
-                                    || url.toExternalForm().matches(".*mule.*-.*-embedded.*\\.jar.*"))
-                                {
-                                    return url;
-                                }
-                            }
-                            // if we haven't found a valid manifest yet, maybe we're running tests
-                            String pathSeparator = System.getProperty("file.separator");
-                            String testManifestPath = "core" + pathSeparator + "target" + pathSeparator + "test-classes";
-                            e = MuleConfiguration.class.getClassLoader().getResources("META-INF/MANIFEST.MF");
-                            while (e.hasMoreElements())
-                            {
-                                URL url = e.nextElement();
-                                if ((url.toExternalForm().indexOf(testManifestPath) > -1 && url.toExternalForm()
-                                    .indexOf("tests.jar") < 0)
-                                    || url.toExternalForm().matches(".*mule.*-.*-embedded.*\\.jar.*"))
-                                {
-                                    return url;
-                                }
-                            }
-                        }
-                        catch (IOException e1)
-                        {
-                            logger.warn("Failure reading manifest: " + e1.getMessage(), e1);
-                        }
-                        return null;
-                    }
-                });
+                URL url = AccessController.doPrivileged(new UrlPrivilegedAction());
 
                 if (url != null)
                 {
@@ -181,5 +144,65 @@ public class MuleManifest
     protected static String getManifestProperty(String name)
     {
         return getManifest().getMainAttributes().getValue(new Attributes.Name(name));
+    }
+
+    static class UrlPrivilegedAction implements PrivilegedAction<URL>
+    {
+        public URL run()
+        {
+            URL result = null;
+            try
+            {
+                Enumeration<URL> e = MuleConfiguration.class.getClassLoader().getResources("META-INF/MANIFEST.MF");
+                result = getManifestJarURL(e);
+                if (result == null)
+                {
+                    // if we haven't found a valid manifest yet, maybe we're running tests
+                    result = getManifestTestJarURL();
+                }
+            }
+            catch (IOException e1)
+            {
+                logger.warn("Failure reading manifest: " + e1.getMessage(), e1);
+            }
+            return result;
+        }
+
+        URL getManifestJarURL(Enumeration<URL> e)
+        {
+            SortedMap<String, URL> candidates = new TreeMap<String, URL>();
+            while (e.hasMoreElements())
+            {
+                URL url = e.nextElement();
+                if ((url.toExternalForm().indexOf("mule-core") > -1 && url.toExternalForm().indexOf("tests.jar") < 0)
+                    || url.toExternalForm().matches(".*mule.*-.*-embedded.*\\.jar.*"))
+                {
+                    candidates.put(url.toExternalForm(), url);
+                }
+            }
+            if (!candidates.isEmpty())
+            {
+                //if mule-core and mule-core-ee jars are present, then mule-core-ee gets precedence
+                return candidates.get(candidates.lastKey());
+            }
+            return null;
+        }
+
+        URL getManifestTestJarURL() throws IOException
+        {
+            String pathSeparator = System.getProperty("file.separator");
+            String testManifestPath = "core" + pathSeparator + "target" + pathSeparator + "test-classes";
+            Enumeration<URL> e = MuleConfiguration.class.getClassLoader().getResources("META-INF/MANIFEST.MF");
+            while (e.hasMoreElements())
+            {
+                URL url = e.nextElement();
+                if ((url.toExternalForm().indexOf(testManifestPath) > -1 && url.toExternalForm().indexOf("tests.jar") < 0)
+                    || url.toExternalForm().matches(".*mule.*-.*-embedded.*\\.jar.*"))
+                {
+                    return url;
+                }
+            }
+            return null;
+        }
     }
 }
