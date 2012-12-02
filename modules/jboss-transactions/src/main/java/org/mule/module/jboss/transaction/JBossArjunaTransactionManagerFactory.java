@@ -28,6 +28,8 @@ public class JBossArjunaTransactionManagerFactory implements TransactionManagerF
 
     public static final String PROPERTY_OBJECTSTORE_DIR = "com.arjuna.ats.arjuna.objectstore.objectStoreDir";
     public static final String PROPERTY_NODE_IDENTIFIER = "com.arjuna.ats.arjuna.nodeIdentifier";
+    public static final String PROPERTY_DEFAULT_TIMEOUT = "com.arjuna.ats.arjuna.coordinator.defaultTimeout";
+    public static final String PROPERTY_TX_REAPER_TIMEOUT = "com.arjuna.ats.arjuna.coordinator.txReaperTimeout";
 
     private Map<String, String> properties = new HashMap<String, String>();
 
@@ -73,13 +75,22 @@ public class JBossArjunaTransactionManagerFactory implements TransactionManagerF
                     // ignore, let the defaults be generated
                 }
             }
-
-
-            // TODO JBossTS now uses different configuration approach, broke props into 3 javabeans, update
+            // TODO JBossTS has many more properties. Should implement something generic, looking for properties with the annotation.
+            // see http://docs.jboss.org/jbosstm/docs/4.2.3/javadoc/jts/com/arjuna/ats/arjuna/common/Environment.html
+            // and com.arjuna.ats.arjuna.common.CoreEnvironmentBean, CoordinatorEnvironmentBean and ObjectStoreEnvironmentBean 
+            //Setting the timeout if any
+            if(properties.containsKey(PROPERTY_DEFAULT_TIMEOUT)){
+            	arjPropertyManager.getCoordinatorEnvironmentBean().setDefaultTimeout(Integer.valueOf(properties.get(PROPERTY_DEFAULT_TIMEOUT)));
+            }
+            //Setting the tx reaper timeout if any
+            if(properties.containsKey(PROPERTY_TX_REAPER_TIMEOUT)){
+            	arjPropertyManager.getCoordinatorEnvironmentBean().setTxReaperTimeout(Long.valueOf(properties.get(PROPERTY_TX_REAPER_TIMEOUT)));
+            }
             /*for (Map.Entry<String, String> entry : properties.entrySet())
             {
                 arjPropertyManager.propertyManager.setProperty(entry.getKey(), entry.getValue());
             }*/
+            
             tm = com.arjuna.ats.jta.TransactionManager.transactionManager();
 
         }
