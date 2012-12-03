@@ -318,6 +318,17 @@ public class RequestContextTestCase extends AbstractMuleTestCase
         {
             return false;
         }
+
+        @Override
+        public boolean isNotificationsEnabled()
+        {
+            return true;
+        }
+
+        @Override
+        public void setEnableNotifications(boolean enabled)
+        {
+        }
     }
 
 }

@@ -10,14 +10,6 @@
 
 package org.mule.processor;
 
-import java.util.Collections;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
-import javax.xml.namespace.QName;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.api.AnnotatedObject;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
@@ -30,6 +22,15 @@ import org.mule.api.processor.MessageProcessorChain;
 import org.mule.context.notification.MessageProcessorNotification;
 import org.mule.processor.chain.DefaultMessageProcessorChain;
 import org.mule.util.ObjectUtils;
+
+import java.util.Collections;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+import javax.xml.namespace.QName;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Abstract implementation that provides the infrastructure for intercepting message processors.
@@ -91,7 +92,7 @@ public abstract class AbstractInterceptingMessageProcessorBase
                 logger.trace("Invoking next MessageProcessor: '" + next.getClass().getName() + "' ");
             }
 
-            boolean fireNotification = !(next instanceof MessageProcessorChain);
+            boolean fireNotification = !(next instanceof MessageProcessorChain) && event.isNotificationsEnabled();
 
             if (fireNotification)
             {

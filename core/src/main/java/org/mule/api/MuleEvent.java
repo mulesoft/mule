@@ -294,5 +294,19 @@ public interface MuleEvent extends Serializable
     void captureReplyToDestination();
     
     boolean isSynchronous();
+
+    /**
+     * Indicates if notifications should be fired when processing this message.
+     *
+     * @return true if notifications are enabled, false otherwise
+     */
+    boolean isNotificationsEnabled();
+
+    /**
+     * Enables the firing of notifications when processing the message.
+     *
+     * @param enabled
+     */
+    void setEnableNotifications(boolean enabled);
     
 }

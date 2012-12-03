@@ -80,6 +80,7 @@ public class DefaultMessageProcessorChain extends AbstractMessageProcessorChain
             processor = processorIterator.next();
         }
         boolean resultWasNull = false;
+        boolean fireNotification = event.isNotificationsEnabled();
         while (processor != null)
         {
             MessageProcessor nextProcessor = null;
@@ -87,8 +88,11 @@ public class DefaultMessageProcessorChain extends AbstractMessageProcessorChain
             {
                 nextProcessor = processorIterator.next();
             }
-            fireNotification(event.getFlowConstruct(), event, processor,
-                MessageProcessorNotification.MESSAGE_PROCESSOR_PRE_INVOKE);
+            if (fireNotification)
+            {
+                fireNotification(event.getFlowConstruct(), event, processor,
+                                 MessageProcessorNotification.MESSAGE_PROCESSOR_PRE_INVOKE);
+            }
 
             if (flowConstruct instanceof Flow && nextProcessor != null
                 && processorMayReturnNull(processor))
@@ -103,9 +107,11 @@ public class DefaultMessageProcessorChain extends AbstractMessageProcessorChain
                 resultEvent = null;
             }
 
-            fireNotification(event.getFlowConstruct(), resultEvent, processor,
-                MessageProcessorNotification.MESSAGE_PROCESSOR_POST_INVOKE);
-
+            if (fireNotification)
+            {
+                fireNotification(event.getFlowConstruct(), resultEvent, processor,
+                                 MessageProcessorNotification.MESSAGE_PROCESSOR_POST_INVOKE);
+            }
 
             if (resultEvent != null)
             {

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:management="http://www.mulesoft.org/schema/mule/management"
+      xsi:schemaLocation="
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+		http://www.mulesoft.org/schema/mule/management http://www.mulesoft.org/schema/mule/management/current/mule-management.xsd">
+
+    <notifications>
+        <notification event="MESSAGE-PROCESSOR"/>
+    </notifications>
+
+    <flow name="testFlow">
+        <vm:inbound-endpoint path="testInput"/>
+        <echo-component/>
+    </flow>
+
+    <management:publish-notifications ignoreMessageProcessorNotifications="false">
+        <vm:outbound-endpoint path="testOut">
+            <payload-type-filter expectedType="org.mule.context.notification.MessageProcessorNotification"/>
+        </vm:outbound-endpoint>
+    </management:publish-notifications>
+</mule>

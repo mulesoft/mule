@@ -83,6 +83,7 @@ public class DefaultMuleEvent extends EventObject
     private Object replyToDestination;
 
     protected String[] ignoredPropertyOverrides = new String[]{MuleProperties.MULE_METHOD_PROPERTY};
+    private boolean notificationsEnabled = true;
 
     // Constructors
 
@@ -270,6 +271,7 @@ public class DefaultMuleEvent extends EventObject
         this.replyToDestination = rewriteEvent.getReplyToDestination();
         this.timeout = rewriteEvent.getTimeout();
         this.transacted = rewriteEvent.isTransacted();
+        this.notificationsEnabled = rewriteEvent.isNotificationsEnabled();
         this.synchronous = synchronous;
     }
 
@@ -806,5 +808,17 @@ public class DefaultMuleEvent extends EventObject
     public boolean isSynchronous()
     {
         return synchronous;
+    }
+
+    @Override
+    public boolean isNotificationsEnabled()
+    {
+        return notificationsEnabled;
+    }
+
+    @Override
+    public void setEnableNotifications(boolean enabled)
+    {
+        notificationsEnabled = enabled;
     }
 }

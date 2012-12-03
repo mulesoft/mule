@@ -18,6 +18,7 @@ import org.mule.api.context.notification.ConnectionNotificationListener;
 import org.mule.api.context.notification.CustomNotificationListener;
 import org.mule.api.context.notification.EndpointMessageNotificationListener;
 import org.mule.api.context.notification.ManagementNotificationListener;
+import org.mule.api.context.notification.MessageProcessorNotificationListener;
 import org.mule.api.context.notification.ModelNotificationListener;
 import org.mule.api.context.notification.MuleContextNotificationListener;
 import org.mule.api.context.notification.SecurityNotificationListener;
@@ -29,6 +30,7 @@ import org.mule.context.notification.ComponentMessageNotification;
 import org.mule.context.notification.ConnectionNotification;
 import org.mule.context.notification.EndpointMessageNotification;
 import org.mule.context.notification.ManagementNotification;
+import org.mule.context.notification.MessageProcessorNotification;
 import org.mule.context.notification.ModelNotification;
 import org.mule.context.notification.MuleContextNotification;
 import org.mule.context.notification.NotificationException;
@@ -66,6 +68,7 @@ public abstract class AbstractNotificationLoggerAgent extends AbstractAgent
     private boolean ignoreMessageNotifications = false;
     private boolean ignoreEndpointMessageNotifications = false;
     private boolean ignoreComponentMessageNotifications = false;
+    private boolean ignoreMessageProcessorNotifications = true;
 
     private Set<ServerNotificationListener> listeners = new HashSet<ServerNotificationListener>();
 
@@ -200,6 +203,16 @@ public abstract class AbstractNotificationLoggerAgent extends AbstractAgent
     public void setIgnoreEndpointMessageNotifications(boolean ignoreEndpointMessageNotifications)
     {
         this.ignoreEndpointMessageNotifications = ignoreEndpointMessageNotifications;
+    }
+
+    public boolean isIgnoreMessageProcessorNotifications()
+    {
+        return ignoreMessageProcessorNotifications;
+    }
+
+    public void setIgnoreMessageProcessorNotifications(boolean ignoreMessageProcessorNotifications)
+    {
+        this.ignoreMessageProcessorNotifications = ignoreMessageProcessorNotifications;
     }
 
     public final void initialise() throws InitialisationException
@@ -390,6 +403,26 @@ public abstract class AbstractNotificationLoggerAgent extends AbstractAgent
             listeners.add(l);
         }
 
+        if (!ignoreMessageNotifications && !ignoreMessageProcessorNotifications)
+        {
+            ServerNotificationListener<MessageProcessorNotification> l
+                    = new MessageProcessorNotificationListener<MessageProcessorNotification>()
+            {
+                public void onNotification(MessageProcessorNotification notification)
+                {
+                    logEvent(notification);
+                }
+            };
+            try
+            {
+                muleContext.registerListener(l);
+            }
+            catch (NotificationException e)
+            {
+                throw new InitialisationException(e, this);
+            }
+            listeners.add(l);
+        }
     }
 
     protected abstract void doInitialise() throws InitialisationException;

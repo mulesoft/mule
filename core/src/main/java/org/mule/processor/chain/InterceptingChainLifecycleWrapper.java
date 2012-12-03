@@ -81,13 +81,21 @@ public class InterceptingChainLifecycleWrapper extends AbstractMessageProcessorC
             return null;
         }
 
-        fireNotification(event.getFlowConstruct(), event, this,
-            MessageProcessorNotification.MESSAGE_PROCESSOR_PRE_INVOKE);
+        boolean fireNotification = event.isNotificationsEnabled();
+
+        if (fireNotification)
+        {
+            fireNotification(event.getFlowConstruct(), event, this,
+                             MessageProcessorNotification.MESSAGE_PROCESSOR_PRE_INVOKE);
+        }
 
         MuleEvent result = super.process(event);
 
-        fireNotification(event.getFlowConstruct(), result, this,
-            MessageProcessorNotification.MESSAGE_PROCESSOR_POST_INVOKE);
+        if (fireNotification)
+        {
+            fireNotification(event.getFlowConstruct(), result, this,
+                             MessageProcessorNotification.MESSAGE_PROCESSOR_POST_INVOKE);
+        }
 
         return result;
     }
