@@ -734,7 +734,8 @@ public class FileUtils extends org.apache.commons.io.FileUtils
     }
     
     /** 
-     * Try to move a file by renaming with backup attempt by copying/deleting via NIO 
+     * Try to move a file by renaming with backup attempt by copying/deleting via NIO.
+     * Creates intermidiate directories as required.
      */
     public static boolean moveFileWithCopyFallback(File sourceFile, File destinationFile)
     {
@@ -749,6 +750,10 @@ public class FileUtils extends org.apache.commons.io.FileUtils
             try
             {
                 fis = new FileInputStream(sourceFile);
+                if (!destinationFile.exists())
+                {
+                    FileUtils.createFile(destinationFile.getPath());
+                }
                 fos = new FileOutputStream(destinationFile);
                 FileChannel srcChannel = fis.getChannel();
                 FileChannel dstChannel = fos.getChannel();
