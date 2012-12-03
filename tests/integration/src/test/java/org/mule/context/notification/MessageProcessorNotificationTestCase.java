@@ -35,10 +35,4 @@ public class MessageProcessorNotificationTestCase extends FunctionalTestCase
         MuleMessage notificationResult = client.request("vm://testOut", 10 * RECEIVE_TIMEOUT);
         assertTrue(notificationResult.getPayload() instanceof MessageProcessorNotification);
     }
-
-    @Override
-    public int getTestTimeoutSecs()
-    {
-        return 120000;
-    }
 }
