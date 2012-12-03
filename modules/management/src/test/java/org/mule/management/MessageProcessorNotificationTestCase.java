@@ -8,11 +8,12 @@
  * LICENSE.txt file.
  */
 
-package org.mule.context.notification;
+package org.mule.management;
 
 import static org.junit.Assert.assertTrue;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
+import org.mule.context.notification.MessageProcessorNotification;
 import org.mule.tck.junit4.FunctionalTestCase;
 
 import org.junit.Test;
