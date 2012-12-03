@@ -31,7 +31,6 @@ import org.mule.management.stats.ProcessingTime;
 import org.mule.processor.strategy.SynchronousProcessingStrategy;
 import org.mule.security.MuleCredentials;
 import org.mule.session.DefaultMuleSession;
-import org.mule.transaction.TransactionCollection;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transport.DefaultReplyToHandler;
@@ -93,6 +92,7 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
     private Object replyToDestination;
 
     protected String[] ignoredPropertyOverrides = new String[]{MuleProperties.MULE_METHOD_PROPERTY};
+    private boolean notificationsEnabled = true;
 
     private transient Map<String, Object> serializedData = null;
 
@@ -320,6 +320,7 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
         this.replyToDestination = rewriteEvent.getReplyToDestination();
         this.timeout = rewriteEvent.getTimeout();
         this.transacted = rewriteEvent.isTransacted();
+        this.notificationsEnabled = rewriteEvent.isNotificationsEnabled();
         this.synchronous = synchronous;
     }
 
@@ -1148,5 +1149,17 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
         this(message, messageSourceURI, messageSourceName, exchangePattern, session.getFlowConstruct(),
             session, timeout, credentials, outputStream, encoding, transacted, synchronous,
             replyToDestination, replyToHandler);
+    }
+
+    @Override
+    public boolean isNotificationsEnabled()
+    {
+        return notificationsEnabled;
+    }
+
+    @Override
+    public void setEnableNotifications(boolean enabled)
+    {
+        notificationsEnabled = enabled;
     }
 }

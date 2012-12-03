@@ -11,6 +11,7 @@ package org.mule.execution;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -64,6 +65,7 @@ public class MessageProcessorNotificationExecutionInterceptorTestCase extends Ab
         final List<ServerNotification> serverNotifications = new ArrayList<ServerNotification>();
         Mockito.when(mockMessageProcessor.process(mockMuleEvent)).thenReturn(mockResultMuleEvent);
         Mockito.when(mockMuleEvent.getMuleContext().getNotificationManager()).thenReturn(mockNotificationManager);
+        Mockito.when(mockMuleEvent.isNotificationsEnabled()).thenReturn(true);
         Mockito.when(mockNextInterceptor.execute(mockMessageProcessor, mockMuleEvent)).thenReturn(mockResultMuleEvent);
         Mockito.when(mockNotificationManager.isNotificationEnabled(MessageProcessorNotification.class)).thenReturn(true);
         Mockito.doAnswer(new Answer<Object>()
@@ -87,6 +89,30 @@ public class MessageProcessorNotificationExecutionInterceptorTestCase extends Ab
         assertThat(afterMessageProcessorNotification.getProcessor(), is(mockMessageProcessor));
         assertThat(afterMessageProcessorNotification.getExceptionThrown(), IsNull.nullValue());
     }
+
+    @Test
+    public void ignoresSuccessfulNotificationIfDisabled() throws MuleException
+    {
+        final List<ServerNotification> serverNotifications = new ArrayList<ServerNotification>();
+        Mockito.when(mockMessageProcessor.process(mockMuleEvent)).thenReturn(mockResultMuleEvent);
+        Mockito.when(mockMuleEvent.getMuleContext().getNotificationManager()).thenReturn(mockNotificationManager);
+        Mockito.when(mockNextInterceptor.execute(mockMessageProcessor, mockMuleEvent)).thenReturn(mockResultMuleEvent);
+        Mockito.when(mockNotificationManager.isNotificationEnabled(MessageProcessorNotification.class)).thenReturn(true);
+        Mockito.doAnswer(new Answer<Object>()
+        {
+            @Override
+            public Object answer(InvocationOnMock invocationOnMock) throws Throwable
+            {
+                serverNotifications.add((ServerNotification) invocationOnMock.getArguments()[0]);
+                return null;
+            }
+        }).when(mockNotificationManager).fireNotification(Mockito.any(ServerNotification.class));
+
+        MuleEvent result = messageProcessorNotificationExecutionInterceptor.execute(mockMessageProcessor, mockMuleEvent);
+
+        assertThat(result, is(mockResultMuleEvent));
+        assertThat(serverNotifications.size(),Is.is(0));
+    }
     
     @Test
     public void testExecutionFailure() throws MuleException
@@ -94,6 +120,7 @@ public class MessageProcessorNotificationExecutionInterceptorTestCase extends Ab
         final List<ServerNotification> serverNotifications = new ArrayList<ServerNotification>();
         Mockito.when(mockNextInterceptor.execute(mockMessageProcessor, mockMuleEvent)).thenThrow(mockMessagingException);
         Mockito.when(mockMuleEvent.getMuleContext().getNotificationManager()).thenReturn(mockNotificationManager);
+        Mockito.when(mockMuleEvent.isNotificationsEnabled()).thenReturn(true);
         Mockito.when(mockNotificationManager.isNotificationEnabled(MessageProcessorNotification.class)).thenReturn(true);
         Mockito.doAnswer(new Answer<Object>()
                 {
@@ -104,11 +131,10 @@ public class MessageProcessorNotificationExecutionInterceptorTestCase extends Ab
                         return null;
                     }
                 }).when(mockNotificationManager).fireNotification(Mockito.any(ServerNotification.class));
-        MuleEvent result = null;
         try
         {
-            result = messageProcessorNotificationExecutionInterceptor.execute(mockMessageProcessor, mockMuleEvent);
-            org.junit.Assert.fail("Exception should be thrown");
+            messageProcessorNotificationExecutionInterceptor.execute(mockMessageProcessor, mockMuleEvent);
+            fail("Exception should be thrown");
         }
         catch (MessagingException e)
         {
@@ -122,5 +148,34 @@ public class MessageProcessorNotificationExecutionInterceptorTestCase extends Ab
         assertThat(afterMessageProcessorNotification.getAction(), is(MessageProcessorNotification.MESSAGE_PROCESSOR_POST_INVOKE));
         assertThat(afterMessageProcessorNotification.getProcessor(), is(mockMessageProcessor));
         assertThat(afterMessageProcessorNotification.getExceptionThrown(), Is.is(mockMessagingException));
+    }
+
+    @Test
+    public void ignoresFailureNotificationIfDisabled() throws MuleException
+    {
+        final List<ServerNotification> serverNotifications = new ArrayList<ServerNotification>();
+        Mockito.when(mockNextInterceptor.execute(mockMessageProcessor, mockMuleEvent)).thenThrow(mockMessagingException);
+        Mockito.when(mockMuleEvent.getMuleContext().getNotificationManager()).thenReturn(mockNotificationManager);
+        Mockito.when(mockNotificationManager.isNotificationEnabled(MessageProcessorNotification.class)).thenReturn(true);
+        Mockito.doAnswer(new Answer<Object>()
+        {
+            @Override
+            public Object answer(InvocationOnMock invocationOnMock) throws Throwable
+            {
+                serverNotifications.add((ServerNotification) invocationOnMock.getArguments()[0]);
+                return null;
+            }
+        }).when(mockNotificationManager).fireNotification(Mockito.any(ServerNotification.class));
+
+        try
+        {
+            messageProcessorNotificationExecutionInterceptor.execute(mockMessageProcessor, mockMuleEvent);
+            fail("Exception should be thrown");
+        }
+        catch (MessagingException e)
+        {
+        }
+
+        assertThat(serverNotifications.size(),Is.is(0));
     }
 }

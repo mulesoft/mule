@@ -2614,19 +2614,28 @@ public abstract class AbstractConnector implements Connector, WorkListener
             try
             {
                 dispatcher = getDispatcher(endpoint);
-                if (notificationMessageProcessor == null)
+                boolean fireNotification = event.isNotificationsEnabled();
+                EndpointMessageNotification beginNotification = null;
+                if (fireNotification)
                 {
-                    notificationMessageProcessor = new OutboundNotificationMessageProcessor(endpoint);
+                    if (notificationMessageProcessor == null)
+                    {
+                        notificationMessageProcessor = new OutboundNotificationMessageProcessor(endpoint);
+                    }
+                    beginNotification = notificationMessageProcessor.createBeginNotification(event);
                 }
-                EndpointMessageNotification beginNotification = notificationMessageProcessor.createBeginNotification(event);
                 MuleEvent result = dispatcher.process(event);
-                // We need to invoke notification message processor with request
-                // message only after successful send/dispatch
-                notificationMessageProcessor.dispatchNotification(beginNotification);
-                notificationMessageProcessor.process((result != null && !VoidMuleEvent.getInstance().equals(
-                    result)) ? result                                                                                                  : event);
-                return result;
 
+                if (fireNotification)
+                {
+                    // We need to invoke notification message processor with request
+                    // message only after successful send/dispatch
+                    notificationMessageProcessor.dispatchNotification(beginNotification);
+                    notificationMessageProcessor.process((result != null && !VoidMuleEvent.getInstance().equals(
+                            result)) ? result : event);
+                }
+
+                return result;
             }
             catch (DispatchException dex)
             {
