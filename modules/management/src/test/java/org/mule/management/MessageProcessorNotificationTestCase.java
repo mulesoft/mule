@@ -8,11 +8,12 @@
  * LICENSE.txt file.
  */
 
-package org.mule.context.notification;
+package org.mule.management;
 
 import static org.junit.Assert.assertTrue;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
+import org.mule.context.notification.MessageProcessorNotification;
 import org.mule.tck.junit4.FunctionalTestCase;
 
 import org.junit.Test;
@@ -32,7 +33,7 @@ public class MessageProcessorNotificationTestCase extends FunctionalTestCase
         MuleClient client = muleContext.getClient();
         client.send("vm://testInput", TEST_MESSAGE, null);
 
-        MuleMessage notificationResult = client.request("vm://testOut", 10 * RECEIVE_TIMEOUT);
+        MuleMessage notificationResult = client.request("vm://testOut", RECEIVE_TIMEOUT);
         assertTrue(notificationResult.getPayload() instanceof MessageProcessorNotification);
     }
 }
