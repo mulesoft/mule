@@ -13,6 +13,7 @@ package org.mule.transport.email;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
+import org.mule.api.transport.PropertyScope;
 import org.mule.transport.AbstractMuleMessageFactory;
 import org.mule.util.StringUtils;
 
@@ -66,17 +67,23 @@ public class MailMuleMessageFactory extends AbstractMuleMessageFactory
 
         Message mailMessage = (Message) transportMessage;
 
-        addRecipientProperty(muleMessage, mailMessage, RecipientType.TO, MailProperties.INBOUND_TO_ADDRESSES_PROPERTY);
-        addRecipientProperty(muleMessage, mailMessage, RecipientType.CC, MailProperties.INBOUND_CC_ADDRESSES_PROPERTY);
-        addRecipientProperty(muleMessage, mailMessage, RecipientType.BCC, MailProperties.INBOUND_BCC_ADDRESSES_PROPERTY);
+        addRecipientProperty(muleMessage, mailMessage, RecipientType.TO, MailProperties.TO_ADDRESSES_PROPERTY);
+        addRecipientProperty(muleMessage, mailMessage, RecipientType.CC, MailProperties.CC_ADDRESSES_PROPERTY);
+        addRecipientProperty(muleMessage, mailMessage, RecipientType.BCC, MailProperties.BCC_ADDRESSES_PROPERTY);
 
         addReplyToProperty(muleMessage, mailMessage);
         addFromProperty(muleMessage, mailMessage);
 
+        muleMessage.setInboundProperty(MailProperties.SUBJECT_PROPERTY,
+            StringUtils.defaultIfEmpty(mailMessage.getSubject(), "(no subject)"));
+        muleMessage.setInboundProperty(MailProperties.CONTENT_TYPE_PROPERTY,
+            StringUtils.defaultIfEmpty(mailMessage.getContentType(), "text/plain"));
+
+        // TODO Remove in Mule 3.4
         muleMessage.setOutboundProperty(MailProperties.INBOUND_SUBJECT_PROPERTY,
-                                        StringUtils.defaultIfEmpty(mailMessage.getSubject(), "(no subject)"));
+            StringUtils.defaultIfEmpty(mailMessage.getSubject(), "(no subject)"));
         muleMessage.setOutboundProperty(MailProperties.INBOUND_CONTENT_TYPE_PROPERTY,
-                                        StringUtils.defaultIfEmpty(mailMessage.getContentType(), "text/plain"));
+            StringUtils.defaultIfEmpty(mailMessage.getContentType(), "text/plain"));
 
         addSentDateProperty(muleMessage, mailMessage);
         addMailHeadersToMessageProperties(mailMessage, muleMessage);
@@ -94,7 +101,9 @@ public class MailMuleMessageFactory extends AbstractMuleMessageFactory
         try
         {
             Address[] recipients = mailMessage.getRecipients(recipientType);
-            muleMessage.setOutboundProperty(property, MailUtils.mailAddressesToString(recipients));
+            muleMessage.setProperty(property, MailUtils.mailAddressesToString(recipients), PropertyScope.INBOUND);
+            // TODO Remove in Mule 3.4
+            muleMessage.setOutboundProperty(MailProperties.INBOUND_PREFIX + property, MailUtils.mailAddressesToString(recipients));
         }
         catch (MessagingException e)
         {
@@ -102,7 +111,9 @@ public class MailMuleMessageFactory extends AbstractMuleMessageFactory
             {
                 String[] header = mimeMessage.getHeader(recipientType.toString());
                 String recipients = StringUtils.join(header, ", ");
-                muleMessage.setOutboundProperty(property, recipients);
+                muleMessage.setProperty(property, recipients, PropertyScope.INBOUND);
+                // TODO Remove in Mule 3.4
+                muleMessage.setOutboundProperty(MailProperties.INBOUND_PREFIX + property, recipients);
             }
         }
     }
@@ -111,8 +122,11 @@ public class MailMuleMessageFactory extends AbstractMuleMessageFactory
     {
         try
         {
+            muleMessage.setInboundProperty(MailProperties.REPLY_TO_ADDRESSES_PROPERTY,
+                MailUtils.mailAddressesToString(mailMessage.getReplyTo()));
+            // TODO Remove in Mule 3.4
             muleMessage.setOutboundProperty(MailProperties.INBOUND_REPLY_TO_ADDRESSES_PROPERTY,
-                                            MailUtils.mailAddressesToString(mailMessage.getReplyTo()));
+                MailUtils.mailAddressesToString(mailMessage.getReplyTo()));
         }
         catch (MessagingException me)
         {
@@ -124,8 +138,11 @@ public class MailMuleMessageFactory extends AbstractMuleMessageFactory
     {
         try
         {
+            muleMessage.setInboundProperty(MailProperties.FROM_ADDRESS_PROPERTY,
+                MailUtils.mailAddressesToString(mailMessage.getFrom()));
+            // TODO Remove in Mule 3.4
             muleMessage.setOutboundProperty(MailProperties.INBOUND_FROM_ADDRESS_PROPERTY,
-                                            MailUtils.mailAddressesToString(mailMessage.getFrom()));
+                MailUtils.mailAddressesToString(mailMessage.getFrom()));
         }
         catch (javax.mail.MessagingException me)
         {
@@ -141,6 +158,8 @@ public class MailMuleMessageFactory extends AbstractMuleMessageFactory
         {
             sentDate = new Date();
         }
+        muleMessage.setInboundProperty(MailProperties.SENT_DATE_PROPERTY, sentDate);
+        // TODO Remove in Mule 3.4
         muleMessage.setOutboundProperty(MailProperties.SENT_DATE_PROPERTY, sentDate);
     }
 
@@ -210,8 +229,11 @@ public class MailMuleMessageFactory extends AbstractMuleMessageFactory
 
         if (headers.size() > 0)
         {
+            muleMessage.setProperty(name + AbstractMailConnector.ATTACHMENT_HEADERS_PROPERTY_POSTFIX,
+                headers, PropertyScope.INBOUND);
+            // TODO Remove in Mule 3.4
             muleMessage.setOutboundProperty(name + AbstractMailConnector.ATTACHMENT_HEADERS_PROPERTY_POSTFIX,
-                                            headers);
+                headers);
         }
     }
 }
