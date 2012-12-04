@@ -10,9 +10,9 @@
 
 package org.mule.test.config;
 
-import java.io.File;
-import java.io.Serializable;
-import java.util.List;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.processor.MessageProcessor;
@@ -20,15 +20,17 @@ import org.mule.api.store.ObjectStore;
 import org.mule.construct.Flow;
 import org.mule.routing.IdempotentMessageFilter;
 import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.transformer.simple.StringAppendTransformer;
 import org.mule.util.SystemUtils;
 import org.mule.util.store.InMemoryObjectStore;
 import org.mule.util.store.SimpleMemoryObjectStore;
 import org.mule.util.store.TextFileObjectStore;
 
-import org.junit.Test;
+import java.io.File;
+import java.io.Serializable;
+import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import org.junit.Test;
 
 /**
  * Tests for all object stores that can be configured on an {@link IdempotentMessageFilter}.
@@ -86,6 +88,15 @@ public class IdempotentMessageFilterNamespaceHandlerTestCase extends FunctionalT
     {
         testPojoObjectStore("customObjectStore");
     }
+    
+    @Test
+    public void testOnUnaccepted() throws Exception
+    {
+        final IdempotentMessageFilter filter = idempotentMessageFilterFromFlow("idempotentFilterWithOnUnacceptedMP");
+        assertNotNull(filter.getUnacceptedMessageProcessor());
+        assertEquals(StringAppendTransformer.class, filter.getUnacceptedMessageProcessor().getClass());
+    }
+
 
     public void testBeanObjectStore() throws Exception
     {

@@ -14,6 +14,7 @@ import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
 import org.mule.config.spring.parsers.PostProcessor;
 import org.mule.config.spring.parsers.assembly.BeanAssembler;
 import org.mule.routing.MessageFilter;
+
 import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 
@@ -29,6 +30,15 @@ public class MessageFilterDefinitionParser extends MessageProcessorDefinitionPar
         registerPostProcessor(this);
     }
 
+    public MessageFilterDefinitionParser(Class<?> filterClass)
+    {
+        super(filterClass);
+        addIgnored(AbstractMuleBeanDefinitionParser.ATTRIBUTE_NAME);
+        addIgnored(ATTRIBUTE_UNACCEPTED);
+        registerPostProcessor(this);
+    }
+
+    
     public void postProcess(ParserContext context, BeanAssembler assembler, Element element)
     {
         String onUnaccepted = element.getAttribute(ATTRIBUTE_UNACCEPTED);
