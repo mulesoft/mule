@@ -18,6 +18,7 @@ import org.mule.api.config.ThreadingProfile;
 import org.mule.api.construct.Pipeline;
 import org.mule.api.context.WorkManager;
 import org.mule.api.context.WorkManagerSource;
+import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.execution.ExecutionCallback;
 import org.mule.api.execution.ExecutionTemplate;
 import org.mule.api.lifecycle.Startable;
@@ -171,8 +172,10 @@ public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessa
         @Override
         protected void doRun()
         {
+            MessagingExceptionHandler exceptionHandler = event.getFlowConstruct() != null ? event.getFlowConstruct().getExceptionListener() : null;
             ExecutionTemplate<MuleEvent> executionTemplate = TransactionalErrorHandlingExecutionTemplate.createMainExecutionTemplate(
-                muleContext, new MuleTransactionConfig(), event.getFlowConstruct().getExceptionListener());
+                    muleContext, new MuleTransactionConfig(), exceptionHandler);
+
             try
             {
                 executionTemplate.execute(new ExecutionCallback<MuleEvent>()

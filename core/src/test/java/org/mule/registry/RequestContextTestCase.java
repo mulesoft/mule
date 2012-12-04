@@ -379,6 +379,17 @@ public class RequestContextTestCase extends AbstractMuleTestCase
         public void clearSessionVariables()
         {
         }
+
+        @Override
+        public boolean isNotificationsEnabled()
+        {
+            return true;
+        }
+
+        @Override
+        public void setEnableNotifications(boolean enabled)
+        {
+        }
     }
 
 }

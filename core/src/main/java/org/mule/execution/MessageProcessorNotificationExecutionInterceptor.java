@@ -33,14 +33,18 @@ class MessageProcessorNotificationExecutionInterceptor implements MessageProcess
     public MuleEvent execute(MessageProcessor messageProcessor, MuleEvent event) throws MessagingException
     {
         ServerNotificationManager notificationManager = event.getMuleContext().getNotificationManager();
-        fireNotification(notificationManager,event.getFlowConstruct(), event, messageProcessor,
-                                null, MessageProcessorNotification.MESSAGE_PROCESSOR_PRE_INVOKE);
+        boolean fireNotification = event.isNotificationsEnabled();
+        if (fireNotification)
+        {
+            fireNotification(notificationManager, event.getFlowConstruct(), event, messageProcessor,
+                             null, MessageProcessorNotification.MESSAGE_PROCESSOR_PRE_INVOKE);
+        }
 
         MuleEvent result = null;
         MessagingException exceptionThrown = null;
         try
         {
-            result = next.execute(messageProcessor,event);
+            result = next.execute(messageProcessor, event);
         }
         catch (MessagingException e)
         {
@@ -49,8 +53,11 @@ class MessageProcessorNotificationExecutionInterceptor implements MessageProcess
         }
         finally
         {
-            fireNotification(notificationManager, event.getFlowConstruct(), result != null ? result : event, messageProcessor,
-                                exceptionThrown, MessageProcessorNotification.MESSAGE_PROCESSOR_POST_INVOKE);
+            if (fireNotification)
+            {
+                fireNotification(notificationManager, event.getFlowConstruct(), result != null ? result : event, messageProcessor,
+                                 exceptionThrown, MessageProcessorNotification.MESSAGE_PROCESSOR_POST_INVOKE);
+            }
         }
         return result;
     }
