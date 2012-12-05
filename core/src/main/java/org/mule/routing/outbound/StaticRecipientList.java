@@ -31,9 +31,10 @@ public class StaticRecipientList extends AbstractRecipientList
     public static final String RECIPIENTS_PROPERTY = "recipients";
     public static final String RECIPIENT_DELIMITER = ",";
 
-    private volatile List recipients = Collections.EMPTY_LIST;
+    private volatile List<Object> recipients = Collections.emptyList();
 
-    protected List getRecipients(MuleEvent event)
+    @Override
+    protected List<Object> getRecipients(MuleEvent event)
     {
         Object msgRecipients = event.getMessage().removeProperty(RECIPIENTS_PROPERTY);
 
@@ -43,45 +44,45 @@ public class StaticRecipientList extends AbstractRecipientList
         }
         else if (msgRecipients instanceof String)
         {
-            return Arrays.asList(StringUtils.splitAndTrim(msgRecipients.toString(), this.getListDelimiter()));
+            Object[] split = StringUtils.splitAndTrim(msgRecipients.toString(), getListDelimiter());
+            return Arrays.<Object>asList(split);
         }
         else if (msgRecipients instanceof List)
         {
-            return new ArrayList((List) msgRecipients);
+            return new ArrayList<Object>((List<?>) msgRecipients);
         }
         else
         {
             logger.warn("Recipients on message are neither String nor List but: " + msgRecipients.getClass());
-            return Collections.EMPTY_LIST;
+            return Collections.emptyList();
         }
     }
 
-    public List getRecipients()
+    public List<Object> getRecipients()
     {
         return recipients;
     }
 
-    public void setRecipients(List recipients)
+    public void setRecipients(List<?> recipients)
     {
         if (recipients != null)
         {
-            this.recipients = new ArrayList(recipients);
+            this.recipients = new ArrayList<Object>(recipients);
         }
         else
         {
-            this.recipients = Collections.EMPTY_LIST;
+            this.recipients = Collections.emptyList();
         }
     }
 
     /**
      * Overloading classes can change the delimiter used to separate entries in the
      * recipient list. By default a ',' is used.
-     * 
+     *
      * @return The list delimiter to use
      */
     protected String getListDelimiter()
     {
         return RECIPIENT_DELIMITER;
     }
-
 }
