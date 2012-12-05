@@ -69,6 +69,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
         {
             logger.warn("The returnOriginalMessageAsReply property will be ignored because disableTemporaryReplyToDestinations=false.  You need to disable temporary ReplyTo destinations in order for this propery to take effect.");
         }
+        logger.warn("Starting patched JmsMessageReceiver");
     }
 
     @Override
@@ -121,9 +122,9 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
         boolean sessionManaged = true;
         try
         {
-            session = connector.getTransactionalResource(endpoint);
-            if (muleTx != null && muleTx.hasResource(session))
+            if (muleTx != null && muleTx.hasResource(connector.getConnection()))
             {
+                session = connector.getTransactionalResource(endpoint);
                 transacted = true;
             }
             // Should we be caching sessions? Note this is not part of the JMS spec.
@@ -138,7 +139,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
                 }
                 else
                 {
-                    //session = connector.getSession(endpoint);
+                    session = connector.getTransactionalResource(endpoint);
                     cachedSession = session;
                 }
             }
@@ -147,7 +148,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
                 // by now we're running with a different connector and connection
                 sessionManaged = muleTx != null && muleTx.isXA();
 
-                //session = connector.getSession(endpoint);
+                session = connector.getTransactionalResource(endpoint);
                 if (endpoint.getTransactionConfig().isTransacted())
                 {
                     transacted = true;
