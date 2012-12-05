@@ -10,13 +10,14 @@
 
 package org.mule.routing.outbound;
 
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import org.mule.api.MuleEvent;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.OutboundEndpoint;
-import org.mule.tck.MuleTestUtils;
 
 import com.mockobjects.dynamic.AnyConstraintMatcher;
-import com.mockobjects.dynamic.Mock;
 
 public class RouterTestUtils
 {
@@ -25,20 +26,18 @@ public class RouterTestUtils
         super();
     }
 
-    /** @return a mock endpoint */
-    public static Mock getMockEndpoint(OutboundEndpoint toMock)
+    public static OutboundEndpoint createMockEndpoint(OutboundEndpoint toMock)
     {
-        Mock mockEndpoint = MuleTestUtils.getMockOutboundEndpoint();
-        mockEndpoint.matchAndReturn("getEndpointURI", toMock.getEndpointURI());
-        mockEndpoint.matchAndReturn("getAddress", toMock.getEndpointURI().getUri().toString());
-        mockEndpoint.matchAndReturn("toString", toMock.toString());
-        mockEndpoint.matchAndReturn("getExchangePattern", toMock.getExchangePattern());
-        mockEndpoint.matchAndReturn("getProperties", toMock.getProperties());
-        mockEndpoint.matchAndReturn("getFilter", toMock.getFilter());
-        mockEndpoint.matchAndReturn("getName", toMock.getName());
-        mockEndpoint.matchAndReturn("getResponseTransformers", toMock.getResponseTransformers());
-        mockEndpoint.matchAndReturn("hashCode", System.identityHashCode(mockEndpoint));
-        return mockEndpoint;
+        OutboundEndpoint endpoint = mock(OutboundEndpoint.class);
+        when(endpoint.getEndpointURI()).thenReturn(toMock.getEndpointURI());
+        when(endpoint.getAddress()).thenReturn(toMock.getAddress());
+        when(endpoint.toString()).thenReturn(toMock.toString());
+        when(endpoint.getExchangePattern()).thenReturn(toMock.getExchangePattern());
+        when(endpoint.getProperties()).thenReturn(toMock.getProperties());
+        when(endpoint.getFilter()).thenReturn(toMock.getFilter());
+        when(endpoint.getName()).thenReturn(toMock.getName());
+        when(endpoint.getResponseTransformers()).thenReturn(toMock.getResponseTransformers());
+        return endpoint;
     }
 
     /** @return an object that verifies that the argument list was a single MuleEvent */

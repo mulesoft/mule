@@ -12,7 +12,9 @@ package org.mule.routing.outbound;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
@@ -25,9 +27,8 @@ import org.mule.api.routing.RoutingException;
 import org.mule.routing.AbstractCatchAllStrategy;
 import org.mule.routing.LoggingCatchAllStrategy;
 import org.mule.routing.filters.PayloadTypeFilter;
+import org.mule.tck.MuleEventCheckAnswer;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
-
-import com.mockobjects.dynamic.Mock;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,18 +52,17 @@ public class OutboundMessageRouterTestCase extends AbstractMuleContextTestCase
         OutboundEndpoint endpoint1 = getTestOutboundEndpoint("Test1Provider",
             "test://Test1Provider?exchangePattern=one-way");
         assertNotNull(endpoint1);
+        OutboundEndpoint mockendpoint1 = RouterTestUtils.createMockEndpoint(endpoint1);
 
         OutboundEndpoint endpoint2 = getTestOutboundEndpoint("Test2Provider");
         assertNotNull(endpoint2);
-
-        Mock mockendpoint1 = RouterTestUtils.getMockEndpoint(endpoint1);
-        Mock mockendpoint2 = RouterTestUtils.getMockEndpoint(endpoint2);
+        OutboundEndpoint mockendpoint2 = RouterTestUtils.createMockEndpoint(endpoint2);
 
         FilteringOutboundRouter router1 = new FilteringOutboundRouter();
         PayloadTypeFilter filter = new PayloadTypeFilter(String.class);
         router1.setFilter(filter);
         List<MessageProcessor> endpoints = new ArrayList<MessageProcessor>();
-        endpoints.add((OutboundEndpoint) mockendpoint1.proxy());
+        endpoints.add(mockendpoint1);
         router1.setRoutes(endpoints);
 
         FilteringOutboundRouter router2 = new FilteringOutboundRouter();
@@ -70,7 +70,7 @@ public class OutboundMessageRouterTestCase extends AbstractMuleContextTestCase
         filter2.setExpectedType(Exception.class);
         router2.setFilter(filter2);
         endpoints = new ArrayList<MessageProcessor>();
-        endpoints.add((OutboundEndpoint) mockendpoint2.proxy());
+        endpoints.add(mockendpoint2);
         router2.setRoutes(endpoints);
 
         messageRouter.addRoute(router1);
@@ -86,33 +86,26 @@ public class OutboundMessageRouterTestCase extends AbstractMuleContextTestCase
         MuleSession session = mock(MuleSession.class);
         MuleEvent event = getTestEvent("test event", session);
 
-        mockendpoint1.expect("process",RouterTestUtils.getArgListCheckerMuleEvent());
+        when(mockendpoint1.process(any(MuleEvent.class))).thenAnswer(new MuleEventCheckAnswer());
         messageRouter.process(event);
-        mockendpoint1.verify();
 
         event = getTestEvent(new IllegalArgumentException(), session);
 
-        mockendpoint2.expect("process", RouterTestUtils.getArgListCheckerMuleEvent());
+        when(mockendpoint2.process(any(MuleEvent.class))).thenAnswer(new MuleEventCheckAnswer());
         messageRouter.process(event);
-        mockendpoint2.verify();
 
         FilteringOutboundRouter router3 = new FilteringOutboundRouter();
         router3.setFilter(new PayloadTypeFilter(Object.class));
         endpoints = new ArrayList<MessageProcessor>();
-        endpoints.add((OutboundEndpoint) mockendpoint2.proxy());
+        endpoints.add(mockendpoint2);
         router3.setRoutes(endpoints);
         messageRouter.addRoute(router3);
 
         // now the message should be routed twice to different targets
         event = getTestEvent("testing multiple routing", session);
 
-        mockendpoint1.expect("process", RouterTestUtils.getArgListCheckerMuleEvent());
-        mockendpoint2.expect("process", RouterTestUtils.getArgListCheckerMuleEvent());
-
         messageRouter.setMatchAll(true);
         messageRouter.process(event);
-        mockendpoint1.verify();
-        mockendpoint2.verify();
     }
 
     @Test
@@ -162,8 +155,6 @@ public class OutboundMessageRouterTestCase extends AbstractMuleContextTestCase
         };
 
         messageRouter.setCatchAllStrategy(strategy);
-
-        MuleSession session = getTestSession(getTestService(), muleContext);
 
         MuleEvent event = getTestEvent("hello");
         messageRouter.process(event);

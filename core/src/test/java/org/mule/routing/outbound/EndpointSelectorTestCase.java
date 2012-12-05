@@ -12,17 +12,19 @@ package org.mule.routing.outbound;
 
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import org.mule.DefaultMuleMessage;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.RoutingException;
+import org.mule.tck.MuleEventCheckAnswer;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
-
-import com.mockobjects.dynamic.Mock;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -38,9 +40,9 @@ public class EndpointSelectorTestCase extends AbstractMuleContextTestCase
     private OutboundEndpoint dest2;
     private OutboundEndpoint dest3;
     private EndpointSelector router;
-    private Mock mockendpoint1;
-    private Mock mockendpoint2;
-    private Mock mockendpoint3;
+    private OutboundEndpoint mockEndpoint1;
+    private OutboundEndpoint mockEndpoint2;
+    private OutboundEndpoint mockEndpoint3;
 
     public EndpointSelectorTestCase()
     {
@@ -56,14 +58,14 @@ public class EndpointSelectorTestCase extends AbstractMuleContextTestCase
         dest2 = getTestOutboundEndpoint("dest2");
         dest3 = getTestOutboundEndpoint("dest3");
 
-        mockendpoint1 = RouterTestUtils.getMockEndpoint(dest1);
-        mockendpoint2 = RouterTestUtils.getMockEndpoint(dest2);
-        mockendpoint3 = RouterTestUtils.getMockEndpoint(dest3);
+        mockEndpoint1 = RouterTestUtils.createMockEndpoint(dest1);
+        mockEndpoint2 = RouterTestUtils.createMockEndpoint(dest2);
+        mockEndpoint3 = RouterTestUtils.createMockEndpoint(dest3);
 
         List<MessageProcessor> endpoints = new ArrayList<MessageProcessor>();
-        endpoints.add((OutboundEndpoint) mockendpoint1.proxy());
-        endpoints.add((OutboundEndpoint) mockendpoint2.proxy());
-        endpoints.add((OutboundEndpoint) mockendpoint3.proxy());
+        endpoints.add(mockEndpoint1);
+        endpoints.add(mockEndpoint2);
+        endpoints.add(mockEndpoint3);
 
         router = new EndpointSelector();
         router.setRoutes(endpoints);
@@ -81,9 +83,9 @@ public class EndpointSelectorTestCase extends AbstractMuleContextTestCase
         MuleMessage message = new DefaultMuleMessage("test event", props, muleContext);
 
         assertTrue(router.isMatch(message));
-        mockendpoint3.expect("process", RouterTestUtils.getArgListCheckerMuleEvent());
+
+        when(mockEndpoint3.process(any(MuleEvent.class))).thenAnswer(new MuleEventCheckAnswer());
         router.route(new OutboundRoutingTestEvent(message, session, muleContext));
-        mockendpoint3.verify();
     }
 
     @Test
@@ -98,11 +100,10 @@ public class EndpointSelectorTestCase extends AbstractMuleContextTestCase
         props.put("wayOut", "dest2");
         props.put("banana", "yellow");
         MuleMessage message = new DefaultMuleMessage("test event", props, muleContext);
-
         assertTrue(router.isMatch(message));
-        mockendpoint2.expect("process", RouterTestUtils.getArgListCheckerMuleEvent());
+
+        when(mockEndpoint2.process(any(MuleEvent.class))).thenAnswer(new MuleEventCheckAnswer());
         router.route(new OutboundRoutingTestEvent(message, session, muleContext));
-        mockendpoint2.verify();
     }
 
     @Test
@@ -130,11 +131,10 @@ public class EndpointSelectorTestCase extends AbstractMuleContextTestCase
     {
         MuleMessage message = new DefaultMuleMessage("test event", muleContext);
         router.setDefaultEndpointName("dest3");
-
         assertTrue(router.isMatch(message));
-        mockendpoint3.expect("process", RouterTestUtils.getArgListCheckerMuleEvent());
+
+        when(mockEndpoint3.process(any(MuleEvent.class))).thenAnswer(new MuleEventCheckAnswer());
         router.route(new OutboundRoutingTestEvent(message, session, muleContext));
-        mockendpoint3.verify();
     }
 
     @Test

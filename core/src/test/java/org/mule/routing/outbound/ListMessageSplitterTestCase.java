@@ -13,7 +13,9 @@ package org.mule.routing.outbound;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
@@ -23,11 +25,10 @@ import org.mule.api.MuleSession;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.service.Service;
 import org.mule.routing.filters.PayloadTypeFilter;
+import org.mule.tck.MuleEventCheckAnswer;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Orange;
-
-import com.mockobjects.dynamic.Mock;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -74,39 +75,43 @@ public class ListMessageSplitterTestCase extends AbstractMuleContextTestCase
     public void testMessageSplitterRouter() throws Exception
     {
         OutboundEndpoint endpoint1 = getTestOutboundEndpoint("Test1endpoint", "test://endpointUri.1", null, new PayloadTypeFilter(Apple.class), null);
+        OutboundEndpoint mockendpoint1 = RouterTestUtils.createMockEndpoint(endpoint1);
+
         OutboundEndpoint endpoint2 = getTestOutboundEndpoint("Test2Endpoint", "test://endpointUri.2", null, new PayloadTypeFilter(Orange.class), null);
+        OutboundEndpoint mockendpoint2 = RouterTestUtils.createMockEndpoint(endpoint2);
+
         OutboundEndpoint endpoint3 = getTestOutboundEndpoint("Test3Endpoint", "test://endpointUri.3");
-        Mock mockendpoint1 = RouterTestUtils.getMockEndpoint(endpoint1);
-        Mock mockendpoint2 = RouterTestUtils.getMockEndpoint(endpoint2);
-        Mock mockendpoint3 = RouterTestUtils.getMockEndpoint(endpoint3);
+        OutboundEndpoint mockendpoint3 = RouterTestUtils.createMockEndpoint(endpoint3);
 
         OutboundEndpoint endpoint4 = getTestOutboundEndpoint("Test4endpoint",
             "test://endpointUri.4?exchangePattern=request-response", null,
             new PayloadTypeFilter(Apple.class), null);
+        OutboundEndpoint mockendpoint4 = RouterTestUtils.createMockEndpoint(endpoint4);
+
         OutboundEndpoint endpoint5 = getTestOutboundEndpoint("Test5Endpoint",
             "test://endpointUri.5?exchangePattern=request-response", null,
             new PayloadTypeFilter(Orange.class), null);
+        OutboundEndpoint mockendpoint5 = RouterTestUtils.createMockEndpoint(endpoint5);
+
         OutboundEndpoint endpoint6 = getTestOutboundEndpoint("Test6Endpoint",
             "test://endpointUri.6?exchangePattern=request-response");
-        Mock mockendpoint4 = RouterTestUtils.getMockEndpoint(endpoint4);
-        Mock mockendpoint5 = RouterTestUtils.getMockEndpoint(endpoint5);
-        Mock mockendpoint6 = RouterTestUtils.getMockEndpoint(endpoint6);
+        OutboundEndpoint mockendpoint6 = RouterTestUtils.createMockEndpoint(endpoint6);
 
         ListMessageSplitter asyncSplitter = new ListMessageSplitter();
         asyncSplitter.setMuleContext(muleContext);
         asyncSplitter.setDisableRoundRobin(true);
         asyncSplitter.setFilter(new PayloadTypeFilter(List.class));
-        asyncSplitter.addRoute((OutboundEndpoint) mockendpoint1.proxy());
-        asyncSplitter.addRoute((OutboundEndpoint) mockendpoint2.proxy());
-        asyncSplitter.addRoute((OutboundEndpoint) mockendpoint3.proxy());
+        asyncSplitter.addRoute(mockendpoint1);
+        asyncSplitter.addRoute(mockendpoint2);
+        asyncSplitter.addRoute(mockendpoint3);
 
         ListMessageSplitter syncSplitter = new ListMessageSplitter();
         syncSplitter.setMuleContext(muleContext);
         syncSplitter.setDisableRoundRobin(true);
         syncSplitter.setFilter(new PayloadTypeFilter(List.class));
-        syncSplitter.addRoute((OutboundEndpoint) mockendpoint4.proxy());
-        syncSplitter.addRoute((OutboundEndpoint) mockendpoint5.proxy());
-        syncSplitter.addRoute((OutboundEndpoint) mockendpoint6.proxy());
+        syncSplitter.addRoute(mockendpoint4);
+        syncSplitter.addRoute(mockendpoint5);
+        syncSplitter.addRoute(mockendpoint6);
         List<Object> payload = new ArrayList<Object>();
         payload.add(new Apple());
         payload.add(new Apple());
@@ -115,10 +120,9 @@ public class ListMessageSplitterTestCase extends AbstractMuleContextTestCase
         MuleMessage message = new DefaultMuleMessage(payload, muleContext);
 
         assertTrue(asyncSplitter.isMatch(message));
-        mockendpoint1.expect("process", RouterTestUtils.getArgListCheckerMuleEvent());
-        mockendpoint1.expect("process", RouterTestUtils.getArgListCheckerMuleEvent());
-        mockendpoint2.expect("process", RouterTestUtils.getArgListCheckerMuleEvent());
-        mockendpoint3.expect("process", RouterTestUtils.getArgListCheckerMuleEvent());
+        when(mockendpoint1.process(any(MuleEvent.class))).thenAnswer(new MuleEventCheckAnswer());
+        when(mockendpoint2.process(any(MuleEvent.class))).thenAnswer(new MuleEventCheckAnswer());
+        when(mockendpoint3.process(any(MuleEvent.class))).thenAnswer(new MuleEventCheckAnswer());
 
         MuleSession session = mock(MuleSession.class);
         asyncSplitter.route(new OutboundRoutingTestEvent(message, session, muleContext));
@@ -126,10 +130,9 @@ public class ListMessageSplitterTestCase extends AbstractMuleContextTestCase
         message = new DefaultMuleMessage(payload, muleContext);
         MuleEvent event = new OutboundRoutingTestEvent(message, null, muleContext);
 
-        mockendpoint4.expectAndReturn("process", RouterTestUtils.getArgListCheckerMuleEvent(), event);
-        mockendpoint4.expectAndReturn("process", RouterTestUtils.getArgListCheckerMuleEvent(), event);
-        mockendpoint5.expectAndReturn("process", RouterTestUtils.getArgListCheckerMuleEvent(), event);
-        mockendpoint6.expectAndReturn("process", RouterTestUtils.getArgListCheckerMuleEvent(), event);
+        when(mockendpoint4.process(any(MuleEvent.class))).thenAnswer(new MuleEventCheckAnswer(event));
+        when(mockendpoint5.process(any(MuleEvent.class))).thenAnswer(new MuleEventCheckAnswer(event));
+        when(mockendpoint6.process(any(MuleEvent.class))).thenAnswer(new MuleEventCheckAnswer(event));
 
         MuleEvent result = syncSplitter.route(new OutboundRoutingTestEvent(message, session, muleContext));
         assertNotNull(result);

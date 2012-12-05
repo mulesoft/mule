@@ -14,7 +14,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.VoidMuleEvent;
@@ -24,9 +26,8 @@ import org.mule.api.MuleMessageCollection;
 import org.mule.api.MuleSession;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.tck.MuleEventCheckAnswer;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
-
-import com.mockobjects.dynamic.Mock;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,8 +38,8 @@ public class SequenceRouterTestCase extends AbstractMuleContextTestCase
 {
     private MuleSession session;
     private SequenceRouter router;
-    private Mock mockEndpoint1;
-    private Mock mockEndpoint2;
+    private OutboundEndpoint mockEndpoint1;
+    private OutboundEndpoint mockEndpoint2;
 
     @Override
     protected void doSetUp() throws Exception
@@ -47,15 +48,16 @@ public class SequenceRouterTestCase extends AbstractMuleContextTestCase
 
         OutboundEndpoint endpoint1 = getTestOutboundEndpoint("Test1Provider",
                                             "test://Test1Provider?exchangePattern=request-response");
+        mockEndpoint1 = RouterTestUtils.createMockEndpoint(endpoint1);
+
         OutboundEndpoint endpoint2 = getTestOutboundEndpoint("Test2Provider",
                                             "test://Test2Provider?exchangePattern=request-response");
-        mockEndpoint1 = RouterTestUtils.getMockEndpoint(endpoint1);
-        mockEndpoint2 = RouterTestUtils.getMockEndpoint(endpoint2);
+        mockEndpoint2 = RouterTestUtils.createMockEndpoint(endpoint2);
 
         router = createObject(SequenceRouter.class);
         List<MessageProcessor> endpoints = new ArrayList<MessageProcessor>();
-        endpoints.add((OutboundEndpoint) mockEndpoint1.proxy());
-        endpoints.add((OutboundEndpoint) mockEndpoint2.proxy());
+        endpoints.add(mockEndpoint1);
+        endpoints.add(mockEndpoint2);
         router.setRoutes(endpoints);
     }
 
@@ -65,8 +67,8 @@ public class SequenceRouterTestCase extends AbstractMuleContextTestCase
         MuleMessage message = new DefaultMuleMessage(TEST_MESSAGE, muleContext);
         MuleEvent event = new OutboundRoutingTestEvent(message, null, muleContext);
 
-        mockEndpoint1.expectAndReturn("process", RouterTestUtils.getArgListCheckerMuleEvent(), event);
-        mockEndpoint2.expectAndReturn("process", RouterTestUtils.getArgListCheckerMuleEvent(), event);
+        when(mockEndpoint1.process(any(MuleEvent.class))).thenAnswer(new MuleEventCheckAnswer(event));
+        when(mockEndpoint2.process(any(MuleEvent.class))).thenAnswer(new MuleEventCheckAnswer(event));
 
         MuleEvent result = router.route(new OutboundRoutingTestEvent(message, session, muleContext));
         assertNotNull(result);
@@ -75,8 +77,6 @@ public class SequenceRouterTestCase extends AbstractMuleContextTestCase
         assertNotNull(resultMessage);
         assertTrue(resultMessage instanceof MuleMessageCollection);
         assertEquals(2, ((MuleMessageCollection)resultMessage).size());
-        mockEndpoint1.verify();
-        mockEndpoint2.verify();
     }
 
     @Test
@@ -85,7 +85,7 @@ public class SequenceRouterTestCase extends AbstractMuleContextTestCase
         MuleMessage message = new DefaultMuleMessage(TEST_MESSAGE, muleContext);
         MuleEvent eventWithNullMessage = new OutboundRoutingTestEvent(null, null, muleContext);
 
-        mockEndpoint1.expectAndReturn("process", RouterTestUtils.getArgListCheckerMuleEvent(), eventWithNullMessage);
+        when(mockEndpoint1.process(any(MuleEvent.class))).thenAnswer(new MuleEventCheckAnswer(eventWithNullMessage));
 
         MuleEvent result = router.route(new OutboundRoutingTestEvent(message, session, muleContext));
         assertSame(VoidMuleEvent.getInstance(), result);
@@ -99,8 +99,8 @@ public class SequenceRouterTestCase extends AbstractMuleContextTestCase
         MuleEvent event = new OutboundRoutingTestEvent(message, null, muleContext);
         MuleEvent eventWithNullMessage = new OutboundRoutingTestEvent(null, null, muleContext);
 
-        mockEndpoint1.expectAndReturn("process", RouterTestUtils.getArgListCheckerMuleEvent(), event);
-        mockEndpoint2.expectAndReturn("process", RouterTestUtils.getArgListCheckerMuleEvent(), eventWithNullMessage);
+        when(mockEndpoint1.process(any(MuleEvent.class))).thenAnswer(new MuleEventCheckAnswer(event));
+        when(mockEndpoint2.process(any(MuleEvent.class))).thenAnswer(new MuleEventCheckAnswer(eventWithNullMessage));
 
         MuleEvent result = router.route(new OutboundRoutingTestEvent(message, session, muleContext));
         assertNotNull(result);
