@@ -13,11 +13,7 @@ package org.mule.routing.outbound;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import org.mule.api.MuleEvent;
-import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.OutboundEndpoint;
-
-import com.mockobjects.dynamic.AnyConstraintMatcher;
 
 public class RouterTestUtils
 {
@@ -38,31 +34,5 @@ public class RouterTestUtils
         when(endpoint.getName()).thenReturn(toMock.getName());
         when(endpoint.getResponseTransformers()).thenReturn(toMock.getResponseTransformers());
         return endpoint;
-    }
-
-    /** @return an object that verifies that the argument list was a single MuleEvent */
-    public static AnyConstraintMatcher getArgListCheckerMuleEvent()
-    {
-        return new AnyConstraintMatcher()
-        {
-            @Override
-            public boolean matches(Object[] args)
-            {
-                return args.length == 1 && args[0] instanceof MuleEvent;
-            }
-        };
-    }
-
-    /** @return an object that verifies that the argument list was a single MuleEvent */
-    public static AnyConstraintMatcher getArgListCheckerFlowConstruct()
-    {
-        return new AnyConstraintMatcher()
-        {
-            @Override
-            public boolean matches(Object[] args)
-            {
-                return args.length == 1 && (args[0] == null || args[0] instanceof FlowConstruct);
-            }
-        };
     }
 }

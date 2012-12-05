@@ -50,8 +50,6 @@ import org.mule.transaction.MuleTransactionConfig;
 import org.mule.transport.AbstractConnector;
 import org.mule.util.ClassUtils;
 
-import com.mockobjects.dynamic.Mock;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -630,10 +628,5 @@ public final class MuleTestUtils
         final TestAgent t = new TestAgent();
         t.initialise();
         return t;
-    }
-
-    public static Mock getMockOutboundEndpoint()
-    {
-        return new Mock(OutboundEndpoint.class, "umoEndpoint");
     }
 }
