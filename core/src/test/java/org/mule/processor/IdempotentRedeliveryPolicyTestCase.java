@@ -24,7 +24,8 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.util.SerializationUtils;
 import org.mule.util.concurrent.Latch;
-import org.mule.util.lock.ServerLockFactory;
+import org.mule.util.lock.MuleLockManager;
+import org.mule.util.lock.SingleServerLockProvider;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -48,6 +49,7 @@ import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -85,7 +87,11 @@ public class IdempotentRedeliveryPolicyTestCase extends AbstractMuleTestCase
                 return mockFailingMessageProcessor.process((MuleEvent) invocationOnMock.getArguments()[0]);
             }
         });
-        when(mockMuleContext.getRegistry().get(MuleProperties.OBJECT_LOCK_FACTORY)).thenReturn(new ServerLockFactory());
+        MuleLockManager muleLockManager = new MuleLockManager();
+        muleLockManager.setMuleContext(mockMuleContext);
+        when(mockMuleContext.getRegistry().get(MuleProperties.OBJECT_LOCK_PROVIDER)).thenReturn(new SingleServerLockProvider());
+        muleLockManager.initialise();
+        when(mockMuleContext.getRegistry().get(MuleProperties.OBJECT_LOCK_MANAGER)).thenReturn(muleLockManager);
         when(mockMuleContext.getRegistry().get(MuleProperties.OBJECT_STORE_MANAGER)).thenReturn(mockObjectStoreManager);
         final InMemoryObjectStore inMemoryObjectStore = new InMemoryObjectStore();
         when(mockObjectStoreManager.getObjectStore(anyString(), anyBoolean(), anyInt(), anyInt(), anyInt())).thenAnswer(new Answer<ObjectStore>()
@@ -128,6 +134,8 @@ public class IdempotentRedeliveryPolicyTestCase extends AbstractMuleTestCase
     public void testMessageRedeliveryUsingSerializationStore() throws Exception
     {
         when(message.getPayload()).thenReturn(STRING_MESSAGE);
+        reset(mockObjectStoreManager);
+        when(mockObjectStoreManager.getObjectStore(anyString(), anyBoolean(), anyInt(), anyInt(), anyInt())).thenReturn(new SerializationObjectStore());
         irp.initialise();
         processUntilFailure();
         verify(mockDlqMessageProcessor, VerificationModeFactory.times(1)).process(event);
@@ -139,7 +147,6 @@ public class IdempotentRedeliveryPolicyTestCase extends AbstractMuleTestCase
         when(message.getPayload()).thenReturn(STRING_MESSAGE);
         irp.setListener(mockWaitingMessageProcessor);
         irp.initialise();
-
         ExecuteIrpThread firstIrpExecutionThread = new ExecuteIrpThread();
         firstIrpExecutionThread.start();
         ExecuteIrpThread threadCausingRedeliveryException = new ExecuteIrpThread();
