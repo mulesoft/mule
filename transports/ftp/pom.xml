@@ -84,7 +84,7 @@
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-vm</artifactId>
-            <version>${project.version}</version> 
+            <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -97,11 +97,6 @@
             <groupId>org.apache.ftpserver</groupId>
             <artifactId>ftplet-api</artifactId>
             <version>1.0.2</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>mockobjects</groupId>
-            <artifactId>mockobjects-core</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>

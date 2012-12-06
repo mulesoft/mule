@@ -67,15 +67,5 @@
             <artifactId>mockito-all</artifactId>
             <scope>test</scope>
         </dependency>
-        <!--
-            Although this module does not depend on mockobjects any more it subclasses
-            abstract test classes that do :-( Bring back the dependency for now until
-            we remove the mockobjects dependency from core, too.
-        -->
-        <dependency>
-            <groupId>mockobjects</groupId>
-            <artifactId>mockobjects-core</artifactId>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
 </project>

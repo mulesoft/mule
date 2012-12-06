@@ -38,7 +38,7 @@
                 </executions>
             </plugin>
             <plugin>
-                <!-- ensure that source jar files are created and installed 
+                <!-- ensure that source jar files are created and installed
                     as well -->
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
@@ -82,12 +82,6 @@
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-tests-functional</artifactId>
             <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>mockobjects</groupId>
-            <artifactId>mockobjects-core</artifactId>
-            <version>${mockobjectsVersion}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -144,17 +138,17 @@
                                     <value>300</value>
                                 </property>
                                 <property>
-                                    <!-- Always pooling for ALL tests! (simple 
+                                    <!-- Always pooling for ALL tests! (simple
                                         way to ensure that all tests works with pooling) -->
                                     <name>mule.sftp.transport.maxConnectionPoolSize</name>
                                     <value>3</value>
                                 </property>
                             </systemProperties>
                             <excludes>
-                                <!-- These test cases test the pooling functionality, 
-                                    and since the tests uses another settings than the above (overridden) settings 
-                                    we can't run them. For example the test that one connector has no pooling 
-                                    and thus the command useConnectionPool() returns false - with the overridden 
+                                <!-- These test cases test the pooling functionality,
+                                    and since the tests uses another settings than the above (overridden) settings
+                                    we can't run them. For example the test that one connector has no pooling
+                                    and thus the command useConnectionPool() returns false - with the overridden
                                     value it will return true, thus an error should have occurred. -->
                                 <exclude>**/SftpPoolingFunctionalTestCase.java</exclude>
                                 <exclude>**/SftpNamespaceHandlerTestCase.java</exclude>
