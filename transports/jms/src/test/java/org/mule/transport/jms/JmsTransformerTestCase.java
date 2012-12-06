@@ -12,6 +12,8 @@ package org.mule.transport.jms;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
@@ -21,16 +23,9 @@ import org.mule.tck.MuleTestUtils;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.transport.jms.transformers.ObjectToJMSMessage;
 
-import com.mockobjects.constraint.Constraint;
-import com.mockobjects.constraint.IsEqual;
-import com.mockobjects.dynamic.ConstraintMatcher;
-import com.mockobjects.dynamic.FullConstraintMatcher;
-import com.mockobjects.dynamic.Mock;
-
 import javax.jms.Message;
 import javax.jms.TextMessage;
 
-import org.apache.commons.collections.IteratorUtils;
 import org.junit.Test;
 
 public class JmsTransformerTestCase extends AbstractMuleContextTestCase
@@ -45,34 +40,20 @@ public class JmsTransformerTestCase extends AbstractMuleContextTestCase
         // First we need a JMS message wrapped into a MuleMessage. This turned out to
         // be trickier than expected (ha ha) since mocking a Message depends on the
         // specific calls made to the mocked class.
-        Mock mockMessage = new Mock(TextMessage.class);
-        mockMessage.expectAndReturn("getJMSCorrelationID", null);
-        mockMessage.expectAndReturn("getJMSMessageID", "1234567890");
-        mockMessage.expectAndReturn("getJMSDeliveryMode", new Integer(1));
-        mockMessage.expectAndReturn("getJMSDestination", null);
-        mockMessage.expectAndReturn("getJMSPriority", new Integer(4));
-        mockMessage.expectAndReturn("getJMSRedelivered", Boolean.FALSE);
-        mockMessage.expectAndReturn("getJMSReplyTo", null);
-        mockMessage.expectAndReturn("getJMSExpiration", new Long(0));
-        mockMessage.expectAndReturn("getJMSTimestamp", new Long(0));
-        mockMessage.expectAndReturn("getJMSType", null);
+        TextMessage textMessage = mock(TextMessage.class);
+        when(textMessage.getJMSCorrelationID()).thenReturn(null);
+        when(textMessage.getJMSMessageID()).thenReturn("1234567890");
+        when(textMessage.getJMSDeliveryMode()).thenReturn(Integer.valueOf(1));
+        when(textMessage.getJMSDestination()).thenReturn(null);
+        when(textMessage.getJMSPriority()).thenReturn(Integer.valueOf(4));
+        when(textMessage.getJMSRedelivered()).thenReturn(Boolean.FALSE);
+        when(textMessage.getJMSReplyTo()).thenReturn(null);
+        when(textMessage.getJMSExpiration()).thenReturn(Long.valueOf(0));
+        when(textMessage.getJMSTimestamp()).thenReturn(Long.valueOf(0));
+        when(textMessage.getJMSType()).thenReturn(null);
+        when(textMessage.getObjectProperty("JMS_CUSTOM_PROPERTY")).thenReturn("customValue");
 
-        mockMessage.expect("toString");
-        mockMessage.expect("toString");
-
-        mockMessage.expect("clearProperties");
-
-        mockMessage.expectAndReturn("getPropertyNames",
-            IteratorUtils.asEnumeration(IteratorUtils.emptyIterator()));
-
-        mockMessage.expectAndReturn("getObjectProperty", "JMS_CUSTOM_PROPERTY", "customValue");
-
-        ConstraintMatcher setPropertyMatcher = new FullConstraintMatcher(new Constraint[]{
-            new IsEqual("JMS_CUSTOM_PROPERTY"), new IsEqual("customValue")});
-        mockMessage.expect("setObjectProperty", setPropertyMatcher);
-
-        Message mockTextMessage = (Message)mockMessage.proxy();
-        MuleMessage msg = new DefaultMuleMessage(mockTextMessage, muleContext);
+        MuleMessage msg = new DefaultMuleMessage(textMessage, muleContext);
 
         // Now we set a custom "JMS-like" property on the MuleMessage
         msg.setOutboundProperty("JMS_CUSTOM_PROPERTY", "customValue");
@@ -87,13 +68,10 @@ public class JmsTransformerTestCase extends AbstractMuleContextTestCase
         // return the same (but mockingly modified!) JMS message that is used as
         // input.
         ObjectToJMSMessage transformer = createObject(ObjectToJMSMessage.class);
-        Message transformed = (Message)transformer.transform(msg.getPayload());
+        Message transformed = (Message)  transformer.transform(msg.getPayload());
 
         // Finally we can assert that the setProperty done to the MuleMessage actually
         // made it through to the wrapped JMS Message. Yay!
         assertEquals("customValue", transformed.getObjectProperty("JMS_CUSTOM_PROPERTY"));
-
-        // note that we don't verify() the mock since we have no way of knowing
-        // whether toString was actually called (environment dependency)
     }
 }

@@ -10,12 +10,13 @@
 
 package org.mule.transport.jms;
 
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.isNull;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
-import com.mockobjects.constraint.Constraint;
-import com.mockobjects.dynamic.C;
-import com.mockobjects.dynamic.FullConstraintMatcher;
-import com.mockobjects.dynamic.Mock;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import javax.jms.JMSException;
 import javax.jms.Queue;
@@ -24,93 +25,57 @@ import javax.jms.Topic;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-
 public class Jms11SupportTestCase extends AbstractMuleContextTestCase
 {
-
     @Test
     public void testNoLocalCalledForDurableTopic() throws Exception
     {
         Jms11Support jmsSupport = new Jms11Support(new JmsConnector(muleContext));
-
-        Mock mockTopic = new Mock(Topic.class);
-        Topic topic = (Topic)mockTopic.proxy();
-
+        Topic topic = mock(Topic.class);
         String durableName = "durableName";
         boolean noLocal = true;
+        Session session = mock(Session.class);
 
-        FullConstraintMatcher matcher = new FullConstraintMatcher(new Constraint[]{C.eq(topic),
-            C.eq(durableName), C.IS_NULL, C.IS_TRUE});
-
-        Mock mockSession = new Mock(Session.class);
-        mockSession.expect("createDurableSubscriber", matcher);
-
-        jmsSupport.createConsumer((Session)mockSession.proxy(), topic, null, noLocal, durableName, true, getTestInboundEndpoint("test"));
-
-        mockTopic.verify();
-        mockSession.verify();
+        jmsSupport.createConsumer(session, topic, null, noLocal, durableName, true, getTestInboundEndpoint("test"));
+        verify(session).createDurableSubscriber(eq(topic), eq(durableName), isNull(String.class), eq(true));
     }
 
     @Test
     public void testNoLocalCalledForNonDurableTopic() throws Exception
     {
         Jms11Support jmsSupport = new Jms11Support(new JmsConnector(muleContext));
-
-        Mock mockTopic = new Mock(Topic.class);
-        Topic topic = (Topic)mockTopic.proxy();
-
+        Topic topic = mock(Topic.class);
         boolean noLocal = true;
+        Session session = mock(Session.class);
 
-        FullConstraintMatcher matcher = new FullConstraintMatcher(new Constraint[]{C.eq(topic), C.IS_NULL,
-            C.IS_TRUE});
-
-        Mock mockSession = new Mock(Session.class);
-        mockSession.expect("createConsumer", matcher);
-
-        jmsSupport.createConsumer((Session)mockSession.proxy(), topic, null, noLocal, null, true, getTestInboundEndpoint("test"));
-
-        mockTopic.verify();
-        mockSession.verify();
+        jmsSupport.createConsumer(session, topic, null, noLocal, null, true, getTestInboundEndpoint("test"));
+        verify(session).createConsumer(eq(topic), isNull(String.class), eq(true));
     }
 
     @Test
     public void testNoLocalNotCalledForQueue() throws Exception
     {
         Jms11Support jmsSupport = new Jms11Support(new JmsConnector(muleContext));
-
-        Mock mockQueue = new Mock(Queue.class);
-        Queue queue = (Queue)mockQueue.proxy();
-
+        Queue queue = mock(Queue.class);
         boolean noLocal = true;
+        Session session = mock(Session.class);
 
-        FullConstraintMatcher matcher = new FullConstraintMatcher(new Constraint[]{C.eq(queue), C.IS_NULL});
-
-        Mock mockSession = new Mock(Session.class);
-        mockSession.expect("createConsumer", matcher);
-
-        jmsSupport.createConsumer((Session)mockSession.proxy(), queue, null, noLocal, null, false, getTestInboundEndpoint("test"));
-
-        mockQueue.verify();
-        mockSession.verify();
+        jmsSupport.createConsumer(session, queue, null, noLocal, null, false, getTestInboundEndpoint("test"));
+        verify(session).createConsumer(eq(queue), isNull(String.class));
     }
 
     @Test
     public void testDurableWithQueueThrowsException() throws Exception
     {
         Jms11Support jmsSupport = new Jms11Support(new JmsConnector(muleContext));
-
-        Mock mockQueue = new Mock(Queue.class);
-        Queue queue = (Queue)mockQueue.proxy();
-
+        Queue queue = mock(Queue.class);
         String durableName = "durableName";
         boolean noLocal = true;
-
-        Mock mockSession = new Mock(Session.class);
+        Session session = mock(Session.class);
 
         try
         {
-            jmsSupport.createConsumer((Session)mockSession.proxy(), queue, null, noLocal, durableName, false, getTestInboundEndpoint("test"));
+            jmsSupport.createConsumer(session, queue, null, noLocal, durableName, false, getTestInboundEndpoint("test"));
         }
         catch (JMSException jmsex)
         {
@@ -118,9 +83,5 @@ public class Jms11SupportTestCase extends AbstractMuleContextTestCase
             assertEquals("Wrong exception text.",
                 "A durable subscriber name was set but the destination was not a Topic", jmsex.getMessage());
         }
-
-        mockQueue.verify();
-        mockSession.verify();
     }
-
 }

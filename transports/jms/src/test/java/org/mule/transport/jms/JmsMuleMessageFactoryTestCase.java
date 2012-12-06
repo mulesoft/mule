@@ -10,19 +10,18 @@
 
 package org.mule.transport.jms;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import org.mule.api.MuleMessage;
 import org.mule.api.transport.MuleMessageFactory;
 import org.mule.transport.AbstractMuleMessageFactoryTestCase;
 
-import com.mockobjects.dynamic.C;
-import com.mockobjects.dynamic.Mock;
-
 import javax.jms.TextMessage;
 
 import org.apache.commons.collections.IteratorUtils;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 public class JmsMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTestCase
 {
@@ -37,24 +36,22 @@ public class JmsMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTes
     @Override
     protected Object getValidTransportMessage() throws Exception
     {
-        Mock message = new Mock(TextMessage.class);
-        message.expectAndReturn("getText", MESSAGE_TEXT);
-        message.expectAndReturn("getJMSCorrelationID", null);
-        message.expectAndReturn("getJMSDeliveryMode", Integer.valueOf(1));
-        message.expectAndReturn("getJMSDestination", null);
-        message.expectAndReturn("getJMSExpiration", Long.valueOf(0));
-        message.expectAndReturn("getJMSMessageID", "1234567890");
-        message.expectAndReturn("getJMSPriority", Integer.valueOf(4));
-        message.expectAndReturn("getJMSRedelivered", Boolean.FALSE);
-        message.expectAndReturn("getJMSReplyTo", null);
-        message.expectAndReturn("getJMSTimestamp", Long.valueOf(0));
-        message.expectAndReturn("getJMSType", null);
-        message.expectAndReturn("getPropertyNames", IteratorUtils.asEnumeration(
-            IteratorUtils.arrayIterator(new Object[] { "foo" })));
-        message.expectAndReturn("getObjectProperty", C.eq("foo"), "bar");
-        message.expectAndReturn("equals", C.eq(MESSAGE_TEXT), true);
-        
-        return message.proxy();
+        TextMessage textMessage = mock(TextMessage.class);
+        when(textMessage.getText()).thenReturn(MESSAGE_TEXT);
+        when(textMessage.getJMSCorrelationID()).thenReturn(null);
+        when(textMessage.getJMSDeliveryMode()).thenReturn(Integer.valueOf(1));
+        when(textMessage.getJMSDestination()).thenReturn(null);
+        when(textMessage.getJMSExpiration()).thenReturn(Long.valueOf(0));
+        when(textMessage.getJMSMessageID()).thenReturn("1234567890");
+        when(textMessage.getJMSPriority()).thenReturn(Integer.valueOf(4));
+        when(textMessage.getJMSRedelivered()).thenReturn(Boolean.FALSE);
+        when(textMessage.getJMSReplyTo()).thenReturn(null);
+        when(textMessage.getJMSTimestamp()).thenReturn(Long.valueOf(0));
+        when(textMessage.getJMSType()).thenReturn(null);
+        when(textMessage.getPropertyNames()).thenReturn(
+            IteratorUtils.asEnumeration(IteratorUtils.arrayIterator(new Object[] { "foo" })));
+        when(textMessage.getObjectProperty("foo")).thenReturn("bar");
+        return textMessage;
     }
 
     @Override
@@ -67,7 +64,7 @@ public class JmsMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTes
     public void testValidPayload() throws Exception
     {
         MuleMessageFactory factory = createMuleMessageFactory();
-        
+
         Object payload = getValidTransportMessage();
         MuleMessage message = factory.create(payload, encoding);
         assertNotNull(message);

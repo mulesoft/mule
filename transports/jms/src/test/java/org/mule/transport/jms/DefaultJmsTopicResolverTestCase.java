@@ -10,19 +10,18 @@
 
 package org.mule.transport.jms;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.tck.junit4.FunctionalTestCase;
-
-import com.mockobjects.dynamic.Mock;
 
 import javax.jms.Queue;
 import javax.jms.Topic;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
 
 public class DefaultJmsTopicResolverTestCase extends FunctionalTestCase
 {
@@ -165,22 +164,17 @@ public class DefaultJmsTopicResolverTestCase extends FunctionalTestCase
     public void testDestinationNotTopic() throws Exception
     {
         // prepare the mock
-        Mock mock = new Mock(Queue.class);
-        Queue queue = (Queue) mock.proxy();
+        Queue queue = mock(Queue.class);
 
         assertFalse(resolver.isTopic(queue));
-        mock.verify();
     }
 
     @Test
     public void testDestinationTopic() throws Exception
     {
         // prepare the mock
-        Mock mock = new Mock(Topic.class);
-        Topic topic = (Topic) mock.proxy();
+        Topic topic = mock(Topic.class);
 
         assertTrue(resolver.isTopic(topic));
-        mock.verify();
     }
-
 }

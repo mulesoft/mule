@@ -10,6 +10,12 @@
 
 package org.mule.transport;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
+
 import org.mule.api.DefaultMuleException;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.exception.SystemExceptionHandler;
@@ -22,15 +28,7 @@ import org.mule.config.i18n.MessageFactory;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 
-import com.mockobjects.dynamic.C;
-import com.mockobjects.dynamic.Mock;
-
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 /**
  * <code>AbstractConnectorTestCase</code> tests common behaviour of all endpoints and
@@ -69,7 +67,7 @@ public abstract class AbstractConnectorTestCase extends AbstractMuleContextTestC
     {
         return (muleContext == null) ?  null : muleContext.getRegistry().lookupConnector(connectorName);
     }
-    
+
     protected Connector getConnectorAndAssert()
     {
         Connector connector = getConnector();
@@ -83,22 +81,18 @@ public abstract class AbstractConnectorTestCase extends AbstractMuleContextTestC
         Connector connector = getConnectorAndAssert();
 
         // Text exception handler
-        Mock ehandlerMock = new Mock(SystemExceptionHandler.class, "exceptionHandler");
-
-        ehandlerMock.expect("handleException", C.isA(Exception.class));
+        SystemExceptionHandler ehandlerMock = mock(SystemExceptionHandler.class);
 
         assertNotNull(muleContext.getExceptionListener());
-        muleContext.setExceptionListener((SystemExceptionHandler) ehandlerMock.proxy());
+        muleContext.setExceptionListener(ehandlerMock);
         muleContext.getExceptionListener().handleException(new DefaultMuleException(MessageFactory.createStaticMessage("Dummy")));
 
         if (connector instanceof AbstractConnector)
         {
-            ehandlerMock.expect("handleException", C.isA(Exception.class));
             muleContext.getExceptionListener().handleException(
                     new DefaultMuleException(MessageFactory.createStaticMessage("Dummy")));
         }
 
-        ehandlerMock.verify();
 
         muleContext.setExceptionListener(null);
         try
@@ -152,7 +146,7 @@ public abstract class AbstractConnectorTestCase extends AbstractMuleContextTestC
 
         Service service = getTestService("anApple", Apple.class);
 
-        InboundEndpoint endpoint = 
+        InboundEndpoint endpoint =
             muleContext.getEndpointFactory().getInboundEndpoint(getTestEndpointURI());
 
         try
@@ -242,7 +236,7 @@ public abstract class AbstractConnectorTestCase extends AbstractMuleContextTestC
 
         assertNotNull("Protocol must be set as a constant", connector.getProtocol());
     }
-    
+
     /**
      * This test only asserts that the transport descriptor mechanism works for creating the
      * MuleMessageFactory. For exhaustive tests of MuleMessageFactory implementations see
@@ -252,7 +246,7 @@ public abstract class AbstractConnectorTestCase extends AbstractMuleContextTestC
     public void testConnectorMuleMessageFactory() throws Exception
     {
         Connector connector = getConnectorAndAssert();
-        
+
         MuleMessageFactory factory = connector.createMuleMessageFactory();
         assertNotNull(factory);
     }
@@ -289,11 +283,10 @@ public abstract class AbstractConnectorTestCase extends AbstractMuleContextTestC
             // expected
         }
     }
-    
+
     public abstract Connector createConnector() throws Exception;
 
     public abstract Object getValidMessage() throws Exception;
 
     public abstract String getTestEndpointURI();
-
 }
