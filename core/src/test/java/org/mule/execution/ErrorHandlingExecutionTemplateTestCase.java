@@ -26,7 +26,9 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.execution.ExecutionTemplate;
+import org.mule.api.registry.MuleRegistry;
 import org.mule.api.transaction.Transaction;
+import org.mule.context.notification.ServerNotificationManager;
 import org.mule.exception.DefaultMessagingExceptionStrategy;
 import org.mule.routing.filters.WildcardFilter;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -270,12 +272,15 @@ public class ErrorHandlingExecutionTemplateTestCase extends AbstractMuleTestCase
     private void configureExceptionListener(final String rollbackFilter,final String commitFilter)
     {
         when(mockMessagingException.getEvent()).thenReturn(mockEvent);
+        when(mockMuleContext.getNotificationManager()).thenReturn(mock(ServerNotificationManager.class));
+        when(mockMuleContext.getRegistry()).thenReturn(mock(MuleRegistry.class));
         when(mockMessagingExceptionHandler.handleException(any(MessagingException.class), any(MuleEvent.class))).thenAnswer(new Answer<Object>()
         {
             @Override
             public Object answer(InvocationOnMock invocationOnMock) throws Throwable
             {
                 DefaultMessagingExceptionStrategy defaultMessagingExceptionStrategy = new DefaultMessagingExceptionStrategy();
+                defaultMessagingExceptionStrategy.setMuleContext(mockMuleContext);
                 if (rollbackFilter != null)
                 {
                     defaultMessagingExceptionStrategy.setRollbackTxFilter(new WildcardFilter(rollbackFilter));

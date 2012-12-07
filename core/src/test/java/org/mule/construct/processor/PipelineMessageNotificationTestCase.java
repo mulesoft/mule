@@ -32,6 +32,7 @@ import org.mule.config.DefaultMuleConfiguration;
 import org.mule.construct.AbstractPipeline;
 import org.mule.construct.Flow;
 import org.mule.context.notification.AsyncMessageNotification;
+import org.mule.context.notification.ExceptionStrategyNotification;
 import org.mule.context.notification.PipelineMessageNotification;
 import org.mule.context.notification.ServerNotificationManager;
 import org.mule.exception.DefaultMessagingExceptionStrategy;
@@ -288,7 +289,13 @@ public class PipelineMessageNotificationTestCase extends AbstractMuleTestCase
         verify(notificationManager, times(1)).fireNotification(
             argThat(new PipelineMessageNotificiationArgumentMatcher(
                 AsyncMessageNotification.PROCESS_ASYNC_COMPLETE, false, null)));
-        verify(notificationManager, times(4)).fireNotification(any(PipelineMessageNotification.class));
+        verify(notificationManager, times(1)).fireNotification(
+            argThat(new PipelineMessageNotificiationArgumentMatcher(
+                ExceptionStrategyNotification.PROCESS_START, false, null)));
+        verify(notificationManager, times(1)).fireNotification(
+            argThat(new PipelineMessageNotificiationArgumentMatcher(
+                ExceptionStrategyNotification.PROCESS_END, false, null)));
+        verify(notificationManager, times(6)).fireNotification(any(PipelineMessageNotification.class));
     }
 
     private class TestPipeline extends AbstractPipeline

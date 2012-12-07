@@ -184,7 +184,11 @@ public class TransactionalErrorHandlingExecutionTemplateTestCase extends Transac
             @Override
             public Object answer(InvocationOnMock invocationOnMock) throws Throwable
             {
-                new DefaultMessagingExceptionStrategy().handleException((Exception)invocationOnMock.getArguments()[0],(MuleEvent)invocationOnMock.getArguments()[1]);
+                DefaultMessagingExceptionStrategy defaultMessagingExceptionStrategy = new DefaultMessagingExceptionStrategy();
+                when(mockMuleContext.getNotificationManager()).thenReturn(mock(ServerNotificationManager.class));
+                when(mockMuleContext.getRegistry()).thenReturn(mock(MuleRegistry.class));
+                defaultMessagingExceptionStrategy.setMuleContext(mockMuleContext);
+                defaultMessagingExceptionStrategy.handleException((Exception) invocationOnMock.getArguments()[0], (MuleEvent) invocationOnMock.getArguments()[1]);
                 return mockResultEvent;
             }
         });
