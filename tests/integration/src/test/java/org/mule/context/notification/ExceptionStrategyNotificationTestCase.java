@@ -42,12 +42,14 @@ public class ExceptionStrategyNotificationTestCase extends AbstractNotificationT
         assertNotNull(client.send("vm://in-catch", "test", null));
         assertNotNull(client.send("vm://in-rollback", "test", null));
         assertNotNull(client.send("vm://in-choice-es", "test", null));
+        assertNotNull(client.send("vm://in-default-es", "test", null));
     }
 
     @Override
     public RestrictedNode getSpecification()
     {
         return new Node()
+                .serial(node(PROCESS_START).serial(node(PROCESS_END)))
                 .serial(node(PROCESS_START).serial(node(PROCESS_END)))
                 .serial(node(PROCESS_START).serial(node(PROCESS_END)))
                 .serial(node(PROCESS_START).serial(node(PROCESS_END)))

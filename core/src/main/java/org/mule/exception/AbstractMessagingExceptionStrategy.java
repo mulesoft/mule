@@ -19,6 +19,7 @@ import org.mule.api.construct.FlowConstruct;
 import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.lifecycle.Lifecycle;
 import org.mule.api.lifecycle.Stoppable;
+import org.mule.context.notification.ExceptionStrategyNotification;
 import org.mule.management.stats.FlowConstructStatistics;
 import org.mule.message.DefaultExceptionPayload;
 import org.mule.transport.NullPayload;
@@ -45,23 +46,32 @@ public abstract class AbstractMessagingExceptionStrategy extends AbstractExcepti
 
     public MuleEvent handleException(Exception ex, MuleEvent event)
     {
-        fireNotification(ex);
-
-        // Work with the root exception, not anything that wraps it
-        //Throwable t = ExceptionHelper.getRootException(ex);
-
-        logException(ex);
-        
-        doHandleException(ex, event);
-
-        ExceptionPayload exceptionPayload = new DefaultExceptionPayload(ex);
-        if (RequestContext.getEvent() != null)
+        try
         {
-            RequestContext.setExceptionPayload(exceptionPayload);
+            muleContext.getNotificationManager().fireNotification(new ExceptionStrategyNotification(event, ExceptionStrategyNotification.PROCESS_START));
+
+            //keep legacy notifications
+            fireNotification(ex);
+
+            // Work with the root exception, not anything that wraps it
+            //Throwable t = ExceptionHelper.getRootException(ex);
+
+            logException(ex);
+            doHandleException(ex, event);
+
+            ExceptionPayload exceptionPayload = new DefaultExceptionPayload(ex);
+            if (RequestContext.getEvent() != null)
+            {
+                RequestContext.setExceptionPayload(exceptionPayload);
+            }
+            event.getMessage().setPayload(NullPayload.getInstance());
+            event.getMessage().setExceptionPayload(exceptionPayload);
+            return event;
         }
-        event.getMessage().setPayload(NullPayload.getInstance());
-        event.getMessage().setExceptionPayload(exceptionPayload);
-        return event;
+        finally
+        {
+            muleContext.getNotificationManager().fireNotification(new ExceptionStrategyNotification(event, ExceptionStrategyNotification.PROCESS_END));
+        }
     }
 
     protected void doHandleException(Exception ex, MuleEvent event)

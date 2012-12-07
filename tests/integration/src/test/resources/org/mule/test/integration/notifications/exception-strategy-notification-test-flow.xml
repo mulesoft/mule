@@ -54,4 +54,9 @@
             </catch-exception-strategy>
         </choice-exception-strategy>
     </flow>
+
+    <flow name="default-es">
+        <vm:inbound-endpoint path="in-default-es" exchange-pattern="request-response"/>
+        <test:component throwException="true"/>
+    </flow>
 </mule>
