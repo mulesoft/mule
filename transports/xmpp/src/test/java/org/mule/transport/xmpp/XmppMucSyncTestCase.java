@@ -46,8 +46,8 @@ public class XmppMucSyncTestCase extends AbstractXmppTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, AbstractXmppTestCase.COMMON_CONFIG + "," + "xmpp-muc-sync-config-service.xml"},
-            {ConfigVariant.FLOW, AbstractXmppTestCase.COMMON_CONFIG + "," + "xmpp-muc-sync-config-flow.xml"}
+            {ConfigVariant.SERVICE, "xmpp-muc-sync-config-service.xml"},
+            {ConfigVariant.FLOW, "xmpp-muc-sync-config-flow.xml"}
         });
     }
 

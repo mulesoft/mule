@@ -33,8 +33,8 @@ public class XmppFunctionalTestCase extends XmppEnableDisableTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][] {
-            {ConfigVariant.SERVICE, AbstractXmppTestCase.COMMON_CONFIG + "," + "xmpp-functional-config-service.xml"},
-            {ConfigVariant.FLOW, AbstractXmppTestCase.COMMON_CONFIG + "," + "xmpp-functional-config-flow.xml"}
+            {ConfigVariant.SERVICE, "xmpp-functional-config-service.xml"},
+            {ConfigVariant.FLOW, "xmpp-functional-config-flow.xml"}
         });
     }
 
