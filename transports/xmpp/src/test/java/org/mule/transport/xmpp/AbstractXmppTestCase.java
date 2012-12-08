@@ -23,7 +23,7 @@ import org.jivesoftware.smack.packet.Packet;
 
 public abstract class AbstractXmppTestCase extends XmppEnableDisableTestCase
 {
-    private static final String COMMON_CONFIG = "xmpp-connector-config.xml,";
+    protected static final String COMMON_CONFIG = "xmpp-connector-config.xml,";
     private static final long STARTUP_TIMEOUT = 5000;
 
     private CountDownLatch jabberLatch;

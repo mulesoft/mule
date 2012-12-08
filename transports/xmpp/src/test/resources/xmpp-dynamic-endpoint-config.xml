@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:spring="http://www.springframework.org/schema/beans"
+    xmlns:xmpp="http://www.mulesoft.org/schema/mule/xmpp"
+    xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+    xmlns:test="http://www.mulesoft.org/schema/mule/test"
+    xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+       http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+       http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
+       http://www.mulesoft.org/schema/mule/xmpp http://www.mulesoft.org/schema/mule/xmpp/current/mule-xmpp.xsd">
+
+    <xmpp:connector name="xmppConnector2" host="${host}" user="${conversationPartner}"
+        password="${conversationPartnerPassword}"/>
+
+    <flow name="sendDyamic">
+        <vm:inbound-endpoint path="fromTest" exchange-pattern="one-way"/>
+        <xmpp:outbound-endpoint type="CHAT" recipient="#[message.inboundProperties['recipient']]"
+            exchange-pattern="one-way" connector-ref="xmppConnector"/>
+    </flow>
+
+    <flow name="receive">
+        <xmpp:inbound-endpoint type="CHAT" from="mule1@localhost"
+            exchange-pattern="one-way" connector-ref="xmppConnector2"/>
+        <test:component/>
+    </flow>
+</mule>
