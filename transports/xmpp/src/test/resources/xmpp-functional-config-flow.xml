@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:spring="http://www.springframework.org/schema/beans"
-    xmlns:xmpp="http://www.mulesoft.org/schema/mule/xmpp" xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+    xmlns:xmpp="http://www.mulesoft.org/schema/mule/xmpp"
+    xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
     xmlns:context="http://www.springframework.org/schema/context"
     xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
@@ -10,36 +12,25 @@
        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
        http://www.mulesoft.org/schema/mule/xmpp http://www.mulesoft.org/schema/mule/xmpp/current/mule-xmpp.xsd">
 
-    <spring:bean id="SaslFixBean"
-        class="org.mule.transport.xmpp.SaslAuthFixBean" />
+    <spring:bean id="SaslFixBean" class="org.mule.transport.xmpp.SaslAuthFixBean" />
 
     <spring:bean id="properties" class="java.util.Properties">
         <spring:constructor-arg>
             <spring:props>
                 <spring:prop key="host">jabber.ccc.de</spring:prop>
-                <spring:prop key="user">mule1</spring:prop>
-                <spring:prop key="password">mule</spring:prop>
+                <spring:prop key="xmppUser">mule1</spring:prop>
+                <spring:prop key="xmppPassword">mule</spring:prop>
             </spring:props>
         </spring:constructor-arg>
     </spring:bean>
 
-    <context:property-placeholder
-        properties-ref="properties" />
+    <context:property-placeholder properties-ref="properties" />
 
-    <xmpp:connector name="xmppConnector" host="${host}"
-        user="${user}" password="${password}" />
+    <xmpp:connector name="xmppConnector" host="${host}" user="${xmppUser}" password="${xmppPassword}" />
 
     <!-- receive normal messages async -->
-
     <flow name="receiveMessage">
-
-        <xmpp:inbound-endpoint type="MESSAGE"
-            from="mule2@localhost" exchange-pattern="one-way" />
-
-
-        <vm:outbound-endpoint path="toTest"
-            exchange-pattern="one-way" />
-
+        <xmpp:inbound-endpoint type="MESSAGE" from="mule2@localhost" exchange-pattern="one-way" />
+        <vm:outbound-endpoint path="toTest" exchange-pattern="one-way" />
     </flow>
-
 </mule>

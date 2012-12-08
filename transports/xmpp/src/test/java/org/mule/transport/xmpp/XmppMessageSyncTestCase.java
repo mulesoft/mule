@@ -14,86 +14,86 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import org.mule.api.MuleMessage;
+import org.mule.api.client.MuleClient;
+import org.mule.tck.functional.FunctionalTestComponent;
+import org.mule.transport.NullPayload;
+import org.mule.transport.xmpp.JabberSender.Callback;
+import org.mule.util.concurrent.Latch;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.concurrent.TimeUnit;
 
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Packet;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.functional.FunctionalTestComponent;
-import org.mule.transport.NullPayload;
-import org.mule.transport.xmpp.JabberSender.Callback;
-import org.mule.util.concurrent.Latch;
 
 public class XmppMessageSyncTestCase extends AbstractXmppTestCase
 {
-    
     protected static final long JABBER_SEND_THREAD_SLEEP_TIME = 1000;
     private static final String RECEIVE_SERVICE_NAME = "receiveFromJabber";
-    
-    public XmppMessageSyncTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
-    
+
     @Parameters
     public static Collection<Object[]> parameters()
     {
-        return Arrays.asList(new Object[][]{
+        return Arrays.asList(new Object[][] {
             {ConfigVariant.SERVICE, AbstractXmppTestCase.COMMON_CONFIG + "," + "xmpp-message-sync-config-service.xml"},
             {ConfigVariant.FLOW, AbstractXmppTestCase.COMMON_CONFIG + "," + "xmpp-message-sync-config-flow.xml"}
         });
     }
 
+    public XmppMessageSyncTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
+    }
+
     @Test
     public void testSendSync() throws Exception
-    {   
-        MuleClient client = new MuleClient(muleContext);
+    {
+        MuleClient client = muleContext.getClient();
         MuleMessage reply = client.send("vm://in", TEST_MESSAGE, null);
         assertNotNull(reply);
         assertEquals(NullPayload.getInstance(), reply.getPayload());
-        
+
         Packet packet = jabberClient.receive(RECEIVE_TIMEOUT);
         assertReceivedPacketEqualsMessageSent(packet);
     }
-    
+
     @Test
     public void testReceiveSync() throws Exception
     {
-        startService(RECEIVE_SERVICE_NAME);
-        
         Latch receiveLatch = new Latch();
         setupTestServiceComponent(receiveLatch);
-        
+
         sendJabberMessageFromNewThread();
         assertTrue(receiveLatch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS));
     }
 
     private void setupTestServiceComponent(Latch receiveLatch) throws Exception
-    {   
+    {
         Object testComponent = getComponent(RECEIVE_SERVICE_NAME);
         assertTrue(testComponent instanceof FunctionalTestComponent);
         FunctionalTestComponent component = (FunctionalTestComponent) testComponent;
-        
+
         XmppCallback callback = new XmppCallback(receiveLatch, expectedXmppMessageType());
         component.setEventCallback(callback);
     }
 
+    @Ignore("requesting should be done in a completely different test case that does not require an initially stopped service")
     @Test
     public void testRequestSync() throws Exception
     {
         doTestRequest("xmpp://MESSAGE/mule2@localhost?exchangePattern=request-response");
     }
-    
+
     protected void doTestRequest(String url) throws Exception
     {
         sendJabberMessageFromNewThread();
 
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage muleMessage = client.request(url, RECEIVE_TIMEOUT);
         assertNotNull(muleMessage);
 
@@ -111,6 +111,7 @@ public class XmppMessageSyncTestCase extends AbstractXmppTestCase
     {
         JabberSender sender = new JabberSender(new Callback()
         {
+            @Override
             public void doit() throws Exception
             {
                 Thread.sleep(JABBER_SEND_THREAD_SLEEP_TIME);

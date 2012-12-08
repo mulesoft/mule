@@ -14,15 +14,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Properties;
-import java.util.concurrent.TimeUnit;
-
-import org.jivesoftware.smack.packet.Message;
-import org.jivesoftware.smack.packet.Packet;
-import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
@@ -33,14 +24,32 @@ import org.mule.transport.xmpp.JabberSender.Callback;
 import org.mule.util.UUID;
 import org.mule.util.concurrent.Latch;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Properties;
+import java.util.concurrent.TimeUnit;
+
+import org.jivesoftware.smack.packet.Message;
+import org.jivesoftware.smack.packet.Packet;
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+
 public class XmppMucSyncTestCase extends AbstractXmppTestCase
 {
-
     protected static final long JABBER_SEND_THREAD_SLEEP_TIME = 1000;
     private static final String RECEIVE_SERVICE_NAME = "receiveFromJabber";
     private static final long SHORT_RETRIEVE_TIMEOUT = 100;
 
     private final String testMessage = UUID.getUUID().toString();
+
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, AbstractXmppTestCase.COMMON_CONFIG + "," + "xmpp-muc-sync-config-service.xml"},
+            {ConfigVariant.FLOW, AbstractXmppTestCase.COMMON_CONFIG + "," + "xmpp-muc-sync-config-flow.xml"}
+        });
+    }
 
     public XmppMucSyncTestCase(ConfigVariant variant, String configResources)
     {
@@ -59,15 +68,6 @@ public class XmppMucSyncTestCase extends AbstractXmppTestCase
         jabberClient.joinGroupchat(chatroom);
     }
 
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, AbstractXmppTestCase.COMMON_CONFIG + "," + "xmpp-muc-sync-config-service.xml"},
-            {ConfigVariant.FLOW, AbstractXmppTestCase.COMMON_CONFIG + "," + "xmpp-muc-sync-config-flow.xml"}
-        });
-    }
-
     @Test
     public void testSendSync() throws Exception
     {
@@ -79,8 +79,7 @@ public class XmppMucSyncTestCase extends AbstractXmppTestCase
 
         Packet packet = jabberClient.receive(RECEIVE_TIMEOUT);
         // The groupchat may have a backlog of messages whis is sent before our input
-        // is transmitted.
-        // Poll the entire groupchat history
+        // is transmitted. Poll the entire groupchat history
         boolean inputSeen = false;
         packet = jabberClient.receive(SHORT_RETRIEVE_TIMEOUT);
         while (packet != null)
@@ -100,8 +99,6 @@ public class XmppMucSyncTestCase extends AbstractXmppTestCase
     @Test
     public void testReceiveSync() throws Exception
     {
-        startService(RECEIVE_SERVICE_NAME);
-
         Latch receiveLatch = new Latch();
         setupTestServiceComponent(receiveLatch);
 

@@ -10,8 +10,9 @@
 
 package org.mule.transport.xmpp;
 
-import org.mule.api.MuleException;
-import org.mule.api.service.Service;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Properties;
 import java.util.concurrent.CountDownLatch;
@@ -20,20 +21,15 @@ import java.util.concurrent.TimeUnit;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Packet;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 public abstract class AbstractXmppTestCase extends XmppEnableDisableTestCase
 {
-
+    protected static final String COMMON_CONFIG = "xmpp-connector-config.xml";
     private static final long STARTUP_TIMEOUT = 5000;
 
     private CountDownLatch jabberLatch;
     protected JabberClient jabberClient;
     protected String conversationPartner;
     protected String muleJabberUserId;
-    protected static final String COMMON_CONFIG = "xmpp-connector-config.xml";
 
     public AbstractXmppTestCase(ConfigVariant variant, String configResources)
     {
@@ -60,7 +56,7 @@ public abstract class AbstractXmppTestCase extends XmppEnableDisableTestCase
         String password = properties.getProperty("conversationPartnerPassword");
 
         // also save the jid that is used to connect to the jabber server
-        muleJabberUserId = properties.getProperty("user") + "@" + host;
+        muleJabberUserId = properties.getProperty("xmppUser") + "@" + host;
 
         jabberClient = new JabberClient(host, conversationPartner, password);
         configureJabberClient(jabberClient);
@@ -82,14 +78,6 @@ public abstract class AbstractXmppTestCase extends XmppEnableDisableTestCase
             jabberClient.disconnect();
         }
         super.doTearDown();
-    }
-
-    protected void startService(String serviceName) throws MuleException
-    {
-        Service service = muleContext.getRegistry().lookupService(serviceName);
-        assertNotNull(service);
-
-        service.start();
     }
 
     protected void startSendThread(JabberSender sender)

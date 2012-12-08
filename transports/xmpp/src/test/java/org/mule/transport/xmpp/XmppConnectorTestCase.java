@@ -26,11 +26,15 @@ public class XmppConnectorTestCase extends AbstractConnectorTestCase
     @Override
     public Connector createConnector() throws Exception
     {
-        XmppConnector cnn = new XmppConnector(muleContext);
-        cnn.setName("xmppConnector");
-        return cnn;
+        XmppConnector connector = new XmppConnector(muleContext);
+        connector.setName("xmppConnector");
+        connector.setHost("localhost");
+        connector.setUser("mule1");
+        connector.setPassword("mule");
+        return connector;
     }
 
+    @Override
     public Object getValidMessage() throws Exception
     {
         Message message = new Message("ross@jabber.org");
@@ -43,8 +47,9 @@ public class XmppConnectorTestCase extends AbstractConnectorTestCase
         return "xmpp";
     }
 
+    @Override
     public String getTestEndpointURI()
     {
-        return this.getProtocol() + "://mule1:mule@jabber.org.au/ross@jabber.org";
+        return getProtocol() + "://MESSAGE/mule1@localhost";
     }
 }
