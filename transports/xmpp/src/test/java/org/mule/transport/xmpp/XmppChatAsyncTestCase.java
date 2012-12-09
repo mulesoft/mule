@@ -12,8 +12,6 @@ package org.mule.transport.xmpp;
 
 import static org.junit.Assert.assertEquals;
 
-import org.mule.transport.xmpp.JabberSender.Callback;
-
 import java.util.Arrays;
 import java.util.Collection;
 
@@ -52,15 +50,6 @@ public class XmppChatAsyncTestCase extends XmppMessageAsyncTestCase
     @Override
     protected void sendJabberMessageFromNewThread()
     {
-        JabberSender sender = new JabberSender(new Callback()
-        {
-            @Override
-            public void doit() throws Exception
-            {
-                Thread.sleep(JABBER_SEND_THREAD_SLEEP_TIME);
-                jabberClient.sendChatMessage(muleJabberUserId, TEST_MESSAGE);
-            }
-        });
-        startSendThread(sender);
+        sendChatMessageFromNewThread();
     }
 }

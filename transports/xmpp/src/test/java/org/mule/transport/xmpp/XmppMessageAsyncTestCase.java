@@ -15,7 +15,6 @@ import static org.junit.Assert.assertTrue;
 
 import org.mule.api.client.MuleClient;
 import org.mule.tck.functional.FunctionalTestComponent;
-import org.mule.transport.xmpp.JabberSender.Callback;
 import org.mule.util.concurrent.Latch;
 
 import java.util.Arrays;
@@ -104,15 +103,6 @@ public class XmppMessageAsyncTestCase extends AbstractXmppTestCase
 
     protected void sendJabberMessageFromNewThread()
     {
-        JabberSender sender = new JabberSender(new Callback()
-        {
-            @Override
-            public void doit() throws Exception
-            {
-                Thread.sleep(JABBER_SEND_THREAD_SLEEP_TIME);
-                jabberClient.sendMessage(muleJabberUserId, TEST_MESSAGE);
-            }
-        });
-        startSendThread(sender);
+        sendNormalMessageFromNewThread();
     }
 }

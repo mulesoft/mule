@@ -102,7 +102,7 @@ public class XmppMucSyncTestCase extends AbstractXmppTestCase
         Latch receiveLatch = new Latch();
         setupTestServiceComponent(receiveLatch);
 
-        sendJabberMessageFromNewThread();
+        sendMucMessageFromNewThread();
         assertTrue(receiveLatch.await(60, TimeUnit.SECONDS));
     }
 
@@ -121,7 +121,7 @@ public class XmppMucSyncTestCase extends AbstractXmppTestCase
         return Message.Type.groupchat;
     }
 
-    protected void sendJabberMessageFromNewThread()
+    protected void sendMucMessageFromNewThread()
     {
         JabberSender sender = new JabberSender(new Callback()
         {

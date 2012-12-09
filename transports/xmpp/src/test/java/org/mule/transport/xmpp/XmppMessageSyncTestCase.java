@@ -18,7 +18,6 @@ import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.transport.NullPayload;
-import org.mule.transport.xmpp.JabberSender.Callback;
 import org.mule.util.concurrent.Latch;
 
 import java.util.Arrays;
@@ -27,7 +26,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Packet;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
@@ -82,42 +80,13 @@ public class XmppMessageSyncTestCase extends AbstractXmppTestCase
         component.setEventCallback(callback);
     }
 
-    @Ignore("requesting should be done in a completely different test case that does not require an initially stopped service")
-    @Test
-    public void testRequestSync() throws Exception
+    protected  void sendJabberMessageFromNewThread()
     {
-        doTestRequest("xmpp://MESSAGE/mule2@localhost?exchangePattern=request-response");
-    }
-
-    protected void doTestRequest(String url) throws Exception
-    {
-        sendJabberMessageFromNewThread();
-
-        MuleClient client = muleContext.getClient();
-        MuleMessage muleMessage = client.request(url, RECEIVE_TIMEOUT);
-        assertNotNull(muleMessage);
-
-        Message xmppMessage = (Message) muleMessage.getPayload();
-        assertEquals(expectedXmppMessageType(), xmppMessage.getType());
-        assertEquals(TEST_MESSAGE, xmppMessage.getBody());
+        sendNormalMessageFromNewThread();
     }
 
     protected Message.Type expectedXmppMessageType()
     {
         return Message.Type.normal;
-    }
-
-    protected void sendJabberMessageFromNewThread()
-    {
-        JabberSender sender = new JabberSender(new Callback()
-        {
-            @Override
-            public void doit() throws Exception
-            {
-                Thread.sleep(JABBER_SEND_THREAD_SLEEP_TIME);
-                jabberClient.sendMessage(muleJabberUserId, TEST_MESSAGE);
-            }
-        });
-        startSendThread(sender);
     }
 }

@@ -14,6 +14,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import org.mule.transport.xmpp.JabberSender.Callback;
+
 import java.util.Properties;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -24,6 +26,7 @@ import org.jivesoftware.smack.packet.Packet;
 public abstract class AbstractXmppTestCase extends XmppEnableDisableTestCase
 {
     protected static final String COMMON_CONFIG = "xmpp-connector-config.xml,";
+    private static final long JABBER_SEND_THREAD_SLEEP_TIME = 1000;
     private static final long STARTUP_TIMEOUT = 5000;
 
     private CountDownLatch jabberLatch;
@@ -78,6 +81,34 @@ public abstract class AbstractXmppTestCase extends XmppEnableDisableTestCase
             jabberClient.disconnect();
         }
         super.doTearDown();
+    }
+
+    protected void sendNormalMessageFromNewThread()
+    {
+        JabberSender sender = new JabberSender(new Callback()
+        {
+            @Override
+            public void doit() throws Exception
+            {
+                Thread.sleep(JABBER_SEND_THREAD_SLEEP_TIME);
+                jabberClient.sendMessage(muleJabberUserId, TEST_MESSAGE);
+            }
+        });
+        startSendThread(sender);
+    }
+
+    protected void sendChatMessageFromNewThread()
+    {
+        JabberSender sender = new JabberSender(new Callback()
+        {
+            @Override
+            public void doit() throws Exception
+            {
+                Thread.sleep(JABBER_SEND_THREAD_SLEEP_TIME);
+                jabberClient.sendChatMessage(muleJabberUserId, TEST_MESSAGE);
+            }
+        });
+        startSendThread(sender);
     }
 
     protected void startSendThread(JabberSender sender)

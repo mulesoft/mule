@@ -10,14 +10,11 @@
 
 package org.mule.transport.xmpp;
 
-import org.mule.transport.xmpp.JabberSender.Callback;
-
 import java.util.Arrays;
 import java.util.Collection;
 
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Message.Type;
-import org.junit.Ignore;
 import org.junit.runners.Parameterized.Parameters;
 
 public class XmppChatSyncTestCase extends XmppMessageSyncTestCase
@@ -36,31 +33,15 @@ public class XmppChatSyncTestCase extends XmppMessageSyncTestCase
         super(variant, configResources);
     }
 
-    @Ignore("requesting should be done in a completely different test case that does not require an initially stopped service")
     @Override
-    public void testRequestSync() throws Exception
+    protected  void sendJabberMessageFromNewThread()
     {
-        doTestRequest("xmpp://CHAT/mule2@localhost?exchangePattern=request-response");
+        sendChatMessageFromNewThread();
     }
 
     @Override
     protected Type expectedXmppMessageType()
     {
         return Message.Type.chat;
-    }
-
-    @Override
-    protected void sendJabberMessageFromNewThread()
-    {
-        JabberSender sender = new JabberSender(new Callback()
-        {
-            @Override
-            public void doit() throws Exception
-            {
-                Thread.sleep(JABBER_SEND_THREAD_SLEEP_TIME);
-                jabberClient.sendChatMessage(muleJabberUserId, TEST_MESSAGE);
-            }
-        });
-        startSendThread(sender);
     }
 }
