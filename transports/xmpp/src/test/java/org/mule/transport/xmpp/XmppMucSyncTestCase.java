@@ -16,7 +16,7 @@ import static org.junit.Assert.assertTrue;
 
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.transport.NullPayload;
@@ -71,7 +71,7 @@ public class XmppMucSyncTestCase extends AbstractXmppTestCase
     @Test
     public void testSendSync() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage reply = client.send("vm://in", testMessage, null);
         assertNotNull(reply);
 

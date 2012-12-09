@@ -14,7 +14,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.transport.NullPayload;
 
 import java.util.Arrays;
@@ -46,8 +46,8 @@ public class XmppFunctionalTestCase extends XmppEnableDisableTestCase
     @Test
     public void testDispatchNormalMessage() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
-        Map<String, String> messageProperties = new HashMap<String, String>();
+        MuleClient client = muleContext.getClient();
+        Map<String, Object> messageProperties = new HashMap<String, Object>();
         messageProperties.put(XmppConnector.XMPP_SUBJECT, "da subject");
         client.dispatch("vm://in", TEST_MESSAGE, messageProperties);
 
@@ -57,7 +57,7 @@ public class XmppFunctionalTestCase extends XmppEnableDisableTestCase
     @Test
     public void testSendNormalMessage() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage result = client.send("vm://in", TEST_MESSAGE, null);
         assertNotNull(result);
         assertFalse(result.getPayload() instanceof NullPayload);
@@ -66,7 +66,7 @@ public class XmppFunctionalTestCase extends XmppEnableDisableTestCase
     @Test
     public void testDispatchChat() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         client.dispatch("vm://in", TEST_MESSAGE, null);
 
         Thread.sleep(10000);
@@ -75,7 +75,7 @@ public class XmppFunctionalTestCase extends XmppEnableDisableTestCase
     @Test
     public void testSendChat() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage result = client.send("vm://in", TEST_MESSAGE, null);
         assertNotNull(result);
         assertFalse(result.getPayload() instanceof NullPayload);
