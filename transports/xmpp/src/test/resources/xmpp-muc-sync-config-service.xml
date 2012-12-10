@@ -26,11 +26,8 @@
                 </pass-through-router>
             </outbound>
         </service>
-        <!-- 
-            This flow is started from within the test case to avoid it consuming messages when 
-            testing the message requester.
-        -->
-        <service name="receiveFromJabber" initialState="stopped">
+
+        <service name="receiveFromJabber">
             <inbound>
                 <xmpp:inbound-endpoint type="GROUPCHAT" from="${chatroom}" exchange-pattern="request-response"/>
             </inbound>

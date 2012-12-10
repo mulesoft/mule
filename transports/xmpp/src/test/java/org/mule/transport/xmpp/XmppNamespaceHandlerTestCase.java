@@ -10,6 +10,10 @@
 
 package org.mule.transport.xmpp;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
@@ -20,19 +24,14 @@ import org.mule.transport.xmpp.transformers.XmppPacketToObject;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 public class XmppNamespaceHandlerTestCase extends FunctionalTestCase
 {
-
     public XmppNamespaceHandlerTestCase()
     {
         // no need to connect to the Jabber server
         setStartContext(false);
     }
-    
+
     @Override
     protected String getConfigResources()
     {
@@ -60,14 +59,14 @@ public class XmppNamespaceHandlerTestCase extends FunctionalTestCase
         assertEquals("xmpp://MESSAGE/recipient@jabberhost", endpoint.getEndpointURI().toString());
         assertEquals("TheSubject", endpoint.getProperty(XmppConnector.XMPP_SUBJECT));
     }
-    
+
     @Test
     public void testReceivingChatEndpoint() throws Exception
     {
         InboundEndpoint endpoint = lookupInboundEndpoint("receivingChatEndpoint");
         assertEquals("xmpp://CHAT/sender@jabberhost", endpoint.getEndpointURI().toString());
     }
-    
+
     @Test
     public void testTransformers() throws Exception
     {
@@ -79,29 +78,29 @@ public class XmppNamespaceHandlerTestCase extends FunctionalTestCase
         assertNotNull(transformer);
         assertEquals(XmppPacketToObject.class, transformer.getClass());
     }
-    
-    private OutboundEndpoint lookupOutboundEndpoint(String name) throws Exception
+
+    private OutboundEndpoint lookupOutboundEndpoint(String endpointName) throws Exception
     {
-        EndpointBuilder endpointBuilder = lookupEndpointBuilder(name);
+        EndpointBuilder endpointBuilder = lookupEndpointBuilder(endpointName);
         return endpointBuilder.buildOutboundEndpoint();
     }
 
-    private InboundEndpoint lookupInboundEndpoint(String name) throws Exception
+    private InboundEndpoint lookupInboundEndpoint(String endpointName) throws Exception
     {
-        EndpointBuilder endpointBuilder = lookupEndpointBuilder(name);
+        EndpointBuilder endpointBuilder = lookupEndpointBuilder(endpointName);
         return endpointBuilder.buildInboundEndpoint();
     }
 
-    private EndpointBuilder lookupEndpointBuilder(String name)
+    private EndpointBuilder lookupEndpointBuilder(String endpointName)
     {
-        EndpointBuilder endpointBuilder = muleContext.getRegistry().lookupEndpointBuilder(name);
+        EndpointBuilder endpointBuilder = muleContext.getRegistry().lookupEndpointBuilder(endpointName);
         assertNotNull(endpointBuilder);
         return endpointBuilder;
     }
-    
-    private Transformer lookupTransformer(String name)
+
+    private Transformer lookupTransformer(String transformerName)
     {
-        Transformer transformer = muleContext.getRegistry().lookupTransformer(name);
+        Transformer transformer = muleContext.getRegistry().lookupTransformer(transformerName);
         assertNotNull(transformer);
         return transformer;
     }

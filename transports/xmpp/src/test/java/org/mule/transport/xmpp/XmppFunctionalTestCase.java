@@ -13,65 +13,69 @@ package org.mule.transport.xmpp;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 
-import java.util.Arrays;
-import java.util.Collection;
-
-import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.transport.NullPayload;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.junit.Ignore;
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+
+@Ignore
 public class XmppFunctionalTestCase extends XmppEnableDisableTestCase
 {
-    
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][] {
+            {ConfigVariant.SERVICE, "xmpp-functional-config-service.xml"},
+            {ConfigVariant.FLOW, "xmpp-functional-config-flow.xml"}
+        });
+    }
+
     public XmppFunctionalTestCase(ConfigVariant variant, String configResources)
     {
         super(variant, configResources);
     }
 
-    @Parameters
-    public static Collection<Object[]> parameters()
+    @Test
+    public void testDispatchNormalMessage() throws Exception
     {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, AbstractXmppTestCase.COMMON_CONFIG + "," + "xmpp-functional-config-service.xml"},
-            {ConfigVariant.FLOW, AbstractXmppTestCase.COMMON_CONFIG + "," + "xmpp-functional-config-flow.xml"}
-        });
+        MuleClient client = muleContext.getClient();
+        Map<String, Object> messageProperties = new HashMap<String, Object>();
+        messageProperties.put(XmppConnector.XMPP_SUBJECT, "da subject");
+        client.dispatch("vm://in", TEST_MESSAGE, messageProperties);
+
+        Thread.sleep(10000);
     }
 
-//    @Test
-//    public void testDispatchNormalMessage() throws Exception
-//    {
-//        MuleClient client = new MuleClient(muleContext);
-//        Map<String, String> messageProperties = new HashMap<String, String>();
-//        messageProperties.put(XmppConnector.XMPP_SUBJECT, "da subject");
-//        client.dispatch("vm://in", TEST_MESSAGE, messageProperties);
-//        
-//        Thread.sleep(10000);
-//    }
-    
-//    @Test
-//    public void testSendNormalMessage() throws Exception
-//    {
-//        MuleClient client = new MuleClient(muleContext);
-//        MuleMessage result = client.send("vm://in", TEST_MESSAGE, null);
-//        assertNotNull(result);
-//        assertFalse(result.getPayload() instanceof NullPayload);
-//    }
+    @Test
+    public void testSendNormalMessage() throws Exception
+    {
+        MuleClient client = muleContext.getClient();
+        MuleMessage result = client.send("vm://in", TEST_MESSAGE, null);
+        assertNotNull(result);
+        assertFalse(result.getPayload() instanceof NullPayload);
+    }
 
-//    @Test
-//    public void testDispatchChat() throws Exception
-//    {
-//        MuleClient client = new MuleClient(muleContext);
-//        client.dispatch("vm://in", TEST_MESSAGE, null);
-//
-//        Thread.sleep(10000);
-//    }
+    @Test
+    public void testDispatchChat() throws Exception
+    {
+        MuleClient client = muleContext.getClient();
+        client.dispatch("vm://in", TEST_MESSAGE, null);
+
+        Thread.sleep(10000);
+    }
 
     @Test
     public void testSendChat() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage result = client.send("vm://in", TEST_MESSAGE, null);
         assertNotNull(result);
         assertFalse(result.getPayload() instanceof NullPayload);

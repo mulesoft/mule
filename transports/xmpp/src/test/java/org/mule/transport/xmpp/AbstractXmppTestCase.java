@@ -10,8 +10,11 @@
 
 package org.mule.transport.xmpp;
 
-import org.mule.api.MuleException;
-import org.mule.api.service.Service;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+import org.mule.transport.xmpp.JabberSender.Callback;
 
 import java.util.Properties;
 import java.util.concurrent.CountDownLatch;
@@ -20,24 +23,20 @@ import java.util.concurrent.TimeUnit;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Packet;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 public abstract class AbstractXmppTestCase extends XmppEnableDisableTestCase
 {
-
+    protected static final String COMMON_CONFIG = "xmpp-connector-config.xml,";
+    private static final long JABBER_SEND_THREAD_SLEEP_TIME = 1000;
     private static final long STARTUP_TIMEOUT = 5000;
 
     private CountDownLatch jabberLatch;
     protected JabberClient jabberClient;
     protected String conversationPartner;
     protected String muleJabberUserId;
-    protected static final String COMMON_CONFIG = "xmpp-connector-config.xml";
 
     public AbstractXmppTestCase(ConfigVariant variant, String configResources)
     {
-        super(variant, configResources);
+        super(variant, COMMON_CONFIG + configResources);
     }
 
     @Override
@@ -60,7 +59,7 @@ public abstract class AbstractXmppTestCase extends XmppEnableDisableTestCase
         String password = properties.getProperty("conversationPartnerPassword");
 
         // also save the jid that is used to connect to the jabber server
-        muleJabberUserId = properties.getProperty("user") + "@" + host;
+        muleJabberUserId = properties.getProperty("xmppUser") + "@" + host;
 
         jabberClient = new JabberClient(host, conversationPartner, password);
         configureJabberClient(jabberClient);
@@ -84,12 +83,32 @@ public abstract class AbstractXmppTestCase extends XmppEnableDisableTestCase
         super.doTearDown();
     }
 
-    protected void startService(String serviceName) throws MuleException
+    protected void sendNormalMessageFromNewThread()
     {
-        Service service = muleContext.getRegistry().lookupService(serviceName);
-        assertNotNull(service);
+        JabberSender sender = new JabberSender(new Callback()
+        {
+            @Override
+            public void doit() throws Exception
+            {
+                Thread.sleep(JABBER_SEND_THREAD_SLEEP_TIME);
+                jabberClient.sendMessage(muleJabberUserId, TEST_MESSAGE);
+            }
+        });
+        startSendThread(sender);
+    }
 
-        service.start();
+    protected void sendChatMessageFromNewThread()
+    {
+        JabberSender sender = new JabberSender(new Callback()
+        {
+            @Override
+            public void doit() throws Exception
+            {
+                Thread.sleep(JABBER_SEND_THREAD_SLEEP_TIME);
+                jabberClient.sendChatMessage(muleJabberUserId, TEST_MESSAGE);
+            }
+        });
+        startSendThread(sender);
     }
 
     protected void startSendThread(JabberSender sender)

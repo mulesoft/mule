@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:spring="http://www.springframework.org/schema/beans"
-    xmlns:xmpp="http://www.mulesoft.org/schema/mule/xmpp" xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
-    xmlns:test="http://www.mulesoft.org/schema/mule/test" xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:xmpp="http://www.mulesoft.org/schema/mule/xmpp"
+    xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+    xmlns:test="http://www.mulesoft.org/schema/mule/test"
+    xmlns:context="http://www.springframework.org/schema/context"
     xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-current.xsd
@@ -13,24 +16,13 @@
 
 
     <flow name="sendViaMuc">
-
-        <vm:inbound-endpoint path="in"
-            exchange-pattern="request-response" />
-
-
-
-        <xmpp:outbound-endpoint type="GROUPCHAT"
-            recipient="${chatroom}" nickname="muley" exchange-pattern="request-response" />
-
+        <vm:inbound-endpoint path="in" exchange-pattern="request-response" />
+        <xmpp:outbound-endpoint type="GROUPCHAT" recipient="${chatroom}" nickname="muley"
+            exchange-pattern="request-response"/>
     </flow>
-    <!-- This flow is started from within the test case to avoid it consuming 
-        messages when testing the message requester. -->
+
     <flow name="receiveFromJabber">
-
-        <xmpp:inbound-endpoint type="GROUPCHAT"
-            from="${chatroom}" exchange-pattern="request-response" />
-
+        <xmpp:inbound-endpoint type="GROUPCHAT" from="${chatroom}" exchange-pattern="request-response" />
         <test:component />
     </flow>
-
 </mule>

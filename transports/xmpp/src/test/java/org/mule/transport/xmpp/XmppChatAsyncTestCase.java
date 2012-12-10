@@ -17,23 +17,21 @@ import java.util.Collection;
 
 import org.jivesoftware.smack.packet.Message;
 import org.junit.runners.Parameterized.Parameters;
-import org.mule.transport.xmpp.JabberSender.Callback;
 
 public class XmppChatAsyncTestCase extends XmppMessageAsyncTestCase
 {
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][] {
+            {ConfigVariant.SERVICE, "xmpp-chat-async-config-service.xml"},
+            {ConfigVariant.FLOW, "xmpp-chat-async-config-flow.xml"}
+        });
+    }
 
     public XmppChatAsyncTestCase(ConfigVariant variant, String configResources)
     {
         super(variant, configResources);
-    }
-
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE,
-                AbstractXmppTestCase.COMMON_CONFIG + "," + "xmpp-chat-async-config-service.xml"},
-            {ConfigVariant.FLOW, AbstractXmppTestCase.COMMON_CONFIG + "," + "xmpp-chat-async-config-flow.xml"}});
     }
 
     @Override
@@ -52,14 +50,6 @@ public class XmppChatAsyncTestCase extends XmppMessageAsyncTestCase
     @Override
     protected void sendJabberMessageFromNewThread()
     {
-        JabberSender sender = new JabberSender(new Callback()
-        {
-            public void doit() throws Exception
-            {
-                Thread.sleep(JABBER_SEND_THREAD_SLEEP_TIME);
-                jabberClient.sendChatMessage(muleJabberUserId, TEST_MESSAGE);
-            }
-        });
-        startSendThread(sender);
+        sendChatMessageFromNewThread();
     }
 }

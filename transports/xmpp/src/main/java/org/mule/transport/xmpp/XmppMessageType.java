@@ -10,10 +10,31 @@
 
 package org.mule.transport.xmpp;
 
+import org.jivesoftware.smack.packet.Message;
+
+
 /**
  * This enum represents the XMPP message types that can be used in Mule.
  */
 public enum XmppMessageType
 {
-    MESSAGE, CHAT, GROUPCHAT
+    /**
+     * represents messages of type {@link Message.Type.normal}
+     */
+    MESSAGE,
+
+    /**
+     * represents messages of type {@link Message.Type.chat}
+     */
+    CHAT,
+
+    /**
+     * represents messages of type {@link Message.Type.groupchat}
+     */
+    GROUPCHAT,
+
+    /**
+     * dynamic Mule endpoints use this identifier
+     */
+    dynamic
 }

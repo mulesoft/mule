@@ -22,19 +22,15 @@
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <xmpp:outbound-endpoint type="CHAT" recipient="${conversationPartner}" 
+                    <xmpp:outbound-endpoint type="CHAT" recipient="${conversationPartner}"
                         exchange-pattern="one-way"/>
                 </pass-through-router>
             </outbound>
         </service>
-        <!-- 
-            This flow is started from within the test case to avoid it consuming messages when 
-            testing the message requester.
-        -->
-        <service name="receiveFromJabber" initialState="stopped">
+
+        <service name="receiveFromJabber">
             <inbound>
-                <xmpp:inbound-endpoint type="CHAT" from="${conversationPartner}"
-                    exchange-pattern="one-way"/>
+                <xmpp:inbound-endpoint type="CHAT" from="${conversationPartner}" exchange-pattern="one-way"/>
             </inbound>
             <test:component/>
         </service>

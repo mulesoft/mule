@@ -16,48 +16,32 @@ import java.util.Collection;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Message.Type;
 import org.junit.runners.Parameterized.Parameters;
-import org.mule.transport.xmpp.JabberSender.Callback;
 
 public class XmppChatSyncTestCase extends XmppMessageSyncTestCase
 {
-    
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "xmpp-chat-sync-config-service.xml"},
+            {ConfigVariant.FLOW, "xmpp-chat-sync-config-flow.xml"}
+        });
+    }
+
     public XmppChatSyncTestCase(ConfigVariant variant, String configResources)
     {
         super(variant, configResources);
     }
 
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, AbstractXmppTestCase.COMMON_CONFIG + "," + "xmpp-chat-sync-config-service.xml"},
-            {ConfigVariant.FLOW, AbstractXmppTestCase.COMMON_CONFIG + "," + "xmpp-chat-sync-config-flow.xml"}
-        });
-    }
-
     @Override
-    public void testRequestSync() throws Exception
+    protected  void sendJabberMessageFromNewThread()
     {
-        doTestRequest("xmpp://CHAT/mule2@localhost?exchangePattern=request-response");
+        sendChatMessageFromNewThread();
     }
 
     @Override
     protected Type expectedXmppMessageType()
     {
         return Message.Type.chat;
-    }
-    
-    @Override
-    protected void sendJabberMessageFromNewThread()
-    {
-        JabberSender sender = new JabberSender(new Callback()
-        {
-            public void doit() throws Exception
-            {
-                Thread.sleep(JABBER_SEND_THREAD_SLEEP_TIME);
-                jabberClient.sendChatMessage(muleJabberUserId, TEST_MESSAGE);
-            }
-        });
-        startSendThread(sender);
     }
 }
