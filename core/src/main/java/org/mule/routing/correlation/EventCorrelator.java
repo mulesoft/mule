@@ -152,7 +152,7 @@ public class EventCorrelator implements Startable, Stoppable
         {
             if (eventGroups.retrieve(groupId) != null)
             {
-                handleGroupExpiry((EventGroup) eventGroups.retrieve(groupId));
+                handleGroupExpiry(getEventGroup(groupId));
             }
             else
             {
@@ -308,11 +308,11 @@ public class EventCorrelator implements Startable, Stoppable
         }
     }
 
-    protected EventGroup getEventGroup(String groupId) throws ObjectStoreException
+    protected EventGroup getEventGroup(Serializable groupId) throws ObjectStoreException
     {
         try
         {
-            EventGroup eventGroup = (EventGroup) eventGroups.retrieve(groupId);
+            EventGroup eventGroup = eventGroups.retrieve(groupId);
             if (! eventGroup.isInitialised())
             {
                 try
@@ -341,7 +341,7 @@ public class EventCorrelator implements Startable, Stoppable
         }
         catch (ObjectAlreadyExistsException e)
         {
-            return (EventGroup) eventGroups.retrieve((Serializable) group.getGroupId());
+            return getEventGroup((String) group.getGroupId());
         }
     }
 
@@ -526,7 +526,7 @@ public class EventCorrelator implements Startable, Stoppable
             {
                 for (Serializable o : expiredAndDispatchedGroups.allKeys())
                 {
-                    Long time = (Long) expiredAndDispatchedGroups.retrieve(o);
+                    Long time = expiredAndDispatchedGroups.retrieve(o);
                     if (time + groupTimeToLive < System.currentTimeMillis())
                     {
                         expiredAndDispatchedGroups.remove(o);
@@ -547,7 +547,7 @@ public class EventCorrelator implements Startable, Stoppable
             {
                 for (Serializable o : eventGroups.allKeys())
                 {
-                    EventGroup group = (EventGroup) eventGroups.retrieve(o);
+                    EventGroup group = getEventGroup(o) ;
                     if ((group.getCreated() + getTimeout() * MILLI_TO_NANO_MULTIPLIER) < System.nanoTime())
                     {
                         expired.add(group);
