@@ -11,19 +11,27 @@
 package org.mule.transport.http;
 
 import org.mule.RequestContext;
-import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.Connector;
 import org.mule.api.transport.OutputHandler;
 import org.mule.util.SystemUtils;
+import org.mule.util.concurrent.Latch;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
+import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.net.SocketAddress;
 import java.net.SocketException;
+import java.security.cert.Certificate;
 import java.util.Iterator;
+
+import javax.net.ssl.HandshakeCompletedEvent;
+import javax.net.ssl.HandshakeCompletedListener;
+import javax.net.ssl.SSLPeerUnverifiedException;
+import javax.net.ssl.SSLSocket;
 
 import org.apache.commons.httpclient.ChunkedOutputStream;
 import org.apache.commons.httpclient.Header;
@@ -33,9 +41,12 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-/** A connection to the SimpleHttpServer. */
-public class HttpServerConnection
+/**
+ * A connection to the SimpleHttpServer.
+ */
+public class HttpServerConnection implements HandshakeCompletedListener
 {
+
     private static final Log logger = LogFactory.getLog(HttpServerConnection.class);
 
     private Socket socket;
@@ -44,6 +55,10 @@ public class HttpServerConnection
     // this should rather be isKeepSocketOpen as this is the main purpose of this flag
     private boolean keepAlive = false;
     private final String encoding;
+    private HttpRequest cachedRequest;
+    private Latch sslSocketHandshakeComplete = new Latch();
+    private Certificate[] peerCertificateChain;
+    private Certificate[] localCertificateChain;
 
     public HttpServerConnection(final Socket socket, String encoding, HttpConnector connector) throws IOException
     {
@@ -55,20 +70,26 @@ public class HttpServerConnection
         }
 
         this.socket = socket;
+
+        if (this.socket instanceof SSLSocket)
+        {
+            ((SSLSocket) socket).addHandshakeCompletedListener(this);
+        }
+
         setSocketTcpNoDelay();
         this.socket.setKeepAlive(connector.isKeepAlive());
-        
+
         if (connector.getReceiveBufferSize() != Connector.INT_VALUE_NOT_SET
             && socket.getReceiveBufferSize() != connector.getReceiveBufferSize())
         {
-            socket.setReceiveBufferSize(connector.getReceiveBufferSize());            
+            socket.setReceiveBufferSize(connector.getReceiveBufferSize());
         }
         if (connector.getServerSoTimeout() != Connector.INT_VALUE_NOT_SET
             && socket.getSoTimeout() != connector.getServerSoTimeout())
         {
             socket.setSoTimeout(connector.getServerSoTimeout());
         }
-        
+
         this.in = socket.getInputStream();
         this.out = new DataOutputStream(socket.getOutputStream());
         this.encoding = encoding;
@@ -86,7 +107,7 @@ public class HttpServerConnection
             {
                 // this is a known Solaris bug, see
                 // http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6378870
-                
+
                 if (logger.isDebugEnabled())
                 {
                     logger.debug("Failed to set tcpNoDelay on socket", se);
@@ -109,7 +130,7 @@ public class HttpServerConnection
                 {
                     logger.debug("Closing: " + socket);
                 }
-                
+
                 try
                 {
                     socket.shutdownOutput();
@@ -118,7 +139,7 @@ public class HttpServerConnection
                 {
                     //Can't shutdown in/output on SSL sockets
                 }
-                
+
                 if (in != null)
                 {
                     in.close();
@@ -180,6 +201,10 @@ public class HttpServerConnection
 
     public HttpRequest readRequest() throws IOException
     {
+        if (cachedRequest != null)
+        {
+            return cachedRequest;
+        }
         try
         {
             String line = readLine();
@@ -187,7 +212,8 @@ public class HttpServerConnection
             {
                 return null;
             }
-            return new HttpRequest(RequestLine.parseLine(line), HttpParser.parseHeaders(this.in, encoding), this.in, encoding);
+            cachedRequest = new HttpRequest(RequestLine.parseLine(line), HttpParser.parseHeaders(this.in, encoding), this.in, encoding);
+            return cachedRequest;
         }
         catch (IOException e)
         {
@@ -271,21 +297,21 @@ public class HttpServerConnection
         outstream.flush();
     }
 
-    public void writeResponse(final HttpResponse response) throws IOException, TransformerException
+    public void writeResponse(final HttpResponse response) throws IOException
     {
         if (response == null)
         {
             return;
         }
-        
-        if (!response.isKeepAlive()) 
+
+        if (!response.isKeepAlive())
         {
             Header header = new Header(HttpConstants.HEADER_CONNECTION, "close");
             response.setHeader(header);
         }
-        
+
         setKeepAlive(response.isKeepAlive());
-        
+
         ResponseWriter writer = new ResponseWriter(this.out, encoding);
         OutputStream outstream = this.out;
 
@@ -323,6 +349,57 @@ public class HttpServerConnection
         outstream.flush();
     }
 
+    /**
+     * Returns the path of the http request without the http parameters encoded in the URL
+     *
+     * @return
+     * @throws IOException
+     */
+    public String getUrlWithoutRequestParams() throws IOException
+    {
+        return readRequest().getUrlWithoutParams();
+    }
+
+    public String getRemoteClientAddress()
+    {
+        final SocketAddress clientAddress = socket.getRemoteSocketAddress();
+        if (clientAddress != null)
+        {
+            return clientAddress.toString();
+        }
+        return null;
+    }
+
+    /**
+     * Sends to the customer a Failure response.
+     *
+     * @param statusCode  http status code to send to the client
+     * @param description description to send as the body of the response
+     * @throws IOException when it's not possible to write the response back to the client.
+     */
+    public void writeFailureResponse(int statusCode, String description) throws IOException
+    {
+        HttpResponse response = new HttpResponse();
+        response.setStatusLine(readRequest().getRequestLine().getHttpVersion(), statusCode);
+        response.setBody(description);
+        writeResponse(response);
+    }
+
+    /**
+     * @return the uri for the request including scheme, host, port and path. i.e: http://192.168.1.1:7777/service/orders
+     * @throws IOException
+     */
+    public String getFullUri() throws IOException
+    {
+        String scheme = "http";
+        if (socket instanceof SSLSocket)
+        {
+            scheme = "https";
+        }
+        InetSocketAddress localSocketAddress = (InetSocketAddress) socket.getLocalSocketAddress();
+        return String.format("%s://%s:%d%s", scheme, localSocketAddress.getHostName(), localSocketAddress.getPort(), readRequest().getUrlWithoutParams());
+    }
+
     public int getSocketTimeout() throws SocketException
     {
         return this.socket.getSoTimeout();
@@ -331,5 +408,63 @@ public class HttpServerConnection
     public void setSocketTimeout(int timeout) throws SocketException
     {
         this.socket.setSoTimeout(timeout);
+    }
+
+    public Latch getSslSocketHandshakeCompleteLatch()
+    {
+        if (!(socket instanceof SSLSocket))
+        {
+            throw new IllegalStateException("The socket type is not SSL");
+        }
+        return sslSocketHandshakeComplete;
+    }
+
+    /**
+     * Clean up cached values.
+     * <p/>
+     * Must be called if a new request from the same socket associated with the instance is going to be processed.
+     */
+    public void reset()
+    {
+        this.cachedRequest = null;
+    }
+
+    @Override
+    public void handshakeCompleted(HandshakeCompletedEvent handshakeCompletedEvent)
+    {
+        try
+        {
+            localCertificateChain = handshakeCompletedEvent.getLocalCertificates();
+            try
+            {
+                peerCertificateChain = handshakeCompletedEvent.getPeerCertificates();
+            }
+            catch (SSLPeerUnverifiedException e)
+            {
+                logger.debug("Cannot get peer certificate chain: " + e.getMessage());
+            }
+        }
+        finally
+        {
+            sslSocketHandshakeComplete.release();
+        }
+    }
+
+    public Certificate[] getLocalCertificateChain()
+    {
+        if (!(socket instanceof SSLSocket))
+        {
+            throw new IllegalStateException("The socket type is not SSL");
+        }
+        return localCertificateChain;
+    }
+
+    public Certificate[] getPeerCertificateChain()
+    {
+        if (!(socket instanceof SSLSocket))
+        {
+            throw new IllegalStateException("The socket type is not SSL");
+        }
+        return peerCertificateChain;
     }
 }

@@ -36,7 +36,7 @@ public class HttpRequest
     private String defaultEncoding;
 
     public HttpRequest(final RequestLine requestLine, final Header[] headers, final InputStream content, String defaultEncoding)
-        throws IOException
+            throws IOException
     {
         super();
         if (requestLine == null)
@@ -238,6 +238,11 @@ public class HttpRequest
         {
             return null;
         }
+    }
+
+    public String getUrlWithoutParams()
+    {
+        return this.requestLine.getUrlWithoutParams();
     }
 
 }

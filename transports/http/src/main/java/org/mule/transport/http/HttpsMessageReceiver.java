@@ -22,19 +22,13 @@ import org.mule.transport.http.i18n.HttpMessages;
 import org.mule.util.StringUtils;
 
 import java.io.IOException;
-import java.net.Socket;
-import java.security.cert.Certificate;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import javax.net.ssl.HandshakeCompletedEvent;
-import javax.net.ssl.HandshakeCompletedListener;
-import javax.net.ssl.SSLPeerUnverifiedException;
-import javax.net.ssl.SSLSocket;
 import javax.resource.spi.work.Work;
 
 public class HttpsMessageReceiver extends HttpMessageReceiver
 {
+
     public HttpsMessageReceiver(Connector connector, FlowConstruct flow, InboundEndpoint endpoint)
             throws CreateException
     {
@@ -59,21 +53,17 @@ public class HttpsMessageReceiver extends HttpMessageReceiver
     }
 
     @Override
-    protected Work createWork(Socket socket) throws IOException
+    public Work createWork(HttpServerConnection httpServerConnection) throws IOException
     {
-        return new HttpsWorker(socket);
+        return new HttpsWorker(httpServerConnection);
     }
 
-    private class HttpsWorker extends HttpWorker implements HandshakeCompletedListener
+    private class HttpsWorker extends HttpWorker
     {
-        private Certificate[] peerCertificateChain;
-        private Certificate[] localCertificateChain;
-        private final CountDownLatch latch = new CountDownLatch(1);
 
-        public HttpsWorker(Socket socket) throws IOException
+        public HttpsWorker(HttpServerConnection httpServerConnection) throws IOException
         {
-            super(socket);
-            ((SSLSocket) socket).addHandshakeCompletedListener(this);
+            super(httpServerConnection);
         }
 
         @Override
@@ -82,7 +72,7 @@ public class HttpsMessageReceiver extends HttpMessageReceiver
             try
             {
                 long timeout = ((HttpsConnector) getConnector()).getSslHandshakeTimeout();
-                boolean handshakeComplete = latch.await(timeout, TimeUnit.MILLISECONDS);
+                boolean handshakeComplete = getServerConnection().getSslSocketHandshakeCompleteLatch().await(timeout, TimeUnit.MILLISECONDS);
                 if (!handshakeComplete)
                 {
                     throw new MessagingException(HttpMessages.sslHandshakeDidNotComplete(), message);
@@ -91,39 +81,20 @@ public class HttpsMessageReceiver extends HttpMessageReceiver
             catch (InterruptedException e)
             {
                 throw new MessagingException(HttpMessages.sslHandshakeDidNotComplete(),
-                    message, e);
+                                             message, e);
             }
 
             super.preRouteMessage(message);
 
-            if (peerCertificateChain != null)
+            if (getServerConnection().getPeerCertificateChain() != null)
             {
-                message.setOutboundProperty(HttpsConnector.PEER_CERTIFICATES, peerCertificateChain);
+                message.setOutboundProperty(HttpsConnector.PEER_CERTIFICATES, getServerConnection().getPeerCertificateChain());
             }
-            if (localCertificateChain != null)
+            if (getServerConnection().getLocalCertificateChain() != null)
             {
-                message.setOutboundProperty(HttpsConnector.LOCAL_CERTIFICATES, localCertificateChain);
+                message.setOutboundProperty(HttpsConnector.LOCAL_CERTIFICATES, getServerConnection().getLocalCertificateChain());
             }
         }
 
-        public void handshakeCompleted(HandshakeCompletedEvent event)
-        {
-            try
-            {
-                localCertificateChain = event.getLocalCertificates();
-                try
-                {
-                    peerCertificateChain = event.getPeerCertificates();
-                }
-                catch (SSLPeerUnverifiedException e)
-                {
-                    logger.debug("Cannot get peer certificate chain: "+ e.getMessage());
-                }
-            }
-            finally
-            {
-                latch.countDown();
-            }
-        }
     }
 }

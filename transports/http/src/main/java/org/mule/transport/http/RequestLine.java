@@ -27,9 +27,11 @@ import org.apache.commons.httpclient.ProtocolException;
 public class RequestLine
 {
 
+    public static final char PARAMETERS_SEPARATOR = '?';
     private HttpVersion httpversion = null;
     private String method = null;
     private String uri = null;
+    private String uriWithoutParams;
 
     public static RequestLine parseLine(final String l) throws HttpException
     {
@@ -38,7 +40,7 @@ public class RequestLine
         String protocol;
         try
         {
-            if (l==null)
+            if (l == null)
             {
                 throw new ProtocolException(HttpMessages.requestLineIsMalformed(l).getMessage());
             }
@@ -75,7 +77,7 @@ public class RequestLine
     }
 
     public RequestLine(final String method, final String uri, final String httpversion)
-        throws ProtocolException
+            throws ProtocolException
     {
         this(method, uri, HttpVersion.parse(httpversion));
     }
@@ -124,5 +126,22 @@ public class RequestLine
         sb.append(" ");
         sb.append(this.httpversion);
         return sb.toString();
+    }
+
+    /**
+     * @return the url without the request parameters
+     */
+    public String getUrlWithoutParams()
+    {
+        if (this.uriWithoutParams == null)
+        {
+            uriWithoutParams = getUri();
+            int i = uriWithoutParams.indexOf(PARAMETERS_SEPARATOR);
+            if (i > -1)
+            {
+                uriWithoutParams = uriWithoutParams.substring(0, i);
+            }
+        }
+        return uriWithoutParams;
     }
 }

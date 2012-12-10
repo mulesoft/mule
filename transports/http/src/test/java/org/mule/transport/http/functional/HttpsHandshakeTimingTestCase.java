@@ -26,6 +26,8 @@ import org.mule.api.lifecycle.CreateException;
 import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.transport.http.HttpConnector;
+import org.mule.transport.http.HttpServerConnection;
 import org.mule.transport.http.HttpsConnector;
 import org.mule.transport.http.HttpsMessageReceiver;
 import org.mule.transport.ssl.MockHandshakeCompletedEvent;
@@ -34,7 +36,6 @@ import org.mule.transport.ssl.MockSslSocket;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.net.Socket;
 import java.util.Collections;
 import java.util.Map;
 
@@ -54,13 +55,14 @@ import org.junit.Test;
  */
 public class HttpsHandshakeTimingTestCase extends AbstractMuleContextTestCase
 {
+
     @Test
     public void testHttpsHandshakeExceedsTimeout() throws Exception
     {
         MockHttpsMessageReceiver messageReceiver = setupMockHttpsMessageReceiver();
 
         MockSslSocket socket = new MockSslSocket();
-        Work work = messageReceiver.createWork(socket);
+        Work work = messageReceiver.createWork(new HttpServerConnection(socket, messageReceiver.getEndpoint().getEncoding(), (HttpConnector) messageReceiver.getConnector()));
         assertNotNull(work);
 
         MuleMessage message = new DefaultMuleMessage(TEST_MESSAGE, muleContext);
@@ -84,23 +86,21 @@ public class HttpsHandshakeTimingTestCase extends AbstractMuleContextTestCase
         MockHttpsMessageReceiver messageReceiver = setupMockHttpsMessageReceiver();
 
         MockSslSocket socket = new MockSslSocket();
-        Work work = messageReceiver.createWork(socket);
+        HttpServerConnection serverConnection = new HttpServerConnection(socket, messageReceiver.getEndpoint().getEncoding(), (HttpConnector) messageReceiver.getConnector());
+        Work work = messageReceiver.createWork(serverConnection);
         assertNotNull(work);
 
-        invokeHandshakeCompleted(work, socket);
+        invokeHandshakeCompleted(serverConnection, socket);
 
         MuleMessage message = new DefaultMuleMessage(TEST_MESSAGE, muleContext);
         invokePreRouteMessage(work, message);
         assertNotNull(message.<Object>getInboundProperty(MuleProperties.MULE_REMOTE_CLIENT_ADDRESS));
     }
 
-    private void invokeHandshakeCompleted(Work work, MockSslSocket socket) throws Exception
+    private void invokeHandshakeCompleted(HttpServerConnection serverConnection, MockSslSocket socket) throws Exception
     {
-        Method handshakeCompleted = work.getClass().getDeclaredMethod("handshakeCompleted", HandshakeCompletedEvent.class);
-        assertNotNull(handshakeCompleted);
-        handshakeCompleted.setAccessible(true);
         HandshakeCompletedEvent event = new MockHandshakeCompletedEvent(socket);
-        handshakeCompleted.invoke(work, new Object[] { event });
+        serverConnection.handshakeCompleted(event);
     }
 
     private void invokePreRouteMessage(Work work, MuleMessage message) throws Exception
@@ -108,7 +108,7 @@ public class HttpsHandshakeTimingTestCase extends AbstractMuleContextTestCase
         Method preRouteMessage = work.getClass().getDeclaredMethod("preRouteMessage", MuleMessage.class);
         assertNotNull(preRouteMessage);
         preRouteMessage.setAccessible(true);
-        preRouteMessage.invoke(work, new Object[] { message });
+        preRouteMessage.invoke(work, new Object[] {message});
     }
 
     private MockHttpsMessageReceiver setupMockHttpsMessageReceiver() throws CreateException
@@ -128,8 +128,9 @@ public class HttpsHandshakeTimingTestCase extends AbstractMuleContextTestCase
 
     private static class MockHttpsMessageReceiver extends HttpsMessageReceiver
     {
+
         public MockHttpsMessageReceiver(Connector connector, FlowConstruct flowConstruct,
-            InboundEndpoint endpoint) throws CreateException
+                                        InboundEndpoint endpoint) throws CreateException
         {
             super(connector, flowConstruct, endpoint);
         }
@@ -138,9 +139,9 @@ public class HttpsHandshakeTimingTestCase extends AbstractMuleContextTestCase
          * Open up access for unit test
          */
         @Override
-        public Work createWork(Socket socket) throws IOException
+        public Work createWork(HttpServerConnection httpServerConnection) throws IOException
         {
-            return super.createWork(socket);
+            return super.createWork(httpServerConnection);
         }
     }
 }

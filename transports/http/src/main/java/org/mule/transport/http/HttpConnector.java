@@ -12,17 +12,27 @@ package org.mule.transport.http;
 
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
+import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.construct.FlowConstruct;
+import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.api.transport.MessageReceiver;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.transport.ConnectException;
 import org.mule.transport.http.ntlm.NTLMScheme;
 import org.mule.transport.tcp.TcpConnector;
+import org.mule.util.MapUtils;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.InetSocketAddress;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.net.URI;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -58,7 +68,6 @@ import org.apache.commons.httpclient.util.IdleConnectionTimeoutThread;
  * <li>proxyUsername - If the proxy requires authentication supply a username</li>
  * <li>proxyPassword - If the proxy requires authentication supply a password</li>
  * </ul>
- * 
  */
 
 public class HttpConnector extends TcpConnector
@@ -66,13 +75,13 @@ public class HttpConnector extends TcpConnector
 
     public static final String HTTP = "http";
     public static final String HTTP_PREFIX = "http.";
-    
+
     /**
      * MuleEvent property to pass back the status for the response
      */
     public static final String HTTP_STATUS_PROPERTY = HTTP_PREFIX + "status";
     public static final String HTTP_VERSION_PROPERTY = HTTP_PREFIX + "version";
-    
+
     /**
      * @deprecated Instead users can now add properties to the outgoing request using the OUTBOUND property scope on the message.
      */
@@ -93,19 +102,19 @@ public class HttpConnector extends TcpConnector
     public static final String HTTP_QUERY_STRING = HTTP_PREFIX + "query.string";
 
     public static final String HTTP_METHOD_PROPERTY = HTTP_PREFIX + "method";
-    
+
     /**
-     * The path and query portions of the URL being accessed. 
+     * The path and query portions of the URL being accessed.
      */
     public static final String HTTP_REQUEST_PROPERTY = HTTP_PREFIX + "request";
-    
+
     /**
      * The path portion of the URL being accessed. No query string is included.
      */
     public static final String HTTP_REQUEST_PATH_PROPERTY = HTTP_PREFIX + "request.path";
-    
+
     /**
-     * The context path of the endpoint being accessed. This is the path that the 
+     * The context path of the endpoint being accessed. This is the path that the
      * HTTP endpoint is listening on.
      */
     public static final String HTTP_CONTEXT_PATH_PROPERTY = HTTP_PREFIX + "context.path";
@@ -136,10 +145,10 @@ public class HttpConnector extends TcpConnector
 
     public static final String HTTP_DISABLE_STATUS_CODE_EXCEPTION_CHECK = HTTP_PREFIX + "disable.status.code.exception.check";
     public static final String HTTP_ENCODE_PARAMVALUE = HTTP_PREFIX + "encode.paramvalue";
-    
+
     public static final Set<String> HTTP_INBOUND_PROPERTIES;
-    
-    static 
+
+    static
     {
         Set<String> props = new HashSet<String>();
         props.add(HTTP_CONTEXT_PATH_PROPERTY);
@@ -156,13 +165,14 @@ public class HttpConnector extends TcpConnector
 
         AuthPolicy.registerAuthScheme(AuthPolicy.NTLM, NTLMScheme.class);
     }
-    
+
     public static final String HTTP_COOKIE_SPEC_PROPERTY = "cookieSpec";
     public static final String HTTP_COOKIES_PROPERTY = "cookies";
     public static final String HTTP_ENABLE_COOKIES_PROPERTY = "enableCookies";
 
     public static final String COOKIE_SPEC_NETSCAPE = "netscape";
     public static final String COOKIE_SPEC_RFC2109 = "rfc2109";
+    public static final String ROOT_PATH = "/";
 
     private String proxyHostname = null;
 
@@ -184,11 +194,13 @@ public class HttpConnector extends TcpConnector
 
     private boolean disableCleanupThread;
 
+    private org.mule.transport.http.HttpConnectionManager connectionManager;
+
     public HttpConnector(MuleContext context)
     {
         super(context);
     }
-    
+
     @Override
     protected void doInitialise() throws InitialisationException
     {
@@ -251,7 +263,7 @@ public class HttpConnector extends TcpConnector
             {
                 // normalize properties for HTTP
                 Map newProperties = new HashMap(endpointProperties.size());
-                for (Iterator entries = endpointProperties.entrySet().iterator(); entries.hasNext();)
+                for (Iterator entries = endpointProperties.entrySet().iterator(); entries.hasNext(); )
                 {
                     Map.Entry entry = (Map.Entry) entries.next();
                     Object key = entry.getKey();
@@ -355,7 +367,7 @@ public class HttpConnector extends TcpConnector
         if (!(COOKIE_SPEC_NETSCAPE.equalsIgnoreCase(cookieSpec) || COOKIE_SPEC_RFC2109.equalsIgnoreCase(cookieSpec)))
         {
             throw new IllegalArgumentException(
-                CoreMessages.propertyHasInvalidValue("cookieSpec", cookieSpec).toString());
+                    CoreMessages.propertyHasInvalidValue("cookieSpec", cookieSpec).toString());
         }
         this.cookieSpec = cookieSpec;
     }
@@ -424,23 +436,23 @@ public class HttpConnector extends TcpConnector
             String authScopeRealm = msg.getOutboundProperty(HTTP_PREFIX + "auth.scope.realm", AuthScope.ANY_REALM);
             String authScopeScheme = msg.getOutboundProperty(HTTP_PREFIX + "auth.scope.scheme", AuthScope.ANY_SCHEME);
             client.getState().setCredentials(
-                new AuthScope(authScopeHost, authScopePort, authScopeRealm, authScopeScheme),
-                new UsernamePasswordCredentials(event.getCredentials().getUsername(), new String(
-                    event.getCredentials().getPassword())));
+                    new AuthScope(authScopeHost, authScopePort, authScopeRealm, authScopeScheme),
+                    new UsernamePasswordCredentials(event.getCredentials().getUsername(), new String(
+                            event.getCredentials().getPassword())));
         }
         else if (endpoint.getEndpointURI().getUserInfo() != null
-            && endpoint.getProperty(HttpConstants.HEADER_AUTHORIZATION) == null)
+                 && endpoint.getProperty(HttpConstants.HEADER_AUTHORIZATION) == null)
         {
             // Add User Creds
             StringBuffer header = new StringBuffer(128);
             header.append("Basic ");
             header.append(new String(Base64.encodeBase64(endpoint.getEndpointURI().getUserInfo().getBytes(
-                endpoint.getEncoding()))));
+                    endpoint.getEncoding()))));
             httpMethod.addRequestHeader(HttpConstants.HEADER_AUTHORIZATION, header.toString());
         }
         //TODO MULE-4501 this sohuld be removed and handled only in the ObjectToHttpRequest transformer
-        else if (event!=null && event.getMessage().getOutboundProperty(HttpConstants.HEADER_AUTHORIZATION) != null &&
-                httpMethod.getRequestHeader(HttpConstants.HEADER_AUTHORIZATION)==null)
+        else if (event != null && event.getMessage().getOutboundProperty(HttpConstants.HEADER_AUTHORIZATION) != null &&
+                 httpMethod.getRequestHeader(HttpConstants.HEADER_AUTHORIZATION) == null)
         {
             String auth = event.getMessage().getOutboundProperty(HttpConstants.HEADER_AUTHORIZATION);
             httpMethod.addRequestHeader(HttpConstants.HEADER_AUTHORIZATION, auth);
@@ -457,11 +469,11 @@ public class HttpConnector extends TcpConnector
      */
     public static String normalizeUrl(String url)
     {
-        if (url == null) 
+        if (url == null)
         {
             url = "/";
-        } 
-        else if (!url.startsWith("/")) 
+        }
+        else if (!url.startsWith("/"))
         {
             url = "/" + url;
         }
@@ -476,5 +488,94 @@ public class HttpConnector extends TcpConnector
     public void setProxyNtlmAuthentication(boolean proxyNtlmAuthentication)
     {
         this.proxyNtlmAuthentication = proxyNtlmAuthentication;
+    }
+
+    public void connect(EndpointURI endpointURI) throws ConnectException
+    {
+        connectionManager.addConnection(endpointURI);
+    }
+
+    public void disconnect(EndpointURI endpointURI)
+    {
+        connectionManager.removeConnection(endpointURI);
+    }
+
+    public HttpMessageReceiver lookupReceiver(Socket socket, HttpRequest request)
+    {
+        String requestUriWithoutParams = request.getUrlWithoutParams();
+
+        StringBuilder requestUri = new StringBuilder(80);
+        if (requestUriWithoutParams.indexOf("://") == -1)
+        {
+            String hostName = ((InetSocketAddress) socket.getLocalSocketAddress()).getHostName();
+            int port = ((InetSocketAddress) socket.getLocalSocketAddress()).getPort();
+            requestUri.append(getProtocol()).append("://").append(hostName).append(':').append(port);
+            if (!ROOT_PATH.equals(requestUriWithoutParams))
+            {
+                requestUri.append(requestUriWithoutParams);
+            }
+        }
+
+        String uriStr = requestUri.toString();
+        // first check that there is a receiver on the root address
+        if (logger.isTraceEnabled())
+        {
+            logger.trace("Looking up receiver on connector: " + getName() + " with URI key: "
+                         + requestUri.toString());
+        }
+
+        HttpMessageReceiver receiver = (HttpMessageReceiver) lookupReceiver(uriStr);
+
+        // If no receiver on the root and there is a request path, look up the
+        // received based on the root plus request path
+        if (receiver == null && !ROOT_PATH.equals(requestUriWithoutParams))
+        {
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Secondary lookup of receiver on connector: " + getName()
+                             + " with URI key: " + requestUri.toString());
+            }
+
+            receiver = (HttpMessageReceiver) findReceiverByStem(getReceivers(), uriStr);
+
+            if (receiver == null && logger.isWarnEnabled())
+            {
+                logger.warn("No receiver found with secondary lookup on connector: " + getName()
+                            + " with URI key: " + requestUri.toString());
+                logger.warn("Receivers on connector are: "
+                            + MapUtils.toString(getReceivers(), true));
+            }
+        }
+        return receiver;
+    }
+
+    public static MessageReceiver findReceiverByStem(Map<Object, MessageReceiver> receivers, String uriStr)
+    {
+        int match = 0;
+        MessageReceiver receiver = null;
+        for (Map.Entry<Object, MessageReceiver> e : receivers.entrySet())
+        {
+            String key = (String) e.getKey();
+            MessageReceiver candidate = e.getValue();
+            if (uriStr.startsWith(key) && match < key.length())
+            {
+                match = key.length();
+                receiver = candidate;
+            }
+        }
+        return receiver;
+    }
+
+    @Override
+    protected ServerSocket getServerSocket(URI uri) throws IOException
+    {
+        return super.getServerSocket(uri);
+    }
+
+    @Override
+    protected void doStart() throws MuleException
+    {
+        super.doStart();
+        connectionManager = new org.mule.transport.http.HttpConnectionManager(this, getReceiverWorkManager());
     }
 }
