@@ -89,7 +89,8 @@
                                                     ant.jar(
                                                         basedir: tempDir,
                                                         destfile: file,
-                                                        excludes: "log4j.properties")
+                                                        excludes: "log4j.properties",
+                                                        manifest: tempDir + "/META-INF/MANIFEST.MF")
                                                 }
                                         }
                                 }
