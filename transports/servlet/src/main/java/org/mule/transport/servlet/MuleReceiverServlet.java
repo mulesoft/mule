@@ -277,7 +277,7 @@ public class MuleReceiverServlet extends AbstractReceiverServlet
         // any of the receiver keys.
         if (receiver == null)
         {
-            receiver = HttpMessageReceiver.findReceiverByStem(connector.getReceivers(), uri);
+            receiver = HttpConnector.findReceiverByStem(connector.getReceivers(), uri);
         }
 
         if (receiver == null)

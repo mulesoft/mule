@@ -502,14 +502,26 @@ public class HttpConnector extends TcpConnector
 
     public HttpMessageReceiver lookupReceiver(Socket socket, HttpRequest request)
     {
-        String requestUriWithoutParams = request.getUrlWithoutParams();
+        int port = ((InetSocketAddress) socket.getLocalSocketAddress()).getPort();
+        String host = null;
+        for (MessageReceiver messageReceiver : receivers.values())
+        {
+            if (messageReceiver.getEndpointURI().getPort() == port)
+            {
+                host = messageReceiver.getEndpointURI().getHost();
+                break;
+            }
+        }
+        if (host == null)
+        {
+            return null;
+        }
 
+        String requestUriWithoutParams = request.getUrlWithoutParams();
         StringBuilder requestUri = new StringBuilder(80);
         if (requestUriWithoutParams.indexOf("://") == -1)
         {
-            String hostName = ((InetSocketAddress) socket.getLocalSocketAddress()).getHostName();
-            int port = ((InetSocketAddress) socket.getLocalSocketAddress()).getPort();
-            requestUri.append(getProtocol()).append("://").append(hostName).append(':').append(port);
+            requestUri.append(getProtocol()).append("://").append(host).append(':').append(port);
             if (!ROOT_PATH.equals(requestUriWithoutParams))
             {
                 requestUri.append(requestUriWithoutParams);

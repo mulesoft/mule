@@ -32,6 +32,7 @@ import org.hamcrest.core.Is;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Answers;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
@@ -39,21 +40,21 @@ import org.mockito.runners.MockitoJUnitRunner;
 public class HttpConnectorTestCase extends AbstractConnectorTestCase
 {
 
-    @Mock
+    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     private HttpMessageReceiver mockServiceOrderReceiverPort5555;
-    @Mock
+    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     private HttpMessageReceiver mockServiceReceiverPort5555;
-    @Mock
+    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     private HttpMessageReceiver mockServiceOrderReceiverPort7777;
-    @Mock
+    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     private HttpMessageReceiver mockServiceReceiverPort7777;
-    @Mock
+    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     private HttpMessageReceiver mockServiceReceiverAnotherHost;
-    @Mock
+    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     private HttpMessageReceiver mockReceiverPort5555;
-    @Mock
+    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     private HttpRequest mockHttpRequest;
-    @Mock
+    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     private Socket mockSocket;
 
     @Override
@@ -141,12 +142,16 @@ public class HttpConnectorTestCase extends AbstractConnectorTestCase
     @Test
     public void lookupReceiverThatContainsPath() throws Exception
     {
+        when(mockServiceReceiverPort5555.getEndpointURI().getPort()).thenReturn(5555);
+        when(mockServiceReceiverPort5555.getEndpointURI().getHost()).thenReturn("somehost");
         testLookupReceiver("somehost", 5555, "/service/product", mockServiceReceiverPort5555);
     }
 
     @Test
     public void lookupReceiverThatExistsWithExactSamePath() throws Exception
     {
+        when(mockServiceReceiverPort5555.getEndpointURI().getPort()).thenReturn(5555);
+        when(mockServiceReceiverPort5555.getEndpointURI().getHost()).thenReturn("somehost");
         testLookupReceiver("somehost", 5555, "/service/order?param1=value1", mockServiceOrderReceiverPort5555);
     }
 

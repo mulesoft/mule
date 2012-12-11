@@ -13,7 +13,7 @@ package org.mule.transport.servlet.jetty;
 import org.mule.api.endpoint.EndpointException;
 import org.mule.api.transport.MessageReceiver;
 import org.mule.api.transport.NoReceiverForEndpointException;
-import org.mule.transport.http.HttpMessageReceiver;
+import org.mule.transport.http.HttpConnector;
 import org.mule.transport.servlet.MuleReceiverServlet;
 import org.mule.util.StringUtils;
 
@@ -44,7 +44,7 @@ public class JettyReceiverServlet extends MuleReceiverServlet
         MessageReceiver receiver = (MessageReceiver)receivers.get(key);
         if (receiver == null)
         {
-            receiver = HttpMessageReceiver.findReceiverByStem(receivers, key);
+            receiver = HttpConnector.findReceiverByStem(receivers, key);
         }
         
         if (receiver == null)
