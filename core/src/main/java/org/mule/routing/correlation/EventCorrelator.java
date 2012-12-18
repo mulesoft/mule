@@ -152,7 +152,7 @@ public class EventCorrelator implements Startable, Stoppable
         {
             if (eventGroups.retrieve(groupId) != null)
             {
-                handleGroupExpiry(eventGroups.retrieve(groupId));
+                handleGroupExpiry(getEventGroup(groupId));
             }
             else
             {
@@ -308,7 +308,7 @@ public class EventCorrelator implements Startable, Stoppable
         }
     }
 
-    protected EventGroup getEventGroup(String groupId) throws ObjectStoreException
+    protected EventGroup getEventGroup(Serializable groupId) throws ObjectStoreException
     {
         try
         {
@@ -341,7 +341,7 @@ public class EventCorrelator implements Startable, Stoppable
         }
         catch (ObjectAlreadyExistsException e)
         {
-            return eventGroups.retrieve((Serializable) group.getGroupId());
+            return getEventGroup((String) group.getGroupId());
         }
     }
 
@@ -551,7 +551,7 @@ public class EventCorrelator implements Startable, Stoppable
             {
                 for (Serializable o : eventGroups.allKeys())
                 {
-                    EventGroup group = eventGroups.retrieve(o);
+                    EventGroup group = getEventGroup(o) ;
                     if ((group.getCreated() + getTimeout() * MILLI_TO_NANO_MULTIPLIER) < System.nanoTime())
                     {
                         expired.add(group);
