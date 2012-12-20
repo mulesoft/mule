@@ -85,6 +85,7 @@
         <antVersion>1.7.0</antVersion>
         <antlrVersion>3.1.1</antlrVersion>
         <asmVersion>3.1</asmVersion>
+        <aspectjVersion>1.6.11</aspectjVersion>
         <bshVersion>2.0b4</bshVersion>
         <bouncycastleVersion>1.46</bouncycastleVersion>
         <cglibVersion>2.2</cglibVersion>
@@ -1209,6 +1210,17 @@
                 <groupId>org.mvel</groupId>
                 <artifactId>mvel2</artifactId>
                 <version>${mvelVersion}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.aspectj</groupId>
+                <artifactId>aspectjrt</artifactId>
+                <version>${aspectjVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.aspectj</groupId>
+                <artifactId>aspectjweaver</artifactId>
+                <version>${aspectjVersion}</version>
             </dependency>
 
         </dependencies>
