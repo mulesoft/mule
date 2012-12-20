@@ -23,18 +23,22 @@ public class XmppConversationFactory
     {
         String host = endpoint.getEndpointURI().getHost();
         XmppMessageType type = XmppMessageType.valueOf(host);
-        
+
         switch (type)
         {
             case MESSAGE:
                 return createMessageConversation(endpoint);
-            
+
             case CHAT:
                 return createChatConversation(endpoint);
 
             case GROUPCHAT:
                 return createGroupchatConversation(endpoint);
-        }                
+
+            case dynamic:
+                // this cannot happen
+                throw new IllegalStateException();
+        }
 
         // we should never get here as valueOf on the enum above will choke if you pass
         // in an invalid string
