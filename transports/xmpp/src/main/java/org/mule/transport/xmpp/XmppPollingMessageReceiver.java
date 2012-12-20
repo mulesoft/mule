@@ -26,15 +26,14 @@ import org.jivesoftware.smack.packet.Message;
 
 public class XmppPollingMessageReceiver extends AbstractPollingMessageReceiver
 {
-    private final XmppConnector connector;
     private XmppConversation conversation;
 
     public XmppPollingMessageReceiver(Connector conn, FlowConstruct flowConstruct, InboundEndpoint endpoint)
         throws CreateException
     {
         super(conn, flowConstruct, endpoint);
-        connector = (XmppConnector) conn;
-        conversation = connector.getConversationFactory().create(endpoint);
+        XmppConnector xmppConnector = (XmppConnector) conn;
+        conversation = xmppConnector.getConversationFactory().create(endpoint);
     }
 
     @Override
@@ -58,7 +57,7 @@ public class XmppPollingMessageReceiver extends AbstractPollingMessageReceiver
     @Override
     public void poll() throws Exception
     {
-        // Wait 10% less than the polling frequency. This approach makes sure that we finish 
+        // Wait 10% less than the polling frequency. This approach makes sure that we finish
         // in time before the next poll call comes in
         try
         {
@@ -79,7 +78,6 @@ public class XmppPollingMessageReceiver extends AbstractPollingMessageReceiver
             connector.getMuleContext().getExceptionListener().handleException(e);
             throw e;
         }
-
     }
 
     @Override
@@ -112,6 +110,5 @@ public class XmppPollingMessageReceiver extends AbstractPollingMessageReceiver
         {
             throw new DefaultMuleException(e);
         }
-
     }
-}    
+}
