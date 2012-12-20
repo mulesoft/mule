@@ -22,14 +22,13 @@ import org.jivesoftware.smack.packet.Message;
  */
 public class XmppMessageRequester extends AbstractMessageRequester
 {
-    private XmppConnector connector;
-    private XmppConversation conversation;    
+    private XmppConversation conversation;
 
     public XmppMessageRequester(InboundEndpoint endpoint)
     {
         super(endpoint);
-        connector = (XmppConnector) endpoint.getConnector();
-        conversation = connector.getConversationFactory().create(endpoint);
+        XmppConnector xmppConnector = (XmppConnector) endpoint.getConnector();
+        conversation = xmppConnector.getConversationFactory().create(endpoint);
     }
 
     @Override
@@ -62,7 +61,7 @@ public class XmppMessageRequester extends AbstractMessageRequester
         {
             message = conversation.receive(timeout);
         }
-        
+
         if (message != null)
         {
             return createMuleMessage(message, endpoint.getEncoding());
