@@ -12,6 +12,7 @@ package org.mule.transport.xmpp;
 
 import org.mule.transport.ConnectException;
 
+import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.packet.Message;
 
@@ -25,7 +26,7 @@ public interface XmppConversation
      * Connect to the Jabber conversation, e.g. join a chat.
      */
     void connect() throws ConnectException;
-    
+
     /**
      * Disconnect from the Jabber conversation, e.g. leave a chat.
      */
@@ -37,8 +38,18 @@ public interface XmppConversation
     void dispatch(Message message) throws XMPPException;
 
     /**
+     * Adds <code>listener</code> to this conversation's XMPP connection.
+     */
+    void addPacketListener(PacketListener listener);
+
+    /**
+     * Removes <code>listener</code> from this conversation's XMPP connection.
+     */
+    void removePacketListener(PacketListener listener);
+
+    /**
      * Wait for a response on this conversation until <code>timeout</code> occurs.
-     * 
+     *
      * @return {@link Message} next available message or <code>null</code> if timeout occurred.
      */
     Message receive(long timeout);

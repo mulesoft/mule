@@ -16,6 +16,7 @@ import org.mule.transport.ConnectException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jivesoftware.smack.PacketCollector;
+import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.filter.PacketFilter;
 import org.jivesoftware.smack.packet.Message;
@@ -87,6 +88,19 @@ public abstract class AbstractXmppConversation implements XmppConversation
     protected void doDisconnect()
     {
         // template method
+    }
+
+    @Override
+    public void addPacketListener(PacketListener listener)
+    {
+        PacketFilter filter = createPacketFilter();
+        connection.addPacketListener(listener, filter);
+    }
+
+    @Override
+    public void removePacketListener(PacketListener listener)
+    {
+        connection.removePacketListener(listener);
     }
 
     @Override
