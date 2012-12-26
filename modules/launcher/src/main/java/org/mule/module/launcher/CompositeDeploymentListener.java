@@ -18,18 +18,20 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class CompositeDeploymentListener implements DeploymentListener
+public class CompositeDeploymentListener implements DeploymentListener, DeploymentListenerManager
 {
 
     private transient final Log logger = LogFactory.getLog(getClass());
 
     private List<DeploymentListener> deploymentListeners = new CopyOnWriteArrayList<DeploymentListener>();
 
+    @Override
     public void addDeploymentListener(DeploymentListener listener)
     {
         this.deploymentListeners.add(listener);
     }
 
+    @Override
     public void removeDeploymentListener(DeploymentListener listener)
     {
         this.deploymentListeners.remove(listener);

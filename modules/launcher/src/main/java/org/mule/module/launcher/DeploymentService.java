@@ -20,7 +20,7 @@ import java.util.concurrent.locks.ReentrantLock;
 /**
  *  Manages deploy of mule applications
  */
-public interface DeploymentService
+public interface DeploymentService extends DeploymentListenerManager
 {
 
     /**
@@ -40,10 +40,6 @@ public interface DeploymentService
     void addStartupListener(StartupListener listener);
 
     void removeStartupListener(StartupListener listener);
-
-    void addDeploymentListener(DeploymentListener listener);
-
-    void removeDeploymentListener(DeploymentListener listener);
 
     /**
      * Obtains the object used to synchronize the service.
