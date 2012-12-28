@@ -26,7 +26,7 @@ import org.custommonkey.xmlunit.XMLUnit;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-public class XmlConfigurationMuleArtifactFactoryTestCase extends AbstractMuleTestCase
+public abstract class XmlConfigurationMuleArtifactFactoryTestCase extends AbstractMuleTestCase
 {
 
     protected void doTest(Document document, XmlConfigurationCallback callback) throws MuleArtifactFactoryException
