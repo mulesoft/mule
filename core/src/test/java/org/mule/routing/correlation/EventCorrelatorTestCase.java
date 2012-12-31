@@ -9,6 +9,13 @@
  */
 package org.mule.routing.correlation;
 
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.isA;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import org.mule.DefaultMessageCollection;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
@@ -18,7 +25,6 @@ import org.mule.api.routing.MessageInfoMapping;
 import org.mule.api.store.ListableObjectStore;
 import org.mule.api.store.ObjectAlreadyExistsException;
 import org.mule.api.store.ObjectStoreManager;
-import org.mule.DefaultMessageCollection;
 import org.mule.routing.EventGroup;
 import org.mule.tck.size.SmallTest;
 
@@ -28,12 +34,10 @@ import org.mockito.Answers;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-
-import static org.mockito.Mockito.*;
-
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
-public class EventCorrelatorTestCase {
+public class EventCorrelatorTestCase
+{
 
 
     public static final String OBJECT_STOR_NAME_PREFIX = "prefix";
@@ -74,17 +78,17 @@ public class EventCorrelatorTestCase {
         }
         finally
         {
-            verify(mockEventGroup,times(1)).initAfterDeserialisation(mockMuleContext);
+            verify(mockEventGroup, times(1)).initAfterDeserialisation(mockMuleContext);
         }
     }
 
     @Test
     public void initAfterDeserializationAfterAddEventGroup() throws Exception
     {
-        doThrow(new ObjectAlreadyExistsException()).when(mockObjectStore).store(TEST_GROUP_ID,mockEventGroup);
+        doThrow(new ObjectAlreadyExistsException()).when(mockObjectStore).store(TEST_GROUP_ID, mockEventGroup);
         EventCorrelator eventCorrelator = createEventCorrelator();
         eventCorrelator.addEventGroup(mockEventGroup);
-        verify(mockEventGroup,times(1)).initAfterDeserialisation(mockMuleContext);
+        verify(mockEventGroup, times(1)).initAfterDeserialisation(mockMuleContext);
     }
 
     @Test
@@ -93,7 +97,7 @@ public class EventCorrelatorTestCase {
         when(mockMessagingInfoMapping.getCorrelationId(isA(MuleMessage.class))).thenReturn(TEST_GROUP_ID);
         when(mockProcessedGroups.contains(TEST_GROUP_ID)).thenReturn(false);
         when(mockEventCorrelatorCallback.shouldAggregateEvents(mockEventGroup)).thenReturn(false);
-        doThrow(new ObjectAlreadyExistsException()).when(mockObjectStore).store(TEST_GROUP_ID,mockEventGroup);
+        doThrow(new ObjectAlreadyExistsException()).when(mockObjectStore).store(TEST_GROUP_ID, mockEventGroup);
         EventCorrelator eventCorrelator = createEventCorrelator();
         eventCorrelator.process(mockMuleEvent);
         verify(mockEventGroup, times(1)).initAfterDeserialisation(mockMuleContext);
@@ -103,11 +107,11 @@ public class EventCorrelatorTestCase {
     {
         when(mockMuleContext.getRegistry().get(MuleProperties.OBJECT_STORE_MANAGER)).thenReturn(mockObjectStoreManager);
         when(mockObjectStoreManager.getObjectStore(OBJECT_STOR_NAME_PREFIX + ".eventGroups", USE_PERSISTENT_STORE)).thenReturn(mockObjectStore);
-        when(mockObjectStoreManager.getObjectStore(OBJECT_STOR_NAME_PREFIX + ".expiredAndDispatchedGroups",USE_PERSISTENT_STORE)).thenReturn(mockExpireGroupsObjectStore);
-        when(mockObjectStoreManager.getObjectStore(OBJECT_STOR_NAME_PREFIX + ".processedGroups",USE_PERSISTENT_STORE,EventCorrelator.MAX_PROCESSED_GROUPS,-1,1000)).thenReturn(mockProcessedGroups);
+        when(mockObjectStoreManager.getObjectStore(OBJECT_STOR_NAME_PREFIX + ".expiredAndDispatchedGroups", USE_PERSISTENT_STORE)).thenReturn(mockExpireGroupsObjectStore);
+        when(mockObjectStoreManager.getObjectStore(OBJECT_STOR_NAME_PREFIX + ".processedGroups", USE_PERSISTENT_STORE, EventCorrelator.MAX_PROCESSED_GROUPS, -1, 1000)).thenReturn(mockProcessedGroups);
         when(mockObjectStore.retrieve(TEST_GROUP_ID)).thenReturn(mockEventGroup);
         when(mockEventGroup.getGroupId()).thenReturn(TEST_GROUP_ID);
         when(mockEventGroup.toMessageCollection()).thenReturn(null);
-        return new EventCorrelator(mockEventCorrelatorCallback,mockTimeoutMessageProcessor, mockMessagingInfoMapping, mockMuleContext, "flowName", USE_PERSISTENT_STORE, OBJECT_STOR_NAME_PREFIX);
+        return new EventCorrelator(mockEventCorrelatorCallback, mockTimeoutMessageProcessor, mockMessagingInfoMapping, mockMuleContext, "flowName", USE_PERSISTENT_STORE, OBJECT_STOR_NAME_PREFIX);
     }
 }
