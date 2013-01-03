@@ -34,7 +34,7 @@ public class UdpMuleMessageFactory extends AbstractMuleMessageFactory
     protected Object extractPayload(Object transportMessage, String encoding) throws Exception
     {
         DatagramPacket packet = (DatagramPacket) transportMessage;
-        
+
         int length = packet.getLength();
         byte[] payload = new byte[length];
         System.arraycopy(packet.getData(), 0, payload, 0, length);
@@ -48,13 +48,22 @@ public class UdpMuleMessageFactory extends AbstractMuleMessageFactory
         super.addProperties(message, transportMessage);
 
         DatagramPacket packet = (DatagramPacket) transportMessage;
-        
+        addAddressProperty(message, packet);
+        addPortProperty(message, packet);
+    }
+
+    private void addAddressProperty(DefaultMuleMessage message, DatagramPacket packet)
+    {
         InetAddress address = packet.getAddress();
         if (address != null)
         {
-            message.setOutboundProperty(UdpConnector.ADDRESS_PROPERTY, address);
+            message.setInboundProperty(UdpConnector.ADDRESS_PROPERTY, address);
         }
+    }
 
-        message.setOutboundProperty(UdpConnector.PORT_PROPERTY, Integer.valueOf(packet.getPort()));
+    private void addPortProperty(DefaultMuleMessage message, DatagramPacket packet)
+    {
+        Integer port = Integer.valueOf(packet.getPort());
+        message.setInboundProperty(UdpConnector.PORT_PROPERTY, port);
     }
 }
