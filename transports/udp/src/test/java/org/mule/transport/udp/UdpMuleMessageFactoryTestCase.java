@@ -10,6 +10,10 @@
 
 package org.mule.transport.udp;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.api.MuleMessage;
 import org.mule.api.transport.MuleMessageFactory;
 import org.mule.transport.AbstractMuleMessageFactoryTestCase;
@@ -17,10 +21,6 @@ import org.mule.transport.AbstractMuleMessageFactoryTestCase;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.util.Arrays;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 public class UdpMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTestCase
 {
@@ -49,14 +49,14 @@ public class UdpMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTes
     public void testValidPayload() throws Exception
     {
         MuleMessageFactory factory = createMuleMessageFactory();
-        
+
         MuleMessage message = factory.create(getValidTransportMessage(), encoding);
         assertNotNull(message);
         assertPayload(message);
-        assertEquals(PORT, message.getOutboundProperty(UdpConnector.PORT_PROPERTY));
-        assertNotNull(message.getOutboundProperty(UdpConnector.ADDRESS_PROPERTY));
+        assertEquals(PORT, message.getInboundProperty(UdpConnector.PORT_PROPERTY));
+        assertNotNull(message.getInboundProperty(UdpConnector.ADDRESS_PROPERTY));
     }
-    
+
     private void assertPayload(MuleMessage message)
     {
         byte[] expected = TEST_MESSAGE.getBytes();
