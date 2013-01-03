@@ -30,6 +30,7 @@ import org.mule.construct.processor.FlowConstructStatisticsMessageProcessor;
 import org.mule.endpoint.DynamicOutboundEndpoint;
 import org.mule.interceptor.LoggingInterceptor;
 import org.mule.interceptor.ProcessingTimeInterceptor;
+import org.mule.processor.ResponseMessageProcessorAdapter;
 import org.mule.processor.StopFurtherMessageProcessingMessageProcessor;
 import org.mule.transformer.TransformerTemplate;
 import org.mule.transformer.TransformerTemplate.TransformerCallback;
@@ -130,7 +131,9 @@ public class WSProxy extends AbstractFlowConstruct
         builder.chain(new FlowConstructStatisticsMessageProcessor());
         builder.chain(proxyMessageProcessor);
         builder.chain(new StopFurtherMessageProcessingMessageProcessor());
-        builder.chain(new TransformerTemplate(new CopyInboundToOutboundPropertiesTransformerCallback()));
+        final TransformerTemplate copyInboundToOutboundPropertiesTransformer = new TransformerTemplate(new CopyInboundToOutboundPropertiesTransformerCallback());
+        builder.chain(copyInboundToOutboundPropertiesTransformer);
+        builder.chain(new ResponseMessageProcessorAdapter(copyInboundToOutboundPropertiesTransformer));
         builder.chain(outboundEndpoint);
     }
 

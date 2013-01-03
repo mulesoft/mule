@@ -10,24 +10,34 @@
 
 package org.mule.test.integration.construct;
 
+import org.mule.api.MuleException;
+import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.test.integration.tck.WeatherForecaster;
 
+import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 public class WSProxyTestCase extends FunctionalTestCase
 {
+    @Rule
+    public DynamicPort port1 = new DynamicPort("port1");
+
+    @Rule
+    public DynamicPort port2 = new DynamicPort("port2");
+
+    @Rule
+    public DynamicPort port3 = new DynamicPort("port3");
+
     private MuleClient muleClient;
 
-    public WSProxyTestCase()
-    {
-        setDisposeContextPerClass(true);
-    }
-    
     @Override
     protected String getConfigResources()
     {
@@ -101,6 +111,16 @@ public class WSProxyTestCase extends FunctionalTestCase
         testWsdlAndWebServiceRequests(9);
     }
 
+    @Test
+    public void testResponsePropertiesPropagation() throws Exception
+    {
+        MuleMessage reply = performWebServiceRequest(10);
+        // Test if Content-Encoding is present as an inbound property because HTTP response headers are translated
+        // into inbound properties when the response is transformed into the MuleMessage.
+        assertNotNull(reply.getInboundProperty("Content-Encoding"));
+        assertEquals(reply.getInboundProperty("Content-Encoding"), "gzip");
+    }
+
     private void testWsdlAndWebServiceRequests(int proxyId) throws Exception
     {
         testWsdlRequest(proxyId);
@@ -109,19 +129,27 @@ public class WSProxyTestCase extends FunctionalTestCase
 
     private void testWsdlRequest(int proxyId) throws Exception
     {
-        final String wsdl = muleClient.request("http://localhost:8090/weather-forecast/" + proxyId + "?wsdl",
-            getTestTimeoutSecs() * 1000L).getPayloadAsString();
+        final String wsdl = muleClient.request(
+                "http://localhost:" + port1.getNumber() + "/weather-forecast/" + proxyId + "?wsdl",
+                getTestTimeoutSecs() * 1000L).getPayloadAsString();
         assertTrue(wsdl.contains("GetWeatherByZipCode"));
     }
 
     private void testWebServiceRequest(int proxyId) throws Exception
     {
-        final String weatherForecast = muleClient.send(
-            "wsdl-cxf:http://localhost:8090/weather-forecast/" + proxyId + "?wsdl&method=GetWeatherByZipCode",
-            "95050", null, getTestTimeoutSecs() * 1000)
-            .getPayloadAsString();
-
+        final String weatherForecast = performWebServiceRequest(proxyId).getPayloadAsString();
         assertEquals(new WeatherForecaster().getByZipCode("95050"), weatherForecast);
     }
 
+    /**
+     * Performs a request to the web-service.
+     * @param proxyId The proxy id.
+     * @return The {@link org.mule.api.MuleMessage} with the web-service response.
+     * @throws org.mule.api.MuleException If there is a problem with the request.
+     */
+    private MuleMessage performWebServiceRequest(final int proxyId) throws MuleException
+    {
+        return muleClient.send("wsdl-cxf:http://localhost:" + port1.getNumber() + "/weather-forecast/" + proxyId
+                               + "?wsdl&method=GetWeatherByZipCode", "95050", null, getTestTimeoutSecs() * 1000);
+    }
 }
