@@ -11,7 +11,7 @@
 package org.mule.config.spring;
 
 import org.mule.api.MuleContext;
-import org.mule.api.MuleException;
+import org.mule.api.construct.Pipeline;
 import org.mule.api.context.MuleContextFactory;
 import org.mule.common.MuleArtifact;
 import org.mule.common.MuleArtifactFactoryException;
@@ -46,57 +46,74 @@ public class SpringXmlConfigurationMuleArtifactFactory implements XmlConfigurati
     public MuleArtifact getArtifact(org.w3c.dom.Element element, XmlConfigurationCallback callback)
         throws MuleArtifactFactoryException
     {
-
+        return doGetArtifact(element, callback, false);
+    }
+    
+    @Override
+    public MuleArtifact getArtifactForMessageProcessor(org.w3c.dom.Element element, XmlConfigurationCallback callback)
+        throws MuleArtifactFactoryException
+    {
+        return doGetArtifact(element, callback, true);
+    }
+    
+    private MuleArtifact doGetArtifact(org.w3c.dom.Element element, XmlConfigurationCallback callback, boolean embedInFlow)
+                    throws MuleArtifactFactoryException
+    {
     	ConfigResource config = null;
         Document document = DocumentHelper.createDocument();
+        
+        // the rootElement is the root of the document
         Element rootElement = document.addElement("mule", "http://www.mulesoft.org/schema/mule/core");
+        
+        // the parentElement is the parent of the element we are adding
+        Element parentElement = rootElement;
+        addSchemaLocation(rootElement, element, callback);
+        String flowName = "flow-" + Integer.toString(element.hashCode());
+        if (embedInFlow)
+        {
+            // Need to put the message processor in a valid flow. Our default flow is:
+            //            "<flow name=\"CreateSingle\">"
+            //          + "</flow>"
+            parentElement = rootElement.addElement("flow", "http://www.mulesoft.org/schema/mule/core");
+            parentElement.addAttribute("name", flowName);
+        }
         try
         {
-            rootElement.add(convert(element));
-            addSchemaLocation(rootElement, element, callback);
+            parentElement.add(convert(element));
             for (int i = 0; i < element.getAttributes().getLength(); i++)
             {
                 String attributeName = element.getAttributes().item(i).getLocalName();
                 if (attributeName != null && attributeName.endsWith("-ref"))
                 {
-                    org.w3c.dom.Element depenedantElement = callback.getGlobalElement(element.getAttributes()
+                    org.w3c.dom.Element dependentElement = callback.getGlobalElement(element.getAttributes()
                         .item(i)
                         .getNodeValue());
-                    if (depenedantElement != null)
+                    if (dependentElement != null)
                     {
                     	// if the element is a spring bean, wrap the element in a top-level spring beans element
-                    	if ("http://www.springframework.org/schema/beans".equals(depenedantElement.getNamespaceURI()))
+                    	if ("http://www.springframework.org/schema/beans".equals(dependentElement.getNamespaceURI()))
                     	{
-                    		String namespaceUri = depenedantElement.getNamespaceURI();
-                    		Namespace namespace = new Namespace(depenedantElement.getPrefix(), namespaceUri);
+                    		String namespaceUri = dependentElement.getNamespaceURI();
+                    		Namespace namespace = new Namespace(dependentElement.getPrefix(), namespaceUri);
                     		Element beans = rootElement.element(new QName("beans", namespace));
                     		if (beans == null)
                     		{
                     			beans = rootElement.addElement("beans", namespaceUri);
                     		}
-                    		beans.add(convert(depenedantElement));
+                    		beans.add(convert(dependentElement));
                     	}
                     	else
                     	{
-	                        rootElement.add(convert(depenedantElement));
-	                        addSchemaLocation(rootElement, depenedantElement, callback);
+	                        rootElement.add(convert(dependentElement));
+	                        addSchemaLocation(rootElement, dependentElement, callback);
                     	}
+                    	addChildSchemaLocations(rootElement, dependentElement, callback);
                     }
-                    else
-                    {
-                        throw new MuleArtifactFactoryException("Missing dependent xml element "
-                        		+ element.getAttributes().item(i).getLocalName()
-                        		+ " with name/id: "
-                        		+ element.getAttributes().item(i).getNodeValue());
-                    }
+                    // if missing a dependent element, try anyway because it might not be needed.
                 }
             }
 
             config = new ConfigResource("", new StringBufferInputStream(document.asXML()));
-        }
-        catch (MuleArtifactFactoryException e) 
-        {
-        	throw e;
         }
         catch (Exception e)
         {
@@ -111,8 +128,17 @@ public class SpringXmlConfigurationMuleArtifactFactory implements XmlConfigurati
                     new ConfigResource[]{config});
             muleContext = factory.createMuleContext(builder);
             muleContext.start();
-            MuleArtifact artifact = new DefaultMuleArtifact(muleContext.getRegistry().lookupObject(
-                element.getAttribute("name")));
+            
+            MuleArtifact artifact = null;
+            if (embedInFlow)
+            {
+                Pipeline pipeline = (Pipeline)muleContext.getRegistry().lookupFlowConstruct(flowName);
+                artifact = new DefaultMuleArtifact(pipeline.getMessageProcessors().get(0));                
+            }
+            else
+            {
+                artifact = new DefaultMuleArtifact(muleContext.getRegistry().lookupObject(element.getAttribute("name")));
+            }
             builders.put(artifact, builder);
             contexts.put(artifact, muleContext);
             return artifact;
@@ -135,6 +161,15 @@ public class SpringXmlConfigurationMuleArtifactFactory implements XmlConfigurati
         rootElement.addAttribute(
             org.dom4j.QName.get("schemaLocation", "xsi", "http://www.w3.org/2001/XMLSchema-instance"),
             schemaLocation.toString());
+    }
+    
+    protected void addChildSchemaLocations(Element rootElement,
+            org.w3c.dom.Element element,
+            XmlConfigurationCallback callback)
+    {
+        //TODO: implement
+//    	NodeList nl = element.getChildNodes();
+//    	for ()
     }
 
     /**
@@ -170,10 +205,8 @@ public class SpringXmlConfigurationMuleArtifactFactory implements XmlConfigurati
 	{
     	if (context != null)
     	{
-			System.out.println("execute context.dispose");
     		context.dispose();
     	}
-		System.out.println("execute delete logger threads");
     	deleteLoggingThreads();
 	}
 	
