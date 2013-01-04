@@ -28,6 +28,7 @@ import org.mule.config.i18n.MessageFactory;
 import org.mule.construct.AbstractConfigurationPattern;
 import org.mule.endpoint.DynamicOutboundEndpoint;
 import org.mule.pattern.core.support.CopyInboundToOutboundPropertiesTransformerCallback;
+import org.mule.processor.ResponseMessageProcessorAdapter;
 import org.mule.transformer.TransformerTemplate;
 import org.mule.transport.http.construct.HttpProxy;
 import org.mule.util.ObjectUtils;
@@ -135,7 +136,9 @@ public class WSProxy extends AbstractConfigurationPattern
     @Override
     protected void configureMessageProcessorsAfterTransformation(final MessageProcessorChainBuilder builder)
     {
-        builder.chain(new TransformerTemplate(new CopyInboundToOutboundPropertiesTransformerCallback()));
+        final TransformerTemplate copyInboundToOutboundPropertiesTransformer = new TransformerTemplate(new CopyInboundToOutboundPropertiesTransformerCallback());
+        builder.chain(copyInboundToOutboundPropertiesTransformer);
+        builder.chain(new ResponseMessageProcessorAdapter(copyInboundToOutboundPropertiesTransformer));
         builder.chain(outboundEndpoint);
     }
 
