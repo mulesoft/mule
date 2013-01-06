@@ -25,7 +25,9 @@ import javax.net.ssl.SSLSocket;
  */
 public class MockSslSocket extends SSLSocket
 {
-    
+
+    private InputStream inputStream;
+
     public void addHandshakeCompletedListener(HandshakeCompletedListener listener)
     {
         // not needed
@@ -119,7 +121,7 @@ public class MockSslSocket extends SSLSocket
     @Override
     public InputStream getInputStream() throws IOException
     {
-        return null;
+        return inputStream;
     }
 
     @Override
@@ -134,5 +136,10 @@ public class MockSslSocket extends SSLSocket
         return new InetSocketAddress("localhost", 12345);
     }
 
+    public void setInputStream(InputStream inputStream)
+    {
+        this.inputStream = inputStream;
+    }
 }
+
 

@@ -39,6 +39,9 @@ import org.mule.api.transport.ReplyToHandler;
 import org.mule.context.notification.EndpointMessageNotification;
 import org.mule.execution.TransactionalErrorHandlingExecutionTemplate;
 import org.mule.lifecycle.PrimaryNodeLifecycleNotificationListener;
+import org.mule.message.processing.MessageProcessContext;
+import org.mule.message.processing.MessageProcessTemplate;
+import org.mule.message.processing.MessageProcessingManager;
 import org.mule.session.DefaultMuleSession;
 import org.mule.session.LegacySessionHandler;
 import org.mule.transaction.TransactionCoordination;
@@ -88,6 +91,7 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
 
     protected ReplyToHandler replyToHandler;
     private PrimaryNodeLifecycleNotificationListener primaryNodeLifecycleNotificationListener;
+    private MessageProcessingManager messageProcessingManager;
 
     /**
      * Creates the Message Receiver
@@ -166,6 +170,8 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
             primaryNodeLifecycleNotificationListener.register();
         }
 
+        messageProcessingManager = getConnector().getMuleContext().getRegistry().get(MuleProperties.OBJECT_DEFAULT_MESSAGE_PROCESSING_MANAGER);
+
         super.initialise();
     }
 
@@ -217,41 +223,7 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
             applyInboundTransformers(muleEvent);
         }
 
-        MuleEvent resultEvent = listener.process(muleEvent);
-        if (resultEvent != null
-            && !VoidMuleEvent.getInstance().equals(resultEvent)
-            && resultEvent.getMessage() != null
-            && resultEvent.getMessage().getExceptionPayload() != null
-            && resultEvent.getMessage().getExceptionPayload().getException() instanceof FilterUnacceptedException)
-        {
-            handleUnacceptedFilter(muleEvent.getMessage());
-            return muleEvent;
-        }
-
-        if (endpoint.getExchangePattern().hasResponse() && resultEvent != null
-            && !VoidMuleEvent.getInstance().equals(resultEvent))
-        {
-            // Do not propagate security context back to caller
-            MuleSession resultSession = new DefaultMuleSession(resultEvent.getSession());
-            resultSession.setSecurityContext(null);
-            connector.getSessionHandler().storeSessionInfoToMessage(resultSession, resultEvent.getMessage());
-
-            if (resultEvent.getMessage() != null && !endpoint.isDisableTransportTransformer())
-            {
-                applyResponseTransformers(resultEvent);
-            }
-
-            if (connector.isEnableMessageEvents())
-            {
-                connector.fireNotification(new EndpointMessageNotification(resultEvent.getMessage(),
-                    endpoint, resultEvent.getFlowConstruct(), EndpointMessageNotification.MESSAGE_RESPONSE));
-            }
-            return resultEvent;
-        }
-        else
-        {
-            return null;
-        }
+        return routeEvent(muleEvent);
     }
 
     protected void propagateRootMessageIdProperty(MuleMessage message)
@@ -491,4 +463,49 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
             }
         }
     }
+
+    public MuleEvent routeEvent(MuleEvent muleEvent) throws MuleException
+    {
+        MuleEvent resultEvent = listener.process(muleEvent);
+        if (resultEvent != null
+            && !VoidMuleEvent.getInstance().equals(resultEvent)
+            && resultEvent.getMessage() != null
+            && resultEvent.getMessage().getExceptionPayload() != null
+            && resultEvent.getMessage().getExceptionPayload().getException() instanceof FilterUnacceptedException)
+        {
+            handleUnacceptedFilter(muleEvent.getMessage());
+            return muleEvent;
+        }
+
+        if (endpoint.getExchangePattern().hasResponse() && resultEvent != null
+            && !VoidMuleEvent.getInstance().equals(resultEvent))
+        {
+            // Do not propagate security context back to caller
+            MuleSession resultSession = new DefaultMuleSession(resultEvent.getSession());
+            resultSession.setSecurityContext(null);
+            connector.getSessionHandler().storeSessionInfoToMessage(resultSession, resultEvent.getMessage());
+
+            if (resultEvent.getMessage() != null && !endpoint.isDisableTransportTransformer())
+            {
+                applyResponseTransformers(resultEvent);
+            }
+
+            if (connector.isEnableMessageEvents())
+            {
+                connector.fireNotification(new EndpointMessageNotification(resultEvent.getMessage(),
+                                                                           endpoint, resultEvent.getFlowConstruct(), EndpointMessageNotification.MESSAGE_RESPONSE));
+            }
+            return resultEvent;
+        }
+        else
+        {
+            return null;
+        }
+    }
+
+    protected void processMessage(final MessageProcessTemplate messageProcessTemplate, final MessageProcessContext messageProcessContext)
+    {
+        messageProcessingManager.processMessage(messageProcessTemplate,messageProcessContext);
+    }
+
 }

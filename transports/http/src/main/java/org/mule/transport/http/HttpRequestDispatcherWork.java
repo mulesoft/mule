@@ -15,15 +15,13 @@ import org.mule.util.monitor.Expirable;
 import java.net.Socket;
 import java.util.concurrent.TimeUnit;
 
-import javax.resource.spi.work.Work;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
  * Dispatches HttpRequest to the appropriate MessageReceiver
  */
-public class HttpRequestDispatcherWork implements Work, Expirable
+public class HttpRequestDispatcherWork implements Runnable, Expirable
 {
 
     private static Log logger = LogFactory.getLog(HttpRequestDispatcherWork.class);
@@ -44,11 +42,6 @@ public class HttpRequestDispatcherWork implements Work, Expirable
         }
         this.httpConnector = httpConnector;
         this.socket = socket;
-    }
-
-    @Override
-    public void release()
-    {
     }
 
     @Override
@@ -77,8 +70,7 @@ public class HttpRequestDispatcherWork implements Work, Expirable
                     HttpMessageReceiver httpMessageReceiver = httpConnector.lookupReceiver(socket, request);
                     if (httpMessageReceiver != null)
                     {
-                        Work work = httpMessageReceiver.createWork(httpServerConnection);
-                        work.run();
+                        httpMessageReceiver.processRequest(httpServerConnection);
                     }
                     else
                     {

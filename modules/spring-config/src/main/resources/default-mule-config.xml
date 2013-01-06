@@ -60,6 +60,8 @@
 
     <bean name="_muleSecurityManager" class="org.mule.security.MuleSecurityManager"/>
 
+    <bean name="_muleMessageProcessingManager" class="org.mule.message.processing.MuleMessageProcessingManager"/>
+
     <bean name="_muleProperties" class="java.util.HashMap"/>
 
     <bean name="_muleEndpointFactory" class="org.mule.endpoint.DefaultEndpointFactory"/>

@@ -10,21 +10,14 @@
 
 package org.mule.transport.http;
 
-import org.mule.api.MessagingException;
-import org.mule.api.MuleMessage;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.transport.Connector;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.transport.ConnectException;
-import org.mule.transport.http.i18n.HttpMessages;
+import org.mule.message.processing.MessageProcessContext;
 import org.mule.util.StringUtils;
-
-import java.io.IOException;
-import java.util.concurrent.TimeUnit;
-
-import javax.resource.spi.work.Work;
 
 public class HttpsMessageReceiver extends HttpMessageReceiver
 {
@@ -53,48 +46,9 @@ public class HttpsMessageReceiver extends HttpMessageReceiver
     }
 
     @Override
-    public Work createWork(HttpServerConnection httpServerConnection) throws IOException
+    HttpMessageProcessTemplate createMessageContext(HttpServerConnection httpServerConnection)
     {
-        return new HttpsWorker(httpServerConnection);
+        return new HttpsMessageProcessTemplate(this,httpServerConnection,getWorkManager());
     }
 
-    private class HttpsWorker extends HttpWorker
-    {
-
-        public HttpsWorker(HttpServerConnection httpServerConnection) throws IOException
-        {
-            super(httpServerConnection);
-        }
-
-        @Override
-        protected void preRouteMessage(MuleMessage message) throws MessagingException
-        {
-            try
-            {
-                long timeout = ((HttpsConnector) getConnector()).getSslHandshakeTimeout();
-                boolean handshakeComplete = getServerConnection().getSslSocketHandshakeCompleteLatch().await(timeout, TimeUnit.MILLISECONDS);
-                if (!handshakeComplete)
-                {
-                    throw new MessagingException(HttpMessages.sslHandshakeDidNotComplete(), message);
-                }
-            }
-            catch (InterruptedException e)
-            {
-                throw new MessagingException(HttpMessages.sslHandshakeDidNotComplete(),
-                                             message, e);
-            }
-
-            super.preRouteMessage(message);
-
-            if (getServerConnection().getPeerCertificateChain() != null)
-            {
-                message.setOutboundProperty(HttpsConnector.PEER_CERTIFICATES, getServerConnection().getPeerCertificateChain());
-            }
-            if (getServerConnection().getLocalCertificateChain() != null)
-            {
-                message.setOutboundProperty(HttpsConnector.LOCAL_CERTIFICATES, getServerConnection().getLocalCertificateChain());
-            }
-        }
-
-    }
 }

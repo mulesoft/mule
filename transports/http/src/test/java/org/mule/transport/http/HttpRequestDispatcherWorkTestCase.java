@@ -17,6 +17,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.mule.tck.size.SmallTest;
+import org.mule.message.processing.MessageProcessContext;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -48,6 +49,8 @@ public class HttpRequestDispatcherWorkTestCase
     private HttpMessageReceiver mockHttpMessageReceiver;
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     private Work mockWork;
+    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+    private MessageProcessContext mockMessageContext;
 
     @Test(expected = IllegalArgumentException.class)
     public void createHttpRequestDispatcherWorkWithNullHttpConnector()
@@ -91,10 +94,9 @@ public class HttpRequestDispatcherWorkTestCase
         HttpRequestDispatcherWork httpRequestDispatcherWork = new HttpRequestDispatcherWork(mockHttpConnector, mockSocket);
         when(mockHttpConnector.lookupReceiver(isA(Socket.class), isA(HttpRequest.class))).thenReturn(mockHttpMessageReceiver);
         setUpSocketMessage();
-        when(mockHttpMessageReceiver.createWork(isA(HttpServerConnection.class))).thenReturn(mockWork);
+        when(mockHttpMessageReceiver.createMessageContext(isA(HttpServerConnection.class))).thenReturn(mockMessageContext);
         httpRequestDispatcherWork.run();
-        verify(mockWork, times(1)).run();
-
+        verify(mockHttpMessageReceiver, times(1)).processRequest(isA(HttpServerConnection.class));
     }
 
     private void setUpSocketMessage() throws IOException

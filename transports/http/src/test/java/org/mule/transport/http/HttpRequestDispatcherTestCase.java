@@ -11,7 +11,6 @@ package org.mule.transport.http;
 
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.anyLong;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -30,10 +29,8 @@ import org.mule.util.concurrent.Latch;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.net.ServerSocket;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
-
-import javax.resource.spi.work.ExecutionContext;
-import javax.resource.spi.work.WorkListener;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -65,6 +62,8 @@ public class HttpRequestDispatcherTestCase extends AbstractMuleTestCase
     private RetryContext mockRetryContext;
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     private SystemExceptionHandler mockExceptionListener;
+    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+    private ExecutorService mockExecutor;
 
 
     @Test(expected = IllegalArgumentException.class)
@@ -143,7 +142,7 @@ public class HttpRequestDispatcherTestCase extends AbstractMuleTestCase
         try
         {
             dispatcherThread.start();
-            verify(mockWorkManager, times(0)).scheduleWork(any(HttpRequestDispatcherWork.class), anyLong(), any(ExecutionContext.class), any(WorkListener.class));
+            verify(mockRetryTemplate, times(0)).execute(any(RetryCallback.class),any(WorkManager.class));
         }
         finally
         {
@@ -156,6 +155,7 @@ public class HttpRequestDispatcherTestCase extends AbstractMuleTestCase
     public void whenSocketAcceptedExecuteWork() throws Exception
     {
         final HttpRequestDispatcher httpRequestDispatcher = new HttpRequestDispatcher(mockHttpConnector, mockRetryTemplate, mockServerSocket, mockWorkManager);
+        httpRequestDispatcher.requestHandOffExecutor = mockExecutor;
         final Latch acceptCalledLath = new Latch();
         sustituteLifecycleManager();
         when(mockConnectorLifecycleManager.getState().isStarted()).thenReturn(true);
@@ -176,7 +176,7 @@ public class HttpRequestDispatcherTestCase extends AbstractMuleTestCase
                 acceptCalledLath.release();
                 return null;
             }
-        }).when(mockWorkManager).scheduleWork(any(HttpRequestDispatcherWork.class), anyLong(), any(ExecutionContext.class), any(WorkListener.class));
+        }).when(mockExecutor).execute(any(HttpRequestDispatcherWork.class));
         Thread dispatcherThread = createDispatcherThread(httpRequestDispatcher);
         dispatcherThread.start();
         try

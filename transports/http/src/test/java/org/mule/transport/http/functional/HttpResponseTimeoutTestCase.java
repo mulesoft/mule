@@ -105,7 +105,7 @@ public class HttpResponseTimeoutTestCase extends AbstractServiceAndFlowTestCase
         // message will be returned as the response. There is no exception payload.
         assertNotNull(message);
         assertNull(message.getExceptionPayload());
-        assertNotNull(getPayload(), message.getPayloadAsString());
+        assertNotNull(message.getPayloadAsString());
         assertTrue((afterCall.getTime() - beforeCall.getTime()) > DEFAULT_RESPONSE_TIMEOUT);
     }
 

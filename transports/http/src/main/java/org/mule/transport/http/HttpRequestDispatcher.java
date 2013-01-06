@@ -9,16 +9,21 @@
  */
 package org.mule.transport.http;
 
+import org.mule.api.config.ThreadingProfile;
 import org.mule.api.context.WorkManager;
 import org.mule.api.retry.RetryCallback;
 import org.mule.api.retry.RetryContext;
 import org.mule.api.retry.RetryPolicyTemplate;
+import org.mule.config.ImmutableThreadingProfile;
+import org.mule.config.MutableThreadingProfile;
 import org.mule.transport.ConnectException;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.resource.spi.work.Work;
@@ -39,6 +44,7 @@ class HttpRequestDispatcher implements Work
     private ServerSocket serverSocket;
     private HttpConnector httpConnector;
     private RetryPolicyTemplate retryTemplate;
+    protected ExecutorService requestHandOffExecutor;
     private WorkManager workManager;
     private final AtomicBoolean disconnect = new AtomicBoolean(false);
 
@@ -64,6 +70,16 @@ class HttpRequestDispatcher implements Work
         this.retryTemplate = retryPolicyTemplate;
         this.serverSocket = serverSocket;
         this.workManager = workManager;
+        this.requestHandOffExecutor = createRequestDispatcherThreadPool(httpConnector);
+    }
+
+    private ExecutorService createRequestDispatcherThreadPool(HttpConnector httpConnector)
+    {
+        ThreadingProfile receiverThreadingProfile = httpConnector.getReceiverThreadingProfile();
+        MutableThreadingProfile dispatcherThreadingProfile = new MutableThreadingProfile(receiverThreadingProfile);
+        dispatcherThreadingProfile.setMaxThreadsActive(dispatcherThreadingProfile.getMaxThreadsActive()*2);
+        ExecutorService executorService = dispatcherThreadingProfile.createPool("http-request-dispatch-" + serverSocket.getInetAddress());
+        return executorService;
     }
 
     @Override
@@ -94,8 +110,9 @@ class HttpRequestDispatcher implements Work
 
                             if (socket != null)
                             {
-                                Work work = new HttpRequestDispatcherWork(httpConnector, socket);
-                                workManager.scheduleWork(work, javax.resource.spi.work.WorkManager.INDEFINITE, null, httpConnector);
+                                final Runnable httpRequestDispatcherWork = new HttpRequestDispatcherWork(httpConnector, socket);
+                                // Process each connection in a different thread so we can continue accepting connection right away.
+                                requestHandOffExecutor.execute(httpRequestDispatcherWork);
                             }
                         }
 
