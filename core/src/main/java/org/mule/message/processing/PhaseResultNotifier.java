@@ -22,7 +22,8 @@ public interface PhaseResultNotifier
     public void phaseSuccessfully();
 
     /**
-     * This method must be called when the phase consume the message and the chain should not continue processing the message
+     * This method must be called when the phase consume the message and the chain should not continue processing the message.
+     * If this method is called then phaseSuccessfully must not be called
      */
     public void phaseConsumedMessage();
 

@@ -43,6 +43,8 @@ public interface MessageProcessPhase<Template extends MessageProcessTemplate>
     /**
      * Process the template through the phase.
      *
+     * The phase execution can not throw an exception. In case of exception {@link PhaseResultNotifier#phaseFailure(Exception)} must be call.
+     *
      * @param messageProcessTemplate template containing message source specific behavior
      * @param messageProcessContext provides context information for executing the message
      * @param phaseResultNotifier notifier that must be advice under certain scenarios

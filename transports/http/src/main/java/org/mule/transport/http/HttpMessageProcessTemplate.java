@@ -90,6 +90,24 @@ public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessT
     }
 
     @Override
+    public void afterFailureProcessingFlow(MuleException exception) throws MuleException
+    {
+        if (!failureSendingResponse)
+        {
+            String temp = ExceptionHelper.getErrorMapping(getConnector().getProtocol(), exception.getClass(),getMuleContext());
+            int httpStatus = Integer.valueOf(temp);
+            try
+            {
+                httpServerConnection.writeFailureResponse(httpStatus, exception.getMessage());
+            }
+            catch (IOException e)
+            {
+                throw new DefaultMuleException(e);
+            }
+        }
+    }
+
+    @Override
     public void sendResponseToClient(MuleEvent muleEvent) throws MuleException
     {
         sendHttpResponse(muleEvent);

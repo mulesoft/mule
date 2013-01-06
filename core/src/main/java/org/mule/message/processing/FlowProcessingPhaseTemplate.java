@@ -63,10 +63,17 @@ public interface FlowProcessingPhaseTemplate extends MessageProcessTemplate
 
 
     /**
-     * Call when the processing of the message through the flow fails
+     * Call when the processing of the message through the flow fails during message processing
      *
      * @param messagingException
      */
     void afterFailureProcessingFlow(MessagingException messagingException) throws MuleException;
+
+    /**
+     * Call when the processing of the message through the flow fails in an exception strategy
+     *
+     * @param exception
+     */
+    void afterFailureProcessingFlow(MuleException exception) throws MuleException;
 
 }

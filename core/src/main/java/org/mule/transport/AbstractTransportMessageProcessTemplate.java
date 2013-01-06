@@ -73,6 +73,11 @@ public abstract class AbstractTransportMessageProcessTemplate<MessageReceiverTyp
     {
     }
 
+    @Override
+    public void afterFailureProcessingFlow(MuleException exception) throws MuleException
+    {
+    }
+
     public MuleEvent routeEvent(MuleEvent muleEvent) throws MuleException
     {
         return messageReceiver.routeEvent(muleEvent);
