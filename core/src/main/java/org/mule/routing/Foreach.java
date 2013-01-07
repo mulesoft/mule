@@ -16,8 +16,12 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.lifecycle.Startable;
+import org.mule.api.lifecycle.Stoppable;
+import org.mule.api.processor.IgnoreInit;
 import org.mule.api.processor.InterceptingMessageProcessor;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.api.source.MessageSource;
 import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.TransformerException;
 import org.mule.expression.ExpressionConfig;
@@ -50,8 +54,7 @@ import org.w3c.dom.Document;
  * <p>
  * The {@link MuleEvent} sent to the next message processor is the same that arrived to foreach.
  */
-public class Foreach extends AbstractMessageProcessorOwner
-    implements Initialisable, InterceptingMessageProcessor
+public class Foreach extends AbstractMessageProcessorOwner implements Initialisable, MessageProcessor
 {
 
     public static final String ROOT_MESSAGE_PROPERTY = "rootMessage";
@@ -63,7 +66,6 @@ public class Foreach extends AbstractMessageProcessorOwner
     private List<MessageProcessor> messageProcessors;
     private MessageProcessor ownedMessageProcessor;
     private AbstractMessageSequenceSplitter splitter;
-    private MessageProcessor next;
     private String collectionExpression;
     private ExpressionConfig expressionConfig = new ExpressionConfig();
     private int batchSize;
@@ -115,7 +117,7 @@ public class Foreach extends AbstractMessageProcessorOwner
         {
             event.removeFlowVariable(parentMessageProp);
         }
-        return processNext(event);
+        return event;
     }
 
     private boolean transformPayloadIfNeeded(MuleMessage message) throws TransformerException
@@ -134,18 +136,6 @@ public class Foreach extends AbstractMessageProcessorOwner
         message.setPayload(message.getPayload(DataType.STRING_DATA_TYPE));
     }
 
-    protected MuleEvent processNext(MuleEvent event) throws MuleException
-    {
-        if (next == null)
-        {
-            return event;
-        }
-        else
-        {
-            return next.process(event);
-        }
-    }
-
     @Override
     protected List<MessageProcessor> getOwnedMessageProcessors()
     {
@@ -158,12 +148,6 @@ public class Foreach extends AbstractMessageProcessorOwner
         //skip the splitter that is added at the beginning
         List<MessageProcessor> mps = getOwnedMessageProcessors().subList(1, getOwnedMessageProcessors().size());
         return NotificationUtils.buildMessageProcessorPaths(mps);
-    }
-
-    @Override
-    public void setListener(MessageProcessor listener)
-    {
-        next = listener;
     }
 
     public void setMessageProcessors(List<MessageProcessor> messageProcessors) throws MuleException

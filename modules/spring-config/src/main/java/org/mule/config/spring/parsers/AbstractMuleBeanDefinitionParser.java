@@ -26,8 +26,7 @@ import org.mule.config.spring.parsers.assembly.DefaultBeanAssemblerFactory;
 import org.mule.config.spring.parsers.assembly.configuration.ReusablePropertyConfiguration;
 import org.mule.config.spring.parsers.assembly.configuration.ValueMap;
 import org.mule.config.spring.parsers.generic.AutoIdUtils;
-import org.mule.enricher.MessageEnricher;
-import org.mule.exception.AbstractExceptionListener;
+import org.mule.processor.AbstractMessageProcessorOwner;
 import org.mule.util.ClassUtils;
 import org.mule.util.StringUtils;
 import org.mule.util.XMLUtils;
@@ -273,9 +272,8 @@ public abstract class AbstractMuleBeanDefinitionParser extends AbstractBeanDefin
         if (!Component.class.isAssignableFrom(beanClass) && !MessageSource.class.isAssignableFrom(beanClass)
             && !OutboundRouterCollection.class.isAssignableFrom(beanClass)
             && !OutboundRouter.class.isAssignableFrom(beanClass)
-            && !AbstractExceptionListener.class.isAssignableFrom(beanClass)
+            && !AbstractMessageProcessorOwner.class.isAssignableFrom(beanClass)
             && !MessagingExceptionHandler.class.isAssignableFrom(beanClass)
-            && !MessageEnricher.class.isAssignableFrom(beanClass)
             && !Transformer.class.isAssignableFrom(beanClass))
         {
             if (Initialisable.class.isAssignableFrom(beanClass))
