@@ -131,6 +131,11 @@ public class VMConnector extends AbstractConnector
         this.queueProfile = queueProfile;
     }
 
+    /**
+     * @deprecated For customizing the behavior of VM transport the whole {@link QueueManager} should be override
+     * @param xaResourceFactory
+     */
+    @Deprecated
     public static void setXaResourceFactory(XAResourceFactory xaResourceFactory)
     {
         VMConnector.xaResourceFactory = xaResourceFactory;

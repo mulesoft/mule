@@ -127,6 +127,9 @@ public class JmxAgent extends AbstractAgent
      */
     private Map<String, String> credentials = new HashMap<String, String>();
 
+    private JmxAgent.MuleContextStartedListener muleContextStartedListener;
+    private JmxAgent.MuleContextStoppedListener muleContextStoppedListener;
+
     static
     {
         Map<String, String> props = new HashMap<String, String>(1);
@@ -211,9 +214,11 @@ public class JmxAgent extends AbstractAgent
         try
         {
             // We need to register all the services once the server has initialised
-            muleContext.registerListener(new MuleContextStartedListener());
+            muleContextStartedListener = new MuleContextStartedListener();
+            muleContext.registerListener(muleContextStartedListener);
             // and unregister once context stopped
-            muleContext.registerListener(new MuleContextStoppedListener());
+            muleContextStoppedListener = new MuleContextStoppedListener();
+            muleContext.registerListener(muleContextStoppedListener);
         }
         catch (NotificationException e)
         {
@@ -316,6 +321,7 @@ public class JmxAgent extends AbstractAgent
     public void dispose()
     {
         unregisterMBeansIfNecessary();
+        unregisterListeners();
         if (serverCreated.get())
         {
             MBeanServerFactory.releaseMBeanServer(mBeanServer);
@@ -323,6 +329,12 @@ public class JmxAgent extends AbstractAgent
         mBeanServer = null;
         serverCreated.compareAndSet(true, false);
         initialized.set(false);
+    }
+
+    private void unregisterListeners()
+    {
+        muleContext.unregisterListener(muleContextStartedListener);
+        muleContext.unregisterListener(muleContextStoppedListener);
     }
 
     /**

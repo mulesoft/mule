@@ -32,6 +32,10 @@ public class VMTransactionFactory implements UniversalTransactionFactory
     /**
      * sets the transaction factory to be used to create VM transactions.  This must also be an UnboundTransactionFactory
      */
+    /**
+     * @deprecated For customizing the behavior of VM transport the whole {@link org.mule.util.queue.QueueManager} should be override
+     * @param factoryDelegate
+     */
     public static void setFactoryDelegate(UniversalTransactionFactory factoryDelegate)
     {
         VMTransactionFactory.factoryDelegate = factoryDelegate;
