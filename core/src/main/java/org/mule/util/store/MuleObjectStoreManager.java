@@ -179,6 +179,13 @@ public class MuleObjectStoreManager
     public void dispose()
     {
         scheduler.shutdown();
+        for (ObjectStore<?> objectStore : stores.values())
+        {
+            if (objectStore instanceof Disposable)
+            {
+                ((Disposable)objectStore).dispose();
+            }
+        }
     }
 
     @Override

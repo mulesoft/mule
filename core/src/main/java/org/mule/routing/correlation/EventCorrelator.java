@@ -19,6 +19,7 @@ import org.mule.api.config.MuleProperties;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.execution.ExecutionCallback;
 import org.mule.api.execution.ExecutionTemplate;
+import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.processor.MessageProcessor;
@@ -51,9 +52,7 @@ import java.util.concurrent.TimeUnit;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-/**
- */
-public class EventCorrelator implements Startable, Stoppable
+public class EventCorrelator implements Startable, Stoppable, Disposable
 {
     /**
      * logger used by this class
@@ -590,6 +589,21 @@ public class EventCorrelator implements Startable, Stoppable
                     }
                 }
             }
+        }
+    }
+
+    public void dispose()
+    {
+        disposeIfDisposable(expiredAndDispatchedGroups);
+        disposeIfDisposable(processedGroups);
+        disposeIfDisposable(eventGroups);
+    }
+
+    private void disposeIfDisposable(Object o)
+    {
+        if (o != null && o instanceof Disposable)
+        {
+            ((Disposable)o).dispose();
         }
     }
 }

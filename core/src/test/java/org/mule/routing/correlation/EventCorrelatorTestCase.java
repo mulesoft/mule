@@ -9,8 +9,10 @@
  */
 package org.mule.routing.correlation;
 
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.isA;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -20,6 +22,7 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
+import org.mule.api.lifecycle.Disposable;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.MessageInfoMapping;
 import org.mule.api.store.ListableObjectStore;
@@ -103,6 +106,17 @@ public class EventCorrelatorTestCase
         verify(mockEventGroup, times(1)).initAfterDeserialisation(mockMuleContext);
     }
 
+    @Test
+    public void disposeObjectStoresIfDisposable() throws Exception
+    {
+        mockExpireGroupsObjectStore = mock(DisposableListableObjectStore.class,RETURNS_DEEP_STUBS);
+        mockProcessedGroups = mock(DisposableListableObjectStore.class, RETURNS_DEEP_STUBS);
+        EventCorrelator eventCorrelator = createEventCorrelator();
+        eventCorrelator.dispose();
+        verify((Disposable)mockExpireGroupsObjectStore,times(1)).dispose();
+        verify((Disposable)mockProcessedGroups,times(1)).dispose();
+    }
+
     private EventCorrelator createEventCorrelator() throws Exception
     {
         when(mockMuleContext.getRegistry().get(MuleProperties.OBJECT_STORE_MANAGER)).thenReturn(mockObjectStoreManager);
@@ -113,5 +127,9 @@ public class EventCorrelatorTestCase
         when(mockEventGroup.getGroupId()).thenReturn(TEST_GROUP_ID);
         when(mockEventGroup.toMessageCollection()).thenReturn(null);
         return new EventCorrelator(mockEventCorrelatorCallback, mockTimeoutMessageProcessor, mockMessagingInfoMapping, mockMuleContext, "flowName", USE_PERSISTENT_STORE, OBJECT_STOR_NAME_PREFIX);
+    }
+
+    public interface DisposableListableObjectStore extends ListableObjectStore, Disposable
+    {
     }
 }

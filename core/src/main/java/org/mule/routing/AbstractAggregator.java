@@ -18,6 +18,7 @@ import org.mule.api.MuleException;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.construct.FlowConstructAware;
 import org.mule.api.context.MuleContextAware;
+import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Startable;
@@ -38,7 +39,7 @@ import org.mule.util.concurrent.ThreadNameHelper;
  */
 
 public abstract class AbstractAggregator extends AbstractInterceptingMessageProcessor
-    implements Initialisable, MuleContextAware, FlowConstructAware, Aggregator, Startable, Stoppable
+    implements Initialisable, MuleContextAware, FlowConstructAware, Aggregator, Startable, Stoppable, Disposable
 {
 
     protected EventCorrelator eventCorrelator;
@@ -163,6 +164,11 @@ public abstract class AbstractAggregator extends AbstractInterceptingMessageProc
     public void setStorePrefix(String storePrefix)
     {
         this.storePrefix = storePrefix;
+    }
+
+    public void dispose()
+    {
+        eventCorrelator.dispose();
     }
 
 }
