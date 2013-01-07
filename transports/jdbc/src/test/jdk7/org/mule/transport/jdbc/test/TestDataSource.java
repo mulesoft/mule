@@ -10,7 +10,8 @@
 
 package org.mule.transport.jdbc.test;
 
-import com.mockobjects.dynamic.Mock;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.io.PrintWriter;
 import java.sql.Connection;
@@ -24,12 +25,9 @@ public class TestDataSource implements DataSource
 {
     public Connection getConnection() throws SQLException
     {
-        Mock mockConnection = new Mock(Connection.class);
-        mockConnection.expectAndReturn("getAutoCommit", false);
-        mockConnection.expect("commit");
-        mockConnection.expect("close");
-
-        return (Connection) mockConnection.proxy();
+        Connection mockConnection = mock(Connection.class);
+        when(mockConnection.getAutoCommit()).thenReturn(false);
+        return mockConnection;
     }
 
     public Connection getConnection(String username, String password) throws SQLException
