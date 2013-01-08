@@ -10,43 +10,22 @@
 
 package org.mule.transport.http;
 
-import org.mule.DefaultMuleEvent;
-import org.mule.DefaultMuleMessage;
-import org.mule.OptimizedRequestContext;
-import org.mule.RequestContext;
-import org.mule.api.DefaultMuleException;
-import org.mule.api.MessagingException;
-import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.api.config.MuleProperties;
 import org.mule.api.construct.FlowConstruct;
-import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.api.execution.ExecutionCallback;
-import org.mule.api.execution.ExecutionTemplate;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.Connector;
-import org.mule.api.transport.PropertyScope;
-import org.mule.config.ExceptionHelper;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.MessageFactory;
+import org.mule.message.processing.MessageProcessContext;
 import org.mule.transport.AbstractMessageReceiver;
 import org.mule.transport.ConnectException;
-import org.mule.message.processing.MessageProcessContext;
-import org.mule.transport.NullPayload;
-import org.mule.transport.http.i18n.HttpMessages;
 import org.mule.util.MapUtils;
 
-import java.io.IOException;
 import java.util.List;
-
-import javax.resource.spi.work.Work;
-
-import org.apache.commons.httpclient.Header;
-import org.apache.commons.httpclient.HttpVersion;
 
 /**
  * <code>HttpMessageReceiver</code> is a simple http server that can be used to
@@ -143,11 +122,17 @@ public class HttpMessageReceiver extends AbstractMessageReceiver
 
     public static class EmptyRequestException extends RuntimeException
     {
-
+        public EmptyRequestException()
+        {
+            super();
+        }
     }
 
     public static class FailureProcessingRequestException extends RuntimeException
     {
-
+        public FailureProcessingRequestException()
+        {
+            super();
+        }
     }
 }
