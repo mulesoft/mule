@@ -152,7 +152,7 @@
         <springSecurityVersion>3.1.0.RELEASE</springSecurityVersion>
         <staxUtilsVersion>20080702</staxUtilsVersion>
         <staxApiVersion>3.0.2</staxApiVersion>
-        <staxonVersion>0.7.0</staxonVersion>
+        <staxonVersion>1.2</staxonVersion>
         <sxcVersion>0.7.3</sxcVersion>
         <tomcatVersion>6.0.29</tomcatVersion>
         <woodstoxVersion>4.0.8</woodstoxVersion>

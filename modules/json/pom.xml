@@ -37,12 +37,6 @@
             <artifactId>mule-module-xml</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <dependency>
-            <groupId>org.mule.tests</groupId>
-            <artifactId>mule-tests-functional</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
 
         <!-- JSON deps, pulls in core and mapper -->
         <dependency>
@@ -50,33 +44,33 @@
             <artifactId>jackson-core-asl</artifactId>
             <version>${jacksonVersion}</version>
         </dependency>
-
         <dependency>
             <groupId>org.codehaus.jackson</groupId>
             <artifactId>jackson-mapper-asl</artifactId>
             <version>${jacksonVersion}</version>
         </dependency>
-
         <dependency>
             <groupId>de.odysseus.staxon</groupId>
             <artifactId>staxon</artifactId>
             <version>${staxonVersion}</version>
         </dependency>
-
         <dependency>
             <groupId>org.codehaus.woodstox</groupId>
             <artifactId>stax2-api</artifactId>
             <version>${staxApiVersion}</version>
         </dependency>
 
+        <!-- test dependencies -->
+        <dependency>
+            <groupId>org.mule.tests</groupId>
+            <artifactId>mule-tests-functional</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.skyscreamer</groupId>
+            <artifactId>jsonassert</artifactId>
+            <version>1.1.1</version>
+        </dependency>
     </dependencies>
-
-
-    <repositories>
-        <repository>
-            <id>staxon</id>
-            <url>http://beckchr.github.com/staxon/maven/releases</url>
-        </repository>
-    </repositories>
-
 </project>

@@ -9,141 +9,172 @@
  */
 package org.mule.module.json.transformers;
 
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.util.IOUtils;
-import org.w3c.dom.ls.LSInput;
-import org.w3c.dom.ls.LSResourceResolver;
-import org.xml.sax.ErrorHandler;
-import org.xml.sax.SAXException;
-import org.xml.sax.SAXParseException;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.Reader;
 import java.io.StringReader;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import org.junit.Test;
+import org.skyscreamer.jsonassert.JSONAssert;
+import org.w3c.dom.ls.LSInput;
+import org.w3c.dom.ls.LSResourceResolver;
+import org.xml.sax.ErrorHandler;
+import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
 
 public class JsonSchemaValidationTestCase extends AbstractMuleContextTestCase
 {
-    private int numErrors = 0;
+    private static final String EXPECTED_JSON =
+        "{" +
+        "    \"cust:customer\" : {" +
+        "        \"@xmlns:cust\" : \"http:customer.com\"," +
+        "        \"cust:id\" : \"112\"," +
+        "        \"cust:first-name\" : \"Jane\"," +
+        "        \"cust:last-name\" : \"Doe\"," +
+        "        \"cust:address\" : {" +
+        "           \"cust:street\" : \"123 A Street\"" +
+        "        }," +
+        "        \"cust:phone-number\" : [ {" +
+        "            \"@type\" : \"work\"," +
+        "            \"$\" : \"555-1111\"" +
+        "        }, {" +
+        "            \"@type\" : \"cell\"," +
+        "            \"$\" : \"555-2222\"" +
+        "        } ]" +
+        "    }" +
+        "}";
 
-    @Test
-    public void testConversion() throws Exception
+    private static final String BAD_JSON =
+        "{\n" +
+        "  \"cust:customer\" : {\n" +
+        "    \"@xmlns:cust\" : \"http:customer.com\",\n" +
+        "    \"cust:ID\" : \"112\",\n" +
+        "    \"cust:first-name\" : \"Jane\",\n" +
+        "    \"cust:last-name\" : \"Doe\",\n" +
+        "    \"cust:address\" : {\n" +
+        "      \"cust:street\" : \"123 A Street\"\n" +
+        "    },\n" +
+        "    \"cust:phone-number\" : [ {\n" +
+        "      \"@type\" : \"work\",\n" +
+        "      \"$\" : \"555-1111\"\n" +
+        "    }, {\n" +
+        "      \"@type\" : \"cell\",\n" +
+        "      \"$\" : \"555-2222\"\n" +
+        "    } ]\n" +
+        "  }\n" +
+        "}";
+
+    private JsonSchemaValidationFilter filter;
+    private CountingErrorHandler errorHandler;
+
+    @Override
+    protected void doSetUp() throws Exception
     {
-        String json = "{\n" +
-            "  \"cust:customer\" : {\n" +
-            "    \"@xmlns:cust\" : \"http:customer.com\",\n" +
-            "    \"cust:id\" : \"112\",\n" +
-            "    \"cust:first-name\" : \"Jane\",\n" +
-            "    \"cust:last-name\" : \"Doe\",\n" +
-            "    \"cust:address\" : {\n" +
-            "      \"cust:street\" : \"123 A Street\"\n" +
-            "    },\n" +
-            "    \"cust:phone-number\" : [ {\n" +
-            "      \"@type\" : \"work\",\n" +
-            "      \"$\" : \"555-1111\"\n" +
-            "    }, {\n" +
-            "      \"@type\" : \"cell\",\n" +
-            "      \"$\" : \"555-2222\"\n" +
-            "    } ]\n" +
-            "  }\n" +
-            "}";
+        super.doSetUp();
 
-        String badJson = "{\n" +
-            "  \"cust:customer\" : {\n" +
-            "    \"@xmlns:cust\" : \"http:customer.com\",\n" +
-            "    \"cust:ID\" : \"112\",\n" +
-            "    \"cust:first-name\" : \"Jane\",\n" +
-            "    \"cust:last-name\" : \"Doe\",\n" +
-            "    \"cust:address\" : {\n" +
-            "      \"cust:street\" : \"123 A Street\"\n" +
-            "    },\n" +
-            "    \"cust:phone-number\" : [ {\n" +
-            "      \"@type\" : \"work\",\n" +
-            "      \"$\" : \"555-1111\"\n" +
-            "    }, {\n" +
-            "      \"@type\" : \"cell\",\n" +
-            "      \"$\" : \"555-2222\"\n" +
-            "    } ]\n" +
-            "  }\n" +
-            "}";
-
-        String xml = "<?xml version=\"1.0\" ?>\n" +
-            "<cust:customer xmlns:cust=\"http:customer.com\">\n" +
-            "\t<cust:id>112</cust:id>\n" +
-            "\t<cust:first-name>Jane</cust:first-name>\n" +
-            "\t<cust:last-name>Doe</cust:last-name>\n" +
-            "\t<cust:address>\n" +
-            "\t\t<cust:street>123 A Street</cust:street>\n" +
-            "\t</cust:address>\n" +
-            "\t<cust:phone-number type=\"work\">555-1111</cust:phone-number>\n" +
-            "\t<cust:phone-number type=\"cell\">555-2222</cust:phone-number>\n" +
-            "</cust:customer>\n";
-
-        XmlToJson xToJ = new XmlToJson();
-        String jsonResponse = (String) xToJ.transform(xml);
-        jsonResponse = jsonResponse.replaceAll("\r\n", "\n");
-        assertEquals(json, jsonResponse);
-
-        JsonSchemaValidationFilter filter = new JsonSchemaValidationFilter();
+        filter = new JsonSchemaValidationFilter();
         filter.setSchemaLocations("customer.xsd");
-        filter.setErrorHandler(new ErrorHandler()
-        {
-            @Override
-            public void warning(SAXParseException exception) throws SAXException
-            {
-            }
 
-            @Override
-            public void error(SAXParseException exception) throws SAXException
-            {
-                numErrors++;
-            }
+        errorHandler = new CountingErrorHandler();
+        filter.setErrorHandler(errorHandler);
 
-            @Override
-            public void fatalError(SAXParseException exception) throws SAXException
-            {
-                numErrors++;
-            }
-        });
         filter.setResourceResolver(new Resolver());
         filter.setReturnResult(true);
         filter.setMuleContext(muleContext);
         filter.initialise();
-
-        MuleMessage msg = new DefaultMuleMessage(json, muleContext);
-        boolean accepted = filter.accept(msg);
-        assertTrue(accepted);
-        assertEquals(json, ((String)msg.getPayload()).replaceAll("\r\n", "\n"));
-
-        msg = new DefaultMuleMessage(new StringReader(json), muleContext);
-        accepted = filter.accept(msg);
-        assertTrue(accepted);
-        assertEquals(json, ((String)msg.getPayload()).replaceAll("\r\n", "\n"));
-
-        msg = new DefaultMuleMessage(json.getBytes(), muleContext);
-        accepted = filter.accept(msg);
-        assertTrue(accepted);
-        assertEquals(json, ((String)msg.getPayload()).replaceAll("\r\n", "\n"));
-
-        msg = new DefaultMuleMessage(new ByteArrayInputStream(json.getBytes()), muleContext);
-        accepted = filter.accept(msg);
-        assertTrue(accepted);
-        assertEquals(json, ((String)msg.getPayload()).replaceAll("\r\n", "\n"));
-
-        msg = new DefaultMuleMessage(badJson, muleContext);
-        accepted = filter.accept(msg);
-        assertTrue(!accepted);
     }
 
-    class Resolver implements LSResourceResolver
+    @Test
+    public void filterShouldAcceptStringInput() throws Exception
     {
-        private String schema = IOUtils.toString(getClass().getClassLoader().getResourceAsStream("customer.xsd"));
+        MuleMessage message = new DefaultMuleMessage(EXPECTED_JSON, muleContext);
+        boolean accepted = filter.accept(message);
+        assertTrue(accepted);
+        assertEquals(0, errorHandler.getErrorCount());
+        JSONAssert.assertEquals(EXPECTED_JSON, message.getPayloadAsString(), false);
+    }
+
+    @Test
+    public void filterShouldAcceptReaderInput() throws Exception
+    {
+        StringReader reader = new StringReader(EXPECTED_JSON);
+        MuleMessage message = new DefaultMuleMessage(reader, muleContext);
+        boolean accepted = filter.accept(message);
+        assertTrue(accepted);
+        assertEquals(0, errorHandler.getErrorCount());
+        JSONAssert.assertEquals(EXPECTED_JSON, message.getPayloadAsString(), false);
+    }
+
+    @Test
+    public void filterShouldAcceptByteArrayInput() throws Exception
+    {
+        byte[] bytes = EXPECTED_JSON.getBytes();
+        MuleMessage message = new DefaultMuleMessage(bytes, muleContext);
+        boolean accepted = filter.accept(message);
+        assertTrue(accepted);
+        assertEquals(0, errorHandler.getErrorCount());
+        JSONAssert.assertEquals(EXPECTED_JSON, message.getPayloadAsString(), false);
+    }
+
+    @Test
+    public void filterShouldAcceptInputStreamInput() throws Exception
+    {
+        MuleMessage message = new DefaultMuleMessage(new ByteArrayInputStream(EXPECTED_JSON.getBytes()), muleContext);
+        boolean accepted = filter.accept(message);
+        assertTrue(accepted);
+        assertEquals(0, errorHandler.getErrorCount());
+        JSONAssert.assertEquals(EXPECTED_JSON, message.getPayloadAsString(), false);
+    }
+
+    @Test
+    public void filterShouldNotAcceptInvalidJson() throws Exception
+    {
+        MuleMessage message = new DefaultMuleMessage(BAD_JSON, muleContext);
+        boolean accepted = filter.accept(message);
+        assertFalse(accepted);
+    }
+
+    private static class CountingErrorHandler implements ErrorHandler
+    {
+        private int errorCount = 0;
+
+        @Override
+        public void warning(SAXParseException exception) throws SAXException
+        {
+            // ignored
+        }
+
+        @Override
+        public void error(SAXParseException exception) throws SAXException
+        {
+            errorCount++;
+        }
+
+        @Override
+        public void fatalError(SAXParseException exception) throws SAXException
+        {
+            errorCount++;
+        }
+
+        public int getErrorCount()
+        {
+            return errorCount;
+        }
+    }
+
+    private static class Resolver implements LSResourceResolver
+    {
+        private String schema = IOUtils.toString(JsonSchemaValidationTestCase.class.getClassLoader().getResourceAsStream("customer.xsd"));
+
         @Override
         public LSInput resolveResource(String type, String namespaceURI, String publicId, String systemId, String baseURI)
         {
@@ -158,6 +189,7 @@ public class JsonSchemaValidationTestCase extends AbstractMuleContextTestCase
                 @Override
                 public void setCharacterStream(Reader characterStream)
                 {
+                    // ignored
                 }
 
                 @Override
@@ -169,6 +201,7 @@ public class JsonSchemaValidationTestCase extends AbstractMuleContextTestCase
                 @Override
                 public void setByteStream(InputStream byteStream)
                 {
+                    // ignored
                 }
 
                 @Override
@@ -180,6 +213,7 @@ public class JsonSchemaValidationTestCase extends AbstractMuleContextTestCase
                 @Override
                 public void setStringData(String stringData)
                 {
+                    // ignored
                 }
 
                 @Override
@@ -189,8 +223,9 @@ public class JsonSchemaValidationTestCase extends AbstractMuleContextTestCase
                 }
 
                 @Override
-                public void setSystemId(String systemId)
+                public void setSystemId(String id)
                 {
+                    // ignored
                 }
 
                 @Override
@@ -200,8 +235,9 @@ public class JsonSchemaValidationTestCase extends AbstractMuleContextTestCase
                 }
 
                 @Override
-                public void setPublicId(String publicId)
+                public void setPublicId(String id)
                 {
+                    // ignored
                 }
 
                 @Override
@@ -211,8 +247,9 @@ public class JsonSchemaValidationTestCase extends AbstractMuleContextTestCase
                 }
 
                 @Override
-                public void setBaseURI(String baseURI)
+                public void setBaseURI(String uri)
                 {
+                    // ignored
                 }
 
                 @Override
@@ -222,8 +259,9 @@ public class JsonSchemaValidationTestCase extends AbstractMuleContextTestCase
                 }
 
                 @Override
-                public void setEncoding(String encoding)
+                public void setEncoding(String enc)
                 {
+                    // ignored
                 }
 
                 @Override
@@ -233,8 +271,9 @@ public class JsonSchemaValidationTestCase extends AbstractMuleContextTestCase
                 }
 
                 @Override
-                public void setCertifiedText(boolean certifiedText)
+                public void setCertifiedText(boolean text)
                 {
+                    // ignored
                 }
             };
         }

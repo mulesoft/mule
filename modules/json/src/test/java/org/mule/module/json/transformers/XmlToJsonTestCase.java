@@ -9,85 +9,145 @@
  */
 package org.mule.module.json.transformers;
 
-import org.junit.Test;
 import org.mule.api.transformer.TransformerException;
 import org.mule.module.xml.util.XMLUtils;
-import org.w3c.dom.Document;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.ByteArrayInputStream;
 import java.io.StringReader;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import org.junit.Test;
+import org.skyscreamer.jsonassert.JSONAssert;
+import org.w3c.dom.Document;
 
-public class XmlToJsonTestCase
+public class XmlToJsonTestCase extends AbstractMuleTestCase
 {
+    private static final String EXPECTED_JSON =
+        "{" +
+        "    \"customer\" : {" +
+        "        \"id\" : \"112\"," +
+        "        \"first-name\" : \"Jane\"," +
+        "        \"last-name\" : \"Doe\"," +
+        "        \"address\" : {" +
+        "            \"street\" : \"123 A Street\"" +
+        "        }," +
+        "        \"phone-number\" : [ {" +
+        "            \"@type\" : \"work\"," +
+        "            \"$\" : \"555-1111\"" +
+        "        }, {" +
+        "            \"@type\" : \"cell\"," +
+        "            \"$\" : \"555-2222\"" +
+        "        } ]" +
+        "    }" +
+        "}";
+
+    private static final String EXPECTED_JSON_WITH_NAMESPACE =
+        "{" +
+        "    \"cust:customer\" : {" +
+        "        \"@xmlns:cust\" : \"http:customer.com\"," +
+        "        \"cust:id\" : \"112\"," +
+        "        \"cust:first-name\" : \"Jane\"," +
+        "        \"cust:last-name\" : \"Doe\"," +
+        "        \"cust:address\" : {" +
+        "           \"cust:street\" : \"123 A Street\"" +
+        "        }," +
+        "        \"cust:phone-number\" : [ {" +
+        "            \"@type\" : \"work\"," +
+        "            \"$\" : \"555-1111\"" +
+        "        }, {" +
+        "            \"@type\" : \"cell\"," +
+        "            \"$\" : \"555-2222\"" +
+        "        } ]" +
+        "    }" +
+        "}";
+
+    private static final String XML =
+        "<?xml version=\"1.0\" ?>" +
+        "<customer>" +
+        "    <id>112</id>" +
+        "    <first-name>Jane</first-name>" +
+        "    <last-name>Doe</last-name>" +
+        "    <address>" +
+        "        <street>123 A Street</street>" +
+        "    </address>" +
+        "    <phone-number type=\"work\">555-1111</phone-number>" +
+        "    <phone-number type=\"cell\">555-2222</phone-number>" +
+        "</customer>";
+
+    private static final String XML_WITH_NAMESPACE =
+        "<?xml version=\"1.0\" ?>" +
+        "<cust:customer xmlns:cust=\"http:customer.com\">" +
+        "    <cust:id>112</cust:id>" +
+        "    <cust:first-name>Jane</cust:first-name>" +
+        "    <cust:last-name>Doe</cust:last-name>" +
+        "    <cust:address>" +
+        "        <cust:street>123 A Street</cust:street>" +
+        "    </cust:address>\n" +
+        "    <cust:phone-number type=\"work\">555-1111</cust:phone-number>" +
+        "    <cust:phone-number type=\"cell\">555-2222</cust:phone-number>" +
+        "</cust:customer>";
+
     @Test
-    public void testConversion() throws Exception
+    public void stringInputShouldBeTransformedToJson() throws Exception
     {
-        String json = "{\n" +
-            "  \"customer\" : {\n" +
-            "    \"id\" : \"112\",\n" +
-            "    \"first-name\" : \"Jane\",\n" +
-            "    \"last-name\" : \"Doe\",\n" +
-            "    \"address\" : {\n" +
-            "      \"street\" : \"123 A Street\"\n" +
-            "    },\n" +
-            "    \"phone-number\" : [ {\n" +
-            "      \"@type\" : \"work\",\n" +
-            "      \"$\" : \"555-1111\"\n" +
-            "    }, {\n" +
-            "      \"@type\" : \"cell\",\n" +
-            "      \"$\" : \"555-2222\"\n" +
-            "    } ]\n" +
-            "  }\n" +
-            "}";
+        XmlToJson transformer = new XmlToJson();
+        String jsonResponse = (String) transformer.transform(XML);
+        JSONAssert.assertEquals(EXPECTED_JSON, jsonResponse, false);
+    }
 
-        String xml = "<?xml version=\"1.0\" ?>\n" +
-            "<customer>\n" +
-            "\t<id>112</id>\n" +
-            "\t<first-name>Jane</first-name>\n" +
-            "\t<last-name>Doe</last-name>\n" +
-            "\t<address>\n" +
-            "\t\t<street>123 A Street</street>\n" +
-            "\t</address>\n" +
-            "\t<phone-number type=\"work\">555-1111</phone-number>\n" +
-            "\t<phone-number type=\"cell\">555-2222</phone-number>\n" +
-            "</customer>\n";
+    @Test
+    public void readerInputShouldBeTransformedToJson() throws Exception
+    {
+        StringReader reader = new StringReader(XML);
 
-        XmlToJson xToJ = new XmlToJson();
-        String jsonResponse = (String) xToJ.transform(xml);
-        jsonResponse = jsonResponse.replaceAll("\r\n", "\n");
-        assertEquals(json, jsonResponse);
+        XmlToJson transformer = new XmlToJson();
+        String jsonResponse = (String) transformer.transform(reader);
+        JSONAssert.assertEquals(EXPECTED_JSON, jsonResponse, false);
+    }
 
-        jsonResponse = (String) xToJ.transform(new StringReader(xml));
-        jsonResponse = jsonResponse.replaceAll("\r\n", "\n");
-        assertEquals(json, jsonResponse);
+    @Test
+    public void byteArrayInputShouldBeTransformedToJson() throws Exception
+    {
+        byte[] bytes = XML.getBytes();
 
-        jsonResponse = (String) xToJ.transform(xml.getBytes());
-        jsonResponse = jsonResponse.replaceAll("\r\n", "\n");
-        assertEquals(json, jsonResponse);
+        XmlToJson transformer = new XmlToJson();
+        String jsonResponse = (String) transformer.transform(bytes);
+        JSONAssert.assertEquals(EXPECTED_JSON, jsonResponse, false);
+    }
 
-        jsonResponse = (String) xToJ.transform(new ByteArrayInputStream(xml.getBytes()));
-        jsonResponse = jsonResponse.replaceAll("\r\n", "\n");
-        assertEquals(json, jsonResponse);
+    @Test
+    public void inputStreamInputShouldBeTransformedToJson() throws Exception
+    {
+        ByteArrayInputStream input = new ByteArrayInputStream(XML.getBytes());
 
-        Document xmlDoc = XMLUtils.toW3cDocument(xml);
-        xmlDoc.setDocumentURI("xxx");
-        jsonResponse = (String) xToJ.transform(xmlDoc);
-        jsonResponse = jsonResponse.replaceAll("\r\n", "\n");
-        assertEquals(json, jsonResponse);
+        XmlToJson transformer = new XmlToJson();
+        String jsonResponse = (String) transformer.transform(input);
+        JSONAssert.assertEquals(EXPECTED_JSON, jsonResponse, false);
+    }
 
+    @Test
+    public void documentInputShouldBeTransformedToJson() throws Exception
+    {
+        Document document = XMLUtils.toW3cDocument(XML);
+        document.setDocumentURI("xxx");
 
-        try
-        {
-            xToJ.transform(new Object());
-            fail();
-        }
-        catch (Exception ex)
-        {
-            assertTrue(ex instanceof TransformerException);
-        }
+        XmlToJson transformer = new XmlToJson();
+        String jsonResponse = (String) transformer.transform(document);
+        JSONAssert.assertEquals(EXPECTED_JSON, jsonResponse, false);
+    }
+
+    @Test(expected = TransformerException.class)
+    public void badInputShouldThrow() throws Exception
+    {
+        XmlToJson transformer = new XmlToJson();
+        transformer.transform(new Object());
+    }
+
+    @Test
+    public void xmlWithNamespaceShouldBeTransformedToJson() throws Exception
+    {
+        XmlToJson transformer = new XmlToJson();
+        String jsonResponse = (String) transformer.transform(XML_WITH_NAMESPACE);
+        JSONAssert.assertEquals(EXPECTED_JSON_WITH_NAMESPACE, jsonResponse, false);
     }
 }
