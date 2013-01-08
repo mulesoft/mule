@@ -16,14 +16,11 @@ import org.mule.api.lifecycle.CreateException;
 import org.mule.api.transport.Connector;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.transport.ConnectException;
-import org.mule.message.processing.MessageProcessContext;
 import org.mule.util.StringUtils;
 
 public class HttpsMessageReceiver extends HttpMessageReceiver
 {
-
-    public HttpsMessageReceiver(Connector connector, FlowConstruct flow, InboundEndpoint endpoint)
-            throws CreateException
+    public HttpsMessageReceiver(Connector connector, FlowConstruct flow, InboundEndpoint endpoint) throws CreateException
     {
         super(connector, flow, endpoint);
     }
@@ -48,7 +45,6 @@ public class HttpsMessageReceiver extends HttpMessageReceiver
     @Override
     HttpMessageProcessTemplate createMessageContext(HttpServerConnection httpServerConnection)
     {
-        return new HttpsMessageProcessTemplate(this,httpServerConnection,getWorkManager());
+        return new HttpsMessageProcessTemplate(this, httpServerConnection,getWorkManager());
     }
-
 }
