@@ -10,8 +10,13 @@
 
 package org.mule.util;
 
+import org.mule.config.MuleManifest;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.util.JdkVersionUtils.JdkVersion;
+
+import java.lang.reflect.Field;
+import java.util.jar.Attributes;
+import java.util.jar.Manifest;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -21,26 +26,38 @@ import static org.junit.Assert.assertTrue;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
 
 public class JdkVersionUtilsTestCase extends AbstractMuleTestCase
 {
 	
 	private String originalJavaVersion;
+    private Manifest originalManifest;
 	
 	@Before
 	public void before()
 	{
 		originalJavaVersion = System.getProperty("java.version");
+        originalManifest = MuleManifest.getManifest();
 	}
 	
 	@After
-	public void after() {
+	public void after() throws Exception
+	{
 		setJdkVersion(originalJavaVersion);
+		setManifest(originalManifest);
 	}
 	
 	private static void setJdkVersion(String version)
 	{
 		System.setProperty("java.version", version);
+	}
+	
+	private void setManifest(Manifest manifest) throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException
+	{
+        Field field = MuleManifest.class.getDeclaredField("manifest");
+        field.setAccessible(true);
+        field.set(null, manifest);   
 	}
 
 	@Test
@@ -60,6 +77,41 @@ public class JdkVersionUtilsTestCase extends AbstractMuleTestCase
 		assertFalse(JdkVersionUtils.isSupportedJdkVersion());
 		setJdkVersion("1.4.2_12");
 		assertFalse(JdkVersionUtils.isSupportedJdkVersion());
+	}
+	
+	@Test
+	public void testUndefinedJdkPreferences() throws Exception
+	{
+        setJdkVersion("1.4.2");
+        
+		//not defined - blank
+		setJdkPreferences("");
+		assertEquals("", JdkVersionUtils.getRecommendedJdks());
+        assertEquals("", JdkVersionUtils.getSupportedJdks());
+        
+		assertTrue(JdkVersionUtils.isRecommendedJdkVersion());
+        assertTrue(JdkVersionUtils.isSupportedJdkVendor());
+        assertTrue(JdkVersionUtils.isSupportedJdkVersion());
+
+        //not defined - null
+        setJdkPreferences(null);
+        assertNull(JdkVersionUtils.getRecommendedJdks());
+        assertNull(JdkVersionUtils.getSupportedJdks());
+        
+        assertTrue(JdkVersionUtils.isRecommendedJdkVersion());
+        assertTrue(JdkVersionUtils.isSupportedJdkVendor());
+        assertTrue(JdkVersionUtils.isSupportedJdkVersion());
+	}
+	
+	private void setJdkPreferences(String preference) throws Exception
+	{
+	    // mock the manifest (this is where the jdk preferences are taken from
+        Manifest manifest = Mockito.mock(Manifest.class);
+        Attributes attributes = Mockito.mock(Attributes.class);
+        Mockito.when(attributes.getValue(Mockito.any(Attributes.Name.class))).thenReturn(preference);
+        Mockito.when(manifest.getMainAttributes()).thenReturn(attributes);
+        
+        setManifest(manifest);
 	}
 	
 	@Test
