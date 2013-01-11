@@ -111,10 +111,16 @@ public class WSProxyService implements Callable, ServiceAware, Initialisable
     {
         this.wsdlFile = wsdlFile;
     }
+    
+    protected boolean isInitialized()
+    {
+        return service != null && urlWebservice != null 
+            && (useFile ? StringUtils.isNotBlank(wsdlFileContents) : StringUtils.isNotBlank(wsdlEndpoint));
+    }
 
     public Object onCall(MuleEventContext eventContext) throws Exception
     {
-        if (wsdlEndpoint == null && lazyInit)
+        if (!isInitialized() && wsdlEndpoint == null && lazyInit)
         {
             initialise();
         }

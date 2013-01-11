@@ -12,10 +12,12 @@ package org.mule.module.cxf;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
+import org.mule.config.ConfigResource;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -23,6 +25,7 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -104,6 +107,38 @@ public class WSProxyTestCase extends FunctionalTestCase
         MuleMessage result = client.send("wsdl-cxf:http://localhost:" + dynamicPort3.getNumber() + "/webServiceProxy?wsdl&method=echo",
             new DefaultMuleMessage("mule", muleContext));
         assertEquals ("mule", result.getPayloadAsString());
+    }
+    
+    @Test
+    public void testWsdlFileNotReloaded() throws Exception
+    {
+        MuleClient client = new MuleClient(muleContext);
+        MuleMessage result = client.send("wsdl-cxf:http://localhost:" + dynamicPort3.getNumber() + "/webServiceProxy?wsdl&method=echo",
+            new DefaultMuleMessage("mule", muleContext));
+        assertEquals ("mule", result.getPayloadAsString());
+        
+        String wsdlFileName = "wsproxyservice-localWsdl.wsdl";
+        ConfigResource wsdlFileResource = new ConfigResource(wsdlFileName);
+        String wsdlFilePathname = wsdlFileResource.getUrl().getFile();
+        String tmpWsdlFilePathname = wsdlFilePathname + ".tmp";
+        File wsdlFile = new File(wsdlFilePathname);
+        assertTrue(wsdlFile.exists());
+        assertTrue(wsdlFile.renameTo(new File(tmpWsdlFilePathname)));
+        
+        try
+        {
+            assertFalse((new File(wsdlFilePathname)).exists());
+    
+            // if initialization will occur a second time, this will throw initialization exception
+            result = client.send("wsdl-cxf:http://localhost:" + dynamicPort3.getNumber() + "/webServiceProxy?wsdl&method=echo",
+                new DefaultMuleMessage("mule", muleContext));
+            assertEquals ("mule", result.getPayloadAsString());
+        }
+        finally
+        {
+            // put the file back
+            (new File(tmpWsdlFilePathname)).renameTo(new File(wsdlFilePathname));
+        }
     }
     
 }
