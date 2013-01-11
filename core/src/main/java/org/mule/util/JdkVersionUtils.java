@@ -266,14 +266,26 @@ public class JdkVersionUtils
     
     public static boolean isSupportedJdkVersion()
     {
-    	List<JdkVersionRange> supportedJdkVersionRanges = createJdkVersionRanges(getSupportedJdks());
-    	return isJdkInRange(getJdkVersion(), supportedJdkVersionRanges);
+        boolean isSupported = true;
+        String supportedJdks = getSupportedJdks();
+        if (supportedJdks != null && !supportedJdks.isEmpty())
+        {
+        	List<JdkVersionRange> supportedJdkVersionRanges = createJdkVersionRanges(supportedJdks);
+        	isSupported = isJdkInRange(getJdkVersion(), supportedJdkVersionRanges);
+        }
+        return isSupported;
     }
     
     public static boolean isRecommendedJdkVersion()
     {
-    	List<JdkVersionRange> recommendedJdkVersionRanges = createJdkVersionRanges(getRecommendedJdks());
-    	return isJdkInRange(getJdkVersion(), recommendedJdkVersionRanges);
+        boolean isRecommended = true;
+        String recommendedJdks = getRecommendedJdks();
+        if (recommendedJdks != null && !recommendedJdks.isEmpty())
+        {
+            List<JdkVersionRange> recommendedJdkVersionRanges = createJdkVersionRanges(recommendedJdks);
+            isRecommended = isJdkInRange(getJdkVersion(), recommendedJdkVersionRanges);
+        }
+        return isRecommended;
     }
     
     private static boolean isJdkInRange(JdkVersion version, List<JdkVersionRange> ranges)
