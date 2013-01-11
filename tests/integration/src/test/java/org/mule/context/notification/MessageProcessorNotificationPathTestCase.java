@@ -38,19 +38,20 @@ public class MessageProcessorNotificationPathTestCase extends FunctionalTestCase
     {
         testFlowPaths("singleMP", "/0");
         testFlowPaths("processorChain", "/0", "/0/0", "/0/1");
+        testFlowPaths("customProcessor", "/0", "/1");
     }
 
     @Test
     public void routers() throws Exception
     {
         testFlowPaths("choice", "/0", "/0/0", "/0/0/0", "/0/1", "/0/1/0", "/0/2", "/0/2/0");
-        testFlowPaths("all", "/0", "/0/0", "/0/0/0", "/0/1", "/0/1/0");
+        testFlowPaths("all", "/0", "/0/0", "/0/0/0", "/0/1", "/0/1/0", "/1");
     }
 
     @Test
     public void scopes() throws Exception
     {
-        testFlowPaths("foreach", "/0", "/0/0");
+        testFlowPaths("foreach", "/0", "/0/0", "/1");
         testFlowPaths("enricher", "/0", "/0/0", "/1", "/1/0", "/1/0/0", "/1/0/1");
         testFlowPaths("until-successful", "/0", "/0/0", "/0/0/0", "/0/0/1");
         testFlowPaths("async", "/0", "/0/0", "/0/1");
@@ -60,6 +61,8 @@ public class MessageProcessorNotificationPathTestCase extends FunctionalTestCase
     public void filters() throws Exception
     {
         testFlowPaths("filters", "/0", "/1");
+        testFlowPaths("idempotent-msg-filter", "/0", "/1" );
+        testFlowPaths("idempotent-secure-hash-msg-filter", "/0", "/1" );
     }
 
     @Test
@@ -77,6 +80,36 @@ public class MessageProcessorNotificationPathTestCase extends FunctionalTestCase
         testFlowPaths("global-es", "/0", "Global_Exception_Strategy/es/0", "Global_Exception_Strategy/es/1");
 
     }
+
+    @Test
+    public void requestReply() throws Exception
+    {
+        testFlowPaths("request-reply", "/0", "/1" );
+    }
+
+    @Test
+    public void multipleEndpoints() throws Exception
+    {
+        testFlowPaths("composite-source", "/0" );
+        testFlowPaths("first-successful", "/0", "/1", "/1/0", "/1/1", "/1/2", "/1/3" );
+        testFlowPaths("round-robin", "/0", "/0/0", "/0/1", "/0/2", "/1");
+    }
+
+    @Test
+    public void collections() throws Exception
+    {
+        testFlowPaths("collectionAggregator", "/0", "/1", "/2");
+        testFlowPaths("customAggregator", "/0", "/1", "/2");
+        testFlowPaths("chunkAggregator", "/0", "/1", "/2", "/3");
+        testFlowPaths("combineCollections", "/0", "/1");
+    }
+
+    @Test
+    public void wireTap() throws Exception
+    {
+        testFlowPaths("wire-tap", "/0", "/0/0", "/1");
+    }
+
 
     private void testFlowPaths(String flowName, String... nodes) throws Exception
     {

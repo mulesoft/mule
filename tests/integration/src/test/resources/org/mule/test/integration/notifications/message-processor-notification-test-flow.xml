@@ -3,12 +3,14 @@
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:spring="http://www.springframework.org/schema/beans"
       xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
       xmlns:test="http://www.mulesoft.org/schema/mule/test"
       xsi:schemaLocation="
                http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
                http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
-               http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+               http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
     <notifications>
         <notification event="MESSAGE-PROCESSOR"/>
@@ -33,6 +35,12 @@
             <logger message="check1"/>
             <logger message="check2"/>
         </processor-chain>
+    </flow>
+
+    <flow name="customProcessor">
+        <vm:inbound-endpoint path="customProcessor" exchange-pattern="request-response"/>
+        <custom-processor class="org.mule.tck.testmodels.mule.TestMessageProcessor" />
+        <logger level="INFO"/>
     </flow>
 
     <flow name="choice">
@@ -60,6 +68,7 @@
                 <logger/>
             </processor-chain>
         </all>
+        <logger message="Log after a scope" />
     </flow>
 
     <flow name="foreach">
@@ -67,6 +76,7 @@
         <foreach collection="#[{'one','two'}]">
             <logger/>
         </foreach>
+        <logger message="Log after a scope" />
     </flow>
 
     <flow name="enricher">
@@ -109,6 +119,22 @@
             <exception-type-filter expectedType="java.lang.Throwable"/>
             <payload-type-filter expectedType="java.lang.String"/>
         </or-filter>
+    </flow>
+
+    <flow name="idempotent-msg-filter">
+        <vm:inbound-endpoint path="idem-msg-filter" exchange-pattern="request-response"/>
+        <idempotent-message-filter idExpression="#[message:id]">
+            <in-memory-store entryTTL="1000" expirationInterval="2000" maxEntries="3000"/>
+        </idempotent-message-filter>
+        <logger level="INFO"/>
+    </flow>
+
+    <flow name="idempotent-secure-hash-msg-filter">
+        <vm:inbound-endpoint path="idem-sh-msg-filter" exchange-pattern="request-response"/>
+        <idempotent-secure-hash-message-filter idExpression="#[message:id]">
+            <in-memory-store entryTTL="1000" expirationInterval="2000" maxEntries="3000"/>
+        </idempotent-secure-hash-message-filter>
+        <logger level="INFO"/>
     </flow>
 
     <flow name="subflow">
@@ -168,4 +194,92 @@
         <exception-strategy ref="Global_Exception_Strategy"/>
     </flow>
 
+    <flow name="request-reply">
+        <vm:inbound-endpoint path="request-reply" exchange-pattern="request-response"/>
+        <request-reply storePrefix="mainFlow">
+            <vm:outbound-endpoint path="request"/>
+            <vm:inbound-endpoint path="reply"/>
+        </request-reply>
+        <logger message="ProcessReqReplyOrder"/>
+    </flow>
+
+    <flow name="handle-request-reply">
+        <vm:inbound-endpoint path="request"/>
+        <logger message="GenerateReqReplyOrder"/>
+    </flow>
+
+    <flow name="composite-source">
+        <composite-source>
+            <vm:inbound-endpoint path="cs1" exchange-pattern="request-response"/>
+            <vm:inbound-endpoint path="cs2" exchange-pattern="request-response"/>
+            <vm:inbound-endpoint path="cs3" exchange-pattern="request-response"/>
+            <vm:inbound-endpoint path="cs4" exchange-pattern="request-response"/>
+        </composite-source>
+        <logger level="INFO"/>
+    </flow>
+
+    <flow name="first-successful">
+        <vm:inbound-endpoint path="fsucc" exchange-pattern="request-response"/>
+        <logger level="INFO"/>
+        <first-successful>
+            <http:outbound-endpoint address="http://localhost:6090/weather-forecast" />
+            <http:outbound-endpoint address="http://localhost:6091/weather-forecast" />
+            <http:outbound-endpoint address="http://localhost:6092/weather-forecast" />
+            <vm:outbound-endpoint path="dead-letter-queue" />
+        </first-successful>
+    </flow>
+
+    <flow name="round-robin">
+        <vm:inbound-endpoint path="round-robin" exchange-pattern="request-response"/>
+        <round-robin>
+            <logger message="First-RRMP"/>
+            <logger message="Second-RRMP"/>
+            <logger message="Third-RRMP"/>
+        </round-robin>
+        <logger level="INFO"/>
+    </flow>
+
+    <flow name="recipient-list">
+        <vm:inbound-endpoint path="recipient-list" exchange-pattern="request-response"/>
+        <recipient-list enableCorrelation="ALWAYS" evaluator="payload"  expression=""/>
+        <logger level="INFO"/>
+    </flow>
+
+    <vm:endpoint name="recipient" path="recipient" />
+    
+    <flow name="collectionAggregator">
+        <vm:inbound-endpoint path="collection-agg" exchange-pattern="request-response"/>
+        <collection-splitter />
+        <logger level="INFO"/>
+        <collection-aggregator failOnTimeout="false" timeout="3600" />
+    </flow>
+    
+    <flow name="customAggregator">
+        <vm:inbound-endpoint path="custom-agg" exchange-pattern="request-response"/>
+        <collection-splitter />
+        <custom-aggregator class="org.mule.routing.outbound.AggregationTestCase$Aggregator" timeout="2000" failOnTimeout="false"/>
+        <logger level="INFO"/>
+    </flow>
+
+    <flow name="chunkAggregator">
+        <vm:inbound-endpoint path="chunk-agg" exchange-pattern="request-response"/>
+        <message-chunk-splitter messageSize="1"/>
+        <logger level="INFO"/>
+        <message-chunk-aggregator/>
+        <logger level="INFO"/>
+    </flow>
+
+    <flow name="combineCollections">
+        <vm:inbound-endpoint path="combine" exchange-pattern="request-response"/>
+        <combine-collections-transformer />
+        <logger level="INFO"/>
+    </flow>
+
+    <flow name="wire-tap">
+        <vm:inbound-endpoint path="wire-tap" exchange-pattern="request-response"/>
+        <wire-tap>
+            <vm:outbound-endpoint path="tapped.channel"/>
+        </wire-tap>
+        <logger level="INFO"/>
+    </flow>
 </mule>

@@ -16,7 +16,7 @@ import org.mule.api.context.notification.ServerNotification;
  * An implementation detail - this enforces the guarantee that once
  * {@link Node#serial(RestrictedNode)} is called, {@link Node#parallel(RestrictedNode)} cannot be.
  */
-interface RestrictedNode 
+public interface RestrictedNode
 {
 
     public RestrictedNode serial(RestrictedNode node);

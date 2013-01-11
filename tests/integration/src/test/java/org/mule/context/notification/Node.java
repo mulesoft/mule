@@ -34,7 +34,7 @@ import org.apache.commons.logging.LogFactory;
  * <p>More exactly, we specify a tree and a traversal - the traversal is hardcoded below, and implicit in
  * the instructions above.
  */
-class Node implements RestrictedNode
+public class Node implements RestrictedNode
 {
 
     // enumeration describing result of checking at this node
