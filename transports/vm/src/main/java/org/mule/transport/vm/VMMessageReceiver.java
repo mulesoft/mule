@@ -206,7 +206,7 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
         {
             QueueSession qs = connector.getQueueSession();
             Queue queue = qs.getQueue(endpoint.getEndpointURI().getAddress());
-            return queue.peek() == null;
+            return queue.size() == 0;
         }
         catch (Exception e)
         {
