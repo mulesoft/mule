@@ -16,9 +16,12 @@ import static org.mockito.Mockito.when;
 import org.mule.api.MuleMessage;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
+import org.mule.transport.http.HttpConstants;
 import org.mule.transport.http.HttpResponse;
 
+import java.text.SimpleDateFormat;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Set;
 
 import org.apache.commons.httpclient.Cookie;
@@ -56,5 +59,30 @@ public class MuleMessageToHttpResponseTestCase extends AbstractMuleTestCase
             }
         }
         Assert.assertEquals(cookiesOutbound.length, cookiesSet);
+    }
+    
+
+    @Test
+    public void testSetDateOnOutbound() throws Exception
+    {
+        MuleMessageToHttpResponse transformer = new MuleMessageToHttpResponse();
+        MuleMessage msg = mock(MuleMessage.class);
+
+        HttpResponse response = transformer.createResponse(null, "UTF-8", msg);
+        Header[] headers = response.getHeaders();
+
+        boolean hasDateHeader = false;
+        for (Header header : headers)
+        {
+            if (HttpConstants.HEADER_DATE.equals(header.getName()))
+            {
+                hasDateHeader = true;
+                // validate that the header is in the appropriate format (rfc-1123)
+                SimpleDateFormat formatter = new SimpleDateFormat(HttpConstants.DATE_FORMAT, Locale.US);
+                formatter.setLenient(false);
+                formatter.parse(header.getValue());
+            }
+        }
+        Assert.assertTrue("Missing 'Date' header", hasDateHeader);
     }
 }

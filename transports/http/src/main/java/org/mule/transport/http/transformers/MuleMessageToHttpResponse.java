@@ -26,9 +26,7 @@ import org.mule.transport.http.i18n.HttpMessages;
 import org.mule.util.StringUtils;
 
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.Collection;
-import java.util.Date;
 import java.util.LinkedList;
 import java.util.Locale;
 import java.util.Map;
@@ -36,12 +34,16 @@ import java.util.Map;
 import org.apache.commons.httpclient.Cookie;
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpVersion;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
 /**
  * Converts a {@link MuleMessage} into an Http response.
  */
 public class MuleMessageToHttpResponse extends AbstractMessageTransformer
 {
+    
+    private static final DateTimeFormatter dateFormatter = DateTimeFormat.forPattern(HttpConstants.DATE_FORMAT).withLocale(Locale.US);
 
     private String server;
 
@@ -188,7 +190,6 @@ public class MuleMessageToHttpResponse extends AbstractMessageTransformer
         {
             version = HttpConstants.HTTP11;
         }
-        String date = new SimpleDateFormat(HttpConstants.DATE_FORMAT, Locale.US).format(new Date());
 
         String contentType = msg.getInboundProperty(HttpConstants.HEADER_CONTENT_TYPE);
         if (contentType == null)
@@ -214,6 +215,7 @@ public class MuleMessageToHttpResponse extends AbstractMessageTransformer
         {
             response.setHeader(new Header(HttpConstants.HEADER_CONTENT_TYPE, contentType));
         }
+        String date = dateFormatter.print(System.currentTimeMillis());
         response.setHeader(new Header(HttpConstants.HEADER_DATE, date));
         response.setHeader(new Header(HttpConstants.HEADER_SERVER, server));
 
