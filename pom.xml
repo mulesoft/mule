@@ -130,6 +130,7 @@
         <jdomVersion>1.1.1</jdomVersion>
         <jettyVersion>6.1.26</jettyVersion>
         <jettyServletApiVersion>2.5-20081211</jettyServletApiVersion>
+        <jodaTimeVersion>1.6</jodaTimeVersion>
         <jschVersion>0.1.44-1</jschVersion>
         <jsr181Version>1.0-MR1</jsr181Version>
         <jsr250AnnotationVerson>1.0</jsr250AnnotationVerson>
