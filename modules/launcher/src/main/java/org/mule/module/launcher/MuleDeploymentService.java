@@ -299,6 +299,11 @@ public class MuleDeploymentService implements DeploymentService
         return deployer;
     }
 
+    public void setAppFactory(ApplicationFactory appFactory)
+    {
+        this.appFactory = appFactory;
+    }
+
     public void setDeployer(MuleDeployer deployer)
     {
         this.deployer = deployer;

@@ -27,10 +27,12 @@ import org.mule.api.config.MuleProperties;
 import org.mule.api.registry.MuleRegistry;
 import org.mule.config.StartupContext;
 import org.mule.module.launcher.application.Application;
+import org.mule.module.launcher.application.TestApplicationFactory;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
 import org.mule.tck.probe.Prober;
+import org.mule.tck.probe.file.FileDoesNotExists;
 import org.mule.util.CollectionUtils;
 import org.mule.util.FileUtils;
 import org.mule.util.StringUtils;
@@ -345,6 +347,49 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         assertUndeploymentSuccess(deploymentListener, "dummy-app");
     }
 
+    @Test
+    public void undeploysAppCompletelyEvenOnStoppingException() throws Exception
+    {
+        final URL url = getClass().getResource("/empty-app.zip");
+        assertNotNull("Test app file not found " + url, url);
+        addAppArchive(url);
+
+        TestApplicationFactory appFactory = new TestApplicationFactory();
+        appFactory.setFailOnStopApplication(true);
+
+        deploymentService.setAppFactory(appFactory);
+        deploymentService.start();
+
+        assertDeploymentSuccess(deploymentListener, "empty-app");
+
+        assertTrue("Unable to remove anchor file", removeAnchorFile("empty-app"));
+
+        assertUndeploymentSuccess(deploymentListener, "empty-app");
+
+        assertAppFolderIsDeleted("empty-app");
+    }
+
+    @Test
+    public void undeploysAppCompletelyEvenOnDisposingException() throws Exception
+    {
+        final URL url = getClass().getResource("/empty-app.zip");
+        assertNotNull("Test app file not found " + url, url);
+        addAppArchive(url);
+
+        TestApplicationFactory appFactory = new TestApplicationFactory();
+        appFactory.setFailOnDisposeApplication(true);
+        deploymentService.setAppFactory(appFactory);
+        deploymentService.start();
+
+        assertDeploymentSuccess(deploymentListener, "empty-app");
+
+        assertTrue("Unable to remove anchor file", removeAnchorFile("empty-app"));
+
+        assertUndeploymentSuccess(deploymentListener, "empty-app");
+
+        assertAppFolderIsDeleted("empty-app");
+    }
+
     private void assertDeploymentSuccess(final DeploymentListener listener, final String appName)
     {
         Prober prober = new PollingProber(DEPLOYMENT_TIMEOUT, 100);
@@ -585,5 +630,12 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         File anchorFile = new File(appsDir, anchorFileName);
 
         return anchorFile.delete();
+    }
+
+    private void assertAppFolderIsDeleted(String appName)
+    {
+        Prober prober = new PollingProber(DEPLOYMENT_TIMEOUT, 100);
+        File appFolder = new File(appsDir, appName);
+        prober.check(new FileDoesNotExists(appFolder));
     }
 }
