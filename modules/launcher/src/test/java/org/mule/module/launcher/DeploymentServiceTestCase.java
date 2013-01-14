@@ -35,10 +35,12 @@ import org.mule.construct.SimpleService;
 import org.mule.module.launcher.application.Application;
 import org.mule.module.launcher.application.ApplicationWrapper;
 import org.mule.module.launcher.application.PriviledgedMuleApplication;
+import org.mule.module.launcher.application.TestApplicationFactory;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
 import org.mule.tck.probe.Prober;
+import org.mule.tck.probe.file.FileDoesNotExists;
 import org.mule.util.CollectionUtils;
 import org.mule.util.FileUtils;
 import org.mule.util.StringUtils;
@@ -49,6 +51,7 @@ import java.net.URL;
 import java.net.URLDecoder;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -395,6 +398,53 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         assertTrue("Unable to remove anchor file", removeAnchorFile("dummy-app"));
 
         assertUndeploymentSuccess(deploymentListener, "dummy-app");
+    }
+
+    @Test
+    public void undeploysAppCompletelyEvenOnStoppingException() throws Exception
+    {
+        final URL url = getClass().getResource("/empty-app.zip");
+        assertNotNull("Test app file not found " + url, url);
+        addAppArchive(url);
+
+        TestApplicationFactory appFactory = new TestApplicationFactory(deploymentService, Collections.EMPTY_MAP);
+        appFactory.setFailOnStopApplication(true);
+
+        deploymentService.setAppFactory(appFactory);
+        deploymentService.start();
+
+        assertDeploymentSuccess(deploymentListener, "empty-app");
+
+        assertTrue("Unable to remove anchor file", removeAnchorFile("empty-app"));
+
+        assertUndeploymentSuccess(deploymentListener, "empty-app");
+
+        Prober prober = new PollingProber(DEPLOYMENT_TIMEOUT, 100);
+        File appFolder = new File(appsDir, "empty-app");
+        prober.check(new FileDoesNotExists(appFolder));
+    }
+
+    @Test
+    public void undeploysAppCompletelyEvenOnDisposingException() throws Exception
+    {
+        final URL url = getClass().getResource("/empty-app.zip");
+        assertNotNull("Test app file not found " + url, url);
+        addAppArchive(url);
+
+        TestApplicationFactory appFactory = new TestApplicationFactory(deploymentService, Collections.EMPTY_MAP);
+        appFactory.setFailOnDisposeApplication(true);
+        deploymentService.setAppFactory(appFactory);
+        deploymentService.start();
+
+        assertDeploymentSuccess(deploymentListener, "empty-app");
+
+        assertTrue("Unable to remove anchor file", removeAnchorFile("empty-app"));
+
+        assertUndeploymentSuccess(deploymentListener, "empty-app");
+
+        Prober prober = new PollingProber(DEPLOYMENT_TIMEOUT, 100);
+        File appFolder = new File(appsDir, "empty-app");
+        prober.check(new FileDoesNotExists(appFolder));
     }
 
     private void assertDeploymentSuccess(final DeploymentListener listener, final String appName)
