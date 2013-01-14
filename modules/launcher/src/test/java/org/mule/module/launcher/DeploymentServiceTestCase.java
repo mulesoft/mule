@@ -27,10 +27,12 @@ import org.mule.construct.SimpleService;
 import org.mule.module.launcher.application.Application;
 import org.mule.module.launcher.application.ApplicationWrapper;
 import org.mule.module.launcher.application.PriviledgedMuleApplication;
+import org.mule.module.launcher.application.TestApplicationFactory;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
 import org.mule.tck.probe.Prober;
+import org.mule.tck.probe.file.FileDoesNotExists;
 import org.mule.util.CollectionUtils;
 import org.mule.util.FileUtils;
 import org.mule.util.StringUtils;
@@ -398,6 +400,59 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
         assertTrue("Undeploy never invoked", undeployLatch.await(2 * LATCH_TIMEOUT, TimeUnit.MILLISECONDS));
         assertEquals("Application has not been properly unregistered from Mule", 0, deploymentService.getApplications().size());
+    }
+
+    @Test
+    public void undeploysAppCompletelyEvenOnStoppingException() throws Exception
+    {
+        final URL url = getClass().getResource("/empty-app.zip");
+        assertNotNull("Test app file not found " + url, url);
+        addAppArchive(url);
+
+        TestApplicationFactory appFactory = new TestApplicationFactory(deploymentService);
+        appFactory.setFailOnStopApplication(true);
+
+        deploymentService.setAppFactory(appFactory);
+        deploymentService.start();
+
+        assertTrue("Deployer never invoked", deployLatch.await(LATCH_TIMEOUT, TimeUnit.MILLISECONDS));
+        assertAppsDir(NONE, new String[] {"empty-app"}, true);
+
+        deployLatch = new Latch();
+        assertTrue("Unable to remove anchor file", removeAnchorFile("empty-app"));
+
+        assertTrue("Undeploy never invoked", undeployLatch.await(LATCH_TIMEOUT, TimeUnit.MILLISECONDS));
+        assertEquals("Application has not been properly unregistered from Mule", 0, deploymentService.getApplications().size());
+
+        Prober prober = new PollingProber(LATCH_TIMEOUT, 100);
+        File appFolder = new File(appsDir, "empty-app");
+        prober.check(new FileDoesNotExists(appFolder));
+    }
+
+    @Test
+    public void undeploysAppCompletelyEvenOnDisposingException() throws Exception
+    {
+        final URL url = getClass().getResource("/empty-app.zip");
+        assertNotNull("Test app file not found " + url, url);
+        addAppArchive(url);
+
+        TestApplicationFactory appFactory = new TestApplicationFactory(deploymentService);
+        appFactory.setFailOnDisposeApplication(true);
+        deploymentService.setAppFactory(appFactory);
+        deploymentService.start();
+
+        assertTrue("Deployer never invoked", deployLatch.await(LATCH_TIMEOUT, TimeUnit.MILLISECONDS));
+        assertAppsDir(NONE, new String[] {"empty-app"}, true);
+
+        deployLatch = new Latch();
+        assertTrue("Unable to remove anchor file", removeAnchorFile("empty-app"));
+
+        assertTrue("Undeploy never invoked", undeployLatch.await(LATCH_TIMEOUT, TimeUnit.MILLISECONDS));
+        assertEquals("Application has not been properly unregistered from Mule", 0, deploymentService.getApplications().size());
+
+        Prober prober = new PollingProber(LATCH_TIMEOUT, 100);
+        File appFolder = new File(appsDir, "empty-app");
+        prober.check(new FileDoesNotExists(appFolder));
     }
 
     private void assertNoDeploymentInvoked()

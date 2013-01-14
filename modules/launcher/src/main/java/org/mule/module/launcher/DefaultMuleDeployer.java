@@ -87,24 +87,33 @@ public class DefaultMuleDeployer implements MuleDeployer
             {
                 return;
             }
-
-            app.stop();
-            app.dispose();
-            final File appDir = new File(MuleContainerBootstrapUtils.getMuleAppsDir(), app.getAppName());
-            FileUtils.deleteDirectory(appDir);
-            // remove a marker, harmless, but a tidy app dir is always better :)
-            File marker = new File(MuleContainerBootstrapUtils.getMuleAppsDir(), String.format("%s-anchor.txt", app.getAppName()));
-            marker.delete();
-            Introspector.flushCaches();
         }
         catch (InterruptedException e)
         {
             Thread.currentThread().interrupt();
             return;
         }
-        catch (Throwable t)
+
+        try
         {
-            logger.error(t);
+            tryToStopApp(app);
+            tryToDisposeApp(app);
+
+            try
+            {
+                final File appDir = new File(MuleContainerBootstrapUtils.getMuleAppsDir(), app.getAppName());
+                FileUtils.deleteDirectory(appDir);
+
+                // remove a marker, harmless, but a tidy app dir is always better :)
+                final File marker = new File(MuleContainerBootstrapUtils.getMuleAppsDir(), String.format("%s-anchor.txt", app.getAppName()));
+                marker.delete();
+
+                Introspector.flushCaches();
+            }
+            catch (IOException e)
+            {
+                throw new DeploymentException(MessageFactory.createStaticMessage("Cannot delete application folder"), e);
+            }
         }
         finally
         {
@@ -112,6 +121,30 @@ public class DefaultMuleDeployer implements MuleDeployer
             {
                 lock.unlock();
             }
+        }
+    }
+
+    private void tryToDisposeApp(Application app)
+    {
+        try
+        {
+            app.dispose();
+        }
+        catch (Throwable t)
+        {
+            logger.error(String.format("Unable to cleanly dispose application '%s'. Restart Mule if you get errors redeploying this application", app.getAppName()), t);
+        }
+    }
+
+    private void tryToStopApp(Application app)
+    {
+        try
+        {
+            app.stop();
+        }
+        catch (Throwable t)
+        {
+            logger.error(String.format("Unable to cleanly stop application '%s'. Restart Mule if you get errors redeploying this application", app.getAppName()), t);
         }
     }
 
