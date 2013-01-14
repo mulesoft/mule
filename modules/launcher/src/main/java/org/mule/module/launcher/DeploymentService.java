@@ -579,8 +579,6 @@ public class DeploymentService
     {
         protected File appsDir;
 
-        // written on app start, will be used to cleanly undeploy the app without file locking issues
-        protected String[] appAnchors = new String[0];
         protected volatile boolean dirty;
 
         public AppDirWatcher(final File appsDir)
@@ -642,6 +640,9 @@ public class DeploymentService
                     }
                     logger.debug(sb.toString());
                 }
+
+                String[] appAnchors = findExpectedAnchorFiles();
+
                 @SuppressWarnings("unchecked")
                 final Collection<String> deletedAnchors = CollectionUtils.subtract(Arrays.asList(appAnchors), Arrays.asList(currentAnchors));
                 if (logger.isDebugEnabled())
@@ -674,8 +675,6 @@ public class DeploymentService
                         logger.error("Failed to undeploy application: " + appName, t);
                     }
                 }
-                appAnchors = currentAnchors;
-
 
                 // new packed Mule apps
                 for (String zip : zips)
@@ -755,6 +754,22 @@ public class DeploymentService
             }
         }
 
+        /**
+         * Determines if a given URL points to the same file as an existing
+         * Returns the list of anchor file names for the deployed apps
+         *
+         * @return a non null list of file names
+         */
+        private String[] findExpectedAnchorFiles()
+        {
+            String[] appAnchors = new String[applications.size()];
+            int i =0;
+            for (Application application : applications)
+            {
+                appAnchors[i++] = application.getAppName() + APP_ANCHOR_SUFFIX;
+            }
+            return appAnchors;
+        }
 
         /**
          * Determines if a given URL points to the same file as an existing
