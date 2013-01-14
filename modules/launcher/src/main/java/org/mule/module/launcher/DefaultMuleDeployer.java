@@ -65,8 +65,9 @@ public class DefaultMuleDeployer implements MuleDeployer
     {
         try
         {
-            app.stop();
-            app.dispose();
+            tryToStopApp(app);
+            tryToDisposeApp(app);
+
             final File appDir = new File(MuleContainerBootstrapUtils.getMuleAppsDir(), app.getAppName());
             FileUtils.deleteDirectory(appDir);
             // remove a marker, harmless, but a tidy app dir is always better :)
@@ -84,6 +85,30 @@ public class DefaultMuleDeployer implements MuleDeployer
 
             final String msg = String.format("Failed to undeploy application [%s]", app.getAppName());
             throw new DeploymentException(MessageFactory.createStaticMessage(msg), t);
+        }
+    }
+
+    private void tryToDisposeApp(Application app)
+    {
+        try
+        {
+            app.dispose();
+        }
+        catch (Throwable t)
+        {
+            logger.error(String.format("Unable to cleanly dispose application '%s'. Restart Mule if you get errors redeploying this application", app.getAppName()), t);
+        }
+    }
+
+    private void tryToStopApp(Application app)
+    {
+        try
+        {
+            app.stop();
+        }
+        catch (Throwable t)
+        {
+            logger.error(String.format("Unable to cleanly stop application '%s'. Restart Mule if you get errors redeploying this application", app.getAppName()), t);
         }
     }
 

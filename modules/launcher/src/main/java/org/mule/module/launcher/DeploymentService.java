@@ -308,6 +308,11 @@ public class DeploymentService
         this.deployer = deployer;
     }
 
+    public void setAppFactory(ApplicationFactory appFactory)
+    {
+        this.appFactory = appFactory;
+    }
+
     public ApplicationFactory getAppFactory()
     {
         return appFactory;
