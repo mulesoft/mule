@@ -26,16 +26,7 @@ public class TcpServerSocketFactory implements SimpleServerSocketFactory
         String host = StringUtils.defaultIfEmpty(uri.getHost(), "localhost");
         InetAddress inetAddress = InetAddress.getByName(host);
 
-        if (inetAddress.equals(InetAddress.getLocalHost())
-                || inetAddress.isLoopbackAddress()
-                || host.trim().equals("localhost"))
-        {
-            return createServerSocket(uri.getPort(), backlog, reuse);
-        }
-        else
-        {
-            return createServerSocket(inetAddress, uri.getPort(), backlog, reuse);
-        }
+        return createServerSocket(inetAddress, uri.getPort(), backlog, reuse);
     }
 
     public ServerSocket createServerSocket(InetAddress address, int port, int backlog, Boolean reuse) throws IOException
