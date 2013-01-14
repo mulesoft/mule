@@ -381,6 +381,22 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         deploymentService.undeploy(app);
     }
 
+    @Test
+    public void undeploysApplicationRemovingAnchorFile() throws Exception
+    {
+        final URL url = getClass().getResource("/dummy-app.zip");
+        assertNotNull("Test app file not found " + url, url);
+
+        addAppArchive(url);
+        deploymentService.start();
+
+        assertDeploymentSuccess(deploymentListener, "dummy-app");
+
+        assertTrue("Unable to remove anchor file", removeAnchorFile("dummy-app"));
+
+        assertUndeploymentSuccess(deploymentListener, "dummy-app");
+    }
+
     private void assertDeploymentSuccess(final DeploymentListener listener, final String appName)
     {
         Prober prober = new PollingProber(DEPLOYMENT_TIMEOUT, 100);
@@ -537,5 +553,18 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         final File tempFile = new File(appsDir, tempFileName);
         FileUtils.copyURLToFile(url, tempFile);
         tempFile.renameTo(new File(StringUtils.removeEnd(tempFile.getAbsolutePath(), ".part")));
+    }
+
+    /**
+     * Removes a given application anchor file in order to start application undeployment
+     * @param appName name of application to undeploy
+     * @return true if anchor file was deleted, false otherwise
+     */
+    private boolean removeAnchorFile(String appName)
+    {
+        String anchorFileName = appName + DeploymentService.APP_ANCHOR_SUFFIX;
+        File anchorFile = new File(appsDir, anchorFileName);
+
+        return anchorFile.delete();
     }
 }
