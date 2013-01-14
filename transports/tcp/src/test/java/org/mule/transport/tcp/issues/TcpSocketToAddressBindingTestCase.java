@@ -1,3 +1,13 @@
+/*
+ * $Id$
+ * --------------------------------------------------------------------------------------
+ * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ *
+ * The software in this package is published under the terms of the CPAL v1.0
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ */
+
 package org.mule.transport.tcp.issues;
 
 import static org.junit.Assert.assertEquals;
@@ -40,80 +50,117 @@ public class TcpSocketToAddressBindingTestCase extends AbstractServiceAndFlowTes
     @Rule
     public DynamicPort dynamicPort3 = new DynamicPort("port3");
 
-    public TcpSocketToAddressBindingTestCase(ConfigVariant variant, String configResources)
+    private List<InetAddress> localInetAddresses;
+
+    public TcpSocketToAddressBindingTestCase(ConfigVariant variant, String configResources) throws SocketException
     {
         super(variant, configResources);
+        localInetAddresses = getAllLocalInetAddresses();
     }
 
     @Parameters
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-                {ConfigVariant.SERVICE, "tcp-socket-to-address-binding-test-service.xml"},
-                {ConfigVariant.FLOW, "tcp-socket-to-address-binding-test-flow.xml"}
+            {ConfigVariant.FLOW, "tcp-socket-to-address-binding-test-flow.xml"}
         });
     }
 
     @Test
-    public void testRequestUsingLoopbackAddress() throws Exception
+    public void testRequestUsingLoopbackAddressAtLoopbackAddress() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
         MuleMessage result;
 
-        // Request using loopback address to all endpoints should get an appropriate response.
+        // Request using loopback address at endpoint listening at 127.0.0.1 should get an appropiate response.
         result = client.send("tcp://127.0.0.1:"+dynamicPort1.getNumber(), TEST_MESSAGE, null);
         assertEquals(TEST_MESSAGE + " Received", result.getPayloadAsString());
+    }
 
+    @Test
+    public void testRequestUsingLoopbackAddressAtLocalhost() throws Exception
+    {
+        MuleClient client = new MuleClient(muleContext);
+        MuleMessage result;
+
+        // Request using loopback address at endpoint listening at localhost should get an appropiate response.
         result = client.send("tcp://127.0.0.1:"+dynamicPort2.getNumber(), TEST_MESSAGE, null);
         assertEquals(TEST_MESSAGE + " Received", result.getPayloadAsString());
+    }
 
+    @Test
+    public void testRequestUsingLoopbackAddressAtAllAddresses() throws Exception
+    {
+        MuleClient client = new MuleClient(muleContext);
+        MuleMessage result;
+
+        // Request using loopback address at endpoint listening at all addresses should get an appropiate response.
         result = client.send("tcp://127.0.0.1:"+dynamicPort3.getNumber(), TEST_MESSAGE, null);
         assertEquals(TEST_MESSAGE + " Received", result.getPayloadAsString());
     }
 
     @Test
-    public void testRequestNotUsingLoopbackAddress() throws Exception
+    public void testRequestNotUsingLoopbackAddressAtLoopbackAddress() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
         MuleMessage result;
 
         // Iterate over local addresses.
-        for (InetAddress inetAddress : getAllLocalInetAddresses())
+        for (InetAddress inetAddress : localInetAddresses)
         {
-            if (!inetAddress.isLoopbackAddress())
+            // Request not using loopback address to endpoint listening at 127.0.0.1 should timeout.
+            try
             {
-                // Request not using loopback address to endpoint listening at 127.0.0.1 should timeout.
-                try
-                {
-                    result = client.send("tcp://"+inetAddress.getHostAddress()+":"+dynamicPort1.getNumber(), TEST_MESSAGE, null);
-                    assertNull(result);
-                }
-                catch (DispatchException ex)
-                {
-                    ex.printStackTrace();
-                }
-
-                // Request not using loopback address to endpoint listening at localhost should timeout.
-                try
-                {
-                    result = client.send("tcp://"+inetAddress.getHostAddress()+":"+dynamicPort2.getNumber(), TEST_MESSAGE, null);
-                    assertNull(result);
-                }
-                catch (DispatchException ex)
-                {
-                    ex.printStackTrace();
-                }
-
-                /* Request not using loopback address to endpoint listening at all local addresses should get an
-                 * appropriate response. */
-                result = client.send("tcp://"+inetAddress.getHostAddress()+":"+dynamicPort3.getNumber(), TEST_MESSAGE, null);
-                assertEquals(TEST_MESSAGE + " Received", result.getPayloadAsString());
+                result = client.send("tcp://"+inetAddress.getHostAddress()+":"+dynamicPort1.getNumber(), TEST_MESSAGE, null);
+                assertNull(result);
+            }
+            catch (DispatchException ex)
+            {
+                ex.printStackTrace();
             }
         }
     }
 
+    @Test
+    public void testRequestNotUsingLoopbackAddressAtLocalhost() throws Exception
+    {
+        MuleClient client = new MuleClient(muleContext);
+        MuleMessage result;
+
+        // Iterate over local addresses.
+        for (InetAddress inetAddress : localInetAddresses)
+        {
+            // Request not using loopback address to endpoint listening at localhost should timeout.
+            try
+            {
+                result = client.send("tcp://"+inetAddress.getHostAddress()+":"+dynamicPort2.getNumber(), TEST_MESSAGE, null);
+                assertNull(result);
+            }
+            catch (DispatchException ex)
+            {
+                ex.printStackTrace();
+            }
+        }
+    }
+
+    @Test
+    public void testRequestNotUsingLoopbackAddressAtAllAddresses() throws Exception
+    {
+        MuleClient client = new MuleClient(muleContext);
+        MuleMessage result;
+
+        // Iterate over local addresses.
+        for (InetAddress inetAddress : localInetAddresses)
+        {
+            /* Request not using loopback address to endpoint listening at all local addresses should get an
+             * appropriate response. */
+            result = client.send("tcp://"+inetAddress.getHostAddress()+":"+dynamicPort3.getNumber(), TEST_MESSAGE, null);
+            assertEquals(TEST_MESSAGE + " Received", result.getPayloadAsString());
+        }
+    }
+
     /**
-     * Returns all local {@link InetAddress}.
+     * Returns all local {@link InetAddress} except the loopback address.
      * @return A {@link java.util.List <InetAddress>} with the IPv4 local addresses.
      * @throws SocketException If there is a problem getting the addresses.
      */
@@ -126,7 +173,7 @@ public class TcpSocketToAddressBindingTestCase extends AbstractServiceAndFlowTes
             Enumeration<InetAddress> inetAddresses = netInt.getInetAddresses();
             for (InetAddress inetAddress : Collections.list(inetAddresses))
             {
-                if (inetAddress instanceof Inet4Address)
+                if (inetAddress instanceof Inet4Address && !inetAddress.isLoopbackAddress())
                 {
                     result.add(inetAddress);
                 }
