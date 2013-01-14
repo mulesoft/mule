@@ -17,7 +17,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.api.MuleContext;
 import org.mule.api.component.JavaComponent;
 import org.mule.api.config.MuleProperties;
@@ -48,7 +47,6 @@ import java.util.List;
 import java.util.Map;
 
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
-
 import org.apache.commons.io.filefilter.DirectoryFileFilter;
 import org.junit.Test;
 
@@ -384,6 +382,24 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         assertEquals(1, applications.size());
     }
 
+    @Test
+    public void undeploysApplicationRemovingAnchorFile() throws Exception
+    {
+        final URL url = getClass().getResource("/dummy-app.zip");
+        assertNotNull("Test app file not found " + url, url);
+
+        addAppArchive(url);
+        deploymentService.start();
+
+        assertTrue("Deployer never invoked", deployLatch.await(LATCH_TIMEOUT, TimeUnit.MILLISECONDS));
+        assertAppsDir(NONE, new String[] {"dummy-app"}, true);
+
+        assertTrue("Unable to remove anchor file", removeAnchorFile("dummy-app"));
+
+        assertTrue("Undeploy never invoked", undeployLatch.await(2 * LATCH_TIMEOUT, TimeUnit.MILLISECONDS));
+        assertEquals("Application has not been properly unregistered from Mule", 0, deploymentService.getApplications().size());
+    }
+
     private void assertNoDeploymentInvoked()
     {
         //TODO(pablo.kraan): look for a better way to test this
@@ -430,7 +446,6 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
     private void assertAppsDir(String[] expectedZips, String[] expectedApps, boolean performValidation)
     {
-        //final String[] actualZips = appsDir.list(new SuffixFileFilter(".zip"));
         final String[] actualZips = appsDir.list(DeploymentService.ZIP_APPS_FILTER);
         if (performValidation) {
             assertArrayEquals("Invalid Mule application archives set", expectedZips, actualZips);
@@ -462,6 +477,18 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         tempFile.renameTo(new File(StringUtils.removeEnd(tempFile.getAbsolutePath(), ".part")));
     }
 
+    /**
+     * Removes a given application anchor file in order to start application undeployment
+     * @param appName name of application to undeploy
+     * @return true if anchor file was deleted, false otherwise
+     */
+    private boolean removeAnchorFile(String appName)
+    {
+        String anchorFileName = appName + DeploymentService.APP_ANCHOR_SUFFIX;
+        File anchorFile = new File(appsDir, anchorFileName);
+
+        return anchorFile.delete();
+    }
 
     private class TestDeployer implements MuleDeployer
     {
