@@ -13,7 +13,7 @@ package org.mule.module.launcher;
 import org.mule.api.MuleContext;
 
 /**
- * Defines a listener for deployment events.
+ * Defines a listener for deployment events for Mule applications.
  */
 public interface DeploymentListener
 {
@@ -62,9 +62,27 @@ public interface DeploymentListener
      */
     void onUndeploymentFailure(String appName, Throwable cause);
 
+    /**
+     * Notifies the creation of the {@link MuleContext} for a given app.
+     *
+     * @param appName name of the application that owns the mule context
+     * @param context mule context for the application being deployed
+     */
     void onMuleContextCreated(String appName, MuleContext context);
 
+    /**
+     * Notifies the initialization of the {@link MuleContext} for a given app.
+     *
+     * @param appName name of the application that owns the mule context
+     * @param context mule context for the application being deployed
+     */
     void onMuleContextInitialised(String appName, MuleContext context);
 
+    /**
+     * Notifies the configuration of the {@link MuleContext} for a given app.
+     *
+     * @param appName name of the application that owns the mule context
+     * @param context mule context for the application being deployed
+     */
     void onMuleContextConfigured(String appName, MuleContext context);
 }
