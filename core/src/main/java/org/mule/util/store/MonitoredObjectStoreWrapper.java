@@ -272,8 +272,7 @@ public class MonitoredObjectStoreWrapper<T extends Serializable>
         if (scheduler == null)
         {
             this.scheduler = new ScheduledThreadPoolExecutor(1);
-            scheduler.setThreadFactory(new DaemonThreadFactory(name + "-Monitor", this.getClass()
-                .getClassLoader()));
+            scheduler.setThreadFactory(new DaemonThreadFactory(name + "-Monitor", context.getExecutionClassLoader()));
             scheduler.scheduleWithFixedDelay(this, 0, expirationInterval, TimeUnit.MILLISECONDS);
         }
     }

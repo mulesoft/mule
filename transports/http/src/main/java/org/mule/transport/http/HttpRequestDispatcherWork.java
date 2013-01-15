@@ -47,10 +47,8 @@ public class HttpRequestDispatcherWork implements Runnable, Expirable
     @Override
     public void run()
     {
-        ClassLoader previousClassLoader = Thread.currentThread().getContextClassLoader();
         try
         {
-            Thread.currentThread().setContextClassLoader(httpConnector.getMuleContext().getExecutionClassLoader());
             long keepAliveTimeout = httpConnector.getKeepAliveTimeout();
             String encoding = httpConnector.getMuleContext().getConfiguration().getDefaultEncoding();
             httpServerConnection = new HttpServerConnection(socket, encoding, httpConnector);
@@ -107,7 +105,6 @@ public class HttpRequestDispatcherWork implements Runnable, Expirable
                 httpServerConnection.close();
                 httpServerConnection = null;
             }
-            Thread.currentThread().setContextClassLoader(previousClassLoader);
         }
     }
 

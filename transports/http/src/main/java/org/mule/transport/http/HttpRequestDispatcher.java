@@ -14,7 +14,6 @@ import org.mule.api.context.WorkManager;
 import org.mule.api.retry.RetryCallback;
 import org.mule.api.retry.RetryContext;
 import org.mule.api.retry.RetryPolicyTemplate;
-import org.mule.config.ImmutableThreadingProfile;
 import org.mule.config.MutableThreadingProfile;
 import org.mule.transport.ConnectException;
 
@@ -23,7 +22,6 @@ import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.resource.spi.work.Work;
@@ -77,6 +75,7 @@ class HttpRequestDispatcher implements Work
     {
         ThreadingProfile receiverThreadingProfile = httpConnector.getReceiverThreadingProfile();
         MutableThreadingProfile dispatcherThreadingProfile = new MutableThreadingProfile(receiverThreadingProfile);
+        dispatcherThreadingProfile.setThreadFactory(null);
         dispatcherThreadingProfile.setMaxThreadsActive(dispatcherThreadingProfile.getMaxThreadsActive()*2);
         ExecutorService executorService = dispatcherThreadingProfile.createPool("http-request-dispatch-" + serverSocket.getInetAddress());
         return executorService;
