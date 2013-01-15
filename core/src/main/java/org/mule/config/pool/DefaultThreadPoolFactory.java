@@ -10,7 +10,6 @@
 
 package org.mule.config.pool;
 
-import org.mule.api.MuleContext;
 import org.mule.api.config.ThreadingProfile;
 import org.mule.util.StringUtils;
 import org.mule.util.concurrent.NamedThreadFactory;
@@ -93,9 +92,9 @@ public class DefaultThreadPoolFactory extends ThreadPoolFactory
             // ..else create a "NamedThreadFactory" if a proper name was passed in
             if (StringUtils.isNotBlank(name))
             {
-                // Use MuleContext classloader so that other temporary classloaders
-                // aren't used when things are started lazily or from elsewhere.
-                pool.setThreadFactory(new NamedThreadFactory(name, MuleContext.class.getClassLoader()));
+                // Threads must use the MuleApplicationClassLoader related to MuleContext or the
+                // thread context class loader in case of embedding mule.
+                pool.setThreadFactory(new NamedThreadFactory(name, Thread.currentThread().getContextClassLoader()));
             }
             else
             {
