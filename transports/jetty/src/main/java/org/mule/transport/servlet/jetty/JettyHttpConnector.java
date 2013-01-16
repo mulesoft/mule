@@ -421,14 +421,12 @@ public class JettyHttpConnector extends AbstractConnector
                 Connector connector = createJettyConnector();
 
                 connector.setPort(endpoint.getEndpointURI().getPort());
-                String host = endpoint.getEndpointURI().getHost();
-                if ("localhost".equalsIgnoreCase(host))
+                connector.setHost(endpoint.getEndpointURI().getHost());
+                if ("localhost".equalsIgnoreCase(endpoint.getEndpointURI().getHost()))
                 {
-                    // We default to binding the port on all local network interfaces if localhost is set.  This
-                    // is the same behaviour as all other socket connectors in Mule
-                    host = "0.0.0.0";
+                    logger.warn("You are using localhost interface! This means that no external connections will be available."
+                                + " Don't you want to use 0.0.0.0 instead (all network interfaces)?");
                 }
-                connector.setHost(host);
                 getHttpServer().addConnector(connector);
 
                 holder = createContextHolder(connector, receiver.getEndpoint(), receiver);
