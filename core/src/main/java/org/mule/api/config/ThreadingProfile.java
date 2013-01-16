@@ -20,6 +20,7 @@ import org.mule.config.pool.ThreadPoolFactory;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.RejectedExecutionHandler;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadFactory;
 
 import org.apache.commons.collections.map.CaseInsensitiveMap;
@@ -177,6 +178,8 @@ public interface ThreadingProfile extends MuleContextAware
     void setDoThreading(boolean doThreading);
 
     ThreadPoolFactory getPoolFactory();
+
+    ScheduledExecutorService createScheduledPool(String name);
 
     interface WorkManagerFactory
     {

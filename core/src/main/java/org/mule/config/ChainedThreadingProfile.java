@@ -18,6 +18,7 @@ import org.mule.config.pool.ThreadPoolFactory;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.RejectedExecutionHandler;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadFactory;
 
 /**
@@ -214,6 +215,12 @@ public class ChainedThreadingProfile implements ThreadingProfile
     public ThreadPoolFactory getPoolFactory()
     {
         return poolFactory;
+    }
+
+    @Override
+    public ScheduledExecutorService createScheduledPool(String name)
+    {
+        return poolFactory.createScheduledPool(name, new ImmutableThreadingProfile(this));
     }
 
     public MuleContext getMuleContext()

@@ -10,21 +10,39 @@
 
 package org.mule.config.pool;
 
+import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsInstanceOf.instanceOf;
+import static org.hamcrest.core.IsNull.notNullValue;
+import static org.junit.Assert.assertThat;
+
 import org.mule.api.config.ThreadingProfile;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
-import org.junit.Test;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 
-import static org.junit.Assert.assertTrue;
+import org.junit.Test;
 
 public class DefaultThreadPoolFactoryTestCase extends AbstractMuleContextTestCase
 {
 
     @Test
-    public void testDefaults() throws Exception
+    public void defaultThreadPoolFactory() throws Exception
     {
         final ThreadingProfile tp = muleContext.getDefaultThreadingProfile();
         final ThreadPoolFactory pf = tp.getPoolFactory();
-        assertTrue(pf instanceof DefaultThreadPoolFactory);
+        assertThat(pf, instanceOf(DefaultThreadPoolFactory.class));
+    }
+
+    @Test
+    public void scheduledThreadPollDefaults() throws Exception
+    {
+        ThreadingProfile threadingProfile = muleContext.getDefaultThreadingProfile();
+        ScheduledExecutorService executorService = threadingProfile.createScheduledPool("sapo pepe");
+        assertThat(executorService, notNullValue());
+        assertThat(executorService, instanceOf(ScheduledThreadPoolExecutor.class));
+        ScheduledThreadPoolExecutor scheduledPool = (ScheduledThreadPoolExecutor) executorService;
+        assertThat(scheduledPool.getContinueExistingPeriodicTasksAfterShutdownPolicy(), is(false));
+        assertThat(scheduledPool.getExecuteExistingDelayedTasksAfterShutdownPolicy(), is(true));
     }
 }

@@ -18,6 +18,7 @@ import org.mule.config.PreferredObjectSelector;
 import org.mule.config.i18n.MessageFactory;
 
 import java.util.Iterator;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadPoolExecutor;
 
 import javax.imageio.spi.ServiceRegistry;
@@ -68,4 +69,6 @@ public abstract class ThreadPoolFactory implements MuleContextAware
     }
 
     public abstract ThreadPoolExecutor createPool(String name, ThreadingProfile tp);
+
+    public abstract ScheduledThreadPoolExecutor createScheduledPool(String name, ThreadingProfile tp);
 }

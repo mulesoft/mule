@@ -17,6 +17,7 @@ import org.mule.util.concurrent.WaitPolicy;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -46,6 +47,13 @@ public class DefaultThreadPoolFactory extends ThreadPoolFactory
         }
 
         ThreadPoolExecutor pool = internalCreatePool(name, tp, buffer);
+        configureThreadPoolExecutor(name, tp, pool);
+        return pool;
+
+    }
+
+    private void configureThreadPoolExecutor(String name, ThreadingProfile tp, ThreadPoolExecutor pool)
+    {
         configureThreadFactory(name, tp, pool);
 
 
@@ -75,9 +83,14 @@ public class DefaultThreadPoolFactory extends ThreadPoolFactory
                     break;
             }
         }
+    }
 
+    @Override
+    public ScheduledThreadPoolExecutor createScheduledPool(String name, ThreadingProfile tp)
+    {
+        ScheduledThreadPoolExecutor pool = internalCreateScheduledPool(tp);
+        configureThreadFactory(name, tp, pool);
         return pool;
-
     }
 
     protected void configureThreadFactory(String name, ThreadingProfile tp, ThreadPoolExecutor pool)
@@ -109,6 +122,15 @@ public class DefaultThreadPoolFactory extends ThreadPoolFactory
         return new ThreadPoolExecutor(Math.min(tp.getMaxThreadsIdle(), tp.getMaxThreadsActive()),
                                       tp.getMaxThreadsActive(), tp.getThreadTTL(),
                                       TimeUnit.MILLISECONDS, buffer);
+    }
 
+    protected ScheduledThreadPoolExecutor internalCreateScheduledPool(ThreadingProfile tp)
+    {
+        ScheduledThreadPoolExecutor scheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(Math.min(tp.getMaxThreadsIdle(), tp.getMaxThreadsActive()));
+        scheduledThreadPoolExecutor.setContinueExistingPeriodicTasksAfterShutdownPolicy(false);
+        scheduledThreadPoolExecutor.setExecuteExistingDelayedTasksAfterShutdownPolicy(true);
+        scheduledThreadPoolExecutor.setKeepAliveTime(tp.getThreadTTL(), TimeUnit.MILLISECONDS);
+        scheduledThreadPoolExecutor.setCorePoolSize(tp.getMaxThreadsIdle());
+        return scheduledThreadPoolExecutor;
     }
 }

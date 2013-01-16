@@ -77,7 +77,7 @@ class HttpRequestDispatcher implements Work
         MutableThreadingProfile dispatcherThreadingProfile = new MutableThreadingProfile(receiverThreadingProfile);
         dispatcherThreadingProfile.setThreadFactory(null);
         dispatcherThreadingProfile.setMaxThreadsActive(dispatcherThreadingProfile.getMaxThreadsActive()*2);
-        ExecutorService executorService = dispatcherThreadingProfile.createPool("http-request-dispatch-" + serverSocket.getInetAddress());
+        ExecutorService executorService = dispatcherThreadingProfile.createPool("http-request-dispatch-" + serverSocket.getLocalPort());
         return executorService;
     }
 
