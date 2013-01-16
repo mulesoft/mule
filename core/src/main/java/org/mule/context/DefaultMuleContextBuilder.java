@@ -22,6 +22,7 @@ import org.mule.api.context.notification.ClusterNodeNotificationListener;
 import org.mule.api.context.notification.ConnectionNotificationListener;
 import org.mule.api.context.notification.CustomNotificationListener;
 import org.mule.api.context.notification.ExceptionNotificationListener;
+import org.mule.api.context.notification.ExceptionStrategyNotificationListener;
 import org.mule.api.context.notification.ManagementNotificationListener;
 import org.mule.api.context.notification.ModelNotificationListener;
 import org.mule.api.context.notification.MuleContextNotificationListener;
@@ -40,6 +41,7 @@ import org.mule.context.notification.ClusterNodeNotification;
 import org.mule.context.notification.ConnectionNotification;
 import org.mule.context.notification.CustomNotification;
 import org.mule.context.notification.ExceptionNotification;
+import org.mule.context.notification.ExceptionStrategyNotification;
 import org.mule.context.notification.ManagementNotification;
 import org.mule.context.notification.ModelNotification;
 import org.mule.context.notification.MuleContextNotification;
@@ -259,6 +261,8 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder
                                    RegistryNotification.class);
         manager.addInterfaceToType(ExceptionNotificationListener.class,
                                    ExceptionNotification.class);
+        manager.addInterfaceToType(ExceptionStrategyNotificationListener.class,
+                                   ExceptionStrategyNotification.class);
         manager.addInterfaceToType(TransactionNotificationListener.class,
                                    TransactionNotification.class);
         manager.addInterfaceToType(PipelineMessageNotificationListener.class,

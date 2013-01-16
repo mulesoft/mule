@@ -104,7 +104,9 @@ public class MessageProcessorNotificationTestCase extends AbstractNotificationTe
                 .serial(prePost())    //MP after the Scope
 
                 //enricher
-                .serial(prePost()) //append-string
+                .serial(pre()) //append-string
+                .serial(prePost())
+                .serial(post())
                 .serial(pre()) //chain
                 .serial(prePost())
                 .serial(prePost())

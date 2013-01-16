@@ -18,6 +18,8 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.expression.ExpressionManager;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.api.processor.MessageProcessorChain;
+import org.mule.api.processor.MessageProcessors;
 import org.mule.processor.AbstractMessageProcessorOwner;
 import org.mule.util.StringUtils;
 
@@ -117,7 +119,14 @@ public class MessageEnricher extends AbstractMessageProcessorOwner implements Me
 
     public void setEnrichmentMessageProcessor(MessageProcessor enrichmentProcessor)
     {
-        this.enrichmentProcessor = enrichmentProcessor;
+        if (!(enrichmentProcessor instanceof MessageProcessorChain))
+        {
+            this.enrichmentProcessor = MessageProcessors.singletonChain(enrichmentProcessor);
+        }
+        else
+        {
+            this.enrichmentProcessor = enrichmentProcessor;
+        }
     }
 
     /**
@@ -125,7 +134,7 @@ public class MessageEnricher extends AbstractMessageProcessorOwner implements Me
      */
     public void setMessageProcessor(MessageProcessor enrichmentProcessor)
     {
-        this.enrichmentProcessor = enrichmentProcessor;
+        setEnrichmentMessageProcessor(enrichmentProcessor);
     }
 
     public void setEnrichExpressionPairs(List<EnrichExpressionPair> enrichExpressionPairs)

@@ -10,10 +10,6 @@
                http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
                http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
 
-    <notifications>
-        <notification event="EXCEPTION-STRATEGY"/>
-    </notifications>
-
     <spring:bean name="notificationLogger" class="org.mule.context.notification.ExceptionStrategyNotificationLogger"/>
 
     <notifications>

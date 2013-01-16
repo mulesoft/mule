@@ -29,6 +29,7 @@ import org.mule.construct.Flow;
 import org.mule.execution.MessageProcessorExecutionTemplate;
 import org.mule.routing.MessageFilter;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
@@ -44,7 +45,7 @@ public class DefaultMessageProcessorChain extends AbstractMessageProcessorChain
 
     protected DefaultMessageProcessorChain(MessageProcessor... processors)
     {
-        super(null, Arrays.asList(processors));
+        super(null, new ArrayList(Arrays.asList(processors)));
     }
 
     protected DefaultMessageProcessorChain(String name, List<MessageProcessor> processors)
