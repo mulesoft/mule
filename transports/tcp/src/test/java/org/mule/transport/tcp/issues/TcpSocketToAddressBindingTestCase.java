@@ -16,7 +16,7 @@ import static org.junit.Assert.assertNull;
 import org.mule.api.MuleMessage;
 import org.mule.api.transport.DispatchException;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.net.Inet4Address;
@@ -24,23 +24,18 @@ import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
 
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
 /**
  * Tests how sockets are bound to addresses by the TCP transport. This test is related to MULE-6584.
  */
-public class TcpSocketToAddressBindingTestCase extends AbstractServiceAndFlowTestCase
+public class TcpSocketToAddressBindingTestCase extends FunctionalTestCase
 {
-    protected static String TEST_MESSAGE = "Test TCP Request";
-
     @Rule
     public DynamicPort dynamicPort1 = new DynamicPort("port1");
 
@@ -52,18 +47,25 @@ public class TcpSocketToAddressBindingTestCase extends AbstractServiceAndFlowTes
 
     private List<InetAddress> localInetAddresses;
 
-    public TcpSocketToAddressBindingTestCase(ConfigVariant variant, String configResources) throws SocketException
+    public TcpSocketToAddressBindingTestCase() throws SocketException
     {
-        super(variant, configResources);
+        super();
         localInetAddresses = getAllLocalInetAddresses();
     }
 
-    @Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigResources()
     {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.FLOW, "tcp-socket-to-address-binding-test-flow.xml"}
-        });
+        return "tcp-socket-to-address-binding-test.xml";
+    }
+
+    /**
+     * Returns the name of the transport associated with this test.
+     * @return The transport name.
+     */
+    protected String getTransportName()
+    {
+        return "tcp";
     }
 
     @Test
@@ -73,7 +75,7 @@ public class TcpSocketToAddressBindingTestCase extends AbstractServiceAndFlowTes
         MuleMessage result;
 
         // Request using loopback address at endpoint listening at 127.0.0.1 should get an appropiate response.
-        result = client.send("tcp://127.0.0.1:"+dynamicPort1.getNumber(), TEST_MESSAGE, null);
+        result = client.send(getTransportName()+"://127.0.0.1:"+dynamicPort1.getNumber(), TEST_MESSAGE, null);
         assertEquals(TEST_MESSAGE + " Received", result.getPayloadAsString());
     }
 
@@ -84,7 +86,7 @@ public class TcpSocketToAddressBindingTestCase extends AbstractServiceAndFlowTes
         MuleMessage result;
 
         // Request using loopback address at endpoint listening at localhost should get an appropiate response.
-        result = client.send("tcp://127.0.0.1:"+dynamicPort2.getNumber(), TEST_MESSAGE, null);
+        result = client.send(getTransportName()+"://127.0.0.1:"+dynamicPort2.getNumber(), TEST_MESSAGE, null);
         assertEquals(TEST_MESSAGE + " Received", result.getPayloadAsString());
     }
 
@@ -95,7 +97,7 @@ public class TcpSocketToAddressBindingTestCase extends AbstractServiceAndFlowTes
         MuleMessage result;
 
         // Request using loopback address at endpoint listening at all addresses should get an appropiate response.
-        result = client.send("tcp://127.0.0.1:"+dynamicPort3.getNumber(), TEST_MESSAGE, null);
+        result = client.send(getTransportName()+"://127.0.0.1:"+dynamicPort3.getNumber(), TEST_MESSAGE, null);
         assertEquals(TEST_MESSAGE + " Received", result.getPayloadAsString());
     }
 
@@ -111,7 +113,7 @@ public class TcpSocketToAddressBindingTestCase extends AbstractServiceAndFlowTes
             // Request not using loopback address to endpoint listening at 127.0.0.1 should timeout.
             try
             {
-                result = client.send("tcp://"+inetAddress.getHostAddress()+":"+dynamicPort1.getNumber(), TEST_MESSAGE, null);
+                result = client.send(getTransportName()+"://"+inetAddress.getHostAddress()+":"+dynamicPort1.getNumber(), TEST_MESSAGE, null);
                 assertNull(result);
             }
             catch (DispatchException ex)
@@ -133,7 +135,7 @@ public class TcpSocketToAddressBindingTestCase extends AbstractServiceAndFlowTes
             // Request not using loopback address to endpoint listening at localhost should timeout.
             try
             {
-                result = client.send("tcp://"+inetAddress.getHostAddress()+":"+dynamicPort2.getNumber(), TEST_MESSAGE, null);
+                result = client.send(getTransportName()+"://"+inetAddress.getHostAddress()+":"+dynamicPort2.getNumber(), TEST_MESSAGE, null);
                 assertNull(result);
             }
             catch (DispatchException ex)
@@ -154,7 +156,7 @@ public class TcpSocketToAddressBindingTestCase extends AbstractServiceAndFlowTes
         {
             /* Request not using loopback address to endpoint listening at all local addresses should get an
              * appropriate response. */
-            result = client.send("tcp://"+inetAddress.getHostAddress()+":"+dynamicPort3.getNumber(), TEST_MESSAGE, null);
+            result = client.send(getTransportName()+"://"+inetAddress.getHostAddress()+":"+dynamicPort3.getNumber(), TEST_MESSAGE, null);
             assertEquals(TEST_MESSAGE + " Received", result.getPayloadAsString());
         }
     }

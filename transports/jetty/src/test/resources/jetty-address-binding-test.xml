@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:jetty="http://www.mulesoft.org/schema/mule/jetty"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xsi:schemaLocation="
+      http://www.mulesoft.org/schema/mule/jetty http://www.mulesoft.org/schema/mule/jetty/current/mule-jetty.xsd
+      http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
+      http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+
+    <jetty:connector name="httpConnector"/>
+
+    <jetty:endpoint name="endpointLoopbackAddress" address="http://127.0.0.1:${port1}" exchange-pattern="request-response" />
+
+    <jetty:endpoint name="endpointLocalhostAddress" address="http://localhost:${port2}" exchange-pattern="request-response" />
+
+    <jetty:endpoint name="endpointAllLocalAddresses" address="http://0.0.0.0:${port3}" exchange-pattern="request-response" />
+
+    <flow name="loopbackAddressEndpointFlow">
+        <inbound-endpoint ref="endpointLoopbackAddress" />
+        <test:component appendString=" Received" />
+    </flow>
+
+    <flow name="localhostEndpointFlow">
+        <inbound-endpoint ref="endpointLocalhostAddress" />
+        <test:component appendString=" Received" />
+    </flow>
+
+    <flow name="allAddressesEndpointFlow">
+        <inbound-endpoint ref="endpointAllLocalAddresses" />
+        <test:component appendString=" Received" />
+    </flow>
+
+</mule>
