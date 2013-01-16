@@ -310,8 +310,8 @@ public class JdkVersionUtils
         {
         	throw new RuntimeException("Unsupported Jdk");
         } else if (!isRecommendedJdkVersion() || !isSupportedJdkVendor()) {
-            logger.warn("You're executing with an unsupported JDK. Version: " + SystemUtils.JAVA_VERSION
-                    + " Vendor: " + SystemUtils.JAVA_VENDOR);
+        	logger.info("You're executing with an unsupported JDK. Version: " + SystemUtils.JAVA_VERSION
+        			+ " Vendor: " + SystemUtils.JAVA_VENDOR);
         }
     }
 }
