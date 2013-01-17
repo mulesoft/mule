@@ -19,13 +19,16 @@ import org.mule.api.MuleMessage;
 import org.mule.api.expression.ExpressionManager;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorChain;
+import org.mule.api.processor.MessageProcessorContainer;
 import org.mule.api.processor.MessageProcessors;
 import org.mule.processor.AbstractMessageProcessorOwner;
+import org.mule.processor.chain.InterceptingChainLifecycleWrapper;
 import org.mule.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 /**
  * The <code>Message Enricher</code> allows the current message to be augmented using data from a seperate
@@ -194,5 +197,15 @@ public class MessageEnricher extends AbstractMessageProcessorOwner implements Me
     protected List<MessageProcessor> getOwnedMessageProcessors()
     {
         return Collections.singletonList(enrichmentProcessor);
+    }
+
+    @Override
+    public Map<MessageProcessor, String> getMessageProcessorPaths()
+    {
+        if (enrichmentProcessor instanceof InterceptingChainLifecycleWrapper)
+        {
+            return super.getMessageProcessorPaths();
+        }
+        return ((MessageProcessorContainer) enrichmentProcessor).getMessageProcessorPaths();
     }
 }
