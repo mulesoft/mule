@@ -26,7 +26,9 @@ import java.net.Socket;
 import java.net.SocketAddress;
 import java.net.SocketException;
 import java.security.cert.Certificate;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 import javax.net.ssl.HandshakeCompletedEvent;
 import javax.net.ssl.HandshakeCompletedListener;
@@ -299,6 +301,18 @@ public class HttpServerConnection implements HandshakeCompletedListener
 
     public void writeResponse(final HttpResponse response) throws IOException
     {
+        writeResponse(response, new HashMap<String,String>());
+    }
+
+    /**
+     * Write an HttpResponse and add the map entries as headers
+     *
+     * @param response http response with the content of the response
+     * @param headers headers to add to the http response besides the one already contained in the HttpResponse object
+     * @throws IOException
+     */
+    public void writeResponse(final HttpResponse response, Map<String,String> headers) throws IOException
+    {
         if (response == null)
         {
             return;
@@ -311,7 +325,7 @@ public class HttpServerConnection implements HandshakeCompletedListener
         }
 
         setKeepAlive(response.isKeepAlive());
-
+        addHeadersToHttpResponse(response, headers);
         ResponseWriter writer = new ResponseWriter(this.out, encoding);
         OutputStream outstream = this.out;
 
@@ -379,10 +393,33 @@ public class HttpServerConnection implements HandshakeCompletedListener
      */
     public void writeFailureResponse(int statusCode, String description) throws IOException
     {
+        writeFailureResponse(statusCode, description, new HashMap<String,String>());
+    }
+
+
+    /**
+     * Sends a customer a failure response but also adds the headers in the headers map
+     *
+     * @param statusCode status code of the failure response
+     * @param description message to be send as the body
+     * @param headers headers to send with the failure response
+     * @throws IOException
+     */
+    public void writeFailureResponse(int statusCode, String description, Map<String, String> headers) throws IOException
+    {
         HttpResponse response = new HttpResponse();
         response.setStatusLine(readRequest().getRequestLine().getHttpVersion(), statusCode);
         response.setBody(description);
+        addHeadersToHttpResponse(response, headers);
         writeResponse(response);
+    }
+
+    private void addHeadersToHttpResponse(HttpResponse response, Map<String, String> headers)
+    {
+        for (String headerName : headers.keySet())
+        {
+            response.addHeader(new Header(headerName, headers.get(headerName)));
+        }
     }
 
     /**

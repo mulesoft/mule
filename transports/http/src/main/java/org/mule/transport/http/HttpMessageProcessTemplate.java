@@ -21,7 +21,6 @@ import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.context.WorkManager;
 import org.mule.api.endpoint.ImmutableEndpoint;
-import org.mule.api.transaction.TransactionConfig;
 import org.mule.api.transport.PropertyScope;
 import org.mule.config.ExceptionHelper;
 import org.mule.message.processing.RequestResponseFlowProcessingPhaseTemplate;
@@ -33,6 +32,8 @@ import org.mule.transport.http.i18n.HttpMessages;
 import org.mule.util.concurrent.Latch;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpVersion;
@@ -41,12 +42,18 @@ public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessT
 {
 
     public static final int MESSAGE_DISCARD_STATUS_CODE = Integer.valueOf(System.getProperty("mule.transport.http.throttling.discardstatuscode","429"));
+    public static final String X_RATE_LIMIT_LIMIT_HEADER = "X-RateLimit-Limit";
+    public static final String X_RATE_LIMIT_REMAINING_HEADER = "X-RateLimit-Remaining";
+    public static final String X_RATE_LIMIT_RESET_HEADER = "X-RateLimit-Reset";
 
     private final HttpServerConnection httpServerConnection;
     private HttpRequest request;
     private boolean badRequest;
     private Latch messageProcessedLatch = new Latch();
     private boolean failureSendingResponse;
+    private Long remainingRequestInCurrentPeriod;
+    private Long maximumRequestAllowedPerPeriod;
+    private Long timeUntilNextPeriodInMillis;
 
     public HttpMessageProcessTemplate(final HttpMessageReceiver messageReceiver, final HttpServerConnection httpServerConnection, final WorkManager flowExecutionWorkManager)
     {
@@ -75,11 +82,11 @@ public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessT
                 if (e instanceof  MessagingException)
                 {
                     httpStatus = response.getMessage().getOutboundProperty(HttpConnector.HTTP_STATUS_PROPERTY) != null ? Integer.valueOf(response.getMessage().getOutboundProperty(HttpConnector.HTTP_STATUS_PROPERTY).toString()) : httpStatus;
-                    httpServerConnection.writeFailureResponse(httpStatus,e.getMessage());
+                    sendFailureResponseToClient(httpStatus, e.getMessage());
                 }
                 else
                 {
-                    httpServerConnection.writeFailureResponse(httpStatus, e.getMessage());
+                    sendFailureResponseToClient(httpStatus, e.getMessage());
                 }
             }
             catch (IOException ioException)
@@ -98,7 +105,7 @@ public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessT
             int httpStatus = Integer.valueOf(temp);
             try
             {
-                httpServerConnection.writeFailureResponse(httpStatus, exception.getMessage());
+                sendFailureResponseToClient(httpStatus, exception.getMessage());
             }
             catch (IOException e)
             {
@@ -108,54 +115,7 @@ public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessT
     }
 
     @Override
-    public void sendResponseToClient(MuleEvent muleEvent) throws MuleException
-    {
-        sendHttpResponse(muleEvent);
-    }
-
-    @Override
-    public MuleEvent beforeRouteEvent(MuleEvent muleEvent) throws MuleException
-    {
-        try
-        {
-            sendExpect100(request);
-            return muleEvent;
-        }
-        catch (IOException e)
-        {
-            throw new DefaultMuleException(e);
-        }
-    }
-
-    private void sendExpect100(HttpRequest request) throws MuleException, IOException
-    {
-        RequestLine requestLine = request.getRequestLine();
-
-        // respond with status code 100, for Expect handshake
-        // according to rfc 2616 and http 1.1
-        // the processing will continue and the request will be fully
-        // read immediately after
-        HttpVersion requestVersion = requestLine.getHttpVersion();
-        if (HttpVersion.HTTP_1_1.equals(requestVersion))
-        {
-            Header expectHeader = request.getFirstHeader(HttpConstants.HEADER_EXPECT);
-            if (expectHeader != null)
-            {
-                String expectHeaderValue = expectHeader.getValue();
-                if (HttpConstants.HEADER_EXPECT_CONTINUE_REQUEST_VALUE.equals(expectHeaderValue))
-                {
-                    HttpResponse expected = new HttpResponse();
-                    expected.setStatusLine(requestLine.getHttpVersion(), HttpConstants.SC_CONTINUE);
-                    final DefaultMuleEvent event = new DefaultMuleEvent(new DefaultMuleMessage(expected,
-                                                  getMuleContext()), getInboundEndpoint(), getFlowConstruct());
-                    RequestContext.setEvent(event);
-                    httpServerConnection.writeResponse(transformResponse(expected));
-                }
-            }
-        }
-    }
-
-    private void sendHttpResponse(MuleEvent responseMuleEvent) throws MessagingException
+    public void sendResponseToClient(MuleEvent responseMuleEvent) throws MuleException
     {
         try
         {
@@ -210,9 +170,10 @@ public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessT
                     response.setKeepAlive(false);
                 }
             }
+
             try
             {
-                httpServerConnection.writeResponse(response);
+                httpServerConnection.writeResponse(response,getThrottlingHeaders());
             }
             catch (Exception e)
             {
@@ -231,6 +192,48 @@ public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessT
                 logger.debug(e);
             }
             throw new MessagingException(responseMuleEvent,e);
+        }
+    }
+
+    @Override
+    public MuleEvent beforeRouteEvent(MuleEvent muleEvent) throws MuleException
+    {
+        try
+        {
+            sendExpect100(request);
+            return muleEvent;
+        }
+        catch (IOException e)
+        {
+            throw new DefaultMuleException(e);
+        }
+    }
+
+    private void sendExpect100(HttpRequest request) throws MuleException, IOException
+    {
+        RequestLine requestLine = request.getRequestLine();
+
+        // respond with status code 100, for Expect handshake
+        // according to rfc 2616 and http 1.1
+        // the processing will continue and the request will be fully
+        // read immediately after
+        HttpVersion requestVersion = requestLine.getHttpVersion();
+        if (HttpVersion.HTTP_1_1.equals(requestVersion))
+        {
+            Header expectHeader = request.getFirstHeader(HttpConstants.HEADER_EXPECT);
+            if (expectHeader != null)
+            {
+                String expectHeaderValue = expectHeader.getValue();
+                if (HttpConstants.HEADER_EXPECT_CONTINUE_REQUEST_VALUE.equals(expectHeaderValue))
+                {
+                    HttpResponse expected = new HttpResponse();
+                    expected.setStatusLine(requestLine.getHttpVersion(), HttpConstants.SC_CONTINUE);
+                    final DefaultMuleEvent event = new DefaultMuleEvent(new DefaultMuleMessage(expected,
+                                                  getMuleContext()), getInboundEndpoint(), getFlowConstruct());
+                    RequestContext.setEvent(event);
+                    httpServerConnection.writeResponse(transformResponse(expected));
+                }
+            }
         }
     }
 
@@ -368,7 +371,6 @@ public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessT
         return true;
     }
 
-
     @Override
     public void discardInvalidMessage() throws MuleException
     {
@@ -384,6 +386,7 @@ public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessT
             }
         }
     }
+
 
     @Override
     public boolean supportsAsynchronousProcessing()
@@ -417,11 +420,41 @@ public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessT
     {
         try
         {
-            httpServerConnection.writeFailureResponse(MESSAGE_DISCARD_STATUS_CODE, "API calls exceeded");
+            sendFailureResponseToClient(MESSAGE_DISCARD_STATUS_CODE,"API calls exceeded");
         }
         catch (IOException e)
         {
             throw new DefaultMuleException(e);
+        }
+    }
+
+    @Override
+    public void setThrottlingPolicyStatistics(long remainingRequestInCurrentPeriod, long maximumRequestAllowedPerPeriod, long timeUntilNextPeriodInMillis)
+    {
+        this.remainingRequestInCurrentPeriod = remainingRequestInCurrentPeriod;
+        this.maximumRequestAllowedPerPeriod  = maximumRequestAllowedPerPeriod;
+        this.timeUntilNextPeriodInMillis = timeUntilNextPeriodInMillis;
+    }
+
+    private void sendFailureResponseToClient(int httpStatus, String message) throws IOException
+    {
+        httpServerConnection.writeFailureResponse(httpStatus,message,getThrottlingHeaders());
+    }
+
+    private Map<String,String> getThrottlingHeaders()
+    {
+        Map<String, String> throttlingHeaders = new HashMap<String, String>();
+        addToMapIfNotNull(throttlingHeaders, X_RATE_LIMIT_LIMIT_HEADER,this.remainingRequestInCurrentPeriod);
+        addToMapIfNotNull(throttlingHeaders, X_RATE_LIMIT_REMAINING_HEADER,this.maximumRequestAllowedPerPeriod);
+        addToMapIfNotNull(throttlingHeaders, X_RATE_LIMIT_RESET_HEADER,this.timeUntilNextPeriodInMillis);
+        return throttlingHeaders;
+    }
+
+    private void addToMapIfNotNull(Map<String,String> map, String key, Long value)
+    {
+        if (value != null)
+        {
+            map.put(key, String.valueOf(value));
         }
     }
 

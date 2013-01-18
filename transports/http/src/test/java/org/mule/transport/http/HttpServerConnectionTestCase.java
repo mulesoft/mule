@@ -21,10 +21,12 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.security.cert.Certificate;
+import java.util.HashMap;
 
 import javax.net.ssl.HandshakeCompletedEvent;
 import javax.net.ssl.HandshakeCompletedListener;
@@ -131,6 +133,83 @@ public class HttpServerConnectionTestCase extends AbstractMuleTestCase
         testUrlWithoutParams("/service?param1=value1&param2=value2", "/service");
         testUrlWithoutParams("/?param1=value1&param2=value2", "/");
         testUrlWithoutParams("/", "/");
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void writeResponseWithNullParams() throws Exception
+    {
+        ByteArrayOutputStream responseContent = new ByteArrayOutputStream();
+        HttpServerConnection httpServerConnection = createHttpServerConnectionForResponseTest(responseContent);
+        httpServerConnection.writeResponse(new HttpResponse(), null);
+    }
+
+    @Test
+    public void writeResponseWithEmptyParams() throws Exception
+    {
+        ByteArrayOutputStream responseContent = new ByteArrayOutputStream();
+        HttpServerConnection httpServerConnection = createHttpServerConnectionForResponseTest(responseContent);
+        httpServerConnection.writeResponse(new HttpResponse(),new HashMap<String,String>());
+        String response = new String(responseContent.toByteArray());
+        assertThat(response.startsWith("HTTP/1.1 200 OK"), is(true));
+        assertThat(response.contains("Connection: close"), is(true));
+    }
+
+    @Test
+    public void writeResponseWithParams() throws Exception
+    {
+        ByteArrayOutputStream responseContent = new ByteArrayOutputStream();
+        HttpServerConnection httpServerConnection = createHttpServerConnectionForResponseTest(responseContent);
+        HashMap<String, String> headers = new HashMap<String, String>();
+        headers.put("header1","value1");
+        headers.put("header2","value2");
+        httpServerConnection.writeResponse(new HttpResponse(), headers);
+        String response = new String(responseContent.toByteArray());
+        assertThat(response.startsWith("HTTP/1.1 200 OK"), is(true));
+        assertThat(response.contains("header1: value1"), is(true));
+        assertThat(response.contains("header2: value2"), is(true));
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void writeFailureResponseWithNullParams() throws Exception
+    {
+        ByteArrayOutputStream responseContent = new ByteArrayOutputStream();
+        HttpServerConnection httpServerConnection = createHttpServerConnectionForResponseTest(responseContent);
+        httpServerConnection.writeFailureResponse(400, "failureMessage",null);
+    }
+
+    @Test
+    public void writeFailureResponseWithEmptyParams() throws Exception
+    {
+        ByteArrayOutputStream responseContent = new ByteArrayOutputStream();
+        HttpServerConnection httpServerConnection = createHttpServerConnectionForResponseTest(responseContent);
+        httpServerConnection.writeFailureResponse(500, "failureMessage", new HashMap<String,String>());
+        String response = new String(responseContent.toByteArray());
+        assertThat(response.startsWith("HTTP/1.1 500"), is(true));
+        assertThat(response.contains("Connection: close"), is(true));
+        assertThat(response.endsWith("failureMessage"), is(true));
+    }
+
+    @Test
+    public void writeFailureResponseWithParams() throws Exception
+    {
+        ByteArrayOutputStream responseContent = new ByteArrayOutputStream();
+        HttpServerConnection httpServerConnection = createHttpServerConnectionForResponseTest(responseContent);
+        HashMap<String, String> headers = new HashMap<String, String>();
+        headers.put("header1","value1");
+        headers.put("header2","value2");
+        httpServerConnection.writeFailureResponse(429, "failureMessage", headers);
+        String response = new String(responseContent.toByteArray());
+        assertThat(response.startsWith("HTTP/1.1 429"), is(true));
+        assertThat(response.contains("header1: value1"), is(true));
+        assertThat(response.contains("header2: value2"), is(true));
+        assertThat(response.endsWith("failureMessage"), is(true));
+    }
+
+    private HttpServerConnection createHttpServerConnectionForResponseTest(ByteArrayOutputStream responseContent) throws IOException
+    {
+        when(mockSocket.getInputStream()).thenReturn(new ByteArrayInputStream(String.format("GET %s HTTP/1.1\n\nGET %s HTTP/1.1\n", "/service/order?param1=value1&param2=value2", "/?param1=value1&param2=value2").getBytes()));
+        when(mockSocket.getOutputStream()).thenReturn(responseContent);
+        return new HttpServerConnection(mockSocket, ENCODING, mockHttpConnector);
     }
 
     private void testUrlWithoutParams(String requestUrl, String expectedUrlWithoutParams) throws IOException

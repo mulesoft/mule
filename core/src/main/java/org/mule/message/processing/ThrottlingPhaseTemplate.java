@@ -1,5 +1,5 @@
 /*
- * $Id: HttpsHandshakeTimingTestCase.java 25119 2012-12-10 21:20:57Z pablo.lagreca $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  *
@@ -24,5 +24,21 @@ public interface ThrottlingPhaseTemplate extends FlowProcessingPhaseTemplate
      * @throws MuleException
      */
     void discardMessageOnThrottlingExceeded() throws MuleException;
+
+    /**
+     * Set up throttling policy state to be used by the {@link org.mule.api.source.MessageSource} for debugging or
+     * information purpose.
+     *
+     * Not all throttling policy supports statistics so this method may not be called
+     *
+     * @param remainingRequestInCurrentPeriod the remaining allowed messages in the current period
+     * @param maximumRequestAllowedPerPeriod the maximum allowed messages in a period
+     * @param timeUntilNextPeriodInMillis time in milliseconds until the next period starts
+     */
+    /*
+       This should no change in the future. The other option was to send the ThrottlingPolicyStatistics object but
+       as CE transports are using this behavior it would involve moving the ThrottlingPolicyStatistics to CE.
+    */
+    void setThrottlingPolicyStatistics(long remainingRequestInCurrentPeriod, long maximumRequestAllowedPerPeriod, long timeUntilNextPeriodInMillis);
 
 }
