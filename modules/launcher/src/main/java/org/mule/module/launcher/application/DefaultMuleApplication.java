@@ -381,17 +381,16 @@ public class DefaultMuleApplication implements Application
             return;
         }
 
+        muleContext.getLifecycleManager().checkPhase(Stoppable.PHASE_NAME);
+
         try
         {
-            if (muleContext.getLifecycleManager().isDirectTransition(Stoppable.PHASE_NAME))
+            if (logger.isInfoEnabled())
             {
-                if (logger.isInfoEnabled())
-                {
-                    logger.info(miniSplash(String.format("Stopping app '%s'", descriptor.getAppName())));
-                }
-
-                this.muleContext.stop();
+                logger.info(miniSplash(String.format("Stopping app '%s'", descriptor.getAppName())));
             }
+
+            this.muleContext.stop();
         }
         catch (MuleException e)
         {

@@ -10,6 +10,7 @@
 
 package org.mule.module.launcher;
 
+import org.mule.api.lifecycle.Stoppable;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.module.launcher.application.Application;
 import org.mule.module.launcher.application.ApplicationFactory;
@@ -102,6 +103,11 @@ public class DefaultMuleDeployer implements MuleDeployer
 
     private void tryToStopApp(Application app)
     {
+        if (!app.getMuleContext().getLifecycleManager().isDirectTransition(Stoppable.PHASE_NAME))
+        {
+            return;
+        }
+
         try
         {
             app.stop();
