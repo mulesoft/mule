@@ -331,7 +331,7 @@ public class DefaultMuleApplication implements Application
 
         String appName = getAppName();
 
-        deploymentListener.onDeploymentStart(appName);
+        deploymentListener.onUndeploymentStart(appName);
         try
         {
             dispose();
