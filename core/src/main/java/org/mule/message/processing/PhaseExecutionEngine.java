@@ -52,7 +52,14 @@ public class PhaseExecutionEngine
             currentPhase++;
             if (currentPhase < phaseList.size())
             {
-                phaseList.get(currentPhase).runPhase(messageProcessTemplate,messageProcessContext,this);
+                if (phaseList.get(currentPhase).supportsTemplate(messageProcessTemplate))
+                {
+                    phaseList.get(currentPhase).runPhase(messageProcessTemplate,messageProcessContext,this);
+                }
+                else
+                {
+                    phaseSuccessfully();
+                }
             }
             else
             {

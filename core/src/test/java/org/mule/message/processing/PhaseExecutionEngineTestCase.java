@@ -18,6 +18,7 @@ import org.mule.api.exception.SystemExceptionHandler;
 import org.mule.tck.size.SmallTest;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Test;
@@ -73,12 +74,26 @@ public class PhaseExecutionEngineTestCase
     @Test
     public void exceptionHandlerIsCalledOnFailure() throws Exception
     {
-        addPhase(mockFailingPhase);
-        addPhase(mockProcessPhase1);
+        addSupportedPhase(mockFailingPhase);
+        addSupportedPhase(mockProcessPhase1);
         when(mockEndPhase.supportsTemplate(mockTemplate)).thenReturn(true);
         PhaseExecutionEngine phaseExecutionEngine = new PhaseExecutionEngine(phaseList, mockExceptionHandler, mockEndPhase);
         phaseExecutionEngine.process(mockTemplate,mockContext);
         verify(mockEndPhase,times(1)).runPhase(any(EndPhaseTemplate.class),any(MessageProcessContext.class), any(PhaseResultNotifier.class));
+    }
+
+    @Test
+    public void phaseItsNoSupportedThenNextPhaseExecutes() throws Exception
+    {
+        addSupportedPhase(mockProcessPhase1);
+        addNotSupportedPhase(mockProcessPhase2);
+        addSupportedPhase(mockProcessPhase3);
+        when(mockProcessPhase2.supportsTemplate(mockTemplate)).thenReturn(false);
+        PhaseExecutionEngine phaseExecutionEngine = new PhaseExecutionEngine(phaseList, mockExceptionHandler, mockEndPhase);
+        phaseExecutionEngine.process(mockTemplate, mockContext);
+        verify(mockProcessPhase1,times(1)).runPhase(any(EndPhaseTemplate.class),any(MessageProcessContext.class), any(PhaseResultNotifier.class));
+        verify(mockProcessPhase2,times(0)).runPhase(any(EndPhaseTemplate.class),any(MessageProcessContext.class), any(PhaseResultNotifier.class));
+        verify(mockProcessPhase3,times(1)).runPhase(any(EndPhaseTemplate.class), any(MessageProcessContext.class), any(PhaseResultNotifier.class));
     }
 
     private void verifyAllPhasesAreRun()
@@ -93,15 +108,25 @@ public class PhaseExecutionEngineTestCase
 
     private void addAllPhases()
     {
-        addPhase(mockProcessPhase1);
-        addPhase(mockProcessPhase2);
-        addPhase(mockProcessPhase3);
+        addSupportedPhase(mockProcessPhase1);
+        addSupportedPhase(mockProcessPhase2);
+        addSupportedPhase(mockProcessPhase3);
     }
 
-    private void addPhase(MessageProcessPhase mockProcessPhase)
+    private void addSupportedPhase(MessageProcessPhase mockProcessPhase)
+    {
+        addPhase(mockProcessPhase, true);
+    }
+
+    private void addNotSupportedPhase(MessageProcessPhase mockProcessPhase)
+    {
+        addPhase(mockProcessPhase, false);
+    }
+
+    private void addPhase(MessageProcessPhase mockProcessPhase, boolean supportsTemplate)
     {
         phaseList.add(mockProcessPhase);
-        when(mockProcessPhase.supportsTemplate(mockTemplate)).thenReturn(true);
+        when(mockProcessPhase.supportsTemplate(mockTemplate)).thenReturn(supportsTemplate);
         Mockito.doAnswer(new Answer()
         {
             @Override
