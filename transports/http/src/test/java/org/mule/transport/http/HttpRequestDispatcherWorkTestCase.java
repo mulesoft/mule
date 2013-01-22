@@ -16,6 +16,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import org.mule.api.transport.NoReceiverForEndpointException;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.tck.size.SmallTest;
 import org.mule.message.processing.MessageProcessContext;
 
@@ -51,6 +53,8 @@ public class HttpRequestDispatcherWorkTestCase
     private Work mockWork;
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     private MessageProcessContext mockMessageContext;
+    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+    NoReceiverForEndpointException mockNoReceiverForEndpointException;
 
     @Test(expected = IllegalArgumentException.class)
     public void createHttpRequestDispatcherWorkWithNullHttpConnector()
@@ -69,7 +73,7 @@ public class HttpRequestDispatcherWorkTestCase
     {
         HttpRequestDispatcherWork httpRequestDispatcherWork = new HttpRequestDispatcherWork(mockHttpConnector, mockSocket);
         setUpSocketMessage();
-        when(mockHttpConnector.lookupReceiver(any(Socket.class), any(HttpRequest.class))).thenThrow(Exception.class);
+        when(mockHttpConnector.lookupReceiver(any(Socket.class), any(RequestLine.class))).thenThrow(Exception.class);
         httpRequestDispatcherWork.run();
         verify(mockHttpConnector.getMuleContext().getExceptionListener(), times(1)).handleException(any(Exception.class));
     }
@@ -80,7 +84,7 @@ public class HttpRequestDispatcherWorkTestCase
         HttpRequestDispatcherWork httpRequestDispatcherWork = new HttpRequestDispatcherWork(mockHttpConnector, mockSocket);
         setUpSocketMessage();
         when(mockSocket.getLocalSocketAddress()).thenReturn(mockInetSocketAddress);
-        when(mockHttpConnector.lookupReceiver(any(Socket.class), any(HttpRequest.class))).thenReturn(null);
+        when(mockHttpConnector.lookupReceiver(any(Socket.class), any(RequestLine.class))).thenThrow(mockNoReceiverForEndpointException);
         ByteArrayOutputStream socketOutput = new ByteArrayOutputStream();
         when(mockSocket.getOutputStream()).thenReturn(socketOutput);
         httpRequestDispatcherWork.run();
@@ -92,7 +96,7 @@ public class HttpRequestDispatcherWorkTestCase
     public void onValidUriProcessRequest() throws Exception
     {
         HttpRequestDispatcherWork httpRequestDispatcherWork = new HttpRequestDispatcherWork(mockHttpConnector, mockSocket);
-        when(mockHttpConnector.lookupReceiver(isA(Socket.class), isA(HttpRequest.class))).thenReturn(mockHttpMessageReceiver);
+        when(mockHttpConnector.lookupReceiver(isA(Socket.class), isA(RequestLine.class))).thenReturn(mockHttpMessageReceiver);
         setUpSocketMessage();
         when(mockHttpMessageReceiver.createMessageContext(isA(HttpServerConnection.class))).thenReturn(mockMessageContext);
         httpRequestDispatcherWork.run();

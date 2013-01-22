@@ -61,7 +61,7 @@ public class HttpMessageReceiver extends AbstractMessageReceiver
     {
         HttpMessageProcessTemplate messageContext = (HttpMessageProcessTemplate) createMessageContext(httpServerConnection);
         processMessage(messageContext,messageContext);
-        messageContext.getMessageProcessedLatch().await();
+        messageContext.awaitTermination();
     }
 
     protected String processRelativePath(String contextPath, String path)

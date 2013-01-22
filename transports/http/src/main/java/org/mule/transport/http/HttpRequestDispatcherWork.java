@@ -9,6 +9,7 @@
  */
 package org.mule.transport.http;
 
+import org.mule.api.transport.NoReceiverForEndpointException;
 import org.mule.transport.http.i18n.HttpMessages;
 import org.mule.util.monitor.Expirable;
 
@@ -66,15 +67,18 @@ public class HttpRequestDispatcherWork implements Runnable, Expirable
                                 keepAliveTimeout, TimeUnit.MILLISECONDS, this);
                     }
 
-                    HttpRequest request = httpServerConnection.readRequest();
-                    HttpMessageReceiver httpMessageReceiver = httpConnector.lookupReceiver(socket, request);
-                    if (httpMessageReceiver != null)
+                    RequestLine requestLine = httpServerConnection.getRequestLine();
+                    if (requestLine != null)
                     {
-                        httpMessageReceiver.processRequest(httpServerConnection);
-                    }
-                    else
-                    {
-                        httpServerConnection.writeFailureResponse(HttpConstants.SC_NOT_FOUND, HttpMessages.cannotBindToAddress(httpServerConnection.getFullUri()).toString());
+                        try
+                        {
+                            HttpMessageReceiver httpMessageReceiver = httpConnector.lookupReceiver(socket, requestLine);
+                            httpMessageReceiver.processRequest(httpServerConnection);
+                        }
+                        catch (NoReceiverForEndpointException e)
+                        {
+                            httpServerConnection.writeFailureResponse(HttpConstants.SC_NOT_FOUND, HttpMessages.cannotBindToAddress(httpServerConnection.getFullUri()).toString());
+                        }
                     }
                 }
                 finally

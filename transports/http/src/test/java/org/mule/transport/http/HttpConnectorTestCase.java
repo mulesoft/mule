@@ -12,12 +12,14 @@ package org.mule.transport.http;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 import static org.mockito.Mockito.when;
 
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
 import org.mule.api.transport.MessageReceiver;
+import org.mule.api.transport.NoReceiverForEndpointException;
 import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.transport.AbstractConnectorTestCase;
 import org.mule.transport.tcp.TcpConnector;
@@ -56,6 +58,8 @@ public class HttpConnectorTestCase extends AbstractConnectorTestCase
     private HttpRequest mockHttpRequest;
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     private Socket mockSocket;
+    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+    private RequestLine mockRequestLine;
 
     @Override
     public Connector createConnector() throws Exception
@@ -155,13 +159,66 @@ public class HttpConnectorTestCase extends AbstractConnectorTestCase
         testLookupReceiver("somehost", 5555, "/service/order?param1=value1", mockServiceOrderReceiverPort5555);
     }
 
+    @Test
+    public void lookupReceiverByRequestLineThatDoesNotExistsInThatPort() throws Exception
+    {
+        testLookupReceiverByRequestLine("somehost", 8888, "/management", null);
+    }
+
+    @Test
+    public void lookupReceiverByRequestLineThatDoesNotExistsInThatHost() throws Exception
+    {
+        testLookupReceiverByRequestLine("nonexistenthost", 5555, "/service", null);
+    }
+
+    @Test
+    public void lookupReceiverByRequestLineThatContainsPath() throws Exception
+    {
+        when(mockServiceReceiverPort5555.getEndpointURI().getPort()).thenReturn(5555);
+        when(mockServiceReceiverPort5555.getEndpointURI().getHost()).thenReturn("somehost");
+        testLookupReceiverByRequestLine("somehost", 5555, "/service/product", mockServiceReceiverPort5555);
+    }
+
+    @Test
+    public void lookupReceiverByRequestLineThatExistsWithExactSamePath() throws Exception
+    {
+        when(mockServiceReceiverPort5555.getEndpointURI().getPort()).thenReturn(5555);
+        when(mockServiceReceiverPort5555.getEndpointURI().getHost()).thenReturn("somehost");
+        testLookupReceiverByRequestLine("somehost", 5555, "/service/order?param1=value1", mockServiceOrderReceiverPort5555);
+    }
+
+
     private void testLookupReceiver(String host, int port, String path, HttpMessageReceiver expectedMessageReceiver)
     {
         HttpConnector httpConnector = (HttpConnector) getConnector();
         httpConnector.getReceivers().putAll(createTestReceivers());
-        when(mockHttpRequest.getUrlWithoutParams()).thenReturn(path);
+        when(mockHttpRequest.getRequestLine()).thenReturn(mockRequestLine);
+        when(mockRequestLine.getUrlWithoutParams()).thenReturn(path);
         when(mockSocket.getLocalSocketAddress()).thenReturn(new InetSocketAddress(host, port));
         Assert.assertThat(httpConnector.lookupReceiver(mockSocket, mockHttpRequest), Is.is(expectedMessageReceiver));
+    }
+
+    private void testLookupReceiverByRequestLine(String host, int port, String path, HttpMessageReceiver expectedMessageReceiver) throws NoReceiverForEndpointException
+    {
+        HttpConnector httpConnector = (HttpConnector) getConnector();
+        httpConnector.getReceivers().putAll(createTestReceivers());
+        when(mockRequestLine.getUrlWithoutParams()).thenReturn(path);
+        when(mockSocket.getLocalSocketAddress()).thenReturn(new InetSocketAddress(host, port));
+        if (expectedMessageReceiver != null)
+        {
+            Assert.assertThat(httpConnector.lookupReceiver(mockSocket, mockRequestLine), Is.is(expectedMessageReceiver));
+        }
+        else
+        {
+            try
+            {
+                httpConnector.lookupReceiver(mockSocket, mockRequestLine);
+                fail("exception should be thrown");
+            }
+            catch (NoReceiverForEndpointException e)
+            {
+            }
+        }
     }
 
 }

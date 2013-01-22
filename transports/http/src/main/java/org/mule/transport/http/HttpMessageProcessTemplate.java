@@ -23,10 +23,10 @@ import org.mule.api.context.WorkManager;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.transport.PropertyScope;
 import org.mule.config.ExceptionHelper;
-import org.mule.message.processing.RequestResponseFlowProcessingPhaseTemplate;
-import org.mule.transport.AbstractTransportMessageProcessTemplate;
 import org.mule.message.processing.EndPhaseTemplate;
+import org.mule.message.processing.RequestResponseFlowProcessingPhaseTemplate;
 import org.mule.message.processing.ThrottlingPhaseTemplate;
+import org.mule.transport.AbstractTransportMessageProcessTemplate;
 import org.mule.transport.NullPayload;
 import org.mule.transport.http.i18n.HttpMessages;
 import org.mule.util.concurrent.Latch;
@@ -38,7 +38,7 @@ import java.util.Map;
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpVersion;
 
-public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessTemplate<HttpMessageReceiver, HttpConnector> implements ThrottlingPhaseTemplate, EndPhaseTemplate, RequestResponseFlowProcessingPhaseTemplate
+public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessTemplate<HttpMessageReceiver, HttpConnector> implements RequestResponseFlowProcessingPhaseTemplate, ThrottlingPhaseTemplate, EndPhaseTemplate
 {
 
     public static final int MESSAGE_DISCARD_STATUS_CODE = Integer.valueOf(System.getProperty("mule.transport.http.throttling.discardstatuscode","429"));
@@ -54,6 +54,7 @@ public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessT
     private Long remainingRequestInCurrentPeriod;
     private Long maximumRequestAllowedPerPeriod;
     private Long timeUntilNextPeriodInMillis;
+    private RequestLine requestLine;
 
     public HttpMessageProcessTemplate(final HttpMessageReceiver messageReceiver, final HttpServerConnection httpServerConnection, final WorkManager flowExecutionWorkManager)
     {
@@ -341,13 +342,12 @@ public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessT
     {
         try
         {
-            this.request = httpServerConnection.readRequest();
-            if (request == null)
+            this.requestLine = httpServerConnection.getRequestLine();
+            if (requestLine == null)
             {
                 return false;
             }
 
-            RequestLine requestLine = request.getRequestLine();
             String method = requestLine.getMethod();
 
             if (!(method.equals(HttpConstants.METHOD_GET)
@@ -378,7 +378,7 @@ public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessT
         {
             try
             {
-                httpServerConnection.writeResponse(doBad(request.getRequestLine()));
+                httpServerConnection.writeResponse(doBad(requestLine));
             }
             catch (IOException e)
             {
@@ -465,4 +465,8 @@ public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessT
     }
 
 
+    public void awaitTermination() throws InterruptedException
+    {
+        this.messageProcessedLatch.await();
+    }
 }

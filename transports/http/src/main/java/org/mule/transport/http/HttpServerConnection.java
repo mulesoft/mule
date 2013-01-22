@@ -61,6 +61,7 @@ public class HttpServerConnection implements HandshakeCompletedListener
     private Latch sslSocketHandshakeComplete = new Latch();
     private Certificate[] peerCertificateChain;
     private Certificate[] localCertificateChain;
+    private RequestLine requestLine;
 
     public HttpServerConnection(final Socket socket, String encoding, HttpConnector connector) throws IOException
     {
@@ -209,12 +210,7 @@ public class HttpServerConnection implements HandshakeCompletedListener
         }
         try
         {
-            String line = readLine();
-            if (line == null)
-            {
-                return null;
-            }
-            cachedRequest = new HttpRequest(RequestLine.parseLine(line), HttpParser.parseHeaders(this.in, encoding), this.in, encoding);
+            cachedRequest = new HttpRequest(getRequestLine(), HttpParser.parseHeaders(this.in, encoding), this.in, encoding);
             return cachedRequest;
         }
         catch (IOException e)
@@ -463,6 +459,7 @@ public class HttpServerConnection implements HandshakeCompletedListener
      */
     public void reset()
     {
+        this.requestLine = null;
         this.cachedRequest = null;
     }
 
@@ -503,5 +500,18 @@ public class HttpServerConnection implements HandshakeCompletedListener
             throw new IllegalStateException("The socket type is not SSL");
         }
         return peerCertificateChain;
+    }
+
+    public RequestLine getRequestLine() throws IOException
+    {
+        if (this.requestLine == null)
+        {
+            String line = readLine();
+            if (line != null)
+            {
+                this.requestLine = RequestLine.parseLine(line);
+            }
+        }
+        return this.requestLine;
     }
 }

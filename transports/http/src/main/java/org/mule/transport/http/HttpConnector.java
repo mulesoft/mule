@@ -21,6 +21,7 @@ import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transport.MessageReceiver;
+import org.mule.api.transport.NoReceiverForEndpointException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.transport.ConnectException;
 import org.mule.transport.http.ntlm.NTLMScheme;
@@ -500,7 +501,8 @@ public class HttpConnector extends TcpConnector
         connectionManager.removeConnection(endpointURI);
     }
 
-    public HttpMessageReceiver lookupReceiver(Socket socket, HttpRequest request)
+
+    public HttpMessageReceiver lookupReceiver(Socket socket, RequestLine requestLine) throws NoReceiverForEndpointException
     {
         int port = ((InetSocketAddress) socket.getLocalSocketAddress()).getPort();
         String host = null;
@@ -514,10 +516,10 @@ public class HttpConnector extends TcpConnector
         }
         if (host == null)
         {
-            return null;
+            throw new NoReceiverForEndpointException(CoreMessages.createStaticMessage("No receiver found for url: " + requestLine.getUrlWithoutParams()));
         }
 
-        String requestUriWithoutParams = request.getUrlWithoutParams();
+        String requestUriWithoutParams = requestLine.getUrlWithoutParams();
         StringBuilder requestUri = new StringBuilder(80);
         if (requestUriWithoutParams.indexOf("://") == -1)
         {
@@ -558,7 +560,26 @@ public class HttpConnector extends TcpConnector
                             + MapUtils.toString(getReceivers(), true));
             }
         }
+        if (receiver == null)
+        {
+            throw new NoReceiverForEndpointException(CoreMessages.createStaticMessage("No receiver found for url: " + requestUriWithoutParams));
+        }
         return receiver;
+    }
+
+    //Leave for backward compatibility
+    @Deprecated
+    public HttpMessageReceiver lookupReceiver(Socket socket, HttpRequest request)
+    {
+        try
+        {
+            return this.lookupReceiver(socket, request.getRequestLine());
+        }
+        catch (NoReceiverForEndpointException e)
+        {
+            logger.debug("No receiver found: " + e.getMessage());
+            return null;
+        }
     }
 
     public static MessageReceiver findReceiverByStem(Map<Object, MessageReceiver> receivers, String uriStr)
