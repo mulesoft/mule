@@ -70,7 +70,6 @@ public class MapCombinerTestCase extends AbstractMuleTestCase
         combiner.setList(new LinkedList());
         combiner.getList().add(map1);
         combiner.getList().add(map2);
-        assertFalse(combiner.isEmpty()); // trigger merge
         assertEquals(combiner, map3);
     }
 
