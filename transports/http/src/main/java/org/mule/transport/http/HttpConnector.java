@@ -243,6 +243,17 @@ public class HttpConnector extends TcpConnector
             params.setDefaultMaxConnectionsPerHost(dispatchers.getMaxTotal());
             clientConnectionManager.setParams(params);
         }
+        if (connectionManager == null)
+        {
+            try
+            {
+                connectionManager = new org.mule.transport.http.HttpConnectionManager(this, getReceiverWorkManager());
+            }
+            catch (MuleException e)
+            {
+                throw new InitialisationException(CoreMessages.createStaticMessage("failed creating http connection manager"),this);
+            }
+        }
     }
 
     @Override
@@ -252,6 +263,7 @@ public class HttpConnector extends TcpConnector
         {
             connectionCleaner.shutdown();
         }
+        connectionManager.dispose();
         super.doDispose();
     }
 
@@ -607,10 +619,4 @@ public class HttpConnector extends TcpConnector
         return super.getServerSocket(uri);
     }
 
-    @Override
-    protected void doStart() throws MuleException
-    {
-        super.doStart();
-        connectionManager = new org.mule.transport.http.HttpConnectionManager(this, getReceiverWorkManager());
-    }
 }

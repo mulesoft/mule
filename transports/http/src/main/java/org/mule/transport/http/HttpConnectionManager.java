@@ -101,4 +101,14 @@ class HttpConnectionManager
     {
         return endpointURI.getHost() + ":" + endpointURI.getPort();
     }
+
+    public void dispose()
+    {
+        for (HttpRequestDispatcher httpRequestDispatcher : socketDispatchers.values())
+        {
+            httpRequestDispatcher.disconnect();
+        }
+        socketDispatchers.clear();
+        socketDispatcherCount.clear();
+    }
 }

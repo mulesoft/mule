@@ -381,8 +381,6 @@ public abstract class AbstractConnector implements Connector, WorkListener
                     configureDispatcherPool();
                     setMaxRequestersActive(getRequesterThreadingProfile().getMaxThreadsActive());
 
-                    doInitialise();
-
                     try
                     {
                         initWorkManagers();
@@ -391,6 +389,8 @@ public abstract class AbstractConnector implements Connector, WorkListener
                     {
                         throw new LifecycleException(e, this);
                     }
+
+                    doInitialise();
                 }
             });
         }
