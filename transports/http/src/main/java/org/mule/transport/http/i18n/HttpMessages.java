@@ -18,7 +18,7 @@ import java.net.URI;
 public class HttpMessages extends MessageFactory
 {
     private static final HttpMessages factory = new HttpMessages();
-    
+
     private static final String BUNDLE_PATH = getBundlePath("http");
 
     public static Message requestFailedWithStatus(String string)
@@ -85,7 +85,7 @@ public class HttpMessages extends MessageFactory
     {
         return factory.createMessage(BUNDLE_PATH, 19);
     }
-    
+
     public static Message sslHandshakeDidNotComplete()
     {
         return factory.createMessage(BUNDLE_PATH, 20);
@@ -115,6 +115,9 @@ public class HttpMessages extends MessageFactory
     {
         return factory.createMessage(BUNDLE_PATH, 25, file);
     }
+
+    public static Message noReceiverFoundForUrl(String url)
+    {
+        return factory.createMessage(BUNDLE_PATH, 26, url);
+    }
 }
-
-

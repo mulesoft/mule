@@ -24,6 +24,7 @@ import org.mule.api.transport.MessageReceiver;
 import org.mule.api.transport.NoReceiverForEndpointException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.transport.ConnectException;
+import org.mule.transport.http.i18n.HttpMessages;
 import org.mule.transport.http.ntlm.NTLMScheme;
 import org.mule.transport.tcp.TcpConnector;
 import org.mule.util.MapUtils;
@@ -516,7 +517,8 @@ public class HttpConnector extends TcpConnector
         }
         if (host == null)
         {
-            throw new NoReceiverForEndpointException(CoreMessages.createStaticMessage("No receiver found for url: " + requestLine.getUrlWithoutParams()));
+            String url = requestLine.getUrlWithoutParams();
+            throw new NoReceiverForEndpointException(HttpMessages.noReceiverFoundForUrl(url));
         }
 
         String requestUriWithoutParams = requestLine.getUrlWithoutParams();
@@ -562,7 +564,7 @@ public class HttpConnector extends TcpConnector
         }
         if (receiver == null)
         {
-            throw new NoReceiverForEndpointException(CoreMessages.createStaticMessage("No receiver found for url: " + requestUriWithoutParams));
+            throw new NoReceiverForEndpointException(HttpMessages.noReceiverFoundForUrl(requestUriWithoutParams));
         }
         return receiver;
     }
