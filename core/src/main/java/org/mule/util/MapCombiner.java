@@ -110,19 +110,27 @@ public class MapCombiner implements Map<Object, Object>, Serializable
         }
     }
 
-    // hashcode, equals and toString don't trigger merge
-
     @Override
     public int hashCode()
     {
-        return cachedMerge.hashCode();
+        // MULE-6607
+        // This was changed from cachedMerge.hashCode() to getCachedMerge().hashCode() since the mutation of MapCombiner (when the list
+        // of maps was merged into cachedMerge) altered the hash code. Now hashCode() method and, consequently, equals() method, trigger
+        // the merge in order not to alter equality of MapCombiner instances.
+        // This had impact on instances of classes such as AbstractEndpoint (which are stored on hash based collections) whose hashCode()
+        // method is defined based on its properties, and this, in turn, defined based on MapCombiner instances.
+        return getCachedMerge().hashCode();
     }
 
     @Override
     public boolean equals(Object o)
     {
-        return cachedMerge.equals(o);
+        // MULE-6607
+        // See comment on hashCode() method.
+        return getCachedMerge().equals(o);
     }
+
+    // toString() doesn't trigger merge.
 
     @Override
     public String toString()
