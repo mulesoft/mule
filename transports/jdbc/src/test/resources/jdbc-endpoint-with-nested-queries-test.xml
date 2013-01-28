@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:jdbc="http://www.mulesoft.org/schema/mule/jdbc"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xsi:schemaLocation="
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.1/mule.xsd
+        http://www.mulesoft.org/schema/mule/jdbc http://www.mulesoft.org/schema/mule/jdbc/3.1/mule-jdbc.xsd
+        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/3.1/mule-test.xsd
+        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.1/mule-vm.xsd
+        http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/3.3/mule-scripting.xsd">
+    
+    <spring:bean id="databaseConnection" class="java.lang.String">
+        <spring:constructor-arg value="jdbc:derby:muleEmbeddedDB;sql.enforce_strict_size=true"/>
+    </spring:bean>
+       
+    <spring:bean id="jdbcDataSource" class="org.enhydra.jdbc.standard.StandardDataSource" destroy-method="shutdown">
+        <spring:property name="driverName" value="org.apache.derby.jdbc.EmbeddedDriver"/>
+        <spring:property name="url" ref="databaseConnection"/>
+    </spring:bean>
+
+    <!--
+        Do not change the name of this connector, AbstractJdbcFunctionalTestCase relies on the 
+        existence of a JDBC connector with this name.
+     -->
+    <jdbc:connector name="jdbcConnector" dataSource-ref="jdbcDataSource" queryTimeout="-1" />
+
+    <flow name="endpointsWithNestedQueries">
+        <vm:inbound-endpoint path="in" exchange-pattern="request-response"/>
+        <jdbc:outbound-endpoint queryKey="insert" exchange-pattern="request-response">
+            <jdbc:query key="insert" value="INSERT INTO TEST (type, data) VALUES (1, #[payload:])" />
+        </jdbc:outbound-endpoint>
+    </flow>
+
+</mule>
