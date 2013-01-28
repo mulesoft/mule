@@ -243,6 +243,8 @@ public class HttpConnector extends TcpConnector
             params.setDefaultMaxConnectionsPerHost(dispatchers.getMaxTotal());
             clientConnectionManager.setParams(params);
         }
+        //connection manager must be created during initialization due that devkit requires the connection manager before start phase.
+        //That's why it not manager only during stop/start phases and must be created also here.
         if (connectionManager == null)
         {
             try
@@ -263,8 +265,24 @@ public class HttpConnector extends TcpConnector
         {
             connectionCleaner.shutdown();
         }
-        connectionManager.dispose();
         super.doDispose();
+    }
+
+    @Override
+    protected void doStop() throws MuleException
+    {
+        this.connectionManager.dispose();
+        this.connectionManager = null;
+    }
+
+    @Override
+    protected void doStart() throws MuleException
+    {
+        super.doStart();
+        if (this.connectionManager == null)
+        {
+            this.connectionManager = new org.mule.transport.http.HttpConnectionManager(this,getReceiverWorkManager());
+        }
     }
 
     @Override
