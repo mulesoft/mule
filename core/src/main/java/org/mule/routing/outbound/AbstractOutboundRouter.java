@@ -481,6 +481,19 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
     }
 
     /**
+     * Creates a fresh copy of a {@link MuleMessage} ensuring that the payload can be cloned (i.e. is not consumable).
+     *
+     * @param event The {@link MuleEvent} to clone the message from.
+     * @return The fresh copy of the {@link MuleMessage}.
+     * @throws MessagingException If the message can't be cloned because it carries a consumable payload.
+     */
+    protected MuleMessage cloneMessage(MuleEvent event, MuleMessage message) throws MessagingException
+    {
+        assertNonConsumableMessage(event, message);
+        return cloneMessage(message);
+    }
+
+    /**
      * Propagates a number of internal system properties to handle correlation, session, etc. Note that in and
      * out params can be the same message object when not dealing with replies.
      * 
@@ -554,5 +567,22 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
     protected List<MessageProcessor> getOwnedMessageProcessors()
     {
         return routes;
+    }
+
+    /**
+     * Asserts that the {@link MuleMessage} in the {@link MuleEvent} doesn't carry a consumable payload. This method
+     * is useful for routers which need to clone the message before dispatching the message to multiple routes.
+     *
+     * @param event The {@link MuleEvent}.
+     * @param event The {@link MuleMessage} whose payload is to be verified.
+     * @throws MessagingException If the payload of the message is consumable.
+     */
+    protected void assertNonConsumableMessage(MuleEvent event, MuleMessage message) throws MessagingException
+    {
+        DefaultMuleMessage defaultMuleMessage = (DefaultMuleMessage) message;
+        if (defaultMuleMessage.isConsumable())
+        {
+            throw new MessagingException(CoreMessages.cannotCopyStreamPayload(defaultMuleMessage.getPayload().getClass().getName()), event);
+        }
     }
 }

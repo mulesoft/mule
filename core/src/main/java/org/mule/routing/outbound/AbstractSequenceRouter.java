@@ -68,14 +68,7 @@ public abstract class AbstractSequenceRouter extends FilteringOutboundRouter
                 OutboundEndpoint endpoint = mp instanceof OutboundEndpoint ? (OutboundEndpoint)mp : null;
                 if (endpoint == null || endpoint.getFilter() == null || (endpoint.getFilter() != null && endpoint.getFilter().accept(message)))
                 {
-                    if (((DefaultMuleMessage) message).isConsumable())
-                    {
-                        throw new MessagingException(
-                                CoreMessages.cannotCopyStreamPayload(message.getPayload().getClass().getName()),
-                                event);
-                    }
-
-                    MuleMessage clonedMessage = cloneMessage(message);
+                    MuleMessage clonedMessage = cloneMessage(event, message);
                     MuleEvent result = sendRequest(event, clonedMessage, mp, true);
                     if (result != null)
                     {
