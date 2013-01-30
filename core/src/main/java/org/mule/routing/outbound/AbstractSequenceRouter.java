@@ -10,8 +10,6 @@
 
 package org.mule.routing.outbound;
 
-import org.mule.DefaultMuleMessage;
-import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
@@ -68,14 +66,7 @@ public abstract class AbstractSequenceRouter extends FilteringOutboundRouter
                 OutboundEndpoint endpoint = mp instanceof OutboundEndpoint ? (OutboundEndpoint)mp : null;
                 if (endpoint == null || endpoint.getFilter() == null || (endpoint.getFilter() != null && endpoint.getFilter().accept(message)))
                 {
-                    if (((DefaultMuleMessage) message).isConsumable())
-                    {
-                        throw new MessagingException(
-                                CoreMessages.cannotCopyStreamPayload(message.getPayload().getClass().getName()),
-                                event);
-                    }
-
-                    MuleMessage clonedMessage = cloneMessage(message);
+                    MuleMessage clonedMessage = cloneMessage(event, message);
                     MuleEvent result = sendRequest(event, clonedMessage, mp, true);
                     if (result != null)
                     {

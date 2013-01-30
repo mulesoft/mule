@@ -56,11 +56,12 @@ public class FirstSuccessful extends AbstractOutboundRouter
         MuleEvent returnEvent = null;
 
         boolean failed = true;
+        Exception failExceptionCause = null;
         for (MessageProcessor mp : routes)
         {
             try
             {
-                MuleEvent toProcess = cloneEventForRoutinng(event, mp);
+                MuleEvent toProcess = cloneEventForRouting(event, mp);
                 returnEvent = mp.process(toProcess);
 
                 if (returnEvent == null)
@@ -76,6 +77,7 @@ public class FirstSuccessful extends AbstractOutboundRouter
             catch (Exception ex)
             {
                 failed = true;
+                failExceptionCause = ex;
             }
             if (!failed)
             {
@@ -85,15 +87,22 @@ public class FirstSuccessful extends AbstractOutboundRouter
 
         if (failed)
         {
-            throw new CouldNotRouteOutboundMessageException(event, this);
+            if (failExceptionCause != null)
+            {
+                throw new CouldNotRouteOutboundMessageException(event, this, failExceptionCause);
+            }
+            else
+            {
+                throw new CouldNotRouteOutboundMessageException(event, this);
+            }
         }
 
         return returnEvent;
     }
 
-    protected MuleEvent cloneEventForRoutinng(MuleEvent event, MessageProcessor mp)
+    protected MuleEvent cloneEventForRouting(MuleEvent event, MessageProcessor mp) throws MessagingException
     {
-        return createEventToRoute(event, cloneMessage(event.getMessage()), mp);
+        return createEventToRoute(event, cloneMessage(event, event.getMessage()), mp);
     }
 
     @Override
