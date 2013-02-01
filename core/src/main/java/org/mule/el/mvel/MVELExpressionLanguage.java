@@ -23,6 +23,7 @@ import org.mule.api.transformer.DataType;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.expression.DefaultExpressionManager;
 import org.mule.transformer.types.DataTypeFactory;
+import org.mule.transport.NullPayload;
 import org.mule.util.IOUtils;
 
 import java.io.IOException;
@@ -281,6 +282,7 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
         // Mule
         parserContext.addImport(DataType.class);
         parserContext.addImport(DataTypeFactory.class);
+        parserContext.addImport(NullPayload.class);
     }
 
     public void setGlobalFunctionsString(String globalFunctionsString)

@@ -11,6 +11,7 @@
 package org.mule.el.context;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
@@ -19,6 +20,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.transformer.DataType;
 import org.mule.tck.testmodels.fruit.Banana;
 import org.mule.transformer.types.DataTypeFactory;
+import org.mule.transport.NullPayload;
 
 import org.junit.Ignore;
 import org.junit.Test;
@@ -154,17 +156,12 @@ public class MessageTestCase extends AbstractELTestCase
     }
 
     @Test
-    @Ignore
-    public void transformedPayload() throws Exception
+    public void nullPayloadTest() throws Exception
     {
         MuleMessage mockMessage = Mockito.mock(MuleMessage.class);
-        Banana b = new Banana();
-        Mockito.when(mockMessage.getPayload()).thenReturn("a");
-        assertEquals(
-            "ab",
-            evaluate(
-                "message.transformedPayload(new org.mule.transformer.simple.StringAppendTransformer('b'))",
-                mockMessage));
+        Mockito.when(mockMessage.getPayload()).thenReturn(NullPayload.getInstance());
+        assertEquals(false, evaluate("message.payload == null", mockMessage));
+        assertEquals(true, evaluate("message.payload is NullPayload", mockMessage));
     }
 
 }
