@@ -1,20 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:spring="http://www.springframework.org/schema/beans"
-      xmlns:test="http://www.mulesoft.org/schema/mule/test"
       xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
       xsi:schemaLocation="
-       http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
-       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
     <endpoint name="inbound1" address="vm://inbound1" exchange-pattern="one-way"/>
-    <endpoint name="inbound2" address="vm://inbound2" exchange-pattern="request-response"/>
+    <endpoint name="inbound2" address="vm://inbound2" exchange-pattern="one-way"/>
+    <endpoint name="inbound3" address="vm://inbound3" exchange-pattern="one-way"/>
     <endpoint name="output1" address="vm://output1" exchange-pattern="one-way"/>
     <endpoint name="output2" address="vm://output2" exchange-pattern="one-way"/>
     <endpoint name="output3" address="vm://output3" exchange-pattern="one-way"/>
+    <endpoint name="output4" address="vm://output4" exchange-pattern="one-way"/>
 
     <flow name="all">
         <inbound-endpoint ref="inbound1"/>
@@ -28,16 +26,18 @@
         </default-exception-strategy>
     </flow>
 
-        <flow name="first-successful">
-            <inbound-endpoint ref="inbound2"/>
-            <first-successful>
-                <component class="org.mule.routing.outbound.MulticastRouterTestCase$Fail"/>
-                <component class="org.mule.routing.outbound.MulticastRouterTestCase$Fail"/>
-                <component class="org.mule.routing.outbound.MulticastRouterTestCase$Echo"/>
-            </first-successful>
-            <default-exception-strategy>
-                <vm:outbound-endpoint path="errors2" exchange-pattern="one-way"/>
-            </default-exception-strategy>            
-        </flow>
+    <flow name="first-successful">
+        <inbound-endpoint ref="inbound2"/>
+        <first-successful>
+            <outbound-endpoint ref="inbound3"/>
+        </first-successful>
+        <default-exception-strategy>
+            <vm:outbound-endpoint path="errors2" exchange-pattern="one-way"/>
+        </default-exception-strategy>
+    </flow>
 
+    <flow name="vm-handler">
+        <inbound-endpoint ref="inbound3"/>
+        <outbound-endpoint ref="output4"/>
+    </flow>
 </mule>
