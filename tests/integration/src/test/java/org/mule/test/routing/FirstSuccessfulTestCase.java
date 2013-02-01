@@ -44,9 +44,8 @@ public class FirstSuccessfulTestCase extends FunctionalTestCase
         response = client.send("vm://input", Boolean.TRUE, null);
         assertNotNull(response);
         assertNotNull(response.getExceptionPayload());
-        assertEquals(CouldNotRouteOutboundMessageException.class, response.getExceptionPayload()
-            .getRootException()
-            .getClass());
+        assertEquals(CouldNotRouteOutboundMessageException.class, response.getExceptionPayload().
+                getException().getClass());
     }
 
     @Test
@@ -64,8 +63,7 @@ public class FirstSuccessfulTestCase extends FunctionalTestCase
         assertNotNull(response);
         assertNotNull(response.getExceptionPayload());
         assertEquals(CouldNotRouteOutboundMessageException.class, response.getExceptionPayload()
-            .getRootException()
-            .getClass());
+            .getException().getClass());
     }
 
     @Test
