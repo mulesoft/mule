@@ -9,30 +9,22 @@
  */
 package org.mule.routing.outbound;
 
-import org.mule.api.MuleEventContext;
-import org.mule.api.MuleMessage;
-import org.mule.api.lifecycle.Callable;
-import org.mule.message.ExceptionMessage;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.junit4.FunctionalTestCase;
-import org.mule.util.IOUtils;
-
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.util.concurrent.atomic.AtomicInteger;
-
-import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import org.mule.api.MuleMessage;
+import org.mule.api.routing.RoutingException;
+import org.mule.message.ExceptionMessage;
+import org.mule.module.client.MuleClient;
+import org.mule.tck.junit4.FunctionalTestCase;
+
+import java.io.ByteArrayInputStream;
+
+import org.junit.Test;
+
 public class MulticastRouterTestCase extends FunctionalTestCase
 {
-    private static AtomicInteger errorCounter = new AtomicInteger(0);
-    
-    
     @Override
     protected String getConfigResources()
     {
@@ -45,13 +37,12 @@ public class MulticastRouterTestCase extends FunctionalTestCase
         ByteArrayInputStream bis = new ByteArrayInputStream("Hello, world".getBytes("UTF-8"));
         MuleClient client = new MuleClient(muleContext);
         client.dispatch("vm://inbound1", bis, null);
+
         MuleMessage response = client.request("vm://output1", 2000);
         assertNull(response);
+
         MuleMessage error = client.request("vm://errors", 2000);
-        assertNotNull(error);
-        Object payload = error.getPayload();
-        assertNotNull(payload);
-        assertTrue(payload instanceof ExceptionMessage);
+        assertRoutingExceptionReceived(error);
     }
 
     @Test
@@ -59,47 +50,27 @@ public class MulticastRouterTestCase extends FunctionalTestCase
     {
         ByteArrayInputStream bis = new ByteArrayInputStream("Hello, world".getBytes("UTF-8"));
         MuleClient client = new MuleClient(muleContext);
-        MuleMessage response = client.send("vm://inbound2", bis, null);
-        assertNotNull(response);
-        Object payload = response.getPayload();
-        assertNotNull(payload);
-        assertEquals("Hello, world", response.getPayload());
-        assertEquals(errorCounter.get(), 2);
+        client.dispatch("vm://inbound2", bis, null);
+
+        MuleMessage response = client.request("vm://output4", 2000);
+        assertNull(response);
+
         MuleMessage error = client.request("vm://errors2", 2000);
-        assertNull(error);
+        assertRoutingExceptionReceived(error);
     }
 
-    public static class Fail implements Callable
+    /**
+     * Asserts that a {@link RoutingException} has been received.
+     *
+     * @param message The received message.
+     */
+    private void assertRoutingExceptionReceived(MuleMessage message)
     {
-        @Override
-        public Object onCall(MuleEventContext eventContext) throws Exception
-        {
-            errorCounter.incrementAndGet();
-            eventContext.getMessage().setPayload("Exception was thrown");
-            throw new Exception();
-        }
-    }
-
-    public static class Echo
-    {
-        public  String process(Object message) throws Exception
-        {
-            if (message instanceof String)
-            {
-                return (String) message;
-            }
-            else if (message instanceof byte[])
-            {
-                return new String((byte[])message);
-            }
-            else if (message instanceof InputStream)
-            {
-                return IOUtils.toString((InputStream) message);
-            }
-            else
-            {
-                return message.toString();
-            }
-        }
+        assertNotNull(message);
+        Object payload = message.getPayload();
+        assertNotNull(payload);
+        assertTrue(payload instanceof ExceptionMessage);
+        ExceptionMessage exceptionMessage = (ExceptionMessage) payload;
+        assertTrue(exceptionMessage.getException() instanceof RoutingException);
     }
 }
