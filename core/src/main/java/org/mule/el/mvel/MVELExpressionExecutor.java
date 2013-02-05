@@ -18,6 +18,7 @@ import java.io.Serializable;
 import org.apache.commons.collections.map.LRUMap;
 import org.mvel2.MVEL;
 import org.mvel2.ParserContext;
+import org.mvel2.optimizers.OptimizerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,6 +39,10 @@ public class MVELExpressionExecutor implements ExpressionExecutor<MVELExpression
 
     public Object execute(String expression, MVELExpressionLanguageContext context)
     {
+        // Use reflective optimizer rather than default to avoid concurrency issues with JIT complication.
+        // See MULE-6630
+        OptimizerFactory.setDefaultOptimizer(OptimizerFactory.SAFE_REFLECTIVE);
+
         if (log.isTraceEnabled())
         {
             log.trace("Executing MVEL expression '" + expression + "' with context: \n" + context.toString());
