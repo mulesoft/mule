@@ -42,6 +42,9 @@ import org.mule.work.MuleWorkManager;
 public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessageProcessor
     implements Startable, Stoppable
 {
+
+    public static final String SYNCHRONOUS_EVENT_ERROR_MESSAGE = "Unable to process a synchronous event asynchronously";
+
     protected WorkManagerSource workManagerSource;
     protected boolean doThreading = true;
     protected WorkManager workManager;
@@ -131,7 +134,7 @@ public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessa
         if (event.isSynchronous() || event.isTransacted())
         {
             throw new MessagingException(
-                CoreMessages.createStaticMessage("Unable to process a synchonrous event asyncronously"),
+                CoreMessages.createStaticMessage(SYNCHRONOUS_EVENT_ERROR_MESSAGE),
                 event, this);
         }
         return doThreading && !event.isSynchronous();
