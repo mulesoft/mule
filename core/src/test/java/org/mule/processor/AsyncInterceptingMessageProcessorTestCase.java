@@ -47,6 +47,8 @@ public class AsyncInterceptingMessageProcessorTestCase extends AbstractMuleConte
     implements ExceptionListener
 {
 
+    public static final String EXPECTING_SYNCHRONOUS_EVENT_ERROR = "Exception expected: '" + AsyncInterceptingMessageProcessor.SYNCHRONOUS_EVENT_ERROR_MESSAGE + "'";
+
     protected AsyncInterceptingMessageProcessor messageProcessor;
     protected TestListener target = new TestListener();
     protected Exception exceptionThrown;
@@ -81,7 +83,7 @@ public class AsyncInterceptingMessageProcessorTestCase extends AbstractMuleConte
         try
         {
             messageProcessor.process(event);
-            fail("Exception expect: 'Unable to process a synchonrous event asyncronously'");
+            fail(EXPECTING_SYNCHRONOUS_EVENT_ERROR);
         }
         catch (Exception e)
         {
@@ -99,7 +101,7 @@ public class AsyncInterceptingMessageProcessorTestCase extends AbstractMuleConte
         try
         {
             messageProcessor.process(event);
-            fail("Exception expect: 'Unable to process a synchonrous event asyncronously'");
+            fail(EXPECTING_SYNCHRONOUS_EVENT_ERROR);
         }
         catch (Exception e)
         {
@@ -121,7 +123,7 @@ public class AsyncInterceptingMessageProcessorTestCase extends AbstractMuleConte
         try
         {
             messageProcessor.process(event);
-            fail("Exception expect: 'Unable to process a synchonrous event asyncronously'");
+            fail(EXPECTING_SYNCHRONOUS_EVENT_ERROR);
         }
         catch (Exception e)
         {
