@@ -96,7 +96,7 @@
         <constructor-arg ref="_muleContext"/>
     </bean>
 
-    <bean name="_muleLockManager" class="org.mule.util.lock.MuleLockManager"/>
+    <bean name="_muleLockFactory" class="org.mule.util.lock.MuleLockFactory"/>
 
     <bean name="_muleLockProvider" class="org.mule.util.lock.SingleServerLockProvider"/>
 
