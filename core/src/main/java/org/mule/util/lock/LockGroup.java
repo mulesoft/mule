@@ -14,7 +14,7 @@ import org.mule.api.lifecycle.Disposable;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Holds reference to all the obtained locks using {@link LockManager} in order
+ * Holds reference to all the obtained locks using {@link LockFactory} in order
  * to release memory of no longer referenced locks.
  *
  */
@@ -40,4 +40,8 @@ public interface LockGroup extends Disposable
      * @throws java.lang.InterruptedException if thread was interrupted during the lock acquisition
      */
     boolean tryLock(String lockId, long timeout, TimeUnit timeUnit) throws InterruptedException;
+
+    boolean tryLock(String lockId);
+
+    void lockInterruptibly(String lockId) throws InterruptedException;
 }

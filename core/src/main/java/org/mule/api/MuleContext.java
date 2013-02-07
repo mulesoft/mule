@@ -33,6 +33,7 @@ import org.mule.api.store.ListableObjectStore;
 import org.mule.context.notification.NotificationException;
 import org.mule.context.notification.ServerNotificationManager;
 import org.mule.management.stats.AllStatistics;
+import org.mule.util.lock.LockFactory;
 import org.mule.util.queue.QueueManager;
 
 import java.io.Serializable;
@@ -300,5 +301,14 @@ public interface MuleContext extends Lifecycle
      * @return 
      */
     ExpressionLanguage getExpressionLanguage();
+
+    /**
+     * Factory for creating locks for synchronizing mule components.
+     *
+     * Synchronization must be done using LockFactory locks in order for mule components to work in single servers as in a cluster
+     *
+     * @return a factory for creating locks
+     */
+    LockFactory getLockFactory();
 }
 

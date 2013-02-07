@@ -33,7 +33,7 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.util.SerializationUtils;
 import org.mule.util.concurrent.Latch;
-import org.mule.util.lock.MuleLockManager;
+import org.mule.util.lock.MuleLockFactory;
 import org.mule.util.lock.SingleServerLockProvider;
 
 import java.io.Serializable;
@@ -86,11 +86,11 @@ public class IdempotentRedeliveryPolicyTestCase extends AbstractMuleTestCase
                 return mockFailingMessageProcessor.process((MuleEvent) invocationOnMock.getArguments()[0]);
             }
         });
-        MuleLockManager muleLockManager = new MuleLockManager();
-        muleLockManager.setMuleContext(mockMuleContext);
+        MuleLockFactory muleLockFactory = new MuleLockFactory();
+        muleLockFactory.setMuleContext(mockMuleContext);
         when(mockMuleContext.getRegistry().get(MuleProperties.OBJECT_LOCK_PROVIDER)).thenReturn(new SingleServerLockProvider());
-        muleLockManager.initialise();
-        when(mockMuleContext.getRegistry().get(MuleProperties.OBJECT_LOCK_MANAGER)).thenReturn(muleLockManager);
+        muleLockFactory.initialise();
+        when(mockMuleContext.getLockFactory()).thenReturn(muleLockFactory);
         when(mockMuleContext.getRegistry().get(MuleProperties.OBJECT_STORE_MANAGER)).thenReturn(mockObjectStoreManager);
         final InMemoryObjectStore inMemoryObjectStore = new InMemoryObjectStore();
         when(mockObjectStoreManager.getObjectStore(anyString(), anyBoolean(), anyInt(), anyInt(), anyInt())).thenAnswer(new Answer<ObjectStore>()

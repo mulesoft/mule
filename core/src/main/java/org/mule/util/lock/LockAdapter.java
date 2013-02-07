@@ -10,6 +10,8 @@
 package org.mule.util.lock;
 
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
 
 /**
  * Implementation of {@link Lock} that delegates the locking mechanism to
@@ -33,6 +35,18 @@ public class LockAdapter implements Lock
     }
 
     @Override
+    public void lockInterruptibly() throws InterruptedException
+    {
+        lockGroup.lockInterruptibly(lockId);
+    }
+
+    @Override
+    public boolean tryLock()
+    {
+        return lockGroup.tryLock(lockId);
+    }
+
+    @Override
     public boolean tryLock(long timeout, TimeUnit timeUnit) throws InterruptedException
     {
         return lockGroup.tryLock(lockId, timeout, timeUnit);
@@ -42,5 +56,11 @@ public class LockAdapter implements Lock
     public void unlock()
     {
         lockGroup.unlock(lockId);
+    }
+
+    @Override
+    public Condition newCondition()
+    {
+        throw new UnsupportedOperationException("Operation not supported by mule locks");
     }
 }

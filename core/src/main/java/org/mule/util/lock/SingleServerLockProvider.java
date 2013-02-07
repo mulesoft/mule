@@ -9,7 +9,7 @@
  */
 package org.mule.util.lock;
 
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
@@ -20,28 +20,7 @@ public class SingleServerLockProvider implements LockProvider
     @Override
     public Lock createLock(String lockId)
     {
-        return new Lock()
-        {
-            private ReentrantLock reentrantLock = new ReentrantLock(true);
-            
-            @Override
-            public void lock()
-            {
-                reentrantLock.lock();
-            }
-
-            @Override
-            public boolean tryLock(long timeout, TimeUnit timeUnit) throws InterruptedException
-            {
-                return reentrantLock.tryLock(timeout,timeUnit);
-            }
-
-            @Override
-            public void unlock()
-            {
-                reentrantLock.unlock();
-            }
-        };
+        return new ReentrantLock(true);
     }
 
     @Override

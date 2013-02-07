@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.Lock;
 
 /**
  * {@link LockGroup} implementation for holding references
@@ -100,6 +101,61 @@ public class InstanceLockGroup implements LockGroup
             }
         }
         return lockAcquired;
+    }
+
+    @Override
+    public boolean tryLock(String lockId)
+    {
+        LockEntry lockEntry;
+        synchronized (lockAccessMonitor)
+        {
+            if (locks.containsKey(lockId))
+            {
+                lockEntry = locks.get(lockId);
+            }
+            else
+            {
+                lockEntry = new LockEntry(lockProvider.createLock(lockId));
+                locks.put(lockId,lockEntry);
+            }
+            lockEntry.incrementLockCount();
+            lockAccessMonitor.notifyAll();
+        }
+        boolean lockAcquired = lockEntry.getLock().tryLock();
+        if (!lockAcquired)
+        {
+            synchronized (lockAccessMonitor)
+            {
+                lockEntry.decrementLockCount();
+                if (!lockEntry.hasPendingLocks())
+                {
+                    locks.remove(lockId);
+                    lockProvider.destroyLock(lockEntry.getLock());
+                }
+            }
+        }
+        return lockAcquired;
+    }
+
+    @Override
+    public void lockInterruptibly(String lockId) throws InterruptedException
+    {
+        LockEntry lockEntry;
+        synchronized (lockAccessMonitor)
+        {
+            if (locks.containsKey(lockId))
+            {
+                lockEntry = locks.get(lockId);
+            }
+            else
+            {
+                lockEntry = new LockEntry(lockProvider.createLock(lockId));
+                locks.put(lockId,lockEntry);
+            }
+            lockEntry.incrementLockCount();
+            lockAccessMonitor.notifyAll();
+        }
+        lockEntry.getLock().lockInterruptibly();
     }
 
     public static class LockEntry

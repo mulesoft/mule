@@ -9,10 +9,12 @@
  */
 package org.mule.util.lock;
 
+import java.util.concurrent.locks.Lock;
+
 /**
  * Provides abstraction in the creation and destruction of Mule locks.
  *
- * {@link LockManager} uses instances of this interface to create and destroy locks.
+ * {@link LockFactory} uses instances of this interface to create and destroy locks.
  *
  * Lock implementation can be changed by replacing the LockProvider in the mule registry.
  */

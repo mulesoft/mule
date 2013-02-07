@@ -24,17 +24,17 @@ import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.transformer.simple.ByteArrayToHexString;
 import org.mule.transformer.simple.ObjectToByteArray;
-import org.mule.util.lock.Lock;
+import org.mule.util.lock.LockFactory;
 import org.mule.util.store.ObjectStorePartition;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.InputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.Lock;
 
-import org.mule.util.lock.LockManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Implement a retry policy for Mule.  This is similar to JMS retry policies that will redeliver a message a maximum
@@ -53,7 +53,7 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy
     private String messageDigestAlgorithm;
     private String idExpression;
     private ObjectStore<AtomicInteger> store;
-    private LockManager lockManager;
+    private LockFactory lockFactory;
     private String idrId;
 
     @Override
@@ -103,7 +103,7 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy
         String appName = muleContext.getConfiguration().getId();
         String flowName = flowConstruct.getName();
         idrId = String.format("%s-%s-%s",appName,flowName,"idr");
-        lockManager = ((LockManager)muleContext.getRegistry().get(MuleProperties.OBJECT_LOCK_MANAGER));
+        lockFactory = muleContext.getLockFactory();
         store = createStore();
     }
 
@@ -174,7 +174,7 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy
             exceptionSeen = true;
         }
 
-        Lock lock = lockManager.getLock(idrId+"-"+messageId);
+        Lock lock = lockFactory.createLock(idrId + "-" + messageId);
         lock.lock();
         try
         {

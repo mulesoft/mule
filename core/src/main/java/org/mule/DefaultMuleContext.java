@@ -65,6 +65,7 @@ import org.mule.util.ServerStartupSplashScreen;
 import org.mule.util.SplashScreen;
 import org.mule.util.SystemUtils;
 import org.mule.util.UUID;
+import org.mule.util.lock.LockFactory;
 import org.mule.util.queue.QueueManager;
 
 import java.io.Serializable;
@@ -141,6 +142,8 @@ public class DefaultMuleContext implements MuleContext
     private SingleResourceTransactionFactoryManager singleResourceTransactionFactoryManager = new SingleResourceTransactionFactoryManager();
 
     private TransactionManager transactionManager;
+
+    private LockFactory lockFactory;
 
     public DefaultMuleContext(MuleConfiguration config,
                               WorkManager workManager,
@@ -825,5 +828,15 @@ public class DefaultMuleContext implements MuleContext
     public ExpressionLanguage getExpressionLanguage()
     {
         return registryBroker.lookupObject(MuleProperties.OBJECT_EXPRESSION_LANGUAGE);
+    }
+
+    @Override
+    public LockFactory getLockFactory()
+    {
+        if (this.lockFactory == null)
+        {
+            this.lockFactory = registryBroker.get(MuleProperties.OBJECT_LOCK_FACTORY);
+        }
+        return this.lockFactory;
     }
 }

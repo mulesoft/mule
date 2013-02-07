@@ -16,12 +16,14 @@ import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 
-public class MuleLockManager implements LockManager, MuleContextAware, Initialisable, Disposable
+import java.util.concurrent.locks.Lock;
+
+public class MuleLockFactory implements LockFactory, MuleContextAware, Initialisable, Disposable
 {
     private LockGroup lockGroup;
     private MuleContext muleContext;
 
-    public synchronized Lock getLock(String lockId)
+    public synchronized Lock createLock(String lockId)
     {
         return new LockAdapter(lockId,lockGroup);
     }
