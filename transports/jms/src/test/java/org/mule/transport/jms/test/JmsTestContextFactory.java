@@ -12,11 +12,14 @@ package org.mule.transport.jms.test;
 
 import org.mule.tck.jndi.TestContextFactory;
 
+import java.util.Hashtable;
+
 import javax.naming.Context;
 import javax.naming.NamingException;
 
 public class JmsTestContextFactory extends TestContextFactory
 {
+    public static boolean failWhenRetrievingInitialContext = false;
 
     @Override
     protected void populateTestData(Context context) throws NamingException
@@ -25,4 +28,23 @@ public class JmsTestContextFactory extends TestContextFactory
         context.bind("jms/connectionFactory", new TestConnectionFactory());
     }
 
+    @Override
+    public Context getInitialContext(Hashtable environment) throws NamingException
+    {
+        if (failWhenRetrievingInitialContext)
+        {
+            throw new NamingException("Initial context not ready");
+        }
+        return super.getInitialContext(environment);
+    }
+
+    @Override
+    public Context getInitialContext() throws NamingException
+    {
+        if (failWhenRetrievingInitialContext)
+        {
+            throw new NamingException("Initial context not ready");
+        }
+        return super.getInitialContext();
+    }
 }

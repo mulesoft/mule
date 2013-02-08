@@ -85,7 +85,7 @@ public class IdempotentRedeliveryPolicyTestCase extends AbstractMuleTestCase
         when(mockMuleContext.getRegistry().get(MuleProperties.OBJECT_LOCK_FACTORY)).thenReturn(new ServerLockFactory());
         when(mockMuleContext.getRegistry().get(MuleProperties.OBJECT_STORE_MANAGER)).thenReturn(mockObjectStoreManager);
         InMemoryObjectStore inMemoryObjectStore = new InMemoryObjectStore();
-        when(mockObjectStoreManager.getObjectStore(anyString(), anyBoolean(), anyInt(), anyInt(), anyInt())).thenReturn(inMemoryObjectStore);
+        when(mockObjectStoreManager.getObjectStore(anyString(), anyBoolean(), anyInt(), anyInt(), anyInt())).thenReturn((ObjectStore)inMemoryObjectStore);
         when(event.getMessage()).thenReturn(message);
         irp.setMaxRedeliveryCount(MAX_REDELIVERY_COUNT);
         irp.setUseSecureHash(true);

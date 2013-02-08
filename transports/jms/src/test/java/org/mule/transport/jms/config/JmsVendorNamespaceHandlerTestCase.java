@@ -27,6 +27,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * Tests the "jms" namespace for vendor-specific configs.
@@ -50,6 +51,7 @@ public class JmsVendorNamespaceHandlerTestCase extends FunctionalTestCase
     {
         JmsConnector c = (JmsConnector) muleContext.getRegistry()
             .lookupConnector("activeMqConnectorDefaults");
+        c.connect();
         assertNotNull(c);
         assertTrue(c instanceof ActiveMQJmsConnector);
 
@@ -63,6 +65,14 @@ public class JmsVendorNamespaceHandlerTestCase extends FunctionalTestCase
     public void testActiveMqBrokerURL() throws Exception
     {
         JmsConnector c = (JmsConnector) muleContext.getRegistry().lookupConnector("activeMqConnectorBroker");
+        try
+        {
+            c.connect();
+        }
+        catch (Exception e)
+        {
+            //Connection will fail due there's no broker but the connection factory will be created.
+        }
         assertNotNull(c);
         assertTrue(c instanceof ActiveMQJmsConnector);
 

@@ -10,6 +10,7 @@
 
 package org.mule.transport.jms;
 
+import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleRuntimeException;
@@ -193,7 +194,7 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
     {
         super(context);
     }
-    
+
     public String getProtocol()
     {
         return JMS;
@@ -201,22 +202,7 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
 
     @Override
     protected void doInitialise() throws InitialisationException
-    {        
-        try
-        {
-            connectionFactory = this.createConnectionFactory();
-        }
-        catch (NamingException ne)
-        {
-            throw new InitialisationException(JmsMessages.errorCreatingConnectionFactory(), ne, this);
-        }
-
-        if ((connectionFactoryProperties != null) && !connectionFactoryProperties.isEmpty())
-        {
-            // apply connection factory properties
-            BeanUtils.populateWithoutFail(connectionFactory, connectionFactoryProperties, true);
-        }
-
+    {
         if (topicResolver == null)
         {
             topicResolver = new DefaultJmsTopicResolver(this);
@@ -233,7 +219,7 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
                 public void onNotification(ConnectionNotification notification)
                 {
                     if (notification.getAction() == ConnectionNotification.CONNECTION_DISCONNECTED
-                            || notification.getAction() == ConnectionNotification.CONNECTION_FAILED)
+                        || notification.getAction() == ConnectionNotification.CONNECTION_FAILED)
                     {
                         // Remove all dispatchers as any cached session will be invalidated
                         clearDispatchers();
@@ -281,7 +267,7 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
         return result;
     }
 
-    protected ConnectionFactory createConnectionFactory() throws InitialisationException, NamingException
+    protected ConnectionFactory createConnectionFactory() throws NamingException, MuleException
     {
         // if an initial factory class was configured that takes precedence over the 
         // spring-configured connection factory or the one that our subclasses may provide
@@ -300,8 +286,8 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
             }
             else
             {
-                throw new InitialisationException(
-                        JmsMessages.invalidResourceType(ConnectionFactory.class, temp), this);
+                throw new DefaultMuleException(
+                        JmsMessages.invalidResourceType(ConnectionFactory.class, temp));
             }
         }
         else
@@ -325,12 +311,12 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
             }
             catch (Exception e)
             {
-                throw new InitialisationException(e, this);
+                throw new DefaultMuleException(e);
             }
             if (factory == null)
             {
                 // no connection factory ... give up
-                throw new InitialisationException(JmsMessages.noConnectionFactoryConfigured(), this);
+                throw new DefaultMuleException(JmsMessages.noConnectionFactoryConfigured());
             }
             return factory;
         }
@@ -409,8 +395,20 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
         }
     }
 
-    protected Connection createConnection() throws NamingException, JMSException, InitialisationException
+    protected Connection createConnection() throws MuleException, JMSException
     {
+        if (connectionFactory == null)
+        {
+            try
+            {
+                connectionFactory = this.createConnectionFactory();
+            }
+            catch (NamingException ne)
+            {
+                throw new DefaultMuleException(JmsMessages.errorCreatingConnectionFactory(), ne);
+            }
+        }
+
         ConnectionFactory cf = this.connectionFactory;
         Connection connection;
 
@@ -447,6 +445,7 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
                 connection.setExceptionListener(this);
             }
         }
+
 
 
         return connection;
@@ -494,13 +493,13 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
         }
 
         int expectedReceiverCount = isMultiConsumerReceiver ? 1 :
-                (jmsConnector.getReceivers().size() * jmsConnector.getNumberOfConcurrentTransactedReceivers());
+                                    (jmsConnector.getReceivers().size() * jmsConnector.getNumberOfConcurrentTransactedReceivers());
 
         if (logger.isDebugEnabled())
         {
             logger.debug("About to recycle myself due to remote JMS connection shutdown but need "
-                    + "to wait for all active receivers to report connection loss. Receiver count: "
-                    + (receiverReportedExceptionCount.get() + 1) + '/' + expectedReceiverCount);
+                         + "to wait for all active receivers to report connection loss. Receiver count: "
+                         + (receiverReportedExceptionCount.get() + 1) + '/' + expectedReceiverCount);
         }
 
         if (receiverReportedExceptionCount.incrementAndGet() >= expectedReceiverCount)
@@ -514,6 +513,11 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
     protected void doConnect() throws Exception
     {
         connection = createConnection();
+        if ((connectionFactoryProperties != null) && !connectionFactoryProperties.isEmpty())
+        {
+            // apply connection factory properties
+            BeanUtils.populateWithoutFail(connectionFactory, connectionFactoryProperties, true);
+        }
         if (isStarted())
         {
             connection.start();
@@ -594,7 +598,7 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
         {
             logger.debug(MessageFormat.format(
                     "Retrieved new jms session from connection: " +
-                            "topic={0}, transacted={1}, ack mode={2}, nolocal={3}: {4}",
+                    "topic={0}, transacted={1}, ack mode={2}, nolocal={3}: {4}",
                     topic, transacted, acknowledgementMode, noLocal, session));
         }
 
@@ -1030,8 +1034,8 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
         else
         {
             throw new IllegalArgumentException(
-                "JMS specification needs to be one of the defined values in JmsConstants but was: "
-                                + specification);
+                    "JMS specification needs to be one of the defined values in JmsConstants but was: "
+                    + specification);
         }
     }
 
