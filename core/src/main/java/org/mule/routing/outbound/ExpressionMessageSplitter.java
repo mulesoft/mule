@@ -89,7 +89,7 @@ public class ExpressionMessageSplitter extends AbstractRoundRobinMessageSplitter
         else
         {
             results.add(result);
-            logger.warn("Splitter only returned a single result. If this is not expected, please check your split expression");
+            logger.debug("Splitter only returned a single result. If this is not expected, please check your split expression");
         }
         return results;
     }
