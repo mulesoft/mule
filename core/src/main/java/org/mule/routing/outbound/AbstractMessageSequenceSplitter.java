@@ -139,7 +139,7 @@ public abstract class AbstractMessageSequenceSplitter extends AbstractIntercepti
         }
         if (correlationSequence == 1)
         {
-            logger.warn("Splitter only returned a single result. If this is not expected, please check your split expression");
+            logger.debug("Splitter only returned a single result. If this is not expected, please check your split expression");
         }
         return resultEvents;
     }
