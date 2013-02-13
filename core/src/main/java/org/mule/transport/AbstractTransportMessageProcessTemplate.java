@@ -27,6 +27,8 @@ import org.mule.message.processing.MessageProcessContext;
 import org.mule.message.processing.ValidationPhaseTemplate;
 import org.mule.util.ObjectUtils;
 
+import java.io.OutputStream;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -47,7 +49,7 @@ public abstract class AbstractTransportMessageProcessTemplate<MessageReceiverTyp
 
     public MuleEvent getMuleEvent() throws MuleException
     {
-        MuleMessage messageFromSource = createMessageFromSource(acquireMessage());
+        MuleMessage messageFromSource = createMessageFromSource(getOriginalMessage());
         return createEventFromMuleMessage(messageFromSource);
     }
 
@@ -145,14 +147,19 @@ public abstract class AbstractTransportMessageProcessTemplate<MessageReceiverTyp
         message.removeProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, PropertyScope.INBOUND);
     }
 
-    private MuleEvent createEventFromMuleMessage(MuleMessage muleMessage) throws MuleException
+    protected MuleEvent createEventFromMuleMessage(MuleMessage muleMessage) throws MuleException
     {
-        MuleEvent muleEvent = messageReceiver.createMuleEvent(muleMessage, null);
+        MuleEvent muleEvent = messageReceiver.createMuleEvent(muleMessage, getOutputStream());
         if (!messageReceiver.getEndpoint().isDisableTransportTransformer())
         {
             messageReceiver.applyInboundTransformers(muleEvent);
         }
         return muleEvent;
+    }
+    
+    protected OutputStream getOutputStream()
+    {
+        return null;
     }
 
     protected MuleMessage createMessageFromSource(Object message) throws MuleException
@@ -173,6 +180,7 @@ public abstract class AbstractTransportMessageProcessTemplate<MessageReceiverTyp
         return this.messageReceiver.getEndpoint();
     }
 
+    @SuppressWarnings("unchecked")
     protected ConnectorType getConnector()
     {
         return (ConnectorType) this.messageReceiver.getConnector();
