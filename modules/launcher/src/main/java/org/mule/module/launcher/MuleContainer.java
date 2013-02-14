@@ -10,21 +10,20 @@
 
 package org.mule.module.launcher;
 
-import org.mule.MuleCoreExtension;
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleException;
-import org.mule.api.lifecycle.InitialisationException;
 import org.mule.config.ExceptionHelper;
 import org.mule.config.StartupContext;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.Message;
+import org.mule.module.launcher.coreextension.DefaultMuleCoreExtensionManager;
+import org.mule.module.launcher.coreextension.MuleCoreExtensionManager;
 import org.mule.module.launcher.log4j.ApplicationAwareRepositorySelector;
 import org.mule.util.MuleUrlStreamHandlerFactory;
 import org.mule.util.StringMessageUtils;
 import org.mule.util.SystemUtils;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -32,9 +31,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.log4j.LogManager;
 
-/**
- *
- */
 public class MuleContainer
 {
 
@@ -67,8 +63,7 @@ public class MuleContainer
     private static MuleShutdownHook muleShutdownHook;
 
     protected DeploymentService deploymentService;
-    protected Map<Class<? extends MuleCoreExtension>, MuleCoreExtension> coreExtensions = new HashMap<Class<? extends MuleCoreExtension>, MuleCoreExtension>();
-    protected final MuleCoreExtensionDiscoverer muleCoreExtensionDiscoverer;
+    private final MuleCoreExtensionManager coreExtensionManager;
 
     static
     {
@@ -93,22 +88,23 @@ public class MuleContainer
 
     public MuleContainer(String[] args)
     {
-        this(args, new ClasspathMuleCoreExtensionDiscoverer(), new MuleDeploymentService());
+        this(args, new MuleDeploymentService(), new DefaultMuleCoreExtensionManager());
     }
 
-    public MuleContainer(MuleCoreExtensionDiscoverer muleCoreExtensionDiscoverer, DeploymentService deploymentService)
+    public MuleContainer(DeploymentService deploymentService, MuleCoreExtensionManager coreExtensionManager)
     {
-        this(new String[0], muleCoreExtensionDiscoverer, deploymentService);
+        this(new String[0], deploymentService, coreExtensionManager);
     }
 
     /**
      * Configure the server with command-line arguments.
      */
-    public MuleContainer(String[] args, MuleCoreExtensionDiscoverer muleCoreExtensionDiscoverer, DeploymentService deploymentService) throws IllegalArgumentException
+    public MuleContainer(String[] args, DeploymentService deploymentService, MuleCoreExtensionManager coreExtensionManager) throws IllegalArgumentException
     {
         //TODO(pablo.kraan): remove the args argument and use the already existing setters to set everything needed
-        this.muleCoreExtensionDiscoverer = muleCoreExtensionDiscoverer;
         this.deploymentService = deploymentService;
+        this.coreExtensionManager = coreExtensionManager;
+
         init(args);
     }
 
@@ -152,50 +148,15 @@ public class MuleContainer
 
         try
         {
-            initializeCoreExtensions();
-            startCoreExtensions();
+            coreExtensionManager.setDeploymentService(deploymentService);
+            coreExtensionManager.initialise();
+            coreExtensionManager.start();
 
             deploymentService.start();
         }
         catch (Throwable e)
         {
             shutdown(e);
-        }
-    }
-
-    private void initializeCoreExtensions() throws InitialisationException, DefaultMuleException
-    {
-        logger.info("Initializing core extensions");
-
-        coreExtensions = muleCoreExtensionDiscoverer.discover();
-
-        for (MuleCoreExtension extension : coreExtensions.values())
-        {
-            if (extension instanceof DeploymentServiceAware)
-            {
-                ((DeploymentServiceAware) extension).setDeploymentService(deploymentService);
-            }
-
-            if (extension instanceof MuleCoreExtensionAware)
-            {
-                ((MuleCoreExtensionAware) extension).setMuleCoreExtensions(coreExtensions);
-            }
-
-            if (extension instanceof DeploymentListener)
-            {
-                deploymentService.addDeploymentListener((DeploymentListener) extension);
-            }
-
-            extension.initialise();
-        }
-    }
-
-    private void startCoreExtensions() throws MuleException
-    {
-        logger.info("Starting core extensions");
-        for (MuleCoreExtension extension : coreExtensions.values())
-        {
-            extension.start();
         }
     }
 
@@ -249,44 +210,14 @@ public class MuleContainer
 
     public void stop() throws MuleException
     {
-        stopMuleCoreExtensions();
+        coreExtensionManager.stop();
 
         if (deploymentService != null)
         {
             deploymentService.stop();
         }
 
-        disposeCoreExtensions();
-    }
-
-    private void stopMuleCoreExtensions()
-    {
-        for (MuleCoreExtension extension : coreExtensions.values())
-        {
-            try
-            {
-                extension.stop();
-            }
-            catch (MuleException e)
-            {
-                logger.warn("Error stopping core extension: " + extension.getName(), e);
-            }
-        }
-    }
-
-    private void disposeCoreExtensions()
-    {
-        for (MuleCoreExtension extension : coreExtensions.values())
-        {
-            try
-            {
-                extension.dispose();
-            }
-            catch (Exception ex)
-            {
-                logger.fatal("Error disposing core extension " + extension.getName(), ex);
-            }
-        }
+        coreExtensionManager.dispose();
     }
 
     public Log getLogger()

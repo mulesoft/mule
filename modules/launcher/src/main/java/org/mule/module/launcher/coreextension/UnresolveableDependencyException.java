@@ -8,17 +8,17 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.launcher;
-
-import org.mule.MuleCoreExtension;
-
-import java.util.Map;
+package org.mule.module.launcher.coreextension;
 
 /**
- * Enables injection of available {@link MuleCoreExtension}.
+ * Thrown to indicate that a mule core extension dependency was not
+ * successfully resolved.
  */
-public interface MuleCoreExtensionAware
+public class UnresolveableDependencyException extends RuntimeException
 {
 
-    void setMuleCoreExtensions(Map<Class<? extends MuleCoreExtension>, MuleCoreExtension> coreExtensions);
+    public UnresolveableDependencyException(String message)
+    {
+        super(message);
+    }
 }

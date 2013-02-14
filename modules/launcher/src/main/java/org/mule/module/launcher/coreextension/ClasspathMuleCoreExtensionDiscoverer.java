@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.launcher;
+package org.mule.module.launcher.coreextension;
 
 import org.mule.MuleCoreExtension;
 import org.mule.api.DefaultMuleException;
@@ -16,7 +16,6 @@ import org.mule.util.ClassUtils;
 
 import java.net.URL;
 import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -26,8 +25,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * Discovers {@link MuleCoreExtension} definitions on that are defined in the
- * classpath using core-extensions.properties files.
+ * Discovers {@link MuleCoreExtension} classes that are defined in the
+ *  classpath using core-extensions.properties files.
  */
 public class ClasspathMuleCoreExtensionDiscoverer implements MuleCoreExtensionDiscoverer
 {
@@ -35,13 +34,13 @@ public class ClasspathMuleCoreExtensionDiscoverer implements MuleCoreExtensionDi
     public static final String SERVICE_PATH = "META-INF/services/org/mule/config/";
     public static final String CORE_EXTENSION_PROPERTIES = "core-extensions.properties";
 
-    private static Log logger = LogFactory.getLog(MuleContainer.class);
+    private static Log logger = LogFactory.getLog(ClasspathMuleCoreExtensionDiscoverer.class);
 
     @Override
-    public Map<Class<? extends MuleCoreExtension>, MuleCoreExtension> discover() throws DefaultMuleException
+    public List<MuleCoreExtension> discover() throws DefaultMuleException
     {
-        //TODO(pablo.kraan): this class was extracted from MuleContainer class. Needs some love
-        Map<Class<? extends MuleCoreExtension>, MuleCoreExtension> result = new HashMap<Class<? extends MuleCoreExtension>, MuleCoreExtension>();
+        List<MuleCoreExtension> result = new LinkedList<MuleCoreExtension>();
+
         Enumeration<?> e = ClassUtils.getResources(SERVICE_PATH + CORE_EXTENSION_PROPERTIES, getClass());
         List<Properties> extensions = new LinkedList<Properties>();
 
@@ -74,7 +73,7 @@ public class ClasspathMuleCoreExtensionDiscoverer implements MuleCoreExtensionDi
                 try
                 {
                     MuleCoreExtension extension = (MuleCoreExtension) ClassUtils.instanciateClass(extClass);
-                    result.put(extension.getClass(), extension);
+                    result.add(extension);
                 }
                 catch (Exception ex)
                 {

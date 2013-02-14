@@ -8,18 +8,15 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.launcher;
+package org.mule.module.launcher.coreextension;
 
-import org.mule.MuleCoreExtension;
-import org.mule.api.DefaultMuleException;
-
-import java.util.Map;
+import org.mule.api.lifecycle.Lifecycle;
+import org.mule.module.launcher.DeploymentServiceAware;
 
 /**
- * Defines a way to search for available {@link org.mule.MuleCoreExtension}
+ * Manages lifecycle and dependency injection for {@link org.mule.MuleCoreExtension}
  */
-public interface MuleCoreExtensionDiscoverer
+public interface MuleCoreExtensionManager extends Lifecycle, DeploymentServiceAware
 {
 
-    Map<Class<? extends MuleCoreExtension>, MuleCoreExtension> discover() throws DefaultMuleException;
 }
