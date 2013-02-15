@@ -10,10 +10,12 @@
 
 package org.mule.transport.jms.config;
 
+import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import org.mule.api.MuleException;
@@ -229,6 +231,8 @@ public class JmsNamespaceHandlerTestCase extends AbstractServiceAndFlowTestCase
     public void testJndiConnectorAtributes() throws Exception
     {
         JmsConnector connector = (JmsConnector) muleContext.getRegistry().lookupConnector("jmsJndiConnector");
+        assertThat("connection factory must be created only after connect so reconnection works when JNDI context is not yet available during start", connector.getConnectionFactory(), nullValue());
+        connector.connect();
         assertNotNull(connector);
 
         assertEquals("org.mule.transport.jms.test.JmsTestContextFactory", connector.getJndiInitialFactory());

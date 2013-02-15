@@ -20,7 +20,10 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import org.mule.api.MuleContext;
 import org.mule.api.transaction.Transaction;
+import org.mule.retry.async.AsynchronousRetryTemplate;
+import org.mule.retry.policies.RetryForeverPolicyTemplate;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.transaction.TransactionCoordination;
 
@@ -32,6 +35,7 @@ import javax.jms.JMSException;
 import javax.jms.Session;
 
 import org.junit.Test;
+import org.mockito.Answers;
 import org.mockito.Matchers;
 
 public class JmsConnectorTestCase extends AbstractMuleContextTestCase
@@ -55,6 +59,8 @@ public class JmsConnectorTestCase extends AbstractMuleContextTestCase
         connector.setClientId(CLIENT_ID1);
         connector.setJmsSupport(jmsSupport);
 
+        ConnectionFactory mockConnectionFactory = mock(ConnectionFactory.class);
+        connector.setConnectionFactory(mockConnectionFactory);
         Connection createdConnection = connector.createConnection();
 
         assertEquals(connection, createdConnection);
@@ -75,6 +81,8 @@ public class JmsConnectorTestCase extends AbstractMuleContextTestCase
         when(jmsSupport.createConnection(Matchers.<ConnectionFactory> any())).thenReturn(connection);
 
         JmsConnector connector = new JmsConnector(muleContext);
+        ConnectionFactory mockConnectionFactory = mock(ConnectionFactory.class);
+        connector.setConnectionFactory(mockConnectionFactory);
         connector.setClientId(CLIENT_ID2);
         connector.setJmsSupport(jmsSupport);
 
@@ -102,6 +110,8 @@ public class JmsConnectorTestCase extends AbstractMuleContextTestCase
         connector.setClientId(CLIENT_ID1);
         connector.setJmsSupport(jmsSupport);
 
+        ConnectionFactory mockConnectionFactory = mock(ConnectionFactory.class);
+        connector.setConnectionFactory(mockConnectionFactory);
         Connection createdConnection = connector.createConnection();
 
         assertEquals(connection, createdConnection);
