@@ -10,6 +10,13 @@
 
 package org.mule.el.mvel;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
@@ -23,6 +30,7 @@ import org.mule.api.transformer.DataType;
 import org.mule.config.MuleManifest;
 import org.mule.el.context.AppContext;
 import org.mule.el.context.MessageContext;
+import org.mule.el.function.RegexExpressionLanguageFuntion;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.transformer.types.DataTypeFactory;
 
@@ -43,6 +51,8 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
 
 import javax.activation.DataHandler;
@@ -56,12 +66,6 @@ import org.junit.runners.Parameterized.Parameters;
 import org.mockito.Mockito;
 import org.mvel2.ParserContext;
 import org.mvel2.ast.Function;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 @RunWith(Parameterized.class)
 public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase
@@ -358,6 +362,57 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase
         assertEquals(DataType.class, evaluate(DataType.class.getSimpleName()));
         assertEquals(DataTypeFactory.class, evaluate(DataTypeFactory.class.getSimpleName()));
 
+    }
+
+    static class DummyExpressionLanguageExtension implements ExpressionLanguageExtension
+    {
+        @Override
+        public void configureContext(ExpressionLanguageContext context)
+        {
+            for (int i=0; i<20; i++)
+            {
+                context.declareFunction("dummy-function-" + i, new RegexExpressionLanguageFuntion());
+            }
+        }
+    }
+
+    @Test
+    public void testConcurrentEvaluation() throws Exception
+    {
+        muleContext.getRegistry().registerObject("dummy-el-extension", new DummyExpressionLanguageExtension());
+        final int N = 100;
+        final CountDownLatch start = new CountDownLatch(1);
+        final CountDownLatch end = new CountDownLatch(N);
+        final AtomicInteger errors = new AtomicInteger(0);
+        for (int i=0; i<N; i++)
+        {
+            new Thread(new Runnable(){
+                @Override
+                public void run()
+                {
+                    try
+                    {
+                        start.await();
+                        testEvaluateString();
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                        errors.incrementAndGet();
+                    }
+                    finally
+                    {
+                        end.countDown();
+                    }
+                }
+            }, "thread-eval-" + i).start();
+        }
+        start.countDown();
+        end.await();
+        if (errors.get() > 0)
+        {
+            fail();
+        }
     }
 
     protected Object evaluate(String expression)

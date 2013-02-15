@@ -248,7 +248,7 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
 
     protected MVELExpressionLanguageContext createExpressionLanguageContext()
     {
-        MVELExpressionLanguageContext factory = new MVELExpressionLanguageContext(parserContext, muleContext);
+        MVELExpressionLanguageContext factory = new MVELExpressionLanguageContext(parserContext.createSubcontext(), muleContext);
         factory.appendFactory(new MVELExpressionLanguageContext(staticContext));
         return factory;
     }
