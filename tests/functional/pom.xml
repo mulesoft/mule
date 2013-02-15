@@ -56,6 +56,32 @@
             <scope>compile</scope>
         </dependency>
 
+        <dependency>
+            <groupId>commons-net</groupId>
+            <artifactId>commons-net</artifactId>
+            <version>${commonsNetVersion}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.ftpserver</groupId>
+            <artifactId>ftpserver-core</artifactId>
+            <version>1.0.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.ftpserver</groupId>
+            <artifactId>ftplet-api</artifactId>
+            <version>1.0.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.sshd</groupId>
+            <artifactId>sshd-core</artifactId>
+            <version>${sshCoreVersion}</version>
+        </dependency>
+        <dependency>
+            <groupId>bouncycastle</groupId>
+            <artifactId>bcprov-jdk14</artifactId>
+            <version>139</version>
+        </dependency>
+
         <!-- Unit tests -->
         <dependency>
             <groupId>org.mule</groupId>
@@ -86,5 +112,6 @@
             <artifactId>aspectjweaver</artifactId>
             <scope>test</scope>
         </dependency>
+
     </dependencies>
 </project>

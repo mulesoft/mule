@@ -151,6 +151,7 @@
         <!-- see http://www.springsource.com/security/cve-2010-1622 -->
         <springVersion>3.1.1.RELEASE</springVersion>
         <springSecurityVersion>3.1.0.RELEASE</springSecurityVersion>
+        <sshCoreVersion>0.6.0</sshCoreVersion>
         <staxUtilsVersion>20080702</staxUtilsVersion>
         <staxApiVersion>3.0.2</staxApiVersion>
         <staxonVersion>1.2</staxonVersion>

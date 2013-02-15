@@ -18,11 +18,17 @@ import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.execution.ExecutionCallback;
 import org.mule.api.execution.ExecutionTemplate;
 import org.mule.api.lifecycle.CreateException;
+import org.mule.api.lifecycle.InitialisationException;
+import org.mule.construct.Flow;
+import org.mule.processor.strategy.SynchronousProcessingStrategy;
 import org.mule.transport.AbstractPollingMessageReceiver;
 import org.mule.transport.sftp.notification.SftpNotifier;
+import org.mule.util.lock.LockFactory;
 
 import java.io.InputStream;
 import java.util.Arrays;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Lock;
 
 /**
  * <code>SftpMessageReceiver</code> polls and receives files from an sftp service
@@ -33,6 +39,8 @@ public class SftpMessageReceiver extends AbstractPollingMessageReceiver
 {
 
     private SftpReceiverRequesterUtil sftpRRUtil = null;
+    private LockFactory lockFactory;
+    private boolean poolOnPrimaryInstanceOnly;
 
     public SftpMessageReceiver(SftpConnector connector,
                                FlowConstruct flow,
@@ -81,7 +89,18 @@ public class SftpMessageReceiver extends AbstractPollingMessageReceiver
                     {
                         break;
                     }
-                    routeFile(file);
+                    Lock fileLock = lockFactory.createLock(connector.getName() + file);
+                    if (fileLock.tryLock(10, TimeUnit.MILLISECONDS))
+                    {
+                        try
+                        {
+                            routeFile(file);
+                        }
+                        catch (Exception e)
+                        {
+                            fileLock.unlock();
+                        }
+                    }
                 }
                 if (logger.isDebugEnabled())
                 {
@@ -103,9 +122,21 @@ public class SftpMessageReceiver extends AbstractPollingMessageReceiver
     }
 
     @Override
+    protected void doInitialise() throws InitialisationException
+    {
+        this.lockFactory = getConnector().getMuleContext().getLockFactory();
+        boolean synchronousProcessing = false;
+        if (getFlowConstruct() instanceof Flow)
+        {
+            synchronousProcessing = ((Flow)getFlowConstruct()).getProcessingStrategy() instanceof SynchronousProcessingStrategy;
+        }
+        this.poolOnPrimaryInstanceOnly = Boolean.valueOf(System.getProperty("mule.transport.sftp.singlepollinstance","false")) && synchronousProcessing;
+    }
+
+    @Override
     protected boolean pollOnPrimaryInstanceOnly()
     {
-        return true;
+        return poolOnPrimaryInstanceOnly;
     }
 
     protected void routeFile(final String path) throws Exception

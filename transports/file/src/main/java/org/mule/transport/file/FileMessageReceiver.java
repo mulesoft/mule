@@ -20,14 +20,18 @@ import org.mule.api.config.MuleProperties;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
+import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transport.Connector;
 import org.mule.api.transport.PropertyScope;
 import org.mule.api.execution.ExecutionCallback;
 import org.mule.api.execution.ExecutionTemplate;
+import org.mule.construct.Flow;
+import org.mule.processor.strategy.SynchronousProcessingStrategy;
 import org.mule.transport.AbstractPollingMessageReceiver;
 import org.mule.transport.ConnectException;
 import org.mule.transport.file.i18n.FileMessages;
 import org.mule.util.FileUtils;
+import org.mule.util.lock.LockFactory;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -42,6 +46,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.locks.Lock;
 
 import org.apache.commons.collections.comparators.ReverseComparator;
 
@@ -68,6 +73,8 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
     private FilenameFilter filenameFilter = null;
     private FileFilter fileFilter = null;
     private boolean forceSync;
+    private LockFactory lockFactory;
+    private boolean poolOnPrimaryInstanceOnly;
 
     public FileMessageReceiver(Connector connector,
                                FlowConstruct flowConstruct,
@@ -120,6 +127,18 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
         boolean messageFactoryConsumes = (createMuleMessageFactory() instanceof FileContentsMuleMessageFactory);
 
         forceSync = connectorIsAutoDelete && !messageFactoryConsumes && !isStreaming;
+    }
+
+    @Override
+    protected void doInitialise() throws InitialisationException
+    {
+        this.lockFactory = getConnector().getMuleContext().getLockFactory();
+        boolean synchronousProcessing = false;
+        if (getFlowConstruct() instanceof Flow)
+        {
+            synchronousProcessing = ((Flow)getFlowConstruct()).getProcessingStrategy() instanceof SynchronousProcessingStrategy;
+        }
+        this.poolOnPrimaryInstanceOnly = Boolean.valueOf(System.getProperty("mule.transport.file.singlepollinstance","false")) && synchronousProcessing;
     }
 
     @Override
@@ -184,7 +203,21 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
                 // don't process directories
                 if (file.isFile())
                 {
-                    processFile(file);
+                    Lock fileLock = lockFactory.createLock(file.getName());
+                    if (fileLock.tryLock())
+                    {
+                        try
+                        {
+                            if (file.exists())
+                            {
+                                processFile(file);
+                            }
+                        }
+                        finally
+                        {
+                            fileLock.unlock();
+                        }
+                    }
                 }
             }
         }
@@ -197,7 +230,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
     @Override
     protected boolean pollOnPrimaryInstanceOnly()
     {
-        return true;
+        return poolOnPrimaryInstanceOnly;
     }
 
     public void processFile(File file) throws MuleException

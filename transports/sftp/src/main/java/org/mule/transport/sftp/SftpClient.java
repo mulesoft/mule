@@ -250,7 +250,7 @@ public class SftpClient
         }
         catch (SftpException e)
         {
-            throw new IOException(e.getMessage());
+            throw new IOException(e);
         }
     }
 

@@ -21,7 +21,11 @@ import org.mule.api.lifecycle.CreateException;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.retry.RetryContext;
 import org.mule.api.transport.Connector;
+import org.mule.construct.Flow;
+import org.mule.processor.strategy.SynchronousProcessingStrategy;
+import org.mule.transport.AbstractConnector;
 import org.mule.transport.AbstractPollingMessageReceiver;
+import org.mule.util.lock.LockFactory;
 
 import java.io.FilenameFilter;
 import java.io.IOException;
@@ -31,6 +35,9 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import javax.resource.spi.work.Work;
 
@@ -50,6 +57,7 @@ public class FtpMessageReceiver extends AbstractPollingMessageReceiver
     // something like commons-tx
     protected final Set<String> scheduledFiles = Collections.synchronizedSet(new HashSet<String>());
     protected final Set<String> currentFiles = Collections.synchronizedSet(new HashSet<String>());
+    private boolean poolOnPrimaryInstanceOnly;
 
     public FtpMessageReceiver(Connector connector,
                               FlowConstruct flowConstruct,
@@ -73,6 +81,19 @@ public class FtpMessageReceiver extends AbstractPollingMessageReceiver
     }
 
     @Override
+    protected void doInitialise() throws InitialisationException
+    {
+        boolean synchronousProcessing = false;
+        if (getFlowConstruct() instanceof Flow)
+        {
+            synchronousProcessing = ((Flow)getFlowConstruct()).getProcessingStrategy() instanceof SynchronousProcessingStrategy;
+        }
+        this.poolOnPrimaryInstanceOnly = Boolean.valueOf(System.getProperty("mule.transport.ftp.singlepollinstance","false")) && synchronousProcessing && !((AbstractConnector)getConnector()).getReceiverThreadingProfile().isDoThreading();
+
+    }
+
+
+    @Override
     public void poll() throws Exception
     {
         FTPFile[] files = listFiles();
@@ -94,8 +115,11 @@ public class FtpMessageReceiver extends AbstractPollingMessageReceiver
 
                 if (!scheduledFiles.contains(fileName) && !currentFiles.contains(fileName))
                 {
-                    scheduledFiles.add(fileName);
-                    getWorkManager().scheduleWork(new FtpWork(fileName, file));
+                    if (!scheduledFiles.contains(fileName) && !currentFiles.contains(fileName))
+                    {
+                        scheduledFiles.add(fileName);
+                        getWorkManager().scheduleWork(new FtpWork(fileName, file));
+                    }
                 }
             }
         }
@@ -104,7 +128,7 @@ public class FtpMessageReceiver extends AbstractPollingMessageReceiver
     @Override
     protected boolean pollOnPrimaryInstanceOnly()
     {
-        return true;
+        return poolOnPrimaryInstanceOnly;
     }
 
     protected FTPFile[] listFiles() throws Exception
@@ -183,7 +207,7 @@ public class FtpMessageReceiver extends AbstractPollingMessageReceiver
         {
             logger.debug("Deleted processed file " + file.getName());
         }
-        
+
         if (connector.isStreaming())
         {
             if (!client.completePendingCommand())
@@ -265,64 +289,69 @@ public class FtpMessageReceiver extends AbstractPollingMessageReceiver
         {
             FTPClient client = null;
             MuleMessage muleMessage = null;
-            try
+            Lock lock = connector.getMuleContext().getLockFactory().createLock(file.getName());
+            if (lock.tryLock())
             {
-                client = connector.createFtpClient(endpoint);
-                final FTPClient finalClient = client;
-                currentFiles.add(name);
-                if (!connector.validateFile(file))
+                try
                 {
-                    return;
+                    client = connector.createFtpClient(endpoint);
+                    final FTPClient finalClient = client;
+                    currentFiles.add(name);
+                    if (!connector.validateFile(file))
+                    {
+                        return;
+                    }
+                    FtpMuleMessageFactory muleMessageFactory = createMuleMessageFactory(finalClient);
+                    final MuleMessage finalMessage = muleMessageFactory.create(file, endpoint.getEncoding());
+                    muleMessage = finalMessage;
+                    ExecutionTemplate<MuleEvent> executionTemplate = createExecutionTemplate();
+                    executionTemplate.execute(new ExecutionCallback<MuleEvent>()
+                    {
+                        @Override
+                        public MuleEvent process() throws Exception
+                        {
+                            routeMessage(finalMessage);
+                            return null;
+                        }
+                    });
+                    postProcess(finalClient, file, finalMessage);
                 }
-                FtpMuleMessageFactory muleMessageFactory = createMuleMessageFactory(finalClient);
-                final MuleMessage finalMessage = muleMessageFactory.create(file, endpoint.getEncoding());
-                muleMessage = finalMessage;
-                ExecutionTemplate<MuleEvent> executionTemplate = createExecutionTemplate();
-                executionTemplate.execute(new ExecutionCallback<MuleEvent>()
+                catch (MessagingException e)
                 {
-                    @Override
-                    public MuleEvent process() throws Exception
+                    //Already handled by TransactionTemplate
+                    if (!e.causedRollback())
                     {
-                        routeMessage(finalMessage);
-                        return null;
-                    }
-                });
-                postProcess(finalClient, file, finalMessage);
-            }
-            catch (MessagingException e)
-            {
-                //Already handled by TransactionTemplate
-                if (!e.causedRollback())
-                {
-                    try
-                    {
-                        postProcess(client,file,muleMessage);
-                    }
-                    catch (Exception e1)
-                    {
-                        logger.error(e);
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                getConnector().getMuleContext().getExceptionListener().handleException(e);
-            }
-            finally
-            {
-                if (client != null)
-                {
-                    try
-                    {
-                        connector.releaseFtp(endpoint.getEndpointURI(), client);
-                    }
-                    catch (Exception e)
-                    {
-                        logger.error(e);
+                        try
+                        {
+                            postProcess(client,file,muleMessage);
+                        }
+                        catch (Exception e1)
+                        {
+                            logger.error(e);
+                        }
                     }
                 }
-                currentFiles.remove(name);
-                scheduledFiles.remove(name);
+                catch (Exception e)
+                {
+                    getConnector().getMuleContext().getExceptionListener().handleException(e);
+                }
+                finally
+                {
+                    lock.unlock();
+                    if (client != null)
+                    {
+                        try
+                        {
+                            connector.releaseFtp(endpoint.getEndpointURI(), client);
+                        }
+                        catch (Exception e)
+                        {
+                            logger.error(e);
+                        }
+                    }
+                    currentFiles.remove(name);
+                    scheduledFiles.remove(name);
+                }
             }
         }
 
