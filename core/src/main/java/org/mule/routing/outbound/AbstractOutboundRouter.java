@@ -480,7 +480,7 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
      */
     protected MuleMessage cloneMessage(MuleMessage message)
     {
-        return new DefaultMuleMessage(message.getPayload(), message, muleContext);
+        return AbstractRoutingStrategy.cloneMessage(message, muleContext);
     }
 
     /**
@@ -492,8 +492,7 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
      */
     protected MuleMessage cloneMessage(MuleEvent event, MuleMessage message) throws MessagingException
     {
-        assertNonConsumableMessage(event, message);
-        return cloneMessage(message);
+        return AbstractRoutingStrategy.cloneMessage(event, message, muleContext);
     }
 
     /**
@@ -564,20 +563,4 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
         return routes;
     }
 
-    /**
-     * Asserts that the {@link MuleMessage} in the {@link MuleEvent} doesn't carry a consumable payload. This method
-     * is useful for routers which need to clone the message before dispatching the message to multiple routes.
-     *
-     * @param event The {@link MuleEvent}.
-     * @param event The {@link MuleMessage} whose payload is to be verified.
-     * @throws MessagingException If the payload of the message is consumable.
-     */
-    protected void assertNonConsumableMessage(MuleEvent event, MuleMessage message) throws MessagingException
-    {
-        DefaultMuleMessage defaultMuleMessage = (DefaultMuleMessage) message;
-        if (defaultMuleMessage.isConsumable())
-        {
-            throw new MessagingException(CoreMessages.cannotCopyStreamPayload(defaultMuleMessage.getPayload().getClass().getName()), event);
-        }
-    }
 }
