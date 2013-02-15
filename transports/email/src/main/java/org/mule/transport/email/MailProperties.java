@@ -11,8 +11,8 @@
 package org.mule.transport.email;
 
 /**
- * Mail properties that are sent on the DefaultMuleMessage when receiving a Mail Message or
- * which can be set on the endpoint or event to be added to outgoing mail
+ * Mail properties that are sent on the DefaultMuleMessage when receiving a Mail Message or which can be set
+ * on the endpoint or event to be added to outgoing mail
  */
 public interface MailProperties
 {
@@ -28,15 +28,16 @@ public interface MailProperties
     public static final String SUBJECT_PROPERTY = "subject";
     public static final String CUSTOM_HEADERS_MAP_PROPERTY = "customHeaders";
     public static final String SENT_DATE_PROPERTY = "sentDate";
-    
-    //these properties will be used to avoid conflict with the outbound SMTP properties
-    public static final String INBOUND_CONTENT_TYPE_PROPERTY = "inbound.contentType";
-    public static final String INBOUND_TO_ADDRESSES_PROPERTY = "inbound.toAddresses";
-    public static final String INBOUND_CC_ADDRESSES_PROPERTY = "inbound.ccAddresses";
-    public static final String INBOUND_BCC_ADDRESSES_PROPERTY = "inbound.bccAddresses";
-    public static final String INBOUND_FROM_ADDRESS_PROPERTY = "inbound.fromAddress";
-    public static final String INBOUND_REPLY_TO_ADDRESSES_PROPERTY = "inbound.replyToAddresses";
-    public static final String INBOUND_SUBJECT_PROPERTY = "inbound.subject";
-    public static final String INBOUND_CUSTOM_HEADERS_MAP_PROPERTY = "inbound.customHeaders";
-    public static final String INBOUND_SENT_DATE_PROPERTY = "inbound.sentDate";
+
+    // these properties will be used to avoid conflict with the outbound SMTP properties
+    public static final String INBOUND_PREFIX = "inbound.";
+    public static final String INBOUND_CONTENT_TYPE_PROPERTY = INBOUND_PREFIX + "contentType";
+    public static final String INBOUND_TO_ADDRESSES_PROPERTY = INBOUND_PREFIX + "toAddresses";
+    public static final String INBOUND_CC_ADDRESSES_PROPERTY = INBOUND_PREFIX + "ccAddresses";
+    public static final String INBOUND_BCC_ADDRESSES_PROPERTY = INBOUND_PREFIX + "bccAddresses";
+    public static final String INBOUND_FROM_ADDRESS_PROPERTY = INBOUND_PREFIX + "fromAddress";
+    public static final String INBOUND_REPLY_TO_ADDRESSES_PROPERTY = INBOUND_PREFIX + "replyToAddresses";
+    public static final String INBOUND_SUBJECT_PROPERTY = INBOUND_PREFIX + "subject";
+    public static final String INBOUND_CUSTOM_HEADERS_MAP_PROPERTY = INBOUND_PREFIX + "customHeaders";
+    public static final String INBOUND_SENT_DATE_PROPERTY = INBOUND_PREFIX + "sentDate";
 }
