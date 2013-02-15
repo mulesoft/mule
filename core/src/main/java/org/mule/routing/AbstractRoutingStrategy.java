@@ -180,7 +180,7 @@ public abstract class AbstractRoutingStrategy implements RoutingStrategy
     /**
      * Create a fresh copy of a message.
      */
-    protected MuleMessage cloneMessage(MuleMessage message)
+    public static MuleMessage cloneMessage(MuleMessage message, MuleContext muleContext)
     {
         return new DefaultMuleMessage(message.getPayload(), message, muleContext);
     }
@@ -229,4 +229,26 @@ public abstract class AbstractRoutingStrategy implements RoutingStrategy
         }
     }
 
+    public static MuleMessage cloneMessage(MuleEvent event, MuleMessage message, MuleContext muleContext) throws MessagingException
+    {
+        assertNonConsumableMessage(event, message);
+        return cloneMessage(message, muleContext);
+    }
+
+    /**
+     * Asserts that the {@link MuleMessage} in the {@link MuleEvent} doesn't carry a consumable payload. This method
+     * is useful for routers which need to clone the message before dispatching the message to multiple routes.
+     *
+     * @param event The {@link MuleEvent}.
+     * @param event The {@link MuleMessage} whose payload is to be verified.
+     * @throws MessagingException If the payload of the message is consumable.
+     */
+    protected static void assertNonConsumableMessage(MuleEvent event, MuleMessage message) throws MessagingException
+    {
+        DefaultMuleMessage defaultMuleMessage = (DefaultMuleMessage) message;
+        if (defaultMuleMessage.isConsumable())
+        {
+            throw new MessagingException(CoreMessages.cannotCopyStreamPayload(defaultMuleMessage.getPayload().getClass().getName()), event);
+        }
+    }
 }

@@ -103,9 +103,9 @@ public class FirstSuccessfulRoutingStrategy extends AbstractRoutingStrategy
         return returnEvent;
     }
 
-    private MuleEvent cloneEventForRoutinng(MuleEvent event, MessageProcessor mp)
+    private MuleEvent cloneEventForRoutinng(MuleEvent event, MessageProcessor mp) throws MessagingException
     {
-        return createEventToRoute(event, cloneMessage(event.getMessage()), mp);
+        return createEventToRoute(event, cloneMessage(event, event.getMessage(), muleContext), mp);
     }
 
 }

@@ -72,7 +72,7 @@ public class DynamicAllTestCase extends FunctionalTestCase
     public void oneRoute() throws Exception
     {
         CustomRouteResolver.routes.add(new CustomRouteResolver.AddLetterMessageProcessor("a"));
-        MuleEvent result = ((Flow) getFlowConstruct("dynamicAllResultAggregator")).process(getTestEvent(""));
+        MuleEvent result = getTestFlow().process(getTestEvent(""));
         assertThat(result.getMessage().getPayloadAsString(), is("a"));
     }
 
@@ -80,7 +80,7 @@ public class DynamicAllTestCase extends FunctionalTestCase
     public void oneRouteWithCustomResultAggregator() throws Exception
     {
         CustomRouteResolver.routes.add(new CustomRouteResolver.AddLetterMessageProcessor("a"));
-        runFlowAndAssertResponse(getTestFlow(),"a");
+        runFlowAndAssertResponse((Flow) getFlowConstruct("dynamicAllResultAggregator"),getTestEvent(""),"a");
     }
 
 
