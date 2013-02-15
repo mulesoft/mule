@@ -21,6 +21,7 @@ import org.mule.api.routing.RoutingException;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.routing.AbstractRoutingStrategy;
 
 /**
  * Simply applies a transformer before continuing on to the next router.
@@ -47,7 +48,7 @@ public class TransformerRouter extends AbstractOutboundRouter
             {
                 Object payload = transformer.transform(message.getPayload());
                 message = new DefaultMuleMessage(payload, message, muleContext);
-                propagateMagicProperties(message, message);
+                AbstractRoutingStrategy.propagateMagicProperties(message,message);
             }
             catch (TransformerException e)
             {

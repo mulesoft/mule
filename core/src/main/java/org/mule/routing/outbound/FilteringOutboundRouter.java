@@ -29,6 +29,7 @@ import org.mule.api.transformer.Transformer;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.endpoint.DynamicURIOutboundEndpoint;
 import org.mule.endpoint.MuleEndpointURI;
+import org.mule.routing.AbstractRoutingStrategy;
 import org.mule.util.TemplateParser;
 
 import java.util.HashMap;
@@ -172,17 +173,7 @@ public class FilteringOutboundRouter extends AbstractOutboundRouter implements T
                 logger.debug("Uri before parsing is: " + uri);
             }
 
-            Map<String, Object> props = new HashMap<String, Object>();
-            // Also add the endpoint properties so that users can set fallback values
-            // when the property is not set on the event
-            props.putAll(ep.getProperties());
-            for (String propertyKey : message.getOutboundPropertyNames())
-            {
-                Object value = message.getOutboundProperty(propertyKey);
-                props.put(propertyKey, value);
-            }
-
-            propagateMagicProperties(message, message);
+            AbstractRoutingStrategy.propagateMagicProperties(message,message);
 
             if (!parser.isContainsTemplate(uri))
             {
@@ -191,6 +182,15 @@ public class FilteringOutboundRouter extends AbstractOutboundRouter implements T
             }
             else
             {
+                Map<String, Object> props = new HashMap<String, Object>();
+                // Also add the endpoint properties so that users can set fallback values
+                // when the property is not set on the event
+                props.putAll(ep.getProperties());
+                for (String propertyKey : message.getOutboundPropertyNames())
+                {
+                    Object value = message.getOutboundProperty(propertyKey);
+                    props.put(propertyKey, value);
+                }
 
                 String newUriString = parser.parse(props, uri);
                 if (parser.isContainsTemplate(newUriString))

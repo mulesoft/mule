@@ -147,6 +147,8 @@ import org.mule.retry.notifiers.ConnectNotifier;
 import org.mule.retry.policies.RetryForeverPolicyTemplate;
 import org.mule.retry.policies.SimpleRetryPolicyTemplate;
 import org.mule.routing.CollectionSplitter;
+import org.mule.routing.DynamicAll;
+import org.mule.routing.DynamicFirstSuccessful;
 import org.mule.routing.ExpressionMessageInfoMapping;
 import org.mule.routing.ExpressionSplitter;
 import org.mule.routing.FirstSuccessful;
@@ -567,6 +569,10 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("first-successful", new ChildDefinitionParser("messageProcessor", FirstSuccessful.class));
         registerBeanDefinitionParser("until-successful", new ChildDefinitionParser("messageProcessor", UntilSuccessful.class));
         registerBeanDefinitionParser("round-robin", new ChildDefinitionParser("messageProcessor", RoundRobin.class));
+        registerBeanDefinitionParser("dynamic-first-successful", new RouterDefinitionParser(DynamicFirstSuccessful.class));
+        registerBeanDefinitionParser("dynamic-all", new RouterDefinitionParser(DynamicAll.class));
+        registerMuleBeanDefinitionParser("custom-route-resolver", new ParentDefinitionParser())
+                .addAlias(AbstractMuleBeanDefinitionParser.ATTRIBUTE_REF, "dynamicRouteResolver");
         registerMuleBeanDefinitionParser("dead-letter-queue", new ParentDefinitionParser()).addAlias("messageProcessor", "deadLetterQueue");
 
         registerBeanDefinitionParser("custom-router", new ChildDefinitionParser("messageProcessor"));

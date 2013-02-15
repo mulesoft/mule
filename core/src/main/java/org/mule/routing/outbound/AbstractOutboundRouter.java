@@ -41,12 +41,12 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.execution.TransactionalExecutionTemplate;
 import org.mule.management.stats.RouterStatistics;
 import org.mule.processor.AbstractMessageProcessorOwner;
+import org.mule.routing.AbstractRoutingStrategy;
 import org.mule.routing.CorrelationMode;
 import org.mule.routing.DefaultRouterResultsHandler;
 import org.mule.util.StringMessageUtils;
 import org.mule.util.SystemUtils;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -61,13 +61,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwner implements OutboundRouter
 {
-    /**
-     * These properties are automatically propagated by Mule from inbound to outbound
-     */
-    protected static List<String> magicProperties = Arrays.asList(
-        MuleProperties.MULE_CORRELATION_ID_PROPERTY, MuleProperties.MULE_CORRELATION_ID_PROPERTY,
-        MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY,
-        MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY, MuleProperties.MULE_SESSION_PROPERTY);
+
 
     /**
      * logger used by this class
@@ -506,18 +500,10 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
      * Propagates a number of internal system properties to handle correlation, session, etc. Note that in and
      * out params can be the same message object when not dealing with replies.
      *
-     * @see #magicProperties
      */
     protected void propagateMagicProperties(MuleMessage in, MuleMessage out)
     {
-        for (String name : magicProperties)
-        {
-            Object value = in.getInboundProperty(name);
-            if (value != null)
-            {
-                out.setOutboundProperty(name, value);
-            }
-        }
+        AbstractRoutingStrategy.propagateMagicProperties(in, out);
     }
 
     public void initialise() throws InitialisationException

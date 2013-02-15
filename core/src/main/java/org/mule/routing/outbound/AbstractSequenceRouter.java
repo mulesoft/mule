@@ -20,6 +20,7 @@ import org.mule.api.routing.CouldNotRouteOutboundMessageException;
 import org.mule.api.routing.RoutePathNotFoundException;
 import org.mule.api.routing.RoutingException;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.routing.AbstractRoutingStrategy;
 import org.mule.routing.CorrelationMode;
 
 import java.util.ArrayList;
@@ -67,6 +68,7 @@ public abstract class AbstractSequenceRouter extends FilteringOutboundRouter
                 OutboundEndpoint endpoint = mp instanceof OutboundEndpoint ? (OutboundEndpoint)mp : null;
                 if (endpoint == null || endpoint.getFilter() == null || (endpoint.getFilter() != null && endpoint.getFilter().accept(message)))
                 {
+                    AbstractRoutingStrategy.validateMessageIsNotConsumable(event,message);
                     MuleMessage clonedMessage = cloneMessage(event, message);
 
                     MuleEvent result = sendRequest(event, clonedMessage, mp, true);

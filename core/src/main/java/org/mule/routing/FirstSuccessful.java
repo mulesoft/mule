@@ -10,13 +10,11 @@
 
 package org.mule.routing;
 
-import org.mule.VoidMuleEvent;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.CouldNotRouteOutboundMessageException;
 import org.mule.routing.filters.ExpressionFilter;
 import org.mule.routing.outbound.AbstractOutboundRouter;
@@ -30,22 +28,14 @@ import org.mule.routing.outbound.AbstractOutboundRouter;
 public class FirstSuccessful extends AbstractOutboundRouter
 {
 
+    private RoutingStrategy routingStrategy;
     protected String failureExpression;
-    protected ExpressionFilter failureExpressionFilter;
 
     @Override
     public void initialise() throws InitialisationException
     {
         super.initialise();
-        if (failureExpression != null)
-        {
-            failureExpressionFilter = new ExpressionFilter(failureExpression);
-        }
-        else
-        {
-            failureExpressionFilter = new ExpressionFilter("exception-type:");
-        }
-        failureExpressionFilter.setMuleContext(muleContext);
+        routingStrategy = new FirstSuccessfulRoutingStrategy(muleContext, failureExpression);
     }
 
     /**
@@ -54,56 +44,14 @@ public class FirstSuccessful extends AbstractOutboundRouter
     @Override
     public MuleEvent route(MuleEvent event) throws MessagingException
     {
-        MuleEvent returnEvent = null;
-
-        boolean failed = true;
-        Exception failExceptionCause = null;
-        for (MessageProcessor mp : routes)
+        try
         {
-            try
-            {
-                MuleEvent toProcess = cloneEventForRouting(event, mp);
-                returnEvent = mp.process(toProcess);
-
-                if (returnEvent == null || VoidMuleEvent.getInstance().equals(returnEvent))
-                {
-                    failed = false;
-                }
-                else
-                {
-                    MuleMessage msg = returnEvent.getMessage();
-                    failed = msg == null || failureExpressionFilter.accept(msg);
-                }
-            }
-            catch (Exception ex)
-            {
-                failed = true;
-                failExceptionCause = ex;
-            }
-            if (!failed)
-            {
-                break;
-            }
+            return routingStrategy.route(event,getRoutes());
         }
-
-        if (failed)
+        catch (RoutingFailedMessagingException exception)
         {
-            if (failExceptionCause != null)
-            {
-                throw new CouldNotRouteOutboundMessageException(event, this, failExceptionCause);
-            }
-            else
-            {
-                throw new CouldNotRouteOutboundMessageException(event, this);
-            }
+            throw new CouldNotRouteOutboundMessageException(event, this);
         }
-
-        return returnEvent;
-    }
-
-    protected MuleEvent cloneEventForRouting(MuleEvent event, MessageProcessor mp) throws MessagingException
-    {
-        return createEventToRoute(event, cloneMessage(event, event.getMessage()), mp);
     }
 
     @Override

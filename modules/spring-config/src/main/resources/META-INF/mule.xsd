@@ -6290,6 +6290,83 @@
         </xsd:complexType>
     </xsd:element>
 
+    <xsd:element name="dynamic-all" substitutionGroup="abstract-routing-message-processor">
+        <xsd:annotation>
+            <xsd:documentation>
+                Sends the same message to multiple message processors or outbound endpoints. THe list of message processors is obtained dynamically using the configured route resolver
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexType>
+            <xsd:complexContent>
+                <xsd:extension base="abstractDynamicRoutingMessageProcessor">
+                    <xsd:sequence>
+                        <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded"/>
+                    </xsd:sequence>
+                </xsd:extension>
+            </xsd:complexContent>
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:element name="dynamic-first-successful" substitutionGroup="abstract-routing-message-processor">
+        <xsd:annotation>
+            <xsd:documentation>
+                Sends a message to a list of message processors until one processes it successfully. The list of message processors is obtained dynamically using the configured route resolver
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexType>
+            <xsd:complexContent>
+                <xsd:extension base="abstractDynamicRoutingMessageProcessor">
+                    <xsd:attribute name="failureExpression" type="xsd:string">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Specifies an expression that when evaluated as determines if the processing of one a route was a failure or not.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:attribute>
+                </xsd:extension>
+            </xsd:complexContent>
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:complexType name="abstractDynamicRoutingMessageProcessor">
+        <xsd:complexContent>
+            <xsd:extension base="abstractRoutingMessageProcessorType">
+                <xsd:sequence minOccurs="1" maxOccurs="1">
+                    <xsd:element ref="abstract-dynamic-route-resolver"/>
+                </xsd:sequence>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="abstract-dynamic-route-resolver" abstract="true">
+        <xsd:annotation>
+            <xsd:documentation>
+                A placeholder for route resolver elements, which return a set of routes.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:element name="custom-route-resolver" type="customRouterResolverType"
+                 substitutionGroup="abstract-dynamic-route-resolver">
+        <xsd:annotation>
+            <xsd:documentation>
+                A mechanism to lookup routes from the service registry specifying service name and service version.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:complexType name="customRouterResolverType">
+        <xsd:complexContent>
+            <xsd:extension base="annotatedType">
+                <xsd:attribute name="ref" type="xsd:string" use="optional">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            A reference to a bean definition of a DynamicRouteResolver.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
     <!--=======================-->
     <!--  2.x Inbound Routers  -->
     <!--=======================-->

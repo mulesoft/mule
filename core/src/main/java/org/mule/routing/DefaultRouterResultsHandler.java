@@ -40,6 +40,20 @@ import org.apache.commons.collections.Predicate;
  */
 public class DefaultRouterResultsHandler implements RouterResultsHandler
 {
+    private boolean returnCollectionWithSingleResult = false;
+
+    public DefaultRouterResultsHandler()
+    {
+    }
+
+    /**
+     * @param returnCollectionWithSingleResult if a MuleMessageCollection should be return despite there's only one result event
+     */
+    public DefaultRouterResultsHandler(boolean returnCollectionWithSingleResult)
+    {
+        this.returnCollectionWithSingleResult = returnCollectionWithSingleResult;
+    }
+
     @SuppressWarnings(value = {"unchecked"})
     public MuleEvent aggregateResults(final List<MuleEvent> results,
                                       final MuleEvent previous,
@@ -62,7 +76,14 @@ public class DefaultRouterResultsHandler implements RouterResultsHandler
             }
             else if (event != null && event.getMessage() != null)
             {
-                return event;
+                if (returnCollectionWithSingleResult)
+                {
+                    return createMessageCollectionWithSingleMessage(event,muleContext);
+                }
+                else
+                {
+                    return event;
+                }
             }
             else
             {
@@ -94,6 +115,14 @@ public class DefaultRouterResultsHandler implements RouterResultsHandler
                 return createMessageCollection(nonNullResults, previous, muleContext);
             }
         }
+    }
+
+    private MuleEvent createMessageCollectionWithSingleMessage(MuleEvent event, MuleContext muleContext)
+    {
+        MuleMessageCollection coll = new DefaultMessageCollection(muleContext);
+        coll.addMessage(event.getMessage());
+        event.setMessage(coll);
+        return OptimizedRequestContext.unsafeSetEvent(event);
     }
 
     private MuleEvent createMessageCollection(final List<MuleEvent> nonNullResults,
