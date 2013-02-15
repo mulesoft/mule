@@ -5583,6 +5583,28 @@
         </xsd:complexContent>
     </xsd:complexType>
 
+    <xsd:complexType name="baseMessageFilterType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractGlobalInterceptingMessageProcessorType">
+                <xsd:attribute name="onUnaccepted" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Events that are not accepted by the filter are sent to this (optional) named message processor.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="throwOnUnaccepted" type="substitutableBoolean">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Whether to throw an exception if a message is not accepted
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+
     <xsd:element name="message-filter" type="messageFilterType"  substitutionGroup="abstract-global-intercepting-message-processor">
         <xsd:annotation>
             <xsd:documentation>
@@ -5592,7 +5614,7 @@
     </xsd:element>
     <xsd:complexType name="messageFilterType">
         <xsd:complexContent>
-            <xsd:extension base="abstractGlobalInterceptingMessageProcessorType">
+            <xsd:extension base="baseMessageFilterType">
                 <xsd:sequence>
                     <xsd:element ref="abstract-filter">
                         <xsd:annotation>
@@ -5602,20 +5624,6 @@
                         </xsd:annotation>
                     </xsd:element>
                 </xsd:sequence>
-                <xsd:attribute name="onUnaccepted" type="xsd:string">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            Events that are not accepted by the filter are sent to this (optional) named message processor.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-                <xsd:attribute name="throwOnUnaccepted" type="xsd:boolean">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            Whether to throw an exception if a message is not accepted
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
@@ -5631,7 +5639,7 @@
 
     <xsd:complexType name="idempotentMessageFilterType">
         <xsd:complexContent>
-            <xsd:extension base="abstractGlobalInterceptingMessageProcessorType">
+            <xsd:extension base="baseMessageFilterType">
                 <xsd:sequence>
                     <xsd:element ref="abstract-object-store" maxOccurs="1" minOccurs="0"/>
                 </xsd:sequence>
@@ -5649,7 +5657,6 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="throwOnUnaccepted" type="substitutableBoolean" />
                 <xsd:attribute name="storePrefix" type="substitutableName">
                     <xsd:annotation>
                         <xsd:documentation>

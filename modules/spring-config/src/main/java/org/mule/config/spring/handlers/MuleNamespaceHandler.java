@@ -540,8 +540,8 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("collection-async-reply-router", new InboundRouterDefinitionParser(SimpleCollectionAggregator.class));
 
         // Routing: Intercepting Message Processors
-        registerMuleBeanDefinitionParser("idempotent-message-filter", new MessageProcessorDefinitionParser(IdempotentMessageFilter.class)).addIgnored("name");
-        registerMuleBeanDefinitionParser("idempotent-secure-hash-message-filter", new MessageProcessorDefinitionParser(IdempotentSecureHashMessageFilter.class)).addIgnored("name");
+        registerMuleBeanDefinitionParser("idempotent-message-filter", new MessageFilterDefinitionParser(IdempotentMessageFilter.class));
+        registerMuleBeanDefinitionParser("idempotent-secure-hash-message-filter", new MessageFilterDefinitionParser(IdempotentSecureHashMessageFilter.class));
         registerBeanDefinitionParser("wire-tap", new InboundRouterDefinitionParser(WireTap.class));
         registerBeanDefinitionParser("custom-aggregator", new AggregatorDefinitionParser());
         registerBeanDefinitionParser("collection-aggregator", new AggregatorDefinitionParser(SimpleCollectionAggregator.class));

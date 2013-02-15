@@ -9,8 +9,10 @@
         http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
         http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
+    <append-string-transformer name="appendStringTransformer" message="appended"/>
+
     <flow name="inMemoryStore">
-        <idempotent-message-filter idExpression="#[message:id]">
+        <idempotent-message-filter idExpression="#[Rmessage:id]">
             <in-memory-store entryTTL="1000" expirationInterval="2000" maxEntries="3000"/>
         </idempotent-message-filter>
     </flow>
@@ -39,4 +41,9 @@
             <spring-object-store ref="objectStore" />
         </idempotent-message-filter>
     </flow>
+
+    <flow name="idempotentFilterWithOnUnacceptedMP">
+        <idempotent-message-filter onUnaccepted="appendStringTransformer"/>
+    </flow>
+
  </mule>
