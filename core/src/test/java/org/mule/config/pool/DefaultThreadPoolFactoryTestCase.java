@@ -20,6 +20,7 @@ import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
 
@@ -44,5 +45,8 @@ public class DefaultThreadPoolFactoryTestCase extends AbstractMuleContextTestCas
         ScheduledThreadPoolExecutor scheduledPool = (ScheduledThreadPoolExecutor) executorService;
         assertThat(scheduledPool.getContinueExistingPeriodicTasksAfterShutdownPolicy(), is(false));
         assertThat(scheduledPool.getExecuteExistingDelayedTasksAfterShutdownPolicy(), is(true));
+        assertThat(scheduledPool.getMaximumPoolSize(), is(threadingProfile.getMaxThreadsActive()));
+        assertThat(scheduledPool.getCorePoolSize(), is(threadingProfile.getMaxThreadsIdle()));
+        assertThat(scheduledPool.getKeepAliveTime(TimeUnit.MILLISECONDS),is(threadingProfile.getThreadTTL()));
     }
 }

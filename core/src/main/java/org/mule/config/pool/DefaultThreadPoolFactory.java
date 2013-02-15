@@ -131,6 +131,7 @@ public class DefaultThreadPoolFactory extends ThreadPoolFactory
         scheduledThreadPoolExecutor.setExecuteExistingDelayedTasksAfterShutdownPolicy(true);
         scheduledThreadPoolExecutor.setKeepAliveTime(tp.getThreadTTL(), TimeUnit.MILLISECONDS);
         scheduledThreadPoolExecutor.setCorePoolSize(tp.getMaxThreadsIdle());
+        scheduledThreadPoolExecutor.setMaximumPoolSize(tp.getMaxThreadsActive());
         return scheduledThreadPoolExecutor;
     }
 }
