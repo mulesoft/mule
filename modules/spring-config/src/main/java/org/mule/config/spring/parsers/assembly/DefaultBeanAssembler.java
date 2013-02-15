@@ -148,9 +148,9 @@ public class DefaultBeanAssembler implements BeanAssembler
         }
         else
         {
-            if (logger.isWarnEnabled())
+            if (logger.isDebugEnabled())
             {
-                logger.warn("Cannot assign "+beanDefinition.getBeanClass()+" to "+AnnotatedObject.class);
+                logger.debug("Cannot assign "+beanDefinition.getBeanClass()+" to "+AnnotatedObject.class);
             }
         }
     }
