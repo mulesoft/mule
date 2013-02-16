@@ -59,6 +59,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
 {
     public static final String COMPARATOR_CLASS_NAME_PROPERTY = "comparator";
     public static final String COMPARATOR_REVERSE_ORDER_PROPERTY = "reverseOrder";
+    public static final String MULE_TRANSPORT_FILE_SINGLEPOLLINSTANCE = "mule.transport.file.singlepollinstance";
 
     private static final List<File> NO_FILES = new ArrayList<File>();
 
@@ -138,7 +139,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
         {
             synchronousProcessing = ((Flow)getFlowConstruct()).getProcessingStrategy() instanceof SynchronousProcessingStrategy;
         }
-        this.poolOnPrimaryInstanceOnly = Boolean.valueOf(System.getProperty("mule.transport.file.singlepollinstance","false")) && synchronousProcessing;
+        this.poolOnPrimaryInstanceOnly = Boolean.valueOf(System.getProperty(MULE_TRANSPORT_FILE_SINGLEPOLLINSTANCE,"false")) || !synchronousProcessing;
     }
 
     @Override

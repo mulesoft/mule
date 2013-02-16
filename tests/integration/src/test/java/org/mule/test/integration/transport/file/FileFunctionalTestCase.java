@@ -17,7 +17,9 @@ import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.tck.functional.FunctionalTestNotification;
 import org.mule.tck.functional.FunctionalTestNotificationListener;
+import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.transport.PollingController;
+import org.mule.transport.file.FileMessageReceiver;
 import org.mule.util.FileUtils;
 import org.mule.util.IOUtils;
 
@@ -27,6 +29,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 
+import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
@@ -37,6 +40,9 @@ import static org.junit.Assert.assertTrue;
 
 public class FileFunctionalTestCase extends AbstractServiceAndFlowTestCase implements FunctionalTestNotificationListener
 {
+    @ClassRule
+    public static SystemProperty filePollOnlyOnPrimaryNode = new SystemProperty(FileMessageReceiver.MULE_TRANSPORT_FILE_SINGLEPOLLINSTANCE,"true");
+
     private Object receivedData = null;
     private boolean shouldPoll;
 

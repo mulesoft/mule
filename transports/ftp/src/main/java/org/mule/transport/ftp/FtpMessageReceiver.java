@@ -88,8 +88,7 @@ public class FtpMessageReceiver extends AbstractPollingMessageReceiver
         {
             synchronousProcessing = ((Flow)getFlowConstruct()).getProcessingStrategy() instanceof SynchronousProcessingStrategy;
         }
-        this.poolOnPrimaryInstanceOnly = Boolean.valueOf(System.getProperty("mule.transport.ftp.singlepollinstance","false")) && synchronousProcessing && !((AbstractConnector)getConnector()).getReceiverThreadingProfile().isDoThreading();
-
+        this.poolOnPrimaryInstanceOnly = Boolean.valueOf(System.getProperty("mule.transport.ftp.singlepollinstance","false")) || (!synchronousProcessing && ((AbstractConnector)getConnector()).getReceiverThreadingProfile().isDoThreading());
     }
 
 
