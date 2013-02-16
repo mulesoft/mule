@@ -9,8 +9,6 @@
  */
 package org.mule.transformer.simple;
 
-import java.text.MessageFormat;
-
 import org.mule.api.MuleMessage;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transformer.TransformerException;
@@ -18,6 +16,8 @@ import org.mule.api.transport.PropertyScope;
 import org.mule.transformer.AbstractMessageTransformer;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.AttributeEvaluator;
+
+import java.text.MessageFormat;
 
 public abstract class AbstractAddVariablePropertyTransformer extends AbstractMessageTransformer
 {
@@ -53,7 +53,7 @@ public abstract class AbstractAddVariablePropertyTransformer extends AbstractMes
             if (value == null)
             {
                 logger.info(MessageFormat.format(
-                        "Variable with key '{0}', not found on message using '{1}'. Since the value was marked optional, nothing was set on the message for this variable",
+                        "Variable with key \"{0}\", not found on message using \"{1}\". Since the value was marked optional, nothing was set on the message for this variable",
                         key, valueEvaluator.getRawValue()));
             }
             else
@@ -90,7 +90,7 @@ public abstract class AbstractAddVariablePropertyTransformer extends AbstractMes
         }
         this.valueEvaluator = new AttributeEvaluator(value);
     }
-    
+
     abstract protected PropertyScope getScope();
 
 }
