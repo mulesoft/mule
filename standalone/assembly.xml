@@ -324,6 +324,13 @@
                 <exclude>org.mule.examples:mule-example-stockquote</exclude>
                 <exclude>org.mule.tools:mule-tools-anttasks</exclude>
 
+                <!-- mule-tests-functional dependencies -->
+                <exclude>org.apache.ftpserver:ftpserver-core</exclude>
+                <exclude>org.apache.ftpserver:ftplet-api</exclude>
+                <exclude>org.apache.sshd:sshd-core</exclude>
+                <exclude>bouncycastle:bcprov-jdk14</exclude>
+                <exclude>org.apache.mina:mina-core</exclude>
+
                 <!-- lib/user -->
                 <exclude>junit:junit</exclude>
                 <exclude>xmlunit:xmlunit</exclude>
