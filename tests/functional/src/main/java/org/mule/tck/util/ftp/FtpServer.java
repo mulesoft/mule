@@ -1,3 +1,13 @@
+/*
+ * $Id$
+ * --------------------------------------------------------------------------------------
+ * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ *
+ * The software in this package is published under the terms of the CPAL v1.0
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ */
+
 package org.mule.tck.util.ftp;
 
 import org.mule.util.FileUtils;
@@ -10,13 +20,16 @@ import org.apache.ftpserver.ftplet.Ftplet;
 public class FtpServer
 {
     public static final String FTP_SERVER_BASE_DIR = "target/ftpserver";
+    
     private String ftpHost;
     private int ftpPort;
     private String ftpUser;
     private String ftpPassword;
     private Server server;
     private FtpClient ftpClient;
-    private Ftplet ftplet = new MuleFtplet(new MuleFtplet.Callback(){
+    
+    private Ftplet ftplet = new MuleFtplet(new MuleFtplet.Callback()
+    {
         @Override
         public void fileUploadCompleted()
         {
@@ -95,6 +108,4 @@ public class FtpServer
             server.stop();
         }
     }
-
-
 }
