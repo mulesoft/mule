@@ -10,7 +10,9 @@
 
 package org.mule.transport.http;
 
+import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 
 import org.mule.api.endpoint.EndpointBuilder;
@@ -19,12 +21,15 @@ import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
 import org.mule.api.transport.MessageReceiver;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
+import org.mule.message.processing.MessageProcessContext;
 import org.mule.transport.AbstractMessageReceiverTestCase;
 import org.mule.transport.http.transformers.MuleMessageToHttpResponse;
 import org.mule.util.CollectionUtils;
 
+import org.hamcrest.core.Is;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
 
 public class HttpMessageReceiverTestCase extends AbstractMessageReceiverTestCase
 {
@@ -74,5 +79,13 @@ public class HttpMessageReceiverTestCase extends AbstractMessageReceiverTestCase
     public void testProcessResourcePropertyRelativePath()
     {
         assertEquals("client/name", httpMessageReceiver.processRelativePath(CONTEXT_PATH, CLIENT_NAME_PATH));
+    }
+
+    @Test
+    public void messageSourceIsEndpointNotMessageReceiver()
+    {
+        HttpServerConnection mockHttpServerConnection = Mockito.mock(HttpServerConnection.class);
+        MessageProcessContext messageContext = httpMessageReceiver.createMessageContext(mockHttpServerConnection);
+        assertThat((InboundEndpoint) messageContext.getMessageSource(), is(httpMessageReceiver.getEndpoint()));
     }
 }

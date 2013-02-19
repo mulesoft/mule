@@ -56,9 +56,8 @@ public abstract class AbstractTransportMessageProcessTemplate<MessageReceiverTyp
     @Override
     public MessageSource getMessageSource()
     {
-        return this.messageReceiver;
+        return this.messageReceiver.getEndpoint();
     }
-
 
     @Override
     public Object getOriginalMessage() throws MuleException
