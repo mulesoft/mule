@@ -17,6 +17,7 @@ import java.io.Serializable;
 
 public class QueueConfiguration
 {
+    public final static int INFINITY_CAPACTY = 0;
     protected final int capacity;
     protected final QueueStore<Serializable> objectStore;
 
@@ -72,5 +73,10 @@ public class QueueConfiguration
     public boolean isPersistent()
     {
         return objectStore.isPersistent();
+    }
+
+    public int getCapacity()
+    {
+        return capacity;
     }
 }
