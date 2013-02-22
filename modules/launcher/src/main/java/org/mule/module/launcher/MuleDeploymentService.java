@@ -252,10 +252,7 @@ public class MuleDeploymentService implements DeploymentService
     @Override
     public void stop()
     {
-        if (appDirMonitorTimer != null)
-        {
-            appDirMonitorTimer.shutdownNow();
-        }
+        stopAppDirMonitorTimer();
 
         // tear down apps in reverse order
         Collections.reverse(applications);
@@ -272,6 +269,25 @@ public class MuleDeploymentService implements DeploymentService
             }
         }
 
+    }
+
+    private void stopAppDirMonitorTimer()
+    {
+        if (appDirMonitorTimer != null)
+        {
+            appDirMonitorTimer.shutdown();
+            while (!appDirMonitorTimer.isTerminated())
+            {
+                try
+                {
+                    Thread.sleep(50);
+                }
+                catch (InterruptedException e)
+                {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
     }
 
     @Override
