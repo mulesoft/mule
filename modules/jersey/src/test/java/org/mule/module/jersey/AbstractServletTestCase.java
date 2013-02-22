@@ -11,28 +11,30 @@
 package org.mule.module.jersey;
 
 import static org.junit.Assert.assertEquals;
+import org.mule.api.MuleMessage;
+import org.mule.api.config.MuleProperties;
+import org.mule.module.client.MuleClient;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.transport.http.HttpConnector;
+import org.mule.transport.http.HttpConstants;
+import org.mule.transport.servlet.MuleReceiverServlet;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.ServletContext;
 
+import org.junit.Rule;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.servlet.Context;
 import org.mortbay.jetty.servlet.ServletHolder;
-import org.mule.api.MuleMessage;
-import org.mule.api.config.MuleProperties;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
-import org.mule.transport.http.HttpConnector;
-import org.mule.transport.http.HttpConstants;
-import org.mule.transport.servlet.MuleReceiverServlet;
 
 public abstract class AbstractServletTestCase extends AbstractServiceAndFlowTestCase
 {
 
-    //TODO(pablo.kraan): replace with a dynamic endpoint
-    public static final int HTTP_PORT = 63088;
+    @Rule
+    public DynamicPort httpPort = new DynamicPort("httpPort");
 
     private Server httpServer;
     private String context;
@@ -48,7 +50,7 @@ public abstract class AbstractServletTestCase extends AbstractServiceAndFlowTest
     {
         super.doSetUp();
 
-        httpServer = new Server(HTTP_PORT);
+        httpServer = new Server(httpPort.getNumber());
 
         Context root = new Context(httpServer,"/",Context.SESSIONS);
         ServletHolder holder = new ServletHolder(MuleReceiverServlet.class);

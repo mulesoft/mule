@@ -36,6 +36,6 @@ public class RootServletTestCase extends AbstractServletTestCase
     @Test
     public void testBasic() throws Exception
     {
-        doTestBasic("http://localhost:63088/base");
+        doTestBasic("http://localhost:" + httpPort.getNumber() + "/base");
     }
 }

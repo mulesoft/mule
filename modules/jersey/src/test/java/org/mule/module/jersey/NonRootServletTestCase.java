@@ -35,6 +35,6 @@ public class NonRootServletTestCase extends AbstractServletTestCase
     @Test
     public void testBasic() throws Exception
     {
-        doTestBasic("http://localhost:63088/context/base");
+        doTestBasic("http://localhost:" + httpPort.getNumber() + "/context/base");
     }
 }
