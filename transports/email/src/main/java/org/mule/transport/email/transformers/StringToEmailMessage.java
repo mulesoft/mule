@@ -112,7 +112,7 @@ public class StringToEmailMessage extends AbstractMessageTransformer
 
         try
         {
-            Message email = new MimeMessage(((SmtpConnector) endpoint.getConnector()).getSessionDetails(endpoint).getSession());
+            MimeMessage email = new MimeMessage(((SmtpConnector) endpoint.getConnector()).getSessionDetails(endpoint).getSession());
 
             email.setRecipients(Message.RecipientType.TO, MailUtils.stringToInternetAddresses(to));
 
@@ -139,7 +139,7 @@ public class StringToEmailMessage extends AbstractMessageTransformer
                 email.setReplyTo(MailUtils.stringToInternetAddresses(replyTo));
             }
 
-            email.setSubject(subject);
+            email.setSubject(subject, outputEncoding);
 
             for (Iterator iterator = headers.entrySet().iterator(); iterator.hasNext();)
             {
