@@ -276,16 +276,13 @@ public class MuleDeploymentService implements DeploymentService
         if (appDirMonitorTimer != null)
         {
             appDirMonitorTimer.shutdown();
-            while (!appDirMonitorTimer.isTerminated())
+            try
             {
-                try
-                {
-                    Thread.sleep(50);
-                }
-                catch (InterruptedException e)
-                {
-                    throw new RuntimeException(e);
-                }
+                appDirMonitorTimer.awaitTermination(DEFAULT_CHANGES_CHECK_INTERVAL_MS, TimeUnit.MILLISECONDS);
+            }
+            catch (InterruptedException e)
+            {
+                throw new RuntimeException(e);
             }
         }
     }
