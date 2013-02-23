@@ -14,6 +14,8 @@ import org.mule.api.MuleMessage;
 import org.mule.api.transport.PropertyScope;
 import org.mule.config.i18n.CoreMessages;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 public class MessagePropertyMapContext extends AbstractMapContext<String, Object>
@@ -89,4 +91,15 @@ public class MessagePropertyMapContext extends AbstractMapContext<String, Object
         message.clearProperties(propertyScope);
     }
 
+    @Override
+    public String toString()
+    {
+        Map<String, Object> map = new HashMap<String, Object>();
+        for (String key : message.getPropertyNames(propertyScope))
+        {
+            Object value = message.getProperty(key, propertyScope);
+            map.put(key, value);
+        }
+        return map.toString();
+    }
 }

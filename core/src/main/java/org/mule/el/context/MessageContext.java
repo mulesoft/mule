@@ -21,9 +21,9 @@ import javax.activation.DataHandler;
 
 /**
  * Exposes information about the current Mule message:
- * 
+ *
  * <li> <b>id</b>                    <i>The unique message id</i>
- * <li> <b>rootId</b>                <i>The root message id.  The id of the message before being split into parts. 
+ * <li> <b>rootId</b>                <i>The root message id.  The id of the message before being split into parts.
  *                                      If was is not split then this value is the same as the id.</i>
  * <li> <b>correlationId</b>         <i>The message correlationId.</i>
  * <li> <b>correlationSequence</b>   <i>The message correlation sequence number.</i>
@@ -125,4 +125,9 @@ public class MessageContext
         return new OutboundAttachmentMapContext(message);
     }
 
+    @Override
+    public String toString()
+    {
+        return message.toString();
+    }
 }
