@@ -30,8 +30,9 @@ import org.mule.transport.jdbc.store.JdbcObjectStore;
  */
 public class JdbcNamespaceHandler extends AbstractMuleNamespaceHandler
 {
+
     public static final String QUERY_KEY = "queryKey";
-    public static final String[] ADDRESS_ATTRIBUTES = new String[]{QUERY_KEY};
+    public static final String[] ADDRESS_ATTRIBUTES = new String[] {QUERY_KEY};
     public static final String SQL_STATEMENT_FACTORY_PROPERTY = "sqlStatementStrategyFactory";
 
     @Override
@@ -55,8 +56,10 @@ public class JdbcNamespaceHandler extends AbstractMuleNamespaceHandler
     {
         registerDerbyDataSourceDefinitionParser();
         registerMysqlDataSourceDefinitionParser();
-        registerOracleDataSourceDefinitionParser();
+        registerInstanceDatasource("oracle-data-source", OracleDataSourceFactoryBean.class);
         registerPostgresqlDataSourceDefinitionParser();
+        registerDb2DataSourceDefinitionParser();
+        registerInstanceDatasource("mssql-data-source", MssqlDatasourceFactoryBean.class);
     }
 
     protected void registerDerbyDataSourceDefinitionParser()
@@ -72,38 +75,56 @@ public class JdbcNamespaceHandler extends AbstractMuleNamespaceHandler
     protected void registerMysqlDataSourceDefinitionParser()
     {
         registerHostAndPortTypeDefinitionParser(MysqlDataSourceFactoryBean.class,
-            "mysql-data-source");
+                                                "mysql-data-source");
     }
 
-    protected void registerOracleDataSourceDefinitionParser()
+    protected void registerDb2DataSourceDefinitionParser()
     {
-        DataSourceDefinitionParser parser = new DataSourceDefinitionParser(OracleDataSourceFactoryBean.class);
+        DataSourceDefinitionParser parser = new DataSourceDefinitionParser(Db2DatasourceFactoryBean.class);
 
+        // make sure that either url or host/port are configured
         String[][] attributeGroups = new String[][] {
-            new String[] { "url" },
-            new String[] { "host", "port", "instance" }
+                new String[] {"url"},
+                new String[] {"host", "port", "database"}
         };
         CheckExclusiveAttributes attributeCheck = new CheckExclusiveAttributes(attributeGroups);
         parser.registerPreProcessor(attributeCheck);
 
-        registerBeanDefinitionParser("oracle-data-source", parser);
+        // make sure that either url or database is configured
+        parser.registerPreProcessor(new CheckDatabaseOrUrl());
+
+        registerBeanDefinitionParser("db2-data-source", parser);
+    }
+
+    private void registerInstanceDatasource(String elementName, Class<? extends AbstractDataSourceFactoryBean> poolFactoryClass)
+    {
+        DataSourceDefinitionParser parser = new DataSourceDefinitionParser(poolFactoryClass);
+
+        String[][] attributeGroups = new String[][] {
+                new String[] {"url"},
+                new String[] {"host", "port", "instance"}
+        };
+        CheckExclusiveAttributes attributeCheck = new CheckExclusiveAttributes(attributeGroups);
+        parser.registerPreProcessor(attributeCheck);
+
+        registerBeanDefinitionParser(elementName, parser);
     }
 
     protected void registerPostgresqlDataSourceDefinitionParser()
     {
         registerHostAndPortTypeDefinitionParser(PostgresqlDataSourceFactoryBean.class,
-            "postgresql-data-source");
+                                                "postgresql-data-source");
     }
 
     protected void registerHostAndPortTypeDefinitionParser(Class<? extends AbstractDataSourceFactoryBean> poolFactoryClass,
-        String elementName)
+                                                           String elementName)
     {
         DataSourceDefinitionParser parser = new DataSourceDefinitionParser(poolFactoryClass);
 
         // make sure that either url or host/port are configured
         String[][] attributeGroups = new String[][] {
-            new String[] { "url" },
-            new String[] { "host", "port" }
+                new String[] {"url"},
+                new String[] {"host", "port"}
         };
         CheckExclusiveAttributes attributeCheck = new CheckExclusiveAttributes(attributeGroups);
         parser.registerPreProcessor(attributeCheck);

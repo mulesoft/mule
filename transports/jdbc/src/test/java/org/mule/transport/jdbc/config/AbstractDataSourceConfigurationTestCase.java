@@ -10,14 +10,13 @@
 
 package org.mule.transport.jdbc.config;
 
+import static org.junit.Assert.fail;
 import org.mule.api.MuleException;
 import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.context.MuleContextFactory;
 import org.mule.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.context.DefaultMuleContextFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
-
-import static org.junit.Assert.fail;
 
 public class AbstractDataSourceConfigurationTestCase extends AbstractMuleTestCase
 {

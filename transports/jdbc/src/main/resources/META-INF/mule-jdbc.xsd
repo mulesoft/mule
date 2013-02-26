@@ -497,4 +497,64 @@
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
+
+    <xsd:element name="db2-data-source" type="db2DataSourceType" substitutionGroup="mule:abstract-extension"/>
+
+    <xsd:complexType name="db2DataSourceType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractDataSourceMandatoryUserAndPasswordType">
+                <xsd:attribute name="host" type="xsd:string" use="optional">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Allows to configure just the host part of the JDBC URL (and leave the rest of the default JDBC URL untouched).
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="port" type="xsd:int" use="optional">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Allows to configure just the port part of the JDBC URL (and leave the rest of the default JDBC URL untouched).
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="database" type="xsd:string" use="optional">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Allows to configure just the database part of the JDBC URL (and leave the rest of the default JDBC URL untouched). When no server/port are defined, database points to a native component and requires native libraries.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="mssql-data-source" type="mssqlDataSourceType" substitutionGroup="mule:abstract-extension"/>
+
+    <xsd:complexType name="mssqlDataSourceType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractDataSourceMandatoryUserAndPasswordType">
+                <xsd:attribute name="host" type="xsd:string" use="optional">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Allows to configure just the host part of the JDBC URL (and leave the rest of the default JDBC URL untouched).
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="port" type="xsd:int" use="optional">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Allows to configure just the port part of the JDBC URL (and leave the rest of the default JDBC URL untouched).
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="instance" type="xsd:string" use="optional">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Allows to configure just the instance part of the JDBC URL (and leave the rest of the default JDBC URL untouched). If not specified, the default instance is used
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
 </xsd:schema>
