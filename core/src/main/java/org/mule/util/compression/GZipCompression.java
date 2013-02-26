@@ -12,7 +12,6 @@ package org.mule.util.compression;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
@@ -116,11 +115,6 @@ public class GZipCompression implements CompressionStrategy
         }
     }
 
-    public InputStream compressInputStream(InputStream is) throws IOException
-    {
-        return new GZIPCompressorInputStream(is);
-    }
-
     /**
      * Used for uncompressing a byte array into a uncompressed byte array using GZIP
      * 
@@ -189,11 +183,6 @@ public class GZipCompression implements CompressionStrategy
             IOUtils.closeQuietly(bais);
             IOUtils.closeQuietly(baos);
         }
-    }
-
-    public InputStream uncompressInputStream(InputStream is) throws IOException
-    {
-        return new GZIPInputStream(is);
     }
 
 }

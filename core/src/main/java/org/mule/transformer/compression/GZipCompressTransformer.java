@@ -12,6 +12,7 @@ package org.mule.transformer.compression;
 
 import org.mule.api.transformer.TransformerException;
 import org.mule.transformer.types.DataTypeFactory;
+import org.mule.util.IOUtils;
 import org.mule.util.SerializationUtils;
 import org.mule.util.compression.GZipCompression;
 
@@ -32,8 +33,7 @@ public class GZipCompressTransformer extends AbstractCompressionTransformer
         this.registerSourceType(DataTypeFactory.create(Serializable.class));
         this.registerSourceType(DataTypeFactory.BYTE_ARRAY);
         this.registerSourceType(DataTypeFactory.INPUT_STREAM);
-        // No type checking for the return type by default. It could either be a byte array or an input stream.
-        this.setReturnDataType(DataTypeFactory.OBJECT);
+        this.setReturnDataType(DataTypeFactory.BYTE_ARRAY);
     }
 
     @Override
@@ -41,23 +41,28 @@ public class GZipCompressTransformer extends AbstractCompressionTransformer
     {
         try
         {
-            if (src instanceof InputStream)
+            byte[] data = null;
+            if (src instanceof byte[])
             {
-                return getStrategy().compressInputStream((InputStream) src);
+                data = (byte[]) src;
+            }
+            else if (src instanceof InputStream)
+            {
+                InputStream input = (InputStream)src;
+                try
+                {
+                    data = IOUtils.toByteArray(input);
+                }
+                finally
+                {
+                    input.close();
+                }
             }
             else
             {
-                byte[] data;
-                if (src instanceof byte[])
-                {
-                    data = (byte[]) src;
-                }
-                else
-                {
-                    data = SerializationUtils.serialize((Serializable) src);
-                }
-                return getStrategy().compressByteArray(data);
+                data = SerializationUtils.serialize((Serializable) src);
             }
+            return this.getStrategy().compressByteArray(data);
         }
         catch (IOException ioex)
         {
