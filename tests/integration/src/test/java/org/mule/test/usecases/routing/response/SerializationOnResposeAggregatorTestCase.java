@@ -66,6 +66,7 @@ public class SerializationOnResposeAggregatorTestCase extends FunctionalTestCase
         {
             return new TestObjectStore<Serializable>();
         }
+
     }
 
     private static class TestObjectStore<T extends Serializable> extends SimpleMemoryObjectStore

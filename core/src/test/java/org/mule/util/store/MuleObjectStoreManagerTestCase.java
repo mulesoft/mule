@@ -1,12 +1,3 @@
-/*
- * $Id$
- * --------------------------------------------------------------------------------------
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
- * The software in this package is published under the terms of the CPAL v1.0
- * license, a copy of which has been included with this distribution in the
- * LICENSE.txt file.
- */
 package org.mule.util.store;
 
 import static org.hamcrest.core.Is.is;
@@ -37,6 +28,8 @@ public class MuleObjectStoreManagerTestCase extends AbstractMuleContextTestCase
     public static final String OBJECT_KEY_VALUE_2 = "anotherValue";
     private final ObjectStoreFactory objectStoreFactory;
 
+    private enum ObjectStoreType {DEFAULT,USER};
+
     public MuleObjectStoreManagerTestCase(ObjectStoreFactory objectStoreFactory)
     {
         this.objectStoreFactory = objectStoreFactory;
@@ -46,8 +39,10 @@ public class MuleObjectStoreManagerTestCase extends AbstractMuleContextTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][] {
-                {new ObjectStoreFactory(false)},
-                {new ObjectStoreFactory(true)}
+                /*{new ObjectStoreFactory(false,ObjectStoreType.DEFAULT)},
+                {new ObjectStoreFactory(true,ObjectStoreType.DEFAULT)},
+                {new ObjectStoreFactory(false,ObjectStoreType.USER)},*/
+                {new ObjectStoreFactory(true,ObjectStoreType.USER)}
         });
     }
 
@@ -123,11 +118,13 @@ public class MuleObjectStoreManagerTestCase extends AbstractMuleContextTestCase
     private static class ObjectStoreFactory
     {
         private final boolean isPersistent;
+        private final ObjectStoreType objectStoreType;
         private MuleObjectStoreManager muleObjectStoreManager;
 
-        public ObjectStoreFactory(boolean isPersistent)
+        public ObjectStoreFactory(boolean isPersistent, ObjectStoreType objectStoreType)
         {
             this.isPersistent = isPersistent;
+            this.objectStoreType = objectStoreType;
         }
 
         public void setMuleObjectStoreManager(MuleObjectStoreManager muleObjectStoreManager)
@@ -137,12 +134,26 @@ public class MuleObjectStoreManagerTestCase extends AbstractMuleContextTestCase
 
         public <T extends ObjectStore<? extends Serializable>> T createObjectStore(String name)
         {
-            return muleObjectStoreManager.getObjectStore(name,isPersistent);
+            if (objectStoreType.equals(ObjectStoreType.USER))
+            {
+                return muleObjectStoreManager.getUserObjectStore(name,isPersistent);
+            }
+            else
+            {
+                return muleObjectStoreManager.getObjectStore(name,isPersistent);
+            }
         }
 
         public <T extends ObjectStore<? extends Serializable>> T createObjectStore(String name, int maxEntries, int entryTTL, int expirationInterval)
         {
-            return muleObjectStoreManager.getObjectStore(name,isPersistent, maxEntries, entryTTL, expirationInterval);
+            if (objectStoreType.equals(ObjectStoreType.USER))
+            {
+                return muleObjectStoreManager.getUserObjectStore(name,isPersistent, maxEntries, entryTTL, expirationInterval);
+            }
+            else
+            {
+                return muleObjectStoreManager.getObjectStore(name,isPersistent, maxEntries, entryTTL, expirationInterval);
+            }
         }
     }
 

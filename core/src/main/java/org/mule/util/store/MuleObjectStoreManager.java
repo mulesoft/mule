@@ -61,6 +61,17 @@ public class MuleObjectStoreManager
         return internalCreateStore(getBaseStore(isPersistent), name, maxEntries, entryTTL, expirationInterval);
     }
 
+    public <T extends ObjectStore<? extends Serializable>> T getUserObjectStore(String name, boolean isPersistent)
+    {
+        return internalCreateStore(getBaseUserStore(isPersistent), name, 0, 0, 0);
+    }
+
+    public <T extends ObjectStore<? extends Serializable>> T getUserObjectStore(String name, boolean isPersistent, int maxEntries, int entryTTL, int expirationInterval)
+    {
+        return internalCreateStore(getBaseUserStore(isPersistent), name, maxEntries, entryTTL, expirationInterval);
+    }
+
+
     @SuppressWarnings({"unchecked"})
     synchronized public <T extends ObjectStore<? extends Serializable>> T internalCreateStore(ListableObjectStore<? extends Serializable> baseStore, String name,
                                                                                               int maxEntries,
@@ -74,7 +85,7 @@ public class MuleObjectStoreManager
         T store= null;
         try
         {
-            store = this.<T>getPartitionFromBaseObjectStore(baseStore,name);
+            store = this.getPartitionFromBaseObjectStore(baseStore,name);
         }
         catch (ObjectStoreException e)
         {
@@ -89,6 +100,22 @@ public class MuleObjectStoreManager
         {
             return getMonitorablePartition(name,baseStore,store,entryTTL,maxEntries,expirationInterval);
         }
+    }
+
+    private <T extends ListableObjectStore<? extends Serializable>> T getBaseUserStore(boolean persistent)
+    {
+        T baseStore;
+        if (persistent)
+        {
+            baseStore = (T) muleContext.getRegistry().lookupObject(
+                    MuleProperties.DEFAULT_USER_PERSISTENT_OBJECT_STORE_NAME);
+        }
+        else
+        {
+            baseStore = (T) muleContext.getRegistry().lookupObject(
+                    MuleProperties.DEFAULT_USER_OBJECT_STORE_NAME);
+        }
+        return baseStore;
     }
 
     private <T extends ListableObjectStore<? extends Serializable>> T getBaseStore(boolean persistent)
