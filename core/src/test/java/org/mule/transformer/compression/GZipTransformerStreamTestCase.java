@@ -10,7 +10,11 @@
 
 package org.mule.transformer.compression;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.api.transformer.TransformerException;
+import org.mule.util.IOUtils;
 import org.mule.util.SerializationUtils;
 
 import java.io.ByteArrayInputStream;
@@ -19,23 +23,24 @@ import java.util.Arrays;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
 public class GZipTransformerStreamTestCase extends GZipTransformerTestCase
 {
     
     @Test
     public void testStreamingCompression() throws TransformerException
     {
-        GZipCompressTransformer transformer = new GZipCompressTransformer();
+        GZipCompressTransformer transformer = (GZipCompressTransformer) super.getTransformer();
         
-        InputStream input = new ByteArrayInputStream(SerializationUtils.serialize(TEST_DATA));
+        InputStream uncompressedInputStream = new ByteArrayInputStream(SerializationUtils.serialize(TEST_DATA));
 
-        byte[] expected = (byte[]) this.getResultData();
-        byte[] result = (byte[]) transformer.transform(input);
-        
-        assertTrue(Arrays.equals(expected, result));
+        // Compress input data.
+        InputStream compressedInputStream = (InputStream) transformer.transform(uncompressedInputStream);
+
+        byte[] compressedBytes = (byte[]) getResultData();
+        assertTrue(Arrays.equals(compressedBytes, IOUtils.toByteArray(compressedInputStream)));
+
+        IOUtils.closeQuietly(uncompressedInputStream);
+        IOUtils.closeQuietly(compressedInputStream);
     }
 
     @Test
@@ -43,12 +48,37 @@ public class GZipTransformerStreamTestCase extends GZipTransformerTestCase
     {
         GZipUncompressTransformer transformer = new GZipUncompressTransformer();
         transformer.setMuleContext(muleContext);
-        
-        InputStream input = new ByteArrayInputStream((byte[]) this.getResultData());
-        byte[] resultBytes = (byte[]) transformer.transform(input);
-        assertEquals(TEST_DATA, SerializationUtils.deserialize(resultBytes));
+
+        InputStream compressedInputStream = new ByteArrayInputStream((byte[]) getResultData());
+
+        // Decompress the input data.
+        InputStream decompressedInputStream = (InputStream) transformer.transform(compressedInputStream);
+
+        assertEquals(TEST_DATA, SerializationUtils.deserialize(IOUtils.toByteArray(decompressedInputStream)));
+
+        IOUtils.closeQuietly(compressedInputStream);
+        IOUtils.closeQuietly(decompressedInputStream);
     }
 
+    @Test
+    public void testStreamingCompressionDecompression() throws TransformerException
+    {
+        GZipCompressTransformer compressTransformer = (GZipCompressTransformer) super.getTransformer();
+        GZipUncompressTransformer decompressTransformer = new GZipUncompressTransformer();
+        decompressTransformer.setMuleContext(muleContext);
+
+        InputStream input = new ByteArrayInputStream(SerializationUtils.serialize(TEST_DATA));
+
+        // Compress the input data.
+        InputStream compressedInputStream = (InputStream) compressTransformer.transform(input);
+        // Decompress the input data.
+        InputStream decompressedInputStream = (InputStream) decompressTransformer.transform(compressedInputStream);
+
+        assertEquals(SerializationUtils.deserialize(IOUtils.toByteArray(decompressedInputStream)), TEST_DATA);
+
+        IOUtils.closeQuietly(compressedInputStream);
+        IOUtils.closeQuietly(decompressedInputStream);
+    }
 }
 
 
