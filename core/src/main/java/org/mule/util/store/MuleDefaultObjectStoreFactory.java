@@ -27,7 +27,7 @@ public class MuleDefaultObjectStoreFactory implements DefaultObjectStoreFactory
     @Override
     public ObjectStore<Serializable> createDefaultPersistentObjectStore()
     {
-        return new QueuePersistenceObjectStore<Serializable>();
+        return new PartitionedPersistentObjectStore<Serializable>();
     }
 
     @Override
