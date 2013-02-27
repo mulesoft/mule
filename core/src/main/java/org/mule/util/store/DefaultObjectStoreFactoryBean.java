@@ -73,7 +73,7 @@ public class DefaultObjectStoreFactoryBean
         return delegate.createDefaultPersistentQueueStore();
     }
 
-    public static Object createDefaultUserObjectStore()
+    public static ObjectStore<Serializable> createDefaultUserObjectStore()
     {
         return delegate.createDefaultUserObjectStore();
     }

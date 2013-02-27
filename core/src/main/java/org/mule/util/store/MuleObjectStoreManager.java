@@ -36,7 +36,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 public class MuleObjectStoreManager
-    implements ObjectStoreManager, MuleContextAware, Initialisable, Disposable
+        implements ObjectStoreManager, MuleContextAware, Initialisable, Disposable
 {
     MuleContext muleContext;
     ConcurrentMap<String, ObjectStore<?>> stores = new ConcurrentHashMap<String, ObjectStore<?>>();
@@ -46,40 +46,41 @@ public class MuleObjectStoreManager
     @Override
     public <T extends ObjectStore<? extends Serializable>> T getObjectStore(String name)
     {
-        return this.<T> getObjectStore(name, false);
+        return this.getObjectStore(name, false);
     }
 
     @Override
     public <T extends ObjectStore<? extends Serializable>> T getObjectStore(String name, boolean isPersistent)
     {
-        return this.<T> getObjectStore(name, isPersistent, 0, 0, 0);
+        return internalCreateStore(getBaseStore(isPersistent), name, 0, 0, 0);
     }
 
     @Override
+    public <T extends ObjectStore<? extends Serializable>> T getObjectStore(String name, boolean isPersistent, int maxEntries, int entryTTL, int expirationInterval)
+    {
+        return internalCreateStore(getBaseStore(isPersistent), name, maxEntries, entryTTL, expirationInterval);
+    }
+
     @SuppressWarnings({"unchecked"})
-    synchronized public <T extends ObjectStore<? extends Serializable>> T getObjectStore(String name,
-                                                                                         boolean isPersistent,
-                                                                                         int maxEntries,
-                                                                                         int entryTTL,
-                                                                                         int expirationInterval)
+    synchronized public <T extends ObjectStore<? extends Serializable>> T internalCreateStore(ListableObjectStore<? extends Serializable> baseStore, String name,
+                                                                                              int maxEntries,
+                                                                                              int entryTTL,
+                                                                                              int expirationInterval)
     {
         if (stores.containsKey(name))
         {
             return (T) stores.get(name);
         }
-        ListableObjectStore<?> baseStore;
-        if (isPersistent)
+        T store= null;
+        try
         {
-            baseStore = (ListableObjectStore<?>) muleContext.getRegistry().lookupObject(
-                MuleProperties.OBJECT_STORE_DEFAULT_PERSISTENT_NAME);
+            store = this.<T>getPartitionFromBaseObjectStore(baseStore,name);
         }
-        else
+        catch (ObjectStoreException e)
         {
-            baseStore = (ListableObjectStore<?>) muleContext.getRegistry().lookupObject(
-                MuleProperties.OBJECT_STORE_DEFAULT_IN_MEMORY_NAME);
+            //TODO In order to avoid breaking backward compatibility. In the future this method must throw object store creation exception
+            throw new MuleRuntimeException(e);
         }
-        T store=this.<T>getPartitionFromBaseObjectStore(baseStore,name);
-
         if (maxEntries == 0)
         {
             return putInStoreMap(name,store);
@@ -90,16 +91,36 @@ public class MuleObjectStoreManager
         }
     }
 
-    @SuppressWarnings({"rawtypes", "unchecked"})
-    private <T extends ObjectStore<? extends Serializable>> T getPartitionFromBaseObjectStore(ListableObjectStore baseStore, String partitionName)
+    private <T extends ListableObjectStore<? extends Serializable>> T getBaseStore(boolean persistent)
     {
-        if (baseStore instanceof PartitionableObjectStore)
+        T baseStore;
+        if (persistent)
         {
-            return (T) new ObjectStorePartition(partitionName, (PartitionableObjectStore) baseStore);
+            baseStore = (T) muleContext.getRegistry().lookupObject(
+                    MuleProperties.OBJECT_STORE_DEFAULT_PERSISTENT_NAME);
         }
         else
         {
-            return (T) new PartitionedObjectStoreWrapper(partitionName, muleContext, baseStore);
+            baseStore = (T) muleContext.getRegistry().lookupObject(
+                    MuleProperties.OBJECT_STORE_DEFAULT_IN_MEMORY_NAME);
+        }
+        return baseStore;
+    }
+
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    private <T extends ObjectStore<? extends Serializable>> T getPartitionFromBaseObjectStore(ListableObjectStore<? extends Serializable> baseStore, String partitionName) throws ObjectStoreException
+    {
+        if (baseStore instanceof PartitionableObjectStore)
+        {
+            ObjectStorePartition objectStorePartition = new ObjectStorePartition(partitionName, (PartitionableObjectStore) baseStore);
+            objectStorePartition.open();
+            return (T) objectStorePartition;
+        }
+        else
+        {
+            PartitionedObjectStoreWrapper partitionedObjectStoreWrapper = new PartitionedObjectStoreWrapper(partitionName, muleContext, baseStore);
+            partitionedObjectStoreWrapper.open();
+            return (T) partitionedObjectStoreWrapper;
         }
     }
 
@@ -126,7 +147,7 @@ public class MuleObjectStoreManager
             if (previous == null)
             {
                 Monitor m = new Monitor(name, (PartitionableExpirableObjectStore) baseStore, entryTTL,
-                    maxEntries);
+                                        maxEntries);
                 scheduler.scheduleWithFixedDelay(m, 0, expirationInterval, TimeUnit.MILLISECONDS);
                 return store;
             }
@@ -148,7 +169,7 @@ public class MuleObjectStoreManager
                     return (T) stores.get(name);
                 }
                 monObjectStore = new MonitoredObjectStoreWrapper((ListableObjectStore) store, maxEntries,
-                    entryTTL, expirationInterval);
+                                                                 entryTTL, expirationInterval);
                 monObjectStore.setMuleContext(muleContext);
                 try
                 {
@@ -193,7 +214,7 @@ public class MuleObjectStoreManager
     {
         scheduler = new ScheduledThreadPoolExecutor(1);
         scheduler.setThreadFactory(new DaemonThreadFactory("ObjectStoreManager-Monitor", this.getClass()
-            .getClassLoader()));
+                .getClassLoader()));
     }
 
     class Monitor implements Runnable
@@ -226,7 +247,7 @@ public class MuleObjectStoreManager
                 catch (Exception e)
                 {
                     MuleObjectStoreManager.logger.warn("Running expirty on partition " + partitionName + " of "
-                        + store + " threw " + e + ":" + e.getMessage());
+                                                       + store + " threw " + e + ":" + e.getMessage());
                 }
             }
         }

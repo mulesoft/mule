@@ -33,7 +33,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang.SerializationException;
 
@@ -119,7 +118,6 @@ public class PartitionedPersistentObjectStore<T extends Serializable> extends
         File storeFile = createStoreFile(key, partitionName);
         T result = deserialize(storeFile);
         deleteStoreFile(storeFile);
-
         return result;
     }
 
@@ -140,7 +138,6 @@ public class PartitionedPersistentObjectStore<T extends Serializable> extends
         {
             List<Serializable> keys = new ArrayList<Serializable>();
             listStoredFiles(createStorePartition(partitionName), keys);
-
             return keys;
         }
         catch (ClassNotFoundException e)
@@ -293,9 +290,10 @@ public class PartitionedPersistentObjectStore<T extends Serializable> extends
 
     protected void serialize(T value, File outputFile) throws ObjectStoreException
     {
+        FileOutputStream out = null;
         try
         {
-            FileOutputStream out = new FileOutputStream(outputFile);
+            out = new FileOutputStream(outputFile);
             SerializationUtils.serialize(value, out);
         }
         catch (SerializationException se)
@@ -306,14 +304,29 @@ public class PartitionedPersistentObjectStore<T extends Serializable> extends
         {
             throw new ObjectStoreException(fnfe);
         }
+        finally
+        {
+            if (out != null)
+            {
+                try
+                {
+                    out.close();
+                }
+                catch (Exception e)
+                {
+                    logger.warn("error closing file " + outputFile.getAbsolutePath());
+                }
+            }
+        }
     }
 
     @SuppressWarnings("unchecked")
     protected T deserialize(File file) throws ObjectStoreException
     {
+        FileInputStream in = null;
         try
         {
-            FileInputStream in = new FileInputStream(file);
+            in = new FileInputStream(file);
             return (T) SerializationUtils.deserialize(in, muleContext);
         }
         catch (SerializationException se)
@@ -323,6 +336,20 @@ public class PartitionedPersistentObjectStore<T extends Serializable> extends
         catch (FileNotFoundException fnfe)
         {
             throw new ObjectDoesNotExistException(fnfe);
+        }
+        finally
+        {
+            if (in != null)
+            {
+                try
+                {
+                    in.close();
+                }
+                catch (Exception e)
+                {
+                    logger.warn("error closing opened file " + file.getAbsolutePath());
+                }
+            }
         }
     }
 
