@@ -46,13 +46,13 @@ public class MuleObjectStoreManager
     @Override
     public <T extends ObjectStore<? extends Serializable>> T getObjectStore(String name)
     {
-        return this.<T> getObjectStore(name, false);
+        return this.getObjectStore(name, false);
     }
 
     @Override
     public <T extends ObjectStore<? extends Serializable>> T getObjectStore(String name, boolean isPersistent)
     {
-        return this.<T> internalCreateStore(getBaseStore(isPersistent), name, 0, 0, 0);
+        return internalCreateStore(getBaseStore(isPersistent), name, 0, 0, 0);
     }
 
     @Override
@@ -91,17 +91,17 @@ public class MuleObjectStoreManager
         }
     }
 
-    private ListableObjectStore<? extends Serializable> getBaseStore(boolean persistent)
+    private <T extends ListableObjectStore<? extends Serializable>> T getBaseStore(boolean persistent)
     {
-        ListableObjectStore<?> baseStore;
+        T baseStore;
         if (persistent)
         {
-            baseStore = (ListableObjectStore<? extends Serializable>) muleContext.getRegistry().lookupObject(
+            baseStore = (T) muleContext.getRegistry().lookupObject(
                     MuleProperties.OBJECT_STORE_DEFAULT_PERSISTENT_NAME);
         }
         else
         {
-            baseStore =  (ListableObjectStore<? extends Serializable>) muleContext.getRegistry().lookupObject(
+            baseStore = (T) muleContext.getRegistry().lookupObject(
                     MuleProperties.OBJECT_STORE_DEFAULT_IN_MEMORY_NAME);
         }
         return baseStore;
