@@ -62,7 +62,7 @@ public class MuleObjectStoreManager
     }
 
     @SuppressWarnings({"unchecked"})
-    synchronized public <T extends ObjectStore<? extends Serializable>> T internalCreateStore(ListableObjectStore<?> baseStore, String name,
+    synchronized public <T extends ObjectStore<? extends Serializable>> T internalCreateStore(ListableObjectStore<? extends Serializable> baseStore, String name,
                                                                                               int maxEntries,
                                                                                               int entryTTL,
                                                                                               int expirationInterval)
@@ -91,24 +91,24 @@ public class MuleObjectStoreManager
         }
     }
 
-    private ListableObjectStore<?> getBaseStore(boolean persistent)
+    private ListableObjectStore<? extends Serializable> getBaseStore(boolean persistent)
     {
         ListableObjectStore<?> baseStore;
         if (persistent)
         {
-            baseStore = (ListableObjectStore<?>) muleContext.getRegistry().lookupObject(
+            baseStore = (ListableObjectStore<? extends Serializable>) muleContext.getRegistry().lookupObject(
                     MuleProperties.OBJECT_STORE_DEFAULT_PERSISTENT_NAME);
         }
         else
         {
-            baseStore =  (ListableObjectStore<?>) muleContext.getRegistry().lookupObject(
+            baseStore =  (ListableObjectStore<? extends Serializable>) muleContext.getRegistry().lookupObject(
                     MuleProperties.OBJECT_STORE_DEFAULT_IN_MEMORY_NAME);
         }
         return baseStore;
     }
 
     @SuppressWarnings({"rawtypes", "unchecked"})
-    private <T extends ObjectStore<? extends Serializable>> T getPartitionFromBaseObjectStore(ListableObjectStore baseStore, String partitionName) throws ObjectStoreException
+    private <T extends ObjectStore<? extends Serializable>> T getPartitionFromBaseObjectStore(ListableObjectStore<? extends Serializable> baseStore, String partitionName) throws ObjectStoreException
     {
         if (baseStore instanceof PartitionableObjectStore)
         {
