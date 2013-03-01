@@ -25,6 +25,7 @@ import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionException;
 import org.mule.api.transport.MessageReceiver;
 import org.mule.common.DefaultTestResult;
+import org.mule.common.FailureType;
 import org.mule.common.TestResult;
 import org.mule.common.Testable;
 import org.mule.config.ExceptionHelper;
@@ -604,15 +605,15 @@ public class JdbcConnector extends AbstractConnector implements Testable
         catch (Exception e)
         {
         	// this surely doesn't cover all cases for all kinds of jdbc drivers but it is better than nothing
-        	TestResult.FailureType failureType = TestResult.FailureType.UNSPECIFIED;
+        	FailureType failureType = FailureType.UNSPECIFIED;
         	String msg = e.getMessage();
         	if (msg != null && msg.contains("Communications link failure"))
         	{
-        		failureType = TestResult.FailureType.CONNECTION_FAILURE;
+        		failureType = FailureType.CONNECTION_FAILURE;
         	}
         	else if (msg != null && msg.contains("Access denied for user"))
         	{
-        		failureType = TestResult.FailureType.INVALID_CREDENTIALS;
+        		failureType = FailureType.INVALID_CREDENTIALS;
         	}
             return new DefaultTestResult(TestResult.Status.FAILURE, e.getMessage(), failureType, e);
         }
