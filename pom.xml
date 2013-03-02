@@ -45,9 +45,9 @@
 
     <!-- Build -->
     <scm>
-        <connection>scm:svn:http://svn.codehaus.org/mule/branches/mule-3.x</connection>
-        <developerConnection>scm:svn:https://svn.codehaus.org/mule/branches/mule-3.x</developerConnection>
-        <url>http://svn.mule.codehaus.org</url>
+        <connection>scm:git:git://github.com/mulesoft/mule.git</connection>
+        <developerConnection>scm:git:git@github.com:mulesoft/mule.git</developerConnection>
+        <url>http://github.com/mulesoft/mule</url>
     </scm>
 
     <modules>
@@ -1934,7 +1934,7 @@
                             </execution>
                         </executions>
                         <configuration>
-                            <!-- never touch svn -->
+                            <!-- never touch vcs -->
                             <doCheck>false</doCheck>
                             <doUpdate>false</doUpdate>
                             <timestampFormat>{0,date,yyyy-MMM-dd HH:mm:ss}</timestampFormat>
