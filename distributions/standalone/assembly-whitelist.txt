@@ -126,12 +126,6 @@
 /mule-standalone-${productVersion}/examples/echo/src/main/app
 /mule-standalone-${productVersion}/examples/echo/src/main/app/adding-logging-to-a-flow.xml
 /mule-standalone-${productVersion}/examples/echo/src/main/app/mule-deploy.properties
-/mule-standalone-${productVersion}/examples/echo/src/main/java
-/mule-standalone-${productVersion}/examples/echo/src/main/java/org
-/mule-standalone-${productVersion}/examples/echo/src/main/java/org/mule
-/mule-standalone-${productVersion}/examples/echo/src/main/java/org/mule/example
-/mule-standalone-${productVersion}/examples/echo/src/main/java/org/mule/example/echo
-/mule-standalone-${productVersion}/examples/echo/src/main/resources
 /mule-standalone-${productVersion}/examples/echo/src/test
 /mule-standalone-${productVersion}/examples/echo/src/test/java
 /mule-standalone-${productVersion}/examples/echo/src/test/java/org
@@ -241,10 +235,6 @@
 /mule-standalone-${productVersion}/examples/flight-reservation/src/main/java/org/mule/example/FlightUnavailableException.java
 /mule-standalone-${productVersion}/examples/flight-reservation/src/main/java/org/mule/example/ReservationRequest.java
 /mule-standalone-${productVersion}/examples/flight-reservation/src/main/java/org/mule/example/ReservationResponse.java
-/mule-standalone-${productVersion}/examples/flight-reservation/src/main/resources
-/mule-standalone-${productVersion}/examples/flight-reservation/src/test
-/mule-standalone-${productVersion}/examples/flight-reservation/src/test/java
-/mule-standalone-${productVersion}/examples/flight-reservation/src/test/resources
 
 #
 # /examples/foreach
@@ -257,11 +247,7 @@
 /mule-standalone-${productVersion}/examples/foreach/src/main
 /mule-standalone-${productVersion}/examples/foreach/src/main/app
 /mule-standalone-${productVersion}/examples/foreach/src/main/app/mule-config.xml
-/mule-standalone-${productVersion}/examples/foreach/src/main/java
 /mule-standalone-${productVersion}/examples/foreach/src/main/resources
-/mule-standalone-${productVersion}/examples/foreach/src/test
-/mule-standalone-${productVersion}/examples/foreach/src/test/java
-/mule-standalone-${productVersion}/examples/foreach/src/test/resources
 /mule-standalone-${productVersion}/examples/foreach/src/main/resources/derby.properties
 /mule-standalone-${productVersion}/examples/foreach/src/main/resources/foreach_error.html
 /mule-standalone-${productVersion}/examples/foreach/src/main/resources/foreach_info.html
@@ -679,6 +665,7 @@
 /mule-standalone-${productVersion}/lib/opt/xmltooling-1.3.2-1.jar
 /mule-standalone-${productVersion}/lib/shared
 /mule-standalone-${productVersion}/lib/shared/default
+/mule-standalone-${productVersion}/lib/shared/default/README.txt
 /mule-standalone-${productVersion}/lib/user
 /mule-standalone-${productVersion}/lib/user/junit-4.9.jar
 /mule-standalone-${productVersion}/lib/user/mule-tests-functional-${productVersion}.jar
