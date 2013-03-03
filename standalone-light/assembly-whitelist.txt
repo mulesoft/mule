@@ -327,6 +327,7 @@
 /mule-standalone-nodocs-${productVersion}/lib/opt/xmltooling-1.3.2-1.jar
 /mule-standalone-nodocs-${productVersion}/lib/shared
 /mule-standalone-nodocs-${productVersion}/lib/shared/default
+/mule-standalone-nodocs-${productVersion}/lib/shared/default/README.txt
 /mule-standalone-nodocs-${productVersion}/lib/user
 /mule-standalone-nodocs-${productVersion}/lib/user/junit-4.9.jar
 /mule-standalone-nodocs-${productVersion}/lib/user/mule-tests-functional-${productVersion}.jar
