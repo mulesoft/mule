@@ -327,7 +327,10 @@ public class PartitionedPersistentObjectStore<T extends Serializable> extends
         try
         {
             in = new FileInputStream(file);
-            return (T) SerializationUtils.deserialize(in, muleContext);
+
+            ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+
+            return (T) SerializationUtils.deserialize(in, contextClassLoader);
         }
         catch (SerializationException se)
         {
