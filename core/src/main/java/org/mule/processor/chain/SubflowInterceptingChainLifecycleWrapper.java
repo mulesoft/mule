@@ -38,10 +38,13 @@ public class SubflowInterceptingChainLifecycleWrapper extends InterceptingChainL
         List<MessageProcessor> filteredMessageProcessorList = new ArrayList<MessageProcessor>();
         for (MessageProcessor messageProcessor : processors)
         {
-            if(messageProcessor instanceof InterceptingMessageProcessor){
+            if (messageProcessor instanceof InterceptingMessageProcessor)
+            {
                 filteredMessageProcessorList.add(messageProcessor);
                 break;
-            }else{
+            }
+            else
+            {
                 filteredMessageProcessorList.add(messageProcessor);
             }
         }

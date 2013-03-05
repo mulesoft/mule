@@ -11,10 +11,11 @@
 package org.mule.api.processor;
 
 /**
- *  Identifies Constructs that contain Message Processors configured by the user.
+ * Identifies Constructs that contain Message Processors configured by the user.
  */
 public interface MessageProcessorContainer
 {
+
     /**
      * Add the child nodes to the path element tree.
      *

@@ -10,7 +10,6 @@
 
 package org.mule.routing;
 
-import org.apache.commons.collections.ListUtils;
 import org.mule.api.AnnotatedObject;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
@@ -37,7 +36,6 @@ import org.mule.config.i18n.MessageFactory;
 import org.mule.management.stats.RouterStatistics;
 import org.mule.util.NotificationUtils;
 
-import javax.xml.namespace.QName;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -46,9 +44,14 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import javax.xml.namespace.QName;
+
+import org.apache.commons.collections.ListUtils;
+
 public abstract class AbstractSelectiveRouter
         implements SelectiveRouter, RouterStatisticsRecorder, Lifecycle, FlowConstructAware, MuleContextAware, AnnotatedObject, MessageProcessorContainer
 {
+
     private final List<MessageProcessorFilterPair> conditionalMessageProcessors = new ArrayList<MessageProcessorFilterPair>();
     private MessageProcessor defaultProcessor;
     private final RouterResultsHandler resultsHandler = new DefaultRouterResultsHandler();
@@ -178,7 +181,7 @@ public abstract class AbstractSelectiveRouter
                 MessageProcessorFilterPair addedPair = new MessageProcessorFilterPair(processor, filter);
 
                 MessageProcessorFilterPair removedPair = conditionalMessageProcessors.set(index,
-                        transitionLifecycleManagedObjectForAddition(addedPair));
+                                                                                          transitionLifecycleManagedObjectForAddition(addedPair));
 
                 transitionLifecycleManagedObjectForRemoval(removedPair);
             }
@@ -204,7 +207,7 @@ public abstract class AbstractSelectiveRouter
             return routeWithProcessor(defaultProcessor, event);
         }
 
-        if (getRouterStatistics() != null  && getRouterStatistics().isEnabled())
+        if (getRouterStatistics() != null && getRouterStatistics().isEnabled())
         {
             getRouterStatistics().incrementNoRoutedMessage();
         }
@@ -321,6 +324,7 @@ public abstract class AbstractSelectiveRouter
 
     private interface RoutesUpdater
     {
+
         void updateAt(int index);
     }
 
@@ -380,6 +384,6 @@ public abstract class AbstractSelectiveRouter
     public String toString()
     {
         return String.format("%s [flow-construct=%s, started=%s]", getClass().getSimpleName(),
-                flowConstruct != null ? flowConstruct.getName() : null, started);
+                             flowConstruct != null ? flowConstruct.getName() : null, started);
     }
 }

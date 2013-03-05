@@ -10,8 +10,6 @@
 
 package org.mule.processor;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.VoidMuleEvent;
 import org.mule.api.AnnotatedObject;
 import org.mule.api.MessagingException;
@@ -30,11 +28,15 @@ import org.mule.processor.chain.DefaultMessageProcessorChain;
 import org.mule.util.NotificationUtils;
 import org.mule.util.ObjectUtils;
 
-import javax.xml.namespace.QName;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
+import javax.xml.namespace.QName;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Abstract implementation that provides the infrastructure for intercepting message processors.
@@ -45,6 +47,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public abstract class AbstractInterceptingMessageProcessorBase
         implements MessageProcessor, MuleContextAware, AnnotatedObject, MessageProcessorContainer
 {
+
     protected Log logger = LogFactory.getLog(getClass());
 
     protected ServerNotificationHandler notificationHandler;
@@ -86,7 +89,7 @@ public abstract class AbstractInterceptingMessageProcessorBase
             if (logger.isDebugEnabled())
             {
                 logger.trace("MuleEvent is null.  Next MessageProcessor '" + next.getClass().getName()
-                        + "' will not be invoked.");
+                             + "' will not be invoked.");
             }
             return null;
         }
@@ -106,7 +109,8 @@ public abstract class AbstractInterceptingMessageProcessorBase
             try
             {
                 return executionTemplateToUse.execute(next, event);
-            } catch (MessagingException e)
+            }
+            catch (MessagingException e)
             {
                 event.getSession().setValid(false);
                 throw e;
@@ -149,7 +153,8 @@ public abstract class AbstractInterceptingMessageProcessorBase
     @Override
     public void addMessageProcessorPathElements(MessageProcessorPathElement pathElement)
     {
-        if(next instanceof InternalMessageProcessor){
+        if (next instanceof InternalMessageProcessor)
+        {
             return;
         }
         if (next instanceof MessageProcessorChain)

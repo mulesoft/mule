@@ -28,12 +28,13 @@ import java.util.List;
 
 /**
  * Selects which exception strategy to execute based on filtering.
- *
+ * <p/>
  * Exception listeners must implement {@link org.mule.api.exception.MessagingExceptionHandlerAcceptor} to be part of ChoiceMessagingExceptionStrategy
  */
 public class ChoiceMessagingExceptionStrategy extends AbstractMuleObjectOwner<MessagingExceptionHandlerAcceptor>
         implements MessagingExceptionHandlerAcceptor, MuleContextAware, Lifecycle, MessageProcessorContainer, GlobalNameableObject
 {
+
     private List<MessagingExceptionHandlerAcceptor> exceptionListeners;
 
     protected String globalName;
@@ -57,7 +58,7 @@ public class ChoiceMessagingExceptionStrategy extends AbstractMuleObjectOwner<Me
             if (exceptionListener.accept(event))
             {
                 event.getMessage().setExceptionPayload(null);
-                return exceptionListener.handleException(exception,event);
+                return exceptionListener.handleException(exception, event);
             }
         }
         throw new MuleRuntimeException(CoreMessages.createStaticMessage("Default exception strategy must accept any event."));
@@ -83,7 +84,7 @@ public class ChoiceMessagingExceptionStrategy extends AbstractMuleObjectOwner<Me
 
     private void addDefaultExceptionStrategyIfRequired() throws InitialisationException
     {
-        if (!exceptionListeners.get(exceptionListeners.size()-1).acceptsAll())
+        if (!exceptionListeners.get(exceptionListeners.size() - 1).acceptsAll())
         {
             MessagingExceptionHandler defaultExceptionStrategy;
             try
@@ -93,15 +94,16 @@ public class ChoiceMessagingExceptionStrategy extends AbstractMuleObjectOwner<Me
             catch (Exception e)
             {
                 throw new InitialisationException(CoreMessages.createStaticMessage("Failure initializing " +
-                        "choice-exception-strategy. If choice-exception-strategy is defined as default one " +
-                        "check that last exception strategy inside choice catchs all"), e, this);
+                                                                                   "choice-exception-strategy. If choice-exception-strategy is defined as default one " +
+                                                                                   "check that last exception strategy inside choice catchs all"), e, this);
             }
             this.exceptionListeners.add(new MessagingExceptionStrategyAcceptorDelegate(defaultExceptionStrategy));
         }
     }
 
     @Override
-    protected List<MessagingExceptionHandlerAcceptor> getOwnedObjects() {
+    protected List<MessagingExceptionHandlerAcceptor> getOwnedObjects()
+    {
         return Collections.unmodifiableList(exceptionListeners);
     }
 
@@ -117,10 +119,11 @@ public class ChoiceMessagingExceptionStrategy extends AbstractMuleObjectOwner<Me
         for (int i = 0; i < exceptionListeners.size(); i++)
         {
             MessagingExceptionHandler messagingExceptionHandler = exceptionListeners.get(i);
-            if (messagingExceptionHandler instanceof MessagingExceptionStrategyAcceptorDelegate) {
-                messagingExceptionHandler = ((MessagingExceptionStrategyAcceptorDelegate)messagingExceptionHandler).getExceptionListener();
+            if (messagingExceptionHandler instanceof MessagingExceptionStrategyAcceptorDelegate)
+            {
+                messagingExceptionHandler = ((MessagingExceptionStrategyAcceptorDelegate) messagingExceptionHandler).getExceptionListener();
             }
-            if (messagingExceptionHandler instanceof RollbackMessagingExceptionStrategy && ((RollbackMessagingExceptionStrategy)messagingExceptionHandler).hasMaxRedeliveryAttempts())
+            if (messagingExceptionHandler instanceof RollbackMessagingExceptionStrategy && ((RollbackMessagingExceptionStrategy) messagingExceptionHandler).hasMaxRedeliveryAttempts())
             {
                 if (rollbackWithRedelivery)
                 {
@@ -133,7 +136,7 @@ public class ChoiceMessagingExceptionStrategy extends AbstractMuleObjectOwner<Me
 
     private void validateOnlyLastAcceptsAll()
     {
-        for (int i = 0; i < exceptionListeners.size()-1; i++)
+        for (int i = 0; i < exceptionListeners.size() - 1; i++)
         {
             MessagingExceptionHandlerAcceptor messagingExceptionHandlerAcceptor = exceptionListeners.get(i);
             if (messagingExceptionHandlerAcceptor.acceptsAll())
@@ -147,7 +150,7 @@ public class ChoiceMessagingExceptionStrategy extends AbstractMuleObjectOwner<Me
     public void addMessageProcessorPathElements(MessageProcessorPathElement pathElement)
     {
         int idx = 0;
-        for(MessagingExceptionHandlerAcceptor listener : exceptionListeners)
+        for (MessagingExceptionHandlerAcceptor listener : exceptionListeners)
         {
             if (listener instanceof MessageProcessorContainer)
             {

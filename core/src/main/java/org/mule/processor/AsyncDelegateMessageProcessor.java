@@ -10,8 +10,6 @@
 
 package org.mule.processor;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.DefaultMuleEvent;
 import org.mule.VoidMuleEvent;
 import org.mule.api.MessagingException;
@@ -39,6 +37,9 @@ import org.mule.work.MuleWorkManager;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * Processes {@link MuleEvent}'s asynchronously using a {@link MuleWorkManager} to schedule asynchronous
  * processing of MessageProcessor delegate configured the next {@link MessageProcessor}. The next
@@ -48,6 +49,7 @@ import java.util.List;
 public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
         implements MessageProcessor, Initialisable, Startable, Stoppable
 {
+
     protected Log logger = LogFactory.getLog(getClass());
 
     protected MessageProcessor delegate;
@@ -81,16 +83,16 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
         StageNameSource nameSource = null;
         if (name != null)
         {
-            nameSource = ((Flow)flowConstruct).getAsyncStageNameSource(name);
+            nameSource = ((Flow) flowConstruct).getAsyncStageNameSource(name);
         }
         else
         {
-            nameSource = ((Flow)flowConstruct).getAsyncStageNameSource();
+            nameSource = ((Flow) flowConstruct).getAsyncStageNameSource();
         }
 
         MessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder(flowConstruct);
         processingStrategy.configureProcessors(Collections.singletonList(delegate), nameSource, builder,
-                muleContext);
+                                               muleContext);
         try
         {
             target = builder.build();
@@ -113,7 +115,7 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
         {
             // Clone event and make it async
             MuleEvent newEvent = new DefaultMuleEvent(
-                    (MuleMessage)((ThreadSafeAccess)event.getMessage()).newThreadCopy(), event, false);
+                    (MuleMessage) ((ThreadSafeAccess) event.getMessage()).newThreadCopy(), event, false);
             target.process(newEvent);
         }
         if (muleContext.getConfiguration().isFlowEndingWithOneWayEndpointReturnsNull())
@@ -157,6 +159,7 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
 
     class AsyncMessageProcessorWorker extends AbstractMuleEventWork
     {
+
         public AsyncMessageProcessorWorker(MuleEvent event)
         {
             super(event);

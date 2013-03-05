@@ -10,7 +10,6 @@
 
 package org.mule.routing.requestreply;
 
-import org.apache.commons.lang.BooleanUtils;
 import org.mule.VoidMuleEvent;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -21,9 +20,12 @@ import org.mule.api.processor.RequestReplyReplierMessageProcessor;
 import org.mule.api.transport.ReplyToHandler;
 import org.mule.processor.AbstractInterceptingMessageProcessor;
 
+import org.apache.commons.lang.BooleanUtils;
+
 public abstract class AbstractReplyToPropertyRequestReplyReplier extends AbstractInterceptingMessageProcessor
         implements RequestReplyReplierMessageProcessor, InternalMessageProcessor
 {
+
     @Override
     public MuleEvent process(MuleEvent event) throws MuleException
     {
@@ -39,7 +41,7 @@ public abstract class AbstractReplyToPropertyRequestReplyReplier extends Abstrac
             final String replyToStop = resultEvent.getMessage().getInvocationProperty(
                     MuleProperties.MULE_REPLY_TO_STOP_PROPERTY);
             if (resultEvent != null && !VoidMuleEvent.getInstance().equals(resultEvent)
-                    && !BooleanUtils.toBoolean(replyToStop))
+                && !BooleanUtils.toBoolean(replyToStop))
             {
                 // reply-to processing should not resurrect a dead event
                 processReplyTo(event, resultEvent, replyToHandler, replyTo);
@@ -64,7 +66,7 @@ public abstract class AbstractReplyToPropertyRequestReplyReplier extends Abstrac
             String requestor = result.getMessage().getOutboundProperty(
                     MuleProperties.MULE_REPLY_TO_REQUESTOR_PROPERTY);
             if ((requestor != null && !requestor.equals(event.getFlowConstruct().getName()))
-                    || requestor == null)
+                || requestor == null)
             {
                 replyToHandler.processReplyTo(event, result.getMessage(), replyTo);
             }

@@ -10,8 +10,6 @@
 
 package org.mule.routing;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -29,7 +27,6 @@ import org.mule.routing.outbound.AbstractMessageSequenceSplitter;
 import org.mule.routing.outbound.CollectionMessageSequence;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.NotificationUtils;
-import org.w3c.dom.Document;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -37,16 +34,20 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.w3c.dom.Document;
+
 /**
- ` * The <code>Foreach</code> MessageProcessor allows iterating over a collection payload, or any collection
+ * ` * The <code>Foreach</code> MessageProcessor allows iterating over a collection payload, or any collection
  * obtained by an expression, generating a message for each element.
- * <p>
+ * <p/>
  * The number of the message being processed is stored in <code>#[variable:counter]</code> and the root
  * message is store in <code>#[variable:rootMessage]</code>. Both variables may be renamed by means of
  * {@link #setCounterVariableName(String)} and {@link #setRootMessageVariableName(String)}.
- * <p>
+ * <p/>
  * Defining a groupSize greater than one, allows iterating over collections of elements of the specified size.
- * <p>
+ * <p/>
  * The {@link MuleEvent} sent to the next message processor is the same that arrived to foreach.
  */
 public class Foreach extends AbstractMessageProcessorOwner implements Initialisable, MessageProcessor
@@ -72,8 +73,8 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
     public MuleEvent process(MuleEvent event) throws MuleException
     {
         String parentMessageProp = rootMessageVariableName != null
-                ? rootMessageVariableName
-                : ROOT_MESSAGE_PROPERTY;
+                                   ? rootMessageVariableName
+                                   : ROOT_MESSAGE_PROPERTY;
         Object previousCounterVar = null;
         Object previousRootMessageVar = null;
         if (event.getFlowVariableNames().contains(counterVariableName))

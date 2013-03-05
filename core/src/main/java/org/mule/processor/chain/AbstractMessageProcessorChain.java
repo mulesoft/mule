@@ -10,8 +10,6 @@
 
 package org.mule.processor.chain;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.construct.FlowConstruct;
@@ -36,6 +34,9 @@ import org.mule.util.StringUtils;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * Builder needs to return a composite rather than the first MessageProcessor in the chain. This is so that if
  * this chain is nested in another chain the next MessageProcessor in the parent chain is not injected into
@@ -44,6 +45,7 @@ import java.util.List;
 public abstract class AbstractMessageProcessorChain extends AbstractInterceptingMessageProcessor
         implements MessageProcessorChain, Lifecycle, FlowConstructAware, MuleContextAware, EndpointAware, MessageProcessorContainer
 {
+
     protected final transient Log log = LogFactory.getLog(getClass());
     protected String name;
     protected List<MessageProcessor> processors;
