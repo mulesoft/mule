@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: AbstractReplyToPropertyRequestReplyReplier.java 24267 2012-04-16 07:18:01Z dfeist $
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  *
@@ -14,6 +14,7 @@ import org.mule.VoidMuleEvent;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.config.MuleProperties;
+import org.mule.api.processor.InternalMessageProcessor;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.RequestReplyReplierMessageProcessor;
 import org.mule.api.transport.ReplyToHandler;
@@ -22,8 +23,9 @@ import org.mule.processor.AbstractInterceptingMessageProcessor;
 import org.apache.commons.lang.BooleanUtils;
 
 public abstract class AbstractReplyToPropertyRequestReplyReplier extends AbstractInterceptingMessageProcessor
-    implements RequestReplyReplierMessageProcessor
+        implements RequestReplyReplierMessageProcessor, InternalMessageProcessor
 {
+
     @Override
     public MuleEvent process(MuleEvent event) throws MuleException
     {
@@ -62,7 +64,7 @@ public abstract class AbstractReplyToPropertyRequestReplyReplier extends Abstrac
         if (result != null && replyToHandler != null)
         {
             String requestor = result.getMessage().getOutboundProperty(
-                MuleProperties.MULE_REPLY_TO_REQUESTOR_PROPERTY);
+                    MuleProperties.MULE_REPLY_TO_REQUESTOR_PROPERTY);
             if ((requestor != null && !requestor.equals(event.getFlowConstruct().getName()))
                 || requestor == null)
             {

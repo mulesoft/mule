@@ -29,6 +29,37 @@
         <logger message="check"/>
     </flow>
 
+    <flow name="singleMP2">
+        <vm:inbound-endpoint path="in-single2" exchange-pattern="request-response"/>
+        <collection-splitter/>
+        <logger message="check"/>
+    </flow>
+
+    <flow name="singleMP3">
+        <vm:inbound-endpoint path="in-single3" exchange-pattern="request-response"/>
+        <collection-splitter/>
+        <logger message="check"/>
+        <logger message="check"/>
+    </flow>
+
+
+    <flow name="processorChain2">
+        <vm:inbound-endpoint path="in-processorChain2" exchange-pattern="request-response"/>
+        <processor-chain>
+            <collection-splitter/>
+            <logger message="check1"/>
+            <logger message="check2"/>
+        </processor-chain>
+    </flow>
+
+    <flow name="processorChain3">
+        <vm:inbound-endpoint path="in-processorChain3" exchange-pattern="request-response"/>
+        <processor-chain>
+            <collection-splitter/>
+            <logger message="check1"/>
+        </processor-chain>
+    </flow>
+
     <flow name="processorChain">
         <vm:inbound-endpoint path="in-processorChain" exchange-pattern="request-response"/>
         <processor-chain>
@@ -39,7 +70,7 @@
 
     <flow name="customProcessor">
         <vm:inbound-endpoint path="customProcessor" exchange-pattern="request-response"/>
-        <custom-processor class="org.mule.tck.testmodels.mule.TestMessageProcessor" />
+        <custom-processor class="org.mule.tck.testmodels.mule.TestMessageProcessor"/>
         <logger level="INFO"/>
     </flow>
 
@@ -58,6 +89,23 @@
         </choice>
     </flow>
 
+    <flow name="choice2">
+        <vm:inbound-endpoint path="in-choice2" exchange-pattern="request-response"/>
+        <choice>
+            <when expression="payload == 'test1'">
+                <collection-splitter/>
+                <logger message="check"/>
+            </when>
+            <when expression="payload == 'test2'">
+                <logger message="check"/>
+            </when>
+            <otherwise>
+                <collection-splitter/>
+                <logger message="check"/>
+            </otherwise>
+        </choice>
+    </flow>
+
     <flow name="all">
         <vm:inbound-endpoint path="in-all" exchange-pattern="request-response"/>
         <all>
@@ -68,7 +116,22 @@
                 <logger/>
             </processor-chain>
         </all>
-        <logger message="Log after a scope" />
+        <logger message="Log after a scope"/>
+    </flow>
+
+    <flow name="all2">
+        <vm:inbound-endpoint path="in-all2" exchange-pattern="request-response"/>
+        <all>
+            <processor-chain>
+                <collection-splitter/>
+                <logger message="check"/>
+            </processor-chain>
+            <processor-chain>
+                <collection-splitter/>
+                <logger message="check"/>
+            </processor-chain>
+        </all>
+        <logger message="Log after a scope"/>
     </flow>
 
     <flow name="foreach">
@@ -76,7 +139,7 @@
         <foreach collection="#[{'one','two'}]">
             <logger/>
         </foreach>
-        <logger message="Log after a scope" />
+        <logger message="Log after a scope"/>
     </flow>
 
     <flow name="enricher">
@@ -222,10 +285,10 @@
         <vm:inbound-endpoint path="fsucc" exchange-pattern="request-response"/>
         <logger level="INFO"/>
         <first-successful>
-            <http:outbound-endpoint address="http://localhost:6090/weather-forecast" />
-            <http:outbound-endpoint address="http://localhost:6091/weather-forecast" />
-            <http:outbound-endpoint address="http://localhost:6092/weather-forecast" />
-            <vm:outbound-endpoint path="dead-letter-queue" />
+            <http:outbound-endpoint address="http://localhost:6090/weather-forecast"/>
+            <http:outbound-endpoint address="http://localhost:6091/weather-forecast"/>
+            <http:outbound-endpoint address="http://localhost:6092/weather-forecast"/>
+            <vm:outbound-endpoint path="dead-letter-queue"/>
         </first-successful>
     </flow>
 
@@ -241,23 +304,24 @@
 
     <flow name="recipient-list">
         <vm:inbound-endpoint path="recipient-list" exchange-pattern="request-response"/>
-        <recipient-list enableCorrelation="ALWAYS" evaluator="payload"  expression=""/>
+        <recipient-list enableCorrelation="ALWAYS" evaluator="payload" expression=""/>
         <logger level="INFO"/>
     </flow>
 
-    <vm:endpoint name="recipient" path="recipient" />
-    
+    <vm:endpoint name="recipient" path="recipient"/>
+
     <flow name="collectionAggregator">
         <vm:inbound-endpoint path="collection-agg" exchange-pattern="request-response"/>
-        <collection-splitter />
+        <collection-splitter/>
         <logger level="INFO"/>
-        <collection-aggregator failOnTimeout="false" timeout="3600" />
+        <collection-aggregator failOnTimeout="false" timeout="3600"/>
     </flow>
-    
+
     <flow name="customAggregator">
         <vm:inbound-endpoint path="custom-agg" exchange-pattern="request-response"/>
-        <collection-splitter />
-        <custom-aggregator class="org.mule.routing.outbound.AggregationTestCase$Aggregator" timeout="2000" failOnTimeout="false"/>
+        <collection-splitter/>
+        <custom-aggregator class="org.mule.routing.outbound.AggregationTestCase$Aggregator" timeout="2000"
+                           failOnTimeout="false"/>
         <logger level="INFO"/>
     </flow>
 
@@ -271,7 +335,7 @@
 
     <flow name="combineCollections">
         <vm:inbound-endpoint path="combine" exchange-pattern="request-response"/>
-        <combine-collections-transformer />
+        <combine-collections-transformer/>
         <logger level="INFO"/>
     </flow>
 

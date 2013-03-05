@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: AbstractPipeline.java 25005 2012-11-12 16:46:53Z svacas $
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  *
@@ -20,10 +20,13 @@ import org.mule.api.construct.Pipeline;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.exception.MessagingExceptionHandlerAcceptor;
 import org.mule.api.lifecycle.LifecycleException;
+import org.mule.api.processor.DefaultMessageProcessorPathElement;
+import org.mule.api.processor.InterceptingMessageProcessor;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorBuilder;
 import org.mule.api.processor.MessageProcessorChainBuilder;
 import org.mule.api.processor.MessageProcessorContainer;
+import org.mule.api.processor.MessageProcessorPathElement;
 import org.mule.api.processor.ProcessingStrategy;
 import org.mule.api.source.ClusterizableMessageSource;
 import org.mule.api.source.CompositeMessageSource;
@@ -41,6 +44,7 @@ import org.mule.processor.strategy.SynchronousProcessingStrategy;
 import org.mule.source.ClusterizableMessageSourceWrapper;
 import org.mule.util.NotificationUtils;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -98,8 +102,8 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
             public MuleEvent process(MuleEvent event) throws MuleException
             {
                 muleContext.getNotificationManager().fireNotification(
-                    new PipelineMessageNotification(AbstractPipeline.this, event,
-                        PipelineMessageNotification.PROCESS_START));
+                        new PipelineMessageNotification(AbstractPipeline.this, event,
+                                PipelineMessageNotification.PROCESS_START));
 
                 MuleEvent result = null;
                 MessagingException exceptionThrown = null;
@@ -116,8 +120,8 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
                 {
                     MuleEvent notificationEvent = result != null ? result : event;
                     muleContext.getNotificationManager().fireNotification(
-                        new PipelineMessageNotification(AbstractPipeline.this, notificationEvent,
-                            PipelineMessageNotification.PROCESS_COMPLETE, exceptionThrown));
+                            new PipelineMessageNotification(AbstractPipeline.this, notificationEvent,
+                                    PipelineMessageNotification.PROCESS_COMPLETE, exceptionThrown));
                 }
             }
         });
@@ -131,8 +135,8 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
             public MuleEvent process(MuleEvent event) throws MuleException
             {
                 muleContext.getNotificationManager().fireNotification(
-                    new PipelineMessageNotification(AbstractPipeline.this, event,
-                        PipelineMessageNotification.PROCESS_END));
+                        new PipelineMessageNotification(AbstractPipeline.this, event,
+                                PipelineMessageNotification.PROCESS_END));
                 return event;
             }
         });
@@ -162,7 +166,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
         if (messageSource instanceof ClusterizableMessageSource)
         {
             this.messageSource = new ClusterizableMessageSourceWrapper(muleContext,
-                (ClusterizableMessageSource) messageSource, this);
+                    (ClusterizableMessageSource) messageSource, this);
         }
         else
         {
@@ -211,14 +215,14 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     protected void configureMessageProcessors(MessageProcessorChainBuilder builder) throws MuleException
     {
         getProcessingStrategy().configureProcessors(getMessageProcessors(),
-            new ProcessingStrategy.StageNameSource()
-            {
-                @Override
-                public String getName()
+                new ProcessingStrategy.StageNameSource()
                 {
-                    return AbstractPipeline.this.getName();
-                }
-            }, builder, muleContext);
+                    @Override
+                    public String getName()
+                    {
+                        return AbstractPipeline.this.getName();
+                    }
+                }, builder, muleContext);
     }
 
     @Override
@@ -229,16 +233,16 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
         // Ensure that inbound endpoints are compatible with processing strategy.
         boolean userConfiguredProcessingStrategy = !(processingStrategy instanceof DefaultFlowProcessingStrategy);
         boolean userConfiguredAsyncProcessingStrategy = processingStrategy instanceof AsynchronousProcessingStrategy
-                                                        && userConfiguredProcessingStrategy;
+                && userConfiguredProcessingStrategy;
 
         boolean redeliveryHandlerConfigured = isRedeliveryPolicyConfigured();
 
         if (userConfiguredAsyncProcessingStrategy
-            && (!isMessageSourceCompatibleWithAsync(messageSource) || (redeliveryHandlerConfigured)))
+                && (!isMessageSourceCompatibleWithAsync(messageSource) || (redeliveryHandlerConfigured)))
         {
             throw new FlowConstructInvalidException(
-                CoreMessages.createStaticMessage("One of the inbound endpoint configured on this Flow is not compatible with an asynchronous processing strategy.  Either because it is request-response, has a transaction defined, or messaging redelivered is configured."),
-                this);
+                    CoreMessages.createStaticMessage("One of the inbound endpoint configured on this Flow is not compatible with an asynchronous processing strategy.  Either because it is request-response, has a transaction defined, or messaging redelivered is configured."),
+                    this);
         }
 
         if (!userConfiguredProcessingStrategy && redeliveryHandlerConfigured)
@@ -255,7 +259,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     {
         boolean isRedeliveredPolicyConfigured = false;
         if (this.exceptionListener instanceof RollbackMessagingExceptionStrategy
-            && ((RollbackMessagingExceptionStrategy) exceptionListener).hasMaxRedeliveryAttempts())
+                && ((RollbackMessagingExceptionStrategy) exceptionListener).hasMaxRedeliveryAttempts())
         {
             isRedeliveredPolicyConfigured = true;
         }
@@ -280,7 +284,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
         {
             InboundEndpoint endpoint = ((InboundEndpoint) source);
             return !endpoint.getExchangePattern().hasResponse()
-                   && !endpoint.getTransactionConfig().isConfigured();
+                    && !endpoint.getTransactionConfig().isConfigured();
         }
         else if (messageSource instanceof CompositeMessageSource)
         {
@@ -316,27 +320,46 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
             logger.warn("flow map already populated");
             return;
         }
-        flowMap = getMessageProcessorPaths();
+
+        DefaultMessageProcessorPathElement pipeLinePathElement = new DefaultMessageProcessorPathElement(null, getName());
+        addMessageProcessorPathElements(pipeLinePathElement);
+        flowMap = NotificationUtils.buildPaths(pipeLinePathElement);
+
     }
 
     @Override
-    public Map<MessageProcessor, String> getMessageProcessorPaths()
+    public void addMessageProcessorPathElements(MessageProcessorPathElement pathElement)
     {
-        String prefix = "/" + getName() + "/processors";
-        Map<MessageProcessor, String> result = NotificationUtils.buildMessageProcessorPaths(getMessageProcessors(), prefix);
+        String prefix =  "processors";
+        MessageProcessorPathElement processorPathElement = pathElement.addChild(prefix);
+
+        //Only MP till first InterceptingMessageProcessor should be used to generate the Path,
+        // since the next ones will be generated by the InterceptingMessageProcessor because they are added as an inned chain
+        List<MessageProcessor> filteredMessageProcessorList = new ArrayList<MessageProcessor>();
+        for (MessageProcessor messageProcessor : getMessageProcessors())
+        {
+            if(messageProcessor instanceof InterceptingMessageProcessor){
+                filteredMessageProcessorList.add(messageProcessor);
+                break;
+            }else{
+                filteredMessageProcessorList.add(messageProcessor);
+            }
+        }
+
+        NotificationUtils.addMessageProcessorPathElements(filteredMessageProcessorList, processorPathElement);
 
         if (exceptionListener instanceof MessageProcessorContainer)
         {
-            Map<MessageProcessor, String> esPathMap = ((MessageProcessorContainer) exceptionListener).getMessageProcessorPaths();
-            NotificationUtils.prefixMessageProcessorPaths(getExceptionStrategyPrefix(), esPathMap);
-            result.putAll(esPathMap);
+            MessageProcessorPathElement exceptionStrategyPathElement =  pathElement.addChild(getExceptionStrategyPrefix());
+            ((MessageProcessorContainer) exceptionListener).addMessageProcessorPathElements(exceptionStrategyPathElement);
+
         }
-        return result;
+
     }
 
     private String getExceptionStrategyPrefix()
     {
-        String esPrefix = "/" + getName() + "/es";
+        String esPrefix =  "es";
         String globalName = null;
         if (exceptionListener instanceof GlobalNameableObject)
         {
@@ -344,7 +367,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
         }
         if (globalName != null)
         {
-            esPrefix = "/" + getName() + "/" + globalName + "/es";
+            esPrefix = globalName + "/es";
         }
         return esPrefix;
     }

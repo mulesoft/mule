@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: AbstractMessageProcessorOwner.java 24925 2012-10-03 17:43:02Z svacas $
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  *
@@ -15,14 +15,14 @@ import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Lifecycle;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorContainer;
+import org.mule.api.processor.MessageProcessorPathElement;
 import org.mule.util.NotificationUtils;
 
+import javax.xml.namespace.QName;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-
-import javax.xml.namespace.QName;
 
 /**
  * An object that owns message processors and delegates startup/shutdown events to them.
@@ -55,9 +55,9 @@ public abstract class AbstractMessageProcessorOwner extends AbstractMuleObjectOw
     protected abstract List<MessageProcessor> getOwnedMessageProcessors();
 
     @Override
-    public Map<MessageProcessor, String> getMessageProcessorPaths()
+    public void addMessageProcessorPathElements(MessageProcessorPathElement pathElement)
     {
-        return NotificationUtils.buildMessageProcessorPaths(getOwnedMessageProcessors());
+        NotificationUtils.addMessageProcessorPathElements(getOwnedMessageProcessors(), pathElement);
     }
 }
 
