@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: AsyncDelegateMessageProcessor.java 24927 2012-10-03 20:25:08Z svacas $
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  *
@@ -10,6 +10,8 @@
 
 package org.mule.processor;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.mule.DefaultMuleEvent;
 import org.mule.VoidMuleEvent;
 import org.mule.api.MessagingException;
@@ -24,6 +26,7 @@ import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorChainBuilder;
 import org.mule.api.processor.MessageProcessorContainer;
+import org.mule.api.processor.MessageProcessorPathElement;
 import org.mule.api.processor.ProcessingStrategy;
 import org.mule.api.processor.ProcessingStrategy.StageNameSource;
 import org.mule.config.i18n.CoreMessages;
@@ -35,10 +38,6 @@ import org.mule.work.MuleWorkManager;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * Processes {@link MuleEvent}'s asynchronously using a {@link MuleWorkManager} to schedule asynchronous
@@ -47,7 +46,7 @@ import org.apache.commons.logging.LogFactory;
  * configured on the inbound endpoint. If a transaction is present then an exception is thrown.
  */
 public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
-    implements MessageProcessor, Initialisable, Startable, Stoppable
+        implements MessageProcessor, Initialisable, Startable, Stoppable
 {
     protected Log logger = LogFactory.getLog(getClass());
 
@@ -91,7 +90,7 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
 
         MessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder(flowConstruct);
         processingStrategy.configureProcessors(Collections.singletonList(delegate), nameSource, builder,
-            muleContext);
+                muleContext);
         try
         {
             target = builder.build();
@@ -114,7 +113,7 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
         {
             // Clone event and make it async
             MuleEvent newEvent = new DefaultMuleEvent(
-                (MuleMessage)((ThreadSafeAccess)event.getMessage()).newThreadCopy(), event, false);
+                    (MuleMessage)((ThreadSafeAccess)event.getMessage()).newThreadCopy(), event, false);
             target.process(newEvent);
         }
         if (muleContext.getConfiguration().isFlowEndingWithOneWayEndpointReturnsNull())
@@ -144,13 +143,16 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
     }
 
     @Override
-    public Map<MessageProcessor, String> getMessageProcessorPaths()
+    public void addMessageProcessorPathElements(MessageProcessorPathElement pathElement)
     {
         if (delegate instanceof MessageProcessorContainer)
         {
-            return ((MessageProcessorContainer) delegate).getMessageProcessorPaths();
+            ((MessageProcessorContainer) delegate).addMessageProcessorPathElements(pathElement);
         }
-        return NotificationUtils.buildMessageProcessorPaths(Collections.singletonList(delegate));
+        else
+        {
+            NotificationUtils.addMessageProcessorPathElements(Collections.singletonList(delegate), pathElement);
+        }
     }
 
     class AsyncMessageProcessorWorker extends AbstractMuleEventWork

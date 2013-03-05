@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: MessageProcessorContainer.java 24919 2012-09-27 18:17:37Z svacas $
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  *
@@ -10,18 +10,15 @@
 
 package org.mule.api.processor;
 
-import java.util.Map;
-
 /**
  *  Identifies Constructs that contain Message Processors configured by the user.
  */
 public interface MessageProcessorContainer
 {
     /**
-     * Generates a map of the child message processors with the message processor
-     * instance as key and the identifier path as value.
+     * Add the child nodes to the path element tree.
      *
-     * @return Map with the paths of the child message processors
+     * @param pathElement
      */
-    Map<MessageProcessor, String> getMessageProcessorPaths();
+    void addMessageProcessorPathElements(MessageProcessorPathElement pathElement);
 }

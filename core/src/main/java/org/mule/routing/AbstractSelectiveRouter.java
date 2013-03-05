@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: AbstractSelectiveRouter.java 24925 2012-10-03 17:43:02Z svacas $
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  *
@@ -10,6 +10,7 @@
 
 package org.mule.routing;
 
+import org.apache.commons.collections.ListUtils;
 import org.mule.api.AnnotatedObject;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
@@ -26,6 +27,7 @@ import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorContainer;
+import org.mule.api.processor.MessageProcessorPathElement;
 import org.mule.api.routing.RoutePathNotFoundException;
 import org.mule.api.routing.RouterResultsHandler;
 import org.mule.api.routing.RouterStatisticsRecorder;
@@ -35,6 +37,7 @@ import org.mule.config.i18n.MessageFactory;
 import org.mule.management.stats.RouterStatistics;
 import org.mule.util.NotificationUtils;
 
+import javax.xml.namespace.QName;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -43,12 +46,8 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import javax.xml.namespace.QName;
-
-import org.apache.commons.collections.ListUtils;
-
 public abstract class AbstractSelectiveRouter
-    implements SelectiveRouter, RouterStatisticsRecorder, Lifecycle, FlowConstructAware, MuleContextAware, AnnotatedObject, MessageProcessorContainer
+        implements SelectiveRouter, RouterStatisticsRecorder, Lifecycle, FlowConstructAware, MuleContextAware, AnnotatedObject, MessageProcessorContainer
 {
     private final List<MessageProcessorFilterPair> conditionalMessageProcessors = new ArrayList<MessageProcessorFilterPair>();
     private MessageProcessor defaultProcessor;
@@ -179,7 +178,7 @@ public abstract class AbstractSelectiveRouter
                 MessageProcessorFilterPair addedPair = new MessageProcessorFilterPair(processor, filter);
 
                 MessageProcessorFilterPair removedPair = conditionalMessageProcessors.set(index,
-                    transitionLifecycleManagedObjectForAddition(addedPair));
+                        transitionLifecycleManagedObjectForAddition(addedPair));
 
                 transitionLifecycleManagedObjectForRemoval(removedPair);
             }
@@ -211,8 +210,8 @@ public abstract class AbstractSelectiveRouter
         }
 
         throw new RoutePathNotFoundException(
-            MessageFactory.createStaticMessage("Can't process message because no route has been found matching any filter and no default route is defined"),
-            event, this);
+                MessageFactory.createStaticMessage("Can't process message because no route has been found matching any filter and no default route is defined"),
+                event, this);
     }
 
     /**
@@ -291,7 +290,7 @@ public abstract class AbstractSelectiveRouter
     }
 
     private MuleEvent routeWithProcessors(Collection<MessageProcessor> processors, MuleEvent event)
-        throws MuleException
+            throws MuleException
     {
         List<MuleEvent> results = new ArrayList<MuleEvent>();
 
@@ -366,7 +365,7 @@ public abstract class AbstractSelectiveRouter
     }
 
     @Override
-    public Map<MessageProcessor, String> getMessageProcessorPaths()
+    public void addMessageProcessorPathElements(MessageProcessorPathElement pathElement)
     {
         List<MessageProcessor> messageProcessors = new ArrayList<MessageProcessor>();
         for (MessageProcessorFilterPair cmp : conditionalMessageProcessors)
@@ -374,13 +373,13 @@ public abstract class AbstractSelectiveRouter
             messageProcessors.add(cmp.getMessageProcessor());
         }
         messageProcessors.add(defaultProcessor);
-        return NotificationUtils.buildMessageProcessorPaths(messageProcessors);
+        NotificationUtils.addMessageProcessorPathElements(messageProcessors, pathElement);
     }
 
     @Override
     public String toString()
     {
         return String.format("%s [flow-construct=%s, started=%s]", getClass().getSimpleName(),
-            flowConstruct != null ? flowConstruct.getName() : null, started);
+                flowConstruct != null ? flowConstruct.getName() : null, started);
     }
 }

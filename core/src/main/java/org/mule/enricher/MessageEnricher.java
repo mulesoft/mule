@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: MessageEnricher.java 25218 2013-01-17 20:25:10Z svacas $
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
@@ -20,6 +20,7 @@ import org.mule.api.expression.ExpressionManager;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorChain;
 import org.mule.api.processor.MessageProcessorContainer;
+import org.mule.api.processor.MessageProcessorPathElement;
 import org.mule.api.processor.MessageProcessors;
 import org.mule.processor.AbstractMessageProcessorOwner;
 import org.mule.processor.chain.InterceptingChainLifecycleWrapper;
@@ -28,7 +29,6 @@ import org.mule.util.StringUtils;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 /**
  * The <code>Message Enricher</code> allows the current message to be augmented using data from a seperate
@@ -79,12 +79,12 @@ public class MessageEnricher extends AbstractMessageProcessorOwner implements Me
             for (EnrichExpressionPair pair : enrichExpressionPairs)
             {
                 enrich(event.getMessage(), enrichmentEvent.getMessage(), pair.getSource(), pair.getTarget(),
-                    expressionManager);
+                        expressionManager);
             }
         }
 
         if (muleContext != null
-            && muleContext.getConfiguration().isEnricherPropagatesSessionVariableChanges())
+                && muleContext.getConfiguration().isEnricherPropagatesSessionVariableChanges())
         {
             event = new DefaultMuleEvent(event.getMessage(), event, enrichmentEvent.getSession());
         }
@@ -200,12 +200,15 @@ public class MessageEnricher extends AbstractMessageProcessorOwner implements Me
     }
 
     @Override
-    public Map<MessageProcessor, String> getMessageProcessorPaths()
+    public void addMessageProcessorPathElements(MessageProcessorPathElement pathElement)
     {
         if (enrichmentProcessor instanceof InterceptingChainLifecycleWrapper)
         {
-            return super.getMessageProcessorPaths();
+            super.addMessageProcessorPathElements(pathElement);
         }
-        return ((MessageProcessorContainer) enrichmentProcessor).getMessageProcessorPaths();
+        else
+        {
+            ((MessageProcessorContainer) enrichmentProcessor).addMessageProcessorPathElements(pathElement);
+        }
     }
 }

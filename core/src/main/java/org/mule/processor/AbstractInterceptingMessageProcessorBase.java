@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: AbstractInterceptingMessageProcessorBase.java 24267 2012-04-16 07:18:01Z dfeist $
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  *
@@ -10,6 +10,8 @@
 
 package org.mule.processor;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.mule.VoidMuleEvent;
 import org.mule.api.AnnotatedObject;
 import org.mule.api.MessagingException;
@@ -18,20 +20,21 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.context.notification.ServerNotificationHandler;
+import org.mule.api.processor.InternalMessageProcessor;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorChain;
+import org.mule.api.processor.MessageProcessorContainer;
+import org.mule.api.processor.MessageProcessorPathElement;
 import org.mule.execution.MessageProcessorExecutionTemplate;
 import org.mule.processor.chain.DefaultMessageProcessorChain;
+import org.mule.util.NotificationUtils;
 import org.mule.util.ObjectUtils;
 
+import javax.xml.namespace.QName;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-
-import javax.xml.namespace.QName;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * Abstract implementation that provides the infrastructure for intercepting message processors.
@@ -40,13 +43,13 @@ import org.apache.commons.logging.LogFactory;
  * attribute.
  */
 public abstract class AbstractInterceptingMessageProcessorBase
-    implements MessageProcessor, MuleContextAware, AnnotatedObject
+        implements MessageProcessor, MuleContextAware, AnnotatedObject, MessageProcessorContainer
 {
     protected Log logger = LogFactory.getLog(getClass());
 
     protected ServerNotificationHandler notificationHandler;
     private MessageProcessorExecutionTemplate messageProcessorExecutorWithoutNotifications = MessageProcessorExecutionTemplate.createExceptionTransformerExecutionTemplate();
-    private MessageProcessorExecutionTemplate messageProcessorExecutorWithNotifications =  MessageProcessorExecutionTemplate.createExecutionTemplate();
+    private MessageProcessorExecutionTemplate messageProcessorExecutorWithNotifications = MessageProcessorExecutionTemplate.createExecutionTemplate();
     protected MuleContext muleContext;
     private final Map<QName, Object> annotations = new ConcurrentHashMap<QName, Object>();
 
@@ -83,7 +86,7 @@ public abstract class AbstractInterceptingMessageProcessorBase
             if (logger.isDebugEnabled())
             {
                 logger.trace("MuleEvent is null.  Next MessageProcessor '" + next.getClass().getName()
-                             + "' will not be invoked.");
+                        + "' will not be invoked.");
             }
             return null;
         }
@@ -102,9 +105,8 @@ public abstract class AbstractInterceptingMessageProcessorBase
 
             try
             {
-                return executionTemplateToUse.execute(next,event);
-            }
-            catch (MessagingException e)
+                return executionTemplateToUse.execute(next, event);
+            } catch (MessagingException e)
             {
                 event.getSession().setValid(false);
                 throw e;
@@ -138,9 +140,25 @@ public abstract class AbstractInterceptingMessageProcessorBase
         annotations.clear();
         annotations.putAll(newAnnotations);
     }
-    
+
     protected boolean isEventValid(MuleEvent event)
     {
         return event != null && !VoidMuleEvent.getInstance().equals(event);
+    }
+
+    @Override
+    public void addMessageProcessorPathElements(MessageProcessorPathElement pathElement)
+    {
+        if(next instanceof InternalMessageProcessor){
+            return;
+        }
+        if (next instanceof MessageProcessorChain)
+        {
+            NotificationUtils.addMessageProcessorPathElements(((MessageProcessorChain) next).getMessageProcessors(), pathElement.getParent());
+        }
+        else if (next != null)
+        {
+            NotificationUtils.addMessageProcessorPathElements(Arrays.asList(next), pathElement.getParent());
+        }
     }
 }

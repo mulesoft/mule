@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: Foreach.java 25169 2013-01-07 17:03:30Z svacas $
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  *
@@ -10,6 +10,8 @@
 
 package org.mule.routing;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -17,6 +19,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.api.processor.MessageProcessorPathElement;
 import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.TransformerException;
 import org.mule.expression.ExpressionConfig;
@@ -26,6 +29,7 @@ import org.mule.routing.outbound.AbstractMessageSequenceSplitter;
 import org.mule.routing.outbound.CollectionMessageSequence;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.NotificationUtils;
+import org.w3c.dom.Document;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -33,12 +37,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.w3c.dom.Document;
-
 /**
-` * The <code>Foreach</code> MessageProcessor allows iterating over a collection payload, or any collection
+ ` * The <code>Foreach</code> MessageProcessor allows iterating over a collection payload, or any collection
  * obtained by an expression, generating a message for each element.
  * <p>
  * The number of the message being processed is stored in <code>#[variable:counter]</code> and the root
@@ -72,8 +72,8 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
     public MuleEvent process(MuleEvent event) throws MuleException
     {
         String parentMessageProp = rootMessageVariableName != null
-                                                                  ? rootMessageVariableName
-                                                                  : ROOT_MESSAGE_PROPERTY;
+                ? rootMessageVariableName
+                : ROOT_MESSAGE_PROPERTY;
         Object previousCounterVar = null;
         Object previousRootMessageVar = null;
         if (event.getFlowVariableNames().contains(counterVariableName))
@@ -138,11 +138,11 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
     }
 
     @Override
-    public Map<MessageProcessor, String> getMessageProcessorPaths()
+    public void addMessageProcessorPathElements(MessageProcessorPathElement pathElement)
     {
         //skip the splitter that is added at the beginning
         List<MessageProcessor> mps = getOwnedMessageProcessors().subList(1, getOwnedMessageProcessors().size());
-        return NotificationUtils.buildMessageProcessorPaths(mps);
+        NotificationUtils.addMessageProcessorPathElements(mps, pathElement);
     }
 
     public void setMessageProcessors(List<MessageProcessor> messageProcessors) throws MuleException
@@ -178,7 +178,7 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
         try
         {
             this.ownedMessageProcessor = new DefaultMessageProcessorChainBuilder().chain(messageProcessors)
-                .build();
+                    .build();
         }
         catch (MuleException e)
         {

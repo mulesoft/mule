@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: ChoiceMessagingExceptionStrategy.java 25057 2012-11-28 18:08:07Z pablo.lagreca $
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  *
@@ -17,17 +17,14 @@ import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.exception.MessagingExceptionHandlerAcceptor;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Lifecycle;
-import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorContainer;
+import org.mule.api.processor.MessageProcessorPathElement;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.message.DefaultExceptionPayload;
 import org.mule.processor.AbstractMuleObjectOwner;
-import org.mule.util.NotificationUtils;
 
 import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Selects which exception strategy to execute based on filtering.
@@ -119,18 +116,18 @@ public class ChoiceMessagingExceptionStrategy extends AbstractMuleObjectOwner<Me
         boolean rollbackWithRedelivery = false;
         for (int i = 0; i < exceptionListeners.size(); i++)
         {
-             MessagingExceptionHandler messagingExceptionHandler = exceptionListeners.get(i);
-             if (messagingExceptionHandler instanceof MessagingExceptionStrategyAcceptorDelegate) {
-                 messagingExceptionHandler = ((MessagingExceptionStrategyAcceptorDelegate)messagingExceptionHandler).getExceptionListener();
-             }
-             if (messagingExceptionHandler instanceof RollbackMessagingExceptionStrategy && ((RollbackMessagingExceptionStrategy)messagingExceptionHandler).hasMaxRedeliveryAttempts())
-             {
+            MessagingExceptionHandler messagingExceptionHandler = exceptionListeners.get(i);
+            if (messagingExceptionHandler instanceof MessagingExceptionStrategyAcceptorDelegate) {
+                messagingExceptionHandler = ((MessagingExceptionStrategyAcceptorDelegate)messagingExceptionHandler).getExceptionListener();
+            }
+            if (messagingExceptionHandler instanceof RollbackMessagingExceptionStrategy && ((RollbackMessagingExceptionStrategy)messagingExceptionHandler).hasMaxRedeliveryAttempts())
+            {
                 if (rollbackWithRedelivery)
                 {
                     throw new MuleRuntimeException(CoreMessages.createStaticMessage("Only one rollback exception strategy inside <choice-exception-strategy> can handle message redelivery."));
                 }
                 rollbackWithRedelivery = true;
-             }
+            }
         }
     }
 
@@ -138,33 +135,30 @@ public class ChoiceMessagingExceptionStrategy extends AbstractMuleObjectOwner<Me
     {
         for (int i = 0; i < exceptionListeners.size()-1; i++)
         {
-             MessagingExceptionHandlerAcceptor messagingExceptionHandlerAcceptor = exceptionListeners.get(i);
-             if (messagingExceptionHandlerAcceptor.acceptsAll())
-             {
-                 throw new MuleRuntimeException(CoreMessages.createStaticMessage("Only last exception strategy inside <choice-exception-strategy> can accept any message. Maybe expression attribute is empty."));
-             }
+            MessagingExceptionHandlerAcceptor messagingExceptionHandlerAcceptor = exceptionListeners.get(i);
+            if (messagingExceptionHandlerAcceptor.acceptsAll())
+            {
+                throw new MuleRuntimeException(CoreMessages.createStaticMessage("Only last exception strategy inside <choice-exception-strategy> can accept any message. Maybe expression attribute is empty."));
+            }
         }
     }
 
     @Override
-    public Map<MessageProcessor, String> getMessageProcessorPaths()
+    public void addMessageProcessorPathElements(MessageProcessorPathElement pathElement)
     {
-        Map<MessageProcessor, String> mpPaths = new LinkedHashMap<MessageProcessor, String> ();
         int idx = 0;
         for(MessagingExceptionHandlerAcceptor listener : exceptionListeners)
         {
-            String prefix = "/" + idx;
             if (listener instanceof MessageProcessorContainer)
             {
-                Map<MessageProcessor, String> children = ((MessageProcessorContainer) listener).getMessageProcessorPaths();
-                NotificationUtils.prefixMessageProcessorPaths(prefix, children);
-                mpPaths.putAll(children);
+                MessageProcessorPathElement exceptionListener = pathElement.addChild(String.valueOf(idx));
+                ((MessageProcessorContainer) listener).addMessageProcessorPathElements(exceptionListener);
             }
             idx++;
         }
-        return mpPaths;
+
     }
-    
+
     @Override
     public boolean accept(MuleEvent event)
     {
