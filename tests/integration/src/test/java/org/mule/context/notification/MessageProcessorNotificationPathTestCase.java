@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: MessageProcessorNotificationPathTestCase.java 25187 2013-01-11 16:54:29Z luciano.gandini $
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  *
@@ -9,17 +9,18 @@
  */
 package org.mule.context.notification;
 
+import org.junit.Assert;
+import org.junit.Test;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.construct.Pipeline;
+import org.mule.api.processor.DefaultMessageProcessorPathElement;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.util.NotificationUtils;
 
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
-
-import org.junit.Assert;
-import org.junit.Test;
 
 /**
  *
@@ -37,6 +38,10 @@ public class MessageProcessorNotificationPathTestCase extends FunctionalTestCase
     public void components() throws Exception
     {
         testFlowPaths("singleMP", "/0");
+        testFlowPaths("singleMP2", "/0","/1");
+        testFlowPaths("singleMP3", "/0","/1","/2");
+        testFlowPaths("processorChain2", "/0", "/0/0", "/0/1", "/0/2");
+        testFlowPaths("processorChain3", "/0", "/0/0", "/0/1");
         testFlowPaths("processorChain", "/0", "/0/0", "/0/1");
         testFlowPaths("customProcessor", "/0", "/1");
     }
@@ -45,6 +50,8 @@ public class MessageProcessorNotificationPathTestCase extends FunctionalTestCase
     public void routers() throws Exception
     {
         testFlowPaths("choice", "/0", "/0/0", "/0/0/0", "/0/1", "/0/1/0", "/0/2", "/0/2/0");
+        testFlowPaths("all2", "/0", "/0/0", "/0/0/0","/0/0/1", "/0/1", "/0/1/0","/0/1/1", "/1");
+        testFlowPaths("choice2", "/0", "/0/0", "/0/0/0","/0/0/1", "/0/1", "/0/1/0", "/0/2", "/0/2/0","/0/2/1");
         testFlowPaths("all", "/0", "/0/0", "/0/0/0", "/0/1", "/0/1/0", "/1");
     }
 
@@ -115,7 +122,9 @@ public class MessageProcessorNotificationPathTestCase extends FunctionalTestCase
     {
         String[] expectedPaths = generatePaths(flowName, nodes);
         FlowConstruct flow = getFlowConstruct(flowName);
-        Map<MessageProcessor,String> messageProcessorPaths = ((Pipeline) flow).getMessageProcessorPaths();
+        DefaultMessageProcessorPathElement flowElement = new DefaultMessageProcessorPathElement(null, flowName);
+        ((Pipeline) flow).addMessageProcessorPathElements(flowElement);
+        Map<MessageProcessor, String> messageProcessorPaths = NotificationUtils.buildPaths(flowElement);
         String[] flowPaths = messageProcessorPaths.values().toArray(new String[]{});
         Assert.assertArrayEquals(expectedPaths, flowPaths);
     }

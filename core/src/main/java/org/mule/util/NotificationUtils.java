@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: NotificationUtils.java 24925 2012-10-03 17:43:02Z svacas $
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  *
@@ -9,15 +9,17 @@
  */
 package org.mule.util;
 
+import org.mule.api.processor.InternalMessageProcessor;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorContainer;
+import org.mule.api.processor.MessageProcessorPathElement;
 
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 /**
- *  Contains useful methods for the generation of message processor identifiers used by the notification system
+ * Contains useful methods for the generation of message processor identifiers used by the notification system
  */
 public class NotificationUtils
 {
@@ -26,51 +28,45 @@ public class NotificationUtils
     {
     }
 
-    public static Map<MessageProcessor, String> buildMessageProcessorPaths(List<MessageProcessor> processors)
+    public static void addMessageProcessorPathElements(List<MessageProcessor> processors, MessageProcessorPathElement parentElement)
     {
-        return buildMessageProcessorPaths(processors, null);
-    }
 
-    public static Map<MessageProcessor, String> buildMessageProcessorPaths(List<MessageProcessor> processors, String basePath)
-    {
-        if (basePath == null)
-        {
-            basePath = "/";
-        }
-        if (!basePath.startsWith("/"))
-        {
-            basePath = "/" + basePath;
-        }
-        if (!basePath.endsWith("/"))
-        {
-            basePath += "/";
-        }
-        Map<MessageProcessor, String> result = new LinkedHashMap<MessageProcessor, String>();
-        int index = 0;
+
         for (MessageProcessor mp : processors)
         {
-            String prefix = basePath + index;
-            result.put(mp, prefix);
-            if (mp instanceof MessageProcessorContainer)
+            if (!(mp instanceof InternalMessageProcessor))
             {
-                Map<MessageProcessor, String> children = ((MessageProcessorContainer) mp).getMessageProcessorPaths();
-                prefixMessageProcessorPaths(prefix, children);
-                result.putAll(children);
+
+                MessageProcessorPathElement messageProcessorPathElement = parentElement.addChild(mp);
+                if (mp instanceof MessageProcessorContainer)
+                {
+                    ((MessageProcessorContainer) mp).addMessageProcessorPathElements(messageProcessorPathElement);
+                }
             }
-            index++;
+
         }
-        return result;
+
     }
 
-    public static void prefixMessageProcessorPaths(String prefix, Map<MessageProcessor, String> pathMap)
+
+    public static Map<MessageProcessor, String> buildPaths(MessageProcessorPathElement element)
     {
-        if (prefix.endsWith("/"))
-        {
-            prefix = prefix.substring(0, prefix.length() - 1);
-        }
-        for (Map.Entry entry : pathMap.entrySet())
-        {
-            entry.setValue(prefix + entry.getValue());
-        }
+        return buildPaths(element, new LinkedHashMap<MessageProcessor, String>());
     }
+
+    private static Map<MessageProcessor, String> buildPaths(MessageProcessorPathElement element, Map<MessageProcessor, String> elements)
+    {
+        if (element.getMessageProcessor() != null)
+        {
+            elements.put(element.getMessageProcessor(), element.getPath());
+        }
+        List<MessageProcessorPathElement> children = element.getChildren();
+        for (MessageProcessorPathElement child : children)
+        {
+            buildPaths(child, elements);
+        }
+        return elements;
+    }
+
+
 }
