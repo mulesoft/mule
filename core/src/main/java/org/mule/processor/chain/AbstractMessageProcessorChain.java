@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: AbstractMessageProcessorChain.java 24925 2012-10-03 17:43:02Z svacas $
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  *
@@ -25,6 +25,7 @@ import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorChain;
 import org.mule.api.processor.MessageProcessorContainer;
+import org.mule.api.processor.MessageProcessorPathElement;
 import org.mule.endpoint.EndpointAware;
 import org.mule.processor.AbstractInterceptingMessageProcessor;
 import org.mule.util.NotificationUtils;
@@ -32,7 +33,6 @@ import org.mule.util.StringUtils;
 
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -43,8 +43,9 @@ import org.apache.commons.logging.LogFactory;
  * the first in the nested chain.
  */
 public abstract class AbstractMessageProcessorChain extends AbstractInterceptingMessageProcessor
-                                                    implements MessageProcessorChain, Lifecycle, FlowConstructAware, MuleContextAware, EndpointAware, MessageProcessorContainer
+        implements MessageProcessorChain, Lifecycle, FlowConstructAware, MuleContextAware, EndpointAware, MessageProcessorContainer
 {
+
     protected final transient Log log = LogFactory.getLog(getClass());
     protected String name;
     protected List<MessageProcessor> processors;
@@ -174,7 +175,7 @@ public abstract class AbstractMessageProcessorChain extends AbstractIntercepting
         {
             if (processor instanceof EndpointAware)
             {
-                 ((EndpointAware) processor).setEndpoint(endpoint);
+                ((EndpointAware) processor).setEndpoint(endpoint);
             }
         }
     }
@@ -185,8 +186,8 @@ public abstract class AbstractMessageProcessorChain extends AbstractIntercepting
     }
 
     @Override
-    public Map<MessageProcessor, String> getMessageProcessorPaths()
+    public void addMessageProcessorPathElements(MessageProcessorPathElement pathElement)
     {
-        return NotificationUtils.buildMessageProcessorPaths(getMessageProcessors());
+        NotificationUtils.addMessageProcessorPathElements(getMessageProcessors(), pathElement);
     }
 }

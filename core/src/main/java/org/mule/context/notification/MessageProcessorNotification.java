@@ -120,7 +120,7 @@ public class MessageProcessorNotification extends ServerNotification implements 
     public String getProcessorPath()
     {
         FlowConstruct fc = getSource().getFlowConstruct();
-        if (! (fc instanceof Pipeline))
+        if (!(fc instanceof Pipeline))
         {
             return null;
         }
