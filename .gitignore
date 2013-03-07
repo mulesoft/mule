@@ -19,3 +19,17 @@ target/
 /activemq-data
 
 /modules/launcher/src/it/test-01-plugin-impl-1/build.log
+
+.pom.xml.swp
+
+examples/flight-reservation/.classpath
+
+examples/flight-reservation/.project
+
+examples/flight-reservation/.settings/org.eclipse.jdt.core.prefs
+
+examples/foreach/.classpath
+
+examples/foreach/.project
+
+examples/foreach/.settings/org.eclipse.jdt.core.prefs
