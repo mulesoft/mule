@@ -316,6 +316,7 @@
 /mule-standalone-nodocs-${productVersion}/lib/opt/xstream-1.2.2-osgi.jar
 /mule-standalone-nodocs-${productVersion}/lib/shared
 /mule-standalone-nodocs-${productVersion}/lib/shared/default
+/mule-standalone-nodocs-${productVersion}/lib/shared/default/README.txt
 /mule-standalone-nodocs-${productVersion}/lib/user
 /mule-standalone-nodocs-${productVersion}/lib/user/junit-4.9.jar
 /mule-standalone-nodocs-${productVersion}/lib/user/mule-tests-functional-${productVersion}.jar
