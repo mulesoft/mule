@@ -3,10 +3,12 @@
 /.clover
 /.classpath
 /.project
-/target
-/*.iml
-/*.ipr
-/*.iws
+target/
+*.iml
+*.ipr
+*.iws
+/.idea/
+.DS_Store
 /build.properties
 /workspace
 /.mule
