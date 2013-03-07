@@ -173,7 +173,6 @@
 /mule-standalone-${productVersion}/examples/echo/src/main/java/org/mule/example
 /mule-standalone-${productVersion}/examples/echo/src/main/java/org/mule/example/echo
 /mule-standalone-${productVersion}/examples/echo/src/main/java/org/mule/example/echo/Echo.java
-/mule-standalone-${productVersion}/examples/echo/src/main/resources
 /mule-standalone-${productVersion}/examples/echo/src/test
 /mule-standalone-${productVersion}/examples/echo/src/test/java
 /mule-standalone-${productVersion}/examples/echo/src/test/java/org
@@ -564,13 +563,7 @@
 /mule-standalone-${productVersion}/examples/mule-example-launcher/src/main/java/org/mule/example/launcher
 /mule-standalone-${productVersion}/examples/mule-example-launcher/src/main/java/org/mule/example/launcher/HTTPResponse.java
 /mule-standalone-${productVersion}/examples/mule-example-launcher/src/main/java/org/mule/example/launcher/SimpleHTTPClient.java
-/mule-standalone-${productVersion}/examples/mule-example-launcher/src/main/resources
 /mule-standalone-${productVersion}/examples/mule-example-launcher/src/test
-/mule-standalone-${productVersion}/examples/mule-example-launcher/src/test/java
-/mule-standalone-${productVersion}/examples/mule-example-launcher/src/test/java/org
-/mule-standalone-${productVersion}/examples/mule-example-launcher/src/test/java/org/mule
-/mule-standalone-${productVersion}/examples/mule-example-launcher/src/test/java/org/mule/example
-/mule-standalone-${productVersion}/examples/mule-example-launcher/src/test/java/org/mule/example/launcher
 /mule-standalone-${productVersion}/examples/mule-example-launcher/src/test/resources
 /mule-standalone-${productVersion}/examples/mule-example-launcher/src/test/resources/log4j.properties
 /mule-standalone-${productVersion}/examples/mule-example-launcher/src/test/resources/log4j.properties
@@ -984,6 +977,7 @@
 /mule-standalone-${productVersion}/lib/opt/xstream-1.2.2-osgi.jar
 /mule-standalone-${productVersion}/lib/shared
 /mule-standalone-${productVersion}/lib/shared/default
+/mule-standalone-${productVersion}/lib/shared/default/README.txt
 /mule-standalone-${productVersion}/lib/user
 /mule-standalone-${productVersion}/lib/user/junit-4.9.jar
 /mule-standalone-${productVersion}/lib/user/mule-tests-functional-${productVersion}.jar
