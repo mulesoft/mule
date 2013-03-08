@@ -13,6 +13,7 @@ package org.mule.management.stats;
  * TODO MULE-2233 Pooling functionality has been abstracted out of the SedaService. 
  * This class should be updated accordingly.
  */
+@Deprecated
 public class SedaServiceStatistics extends ServiceStatistics
 {
     private int componentPoolMaxSize = 0;
