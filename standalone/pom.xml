@@ -166,14 +166,6 @@
             <type>pom</type>
             <exclusions>
                 <exclusion>
-                    <groupId>org.mule.modules.jca</groupId>
-                    <artifactId>mule-module-jca-generic</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.mule.modules.jca</groupId>
-                    <artifactId>mule-module-jca-jboss</artifactId>
-                </exclusion>
-                <exclusion>
                     <groupId>xalan</groupId>
                     <artifactId>xalan</artifactId>
                 </exclusion>
