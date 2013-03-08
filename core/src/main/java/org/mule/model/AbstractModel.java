@@ -13,6 +13,7 @@ package org.mule.model;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.component.LifecycleAdapterFactory;
+import org.mule.api.config.MuleProperties;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.lifecycle.InitialisationException;
@@ -21,6 +22,7 @@ import org.mule.api.model.EntryPointResolver;
 import org.mule.api.model.EntryPointResolverSet;
 import org.mule.api.model.Model;
 import org.mule.component.DefaultComponentLifecycleAdapterFactory;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.lifecycle.EmptyLifecycleCallback;
 import org.mule.model.resolvers.DefaultEntryPointResolverSet;
 import org.mule.model.resolvers.LegacyEntryPointResolverSet;
@@ -36,6 +38,7 @@ import org.apache.commons.logging.LogFactory;
  * encapsulates and manages the runtime behaviour of a Mule Server instance. It is
  * responsible for maintaining the service instances and their configuration.
  */
+@Deprecated
 public abstract class AbstractModel implements Model
 {
 
@@ -155,6 +158,11 @@ public abstract class AbstractModel implements Model
 
     public void initialise() throws InitialisationException
     {
+        if (!name.equals(MuleProperties.OBJECT_SYSTEM_MODEL))
+        {
+            logger.warn(CoreMessages.modelDeprecated());
+        }
+        
         try
         {
             lifecycleManager.fireInitialisePhase(new EmptyLifecycleCallback<AbstractModel>());

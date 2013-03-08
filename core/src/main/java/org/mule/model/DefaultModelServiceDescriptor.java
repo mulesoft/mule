@@ -33,6 +33,7 @@ public class DefaultModelServiceDescriptor extends AbstractServiceDescriptor imp
         modelClass = removeProperty(MuleProperties.MODEL_CLASS, properties);
     }
 
+    @Deprecated
     public Model createModel() throws ServiceException
     {
         if (modelClass != null)
@@ -52,6 +53,7 @@ public class DefaultModelServiceDescriptor extends AbstractServiceDescriptor imp
     }
 
     @SuppressWarnings("unchecked")
+    @Deprecated
     public Class<Model> getModelClass() throws ServiceException
     {
         try 

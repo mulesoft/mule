@@ -20,6 +20,7 @@ import org.mule.api.registry.ServiceException;
  * type of the model to be created.  The service descriptor is in the form of
  * string key value pairs.
  */
+@Deprecated
 public interface ModelServiceDescriptor extends ServiceDescriptor
 {
     Model createModel() throws ServiceException;

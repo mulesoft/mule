@@ -15,6 +15,7 @@ import org.mule.model.AbstractModel;
 /**
  * Creates a model suitable for Jca execution
  */
+@Deprecated
 public class JcaModel extends AbstractModel
 {
     public static final String JCA_MODEL_TYPE = "jca";

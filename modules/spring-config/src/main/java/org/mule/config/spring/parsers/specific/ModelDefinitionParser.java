@@ -11,11 +11,12 @@
 package org.mule.config.spring.parsers.specific;
 
 import org.mule.config.spring.parsers.delegate.InheritDefinitionParser;
-import org.mule.config.spring.parsers.generic.OrphanDefinitionParser;
 import org.mule.config.spring.parsers.generic.NamedDefinitionParser;
+import org.mule.config.spring.parsers.generic.OrphanDefinitionParser;
 import org.mule.config.spring.parsers.processors.ProvideDefaultName;
 import org.mule.model.seda.SedaModel;
 
+@Deprecated
 public class ModelDefinitionParser extends InheritDefinitionParser
 {
 

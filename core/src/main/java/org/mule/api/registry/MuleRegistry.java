@@ -137,8 +137,10 @@ public interface MuleRegistry extends Registry
 
     Collection<FlowConstruct> lookupFlowConstructs();
 
+    @Deprecated
     Model lookupModel(String name);
 
+    @Deprecated
     Model lookupSystemModel();
 
     Agent lookupAgent(String agentName);
@@ -201,8 +203,10 @@ public interface MuleRegistry extends Registry
 
     void unregisterFlowConstruct(String flowConstructName) throws MuleException;
 
+    @Deprecated
     void registerModel(Model model) throws MuleException;
 
+    @Deprecated
     void unregisterModel(String modelName) throws MuleException;
 
     void registerAgent(Agent agent) throws MuleException;

@@ -18,6 +18,7 @@ import org.mule.context.notification.ModelNotification;
  * implement and then register themselves with the Mule manager to be notified when a
  * Model event occurs.
  */
+@Deprecated
 public interface ModelNotificationListener<T extends ModelNotification> extends ServerNotificationListener<ModelNotification>
 {
     // no methods

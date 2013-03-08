@@ -322,6 +322,7 @@ public class MuleRegistryHelper implements MuleRegistry
     /**
      * {@inheritDoc}
      */
+    @Deprecated
     public Model lookupModel(String name)
     {
         return (Model) registry.lookupObject(name);
@@ -330,6 +331,7 @@ public class MuleRegistryHelper implements MuleRegistry
     /**
      * {@inheritDoc}
      */
+    @Deprecated
     public Model lookupSystemModel()
     {
         return lookupModel(MuleProperties.OBJECT_SYSTEM_MODEL);
@@ -338,6 +340,7 @@ public class MuleRegistryHelper implements MuleRegistry
     /**
      * {@inheritDoc}
      */
+    @Deprecated
     public Collection<Model> getModels()
     {
         return registry.lookupObjects(Model.class);
@@ -540,6 +543,7 @@ public class MuleRegistryHelper implements MuleRegistry
     /**
      * {@inheritDoc}
      */
+    @Deprecated
     public void registerModel(Model model) throws MuleException
     {
         registry.registerObject(getName(model), model, Model.class);
@@ -604,6 +608,7 @@ public class MuleRegistryHelper implements MuleRegistry
     /**
      * {@inheritDoc}
      */
+    @Deprecated
     public void unregisterModel(String modelName) throws MuleException
     {
         registry.unregisterObject(modelName, Model.class);

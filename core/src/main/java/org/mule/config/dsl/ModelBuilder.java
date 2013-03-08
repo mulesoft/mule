@@ -11,19 +11,24 @@ package org.mule.config.dsl;
 
 import org.mule.api.MuleContext;
 import org.mule.api.model.Model;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.model.seda.SedaModel;
 
-/**
- * TODO
- */
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+@Deprecated
 public class ModelBuilder
 {
+    protected transient Log logger = LogFactory.getLog(getClass());
+    
     private MuleContext muleContext;
 
     private Model model;
 
     public ModelBuilder(MuleContext muleContext)
     {
+        logger.warn(CoreMessages.modelDeprecated());
         this.muleContext = muleContext;
         model = new SedaModel();
     }

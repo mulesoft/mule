@@ -20,6 +20,7 @@ import org.mule.api.model.Model;
  * 
  * @see org.mule.api.model.Model
  */
+@Deprecated
 public class ModelNotification extends ServerNotification implements BlockingServerEvent
 {
     /**

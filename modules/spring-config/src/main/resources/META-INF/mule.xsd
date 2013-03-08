@@ -1387,7 +1387,14 @@
     <xsd:simpleType name="notificationTypes">
         <xsd:restriction base="xsd:NMTOKEN">
             <xsd:enumeration value="CONTEXT"/>
-            <xsd:enumeration value="MODEL"/>
+            <xsd:enumeration value="MODEL">
+                <xsd:annotation>
+                    <xsd:documentation>
+                        DEPRECATED: The use of 'model' and 'service' is deprecated in Mule 3.4 and will be removed in Mule 4.0. As such this
+                        notification is also deprecated and will be removed in Mule 4.0.
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:enumeration>
             <xsd:enumeration value="SERVICE"/>
             <xsd:enumeration value="SECURITY"/>
             <xsd:enumeration value="ASYNC-MESSAGE"/>
@@ -1412,6 +1419,7 @@
     <xsd:element name="abstract-model" abstract="true" type="abstractModelType">
         <xsd:annotation>
             <xsd:documentation>
+                DEPRECATED: The 'model' element is deprecated in Mule 3.4 and will be removed in Mule 4.0.  Flows do not need to be configured inside a 'model' element. 
                 A placeholder for model elements. A model provides basic settings and processing for all the services it contains.
             </xsd:documentation>
         </xsd:annotation>
@@ -1438,6 +1446,7 @@
     <xsd:element name="seda-model" type="sedaModelType" substitutionGroup="abstract-model">
         <xsd:annotation>
             <xsd:documentation>
+                DEPRECATED: The 'model' element is deprecated in Mule 3.4 and will be removed in Mule 4.0.  Flows do not need to be configured inside a 'model' element. 
                 A staged event-driven architecture (SEDA) model has separate threads and queues for each service.
             </xsd:documentation>
         </xsd:annotation>
@@ -1462,6 +1471,7 @@
     <xsd:element name="model" type="defaultModelType" substitutionGroup="abstract-model">
         <xsd:annotation>
             <xsd:documentation>
+                DEPRECATED: The 'model' element is deprecated in Mule 3.4 and will be removed in Mule 4.0.  Flows do not need to be configured inside a 'model' element. 
                 The container for a set of services, providing basic settings and processing for all the services it contains.
             </xsd:documentation>
         </xsd:annotation>

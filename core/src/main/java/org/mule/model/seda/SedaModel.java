@@ -19,6 +19,7 @@ import org.mule.model.AbstractModel;
  * A mule service service model that uses SEDA principals to achieve high
  * throughput by Queuing events for components and processing them concurrently.
  */
+@Deprecated
 public class SedaModel extends AbstractModel
 {
     /**

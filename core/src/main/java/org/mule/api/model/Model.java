@@ -22,6 +22,7 @@ import org.mule.api.lifecycle.LifecycleStateEnabled;
  * Mule Server instance. It is responsible for maintaining the Service instances and
  * their configuration.
  */
+@Deprecated
 public interface Model extends Lifecycle, MuleContextAware, NameableObject, LifecycleStateEnabled
 {
     /**

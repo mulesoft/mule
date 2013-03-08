@@ -21,6 +21,7 @@ import org.mule.lifecycle.SimpleLifecycleManager;
 /**
  * Handles Lifecycle transitions for {@link org.mule.api.model.Model} implementations
  */
+@Deprecated
 public class ModelLifecycleManager extends SimpleLifecycleManager<AbstractModel>
 {
     public ModelLifecycleManager(AbstractModel model)

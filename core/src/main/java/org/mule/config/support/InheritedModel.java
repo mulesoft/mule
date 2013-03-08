@@ -14,6 +14,7 @@ import org.mule.model.AbstractModel;
 /**
  * TODO
  */
+@Deprecated
 public class InheritedModel extends AbstractModel
 {
     public String getType()

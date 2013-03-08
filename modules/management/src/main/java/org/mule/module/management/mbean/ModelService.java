@@ -17,6 +17,7 @@ import org.mule.api.model.Model;
  * <code>ModelService</code> exposes service information and actions on the Mule
  * Model.
  */
+@Deprecated
 public class ModelService implements ModelServiceMBean
 {
     private Model model;

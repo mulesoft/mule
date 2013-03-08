@@ -116,6 +116,7 @@ public class DefaultsConfigurationBuilder extends AbstractConfigurationBuilder
             new ChainedThreadingProfile(defaultThreadingProfile));
     }
 
+    @Deprecated
     protected void configureSystemModel(MuleRegistry registry) throws MuleException
     {
         Model systemModel = new SedaModel();
