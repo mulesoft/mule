@@ -71,16 +71,6 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.mule.modules.jca</groupId>
-            <artifactId>mule-module-jca-generic</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.modules.jca</groupId>
-            <artifactId>mule-module-jca-jboss</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-jersey</artifactId>
             <version>${project.version}</version>
