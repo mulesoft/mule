@@ -458,6 +458,7 @@ public final class MuleTestUtils
 //    }
 
     /** Supply service but no endpoint */
+    @Deprecated
     public static MuleEvent getTestEvent(Object data, Service service, MuleContext context) throws Exception
     {
         return getTestEvent(data, service, getTestInboundEndpoint("test1",
@@ -559,6 +560,7 @@ public final class MuleTestUtils
         return testConnector;
     }
 
+    @Deprecated
     public static Service getTestService(MuleContext context) throws Exception
     {
         return getTestService("appleService", Apple.class, context);
@@ -569,11 +571,13 @@ public final class MuleTestUtils
         return getTestFlow("appleFlow", context);
     }
 
+    @Deprecated
     public static Service getTestService(String name, Class<?> clazz, MuleContext context) throws Exception
     {
         return getTestService(name, clazz, null, context);
     }
 
+    @Deprecated
     public static Service getTestService(String name, Class<?> clazz, Map props, MuleContext context)
         throws Exception
     {
@@ -585,6 +589,7 @@ public final class MuleTestUtils
         return getTestFlow(name, context, true);
     }
 
+    @Deprecated
     public static Service getTestService(String name,
                                          Class<?> clazz,
                                          Map props,

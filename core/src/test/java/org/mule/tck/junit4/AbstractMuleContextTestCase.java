@@ -53,7 +53,6 @@ import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
-
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -401,12 +400,14 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase
         return MuleTestUtils.getTestEvent(data, endpoint, muleContext);
     }
 
+    @Deprecated
     public static MuleEvent getTestEvent(Object data, Service service, InboundEndpoint endpoint)
             throws Exception
     {
         return MuleTestUtils.getTestEvent(data, service, endpoint, muleContext);
     }
 
+    @Deprecated
     public static MuleSession getTestSession(Service service, MuleContext context)
     {
         return MuleTestUtils.getTestSession(service, context);
@@ -417,16 +418,19 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase
         return MuleTestUtils.getTestConnector(muleContext);
     }
 
+    @Deprecated
     public static Service getTestService() throws Exception
     {
         return MuleTestUtils.getTestService(muleContext);
     }
 
+    @Deprecated
     public static Service getTestService(String name, Class<?> clazz) throws Exception
     {
         return MuleTestUtils.getTestService(name, clazz, muleContext);
     }
 
+    @Deprecated
     public static Service getTestService(String name, Class<?> clazz, Map<?, ?> props) throws Exception
     {
         return MuleTestUtils.getTestService(name, clazz, props, muleContext);
