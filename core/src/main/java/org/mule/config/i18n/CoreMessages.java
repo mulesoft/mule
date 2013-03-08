@@ -1388,5 +1388,10 @@ public class CoreMessages extends MessageFactory
     {
         return factory.createMessage(BUNDLE_PATH, 341, jdkVersion, jdkVendor, validJdks);
     }
+    
+    public static Message servicesDeprecated()
+    {
+        return factory.createMessage(BUNDLE_PATH, 342);
+    }
 
 }
