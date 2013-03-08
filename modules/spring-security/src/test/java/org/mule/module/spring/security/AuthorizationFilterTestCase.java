@@ -17,9 +17,12 @@ import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.methods.GetMethod;
+import org.hamcrest.core.Is;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 
 public class AuthorizationFilterTestCase extends FunctionalTestCase
 {
@@ -28,6 +31,12 @@ public class AuthorizationFilterTestCase extends FunctionalTestCase
     protected String getConfigResources()
     {
         return "http-filter-test.xml";
+    }
+
+    @Test
+    public void testNotAuthenticated() throws Exception
+    {
+        doRequest("localhost",getUrl(), 401);
     }
 
     @Test
@@ -45,6 +54,25 @@ public class AuthorizationFilterTestCase extends FunctionalTestCase
     protected String getUrl()
     {
         return "http://localhost:4567/authorize";
+    }
+
+    private void doRequest(String host,
+                           String url,
+                           int result) throws Exception
+    {
+        HttpClient client = new HttpClient();
+        GetMethod get = new GetMethod(url);
+        try
+        {
+            int status = client.executeMethod(get);
+            assertEquals(status,result);
+            assertNotNull(get.getResponseHeader("WWW-Authenticate"));
+            assertThat(get.getResponseHeader("WWW-Authenticate").getValue().contains("mule-realm"), Is.is(true));
+        }
+        finally
+        {
+            get.releaseConnection();
+        }
     }
 
     private void doRequest(String realm,

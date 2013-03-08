@@ -82,8 +82,7 @@ public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessT
             {
                 if (e instanceof  MessagingException)
                 {
-                    httpStatus = response.getMessage().getOutboundProperty(HttpConnector.HTTP_STATUS_PROPERTY) != null ? Integer.valueOf(response.getMessage().getOutboundProperty(HttpConnector.HTTP_STATUS_PROPERTY).toString()) : httpStatus;
-                    sendFailureResponseToClient(httpStatus, e.getMessage());
+                    sendFailureResponseToClient((MessagingException)e, httpStatus);
                 }
                 else
                 {
@@ -439,6 +438,16 @@ public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessT
     private void sendFailureResponseToClient(int httpStatus, String message) throws IOException
     {
         httpServerConnection.writeFailureResponse(httpStatus,message,getThrottlingHeaders());
+    }
+
+    private void sendFailureResponseToClient(MessagingException exception, int httpStatus) throws IOException, MuleException
+    {
+        MuleEvent response = exception.getEvent();
+        response.getMessage().setPayload(exception.getMessage());
+        httpStatus = response.getMessage().getOutboundProperty(HttpConnector.HTTP_STATUS_PROPERTY) != null ? Integer.valueOf(response.getMessage().getOutboundProperty(HttpConnector.HTTP_STATUS_PROPERTY).toString()) : httpStatus;
+        response.getMessage().setOutboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, httpStatus);
+        HttpResponse httpResponse = transformResponse(response.getMessage());
+        httpServerConnection.writeResponse(httpResponse, getThrottlingHeaders());
     }
 
     private Map<String,String> getThrottlingHeaders()
