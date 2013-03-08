@@ -29,6 +29,7 @@ import org.apache.commons.logging.LogFactory;
  * The lifecycle manager responsible for managing lifecycle transitions for a Mule service.  The Mule service adds some additional
  * states, namely pause and resume.  The lifecycle manager manages lifecycle notifications and logging as well.
  */
+@Deprecated
 public class ServiceLifecycleManager extends SimpleLifecycleManager<FlowConstruct>
 {
     /**

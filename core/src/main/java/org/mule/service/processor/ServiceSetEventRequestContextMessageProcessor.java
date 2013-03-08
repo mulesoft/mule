@@ -14,7 +14,7 @@ import org.mule.OptimizedRequestContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.processor.MessageProcessor;
-
+@Deprecated
 public class ServiceSetEventRequestContextMessageProcessor implements MessageProcessor
 {
 

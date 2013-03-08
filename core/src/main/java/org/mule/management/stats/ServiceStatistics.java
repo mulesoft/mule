@@ -14,7 +14,7 @@ import org.mule.management.stats.printers.SimplePrinter;
 
 import java.io.PrintWriter;
 import java.util.concurrent.atomic.AtomicLong;
-
+@Deprecated
 public class ServiceStatistics extends FlowConstructStatistics implements QueueStatistics
 {
     private static final long serialVersionUID = -2086999226732861675L;

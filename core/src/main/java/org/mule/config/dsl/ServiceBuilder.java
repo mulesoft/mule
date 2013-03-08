@@ -17,6 +17,7 @@ import org.mule.model.seda.SedaService;
 /**
  * TODO
  */
+@Deprecated
 public class ServiceBuilder
 {
     private Service service;

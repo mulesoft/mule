@@ -18,6 +18,7 @@ import org.mule.api.lifecycle.Stoppable;
  * <code>ServiceServiceMBean</code> defines the management interface for a mule
  * managed service.
  */
+@Deprecated
 public interface ServiceServiceMBean extends Stoppable, Startable, FlowConstructServiceMBean, ServiceStatsMBean
 {
     String DEFAULT_JMX_NAME_PREFIX = "type=Service,name=";

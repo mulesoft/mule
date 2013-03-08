@@ -23,6 +23,7 @@ import org.mule.source.StartableCompositeMessageSource;
  * Extension of {@link StartableCompositeMessageSource} which adds message processors between the composite
  * source and the target listener
  */
+@Deprecated
 public class ServiceAsyncReplyCompositeMessageSource extends ServiceCompositeMessageSource
 {
     protected Long timeout;

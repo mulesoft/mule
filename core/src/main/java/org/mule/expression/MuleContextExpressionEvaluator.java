@@ -24,7 +24,7 @@ import org.mule.config.i18n.CoreMessages;
  * the server itself such as the server id or about the current request such as the current service name.
  * <ul>
  * <li>serviceName - returns the name of the service currently processing the event.</li>
- * <li>modelName - returns the name of the model that hosts the current service</li>
+ * <li>modelName - DEPRECATED returns the name of the model that hosts the current service</li>
  * <li>inboundEndpoint - returns the URI string of the endpoint that received the current messgae.</li>
  * <li>serverId - the Mule instance server Id.</li>
  * <li>clusterId - the Mule instance cluster Id.</li>

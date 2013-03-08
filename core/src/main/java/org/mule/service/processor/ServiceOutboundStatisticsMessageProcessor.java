@@ -16,7 +16,7 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.OutboundRouterCollection;
 import org.mule.api.service.Service;
 import org.mule.management.stats.ServiceStatistics;
-
+@Deprecated
 public class ServiceOutboundStatisticsMessageProcessor implements MessageProcessor
 {
 

@@ -14,7 +14,7 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.service.Service;
-
+@Deprecated
 public class ServiceStatisticsMessageProcessor implements MessageProcessor
 {
     protected Service service;

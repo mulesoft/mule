@@ -72,6 +72,7 @@ import org.apache.commons.logging.LogFactory;
 /**
  * A base implementation for all Services in Mule
  */
+@Deprecated
 public abstract class AbstractService implements Service, MessageProcessor, AnnotatedObject
 {
 
@@ -163,6 +164,8 @@ public abstract class AbstractService implements Service, MessageProcessor, Anno
      */
     public final synchronized void initialise() throws InitialisationException
     {
+        logger.warn(CoreMessages.servicesDeprecated());
+        
         try
         {
             lifecycleManager.fireInitialisePhase(new LifecycleCallback<FlowConstruct>()

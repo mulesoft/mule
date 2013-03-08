@@ -23,6 +23,7 @@ import org.apache.commons.logging.LogFactory;
 /**
  * <code>ServiceStats</code> TODO
  */
+@Deprecated
 public class ServiceStats extends FlowConstructStats implements ServiceStatsMBean, MBeanRegistration
 {
 

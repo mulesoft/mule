@@ -15,6 +15,7 @@ import org.mule.routing.filters.ExpressionFilter;
 /**
  * TODO
  */
+@Deprecated
 public class WhenDefinition
 {
     private ContentBasedRouter router;

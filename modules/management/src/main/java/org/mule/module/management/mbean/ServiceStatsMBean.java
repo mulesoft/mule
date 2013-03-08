@@ -13,6 +13,7 @@ package org.mule.module.management.mbean;
 /**
  * <code>ServiceStatsMBean</code> TODO
  */
+@Deprecated
 public interface ServiceStatsMBean extends FlowConstructStatsMBean
 {
 

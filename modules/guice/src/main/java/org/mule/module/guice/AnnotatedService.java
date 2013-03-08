@@ -24,6 +24,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @BindingAnnotation
+@Deprecated
 public @interface AnnotatedService
 {
     String name() default "";

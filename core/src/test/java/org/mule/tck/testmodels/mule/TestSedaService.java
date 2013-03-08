@@ -17,6 +17,7 @@ import org.mule.model.seda.SedaService;
 /**
  * Exposes some internals of the SedaService useful for unit testing.
  */
+@Deprecated
 public class TestSedaService extends SedaService
 {
     public TestSedaService(MuleContext muleContext)

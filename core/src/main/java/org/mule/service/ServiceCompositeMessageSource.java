@@ -40,6 +40,7 @@ import java.util.List;
  * Extension of {@link StartableCompositeMessageSource} which adds message processors between the composite
  * source and the target listener
  */
+@Deprecated
 public class ServiceCompositeMessageSource extends StartableCompositeMessageSource implements Initialisable, RouterStatisticsRecorder
 {
     protected List<MessageProcessor> processors = new LinkedList<MessageProcessor>();

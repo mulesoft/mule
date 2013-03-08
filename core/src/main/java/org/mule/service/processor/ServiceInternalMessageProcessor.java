@@ -20,7 +20,7 @@ import org.mule.api.transport.ReplyToHandler;
 import org.mule.processor.AbstractInterceptingMessageProcessor;
 
 import org.apache.commons.lang.BooleanUtils;
-
+@Deprecated
 public class ServiceInternalMessageProcessor extends AbstractInterceptingMessageProcessor
 {
 

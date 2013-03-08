@@ -81,6 +81,7 @@ public interface MuleRegistry extends Registry
 
     Transformer lookupTransformer(String name);
 
+    @Deprecated
     Service lookupService(String name);
 
     FlowConstruct lookupFlowConstruct(String name);
@@ -131,8 +132,10 @@ public interface MuleRegistry extends Registry
      */
     Transformer lookupTransformer(DataType<?> source, DataType<?> result) throws TransformerException;
 
+    @Deprecated
     Collection<Service> lookupServices(String model);
 
+    @Deprecated
     Collection<Service> lookupServices();
 
     Collection<FlowConstruct> lookupFlowConstructs();
@@ -195,8 +198,10 @@ public interface MuleRegistry extends Registry
 
     void unregisterTransformer(String transformerName) throws MuleException;
 
+    @Deprecated
     void registerService(Service service) throws MuleException;
 
+    @Deprecated
     void unregisterService(String serviceName) throws MuleException;
 
     void registerFlowConstruct(FlowConstruct flowConstruct) throws MuleException;

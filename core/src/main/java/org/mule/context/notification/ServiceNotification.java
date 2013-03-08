@@ -19,6 +19,7 @@ import org.mule.api.service.Service;
  * starting occurs. The payload of this event will always be a reference to the
  * service.
  */
+@Deprecated
 public class ServiceNotification extends ServerNotification implements BlockingServerEvent
 {
     /**

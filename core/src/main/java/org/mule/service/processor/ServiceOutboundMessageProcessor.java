@@ -31,6 +31,7 @@ import org.mule.transport.NullPayload;
  * the outbound phase returns null this MessageProcessor will return the request
  * event.
  */
+@Deprecated
 public class ServiceOutboundMessageProcessor extends AbstractInterceptingMessageProcessor
 {
 

@@ -21,6 +21,7 @@ import org.mule.routing.outbound.AbstractOutboundRouter;
 /**
  * TODO
  */
+@Deprecated
 public class ContentBasedRouter extends AbstractOutboundRouter
 {
     @Override

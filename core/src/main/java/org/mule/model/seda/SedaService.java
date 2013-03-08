@@ -39,6 +39,7 @@ import org.mule.util.concurrent.ThreadNameHelper;
  * Queue and thread pool for a Mule sevice service. In Seda terms this is equivilent
  * to a stage.
  */
+@Deprecated
 public class SedaService extends AbstractService
 {
     /**

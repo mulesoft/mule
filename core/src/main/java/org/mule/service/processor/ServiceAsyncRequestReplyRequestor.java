@@ -15,7 +15,7 @@ import org.mule.api.processor.InterceptingMessageProcessor;
 import org.mule.api.source.MessageSource;
 import org.mule.routing.requestreply.AbstractAsyncRequestReplyRequester;
 import org.mule.service.ServiceAsyncReplyCompositeMessageSource;
-
+@Deprecated
 public class ServiceAsyncRequestReplyRequestor extends AbstractAsyncRequestReplyRequester implements InterceptingMessageProcessor
 {
 

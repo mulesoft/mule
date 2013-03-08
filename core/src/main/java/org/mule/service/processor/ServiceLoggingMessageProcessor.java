@@ -17,7 +17,7 @@ import org.mule.api.service.Service;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
+@Deprecated
 public class ServiceLoggingMessageProcessor implements MessageProcessor
 {
     protected final transient Log logger = LogFactory.getLog(getClass());

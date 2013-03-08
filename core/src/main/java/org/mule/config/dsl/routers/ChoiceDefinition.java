@@ -12,6 +12,7 @@ package org.mule.config.dsl.routers;
 /**
  * TODO
  */
+@Deprecated
 public class ChoiceDefinition
 {
 

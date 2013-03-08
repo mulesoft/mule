@@ -1395,7 +1395,14 @@
                     </xsd:documentation>
                 </xsd:annotation>
             </xsd:enumeration>
-            <xsd:enumeration value="SERVICE"/>
+            <xsd:enumeration value="SERVICE">
+                <xsd:annotation>
+                    <xsd:documentation>
+                        DEPRECATED: The use of 'model' and 'service' is deprecated in Mule 3.4 and will be removed in Mule 4.0. As such this
+                        notification is also deprecated and will be removed in Mule 4.0.
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:enumeration>
             <xsd:enumeration value="SECURITY"/>
             <xsd:enumeration value="ASYNC-MESSAGE"/>
             <xsd:enumeration value="ENDPOINT-MESSAGE"/>
@@ -1758,6 +1765,7 @@
     <xsd:element name="abstract-service" abstract="true" type="abstractServiceType">
         <xsd:annotation>
             <xsd:documentation>
+                DEPRECATED: Services are deprecated in Mule 3.4 and will be removed in Mule 4.0. 
                 A placeholder for a service element. Services combine message routing with a component (typically a POJO).
             </xsd:documentation>
         </xsd:annotation>
@@ -2144,6 +2152,7 @@
     <xsd:element name="service" type="sedaServiceType" substitutionGroup="abstract-service">
         <xsd:annotation>
             <xsd:documentation>
+                DEPRECATED: Services are deprecated in Mule 3.4 and will be removed in Mule 4.0.
                 Describes how to receive messages, deliver them to a component, and handle the results (if any).
             </xsd:documentation>
         </xsd:annotation>
@@ -2169,6 +2178,7 @@
     <xsd:element name="custom-service" type="customServiceType" substitutionGroup="abstract-service">
         <xsd:annotation>
             <xsd:documentation>
+                DEPRECATED: Services are deprecated in Mule 3.4 and will be removed in Mule 4.0.
                 A user-implemented service (typically used only in testing).
             </xsd:documentation>
         </xsd:annotation>

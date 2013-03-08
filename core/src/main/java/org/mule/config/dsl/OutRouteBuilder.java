@@ -16,6 +16,7 @@ import org.mule.routing.outbound.MulticastingRouter;
 /**
  * TODO
  */
+@Deprecated
 public class OutRouteBuilder
 {
     private MuleContext muleContext;

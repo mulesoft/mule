@@ -21,6 +21,7 @@ package org.mule.api.service;
  * @see org.mule.api.lifecycle.Initialisable
  * @see Service
  */
+@Deprecated
 public interface ServiceAware
 {
 

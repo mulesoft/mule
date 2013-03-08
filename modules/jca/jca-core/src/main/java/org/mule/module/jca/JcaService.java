@@ -23,6 +23,7 @@ import org.mule.service.AbstractService;
  * an app server using JCA. In the future we might want to use one of the existing
  * models.
  */
+@Deprecated
 public class JcaService extends AbstractService
 {
 

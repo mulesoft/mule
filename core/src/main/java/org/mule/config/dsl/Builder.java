@@ -14,7 +14,7 @@ import org.mule.api.MuleContext;
 /**
  * TODO
  */
-
+@Deprecated
 public interface Builder<T>
 {
     T create(MuleContext muleContext);

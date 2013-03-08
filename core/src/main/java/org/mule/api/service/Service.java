@@ -33,6 +33,7 @@ import java.io.Serializable;
  * is responsible for managing the interaction of events to and from the service as
  * well as managing pooled resources.
  */
+@Deprecated
 public interface Service extends Serializable, FlowConstruct, Lifecycle, NameableObject
 {
     /**

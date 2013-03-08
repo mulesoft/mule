@@ -18,6 +18,7 @@ import org.mule.context.notification.ServiceNotification;
  * can implement and then register themselves with the Mule manager to be notified
  * when a Service event occurs.
  */
+@Deprecated
 public interface ServiceNotificationListener<T extends ServiceNotification> extends ServerNotificationListener<ServiceNotification>
 {
     // no methods

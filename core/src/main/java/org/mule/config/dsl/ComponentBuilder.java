@@ -21,6 +21,7 @@ import org.mule.object.SingletonObjectFactory;
 /**
  * TODO
  */
+@Deprecated
 public class ComponentBuilder
 {
     public enum Scope

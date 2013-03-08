@@ -321,6 +321,7 @@ public class CoreMessages extends MessageFactory
         return factory.createMessage(BUNDLE_PATH, 70, type);
     }
 
+    @Deprecated
     public static Message routingFailedOnEndpoint(Service service, ImmutableEndpoint endpoint)
     {
         EndpointURI endpointURI = null;
@@ -1017,6 +1018,7 @@ public class CoreMessages extends MessageFactory
         return factory.createMessage(BUNDLE_PATH, 248, tx.getClass());
     }
 
+    @Deprecated
     public static Message noServiceQueueTimeoutSet(Service service)
     {
         return factory.createMessage(BUNDLE_PATH, 249, service);

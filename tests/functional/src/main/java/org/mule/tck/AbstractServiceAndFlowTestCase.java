@@ -16,6 +16,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 @RunWith(Parameterized.class)
+@Deprecated
 public abstract class AbstractServiceAndFlowTestCase extends FunctionalTestCase
 {
     protected ConfigVariant variant;
