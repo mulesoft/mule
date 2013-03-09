@@ -11,7 +11,6 @@
 package org.mule.module.launcher.application;
 
 import static org.mule.util.SplashScreen.miniSplash;
-
 import org.mule.MuleServer;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
@@ -29,19 +28,14 @@ import org.mule.context.notification.NotificationException;
 import org.mule.module.launcher.AbstractFileWatcher;
 import org.mule.module.launcher.ApplicationMuleContextBuilder;
 import org.mule.module.launcher.ConfigChangeMonitorThreadFactory;
-import org.mule.module.launcher.DefaultMuleSharedDomainClassLoader;
 import org.mule.module.launcher.DeploymentInitException;
 import org.mule.module.launcher.DeploymentListener;
-import org.mule.module.launcher.MuleDeploymentService;
 import org.mule.module.launcher.DeploymentStartException;
 import org.mule.module.launcher.DeploymentStopException;
 import org.mule.module.launcher.GoodCitizenClassLoader;
 import org.mule.module.launcher.InstallException;
-import org.mule.module.launcher.MuleApplicationClassLoader;
-import org.mule.module.launcher.MuleSharedDomainClassLoader;
+import org.mule.module.launcher.MuleDeploymentService;
 import org.mule.module.launcher.descriptor.ApplicationDescriptor;
-import org.mule.module.launcher.plugin.MulePluginsClassLoader;
-import org.mule.module.launcher.plugin.PluginDescriptor;
 import org.mule.module.reboot.MuleContainerBootstrapUtils;
 import org.mule.util.ClassUtils;
 import org.mule.util.ExceptionUtils;
@@ -53,7 +47,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -79,10 +72,11 @@ public class DefaultMuleApplication implements Application
 
     protected DeploymentListener deploymentListener;
 
-    protected DefaultMuleApplication(ApplicationDescriptor appDesc)
+    protected DefaultMuleApplication(ApplicationDescriptor appDesc, ClassLoader classLoader)
     {
         this.descriptor = appDesc;
         this.deploymentListener = new NullDeploymentListener();
+        this.deploymentClassLoader = classLoader;
     }
 
     public void setDeploymentListener(DeploymentListener deploymentListener)
@@ -119,7 +113,6 @@ public class DefaultMuleApplication implements Application
             absoluteResourcePaths[i] = file.getAbsolutePath();
         }
 
-        createDeploymentClassLoader();
     }
 
     @Override
@@ -437,34 +430,6 @@ public class DefaultMuleApplication implements Application
 
         muleContext.dispose();
         muleContext = null;
-    }
-
-    protected void createDeploymentClassLoader()
-    {
-        final String domain = descriptor.getDomain();
-        ClassLoader parent;
-
-        if (StringUtils.isBlank(domain) || DefaultMuleSharedDomainClassLoader.DEFAULT_DOMAIN_NAME.equals(domain))
-        {
-            parent = new DefaultMuleSharedDomainClassLoader(getClass().getClassLoader());
-        }
-        else
-        {
-            // TODO handle non-existing domains with an exception
-            parent = new MuleSharedDomainClassLoader(domain, getClass().getClassLoader());
-        }
-
-        final Set<PluginDescriptor> plugins = descriptor.getPlugins();
-        if (!plugins.isEmpty())
-        {
-            MulePluginsClassLoader cl = new MulePluginsClassLoader(parent, plugins);
-            // re-assign parent ref if any plugins deployed, will be used by the MuleAppCL
-            parent = cl;
-        }
-
-        final MuleApplicationClassLoader appCl = new MuleApplicationClassLoader(descriptor.getAppName(),
-            parent, descriptor.getLoaderOverride());
-        this.deploymentClassLoader = appCl;
     }
 
     protected void createRedeployMonitor() throws NotificationException
