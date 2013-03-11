@@ -102,7 +102,7 @@ public class JsonExpressionEvaluator implements ExpressionEvaluator
                 JsonNode resultNode = data.get(expression);
                 if (compareTo != null)
                 {
-                    Object resultValue = resultNode.isValueNode() ? resultNode.getValueAsText() : resultNode;
+                    Object resultValue = resultNode.isValueNode() ? resultNode.asText() : resultNode;
                     if (compareTo.equalsIgnoreCase("null"))
                     {
                         boolean answer = resultValue == null;
@@ -151,7 +151,7 @@ public class JsonExpressionEvaluator implements ExpressionEvaluator
     {
         if (result instanceof ValueNode)
         {
-            return result.getValueAsText();
+            return result.asText();
         }
         if (result instanceof ObjectNode)
         {

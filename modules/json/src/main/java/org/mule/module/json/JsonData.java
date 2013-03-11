@@ -141,7 +141,7 @@ public class JsonData implements Serializable
         JsonNode node = get(expression);
         if (node.isValueNode())
         {
-            return node.getValueAsText();
+            return node.asText();
         }
         else
         {

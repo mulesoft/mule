@@ -35,7 +35,7 @@ public class JsonNodeExpressionEvaluator extends JsonExpressionEvaluator
     {
         if (result instanceof ValueNode)
         {
-            return result.getValueAsText();
+            return result.asText();
         }
         if (result instanceof ArrayNode)
         {
