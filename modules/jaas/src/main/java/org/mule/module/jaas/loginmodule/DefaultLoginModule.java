@@ -46,12 +46,12 @@ public class DefaultLoginModule implements LoginModule
     private String username;
     private String password;
     private String credentials;
-    private List credentialList;
+    private List<String> credentialList;
     private Subject subject;
 
     /**
      * Abort if authentication fails
-     * 
+     *
      * @return boolean
      * @throws LoginException
      */
@@ -82,7 +82,7 @@ public class DefaultLoginModule implements LoginModule
 
     /**
      * Commit if authentication succeeds, otherwise return false
-     * 
+     *
      * @return boolean
      * @throws LoginException
      */
@@ -95,11 +95,11 @@ public class DefaultLoginModule implements LoginModule
         else
         {
             // set the principal just authenticated in the subject
-            if (subject == null) 
+            if (subject == null)
             {
                 return false;
             }
-            MuleJaasPrincipal principal = new MuleJaasPrincipal(username); 
+            MuleJaasPrincipal principal = new MuleJaasPrincipal(username);
             Set entities = subject.getPrincipals();
             if (!entities.contains(principal))
             {
@@ -113,10 +113,10 @@ public class DefaultLoginModule implements LoginModule
             return true;
         }
     }
-    
+
     /**
      * Initialises the callbackHandler, the credentials and the credentials list
-     * 
+     *
      * @param subject
      * @param callbackHandler
      * @param sharedState
@@ -137,7 +137,7 @@ public class DefaultLoginModule implements LoginModule
     /**
      * This method attempts to login the user by checking his credentials against
      * those of the authorised users.
-     * 
+     *
      * @throws LoginException This is thrown either when there is no callback Handler
      *             or else when the user fails to be authenticated
      */
@@ -186,7 +186,7 @@ public class DefaultLoginModule implements LoginModule
         // check the username and password against the list of authorised users
         for (int i = 0; i < credentialList.size(); i = i + 2)
         {
-            if (username.equals(credentialList.get(i).toString()))
+            if (username.equals(credentialList.get(i)))
             {
                 usernameCorrect = true;
             }
@@ -195,7 +195,7 @@ public class DefaultLoginModule implements LoginModule
                 usernameCorrect = false;
             }
 
-            if (password.equals(credentialList.get(i + 1).toString()))
+            if (password.equals(credentialList.get(i + 1)))
             {
                 passwordCorrect = true;
             }
@@ -231,10 +231,10 @@ public class DefaultLoginModule implements LoginModule
             }
         }
     }
-    
+
     /**
      * Returns true when authentication succeeds or false when it fails
-     * 
+     *
      * @return succeeded
      */
     public final boolean logout()
@@ -246,24 +246,24 @@ public class DefaultLoginModule implements LoginModule
      * This method parses the credentials string and populates the credentials list
      * against which the username and password submitted with the request will be
      * checked
-     * 
-     * @param credentials
+     *
+     * @param creds
      * @return outputList
      */
-    public final List getCredentialList(String credentials)
+    public final List<String> getCredentialList(String creds)
     {
         boolean semicolonIsFound = false;
         boolean dividerIsFound = false;
-        char[] credentialArray = credentials.toCharArray();
-        String username = "";
-        String password = "";
-        List outputList = new Vector();
+        char[] credentialArray = creds.toCharArray();
+        String user = "";
+        String passwd = "";
+        List<String> outputList = new Vector<String>();
 
-        for (int i = 0; i < credentials.length(); i++)
+        for (int i = 0; i < creds.length(); i++)
         {
             if ((credentialArray[i] != ':') && (!dividerIsFound))
             {
-                username = username + credentialArray[i];
+                user = user + credentialArray[i];
             }
             else if ((credentialArray[i] == ':') && (!dividerIsFound))
             {
@@ -271,20 +271,20 @@ public class DefaultLoginModule implements LoginModule
             }
             else if ((credentialArray[i] != ';') && (!semicolonIsFound) && (dividerIsFound))
             {
-                password = password + credentialArray[i];
+                passwd = passwd + credentialArray[i];
             }
             else if ((credentialArray[i] != ';') && (!semicolonIsFound) && (dividerIsFound))
             {
-                password = password + credentialArray[i];
+                passwd = passwd + credentialArray[i];
             }
             else if ((credentialArray[i] == ';') && (!semicolonIsFound) && (dividerIsFound))
             {
-                outputList.add(username);
-                outputList.add(password);
+                outputList.add(user);
+                outputList.add(passwd);
                 semicolonIsFound = false;
                 dividerIsFound = false;
-                username = "";
-                password = "";
+                user = "";
+                passwd = "";
             }
         }
         return outputList;
