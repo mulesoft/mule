@@ -224,9 +224,9 @@
 /mule-standalone-nodocs-${productVersion}/lib/opt/hibernate-core-3.6.0.Final.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/hibernate-jpa-2.0-api-1.0.0.Final.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/isorelax-20030108.jar
-/mule-standalone-nodocs-${productVersion}/lib/opt/jackson-core-asl-1.8.0.jar
-/mule-standalone-nodocs-${productVersion}/lib/opt/jackson-jaxrs-1.8.0.jar
-/mule-standalone-nodocs-${productVersion}/lib/opt/jackson-mapper-asl-1.8.0.jar
+/mule-standalone-nodocs-${productVersion}/lib/opt/jackson-core-asl-1.9.11.jar
+/mule-standalone-nodocs-${productVersion}/lib/opt/jackson-jaxrs-1.9.11.jar
+/mule-standalone-nodocs-${productVersion}/lib/opt/jackson-mapper-asl-1.9.11.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/jackson-xc-1.7.1.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/jasper-6.0.29.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/jasper-el-6.0.29.jar
