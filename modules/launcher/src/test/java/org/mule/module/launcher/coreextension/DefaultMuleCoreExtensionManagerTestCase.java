@@ -18,6 +18,8 @@ import org.mule.MuleCoreExtension;
 import org.mule.module.launcher.DeploymentListener;
 import org.mule.module.launcher.DeploymentService;
 import org.mule.module.launcher.DeploymentServiceAware;
+import org.mule.module.launcher.PluginClassLoaderManager;
+import org.mule.module.launcher.PluginClassLoaderManagerAware;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -72,6 +74,21 @@ public class DefaultMuleCoreExtensionManagerTestCase extends AbstractMuleTestCas
         coreExtensionManager.initialise();
 
         verify(deploymentService).addDeploymentListener(extension);
+    }
+
+    @Test
+    public void injectsPluginClassLoaderAwareCoreExtension() throws Exception
+    {
+        List<MuleCoreExtension> extensions = new LinkedList<MuleCoreExtension>();
+        TestPluginClassLoaderManagerAwareExtension extension = mock(TestPluginClassLoaderManagerAwareExtension.class);
+        extensions.add(extension);
+        when(coreExtensionDiscoverer.discover()).thenReturn(extensions);
+        PluginClassLoaderManager pluginClassLoaderManager = mock(PluginClassLoaderManager.class);
+        coreExtensionManager.setPluginClassLoaderManager(pluginClassLoaderManager);
+
+        coreExtensionManager.initialise();
+
+        verify(extension).setPluginClassLoaderManager(pluginClassLoaderManager);
     }
 
     @Test
@@ -163,6 +180,11 @@ public class DefaultMuleCoreExtensionManagerTestCase extends AbstractMuleTestCas
     }
 
     public static interface TestDeploymentListenerExtension extends MuleCoreExtension, DeploymentListener
+    {
+
+    }
+
+    public static interface TestPluginClassLoaderManagerAwareExtension extends MuleCoreExtension, PluginClassLoaderManagerAware
     {
 
     }

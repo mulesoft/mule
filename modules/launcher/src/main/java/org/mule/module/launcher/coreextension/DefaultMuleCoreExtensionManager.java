@@ -17,6 +17,8 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.module.launcher.DeploymentListener;
 import org.mule.module.launcher.DeploymentService;
 import org.mule.module.launcher.DeploymentServiceAware;
+import org.mule.module.launcher.PluginClassLoaderManager;
+import org.mule.module.launcher.PluginClassLoaderManagerAware;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -34,6 +36,7 @@ public class DefaultMuleCoreExtensionManager implements MuleCoreExtensionManager
     private List<MuleCoreExtension> coreExtensions = new LinkedList<MuleCoreExtension>();
     private DeploymentService deploymentService;
     private List<MuleCoreExtension> orderedCoreExtensions;
+    private PluginClassLoaderManager pluginClassLoaderManager;
 
     public DefaultMuleCoreExtensionManager()
     {
@@ -129,6 +132,11 @@ public class DefaultMuleCoreExtensionManager implements MuleCoreExtensionManager
                 deploymentService.addDeploymentListener((DeploymentListener) extension);
             }
 
+            if (extension instanceof PluginClassLoaderManagerAware)
+            {
+                ((PluginClassLoaderManagerAware) extension).setPluginClassLoaderManager(pluginClassLoaderManager);
+            }
+
             extension.initialise();
         }
     }
@@ -137,5 +145,11 @@ public class DefaultMuleCoreExtensionManager implements MuleCoreExtensionManager
     public void setDeploymentService(DeploymentService deploymentService)
     {
         this.deploymentService = deploymentService;
+    }
+
+    @Override
+    public void setPluginClassLoaderManager(PluginClassLoaderManager pluginClassLoaderManager)
+    {
+        this.pluginClassLoaderManager = pluginClassLoaderManager;
     }
 }
