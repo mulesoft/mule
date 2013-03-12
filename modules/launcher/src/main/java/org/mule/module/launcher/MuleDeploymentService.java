@@ -14,8 +14,10 @@ import static org.mule.util.SplashScreen.miniSplash;
 import org.mule.config.StartupContext;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.module.launcher.application.Application;
+import org.mule.module.launcher.application.ApplicationClassLoaderFactory;
 import org.mule.module.launcher.application.ApplicationFactory;
 import org.mule.module.launcher.application.DefaultApplicationFactory;
+import org.mule.module.launcher.application.MuleApplicationClassLoaderFactory;
 import org.mule.module.launcher.util.DebuggableReentrantLock;
 import org.mule.module.launcher.util.ElementAddedEvent;
 import org.mule.module.launcher.util.ElementRemovedEvent;
@@ -83,7 +85,8 @@ public class MuleDeploymentService implements DeploymentService
 
     public MuleDeploymentService()
     {
-        DefaultApplicationFactory appFactory = new DefaultApplicationFactory();
+        ApplicationClassLoaderFactory applicationClassLoaderFactory = new MuleApplicationClassLoaderFactory();
+        DefaultApplicationFactory appFactory = new DefaultApplicationFactory(applicationClassLoaderFactory);
         appFactory.setDeploymentListener(deploymentListener);
         this.appFactory = appFactory;
 
@@ -417,7 +420,6 @@ public class MuleDeploymentService implements DeploymentService
         catch (InterruptedException e)
         {
             Thread.currentThread().interrupt();
-            return;
         }
         finally
         {
@@ -467,7 +469,6 @@ public class MuleDeploymentService implements DeploymentService
         catch (InterruptedException e)
         {
             Thread.currentThread().interrupt();
-            return;
         }
         finally
         {

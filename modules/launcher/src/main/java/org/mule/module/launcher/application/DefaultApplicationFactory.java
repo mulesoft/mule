@@ -23,7 +23,13 @@ import java.io.IOException;
 public class DefaultApplicationFactory implements ApplicationFactory
 {
 
+    private final ApplicationClassLoaderFactory applicationClassLoaderFactory;
     protected DeploymentListener deploymentListener;
+
+    public DefaultApplicationFactory(ApplicationClassLoaderFactory applicationClassLoaderFactory)
+    {
+        this.applicationClassLoaderFactory = applicationClassLoaderFactory;
+    }
 
     public void setDeploymentListener(DeploymentListener deploymentListener)
     {
@@ -40,10 +46,10 @@ public class DefaultApplicationFactory implements ApplicationFactory
 
     protected Application createAppFrom(ApplicationDescriptor descriptor) throws IOException
     {
-        MuleApplicationClassLoaderFactory applicationClassLoaderFactory = new MuleApplicationClassLoaderFactory();
-        ClassLoader appClassLoader = applicationClassLoaderFactory.create(descriptor);
+        ClassLoader classLoader = applicationClassLoaderFactory.create(descriptor);
 
-        final DefaultMuleApplication delegate = new DefaultMuleApplication(descriptor, appClassLoader);
+        final DefaultMuleApplication delegate = new DefaultMuleApplication(descriptor, classLoader);
+
         if (deploymentListener != null)
         {
             delegate.setDeploymentListener(deploymentListener);

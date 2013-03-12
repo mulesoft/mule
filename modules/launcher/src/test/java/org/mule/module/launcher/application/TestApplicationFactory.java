@@ -22,6 +22,11 @@ public class TestApplicationFactory extends DefaultApplicationFactory
     private boolean failOnStopApplication;
     private boolean failOnDisposeApplication;
 
+    public TestApplicationFactory(ApplicationClassLoaderFactory applicationClassLoaderFactory)
+    {
+        super(applicationClassLoaderFactory);
+    }
+
     @Override
     public Application createApp(String appName) throws IOException
     {
