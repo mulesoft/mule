@@ -16,16 +16,13 @@ import static org.mockito.Mockito.mock;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Collections;
 import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 import org.junit.Test;
 
@@ -57,8 +54,8 @@ public class CompositeApplicationClassLoaderTestCase extends AbstractMuleTestCas
     @Test
     public void loadsClassFromAppFirst() throws Exception
     {
-        appClassLoader.classes.put(CLASS_NAME, APP_LOADED_CLASS);
-        pluginClassLoader.classes.put(CLASS_NAME, PLUGIN_LOADED_CLASS);
+        appClassLoader.addClass(CLASS_NAME, APP_LOADED_CLASS);
+        pluginClassLoader.addClass(CLASS_NAME, PLUGIN_LOADED_CLASS);
 
         List<ClassLoader> classLoaders = getClassLoaders(appClassLoader, pluginClassLoader);
 
@@ -71,7 +68,7 @@ public class CompositeApplicationClassLoaderTestCase extends AbstractMuleTestCas
     @Test
     public void loadsClassFromPluginWhenIsNotDefinedInApp() throws Exception
     {
-        pluginClassLoader.classes.put(CLASS_NAME, PLUGIN_LOADED_CLASS);
+        pluginClassLoader.addClass(CLASS_NAME, PLUGIN_LOADED_CLASS);
 
         List<ClassLoader> classLoaders = getClassLoaders(appClassLoader, pluginClassLoader);
 
@@ -94,8 +91,8 @@ public class CompositeApplicationClassLoaderTestCase extends AbstractMuleTestCas
     @Test
     public void loadsResourceFromAppFirst() throws Exception
     {
-        appClassLoader.resources.put(RESOURCE_NAME, APP_LOADED_RESOURCE);
-        pluginClassLoader.resources.put(RESOURCE_NAME, PLUGIN_LOADED_RESOURCE);
+        appClassLoader.addResource(RESOURCE_NAME, APP_LOADED_RESOURCE);
+        pluginClassLoader.addResource(RESOURCE_NAME, PLUGIN_LOADED_RESOURCE);
 
         List<ClassLoader> classLoaders = getClassLoaders(appClassLoader, pluginClassLoader);
 
@@ -108,7 +105,7 @@ public class CompositeApplicationClassLoaderTestCase extends AbstractMuleTestCas
     @Test
     public void loadsResourceFromPluginWhenIsNotDefinedInApp() throws Exception
     {
-        pluginClassLoader.resources.put(RESOURCE_NAME, PLUGIN_LOADED_RESOURCE);
+        pluginClassLoader.addResource(RESOURCE_NAME, PLUGIN_LOADED_RESOURCE);
 
         List<ClassLoader> classLoaders = getClassLoaders(appClassLoader, pluginClassLoader);
 
@@ -132,8 +129,8 @@ public class CompositeApplicationClassLoaderTestCase extends AbstractMuleTestCas
     @Test
     public void loadsStreamResourceFromAppFirst() throws Exception
     {
-        appClassLoader.streamResources.put(RESOURCE_NAME, APP_LOADED_STREAM_RESOURCE);
-        pluginClassLoader.streamResources.put(RESOURCE_NAME, PLUGIN_LOADED_STREAM_RESOURCE);
+        appClassLoader.addStreamResource(RESOURCE_NAME, APP_LOADED_STREAM_RESOURCE);
+        pluginClassLoader.addStreamResource(RESOURCE_NAME, PLUGIN_LOADED_STREAM_RESOURCE);
 
         List<ClassLoader> classLoaders = getClassLoaders(appClassLoader, pluginClassLoader);
 
@@ -146,7 +143,7 @@ public class CompositeApplicationClassLoaderTestCase extends AbstractMuleTestCas
     @Test
     public void loadsStreamResourceFromPluginWhenIsNotDefinedInApp() throws Exception
     {
-        pluginClassLoader.streamResources.put(RESOURCE_NAME, PLUGIN_LOADED_STREAM_RESOURCE);
+        pluginClassLoader.addStreamResource(RESOURCE_NAME, PLUGIN_LOADED_STREAM_RESOURCE);
 
         List<ClassLoader> classLoaders = getClassLoaders(appClassLoader, pluginClassLoader);
 
@@ -170,8 +167,8 @@ public class CompositeApplicationClassLoaderTestCase extends AbstractMuleTestCas
     @Test
     public void getsResourcesFromAppAndPluginClassLoader() throws Exception
     {
-        appClassLoader.resources.put(RESOURCE_NAME, APP_LOADED_RESOURCE);
-        pluginClassLoader.resources.put(PLUGIN_RESOURCE_NAME, PLUGIN_LOADED_RESOURCE);
+        appClassLoader.addResource(RESOURCE_NAME, APP_LOADED_RESOURCE);
+        pluginClassLoader.addResource(PLUGIN_RESOURCE_NAME, PLUGIN_LOADED_RESOURCE);
 
         List<ClassLoader> classLoaders = getClassLoaders(appClassLoader, pluginClassLoader);
 
@@ -189,8 +186,8 @@ public class CompositeApplicationClassLoaderTestCase extends AbstractMuleTestCas
     @Test
     public void filtersResourcesDuplicatedInAppAndPluginClassLoader() throws Exception
     {
-        appClassLoader.resources.put(RESOURCE_NAME, APP_LOADED_RESOURCE);
-        pluginClassLoader.resources.put(RESOURCE_NAME, APP_LOADED_RESOURCE);
+        appClassLoader.addResource(RESOURCE_NAME, APP_LOADED_RESOURCE);
+        pluginClassLoader.addResource(RESOURCE_NAME, APP_LOADED_RESOURCE);
 
         List<ClassLoader> classLoaders = getClassLoaders(appClassLoader, pluginClassLoader);
 
@@ -213,42 +210,4 @@ public class CompositeApplicationClassLoaderTestCase extends AbstractMuleTestCas
         return classLoaders;
     }
 
-    public static class TestClassLoader extends ClassLoader
-    {
-
-        private Map<String, Class> classes = new HashMap<String, Class>();
-        private Map<String, URL> resources = new HashMap<String, URL>();
-        private Map<String, InputStream> streamResources = new HashMap<String, InputStream>();
-
-        @Override
-        public Class<?> loadClass(String s) throws ClassNotFoundException
-        {
-
-            Class aClass = classes.get(s);
-            if (aClass == null)
-            {
-                throw new ClassNotFoundException(s);
-            }
-
-            return aClass;
-        }
-
-        @Override
-        public URL getResource(String s)
-        {
-            return resources.get(s);
-        }
-
-        @Override
-        public InputStream getResourceAsStream(String s)
-        {
-            return streamResources.get(s);
-        }
-
-        @Override
-        public Enumeration<URL> getResources(String s) throws IOException
-        {
-            return new EnumerationAdapter<URL>(resources.values());
-        }
-    }
 }
