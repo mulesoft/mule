@@ -12,6 +12,7 @@ package org.mule.module.launcher.application;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -98,6 +99,47 @@ public class CompositeApplicationClassLoader extends ClassLoader
                 }
 
                 return resourceAsStream;
+            }
+        }
+
+        return null;
+    }
+
+    @Override
+    protected String findLibrary(String s)
+    {
+        for (ClassLoader classLoader : classLoaders)
+        {
+            String library = findLibrary(s, classLoader);
+            if (library != null)
+            {
+
+                if (logger.isDebugEnabled())
+                {
+                    logger.debug(String.format("Library '%s' found in classLoader '%s", s, classLoader));
+                }
+
+                return library;
+            }
+        }
+
+        return null;
+    }
+
+    protected String findLibrary(String s, ClassLoader classLoader)
+    {
+        try
+        {
+            Method findLibraryMethod = classLoader.getClass().getDeclaredMethod("findLibrary", String.class);
+            findLibraryMethod.setAccessible(true);
+
+            return (String) findLibraryMethod.invoke(classLoader, s);
+        }
+        catch (Exception e)
+        {
+            if (logger.isDebugEnabled())
+            {
+                logger.debug(String.format("Error finding library '%s' in classloader", s, classLoader), e);
             }
         }
 

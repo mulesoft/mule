@@ -36,6 +36,11 @@ public class CompositeApplicationClassLoaderTestCase extends AbstractMuleTestCas
 
     public static final String RESOURCE_NAME = "dummy.txt";
     public static final String PLUGIN_RESOURCE_NAME = "plugin.txt";
+
+    public static final String LIBRARY_NAME = "dummy.so";
+    public static final String APP_LOADED_LIBRARY = "app.dummy.so";
+    public static final String PLUGIN_LOADED_LIBRARY = "plugin.dummy.so";
+
     public final URL APP_LOADED_RESOURCE;
     public final URL PLUGIN_LOADED_RESOURCE;
 
@@ -199,6 +204,47 @@ public class CompositeApplicationClassLoaderTestCase extends AbstractMuleTestCas
         expectedResources.add(APP_LOADED_RESOURCE);
 
         assertThat(resources, EnumerationMatcher.equalTo(expectedResources));
+    }
+
+    @Test
+    public void loadsLibraryFromAppFirst() throws Exception
+    {
+        appClassLoader.addLibrary(LIBRARY_NAME, APP_LOADED_LIBRARY);
+        pluginClassLoader.addLibrary(LIBRARY_NAME, PLUGIN_LOADED_LIBRARY);
+
+        List<ClassLoader> classLoaders = getClassLoaders(appClassLoader, pluginClassLoader);
+
+        CompositeApplicationClassLoader compositeApplicationClassLoader = new CompositeApplicationClassLoader(classLoaders);
+
+        String library = compositeApplicationClassLoader.findLibrary(LIBRARY_NAME);
+
+        assertThat(library, equalTo(APP_LOADED_LIBRARY));
+    }
+
+    @Test
+    public void loadsLibraryFromPluginWhenIsNotDefinedInApp() throws Exception
+    {
+        pluginClassLoader.addLibrary(LIBRARY_NAME, PLUGIN_LOADED_LIBRARY);
+
+        List<ClassLoader> classLoaders = getClassLoaders(appClassLoader, pluginClassLoader);
+
+        CompositeApplicationClassLoader compositeApplicationClassLoader = new CompositeApplicationClassLoader(classLoaders);
+
+        String library = compositeApplicationClassLoader.findLibrary(LIBRARY_NAME);
+
+        assertThat(library, equalTo(PLUGIN_LOADED_LIBRARY));
+    }
+
+    @Test
+    public void returnsNullWhenLibraryIsNotDefinedInAnyClassLoader() throws Exception
+    {
+        List<ClassLoader> classLoaders = getClassLoaders(appClassLoader, pluginClassLoader);
+
+        CompositeApplicationClassLoader compositeApplicationClassLoader = new CompositeApplicationClassLoader(classLoaders);
+
+        String library = compositeApplicationClassLoader.findLibrary(LIBRARY_NAME);
+
+        assertThat(library, equalTo(null));
     }
 
     private List<ClassLoader> getClassLoaders(ClassLoader... expectedClassLoaders)

@@ -26,6 +26,7 @@ public class TestClassLoader extends ClassLoader
     private Map<String, Class> classes = new HashMap<String, Class>();
     private Map<String, URL> resources = new HashMap<String, URL>();
     private Map<String, InputStream> streamResources = new HashMap<String, InputStream>();
+    private Map<String, String> libraries = new HashMap<String, String>();
 
     @Override
     public Class<?> loadClass(String s) throws ClassNotFoundException
@@ -58,6 +59,12 @@ public class TestClassLoader extends ClassLoader
         return new EnumerationAdapter<URL>(resources.values());
     }
 
+    @Override
+    protected String findLibrary(String s)
+    {
+        return libraries.get(s);
+    }
+
     public void addClass(String className, Class aClass)
     {
         classes.put(className, aClass);
@@ -71,5 +78,10 @@ public class TestClassLoader extends ClassLoader
     public void addStreamResource(String resourceName, InputStream resourceStream)
     {
         streamResources.put(resourceName, resourceStream);
+    }
+
+    public void addLibrary(String libraryName, String libraryPath)
+    {
+        libraries.put(libraryName, libraryPath);
     }
 }
