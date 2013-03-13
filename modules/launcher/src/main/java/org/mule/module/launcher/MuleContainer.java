@@ -62,8 +62,9 @@ public class MuleContainer
      */
     private static MuleShutdownHook muleShutdownHook;
 
-    protected DeploymentService deploymentService;
+    protected final DeploymentService deploymentService;
     private final MuleCoreExtensionManager coreExtensionManager;
+    private final PluginClassLoaderManager pluginClassLoaderManager = new MulePluginClassLoaderManager();
 
     static
     {
@@ -88,7 +89,10 @@ public class MuleContainer
 
     public MuleContainer(String[] args)
     {
-        this(args, new MuleDeploymentService(), new DefaultMuleCoreExtensionManager());
+        this.deploymentService = new MuleDeploymentService(pluginClassLoaderManager);
+        this.coreExtensionManager = new DefaultMuleCoreExtensionManager();
+
+        init(args);
     }
 
     public MuleContainer(DeploymentService deploymentService, MuleCoreExtensionManager coreExtensionManager)
@@ -149,6 +153,7 @@ public class MuleContainer
         try
         {
             coreExtensionManager.setDeploymentService(deploymentService);
+            coreExtensionManager.setPluginClassLoaderManager(pluginClassLoaderManager);
             coreExtensionManager.initialise();
             coreExtensionManager.start();
 

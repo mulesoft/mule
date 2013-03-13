@@ -16,6 +16,7 @@ import org.mule.config.i18n.MessageFactory;
 import org.mule.module.launcher.application.Application;
 import org.mule.module.launcher.application.ApplicationClassLoaderFactory;
 import org.mule.module.launcher.application.ApplicationFactory;
+import org.mule.module.launcher.application.CompositeApplicationClassLoaderFactory;
 import org.mule.module.launcher.application.DefaultApplicationFactory;
 import org.mule.module.launcher.application.MuleApplicationClassLoaderFactory;
 import org.mule.module.launcher.util.DebuggableReentrantLock;
@@ -83,9 +84,10 @@ public class MuleDeploymentService implements DeploymentService
 
     private CompositeDeploymentListener deploymentListener = new CompositeDeploymentListener();
 
-    public MuleDeploymentService()
+    public MuleDeploymentService(PluginClassLoaderManager pluginClassLoaderManager)
     {
         ApplicationClassLoaderFactory applicationClassLoaderFactory = new MuleApplicationClassLoaderFactory();
+        applicationClassLoaderFactory = new CompositeApplicationClassLoaderFactory(applicationClassLoaderFactory, pluginClassLoaderManager);
         DefaultApplicationFactory appFactory = new DefaultApplicationFactory(applicationClassLoaderFactory);
         appFactory.setDeploymentListener(deploymentListener);
         this.appFactory = appFactory;
