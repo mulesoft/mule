@@ -82,7 +82,7 @@ public class TcpNamespaceHandlerTestCase extends FunctionalTestCase
         TcpConnector connector = lookupTcpConnector("connectorWithProtocolRef");
         assertTrue(connector.getTcpProtocol() instanceof MockTcpProtocol);
     }
-    
+
     private TcpConnector lookupTcpConnector(String name)
     {
         TcpConnector connector = (TcpConnector)muleContext.getRegistry().lookupConnector(name);
@@ -136,5 +136,9 @@ public class TcpNamespaceHandlerTestCase extends FunctionalTestCase
         TcpConnector c = (TcpConnector)muleContext.getRegistry().lookupConnector("messageDispatcherFactoryConnector");
         assertNotNull(c);
         assertEquals(LocalSocketTcpMessageDispatcherFactory.class, c.getDispatcherFactory().getClass());
+    }
+
+    public static class FakeClassLoader extends ClassLoader
+    {
     }
 }

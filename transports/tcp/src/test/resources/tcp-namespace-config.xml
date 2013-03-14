@@ -32,18 +32,13 @@
                    clientSoTimeout="3000"
                    pollingFrequency="4000"/>
     
-    <spring:bean id="theClass"
-        factory-bean="pollingConnector"
-        factory-method="getClass"/>
-
     <spring:bean name="tcpProtocol" class="org.mule.transport.tcp.TcpNamespaceHandlerTestCase$MockTcpProtocol"/>
+
     <tcp:connector name="connectorWithProtocolRef">
         <tcp:custom-protocol ref="tcpProtocol"/>
     </tcp:connector>    
 
-    <spring:bean id="classLoader"
-            factory-bean="theClass"
-            factory-method="getClassLoader"/>
+    <spring:bean id="classLoader" class="org.mule.transport.tcp.TcpNamespaceHandlerTestCase$FakeClassLoader"/>
 
     <tcp:connector name="custom-class-loading-protocol-connector">
         <tcp:custom-class-loading-protocol payloadOnly="true" classLoader-ref="classLoader" rethrowExceptionOnRead="true"/>
