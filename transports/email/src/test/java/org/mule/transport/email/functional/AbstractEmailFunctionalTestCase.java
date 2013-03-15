@@ -10,6 +10,11 @@
 
 package org.mule.transport.email.functional;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
@@ -26,7 +31,9 @@ import org.mule.util.SystemUtils;
 import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.ServerSetup;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -38,11 +45,6 @@ import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 
 import org.junit.Rule;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 public abstract class AbstractEmailFunctionalTestCase extends FunctionalTestCase
 {
@@ -267,11 +269,37 @@ public abstract class AbstractEmailFunctionalTestCase extends FunctionalTestCase
         server.start();
         if (protocol.startsWith(Pop3Connector.POP3) || protocol.startsWith(ImapConnector.IMAP))
         {
-            GreenMailUtilities.storeEmail(server.getManagers().getUserManager(),
-                    email, user, password,
-                    GreenMailUtilities.toMessage(message, email, charset));
+            generateAndStoreEmail();
         }
         logger.debug("server started for protocol " + protocol);
+    }
+
+    /**
+     * Generates and store emails on the server.
+     *
+     * @throws Exception If there's a problem with the storing of the messages in the server.
+     */
+    protected void generateAndStoreEmail() throws Exception
+    {
+        List<MimeMessage> messages = new ArrayList<MimeMessage>();
+        messages.add(GreenMailUtilities.toMessage(message, email, charset));
+        storeEmail(messages);
+    }
+
+    /**
+     * Helper method to store email on the server. Can be overriden by subclasses if other tests want to store
+     * a different list of messages.
+     *
+     * @param messages The list of messages to be stored.
+     * @throws Exception If there's a problem with the storing of the messages in the server.
+     */
+    protected void storeEmail(List<MimeMessage> messages) throws Exception
+    {
+        for (MimeMessage message : messages)
+        {
+            GreenMailUtilities.storeEmail(server.getManagers().getUserManager(),
+                                          email, user, password, message);
+        }
     }
 
     private void stopServer()

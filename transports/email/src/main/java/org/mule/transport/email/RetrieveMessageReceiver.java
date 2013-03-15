@@ -53,6 +53,8 @@ public class RetrieveMessageReceiver extends AbstractPollingMessageReceiver impl
     private Folder moveToFolder = null;
     private boolean backupEnabled;
     private String backupFolder = null;
+    // A lock to protect concurrent access to the folder.
+    private final Object folderLock = new Object();
 
     public RetrieveMessageReceiver(Connector connector,
                                    FlowConstruct flowConstruct,
@@ -108,9 +110,12 @@ public class RetrieveMessageReceiver extends AbstractPollingMessageReceiver impl
     @Override
     protected void doStop()
     {
-        if (folder != null)
+        synchronized (folderLock)
         {
-            folder.removeMessageCountListener(this);
+            if (folder != null)
+            {
+                folder.removeMessageCountListener(this);
+            }
         }
     }
 
@@ -118,7 +123,10 @@ public class RetrieveMessageReceiver extends AbstractPollingMessageReceiver impl
     protected void doStart() throws MuleException
     {
         super.doStart();
-        folder.addMessageCountListener(this);
+        synchronized (folderLock)
+        {
+            folder.addMessageCountListener(this);
+        }
     }
 
     public void messagesAdded(MessageCountEvent event)
@@ -130,7 +138,7 @@ public class RetrieveMessageReceiver extends AbstractPollingMessageReceiver impl
             MuleMessage message = null;
             for (int i = 0; i < messages.length; i++)
             {
-                if (getLifecycleState().isStopping())
+                if (getLifecycleState().isStopping() || getLifecycleState().isStopped())
                 {
                     break;
                 }
@@ -229,15 +237,15 @@ public class RetrieveMessageReceiver extends AbstractPollingMessageReceiver impl
     }
 
     /** @param folder */
-    public synchronized void setFolder(Folder folder)
+    public void setFolder(Folder folder)
     {
-        if (folder == null)
+        synchronized (folderLock)
         {
-            throw new IllegalArgumentException("Mail folder cannot be null");
-        }
-        this.folder = folder;
-        synchronized (this.folder)
-        {
+            if (folder == null)
+            {
+                throw new IllegalArgumentException("Mail folder cannot be null");
+            }
+            this.folder = folder;
             if (!this.folder.isOpen())
             {
                 try
@@ -295,52 +303,55 @@ public class RetrieveMessageReceiver extends AbstractPollingMessageReceiver impl
     }
 
     @Override
-    public synchronized void poll()
+    public void poll()
     {
-        try
+        synchronized (folderLock)
         {
             try
             {
-                if (!folder.isOpen())
+                try
                 {
-                    folder.open(Folder.READ_WRITE);
+                    if (!folder.isOpen())
+                    {
+                        folder.open(Folder.READ_WRITE);
+                    }
                 }
-            }
-            catch (Exception e)
-            {
-                if (logger.isDebugEnabled())
+                catch (Exception e)
                 {
-                    logger.debug("ignoring exception: " + e.getMessage());
+                    if (logger.isDebugEnabled())
+                    {
+                        logger.debug("ignoring exception: " + e.getMessage());
+                    }
                 }
-            }
 
-            int count = folder.getMessageCount();
-            if (count > 0)
-            {
-                Message[] messages = folder.getMessages();
-                MessageCountEvent event = new MessageCountEvent(folder, MessageCountEvent.ADDED, true,
-                    messages);
-                messagesAdded(event);
+                int count = folder.getMessageCount();
+                if (count > 0)
+                {
+                    Message[] messages = folder.getMessages();
+                    MessageCountEvent event = new MessageCountEvent(folder, MessageCountEvent.ADDED, true,
+                        messages);
+                    messagesAdded(event);
+                }
+                else if (count == -1)
+                {
+                    throw new MessagingException("Cannot monitor folder: " + folder.getFullName()
+                                                 + " as folder is closed");
+                }
             }
-            else if (count == -1)
+            catch (MessagingException e)
             {
-                throw new MessagingException("Cannot monitor folder: " + folder.getFullName()
-                                             + " as folder is closed");
+                getConnector().getMuleContext().getExceptionListener().handleException(e);
             }
-        }
-        catch (MessagingException e)
-        {
-            getConnector().getMuleContext().getExceptionListener().handleException(e);
-        }
-        finally
-        {
-            try
+            finally
             {
-                folder.close(true); // close and expunge deleted messages
-            }
-            catch (Exception e)
-            {
-                logger.error("Failed to close pop3  inbox: " + e.getMessage());
+                try
+                {
+                    folder.close(true); // close and expunge deleted messages
+                }
+                catch (Exception e)
+                {
+                    logger.error("Failed to close pop3 inbox: " + e.getMessage());
+                }
             }
         }
     }
@@ -348,19 +359,21 @@ public class RetrieveMessageReceiver extends AbstractPollingMessageReceiver impl
     @Override
     protected void doDispose()
     {
-        if (null != folder)
+        synchronized (folderLock)
         {
-            folder.removeMessageCountListener(this);
-            if (folder.isOpen())
+            if (null != folder)
             {
-                try
+                folder.removeMessageCountListener(this);
+                if (folder.isOpen())
                 {
-
-                    folder.close(true);
-                }
-                catch (Exception e)
-                {
-                    logger.debug("ignoring exception: " + e.getMessage(), e);
+                    try
+                    {
+                        folder.close(true);
+                    }
+                    catch (Exception e)
+                    {
+                        logger.debug("ignoring exception: " + e.getMessage(), e);
+                    }
                 }
             }
         }
