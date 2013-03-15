@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:imap="http://www.mulesoft.org/schema/mule/imap"
+      xsi:schemaLocation="
+        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+        http://www.mulesoft.org/schema/mule/imap http://www.mulesoft.org/schema/mule/imap/current/mule-imap.xsd">
+
+    <!-- This is to force the flow to process messages on a single thread -->
+    <configuration>
+        <default-threading-profile doThreading="false"/>
+    </configuration>
+
+    <imap:connector name="imapConnector" checkFrequency="1000"/>
+
+    <flow name="emailPollingFlow">
+        <imap:inbound-endpoint name="imapInboundEndpoint" host="localhost" port="${port1}" user="bob" password="password" responseTimeout="10000" />
+        <component class="org.mule.transport.email.functional.ImapUndeployTestCase$MailMessageProcessor" />
+    </flow>
+
+</mule>

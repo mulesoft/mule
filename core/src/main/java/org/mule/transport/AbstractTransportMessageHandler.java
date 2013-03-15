@@ -413,6 +413,11 @@ public abstract class AbstractTransportMessageHandler<O> implements Connectable,
         return getLifecycleState().isStarting();
     }
 
+    public boolean isStopped()
+    {
+        return getLifecycleState().isStopped();
+    }
+
     public boolean isStopping()
     {
         return getLifecycleState().isStopping();
