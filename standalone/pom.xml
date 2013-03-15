@@ -336,5 +336,12 @@
             <artifactId>aspectjweaver</artifactId>
         </dependency>
 
+        <!-- devkit interfaces dependency -->
+        <dependency>
+            <groupId>org.mule.tools.devkit</groupId>
+            <artifactId>mule-devkit-interfaces</artifactId>
+            <version>3.4-SNAPSHOT</version>
+        </dependency>
+
     </dependencies>
 </project>

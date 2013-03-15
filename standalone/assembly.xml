@@ -194,7 +194,6 @@
             <useStrictFiltering>true</useStrictFiltering>
             <includes>
                 <!-- Core -->
-                <include>org.mule.common:mule-common</include>
                 <include>org.mule:mule-core</include>
                 <!-- Transports -->
                 <include>org.mule.transports:mule-transport-ajax</include>
@@ -245,6 +244,9 @@
                 <include>org.mule.patterns:mule-pattern-core</include>
                 <!-- Tools -->
                 <include>org.mule.tools:mule-tools-anttasks</include>
+                <!-- Shared libs -->
+                <include>org.mule.common:mule-common</include>
+                <include>org.mule.tools.devkit:mule-devkit-interfaces</include>
             </includes>
         </dependencySet>
 
@@ -259,8 +261,9 @@
     because they are already in a different directory). -->
             <excludes>
                 <!-- lib/mule -->
-                <exclude>org.mule:mule-core</exclude>
                 <exclude>org.mule.common:mule-common</exclude>
+                <exclude>org.mule:mule-core</exclude>
+                <exclude>org.mule.tools.devkit:mule-devkit-interfaces</exclude>
                 <exclude>org.mule.transports:mule-transports-all</exclude>
                 <exclude>org.mule.transports:mule-transport-ajax</exclude>
                 <exclude>org.mule.transports:mule-transport-ejb</exclude>
