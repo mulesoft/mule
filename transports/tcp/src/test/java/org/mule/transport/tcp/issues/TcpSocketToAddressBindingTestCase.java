@@ -80,13 +80,13 @@ public class TcpSocketToAddressBindingTestCase extends FunctionalTestCase
     }
 
     @Test
-    public void testRequestUsingLoopbackAddressAtLocalhost() throws Exception
+    public void testRequestUsingLocalhostAtLocalhost() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
         MuleMessage result;
 
-        // Request using loopback address at endpoint listening at localhost should get an appropiate response.
-        result = client.send(getTransportName()+"://127.0.0.1:"+dynamicPort2.getNumber(), TEST_MESSAGE, null);
+        // Request using localhost address at endpoint listening at localhost should get an appropiate response.
+        result = client.send(getTransportName()+"://localhost:"+dynamicPort2.getNumber(), TEST_MESSAGE, null);
         assertEquals(TEST_MESSAGE + " Received", result.getPayloadAsString());
     }
 
@@ -114,28 +114,6 @@ public class TcpSocketToAddressBindingTestCase extends FunctionalTestCase
             try
             {
                 result = client.send(getTransportName()+"://"+inetAddress.getHostAddress()+":"+dynamicPort1.getNumber(), TEST_MESSAGE, null);
-                assertNull(result);
-            }
-            catch (DispatchException ex)
-            {
-                ex.printStackTrace();
-            }
-        }
-    }
-
-    @Test
-    public void testRequestNotUsingLoopbackAddressAtLocalhost() throws Exception
-    {
-        MuleClient client = new MuleClient(muleContext);
-        MuleMessage result;
-
-        // Iterate over local addresses.
-        for (InetAddress inetAddress : localInetAddresses)
-        {
-            // Request not using loopback address to endpoint listening at localhost should timeout.
-            try
-            {
-                result = client.send(getTransportName()+"://"+inetAddress.getHostAddress()+":"+dynamicPort2.getNumber(), TEST_MESSAGE, null);
                 assertNull(result);
             }
             catch (DispatchException ex)
