@@ -17,9 +17,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.mule.api.transport.NoReceiverForEndpointException;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.tck.size.SmallTest;
 import org.mule.message.processing.MessageProcessContext;
+import org.mule.tck.size.SmallTest;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -45,8 +44,6 @@ public class HttpRequestDispatcherWorkTestCase
     private HttpConnector mockHttpConnector;
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     private Socket mockSocket;
-    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-    private InetSocketAddress mockInetSocketAddress;
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     private HttpMessageReceiver mockHttpMessageReceiver;
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
@@ -83,7 +80,7 @@ public class HttpRequestDispatcherWorkTestCase
     {
         HttpRequestDispatcherWork httpRequestDispatcherWork = new HttpRequestDispatcherWork(mockHttpConnector, mockSocket);
         setUpSocketMessage();
-        when(mockSocket.getLocalSocketAddress()).thenReturn(mockInetSocketAddress);
+        when(mockSocket.getLocalSocketAddress()).thenReturn(new InetSocketAddress(0));
         when(mockHttpConnector.lookupReceiver(any(Socket.class), any(RequestLine.class))).thenThrow(mockNoReceiverForEndpointException);
         ByteArrayOutputStream socketOutput = new ByteArrayOutputStream();
         when(mockSocket.getOutputStream()).thenReturn(socketOutput);
