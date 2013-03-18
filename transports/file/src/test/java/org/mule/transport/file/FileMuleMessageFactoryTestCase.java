@@ -10,13 +10,13 @@
 
 package org.mule.transport.file;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import org.mule.api.MuleMessage;
 import org.mule.api.transport.MuleMessageFactory;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 public class FileMuleMessageFactoryTestCase extends AbstractFileMuleMessageFactoryTestCase
 {
@@ -55,10 +55,9 @@ public class FileMuleMessageFactoryTestCase extends AbstractFileMuleMessageFacto
 
     private void assertMessageProperties(MuleMessage message)
     {
-        assertEquals(tempFile.getName(),
-            message.getOutboundProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME));
-        assertEquals(tempFile.getParent(), message.getOutboundProperty(FileConnector.PROPERTY_DIRECTORY));
-        assertEquals(0l, message.getOutboundProperty(FileConnector.PROPERTY_FILE_SIZE));
+        assertEquals(tempFile.getName(), message.getInboundProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME));
+        assertEquals(tempFile.getParent(), message.getInboundProperty(FileConnector.PROPERTY_DIRECTORY));
+        assertEquals(0l, message.getInboundProperty(FileConnector.PROPERTY_FILE_SIZE));
     }
 }
 
