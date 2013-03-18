@@ -103,7 +103,7 @@ public class DefaultMuleDeployer implements MuleDeployer
 
     private void tryToStopApp(Application app)
     {
-        if (!app.getMuleContext().getLifecycleManager().isDirectTransition(Stoppable.PHASE_NAME))
+        if (app.getMuleContext() == null || !app.getMuleContext().getLifecycleManager().isDirectTransition(Stoppable.PHASE_NAME))
         {
             return;
         }
