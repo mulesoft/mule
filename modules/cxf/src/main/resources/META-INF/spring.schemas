@@ -1,4 +1,5 @@
 http\://www.mulesoft.org/schema/mule/cxf/3.1/mule-cxf.xsd=META-INF/mule-cxf.xsd
 http\://www.mulesoft.org/schema/mule/cxf/3.2/mule-cxf.xsd=META-INF/mule-cxf.xsd
 http\://www.mulesoft.org/schema/mule/cxf/3.3/mule-cxf.xsd=META-INF/mule-cxf.xsd
+http\://www.mulesoft.org/schema/mule/cxf/3.4/mule-cxf.xsd=META-INF/mule-cxf.xsd
 http\://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd=META-INF/mule-cxf.xsd
