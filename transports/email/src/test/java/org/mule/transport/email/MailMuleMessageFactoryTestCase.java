@@ -94,14 +94,6 @@ public class MailMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTe
         assertEquals("(no subject)", muleMessage.getInboundProperty(MailProperties.SUBJECT_PROPERTY));
         assertEquals("text/plain", muleMessage.getInboundProperty(MailProperties.CONTENT_TYPE_PROPERTY));
         assertEquals(new MailDateFormat().parse(new MailDateFormat().format(now)), muleMessage.getInboundProperty(MailProperties.SENT_DATE_PROPERTY));
-        // TODO Remove in Mule 3.4
-        assertEquals(to, muleMessage.getOutboundProperty(MailProperties.INBOUND_TO_ADDRESSES_PROPERTY));
-        assertEquals(cc, muleMessage.getOutboundProperty(MailProperties.INBOUND_CC_ADDRESSES_PROPERTY));
-        assertEquals(bcc, muleMessage.getOutboundProperty(MailProperties.INBOUND_BCC_ADDRESSES_PROPERTY));
-        assertEquals("me@myco.com", muleMessage.getOutboundProperty(MailProperties.INBOUND_FROM_ADDRESS_PROPERTY));
-        assertEquals("reply@myco.com", muleMessage.getOutboundProperty(MailProperties.INBOUND_REPLY_TO_ADDRESSES_PROPERTY));
-        assertEquals("(no subject)", muleMessage.getOutboundProperty(MailProperties.INBOUND_SUBJECT_PROPERTY));
-        assertEquals(new MailDateFormat().parse(new MailDateFormat().format(now)), muleMessage.getOutboundProperty(MailProperties.SENT_DATE_PROPERTY));
     }
 
     @Test

@@ -79,12 +79,6 @@ public class MailMuleMessageFactory extends AbstractMuleMessageFactory
         muleMessage.setInboundProperty(MailProperties.CONTENT_TYPE_PROPERTY,
             StringUtils.defaultIfEmpty(mailMessage.getContentType(), "text/plain"));
 
-        // TODO Remove in Mule 3.4
-        muleMessage.setOutboundProperty(MailProperties.INBOUND_SUBJECT_PROPERTY,
-            StringUtils.defaultIfEmpty(mailMessage.getSubject(), "(no subject)"));
-        muleMessage.setOutboundProperty(MailProperties.INBOUND_CONTENT_TYPE_PROPERTY,
-            StringUtils.defaultIfEmpty(mailMessage.getContentType(), "text/plain"));
-
         addSentDateProperty(muleMessage, mailMessage);
         addMailHeadersToMessageProperties(mailMessage, muleMessage);
     }
@@ -102,8 +96,6 @@ public class MailMuleMessageFactory extends AbstractMuleMessageFactory
         {
             Address[] recipients = mailMessage.getRecipients(recipientType);
             muleMessage.setProperty(property, MailUtils.mailAddressesToString(recipients), PropertyScope.INBOUND);
-            // TODO Remove in Mule 3.4
-            muleMessage.setOutboundProperty(MailProperties.INBOUND_PREFIX + property, MailUtils.mailAddressesToString(recipients));
         }
         catch (MessagingException e)
         {
@@ -112,8 +104,6 @@ public class MailMuleMessageFactory extends AbstractMuleMessageFactory
                 String[] header = mimeMessage.getHeader(recipientType.toString());
                 String recipients = StringUtils.join(header, ", ");
                 muleMessage.setProperty(property, recipients, PropertyScope.INBOUND);
-                // TODO Remove in Mule 3.4
-                muleMessage.setOutboundProperty(MailProperties.INBOUND_PREFIX + property, recipients);
             }
         }
     }
@@ -123,9 +113,6 @@ public class MailMuleMessageFactory extends AbstractMuleMessageFactory
         try
         {
             muleMessage.setInboundProperty(MailProperties.REPLY_TO_ADDRESSES_PROPERTY,
-                MailUtils.mailAddressesToString(mailMessage.getReplyTo()));
-            // TODO Remove in Mule 3.4
-            muleMessage.setOutboundProperty(MailProperties.INBOUND_REPLY_TO_ADDRESSES_PROPERTY,
                 MailUtils.mailAddressesToString(mailMessage.getReplyTo()));
         }
         catch (MessagingException me)
@@ -139,9 +126,6 @@ public class MailMuleMessageFactory extends AbstractMuleMessageFactory
         try
         {
             muleMessage.setInboundProperty(MailProperties.FROM_ADDRESS_PROPERTY,
-                MailUtils.mailAddressesToString(mailMessage.getFrom()));
-            // TODO Remove in Mule 3.4
-            muleMessage.setOutboundProperty(MailProperties.INBOUND_FROM_ADDRESS_PROPERTY,
                 MailUtils.mailAddressesToString(mailMessage.getFrom()));
         }
         catch (javax.mail.MessagingException me)
@@ -159,8 +143,6 @@ public class MailMuleMessageFactory extends AbstractMuleMessageFactory
             sentDate = new Date();
         }
         muleMessage.setInboundProperty(MailProperties.SENT_DATE_PROPERTY, sentDate);
-        // TODO Remove in Mule 3.4
-        muleMessage.setOutboundProperty(MailProperties.SENT_DATE_PROPERTY, sentDate);
     }
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
@@ -177,14 +159,14 @@ public class MailMuleMessageFactory extends AbstractMuleMessageFactory
 
             if (null == muleMessage.getOutboundProperty(name))
             {
-                muleMessage.setOutboundProperty(name, value);
+                muleMessage.setInboundProperty(name, value);
             }
 
             Object listPropertyValue = muleMessage.getOutboundProperty(listName);
             if (null == listPropertyValue)
             {
                 listPropertyValue = new LinkedList<Object>();
-                muleMessage.setOutboundProperty(listName, listPropertyValue);
+                muleMessage.setInboundProperty(listName, listPropertyValue);
             }
             if (listPropertyValue instanceof List<?>)
             {
@@ -231,9 +213,6 @@ public class MailMuleMessageFactory extends AbstractMuleMessageFactory
         {
             muleMessage.setProperty(name + AbstractMailConnector.ATTACHMENT_HEADERS_PROPERTY_POSTFIX,
                 headers, PropertyScope.INBOUND);
-            // TODO Remove in Mule 3.4
-            muleMessage.setOutboundProperty(name + AbstractMailConnector.ATTACHMENT_HEADERS_PROPERTY_POSTFIX,
-                headers);
         }
     }
 }
