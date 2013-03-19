@@ -94,7 +94,6 @@
 /mule-standalone-nodocs-${productVersion}/lib/mule/mule-common-0.11.0-SNAPSHOT.jar
 /mule-standalone-nodocs-${productVersion}/lib/mule/mule-core-${productVersion}-tests.jar
 /mule-standalone-nodocs-${productVersion}/lib/mule/mule-core-${productVersion}.jar
-/mule-standalone-nodocs-${productVersion}/lib/mule/mule-devkit-interfaces-3.4.0-RC3.jar
 /mule-standalone-nodocs-${productVersion}/lib/mule/mule-module-annotations-${productVersion}.jar
 /mule-standalone-nodocs-${productVersion}/lib/mule/mule-module-atom-${productVersion}.jar
 /mule-standalone-nodocs-${productVersion}/lib/mule/mule-module-bpm-${productVersion}.jar

@@ -246,7 +246,6 @@
                 <include>org.mule.tools:mule-tools-anttasks</include>
                 <!-- Shared libs -->
                 <include>org.mule.common:mule-common</include>
-                <include>org.mule.tools.devkit:mule-devkit-interfaces</include>
             </includes>
         </dependencySet>
 
@@ -263,7 +262,6 @@
                 <!-- lib/mule -->
                 <exclude>org.mule.common:mule-common</exclude>
                 <exclude>org.mule:mule-core</exclude>
-                <exclude>org.mule.tools.devkit:mule-devkit-interfaces</exclude>
                 <exclude>org.mule.transports:mule-transports-all</exclude>
                 <exclude>org.mule.transports:mule-transport-ajax</exclude>
                 <exclude>org.mule.transports:mule-transport-ejb</exclude>
