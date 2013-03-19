@@ -1,13 +1,12 @@
-/**
- * Mule Development Kit
- * Copyright 2010-2012 (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+/*
+ * $Id$
+ * --------------------------------------------------------------------------------------
+ * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  *
- * This software is protected under international copyright law. All use of this software is
- * subject to MuleSoft's Master Subscription Agreement (or other master license agreement)
- * separately entered into in writing between you and MuleSoft. If such an agreement is not
- * in place, you may not use the software.
+ * The software in this package is published under the terms of the CPAL v1.0
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
  */
-
 
 package org.mule.api.callback;
 
@@ -16,6 +15,8 @@ package org.mule.api.callback;
  * <p/>
  * It will be executed when the MessageSource is being stopped.
  */
-public interface StopSourceCallback {
+public interface StopSourceCallback
+{
+
     void stop() throws Exception;
 }

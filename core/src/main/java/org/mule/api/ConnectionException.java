@@ -1,20 +1,21 @@
-/**
- * Mule Development Kit
- * Copyright 2010-2012 (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+/*
+ * $Id$
+ * --------------------------------------------------------------------------------------
+ * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  *
- * This software is protected under international copyright law. All use of this software is
- * subject to MuleSoft's Master Subscription Agreement (or other master license agreement)
- * separately entered into in writing between you and MuleSoft. If such an agreement is not
- * in place, you may not use the software.
+ * The software in this package is published under the terms of the CPAL v1.0
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
  */
-
 
 package org.mule.api;
 
 /**
  * Exception thrown when connect method in cloud connectors fails to connect properly.
  */
-public class ConnectionException extends Exception {
+public class ConnectionException extends Exception
+{
+
     /**
      * Exception code
      */
@@ -32,7 +33,8 @@ public class ConnectionException extends Exception {
      * @param thirdPartyCode Code as provided by the third party API
      * @param message        Message describing what went wrong
      */
-    public ConnectionException(ConnectionExceptionCode code, String thirdPartyCode, String message) {
+    public ConnectionException(ConnectionExceptionCode code, String thirdPartyCode, String message)
+    {
         super(message);
 
         this.code = code;
@@ -47,7 +49,8 @@ public class ConnectionException extends Exception {
      * @param throwable      Inner exception
      * @param message        Message describing what went wrong
      */
-    public ConnectionException(ConnectionExceptionCode code, String thirdPartyCode, String message, Throwable throwable) {
+    public ConnectionException(ConnectionExceptionCode code, String thirdPartyCode, String message, Throwable throwable)
+    {
         super(message, throwable);
 
         this.code = code;
@@ -59,7 +62,8 @@ public class ConnectionException extends Exception {
      *
      * @return A {@link ConnectionExceptionCode}
      */
-    public ConnectionExceptionCode getCode() {
+    public ConnectionExceptionCode getCode()
+    {
         return code;
     }
 
@@ -69,7 +73,8 @@ public class ConnectionException extends Exception {
      *
      * @return A string with the code
      */
-    public String getThirdPartyCode() {
+    public String getThirdPartyCode()
+    {
         return thirdPartyCode;
     }
 }
