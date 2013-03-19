@@ -27,6 +27,9 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleConfiguration;
+import org.mule.api.construct.FlowConstruct;
+import org.mule.api.construct.FlowConstructAware;
+import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Lifecycle;
 import org.mule.api.processor.InterceptingMessageProcessor;
@@ -475,8 +478,10 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleTestCase
             new DefaultMessageProcessorChainBuilder().chain(new AppendingInterceptingMP("a"),
                 new ReturnVoidMPInterceptongMP(), new AppendingInterceptingMP("b")).build(),
             new AppendingInterceptingMP("2"));
-        assertEquals("0before1before2after2after1",
-            builder.build().process(getTestEventUsingFlow("0")).getMessage().getPayload());
+        assertEquals("0before1before2after2after1", builder.build()
+            .process(getTestEventUsingFlow("0"))
+            .getMessage()
+            .getPayload());
     }
 
     @Test
@@ -530,6 +535,8 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleTestCase
         AppendingMP mp1 = new AppendingInterceptingMP("1");
         AppendingMP mp2 = new AppendingInterceptingMP("2");
         MessageProcessor chain = builder.chain(mp1, mp2).build();
+        ((MuleContextAware) chain).setMuleContext(Mockito.mock(MuleContext.class));
+        ((FlowConstructAware) chain).setFlowConstruct(Mockito.mock(FlowConstruct.class));
         ((Lifecycle) chain).initialise();
         ((Lifecycle) chain).start();
         ((Lifecycle) chain).stop();
@@ -548,6 +555,8 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleTestCase
         AppendingMP mpa = new AppendingInterceptingMP("a");
         AppendingMP mpb = new AppendingInterceptingMP("b");
         MessageProcessor chain = builder.chain(mp1, nestedBuilder.chain(mpa, mpb).build(), mp2).build();
+        ((MuleContextAware) chain).setMuleContext(Mockito.mock(MuleContext.class));
+        ((FlowConstructAware) chain).setFlowConstruct(Mockito.mock(FlowConstruct.class));
         ((Lifecycle) chain).initialise();
         ((Lifecycle) chain).start();
         ((Lifecycle) chain).stop();
@@ -643,15 +652,19 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleTestCase
 
     private void assertLifecycle(AppendingMP mp)
     {
+        assertTrue(mp.flowConstuctInjected);
+        assertTrue(mp.muleContextInjected);
         assertTrue(mp.initialised);
         assertTrue(mp.started);
         assertTrue(mp.stopped);
         assertTrue(mp.disposed);
     }
 
-    private class AppendingMP implements MessageProcessor, Lifecycle
+    private class AppendingMP implements MessageProcessor, Lifecycle, FlowConstructAware, MuleContextAware
     {
         String appendString;
+        boolean muleContextInjected;
+        boolean flowConstuctInjected;
         boolean initialised;
         boolean started;
         boolean stopped;
@@ -698,6 +711,18 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleTestCase
         public String toString()
         {
             return ObjectUtils.toString(this);
+        }
+
+        @Override
+        public void setMuleContext(MuleContext context)
+        {
+            this.muleContextInjected = true;
+        }
+
+        @Override
+        public void setFlowConstruct(FlowConstruct flowConstruct)
+        {
+            this.flowConstuctInjected = true;
         }
     }
 

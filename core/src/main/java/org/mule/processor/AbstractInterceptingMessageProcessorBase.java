@@ -24,7 +24,6 @@ import org.mule.api.processor.MessageProcessorChain;
 import org.mule.api.processor.MessageProcessorContainer;
 import org.mule.api.processor.MessageProcessorPathElement;
 import org.mule.execution.MessageProcessorExecutionTemplate;
-import org.mule.processor.chain.DefaultMessageProcessorChain;
 import org.mule.util.NotificationUtils;
 import org.mule.util.ObjectUtils;
 
@@ -60,10 +59,6 @@ public abstract class AbstractInterceptingMessageProcessorBase
     {
         this.muleContext = context;
         notificationHandler = muleContext.getNotificationManager();
-        if (next instanceof DefaultMessageProcessorChain)
-        {
-            ((DefaultMessageProcessorChain) next).setMuleContext(context);
-        }
     }
 
     public final MessageProcessor getListener()

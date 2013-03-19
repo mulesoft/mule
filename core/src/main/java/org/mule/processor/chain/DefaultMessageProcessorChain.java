@@ -75,7 +75,8 @@ public class DefaultMessageProcessorChain extends AbstractMessageProcessorChain
 
     protected MuleEvent doProcess(MuleEvent event) throws MuleException
     {
-        if (muleContext != null && muleContext.getConfiguration().isFlowEndingWithOneWayEndpointReturnsNull())
+        if (event.getMuleContext() != null
+            && event.getMuleContext().getConfiguration().isFlowEndingWithOneWayEndpointReturnsNull())
         {
             return doProcessFlowEndingWithOneWayEndpointReturnsNull(event);
         }
