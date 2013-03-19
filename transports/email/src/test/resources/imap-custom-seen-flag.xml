@@ -14,7 +14,7 @@
 
     <flow name="custom-flags">
         <imap:inbound-endpoint host="localhost" port="${port1}" user="bob" password="password">
-            <message-property-filter pattern="to=barney@mule.org"/>
+            <message-property-filter pattern="to=barney@mule.org" scope="inbound"/>
         </imap:inbound-endpoint>
         <test:component/>
     </flow>
