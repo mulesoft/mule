@@ -224,6 +224,7 @@
                 <include>org.mule.modules:mule-module-builders</include>
                 <include>org.mule.modules:mule-module-client</include>
                 <include>org.mule.modules:mule-module-cxf</include>
+                <include>org.mule.modules:mule-module-devkit-support</include>
                 <include>org.mule.modules:mule-module-drools</include>
                 <include>org.mule.modules:mule-module-jaas</include>
                 <include>org.mule.modules:mule-module-jersey</include>
@@ -291,6 +292,7 @@
                 <exclude>org.mule.modules:mule-module-builders</exclude>
                 <exclude>org.mule.modules:mule-module-client</exclude>
                 <exclude>org.mule.modules:mule-module-cxf</exclude>
+                <exclude>org.mule.modules:mule-module-devkit-support</exclude>
                 <exclude>org.mule.modules:mule-module-drools</exclude>
                 <exclude>org.mule.modules:mule-module-jaas</exclude>
                 <exclude>org.mule.modules:mule-module-jersey</exclude>
