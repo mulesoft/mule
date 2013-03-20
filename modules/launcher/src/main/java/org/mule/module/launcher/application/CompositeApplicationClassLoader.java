@@ -64,6 +64,50 @@ public class CompositeApplicationClassLoader extends ClassLoader
     }
 
     @Override
+    protected synchronized Class<?> loadClass(String s, boolean b) throws ClassNotFoundException
+    {
+        for (ClassLoader classLoader : classLoaders)
+        {
+            try
+            {
+                Class<?> aClass = loadClass(classLoader, s, b);
+                if (logger.isDebugEnabled())
+                {
+                    logger.debug(String.format("Class '%s' loaded from classLoader '%s", s, classLoader));
+                }
+
+                return aClass;
+            }
+            catch (ClassNotFoundException e)
+            {
+                // Ignoring
+            }
+        }
+
+        throw new ClassNotFoundException(String.format("Cannot load class '%s'", s));
+    }
+
+    protected Class<?> loadClass(ClassLoader classLoader, String s, boolean b) throws ClassNotFoundException
+    {
+        try
+        {
+            Method findLibraryMethod = classLoader.getClass().getDeclaredMethod("loadClass", String.class, boolean.class);
+            findLibraryMethod.setAccessible(true);
+
+            return (Class<?>) findLibraryMethod.invoke(classLoader, s, b);
+        }
+        catch (Exception e)
+        {
+            if (logger.isDebugEnabled())
+            {
+                logger.debug(String.format("Error loading class '%s' from classloader", s, classLoader), e);
+            }
+        }
+
+        throw new ClassNotFoundException(String.format("Cannot load class '%s'", s));
+    }
+
+    @Override
     public URL getResource(String s)
     {
         for (ClassLoader classLoader : classLoaders)

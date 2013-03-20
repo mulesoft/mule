@@ -84,4 +84,10 @@ public class TestClassLoader extends ClassLoader
     {
         libraries.put(libraryName, libraryPath);
     }
+
+    @Override
+    protected synchronized Class<?> loadClass(String s, boolean b) throws ClassNotFoundException
+    {
+        return loadClass(s);
+    }
 }

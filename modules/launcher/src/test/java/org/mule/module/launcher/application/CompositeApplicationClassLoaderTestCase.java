@@ -247,6 +247,43 @@ public class CompositeApplicationClassLoaderTestCase extends AbstractMuleTestCas
         assertThat(library, equalTo(null));
     }
 
+    @Test
+    public void loadsResolvedClassFromAppFirst() throws Exception
+    {
+        appClassLoader.addClass(CLASS_NAME, APP_LOADED_CLASS);
+        pluginClassLoader.addClass(CLASS_NAME, PLUGIN_LOADED_CLASS);
+
+        List<ClassLoader> classLoaders = getClassLoaders(appClassLoader, pluginClassLoader);
+
+        CompositeApplicationClassLoader compositeApplicationClassLoader = new CompositeApplicationClassLoader(classLoaders);
+
+        Class<?> aClass = compositeApplicationClassLoader.loadClass(CLASS_NAME, true);
+        assertThat(aClass, equalTo(APP_LOADED_CLASS));
+    }
+
+    @Test
+    public void loadsResolvedClassFromPluginWhenIsNotDefinedInApp() throws Exception
+    {
+        pluginClassLoader.addClass(CLASS_NAME, PLUGIN_LOADED_CLASS);
+
+        List<ClassLoader> classLoaders = getClassLoaders(appClassLoader, pluginClassLoader);
+
+        CompositeApplicationClassLoader compositeApplicationClassLoader = new CompositeApplicationClassLoader(classLoaders);
+
+        Class<?> aClass = compositeApplicationClassLoader.loadClass(CLASS_NAME, true);
+        assertThat(aClass, equalTo(PLUGIN_LOADED_CLASS));
+    }
+
+    @Test(expected = ClassNotFoundException.class)
+    public void failsToLoadResolvedClassWhenIsNotDefinedInAnyClassLoader() throws Exception
+    {
+        List<ClassLoader> classLoaders = getClassLoaders(appClassLoader, pluginClassLoader);
+
+        CompositeApplicationClassLoader compositeApplicationClassLoader = new CompositeApplicationClassLoader(classLoaders);
+
+        compositeApplicationClassLoader.loadClass(CLASS_NAME, true);
+    }
+
     private List<ClassLoader> getClassLoaders(ClassLoader... expectedClassLoaders)
     {
         List<ClassLoader> classLoaders = new LinkedList<ClassLoader>();
