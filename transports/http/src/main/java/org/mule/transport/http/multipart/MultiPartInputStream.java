@@ -22,12 +22,13 @@ package org.mule.transport.http.multipart;
 // ========================================================================
 
 
+import org.mule.model.streaming.DeleteOnCloseFileInputStream;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -40,6 +41,7 @@ import java.util.StringTokenizer;
 
 import javax.servlet.ServletException;
 
+import org.apache.commons.io.input.AutoCloseInputStream;
 
 /**
 * MultipartInputStream
@@ -195,7 +197,8 @@ public class MultiPartInputStream
         {
            if (_file != null)
            {
-               return new BufferedInputStream (new FileInputStream(_file));
+               // Automatically close and delete the temp file when end of input has been reached (MULE-6732).
+               return new BufferedInputStream(new AutoCloseInputStream(new DeleteOnCloseFileInputStream(_file)));
            }
            else
            {
