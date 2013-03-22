@@ -29,6 +29,9 @@ import org.mule.transport.AbstractConnector;
 import org.mule.transport.servlet.JarResourceServlet;
 import org.mule.transport.servlet.MuleReceiverServlet;
 import org.mule.transport.servlet.MuleServletContextListener;
+import org.mule.transport.tcp.TcpPropertyHelper;
+import org.mule.transport.tcp.TcpServerSocketFactory;
+import org.mule.transport.tcp.i18n.TcpMessages;
 import org.mule.util.ClassUtils;
 import org.mule.util.IOUtils;
 import org.mule.util.StringMessageUtils;
@@ -421,12 +424,14 @@ public class JettyHttpConnector extends AbstractConnector
                 Connector connector = createJettyConnector();
 
                 connector.setPort(endpoint.getEndpointURI().getPort());
-                connector.setHost(endpoint.getEndpointURI().getHost());
-                if ("localhost".equalsIgnoreCase(endpoint.getEndpointURI().getHost()))
+                String host = endpoint.getEndpointURI().getHost();
+                if ("localhost".equalsIgnoreCase(host) && TcpPropertyHelper.isBindingLocalhostToAllLocalInterfaces())
                 {
-                    logger.warn("You are using localhost interface! This means that no external connections will be available."
-                                + " Don't you want to use 0.0.0.0 instead (all network interfaces)?");
+                    // bindingLocalhostToAllLocalInterfaces property is set, so we must bind localhost to all local interfaces.
+                    logger.warn(TcpMessages.localhostBoundToAllLocalInterfaces());
+                    host = "0.0.0.0";
                 }
+                connector.setHost(host);
                 getHttpServer().addConnector(connector);
 
                 holder = createContextHolder(connector, receiver.getEndpoint(), receiver);

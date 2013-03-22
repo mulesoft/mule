@@ -13,6 +13,7 @@ package org.mule.transport.tcp.i18n;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.transport.tcp.TcpConnector;
+import org.mule.transport.tcp.TcpPropertyHelper;
 
 import java.net.URI;
 
@@ -45,6 +46,11 @@ public class TcpMessages extends MessageFactory
     public static Message pollingReceiverCannotbeUsed()
     {
         return factory.createMessage(BUNDLE_PATH, 5);
+    }
+
+    public static Message localhostBoundToAllLocalInterfaces()
+    {
+        return factory.createMessage(BUNDLE_PATH, 6, TcpPropertyHelper.MULE_TCP_BIND_LOCALHOST_TO_ALL_LOCAL_INTERFACES_PROPERTY);
     }
 }
 
