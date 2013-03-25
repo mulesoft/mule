@@ -5,12 +5,14 @@
       xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
       xmlns:http="http://www.mulesoft.org/schema/mule/http"
       xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
       xsi:schemaLocation="
                http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
                http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
                http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
-               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+               http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd">
 
     <notifications>
         <notification event="MESSAGE-PROCESSOR"/>
@@ -27,6 +29,13 @@
     <flow name="singleMP">
         <vm:inbound-endpoint path="in-single" exchange-pattern="request-response"/>
         <logger message="check"/>
+    </flow>
+
+    <flow name="cxfMP">
+        <vm:inbound-endpoint path="in-cxf" exchange-pattern="request-response"/>
+        <cxf:jaxws-service port="80" serviceClass="org.mule.context.notification.CxfSimpleService" enableMuleSoapHeaders="false"/>
+        <logger message="check1"/>
+        <logger message="check2"/>
     </flow>
 
     <flow name="singleMP2">
