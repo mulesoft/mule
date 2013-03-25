@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -91,16 +92,15 @@ public class CompositeApplicationClassLoader extends ClassLoader
     {
         try
         {
-            Method findLibraryMethod = classLoader.getClass().getDeclaredMethod("loadClass", String.class, boolean.class);
-            findLibraryMethod.setAccessible(true);
+            Method loadClassMethod = findDeclaredMethod(classLoader, "loadClass", String.class, boolean.class);
 
-            return (Class<?>) findLibraryMethod.invoke(classLoader, s, b);
+            return (Class<?>) loadClassMethod.invoke(classLoader, s, b);
         }
         catch (Exception e)
         {
             if (logger.isDebugEnabled())
             {
-                logger.debug(String.format("Error loading class '%s' from classloader", s, classLoader), e);
+                logger.debug(String.format("Error loading class '%s' from classloader '%s'", s, classLoader), e);
             }
         }
 
@@ -174,8 +174,7 @@ public class CompositeApplicationClassLoader extends ClassLoader
     {
         try
         {
-            Method findLibraryMethod = classLoader.getClass().getDeclaredMethod("findLibrary", String.class);
-            findLibraryMethod.setAccessible(true);
+            Method findLibraryMethod = findDeclaredMethod(classLoader, "findLibrary", String.class);
 
             return (String) findLibraryMethod.invoke(classLoader, s);
         }
@@ -183,7 +182,7 @@ public class CompositeApplicationClassLoader extends ClassLoader
         {
             if (logger.isDebugEnabled())
             {
-                logger.debug(String.format("Error finding library '%s' in classloader", s, classLoader), e);
+                logger.debug(String.format("Error finding library '%s' in classloader '%s'", s, classLoader), e);
             }
         }
 
@@ -210,5 +209,67 @@ public class CompositeApplicationClassLoader extends ClassLoader
         }
 
         return new EnumerationAdapter<URL>(resources.values());
+    }
+
+    @Override
+    public URL findResource(String s)
+    {
+        for (ClassLoader classLoader : classLoaders)
+        {
+            URL resource = findResource(classLoader, s);
+
+            if (resource != null)
+            {
+                if (logger.isDebugEnabled())
+                {
+                    logger.debug(String.format("Resource '%s' loaded from classLoader '%s", s, classLoader));
+                }
+
+                return resource;
+            }
+        }
+
+        return null;
+    }
+
+    private URL findResource(ClassLoader classLoader, String s)
+    {
+        try
+        {
+            Method findResourceMethod = findDeclaredMethod(classLoader, "findResource", String.class);
+
+            return (URL) findResourceMethod.invoke(classLoader, s);
+        }
+        catch (Exception e)
+        {
+            if (logger.isDebugEnabled())
+            {
+                logger.debug(String.format("Error finding resource '%s' in classloader '%s'", s, classLoader), e);
+            }
+        }
+
+        return null;
+    }
+
+    private Method findDeclaredMethod(ClassLoader classLoader, String methodName, Class<?>... params) throws NoSuchMethodException
+    {
+        Class clazz = classLoader.getClass();
+
+        while (clazz != null)
+        {
+            try
+            {
+                Method findLibraryMethod = clazz.getDeclaredMethod(methodName, params);
+                findLibraryMethod.setAccessible(true);
+
+                return findLibraryMethod;
+            }
+            catch (NoSuchMethodException e)
+            {
+                clazz = clazz.getSuperclass();
+            }
+        }
+
+        throw new NoSuchMethodException(String.format("Cannot find a method '%s' with the given parameter types '%s'", methodName, Arrays.toString(params)));
     }
 }

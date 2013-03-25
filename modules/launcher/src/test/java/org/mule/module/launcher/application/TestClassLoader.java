@@ -60,6 +60,12 @@ public class TestClassLoader extends ClassLoader
     }
 
     @Override
+    protected URL findResource(String s)
+    {
+        return resources.get(s);
+    }
+
+    @Override
     protected String findLibrary(String s)
     {
         return libraries.get(s);
