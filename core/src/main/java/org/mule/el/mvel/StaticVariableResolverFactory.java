@@ -14,6 +14,7 @@ import org.mule.api.MuleContext;
 import org.mule.el.context.AppContext;
 import org.mule.el.context.MuleInstanceContext;
 import org.mule.el.context.ServerContext;
+import org.mule.el.function.DateTimeExpressionLanguageFuntion;
 import org.mule.el.function.RegexExpressionLanguageFuntion;
 
 import org.mvel2.ParserContext;
@@ -30,6 +31,7 @@ class StaticVariableResolverFactory extends MVELExpressionLanguageContext
         addVariable("mule", new MuleInstanceContext(muleContext));
         addVariable("app", new AppContext(muleContext));
         declareFunction("regex", new RegexExpressionLanguageFuntion());
+        declareFunction("dateTime", new DateTimeExpressionLanguageFuntion());
     }
 
 }
