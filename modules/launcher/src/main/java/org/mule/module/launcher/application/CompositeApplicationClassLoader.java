@@ -28,16 +28,24 @@ import org.apache.commons.logging.LogFactory;
  * Defines a classloader that delegates classes and resources resolution to
  * a list of classloaders.
  */
-public class CompositeApplicationClassLoader extends ClassLoader
+public class CompositeApplicationClassLoader extends ClassLoader implements ApplicationClassLoader
 {
 
     protected static final Log logger = LogFactory.getLog(CompositeApplicationClassLoader.class);
 
     private final List<ClassLoader> classLoaders;
+    private final String appName;
 
-    public CompositeApplicationClassLoader(List<ClassLoader> classLoaders)
+    public CompositeApplicationClassLoader(String appName, List<ClassLoader> classLoaders)
     {
+        this.appName = appName;
         this.classLoaders = new LinkedList<ClassLoader>(classLoaders);
+    }
+
+    @Override
+    public String getAppName()
+    {
+        return appName;
     }
 
     @Override

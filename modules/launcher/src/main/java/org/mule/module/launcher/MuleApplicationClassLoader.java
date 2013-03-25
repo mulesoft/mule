@@ -11,6 +11,7 @@
 package org.mule.module.launcher;
 
 import org.mule.api.config.MuleProperties;
+import org.mule.module.launcher.application.ApplicationClassLoader;
 import org.mule.util.FileUtils;
 import org.mule.util.SystemUtils;
 
@@ -28,7 +29,7 @@ import java.util.Set;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class MuleApplicationClassLoader extends FineGrainedControlClassLoader
+public class MuleApplicationClassLoader extends FineGrainedControlClassLoader implements ApplicationClassLoader
 {
 
     /**

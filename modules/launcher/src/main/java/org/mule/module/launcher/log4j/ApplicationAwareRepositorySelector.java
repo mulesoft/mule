@@ -11,6 +11,7 @@
 package org.mule.module.launcher.log4j;
 
 import org.mule.module.launcher.MuleApplicationClassLoader;
+import org.mule.module.launcher.application.ApplicationClassLoader;
 import org.mule.module.reboot.MuleContainerBootstrapUtils;
 import org.mule.module.reboot.MuleContainerSystemClassLoader;
 
@@ -67,17 +68,10 @@ public class ApplicationAwareRepositorySelector implements RepositorySelector
             try
             {
                 ConfigWatchDog configWatchDog = null;
-                if (ccl instanceof MuleApplicationClassLoader)
+                if (ccl instanceof ApplicationClassLoader)
                 {
-                    MuleApplicationClassLoader muleCL = (MuleApplicationClassLoader) ccl;
-                    // check if there's an app-specific logging configuration available,
-                    // scope the lookup to this classloader only, as getResource() will delegate to parents
-                    // locate xml config first, fallback to properties format if not found
-                    URL appLogConfig = muleCL.findResource("log4j.xml");
-                    if (appLogConfig == null)
-                    {
-                        appLogConfig = muleCL.findResource("log4j.properties");
-                    }
+                    ApplicationClassLoader muleCL = (ApplicationClassLoader) ccl;
+                    URL appLogConfig = getAppLoggingConfig(muleCL);
                     final String appName = muleCL.getAppName();
                     if (appLogConfig == null)
                     {
@@ -96,7 +90,7 @@ public class ApplicationAwareRepositorySelector implements RepositorySelector
                         if (appLogConfig.toExternalForm().startsWith("file:"))
                         {
                             // if it's not a file, no sense in monitoring it for changes
-                            configWatchDog = new ConfigWatchDog(muleCL, appLogConfig.getFile(), repository);
+                            configWatchDog = new ConfigWatchDog(ccl, appLogConfig.getFile(), repository);
                             configWatchDog.setName(String.format("[%s].log4j.config.monitor", appName));
                         }
                         else
@@ -153,6 +147,26 @@ public class ApplicationAwareRepositorySelector implements RepositorySelector
         }
 
         return repository;
+    }
+
+    private URL getAppLoggingConfig(ApplicationClassLoader muleCL)
+    {
+        // Checks if there's an app-specific logging configuration available,
+        // scope the lookup to this classloader only, as getResource() will delegate to parents
+        // locate xml config first, fallback to properties format if not found
+        URL appLogConfig = muleCL.findResource("log4j.xml");
+
+        if (appLogConfig == null)
+        {
+            appLogConfig = muleCL.findResource("log4j.properties");
+        }
+
+        if (appLogConfig != null && logger.isInfoEnabled())
+        {
+            logger.info(String.format("Found logging config for application '%s' at '%s'", muleCL.getAppName(), appLogConfig));
+        }
+
+        return appLogConfig;
     }
 
     protected void configureFrom(URL url, LoggerRepository repository)
