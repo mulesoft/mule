@@ -26,9 +26,9 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-public class MessageTestCase extends AbstractELTestCase
+public class MessageContextTestCase extends AbstractELTestCase
 {
-    public MessageTestCase(Variant variant)
+    public MessageContextTestCase(Variant variant)
     {
         super(variant);
     }
@@ -160,8 +160,9 @@ public class MessageTestCase extends AbstractELTestCase
     {
         MuleMessage mockMessage = Mockito.mock(MuleMessage.class);
         Mockito.when(mockMessage.getPayload()).thenReturn(NullPayload.getInstance());
-        assertEquals(false, evaluate("message.payload == null", mockMessage));
-        assertEquals(true, evaluate("message.payload is NullPayload", mockMessage));
+        assertEquals(true, evaluate("message.payload == null", mockMessage));
+        assertEquals(false, evaluate("message.payload is NullPayload", mockMessage));
+        assertEquals(true, evaluate("message.payload == empty", mockMessage));
     }
 
 }
