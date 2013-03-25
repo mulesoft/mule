@@ -62,7 +62,7 @@ public abstract class AbstractInstant
         return dateFormat.format(calendar.getTime());
     }
 
-    public String getZone()
+    public String getTimeZone()
     {
         return calendar.getTimeZone().getDisplayName(locale);
     }

@@ -124,7 +124,7 @@ public class DateTimeFunctionalTestCase extends AbstractELTestCase
     @Test
     public void simpleDateFromatToIso8601()
     {
-        assertEquals("1900-01-01T00:00:00Z", evaluate("dateTime('1/1/1900','d/M/yyyy').toString()"));
+        assertEquals("1900-01-01T00:00:00Z", evaluate("dateTime('1/1/1900','d/M/yyyy').withTimeZone('GMT').toString()"));
     }
 
     @Test
@@ -137,7 +137,7 @@ public class DateTimeFunctionalTestCase extends AbstractELTestCase
     @Test
     public void addDays8601String()
     {
-        assertEquals("1900-01-03T00:00:00Z", evaluate("dateTime('1900-01-01').plusDays(2).toString()"));
+        assertEquals("1900-01-03T00:00:00Z", evaluate("dateTime('1900-01-01').withTimeZone('GMT').plusDays(2).toString()"));
     }
 
     @Test
@@ -185,13 +185,13 @@ public class DateTimeFunctionalTestCase extends AbstractELTestCase
     @Test
     public void dateToString()
     {
-        assertEquals("2100-12-12Z", evaluate("dateTime('2100-12-12T23:11:34').date.format()"));
+        assertEquals("2100-12-12Z", evaluate("dateTime('2100-12-12T23:11:34').withTimeZone('GMT').date.format()"));
     }
 
     @Test
     public void timeToString()
     {
-        assertEquals("23:11:34Z", evaluate("dateTime('2100-12-12T23:11:34').time.format()"));
+        assertEquals("23:11:34Z", evaluate("dateTime('2100-12-12T23:11:34').withTimeZone('GMT').time.format()"));
     }
 
 }

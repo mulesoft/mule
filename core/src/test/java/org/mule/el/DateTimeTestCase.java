@@ -74,7 +74,7 @@ public class DateTimeTestCase extends AbstractMuleTestCase
     @Test
     public void timeZone()
     {
-        Assert.assertEquals(TimeZone.getDefault().getDisplayName(), now.getZone());
+        Assert.assertEquals(TimeZone.getDefault().getDisplayName(), now.getTimeZone());
     }
 
     @Test
@@ -126,7 +126,7 @@ public class DateTimeTestCase extends AbstractMuleTestCase
     @Test
     public void withTimeZone()
     {
-        assertEquals("Central European Time", now.withTimeZone("CET").getZone());
+        assertEquals("Central European Time", now.withTimeZone("CET").getTimeZone());
     }
 
     @Test

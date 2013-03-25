@@ -279,7 +279,7 @@ public class ServerContextTestCase extends AbstractELTestCase
     @Test
     public void dateTimeZone()
     {
-        Assert.assertEquals(TimeZone.getDefault().getDisplayName(), evaluate("server.dateTime.zone"));
+        Assert.assertEquals(TimeZone.getDefault().getDisplayName(), evaluate("server.dateTime.timeZone"));
     }
 
     @Test
@@ -332,9 +332,9 @@ public class ServerContextTestCase extends AbstractELTestCase
     }
 
     @Test
-    public void dateTimeWithZone()
+    public void dateTimeWithTimeZone()
     {
-        assertEquals("Central European Time", evaluate("server.dateTime.withTimeZone('CET').zone"));
+        assertEquals("Central European Time", evaluate("server.dateTime.withTimeZone('CET').timeZone"));
     }
 
     @Test
