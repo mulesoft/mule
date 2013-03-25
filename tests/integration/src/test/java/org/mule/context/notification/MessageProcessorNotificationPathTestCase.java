@@ -9,8 +9,6 @@
  */
 package org.mule.context.notification;
 
-import org.junit.Assert;
-import org.junit.Test;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.construct.Pipeline;
 import org.mule.api.processor.DefaultMessageProcessorPathElement;
@@ -21,6 +19,9 @@ import org.mule.util.NotificationUtils;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
+
+import org.junit.Assert;
+import org.junit.Test;
 
 /**
  *
@@ -53,6 +54,12 @@ public class MessageProcessorNotificationPathTestCase extends FunctionalTestCase
         testFlowPaths("all2", "/0", "/0/0", "/0/0/0","/0/0/1", "/0/1", "/0/1/0","/0/1/1", "/1");
         testFlowPaths("choice2", "/0", "/0/0", "/0/0/0","/0/0/1", "/0/1", "/0/1/0", "/0/2", "/0/2/0","/0/2/1");
         testFlowPaths("all", "/0", "/0/0", "/0/0/0", "/0/1", "/0/1/0", "/1");
+    }
+
+    @Test
+    public void interceptors() throws Exception
+    {
+         testFlowPaths("cxfMP","/0","/1","/2");
     }
 
     @Test
