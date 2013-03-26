@@ -48,9 +48,9 @@ public class MuleObjectStoreManagerTestCase extends AbstractMuleContextTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][] {
-                /*{new ObjectStoreFactory(false,ObjectStoreType.DEFAULT)},
+                {new ObjectStoreFactory(false,ObjectStoreType.DEFAULT)},
                 {new ObjectStoreFactory(true,ObjectStoreType.DEFAULT)},
-                {new ObjectStoreFactory(false,ObjectStoreType.USER)},*/
+                {new ObjectStoreFactory(false,ObjectStoreType.USER)},
                 {new ObjectStoreFactory(true,ObjectStoreType.USER)}
         });
     }

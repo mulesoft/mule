@@ -108,12 +108,12 @@ public class MuleObjectStoreManager
         if (persistent)
         {
             baseStore = (T) muleContext.getRegistry().lookupObject(
-                    MuleProperties.DEFAULT_USER_PERSISTENT_OBJECT_STORE_NAME);
+                    MuleProperties.DEFAULT_USER_OBJECT_STORE_NAME);
         }
         else
         {
             baseStore = (T) muleContext.getRegistry().lookupObject(
-                    MuleProperties.DEFAULT_USER_OBJECT_STORE_NAME);
+                    MuleProperties.DEFAULT_USER_TRANSIENT_OBJECT_STORE_NAME);
         }
         return baseStore;
     }

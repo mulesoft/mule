@@ -39,7 +39,7 @@ public class DefaultObjectStoreFactoryBean
      * - {@link org.mule.api.config.MuleProperties#OBJECT_STORE_DEFAULT_IN_MEMORY_NAME}
      * - {@link org.mule.api.config.MuleProperties#OBJECT_STORE_DEFAULT_PERSISTENT_NAME}
      * - {@link org.mule.api.config.MuleProperties#DEFAULT_USER_OBJECT_STORE_NAME}
-     * - {@link org.mule.api.config.MuleProperties#DEFAULT_USER_PERSISTENT_OBJECT_STORE_NAME}
+     * - {@link org.mule.api.config.MuleProperties#DEFAULT_USER_TRANSIENT_OBJECT_STORE_NAME}
      * - {@link org.mule.api.config.MuleProperties#QUEUE_STORE_DEFAULT_IN_MEMORY_NAME}
      * - {@link org.mule.api.config.MuleProperties#QUEUE_STORE_DEFAULT_PERSISTENT_NAME}
      * @param factory
@@ -76,11 +76,15 @@ public class DefaultObjectStoreFactoryBean
 
     public static ObjectStore<Serializable> createDefaultUserObjectStore()
     {
+        if ("true".equals(System.getProperty("mule.objectstore.user.transient")))
+        {
+            return delegate.createDefaultUserTransientObjectStore();
+        }
         return delegate.createDefaultUserObjectStore();
     }
 
-    public static ObjectStore<Serializable> createDefaultUserPersistentObjectStore()
+    public static ObjectStore<Serializable> createDefaultUserTransientObjectStore()
     {
-        return delegate.createDefaultUserPersistentObjectStore();
+        return delegate.createDefaultUserTransientObjectStore();
     }
 }
