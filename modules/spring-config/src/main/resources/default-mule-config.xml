@@ -54,10 +54,10 @@
 
     <bean name="_defaultUserObjectStore" class="org.mule.util.store.DefaultObjectStoreFactoryBean" factory-method="createDefaultUserObjectStore"/>
 
-    <bean name="_defaultPersistentUserObjectStore" class="org.mule.util.store.DefaultObjectStoreFactoryBean" factory-method="createDefaultUserPersistentObjectStore"/>
+    <bean name="_defaultTransientUserObjectStore" class="org.mule.util.store.DefaultObjectStoreFactoryBean" factory-method="createDefaultUserTransientObjectStore"/>
 
     <bean name="_muleQueueManager" class="org.mule.util.queue.TransactionalQueueManager"/>
-    
+
     <bean name="_muleObjectStoreManager" class="org.mule.util.store.MuleObjectStoreManager"/>
 
     <bean name="_muleSecurityManager" class="org.mule.security.MuleSecurityManager"/>
