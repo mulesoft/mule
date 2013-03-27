@@ -18,7 +18,7 @@ import org.mvel2.ParserContext;
 import org.mvel2.UnresolveablePropertyException;
 import org.mvel2.integration.VariableResolver;
 
-class VariableVariableResolverFactory extends MVELExpressionLanguageContext
+public class VariableVariableResolverFactory extends MVELExpressionLanguageContext
 {
 
     private static final long serialVersionUID = -4433478558175131280L;
