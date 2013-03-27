@@ -16,7 +16,7 @@ import org.mule.api.construct.FlowConstruct;
 
 import org.mvel2.ParserContext;
 
-class EventVariableResolverFactory extends MessageVariableResolverFactory
+public class EventVariableResolverFactory extends MessageVariableResolverFactory
 {
 
     private static final long serialVersionUID = -6819292692339684915L;

@@ -18,7 +18,7 @@ import java.util.Map.Entry;
 import org.mvel2.ParserContext;
 import org.mvel2.ast.Function;
 
-class GlobalVariableResolverFactory extends MVELExpressionLanguageContext
+public class GlobalVariableResolverFactory extends MVELExpressionLanguageContext
 {
     private MVELExpressionLanguageContext parent;
 
