@@ -21,6 +21,11 @@ import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.exception.RollbackSourceCallback;
 import org.mule.api.lifecycle.CreateException;
+import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.store.ObjectAlreadyExistsException;
+import org.mule.api.store.ObjectStore;
+import org.mule.api.store.ObjectStoreException;
+import org.mule.api.store.ObjectStoreManager;
 import org.mule.api.transport.Connector;
 import org.mule.api.transport.PropertyScope;
 import org.mule.transport.AbstractPollingMessageReceiver;
@@ -66,6 +71,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
     private FilenameFilter filenameFilter = null;
     private FileFilter fileFilter = null;
     private boolean forceSync;
+    private ObjectStore<String> filesBeingProcessingObjectStore;
 
     public FileMessageReceiver(Connector connector,
                                FlowConstruct flowConstruct,
@@ -147,6 +153,13 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
     }
 
     @Override
+    protected void doInitialise() throws InitialisationException
+    {
+        ObjectStoreManager objectStoreManager = getConnector().getMuleContext().getRegistry().get(MuleProperties.OBJECT_STORE_MANAGER);
+        filesBeingProcessingObjectStore = objectStoreManager.getObjectStore(getEndpoint().getName(),false,1000,60000,20000);
+    }
+
+    @Override
     protected void doDisconnect() throws Exception
     {
         // template method
@@ -182,7 +195,15 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
                 // don't process directories
                 if (file.isFile())
                 {
-                    processFile(file);
+                    try
+                    {
+                        filesBeingProcessingObjectStore.store(file.getName(),file.getName());
+                        processFile(file);
+                    }
+                    catch (ObjectAlreadyExistsException e)
+                    {
+                        logger.debug("file " + file.getName() + " it's being processed. Skipping it.");
+                    }
                 }
             }
         }
@@ -289,8 +310,24 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
         {
             if (fileConnector.isStreaming())
             {
-                ReceiverFileInputStream payload = new ReceiverFileInputStream(sourceFile,
-                    fileConnector.isAutoDelete(), destinationFile);
+                ReceiverFileInputStream payload = new ReceiverFileInputStream(sourceFile, fileConnector.isAutoDelete(), destinationFile, new InputStreamCloseListener()
+                {
+                    public void fileClose(File file)
+                    {
+                        try
+                        {
+                            if (logger.isDebugEnabled())
+                            {
+                                logger.debug(String.format("Removing processing flag for $ ", originalSourceFileName));
+                            }
+                            filesBeingProcessingObjectStore.remove(originalSourceFileName);
+                        }
+                        catch (ObjectStoreException e)
+                        {
+                            logger.warn("Failure trying to remove file " + originalSourceFileName + " from list of files under processing");
+                        }
+                    }
+                });
                 message = createMuleMessage(payload, encoding);
             }
             else
@@ -378,47 +415,65 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
     private void moveAndDelete(final File sourceFile, File destinationFile,
         String sourceFileOriginalName, MuleMessage message) throws MuleException
     {
-        // If we are moving the file to a read directory, move it there now and
-        // hand over a reference to the
-        // File in its moved location
-        if (destinationFile != null)
+        try
         {
-            // move sourceFile to new destination
-            try
+            // If we are moving the file to a read directory, move it there now and
+            // hand over a reference to the
+            // File in its moved location
+            if (destinationFile != null)
             {
-                FileUtils.moveFile(sourceFile, destinationFile);
-            }
-            catch (IOException e)
-            {
-                // move didn't work - bail out (will attempt rollback)
-                throw new DefaultMuleException(FileMessages.failedToMoveFile(
-                    sourceFile.getAbsolutePath(), destinationFile.getAbsolutePath()));
-            }
-
-            // create new Message for destinationFile
-            message = createMuleMessage(destinationFile, endpoint.getEncoding());
-            message.setOutboundProperty(FileConnector.PROPERTY_FILENAME, destinationFile.getName());
-            message.setOutboundProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, sourceFileOriginalName);
-        }
-
-        // finally deliver the file message
-        this.routeMessage(message);
-
-        // at this point msgAdapter either points to the old sourceFile
-        // or the new destinationFile.
-        if (fileConnector.isAutoDelete())
-        {
-            // no moveTo directory
-            if (destinationFile == null)
-            {
-                // delete source
-                if (!sourceFile.delete())
+                // move sourceFile to new destination
+                try
                 {
-                    throw new DefaultMuleException(FileMessages.failedToDeleteFile(sourceFile));
+                    FileUtils.moveFile(sourceFile, destinationFile);
+                }
+                catch (IOException e)
+                {
+                    // move didn't work - bail out (will attempt rollback)
+                    throw new DefaultMuleException(FileMessages.failedToMoveFile(
+                            sourceFile.getAbsolutePath(), destinationFile.getAbsolutePath()));
+                }
+
+                // create new Message for destinationFile
+                message = createMuleMessage(destinationFile, endpoint.getEncoding());
+                message.setOutboundProperty(FileConnector.PROPERTY_FILENAME, destinationFile.getName());
+                message.setOutboundProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, sourceFileOriginalName);
+            }
+
+            // finally deliver the file message
+            this.routeMessage(message);
+
+            // at this point msgAdapter either points to the old sourceFile
+            // or the new destinationFile.
+            if (fileConnector.isAutoDelete())
+            {
+                // no moveTo directory
+                if (destinationFile == null)
+                {
+                    // delete source
+                    if (!sourceFile.delete())
+                    {
+                        throw new DefaultMuleException(FileMessages.failedToDeleteFile(sourceFile));
+                    }
                 }
             }
         }
-    }
+        finally
+        {
+            try
+            {
+                filesBeingProcessingObjectStore.remove(sourceFileOriginalName);
+                if (logger.isDebugEnabled())
+                {
+                    logger.debug(String.format("Removing processing flag for $ ", sourceFileOriginalName));
+                }
+            }
+            catch (ObjectStoreException e)
+            {
+                logger.warn("Failure trying to remove file " + sourceFileOriginalName + " from list of files under processing");
+            }
+        }
+}
 
     /**
      * Try to acquire a lock on a file and release it immediately. Usually used as a
