@@ -19,6 +19,10 @@ import org.mule.api.config.MuleProperties;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
+import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.store.ObjectAlreadyExistsException;
+import org.mule.api.store.ObjectStore;
+import org.mule.api.store.ObjectStoreException;
 import org.mule.api.transport.Connector;
 import org.mule.api.transport.PropertyScope;
 import org.mule.config.i18n.Message;
@@ -26,6 +30,7 @@ import org.mule.transport.AbstractPollingMessageReceiver;
 import org.mule.transport.ConnectException;
 import org.mule.transport.file.i18n.FileMessages;
 import org.mule.util.FileUtils;
+import org.mule.util.store.InMemoryObjectStore;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -64,6 +69,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
     private FilenameFilter filenameFilter = null;
     private FileFilter fileFilter = null;
     private boolean forceSync;
+    private ObjectStore<String> filesBeingProcessingObjectStore;
 
     public FileMessageReceiver(Connector connector,
                                FlowConstruct flowConstruct,
@@ -143,6 +149,16 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
     }
 
     @Override
+    protected void doInitialise() throws InitialisationException
+    {
+        InMemoryObjectStore objectStore = new InMemoryObjectStore<String>();
+        objectStore.setMaxEntries(1000);
+        objectStore.setExpirationInterval(20000);
+        objectStore.setEntryTTL(60000);
+        filesBeingProcessingObjectStore = objectStore;
+    }
+
+    @Override
     protected void doDisconnect() throws Exception
     {
         // template method
@@ -178,7 +194,15 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
                 // don't process directories
                 if (file.isFile())
                 {
-                    processFile(file);
+                    try
+                    {
+                        filesBeingProcessingObjectStore.store(file.getAbsolutePath(),file.getAbsolutePath());
+                        processFile(file);
+                    }
+                    catch (ObjectAlreadyExistsException e)
+                    {
+                        logger.debug("file " + file.getAbsolutePath() + " it's being processed. Skipping it.");
+                    }
                 }
             }
         }
@@ -213,6 +237,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
         }
 
         String sourceFileOriginalName = sourceFile.getName();
+        final String sourceFileOriginalAbsolutePath = sourceFile.getAbsolutePath();
 
         // Perform some quick checks to make sure file can be processed
         if (!(sourceFile.canRead() && sourceFile.exists() && sourceFile.isFile()))
@@ -278,8 +303,24 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
         {
             if (fileConnector.isStreaming())
             {
-                ReceiverFileInputStream payload = new ReceiverFileInputStream(sourceFile,
-                    fileConnector.isAutoDelete(), destinationFile);
+                ReceiverFileInputStream payload = new ReceiverFileInputStream(sourceFile, fileConnector.isAutoDelete(), destinationFile, new InputStreamCloseListener()
+                {
+                    public void fileClose(File file)
+                    {
+                        try
+                        {
+                            if (logger.isDebugEnabled())
+                            {
+                                logger.debug(String.format("Removing processing flag for $ ", file.getAbsolutePath()));
+                            }
+                            filesBeingProcessingObjectStore.remove(sourceFileOriginalAbsolutePath);
+                        }
+                        catch (ObjectStoreException e)
+                        {
+                            logger.warn("Failure trying to remove file " + sourceFileOriginalAbsolutePath + " from list of files under processing");
+                        }
+                    }
+                });
                 message = createMuleMessage(payload, encoding);
             }
             else
@@ -301,7 +342,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
         }
         if (!fileConnector.isStreaming())
         {
-            moveAndDelete(sourceFile, destinationFile, sourceFileOriginalName, message);
+            moveAndDelete(sourceFile, destinationFile, sourceFileOriginalName, sourceFileOriginalAbsolutePath,message);
         }
         else
         {
@@ -313,7 +354,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
     }
 
     private void moveAndDelete(final File sourceFile, File destinationFile,
-        String sourceFileOriginalName, MuleMessage message)
+        String sourceFileOriginalName, String sourceFileOriginalAbsolutePath, MuleMessage message)
     {
         boolean fileWasMoved = false;
 
@@ -388,7 +429,22 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
                 (fileWasRolledBack ? "successful" : "unsuccessful"));
             getConnector().getMuleContext().getExceptionListener().handleException(new MessagingException(msg, message, e));
         }
-    }
+        finally
+        {
+            try
+            {
+                filesBeingProcessingObjectStore.remove(sourceFileOriginalAbsolutePath);
+                if (logger.isDebugEnabled())
+                {
+                    logger.debug(String.format("Removing processing flag for $ ", sourceFileOriginalAbsolutePath));
+                }
+            }
+            catch (ObjectStoreException e)
+            {
+                logger.warn("Failure trying to remove file " + sourceFileOriginalAbsolutePath + " from list of files under processing");
+            }
+        }
+}
 
     /**
      * Try to acquire a lock on a file and release it immediately. Usually used as a
