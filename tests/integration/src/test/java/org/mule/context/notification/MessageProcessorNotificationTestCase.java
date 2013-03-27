@@ -77,8 +77,10 @@ public class MessageProcessorNotificationTestCase extends AbstractNotificationTe
                 .serial(prePost())
 
                 //processorChain
+                .serial(pre()) //Message Processor Chain
                 .serial(prePost()) //logger-1
                 .serial(prePost()) //logger-2
+                .serial(post()) //Message Processor Chain
 
                 //custom-processor
                 .serial(prePost())

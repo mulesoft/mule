@@ -69,6 +69,15 @@
         </processor-chain>
     </flow>
 
+    <flow name="processorChain4">
+        <vm:inbound-endpoint path="in-processorChain4" exchange-pattern="request-response"/>
+        <processor-chain>
+            <logger message="check1"/>
+            <logger message="check2"/>
+        </processor-chain>
+        <logger message="check3"/>
+    </flow>
+
     <flow name="processorChain">
         <vm:inbound-endpoint path="in-processorChain" exchange-pattern="request-response"/>
         <processor-chain>
@@ -213,6 +222,13 @@
         <vm:inbound-endpoint path="in-subflow" exchange-pattern="request-response"/>
         <echo-component/>
         <flow-ref name="subflow-call"/>
+    </flow>
+
+    <flow name="subflow2">
+        <vm:inbound-endpoint path="in-subflow2" exchange-pattern="request-response"/>
+        <echo-component/>
+        <flow-ref name="subflow-call"/>
+        <logger/>
     </flow>
 
     <sub-flow name="subflow-call">
