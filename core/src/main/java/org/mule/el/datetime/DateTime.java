@@ -187,6 +187,7 @@ public class DateTime extends AbstractInstant implements Date, Time
         return this;
     }
 
+    @Override
     public DateTime withTimeZone(String newTimezone)
     {
         super.withTimeZone(newTimezone);
@@ -196,7 +197,7 @@ public class DateTime extends AbstractInstant implements Date, Time
     @Override
     public DateTime changeTimeZone(String newTimezone)
     {
-        super.withTimeZone(newTimezone);
+        super.changeTimeZone(newTimezone);
         return this;
     }
 
@@ -282,6 +283,27 @@ public class DateTime extends AbstractInstant implements Date, Time
         }
 
         @Override
+        public Date withLocale(String locale)
+        {
+            super.withLocale(locale);
+            return this;
+        }
+
+        @Override
+        public Date withTimeZone(String newTimezone)
+        {
+            super.withTimeZone(newTimezone);
+            return this;
+        };
+
+        @Override
+        public Date changeTimeZone(String newTimezone)
+        {
+            super.changeTimeZone(newTimezone);
+            return this;
+        }
+
+        @Override
         public String toString()
         {
             return DatatypeConverter.printDate(calendar);
@@ -345,21 +367,37 @@ public class DateTime extends AbstractInstant implements Date, Time
             return calendar.get(Calendar.HOUR_OF_DAY);
         }
 
+        public Time changeTimeZone(String newTimezone)
+        {
+            super.changeTimeZone(newTimezone);
+            resetDate();
+            return this;
+        }
+
+        @Override
+        public Time withLocale(String locale)
+        {
+            super.withLocale(locale);
+            return this;
+        }
+
+        @Override
+        public Time withTimeZone(String newTimezone)
+        {
+            super.withTimeZone(newTimezone);
+            return this;
+        };
+
         @Override
         public String toString()
         {
             return DatatypeConverter.printTime(calendar);
         }
 
-        public Time changeTimeZone(String newTimezone)
-        {
-            calendar.setTimeZone(TimeZone.getTimeZone(newTimezone));
-            resetDate();
-            return this;
-        }
-
         private void resetDate()
         {
+            // Workaround for issues with java.util.Calendar.  Ensure Calendar is in right state before updating timeZone 
+            calendar.get(Calendar.ERA);
             calendar.set(Calendar.YEAR, 1970);
             calendar.set(Calendar.DAY_OF_YEAR, 1);
         }

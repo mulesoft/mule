@@ -15,7 +15,6 @@ import static org.junit.Assert.assertTrue;
 
 import org.mule.el.context.AbstractELTestCase;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class DateTimeFunctionalTestCase extends AbstractELTestCase
@@ -143,18 +142,25 @@ public class DateTimeFunctionalTestCase extends AbstractELTestCase
     }
 
     @Test
-    @Ignore
-    public void changeIso8601TimeZone()
+    public void updateIso8601TimeZone()
     {
-        assertEquals("1900-01-01T00:00:00-08:00",
-            evaluate("dateTime('1900-01-01').changeTimeZone('PST').toString()"));
+        assertEquals("1900-01-01T09:00:00-08:00",
+            evaluate("dateTime('1900-01-01T09:00:00Z').withTimeZone('GMT-08:00').toString()"));
     }
 
+    @Test
+    public void changeIso8601TimeZone()
+    {
+        assertEquals("1900-01-01T01:00:00-08:00",
+            evaluate("dateTime('1900-01-01T09:00:00Z').changeTimeZone('GMT-08:00').toString()"));
+    }
+
+    
     @Test
     public void addDays8601String()
     {
         assertEquals("1900-01-03T00:00:00Z",
-            evaluate("dateTime('1900-01-01').withTimeZone('GMT').plusDays(2).toString()"));
+            evaluate("dateTime('1900-01-01T00:00:00Z').plusDays(2).toString()"));
     }
 
     @Test
@@ -211,7 +217,7 @@ public class DateTimeFunctionalTestCase extends AbstractELTestCase
     public void timeToString()
     {
         assertEquals("23:11:34Z",
-            evaluate("dateTime('2100-12-12T23:11:34').withTimeZone('GMT').time.format()"));
+            evaluate("dateTime('2100-12-12T23:11:34Z').time.format()"));
     }
 
 }

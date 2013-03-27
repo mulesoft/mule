@@ -35,4 +35,13 @@ public interface Date extends Instant
 
     Date plusYears(int add);
 
+    @Override
+    Date withTimeZone(String newTimezone);
+
+    @Override
+    Date changeTimeZone(String newTimezone);
+
+    @Override
+    Date withLocale(String locale);
+
 }

@@ -29,4 +29,13 @@ public interface Time extends Instant
 
     Time plusHours(int add);
 
+    @Override
+    Time withTimeZone(String newTimezone);
+
+    @Override
+    Time changeTimeZone(String newTimezone);
+
+    @Override
+    Time withLocale(String locale);
+
 }

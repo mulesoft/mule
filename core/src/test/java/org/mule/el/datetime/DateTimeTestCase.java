@@ -123,16 +123,14 @@ public class DateTimeTestCase extends AbstractMuleTestCase
     public void withTimeZone()
     {
         int hour = now.getHours();
-        assertEquals("GMT-03:00", now.withTimeZone("GMT-03:00").getTimeZone());
-        assertEquals(hour, now.getHours());
+        assertEquals(hour, now.withTimeZone("GMT-03:00").getHours());
     }
 
     @Test
     public void changeTimeZone()
     {
         int hour = now.getHours();
-        assertEquals("GMT-03:00", now.changeTimeZone("GMT-03:00").getTimeZone());
-        assertEquals(hour, now.getHours());
+        assertEquals(hour - 3, now.changeTimeZone("GMT-03:00").getHours());
     }
 
     @Test

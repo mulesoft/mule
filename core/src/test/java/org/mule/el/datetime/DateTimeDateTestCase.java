@@ -100,12 +100,6 @@ public class DateTimeDateTestCase extends AbstractMuleTestCase
     }
 
     @Test
-    public void withTimeZone()
-    {
-        assertEquals("Central European Time", now.withTimeZone("CET").getTimeZone());
-    }
-
-    @Test
     public void withLocale()
     {
         assertEquals(new SimpleDateFormat("E").format(new Date()), now.withLocale("en_US").format("E"));

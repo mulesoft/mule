@@ -30,8 +30,6 @@ import javax.xml.datatype.XMLGregorianCalendar;
 
 import junit.framework.Assert;
 
-import org.apache.commons.lang.LocaleUtils;
-import org.junit.Ignore;
 import org.junit.Test;
 
 @SmallTest
@@ -53,7 +51,6 @@ public class DateTimeTimeTestCase extends AbstractMuleTestCase
     }
 
     @Test
-    @Ignore
     public void isAfter()
     {
         Assert.assertTrue((Boolean) now.isAfter(new DateTime().withTimeZone("UTC").plusHours(-1).getTime()));
@@ -62,10 +59,9 @@ public class DateTimeTimeTestCase extends AbstractMuleTestCase
     @Test
     public void format()
     {
-        Assert.assertEquals(new SimpleDateFormat("hh:mm:ss").format(new Date()), now.format("hh:mm:ss"));
-        Assert.assertEquals(
-            new SimpleDateFormat("hh:mm:ss", LocaleUtils.toLocale("en_US")).format(new Date()),
-            now.withLocale("en_US").format("hh:mm:ss"));
+        SimpleDateFormat df = new SimpleDateFormat("hh:mm:ss");
+        df.setTimeZone(TimeZone.getTimeZone("UTC"));
+        Assert.assertEquals(df.format(now.toDate()), now.format("hh:mm:ss"));
     }
 
     @Test
@@ -103,8 +99,9 @@ public class DateTimeTimeTestCase extends AbstractMuleTestCase
     @Test
     public void plusHours()
     {
-        Assert.assertEquals((Calendar.getInstance().get(Calendar.HOUR_OF_DAY) + 1) % 24, now.plusHours(1)
-            .getHours());
+        Assert.assertEquals(
+            (Calendar.getInstance(TimeZone.getTimeZone("UTC")).get(Calendar.HOUR_OF_DAY) + 1) % 24,
+            now.plusHours(1).getHours());
     }
 
     @Test
@@ -117,16 +114,14 @@ public class DateTimeTimeTestCase extends AbstractMuleTestCase
     public void withTimeZone()
     {
         int hour = now.getHours();
-        assertEquals("Central European Time", now.withTimeZone("CET").getTimeZone());
-        assertEquals(hour, now.getHours());
+        assertEquals(hour, now.withTimeZone("GMT-03:00").getHours());
     }
 
     @Test
     public void changeTimeZone()
     {
         int hour = now.getHours();
-        assertEquals("Central European Time", now.changeTimeZone("CET").getTimeZone());
-        assertEquals(hour, now.getHours());
+        assertEquals(hour - 3, now.changeTimeZone("GMT-03:00").getHours());
     }
 
     @Test
@@ -138,23 +133,23 @@ public class DateTimeTimeTestCase extends AbstractMuleTestCase
     @Test
     public void seconds()
     {
-        assertEquals(Calendar.getInstance().get(Calendar.SECOND), now.getSeconds());
+        assertEquals(Calendar.getInstance(TimeZone.getTimeZone("UTC")).get(Calendar.SECOND), now.getSeconds());
     }
 
     @Test
     public void minutes()
     {
-        assertEquals(Calendar.getInstance().get(Calendar.MINUTE), now.getMinutes());
+        assertEquals(Calendar.getInstance(TimeZone.getTimeZone("UTC")).get(Calendar.MINUTE), now.getMinutes());
     }
 
     @Test
     public void hourOfDay()
     {
-        assertEquals(Calendar.getInstance().get(Calendar.HOUR_OF_DAY), now.getHours());
+        assertEquals(Calendar.getInstance(TimeZone.getTimeZone("UTC")).get(Calendar.HOUR_OF_DAY),
+            now.getHours());
     }
 
     @Test
-    @Ignore
     public void testToString()
     {
         assertEquals(DatatypeConverter.printTime(Calendar.getInstance(TimeZone.getTimeZone("UTC")))
