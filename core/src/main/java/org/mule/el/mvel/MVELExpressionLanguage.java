@@ -40,6 +40,7 @@ import org.mvel2.CompileException;
 import org.mvel2.ParserContext;
 import org.mvel2.ast.Function;
 import org.mvel2.compiler.ExpressionCompiler;
+import org.mvel2.integration.VariableResolverFactory;
 import org.mvel2.integration.impl.CachedMapVariableResolverFactory;
 import org.mvel2.util.CompilerTools;
 import org.slf4j.Logger;
@@ -69,16 +70,30 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
     public MVELExpressionLanguage(MuleContext muleContext)
     {
         this.muleContext = muleContext;
+        System.setProperty("mvel2.compiler.allow_override_all_prophandling", "true");
+        if (muleContext.getExpressionManager() instanceof DefaultExpressionManager)
+        {
+            ((DefaultExpressionManager) muleContext.getExpressionManager()).setExpressionLanguage(this);
+        }
     }
 
     @Override
     public void initialise() throws InitialisationException
     {
-        System.setProperty("mvel2.compiler.allow_override_all_prophandling", "true");
-
         parserContext = createParserContext();
         expressionExecutor = new MVELExpressionExecutor(parserContext);
 
+        loadGlobalFunctions();
+        createStaticContext();
+    }
+
+    protected void createStaticContext()
+    {
+        staticContext = new StaticVariableResolverFactory(parserContext, muleContext);
+    }
+
+    protected void loadGlobalFunctions() throws InitialisationException
+    {
         // Global functions defined in external file
         if (globalFunctionsFile != null)
         {
@@ -96,13 +111,6 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
         // Global functions defined in configuration file (take precedence over functions in file)
         globalFunctions.putAll(CompilerTools.extractAllDeclaredFunctions(new ExpressionCompiler(
             globalFunctionsString).compile()));
-
-        staticContext = new StaticVariableResolverFactory(parserContext, muleContext);
-
-        if (muleContext.getExpressionManager() instanceof DefaultExpressionManager)
-        {
-            ((DefaultExpressionManager) muleContext.getExpressionManager()).setExpressionLanguage(this);
-        }
     }
 
     @Override
@@ -110,7 +118,7 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
     public <T> T evaluate(String expression)
     {
         MVELExpressionLanguageContext factory = createExpressionLanguageContext();
-        factory.appendFactory(new GlobalVariableResolverFactory(this, factory, parserContext, muleContext));
+        factory.appendFactory(createGlobalVariableResolverFactory(factory));
         return (T) evaluateInternal(expression, factory);
     }
 
@@ -123,7 +131,7 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
         {
             factory.appendFactory(new CachedMapVariableResolverFactory(vars));
         }
-        factory.appendFactory(new GlobalVariableResolverFactory(this, factory, parserContext, muleContext));
+        factory.appendFactory(createGlobalVariableResolverFactory(factory));
         return (T) evaluateInternal(expression, factory);
     }
 
@@ -143,35 +151,33 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
         {
             factory.appendFactory(new CachedMapVariableResolverFactory(vars));
         }
-        factory.appendFactory(new EventVariableResolverFactory(parserContext, muleContext, event));
+        factory.appendFactory(createEventVariableResolverFactory(event));
 
-        factory.appendFactory(new GlobalVariableResolverFactory(this, factory, parserContext, muleContext));
+        factory.appendFactory(createGlobalVariableResolverFactory(factory));
         if (autoResolveVariables)
         {
-            factory.localFactory.appendFactory(new VariableVariableResolverFactory(parserContext,
-                muleContext, event.getMessage()));
+            factory.localFactory.appendFactory(createVariableVariableResolverFactory(event));
         }
         return (T) evaluateInternal(expression, factory);
     }
 
     @Override
-    @SuppressWarnings({"unchecked", "deprecation"})
+    @Deprecated
     public <T> T evaluate(String expression, MuleMessage message)
     {
         MVELExpressionLanguageContext factory = createExpressionLanguageContext();
-        factory.appendFactory(new MessageVariableResolverFactory(parserContext, muleContext, message));
+        factory.appendFactory(createMessageVariableResolverFactory(message));
 
-        factory.appendFactory(new GlobalVariableResolverFactory(this, factory, parserContext, muleContext));
+        factory.appendFactory(createGlobalVariableResolverFactory(factory));
         if (autoResolveVariables)
         {
-            factory.localFactory.appendFactory(new VariableVariableResolverFactory(parserContext,
-                muleContext, message));
+            factory.localFactory.appendFactory(createVariableVariableResolverFactory(message));
         }
         return (T) evaluateInternal(expression, factory);
     }
 
-    @SuppressWarnings({"unchecked", "deprecation"})
     @Override
+    @Deprecated
     public <T> T evaluate(String expression, MuleMessage message, Map<String, Object> vars)
     {
         MVELExpressionLanguageContext factory = createExpressionLanguageContext();
@@ -179,13 +185,12 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
         {
             factory.appendFactory(new CachedMapVariableResolverFactory(vars));
         }
-        factory.appendFactory(new MessageVariableResolverFactory(parserContext, muleContext, message));
+        factory.appendFactory(createMessageVariableResolverFactory(message));
 
-        factory.appendFactory(new GlobalVariableResolverFactory(this, factory, parserContext, muleContext));
+        factory.appendFactory(createGlobalVariableResolverFactory(factory));
         if (autoResolveVariables)
         {
-            factory.localFactory.appendFactory(new VariableVariableResolverFactory(parserContext,
-                muleContext, message));
+            factory.localFactory.appendFactory(createVariableVariableResolverFactory(message));
         }
         return (T) evaluateInternal(expression, factory);
     }
@@ -248,7 +253,8 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
 
     protected MVELExpressionLanguageContext createExpressionLanguageContext()
     {
-        MVELExpressionLanguageContext factory = new MVELExpressionLanguageContext(parserContext.createSubcontext(), muleContext);
+        MVELExpressionLanguageContext factory = new MVELExpressionLanguageContext(
+            parserContext.createSubcontext(), muleContext);
         factory.appendFactory(new MVELExpressionLanguageContext(staticContext));
         return factory;
     }
@@ -272,13 +278,13 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
         parserContext.addPackageImport("java.lang");
         parserContext.addPackageImport("java.net");
         parserContext.addPackageImport("java.util");
-        
+
         parserContext.addImport(BigDecimal.class);
         parserContext.addImport(BigInteger.class);
         parserContext.addImport(DataHandler.class);
         parserContext.addImport(MimeType.class);
         parserContext.addImport(Pattern.class);
-        
+
         // Mule
         parserContext.addImport(DataType.class);
         parserContext.addImport(DataTypeFactory.class);
@@ -323,6 +329,33 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
     public void setGlobalFunctionsFile(String globalFunctionsFile)
     {
         this.globalFunctionsFile = globalFunctionsFile;
+    }
+
+    protected VariableResolverFactory createGlobalVariableResolverFactory(MVELExpressionLanguageContext context)
+    {
+        return new GlobalVariableResolverFactory(this, context, parserContext, muleContext);
+    }
+
+    protected VariableResolverFactory createEventVariableResolverFactory(MuleEvent event)
+    {
+        return new EventVariableResolverFactory(parserContext, muleContext, event);
+    }
+
+    @Deprecated
+    protected VariableResolverFactory createMessageVariableResolverFactory(MuleMessage message)
+    {
+        return new MessageVariableResolverFactory(parserContext, muleContext, message);
+    }
+
+    protected VariableResolverFactory createVariableVariableResolverFactory(MuleEvent event)
+    {
+        return new VariableVariableResolverFactory(parserContext, muleContext, event);
+    }
+
+    @Deprecated
+    protected VariableResolverFactory createVariableVariableResolverFactory(MuleMessage message)
+    {
+        return new VariableVariableResolverFactory(parserContext, muleContext, message);
     }
 
 }
