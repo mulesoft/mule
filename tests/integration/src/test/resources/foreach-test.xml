@@ -48,7 +48,7 @@
 
     <flow name="partitioned-config">
         <vm:inbound-endpoint path="input-4" exchange-pattern="request-response"/>
-        <foreach batchSize="3">
+        <foreach batchSize="${batch.size}">
             <test:component/>
             <vm:outbound-endpoint path="out"/>
         </foreach>

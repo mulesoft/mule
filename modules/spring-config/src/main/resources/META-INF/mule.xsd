@@ -6037,7 +6037,7 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="batchSize" use="optional" type="xsd:integer">
+                <xsd:attribute name="batchSize" use="optional" type="substitutableInt">
                     <xsd:annotation>
                         <xsd:documentation>
                             Partitions the collection in subcollections of the specified size.
