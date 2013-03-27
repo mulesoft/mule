@@ -24,6 +24,7 @@ import org.mule.api.transport.PropertyScope;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.functional.FlowAssert;
 import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.SystemProperty;
 
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -33,10 +34,14 @@ import java.util.Map;
 
 import org.apache.kahadb.util.ByteArrayInputStream;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 
 public class ForeachTestCase extends FunctionalTestCase
 {
+
+    @Rule
+    public SystemProperty systemProperty = new SystemProperty("batch.size", "3");
 
     private MuleClient client;
 
