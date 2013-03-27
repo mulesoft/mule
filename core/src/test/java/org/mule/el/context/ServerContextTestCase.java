@@ -14,7 +14,7 @@ import static org.junit.Assert.assertEquals;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
-import org.mule.el.DateTime;
+import org.mule.el.datetime.DateTime;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -285,42 +285,42 @@ public class ServerContextTestCase extends AbstractELTestCase
     @Test
     public void dateTimeAddSeconds()
     {
-        Assert.assertEquals(Calendar.getInstance().get(Calendar.SECOND) + 1,
+        Assert.assertEquals((Calendar.getInstance().get(Calendar.SECOND) + 1) % 60,
             evaluate("(int) server.dateTime.plusSeconds(1).format('s')"));
     }
 
     @Test
     public void dateTimeAddMinutes()
     {
-        Assert.assertEquals(Calendar.getInstance().get(Calendar.MINUTE) + 1,
+        Assert.assertEquals((Calendar.getInstance().get(Calendar.MINUTE) + 1) % 60,
             evaluate("server.dateTime.plusMinutes(1).minutes"));
     }
 
     @Test
     public void dateTimeAddHours()
     {
-        Assert.assertEquals(Calendar.getInstance().get(Calendar.HOUR_OF_DAY) + 1,
+        Assert.assertEquals((Calendar.getInstance().get(Calendar.HOUR_OF_DAY) + 1) % 24,
             evaluate("server.dateTime.plusHours(1).hours"));
     }
 
     @Test
     public void dateTimeAddDays()
     {
-        Assert.assertEquals(Calendar.getInstance().get(Calendar.DAY_OF_YEAR) + 1,
+        Assert.assertEquals((Calendar.getInstance().get(Calendar.DAY_OF_YEAR) + 1) % 365,
             evaluate("(int) server.dateTime.plusDays(1).dayOfYear"));
     }
 
     @Test
     public void dateTimeAddWeeks()
     {
-        Assert.assertEquals(Calendar.getInstance().get(Calendar.WEEK_OF_YEAR) + 1,
+        Assert.assertEquals((Calendar.getInstance().get(Calendar.WEEK_OF_YEAR) + 1) % 52,
             evaluate("(int) server.dateTime.plusWeeks(1).weekOfYear"));
     }
 
     @Test
     public void dateTimeAddMonths()
     {
-        Assert.assertEquals(Calendar.getInstance(Locale.US).get(Calendar.MONTH) + 2,
+        Assert.assertEquals((Calendar.getInstance(Locale.US).get(Calendar.MONTH) + 2) % 12,
             evaluate("(int) server.dateTime.plusMonths(1).month"));
     }
 

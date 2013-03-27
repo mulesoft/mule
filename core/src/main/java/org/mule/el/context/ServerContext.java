@@ -10,7 +10,7 @@
 
 package org.mule.el.context;
 
-import org.mule.el.DateTime;
+import org.mule.el.datetime.DateTime;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;

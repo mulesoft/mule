@@ -8,19 +8,25 @@
  * LICENSE.txt file.
  */
 
-package org.mule.el;
+package org.mule.el.datetime;
+
+import org.mule.api.MuleRuntimeException;
+import org.mule.api.el.datetime.Instant;
+import org.mule.config.i18n.CoreMessages;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.Locale;
 import java.util.TimeZone;
 
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.apache.commons.lang.LocaleUtils;
 
-public abstract class AbstractInstant
+public abstract class AbstractInstant implements Instant
 {
 
     protected Locale locale;
@@ -40,21 +46,31 @@ public abstract class AbstractInstant
         }
     }
 
-    public boolean isBefore(AbstractInstant date)
+    public AbstractInstant(Calendar calendar, Locale locale)
     {
-        return calendar.before(date.calendar);
+        this.calendar = calendar;
+        this.locale = locale;
     }
 
-    public boolean isAfter(AbstractInstant date)
+    @Override
+    public boolean isBefore(Instant date)
     {
-        return calendar.after(date.calendar);
+        return calendar.before(date.toCalendar());
     }
 
+    @Override
+    public boolean isAfter(Instant date)
+    {
+        return calendar.after(date.toCalendar());
+    }
+
+    @Override
     public String format()
     {
         return toString();
     }
 
+    @Override
     public String format(String pattern)
     {
         SimpleDateFormat dateFormat = new SimpleDateFormat(pattern, locale);
@@ -62,24 +78,67 @@ public abstract class AbstractInstant
         return dateFormat.format(calendar.getTime());
     }
 
+    @Override
     public String getTimeZone()
     {
         return calendar.getTimeZone().getDisplayName(locale);
     }
 
-    public AbstractInstant withTimeZone(String newTimezone)
+    @Override
+    public Instant withTimeZone(String newTimezone)
+    {
+        TimeZone timeZone = TimeZone.getTimeZone(newTimezone);
+        calendar.setTimeZone(timeZone);
+        calendar.add(Calendar.MILLISECOND, timeZone.getOffset(calendar.getTimeInMillis()));
+        return this;
+    }
+
+    @Override
+    public Instant changeTimeZone(String newTimezone)
     {
         calendar.setTimeZone(TimeZone.getTimeZone(newTimezone));
         return this;
     }
 
-    public AbstractInstant withLocale(String locale)
+    @Override
+    public Instant withLocale(String locale)
     {
         this.locale = LocaleUtils.toLocale(locale);
         Calendar newCalendar = Calendar.getInstance(calendar.getTimeZone(), this.locale);
         newCalendar.setTime(calendar.getTime());
         this.calendar = newCalendar;
         return this;
+    }
+
+    @Override
+    public Calendar toCalendar()
+    {
+        return calendar;
+    }
+
+    @Override
+    public java.util.Date toDate()
+    {
+        return calendar.getTime();
+    }
+
+    @Override
+    public XMLGregorianCalendar toXMLCalendar() throws DatatypeConfigurationException
+    {
+        if (calendar instanceof GregorianCalendar)
+        {
+            return datatypeFactory.newXMLGregorianCalendar((GregorianCalendar) calendar);
+        }
+        else
+        {
+            throw new MuleRuntimeException(
+                CoreMessages.createStaticMessage("org.mule.el.DateTime.toXMLCalendar() does not support non-gregorian calendars."));
+        }
+    }
+
+    private int getTimeZoneOffset()
+    {
+        return calendar.get(Calendar.ZONE_OFFSET);
     }
 
     @Override
@@ -94,9 +153,8 @@ public abstract class AbstractInstant
             AbstractInstant other = (AbstractInstant) obj;
             return calendar.getTimeInMillis() == other.calendar.getTimeInMillis()
                    && calendar.getFirstDayOfWeek() == other.calendar.getFirstDayOfWeek()
-                   && calendar.getFirstDayOfWeek() == other.calendar.getFirstDayOfWeek()
-                   && calendar.getTimeZone().getOffset(calendar.getTimeInMillis()) == other.calendar.getTimeZone()
-                       .getOffset(other.calendar.getTimeInMillis());
+                   && calendar.getMinimalDaysInFirstWeek() == other.calendar.getMinimalDaysInFirstWeek()
+                   && getTimeZoneOffset() == other.getTimeZoneOffset();
         }
     }
 }

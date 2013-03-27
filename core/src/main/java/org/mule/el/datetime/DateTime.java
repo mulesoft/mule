@@ -1,0 +1,369 @@
+/*
+ * $Id$
+ * --------------------------------------------------------------------------------------
+ * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ *
+ * The software in this package is published under the terms of the CPAL v1.0
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ */
+
+package org.mule.el.datetime;
+
+import org.mule.api.el.datetime.Date;
+import org.mule.api.el.datetime.Time;
+import org.mule.el.context.ServerContext;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Locale;
+import java.util.TimeZone;
+
+import javax.xml.bind.DatatypeConverter;
+import javax.xml.datatype.XMLGregorianCalendar;
+
+/**
+ * Models a DateTime and simplifies the parsing/formatting and very basic manipulation of dates via Mule
+ * expression language.
+ */
+public class DateTime extends AbstractInstant implements Date, Time
+{
+
+    public DateTime(Calendar calendar, Locale locale)
+    {
+        super(calendar, locale);
+    }
+
+    public DateTime()
+    {
+        this(Calendar.getInstance(ServerContext.getLocale()), (ServerContext.getLocale()));
+    }
+
+    public DateTime(Calendar calendar)
+    {
+        this(calendar, ServerContext.getLocale());
+    }
+
+    public DateTime(java.util.Date date)
+    {
+        this(Calendar.getInstance(ServerContext.getTimeZone(), ServerContext.getLocale()),
+            ServerContext.getLocale());
+        this.calendar.setTime(date);
+    }
+
+    public DateTime(XMLGregorianCalendar xmlCalendar)
+    {
+        this(xmlCalendar.toGregorianCalendar(), ServerContext.getLocale());
+    }
+
+    public DateTime(String iso8601String)
+    {
+        this(datatypeFactory.newXMLGregorianCalendar(iso8601String).toGregorianCalendar());
+    }
+
+    public DateTime(String dateString, String format) throws ParseException
+    {
+        this(Calendar.getInstance(TimeZone.getTimeZone("UTC"), ServerContext.getLocale()),
+            ServerContext.getLocale());
+        SimpleDateFormat dateFormat = new SimpleDateFormat(format);
+        dateFormat.setCalendar(this.calendar);
+        dateFormat.parse(dateString);
+    }
+
+    @Override
+    public String toString()
+    {
+        return DatatypeConverter.printDateTime(calendar);
+    }
+
+    public int getDayOfWeek()
+    {
+        return calendar.get(Calendar.DAY_OF_WEEK);
+    }
+
+    public int getDayOfMonth()
+    {
+        return calendar.get(Calendar.DAY_OF_MONTH);
+    }
+
+    public int getDayOfYear()
+    {
+        return calendar.get(Calendar.DAY_OF_YEAR);
+    }
+
+    public int getWeekOfMonth()
+    {
+        return calendar.get(Calendar.WEEK_OF_MONTH);
+    }
+
+    public int getWeekOfYear()
+    {
+        return calendar.get(Calendar.WEEK_OF_YEAR);
+    }
+
+    public int getMonth()
+    {
+        return calendar.get(Calendar.MONTH) + 1;
+    }
+
+    public int getYear()
+    {
+        return calendar.get(Calendar.YEAR);
+    }
+
+    public DateTime plusDays(int add)
+    {
+        calendar.add(Calendar.DAY_OF_YEAR, add);
+        return this;
+    }
+
+    public DateTime plusWeeks(int add)
+    {
+        calendar.add(Calendar.WEEK_OF_YEAR, add);
+        return this;
+    }
+
+    public DateTime plusMonths(int add)
+    {
+        calendar.add(Calendar.MONTH, add);
+        return this;
+    }
+
+    public DateTime plusYears(int add)
+    {
+        calendar.add(Calendar.YEAR, add);
+        return this;
+    }
+
+    public DateTime plusMilliSeconds(int add)
+    {
+        calendar.add(Calendar.MILLISECOND, add);
+        return this;
+    }
+
+    public DateTime plusSeconds(int add)
+    {
+        calendar.add(Calendar.SECOND, add);
+        return this;
+    }
+
+    public DateTime plusMinutes(int add)
+    {
+        calendar.add(Calendar.MINUTE, add);
+        return this;
+    }
+
+    public DateTime plusHours(int add)
+    {
+        calendar.add(Calendar.HOUR_OF_DAY, add);
+        return this;
+    }
+
+    public long getMilliSeconds()
+    {
+        return calendar.get(Calendar.MILLISECOND);
+    }
+
+    public int getSeconds()
+    {
+        return calendar.get(Calendar.SECOND);
+    }
+
+    public int getMinutes()
+    {
+        return calendar.get(Calendar.MINUTE);
+    }
+
+    public int getHours()
+    {
+        return calendar.get(Calendar.HOUR_OF_DAY);
+    }
+
+    @Override
+    public DateTime withLocale(String locale)
+    {
+        super.withLocale(locale);
+        return this;
+    }
+
+    public DateTime withTimeZone(String newTimezone)
+    {
+        super.withTimeZone(newTimezone);
+        return this;
+    };
+
+    @Override
+    public AbstractInstant changeTimeZone(String newTimezone)
+    {
+        super.withTimeZone(newTimezone);
+        return this;
+    }
+
+    public Date getDate()
+    {
+        return new InternalDate((Calendar) calendar.clone(), locale);
+    }
+
+    public Time getTime()
+    {
+        return new InternalTime((Calendar) calendar.clone(), locale);
+    }
+
+    class InternalDate extends AbstractInstant implements Date
+    {
+
+        public InternalDate(Calendar calendar, Locale locale)
+        {
+            super(calendar, locale);
+            this.calendar.set(Calendar.HOUR_OF_DAY, 0);
+            this.calendar.set(Calendar.MINUTE, 0);
+            this.calendar.set(Calendar.SECOND, 0);
+            this.calendar.set(Calendar.MILLISECOND, 0);
+        }
+
+        public int getDayOfWeek()
+        {
+            return calendar.get(Calendar.DAY_OF_WEEK);
+        }
+
+        public int getDayOfMonth()
+        {
+            return calendar.get(Calendar.DAY_OF_MONTH);
+        }
+
+        public int getDayOfYear()
+        {
+            return calendar.get(Calendar.DAY_OF_YEAR);
+        }
+
+        public int getWeekOfMonth()
+        {
+            return calendar.get(Calendar.WEEK_OF_MONTH);
+        }
+
+        public int getWeekOfYear()
+        {
+            return calendar.get(Calendar.WEEK_OF_YEAR);
+        }
+
+        public int getMonth()
+        {
+            return calendar.get(Calendar.MONTH) + 1;
+        }
+
+        public int getYear()
+        {
+            return calendar.get(Calendar.YEAR);
+        }
+
+        public Date plusDays(int add)
+        {
+            calendar.add(Calendar.DAY_OF_YEAR, add);
+            return this;
+        }
+
+        public Date plusWeeks(int add)
+        {
+            calendar.add(Calendar.WEEK_OF_YEAR, add);
+            return this;
+        }
+
+        public Date plusMonths(int add)
+        {
+            calendar.add(Calendar.MONTH, add);
+            return this;
+        }
+
+        public Date plusYears(int add)
+        {
+            calendar.add(Calendar.YEAR, add);
+            return this;
+        }
+
+        @Override
+        public String toString()
+        {
+            return DatatypeConverter.printDate(calendar);
+        }
+    }
+
+    class InternalTime extends AbstractInstant implements Time
+    {
+
+        public InternalTime(Calendar calendar, Locale locale)
+        {
+            super(calendar, locale);
+            resetDate();
+        }
+
+        public Time plusMilliSeconds(int add)
+        {
+            calendar.add(Calendar.MILLISECOND, add);
+            resetDate();
+            return this;
+        }
+
+        public Time plusSeconds(int add)
+        {
+            calendar.add(Calendar.SECOND, add);
+            resetDate();
+            return this;
+        }
+
+        public Time plusMinutes(int add)
+        {
+            calendar.add(Calendar.MINUTE, add);
+            resetDate();
+            return this;
+        }
+
+        public Time plusHours(int add)
+        {
+            calendar.add(Calendar.HOUR_OF_DAY, add);
+            resetDate();
+            return this;
+        }
+
+        public long getMilliSeconds()
+        {
+            return calendar.get(Calendar.MILLISECOND);
+        }
+
+        public int getSeconds()
+        {
+            return calendar.get(Calendar.SECOND);
+        }
+
+        public int getMinutes()
+        {
+            return calendar.get(Calendar.MINUTE);
+        }
+
+        public int getHours()
+        {
+            return calendar.get(Calendar.HOUR_OF_DAY);
+        }
+
+        @Override
+        public String toString()
+        {
+            return DatatypeConverter.printTime(calendar);
+        }
+
+        public Time changeTimeZone(String newTimezone)
+        {
+            calendar.setTimeZone(TimeZone.getTimeZone(newTimezone));
+            resetDate();
+            return this;
+        }
+
+        private void resetDate()
+        {
+            calendar.set(Calendar.YEAR, 1970);
+            calendar.set(Calendar.DAY_OF_YEAR, 1);
+        }
+
+    }
+
+}

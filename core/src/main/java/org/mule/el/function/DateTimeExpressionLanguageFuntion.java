@@ -14,7 +14,7 @@ import org.mule.api.el.ExpressionLanguageContext;
 import org.mule.api.el.ExpressionLanguageFunction;
 import org.mule.api.expression.ExpressionRuntimeException;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.el.DateTime;
+import org.mule.el.datetime.DateTime;
 
 import java.text.ParseException;
 import java.util.Calendar;

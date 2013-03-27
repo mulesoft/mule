@@ -16,7 +16,7 @@ import static org.junit.Assert.assertNotNull;
 import org.mule.api.MuleContext;
 import org.mule.api.el.ExpressionExecutor;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.el.DateTime;
+import org.mule.el.datetime.DateTime;
 import org.mule.el.mvel.MVELExpressionExecutor;
 import org.mule.el.mvel.MVELExpressionLanguageContext;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -59,6 +59,22 @@ public class DateTimeExpressionLanguageFunctionTestCase extends AbstractMuleTest
         assertEquals(0, dateTime.getHours());
         assertEquals(23, dateTime.getMinutes());
         assertEquals(0, dateTime.getSeconds());
+        assertEquals(0, dateTime.toCalendar().get(Calendar.ZONE_OFFSET));
+    }
+
+    @Test
+    public void parseISO8601StringWithTimeZome() throws Exception
+    {
+        DateTime dateTime = (DateTime) dateTimeFunction.call(new Object[]{"2013-03-17T00:23:00+07:00"},
+            context);
+        assertNotNull(dateTime);
+        assertEquals(2013, dateTime.getYear());
+        assertEquals(3, dateTime.getMonth());
+        assertEquals(17, dateTime.getDayOfMonth());
+        assertEquals(0, dateTime.getHours());
+        assertEquals(23, dateTime.getMinutes());
+        assertEquals(0, dateTime.getSeconds());
+        assertEquals(7 * 1000 * 60 * 60, dateTime.toCalendar().get(Calendar.ZONE_OFFSET));
     }
 
     @Test
@@ -73,6 +89,22 @@ public class DateTimeExpressionLanguageFunctionTestCase extends AbstractMuleTest
         assertEquals(0, dateTime.getHours());
         assertEquals(23, dateTime.getMinutes());
         assertEquals(0, dateTime.getSeconds());
+        assertEquals(0, dateTime.toCalendar().get(Calendar.ZONE_OFFSET));
+    }
+
+    @Test
+    public void parseFormattedStringWithTimeZone() throws Exception
+    {
+        DateTime dateTime = (DateTime) dateTimeFunction.call(new Object[]{"17/3/13 00:23:00 -0700",
+            "dd/M/yy hh:mm:ss ZZ"}, context);
+        assertNotNull(dateTime);
+        assertEquals(2013, dateTime.getYear());
+        assertEquals(3, dateTime.getMonth());
+        assertEquals(17, dateTime.getDayOfMonth());
+        assertEquals(0, dateTime.getHours());
+        assertEquals(23, dateTime.getMinutes());
+        assertEquals(0, dateTime.getSeconds());
+        assertEquals(-7 * 1000 * 60 * 60, dateTime.toCalendar().get(Calendar.ZONE_OFFSET));
     }
 
     @Test
