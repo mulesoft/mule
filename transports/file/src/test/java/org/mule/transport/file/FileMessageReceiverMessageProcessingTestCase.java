@@ -36,6 +36,7 @@ import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.api.store.ObjectStoreManager;
 import org.mule.api.transport.PropertyScope;
 import org.mule.message.processing.MessageProcessingManager;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -48,7 +49,7 @@ public class FileMessageReceiverMessageProcessingTestCase extends AbstractMuleTe
 {
 
     public static final String IMPUT_FILES_DIR = "temp";
-    private MuleContext mockMuleContext = mock(MuleContext.class);
+    private MuleContext mockMuleContext = mock(MuleContext.class,Answers.RETURNS_DEEP_STUBS.get());
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     private FileConnector mockFileConnector;
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
@@ -70,6 +71,8 @@ public class FileMessageReceiverMessageProcessingTestCase extends AbstractMuleTe
     private MessagingException mockUnhandledMessagingException;
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     private MessageProcessingManager mockMessageManager;
+    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+    private ObjectStoreManager mockObjectStoreManager;
 
 
     /**
@@ -240,6 +243,7 @@ public class FileMessageReceiverMessageProcessingTestCase extends AbstractMuleTe
             }
         });
         when(mockFileConnector.getMuleContext().getRegistry().get(MuleProperties.OBJECT_DEFAULT_MESSAGE_PROCESSING_MANAGER)).thenReturn(mockMessageManager);
+        when(mockFileConnector.getMuleContext().getRegistry().get(MuleProperties.OBJECT_STORE_MANAGER)).thenReturn(mockObjectStoreManager);
     }
 
     private void configureWorkingDirectory(String workingDirectory)
