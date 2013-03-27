@@ -53,6 +53,7 @@ public class DateTimeTimeTestCase extends AbstractMuleTestCase
     }
 
     @Test
+    @Ignore
     public void isAfter()
     {
         Assert.assertTrue((Boolean) now.isAfter(new DateTime().withTimeZone("UTC").plusHours(-1).getTime()));
@@ -113,7 +114,6 @@ public class DateTimeTimeTestCase extends AbstractMuleTestCase
     }
 
     @Test
-    @Ignore
     public void withTimeZone()
     {
         int hour = now.getHours();
@@ -154,6 +154,7 @@ public class DateTimeTimeTestCase extends AbstractMuleTestCase
     }
 
     @Test
+    @Ignore
     public void testToString()
     {
         assertEquals(DatatypeConverter.printTime(Calendar.getInstance(TimeZone.getTimeZone("UTC")))

@@ -194,7 +194,7 @@ public class DateTime extends AbstractInstant implements Date, Time
     };
 
     @Override
-    public AbstractInstant changeTimeZone(String newTimezone)
+    public DateTime changeTimeZone(String newTimezone)
     {
         super.withTimeZone(newTimezone);
         return this;

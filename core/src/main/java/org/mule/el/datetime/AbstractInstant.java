@@ -89,7 +89,7 @@ public abstract class AbstractInstant implements Instant
     {
         TimeZone timeZone = TimeZone.getTimeZone(newTimezone);
         calendar.setTimeZone(timeZone);
-        calendar.add(Calendar.MILLISECOND, timeZone.getOffset(calendar.getTimeInMillis()));
+        calendar.add(Calendar.MILLISECOND, -timeZone.getOffset(calendar.getTimeInMillis()));
         return this;
     }
 

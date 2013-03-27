@@ -152,7 +152,8 @@ public class DateTimeDateTestCase extends AbstractMuleTestCase
     @Test
     public void testToString()
     {
-        assertEquals(DatatypeConverter.printDate(Calendar.getInstance()), now.toString());
+        assertEquals(DatatypeConverter.printDate(Calendar.getInstance(TimeZone.getTimeZone("UTC"))),
+            now.toString());
     }
 
     @Test
