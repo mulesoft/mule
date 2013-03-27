@@ -34,6 +34,7 @@ class ReceiverFileInputStream extends FileInputStream
     private boolean deleteOnClose;
     private File moveToOnClose;
     private boolean streamProcessingError;
+    private InputStreamCloseListener closeListener;
 
     public ReceiverFileInputStream(File currentFile, boolean deleteOnClose, File moveToOnClose)
         throws FileNotFoundException
@@ -42,6 +43,12 @@ class ReceiverFileInputStream extends FileInputStream
         this.currentFile = currentFile;
         this.deleteOnClose = deleteOnClose;
         this.moveToOnClose = moveToOnClose;
+    }
+
+    public ReceiverFileInputStream(File sourceFile, boolean deleteOnClose, File destinationFile, InputStreamCloseListener closeListener) throws FileNotFoundException
+    {
+        this(sourceFile, deleteOnClose, destinationFile);
+        this.closeListener = closeListener;
     }
 
     @Override
@@ -74,6 +81,10 @@ class ReceiverFileInputStream extends FileInputStream
                     }
                 }
             }
+        }
+        if (closeListener != null)
+        {
+            closeListener.fileClose(currentFile);
         }
     }
 

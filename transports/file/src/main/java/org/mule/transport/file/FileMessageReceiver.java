@@ -20,6 +20,11 @@ import org.mule.api.config.MuleProperties;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
+import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.store.ObjectAlreadyExistsException;
+import org.mule.api.store.ObjectStore;
+import org.mule.api.store.ObjectStoreException;
+import org.mule.api.store.ObjectStoreManager;
 import org.mule.api.transport.Connector;
 import org.mule.api.transport.PropertyScope;
 import org.mule.api.execution.ExecutionCallback;
@@ -68,6 +73,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
     private FilenameFilter filenameFilter = null;
     private FileFilter fileFilter = null;
     private boolean forceSync;
+    private ObjectStore<String> filesBeingProcessingObjectStore;
 
     public FileMessageReceiver(Connector connector,
                                FlowConstruct flowConstruct,
@@ -120,6 +126,13 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
         boolean messageFactoryConsumes = (createMuleMessageFactory() instanceof FileContentsMuleMessageFactory);
 
         forceSync = connectorIsAutoDelete && !messageFactoryConsumes && !isStreaming;
+    }
+
+    @Override
+    protected void doInitialise() throws InitialisationException
+    {
+        ObjectStoreManager objectStoreManager = getConnector().getMuleContext().getRegistry().get(MuleProperties.OBJECT_STORE_MANAGER);
+        filesBeingProcessingObjectStore = objectStoreManager.getObjectStore(getEndpoint().getName(),false,1000,60000,20000);
     }
 
     @Override
@@ -184,7 +197,27 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
                 // don't process directories
                 if (file.isFile())
                 {
-                    processFile(file);
+                    String fileAbsolutePath = file.getAbsolutePath();
+                    try
+                    {
+                        filesBeingProcessingObjectStore.store(fileAbsolutePath, fileAbsolutePath);
+                        if (logger.isDebugEnabled())
+                        {
+                            logger.debug(String.format("Flag for $ stored successfully.", fileAbsolutePath));
+                        }
+                    }
+                    catch (ObjectAlreadyExistsException e)
+                    {
+                        if (logger.isDebugEnabled())
+                        {
+                            logger.debug(String.format("Flag for %s being processed is on. Skipping file.", fileAbsolutePath));
+                        }
+                        continue;
+                    }
+                    if (file.exists())
+                    {
+                        processFile(file);
+                    }
                 }
             }
         }
@@ -286,7 +319,25 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
         {
             if (fileConnector.isStreaming())
             {
-                ReceiverFileInputStream payload = createReceiverFileInputStream(sourceFile, destinationFile);
+                ReceiverFileInputStream payload = createReceiverFileInputStream(sourceFile, destinationFile, new InputStreamCloseListener()
+                {
+                    @Override
+                    public void fileClose(File file)
+                    {
+                        try
+                        {
+                            if (logger.isDebugEnabled())
+                            {
+                                logger.debug(String.format("Removing processing flag for $ ", file.getAbsolutePath()));
+                            }
+                            filesBeingProcessingObjectStore.remove(file.getAbsolutePath());
+                        }
+                        catch (ObjectStoreException e)
+                        {
+                            logger.warn("Failure trying to remove file " + originalSourceFile + " from list of files under processing");
+                        }
+                    }
+                });
                 message = createMuleMessage(payload, encoding);
             }
             else
@@ -353,6 +404,21 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
             rollbackFileMoveIfRequired(originalSourceFile, sourceFile);
             connector.getMuleContext().getExceptionListener().handleException(e);
         }
+        finally
+        {
+            try
+            {
+                filesBeingProcessingObjectStore.remove(originalSourceFile);
+                if (logger.isDebugEnabled())
+                {
+                    logger.debug(String.format("Removing processing flag for $ ", originalSourceFile));
+                }
+            }
+            catch (ObjectStoreException e)
+            {
+                logger.warn("Failure trying to remove file " + originalSourceFile + " from list of files under processing");
+            }
+        }
     }
 
     private void processWithStreaming(final File sourceFile, final ReceiverFileInputStream originalPayload, ExecutionTemplate<MuleEvent> executionTemplate, final MuleMessage finalMessage)
@@ -411,10 +477,17 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
         }
     }
 
+    /* Left for baackward compatibility */
     protected ReceiverFileInputStream createReceiverFileInputStream(File sourceFile, File destinationFile) throws FileNotFoundException
     {
         return new ReceiverFileInputStream(sourceFile,
-            fileConnector.isAutoDelete(), destinationFile);
+                                           fileConnector.isAutoDelete(), destinationFile);
+    }
+
+    protected ReceiverFileInputStream createReceiverFileInputStream(File sourceFile, File destinationFile, InputStreamCloseListener closeListener) throws FileNotFoundException
+    {
+        return new ReceiverFileInputStream(sourceFile,
+                                           fileConnector.isAutoDelete(), destinationFile,closeListener);
     }
 
     private void rollbackFileMoveIfRequired(String originalSourceFile, File sourceFile)
