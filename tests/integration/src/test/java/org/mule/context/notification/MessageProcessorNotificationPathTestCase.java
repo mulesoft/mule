@@ -43,6 +43,7 @@ public class MessageProcessorNotificationPathTestCase extends FunctionalTestCase
         testFlowPaths("singleMP3", "/0","/1","/2");
         testFlowPaths("processorChain2", "/0", "/0/0", "/0/1", "/0/2");
         testFlowPaths("processorChain3", "/0", "/0/0", "/0/1");
+        testFlowPaths("processorChain4", "/0", "/0/0", "/0/1", "/1");
         testFlowPaths("processorChain", "/0", "/0/0", "/0/1");
         testFlowPaths("customProcessor", "/0", "/1");
     }
@@ -83,6 +84,7 @@ public class MessageProcessorNotificationPathTestCase extends FunctionalTestCase
     public void flowRefs() throws Exception
     {
         testFlowPaths("subflow", "/0", "/1", "/1/subflow-call/subprocessors/0", "/1/subflow-call/subprocessors/1");
+        testFlowPaths("subflow2", "/0", "/1", "/1/subflow-call/subprocessors/0", "/1/subflow-call/subprocessors/1","/2");
     }
 
     @Test
