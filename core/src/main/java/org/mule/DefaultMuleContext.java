@@ -44,6 +44,7 @@ import org.mule.exception.DefaultSystemExceptionStrategy;
 import org.mule.expression.DefaultExpressionManager;
 import org.mule.lifecycle.MuleContextLifecycleManager;
 import org.mule.management.stats.AllStatistics;
+import org.mule.management.stats.ProcessingTimeWatcher;
 import org.mule.registry.DefaultRegistryBroker;
 import org.mule.registry.MuleRegistryHelper;
 import org.mule.util.ApplicationShutdownSplashScreen;
@@ -110,6 +111,8 @@ public class DefaultMuleContext implements MuleContext
     
     /** Global exception handler which handles "system" exceptions (i.e., when no message is involved). */
     protected SystemExceptionHandler exceptionListener;
+
+    private ProcessingTimeWatcher processingTimeWatcher;
 
     public DefaultMuleContext(MuleConfiguration config,
                               WorkManager workManager,
@@ -651,5 +654,16 @@ public class DefaultMuleContext implements MuleContext
     public EndpointFactory getEndpointFactory()
     {
         return (EndpointFactory) registryBroker.lookupObject(MuleProperties.OBJECT_MULE_ENDPOINT_FACTORY);
+    }
+
+    @Override
+    public ProcessingTimeWatcher getProcessorTimeWatcher()
+    {
+        if (this.processingTimeWatcher == null)
+        {
+            this.processingTimeWatcher = registryBroker.get(MuleProperties.OBJECT_PROCESSING_TIME_WATCHER);
+        }
+
+        return this.processingTimeWatcher;
     }
 }

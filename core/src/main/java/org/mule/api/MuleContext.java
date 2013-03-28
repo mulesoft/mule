@@ -28,6 +28,7 @@ import org.mule.api.security.SecurityManager;
 import org.mule.context.notification.NotificationException;
 import org.mule.context.notification.ServerNotificationManager;
 import org.mule.management.stats.AllStatistics;
+import org.mule.management.stats.ProcessingTimeWatcher;
 import org.mule.util.queue.QueueManager;
 
 import javax.resource.spi.work.WorkListener;
@@ -234,4 +235,9 @@ public interface MuleContext extends Lifecycle
     SystemExceptionHandler getExceptionListener();
 
     void setExceptionListener(SystemExceptionHandler exceptionListener);
+
+    /**
+     * @return {@link {ProcessingTimeWatcher} used to compute processing time of finalized events
+     */
+    ProcessingTimeWatcher getProcessorTimeWatcher();
 }
