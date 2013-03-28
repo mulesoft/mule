@@ -19,7 +19,11 @@ import java.util.Map;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
+
+import org.mule.api.MuleEvent;
+import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.util.SystemUtils;
 
 public class JaasAuthenticationWithNtLoginModule extends AbstractJaasFunctionalTestCase

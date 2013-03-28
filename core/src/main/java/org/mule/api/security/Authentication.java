@@ -34,4 +34,6 @@ public interface Authentication extends Serializable
     void setProperties(Map<String, Object> properties);
 
     MuleEvent getEvent();
+
+    void setEvent(MuleEvent event);
 }

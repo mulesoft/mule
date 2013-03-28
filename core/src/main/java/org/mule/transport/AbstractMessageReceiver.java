@@ -319,6 +319,10 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
             event = new DefaultMuleEvent(message, getEndpoint(), flowConstruct, session, null, ros);
         }
         event = OptimizedRequestContext.unsafeSetEvent(event);
+        if (session.getSecurityContext() != null && session.getSecurityContext().getAuthentication() != null)
+        {
+            session.getSecurityContext().getAuthentication().setEvent(event);
+        }
         return event;
     }
 

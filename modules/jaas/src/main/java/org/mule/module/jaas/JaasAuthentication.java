@@ -25,8 +25,8 @@ public class JaasAuthentication implements Authentication
     private String user;
     private Map<String, Object> properties;
     private Subject subject;
-    private MuleEvent event;
-
+    transient private MuleEvent event;
+    
     public JaasAuthentication(Credentials credentials)
     {
         this.user = credentials.getUsername();
