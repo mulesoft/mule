@@ -18,6 +18,7 @@ import org.mule.config.i18n.CoreMessages;
 
 import java.lang.reflect.Method;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.mvel2.ImmutableElementException;
@@ -33,10 +34,13 @@ public class MVELExpressionLanguageContext extends BaseVariableResolverFactory
 {
 
     private static final long serialVersionUID = 909413730991198290L;
+    public static final String MULE_MESSAGE_INTERNAL_VARIABLE = "_muleMessage";
+    public static final String MULE_CONTEXT_INTERNAL_VARIABLE = "_muleContext";
 
     protected ParserContext parserContext;
     protected MuleContext muleContext;
     protected InternalVariableResolverFactory localFactory;
+    protected Map<String, Object> privateVariables = new HashMap<String, Object>();
 
     public MVELExpressionLanguageContext(ParserContext parserContext, MuleContext muleContext)
     {
@@ -150,14 +154,21 @@ public class MVELExpressionLanguageContext extends BaseVariableResolverFactory
     @Override
     public <T> T getVariable(String name)
     {
-        VariableResolver resolver = getVariableResolver(name);
-        if (resolver != null)
+        if (privateVariables.containsKey(name))
         {
-            return (T) resolver.getValue();
+            return (T) privateVariables.get(name);
         }
         else
         {
-            return null;
+            VariableResolver resolver = getVariableResolver(name);
+            if (resolver != null)
+            {
+                return (T) resolver.getValue();
+            }
+            else
+            {
+                return null;
+            }
         }
     }
 
@@ -229,7 +240,6 @@ public class MVELExpressionLanguageContext extends BaseVariableResolverFactory
         addFinalVariable(name, new MVELFunctionAdaptor(name, function, parserContext));
     }
 
-
     @Override
     public void appendFactory(VariableResolverFactory resolverFactory)
     {
@@ -269,5 +279,11 @@ public class MVELExpressionLanguageContext extends BaseVariableResolverFactory
     {
         return this;
     }
+
+    @Override
+    public <T> void addPrivateVariable(String name, T value)
+    {
+        privateVariables.put(name, value);
+    };
 
 }

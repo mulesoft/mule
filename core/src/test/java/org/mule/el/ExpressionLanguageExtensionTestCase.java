@@ -25,6 +25,7 @@ import org.mule.config.builders.SimpleConfigurationBuilder;
 import org.mule.el.context.AbstractELTestCase;
 import org.mule.el.context.AppContext;
 import org.mule.el.mvel.MVELExpressionLanguage;
+import org.mule.el.mvel.MVELExpressionLanguageContext;
 
 import java.text.DateFormat;
 import java.util.Calendar;
@@ -32,6 +33,7 @@ import java.util.Collections;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.mockito.Mockito;
 
 public class ExpressionLanguageExtensionTestCase extends AbstractELTestCase
 {
@@ -148,6 +150,25 @@ public class ExpressionLanguageExtensionTestCase extends AbstractELTestCase
                             + muleContext.getConfiguration().getId(), mvel.evaluate("f('one','two')"));
     }
 
+    @Test
+    public void testMuleContextAvailableInFunction() throws RegistrationException, InitialisationException
+    {
+        MVELExpressionLanguage mvel = new MVELExpressionLanguage(muleContext);
+        mvel.initialise();
+
+        Assert.assertEquals(muleContext, mvel.evaluate("muleContext()"));
+    }
+
+    @Test
+    public void testMuleMessageAvailableInFunction() throws RegistrationException, InitialisationException
+    {
+        MVELExpressionLanguage mvel = new MVELExpressionLanguage(muleContext);
+        mvel.initialise();
+        MuleMessage message = Mockito.mock(MuleMessage.class);
+
+        Assert.assertEquals(message, mvel.evaluate("muleMessage()", message));
+    }
+
     @Test(expected = ExpressionRuntimeException.class)
     public void testFunctionInvalidParams() throws RegistrationException, InitialisationException
     {
@@ -192,6 +213,22 @@ public class ExpressionLanguageExtensionTestCase extends AbstractELTestCase
                 {
                     return "called param[0]=" + params[0] + ",param[1]=" + params[1] + ",app.name="
                            + ((AppContext) context.getVariable("app")).getName();
+                }
+            });
+            context.declareFunction("muleContext", new ExpressionLanguageFunction()
+            {
+                @Override
+                public Object call(Object[] params, ExpressionLanguageContext context)
+                {
+                    return context.getVariable(MVELExpressionLanguageContext.MULE_CONTEXT_INTERNAL_VARIABLE);
+                }
+            });
+            context.declareFunction("muleMessage", new ExpressionLanguageFunction()
+            {
+                @Override
+                public Object call(Object[] params, ExpressionLanguageContext context)
+                {
+                    return context.getVariable(MVELExpressionLanguageContext.MULE_MESSAGE_INTERNAL_VARIABLE);
                 }
             });
         }

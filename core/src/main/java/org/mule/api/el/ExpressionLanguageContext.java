@@ -40,4 +40,6 @@ public interface ExpressionLanguageContext
 
     boolean contains(String name);
 
+    <T> void addPrivateVariable(String name, T value);
+
 }

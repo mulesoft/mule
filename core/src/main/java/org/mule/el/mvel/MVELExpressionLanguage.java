@@ -158,6 +158,8 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
         {
             factory.localFactory.appendFactory(createVariableVariableResolverFactory(event));
         }
+        factory.addPrivateVariable(MVELExpressionLanguageContext.MULE_MESSAGE_INTERNAL_VARIABLE,
+            event.getMessage());
         return (T) evaluateInternal(expression, factory);
     }
 
@@ -173,6 +175,7 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
         {
             factory.localFactory.appendFactory(createVariableVariableResolverFactory(message));
         }
+        factory.addPrivateVariable(MVELExpressionLanguageContext.MULE_MESSAGE_INTERNAL_VARIABLE, message);
         return (T) evaluateInternal(expression, factory);
     }
 
@@ -192,6 +195,7 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
         {
             factory.localFactory.appendFactory(createVariableVariableResolverFactory(message));
         }
+        factory.addPrivateVariable(MVELExpressionLanguageContext.MULE_MESSAGE_INTERNAL_VARIABLE, message);
         return (T) evaluateInternal(expression, factory);
     }
 
@@ -256,6 +260,7 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
         MVELExpressionLanguageContext factory = new MVELExpressionLanguageContext(
             parserContext.createSubcontext(), muleContext);
         factory.appendFactory(new MVELExpressionLanguageContext(staticContext));
+        factory.addPrivateVariable(MVELExpressionLanguageContext.MULE_CONTEXT_INTERNAL_VARIABLE, muleContext);
         return factory;
     }
 
