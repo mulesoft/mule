@@ -10,11 +10,17 @@
 
 package org.mule.transport.servlet.jetty;
 
+import org.mule.DefaultMuleMessage;
+import org.mule.api.MuleException;
+import org.mule.api.MuleMessage;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.transport.Connector;
 import org.mule.transport.AbstractMessageReceiver;
+
+import javax.resource.spi.work.Work;
+import javax.resource.spi.work.WorkException;
 
 /**
  * <code>JettyHttpMessageReceiver</code> is a simple http server that can be used to
@@ -28,5 +34,36 @@ public class JettyHttpMessageReceiver extends AbstractMessageReceiver
         throws CreateException
     {
         super(connector, flowConstruct, endpoint);
+    }
+    
+    public void routeMessageAsync(final MuleMessage message, final ContinuationsReplyTo continuationsReplyTo)
+    {
+        try
+        {
+            getWorkManager().scheduleWork(new Work() {
+
+                public void run()
+                {
+                    try
+                    {
+                        MuleMessage threadSafeMessage = new DefaultMuleMessage(message);
+                        routeMessage(threadSafeMessage);
+                    }
+                    catch (MuleException e)
+                    {
+                        continuationsReplyTo.setAndResume(e);
+                    }
+                }
+
+                public void release()
+                {
+                    // nothing to clean up
+                }
+            });
+        }
+        catch (WorkException e)
+        {
+            getConnector().getMuleContext().getExceptionListener().handleException(e);
+        }
     }
 }
