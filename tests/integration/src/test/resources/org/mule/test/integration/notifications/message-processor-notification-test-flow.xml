@@ -18,7 +18,7 @@
         <notification event="MESSAGE-PROCESSOR"/>
     </notifications>
 
-    <spring:bean name="notificationLogger" class="org.mule.context.notification.MessageProcessorNotificationLogger"/>
+    <spring:bean name="notificationLogger" class="org.mule.context.notification.processors.MessageProcessorNotificationLogger"/>
 
     <notifications>
         <notification-listener ref="notificationLogger"/>
@@ -33,7 +33,8 @@
 
     <flow name="cxfMP">
         <vm:inbound-endpoint path="in-cxf" exchange-pattern="request-response"/>
-        <cxf:jaxws-service port="80" serviceClass="org.mule.context.notification.CxfSimpleService" enableMuleSoapHeaders="false"/>
+        <cxf:jaxws-service port="80" serviceClass="org.mule.context.notification.CxfSimpleService"
+                           enableMuleSoapHeaders="false"/>
         <logger message="check1"/>
         <logger message="check2"/>
     </flow>
@@ -148,6 +149,15 @@
                 <collection-splitter/>
                 <logger message="check"/>
             </processor-chain>
+        </all>
+        <logger message="Log after a scope"/>
+    </flow>
+
+    <flow name="all3">
+        <vm:inbound-endpoint path="in-all3" exchange-pattern="request-response"/>
+        <all>
+            <logger message="check"/>
+            <logger message="check"/>
         </all>
         <logger message="Log after a scope"/>
     </flow>

@@ -11,6 +11,7 @@ package org.mule.execution;
 
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
+import org.mule.api.MuleException;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.construct.Pipeline;
 import org.mule.api.processor.MessageProcessor;
@@ -22,12 +23,19 @@ import org.mule.context.notification.ServerNotificationManager;
  */
 class MessageProcessorNotificationExecutionInterceptor implements MessageProcessorExecutionInterceptor
 {
+
     private MessageProcessorExecutionInterceptor next;
 
     MessageProcessorNotificationExecutionInterceptor(MessageProcessorExecutionInterceptor next)
     {
         this.next = next;
     }
+
+    MessageProcessorNotificationExecutionInterceptor()
+    {
+
+    }
+
 
     @Override
     public MuleEvent execute(MessageProcessor messageProcessor, MuleEvent event) throws MessagingException
@@ -44,12 +52,24 @@ class MessageProcessorNotificationExecutionInterceptor implements MessageProcess
         MessagingException exceptionThrown = null;
         try
         {
-            result = next.execute(messageProcessor, event);
+            if (next == null)
+            {
+                result = messageProcessor.process(event);
+            }
+            else
+            {
+                result = next.execute(messageProcessor, event);
+            }
         }
         catch (MessagingException e)
         {
             exceptionThrown = e;
             throw e;
+        }
+        catch (MuleException e)
+        {
+            exceptionThrown = new MessagingException(event, e, messageProcessor);
+            throw exceptionThrown;
         }
         finally
         {
