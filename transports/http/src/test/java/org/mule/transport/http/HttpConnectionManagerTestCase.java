@@ -107,6 +107,14 @@ public class HttpConnectionManagerTestCase extends AbstractMuleTestCase
         verify(mockWorkManager, times(2)).scheduleWork(any(HttpRequestDispatcher.class), anyLong(), any(ExecutionContext.class), any(WorkListener.class));
     }
 
+    @Test
+    public void disposeShutdownsEverything() throws Exception
+    {
+        HttpConnectionManager connectionManager = createConnectionManagerAndAddDefaultEndpointUri();
+        connectionManager.dispose();
+        verify(mockWorkManager, times(1)).dispose();
+    }
+
     private HttpConnectionManager createConnectionManagerAndAddDefaultEndpointUri() throws ConnectException, EndpointException
     {
         HttpConnectionManager connectionManager = new HttpConnectionManager(mockHttpConnector, mockWorkManager);

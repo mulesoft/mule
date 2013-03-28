@@ -16,6 +16,7 @@ import org.mule.api.retry.RetryContext;
 import org.mule.api.retry.RetryPolicyTemplate;
 import org.mule.config.MutableThreadingProfile;
 import org.mule.transport.ConnectException;
+import org.mule.util.concurrent.ThreadNameHelper;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -76,8 +77,9 @@ class HttpRequestDispatcher implements Work
         ThreadingProfile receiverThreadingProfile = httpConnector.getReceiverThreadingProfile();
         MutableThreadingProfile dispatcherThreadingProfile = new MutableThreadingProfile(receiverThreadingProfile);
         dispatcherThreadingProfile.setThreadFactory(null);
-        dispatcherThreadingProfile.setMaxThreadsActive(dispatcherThreadingProfile.getMaxThreadsActive()*2);
-        ExecutorService executorService = dispatcherThreadingProfile.createPool("http-request-dispatch-" + serverSocket.getLocalPort());
+        dispatcherThreadingProfile.setMaxThreadsActive(dispatcherThreadingProfile.getMaxThreadsActive() * 2);
+        String threadNamePrefix = ThreadNameHelper.getPrefix(httpConnector.getMuleContext()) + "http.request.dispatch." + serverSocket.getLocalPort();
+        ExecutorService executorService = dispatcherThreadingProfile.createPool(threadNamePrefix);
         return executorService;
     }
 

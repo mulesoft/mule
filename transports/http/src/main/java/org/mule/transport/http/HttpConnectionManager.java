@@ -31,7 +31,6 @@ class HttpConnectionManager
 
     private static final int LAST_CONNECTION = 1;
     protected final Log logger = LogFactory.getLog(getClass());
-
     final private HttpConnector connector;
     final private Map<String, HttpRequestDispatcher> socketDispatchers = new HashMap<String, HttpRequestDispatcher>();
     final private Map<String, Integer> socketDispatcherCount = new HashMap<String, Integer>();
@@ -110,5 +109,6 @@ class HttpConnectionManager
         }
         socketDispatchers.clear();
         socketDispatcherCount.clear();
+        workManager.dispose();
     }
 }
