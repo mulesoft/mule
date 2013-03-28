@@ -30,6 +30,7 @@ import org.mule.api.store.ListableObjectStore;
 import org.mule.context.notification.NotificationException;
 import org.mule.context.notification.ServerNotificationManager;
 import org.mule.management.stats.AllStatistics;
+import org.mule.management.stats.ProcessingTimeWatcher;
 import org.mule.util.queue.QueueManager;
 
 import java.io.Serializable;
@@ -276,5 +277,10 @@ public interface MuleContext extends Lifecycle
      * Return all annotations seen in the configuration
      */
     Map<QName, Set<Object>> getConfigurationAnnotations();
+
+    /**
+     * @return {@link {ProcessingTimeWatcher} used to compute processing time of finalized events
+     */
+    ProcessingTimeWatcher getProcessorTimeWatcher();
 }
 

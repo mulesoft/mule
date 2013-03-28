@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule;
 
 import org.mule.api.MessagingException;
@@ -40,7 +41,6 @@ import org.mule.api.store.ListableObjectStore;
 import org.mule.api.transaction.TransactionManagerFactory;
 import org.mule.client.DefaultLocalMuleClient;
 import org.mule.config.DefaultMuleConfiguration;
-import org.mule.config.ExceptionHelper;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.context.notification.MuleContextNotification;
 import org.mule.context.notification.NotificationException;
@@ -49,6 +49,7 @@ import org.mule.exception.DefaultSystemExceptionStrategy;
 import org.mule.expression.DefaultExpressionManager;
 import org.mule.lifecycle.MuleContextLifecycleManager;
 import org.mule.management.stats.AllStatistics;
+import org.mule.management.stats.ProcessingTimeWatcher;
 import org.mule.registry.DefaultRegistryBroker;
 import org.mule.registry.MuleRegistryHelper;
 import org.mule.transport.DefaultPollingController;
@@ -131,6 +132,8 @@ public class DefaultMuleContext implements MuleContext
     private PollingController pollingController = new DefaultPollingController();
 
     private Map<QName, Set<Object>> configurationAnnotations;
+
+    private ProcessingTimeWatcher processingTimeWatcher;
 
     public DefaultMuleContext(MuleConfiguration config,
                               WorkManager workManager,
@@ -740,5 +743,16 @@ public class DefaultMuleContext implements MuleContext
     public Map<QName, Set<Object>> getConfigurationAnnotations()
     {
         return configurationAnnotations;
+    }
+
+    @Override
+    public ProcessingTimeWatcher getProcessorTimeWatcher()
+    {
+        if (this.processingTimeWatcher == null)
+        {
+            this.processingTimeWatcher = registryBroker.get(MuleProperties.OBJECT_PROCESSING_TIME_WATCHER);
+        }
+
+        return this.processingTimeWatcher;
     }
 }
