@@ -33,8 +33,7 @@ public class JettyContinuationsReplyToHandler extends DefaultReplyToHandler
     @Override
     public void processReplyTo(MuleEvent event, MuleMessage returnMessage, Object replyTo) throws MuleException
     {
-        Continuation continuation = (Continuation)replyTo;
-        continuation.setObject(returnMessage);
-        continuation.resume();
+        ContinuationsReplyTo continuationReplyTo = (ContinuationsReplyTo) replyTo;
+        continuationReplyTo.setAndResume(returnMessage);
     }
 }

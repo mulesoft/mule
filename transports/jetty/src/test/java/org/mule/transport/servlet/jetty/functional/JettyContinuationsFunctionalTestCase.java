@@ -8,14 +8,18 @@
  * LICENSE.txt file.
  */
 
-package org.mule.transport.servlet.jetty;
+package org.mule.transport.servlet.jetty.functional;
 
-public class JettyContinuationsTwoEndpointsSinglePortTestCase extends JettyTwoEndpointsSinglePortTestCase
+/**
+ * Functional tests specific to Jetty using continuations.
+ */
+public class JettyContinuationsFunctionalTestCase extends JettyFunctionalTestCase
 {
+
     @Override
     protected String getConfigResources()
     {
-        return "jetty-continuations-two-endpoints-single-port.xml";
+        return "jetty-continuations-functional-test.xml";
     }
 
 }
