@@ -217,6 +217,12 @@ public class DateTime extends AbstractInstant implements Date, Time
         public InternalDate(Calendar calendar, Locale locale)
         {
             super(calendar, locale);
+            resetTime();
+        }
+
+        protected void resetTime()
+        {
+            this.calendar.get(Calendar.ERA);
             this.calendar.set(Calendar.HOUR_OF_DAY, 0);
             this.calendar.set(Calendar.MINUTE, 0);
             this.calendar.set(Calendar.SECOND, 0);
@@ -300,6 +306,7 @@ public class DateTime extends AbstractInstant implements Date, Time
         public Date changeTimeZone(String newTimezone)
         {
             super.changeTimeZone(newTimezone);
+            resetTime();
             return this;
         }
 
@@ -396,7 +403,8 @@ public class DateTime extends AbstractInstant implements Date, Time
 
         private void resetDate()
         {
-            // Workaround for issues with java.util.Calendar.  Ensure Calendar is in right state before updating timeZone 
+            // Workaround for issues with java.util.Calendar. Ensure Calendar is in right state before
+            // updating timeZone
             calendar.get(Calendar.ERA);
             calendar.set(Calendar.YEAR, 1970);
             calendar.set(Calendar.DAY_OF_YEAR, 1);

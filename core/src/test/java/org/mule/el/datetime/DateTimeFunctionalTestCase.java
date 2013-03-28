@@ -210,7 +210,7 @@ public class DateTimeFunctionalTestCase extends AbstractELTestCase
     public void dateToString()
     {
         assertEquals("2100-12-12Z",
-            evaluate("dateTime('2100-12-12T23:11:34').withTimeZone('GMT').date.format()"));
+            evaluate("dateTime('2100-12-12T23:11:34Z').date.format()"));
     }
 
     @Test

@@ -29,7 +29,6 @@ import javax.xml.datatype.XMLGregorianCalendar;
 
 import junit.framework.Assert;
 
-import org.apache.commons.lang.LocaleUtils;
 import org.junit.Test;
 
 @SmallTest
@@ -63,11 +62,9 @@ public class DateTimeTestCase extends AbstractMuleTestCase
     @Test
     public void format()
     {
-        Assert.assertEquals(new SimpleDateFormat("EEE, MMM d, yyyy").format(new Date()),
-            now.format("EEE, MMM d, yyyy"));
-        Assert.assertEquals(
-            new SimpleDateFormat("EEE, MMM d, yyyy", LocaleUtils.toLocale("en_US")).format(new Date()),
-            now.withLocale("en_US").format("EEE, MMM d, yyyy"));
+        SimpleDateFormat df = new SimpleDateFormat("EEE, MMM d, yyyy");
+        df.setTimeZone(TimeZone.getTimeZone("UTC"));
+        Assert.assertEquals(df.format(now.toDate()), now.format("EEE, MMM d, yyyy"));
     }
 
     @Test
@@ -130,15 +127,15 @@ public class DateTimeTestCase extends AbstractMuleTestCase
     public void changeTimeZone()
     {
         int hour = now.getHours();
-        assertEquals(hour - 3, now.changeTimeZone("GMT-03:00").getHours());
+        assertEquals((hour + 24 - 3) % 24, now.changeTimeZone("GMT-03:00").getHours());
     }
 
     @Test
     public void withLocale()
     {
-        assertEquals(new SimpleDateFormat("E").format(new Date()), now.withLocale("en_US").format("E"));
-        assertEquals(new SimpleDateFormat("E", LocaleUtils.toLocale("es_AR")).format(new Date()),
-            now.withLocale("es_AR").format("E"));
+        SimpleDateFormat df = new SimpleDateFormat("E");
+        df.setTimeZone(TimeZone.getTimeZone("UTC"));
+        assertEquals(df.format(new Date()), now.withLocale("en_US").format("E"));
     }
 
     @Test

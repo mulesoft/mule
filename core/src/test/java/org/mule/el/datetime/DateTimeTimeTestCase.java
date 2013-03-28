@@ -46,14 +46,36 @@ public class DateTimeTimeTestCase extends AbstractMuleTestCase
 
     @Test
     public void isBefore()
-    {
-        Assert.assertTrue((Boolean) now.isBefore(new DateTime().withTimeZone("UTC").plusHours(1).getTime()));
+    {System.out.println(now.getHours());
+        if (now.getHours() == 23)
+        {
+            Assert.assertTrue((Boolean) now.isAfter(new DateTime().changeTimeZone("UTC")
+                .plusHours(1)
+                .getTime()));
+        }
+        else
+        {
+            Assert.assertTrue((Boolean) now.isBefore(new DateTime().changeTimeZone("UTC")
+                .plusHours(1)
+                .getTime()));
+        }
     }
 
     @Test
     public void isAfter()
     {
-        Assert.assertTrue((Boolean) now.isAfter(new DateTime().withTimeZone("UTC").plusHours(-1).getTime()));
+        if (now.getHours() == 0)
+        {
+            Assert.assertTrue((Boolean) now.isBefore(new DateTime().withTimeZone("UTC")
+                .plusHours(-1)
+                .getTime()));
+        }
+        else
+        {
+            Assert.assertTrue((Boolean) now.isAfter(new DateTime().withTimeZone("UTC")
+                .plusHours(-1)
+                .getTime()));
+        }
     }
 
     @Test
@@ -121,7 +143,7 @@ public class DateTimeTimeTestCase extends AbstractMuleTestCase
     public void changeTimeZone()
     {
         int hour = now.getHours();
-        assertEquals(hour - 3, now.changeTimeZone("GMT-03:00").getHours());
+        assertEquals((hour + 24 - 3) % 24, now.changeTimeZone("GMT-03:00").getHours());
     }
 
     @Test
