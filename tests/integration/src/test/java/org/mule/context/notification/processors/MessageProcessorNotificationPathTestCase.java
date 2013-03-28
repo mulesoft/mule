@@ -7,7 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.context.notification;
+package org.mule.context.notification.processors;
 
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.construct.Pipeline;

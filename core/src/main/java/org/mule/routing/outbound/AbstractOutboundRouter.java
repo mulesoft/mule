@@ -11,7 +11,6 @@
 package org.mule.routing.outbound;
 
 import org.mule.DefaultMuleEvent;
-import org.mule.DefaultMuleMessage;
 import org.mule.VoidMuleEvent;
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MessagingException;
@@ -32,12 +31,14 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.api.processor.MessageProcessorChain;
 import org.mule.api.routing.OutboundRouter;
 import org.mule.api.routing.RouterResultsHandler;
 import org.mule.api.routing.RoutingException;
 import org.mule.api.transaction.TransactionConfig;
 import org.mule.api.transport.DispatchException;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.execution.MessageProcessorExecutionTemplate;
 import org.mule.execution.TransactionalExecutionTemplate;
 import org.mule.management.stats.RouterStatistics;
 import org.mule.processor.AbstractMessageProcessorOwner;
@@ -86,6 +87,8 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
 
     protected AtomicBoolean initialised = new AtomicBoolean(false);
     protected AtomicBoolean started = new AtomicBoolean(false);
+
+    private MessageProcessorExecutionTemplate notificationTemplate = MessageProcessorExecutionTemplate.createNotificationExecutionTemplate();
 
     public MuleEvent process(final MuleEvent event) throws MuleException
     {
@@ -200,7 +203,7 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
                     {
                         logger.trace("Response payload: \n"
                                      + StringMessageUtils.truncate(resultMessage.getPayloadForLogging(), 100,
-                                         false));
+                                                                   false));
                     }
                     catch (Exception e)
                     {
@@ -463,8 +466,14 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
                 event.setTimeout(timeout);
             }
         }
-
-        return route.process(event);
+        if (route instanceof MessageProcessorChain)
+        {
+            return route.process(event);
+        }
+        else
+        {
+            return notificationTemplate.execute(route, event);
+        }
     }
 
     /**
@@ -498,7 +507,6 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
     /**
      * Propagates a number of internal system properties to handle correlation, session, etc. Note that in and
      * out params can be the same message object when not dealing with replies.
-     *
      */
     protected void propagateMagicProperties(MuleMessage in, MuleMessage out)
     {
@@ -519,7 +527,7 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
         synchronized (routes)
         {
             super.dispose();
-            routes = Collections.<MessageProcessor> emptyList();
+            routes = Collections.<MessageProcessor>emptyList();
             initialised.set(false);
         }
     }

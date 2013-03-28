@@ -11,7 +11,6 @@ package org.mule.execution;
 
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
-import org.mule.api.context.notification.ServerNotificationHandler;
 import org.mule.api.processor.MessageProcessor;
 
 /**
@@ -36,6 +35,11 @@ public class MessageProcessorExecutionTemplate
     public static MessageProcessorExecutionTemplate createExecutionTemplate()
     {
         return new MessageProcessorExecutionTemplate(new MessageProcessorNotificationExecutionInterceptor(new ExceptionToMessagingExceptionExecutionInterceptor()));
+    }
+
+    public static MessageProcessorExecutionTemplate createNotificationExecutionTemplate()
+    {
+        return new MessageProcessorExecutionTemplate(new MessageProcessorNotificationExecutionInterceptor());
     }
 
     public MuleEvent execute(MessageProcessor messageProcessor, MuleEvent event) throws MessagingException

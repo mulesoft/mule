@@ -7,10 +7,13 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.context.notification;
+package org.mule.context.notification.processors;
 
 import static org.junit.Assert.assertNotNull;
 
+import org.mule.context.notification.Node;
+import org.mule.context.notification.RestrictedNode;
+import org.mule.context.notification.processors.AbstractMessageProcessorNotificationTestCase;
 import org.mule.module.client.MuleClient;
 
 import java.util.Arrays;
@@ -19,7 +22,7 @@ import java.util.List;
 
 import org.junit.runners.Parameterized;
 
-public class MessageProcessorNotificationTestCase extends AbstractNotificationTestCase
+public class MessageProcessorNotificationTestCase extends AbstractMessageProcessorNotificationTestCase
 {
 
     public MessageProcessorNotificationTestCase(ConfigVariant variant, String configResources)
@@ -44,7 +47,7 @@ public class MessageProcessorNotificationTestCase extends AbstractNotificationTe
         assertNotNull(client.send("vm://in-processorChain", "test", null));
         assertNotNull(client.send("vm://customProcessor", "test", null));
         assertNotNull(client.send("vm://in-choice", "test", null));
-        assertNotNull(client.send("vm://in-all", "test", null));
+
         assertNotNull(client.send("vm://in-foreach", "test", null));
         assertNotNull(client.send("vm://in-enricher", "test", null));
         //assertNotNull(client.send("vm://in-async", "test", null));
@@ -91,12 +94,7 @@ public class MessageProcessorNotificationTestCase extends AbstractNotificationTe
                 .serial(prePost())    //otherwise-logger
                 .serial(post())
 
-                //all
-                .serial(pre())
-                .serial(prePost())
-                .serial(prePost())
-                .serial(post())
-                .serial(prePost())    //MP after the Scope
+
 
                 //foreach
                 .serial(pre()) //foreach
@@ -216,20 +214,6 @@ public class MessageProcessorNotificationTestCase extends AbstractNotificationTe
                 .serial(prePost())
 
                 ;
-    }
-    private RestrictedNode pre()
-    {
-        return new Node(MessageProcessorNotification.class, MessageProcessorNotification.MESSAGE_PROCESSOR_PRE_INVOKE);
-    }
-
-    private RestrictedNode post()
-    {
-        return new Node(MessageProcessorNotification.class, MessageProcessorNotification.MESSAGE_PROCESSOR_POST_INVOKE);
-    }
-
-    private RestrictedNode prePost()
-    {
-        return new Node().serial(pre()).serial(post());
     }
 
     @Override
