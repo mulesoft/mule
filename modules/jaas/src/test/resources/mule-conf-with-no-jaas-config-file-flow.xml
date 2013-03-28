@@ -25,7 +25,12 @@
             exchange-pattern="request-response">
             <jaas:jaas-security-filter />
         </inbound-endpoint>
+        <custom-processor class="org.mule.module.jaas.JaasAuthenticationNoJaasConfigFileTestCase$AddNotSerializableProperty"/>
+        <outbound-endpoint address="vm://in" exchange-pattern="request-response"/>
+    </flow>
 
+    <flow name="flowWithPropagatedSecurityContext">
+        <inbound-endpoint address="vm://in" exchange-pattern="request-response"/>
         <test:component appendString=" Received" />
     </flow>
 

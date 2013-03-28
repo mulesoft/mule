@@ -25,7 +25,7 @@ public class JaasAuthentication implements Authentication
     private String user;
     private Map properties;
     private Subject subject;
-    private MuleEvent event;
+    transient private MuleEvent event;
     
     public JaasAuthentication(Credentials credentials)
     {

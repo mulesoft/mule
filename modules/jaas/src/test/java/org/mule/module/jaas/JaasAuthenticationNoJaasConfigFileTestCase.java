@@ -14,7 +14,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import org.mule.api.MuleEvent;
+import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.api.security.UnauthorisedException;
 import org.mule.util.ExceptionUtils;
 
@@ -97,5 +100,15 @@ public class JaasAuthenticationNoJaasConfigFileTestCase extends AbstractJaasFunc
         assertNotNull(message.getExceptionPayload());
         assertTrue(ExceptionUtils.containsType(message.getExceptionPayload().getException(),
             UnauthorisedException.class));
+    }
+
+    public static class AddNotSerializableProperty implements MessageProcessor
+    {
+        @Override
+        public MuleEvent process(MuleEvent event) throws MuleException
+        {
+            event.getMessage().setInvocationProperty("notSerializableProperty",new Object());
+            return event;
+        }
     }
 }

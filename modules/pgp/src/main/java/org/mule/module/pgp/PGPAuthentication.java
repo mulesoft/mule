@@ -23,7 +23,7 @@ public class PGPAuthentication implements Authentication
     private String userName;
     private Message message;
     private PGPPublicKey publicKey;
-    private MuleEvent event;
+    transient private MuleEvent event;
     
     public PGPAuthentication(String userName, Message message)
     {

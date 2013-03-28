@@ -26,7 +26,7 @@ public class SpringAuthenticationAdapter implements Authentication
 
     private org.springframework.security.core.Authentication delegate;    
     private Map properties;
-    private MuleEvent event;
+    transient private MuleEvent event;
     
     public SpringAuthenticationAdapter(org.springframework.security.core.Authentication authentication)    
     {
