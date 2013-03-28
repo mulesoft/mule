@@ -155,6 +155,7 @@ public class MuleProperties
     public static final String OBJECT_LOCK_FACTORY = "_muleLockFactory";
     public static final String OBJECT_LOCK_PROVIDER = "_muleLockProvider";
     public static final String OBJECT_DEFAULT_MESSAGE_PROCESSING_MANAGER = "_muleMessageProcessingManager";
+    public static final String OBJECT_PROCESSING_TIME_WATCHER = "_muleProcessingTimeWatcher";
 
     // Not currently used as these need to be instance variables of the MuleContext.
     public static final String OBJECT_WORK_MANAGER = "_muleWorkManager";

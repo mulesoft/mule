@@ -53,6 +53,7 @@ import org.mule.exception.DefaultSystemExceptionStrategy;
 import org.mule.expression.DefaultExpressionManager;
 import org.mule.lifecycle.MuleContextLifecycleManager;
 import org.mule.management.stats.AllStatistics;
+import org.mule.management.stats.ProcessingTimeWatcher;
 import org.mule.registry.DefaultRegistryBroker;
 import org.mule.registry.MuleRegistryHelper;
 import org.mule.transport.DefaultPollingController;
@@ -144,6 +145,8 @@ public class DefaultMuleContext implements MuleContext
     private TransactionManager transactionManager;
 
     private LockFactory lockFactory;
+
+    private ProcessingTimeWatcher processingTimeWatcher;
 
     public DefaultMuleContext(MuleConfiguration config,
                               WorkManager workManager,
@@ -838,5 +841,16 @@ public class DefaultMuleContext implements MuleContext
             this.lockFactory = registryBroker.get(MuleProperties.OBJECT_LOCK_FACTORY);
         }
         return this.lockFactory;
+    }
+
+    @Override
+    public ProcessingTimeWatcher getProcessorTimeWatcher()
+    {
+        if (this.processingTimeWatcher == null)
+        {
+            this.processingTimeWatcher = registryBroker.get(MuleProperties.OBJECT_PROCESSING_TIME_WATCHER);
+        }
+
+        return this.processingTimeWatcher;
     }
 }
