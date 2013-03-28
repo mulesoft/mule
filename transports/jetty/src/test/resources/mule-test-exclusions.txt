@@ -1,9 +1,3 @@
 #
 # Test cases listed in this file are not run.
 #
-
-# MULE-3992
-org.mule.transport.servlet.jetty.JettyContinuationsTwoEndpointsSinglePortTestCase
-
-# MULE-4586
-#org.mule.transport.servlet.jetty.JettyContinuationsHttpFunctionalTestCase

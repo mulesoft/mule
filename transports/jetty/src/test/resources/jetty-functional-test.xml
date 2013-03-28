@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:jetty="http://www.mulesoft.org/schema/mule/jetty"
+       xmlns:test="http://www.mulesoft.org/schema/mule/test"
+    xsi:schemaLocation="
+       http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+       http://www.mulesoft.org/schema/mule/jetty http://www.mulesoft.org/schema/mule/jetty/current/mule-jetty.xsd">
+
+    <jetty:connector name="jettyConnector" />
+    
+    <flow name="normalExecutionFlow">
+        <jetty:inbound-endpoint address="http://localhost:${port1}/normal" exchange-pattern="request-response" />
+        <test:component appendString=" received"/>
+    </flow>
+    
+    <flow name="exceptionExecutionFlow">
+        <jetty:inbound-endpoint address="http://localhost:${port1}/exception" exchange-pattern="request-response" />
+        <test:component throwException="true"/>
+    </flow>
+
+</mule>
