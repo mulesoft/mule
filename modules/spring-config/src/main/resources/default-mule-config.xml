@@ -98,6 +98,8 @@
 
     <bean name="_muleLockProvider" class="org.mule.util.lock.SingleServerLockProvider"/>
 
+    <bean name="_muleProcessingTimeWatcher" class="org.mule.management.stats.DefaultProcessingTimeWatcher"/>
+
     <!-- Default Transformers are now loaded from META-INF/services/org/mule/config/registry-bootstrap.properties so that
     the transformers will be available even when using the TransientRegistry only -->
 

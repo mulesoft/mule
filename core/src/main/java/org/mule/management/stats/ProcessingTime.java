@@ -13,39 +13,27 @@ package org.mule.management.stats;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.construct.FlowConstruct;
-import org.mule.util.concurrent.ThreadNameHelper;
 
 import java.io.Serializable;
-import java.lang.ref.ReferenceQueue;
-import java.lang.ref.WeakReference;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * Accumulates the processing time for all branches of a flow
  */
 public class ProcessingTime implements Serializable
 {
+
     /**
      * Serial version
      */
     private static final long serialVersionUID = 1L;
 
-    private static final Log logger = LogFactory.getLog(ProcessingTime.class);
-    private static volatile Thread referenceThread;
-    private static ReferenceQueue<ProcessingTime> queue = new ReferenceQueue<ProcessingTime>();
-    private static Map refs = new ConcurrentHashMap();
-
     private AtomicLong accumulator = new AtomicLong();
     private FlowConstructStatistics statistics;
-    private String threadName;
 
     /**
      * Create a ProcessingTime for the specified MuleSession.
+     *
      * @return ProcessingTime if the session has an enabled FlowConstructStatistics or null otherwise
      */
     public static ProcessingTime newInstance(MuleEvent event)
@@ -67,23 +55,21 @@ public class ProcessingTime implements Serializable
 
     /**
      * Create a Processing Time
-     * @param stats never null
+     *
+     * @param stats       never null
      * @param muleContext
      */
     private ProcessingTime(FlowConstructStatistics stats, MuleContext muleContext)
     {
         this.statistics = stats;
-        this.threadName = String.format("%sprocessing.time.monitor", ThreadNameHelper.getPrefix(muleContext));
-        if (referenceThread == null)
-        {
-            startThread();
-        }
-        refs.put(new Reference(this), refs);
+        ProcessingTimeWatcher processorTimeWatcher = muleContext.getProcessorTimeWatcher();
+        processorTimeWatcher.addProcessingTime(this);
     }
 
     /**
      * Add the execution time for this branch to the flow construct's statistics
-     * @param startTime  time this branch started
+     *
+     * @param startTime time this branch started
      */
     public void addFlowExecutionBranchTime(long startTime)
     {
@@ -103,105 +89,13 @@ public class ProcessingTime implements Serializable
         return (time <= 0) ? 1L : time;
     }
 
-    /**
-     * Start timer that processes reference queue
-     */
-    public void startThread()
+    public FlowConstructStatistics getStatistics()
     {
-        synchronized (ProcessingTime.class)
-        {
-            if (referenceThread == null)
-            {
-                referenceThread = new Thread(new Runnable()
-                {
-                    /**
-                     * As weak references to completed ProcessingTimes are delivered, record them
-                     */
-                    public void run()
-                    {
-
-                        try
-                        {
-                            while (true)
-                            {
-                                if (Thread.currentThread() != referenceThread)
-                                {
-                                    break;
-                                }
-                                try
-                                {
-                                    // The next two lines look silly, but
-                                    //       ref = (Reference) queue.poll();
-                                    // fails on the IBM 1.5 compiler
-                                    Object temp = queue.remove();
-                                    Reference ref = (Reference) temp;
-                                    refs.remove(ref);
-                                    FlowConstructStatistics stats = ref.getStatistics();
-                                    if (stats.isEnabled())
-                                    {
-                                        stats.addCompleteFlowExecutionTime(ref.getAccumulator().longValue());
-                                    }
-                                }
-                                catch (InterruptedException ex )
-                                {
-                                    Thread.currentThread().interrupt();
-                                    break;
-                                }
-                                catch (Exception ex)
-                                {
-                                    // Don't let exception escape -- it kills the thread
-                                    logger.error(this, ex);
-                                }
-                            }
-                        }
-                        finally
-                        {
-                            referenceThread = null;
-                        }
-                    }
-                }, this.threadName);
-                referenceThread.setDaemon(true);
-                referenceThread.start();
-            }
-        }
+        return statistics;
     }
 
-    /**
-     * Stop timer that processes reference queue
-     */
-    public synchronized static void stopTimer()
+    public AtomicLong getAccumulator()
     {
-        if (referenceThread != null)
-        {
-            referenceThread.interrupt();
-            referenceThread = null;
-        }
-        refs.clear();
-    }
-
-    /**
-     * Weak reference that includes flow statistics to be updated
-     */
-    static class Reference extends WeakReference<ProcessingTime>
-    {
-        private FlowConstructStatistics statistics;
-        private AtomicLong accumulator;
-
-        Reference(ProcessingTime time)
-        {
-            super(time, queue);
-            this.statistics = time.statistics;
-            this.accumulator = time.accumulator;
-        }
-
-        public AtomicLong getAccumulator()
-        {
-            return accumulator;
-        }
-
-        public FlowConstructStatistics getStatistics()
-        {
-            return statistics;
-        }
+        return accumulator;
     }
 }

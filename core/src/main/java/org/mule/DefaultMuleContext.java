@@ -44,7 +44,6 @@ import org.mule.api.store.ListableObjectStore;
 import org.mule.api.transaction.TransactionManagerFactory;
 import org.mule.client.DefaultLocalMuleClient;
 import org.mule.config.DefaultMuleConfiguration;
-import org.mule.config.ExceptionHelper;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.context.notification.MuleContextNotification;
 import org.mule.context.notification.NotificationException;
@@ -54,6 +53,7 @@ import org.mule.exception.DefaultSystemExceptionStrategy;
 import org.mule.expression.DefaultExpressionManager;
 import org.mule.lifecycle.MuleContextLifecycleManager;
 import org.mule.management.stats.AllStatistics;
+import org.mule.management.stats.ProcessingTimeWatcher;
 import org.mule.registry.DefaultRegistryBroker;
 import org.mule.registry.MuleRegistryHelper;
 import org.mule.transport.DefaultPollingController;
@@ -142,6 +142,8 @@ public class DefaultMuleContext implements MuleContext
     private SingleResourceTransactionFactoryManager singleResourceTransactionFactoryManager = new SingleResourceTransactionFactoryManager();
 
     private TransactionManager transactionManager;
+
+    private ProcessingTimeWatcher processingTimeWatcher;
 
     public DefaultMuleContext(MuleConfiguration config,
                               WorkManager workManager,
@@ -826,5 +828,16 @@ public class DefaultMuleContext implements MuleContext
     public ExpressionLanguage getExpressionLanguage()
     {
         return registryBroker.lookupObject(MuleProperties.OBJECT_EXPRESSION_LANGUAGE);
+    }
+
+    @Override
+    public ProcessingTimeWatcher getProcessorTimeWatcher()
+    {
+        if (this.processingTimeWatcher == null)
+        {
+            this.processingTimeWatcher = registryBroker.get(MuleProperties.OBJECT_PROCESSING_TIME_WATCHER);
+        }
+
+        return this.processingTimeWatcher;
     }
 }

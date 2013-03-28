@@ -153,6 +153,7 @@ public class MuleProperties
     public static final String OBJECT_EXPRESSION_LANGUAGE = "_muleExpressionLanguage";
     public static final String OBJECT_LOCK_MANAGER = "_muleLockManager";
     public static final String OBJECT_LOCK_PROVIDER = "_muleLockProvider";
+    public static final String OBJECT_PROCESSING_TIME_WATCHER = "_muleProcessingTimeWatcher";
 
     // Not currently used as these need to be instance variables of the MuleContext.
     public static final String OBJECT_WORK_MANAGER = "_muleWorkManager";
