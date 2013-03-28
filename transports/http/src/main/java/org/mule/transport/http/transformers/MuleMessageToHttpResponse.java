@@ -43,7 +43,12 @@ import org.joda.time.format.DateTimeFormatter;
 public class MuleMessageToHttpResponse extends AbstractMessageTransformer
 {
     
-    private static final DateTimeFormatter dateFormatter = DateTimeFormat.forPattern(HttpConstants.DATE_FORMAT).withLocale(Locale.US);
+    private static final DateTimeFormatter dateFormatter = DateTimeFormat.forPattern(HttpConstants.DATE_FORMAT_RFC822).withLocale(Locale.US);
+    
+    public static String formatDate(long time)
+    {
+        return dateFormatter.print(time);
+    }
 
     private String server;
 
@@ -215,7 +220,7 @@ public class MuleMessageToHttpResponse extends AbstractMessageTransformer
         {
             response.setHeader(new Header(HttpConstants.HEADER_CONTENT_TYPE, contentType));
         }
-        String date = dateFormatter.print(System.currentTimeMillis());
+        String date = formatDate(System.currentTimeMillis());
         response.setHeader(new Header(HttpConstants.HEADER_DATE, date));
         response.setHeader(new Header(HttpConstants.HEADER_SERVER, server));
 

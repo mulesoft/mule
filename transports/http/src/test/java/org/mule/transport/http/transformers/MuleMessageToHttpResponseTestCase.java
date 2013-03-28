@@ -19,6 +19,7 @@ import org.mule.tck.size.SmallTest;
 import org.mule.transport.http.HttpConstants;
 import org.mule.transport.http.HttpResponse;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.HashSet;
 import java.util.Locale;
@@ -80,7 +81,19 @@ public class MuleMessageToHttpResponseTestCase extends AbstractMuleTestCase
                 // validate that the header is in the appropriate format (rfc-1123)
                 SimpleDateFormat formatter = new SimpleDateFormat(HttpConstants.DATE_FORMAT, Locale.US);
                 formatter.setLenient(false);
-                formatter.parse(header.getValue());
+                try
+                {
+                    formatter.parse(header.getValue());
+                }
+                catch (ParseException e)
+                {
+                    // will to accept 24 hour style (which is really what it's supposed to be).
+                    formatter.setLenient(true);
+                    formatter.parse(header.getValue());
+                    formatter = new SimpleDateFormat(HttpConstants.DATE_FORMAT.replaceFirst("hh", "HH"), Locale.US);
+                    formatter.setLenient(false);
+                    formatter.parse(header.getValue());
+                }
             }
         }
         Assert.assertTrue("Missing 'Date' header", hasDateHeader);

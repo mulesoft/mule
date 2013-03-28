@@ -46,6 +46,7 @@ public class HttpConstants
 
     // Date header format
     public static final String DATE_FORMAT = "EEE, dd MMM yyyy hh:mm:ss zzz";
+    public static final String DATE_FORMAT_RFC822 = "EEE, dd MMM yyyy HH:mm:ss Z";
 
     // Newline
     public static final String CRLF = "\r\n";
