@@ -22,7 +22,7 @@ public class DefaultMuleAuthentication implements Authentication
     private char[] credentials;
     private String user;
     private Map<String, Object> properties;
-    private MuleEvent event;
+    transient private MuleEvent event;
 
     public DefaultMuleAuthentication(Credentials credentials)
     {

@@ -10,36 +10,31 @@
 
 package org.mule.module.spring.security;
 
+import static org.junit.Assert.assertEquals;
+
+import org.mule.api.MuleEvent;
+import org.mule.api.MuleException;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.http.HttpConstants;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.methods.GetMethod;
+import org.junit.Rule;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-
-public class AuthorizationFilterTestCase extends FunctionalTestCase
+public class SecurityContextSerializationTestCase extends FunctionalTestCase
 {
+    @Rule
+    public DynamicPort httpPort = new DynamicPort("port1");
 
     @Override
     protected String getConfigResources()
     {
-        return "http-filter-test.xml";
-    }
-
-    @Test
-    public void testAuthenticatedButNotAuthorized() throws Exception
-    {
-        doRequest(null, "localhost", "anon", "anon", getUrl(), false, 405);
-    }
-    
-    @Test
-    public void testAuthorized() throws Exception
-    {
-        doRequest(null, "localhost", "ross", "ross", getUrl(), false, 200);
+        return "security-context-serialization-test-case.xml";
     }
 
     @Test
@@ -50,7 +45,7 @@ public class AuthorizationFilterTestCase extends FunctionalTestCase
 
     protected String getUrl()
     {
-        return "http://localhost:4567/authorize";
+        return String.format("http://localhost:%s/authorize",httpPort.getNumber());
     }
 
     private void doRequest(String realm,
@@ -88,6 +83,16 @@ public class AuthorizationFilterTestCase extends FunctionalTestCase
         finally
         {
             get.releaseConnection();
+        }
+    }
+
+    public static class AddNotSerializableProperty implements MessageProcessor
+    {
+        @Override
+        public MuleEvent process(MuleEvent event) throws MuleException
+        {
+            event.getMessage().setInvocationProperty("notSerializableProperty",new Object());
+            return event;
         }
     }
 
