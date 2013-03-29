@@ -156,12 +156,7 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <!--
-                Ideally, scope should be test but this fails generating the javadocs.
-                The distributions etc. make sure that this dependency does not end up
-                in the final package.
-
-                <scope>test</scope> -->
+            <scope>test</scope>
         </dependency>
     </dependencies>
 </project>
