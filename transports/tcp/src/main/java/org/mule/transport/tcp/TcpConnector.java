@@ -154,7 +154,8 @@ public class TcpConnector extends AbstractConnector
         socketsPool.setFactory(getSocketFactory());
         socketsPool.setTestOnBorrow(true);
         socketsPool.setTestOnReturn(true);
-        setMaxSocketActive();
+        socketsPool.setMaxActive(getDispatcherThreadingProfile().getMaxThreadsActive());
+        socketsPool.setMaxIdle(getDispatcherThreadingProfile().getMaxThreadsIdle());
         socketsPool.setWhenExhaustedAction(GenericKeyedObjectPool.WHEN_EXHAUSTED_BLOCK);
         socketsPool.setMaxWait(socketMaxWait);
 
@@ -164,13 +165,6 @@ public class TcpConnector extends AbstractConnector
                                                  ThreadNameHelper.getPrefix(muleContext),
                                                  getName());
         keepAliveMonitor = new ExpiryMonitor(monitorName, 1000, this.getClass().getClassLoader(), muleContext, false);
-    }
-
-    private void setMaxSocketActive()
-    {
-        int maxActive = getDispatcherThreadingProfile().getMaxThreadsActive();
-        socketsPool.setMaxActive(maxActive);
-        socketsPool.setMaxIdle(maxActive);
     }
 
     @Override
