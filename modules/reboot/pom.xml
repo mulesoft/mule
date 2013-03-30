@@ -40,5 +40,10 @@
             <groupId>tanukisoft</groupId>
             <artifactId>wrapper</artifactId>
         </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 </project>
