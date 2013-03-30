@@ -1857,7 +1857,7 @@
                     <plugin>
                         <groupId>org.codehaus.mojo</groupId>
                         <artifactId>buildnumber-maven-plugin</artifactId>
-                        <version>1.0-beta-2</version>
+                        <version>1.1</version>
                         <executions>
                             <execution>
                                 <phase>validate</phase>
@@ -1871,6 +1871,7 @@
                             <doCheck>false</doCheck>
                             <doUpdate>false</doUpdate>
                             <timestampFormat>{0,date,yyyy-MMM-dd HH:mm:ss}</timestampFormat>
+                            <shortRevisionLength>8</shortRevisionLength>
                         </configuration>
                     </plugin>
                 </plugins>
