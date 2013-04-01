@@ -34,13 +34,11 @@ public class DefaultProcessingTimeWatcher implements ProcessingTimeWatcher, Mule
     private Thread watcherThread;
     private MuleContext muleContext;
 
-    @Override
     public void addProcessingTime(ProcessingTime processingTime)
     {
         refs.put(new ProcessingTimeReference(processingTime, queue), refs);
     }
 
-    @Override
     public void start() throws MuleException
     {
         String threadName = String.format("%sprocessing.time.monitor", ThreadNameHelper.getPrefix(muleContext));
@@ -49,7 +47,6 @@ public class DefaultProcessingTimeWatcher implements ProcessingTimeWatcher, Mule
         watcherThread.start();
     }
 
-    @Override
     public void stop() throws MuleException
     {
         if (watcherThread != null)
@@ -59,7 +56,6 @@ public class DefaultProcessingTimeWatcher implements ProcessingTimeWatcher, Mule
         refs.clear();
     }
 
-    @Override
     public void setMuleContext(MuleContext muleContext)
     {
         this.muleContext = muleContext;

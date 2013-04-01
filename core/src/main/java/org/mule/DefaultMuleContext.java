@@ -656,7 +656,6 @@ public class DefaultMuleContext implements MuleContext
         return (EndpointFactory) registryBroker.lookupObject(MuleProperties.OBJECT_MULE_ENDPOINT_FACTORY);
     }
 
-    @Override
     public ProcessingTimeWatcher getProcessorTimeWatcher()
     {
         if (this.processingTimeWatcher == null)
