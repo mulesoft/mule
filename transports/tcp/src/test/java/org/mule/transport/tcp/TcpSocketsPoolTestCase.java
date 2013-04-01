@@ -77,7 +77,7 @@ public class TcpSocketsPoolTestCase extends AbstractServiceAndFlowTestCase
     {
         TcpConnector tcpConnector = (TcpConnector) muleContext.getRegistry().lookupConnector("connectorWithException");
         assertEquals(8, tcpConnector.getSocketsPoolMaxActive());
-        assertEquals(8, tcpConnector.getSocketsPoolMaxIdle());
+        assertEquals(1, tcpConnector.getSocketsPoolMaxIdle());
         assertEquals(3000, tcpConnector.getSocketsPoolMaxWait());
     }
 
@@ -86,8 +86,9 @@ public class TcpSocketsPoolTestCase extends AbstractServiceAndFlowTestCase
     {
         TcpConnector tcpConnector = (TcpConnector) muleContext.getRegistry().lookupConnector("tcpConnector");
         int maxActive = tcpConnector.getDispatcherThreadingProfile().getMaxThreadsActive();
+        int maxIdle = tcpConnector.getDispatcherThreadingProfile().getMaxThreadsIdle();
         assertEquals(maxActive, tcpConnector.getSocketsPoolMaxActive());
-        assertEquals(maxActive, tcpConnector.getSocketsPoolMaxIdle());
+        assertEquals(maxIdle, tcpConnector.getSocketsPoolMaxIdle());
         assertEquals(TcpConnector.DEFAULT_WAIT_TIMEOUT, tcpConnector.getSocketMaxWait());
     }
 
