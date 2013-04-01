@@ -38,7 +38,7 @@ public class DynamicEndpointParsingTestCase extends AbstractMuleContextTestCase
     }
 
     @Test
-    public void testDynamicUriIsProperlyResolvedOnEvent() throws Exception
+    public void testDynamicEventMessageSourceURIUntouched() throws Exception
     {
         OutboundEndpoint endpoint = createRequestResponseEndpoint("test://localhost:#[header:port]");
         assertTrue(endpoint instanceof DynamicOutboundEndpoint);
@@ -48,7 +48,7 @@ public class DynamicEndpointParsingTestCase extends AbstractMuleContextTestCase
 
         MuleEvent response = endpoint.process(event);
 
-        assertEquals("test://localhost:12345", response.getMessageSourceURI().toString());
+        assertEquals("test://test", response.getMessageSourceURI().toString());
     }
 
     @Test
