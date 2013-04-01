@@ -12,6 +12,7 @@ package org.mule.module.launcher;
 
 import org.mule.util.ClassUtils;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -34,7 +35,7 @@ import sun.net.www.protocol.jar.Handler;
  *      and preventing it from being undeployed correctly (no leaving locked jars behind).</li>
  * </ol>
  */
-public class GoodCitizenClassLoader extends URLClassLoader
+public class GoodCitizenClassLoader extends URLClassLoader implements Closeable
 {
 
     public GoodCitizenClassLoader(URL[] urls, ClassLoader parent)

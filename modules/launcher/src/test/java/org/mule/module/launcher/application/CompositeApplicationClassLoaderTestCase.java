@@ -16,6 +16,7 @@ import static org.mockito.Mockito.mock;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
+import java.io.Closeable;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -47,7 +48,7 @@ public class CompositeApplicationClassLoaderTestCase extends AbstractMuleTestCas
 
     public final InputStream APP_LOADED_STREAM_RESOURCE = mock(InputStream.class);
     public final InputStream PLUGIN_LOADED_STREAM_RESOURCE = mock(InputStream.class);
-    private final TestClassLoader appClassLoader = new TestClassLoader();
+    private final TestApplicationClassLoader appClassLoader = new TestApplicationClassLoader();
     private final TestClassLoader pluginClassLoader = new SubTestClassLoader();
 
 
@@ -323,6 +324,17 @@ public class CompositeApplicationClassLoaderTestCase extends AbstractMuleTestCas
         assertThat(resource, equalTo(null));
     }
 
+    @Test
+    public void closesApplicationClassLoaders() throws Exception
+    {
+        List<ClassLoader> classLoaders = getClassLoaders(appClassLoader, pluginClassLoader);
+
+        CompositeApplicationClassLoader compositeApplicationClassLoader = new CompositeApplicationClassLoader(APP_NAME, classLoaders);
+
+        compositeApplicationClassLoader.close();
+        assertThat(appClassLoader.closed, equalTo(true));
+    }
+
     private List<ClassLoader> getClassLoaders(ClassLoader... expectedClassLoaders)
     {
         List<ClassLoader> classLoaders = new LinkedList<ClassLoader>();
@@ -332,6 +344,17 @@ public class CompositeApplicationClassLoaderTestCase extends AbstractMuleTestCas
         return classLoaders;
     }
 
+    public static class TestApplicationClassLoader extends TestClassLoader implements Closeable
+    {
+
+        private boolean closed;
+
+        @Override
+        public void close()
+        {
+            this.closed = true;
+        }
+    }
 
     // Used to ensure that the composite classloader is able to access
     // protected methods in subclasses by reflection

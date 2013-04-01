@@ -10,6 +10,7 @@
 
 package org.mule.module.launcher.application;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Method;
@@ -28,7 +29,7 @@ import org.apache.commons.logging.LogFactory;
  * Defines a classloader that delegates classes and resources resolution to
  * a list of classloaders.
  */
-public class CompositeApplicationClassLoader extends ClassLoader implements ApplicationClassLoader
+public class CompositeApplicationClassLoader extends ClassLoader implements ApplicationClassLoader, Closeable
 {
 
     protected static final Log logger = LogFactory.getLog(CompositeApplicationClassLoader.class);
@@ -238,6 +239,25 @@ public class CompositeApplicationClassLoader extends ClassLoader implements Appl
         }
 
         return null;
+    }
+
+    @Override
+    public void close()
+    {
+        for (ClassLoader classLoader : classLoaders)
+        {
+            if (classLoader instanceof Closeable)
+            {
+                try
+                {
+                    ((Closeable) classLoader).close();
+                }
+                catch (IOException e)
+                {
+                    // Ignore and continue
+                }
+            }
+        }
     }
 
     private URL findResource(ClassLoader classLoader, String s)
