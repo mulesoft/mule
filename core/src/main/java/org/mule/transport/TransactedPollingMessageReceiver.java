@@ -175,9 +175,10 @@ public abstract class TransactedPollingMessageReceiver extends AbstractPollingMe
                     countdown.await();
                 }
             }
-        }    catch (Exception e)
+        }
+        catch (Exception e)
         {
-            logger.error(e);
+            getConnector().getMuleContext().handleException(e);
         }
 
     }
