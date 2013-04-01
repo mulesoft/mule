@@ -10,16 +10,16 @@
 
 package org.mule.util.xa;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.transaction.xa.Xid;
 
 public abstract class AbstractXAResourceManager extends AbstractResourceManager
 {
 
-    protected Map suspendedContexts = new HashMap();
-    protected Map activeContexts = new HashMap();
+    protected Map suspendedContexts = new ConcurrentHashMap();
+    protected Map activeContexts = new ConcurrentHashMap();
 
     public AbstractXAResourceManager()
     {
