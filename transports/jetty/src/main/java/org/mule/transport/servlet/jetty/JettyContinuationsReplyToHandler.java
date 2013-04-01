@@ -9,6 +9,7 @@
  */
 package org.mule.transport.servlet.jetty;
 
+import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -17,8 +18,6 @@ import org.mule.api.transformer.Transformer;
 import org.mule.transport.DefaultReplyToHandler;
 
 import java.util.List;
-
-import org.mortbay.util.ajax.Continuation;
 
 /**
  * This handler is responsible for resuming the continuation for the current request
@@ -34,6 +33,7 @@ public class JettyContinuationsReplyToHandler extends DefaultReplyToHandler
     public void processReplyTo(MuleEvent event, MuleMessage returnMessage, Object replyTo) throws MuleException
     {
         ContinuationsReplyTo continuationReplyTo = (ContinuationsReplyTo) replyTo;
-        continuationReplyTo.setAndResume(returnMessage);
+        MuleMessage threadSafeMessage = new DefaultMuleMessage(returnMessage);
+        continuationReplyTo.setAndResume(threadSafeMessage);
     }
 }
