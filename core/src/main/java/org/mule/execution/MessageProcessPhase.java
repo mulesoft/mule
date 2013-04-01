@@ -7,7 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.message.processing;
+package org.mule.execution;
 
 /**
  *
@@ -15,12 +15,12 @@ package org.mule.message.processing;
  *
  * The phase will be part of a chain of responsibility were the phase can define
  * the end of the execution of the set of phases by calling:
- * - {@link org.mule.message.processing.PhaseResultNotifier#phaseConsumedMessage()} which indicates that the phase has consume the message
+ * - {@link PhaseResultNotifier#phaseConsumedMessage()} which indicates that the phase has consume the message
  * and it should not be longer processed
- * - {@link org.mule.message.processing.PhaseResultNotifier#phaseFailure(Exception)} which indicates that there was a failure
+ * - {@link PhaseResultNotifier#phaseFailure(Exception)} which indicates that there was a failure
  * during message processing.
  *
- * Whenever a phase finish execution it must call {@link org.mule.message.processing.PhaseResultNotifier#phaseSuccessfully()} which will cause
+ * Whenever a phase finish execution it must call {@link PhaseResultNotifier#phaseSuccessfully()} which will cause
  * the next phase to be executed.
  *
  * Optionally a {@link MessageProcessPhase} can implement {@link Comparable<MessageProcessPhase>}

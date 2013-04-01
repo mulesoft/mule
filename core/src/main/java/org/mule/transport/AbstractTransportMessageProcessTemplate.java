@@ -22,9 +22,9 @@ import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.source.MessageSource;
 import org.mule.api.transaction.TransactionConfig;
 import org.mule.api.transport.PropertyScope;
-import org.mule.message.processing.FlowProcessingPhaseTemplate;
-import org.mule.message.processing.MessageProcessContext;
-import org.mule.message.processing.ValidationPhaseTemplate;
+import org.mule.execution.FlowProcessingPhaseTemplate;
+import org.mule.execution.MessageProcessContext;
+import org.mule.execution.ValidationPhaseTemplate;
 import org.mule.util.ObjectUtils;
 
 import java.io.OutputStream;

@@ -23,6 +23,16 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.exception.SystemExceptionHandler;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.execution.EndPhaseTemplate;
+import org.mule.execution.FlowProcessingPhase;
+import org.mule.execution.FlowProcessingPhaseTemplate;
+import org.mule.execution.MessageProcessContext;
+import org.mule.execution.MessageProcessPhase;
+import org.mule.execution.MessageProcessTemplate;
+import org.mule.execution.MuleMessageProcessingManager;
+import org.mule.execution.PhaseResultNotifier;
+import org.mule.execution.ValidationPhase;
+import org.mule.execution.ValidationPhaseTemplate;
 import org.mule.tck.size.SmallTest;
 
 import java.util.Arrays;
@@ -170,7 +180,7 @@ public class MuleMessageProcessingManagerTestCase extends org.mule.tck.junit4.Ab
             {
                 return 1;
             }
-            if (messageProcessPhase instanceof  FlowProcessingPhase)
+            if (messageProcessPhase instanceof FlowProcessingPhase)
             {
                 return -1;
             }

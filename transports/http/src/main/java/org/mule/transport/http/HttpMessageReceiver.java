@@ -20,7 +20,7 @@ import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.Connector;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.MessageFactory;
-import org.mule.message.processing.MessageProcessContext;
+import org.mule.execution.MessageProcessContext;
 import org.mule.transport.AbstractMessageReceiver;
 import org.mule.transport.ConnectException;
 import org.mule.util.MapUtils;

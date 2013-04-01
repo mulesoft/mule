@@ -15,6 +15,10 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.mule.api.MuleException;
+import org.mule.execution.MessageProcessContext;
+import org.mule.execution.PhaseResultNotifier;
+import org.mule.execution.ValidationPhase;
+import org.mule.execution.ValidationPhaseTemplate;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
 

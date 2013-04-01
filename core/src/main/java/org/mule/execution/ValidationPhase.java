@@ -7,10 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.message.processing;
-
-import org.mule.api.MuleContext;
-import org.mule.api.context.MuleContextAware;
+package org.mule.execution;
 
 /**
  * This phase validates the incoming message.

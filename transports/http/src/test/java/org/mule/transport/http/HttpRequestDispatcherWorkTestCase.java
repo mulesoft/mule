@@ -17,7 +17,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.mule.api.transport.NoReceiverForEndpointException;
-import org.mule.message.processing.MessageProcessContext;
+import org.mule.execution.MessageProcessContext;
 import org.mule.tck.size.SmallTest;
 
 import java.io.ByteArrayInputStream;

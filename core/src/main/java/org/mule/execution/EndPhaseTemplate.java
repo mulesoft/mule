@@ -7,15 +7,18 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.message.processing;
+package org.mule.execution;
 
 /**
- * Maker interface for every template that can be used in a {@link MessageProcessPhase}
- *
- * A {@link MessageProcessTemplate} must contain all the required method that redefines behavior
- * inside a {@link MessageProcessPhase} and it's particular from the {@link org.mule.api.source.MessageSource}
- *
+ *  Phase were the {@link MessageProcessTemplate} is notified that
+ *  the message processing has ended
  */
-public interface MessageProcessTemplate
+public interface EndPhaseTemplate extends MessageProcessTemplate
 {
+
+    /**
+     * template method call when the message processing ends
+     */
+    void messageProcessingEnded();
+
 }

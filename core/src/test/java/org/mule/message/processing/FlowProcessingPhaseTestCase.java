@@ -21,6 +21,13 @@ import static org.mockito.Mockito.when;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
+import org.mule.execution.FlowProcessingPhase;
+import org.mule.execution.FlowProcessingPhaseTemplate;
+import org.mule.execution.MessageProcessContext;
+import org.mule.execution.MessageProcessPhase;
+import org.mule.execution.PhaseResultNotifier;
+import org.mule.execution.RequestResponseFlowProcessingPhaseTemplate;
+import org.mule.execution.ValidationPhase;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 

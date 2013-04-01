@@ -15,10 +15,16 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.mule.api.exception.SystemExceptionHandler;
+import org.mule.execution.EndPhaseTemplate;
+import org.mule.execution.EndProcessPhase;
+import org.mule.execution.MessageProcessContext;
+import org.mule.execution.MessageProcessPhase;
+import org.mule.execution.MessageProcessTemplate;
+import org.mule.execution.PhaseExecutionEngine;
+import org.mule.execution.PhaseResultNotifier;
 import org.mule.tck.size.SmallTest;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Test;

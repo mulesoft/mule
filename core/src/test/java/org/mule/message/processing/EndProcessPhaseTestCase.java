@@ -13,6 +13,11 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+import org.mule.execution.EndPhaseTemplate;
+import org.mule.execution.EndProcessPhase;
+import org.mule.execution.MessageProcessContext;
+import org.mule.execution.MessageProcessTemplate;
+import org.mule.execution.PhaseResultNotifier;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 

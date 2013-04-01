@@ -21,12 +21,11 @@ import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
 import org.mule.api.transport.MessageReceiver;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
-import org.mule.message.processing.MessageProcessContext;
+import org.mule.execution.MessageProcessContext;
 import org.mule.transport.AbstractMessageReceiverTestCase;
 import org.mule.transport.http.transformers.MuleMessageToHttpResponse;
 import org.mule.util.CollectionUtils;
 
-import org.hamcrest.core.Is;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;

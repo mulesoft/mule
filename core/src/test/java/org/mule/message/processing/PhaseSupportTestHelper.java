@@ -12,6 +12,9 @@ package org.mule.message.processing;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
+import org.mule.execution.MessageProcessPhase;
+import org.mule.execution.MessageProcessTemplate;
+
 import org.mockito.Mockito;
 
 public class PhaseSupportTestHelper<T>
