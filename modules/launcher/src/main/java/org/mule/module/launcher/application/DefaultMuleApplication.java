@@ -363,6 +363,7 @@ public class DefaultMuleApplication implements Application
         }
         catch(Throwable cause)
         {
+            logger.error("Application deployment error", cause);
             deploymentListener.onDeploymentFailure(appName, cause);
         }
 
