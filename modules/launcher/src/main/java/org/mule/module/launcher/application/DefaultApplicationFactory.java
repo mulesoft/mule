@@ -46,9 +46,7 @@ public class DefaultApplicationFactory implements ApplicationFactory
 
     protected Application createAppFrom(ApplicationDescriptor descriptor) throws IOException
     {
-        ClassLoader classLoader = applicationClassLoaderFactory.create(descriptor);
-
-        final DefaultMuleApplication delegate = new DefaultMuleApplication(descriptor, classLoader);
+        final DefaultMuleApplication delegate = new DefaultMuleApplication(descriptor, applicationClassLoaderFactory);
 
         if (deploymentListener != null)
         {

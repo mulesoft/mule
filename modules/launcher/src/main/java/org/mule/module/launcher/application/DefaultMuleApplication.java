@@ -67,16 +67,17 @@ public class DefaultMuleApplication implements Application
     protected MuleContext muleContext;
     protected ClassLoader deploymentClassLoader;
     protected ApplicationDescriptor descriptor;
+    protected final ApplicationClassLoaderFactory applicationClassLoaderFactory;
 
     protected String[] absoluteResourcePaths;
 
     protected DeploymentListener deploymentListener;
 
-    protected DefaultMuleApplication(ApplicationDescriptor appDesc, ClassLoader classLoader)
+    protected DefaultMuleApplication(ApplicationDescriptor appDesc, ApplicationClassLoaderFactory applicationClassLoaderFactory)
     {
         this.descriptor = appDesc;
+        this.applicationClassLoaderFactory = applicationClassLoaderFactory;
         this.deploymentListener = new NullDeploymentListener();
-        this.deploymentClassLoader = classLoader;
     }
 
     public void setDeploymentListener(DeploymentListener deploymentListener)
@@ -113,6 +114,7 @@ public class DefaultMuleApplication implements Application
             absoluteResourcePaths[i] = file.getAbsolutePath();
         }
 
+        deploymentClassLoader = applicationClassLoaderFactory.create(descriptor);
     }
 
     @Override

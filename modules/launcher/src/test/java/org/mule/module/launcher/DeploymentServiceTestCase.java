@@ -141,6 +141,31 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     }
 
     @Test
+    public void redeploysAppWhenConfigChanges() throws Exception
+    {
+        final URL url = getClass().getResource("/dummy-app.zip");
+        assertNotNull("Test app file not found " + url, url);
+        addAppArchive(url);
+
+        deploymentService.start();
+
+        assertDeploymentSuccess(deploymentListener, "dummy-app");
+
+        assertAppsDir(NONE, new String[] {"dummy-app"}, true);
+        assertEquals("Application has not been properly registered with Mule", 1, deploymentService.getApplications().size());
+
+        reset(deploymentListener);
+
+        File configFile = new File(appsDir + "/dummy-app", "mule-config.xml");
+        configFile.setLastModified(configFile.lastModified() + 1000);
+
+        assertUndeploymentSuccess(deploymentListener, "dummy-app");
+        assertDeploymentSuccess(deploymentListener, "dummy-app");
+        assertEquals("Application has not been properly registered with Mule", 1, deploymentService.getApplications().size());
+        assertAppsDir(NONE, new String[]{"dummy-app"}, true);
+    }
+
+    @Test
     public void testBrokenAppArchiveWithoutArgument() throws Exception
     {
         doBrokenAppArchiveTest();
