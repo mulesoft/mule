@@ -143,14 +143,7 @@ public class DynamicOutboundEndpoint implements OutboundEndpoint
     public MuleEvent process(MuleEvent event) throws MuleException
     {
         EndpointURI endpointURIForMessage = getEndpointURIForMessage(event);
-        OutboundEndpoint outboundEndpoint = getStaticEndpointFor(endpointURIForMessage);
-
-        event = new DefaultMuleEvent(event.getMessage(), endpointURIForMessage.getUri(), event.getMessageSourceName(),
-                                     event.getExchangePattern(), event.getFlowConstruct(), event.getSession(), event.getTimeout(),
-                                     event.getCredentials(), (ResponseOutputStream) event.getOutputStream(), event.getEncoding(),
-                                     event.isTransacted(), event.isSynchronous(), event.getReplyToDestination(), event.getReplyToHandler());
-
-        return outboundEndpoint.process(event);
+        return getStaticEndpointFor(endpointURIForMessage).process(event);
     }
 
     private OutboundEndpoint getStaticEndpointFor(EndpointURI uri) throws EndpointException, InitialisationException
