@@ -18,6 +18,7 @@ import org.mule.api.registry.MuleRegistry;
 import org.mule.config.ChainedThreadingProfile;
 import org.mule.config.bootstrap.SimpleRegistryBootstrap;
 import org.mule.endpoint.DefaultEndpointFactory;
+import org.mule.management.stats.DefaultProcessingTimeWatcher;
 import org.mule.model.seda.SedaModel;
 import org.mule.retry.policies.NoRetryPolicyTemplate;
 import org.mule.security.MuleSecurityManager;
@@ -75,7 +76,8 @@ public class DefaultsConfigurationBuilder extends AbstractConfigurationBuilder
             new ChainedThreadingProfile(defaultThreadingProfile));
         registry.registerObject(MuleProperties.OBJECT_DEFAULT_SERVICE_THREADING_PROFILE,
             new ChainedThreadingProfile(defaultThreadingProfile));
-        
+        registry.registerObject(MuleProperties.OBJECT_PROCESSING_TIME_WATCHER, new DefaultProcessingTimeWatcher());
+
         registry.registerObject(MuleProperties.OBJECT_DEFAULT_RETRY_POLICY_TEMPLATE, new NoRetryPolicyTemplate());
         
         Model systemModel = new SedaModel();
