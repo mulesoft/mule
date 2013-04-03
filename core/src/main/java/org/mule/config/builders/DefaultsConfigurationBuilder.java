@@ -24,6 +24,7 @@ import org.mule.config.bootstrap.SimpleRegistryBootstrap;
 import org.mule.el.mvel.MVELExpressionLanguage;
 import org.mule.endpoint.DefaultEndpointFactory;
 import org.mule.execution.MuleMessageProcessingManager;
+import org.mule.management.stats.DefaultProcessingTimeWatcher;
 import org.mule.model.seda.SedaModel;
 import org.mule.retry.policies.NoRetryPolicyTemplate;
 import org.mule.security.MuleSecurityManager;
@@ -85,6 +86,8 @@ public class DefaultsConfigurationBuilder extends AbstractConfigurationBuilder
         registry.registerObject(MuleProperties.OBJECT_LOCK_FACTORY, new MuleLockFactory());
         registry.registerObject(MuleProperties.OBJECT_LOCK_PROVIDER, new SingleServerLockProvider());
 
+        registry.registerObject(MuleProperties.OBJECT_PROCESSING_TIME_WATCHER, new DefaultProcessingTimeWatcher());
+        
         configureThreadingProfiles(registry);
 
         registry.registerObject(MuleProperties.OBJECT_DEFAULT_RETRY_POLICY_TEMPLATE, new NoRetryPolicyTemplate());
