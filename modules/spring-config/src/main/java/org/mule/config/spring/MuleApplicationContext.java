@@ -43,7 +43,7 @@ public class MuleApplicationContext extends AbstractXmlApplicationContext
      * Parses configuration files creating a spring ApplicationContext which is used
      * as a parent registry using the SpringRegistry registry implementation to wraps
      * the spring ApplicationContext
-     * 
+     *
      * @param configResources
      * @see org.mule.config.spring.SpringRegistry
      */
@@ -59,7 +59,7 @@ public class MuleApplicationContext extends AbstractXmlApplicationContext
         this.springResources = springResources;
     }
 
-    protected void prepareBeanFactory(ConfigurableListableBeanFactory beanFactory) 
+    protected void prepareBeanFactory(ConfigurableListableBeanFactory beanFactory)
     {
         super.prepareBeanFactory(beanFactory);
         beanFactory.addBeanPostProcessor(new MuleContextPostProcessor(muleContext));
@@ -115,7 +115,8 @@ public class MuleApplicationContext extends AbstractXmlApplicationContext
         }
     }
 
-    protected BeanDefinitionReader createBeanDefinitionReader(DefaultListableBeanFactory beanFactory) {
+    protected BeanDefinitionReader createBeanDefinitionReader(DefaultListableBeanFactory beanFactory)
+    {
         XmlBeanDefinitionReader beanDefinitionReader = new XmlBeanDefinitionReader(beanFactory);
         //hook in our custom hierarchical reader
         beanDefinitionReader.setDocumentReaderClass(MuleBeanDefinitionDocumentReader.class);
