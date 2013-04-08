@@ -8,21 +8,55 @@
           http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/3.2/mule-http.xsd
           http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd">
 
-    <http:connector name="HttpKeepAliveConnector">
+    <http:connector name="HttpConnectorKeepAlive">
         <spring:property name="keepAlive" value="true"/>
         <spring:property name="keepAliveTimeout" value="60000"/>
     </http:connector>
+    
+    <http:connector name="HttpConnectorNoKeepAlive">
+        <spring:property name="keepAlive" value="false"/>
+        <spring:property name="keepAliveTimeout" value="60000"/>
+    </http:connector>
 
-    <flow name="WithoutEndpointOverride">
+    <flow name="ConnectorKeepAliveEpEmpty">
         <http:inbound-endpoint address="http://localhost:${port1}/http-in" exchange-pattern="request-response"
-                               name="inWithoutEndpointOverride"/>
-        <echo-component/>
-    </flow>
-
-    <flow name="WithEndpointOverride">
-        <http:inbound-endpoint address="http://localhost:${port2}/http-in" keep-alive="true"
-                               exchange-pattern="request-response" name="inWithEndpointOverride"/>
+                               connector-ref="HttpConnectorKeepAlive"
+                               name="inConnectorKeepAliveEpEmpty"/>
         <echo-component/>
     </flow>
     
+    <flow name="ConnectorKeepAliveEpNoKeepAlive">
+        <http:inbound-endpoint address="http://localhost:${port2}/http-in" exchange-pattern="request-response" keep-alive="false"
+                               connector-ref="HttpConnectorKeepAlive"
+                               name="inConnectorKeepAliveEpNoKeepAlive"/>
+        <echo-component/>
+    </flow>
+    
+    <flow name="ConnectorKeepAliveEpKeepAlive">
+        <http:inbound-endpoint address="http://localhost:${port3}/http-in" exchange-pattern="request-response" keep-alive="true"
+                               connector-ref="HttpConnectorKeepAlive"
+                               name="inConnectorKeepAliveEpKeepAlive"/>
+        <echo-component/>
+    </flow>
+    
+    <flow name="ConnectorNoKeepAliveEpEmpty">
+        <http:inbound-endpoint address="http://localhost:${port4}/http-in" exchange-pattern="request-response"
+                               connector-ref="HttpConnectorNoKeepAlive"
+                               name="inConnectorNoKeepAliveEpEmpty"/>
+        <echo-component/>
+    </flow>
+    
+    <flow name="ConnectorNoKeepAliveEpNoKeepAlive">
+        <http:inbound-endpoint address="http://localhost:${port5}/http-in" exchange-pattern="request-response" keep-alive="false"
+                               connector-ref="HttpConnectorNoKeepAlive"
+                               name="inConnectorNoKeepAliveEpNoKeepAlive"/>
+        <echo-component/>
+    </flow>
+    
+    <flow name="ConnectorNoKeepAliveEpKeepAlive">
+        <http:inbound-endpoint address="http://localhost:${port6}/http-in" exchange-pattern="request-response" keep-alive="true"
+                               connector-ref="HttpConnectorNoKeepAlive"
+                               name="inConnectorNoKeepAliveEpKeepAlive"/>
+        <echo-component/>
+    </flow>
 </mule>
