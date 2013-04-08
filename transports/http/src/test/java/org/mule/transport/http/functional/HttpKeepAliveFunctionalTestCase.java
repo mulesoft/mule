@@ -10,8 +10,9 @@
 
 package org.mule.transport.http.functional;
 
+import static junit.framework.Assert.assertNotNull;
+import static org.junit.Assert.assertEquals;
 import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.module.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.http.HttpConstants;
@@ -23,21 +24,26 @@ import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.HttpVersion;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.params.HttpClientParams;
+import org.apache.commons.lang.StringUtils;
 import org.junit.Rule;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 /**
  * Tests as per http://www.io.com/~maus/HttpKeepAlive.html
  */
 public class HttpKeepAliveFunctionalTestCase extends FunctionalTestCase
 {
-    
-    private HttpClient http10Client;
-    private HttpClient http11Client;
-    private MuleClient client = null;
+
+    private static final String IN_CONNECTOR_NO_KEEP_ALIVE_EP_NO_KEEP_ALIVE = "inConnectorNoKeepAliveEpNoKeepAlive";
+    private static final String IN_CONNECTOR_KEEP_ALIVE_EP_KEEP_ALIVE = "inConnectorKeepAliveEpKeepAlive";
+    private static final String IN_CONNECTOR_NO_KEEP_ALIVE_EP_KEEP_ALIVE = "inConnectorNoKeepAliveEpKeepAlive";
+    private static final String IN_CONNECTOR_KEEP_ALIVE_EP_NO_KEEP_ALIVE = "inConnectorKeepAliveEpNoKeepAlive";
+    private static final String IN_CONNECTOR_NO_KEEP_ALIVE_EP_EMPTY = "inConnectorNoKeepAliveEpEmpty";
+    private static final String IN_CONNECTOR_KEEP_ALIVE_EP_EMPTY = "inConnectorKeepAliveEpEmpty";
+
+    private static final String CLOSE = "close";
+    private static final String KEEP_ALIVE = "Keep-Alive";
+    private static final String EMPTY = "";
 
     @Rule
     public DynamicPort dynamicPort1 = new DynamicPort("port1");
@@ -45,110 +51,189 @@ public class HttpKeepAliveFunctionalTestCase extends FunctionalTestCase
     @Rule
     public DynamicPort dynamicPort2 = new DynamicPort("port2");
     
-    @Override
-    protected void doSetUp() throws Exception
-    {
-        super.doSetUp();
+    @Rule
+    public DynamicPort dynamicPort3 = new DynamicPort("port3");
 
-        http10Client = setupHttpClient(HttpVersion.HTTP_1_0);
-        http11Client = setupHttpClient(HttpVersion.HTTP_1_1);
-        client = new MuleClient(muleContext);
-    }
-    
-    private HttpClient setupHttpClient(HttpVersion version)
-    {
-        HttpClientParams params = new HttpClientParams();
-        params.setVersion(version);
-        return new HttpClient(params);
-    }
+    @Rule
+    public DynamicPort dynamicPort4 = new DynamicPort("port4");
+
+    @Rule
+    public DynamicPort dynamicPort5 = new DynamicPort("port5");
+
+    @Rule
+    public DynamicPort dynamicPort6 = new DynamicPort("port6");
 
     @Override
     protected String getConfigResources()
     {
         return "http-keep-alive-config.xml";
     }
-    
+
     @Test
-    public void testHttp10WithoutConnectionHeader() throws Exception
+    public void testHttp10ConnectorKeepAliveEpEmpty() throws Exception
     {
-        GetMethod request = new GetMethod(((InboundEndpoint) client.getMuleContext().getRegistry().lookupObject("inWithoutEndpointOverride")).getAddress());
-        request.removeRequestHeader(HttpConstants.HEADER_CONNECTION);
-        runHttp10MethodAndAssertConnectionHeader(request, "close");
-    }
-    
-    @Test
-    public void testHttp10WithCloseConnectionHeader() throws Exception
-    {
-        GetMethod request = new GetMethod(((InboundEndpoint) client.getMuleContext().getRegistry().lookupObject("inWithoutEndpointOverride")).getAddress());
-        request.setRequestHeader(HttpConstants.HEADER_CONNECTION, "close");
-        runHttp10MethodAndAssertConnectionHeader(request, "close");
-    }
-    
-    @Test
-    public void testHttp10KeepAlive() throws Exception
-    {
-        doTestKeepAlive(((InboundEndpoint) client.getMuleContext().getRegistry().lookupObject("inWithoutEndpointOverride")).getAddress());
-    }
-    
-    @Test
-    public void testHttp10KeepAliveWitEpOverride() throws Exception
-    {
-        doTestKeepAlive(((InboundEndpoint) client.getMuleContext().getRegistry().lookupObject("inWithoutEndpointOverride")).getAddress());
-    }
-    
-    private void doTestKeepAlive(String url) throws Exception
-    {
-        GetMethod request = new GetMethod(url);
-        request.addRequestHeader(HttpConstants.HEADER_CONNECTION, "Keep-Alive");
-        runHttp10MethodAndAssertConnectionHeader(request, "Keep-Alive");
-        
-        request.setRequestHeader(HttpConstants.HEADER_CONNECTION, "close");
-        runHttp10MethodAndAssertConnectionHeader(request, "close");
-    }
-    
-    private void runHttp10MethodAndAssertConnectionHeader(HttpMethod request, String expectedConnectionHeaderValue) throws Exception
-    {
-        int status = http10Client.executeMethod(request);
-        assertEquals(HttpStatus.SC_OK, status);
-        String connectionHeader = request.getResponseHeader(HttpConstants.HEADER_CONNECTION).getValue();
-        assertNotNull(connectionHeader);
-        assertEquals(expectedConnectionHeaderValue, connectionHeader);
-    }
-    
-    @Test
-    public void testHttp11KeepAlive() throws Exception
-    {
-        doTestHttp11KeepAlive(((InboundEndpoint) client.getMuleContext().getRegistry().lookupObject("inWithoutEndpointOverride")).getAddress());
-    }
-    
-    @Test
-    public void testHttp11KeepAliveWithEpOverride() throws Exception
-    {
-        doTestHttp11KeepAlive(((InboundEndpoint) client.getMuleContext().getRegistry().lookupObject("inWithoutEndpointOverride")).getAddress());
-    }
-    
-    public void doTestHttp11KeepAlive(String url) throws Exception
-    {
-        GetMethod request = new GetMethod(url);
-        runHttp11MethodAndAssert(request);
-        
-        // the connection should be still open, send another request and terminate the connection
-        request = new GetMethod(url);
-        request.setRequestHeader(HttpConstants.HEADER_CONNECTION, "close");
-        runHttp11MethodAndAssert(request);
-        
-        Header connectHeader = request.getResponseHeader(HttpConstants.HEADER_CONNECTION);
-        assertNotNull(connectHeader);
-        assertEquals("close", connectHeader.getValue());
-    }
-        
-    private void runHttp11MethodAndAssert(HttpMethod request) throws Exception
-    {
-        int status = http11Client.executeMethod(request);
-        assertEquals(HttpStatus.SC_OK, status);
-        assertEquals("/http-in", request.getResponseBodyAsString());
+        doTestKeepAliveInHttp10(getEndpointAddress(IN_CONNECTOR_KEEP_ALIVE_EP_EMPTY));
     }
 
+    @Test
+    public void testHttp10ConnectorNoKeepAliveEpEmpty() throws Exception
+    {
+        doTestNoKeepAliveInHttp10(getEndpointAddress(IN_CONNECTOR_NO_KEEP_ALIVE_EP_EMPTY));
+    }
+
+    @Test
+    public void testHttp10ConnectorKeepAliveEpNoKeepAlive() throws Exception
+    {
+        doTestNoKeepAliveInHttp10(getEndpointAddress(IN_CONNECTOR_KEEP_ALIVE_EP_NO_KEEP_ALIVE));
+    }
+
+    @Test
+    public void testHttp10ConnectorNoKeepAliveEpKeepAlive() throws Exception
+    {
+        doTestNoKeepAliveInHttp10(getEndpointAddress(IN_CONNECTOR_NO_KEEP_ALIVE_EP_KEEP_ALIVE));
+    }
+
+    @Test
+    public void testHttp10ConnectorKeepAliveEpKeepAlive() throws Exception
+    {
+        doTestKeepAliveInHttp10(getEndpointAddress(IN_CONNECTOR_KEEP_ALIVE_EP_KEEP_ALIVE));
+    }
+
+    @Test
+    public void testHttp10ConnectorNoKeepAliveEpNoKeepAlive() throws Exception
+    {
+        doTestNoKeepAliveInHttp10(getEndpointAddress(IN_CONNECTOR_NO_KEEP_ALIVE_EP_NO_KEEP_ALIVE));
+    }
+
+    @Test
+    public void testHttp11ConnectorKeepAliveEpEmpty() throws Exception
+    {
+        doTestKeepAliveInHttp11(getEndpointAddress(IN_CONNECTOR_KEEP_ALIVE_EP_EMPTY));
+    }
+
+    @Test
+    public void testHttp11ConnectorNoKeepAliveEpEmpty() throws Exception
+    {
+        doTestNoKeepAliveInHttp11(getEndpointAddress(IN_CONNECTOR_NO_KEEP_ALIVE_EP_EMPTY));
+    }
+
+    @Test
+    public void testHttp11ConnectorKeepAliveEpNoKeepAlive() throws Exception
+    {
+        doTestNoKeepAliveInHttp11(getEndpointAddress(IN_CONNECTOR_KEEP_ALIVE_EP_NO_KEEP_ALIVE));
+    }
+
+    @Test
+    public void testHttp11ConnectorNoKeepAliveEpKeepAlive() throws Exception
+    {
+        doTestNoKeepAliveInHttp11(getEndpointAddress(IN_CONNECTOR_NO_KEEP_ALIVE_EP_KEEP_ALIVE));
+    }
+
+    @Test
+    public void testHttp11ConnectorKeepAliveEpKeepAlive() throws Exception
+    {
+        doTestKeepAliveInHttp11(getEndpointAddress(IN_CONNECTOR_KEEP_ALIVE_EP_KEEP_ALIVE));
+    }
+
+    @Test
+    public void testHttp11ConnectorNoKeepAliveEpNoKeepAlive() throws Exception
+    {
+        doTestNoKeepAliveInHttp11(getEndpointAddress(IN_CONNECTOR_NO_KEEP_ALIVE_EP_NO_KEEP_ALIVE));
+    }
+
+    private void doTestKeepAliveInHttp10(String endpointAddress) throws Exception
+    {
+        HttpClient httpClient = setupHttpClient(HttpVersion.HTTP_1_0);
+
+        doTestHttp(endpointAddress, EMPTY, CLOSE, httpClient);
+        doTestHttp(endpointAddress, CLOSE, CLOSE, httpClient);
+        doTestHttp(endpointAddress, KEEP_ALIVE, KEEP_ALIVE, httpClient);
+    }
+
+    private void doTestNoKeepAliveInHttp10(String endpointAddress) throws Exception
+    {
+        HttpClient httpClient = setupHttpClient(HttpVersion.HTTP_1_0);
+
+        doTestHttp(endpointAddress, EMPTY, CLOSE, httpClient);
+        doTestHttp(endpointAddress, CLOSE, CLOSE, httpClient);
+        doTestHttp(endpointAddress, KEEP_ALIVE, CLOSE, httpClient);
+    }
+
+    private void doTestKeepAliveInHttp11(String endpointAddress) throws Exception
+    {
+        HttpClient httpClient = setupHttpClient(HttpVersion.HTTP_1_1);
+
+        doTestHttp(endpointAddress, EMPTY, EMPTY, httpClient);
+        doTestHttp(endpointAddress, CLOSE, CLOSE, httpClient);
+        doTestHttp(endpointAddress, KEEP_ALIVE, EMPTY, httpClient);
+    }
+
+    private void doTestNoKeepAliveInHttp11(String endpointAddress) throws Exception
+    {
+        HttpClient httpClient = setupHttpClient(HttpVersion.HTTP_1_1);
+
+        doTestHttp(endpointAddress, EMPTY, CLOSE, httpClient);
+        doTestHttp(endpointAddress, CLOSE, CLOSE, httpClient);
+        doTestHttp(endpointAddress, KEEP_ALIVE, CLOSE, httpClient);
+    }
+
+    private HttpClient setupHttpClient(HttpVersion version)
+    {
+        HttpClientParams params = new HttpClientParams();
+        params.setVersion(version);
+
+        return new HttpClient(params);
+    }
+
+    private void doTestHttp(String url, String inConnectionHeaderValue, String expectedConnectionHeaderValue, HttpClient httpClient) throws Exception
+    {
+        GetMethod request = new GetMethod(url);
+        if (StringUtils.isEmpty(inConnectionHeaderValue))
+        {
+            request.removeRequestHeader(HttpConstants.HEADER_CONNECTION);
+        }
+        else
+        {
+            request.setRequestHeader(HttpConstants.HEADER_CONNECTION, inConnectionHeaderValue);
+        }
+
+        runHttpMethodAndAssertConnectionHeader(request, expectedConnectionHeaderValue, httpClient);
+
+        // the connection should be still open, send another request and terminate the connection
+        request = new GetMethod(url);
+        request.setRequestHeader(HttpConstants.HEADER_CONNECTION, CLOSE);
+        int status = httpClient.executeMethod(request);
+        assertEquals(HttpStatus.SC_OK, status);
+    }
+
+    private void runHttpMethodAndAssertConnectionHeader(HttpMethod request, String expectedConnectionHeaderValue, HttpClient httpClient) throws Exception
+    {
+        int status = httpClient.executeMethod(request);
+        assertEquals(HttpStatus.SC_OK, status);
+
+        String connectionHeader;
+        if (httpClient.getParams().getVersion().equals(HttpVersion.HTTP_1_0))
+        {
+            connectionHeader = request.getResponseHeader(HttpConstants.HEADER_CONNECTION).getValue();
+            assertNotNull(connectionHeader);
+        }
+        else
+        {
+            Header responseHeader = request.getResponseHeader(HttpConstants.HEADER_CONNECTION);
+            connectionHeader = responseHeader != null ? responseHeader.getValue() : EMPTY;
+        }
+        assertEquals(expectedConnectionHeaderValue, connectionHeader);
+    }
+
+    private InboundEndpoint getEndpoint(String endpointName)
+    {
+        return muleContext.getRegistry().lookupObject(endpointName);
+    }
+
+    private String getEndpointAddress(String endpointName)
+    {
+        return getEndpoint(endpointName).getAddress();
+    }
 }
 
 
