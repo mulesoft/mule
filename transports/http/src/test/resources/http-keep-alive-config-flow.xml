@@ -15,7 +15,6 @@
     
     <http:connector name="HttpConnectorNoKeepAlive">
         <spring:property name="keepAlive" value="false"/>
-        <spring:property name="keepAliveTimeout" value="60000"/>
     </http:connector>
 
     <flow name="ConnectorKeepAliveEpEmpty">
