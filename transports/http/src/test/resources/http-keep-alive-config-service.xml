@@ -8,22 +8,64 @@
           http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
           http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
-    <http:connector name="HttpKeepAliveConnector">
+    <http:connector name="HttpConnectorKeepAlive">
         <spring:property name="keepAlive" value="true"/>
         <spring:property name="keepAliveTimeout" value="60000"/>
     </http:connector>
     
+    <http:connector name="HttpConnectorNoKeepAlive">
+        <spring:property name="keepAlive" value="false"/>
+    </http:connector>
+    
     <model>
-        <service name="WithoutEndpointOverride">
+        <service name="ConnectorKeepAliveEpEmpty">
             <inbound>
-                <http:inbound-endpoint address="http://localhost:${port1}/http-in" exchange-pattern="request-response" name="inWithoutEndpointOverride"/>
+                <http:inbound-endpoint address="http://localhost:${port1}/http-in" exchange-pattern="request-response"
+                                       connector-ref="HttpConnectorKeepAlive"
+                                       name="inConnectorKeepAliveEpEmpty"/>
             </inbound>
             <echo-component/>
         </service>
         
-        <service name="WithEndpointOverride">
+        <service name="ConnectorKeepAliveEpNoKeepAlive">
             <inbound>
-               <http:inbound-endpoint address="http://localhost:${port2}/http-in" keep-alive="true" exchange-pattern="request-response" name="inWithEndpointOverride"/>
+               <http:inbound-endpoint address="http://localhost:${port2}/http-in" keep-alive="false" exchange-pattern="request-response" 
+                                      connector-ref="HttpConnectorKeepAlive"
+                                      name="inConnectorKeepAliveEpNoKeepAlive"/>
+            </inbound>
+            <echo-component/>
+        </service>
+        <service name="ConnectorKeepAliveEpKeepAlive">
+            <inbound>
+                <http:inbound-endpoint address="http://localhost:${port3}/http-in" keep-alive="true" exchange-pattern="request-response" 
+                                       connector-ref="HttpConnectorKeepAlive"
+                                       name="inConnectorKeepAliveEpKeepAlive"/>
+            </inbound>
+            <echo-component/>
+        </service>
+        
+        <service name="ConnectorNoKeepAliveEpEmpty">
+            <inbound>
+               <http:inbound-endpoint address="http://localhost:${port4}/http-in" exchange-pattern="request-response" 
+                                      connector-ref="HttpConnectorNoKeepAlive"
+                                      name="inConnectorNoKeepAliveEpEmpty"/>
+            </inbound>
+            <echo-component/>
+        </service>
+        <service name="ConnectorNoKeepAliveEpNoKeepAlive">
+            <inbound>
+                <http:inbound-endpoint address="http://localhost:${port5}/http-in" keep-alive="false" exchange-pattern="request-response" 
+                                       connector-ref="HttpConnectorNoKeepAlive"
+                                       name="inConnectorNoKeepAliveEpNoKeepAlive"/>
+            </inbound>
+            <echo-component/>
+        </service>
+        
+        <service name="ConnectorNoKeepAliveEpKeepAlive">
+            <inbound>
+               <http:inbound-endpoint address="http://localhost:${port6}/http-in" keep-alive="true" exchange-pattern="request-response" 
+                                      connector-ref="HttpConnectorNoKeepAlive"
+                                      name="inConnectorNoKeepAliveEpKeepAlive"/>
             </inbound>
             <echo-component/>
         </service>
