@@ -20,6 +20,7 @@ import java.io.IOException;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.AbstractBeanFactory;
+import org.springframework.beans.factory.support.BeanDefinitionReader;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.context.support.AbstractXmlApplicationContext;
@@ -42,7 +43,7 @@ public class MuleApplicationContext extends AbstractXmlApplicationContext
      * Parses configuration files creating a spring ApplicationContext which is used
      * as a parent registry using the SpringRegistry registry implementation to wraps
      * the spring ApplicationContext
-     * 
+     *
      * @param configResources
      * @see org.mule.config.spring.SpringRegistry
      */
@@ -58,7 +59,7 @@ public class MuleApplicationContext extends AbstractXmlApplicationContext
         this.springResources = springResources;
     }
 
-    protected void prepareBeanFactory(ConfigurableListableBeanFactory beanFactory) 
+    protected void prepareBeanFactory(ConfigurableListableBeanFactory beanFactory)
     {
         super.prepareBeanFactory(beanFactory);
         beanFactory.addBeanPostProcessor(new MuleContextPostProcessor(muleContext));
@@ -100,11 +101,7 @@ public class MuleApplicationContext extends AbstractXmlApplicationContext
 
     protected void loadBeanDefinitions(DefaultListableBeanFactory beanFactory) throws IOException
     {
-        XmlBeanDefinitionReader beanDefinitionReader = new XmlBeanDefinitionReader(beanFactory);
-        //hook in our custom hierarchical reader
-        beanDefinitionReader.setDocumentReaderClass(MuleBeanDefinitionDocumentReader.class);
-        //add error reporting
-        beanDefinitionReader.setProblemReporter(new MissingParserProblemReporter());
+        BeanDefinitionReader beanDefinitionReader = createBeanDefinitionReader(beanFactory);
 
         // Communicate mule context to parsers
         try
@@ -116,6 +113,17 @@ public class MuleApplicationContext extends AbstractXmlApplicationContext
         {
             currentMuleContext.remove();
         }
+    }
+
+    protected BeanDefinitionReader createBeanDefinitionReader(DefaultListableBeanFactory beanFactory)
+    {
+        XmlBeanDefinitionReader beanDefinitionReader = new XmlBeanDefinitionReader(beanFactory);
+        //hook in our custom hierarchical reader
+        beanDefinitionReader.setDocumentReaderClass(MuleBeanDefinitionDocumentReader.class);
+        //add error reporting
+        beanDefinitionReader.setProblemReporter(new MissingParserProblemReporter());
+
+        return beanDefinitionReader;
     }
 
     @Override
