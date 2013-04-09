@@ -151,12 +151,22 @@ public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessT
             response.disableKeepAlive(!httpConnector.isKeepAlive());
 
             Header connectionHeader = request.getFirstHeader("Connection");
-            boolean endpointOverride = getEndpointKeepAliveValue(getMessageReceiver().getEndpoint());
+            boolean endpointOverride = getMessageReceiver().getEndpoint().getProperty("keepAlive") != null;
+            boolean endpointKeepAliveValue = getEndpointKeepAliveValue(getMessageReceiver().getEndpoint());
+
+            if (endpointOverride)
+            {
+                response.disableKeepAlive(!endpointKeepAliveValue);
+            }
+            else
+            {
+                response.disableKeepAlive(!httpConnector.isKeepAlive());
+            }
 
             if (connectionHeader != null)
             {
                 String value = connectionHeader.getValue();
-                if ("keep-alive".equalsIgnoreCase(value) && endpointOverride)
+                if ("keep-alive".equalsIgnoreCase(value) && endpointKeepAliveValue)
                 {
                     response.setKeepAlive(true);
 
@@ -166,14 +176,14 @@ public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessT
                         response.setHeader(connectionHeader);
                     }
                 }
-                else if ("close".equalsIgnoreCase(value) || !endpointOverride)
+                else if ("close".equalsIgnoreCase(value) || !endpointKeepAliveValue)
                 {
                     response.setKeepAlive(false);
                 }
             }
             else if (request.getRequestLine().getHttpVersion().equals(HttpVersion.HTTP_1_1))
             {
-                response.setKeepAlive(endpointOverride);
+                response.setKeepAlive(endpointKeepAliveValue);
             }
 
             try
