@@ -90,7 +90,7 @@ public class HttpKeepAliveFunctionalTestCase extends FunctionalTestCase
     @Test
     public void testHttp10ConnectorNoKeepAliveEpKeepAlive() throws Exception
     {
-        doTestNoKeepAliveInHttp10(getEndpointAddress(IN_CONNECTOR_NO_KEEP_ALIVE_EP_KEEP_ALIVE));
+        doTestKeepAliveInHttp10(getEndpointAddress(IN_CONNECTOR_NO_KEEP_ALIVE_EP_KEEP_ALIVE));
     }
 
     @Test
@@ -126,7 +126,7 @@ public class HttpKeepAliveFunctionalTestCase extends FunctionalTestCase
     @Test
     public void testHttp11ConnectorNoKeepAliveEpKeepAlive() throws Exception
     {
-        doTestNoKeepAliveInHttp11(getEndpointAddress(IN_CONNECTOR_NO_KEEP_ALIVE_EP_KEEP_ALIVE));
+        doTestKeepAliveInHttp11(getEndpointAddress(IN_CONNECTOR_NO_KEEP_ALIVE_EP_KEEP_ALIVE));
     }
 
     @Test
