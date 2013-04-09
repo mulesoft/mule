@@ -349,15 +349,24 @@ public class HttpMessageReceiver extends TcpMessageReceiver
 
                 response.setupKeepAliveFromRequestVersion(request.getRequestLine().getHttpVersion());
                 HttpConnector httpConnector = (HttpConnector) connector;
-                response.disableKeepAlive(!httpConnector.isKeepAlive());
 
-                Header connectionHeader = request.getFirstHeader("Connection");               
-                boolean endpointOverride = getEndpointKeepAliveValue(endpoint);
+                Header connectionHeader = request.getFirstHeader("Connection");
+                boolean endpointOverride = endpoint.getProperty("keepAlive") != null;
+                boolean endpointKeepAliveValue = getEndpointKeepAliveValue(endpoint);
+
+                if (endpointOverride)
+                {
+                    response.disableKeepAlive(!endpointKeepAliveValue);
+                }
+                else
+                {
+                    response.disableKeepAlive(!httpConnector.isKeepAlive());
+                }
 
                 if (connectionHeader != null)
                 {
                     String value = connectionHeader.getValue();
-                    if ("keep-alive".equalsIgnoreCase(value) && endpointOverride)
+                    if ("keep-alive".equalsIgnoreCase(value) && endpointKeepAliveValue)
                     {
                         response.setKeepAlive(true);
 
@@ -367,14 +376,14 @@ public class HttpMessageReceiver extends TcpMessageReceiver
                             response.setHeader(connectionHeader);
                         }
                     }
-                    else if ("close".equalsIgnoreCase(value) || !endpointOverride)
+                    else if ("close".equalsIgnoreCase(value) || !endpointKeepAliveValue)
                     {
                         response.setKeepAlive(false);
                     }
                 }
                 else if (request.getRequestLine().getHttpVersion().equals(HttpVersion.HTTP_1_1))
                 {
-                    response.setKeepAlive(endpointOverride);
+                    response.setKeepAlive(endpointKeepAliveValue);
                 }
             }
             else
