@@ -8,15 +8,12 @@
           http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
           http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
-    <http:connector name="HttpConnectorKeepAlive">
-        <spring:property name="keepAlive" value="true"/>
+    <http:connector name="HttpConnectorKeepAlive" keepAlive="true">
         <spring:property name="keepAliveTimeout" value="60000"/>
     </http:connector>
     
-    <http:connector name="HttpConnectorNoKeepAlive">
-        <spring:property name="keepAlive" value="false"/>
-    </http:connector>
-    
+    <http:connector name="HttpConnectorNoKeepAlive" keepAlive="false"/>
+
     <model>
         <service name="ConnectorKeepAliveEpEmpty">
             <inbound>
