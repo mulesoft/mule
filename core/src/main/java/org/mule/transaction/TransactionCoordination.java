@@ -141,4 +141,8 @@ public final class TransactionCoordination
         }
     }
 
+    public void clear()
+    {
+        transactions.remove();
+    }
 }

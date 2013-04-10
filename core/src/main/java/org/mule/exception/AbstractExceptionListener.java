@@ -187,7 +187,7 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
         {
             if (tx != null)
             {
-                tx.setRollbackOnly();
+                tx.rollback();
             }
         }
         catch (TransactionException e)
