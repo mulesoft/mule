@@ -212,7 +212,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
         }
     }
 
-    public void processFile(File sourceFile) throws MuleException
+    public void processFile(File file) throws MuleException
     {
         FileConnector fileConnector = (FileConnector) connector;
 
@@ -223,24 +223,24 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
         if (checkFileAge)
         {
             long fileAge = ((FileConnector) connector).getFileAge();
-            long lastMod = sourceFile.lastModified();
+            long lastMod = file.lastModified();
             long now = System.currentTimeMillis();
             long thisFileAge = now - lastMod;
             if (thisFileAge < fileAge)
             {
                 if (logger.isDebugEnabled())
                 {
-                    logger.debug("The file has not aged enough yet, will return nothing for: " + sourceFile);
+                    logger.debug("The file has not aged enough yet, will return nothing for: " + file);
                 }
                 return;
             }
         }
 
-        String sourceFileOriginalName = sourceFile.getName();
-        final String sourceFileOriginalAbsolutePath = sourceFile.getAbsolutePath();
+        String sourceFileOriginalName = file.getName();
+        final String sourceFileOriginalAbsolutePath = file.getAbsolutePath();
 
         // Perform some quick checks to make sure file can be processed
-        if (!(sourceFile.canRead() && sourceFile.exists() && sourceFile.isFile()))
+        if (!(file.canRead() && file.exists() && file.isFile()))
         {
             throw new DefaultMuleException(FileMessages.fileDoesNotExist(sourceFileOriginalName));
         }
@@ -253,13 +253,13 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
         {
             // don't process a file that is locked by another process (probably still
             // being written)
-            if (!attemptFileLock(sourceFile))
+            if (!attemptFileLock(file))
             {
                 return;
             }
             else if (logger.isInfoEnabled())
             {
-                logger.info("Lock obtained on file: " + sourceFile.getAbsolutePath());
+                logger.info("Lock obtained on file: " + file.getAbsolutePath());
             }
         }
 
@@ -269,6 +269,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
         fileParserMessasge.setOutboundProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, sourceFileOriginalName);
 
         File workFile = null;
+        final File sourceFile;
         if (workDir != null)
         {
             String workFileName = sourceFileOriginalName;
@@ -278,9 +279,13 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
             // don't use new File() directly, see MULE-1112
             workFile = FileUtils.newFile(workDir, workFileName);
 
-            fileConnector.move(sourceFile, workFile);
+            fileConnector.move(file, workFile);
             // Now the Work File is the Source file
             sourceFile = workFile;
+        }
+        else
+        {
+            sourceFile = file;
         }
 
         // set up destination file
@@ -333,6 +338,12 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
             // we can ignore since we did manage to acquire a lock, but just in case
             logger.error("File being read disappeared!", e);
             return;
+        }
+
+        if (workDir != null)
+        {
+            message.setProperty(FileConnector.PROPERTY_SOURCE_DIRECTORY, file.getParent(), PropertyScope.INBOUND);
+            message.setProperty(FileConnector.PROPERTY_SOURCE_FILENAME, file.getName(), PropertyScope.INBOUND);
         }
 
         message.setOutboundProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, sourceFileOriginalName);
