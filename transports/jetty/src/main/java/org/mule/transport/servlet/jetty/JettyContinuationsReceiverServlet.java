@@ -15,6 +15,7 @@ import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.transport.MessageReceiver;
+import org.mule.api.transport.PropertyScope;
 import org.mule.transport.http.HttpConnector;
 
 import java.io.IOException;
@@ -49,7 +50,7 @@ public class JettyContinuationsReceiverServlet extends JettyReceiverServlet
                     MessageReceiver receiver = getReceiverForURI(request);
                     
                     MuleMessage requestMessage = receiver.createMuleMessage(request);
-                    requestMessage.setOutboundProperty(HttpConnector.HTTP_METHOD_PROPERTY, request.getMethod());
+                    requestMessage.setProperty(HttpConnector.HTTP_METHOD_PROPERTY, request.getMethod(), PropertyScope.INBOUND);
     
                     ContinuationsReplyTo continuationsReplyTo = new ContinuationsReplyTo(continuation, mutex);
                     //This will allow Mule to continue the response once the service has do its processing
