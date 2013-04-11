@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:file="http://www.mulesoft.org/schema/mule/file"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:script="http://www.mulesoft.org/schema/mule/scripting"
+      xsi:schemaLocation="
+            http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd
+            http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+            http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+            http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd">
+
+    <file:connector name="GenericFileConnector" streaming="false" workDirectory=".mule/work"/>
+
+    <flow name="testFLow">
+        <file:inbound-endpoint connector-ref="GenericFileConnector" path=".mule/data" responseTimeout="60000"/>
+
+        <script:transformer>
+            <script:script engine="groovy">
+                def map = [:];
+                map.put("sourceDirectory", message.getInboundProperty("sourceDirectory"));
+                map.put("sourceFileName",message.getInboundProperty("sourceFileName"));
+
+                return map;
+            </script:script>
+        </script:transformer>
+
+        <vm:outbound-endpoint path="testOut"/>
+    </flow>
+</mule>

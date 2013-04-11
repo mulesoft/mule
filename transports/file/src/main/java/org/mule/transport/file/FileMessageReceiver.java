@@ -287,8 +287,6 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
         {
             sourceFile = file;
         }
-        // Do not use the original file handle beyond this point since it may have moved.
-        file = null;
 
         // set up destination file
         File destinationFile = null;
@@ -340,6 +338,12 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
             // we can ignore since we did manage to acquire a lock, but just in case
             logger.error("File being read disappeared!", e);
             return;
+        }
+
+        if (workDir != null)
+        {
+            message.setProperty(FileConnector.PROPERTY_SOURCE_DIRECTORY, file.getParent(), PropertyScope.INBOUND);
+            message.setProperty(FileConnector.PROPERTY_SOURCE_FILENAME, file.getName(), PropertyScope.INBOUND);
         }
 
         message.setOutboundProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, originalSourceFileName);
