@@ -47,6 +47,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.cxf.Bus;
 import org.apache.cxf.endpoint.Server;
+import org.apache.cxf.interceptor.StaxInEndingInterceptor;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
@@ -284,6 +285,8 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
             m.setDestination(d);
 
             ExchangeImpl exchange = new ExchangeImpl();
+            // mule will close the stream so don't let cxf, otherwise cxf will close it too early
+            exchange.put(StaxInEndingInterceptor.STAX_IN_NOCLOSE, Boolean.TRUE);
             exchange.setInMessage(m);
 
             // if there is a fault, then we need an event in here because we won't
