@@ -157,12 +157,12 @@ public class MailMuleMessageFactory extends AbstractMuleMessageFactory
             String listName = MailUtils.toListHeader(name);
             String value = header.getValue();
 
-            if (null == muleMessage.getOutboundProperty(name))
+            if (null == muleMessage.getInboundProperty(name))
             {
                 muleMessage.setInboundProperty(name, value);
             }
 
-            Object listPropertyValue = muleMessage.getOutboundProperty(listName);
+            Object listPropertyValue = muleMessage.getInboundProperty(listName);
             if (null == listPropertyValue)
             {
                 listPropertyValue = new LinkedList<Object>();
