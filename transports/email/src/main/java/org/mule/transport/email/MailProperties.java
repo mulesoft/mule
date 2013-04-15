@@ -28,16 +28,4 @@ public interface MailProperties
     public static final String SUBJECT_PROPERTY = "subject";
     public static final String CUSTOM_HEADERS_MAP_PROPERTY = "customHeaders";
     public static final String SENT_DATE_PROPERTY = "sentDate";
-
-    // these properties will be used to avoid conflict with the outbound SMTP properties
-    public static final String INBOUND_PREFIX = "inbound.";
-    public static final String INBOUND_CONTENT_TYPE_PROPERTY = INBOUND_PREFIX + "contentType";
-    public static final String INBOUND_TO_ADDRESSES_PROPERTY = INBOUND_PREFIX + "toAddresses";
-    public static final String INBOUND_CC_ADDRESSES_PROPERTY = INBOUND_PREFIX + "ccAddresses";
-    public static final String INBOUND_BCC_ADDRESSES_PROPERTY = INBOUND_PREFIX + "bccAddresses";
-    public static final String INBOUND_FROM_ADDRESS_PROPERTY = INBOUND_PREFIX + "fromAddress";
-    public static final String INBOUND_REPLY_TO_ADDRESSES_PROPERTY = INBOUND_PREFIX + "replyToAddresses";
-    public static final String INBOUND_SUBJECT_PROPERTY = INBOUND_PREFIX + "subject";
-    public static final String INBOUND_CUSTOM_HEADERS_MAP_PROPERTY = INBOUND_PREFIX + "customHeaders";
-    public static final String INBOUND_SENT_DATE_PROPERTY = INBOUND_PREFIX + "sentDate";
 }

@@ -37,6 +37,16 @@ import org.junit.Test;
 
 public class MailMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTestCase
 {
+
+    protected static final String TEST_TO = "Information <info@domain.com>";
+    protected static final String TEST_CC = "\"info@\" <domain.com info@domain.com>";
+    protected static final String TEST_BCC = "'invalid@domain.com', info <info@domain.com>";
+    protected static final String TEST_FROM = "me@myco.com";
+    protected static final String TEST_SUBJECT = "eMail Subject";
+    protected static final String TEST_REPLY_TO = "reply@myco.com";
+    protected static final String TEST_CONTENT_TYPE = "text/plain";
+
+
     @Override
     protected MuleMessageFactory doCreateMuleMessageFactory()
     {
@@ -70,30 +80,65 @@ public class MailMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTe
     @Test
     public void testAddRecipientProperties() throws Exception
     {
-        String to = "Information <info@domain.com>";
-        String cc = "\"info@\" <domain.com info@domain.com>";
-        String bcc = "'invalid@domain.com', info <info@domain.com>";
         Date now = new Date();
         
         MimeMessage payload = getValidTransportMessage();
-        payload.setHeader(RecipientType.TO.toString(), to);
-        payload.setHeader(RecipientType.CC.toString(), cc);
-        payload.setHeader(RecipientType.BCC.toString(), bcc);
-        payload.setFrom(new InternetAddress("me@myco.com"));
-        payload.setReplyTo(new InternetAddress[]{new InternetAddress("reply@myco.com")});
+        payload.setHeader(RecipientType.TO.toString(), TEST_TO);
+        payload.setHeader(RecipientType.CC.toString(), TEST_CC);
+        payload.setHeader(RecipientType.BCC.toString(), TEST_BCC);
+        payload.setFrom(new InternetAddress(TEST_FROM));
+        payload.setReplyTo(new InternetAddress[]{new InternetAddress(TEST_REPLY_TO)});
         payload.setSentDate(now);
 
         MuleMessageFactory factory = createMuleMessageFactory();
         MuleMessage muleMessage = factory.create(payload, encoding);
 
-        assertEquals(to, muleMessage.getInboundProperty(MailProperties.TO_ADDRESSES_PROPERTY));
-        assertEquals(cc, muleMessage.getInboundProperty(MailProperties.CC_ADDRESSES_PROPERTY));
-        assertEquals(bcc, muleMessage.getInboundProperty(MailProperties.BCC_ADDRESSES_PROPERTY));
-        assertEquals("me@myco.com", muleMessage.getInboundProperty(MailProperties.FROM_ADDRESS_PROPERTY));
-        assertEquals("reply@myco.com", muleMessage.getInboundProperty(MailProperties.REPLY_TO_ADDRESSES_PROPERTY));
+        assertEquals(TEST_TO, muleMessage.getInboundProperty(MailProperties.TO_ADDRESSES_PROPERTY));
+        assertEquals(TEST_CC, muleMessage.getInboundProperty(MailProperties.CC_ADDRESSES_PROPERTY));
+        assertEquals(TEST_BCC, muleMessage.getInboundProperty(MailProperties.BCC_ADDRESSES_PROPERTY));
+        assertEquals(TEST_FROM, muleMessage.getInboundProperty(MailProperties.FROM_ADDRESS_PROPERTY));
+        assertEquals(TEST_REPLY_TO, muleMessage.getInboundProperty(MailProperties.REPLY_TO_ADDRESSES_PROPERTY));
         assertEquals("(no subject)", muleMessage.getInboundProperty(MailProperties.SUBJECT_PROPERTY));
-        assertEquals("text/plain", muleMessage.getInboundProperty(MailProperties.CONTENT_TYPE_PROPERTY));
+        assertEquals(TEST_CONTENT_TYPE, muleMessage.getInboundProperty(MailProperties.CONTENT_TYPE_PROPERTY));
         assertEquals(new MailDateFormat().parse(new MailDateFormat().format(now)), muleMessage.getInboundProperty(MailProperties.SENT_DATE_PROPERTY));
+    }
+
+    @Test
+    public void testAddMailHeadersToMessageProperties() throws Exception
+    {
+        String invalid = "Invalid";
+        String customProperty = "customProperty";
+        Date now = new Date();
+
+        MimeMessage payload = getValidTransportMessage();
+        payload.setHeader(RecipientType.TO.toString(), TEST_TO);
+        payload.setHeader(MailProperties.TO_ADDRESSES_PROPERTY,invalid);
+        payload.setHeader(RecipientType.CC.toString(), TEST_CC);
+        payload.setHeader(MailProperties.CC_ADDRESSES_PROPERTY,invalid);
+        payload.setHeader(RecipientType.BCC.toString(), TEST_BCC);
+        payload.setHeader(MailProperties.BCC_ADDRESSES_PROPERTY,invalid);
+        payload.setFrom(new InternetAddress(TEST_FROM));
+        payload.setHeader(MailProperties.FROM_ADDRESS_PROPERTY, invalid);
+        payload.setReplyTo(new InternetAddress[] {new InternetAddress(TEST_REPLY_TO)});
+        payload.setHeader(MailProperties.REPLY_TO_ADDRESSES_PROPERTY, invalid);
+        payload.setSentDate(now);
+        payload.setHeader(MailProperties.SENT_DATE_PROPERTY, invalid);
+        payload.setSubject(TEST_SUBJECT);
+        payload.setHeader(MailProperties.CONTENT_TYPE_PROPERTY, invalid);
+        payload.setHeader(customProperty, customProperty);
+
+        MuleMessageFactory factory = createMuleMessageFactory();
+        MuleMessage muleMessage = factory.create(payload, encoding);
+
+        assertEquals(TEST_TO, muleMessage.getInboundProperty(MailProperties.TO_ADDRESSES_PROPERTY));
+        assertEquals(TEST_CC, muleMessage.getInboundProperty(MailProperties.CC_ADDRESSES_PROPERTY));
+        assertEquals(TEST_BCC, muleMessage.getInboundProperty(MailProperties.BCC_ADDRESSES_PROPERTY));
+        assertEquals(TEST_FROM, muleMessage.getInboundProperty(MailProperties.FROM_ADDRESS_PROPERTY));
+        assertEquals(TEST_REPLY_TO, muleMessage.getInboundProperty(MailProperties.REPLY_TO_ADDRESSES_PROPERTY));
+        assertEquals(TEST_SUBJECT, muleMessage.getInboundProperty(MailProperties.SUBJECT_PROPERTY));
+        assertEquals(TEST_CONTENT_TYPE, muleMessage.getInboundProperty(MailProperties.CONTENT_TYPE_PROPERTY));
+        assertEquals(new MailDateFormat().parse(new MailDateFormat().format(now)), muleMessage.getInboundProperty(MailProperties.SENT_DATE_PROPERTY));
+        assertEquals(customProperty, muleMessage.getInboundProperty(customProperty));
     }
 
     @Test
