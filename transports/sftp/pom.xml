@@ -108,9 +108,9 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>bouncycastle</groupId>
-            <artifactId>bcprov-jdk14</artifactId>
-            <version>139</version>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcprov-jdk16</artifactId>
+            <version>${bouncycastleVersion}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
