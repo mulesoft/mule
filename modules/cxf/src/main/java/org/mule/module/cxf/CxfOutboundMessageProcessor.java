@@ -45,6 +45,8 @@ import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.frontend.MethodDispatcher;
 import org.apache.cxf.interceptor.Fault;
+import org.apache.cxf.interceptor.StaxInEndingInterceptor;
+import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.ws.addressing.WSAContextUtils;
 
@@ -231,8 +233,11 @@ public class CxfOutboundMessageProcessor extends AbstractInterceptingMessageProc
                 props.put((String)arr[i], event.getMessage().getProperty((String)arr[i]));
             }
         }
-
-        Object[] response = client.invoke(bop, getArgs(event), ctx);
+        
+        ExchangeImpl exchange = new ExchangeImpl();
+        // mule will close the stream so don't let cxf, otherwise cxf will close it too early
+        exchange.put(StaxInEndingInterceptor.STAX_IN_NOCLOSE, Boolean.TRUE);
+        Object[] response = client.invoke(bop, getArgs(event), ctx, exchange);
 
         return buildResponseMessage(event, responseHolder.value, response);
     }

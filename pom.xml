@@ -84,7 +84,7 @@
         <activemqVersion>5.5.0</activemqVersion>
         <antVersion>1.7.0</antVersion>
         <antlrVersion>3.1.1</antlrVersion>
-        <asmVersion>3.1</asmVersion>
+        <asmVersion>3.3.1</asmVersion>
         <aspectjVersion>1.6.11</aspectjVersion>
         <bshVersion>2.0b4</bshVersion>
         <bouncycastleVersion>1.46</bouncycastleVersion>
@@ -104,7 +104,7 @@
         but the PGP module would need some work in order to use it -->
         <cryptixJceVersion>20050328</cryptixJceVersion>
         <cryptixVersion>20050405</cryptixVersion>
-        <cxfVersion>2.5.1</cxfVersion>
+        <cxfVersion>2.5.9</cxfVersion>
         <derbyVersion>10.6.1.0</derbyVersion>
         <dom4jVersion>1.6.1</dom4jVersion>
         <flatpackVersion>3.1.1</flatpackVersion>
@@ -127,7 +127,7 @@
         <jbossTsVersion>4.15.0.Final</jbossTsVersion>
         <jbpmVersion>4.4</jbpmVersion>
         <jcrVersion>1.0</jcrVersion>
-        <jdomVersion>1.1.1</jdomVersion>
+        <jdomVersion>1.1.3</jdomVersion>
         <jettyVersion>6.1.26</jettyVersion>
         <jettyServletApiVersion>2.5-20081211</jettyServletApiVersion>
         <jodaTimeVersion>1.6</jodaTimeVersion>
@@ -153,16 +153,16 @@
         <springSecurityVersion>3.1.0.RELEASE</springSecurityVersion>
         <sshCoreVersion>0.6.0</sshCoreVersion>
         <staxUtilsVersion>20080702</staxUtilsVersion>
-        <staxApiVersion>3.0.2</staxApiVersion>
+        <staxApiVersion>3.1.1</staxApiVersion>
         <staxonVersion>1.2</staxonVersion>
         <sxcVersion>0.7.3</sxcVersion>
         <tomcatVersion>6.0.29</tomcatVersion>
-        <woodstoxVersion>4.0.8</woodstoxVersion>
+        <woodstoxVersion>4.1.4</woodstoxVersion>
         <wrapperVersion>3.2.3</wrapperVersion>
         <xalanVersion>2.7.1</xalanVersion>
         <xmlPullVersion>1.1.3.4.O</xmlPullVersion>
         <xmlResolverVersion>1.2</xmlResolverVersion>
-        <xmlSecurityVersion>1.4.0</xmlSecurityVersion>
+        <xmlSecurityVersion>1.5.3</xmlSecurityVersion>
         <xstreamVersion>1.4.2</xstreamVersion>
         <xaPoolVersion>1.5.0</xaPoolVersion>
     </properties>
@@ -895,7 +895,7 @@
             <dependency>
                 <!-- this really should be the org.jdom groupId but all the other modules use the jdom groupId -->
                 <groupId>jdom</groupId>
-                <artifactId>jdom</artifactId>
+                <artifactId>org.jdom</artifactId>
                 <version>${jdomVersion}</version>
             </dependency>
             <dependency>
@@ -941,7 +941,7 @@
             <dependency>
                 <groupId>org.apache.ws.security</groupId>
                 <artifactId>wss4j</artifactId>
-                <version>1.6.3</version>
+                <version>1.6.9</version>
                 <exclusions>
                     <exclusion>
                         <groupId>axis</groupId>
@@ -980,7 +980,7 @@
             <dependency>
                 <groupId>org.apache.santuario</groupId>
                 <artifactId>xmlsec</artifactId>
-                <version>${xmlSecurityVersion}-osgi</version>
+                <version>${xmlSecurityVersion}</version>
             </dependency>
             <dependency>
                 <groupId>xml-resolver</groupId>
@@ -1010,7 +1010,7 @@
             <dependency>
                 <groupId>asm</groupId>
                 <artifactId>asm</artifactId>
-                <version>${asmVersion}-osgi</version>
+                <version>${asmVersion}</version>
             </dependency>
             <dependency>
                 <groupId>org.beanshell</groupId>
