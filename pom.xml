@@ -895,7 +895,7 @@
             <dependency>
                 <!-- this really should be the org.jdom groupId but all the other modules use the jdom groupId -->
                 <groupId>org.jdom</groupId>
-                <artifactId>org.jdom</artifactId>
+                <artifactId>jdom</artifactId>
                 <version>${jdomVersion}</version>
             </dependency>
             <dependency>
