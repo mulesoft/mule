@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:mulexml="http://www.mulesoft.org/schema/mule/xml"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns="http://www.mulesoft.org/schema/mule/core" version="EE-3.5.1"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/current/mule-xml.xsd
+
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+
+    <flow name="xmlSourceParam">
+        <mulexml:xml-to-dom-transformer returnClass="javax.xml.transform.Source"/>
+        <flow-ref name="transform" />
+    </flow>
+
+    <flow name="xmlStringParam">
+        <mulexml:xml-to-dom-transformer returnClass="org.dom4j.Document"/>
+
+        <enricher target="#[flowVars['xml']]">
+            <processor-chain>
+                <set-payload value="#[flowVars['xml']]"/>
+                <mulexml:xml-to-dom-transformer returnClass="javax.xml.transform.Source"/>
+            </processor-chain>
+        </enricher>
+
+        <flow-ref name="transform" />
+    </flow>
+
+    <sub-flow name="transform">
+        <mulexml:xslt-transformer maxIdleTransformers="2" maxActiveTransformers="5" xsl-file="with-xml-node-param.xsl">
+            <mulexml:context-property key="SomeXml" value="#[flowVars['xml']]"/>
+        </mulexml:xslt-transformer>
+
+        <mulexml:dom-to-xml-transformer/>
+    </sub-flow>
+
+</mule>
