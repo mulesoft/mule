@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.xml.stream.XMLStreamReader;
+import javax.xml.transform.Source;
 import javax.xml.transform.URIResolver;
 
 import org.junit.Test;
@@ -251,6 +252,62 @@ public class XsltTransformerTestCase extends AbstractXmlTransformerTestCase
         transformerResult = transformerResult.substring(transformerResult.indexOf("?>") + 2);
 
         assertTrue(transformerResult.indexOf(expectedTransformedxml) > -1);
+    }
+    
+    @Test
+    public void testTransformWithXmlDocParam() throws Exception
+    {
+    	XsltTransformer transformer = new XsltTransformer();
+
+        transformer.setMuleContext(muleContext);
+        transformer.setReturnDataType(DataTypeFactory.STRING);
+        transformer.setMuleContext(muleContext);
+        
+        transformer.setXslFile("with-xml-node-param.xsl");
+        Source body = XMLTestUtils.toSource("simple.xml");
+        Source param = XMLTestUtils.toSource("test.xml");
+        
+        // set parameters
+        Map<String, Object> params = new HashMap<String, Object>();
+        params.put("SomeXml", "#[header:myparam]");
+        transformer.setContextProperties(params);
+        
+        // init transformer
+        transformer.initialise();
+        
+        MuleMessage message = new DefaultMuleMessage(body, muleContext);
+        message.setOutboundProperty("myparam", param);
+        // do transformation
+        String transformerResult = (String) transformer.transform(message);
+        compareResults("<?xml version=\"1.0\" encoding=\"UTF-8\"?><result><body><just>testing</just></body><fromParam>value element</fromParam></result>", transformerResult);
+    }
+
+    @Test
+    public void testTransformWithXmlStringParam() throws Exception
+    {
+        XsltTransformer transformer = new XsltTransformer();
+
+        transformer.setMuleContext(muleContext);
+        transformer.setReturnDataType(DataTypeFactory.STRING);
+        transformer.setMuleContext(muleContext);
+
+        transformer.setXslFile("with-xml-param.xsl");
+        Source body = XMLTestUtils.toSource("simple.xml");
+        String param = XMLTestUtils.toString("test.xml");
+
+        // set parameters
+        Map<String, Object> params = new HashMap<String, Object>();
+        params.put("SomeXml", "#[message.outboundProperties['myparam']]");
+        transformer.setContextProperties(params);
+
+        // init transformer
+        transformer.initialise();
+
+        MuleMessage message = new DefaultMuleMessage(body, muleContext);
+        message.setOutboundProperty("myparam", param);
+        // do transformation
+        String transformerResult = (String) transformer.transform(message);
+        compareResults("<?xml version=\"1.0\" encoding=\"UTF-8\"?><result><body><just>testing</just></body><fromParam>value element</fromParam></result>", transformerResult);
     }
 
     @Test
