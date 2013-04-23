@@ -60,7 +60,7 @@ public class UsernameTokenTestCase extends AbstractServiceAndFlowTestCase
         assertTrue(greetLatch.await(60, TimeUnit.SECONDS));
     }
 
-    private GreeterWithLatch getGreeter() throws Exception
+    protected GreeterWithLatch getGreeter() throws Exception
     {
         Object instance = getComponent("greeterService");
         return (GreeterWithLatch) instance;

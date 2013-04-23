@@ -10,6 +10,10 @@
 
 package org.mule.module.cxf.wssec;
 
+import static org.junit.Assert.*;
+
+import org.mule.api.security.SecurityContext;
+
 import java.util.Arrays;
 import java.util.Collection;
 
@@ -30,4 +34,16 @@ public class SpringSecurityTestCase extends UsernameTokenTestCase
             {ConfigVariant.FLOW, "org/mule/module/cxf/wssec/cxf-secure-service-flow.xml, org/mule/module/cxf/wssec/spring-security-conf.xml"}
         });
     }      
+    
+    @Override
+    public void testUsernameToken() throws Exception
+    {
+        super.testUsernameToken();
+        GreeterWithLatch greeter = getGreeter();
+        SecurityContext sc = greeter.getSecurityContext();
+        assertNotNull(sc);
+        assertNotNull(sc.getAuthentication());
+        assertEquals("secret", sc.getAuthentication().getCredentials());
+        assertNotNull(sc.getAuthentication().getPrincipal());
+    }
 }
