@@ -48,7 +48,7 @@ public class UsernameTokenTestCase extends FunctionalTestCase
         assertTrue(greetLatch.await(60, TimeUnit.SECONDS));
     }
 
-    private GreeterWithLatch getGreeter() throws Exception
+    protected GreeterWithLatch getGreeter() throws Exception
     {
         Object instance = getComponent("greeterService");
         return (GreeterWithLatch) instance;
