@@ -31,6 +31,17 @@
             <groupId>rome</groupId>
             <artifactId>rome</artifactId>
             <version>0.9</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>jdom</groupId>
+                    <artifactId>jdom</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.jdom</groupId>
+            <artifactId>jdom</artifactId>
+            <version>${jdomVersion}</version>
         </dependency>
 
         <!--test deps -->
