@@ -11,7 +11,6 @@ package org.mule.util.store;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
-
 import org.mule.api.config.MuleProperties;
 import org.mule.api.store.ListableObjectStore;
 import org.mule.api.store.ObjectStore;
@@ -22,6 +21,7 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collection;
 
+import org.hamcrest.core.Is;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -118,6 +118,19 @@ public class MuleObjectStoreManagerTestCase extends AbstractMuleContextTestCase
             assertThat(os.contains(i),is(true));
         }
         assertThat(os.contains(OBJECT_KEY), is(true));
+    }
+
+    @Test
+    public void storeUsingBigKey() throws Exception
+    {
+        ListableObjectStore os = objectStoreFactory.createObjectStore("myOs");
+        StringBuffer bigKey = new StringBuffer();
+        for (int i = 0; i < 50; i++)
+        {
+            bigKey.append("abcdefghijklmnopqrstuvwxyz");
+        }
+        os.store(bigKey.toString(),1);
+        assertThat((Integer) os.retrieve(bigKey.toString()), Is.is(1));
     }
 
     private static class ObjectStoreFactory

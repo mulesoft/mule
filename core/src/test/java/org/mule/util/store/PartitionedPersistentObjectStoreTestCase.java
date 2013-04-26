@@ -12,7 +12,6 @@ package org.mule.util.store;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.when;
-
 import org.mule.api.MuleContext;
 import org.mule.api.store.ObjectAlreadyExistsException;
 import org.mule.api.store.ObjectStoreException;
@@ -47,7 +46,7 @@ public class PartitionedPersistentObjectStoreTestCase extends AbstractMuleTestCa
         when(mockMuleContext.getConfiguration().getWorkingDirectory()).thenReturn(".");
         when(mockMuleContext.getExecutionClassLoader()).thenReturn(Thread.currentThread().getContextClassLoader());
         os = new PartitionedPersistentObjectStore<Serializable>(mockMuleContext);
-        File objectStorePersistDir = new File(PartitionedPersistentObjectStore.DEFAULT_OBJECT_STORE);
+        File objectStorePersistDir = new File(PartitionedPersistentObjectStore.OBJECT_STORE_DIR);
         if (objectStorePersistDir.exists())
         {
             FileUtils.deleteDirectory(objectStorePersistDir);
@@ -88,6 +87,12 @@ public class PartitionedPersistentObjectStoreTestCase extends AbstractMuleTestCa
         closePartitions();
         openPartitions();
         assertAllValuesExistsInPartitionAreUnique(OBJECT_KEY, OBJECT_BASE_VALUE);
+    }
+
+    @Test
+    public void allowsAnyPartitionName() throws Exception
+    {
+        os.open("asdfsadfsa#$%@#$@#$@$%$#&8******ASDFWER??!?!");
     }
 
     private void closePartitions() throws ObjectStoreException
