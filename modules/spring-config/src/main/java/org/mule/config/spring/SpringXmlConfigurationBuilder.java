@@ -70,7 +70,29 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
             allResources[0] = new ConfigResource(MULE_SPRING_CONFIG);
             System.arraycopy(configResources, 0, allResources, 1, configResources.length);
         }
+        setParentContext(ContainerResources.getServerResourcesContext());
         createSpringRegistry(muleContext, createApplicationContext(muleContext, allResources));
+    }
+
+    protected ApplicationContext doConfigure2(MuleContext muleContext) throws Exception
+    {
+        ConfigResource[] allResources;
+        if (useDefaultConfigResource)
+        {
+            allResources = new ConfigResource[configResources.length + 2];
+            allResources[0] = new ConfigResource(MULE_SPRING_CONFIG);
+            allResources[1] = new ConfigResource(MULE_DEFAULTS_CONFIG);
+            System.arraycopy(configResources, 0, allResources, 2, configResources.length);
+        }
+        else
+        {
+            allResources = new ConfigResource[configResources.length + 1];
+            allResources[0] = new ConfigResource(MULE_SPRING_CONFIG);
+            System.arraycopy(configResources, 0, allResources, 1, configResources.length);
+        }
+        ApplicationContext applicationContext = createApplicationContext(muleContext, allResources);
+        createSpringRegistry(muleContext, applicationContext);
+        return applicationContext;
     }
 
     public void unconfigure(MuleContext muleContext)

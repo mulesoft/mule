@@ -69,7 +69,10 @@ public class DefaultsConfigurationBuilder extends AbstractConfigurationBuilder
 
         configureQueueManager(muleContext);
 
-        registry.registerObject(MuleProperties.OBJECT_SECURITY_MANAGER, new MuleSecurityManager());
+        if (registry.get(MuleProperties.OBJECT_SECURITY_MANAGER) == null)
+        {
+            registry.registerObject(MuleProperties.OBJECT_SECURITY_MANAGER, new MuleSecurityManager());
+        }
 
         registry.registerObject(MuleProperties.OBJECT_STORE_DEFAULT_IN_MEMORY_NAME, DefaultObjectStoreFactoryBean.createDefaultInMemoryObjectStore());
         registry.registerObject(MuleProperties.OBJECT_STORE_DEFAULT_PERSISTENT_NAME, DefaultObjectStoreFactoryBean.createDefaultPersistentObjectStore());
