@@ -1,0 +1,50 @@
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
+      xmlns:quartz="http://www.mulesoft.org/schema/mule/quartz"
+      xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+       http://www.mulesoft.org/schema/mule/quartz http://www.mulesoft.org/schema/mule/quartz/current/mule-quartz.xsd
+       http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd">
+
+    <spring:bean name="usernameTokenValidator" class="org.mule.module.cxf.wssec.UsernameTokenTestValidator"/>
+
+    <flow name="cxfClient">
+        <inbound-endpoint address="vm://greetMe" exchange-pattern="request-response"/>
+        <set-variable variableName="originalPayload" value="#[message.payload]" />
+        <outbound-endpoint address="http://localhost:${port1}/services/greeter" exchange-pattern="request-response">
+            <cxf:jaxws-client clientClass="org.apache.hello_world_soap_http.SOAPService" port="SoapPort"
+                              wsdlLocation="classpath:/wsdl/hello_world.wsdl" operation="greetMe">
+                <cxf:ws-security>
+                    <cxf:ws-config>
+                        <cxf:property key="action" value="UsernameToken"/>
+                        <cxf:property key="user" value="joe"/>
+                        <cxf:property key="passwordType" value="#[originalPayload]"/>
+                        <cxf:property key="passwordCallbackClass" value="org.mule.module.cxf.wssec.ClientPasswordCallback"/>
+                    </cxf:ws-config>
+                </cxf:ws-security>
+            </cxf:jaxws-client>
+        </outbound-endpoint>
+    </flow>
+
+    <flow name="greeterService">
+        <inbound-endpoint address="http://localhost:${port1}/services/greeter" exchange-pattern="request-response">
+            <cxf:jaxws-service serviceClass="org.mule.module.cxf.wssec.GreeterWithLatch">
+                <cxf:ws-security>
+                    <cxf:ws-config>
+                        <cxf:property key="action" value="UsernameToken"/>
+                    </cxf:ws-config>
+                    <cxf:ws-custom-validator>
+                        <cxf:username-token-validator ref="usernameTokenValidator" />
+                    </cxf:ws-custom-validator>
+                </cxf:ws-security>
+            </cxf:jaxws-service>
+        </inbound-endpoint>
+        <component>
+            <singleton-object class="org.mule.module.cxf.wssec.GreeterWithLatch"/>
+        </component>
+    </flow>
+
+</mule>
