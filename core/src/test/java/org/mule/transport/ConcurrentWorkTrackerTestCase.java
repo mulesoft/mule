@@ -45,4 +45,15 @@ public class ConcurrentWorkTrackerTestCase extends AbstractMuleTestCase
 
         assertThat(workTracker.pendingWorks(), not(hasItem(work)));
     }
+
+    @Test
+    public void cleansUpPendingWorksOnDispose() throws Exception
+    {
+        Runnable work = mock(Runnable.class);
+        workTracker.addWork(work);
+
+        workTracker.dispose();
+
+        assertThat(workTracker.pendingWorks(), not(hasItem(work)));
+    }
 }

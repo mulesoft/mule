@@ -79,6 +79,8 @@ public class TrackingWorkManager implements WorkManager
         {
             logger.debug(String.format("Stop waiting for works completion. There are %s works unfinished works", workTracker.pendingWorks().size()));
         }
+
+        workTracker.dispose();
     }
 
     @Override
