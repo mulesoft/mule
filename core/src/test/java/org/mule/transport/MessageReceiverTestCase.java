@@ -19,6 +19,7 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
+import org.mule.api.config.MuleConfiguration;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
@@ -59,6 +60,8 @@ public class MessageReceiverTestCase extends AbstractMuleTestCase
     public void setup()
     {
         Mockito.when(muleSession.getId()).thenReturn("1");
+        MuleConfiguration muleConfiguration = Mockito.mock(MuleConfiguration.class);
+        Mockito.when(muleContext.getConfiguration()).thenReturn(muleConfiguration);
     }
 
     @Test
@@ -92,6 +95,7 @@ public class MessageReceiverTestCase extends AbstractMuleTestCase
     {
         AbstractConnector connector = Mockito.mock(AbstractConnector.class);
         Mockito.when(connector.getSessionHandler()).thenReturn(new NullSessionHandler());
+        Mockito.when(connector.getMuleContext()).thenReturn(muleContext);
 
         FlowConstruct flowConstruct = Mockito.mock(FlowConstruct.class);
 

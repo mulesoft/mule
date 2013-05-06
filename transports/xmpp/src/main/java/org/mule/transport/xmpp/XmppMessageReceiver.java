@@ -66,6 +66,8 @@ public class XmppMessageReceiver extends AbstractMessageReceiver implements Pack
     @Override
     protected void doStop() throws MuleException
     {
+        super.doStop();
+
         xmppConversation.removePacketListener(this);
     }
 

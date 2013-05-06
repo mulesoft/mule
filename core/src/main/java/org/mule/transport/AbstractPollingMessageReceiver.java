@@ -70,6 +70,7 @@ public abstract class AbstractPollingMessageReceiver extends AbstractMessageRece
     @Override
     protected void doStop() throws MuleException
     {
+        super.doStop();
         this.unschedule();
     }
 

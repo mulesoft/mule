@@ -167,6 +167,8 @@ public class TransactedSingleResourceJmsMessageReceiver extends AbstractMessageR
     @Override
     protected void doStop() throws MuleException
     {
+        super.doStop();
+
         try
         {
             if (consumer != null)

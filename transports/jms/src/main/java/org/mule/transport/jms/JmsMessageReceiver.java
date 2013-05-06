@@ -197,6 +197,8 @@ public class JmsMessageReceiver extends AbstractMessageReceiver implements Messa
 
     protected void doStop() throws MuleException
     {
+        super.doStop();
+
         try
         {
             if (consumer != null)
