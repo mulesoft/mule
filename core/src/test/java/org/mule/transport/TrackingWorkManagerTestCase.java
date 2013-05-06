@@ -856,6 +856,13 @@ public class TrackingWorkManagerTestCase extends AbstractMuleTestCase
         verify(workTracker, times(3)).pendingWorks();
     }
 
+    @Test
+    public void disposesWorkTracker() throws Exception
+    {
+        trackingWorkManager.dispose();
+        verify(workTracker).dispose();
+    }
+
     private void expectedExceptionFail()
     {
         fail("Should throw an exception");

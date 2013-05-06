@@ -82,4 +82,19 @@ public class ConcurrentWorkTracker implements WorkTracker
         }
     }
 
+    @Override
+    public void dispose()
+    {
+        Lock lock = registryLock.writeLock();
+
+        try
+        {
+            lock.lock();
+            works.clear();
+        }
+        finally
+        {
+            lock.unlock();
+        }
+    }
 }

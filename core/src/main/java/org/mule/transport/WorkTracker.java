@@ -10,12 +10,14 @@
 
 package org.mule.transport;
 
+import org.mule.api.lifecycle.Disposable;
+
 import java.util.List;
 
 /**
  * Tracks works that are running in behalf of a given component.
  */
-public interface WorkTracker
+public interface WorkTracker extends Disposable
 {
 
     /**
