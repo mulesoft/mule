@@ -119,12 +119,6 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Work
         // nothing to do
     }
 
-    @Override
-    protected void doStop() throws MuleException
-    {
-        // nothing to do
-    }
-
     /**
      * Obtain the serverSocket
      * @return the server socket for this server
