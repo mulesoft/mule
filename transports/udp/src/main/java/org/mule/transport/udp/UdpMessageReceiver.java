@@ -10,7 +10,6 @@
 
 package org.mule.transport.udp;
 
-import org.mule.MessageExchangePattern;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
@@ -109,12 +108,6 @@ public class UdpMessageReceiver extends AbstractMessageReceiver implements Work
 
     @Override
     protected void doStart() throws MuleException
-    {
-        // nothing to do
-    }
-
-    @Override
-    protected void doStop() throws MuleException
     {
         // nothing to do
     }

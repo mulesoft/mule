@@ -109,8 +109,10 @@ public class RetrieveMessageReceiver extends AbstractPollingMessageReceiver impl
     }
 
     @Override
-    protected void doStop()
+    protected void doStop() throws MuleException
     {
+        super.doStop();
+
         synchronized (folderLock)
         {
             if (folder != null)

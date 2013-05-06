@@ -153,12 +153,6 @@ public class RmiCallbackMessageReceiver extends AbstractMessageReceiver
         // nothing to do
     }
 
-    @Override
-    protected void doStop() throws MuleException
-    {
-        // nothing to do
-    }
-
     /**
      * Gets RmiAble objetc for registry to add in.
      *

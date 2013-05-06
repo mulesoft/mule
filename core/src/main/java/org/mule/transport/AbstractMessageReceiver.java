@@ -93,6 +93,8 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
     private PrimaryNodeLifecycleNotificationListener primaryNodeLifecycleNotificationListener;
     private MessageProcessingManager messageProcessingManager;
 
+    private WorkManager messageReceiverWorkManager;
+
     /**
      * Creates the Message Receiver
      *
@@ -115,6 +117,8 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
             throw new IllegalArgumentException("FlowConstruct cannot be null");
         }
         this.flowConstruct = flowConstruct;
+
+        messageReceiverWorkManager = createWorkManager();
     }
 
     @Override
@@ -213,9 +217,9 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
     {
 
         warnIfMuleClientSendUsed(message);
-        
+
         propagateRootMessageIdProperty(message);
-        
+
         MuleEvent muleEvent = createMuleEvent(message, outputStream);
 
         if (!endpoint.isDisableTransportTransformer())
@@ -302,7 +306,7 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
             }
             catch (Exception e)
             {
-                // If the LegacySessionHandler didn't work either, just bubble up the original SerializationException (see MULE-5487)  
+                // If the LegacySessionHandler didn't work either, just bubble up the original SerializationException (see MULE-5487)
                 throw se;
             }
         }
@@ -367,6 +371,11 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
 
     @Override
     protected WorkManager getWorkManager()
+    {
+        return messageReceiverWorkManager;
+    }
+
+    private WorkManager getConnectorWorkManager()
     {
         try
         {
@@ -437,6 +446,7 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
             {
                 logger.info("Connecting clusterizable message receiver");
             }
+
             doConnect();
         }
         else
@@ -457,6 +467,11 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
             {
                 logger.info("Starting clusterizable message receiver");
             }
+            if (messageReceiverWorkManager == null)
+            {
+                messageReceiverWorkManager = createWorkManager();
+            }
+
             doStart();
         }
         else
@@ -466,6 +481,25 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
                 logger.debug("Clusterizable message receiver not started on this node");
             }
         }
+    }
+
+    @Override
+    protected void doStop() throws MuleException
+    {
+        super.doStop();
+
+        if (messageReceiverWorkManager != null)
+        {
+            messageReceiverWorkManager.dispose();
+            messageReceiverWorkManager = null;
+        }
+    }
+
+    private WorkManager createWorkManager()
+    {
+        int shutdownTimeout = connector.getMuleContext().getConfiguration().getShutdownTimeout();
+
+        return new TrackingWorkManager(getConnectorWorkManager(), shutdownTimeout);
     }
 
     public MuleEvent routeEvent(MuleEvent muleEvent) throws MuleException
