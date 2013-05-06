@@ -102,6 +102,8 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
     @Override
     protected void doStop() throws MuleException
     {
+        super.doStop();
+
         logger.debug("doStop()");
         if (consumers != null)
         {

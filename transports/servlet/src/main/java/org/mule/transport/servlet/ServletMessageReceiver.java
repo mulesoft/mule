@@ -53,10 +53,4 @@ public class ServletMessageReceiver extends AbstractMessageReceiver
     {
         // nothing to do
     }
-
-    @Override
-    protected void doStop() throws MuleException
-    {
-        // nothing to do
-    }
 }

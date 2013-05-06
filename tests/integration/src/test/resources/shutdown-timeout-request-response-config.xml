@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="http://www.mulesoft.org/schema/mule/core"
+        xmlns:http="http://www.mulesoft.org/schema/mule/http"
+        xmlns:script="http://www.mulesoft.org/schema/mule/scripting"
+        xsi:schemaLocation="
+        http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+
+    <configuration shutdownTimeout="${contextShutdownTimeout}"/>
+
+    <flow name="staticComponentFlow">
+        <http:inbound-endpoint host="localhost" port="${httpPort}" path="staticComponent" exchange-pattern="request-response"/>
+
+        <custom-processor class="org.mule.shutdown.AbstractShutdownTimeoutRequestResponseTestCase$BlockMessageProcessor"/>
+        <static-component>
+            <return-data>staticComponentResponse</return-data>
+        </static-component>
+    </flow>
+
+    <flow name="scriptComponentFlow">
+        <http:inbound-endpoint host="localhost" port="${httpPort}" path="scriptComponent" exchange-pattern="request-response"/>
+
+        <custom-processor class="org.mule.shutdown.AbstractShutdownTimeoutRequestResponseTestCase$BlockMessageProcessor"/>
+        <script:component>
+            <script:script engine="groovy">return &quot;scriptComponentResponse&quot;;</script:script>
+        </script:component>
+    </flow>
+
+    <flow name="expressionTransformerFlow">
+        <http:inbound-endpoint host="localhost" port="${httpPort}" path="expressionTransformer" exchange-pattern="request-response"/>
+
+        <custom-processor class="org.mule.shutdown.AbstractShutdownTimeoutRequestResponseTestCase$BlockMessageProcessor"/>
+        <expression-transformer>
+            <return-argument expression="return &quot;expressionTransformerResponse&quot;;" evaluator="groovy" />
+        </expression-transformer>
+    </flow>
+</mule>

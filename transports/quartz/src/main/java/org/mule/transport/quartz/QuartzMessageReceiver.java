@@ -197,12 +197,6 @@ public class QuartzMessageReceiver extends AbstractMessageReceiver
     }
 
     @Override
-    protected void doStop() throws MuleException
-    {
-        // nothing to do
-    }
-
-    @Override
     protected void doConnect() throws Exception
     {
         // nothing to do

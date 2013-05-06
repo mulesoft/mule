@@ -379,6 +379,8 @@ public class AxisMessageReceiver extends AbstractMessageReceiver
     @Override
     protected void doStop() throws MuleException
     {
+        super.doStop();
+
         if (soapService != null)
         {
             soapService.stop();

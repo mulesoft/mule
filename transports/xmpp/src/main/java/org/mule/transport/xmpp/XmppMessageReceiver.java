@@ -85,13 +85,6 @@ public class XmppMessageReceiver extends AbstractMessageReceiver implements Pack
         // nothing to do
     }
 
-    // TODO xmpp: consider lifecycle
-    @Override
-    protected void doStop() throws MuleException
-    {
-        // nothing to do
-    }
-
     @Override
     protected void doDispose()
     {
