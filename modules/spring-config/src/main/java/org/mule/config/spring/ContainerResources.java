@@ -22,7 +22,7 @@ public class ContainerResources
             try
             {
                 MuleContext muleContext = new DefaultMuleContextFactory().createMuleContext();
-                serverContext = new SpringXmlConfigurationBuilder("mule-server-config.xml").doConfigure2(muleContext);
+                serverContext = new SpringXmlConfigurationBuilder(new String[]{"container-config.xml","mule-server-config.xml"}).doConfigure2(muleContext);
                 try
                 {
                     muleContext.start();
