@@ -34,6 +34,7 @@ import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
 import org.mule.tck.probe.Prober;
 import org.mule.tck.probe.file.FileDoesNotExists;
+import org.mule.tck.probe.file.FileExists;
 import org.mule.util.CollectionUtils;
 import org.mule.util.FileUtils;
 import org.mule.util.StringUtils;
@@ -416,6 +417,26 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         assertAppFolderIsDeleted("empty-app");
     }
 
+    @Test
+    public void mantainsAppFolderOnDeploymentError() throws Exception
+    {
+        final URL url = getClass().getResource("/incompleteApp.zip");
+        assertNotNull("Test app file not found " + url, url);
+        addAppArchive(url, "incompleteApp.zip");
+
+        deploymentService.start();
+        assertDeploymentFailure(deploymentListener, "incompleteApp");
+
+        // Deploys another app to confirm that DeploymentService has execute the updater thread
+        final URL extraApp = getClass().getResource("/dummy-app.zip");
+        assertNotNull("Test app file not found " + extraApp, extraApp);
+        addAppArchive(extraApp);
+        assertDeploymentSuccess(deploymentListener, "dummy-app");
+
+        // Check that the failed application folder is still there
+        assertAppFolderIsMaintained("incompleteApp");
+    }
+
     private void assertDeploymentSuccess(final DeploymentListener listener, final String appName)
     {
         Prober prober = new PollingProber(DEPLOYMENT_TIMEOUT, 100);
@@ -663,5 +684,12 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         Prober prober = new PollingProber(DEPLOYMENT_TIMEOUT, 100);
         File appFolder = new File(appsDir, appName);
         prober.check(new FileDoesNotExists(appFolder));
+    }
+
+    private void assertAppFolderIsMaintained(String appName)
+    {
+        Prober prober = new PollingProber(DEPLOYMENT_TIMEOUT, 100);
+        File appFolder = new File(appsDir, appName);
+        prober.check(new FileExists(appFolder));
     }
 }
