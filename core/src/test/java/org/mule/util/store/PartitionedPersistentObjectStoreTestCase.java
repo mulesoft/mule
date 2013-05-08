@@ -10,6 +10,7 @@
 package org.mule.util.store;
 
 import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.when;
 import org.mule.api.MuleContext;
@@ -95,6 +96,15 @@ public class PartitionedPersistentObjectStoreTestCase extends AbstractMuleTestCa
         os.open("asdfsadfsa#$%@#$@#$@$%$#&8******ASDFWER??!?!");
     }
 
+    @Test
+    public void muleContextAwareValueGetsDeserialized() throws Exception
+    {
+        os.open();
+        os.store("key",new DeserializableValue(mockMuleContext));
+        DeserializableValue value = (DeserializableValue) os.retrieve("key");
+        assertNotNull(value.getMuleContext());
+    }
+
     private void closePartitions() throws ObjectStoreException
     {
         for (int i = 0; i < numberOfPartitions; i++)
@@ -154,6 +164,25 @@ public class PartitionedPersistentObjectStoreTestCase extends AbstractMuleTestCa
     private String getPartitionName(int i)
     {
         return "partition" + i;
+    }
+
+    public static class DeserializableValue implements DeserializationPostInitialisable, Serializable
+    {
+        private transient MuleContext muleContext;
+
+        public DeserializableValue(MuleContext muleContext)
+        {
+            this.muleContext = muleContext;
+        }
+
+        public void initAfterDeserialisation(MuleContext muleContext)
+        {
+            this.muleContext = muleContext;
+        }
+
+        public MuleContext getMuleContext() {
+            return muleContext;
+        }
     }
 
 }
