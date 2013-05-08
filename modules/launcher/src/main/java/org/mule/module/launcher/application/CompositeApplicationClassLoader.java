@@ -13,6 +13,7 @@ package org.mule.module.launcher.application;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.Arrays;
@@ -109,7 +110,7 @@ public class CompositeApplicationClassLoader extends ClassLoader implements Appl
         {
             if (logger.isDebugEnabled())
             {
-                logger.debug(String.format("Error loading class '%s' from classloader '%s'", s, classLoader), e);
+                logReflectionLoadingError(s, classLoader, e, "Class");
             }
         }
 
@@ -191,7 +192,7 @@ public class CompositeApplicationClassLoader extends ClassLoader implements Appl
         {
             if (logger.isDebugEnabled())
             {
-                logger.debug(String.format("Error finding library '%s' in classloader '%s'", s, classLoader), e);
+                logReflectionLoadingError(s, classLoader, e, "Library");
             }
         }
 
@@ -272,7 +273,7 @@ public class CompositeApplicationClassLoader extends ClassLoader implements Appl
         {
             if (logger.isDebugEnabled())
             {
-                logger.debug(String.format("Error finding resource '%s' in classloader '%s'", s, classLoader), e);
+                logReflectionLoadingError(s, classLoader, e, "Resource");
             }
         }
 
@@ -299,5 +300,27 @@ public class CompositeApplicationClassLoader extends ClassLoader implements Appl
         }
 
         throw new NoSuchMethodException(String.format("Cannot find a method '%s' with the given parameter types '%s'", methodName, Arrays.toString(params)));
+    }
+
+    private void logReflectionLoadingError(String name, ClassLoader classLoader, Exception e, String type)
+    {
+        if (e instanceof InvocationTargetException && ((InvocationTargetException) e).getTargetException() instanceof ClassNotFoundException)
+        {
+            logger.debug(String.format("'%s' '%s' not found in class loader '%s'", type, name, classLoader));
+        }
+        else
+        {
+            final String errorMessage;
+            if (e instanceof InvocationTargetException)
+            {
+                errorMessage = ((InvocationTargetException) e).getTargetException().getMessage();
+            }
+            else
+            {
+                errorMessage = e.getMessage();
+            }
+
+            logger.debug(String.format("Error loading '%s' '%s' from class loader '%s': '%s'", type.toLowerCase(), name, classLoader, errorMessage));
+        }
     }
 }
