@@ -33,6 +33,7 @@ import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
 import org.mule.tck.probe.Prober;
 import org.mule.tck.probe.file.FileDoesNotExists;
+import org.mule.tck.probe.file.FileExists;
 import org.mule.util.CollectionUtils;
 import org.mule.util.FileUtils;
 import org.mule.util.StringUtils;
@@ -453,6 +454,23 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         Prober prober = new PollingProber(LATCH_TIMEOUT, 100);
         File appFolder = new File(appsDir, "empty-app");
         prober.check(new FileDoesNotExists(appFolder));
+    }
+
+    @Test
+    public void mantainsAppFolderOnDeploymentError() throws Exception
+    {
+        final URL url = getClass().getResource("/incompleteApp.zip");
+        assertNotNull("Test app file not found " + url, url);
+        addAppArchive(url, "incompleteApp.zip");
+
+        deploymentService.start();
+
+        // Deploys another app to confirm that DeploymentService has execute the updater thread
+        final URL extraApp = getClass().getResource("/dummy-app.zip");
+        assertNotNull("Test app file not found " + extraApp, extraApp);
+        addAppArchive(extraApp);
+        assertTrue("Deployer never invoked", deployLatch.await(LATCH_TIMEOUT, TimeUnit.MILLISECONDS));
+        assertAppsDir(NONE, new String[] {"incompleteApp", "dummy-app"}, true);
     }
 
     private void assertNoDeploymentInvoked()

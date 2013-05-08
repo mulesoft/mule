@@ -10,6 +10,7 @@
 
 package org.mule.module.launcher.application;
 
+import static org.mule.util.SplashScreen.miniSplash;
 import org.mule.MuleServer;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
@@ -56,8 +57,6 @@ import java.util.concurrent.TimeUnit;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import static org.mule.util.SplashScreen.miniSplash;
-
 public class DefaultMuleApplication implements Application
 {
 
@@ -97,6 +96,8 @@ public class DefaultMuleApplication implements Application
         {
             throw new InstallException(MessageFactory.createStaticMessage("Failed to parse the application deployment descriptor"), e);
         }
+
+        createAnchorFile(getAppName());
 
         // convert to absolute paths
         final String[] configResources = descriptor.getConfigResources();
@@ -143,9 +144,6 @@ public class DefaultMuleApplication implements Application
         try
         {
             this.muleContext.start();
-            // save app's state in the marker file
-            File marker = new File(MuleContainerBootstrapUtils.getMuleAppsDir(), String.format("%s-anchor.txt", getAppName()));
-            FileUtils.writeStringToFile(marker, ANCHOR_FILE_BLURB);
 
             // null CCL ensures we log at 'system' level
             // TODO create a more usable wrapper for any logger to be logged at sys level
@@ -161,13 +159,6 @@ public class DefaultMuleApplication implements Application
             }
         }
         catch (MuleException e)
-        {
-            // log it here so it ends up in app log, sys log will only log a message without stacktrace
-            logger.error(null, ExceptionUtils.getRootCause(e));
-            // TODO add app name to the exception field
-            throw new DeploymentStartException(CoreMessages.createStaticMessage(ExceptionUtils.getRootCauseMessage(e)), e);
-        }
-        catch (IOException e)
         {
             // log it here so it ends up in app log, sys log will only log a message without stacktrace
             logger.error(null, ExceptionUtils.getRootCause(e));
@@ -477,6 +468,22 @@ public class DefaultMuleApplication implements Application
         final String muleHome = System.getProperty(MuleProperties.MULE_HOME_DIRECTORY_PROPERTY);
         String configPath = String.format("%s/apps/%s/%s", muleHome, getAppName(), path);
         return new File(configPath);
+    }
+
+    private void createAnchorFile(String appName)
+    {
+        try
+        {
+            File marker = new File(MuleContainerBootstrapUtils.getMuleAppsDir(), String.format("%s-anchor.txt", appName));
+            FileUtils.writeStringToFile(marker, ANCHOR_FILE_BLURB);
+        }
+        catch (IOException e)
+        {
+            // log it here so it ends up in app log, sys log will only log a message without stacktrace
+            logger.error(null, ExceptionUtils.getRootCause(e));
+            // TODO add app name to the exception field
+            throw new DeploymentInitException(CoreMessages.createStaticMessage(ExceptionUtils.getRootCauseMessage(e)), e);
+        }
     }
 
     protected class ConfigFileWatcher extends AbstractFileWatcher
