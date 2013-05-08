@@ -314,7 +314,12 @@ public class PersistentObjectStorePartition<T extends Serializable> implements L
         try
         {
             objectInputStream = new ObjectInputStream(new FileInputStream(file));
-            return (StoreValue<T>) SerializationUtils.deserialize(objectInputStream, muleContext);
+            StoreValue<T> storedValue = (StoreValue<T>) SerializationUtils.deserialize(objectInputStream, muleContext);
+            if (storedValue.getValue() instanceof DeserializationPostInitialisable)
+            {
+                DeserializationPostInitialisable.Implementation.init(storedValue.getValue(),muleContext);
+            }
+            return storedValue;
         }
         catch (FileNotFoundException e)
         {
