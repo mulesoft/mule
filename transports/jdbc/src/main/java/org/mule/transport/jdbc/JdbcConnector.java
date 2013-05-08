@@ -302,13 +302,6 @@ public class JdbcConnector extends AbstractConnector
         {
             String key = m.group();
             m.appendReplacement(sb, "?");
-            //Special legacy handling for #[payload]
-            if (key.equals("#[payload]"))
-            {
-                //MULE-3597
-                logger.error("invalid expression template #[payload]. It should be replaced with #[payload:] to conform with the correct expression syntax. Mule has replaced this for you, but may not in future versions.");
-                key = "#[payload:]";
-            }
             params.add(key);
         }
         m.appendTail(sb);
