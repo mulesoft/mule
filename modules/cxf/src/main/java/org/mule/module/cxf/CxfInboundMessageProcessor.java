@@ -265,7 +265,7 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
             // Add protocol headers with the soap action so that the SoapActionInInterceptor can find them if it is soap v1.1
             Map<String, List<String>> protocolHeaders = new HashMap<String, List<String>>();
             List<String> soapActions = new ArrayList<String>();
-            if (soapAction != null && !soapAction.isEmpty())
+            if (soapAction != null && !"".equals(soapAction))
             {
                 soapActions.add(soapAction);
             }
