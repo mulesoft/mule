@@ -38,6 +38,10 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.Source;
@@ -46,6 +50,7 @@ import javax.xml.transform.dom.DOMSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.cxf.Bus;
+import org.apache.cxf.binding.soap.SoapBindingConstants;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.interceptor.StaxInEndingInterceptor;
 import org.apache.cxf.message.ExchangeImpl;
@@ -261,6 +266,16 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
             // TODO: Not sure if this is 100% correct - DBD
             String soapAction = getSoapAction(event.getMessage());
             m.put(org.mule.module.cxf.SoapConstants.SOAP_ACTION_PROPERTY_CAPS, soapAction);
+            
+            // Add protocol headers with the soap action so that the SoapActionInInterceptor can find them if it is soap v1.1
+            Map<String, List<String>> protocolHeaders = new HashMap<String, List<String>>();
+            List<String> soapActions = new ArrayList<String>();
+            if (soapAction != null && !soapAction.isEmpty())
+            {
+                soapActions.add(soapAction);
+            }
+            protocolHeaders.put(SoapBindingConstants.SOAP_ACTION, soapActions);
+            m.put(Message.PROTOCOL_HEADERS, protocolHeaders);
 
             org.apache.cxf.transport.Destination d;
             
