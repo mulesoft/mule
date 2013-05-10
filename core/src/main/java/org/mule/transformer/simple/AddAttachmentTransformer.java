@@ -55,8 +55,8 @@ public class AddAttachmentTransformer extends AbstractMessageTransformer
                 Object value = valueEvaluator.resolveValue(message);
                 if (value == null)
                 {
-                    logger.info(MessageFormat.format(
-                         "Attachment with key '{0}', not found on message using '{1}'. Since the value was marked optional, nothing was set on the message for this attachment",
+                    logger.error(MessageFormat.format(
+                         "Attachment with key ''{0}'', not found on message using ''{1}''. Since the value was marked optional, nothing was set on the message for this attachment",
                          key, valueEvaluator.getRawValue()));
                 }
                 else
