@@ -24,7 +24,7 @@ import static org.junit.Assert.assertTrue;
 
 public class GZipTransformerStreamTestCase extends GZipTransformerTestCase
 {
-    
+
     @Test
     public void testStreamingCompression() throws TransformerException
     {
@@ -45,8 +45,8 @@ public class GZipTransformerStreamTestCase extends GZipTransformerTestCase
         transformer.setMuleContext(muleContext);
         
         InputStream input = new ByteArrayInputStream((byte[]) this.getResultData());
-        byte[] resultBytes = (byte[]) transformer.transform(input);
-        assertEquals(TEST_DATA, SerializationUtils.deserialize(resultBytes));
+        String resultingString = (String) transformer.transform(input);
+        assertEquals(TEST_DATA, resultingString);
     }
 
 }

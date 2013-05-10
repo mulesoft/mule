@@ -20,6 +20,8 @@ import org.mule.util.compression.GZipCompression;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.apache.commons.lang.SerializationException;
+
 /**
  * <code>GZipCompressTransformer</code> will uncompress a byte[] or InputStream
  */
@@ -31,7 +33,8 @@ public class GZipUncompressTransformer extends AbstractCompressionTransformer
         this.setStrategy(new GZipCompression());
         this.registerSourceType(DataTypeFactory.BYTE_ARRAY);
         this.registerSourceType(DataTypeFactory.INPUT_STREAM);
-        this.setReturnDataType(DataTypeFactory.BYTE_ARRAY);
+        // No type checking for the return type by default. It could either be a byte array or an object.
+        this.setReturnDataType(DataTypeFactory.OBJECT);
     }
 
     @Override
@@ -67,11 +70,23 @@ public class GZipUncompressTransformer extends AbstractCompressionTransformer
                     MessageFactory.createStaticMessage("Failed to uncompress message."), this, e);
         }
 
-        if (!DataTypeFactory.BYTE_ARRAY.equals(getReturnDataType()))
+        // If a return type different than a byte array has been specified, then deserialize the uncompressed byte array.
+        if (!DataTypeFactory.OBJECT.equals(getReturnDataType()) && !DataTypeFactory.BYTE_ARRAY.equals(getReturnDataType()))
         {
             return SerializationUtils.deserialize(buffer, muleContext);
         }
-
-        return buffer;
+        else
+        {
+            // First try to deserialize the byte array. If it can be deserialized, then it was originally serialized.
+            try
+            {
+                return SerializationUtils.deserialize(buffer, muleContext);
+            }
+            catch (SerializationException e)
+            {
+                // If it fails, ignore it. We assume it was not serialized in the first place and return the buffer as it is.
+                return buffer;
+            }
+        }
     }
 }
