@@ -191,7 +191,7 @@ public class MessagePropertiesTransformer extends AbstractMessageTransformer
                 else if (logger.isInfoEnabled())
                 {
                     logger.info(MessageFormat.format(
-                        "Property with key '{0}', not found on message using '{1}'. Since the value was marked optional, nothing was set on the message for this property",
+                        "Property with key ''{0}'', not found on message using ''{1}''. Since the value was marked optional, nothing was set on the message for this property",
                         key, value));
                 }
             }
