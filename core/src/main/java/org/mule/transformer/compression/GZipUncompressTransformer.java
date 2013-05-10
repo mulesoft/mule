@@ -20,6 +20,8 @@ import org.mule.util.compression.GZipCompression;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.apache.commons.lang.SerializationException;
+
 /**
  * <code>GZipCompressTransformer</code> will uncompress a byte[] or InputStream
  */
@@ -31,7 +33,7 @@ public class GZipUncompressTransformer extends AbstractCompressionTransformer
         this.setStrategy(new GZipCompression());
         this.registerSourceType(DataTypeFactory.BYTE_ARRAY);
         this.registerSourceType(DataTypeFactory.INPUT_STREAM);
-        // No type checking for the return type by default. It could either be a byte array or an input stream.
+        // No type checking for the return type by default. It could either be a byte array, an input stream or an object.
         this.setReturnDataType(DataTypeFactory.OBJECT);
     }
 
@@ -48,13 +50,24 @@ public class GZipUncompressTransformer extends AbstractCompressionTransformer
             {
                 byte[] buffer = getStrategy().uncompressByteArray((byte[]) src);
                 DataType<?> returnDataType = getReturnDataType();
-                if (!DataTypeFactory.OBJECT.equals(returnDataType) && !DataTypeFactory.BYTE_ARRAY.equals(getReturnDataType()))
+
+                // If a return type has been specified, then deserialize the uncompressed byte array.
+                if (!DataTypeFactory.OBJECT.equals(returnDataType) && !DataTypeFactory.BYTE_ARRAY.equals(returnDataType))
                 {
                     return SerializationUtils.deserialize(buffer, muleContext);
                 }
                 else
                 {
-                    return buffer;
+                    // First try to deserialize the byte array. If it can be deserialized, then it was originally serialized.
+                    try
+                    {
+                        return SerializationUtils.deserialize(buffer, muleContext);
+                    }
+                    catch (SerializationException e)
+                    {
+                        // If it fails, ignore it. We assume it was not serialized in the first place and return the buffer as it is.
+                        return buffer;
+                    }
                 }
             }
         }
