@@ -41,7 +41,7 @@ public class GZipTransformerFunctionalTestCase extends FunctionalTestCase
     @Test
     public void testCompressDecompressByteArray() throws Exception
     {
-        byte[] testDataByteArray = SerializationUtils.serialize(TEST_DATA);
+        byte[] testDataByteArray = TEST_DATA.getBytes();
         MuleClient client = new MuleClient(muleContext);
 
         // Compress input.
@@ -54,14 +54,14 @@ public class GZipTransformerFunctionalTestCase extends FunctionalTestCase
         assertNotNull(uncompressedResponse);
         assertTrue(uncompressedResponse.getPayload() instanceof byte[]);
 
-        String uncompressedStr = (String) SerializationUtils.deserialize((byte[]) uncompressedResponse.getPayload());
+        String uncompressedStr = new String((byte[]) uncompressedResponse.getPayload());
         assertEquals(TEST_DATA, uncompressedStr);
     }
 
     @Test
     public void testCompressDecompressInputStream() throws Exception
     {
-        ByteArrayInputStream bis = new ByteArrayInputStream(SerializationUtils.serialize(TEST_DATA));
+        ByteArrayInputStream bis = new ByteArrayInputStream(TEST_DATA.getBytes());
         MuleClient client = new MuleClient(muleContext);
 
         // Compress input.
@@ -75,7 +75,7 @@ public class GZipTransformerFunctionalTestCase extends FunctionalTestCase
         assertTrue(uncompressedResponse.getPayload() instanceof InputStream);
 
         byte[] uncompressedByteArray = IOUtils.toByteArray((InputStream) uncompressedResponse.getPayload());
-        String uncompressedStr = (String) SerializationUtils.deserialize(uncompressedByteArray);
+        String uncompressedStr = new String(uncompressedByteArray);
         assertEquals(TEST_DATA, uncompressedStr);
     }
 }
