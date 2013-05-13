@@ -262,12 +262,69 @@
 
     </flow>
 
+    <flow name="routeBasedNoWsdl">
+        <composite-source>
+            <inbound-endpoint
+                address="http://localhost:${port1}/services/routeBasedNoWsdl"
+                exchange-pattern="request-response">
+				<cxf:proxy-service>
+                    <cxf:features>
+                        <cxf-core:logging />
+                    </cxf:features>
+                </cxf:proxy-service>
+            </inbound-endpoint>
+            <inbound-endpoint
+                address="http://localhost:${port1}/services/routeBasedNoWsdlAsync"
+                exchange-pattern="one-way">
+				<cxf:proxy-service>
+                    <cxf:features>
+                        <cxf-core:logging />
+                    </cxf:features>
+                </cxf:proxy-service>
+            </inbound-endpoint>
+        </composite-source>
+
+        <outbound-endpoint address="http://localhost:${port1}/services/Echo"
+            exchange-pattern="request-response">
+            <cxf:proxy-client />
+        </outbound-endpoint>
+    </flow>
+
+    <flow name="routeBasedOnNoSoapAction">
+        <composite-source>
+            <inbound-endpoint
+                address="http://localhost:${port1}/services/routeBasedOnNoSoapAction"
+                exchange-pattern="request-response">
+				<cxf:proxy-service bindingId="WebServiceHttpBinding" namespace="http://www.muleumo.org" service="WebService" payload="body" wsdlLocation="localWsdl.wsdl" >
+                    <cxf:features>
+                        <cxf-core:logging />
+                    </cxf:features>
+                </cxf:proxy-service>
+            </inbound-endpoint>
+            <inbound-endpoint
+                address="http://localhost:${port1}/services/routeBasedOnNoSoapActionAsync"
+                exchange-pattern="one-way">
+				<cxf:proxy-service bindingId="WebService2HttpBinding" namespace="http://www.muleumo.org" service="WebService2" payload="body" wsdlLocation="localWsdl.wsdl" >
+                    <cxf:features>
+                        <cxf-core:logging />
+                    </cxf:features>
+                </cxf:proxy-service>
+            </inbound-endpoint>
+        </composite-source>
+
+        <outbound-endpoint address="http://localhost:${port1}/services/Echo"
+            exchange-pattern="request-response">
+            <cxf:proxy-client />
+        </outbound-endpoint>
+    </flow>
+
     <flow name="routeBasedOnSoapAction">
         <composite-source>
             <inbound-endpoint
                 address="http://localhost:${port1}/services/routeBasedOnSoapAction"
                 exchange-pattern="request-response">
-                <cxf:proxy-service>
+				<cxf:proxy-service bindingId="EchoBinding" namespace="http://new.webservice.namespace" service="EchoService" payload="body"
+					wsdlLocation="echo-11.wsdl" >
                     <cxf:features>
                         <cxf-core:logging />
                     </cxf:features>
@@ -276,7 +333,8 @@
             <inbound-endpoint
                 address="http://localhost:${port1}/services/routeBasedOnSoapActionAsync"
                 exchange-pattern="one-way">
-                <cxf:proxy-service>
+		    	<cxf:proxy-service bindingId="EchoBinding" namespace="http://new.webservice.namespace" service="EchoService" payload="body"
+					wsdlLocation="echo-11.wsdl" >
                     <cxf:features>
                         <cxf-core:logging />
                     </cxf:features>
@@ -284,18 +342,10 @@
             </inbound-endpoint>
         </composite-source>
 
-        <message-filter onUnaccepted="messageFilter2">
-            <message-property-filter
-                pattern="SOAPAction=http://acme.com/no-transform" scope="inbound" />
-
-        </message-filter>
-
         <outbound-endpoint address="http://localhost:${port1}/services/Echo"
             exchange-pattern="request-response">
             <cxf:proxy-client />
         </outbound-endpoint>
-
-
     </flow>
 
     <flow name="asyncService">
@@ -308,6 +358,19 @@
         <component>
             <singleton-object
                 class="org.mule.module.cxf.testmodels.AsyncService" />
+        </component>
+    </flow>
+
+    <flow name="asyncServiceWithSoapAction">
+
+        <inbound-endpoint address="http://localhost:${port1}/services/onewayWithSoapAction"
+            exchange-pattern="request-response">
+            <cxf:jaxws-service serviceClass="org.mule.module.cxf.testmodels.AsyncServiceWithSoapAction"/>
+        </inbound-endpoint>
+
+        <component>
+            <singleton-object
+                class="org.mule.module.cxf.testmodels.AsyncServiceWithSoapAction" />
         </component>
     </flow>
 

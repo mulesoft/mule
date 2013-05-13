@@ -12,8 +12,21 @@ package org.mule.module.cxf;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+import org.mule.api.MuleEventContext;
+import org.mule.api.MuleException;
+import org.mule.api.MuleMessage;
+import org.mule.module.client.MuleClient;
+import org.mule.module.cxf.testmodels.AsyncService;
+import org.mule.module.cxf.testmodels.AsyncServiceWithSoapAction;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.functional.EventCallback;
+import org.mule.tck.functional.FunctionalTestComponent;
+import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.transport.http.HttpConstants;
+import org.mule.util.concurrent.Latch;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -24,17 +37,6 @@ import java.util.concurrent.TimeUnit;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-
-import org.mule.api.MuleEventContext;
-import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
-import org.mule.module.cxf.testmodels.AsyncService;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
-import org.mule.tck.functional.EventCallback;
-import org.mule.tck.functional.FunctionalTestComponent;
-import org.mule.tck.junit4.rule.DynamicPort;
-import org.mule.transport.http.HttpConstants;
-import org.mule.util.concurrent.Latch;
 
 public class ProxyTestCase extends AbstractServiceAndFlowTestCase
 {
@@ -93,7 +95,6 @@ public class ProxyTestCase extends AbstractServiceAndFlowTestCase
         MuleClient client = new MuleClient(muleContext);
         MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/services/Echo", msg, null);
         String resString = result.getPayloadAsString();
-//        System.out.println(resString);
         assertTrue(resString.indexOf("<test xmlns=\"http://foo\"> foo </test>") != -1);
     }
 
@@ -251,21 +252,195 @@ public class ProxyTestCase extends AbstractServiceAndFlowTestCase
         String resString = result.getPayloadAsString();
         assertTrue(resString.indexOf("greetMeResponse") != -1);
    }
+   
+   @Test
+   public void testServerNoSoapAction() throws Exception
+   {
+       String msg = "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">"
+                       + "<soap:Body> <test xmlns=\"http://foo\"></test>" + "</soap:Body>" + "</soap:Envelope>";
+       String path = "/services/routeBasedOnNoSoapAction";
+       String expectedString = "<test xmlns=\"http://foo\"";
+       
+       // wsdl has soap action as empty string
+       MuleMessage result = executeSoapCall(msg, "", path);
+       assertResultContains(result, expectedString);
+
+       result = executeSoapCall(msg, null, path);
+       assertResultContains(result, expectedString);
+   }
+   
+   @Test
+   public void testServerNoSoapActionSpoofing() throws Exception
+   {
+       String msg = "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">"
+                       + "<soap:Body> <test xmlns=\"http://foo\"></test>" + "</soap:Body>" + "</soap:Envelope>";
+       // wsdl has soap action as empty string so being anything else is not allowed
+       MuleMessage result = executeSoapCall(msg, "echo", "/services/routeBasedOnNoSoapAction");
+       assertResultIsFault(result);
+   }
 
    @Test
-   public void testSoapActionRouting() throws Exception
+   public void testServerSoapAction() throws Exception
    {
-        String msg = "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">"
-            + "<soap:Body> <test xmlns=\"http://foo\"></test>" + "</soap:Body>" + "</soap:Envelope>";
+       String msg = "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:new=\"http://new.webservice.namespace\">"
+               + "<soapenv:Header/>"
+               + "  <soapenv:Body>"
+               + "    <new:parameter1>hello world</new:parameter1>"
+               + "  </soapenv:Body>"
+               + "</soapenv:Envelope>";
 
-        Map<String, Object> props = new HashMap<String, Object>();
-        props.put("SOAPAction", "http://acme.com/transform");
+       MuleMessage result = executeSoapCall(msg, "EchoOperation1", "/services/routeBasedOnSoapAction");
+       assertResultContains(result, "<new:parameter1");
+   }
+   
+   @Test
+   public void testServerSoapActionSpoofing() throws Exception
+   {
+       String msg = "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:new=\"http://new.webservice.namespace\">"
+               + "<soapenv:Header/>"
+               + "  <soapenv:Body>"
+               + "    <new:parameter1>hello world</new:parameter1>"
+               + "  </soapenv:Body>"
+               + "</soapenv:Envelope>";
 
+       MuleMessage result = executeSoapCall(msg, "NonSpecifiedOperation", "/services/routeBasedOnSoapAction");
+       assertResultIsFault(result);
+   }
+   
+   @Test
+   public void testServerNoSoapActionNoWsdl() throws Exception
+   {
+       String msg = "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">"
+                       + "<soap:Body> <test xmlns=\"http://foo\"></test>" + "</soap:Body>" + "</soap:Envelope>";
+       String path = "/services/routeBasedOnNoSoapActionNoWsdl";
+       String expectedString = "<test xmlns=\"http://foo\"";
+       
+       MuleMessage result = executeSoapCall(msg, "", path);
+       assertResultContains(result, expectedString);
+
+       result = executeSoapCall(msg, null, path);
+       assertResultContains(result, expectedString);
+       
+
+       msg = "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:new=\"http://new.webservice.namespace\">"
+               + "<soapenv:Header/>"
+               + "  <soapenv:Body>"
+               + "    <new:parameter1>hello world</new:parameter1>"
+               + "  </soapenv:Body>"
+               + "</soapenv:Envelope>";
+       
+       result = executeSoapCall(msg, "", path);
+       assertResultContains(result, "<new:parameter1");
+
+       result = executeSoapCall(msg, null, path);
+       assertResultContains(result, "<new:parameter1");
+   }
+   
+   @Test
+   public void testServerSoapActionNoWsdl() throws Exception
+   {
+       String path = "/services/routeBasedNoWsdl";
+       
+       msg = "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:new=\"http://new.webservice.namespace\">"
+               + "<soapenv:Header/>"
+               + "  <soapenv:Body>"
+               + "    <new:parameter1>hello world</new:parameter1>"
+               + "  </soapenv:Body>"
+               + "</soapenv:Envelope>";
+       MuleMessage result = executeSoapCall(msg, "EchoOperation1", path);
+       assertResultContains(result, "<new:parameter1");
+   }
+   
+   private MuleMessage executeSoapCall(String msg, String soapAction, String path) throws MuleException {
+       Map<String, Object> props = new HashMap<String, Object>();
+       if (soapAction != null)
+       {
+           props.put("SOAPAction", soapAction);
+       }
+
+       MuleClient client = new MuleClient(muleContext);
+       return client.send("http://localhost:" + dynamicPort.getNumber() + path, msg, props);
+   }
+   
+   private void assertResultContains(MuleMessage result, String expectedString) throws Exception
+   {
+       String resString = result.getPayloadAsString();
+       System.out.println(resString);
+       assertTrue("message didn't contain the test string: " + expectedString + " but was: " + resString, resString.indexOf(expectedString) != -1);   
+   }
+   
+   private void assertResultIsFault(MuleMessage result) throws Exception
+   {
+       String resString = result.getPayloadAsString();
+       assertFalse("Status code should not be 'OK' when the proxied endpoint returns a fault",
+                   String.valueOf(HttpConstants.SC_OK).equals(result.getOutboundProperty("http.status")));
+       assertTrue(resString.indexOf("Fault") != -1);   
+   }
+
+   @Test
+   public void testOneWaySendWithSoapAction() throws Exception
+   {
         MuleClient client = new MuleClient(muleContext);
-        MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/services/routeBasedOnSoapAction", msg, props);
-        String resString = result.getPayloadAsString();
-        System.out.println(resString);
-        assertTrue(resString.indexOf("<transformed xmlns=\"http://foo\">") != -1);
+        MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/services/onewayWithSoapAction",
+            prepareOneWayTestMessage(), prepareOneWayWithSoapActionTestProperties());
+        assertEquals("", result.getPayloadAsString());
+
+        AsyncServiceWithSoapAction component = (AsyncServiceWithSoapAction) getComponent("asyncServiceWithSoapAction");
+        assertTrue(component.getLatch().await(1000, TimeUnit.MILLISECONDS));
+   }
+
+   @Test
+   public void testOneWayDispatchWithSoapAction() throws Exception
+   {
+        new MuleClient(muleContext).dispatch("http://localhost:" + dynamicPort.getNumber() + "/services/onewayWithSoapAction", prepareOneWayTestMessage(),
+            prepareOneWayWithSoapActionTestProperties());
+
+        AsyncServiceWithSoapAction component = (AsyncServiceWithSoapAction) getComponent("asyncServiceWithSoapAction");
+        assertTrue(component.getLatch().await(1000, TimeUnit.MILLISECONDS));
+   }
+
+   @Test
+   public void testOneWaySendWithSoapActionSpoofing() throws Exception
+   {
+        MuleClient client = new MuleClient(muleContext);
+        MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/services/onewayWithSoapAction",
+            prepareOneWayTestMessage(), prepareOneWaySpoofingTestProperties());
+        assertNotNull(result);
+
+        AsyncServiceWithSoapAction component = (AsyncServiceWithSoapAction) getComponent("asyncServiceWithSoapAction");
+        assertFalse(component.getLatch().await(1000, TimeUnit.MILLISECONDS));
+   }
+
+   @Test
+   public void testOneWayDispatchWithSoapActionSpoofing() throws Exception
+   {
+        new MuleClient(muleContext).dispatch("http://localhost:" + dynamicPort.getNumber() + "/services/onewayWithSoapAction", prepareOneWayTestMessage(),
+            prepareOneWaySpoofingTestProperties());
+
+        AsyncServiceWithSoapAction component = (AsyncServiceWithSoapAction) getComponent("asyncServiceWithSoapAction");
+        assertFalse(component.getLatch().await(1000, TimeUnit.MILLISECONDS));
+   }
+
+   @Test
+   public void testOneWaySendUnknownSoapAction() throws Exception
+   {
+        MuleClient client = new MuleClient(muleContext);
+        MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/services/oneway",
+            prepareOneWayTestMessage(), prepareOneWayWithSoapActionTestProperties());
+        assertNotNull(result);
+
+        AsyncService component = (AsyncService) getComponent("asyncService");
+        assertFalse(component.getLatch().await(1000, TimeUnit.MILLISECONDS));
+   }
+
+   @Test
+   public void testOneWayDispatchUnknownSoapAction() throws Exception
+   {
+        new MuleClient(muleContext).dispatch("http://localhost:" + dynamicPort.getNumber() + "/services/oneway", prepareOneWayTestMessage(),
+            prepareOneWayWithSoapActionTestProperties());
+
+        AsyncService component = (AsyncService) getComponent("asyncService");
+        assertFalse(component.getLatch().await(1000, TimeUnit.MILLISECONDS));
    }
 
    @Test
@@ -274,10 +449,10 @@ public class ProxyTestCase extends AbstractServiceAndFlowTestCase
         MuleClient client = new MuleClient(muleContext);
         MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/services/oneway",
             prepareOneWayTestMessage(), prepareOneWayTestProperties());
-        assertEquals("", result.getPayloadAsString());
+        assertNotNull(result);
 
         AsyncService component = (AsyncService) getComponent("asyncService");
-        assertTrue(component.getLatch().await(10000, TimeUnit.MILLISECONDS));
+        assertTrue(component.getLatch().await(1000, TimeUnit.MILLISECONDS));
    }
 
    @Test
@@ -287,7 +462,7 @@ public class ProxyTestCase extends AbstractServiceAndFlowTestCase
             prepareOneWayTestProperties());
 
         AsyncService component = (AsyncService) getComponent("asyncService");
-        assertTrue(component.getLatch().await(10000, TimeUnit.MILLISECONDS));
+        assertTrue(component.getLatch().await(1000, TimeUnit.MILLISECONDS));
    }
 
    /**
@@ -365,10 +540,24 @@ public class ProxyTestCase extends AbstractServiceAndFlowTestCase
                + "</soap:Body>" + "</soap:Envelope>";
     }
     
-    protected Map prepareOneWayTestProperties()
+    protected Map<String, Object> prepareOneWayTestProperties()
     {
         Map<String, Object> props = new HashMap<String, Object>();
-        props.put("SOAPAction", "http://acme.com/oneway");
+        props.put("SOAPAction", "");
+        return props;
+    }
+    
+    protected Map<String, Object> prepareOneWayWithSoapActionTestProperties()
+    {
+        Map<String, Object> props = new HashMap<String, Object>();
+        props.put("SOAPAction", "send");
+        return props;
+    }
+    
+    protected Map<String, Object> prepareOneWaySpoofingTestProperties()
+    {
+        Map<String, Object> props = new HashMap<String, Object>();
+        props.put("SOAPAction", "hiddenAction");
         return props;
     }
 
