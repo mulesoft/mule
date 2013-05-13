@@ -26,12 +26,6 @@ public class GZipTransformerObjectTestCase extends GZipTransformerTestCase
     private static final TestObject TEST_OBJECT = new TestObject(15, TEST_DATA);
 
     @Override
-    public int getTestTimeoutSecs()
-    {
-        return 99999;
-    }
-
-    @Override
     public Object getResultData()
     {
         try
