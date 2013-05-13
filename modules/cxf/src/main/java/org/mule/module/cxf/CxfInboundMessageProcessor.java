@@ -267,15 +267,22 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
             String soapAction = getSoapAction(event.getMessage());
             m.put(org.mule.module.cxf.SoapConstants.SOAP_ACTION_PROPERTY_CAPS, soapAction);
             
-            // Add protocol headers with the soap action so that the SoapActionInInterceptor can find them if it is soap v1.1
-            Map<String, List<String>> protocolHeaders = new HashMap<String, List<String>>();
-            List<String> soapActions = new ArrayList<String>();
-            if (soapAction != null && !soapAction.isEmpty())
+            // For MULE-6829
+            if (shouldSoapActionHeader())
             {
-                soapActions.add(soapAction);
+                // Add protocol headers with the soap action so that the SoapActionInInterceptor can find them if it is soap v1.1
+                Map<String, List<String>> protocolHeaders = new HashMap<String, List<String>>();
+                if (soapAction != null && !soapAction.isEmpty())
+                {
+                    List<String> soapActions = new ArrayList<String>();
+                    // An HTTP client MUST use [SOAPAction] header field when issuing a SOAP HTTP Request.
+                    // The header field value of empty string ("") means that the intent of the SOAP message is provided by the HTTP Request-URI. 
+                    // No value means that there is no indication of the intent of the message.
+                    soapActions.add(soapAction);
+                    protocolHeaders.put(SoapBindingConstants.SOAP_ACTION, soapActions);
+                }
+                m.put(Message.PROTOCOL_HEADERS, protocolHeaders);
             }
-            protocolHeaders.put(SoapBindingConstants.SOAP_ACTION, soapActions);
-            m.put(Message.PROTOCOL_HEADERS, protocolHeaders);
 
             org.apache.cxf.transport.Destination d;
             
@@ -346,6 +353,16 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
             logger.warn("Could not dispatch message to CXF!", e);
             throw e;
         }
+    }
+    
+    protected boolean shouldSoapActionHeader()
+    {
+        // Only add soap headers if we can validate the bindings. if not, cxf will throw a fault in SoapActionInInterceptor
+        // we cannot validate the bindings if we're using mule's pass-through invoke proxy service 
+        boolean isGenericProxy = "http://support.cxf.module.mule.org/"
+                .equals(getServer().getEndpoint().getService().getName().getNamespaceURI()) && 
+                "ProxyService".equals(getServer().getEndpoint().getService().getName().getLocalPart());
+        return !isGenericProxy;
     }
 
     @Override
