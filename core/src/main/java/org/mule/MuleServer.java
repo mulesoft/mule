@@ -173,7 +173,7 @@ public class MuleServer implements Runnable
     	}
     	catch (RuntimeException e)
     	{
-    		System.out.println(CoreMessages.invalidJdk(SystemUtils.JAVA_VERSION, SystemUtils.JAVA_VENDOR, 
+    		System.out.println(CoreMessages.invalidJdk(SystemUtils.JAVA_VERSION, 
     				JdkVersionUtils.getSupportedJdks()));
             System.exit(-1);
     	}
