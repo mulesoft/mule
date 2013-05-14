@@ -10,6 +10,11 @@
 
 package org.mule.util;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.config.MuleManifest;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.util.JdkVersionUtils.JdkVersion;
@@ -17,11 +22,6 @@ import org.mule.util.JdkVersionUtils.JdkVersion;
 import java.lang.reflect.Field;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 
 import org.junit.After;
 import org.junit.Before;
@@ -67,12 +67,16 @@ public class JdkVersionUtilsTestCase extends AbstractMuleTestCase
 		assertTrue(JdkVersionUtils.isSupportedJdkVersion());
 		setJdkVersion("1.6");
 		assertTrue(JdkVersionUtils.isSupportedJdkVersion());
+        setJdkVersion("1.6.20");
+        assertTrue(JdkVersionUtils.isSupportedJdkVersion());
+        setJdkVersion("1.6.0_129");
+        assertTrue(JdkVersionUtils.isSupportedJdkVersion());
 		setJdkVersion("1.7");
+		assertTrue(JdkVersionUtils.isSupportedJdkVersion());
+		setJdkVersion("1.8");
 		assertTrue(JdkVersionUtils.isSupportedJdkVersion());
 
 		//not supported
-		setJdkVersion("1.8");
-		assertFalse(JdkVersionUtils.isSupportedJdkVersion());
 		setJdkVersion("1.4.2");
 		assertFalse(JdkVersionUtils.isSupportedJdkVersion());
 		setJdkVersion("1.4.2_12");
@@ -124,18 +128,24 @@ public class JdkVersionUtilsTestCase extends AbstractMuleTestCase
 	public void testRecommendedJdkVersion()
 	{
 		// recommended
-		setJdkVersion("1.6");
+        setJdkVersion("1.6.0_129");
+        assertTrue(JdkVersionUtils.isRecommendedJdkVersion());
+        setJdkVersion("1.6.20");
+        assertTrue(JdkVersionUtils.isRecommendedJdkVersion());
+		setJdkVersion("1.7.0_03");
 		assertTrue(JdkVersionUtils.isRecommendedJdkVersion());
-		setJdkVersion("1.7");
-		assertTrue(JdkVersionUtils.isRecommendedJdkVersion());
+        setJdkVersion("1.8");
+        assertTrue(JdkVersionUtils.isRecommendedJdkVersion());
 
 		//not recommended
-		setJdkVersion("1.8");
-		assertFalse(JdkVersionUtils.isRecommendedJdkVersion());
 		setJdkVersion("1.4.2");
 		assertFalse(JdkVersionUtils.isRecommendedJdkVersion());
+        setJdkVersion("1.6");
+        assertFalse(JdkVersionUtils.isRecommendedJdkVersion());
 		setJdkVersion("1.6.0_5");
 		assertFalse(JdkVersionUtils.isRecommendedJdkVersion());
+        setJdkVersion("1.7.0");
+        assertFalse(JdkVersionUtils.isRecommendedJdkVersion());
 	}
 	
 	@Test
@@ -169,6 +179,7 @@ public class JdkVersionUtilsTestCase extends AbstractMuleTestCase
 		JdkVersion jdk1_3 = new JdkVersion("1.3");
 		JdkVersion jdk1_6_0_5 = new JdkVersion("1.6.0_5");
 		JdkVersion jdk1_7 = new JdkVersion("1.7");
+		JdkVersion jdk1_6_0_29 = new JdkVersion("1.6.0_29");
 		JdkVersion jdk1_6_0_29_b04 = new JdkVersion("1.6.0_29-b04");
 		JdkVersion jdk1_6_0_29_b05 = new JdkVersion("1.6.0_29-b05");
 		
@@ -179,11 +190,40 @@ public class JdkVersionUtilsTestCase extends AbstractMuleTestCase
 		
 		assertTrue(jdk1_6_0_5.compareTo(jdk1_6_0_29_b04) < 0);
 		assertTrue(jdk1_6_0_29_b04.compareTo(jdk1_6_0_5) > 0);
+		assertTrue(jdk1_6_0_29.compareTo(jdk1_6_0_5) > 0);
+        assertTrue(jdk1_6_0_5.compareTo(jdk1_6_0_29) < 0);
+        assertTrue(jdk1_6_0_29.compareTo(jdk1_6_0_29_b04) < 0);
+        assertTrue(jdk1_6_0_29_b04.compareTo(jdk1_6_0_29) > 0);
 		
 		assertTrue(jdk1_6_0_29_b04.compareTo(jdk1_6_0_29_b05) < 0);
 		assertTrue(jdk1_6_0_29_b05.compareTo(jdk1_6_0_29_b04) > 0);
 		
 		assertTrue(jdk1_6_0_29_b04.compareTo(jdk1_7) < 0);
 		assertTrue(jdk1_7.compareTo(jdk1_6_0_29_b04) > 0);
+	}
+	
+	@Test
+	public void testValidateJdk()
+	{
+	    JdkVersionUtils.validateJdk();
+        setJdkVersion("1.6.0");
+        JdkVersionUtils.validateJdk();
+        setJdkVersion("1.6.0_129");
+        JdkVersionUtils.validateJdk();
+        setJdkVersion("1.6.20");
+        JdkVersionUtils.validateJdk();
+        setJdkVersion("1.7.0");
+        JdkVersionUtils.validateJdk();
+        setJdkVersion("1.7.0_03");
+        JdkVersionUtils.validateJdk();
+        setJdkVersion("1.8");
+        JdkVersionUtils.validateJdk();
+	}
+	
+	@Test(expected=java.lang.RuntimeException.class)
+	public void testValidateJdk5()
+	{
+        setJdkVersion("1.5.1");
+        JdkVersionUtils.validateJdk();   
 	}
 }

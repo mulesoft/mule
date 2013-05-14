@@ -119,9 +119,13 @@ public class JdkVersionUtils
 			{
 				return 1;
 			}
+			else if (second != null)
+			{
+				return -1;
+			}
 			else
 			{
-				return 0;
+			    return 0;
 			}
 		}
 
@@ -306,12 +310,14 @@ public class JdkVersionUtils
      */
     public static void validateJdk() throws RuntimeException
     {
-    	if (!isSupportedJdkVersion())
+        if (!isSupportedJdkVersion())
         {
-        	throw new RuntimeException("Unsupported Jdk");
-        } else if (!isRecommendedJdkVersion() || !isSupportedJdkVendor()) {
-        	logger.info("You're executing with an unsupported JDK. Version: " + SystemUtils.JAVA_VERSION
-        			+ " Vendor: " + SystemUtils.JAVA_VENDOR);
+            throw new RuntimeException("Unsupported Jdk");
+        }
+        if (!isSupportedJdkVendor())
+        {
+            logger.info("You're executing with a JDK made by a vendor that is not on the recommended list of vendors. Vendor: "
+                            + SystemUtils.JAVA_VENDOR + " Please consider changing to a recommended JDK vendor.");
         }
     }
 }
