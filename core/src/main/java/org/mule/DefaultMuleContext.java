@@ -202,7 +202,7 @@ public class DefaultMuleContext implements MuleContext
         catch (RuntimeException e)
         {
         	throw new InitialisationException(CoreMessages.invalidJdk(SystemUtils.JAVA_VERSION, 
-        			SystemUtils.JAVA_VENDOR, JdkVersionUtils.getSupportedJdks()), this);
+        			JdkVersionUtils.getSupportedJdks()), this);
         }
 
         try
