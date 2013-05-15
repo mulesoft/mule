@@ -108,20 +108,6 @@ public class TransactionalQueueManager extends AbstractXAResourceManager impleme
     @Override
     protected boolean shutdown(int mode, long timeoutMSecs)
     {
-        findAllListableObjectStores();
-        for (ListableObjectStore store: listableObjectStores)
-        {
-            try
-            {
-                store.close();
-            }
-            catch (ObjectStoreException e)
-            {
-                // TODO BL-405 what to do with this exception? Looking at the call graph of this method it seems that it's never called from any production code (i.e. when shutting down MuleContext)
-                logger.error("Error closing persistent store", e);
-            }
-        }
-
         // Clear queues on shutdown to avoid duplicate entries on warm restarts (MULE-3678)
         synchronized (this)
         {
