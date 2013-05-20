@@ -639,7 +639,6 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
             try
             {
                 connection.stop();
-                connection = null;
             }
             catch (Exception e)
             {
