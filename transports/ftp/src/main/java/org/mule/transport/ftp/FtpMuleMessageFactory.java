@@ -57,14 +57,7 @@ public class FtpMuleMessageFactory extends AbstractMuleMessageFactory
                     file.getName(), ftpClient.getReplyCode()));
             }
             byte[] bytes = baos.toByteArray();
-            if (bytes.length > 0)
-            {
-                return bytes;
-            }
-            else
-            {
-                throw new IOException("File " + file.getName() + " is empty (zero bytes)");
-            }
+            return bytes;
         }
     }
 
