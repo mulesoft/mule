@@ -13,14 +13,12 @@ package org.mule.transport.jdbc;
 import org.mule.api.MuleContext;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionException;
-import org.mule.api.transaction.TransactionFactory;
+import org.mule.api.transaction.UniversalTransactionFactory;
 
-/**
- * TODO
- */
-public class JdbcTransactionFactory implements TransactionFactory
+public class JdbcTransactionFactory implements UniversalTransactionFactory
 {
 
+    @Override
     public Transaction beginTransaction(MuleContext muleContext) throws TransactionException
     {
         JdbcTransaction tx = new JdbcTransaction(muleContext);
@@ -28,9 +26,15 @@ public class JdbcTransactionFactory implements TransactionFactory
         return tx;
     }
 
+    @Override
     public boolean isTransacted()
     {
         return true;
     }
 
+    @Override
+    public Transaction createUnboundTransaction(MuleContext muleContext) throws TransactionException
+    {
+        return new JdbcTransaction(muleContext);
+    }
 }
