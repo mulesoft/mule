@@ -282,7 +282,11 @@ public interface MuleEvent extends Serializable
     /**
      * Set the reply-to destination from the current message, and remove it from the message, to prevent any
      * further propagation.
+     * @deprecated this method was used to move the replyToDestination from the message to the event. The
+     *             same must now be done explicitly inside the message receiver which creates the event.
+     *
      */
+    @Deprecated
     void captureReplyToDestination();
 
     boolean isSynchronous();

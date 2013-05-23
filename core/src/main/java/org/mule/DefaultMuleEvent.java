@@ -221,12 +221,12 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
                             FlowConstruct flowConstruct,
                             MuleSession session)
     {
-        this(message, endpoint, flowConstruct, session, null, null);
+        this(message, endpoint, flowConstruct, session, null, null, null);
     }
 
     public DefaultMuleEvent(MuleMessage message, InboundEndpoint endpoint, FlowConstruct flowConstruct)
     {
-        this(message, endpoint, flowConstruct, new DefaultMuleSession(), null, null);
+        this(message, endpoint, flowConstruct, new DefaultMuleSession(), null, null, null);
     }
 
     public DefaultMuleEvent(MuleMessage message,
@@ -234,6 +234,7 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
                             FlowConstruct flowConstruct,
                             MuleSession session,
                             ReplyToHandler replyToHandler,
+                            Object replyToDestination,
                             ResponseOutputStream outputStream)
     {
         this.id = generateEventId(message.getMuleContext());
@@ -244,6 +245,7 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
         this.outputStream = outputStream;
         this.processingTime = ProcessingTime.newInstance(this);
         this.replyToHandler = replyToHandler;
+        this.replyToDestination = replyToDestination;
         this.credentials = extractCredentials(endpoint);
         this.encoding = endpoint.getEncoding();
         this.exchangePattern = endpoint.getExchangePattern();
@@ -353,11 +355,11 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
         this.messageSourceName = messageSourceName;
         this.processingTime = ProcessingTime.newInstance(this);
         this.replyToHandler = replyToHandler;
+        this.replyToDestination = replyToDestination;
         this.transacted = transacted;
         this.synchronous = synchronous;
         this.timeout = timeout;
         this.outputStream = outputStream;
-        this.replyToDestination = replyToDestination;
     }
 
     protected boolean resolveEventSynchronicity()
@@ -863,11 +865,7 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
     @Override
     public void captureReplyToDestination()
     {
-        if (message != null)
-        {
-            replyToDestination = message.getReplyTo();
-            message.setReplyTo(null);
-        }
+
     }
 
     @Override
@@ -1118,7 +1116,7 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
     @Deprecated
     public DefaultMuleEvent(MuleMessage message, InboundEndpoint endpoint, MuleSession session)
     {
-        this(message, endpoint, session, null, null);
+        this(message, endpoint, session, null, null, null);
     }
 
     /**
@@ -1130,9 +1128,10 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
                             InboundEndpoint endpoint,
                             MuleSession session,
                             ReplyToHandler replyToHandler,
-                            ResponseOutputStream outputStream)
+                            ResponseOutputStream outputStream,
+                            Object replyToDestination)
     {
-        this(message, endpoint, session.getFlowConstruct(), session, replyToHandler, outputStream);
+        this(message, endpoint, session.getFlowConstruct(), session, replyToHandler, replyToDestination, outputStream);
     }
 
     /**

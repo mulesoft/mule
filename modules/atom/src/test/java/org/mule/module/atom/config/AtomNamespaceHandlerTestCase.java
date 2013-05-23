@@ -9,6 +9,10 @@
  */
 package org.mule.module.atom.config;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transformer.Transformer;
@@ -23,11 +27,6 @@ import org.mule.tck.junit4.FunctionalTestCase;
 import java.text.SimpleDateFormat;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 public class AtomNamespaceHandlerTestCase extends FunctionalTestCase
 {
@@ -44,7 +43,7 @@ public class AtomNamespaceHandlerTestCase extends FunctionalTestCase
         assertNotNull(flowConstruct);
         assertTrue(flowConstruct.getMessageSource() instanceof InboundEndpoint);
         InboundEndpoint ep = ((InboundEndpoint)flowConstruct.getMessageSource());
-        assertEquals(3, ep.getMessageProcessors().size());
+        assertEquals(2, ep.getMessageProcessors().size());
         MessageProcessor mp = ep.getMessageProcessors().get(0);
         assertTrue(mp instanceof FeedSplitter);
         mp = ep.getMessageProcessors().get(1);

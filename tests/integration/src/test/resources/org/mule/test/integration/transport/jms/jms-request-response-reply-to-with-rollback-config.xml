@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
+      xsi:schemaLocation="
+          http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
+          http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+          http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd">
+
+    <jms:activemq-connector name="jmsConnector"
+                            specification="1.1"
+                            numberOfConsumers="1"
+                            maxRedelivery="-1"/>
+
+    <flow name="test">
+        <jms:inbound-endpoint queue="testIn" exchange-pattern="request-response"/>
+
+        <test:component throwException="true" exceptionToThrow="java.lang.IllegalStateException"/>
+
+        <choice-exception-strategy>
+            <rollback-exception-strategy when="#[exception.causedBy(java.lang.Exception)]" maxRedeliveryAttempts="0">
+                <on-redelivery-attempts-exceeded>
+                    <set-payload value="ROLLBACK"/>
+                </on-redelivery-attempts-exceeded>
+            </rollback-exception-strategy>
+
+            <catch-exception-strategy/>
+        </choice-exception-strategy>
+    </flow>
+</mule>
