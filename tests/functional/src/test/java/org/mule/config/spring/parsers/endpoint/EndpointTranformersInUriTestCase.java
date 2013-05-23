@@ -13,7 +13,6 @@ package org.mule.config.spring.parsers.endpoint;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.api.MuleException;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.processor.MessageProcessor;
@@ -24,7 +23,6 @@ import org.mule.construct.Flow;
 import org.mule.routing.outbound.OutboundPassThroughRouter;
 import org.mule.service.ServiceCompositeMessageSource;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
-import org.mule.tck.AbstractServiceAndFlowTestCase.ConfigVariant;
 import org.mule.tck.testmodels.mule.TestInboundTransformer;
 import org.mule.tck.testmodels.mule.TestResponseTransformer;
 
@@ -58,7 +56,7 @@ public class EndpointTranformersInUriTestCase extends AbstractServiceAndFlowTest
         
         List <MessageProcessor> processors = endpoint.getMessageProcessors();
         assertNotNull(processors);
-        assertEquals(2, processors.size());
+        assertEquals(1, processors.size());
         assertTrue(processors.get(0) instanceof TestInboundTransformer);
         // For backwards-compatibility only
         List <Transformer> transformers = endpoint.getTransformers();
@@ -84,7 +82,7 @@ public class EndpointTranformersInUriTestCase extends AbstractServiceAndFlowTest
         
         List <MessageProcessor> processors = endpoint.getMessageProcessors();
         assertNotNull(processors);
-        assertEquals(3, processors.size());
+        assertEquals(2, processors.size());
         assertTrue(processors.get(0) instanceof TestInboundTransformer);
         assertTrue(processors.get(1) instanceof TestInboundTransformer);
         // For backwards-compatibility only
@@ -125,7 +123,7 @@ public class EndpointTranformersInUriTestCase extends AbstractServiceAndFlowTest
         
         List <MessageProcessor> processors = endpoint.getMessageProcessors();
         assertNotNull(processors);
-        assertEquals(2, processors.size());
+        assertEquals(1, processors.size());
         assertTrue(processors.get(0) instanceof TestInboundTransformer);
         // For backwards-compatibility only
         List <Transformer> transformers = endpoint.getTransformers();
@@ -196,7 +194,7 @@ public class EndpointTranformersInUriTestCase extends AbstractServiceAndFlowTest
         
         List <MessageProcessor> processors = endpoint.getMessageProcessors();
         assertNotNull(processors);
-        assertEquals(2, processors.size());
+        assertEquals(1, processors.size());
         assertTrue(processors.get(0) instanceof TestInboundTransformer);
         // For backwards-compatibility only
         List <Transformer> transformers = endpoint.getTransformers();

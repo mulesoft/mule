@@ -13,14 +13,12 @@ package org.mule.config.spring.parsers.endpoint;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.api.MuleException;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorChain;
 import org.mule.api.routing.OutboundRouterCollection;
 import org.mule.construct.Flow;
-import org.mule.endpoint.DefaultInboundEndpoint;
 import org.mule.routing.outbound.OutboundPassThroughRouter;
 import org.mule.service.ServiceCompositeMessageSource;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
@@ -56,7 +54,7 @@ public class EndpointMessageProcessorsTestCase extends AbstractServiceAndFlowTes
 
         List<MessageProcessor> processors = endpoint.getMessageProcessors();
         assertNotNull(processors);
-        assertEquals(2, processors.size());
+        assertEquals(1, processors.size());
         assertTrue(processors.get(0) instanceof TestMessageProcessor);
 
         processors = endpoint.getResponseMessageProcessors();
@@ -72,7 +70,7 @@ public class EndpointMessageProcessorsTestCase extends AbstractServiceAndFlowTes
 
         List<MessageProcessor> processors = endpoint.getMessageProcessors();
         assertNotNull(processors);
-        assertEquals(3, processors.size());
+        assertEquals(2, processors.size());
         assertEquals("1", ((TestMessageProcessor) processors.get(0)).getLabel());
         assertEquals("2", ((TestMessageProcessor) processors.get(1)).getLabel());
 
@@ -105,7 +103,7 @@ public class EndpointMessageProcessorsTestCase extends AbstractServiceAndFlowTes
 
         List<MessageProcessor> processors = endpoint.getMessageProcessors();
         assertNotNull(processors);
-        assertEquals(3, processors.size());
+        assertEquals(2, processors.size());
         assertEquals("A", ((TestMessageProcessor) processors.get(0)).getLabel());
         assertEquals("B", ((TestMessageProcessor) processors.get(1)).getLabel());
 

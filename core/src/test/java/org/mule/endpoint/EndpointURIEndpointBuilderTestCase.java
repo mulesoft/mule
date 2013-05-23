@@ -10,6 +10,10 @@
 
 package org.mule.endpoint;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import org.mule.MessageExchangePattern;
 import org.mule.api.MuleException;
 import org.mule.api.endpoint.EndpointBuilder;
@@ -25,11 +29,6 @@ import org.mule.transformer.simple.StringAppendTransformer;
 import org.mule.util.ObjectNameHelper;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 public class EndpointURIEndpointBuilderTestCase extends AbstractMuleContextTestCase
 {
@@ -132,12 +131,12 @@ public class EndpointURIEndpointBuilderTestCase extends AbstractMuleContextTestC
 
         InboundEndpoint endpoint = endpointBuilder.buildInboundEndpoint();
 
-        assertEquals(3, endpoint.getMessageProcessors().size());
+        assertEquals(2, endpoint.getMessageProcessors().size());
         assertEquals(2, endpoint.getResponseMessageProcessors().size());
 
         endpoint = endpointBuilder.buildInboundEndpoint();
 
-        assertEquals(3, endpoint.getMessageProcessors().size());
+        assertEquals(2, endpoint.getMessageProcessors().size());
         assertEquals(2, endpoint.getResponseMessageProcessors().size());
     }
     
