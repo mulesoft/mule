@@ -10,6 +10,7 @@
 
 package org.mule.config.spring.parsers.specific;
 
+import static org.junit.Assert.assertEquals;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
@@ -17,8 +18,6 @@ import org.mule.processor.NullMessageProcessor;
 import org.mule.tck.junit4.FunctionalTestCase;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
 
 public class CompositeMessageProcessorDefinitionParserTestCase extends FunctionalTestCase
 {
@@ -48,7 +47,7 @@ public class CompositeMessageProcessorDefinitionParserTestCase extends Functiona
     {
         EndpointBuilder endpointBuilder = muleContext.getRegistry().lookupEndpointBuilder("endpoint");
         InboundEndpoint endpoint = endpointBuilder.buildInboundEndpoint();
-        assertEquals(3, endpoint.getMessageProcessors().size());
+        assertEquals(2, endpoint.getMessageProcessors().size());
 
         MessageProcessor endpointProcessor = endpoint.getMessageProcessorsFactory()
             .createInboundMessageProcessorChain(endpoint, null, new NullMessageProcessor());

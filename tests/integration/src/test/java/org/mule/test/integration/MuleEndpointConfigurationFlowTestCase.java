@@ -85,7 +85,7 @@ public class MuleEndpointConfigurationFlowTestCase extends FunctionalTestCase
         assertNotNull(flow);
         assertNotNull(((Flow) flow).getMessageSource());
 
-        assertEquals(2, ((DefaultInboundEndpoint) ((Flow) flow).getMessageSource()).getMessageProcessors()
+        assertEquals(1, ((DefaultInboundEndpoint) ((Flow) flow).getMessageSource()).getMessageProcessors()
             .size());
 
         ImmutableEndpoint endpoint = ((DefaultInboundEndpoint) ((Flow) flow).getMessageSource());
