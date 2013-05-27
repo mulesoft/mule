@@ -16,6 +16,8 @@ package org.mule.api;
 public class ConnectionException extends Exception
 {
 
+    private static final long serialVersionUID = 1131270076379901356L;
+
     /**
      * Exception code
      */
