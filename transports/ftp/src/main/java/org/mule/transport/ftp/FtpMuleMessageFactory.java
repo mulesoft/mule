@@ -80,9 +80,9 @@ public class FtpMuleMessageFactory extends AbstractMuleMessageFactory
         super.addProperties(message, transportMessage);
         
         FTPFile file = (FTPFile) transportMessage;
-        message.setInboundProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, file.getName());
-        message.setInboundProperty(FileConnector.PROPERTY_FILE_SIZE, file.getSize());
-        message.setInboundProperty(FileConnector.PROPERTY_FILE_TIMESTAMP, file.getTimestamp());
+        message.setOutboundProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, file.getName());
+        message.setOutboundProperty(FileConnector.PROPERTY_FILE_SIZE, file.getSize());
+        message.setOutboundProperty(FileConnector.PROPERTY_FILE_TIMESTAMP, file.getTimestamp());
     }
 
     public void setFtpClient(FTPClient ftpClient)

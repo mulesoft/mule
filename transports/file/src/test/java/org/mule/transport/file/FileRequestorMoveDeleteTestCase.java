@@ -10,10 +10,6 @@
 
 package org.mule.transport.file;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 import org.mule.api.MessagingException;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
@@ -28,6 +24,10 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class FileRequestorMoveDeleteTestCase extends AbstractFileMoveDeleteTestCase
 {
@@ -174,7 +174,7 @@ public class FileRequestorMoveDeleteTestCase extends AbstractFileMoveDeleteTestC
         Thread.sleep(2000);
 
         assertNotNull(message);
-        assertEquals(inFile.getName(), message.getInboundProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME));
+        assertEquals(inFile.getName(), message.getOutboundProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME));
 
         assertNotNull(message.getPayload());
         if (streaming)

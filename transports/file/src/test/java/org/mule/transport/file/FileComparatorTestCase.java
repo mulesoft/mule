@@ -9,9 +9,6 @@
  */
 package org.mule.transport.file;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
 import org.mule.api.MuleEventContext;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
@@ -23,6 +20,9 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class FileComparatorTestCase extends FunctionalTestCase
 {
@@ -48,7 +48,7 @@ public class FileComparatorTestCase extends FunctionalTestCase
             public void eventReceived(MuleEventContext context, Object component) throws Exception
             {
                 int index = (int) countDown.getCount() - 1;
-                assertEquals(FILE_NAMES[index], context.getMessage().getInboundProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME));
+                assertEquals(FILE_NAMES[index], context.getMessage().getOutboundProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME));
                 countDown.countDown();
             }
         };

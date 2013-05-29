@@ -10,9 +10,6 @@
 
 package org.mule.transport.file;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 import org.mule.RequestContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
@@ -27,6 +24,9 @@ import java.io.File;
 import java.io.InputStream;
 
 import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class AutoDeleteOnFileDispatcherReceiverTestCase extends AbstractMuleContextTestCase
 {
@@ -52,7 +52,7 @@ public class AutoDeleteOnFileDispatcherReceiverTestCase extends AbstractMuleCont
         assertTrue(files.length > 0);
         for (int i = 0; i < files.length; i++)
         {
-            assertTrue(files[i].getName().equals(message.getInboundProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME)));
+            assertTrue(files[i].getName().equals(message.getOutboundProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME)));
             files[i].delete();
         }
     }
