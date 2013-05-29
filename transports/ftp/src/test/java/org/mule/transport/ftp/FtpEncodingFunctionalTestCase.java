@@ -50,7 +50,7 @@ public class FtpEncodingFunctionalTestCase extends AbstractFtpServerTestCase
     @Test
     public void testReadingFileWithEucJpEncodingGetsTheRightText() throws Exception
     {
-        File tmpDir = new File(FTP_SERVER_BASE_DIR);
+        File tmpDir = getFtpServerBaseDir();
         testDataFile = createDataFile(tmpDir, ENCODING, TEST_MESSAGE_EUC_JP_ENCODED);
 
         MuleClient client = new MuleClient(muleContext);
@@ -59,15 +59,6 @@ public class FtpEncodingFunctionalTestCase extends AbstractFtpServerTestCase
         assertNotNull(message);
         assertEquals(ENCODING, message.getEncoding());
         assertEquals(TEST_MESSAGE_EUC_JP_ENCODED, message.getPayloadAsString());
-    }
-
-    private File createDataFile(File folder, String encoding, final String testMessage) throws Exception
-    {
-        File target = File.createTempFile("mule-file-test-", ".txt", folder);
-        target.deleteOnExit();
-        FileUtils.writeStringToFile(target, testMessage, encoding);
-
-        return target;
     }
 
     @Override

@@ -10,6 +10,7 @@
 
 package org.mule.transport.sftp;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.LocalMuleClient;
@@ -19,28 +20,29 @@ import java.io.IOException;
 
 import org.junit.Test;
 
-public class SftpFileWithOutExtensionTestCase extends AbstractSftpFunctionalTestCase
+public class SftpFileNameFilterTestCase extends AbstractSftpFunctionalTestCase
 {
 
     @Override
     protected String getConfigResources()
     {
-        return "mule-sftp-file-without-extension-config.xml";
+        return "sftp-filename-filter-config.xml";
     }
 
     @Override
     protected void setUpTestData() throws IOException
     {
-        sftpClient.storeFile("file", new ByteArrayInputStream(TEST_MESSAGE.getBytes()));
+        sftpClient.storeFile("file.txt", new ByteArrayInputStream(TEST_MESSAGE.getBytes()));
     }
 
     @Test
-    public void readsFileWithNoExtension() throws Exception
+    public void filtersFile() throws Exception
     {
         LocalMuleClient client = muleContext.getClient();
 
         MuleMessage response = client.request("vm://testOut", RECEIVE_TIMEOUT);
 
         assertNotNull("Did not processed the file", response);
+        assertEquals(TEST_MESSAGE, response.getPayload());
     }
 }

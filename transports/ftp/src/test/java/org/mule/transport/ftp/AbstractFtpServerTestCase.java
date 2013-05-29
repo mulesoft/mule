@@ -195,4 +195,23 @@ public abstract class AbstractFtpServerTestCase extends AbstractServiceAndFlowTe
     {
         // subclasses can override this method
     }
+
+    protected File getFtpServerBaseDir()
+    {
+        return new File(FTP_SERVER_BASE_DIR);
+    }
+
+    protected File createDataFile(File folder, final String testMessage) throws Exception
+    {
+        return createDataFile(folder, "UTF-8", testMessage);
+
+    }
+    protected File createDataFile(File folder, String encoding, final String testMessage) throws Exception
+    {
+        File target = File.createTempFile("mule-file-test-", ".txt", folder);
+        target.deleteOnExit();
+        FileUtils.writeStringToFile(target, testMessage, encoding);
+
+        return target;
+    }
 }
