@@ -15,6 +15,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import org.mule.api.MuleEventContext;
+import org.mule.api.transport.PropertyScope;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.functional.EventCallback;
 
@@ -98,8 +99,7 @@ public class SftpPoolingFunctionalTestCase extends AbstractSftpTestCase
             public void eventReceived(MuleEventContext context, Object component) throws Exception
             {
 
-                String filename = context.getMessage().getProperty(SftpConnector.PROPERTY_ORIGINAL_FILENAME,
-                    null);
+                String filename = context.getMessage().getProperty(SftpConnector.PROPERTY_ORIGINAL_FILENAME, PropertyScope.INBOUND);
                 SftpInputStream inputStream = null;
                 try
                 {

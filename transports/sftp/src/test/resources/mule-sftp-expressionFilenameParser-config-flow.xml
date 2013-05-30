@@ -35,7 +35,7 @@
 
         <sftp:outbound-endpoint
             address="sftp://${USER1_NAME}@${SFTP_HOST}:${SFTP_PORT}/~/outbound"
-            outputPattern="#[header:originalFilename]" name="outboundEndpoint">
+            outputPattern="#[header:inbound:originalFilename]" name="outboundEndpoint">
         </sftp:outbound-endpoint>
 
     </flow>

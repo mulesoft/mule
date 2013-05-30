@@ -299,7 +299,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
         // This isn't nice but is needed as MuleMessage is required to resolve
         // destination file name
         DefaultMuleMessage fileParserMessasge = new DefaultMuleMessage(null, connector.getMuleContext());
-        fileParserMessasge.setOutboundProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, file.getName());
+        fileParserMessasge.setInboundProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, file.getName());
 
         // The file may get moved/renamed here so store the original file info.
         final String originalSourceFile = file.getAbsolutePath();
@@ -381,7 +381,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
             message.setProperty(FileConnector.PROPERTY_SOURCE_FILENAME, file.getName(), PropertyScope.INBOUND);
         }
 
-        message.setOutboundProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, originalSourceFileName);
+        message.setInvocationProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, originalSourceFileName);
         if (forceSync)
         {
             message.setProperty(MuleProperties.MULE_FORCE_SYNC_PROPERTY, Boolean.TRUE, PropertyScope.INBOUND);
@@ -556,8 +556,8 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
 
             // create new Message for destinationFile
             message = createMuleMessage(destinationFile, endpoint.getEncoding());
-            message.setOutboundProperty(FileConnector.PROPERTY_FILENAME, destinationFile.getName());
-            message.setOutboundProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, sourceFileOriginalName);
+            message.setProperty(FileConnector.PROPERTY_FILENAME, destinationFile.getName(), PropertyScope.INBOUND);
+            message.setProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, sourceFileOriginalName, PropertyScope.INBOUND);
         }
 
         // finally deliver the file message

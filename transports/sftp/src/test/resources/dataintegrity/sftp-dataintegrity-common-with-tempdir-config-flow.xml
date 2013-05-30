@@ -18,7 +18,7 @@
             name="inboundEndpoint" pollingFrequency="500" />
         <sftp:outbound-endpoint
             address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}:${SFTP_PORT}/~/outbound"
-            tempDir="uploading" outputPattern="#[header:originalFilename]"
+            tempDir="uploading" outputPattern="#[header:inbound:originalFilename]"
             keepFileOnError="true" name="outboundEndpoint" />
     </flow>
 

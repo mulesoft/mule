@@ -33,7 +33,7 @@
                 <pass-through-router>
                     <sftp:outbound-endpoint
                         address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}:${SFTP_PORT}/~/outbound"
-                        tempDir="uploading" outputPattern="#[header:originalFilename]"
+                        tempDir="uploading" outputPattern="#[header:inbound:originalFilename]"
                         exchange-pattern="request-response"
                         keepFileOnError="true" name="outboundEndpoint"
                         duplicateHandling="addSeqNo" />
@@ -52,7 +52,7 @@
                     <!-- tempDir="uploading" -->
                     <sftp:outbound-endpoint
                         address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}:${SFTP_PORT}/~/outbound2"
-                        tempDir="uploading" outputPattern="#[header:originalFilename]"
+                        tempDir="uploading" outputPattern="#[header:inbound:originalFilename]"
                         exchange-pattern="request-response"
                         keepFileOnError="true" name="outboundEndpoint2"
                         duplicateHandling="throwException" />
