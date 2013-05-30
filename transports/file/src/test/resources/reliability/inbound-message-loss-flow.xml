@@ -50,7 +50,7 @@
     </flow>
     <flow name="RollbackExceptionStrategyCommit" >
         <file:inbound-endpoint path=".mule/rollbackOnException" >
-            <idempotent-redelivery-policy idExpression="#[header:OUTBOUND:originalFilename]"/>
+            <idempotent-redelivery-policy idExpression="#[header:inbound:originalFilename]"/>
         </file:inbound-endpoint>
         <test:component throwException="true"/>
         <rollback-exception-strategy maxRedeliveryAttempts="2"/>

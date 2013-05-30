@@ -17,6 +17,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.routing.filter.Filter;
+import org.mule.api.transport.PropertyScope;
 import org.mule.transport.AbstractMessageRequester;
 import org.mule.transport.file.i18n.FileMessages;
 import org.mule.util.FileUtils;
@@ -182,7 +183,7 @@ public class FileMessageRequester extends AbstractMessageRequester
                     logger.error("File being read disappeared!", e);
                     return null;
                 }
-                returnMessage.setOutboundProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, sourceFileOriginalName);
+                returnMessage.setProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, sourceFileOriginalName, PropertyScope.INBOUND);
 
                 if (!fileConnector.isStreaming())
                 {
@@ -202,8 +203,7 @@ public class FileMessageRequester extends AbstractMessageRequester
         // This isn't nice but is needed as MuleMessage is required to resolve
         // destination file name
         DefaultMuleMessage fileParserMessasge = new DefaultMuleMessage(null, fileConnector.getMuleContext());
-        fileParserMessasge.setOutboundProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME,
-            originalName);
+        fileParserMessasge.setInboundProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, originalName);
 
         return fileConnector.getFilenameParser().getFilename(fileParserMessasge, pattern);
     }

@@ -19,6 +19,7 @@ import org.mule.api.execution.ExecutionCallback;
 import org.mule.api.execution.ExecutionTemplate;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.transport.PropertyScope;
 import org.mule.construct.Flow;
 import org.mule.processor.strategy.SynchronousProcessingStrategy;
 import org.mule.transport.AbstractPollingMessageReceiver;
@@ -161,8 +162,8 @@ public class SftpMessageReceiver extends AbstractPollingMessageReceiver
 
                 MuleMessage message = createMuleMessage(inputStream);
 
-                message.setOutboundProperty(SftpConnector.PROPERTY_FILENAME, path);
-                message.setOutboundProperty(SftpConnector.PROPERTY_ORIGINAL_FILENAME, path);
+                message.setProperty(SftpConnector.PROPERTY_FILENAME, path, PropertyScope.INBOUND);
+                message.setProperty(SftpConnector.PROPERTY_ORIGINAL_FILENAME, path, PropertyScope.INBOUND);
 
                 // Now we have access to the message, update the notifier with the message
                 notifier.setMessage(message);

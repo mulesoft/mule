@@ -54,7 +54,7 @@ public class FileConnector extends AbstractConnector
     private static Log logger = LogFactory.getLog(FileConnector.class);
 
     public static final String FILE = "file";
-    private static final String DEFAULT_WORK_FILENAME_PATTERN = "#[function:uuid].#[function:systime].#[header:originalFilename]";
+    private static final String DEFAULT_WORK_FILENAME_PATTERN = "#[function:uuid].#[function:systime].#[header:inbound:originalFilename]";
 
     // These are properties that can be overridden on the Receiver by the endpoint declaration
     // inbound only

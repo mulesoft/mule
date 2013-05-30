@@ -11,15 +11,15 @@
     </spring:beans>
 
     <sftp:connector name="sftpCustomConnector"
-        pollingFrequency="500" autoDelete="true" outputPattern="#[header:originalFilename]"
+        pollingFrequency="500" autoDelete="true" outputPattern="#[header:inbound:originalFilename]"
         identityFile="${USER1_IDENTITYFILE}" passphrase="${USER1_IDENTITYFILE_PASSPHRASE}" />
 
     <sftp:connector name="sftpCustomConnectorTempDirOutbound"
-        outputPattern="#[header:originalFilename]" identityFile="${USER1_IDENTITYFILE}"
+        outputPattern="#[header:inbound:originalFilename]" identityFile="${USER1_IDENTITYFILE}"
         passphrase="${USER1_IDENTITYFILE_PASSPHRASE}" tempDirOutbound="uploading" />
 
     <sftp:connector name="sftpCustomConnectorTempDirInbound"
-        outputPattern="#[header:originalFilename]" identityFile="${USER1_IDENTITYFILE}"
+        outputPattern="#[header:inbound:originalFilename]" identityFile="${USER1_IDENTITYFILE}"
         passphrase="${USER1_IDENTITYFILE_PASSPHRASE}" tempDirInbound="uploading" />
 
     <spring:bean name="endpointMessageNotificationLogger"
