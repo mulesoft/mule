@@ -19,10 +19,6 @@
             <artifactId>mule-module-xml</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <dependency>
-            <groupId>javax.activation</groupId>
-            <artifactId>activation</artifactId>
-        </dependency>
 
         <!-- Unit tests -->
         <dependency>

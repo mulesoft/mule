@@ -118,7 +118,6 @@
         <jerseyVersion>1.6</jerseyVersion>
         <jaxbApiVersion>2.1</jaxbApiVersion>
         <javassistVersion>3.7.ga</javassistVersion>
-        <javaActivationVersion>1.1</javaActivationVersion>
         <javaMailVersion>1.4.3</javaMailVersion>
         <javaScriptVersion>2.0.5</javaScriptVersion>
         <javaXmlBindVersion>2.1.9</javaXmlBindVersion>
@@ -561,11 +560,6 @@
                 <groupId>org.apache.geronimo.specs</groupId>
                 <artifactId>geronimo-jta_1.1_spec</artifactId>
                 <version>${geronimoSpecsJtaVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>javax.activation</groupId>
-                <artifactId>activation</artifactId>
-                <version>${javaActivationVersion}-osgi</version>
             </dependency>
             <dependency>
                 <groupId>javax.mail</groupId>
