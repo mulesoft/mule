@@ -491,7 +491,6 @@
 /mule-standalone-${productVersion}/lib/opt/abdera-parser-0.4.0-incubating.jar
 /mule-standalone-${productVersion}/lib/opt/abdera-server-0.4.0-incubating.jar
 /mule-standalone-${productVersion}/lib/opt/abdera-spring-0.4.0-incubating.jar
-/mule-standalone-${productVersion}/lib/opt/activation-1.1-osgi.jar
 /mule-standalone-${productVersion}/lib/opt/annotations-api-6.0.29.jar
 /mule-standalone-${productVersion}/lib/opt/ant-1.7.0.jar
 /mule-standalone-${productVersion}/lib/opt/ant-launcher-1.7.0.jar
