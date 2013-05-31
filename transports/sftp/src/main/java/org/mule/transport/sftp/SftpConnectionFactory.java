@@ -10,18 +10,21 @@
 
 package org.mule.transport.sftp;
 
-import org.apache.commons.pool.PoolableObjectFactory;
-import org.apache.log4j.Logger;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.util.StringUtils;
 
 import java.io.IOException;
+
+import org.apache.commons.pool.PoolableObjectFactory;
+import org.apache.log4j.Logger;
 
 public class SftpConnectionFactory implements PoolableObjectFactory
 {
     private final static Logger logger = Logger.getLogger(SftpConnectionFactory.class);
 
     private final ImmutableEndpoint endpoint;
+    private String preferredAuthenticationMethods;
 
     public SftpConnectionFactory(ImmutableEndpoint endpoint)
     {
@@ -41,10 +44,15 @@ public class SftpConnectionFactory implements PoolableObjectFactory
 
     public Object makeObject() throws Exception
     {
-        return createClient(endpoint);
+        return createClient(endpoint, preferredAuthenticationMethods);
     }
 
     public static SftpClient createClient(ImmutableEndpoint endpoint) throws Exception
+    {
+        return createClient(endpoint, null);
+    }
+
+    public static SftpClient createClient(ImmutableEndpoint endpoint, String preferredAuthenticationMethods) throws IOException
     {
         EndpointURI endpointURI = endpoint.getEndpointURI();
 
@@ -55,6 +63,10 @@ public class SftpConnectionFactory implements PoolableObjectFactory
         }
 
         SftpClient client = new SftpClient(host);
+        if (!StringUtils.isEmpty(preferredAuthenticationMethods))
+        {
+            client.setPreferredAuthenticationMethods(preferredAuthenticationMethods);
+        }
 
         try
         {
@@ -132,5 +144,10 @@ public class SftpConnectionFactory implements PoolableObjectFactory
             logger.debug("Inside validateObject - will return " + client.isConnected());
         }
         return client.isConnected();
+    }
+
+    public void setPreferredAuthenticationMethods(String preferredAuthenticationMethods)
+    {
+        this.preferredAuthenticationMethods = preferredAuthenticationMethods;
     }
 }

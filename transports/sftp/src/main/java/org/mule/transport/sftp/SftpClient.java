@@ -17,6 +17,7 @@ import static org.mule.transport.sftp.notification.SftpTransportNotification.SFT
 
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.transport.sftp.notification.SftpNotifier;
+import org.mule.util.StringUtils;
 
 import com.jcraft.jsch.Channel;
 import com.jcraft.jsch.ChannelSftp;
@@ -45,11 +46,12 @@ import org.apache.commons.logging.LogFactory;
 
 public class SftpClient
 {
-    private Log logger = LogFactory.getLog(getClass());
 
     public static final String CHANNEL_SFTP = "sftp";
-
     public static final String STRICT_HOST_KEY_CHECKING = "StrictHostKeyChecking";
+    public static final String PREFERRED_AUTHENTICATION_METHODS = "PreferredAuthentications";
+
+    private Log logger = LogFactory.getLog(getClass());
 
     private ChannelSftp channelSftp;
 
@@ -68,6 +70,8 @@ public class SftpClient
     private String currentDirectory = "";
 
     private static final Object lock = new Object();
+
+    private String preferredAuthenticationMethods;
 
     public SftpClient(String host)
     {
@@ -127,6 +131,10 @@ public class SftpClient
         {
             Properties hash = new Properties();
             hash.put(STRICT_HOST_KEY_CHECKING, "no");
+            if (!StringUtils.isEmpty(preferredAuthenticationMethods))
+            {
+                hash.put(PREFERRED_AUTHENTICATION_METHODS, preferredAuthenticationMethods);
+            }
 
             session = jsch.getSession(user, host);
             session.setConfig(hash);
@@ -171,6 +179,10 @@ public class SftpClient
 
             Properties hash = new Properties();
             hash.put(STRICT_HOST_KEY_CHECKING, "no");
+            if (!StringUtils.isEmpty(preferredAuthenticationMethods))
+            {
+                hash.put(PREFERRED_AUTHENTICATION_METHODS, preferredAuthenticationMethods);
+            }
 
             session = jsch.getSession(user, host);
             session.setConfig(hash);
@@ -679,5 +691,10 @@ public class SftpClient
         }
         this.changeWorkingDirectory("..");
         this.deleteDirectory(dir);
+    }
+
+    public void setPreferredAuthenticationMethods(String preferredAuthenticationMethods)
+    {
+        this.preferredAuthenticationMethods = preferredAuthenticationMethods;
     }
 }

@@ -52,6 +52,13 @@
                 <xsd:attributeGroup ref="commonKeyAuthenticationAttributes"/>
                 <xsd:attributeGroup ref="connectorAttributes"/>
                 <xsd:attributeGroup ref="commonEndpointAndConnectorAttributes"/>
+                <xsd:attribute name="preferredAuthenticationMethods" type="xsd:string" use="optional">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Comma separated list of authentication methods used by the SFTP client. Valid values are: gssapi-with-mic, publickey, keyboard-interactive and password.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
