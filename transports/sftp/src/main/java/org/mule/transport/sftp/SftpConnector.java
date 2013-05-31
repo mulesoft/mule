@@ -10,6 +10,7 @@
 
 package org.mule.transport.sftp;
 
+import static org.mule.transport.sftp.AuthenticationMethodValidator.validateAuthenticationMethods;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.construct.FlowConstruct;
@@ -100,6 +101,7 @@ public class SftpConnector extends AbstractConnector
     private String archiveDir = "";
     private String archiveTempReceivingDir = "";
     private String archiveTempSendingDir = "";
+    private String preferredAuthenticationMethods;
 
     /**
      * Should the file be kept if an error occurs when writing the file on the
@@ -166,7 +168,7 @@ public class SftpConnector extends AbstractConnector
             logger.debug("Set polling frequency to: " + polling);
         }
 
-        return serviceDescriptor.createMessageReceiver(this, flow, endpoint, new Object[]{polling});
+        return serviceDescriptor.createMessageReceiver(this, flow, endpoint, new Object[] {polling});
     }
 
     public SftpClient createSftpClient(ImmutableEndpoint endpoint) throws Exception
@@ -188,7 +190,7 @@ public class SftpConnector extends AbstractConnector
             }
             else
             {
-                client = SftpConnectionFactory.createClient(endpoint);
+                client = SftpConnectionFactory.createClient(endpoint, preferredAuthenticationMethods);
             }
 
             // We have to set the working directory before returning
@@ -276,7 +278,9 @@ public class SftpConnector extends AbstractConnector
                 logger.debug("Pool is null - creating one for endpoint " + endpoint.getEndpointURI()
                              + " with max size " + getMaxConnectionPoolSize());
             }
-            pool = new GenericObjectPool(new SftpConnectionFactory(endpoint), getMaxConnectionPoolSize());
+            SftpConnectionFactory factory = new SftpConnectionFactory(endpoint);
+            factory.setPreferredAuthenticationMethods(preferredAuthenticationMethods);
+            pool = new GenericObjectPool(factory, getMaxConnectionPoolSize());
             pool.setTestOnBorrow(isValidateConnections());
             pools.put(endpoint.getEndpointURI(), pool);
         }
@@ -575,4 +579,17 @@ public class SftpConnector extends AbstractConnector
     {
         keepFileOnError = pKeepFileOnError;
     }
+
+    public String getPreferredAuthenticationMethods()
+    {
+        return preferredAuthenticationMethods;
+    }
+
+    public void setPreferredAuthenticationMethods(String preferredAuthenticationMethods)
+    {
+        validateAuthenticationMethods(preferredAuthenticationMethods);
+        
+        this.preferredAuthenticationMethods = preferredAuthenticationMethods;
+    }
+
 }
