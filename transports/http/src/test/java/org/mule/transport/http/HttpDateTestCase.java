@@ -10,6 +10,9 @@
 
 package org.mule.transport.http;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.transport.http.transformers.MuleMessageToHttpResponse;
@@ -18,13 +21,30 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 
+import org.joda.time.DateTimeZone;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
-
-import static org.junit.Assert.*;
 
 @SmallTest
 public class HttpDateTestCase extends AbstractMuleTestCase
 {
+    private DateTimeZone savedDateTimeZone;
+
+    @Before
+    public void initDefaultDateTimeZone()
+    {
+        savedDateTimeZone = DateTimeZone.getDefault();
+
+        DateTimeZone pst = DateTimeZone.forID("America/Los_Angeles");
+        DateTimeZone.setDefault(pst);
+    }
+
+    @After
+    public void restoreDefaultDateTimeZone()
+    {
+        DateTimeZone.setDefault(savedDateTimeZone);
+    }
 
     @Test
     public void testParsingBackwardsCompatibility()
@@ -32,11 +52,17 @@ public class HttpDateTestCase extends AbstractMuleTestCase
         String originalFormat = "EEE, dd MMM yyyy hh:mm:ss zzz";
         SimpleDateFormat originalFormatter = new SimpleDateFormat(originalFormat, Locale.US);
 
-        String[] dates = new String[] {"Tue, 15 Nov 1994 08:12:31 GMT", "Tue, 15 Nov 1994 08:12:31 -0300", 
-                "Tue, 15 Nov 1994 08:12:31 +0400", "Tue, 15 Nov 1994 08:12:31 +0230", 
-                "Tue, 15 Nov 1994 08:12:31 PST", "Tue, 15 Jun 1994 08:12:31 PDT",
-                "Tue, 15 Nov 2013 00:00:00 EST", "Tue, 15 Nov 2013 23:59:59 EST",
-                "Thu, 28 Mar 2013 13:15:40 -0700"}; 
+        String[] dates = new String[] {
+            "Tue, 15 Nov 1994 08:12:31 GMT",
+            "Tue, 15 Nov 1994 08:12:31 -0300",
+            "Tue, 15 Nov 1994 08:12:31 +0400",
+            "Tue, 15 Nov 1994 08:12:31 +0230",
+            "Tue, 15 Nov 1994 08:12:31 PST",
+            "Tue, 15 Jun 1994 08:12:31 PDT",
+            "Tue, 15 Nov 2013 00:00:00 EST",
+            "Tue, 15 Nov 2013 23:59:59 EST",
+            "Thu, 28 Mar 2013 13:15:40 -0700"
+        };
         //, "Tue, 15 Nov 2013 23:12:31 UT" >> UT fails to parse in original parser even though it is valid in rfc822
 
         for (String date : dates)
@@ -50,6 +76,7 @@ public class HttpDateTestCase extends AbstractMuleTestCase
             {
                 fail("Parsing failed with original parser: " + date);
             }
+
             String newDateStr = MuleMessageToHttpResponse.formatDate(originalMillis);
             try
             {
@@ -64,5 +91,3 @@ public class HttpDateTestCase extends AbstractMuleTestCase
         }
     }
 }
-
-
