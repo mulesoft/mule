@@ -14,7 +14,6 @@ import org.mule.util.counters.CounterFactory.Type;
 
 public class Max extends AggregateCounter
 {
-
     private double max = Double.MIN_VALUE;
 
     public Max(String name, AbstractCounter base)
@@ -22,11 +21,13 @@ public class Max extends AggregateCounter
         super(name, Type.MAX, base);
     }
 
+    @Override
     public double nextValue()
     {
         return max;
     }
 
+    @Override
     public void doCompute()
     {
         double next = this.getBase().nextValue();
@@ -36,5 +37,4 @@ public class Max extends AggregateCounter
             max = next;
         }
     }
-
 }

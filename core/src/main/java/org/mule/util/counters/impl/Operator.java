@@ -15,7 +15,6 @@ import org.mule.util.counters.CounterFactory.Type;
 
 public class Operator extends AggregateCounter
 {
-
     private final Counter base2;
     private double val1;
     private double val2;
@@ -27,6 +26,7 @@ public class Operator extends AggregateCounter
         base2.addAggregate(this);
     }
 
+    @Override
     public double nextValue()
     {
         Type type = this.getType();
@@ -55,10 +55,10 @@ public class Operator extends AggregateCounter
         }
     }
 
+    @Override
     public void doCompute()
     {
         this.val1 = this.getBase().nextValue();
         this.val2 = base2.nextValue();
     }
-
 }

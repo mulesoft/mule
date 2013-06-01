@@ -14,7 +14,6 @@ import org.mule.util.counters.CounterFactory.Type;
 
 public class Sum extends AggregateCounter
 {
-
     private double value;
 
     public Sum(String name, AbstractCounter base)
@@ -22,14 +21,15 @@ public class Sum extends AggregateCounter
         super(name, Type.SUM, base);
     }
 
+    @Override
     public double nextValue()
     {
         return this.value;
     }
 
+    @Override
     public void doCompute()
     {
         this.value += getBase().nextValue();
     }
-
 }

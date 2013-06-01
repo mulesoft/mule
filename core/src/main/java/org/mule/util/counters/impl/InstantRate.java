@@ -14,7 +14,6 @@ import org.mule.util.counters.CounterFactory.Type;
 
 public class InstantRate extends AggregateCounter
 {
-
     private double firstTime;
     private double lastTime;
     private double value;
@@ -24,6 +23,7 @@ public class InstantRate extends AggregateCounter
         super(name, Type.INSTANT_RATE, base);
     }
 
+    @Override
     public double nextValue()
     {
         if (firstTime == 0 || firstTime == lastTime)
@@ -36,11 +36,11 @@ public class InstantRate extends AggregateCounter
         }
     }
 
+    @Override
     public void doCompute()
     {
         firstTime = lastTime;
         lastTime = System.currentTimeMillis();
         value = getBase().nextValue();
     }
-
 }

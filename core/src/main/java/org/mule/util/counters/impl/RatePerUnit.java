@@ -18,7 +18,6 @@ import java.util.LinkedList;
 
 public class RatePerUnit extends AggregateCounter
 {
-
     private static class Sample
     {
         private double value;
@@ -47,7 +46,7 @@ public class RatePerUnit extends AggregateCounter
         }
     }
 
-    private final LinkedList samples;
+    private final LinkedList<Sample> samples;
     private final long unit;
     private final long length;
     private final long baseTime;
@@ -93,10 +92,11 @@ public class RatePerUnit extends AggregateCounter
             length = newLength;
         }
 
-        samples = new LinkedList();
+        samples = new LinkedList<Sample>();
         baseTime = System.currentTimeMillis();
     }
 
+    @Override
     public double nextValue()
     {
         if (samples.isEmpty())
@@ -107,11 +107,11 @@ public class RatePerUnit extends AggregateCounter
         {
             double total = 0.0;
             long current = getTime();
-            Iterator it = samples.iterator();
+            Iterator<Sample> it = samples.iterator();
             Sample sample = null;
             while (it.hasNext())
             {
-                sample = (Sample) it.next();
+                sample = it.next();
                 if (current - sample.time > length)
                 {
                     break;
@@ -122,6 +122,7 @@ public class RatePerUnit extends AggregateCounter
         }
     }
 
+    @Override
     public void doCompute()
     {
         Sample l = samples.isEmpty() ? null : (Sample) samples.getFirst();
@@ -145,5 +146,4 @@ public class RatePerUnit extends AggregateCounter
     {
         return (System.currentTimeMillis() - baseTime) / unit;
     }
-
 }

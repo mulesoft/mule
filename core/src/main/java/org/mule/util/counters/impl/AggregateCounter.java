@@ -15,7 +15,6 @@ import org.mule.util.counters.CounterFactory.Type;
 
 public abstract class AggregateCounter extends AbstractCounter
 {
-
     private final Counter base;
 
     public AggregateCounter(String name, Type type, AbstractCounter base)
@@ -25,21 +24,25 @@ public abstract class AggregateCounter extends AbstractCounter
         base.addAggregate(this);
     }
 
+    @Override
     public double increment()
     {
         throw new UnsupportedOperationException();
     }
 
+    @Override
     public double incrementBy(double value)
     {
         throw new UnsupportedOperationException();
     }
 
+    @Override
     public double decrement()
     {
         throw new UnsupportedOperationException();
     }
 
+    @Override
     public void setRawValue(double value)
     {
         throw new UnsupportedOperationException();
@@ -56,8 +59,8 @@ public abstract class AggregateCounter extends AbstractCounter
         return this.base;
     }
 
+    @Override
     public abstract double nextValue();
 
     public abstract void doCompute();
-
 }

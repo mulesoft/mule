@@ -14,7 +14,6 @@ import org.mule.util.counters.CounterFactory.Type;
 
 public class Average extends AggregateCounter
 {
-
     private double sum = 0;
     private long times = 0;
 
@@ -23,15 +22,16 @@ public class Average extends AggregateCounter
         super(name, Type.AVERAGE, base);
     }
 
+    @Override
     public double nextValue()
     {
         return (times > 0) ? sum / times : 0;
     }
 
+    @Override
     public void doCompute()
     {
         this.sum += getBase().nextValue();
         this.times++;
     }
-
 }

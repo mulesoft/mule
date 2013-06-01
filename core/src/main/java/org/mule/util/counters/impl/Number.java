@@ -14,7 +14,6 @@ import org.mule.util.counters.CounterFactory.Type;
 
 public class Number extends AbstractCounter
 {
-
     private double value = 0.0;
 
     public Number(String name)
@@ -22,6 +21,7 @@ public class Number extends AbstractCounter
         super(name, Type.NUMBER);
     }
 
+    @Override
     public synchronized double increment()
     {
         this.value++;
@@ -29,6 +29,7 @@ public class Number extends AbstractCounter
         return this.value;
     }
 
+    @Override
     public synchronized double incrementBy(double value)
     {
         this.value += value;
@@ -36,6 +37,7 @@ public class Number extends AbstractCounter
         return this.value;
     }
 
+    @Override
     public synchronized double decrement()
     {
         this.value--;
@@ -43,15 +45,16 @@ public class Number extends AbstractCounter
         return this.value;
     }
 
+    @Override
     public synchronized void setRawValue(double value)
     {
         this.value = value;
         propagate();
     }
 
+    @Override
     public synchronized double nextValue()
     {
         return this.value;
     }
-
 }

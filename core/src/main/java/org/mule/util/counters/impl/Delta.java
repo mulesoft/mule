@@ -14,7 +14,6 @@ import org.mule.util.counters.CounterFactory.Type;
 
 public class Delta extends AggregateCounter
 {
-
     private double first = 0.0;
     private double second = 0.0;
 
@@ -23,6 +22,7 @@ public class Delta extends AggregateCounter
         super(name, Type.DELTA, base);
     }
 
+    @Override
     public double nextValue()
     {
         if (Double.isNaN(first) || Double.isNaN(second))
@@ -35,10 +35,10 @@ public class Delta extends AggregateCounter
         }
     }
 
+    @Override
     public void doCompute()
     {
         first = second;
         second = this.getBase().nextValue();
     }
-
 }
