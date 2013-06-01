@@ -36,14 +36,6 @@ import java.util.Properties;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mule.api.MuleException;
-import org.mule.api.MuleRuntimeException;
-import org.mule.api.config.ExceptionReader;
-import org.mule.api.registry.ServiceType;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.util.ClassUtils;
-import org.mule.util.MapUtils;
-import org.mule.util.SpiUtils;
 
 /**
  * <code>ExceptionHelper</code> provides a number of helper functions that can be
@@ -79,7 +71,7 @@ public final class ExceptionHelper
     private static Properties errorCodes = new Properties();
     private static Map reverseErrorCodes = null;
     private static Map<String,Properties> errorMappings = new HashMap<String,Properties>();
-    private static Map<String,Boolean> disposeListenerRegistered = new HashMap<String,Boolean>(); 
+    private static Map<String,Boolean> disposeListenerRegistered = new HashMap<String,Boolean>();
 
     private static int exceptionThreshold = 0;
     private static boolean verbose = true;
@@ -215,7 +207,7 @@ public final class ExceptionHelper
             catch (NotificationException e)
             {
                 throw new MuleRuntimeException(e);
-            }    
+            }
         }
     }
 
@@ -418,7 +410,7 @@ public final class ExceptionHelper
 
         System.arraycopy(trace, 0, newTrace, 0, newStackDepth);
         t.setStackTrace(newTrace);
-        
+
         return t;
     }
 
@@ -487,9 +479,9 @@ public final class ExceptionHelper
         return exception;
     }
 
-    public static List getExceptionsAsList(Throwable t)
+    public static List<Throwable> getExceptionsAsList(Throwable t)
     {
-        List exceptions = new ArrayList();
+        List<Throwable> exceptions = new ArrayList<Throwable>();
         Throwable cause = t;
         while (cause != null)
         {
@@ -525,17 +517,17 @@ public final class ExceptionHelper
     {
         StringBuffer buf = new StringBuffer();
         // get exception stack
-        List exceptions = getExceptionsAsList(t);
+        List<Throwable> exceptions = getExceptionsAsList(t);
 
         int i = 1;
-        for (Iterator iterator = exceptions.iterator(); iterator.hasNext(); i++)
+        for (Iterator<Throwable> iterator = exceptions.iterator(); iterator.hasNext(); i++)
         {
             if (i > exceptionThreshold && exceptionThreshold > 0)
             {
                 buf.append("(").append(exceptions.size() - i + 1).append(" more...)");
                 break;
             }
-            Throwable throwable = (Throwable) iterator.next();
+            Throwable throwable = iterator.next();
             ExceptionReader er = getExceptionReader(throwable);
             buf.append(i).append(". ").append(er.getMessage(throwable)).append(" (");
             buf.append(throwable.getClass().getName()).append(")\n");
@@ -563,7 +555,7 @@ public final class ExceptionHelper
     {
         exceptionReaders.add(reader);
     }
-    
+
     public static <T> T traverseCauseHierarchy(Throwable e, ExceptionEvaluator<T> evaluator)
     {
         LinkedList<Throwable> exceptions = new LinkedList<Throwable>();
@@ -621,7 +613,7 @@ public final class ExceptionHelper
 
     }
 
-    public static interface ExceptionEvaluator<T> 
+    public static interface ExceptionEvaluator<T>
     {
         T evaluate(Throwable e);
     }
@@ -644,7 +636,7 @@ public final class ExceptionHelper
         }
         return cause instanceof MuleException ? null : cause;
     }
-    
+
     private static void clearCacheFor(MuleContext muleContext)
     {
         List<String> entriesToRemove = new ArrayList<String>();

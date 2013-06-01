@@ -38,18 +38,18 @@ import java.util.List;
  */
 public class ExceptionBasedRouter extends ExpressionRecipientList
 {
-    
+
     public ExceptionBasedRouter()
     {
         expressionConfig = new ExpressionConfig(DEFAULT_SELECTOR_EXPRESSION, DEFAULT_SELECTOR_EVALUATOR, null);
     }
-    
+
     @Override
     public MuleEvent route(MuleEvent event) throws RoutingException
     {
         MuleMessage message = event.getMessage();
 
-        List recipients = null;
+        List<Object> recipients = null;
         try
         {
             recipients = getRecipients(event);
@@ -62,13 +62,13 @@ public class ExceptionBasedRouter extends ExpressionRecipientList
         if (recipients == null)
         {
             int endpointsCount = routes.size();
-            recipients = new ArrayList(endpointsCount);
+            recipients = new ArrayList<Object>(endpointsCount);
             for (int i = 0; i < endpointsCount; i++)
             {
                 recipients.add(getRoute(i, event));
             }
-        }        
-        
+        }
+
         if (recipients.size() == 0)
         {
             throw new RoutePathNotFoundException(CoreMessages.noEndpointsForRouter(), event, null);
@@ -93,21 +93,21 @@ public class ExceptionBasedRouter extends ExpressionRecipientList
         MuleMessage request = null;
         boolean success = false;
 
-        for (Iterator iterator = recipients.iterator(); iterator.hasNext();)
+        for (Iterator<Object> iterator = recipients.iterator(); iterator.hasNext();)
         {
             request = new DefaultMuleMessage(message.getPayload(), message, muleContext);
             try
             {
                 endpoint = getRecipientEndpoint(request, iterator.next());
                 boolean lastEndpoint = !iterator.hasNext();
-    
+
                 // TODO MULE-4476
                 if (!lastEndpoint && !endpoint.getExchangePattern().hasResponse())
                 {
                     throw new CouldNotRouteOutboundMessageException(
                         MessageFactory.createStaticMessage("The ExceptionBasedRouter does not support asynchronous endpoints, make sure all endpoints on the router are configured as synchronous"), event, endpoint);
                 }
-                
+
                 if (endpoint.getExchangePattern().hasResponse())
                 {
                     MuleMessage resultMessage = null;
@@ -174,5 +174,5 @@ public class ExceptionBasedRouter extends ExpressionRecipientList
             return false;
         }
     }
-    
+
 }

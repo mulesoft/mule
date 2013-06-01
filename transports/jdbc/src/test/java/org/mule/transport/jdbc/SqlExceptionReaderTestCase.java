@@ -10,6 +10,10 @@
 
 package org.mule.transport.jdbc;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
 import org.mule.api.DefaultMuleException;
 import org.mule.config.ExceptionHelper;
 import org.mule.config.i18n.MessageFactory;
@@ -21,10 +25,6 @@ import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 
 public class SqlExceptionReaderTestCase extends AbstractMuleTestCase
 {
@@ -52,7 +52,7 @@ public class SqlExceptionReaderTestCase extends AbstractMuleTestCase
         assertEquals("bar", t.getMessage());
         assertNotNull(t.getCause());
 
-        List l = ExceptionHelper.getExceptionsAsList(testException);
+        List<Throwable> l = ExceptionHelper.getExceptionsAsList(testException);
         assertEquals(4, l.size());
 
         Map info = ExceptionHelper.getExceptionInfo(testException);
