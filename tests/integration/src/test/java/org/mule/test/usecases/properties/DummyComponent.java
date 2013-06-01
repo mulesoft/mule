@@ -18,14 +18,12 @@ import java.util.List;
 
 public class DummyComponent
 {
-
     public void processData(String theData)
     {
-        List recipients = new ArrayList();
+        List<String> recipients = new ArrayList<String>();
         recipients.add("ross.mason@symphonysoft.com");
         recipients.add("ross@rossmason.com");
         RequestContext.getEventContext().getMessage().setOutboundProperty(StaticRecipientList.RECIPIENTS_PROPERTY,
                                                                           recipients);
     }
-
 }

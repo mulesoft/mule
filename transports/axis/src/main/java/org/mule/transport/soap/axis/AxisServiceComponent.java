@@ -38,9 +38,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -100,7 +100,7 @@ public class AxisServiceComponent implements Initialisable, Callable
 
     /**
      * Passes the context to the listener
-     * 
+     *
      * @param context the context to process
      * @return Object this object can be anything. When the
      *         <code>LifecycleAdapter</code> for the component receives this
@@ -130,7 +130,7 @@ public class AxisServiceComponent implements Initialisable, Callable
             doPost(context, response);
         }
         response.close();
-        
+
         String payload = response.getWriter().toString();
         Map<String, Object> properties = response.getProperties();
         return new DefaultMuleMessage(payload, properties, context.getMuleContext());
@@ -166,7 +166,7 @@ public class AxisServiceComponent implements Initialisable, Callable
             }
 
             endpointUri.initialise();
-            
+
             AxisEngine engine = getAxis();
             String pathInfo = endpointUri.getPath();
             boolean wsdlRequested = false;
@@ -496,7 +496,7 @@ public class AxisServiceComponent implements Initialisable, Callable
         response.setProperty(HTTPConstants.HEADER_CONTENT_TYPE, "text/xml");
         response.write(responseMsg.getSOAPPartAsString());
     }
-    
+
     private void populateAxisProperties()
     {
 
@@ -598,7 +598,7 @@ public class AxisServiceComponent implements Initialisable, Callable
 
     }
 
-    private void listServices(Iterator i, AxisStringWriter response)
+    private void listServices(Iterator<?> i, AxisStringWriter response)
     {
         response.write("<ul>");
         while (i.hasNext())
@@ -624,12 +624,12 @@ public class AxisServiceComponent implements Initialisable, Callable
             {
                 response.write("<ul><h6>" + sd.getDocumentation() + "</h6></ul>");
             }
-            ArrayList operations = sd.getOperations();
+            List<?> operations = sd.getOperations();
             if (!operations.isEmpty())
             {
                 response.write("<ul>");
                 OperationDesc desc;
-                for (Iterator it = operations.iterator(); it.hasNext();)
+                for (Iterator<?> it = operations.iterator(); it.hasNext();)
                 {
                     desc = (OperationDesc)it.next();
                     response.write("<li>" + desc.getName());

@@ -35,15 +35,14 @@ import java.util.List;
  */
 public class JdbcMessageReceiver extends TransactedPollingMessageReceiver
 {
-
     public static final String RECEIVE_MESSAGE_IN_TRANSCTION = "receiveMessageInTransaction";
     public static final String RECEIVE_MESSAGES_IN_XA_TRANSCTION = "receiveMessagesInXaTransaction";
 
     protected JdbcConnector connector;
     protected String readStmt;
     protected String ackStmt;
-    protected List<?> readParams;
-    protected List<?> ackParams;
+    protected List<String> readParams;
+    protected List<String> ackParams;
     public boolean receiveMessagesInXaTransaction = false;
     private volatile boolean aggregateResult;
 
@@ -94,9 +93,9 @@ public class JdbcMessageReceiver extends TransactedPollingMessageReceiver
      */
     protected void parseStatements(String readStmt, String ackStmt)
     {
-        this.readParams = new ArrayList<Object>();
+        this.readParams = new ArrayList<String>();
         this.readStmt = this.connector.parseStatement(readStmt, this.readParams);
-        this.ackParams = new ArrayList<Object>();
+        this.ackParams = new ArrayList<String>();
         this.ackStmt = this.connector.parseStatement(ackStmt, this.ackParams);
     }
 

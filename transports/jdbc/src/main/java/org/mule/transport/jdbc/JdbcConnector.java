@@ -92,6 +92,7 @@ public class JdbcConnector extends AbstractConnector implements Testable
         super(context);
     }
 
+    @Override
     protected void doInitialise() throws InitialisationException
     {
         createMultipleTransactedReceivers = false;
@@ -119,6 +120,7 @@ public class JdbcConnector extends AbstractConnector implements Testable
         }
     }
 
+    @Override
     public MessageReceiver createReceiver(FlowConstruct flowConstruct, InboundEndpoint endpoint)
         throws Exception
     {
@@ -292,11 +294,11 @@ public class JdbcConnector extends AbstractConnector implements Testable
 
     /**
      * Parse the given statement filling the parameter list and return the ready to use statement.
-     * 
+     *
      * @param stmt
      * @param params
      */
-    public String parseStatement(String stmt, List params)
+    public String parseStatement(String stmt, List<String> params)
     {
         if (stmt == null)
         {
@@ -356,11 +358,13 @@ public class JdbcConnector extends AbstractConnector implements Testable
         return param.substring(2, param.length() - 1);
     }
 
+    @Override
     protected void doDispose()
     {
         // template method
     }
 
+    @Override
     protected void doConnect() throws Exception
     {
         Connection connection = null;
@@ -380,9 +384,10 @@ public class JdbcConnector extends AbstractConnector implements Testable
 
     /**
      * Verify that we are able to connect to the DataSource (needed for retry policies)
-     * 
+     *
      * @param retryContext
      */
+    @Override
     public RetryContext validateConnection(RetryContext retryContext)
     {
         Connection con;
@@ -407,16 +412,19 @@ public class JdbcConnector extends AbstractConnector implements Testable
         return retryContext;
     }
 
+    @Override
     protected void doDisconnect() throws Exception
     {
         // template method
     }
 
+    @Override
     protected void doStart() throws MuleException
     {
         // template method
     }
 
+    @Override
     protected void doStop() throws MuleException
     {
         // template method

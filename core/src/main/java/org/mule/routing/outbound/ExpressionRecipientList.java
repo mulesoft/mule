@@ -29,7 +29,7 @@ public class ExpressionRecipientList extends AbstractRecipientList
     protected ExpressionConfig expressionConfig = new ExpressionConfig();
 
     @Override
-    protected List getRecipients(MuleEvent event) throws CouldNotRouteOutboundMessageException
+    protected List<Object> getRecipients(MuleEvent event) throws CouldNotRouteOutboundMessageException
     {
         String expr = getFullExpression();
         if (!muleContext.getExpressionManager().isValidExpression(expr))
@@ -46,11 +46,12 @@ public class ExpressionRecipientList extends AbstractRecipientList
         }
         else if (msgRecipients instanceof String)
         {
-            return Arrays.asList(StringUtils.splitAndTrim(msgRecipients.toString(), " ,;:"));
+            Object[] recipients = StringUtils.splitAndTrim(msgRecipients.toString(), " ,;:");
+            return Arrays.asList(recipients);
         }
         else if (msgRecipients instanceof List)
         {
-            return new ArrayList((List) msgRecipients);
+            return new ArrayList<Object>((List<?>) msgRecipients);
         }
         else
         {

@@ -10,6 +10,8 @@
 
 package org.mule.test;
 
+import static org.junit.Assert.assertEquals;
+
 import org.mule.module.scripting.expression.GroovyExpressionEvaluator;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.transport.jdbc.JdbcConnector;
@@ -19,17 +21,14 @@ import java.util.List;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-
 public class ComplexExpressionParsingTestCase extends AbstractMuleContextTestCase
 {
-
     @Test
     public void testComplexExpressionJdbcParsing() throws Exception
     {
         muleContext.getExpressionManager().registerEvaluator(new GroovyExpressionEvaluator());
 
-        List parsedParams = new ArrayList();
+        List<String> parsedParams = new ArrayList<String>();
         JdbcConnector c = new JdbcConnector(muleContext);
         String result = c.parseStatement("#[groovy:payload[0]] - #[groovy:payload[1].toUpperCase()]", parsedParams);
 
@@ -40,5 +39,4 @@ public class ComplexExpressionParsingTestCase extends AbstractMuleContextTestCas
         // it's jdbc's PreparedStatement params here
         assertEquals("? - ?", result);
     }
-
 }

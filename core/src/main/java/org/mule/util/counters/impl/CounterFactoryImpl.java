@@ -16,13 +16,13 @@ import org.mule.util.counters.CounterFactory.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 public final class CounterFactoryImpl
 {
-
-    private static Map counters = new HashMap();
-    private static ArrayList publicCounters = new ArrayList();
+    private static Map<String, AbstractCounter> counters = new HashMap<String, AbstractCounter>();
+    private static List<AbstractCounter> publicCounters = new ArrayList<AbstractCounter>();
 
     /** Do not instanciate. */
     private CounterFactoryImpl ()
@@ -32,7 +32,7 @@ public final class CounterFactoryImpl
 
     public static Counter getCounter(String name)
     {
-        return (Counter) counters.get(name);
+        return counters.get(name);
     }
 
     public static Counter createCounter(String name, String first, String second, Type type, boolean visible)
@@ -49,7 +49,7 @@ public final class CounterFactoryImpl
         return counter;
     }
 
-    public static Iterator getCounters()
+    public static Iterator<AbstractCounter> getCounters()
     {
         return publicCounters.iterator();
     }

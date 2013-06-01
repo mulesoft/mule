@@ -14,10 +14,7 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.ImmutableEndpoint;
-import org.mule.api.transaction.Transaction;
-import org.mule.transaction.TransactionCoordination;
 import org.mule.transport.jdbc.JdbcConnector;
-import org.mule.transport.jdbc.JdbcUtils;
 import org.mule.util.ArrayUtils;
 
 import java.sql.Connection;
@@ -41,7 +38,7 @@ public  class SimpleUpdateSqlStatementStrategy implements SqlStatementStrategy
         String statement = connector.getStatement(endpoint);
 
         //Storage for parameters
-        List<?> paramNames = new ArrayList<Object>();
+        List<String> paramNames = new ArrayList<String>();
 
         //Parsed SQL statement (with ? placeholders instead of #[foo] params)
         String sql = connector.parseStatement(statement, paramNames);

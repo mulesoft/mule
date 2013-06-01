@@ -14,21 +14,21 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-/**
-*
-*/
-public class ElementsClearedEvent extends ElementEvent {
+public class ElementsClearedEvent extends ElementEvent
+{
+    private List<Object> values = new ArrayList<Object>();
 
-    private List values = new ArrayList();
-
-    public ElementsClearedEvent(Object source, List values) {
+    public ElementsClearedEvent(Object source, List<?> values)
+    {
         super(source, OLDVALUE, NEWVALUE, ElementEvent.CLEARED, 0);
-        if (values != null) {
+        if (values != null)
+        {
             this.values.addAll(values);
         }
     }
 
-    public List getValues() {
+    public List<?> getValues()
+    {
         return Collections.unmodifiableList(values);
     }
 }
