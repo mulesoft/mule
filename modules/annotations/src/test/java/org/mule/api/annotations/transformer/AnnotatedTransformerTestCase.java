@@ -9,6 +9,10 @@
  */
 package org.mule.api.annotations.transformer;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.api.annotations.ContainsTransformerMethods;
 import org.mule.api.annotations.Transformer;
 import org.mule.api.transformer.DataType;
@@ -24,10 +28,6 @@ import java.io.InputStream;
 import java.util.ArrayList;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 
 @ContainsTransformerMethods
@@ -78,9 +78,9 @@ public class AnnotatedTransformerTestCase extends AbstractMuleContextTestCase
     }
 
     @Transformer
-    public ArrayList dummy(InputStream in)
+    public ArrayList<String> dummy(InputStream in)
     {
-        return new ArrayList();
+        return new ArrayList<String>();
     }
 
     @Transformer(sourceTypes = {FileInputStream.class, ByteArrayInputStream.class}, priorityWeighting = 9)

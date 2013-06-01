@@ -19,9 +19,6 @@ import org.mule.util.StringUtils;
 
 import java.io.IOException;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 /**
  * Abstract {@link ConfigurationBuilder} implementation used for
  * ConfigurationBuider's that use one of more configuration resources of the same
@@ -31,9 +28,6 @@ import org.apache.commons.logging.LogFactory;
  */
 public abstract class AbstractResourceConfigurationBuilder extends AbstractConfigurationBuilder
 {
-
-    protected static final Log logger = LogFactory.getLog(AutoConfigurationBuilder.class);
-
     protected ConfigResource[] configResources;
 
     /**
@@ -68,6 +62,7 @@ public abstract class AbstractResourceConfigurationBuilder extends AbstractConfi
      * Override to check for existence of configResouce before invocation, and set
      * resources n configuration afterwards.
      */
+    @Override
     public void configure(MuleContext muleContext) throws ConfigurationException
     {
         if (configResources == null)

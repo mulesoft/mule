@@ -39,6 +39,7 @@ public abstract class AbstractConfigurationBuilder implements ConfigurationBuild
      * @throws ConfigurationException if the configuration fails i.e. an object cannot be created or
      * initialised properly
      */
+    @Override
     public void configure(MuleContext muleContext) throws ConfigurationException
     {
         try
@@ -91,6 +92,7 @@ public abstract class AbstractConfigurationBuilder implements ConfigurationBuild
      * Has this builder been configured already
      * @return true if the {@link #configure(org.mule.api.MuleContext)} method has been called
      */
+    @Override
     public boolean isConfigured()
     {
         return configured;

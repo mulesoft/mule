@@ -29,11 +29,13 @@ public class XAResourceManagerTestCase extends AbstractMuleContextTestCase
 {
     private TransactionManager tm;
 
+    @Override
     protected void doSetUp() throws Exception
     {
         tm = new JBossArjunaTransactionManagerFactory().create(muleContext.getConfiguration());
     }
 
+    @Override
     protected void doTearDown() throws Exception
     {
         tm = null;
@@ -56,7 +58,6 @@ public class XAResourceManagerTestCase extends AbstractMuleContextTestCase
 
     protected static class TestXAResourceManager extends AbstractXAResourceManager
     {
-
         private static Log logger = LogFactory.getLog(TestXAResourceManager.class);
 
         public DefaultXASession createSession()
@@ -69,38 +70,45 @@ public class XAResourceManagerTestCase extends AbstractMuleContextTestCase
             return logger;
         }
 
+        @Override
         protected AbstractTransactionContext createTransactionContext(Object session)
         {
-            return new AbstractTransactionContext() 
+            return new AbstractTransactionContext()
             {
                 @Override
                 public void doCommit()
                 {
+                    // does nothing
                 }
 
                 @Override
                 public void doRollback()
                 {
+                     // does nothing
                 }
             };
         }
 
+        @Override
         protected void doBegin(AbstractTransactionContext context)
         {
             // template method
         }
 
+        @Override
         protected int doPrepare(AbstractTransactionContext context)
         {
             // template method
             return 0;
         }
 
+        @Override
         protected void doCommit(AbstractTransactionContext context) throws ResourceManagerException
         {
             // template method
         }
 
+        @Override
         protected void doRollback(AbstractTransactionContext context) throws ResourceManagerException
         {
             // template method

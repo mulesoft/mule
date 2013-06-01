@@ -81,7 +81,7 @@ public abstract class AbstractReceiverWorker implements Work
             receiver.getConnector().getMuleContext().getExceptionListener().handleException(e);
         }
     }
-    
+
     /**
      * The actual logic used to receive messages from the underlying transport.  The default implementation
      * will execute the processing of messages within a TransactionTemplate.  This template will manage the
@@ -188,10 +188,10 @@ public abstract class AbstractReceiverWorker implements Work
         }
     }
 
-    protected List handleEventResults(List<MuleEvent> messages) throws Exception
+    protected List<Object> handleEventResults(List<MuleEvent> events) throws Exception
     {
-        List payloads = new ArrayList(messages.size());
-        for (MuleEvent muleEvent : messages)
+        List<Object> payloads = new ArrayList<Object>(events.size());
+        for (MuleEvent muleEvent : events)
         {
             MuleMessage result = muleEvent == null ?  null : muleEvent.getMessage();
             if (result != null)

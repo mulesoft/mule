@@ -11,9 +11,9 @@
 package org.mule.management.stats.printers;
 
 import org.mule.management.stats.FlowConstructStatistics;
-import org.mule.management.stats.ServiceStatistics;
 import org.mule.management.stats.RouterStatistics;
 import org.mule.management.stats.SedaServiceStatistics;
+import org.mule.management.stats.ServiceStatistics;
 
 import java.io.OutputStream;
 import java.io.PrintWriter;
@@ -219,6 +219,7 @@ public class AbstractTablePrinter extends PrintWriter
         return table;
     }
 
+    @Override
     public void print(Object obj)
     {
         if (obj instanceof Collection)
@@ -227,8 +228,8 @@ public class AbstractTablePrinter extends PrintWriter
         }
         else if (obj instanceof ServiceStatistics)
         {
-            List l = new ArrayList();
-            l.add(obj);
+            List<ServiceStatistics> l = new ArrayList<ServiceStatistics>();
+            l.add((ServiceStatistics)obj);
             print(l);
         }
         else
@@ -237,6 +238,7 @@ public class AbstractTablePrinter extends PrintWriter
         }
     }
 
+    @Override
     public void println(Object obj)
     {
         print(obj);
@@ -250,6 +252,7 @@ public class AbstractTablePrinter extends PrintWriter
 
     // help IBM compiler, it complains helplessly about
     // an abmiguously overloaded/overridden method.
+    @Override
     public void println(String string)
     {
         this.println((Object) string);
@@ -257,9 +260,9 @@ public class AbstractTablePrinter extends PrintWriter
 
     // help IBM compiler, it complains helplessly about
     // an abmiguously overloaded/overridden method.
+    @Override
     public void print(String string)
     {
         this.print((Object) string);
     }
-
 }

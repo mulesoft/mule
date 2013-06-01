@@ -19,14 +19,10 @@ import org.mule.util.ClassUtils;
 import org.mule.util.StringUtils;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * Configures Mule from a configuration resource or comma seperated list of configuration resources by
@@ -35,8 +31,6 @@ import org.apache.commons.logging.LogFactory;
  */
 public class AutoConfigurationBuilder extends AbstractResourceConfigurationBuilder
 {
-    protected static final Log logger = LogFactory.getLog(AutoConfigurationBuilder.class);
-
     public AutoConfigurationBuilder(String resource) throws ConfigurationException
     {
         super(resource);
@@ -52,27 +46,27 @@ public class AutoConfigurationBuilder extends AbstractResourceConfigurationBuild
         super(resources);
     }
 
+    @Override
     protected void doConfigure(MuleContext muleContext) throws ConfigurationException
     {
         autoConfigure(muleContext, configResources);
     }
 
-    protected void autoConfigure(MuleContext muleContext, ConfigResource[] configResources) throws ConfigurationException
+    protected void autoConfigure(MuleContext muleContext, ConfigResource[] resources) throws ConfigurationException
     {
+        Map<String, List<ConfigResource>> configsMap = new LinkedHashMap<String, List<ConfigResource>>();
 
-        Map configsMap = new LinkedHashMap();
-
-        for (int i = 0; i < configResources.length; i++)
+        for (int i = 0; i < resources.length; i++)
         {
             String configExtension = StringUtils.substringAfterLast(
-                (configResources[i]).getUrl().getFile(), ".");
-            List configs = (List) configsMap.get(configExtension);
+                (resources[i]).getUrl().getFile(), ".");
+            List<ConfigResource> configs = configsMap.get(configExtension);
             if (configs == null)
             {
-                configs = new ArrayList();
+                configs = new ArrayList<ConfigResource>();
                 configsMap.put(configExtension, configs);
             }
-            configs.add(configResources[i]);
+            configs.add(resources[i]);
         }
 
         try
@@ -80,12 +74,10 @@ public class AutoConfigurationBuilder extends AbstractResourceConfigurationBuild
             Properties props = new Properties();
             props.load(ClassUtils.getResource("configuration-builders.properties", this.getClass()).openStream());
 
-            Iterator iterator = configsMap.entrySet().iterator();
-            while (iterator.hasNext())
+            for (Map.Entry<String, List<ConfigResource>> e : configsMap.entrySet())
             {
-                Map.Entry e = (Map.Entry) iterator.next();
-                String extension = (String) e.getKey();
-                List configs = (List) e.getValue();
+                String extension = e.getKey();
+                List<ConfigResource> configs = e.getValue();
 
                 String className = (String) props.get(extension);
 
@@ -110,5 +102,4 @@ public class AutoConfigurationBuilder extends AbstractResourceConfigurationBuild
             throw new ConfigurationException(e);
         }
     }
-
 }
