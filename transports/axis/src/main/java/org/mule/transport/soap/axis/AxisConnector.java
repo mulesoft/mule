@@ -113,18 +113,15 @@ public class AxisConnector extends AbstractConnector implements MuleContextNotif
     private String clientConfig = DEFAULT_MULE_AXIS_CLIENT_CONFIG;
     private SimpleProvider clientProvider = null;
 
-    private List beanTypes;
+    private List<?> beanTypes;
     private Service axisComponent;
-
-    //this will store the name of the descriptor of the current connector's AxisServiceComponent
-    //private String specificAxisServiceComponentName;
 
     /**
      * These protocols will be set on client invocations. By default Mule uses it's
      * own transports rather that Axis's. This is only because it gives us more
      * flexibility inside Mule and simplifies the code
      */
-    private Map axisTransportProtocols = null;
+    private Map<String, Class<?>> axisTransportProtocols = null;
 
     /**
      * A store of registered servlet services that need to have their endpoints
@@ -132,9 +129,9 @@ public class AxisConnector extends AbstractConnector implements MuleContextNotif
      * only required to ensure wsdl is generated correctly. I would like a clearer
      * way of doing this so I can remove this workaround
      */
-    private List servletServices = new ArrayList();
+    private List<SOAPService> servletServices = new ArrayList<SOAPService>();
 
-    private List supportedSchemes = null;
+    private List<String> supportedSchemes = null;
 
     private boolean doAutoTypes = true;
 
@@ -152,7 +149,7 @@ public class AxisConnector extends AbstractConnector implements MuleContextNotif
         {
             // Default supported schemes, these can be restricted
             // through configuration
-            supportedSchemes = new ArrayList();
+            supportedSchemes = new ArrayList<String>();
             supportedSchemes.add("http");
             supportedSchemes.add("https");
             supportedSchemes.add("servlet");
@@ -169,27 +166,22 @@ public class AxisConnector extends AbstractConnector implements MuleContextNotif
             supportedSchemes.add("imaps");
         }
 
-        for (Iterator iterator = supportedSchemes.iterator(); iterator.hasNext();)
+        for (String scheme : supportedSchemes)
         {
-            String s = (String) iterator.next();
-            registerSupportedProtocol(s);
+            registerSupportedProtocol(scheme);
         }
     }
 
     @Override
     protected void doInitialise() throws InitialisationException
     {
-        axisTransportProtocols = new HashMap();
-        //specificAxisServiceComponentName = AXIS_SERVICE_COMPONENT_NAME + "_" + name;
-
-        axisTransportProtocols = new HashMap();
+        axisTransportProtocols = new HashMap<String, Class<?>>();
         try
         {
-            for (Iterator iterator = supportedSchemes.iterator(); iterator.hasNext();)
+            for (String scheme : supportedSchemes)
             {
-                String s = (String) iterator.next();
-                axisTransportProtocols.put(s, MuleTransport.getTransportClass(s));
-                registerSupportedProtocol(s);
+                axisTransportProtocols.put(scheme, MuleTransport.getTransportClass(scheme));
+                registerSupportedProtocol(scheme);
             }
             muleContext.registerListener(this);
         }
@@ -267,18 +259,17 @@ public class AxisConnector extends AbstractConnector implements MuleContextNotif
         // Register Transport handlers
         // By default these will all be handled by Mule, however some companies may
         // have their own they wish to use
-        for (Iterator iterator = getAxisTransportProtocols().keySet().iterator(); iterator.hasNext();)
+        for (String protocol : getAxisTransportProtocols().keySet())
         {
-            String protocol = (String) iterator.next();
             Object temp = getAxisTransportProtocols().get(protocol);
-            Class clazz;
+            Class<?> clazz;
             if (temp instanceof String)
             {
                 clazz = ClassUtils.loadClass(temp.toString(), getClass());
             }
             else
             {
-                clazz = (Class) temp;
+                clazz = (Class<?>) temp;
             }
             Call.setTransportForProtocol(protocol, clazz);
         }
@@ -300,6 +291,7 @@ public class AxisConnector extends AbstractConnector implements MuleContextNotif
         return new MuleConfigProvider(fileProvider);
     }
 
+    @Override
     public String getProtocol()
     {
         return AXIS;
@@ -415,7 +407,7 @@ public class AxisConnector extends AbstractConnector implements MuleContextNotif
         AbstractEndpointBuilder receiverEndpointBuilder = new EndpointURIEndpointBuilder(receiver.getEndpoint());
         // Remove the Axis filter now
 
-        List<MessageProcessor> procs = new ArrayList(receiverEndpointBuilder.getMessageProcessors());
+        List<MessageProcessor> procs = new ArrayList<MessageProcessor>(receiverEndpointBuilder.getMessageProcessors());
         CollectionUtils.removeType(procs, MessageFilter.class);
         CollectionUtils.removeType(procs, SecurityFilterMessageProcessor.class);
         receiverEndpointBuilder.setMessageProcessors(procs);
@@ -541,12 +533,12 @@ public class AxisConnector extends AbstractConnector implements MuleContextNotif
         this.serverConfig = serverConfig;
     }
 
-    public List getBeanTypes()
+    public List<?> getBeanTypes()
     {
         return beanTypes;
     }
 
-    public void setBeanTypes(List beanTypes)
+    public void setBeanTypes(List<?> beanTypes)
     {
         this.beanTypes = beanTypes;
     }
@@ -591,12 +583,12 @@ public class AxisConnector extends AbstractConnector implements MuleContextNotif
         this.clientProvider = clientProvider;
     }
 
-    public Map getAxisTransportProtocols()
+    public Map<String, Class<?>> getAxisTransportProtocols()
     {
         return axisTransportProtocols;
     }
 
-    public void setAxisTransportProtocols(Map axisTransportProtocols)
+    public void setAxisTransportProtocols(Map<String, Class<?>> axisTransportProtocols)
     {
         this.axisTransportProtocols.putAll(axisTransportProtocols);
     }
@@ -606,12 +598,12 @@ public class AxisConnector extends AbstractConnector implements MuleContextNotif
         servletServices.add(service);
     }
 
-    public List getSupportedSchemes()
+    public List<String> getSupportedSchemes()
     {
         return supportedSchemes;
     }
 
-    public void setSupportedSchemes(List supportedSchemes)
+    public void setSupportedSchemes(List<String> supportedSchemes)
     {
         this.supportedSchemes = supportedSchemes;
     }
@@ -678,9 +670,8 @@ public class AxisConnector extends AbstractConnector implements MuleContextNotif
                     // We have to perform a small hack here to rewrite servlet://
                     // endpoints with the
                     // real http:// address
-                    for (Iterator iterator = servletServices.iterator(); iterator.hasNext();)
+                    for (SOAPService service : servletServices)
                     {
-                        SOAPService service = (SOAPService) iterator.next();
                         ServletConnector servletConnector = (ServletConnector) new TransportFactory(muleContext).getConnectorByProtocol("servlet");
                         String url = servletConnector.getServletUrl();
                         if (url != null)

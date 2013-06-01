@@ -416,11 +416,10 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
         if (event.getMessage().getOutboundAttachmentNames() != null
             && event.getMessage().getOutboundAttachmentNames().size() > 0)
         {
-            ArrayList attachments = new ArrayList();
-            Iterator i = event.getMessage().getOutboundAttachmentNames().iterator();
-            while (i.hasNext())
+            List<DataHandler> attachments = new ArrayList<DataHandler>();
+            for (String name : event.getMessage().getOutboundAttachmentNames())
             {
-                attachments.add(event.getMessage().getOutboundAttachment((String)i.next()));
+                attachments.add(event.getMessage().getOutboundAttachment(name));
             }
             ArrayList temp = new ArrayList(Arrays.asList(args));
             temp.add(attachments.toArray(new DataHandler[attachments.size()]));
