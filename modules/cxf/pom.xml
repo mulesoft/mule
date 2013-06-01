@@ -139,7 +139,7 @@
             <artifactId>cxf-rt-core</artifactId>
             <version>${cxfVersion}</version>
             <exclusions>
-                <!-- We use javax.activation -->
+                <!-- The activation framework is part of JDK6 -->
                 <exclusion>
                     <groupId>org.apache.geronimo.specs</groupId>
                     <artifactId>geronimo-activation_1.1_spec</artifactId>
@@ -179,7 +179,7 @@
             <artifactId>cxf-rt-frontend-simple</artifactId>
             <version>${cxfVersion}</version>
             <exclusions>
-                <!-- We use javax.activation -->
+                <!-- The activation framework is part of JDK6 -->
                 <exclusion>
                     <groupId>org.apache.geronimo.specs</groupId>
                     <artifactId>geronimo-activation_1.1_spec</artifactId>
@@ -219,7 +219,7 @@
             <artifactId>cxf-rt-frontend-jaxws</artifactId>
             <version>${cxfVersion}</version>
             <exclusions>
-                <!-- We use javax.activation -->
+                <!-- The activation framework is part of JDK6 -->
                 <exclusion>
                     <groupId>org.apache.geronimo.specs</groupId>
                     <artifactId>geronimo-activation_1.1_spec</artifactId>
@@ -259,7 +259,7 @@
             <artifactId>cxf-rt-databinding-aegis</artifactId>
             <version>${cxfVersion}</version>
             <exclusions>
-                <!-- We use javax.activation -->
+                <!-- The activation framework is part of JDK6 -->
                 <exclusion>
                     <groupId>org.apache.geronimo.specs</groupId>
                     <artifactId>geronimo-activation_1.1_spec</artifactId>
@@ -299,7 +299,7 @@
             <artifactId>cxf-rt-databinding-jaxb</artifactId>
             <version>${cxfVersion}</version>
             <exclusions>
-                <!-- We use javax.activation -->
+                <!-- The activation framework is part of JDK6 -->
                 <exclusion>
                     <groupId>org.apache.geronimo.specs</groupId>
                     <artifactId>geronimo-activation_1.1_spec</artifactId>
@@ -331,7 +331,7 @@
             <artifactId>cxf-rt-databinding-jibx</artifactId>
             <version>${cxfVersion}</version>
             <exclusions>
-                <!-- We use javax.activation -->
+                <!-- The activation framework is part of JDK6 -->
                 <exclusion>
                     <groupId>org.apache.geronimo.specs</groupId>
                     <artifactId>geronimo-activation_1.1_spec</artifactId>
@@ -375,7 +375,7 @@
             <artifactId>cxf-rt-transports-local</artifactId>
             <version>${cxfVersion}</version>
             <exclusions>
-                <!-- We use javax.activation -->
+                <!-- The activation framework is part of JDK6 -->
                 <exclusion>
                     <groupId>org.apache.geronimo.specs</groupId>
                     <artifactId>geronimo-activation_1.1_spec</artifactId>
@@ -415,7 +415,7 @@
             <artifactId>cxf-rt-ws-security</artifactId>
             <version>${cxfVersion}</version>
             <exclusions>
-                <!-- We use javax.activation -->
+                <!-- The activation framework is part of JDK6 -->
                 <exclusion>
                     <groupId>org.apache.geronimo.specs</groupId>
                     <artifactId>geronimo-activation_1.1_spec</artifactId>
@@ -463,7 +463,7 @@
             <artifactId>cxf-rt-ws-rm</artifactId>
             <version>${cxfVersion}</version>
             <exclusions>
-                <!-- We use javax.activation -->
+                <!-- The activation framework is part of JDK6 -->
                 <exclusion>
                     <groupId>org.apache.geronimo.specs</groupId>
                     <artifactId>geronimo-activation_1.1_spec</artifactId>
@@ -512,7 +512,7 @@
             <artifactId>cxf-rt-ws-addr</artifactId>
             <version>${cxfVersion}</version>
             <exclusions>
-                <!-- We use javax.activation -->
+                <!-- The activation framework is part of JDK6 -->
                 <exclusion>
                     <groupId>org.apache.geronimo.specs</groupId>
                     <artifactId>geronimo-activation_1.1_spec</artifactId>
@@ -561,7 +561,7 @@
             <artifactId>cxf-rt-transports-http</artifactId>
             <version>${cxfVersion}</version>
             <exclusions>
-                <!-- We use javax.activation -->
+                <!-- The activation framework is part of JDK6 -->
                 <exclusion>
                     <groupId>org.apache.geronimo.specs</groupId>
                     <artifactId>geronimo-activation_1.1_spec</artifactId>
@@ -602,7 +602,7 @@
             <artifactId>cxf-wstx-msv-validation</artifactId>
             <version>${cxfVersion}</version>
             <exclusions>
-                <!-- We use javax.activation -->
+                <!-- The activation framework is part of JDK6 -->
                 <exclusion>
                     <groupId>org.apache.geronimo.specs</groupId>
                     <artifactId>geronimo-activation_1.1_spec</artifactId>
@@ -649,6 +649,12 @@
         <dependency>
             <groupId>com.sun.xml.messaging.saaj</groupId>
             <artifactId>saaj-impl</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>javax.activation</groupId>
+                    <artifactId>activation</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
@@ -790,8 +796,14 @@
         <dependency>
             <groupId>javax.mail</groupId>
             <artifactId>mail</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>javax.activation</groupId>
+                    <artifactId>activation</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
-         <dependency>
+        <dependency>
             <groupId>javax.xml.ws</groupId>
             <artifactId>jaxws-api</artifactId>
         </dependency>
