@@ -10,20 +10,20 @@
 
 package org.mule.transport.vm.functional;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
+
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
 
 import java.util.Collections;
+import java.util.Map;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
-
 public class SessionPropertiesTestCase extends FunctionalTestCase
 {
-
     @Override
     protected String getConfigResources()
     {
@@ -34,7 +34,8 @@ public class SessionPropertiesTestCase extends FunctionalTestCase
     public void testVmToVmSessionPropertiesTestCase() throws Exception
     {
         final MuleClient client = new MuleClient(muleContext);
-        MuleMessage response = client.send("vm://Flow1s1", "some message", Collections.emptyMap(), 1200000);
+        Map<String, Object> properties = Collections.emptyMap();
+        MuleMessage response = client.send("vm://Flow1s1", "some message", properties, 1200000);
         assertNotNullAndNotExceptionResponse(response);
     }
 
@@ -42,7 +43,8 @@ public class SessionPropertiesTestCase extends FunctionalTestCase
     public void testVm1ToVm2ThenVm1ToVm2SessionPropertiesTestCase() throws Exception
     {
         final MuleClient client = new MuleClient(muleContext);
-        MuleMessage response = client.send("vm://Flow1s2", "some message", Collections.emptyMap(), 1200000);
+        Map<String, Object> properties = Collections.emptyMap();
+        MuleMessage response = client.send("vm://Flow1s2", "some message", properties, 1200000);
         assertNotNullAndNotExceptionResponse(response);
     }
 
@@ -54,5 +56,4 @@ public class SessionPropertiesTestCase extends FunctionalTestCase
             fail(response.getExceptionPayload().getException().getCause().toString());
         }
     }
-
 }

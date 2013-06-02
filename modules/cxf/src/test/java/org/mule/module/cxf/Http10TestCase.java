@@ -47,17 +47,17 @@ public class Http10TestCase extends AbstractServiceAndFlowTestCase
             {ConfigVariant.SERVICE, "http-10-conf-service.xml"},
             {ConfigVariant.FLOW, "http-10-conf-flow.xml"}
         });
-    }      
+    }
 
     @Test
     public void testHttp10TransformerNotOnProtocol() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
-        Map<String,String> props = new HashMap<String, String>();
-        
+
+        Map<String,Object> props = new HashMap<String, Object>();
         MuleMessage result = client.send("cxfOutbound", "Dan", props);
         assertEquals("Hello Dan", result.getPayload());
-        
+
         result = client.request("vm://out", 1000);
         assertFalse("chunked".equals(result.getOutboundProperty(HttpConstants.HEADER_TRANSFER_ENCODING)));
     }
@@ -66,11 +66,11 @@ public class Http10TestCase extends AbstractServiceAndFlowTestCase
     public void testHttp10TransformerOnProtocol() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
-        Map<String,String> props = new HashMap<String, String>();
-        
+
+        Map<String, Object> props = new HashMap<String, Object>();
         MuleMessage result = client.send("cxfOutbound2", "Dan", props);
         assertEquals("Hello Dan", result.getPayload());
-        
+
         result = client.request("vm://out", 1000);
         assertFalse("chunked".equals(result.getOutboundProperty(HttpConstants.HEADER_TRANSFER_ENCODING)));
     }

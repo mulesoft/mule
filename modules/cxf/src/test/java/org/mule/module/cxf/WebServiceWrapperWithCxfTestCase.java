@@ -13,22 +13,23 @@ package org.mule.module.cxf;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Properties;
-
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+
 public class WebServiceWrapperWithCxfTestCase extends AbstractServiceAndFlowTestCase
 {
-
     private String testString = "test";
 
     @Rule
@@ -61,8 +62,8 @@ public class WebServiceWrapperWithCxfTestCase extends AbstractServiceAndFlowTest
     public void testWsCallWithUrlFromMessage() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
-        Properties props = new Properties();
-        props.setProperty("ws.service.url", "http://localhost:" + dynamicPort.getNumber()
+        Map<String, Object> props = new HashMap<String, Object>();
+        props.put("ws.service.url", "http://localhost:" + dynamicPort.getNumber()
                                             + "/services/TestUMO?method=onReceive");
         MuleMessage result = client.send("vm://testin2", testString, props);
         assertNotNull(result.getPayload());

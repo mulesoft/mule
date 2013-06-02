@@ -10,6 +10,9 @@
 
 package org.mule.transport.jms.integration;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.RequestContext;
 import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.transformer.types.DataTypeFactory;
@@ -35,9 +38,6 @@ import javax.jms.TextMessage;
 
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 /**
  * <code>JmsTransformersTestCase</code> Tests the JMS transformer implementations.
@@ -199,7 +199,7 @@ public class JmsTransformersTestCase extends AbstractJmsFunctionalTestCase
         String text = "Test Text";
         int i = 97823;
         double d = 0923.2143E124;
-        List list = new ArrayList();
+        List<Object> list = new ArrayList<Object>();
         list.add(new Integer(i));
         list.add(new Double(d));
         list.add(text);
@@ -214,7 +214,7 @@ public class JmsTransformersTestCase extends AbstractJmsFunctionalTestCase
         Object transformedObject = trans.transform(message);
         assertTrue("Transformed object should be a List", transformedObject instanceof List);
 
-        final List result = (List) transformedObject;
+        final List<?> result = (List<?>) transformedObject;
         String newText = (String) result.get(0);
         Integer newI = (Integer) result.get(1);
         Double newD = (Double) result.get(2);

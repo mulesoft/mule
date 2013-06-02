@@ -13,6 +13,14 @@ package org.mule.transport.tcp.issues;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import org.mule.api.MuleEventContext;
+import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.module.client.MuleClient;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.functional.EventCallback;
+import org.mule.tck.functional.FunctionalStreamingTestComponent;
+import org.mule.tck.junit4.rule.DynamicPort;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
@@ -23,17 +31,10 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-import org.mule.api.MuleEventContext;
-import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
-import org.mule.tck.functional.EventCallback;
-import org.mule.tck.functional.FunctionalStreamingTestComponent;
-import org.mule.tck.junit4.rule.DynamicPort;
 
 public class MultiStreamMule1692TestCase extends AbstractServiceAndFlowTestCase
 {
-    
+
     public static final int TIMEOUT = 3000;
     public static final String TEST_MESSAGE = "Test TCP Request";
     public static final String TEST_MESSAGE_2 = "Second test TCP Request";
@@ -50,7 +51,7 @@ public class MultiStreamMule1692TestCase extends AbstractServiceAndFlowTestCase
     {
         super(variant, configResources);
     }
-    
+
     @Parameters
     public static Collection<Object[]> parameters()
     {
@@ -59,7 +60,7 @@ public class MultiStreamMule1692TestCase extends AbstractServiceAndFlowTestCase
             {ConfigVariant.FLOW, "tcp-streaming-test-flow.xml"}
         });
     }
-    
+
     private EventCallback newCallback(final CountDownLatch latch, final AtomicReference<String> message)
     {
         return new EventCallback()
@@ -93,12 +94,11 @@ public class MultiStreamMule1692TestCase extends AbstractServiceAndFlowTestCase
         Object ftc = getComponent("testComponent");
         assertTrue("FunctionalStreamingTestComponent expected", ftc instanceof FunctionalStreamingTestComponent);
 
-
         final CountDownLatch latch = new CountDownLatch(1);
         final AtomicReference<String> message = new AtomicReference<String>();
         ((FunctionalStreamingTestComponent) ftc).setEventCallback(newCallback(latch, message), TEST_MESSAGE.length());
         client.dispatch(((InboundEndpoint) client.getMuleContext().getRegistry().lookupObject("testInbound")).getAddress(),
-            TEST_MESSAGE, new HashMap<Object, Object>());
+            TEST_MESSAGE, new HashMap<String, Object>());
         latch.await(10, TimeUnit.SECONDS);
         assertEquals(RESULT, message.get());
 
@@ -106,7 +106,7 @@ public class MultiStreamMule1692TestCase extends AbstractServiceAndFlowTestCase
         final AtomicReference<String> message2 = new AtomicReference<String>();
         ((FunctionalStreamingTestComponent) ftc).setEventCallback(newCallback(latch2, message2), TEST_MESSAGE_2.length());
         client.dispatch(((InboundEndpoint) client.getMuleContext().getRegistry().lookupObject("testInbound")).getAddress(),
-            TEST_MESSAGE_2, new HashMap<Object, Object>());
+            TEST_MESSAGE_2, new HashMap<String, Object>());
         latch2.await(10, TimeUnit.SECONDS);
         assertEquals(RESULT_2, message2.get());
     }

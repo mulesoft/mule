@@ -10,6 +10,8 @@
 
 package org.mule.test.integration.construct;
 
+import static org.junit.Assert.assertEquals;
+
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
@@ -27,8 +29,6 @@ import java.util.concurrent.TimeUnit;
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang.math.RandomUtils;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
 
 public class BridgeTestCase extends FunctionalTestCase
 {
@@ -116,13 +116,15 @@ public class BridgeTestCase extends FunctionalTestCase
     @Test
     public void testDynamicEndpoint() throws Exception
     {
-        doTestMathsService("vm://child-dynamic-endpoint-bridge.in", Collections.singletonMap("bridgeTarget", "maths-service.in"));
+        Map<String, Object> properties = Collections.<String, Object>singletonMap("bridgeTarget", "maths-service.in");
+        doTestMathsService("vm://child-dynamic-endpoint-bridge.in", properties);
     }
 
     @Test
     public void testDynamicAddress() throws Exception
     {
-        doTestMathsService("vm://address-dynamic-endpoint-bridge.in", Collections.singletonMap("bridgeTarget", "maths-service.in"));
+        Map<String, Object> properties = Collections.<String, Object>singletonMap("bridgeTarget", "maths-service.in");
+        doTestMathsService("vm://address-dynamic-endpoint-bridge.in", properties);
     }
 
     private void doJmsBasedTest(final String jmsDestinationUri, final String ftcName) throws Exception, MuleException, InterruptedException
@@ -150,7 +152,7 @@ public class BridgeTestCase extends FunctionalTestCase
         doTestMathsService(url, null);
     }
 
-    private void doTestMathsService(final String url, final Map<?, ?> messageProperties) throws MuleException
+    private void doTestMathsService(String url, Map<String, Object> messageProperties) throws MuleException
     {
         final int a = RandomUtils.nextInt(100);
         final int b = RandomUtils.nextInt(100);

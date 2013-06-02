@@ -10,6 +10,12 @@
 
 package org.mule.transport.jms.integration;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import org.mule.api.MuleMessage;
 import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.transaction.Transaction;
@@ -48,12 +54,6 @@ import javax.transaction.SystemException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 /**
  * This is the base class for all integration tests that are part of the JMS integration test suite.  This is
@@ -438,7 +438,7 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
         dispatchMessage(payload, null);
     }
 
-    protected void dispatchMessage(Object payload, Properties props) throws Exception
+    protected void dispatchMessage(Object payload, Map<String, Object> props) throws Exception
     {
         client.dispatch(getInboundEndpoint(), payload, props);
     }

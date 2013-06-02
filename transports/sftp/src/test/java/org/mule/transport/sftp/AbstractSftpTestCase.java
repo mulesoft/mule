@@ -69,7 +69,7 @@ public abstract class AbstractSftpTestCase extends AbstractServiceAndFlowTestCas
     private static final String USER = "muletest1";
     private static final String PASSWORD = "muletest1";
     private static final String FILENAME_HEADER = "filename";
-    protected static final Map<String, String> MESSAGE_PROPERTIES = new HashMap<String, String>();
+    protected static final Map<String, Object> MESSAGE_PROPERTIES = new HashMap<String, Object>();
     protected static String INBOUND_ENDPOINT_DIR = "inbound";
     protected static String OUTBOUND_ENDPOINT_DIR = "outbound";
     {
@@ -83,12 +83,12 @@ public abstract class AbstractSftpTestCase extends AbstractServiceAndFlowTestCas
 
     protected SftpServer sftpServer;
     protected SftpClient sftpClient;
-    
+
     public AbstractSftpTestCase(ConfigVariant variant, String configResources)
     {
         super(variant, configResources);
     }
-    
+
     /**
      * Deletes all files in the directory, useful when testing to ensure that no
      * files are in the way...
@@ -291,7 +291,7 @@ public abstract class AbstractSftpTestCase extends AbstractServiceAndFlowTestCas
         return sftpClient;
     }
 
-    
+
     /** Checks if the file exists on the server */
     protected boolean verifyFileExists(SftpClient sftpClient, EndpointURI endpointURI, String file)
         throws IOException
@@ -458,12 +458,14 @@ public abstract class AbstractSftpTestCase extends AbstractServiceAndFlowTestCas
             }
         };
 
-        HashMap<String, String> props = new HashMap<String, String>(1);
+        HashMap<String, Object> props = new HashMap<String, Object>();
         props.put(SftpConnector.PROPERTY_FILENAME, filename);
         props.put(SftpConnector.PROPERTY_ORIGINAL_FILENAME, filename);
 
         if (logger.isInfoEnabled())
+        {
             logger.info(StringMessageUtils.getBoilerPlate("Note! If this test fails due to timeout please add '-Dmule.test.timeoutSecs=XX' to the mvn command!"));
+        }
 
         executeBaseAssertionsBeforeCall();
 
@@ -694,7 +696,7 @@ public abstract class AbstractSftpTestCase extends AbstractServiceAndFlowTestCas
 
             // Prepare message headers, set filename-header and if supplied any
             // headers supplied in the call.
-            Map<String, String> headers = new HashMap<String, String>();
+            Map<String, Object> headers = new HashMap<String, Object>();
             headers.put("filename", p.getFilename());
 
             if (p.getHeaders() != null)
@@ -821,7 +823,7 @@ public abstract class AbstractSftpTestCase extends AbstractServiceAndFlowTestCas
 
             // Prepare message headers, set filename-header and if supplied any
             // headers supplied in the call.
-            Map<String, String> headers = new HashMap<String, String>();
+            Map<String, Object> headers = new HashMap<String, Object>();
             headers.put("filename", p.getFilename());
 
             if (p.getHeaders() != null)
@@ -1334,12 +1336,12 @@ public abstract class AbstractSftpTestCase extends AbstractServiceAndFlowTestCas
             assertTrue(pairs.getKey() + " is not started", pairs.getValue().getLifecycleState().isStarted());
         }
     }
-    
+
     @Before
     public void before() throws Exception {
         sftpServer = new SftpServer(this.port.getNumber());
         sftpServer.start();
         sftpClient = getSftpClient(HOST, port.getNumber(), USER, PASSWORD);
     }
-    
+
 }

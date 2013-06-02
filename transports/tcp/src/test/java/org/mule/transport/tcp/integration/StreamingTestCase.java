@@ -14,6 +14,14 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import org.mule.api.MuleEventContext;
+import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.module.client.MuleClient;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.functional.EventCallback;
+import org.mule.tck.functional.FunctionalStreamingTestComponent;
+import org.mule.tck.junit4.rule.DynamicPort;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
@@ -25,13 +33,6 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-import org.mule.api.MuleEventContext;
-import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
-import org.mule.tck.functional.EventCallback;
-import org.mule.tck.functional.FunctionalStreamingTestComponent;
-import org.mule.tck.junit4.rule.DynamicPort;
 
 /**
  * This test is more about testing the streaming model than the TCP provider, really.
@@ -53,7 +54,7 @@ public class StreamingTestCase extends AbstractServiceAndFlowTestCase
     {
         super(variant, configResources);
     }
-    
+
     @Parameters
     public static Collection<Object[]> parameters()
     {
@@ -62,7 +63,7 @@ public class StreamingTestCase extends AbstractServiceAndFlowTestCase
             {ConfigVariant.FLOW, "tcp-streaming-test-flow.xml"}
         });
     }
-   
+
     @Test
     public void testSend() throws Exception
     {
@@ -104,7 +105,7 @@ public class StreamingTestCase extends AbstractServiceAndFlowTestCase
         ((FunctionalStreamingTestComponent) ftc).setEventCallback(callback, TEST_MESSAGE.length());
 
         client.dispatch(((InboundEndpoint) client.getMuleContext().getRegistry().lookupObject("testInbound")).getAddress(),
-            TEST_MESSAGE, new HashMap<Object, Object>());
+            TEST_MESSAGE, new HashMap<String, Object>());
 
         latch.await(10, TimeUnit.SECONDS);
         assertEquals(RESULT, message.get());

@@ -10,6 +10,8 @@
 
 package org.mule.test.integration.construct;
 
+import static org.junit.Assert.assertEquals;
+
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
@@ -25,8 +27,6 @@ import java.util.Map;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-
-import static org.junit.Assert.assertEquals;
 
 public class HttpProxyTestCase extends AbstractServiceAndFlowTestCase
 {
@@ -134,7 +134,7 @@ public class HttpProxyTestCase extends AbstractServiceAndFlowTestCase
                              final String expectedResult,
                              final Map<String, String> extraHeaders) throws Exception
     {
-        final Map<String, String> headers = new HashMap<String, String>(Collections.singletonMap(
+        Map<String, Object> headers = new HashMap<String, Object>(Collections.singletonMap(
             "X-Custom-Header", "w00t"));
         headers.putAll(extraHeaders);
 

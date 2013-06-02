@@ -10,20 +10,21 @@
 
 package org.mule.transport.soap.axis.functional;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
-import java.util.Properties;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.junit.Rule;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 public class WebServiceWrapperWithAxisTestCase extends FunctionalTestCase
 {
@@ -54,8 +55,8 @@ public class WebServiceWrapperWithAxisTestCase extends FunctionalTestCase
     public void testWsCallWithUrlFromMessage() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
-        Properties props = new Properties();
-        props.setProperty("ws.service.url", "http://localhost:" + dynamicPort1.getNumber() + "/services/TestUMO?method=receive");
+        Map<String, Object> props = new HashMap<String, Object>();
+        props.put("ws.service.url", "http://localhost:" + dynamicPort1.getNumber() + "/services/TestUMO?method=receive");
         MuleMessage result = client.send("vm://testin2", testString, props);
         assertNotNull(result.getPayload());
         assertEquals("Payload", "Received: "+ testString, result.getPayloadAsString());

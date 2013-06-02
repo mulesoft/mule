@@ -11,6 +11,7 @@
 package org.mule.module.jersey;
 
 import static org.junit.Assert.assertEquals;
+
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.module.client.MuleClient;
@@ -38,7 +39,7 @@ public abstract class AbstractServletTestCase extends AbstractServiceAndFlowTest
 
     private Server httpServer;
     private String context;
-    
+
     public AbstractServletTestCase(ConfigVariant variant, String configResources, String context)
     {
         super(variant, configResources);
@@ -58,7 +59,7 @@ public abstract class AbstractServletTestCase extends AbstractServiceAndFlowTest
 
         ServletContext context = root.getServletContext();
         context.setAttribute(MuleProperties.MULE_CONTEXT_PROPERTY, muleContext);
-        
+
         httpServer.start();
     }
 
@@ -83,7 +84,7 @@ public abstract class AbstractServletTestCase extends AbstractServiceAndFlowTest
         result = client.send(root + "/hello", "", null);
         assertEquals((Integer)404, result.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0));
 
-        Map<String, String> props = new HashMap<String, String>();
+        Map<String, Object> props = new HashMap<String, Object>();
         props.put(HttpConnector.HTTP_METHOD_PROPERTY, HttpConstants.METHOD_GET);
         result = client.send(root + "/helloworld", "", props);
         assertEquals((Integer)405, result.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0));

@@ -52,18 +52,19 @@ public class HttpFunctionalTestCase extends AbstractServiceAndFlowTestCase
       //      {ConfigVariant.SERVICE, "http-functional-test-service.xml"},
       //      {ConfigVariant.FLOW, "http-functional-test-flow.xml"}
         });
-    }      
-    
+    }
+
     @Test
     public void testSend() throws Exception
-    {        
+    {
         FunctionalTestComponent testComponent = getFunctionalTestComponent("testComponent");
         assertNotNull(testComponent);
 
-        if (checkPathProperties) 
+        if (checkPathProperties)
         {
             EventCallback callback = new EventCallback()
             {
+                @Override
                 public void eventReceived(final MuleEventContext context, final Object component) throws Exception
                 {
                     MuleMessage msg = context.getMessage();
@@ -72,15 +73,14 @@ public class HttpFunctionalTestCase extends AbstractServiceAndFlowTestCase
                     assertEquals("/", msg.getInboundProperty(HttpConnector.HTTP_CONTEXT_PATH_PROPERTY));
                 }
             };
-        
+
             testComponent.setEventCallback(callback);
         }
 
         MuleClient client = new MuleClient(muleContext);
-        Map<String, String> props = new HashMap<String, String>();
+        Map<String, Object> props = new HashMap<String, Object>();
         props.put(HttpConstants.HEADER_CONTENT_TYPE, "text/plain;charset=UTF-8");
         MuleMessage result = client.send("clientEndpoint", TEST_MESSAGE, props);
         assertEquals(TEST_MESSAGE + " Received", result.getPayloadAsString());
     }
-
 }

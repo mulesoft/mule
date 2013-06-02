@@ -31,7 +31,6 @@ import org.junit.runners.Parameterized.Parameters;
 
 public class JettyTwoEndpointsSinglePortTestCase extends AbstractServiceAndFlowTestCase
 {
-
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
@@ -47,12 +46,11 @@ public class JettyTwoEndpointsSinglePortTestCase extends AbstractServiceAndFlowT
             {ConfigVariant.SERVICE, "jetty-two-endpoints-single-port-service.xml"},
             {ConfigVariant.FLOW, "jetty-two-endpoints-single-port-flow.xml"}
         });
-    }      
-    
+    }
+
     @Test
     public void testSendToEach() throws Exception
     {
-
         sendWithResponse("http://localhost:" + dynamicPort.getNumber() + "/mycomponent1", "test", "mycomponent1", 10);
         sendWithResponse("http://localhost:" + dynamicPort.getNumber() + "/mycomponent2", "test", "mycomponent2", 10);
     }
@@ -60,7 +58,6 @@ public class JettyTwoEndpointsSinglePortTestCase extends AbstractServiceAndFlowT
     @Test
     public void testSendToEachWithBadEndpoint() throws Exception
     {
-
         MuleClient client = new MuleClient(muleContext);
 
         sendWithResponse("http://localhost:" + dynamicPort.getNumber() + "/mycomponent1", "test", "mycomponent1", 5);
@@ -82,7 +79,7 @@ public class JettyTwoEndpointsSinglePortTestCase extends AbstractServiceAndFlowT
     {
         MuleClient client = new MuleClient(muleContext);
 
-        List results = new ArrayList();
+        List<Object> results = new ArrayList<Object>();
         for (int i = 0; i < noOfMessages; i++)
         {
             MuleMessage result = client.send(endpoint, message, null);

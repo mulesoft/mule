@@ -10,6 +10,9 @@
 
 package org.mule.test.integration.messaging.meps;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
@@ -25,9 +28,6 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 //START SNIPPET: full-class
 public class InOptionalOutOutOnlyJMSTestCase extends AbstractServiceAndFlowTestCase
@@ -74,7 +74,7 @@ public class InOptionalOutOutOnlyJMSTestCase extends AbstractServiceAndFlowTestC
         assertNotNull(result);
         assertEquals(NullPayload.getInstance(), result.getPayload());
 
-        Map<String, String> props = new HashMap<String, String>();
+        Map<String, Object> props = new HashMap<String, Object>();
         props.put("foo", "bar");
         result = client.send("inboundEndpoint", "some data", props, 20000);
 

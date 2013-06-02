@@ -25,6 +25,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -145,7 +146,7 @@ public class SftpPoolingFunctionalTestCase extends AbstractSftpTestCase
 
         for (String sendFile : sendFiles)
         {
-            HashMap<String, String> props = new HashMap<String, String>(1);
+            Map<String, Object> props = new HashMap<String, Object>();
             props.put(SftpConnector.PROPERTY_FILENAME, sendFile + ".txt");
 
             client.dispatch("vm://test.upload", sendFile, props);

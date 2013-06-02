@@ -57,8 +57,8 @@ public class CxfCustomHttpHeaderTestCase extends AbstractServiceAndFlowTestCase 
             {ConfigVariant.SERVICE, "headers-conf-service.xml"},
             {ConfigVariant.FLOW, "headers-conf-flow.xml"}
         });
-    }      
-    
+    }
+
     @Override
     protected void doSetUp() throws Exception
     {
@@ -81,7 +81,7 @@ public class CxfCustomHttpHeaderTestCase extends AbstractServiceAndFlowTestCase 
         Object payload = new Object[]{"Test String"};
         String myProperty = "myProperty";
 
-        HashMap<String, String> props = new HashMap<String, String>();
+        HashMap<String, Object> props = new HashMap<String, Object>();
         props.put(MuleProperties.MULE_USER_PROPERTY, "alan");
         props.put(MuleProperties.MULE_METHOD_PROPERTY, "onReceive");
         props.put(myProperty, myProperty);
@@ -109,6 +109,7 @@ public class CxfCustomHttpHeaderTestCase extends AbstractServiceAndFlowTestCase 
         assertEquals(myProperty, notificationMsgList.get(0).getOutboundProperty(myProperty));
     }
 
+    @Override
     public void onNotification(ServerNotification notification)
     {
         if (notification instanceof EndpointMessageNotification)

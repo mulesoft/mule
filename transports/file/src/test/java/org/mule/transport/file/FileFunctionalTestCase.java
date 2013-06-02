@@ -10,6 +10,9 @@
 
 package org.mule.transport.file;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 
@@ -23,16 +26,12 @@ import java.util.Map;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
 /**
  * We are careful here to access the file sstem in a generic way.  This means setting directories
  * dynamically.
  */
 public class FileFunctionalTestCase extends AbstractFileFunctionalTestCase
 {
-
     public FileFunctionalTestCase(ConfigVariant variant, String configResources)
     {
         super(variant, configResources);
@@ -47,7 +46,7 @@ public class FileFunctionalTestCase extends AbstractFileFunctionalTestCase
         FileConnector connector =
                 (FileConnector) muleContext.getRegistry().lookupConnector("sendConnector");
         connector.setWriteToDirectory(target.getParent());
-        Map<String, String> props = new HashMap<String, String>();
+        Map<String, Object> props = new HashMap<String, Object>();
         props.put(TARGET_FILE, target.getName());
 
         MuleClient client = new MuleClient(muleContext);
@@ -68,7 +67,7 @@ public class FileFunctionalTestCase extends AbstractFileFunctionalTestCase
         MuleMessage message = client.request(url, 100000);
         checkReceivedMessage(message);
     }
-    
+
     @Test
     public void testRecursive() throws Exception
     {

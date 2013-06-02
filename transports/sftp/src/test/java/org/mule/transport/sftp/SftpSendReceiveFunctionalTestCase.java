@@ -17,7 +17,6 @@ import org.mule.api.MuleEventContext;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.functional.EventCallback;
 
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -127,7 +126,7 @@ public class SftpSendReceiveFunctionalTestCase extends AbstractSftpTestCase
 
         for (String sendFile : sendFiles)
         {
-            HashMap<String, String> props = new HashMap<String, String>(1);
+            HashMap<String, Object> props = new HashMap<String, Object>();
             props.put(SftpConnector.PROPERTY_FILENAME, sendFile + ".txt");
             client.dispatch("vm://test.upload", sendFile, props);
         }

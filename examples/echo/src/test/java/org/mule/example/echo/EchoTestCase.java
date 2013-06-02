@@ -23,13 +23,8 @@ import java.util.Map;
 
 import org.junit.Test;
 
-/**
- * @author alejandrosequeira
- *
- */
 public class EchoTestCase extends FunctionalTestCase
 {
-
     private static String MESSAGE = "message";
 
     @Override
@@ -42,12 +37,13 @@ public class EchoTestCase extends FunctionalTestCase
     public void httpGetToFlowUrlEchoesSentMessage() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
-        Map<String, String> props = new HashMap<String, String>();
+
+        Map<String, Object> props = new HashMap<String, Object>();
         props.put("http.method", "GET");
+
         MuleMessage result = client.send("http://localhost:8084/" + MESSAGE, "", props);
         assertNotNull(result);
         assertFalse(result.getPayload() instanceof NullPayload);
         assertEquals("/" + MESSAGE, result.getPayloadAsString());
     }
-
 }

@@ -10,6 +10,10 @@
 
 package org.mule.transport.jms.integration;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 
@@ -17,10 +21,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 public class JmsReplyToPropertyTestCase extends AbstractJmsFunctionalTestCase
 {
@@ -35,7 +35,7 @@ public class JmsReplyToPropertyTestCase extends AbstractJmsFunctionalTestCase
     public void testReplyTo() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
-        Map<String, String> props = new HashMap<String, String>();
+        Map<String, Object> props = new HashMap<String, Object>();
         props.put("JMSReplyTo", "middle");
         client.dispatch("in", DEFAULT_INPUT_MESSAGE, props);
 
@@ -44,7 +44,7 @@ public class JmsReplyToPropertyTestCase extends AbstractJmsFunctionalTestCase
         assertNotNull(output);
         final Object o = output.getOutboundProperty("JMSReplyTo");
         assertTrue(o.toString().contains("middle"));
-        
+
         // Check that the reply message was generated
         output = client.request("middle", 2000);
         assertNotNull(output);

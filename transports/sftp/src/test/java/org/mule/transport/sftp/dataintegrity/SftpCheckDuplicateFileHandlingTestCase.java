@@ -10,6 +10,9 @@
 
 package org.mule.transport.sftp.dataintegrity;
 
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import org.mule.api.MuleException;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
@@ -33,9 +36,6 @@ import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 /**
  * Test the three different types of handling when duplicate files (i.e. file names)
@@ -65,7 +65,7 @@ public class SftpCheckDuplicateFileHandlingTestCase extends AbstractServiceAndFl
         super(variant, configResources);
     }
 
-    private static final HashMap<String, String> MESSAGE_PROPERTIES = new HashMap<String, String>();
+    private static final HashMap<String, Object> MESSAGE_PROPERTIES = new HashMap<String, Object>();
     {
         MESSAGE_PROPERTIES.put(FILENAME_MESSAGE_PROPERTY, FILENAME);
     }

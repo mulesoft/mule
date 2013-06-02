@@ -5,7 +5,7 @@
  *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
- * LICENSE.txt file. 
+ * LICENSE.txt file.
  */
 
 package org.mule.transport.sftp;
@@ -13,15 +13,16 @@ package org.mule.transport.sftp;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.module.client.MuleClient;
+import org.mule.transport.sftp.dataintegrity.AbstractSftpDataIntegrityTestCase;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-import org.mule.api.endpoint.ImmutableEndpoint;
-import org.mule.module.client.MuleClient;
-import org.mule.transport.sftp.dataintegrity.AbstractSftpDataIntegrityTestCase;
 
 /**
  * Simple test to verify that the filter configuration works. Note that the transport
@@ -36,7 +37,7 @@ public class SftpFilterTestCase extends AbstractSftpDataIntegrityTestCase
     {
         super(variant, configResources);
     }
-    
+
     @Parameters
     public static Collection<Object[]> parameters()
     {
@@ -63,7 +64,7 @@ public class SftpFilterTestCase extends AbstractSftpDataIntegrityTestCase
         // Send .txt file using muleclient.dipatch directly (since the file won't be
         // delivered to the endpoint (due to filter settings) we can't wait for a
         // delivery notification....
-        HashMap<String, String> txtProps = new HashMap<String, String>(1);
+        HashMap<String, Object> txtProps = new HashMap<String, Object>();
         txtProps.put(SftpConnector.PROPERTY_FILENAME, FILENAME);
         muleClient.dispatch(getAddressByEndpoint(muleClient, INBOUND_ENDPOINT_NAME), TEST_MESSAGE, txtProps);
 

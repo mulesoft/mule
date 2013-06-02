@@ -15,6 +15,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
@@ -28,7 +29,6 @@ import org.junit.Test;
 
 public class LoanBrokerSyncTestCase extends FunctionalTestCase
 {
-
     @Override
     protected String getConfigResources()
     {
@@ -40,7 +40,7 @@ public class LoanBrokerSyncTestCase extends FunctionalTestCase
     {
         MuleClient client = new MuleClient(muleContext);
         @SuppressWarnings("unchecked")
-        Map<String, String> props = new SingletonMap("http.method", HttpConstants.METHOD_GET);
+        Map<String, Object> props = new SingletonMap("http.method", HttpConstants.METHOD_GET);
         MuleMessage result = client.send("http://localhost:11081?name=Muley&amount=20000&term=48&ssn=1234", null, props);
         assertNotNull("Result is null", result);
         assertFalse("Result is null", result.getPayload() instanceof NullPayload);
@@ -54,7 +54,7 @@ public class LoanBrokerSyncTestCase extends FunctionalTestCase
         MuleClient client = new MuleClient(muleContext);
 
         @SuppressWarnings("unchecked")
-        Map<String, String> props = new SingletonMap("http.method", HttpConstants.METHOD_GET);
+        Map<String, Object> props = new SingletonMap("http.method", HttpConstants.METHOD_GET);
         MuleMessage result = client.send("http://localhost:11081?amount=1234", null, props);
         assertEquals("Error: incomplete request", result.getPayloadAsString());
     }
@@ -65,10 +65,8 @@ public class LoanBrokerSyncTestCase extends FunctionalTestCase
         MuleClient client = new MuleClient(muleContext);
 
         @SuppressWarnings("unchecked")
-        Map<String, String> props = new SingletonMap("http.method", HttpConstants.METHOD_GET);
+        Map<String, Object> props = new SingletonMap("http.method", HttpConstants.METHOD_GET);
         MuleMessage result = client.send("http://localhost:11081?name=Muley&term=48&ssn=1234&amount=abcd", null, props);
         assertEquals("Error processing loan request", result.getPayloadAsString());
     }
 }
-
-

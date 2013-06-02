@@ -14,6 +14,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import org.mule.module.client.MuleClient;
+import org.mule.tck.junit4.rule.DynamicPort;
+
 import java.io.BufferedReader;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -27,8 +30,6 @@ import java.util.concurrent.TimeUnit;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.junit4.rule.DynamicPort;
 
 public class HttpCookieTestCase extends AbstractMockHttpServerTestCase
 {
@@ -63,7 +64,7 @@ public class HttpCookieTestCase extends AbstractMockHttpServerTestCase
     @Test
     public void testCookies() throws Exception
     {
-        Map<String, String> properties = new HashMap<String, String>();
+        Map<String, Object> properties = new HashMap<String, Object>();
         properties.put("COOKIE_HEADER", "MYCOOKIE");
 
         MuleClient client = new MuleClient(muleContext);
