@@ -16,7 +16,7 @@ import java.util.List;
 
 public class FruitLover
 {
-    private final List eatList = Collections.synchronizedList(new ArrayList());
+    private final List<Class<? extends Fruit>> eatList = Collections.synchronizedList(new ArrayList<Class<? extends Fruit>>());
     private final String catchphrase;
 
     public FruitLover(String catchphrase)
@@ -30,7 +30,7 @@ public class FruitLover
         eatList.add(fruit.getClass());
     }
 
-    public List getEatList()
+    public List<Class<? extends Fruit>> getEatList()
     {
         return eatList;
     }

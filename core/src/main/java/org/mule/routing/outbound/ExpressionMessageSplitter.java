@@ -78,13 +78,13 @@ public class ExpressionMessageSplitter extends AbstractRoundRobinMessageSplitter
     }
 
     @Override
-    protected List splitMessage(MuleMessage message)
+    protected List<Object> splitMessage(MuleMessage message)
     {
-        List results = new ArrayList(4);
+        List<Object> results = new ArrayList<Object>(4);
         Object result = muleContext.getExpressionManager().evaluate(config.getFullExpression(expressionManager), message);
         if (result instanceof List)
         {
-            results.addAll((List)result);
+            results.addAll((List<?>)result);
         }
         else
         {

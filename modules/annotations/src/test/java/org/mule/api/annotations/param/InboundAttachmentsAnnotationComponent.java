@@ -30,7 +30,7 @@ public class InboundAttachmentsAnnotationComponent
 
     public String processAttachmentOptional(@InboundAttachments("faz?") DataHandler faz)
     {
-        if(faz==null)
+        if (faz == null)
         {
             return "faz not set";
         }
@@ -47,7 +47,7 @@ public class InboundAttachmentsAnnotationComponent
     {
         return attachments;
     }
-    
+
     public Map<String, DataHandler> processAttachmentsAll(@InboundAttachments("*") Map<String, DataHandler> attachments)
     {
         return attachments;
@@ -57,17 +57,17 @@ public class InboundAttachmentsAnnotationComponent
     {
         return attachments;
     }
-    
+
     public Map<String, DataHandler> processAttachmentsMultiWildcard(@InboundAttachments("ba*, f*") Map<String, DataHandler> attachments)
     {
         return attachments;
     }
-    
+
     public Map<String, DataHandler> processSingleMapAttachment(@InboundAttachments("foo") Map<String, DataHandler> attachments)
     {
         return attachments;
     }
-    
+
     public Map<String, DataHandler> processAttachmentsOptional(@InboundAttachments("foo, bar, baz?") Map<String, DataHandler> attachments)
     {
         return attachments;
@@ -77,7 +77,7 @@ public class InboundAttachmentsAnnotationComponent
     {
         return attachments;
     }
-    
+
     public Map<String, DataHandler> processUnmodifiableAttachments(@InboundAttachments("foo, bar") Map<String, DataHandler> attachments)
     {
         //Should throw UnsupportedOperationException
@@ -86,52 +86,56 @@ public class InboundAttachmentsAnnotationComponent
         return attachments;
     }
 
-    public List processAttachmentsList(@InboundAttachments("foo, bar, baz") List<DataHandler> attachments)
+    public List<Object> processAttachmentsList(@InboundAttachments("foo, bar, baz") List<DataHandler> attachments)
     {
         return readToList(attachments);
     }
 
-    public List processAttachmentsListAll(@InboundAttachments("*") List<DataHandler> attachments)
+    public List<Object> processAttachmentsListAll(@InboundAttachments("*") List<DataHandler> attachments)
     {
         return readToList(attachments);
     }
 
-    public List processSingleAttachmentList(@InboundAttachments("foo") List<DataHandler> attachments)
+    public List<Object> processSingleAttachmentList(@InboundAttachments("foo") List<DataHandler> attachments)
     {
         return readToList(attachments);
     }
 
-    public List processAttachmentsListOptional(@InboundAttachments("foo, bar, baz?") List<DataHandler> attachments)
+    public List<Object> processAttachmentsListOptional(@InboundAttachments("foo, bar, baz?") List<DataHandler> attachments)
     {
         return readToList(attachments);
     }
 
-    public List processAttachmentsListAllOptional(@InboundAttachments("foo?, bar?, baz?") List<DataHandler> attachments)
+    public List<Object> processAttachmentsListAllOptional(@InboundAttachments("foo?, bar?, baz?") List<DataHandler> attachments)
     {
         return readToList(attachments);
     }
 
-    public List processUnmodifiableAttachmentsList(@InboundAttachments("foo, bar") List<DataHandler> attachments)
+    public List<Object> processUnmodifiableAttachmentsList(@InboundAttachments("foo, bar") List<DataHandler> attachments)
     {
         //Should throw UnsupportedOperationException
         attachments.add(new DataHandler(new StringDataSource("carValue")));
         return readToList(attachments);
     }
 
-    public List processAttachmentsListWildcard(@InboundAttachments("ba*") List<DataHandler> attachments)
+    public List<Object> processAttachmentsListWildcard(@InboundAttachments("ba*") List<DataHandler> attachments)
     {
         return readToList(attachments);
     }
 
-    public List processAttachmentsListMultiWildcard(@InboundAttachments("ba*, f*") List<DataHandler> attachments)
+    public List<Object> processAttachmentsListMultiWildcard(@InboundAttachments("ba*, f*") List<DataHandler> attachments)
     {
         return readToList(attachments);
     }
 
-    private List readToList(List<DataHandler> list)
+    private List<Object> readToList(List<DataHandler> list)
     {
-        if(list.size()==0) return list;
-        List l = new ArrayList(list.size());
+        if (list.size() == 0)
+        {
+            return new ArrayList<Object>();
+        }
+
+        List<Object> l = new ArrayList<Object>(list.size());
         for (DataHandler dataHandler : list)
         {
             try

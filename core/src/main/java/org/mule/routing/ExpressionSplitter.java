@@ -58,6 +58,7 @@ public class ExpressionSplitter extends AbstractSplitter
         config.validate(expressionManager);
     }
 
+    @Override
     protected List<MuleMessage> splitMessage(MuleEvent event)
     {
         Object result = event.getMuleContext()
@@ -94,7 +95,7 @@ public class ExpressionSplitter extends AbstractSplitter
         }
         else if (result == null)
         {
-            return new ArrayList();
+            return new ArrayList<MuleMessage>();
         }
         else
         {

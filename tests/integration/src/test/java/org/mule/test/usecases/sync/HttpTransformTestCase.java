@@ -62,7 +62,7 @@ public class HttpTransformTestCase extends AbstractServiceAndFlowTestCase
     public void testBinary() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
-        ArrayList<Integer> payload = new ArrayList();
+        ArrayList<Integer> payload = new ArrayList<Integer>();
         payload.add(42);
         MuleMessage message = client.send("http://localhost:18081/RemoteService", SerializationUtils.serialize(payload), null);
         assertNotNull(message);
