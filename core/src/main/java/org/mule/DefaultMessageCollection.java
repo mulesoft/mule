@@ -19,7 +19,6 @@ import org.mule.api.transformer.TransformerException;
 import org.mule.transformer.types.DataTypeFactory;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -38,14 +37,14 @@ import java.util.concurrent.CopyOnWriteArrayList;
  */
 public class DefaultMessageCollection extends DefaultMuleMessage implements MuleMessageCollection
 {
-    private List messageList = new CopyOnWriteArrayList();
+    private List<MuleMessage> messageList = new CopyOnWriteArrayList<MuleMessage>();
 
     private boolean invalidatedPayload;
 
     public DefaultMessageCollection(MuleContext muleContext)
     {
         //This will be a collection of payloads
-        super(new CopyOnWriteArrayList(), muleContext);
+        super(new CopyOnWriteArrayList<Object>(), muleContext);
         invalidatedPayload = false;
     }
 
@@ -108,6 +107,7 @@ public class DefaultMessageCollection extends DefaultMuleMessage implements Mule
         }
     }
 
+    @Override
     public void addMessage(MuleMessage message)
     {
         checkValidPayload();
@@ -115,24 +115,27 @@ public class DefaultMessageCollection extends DefaultMuleMessage implements Mule
         getPayloadList().add(message.getPayload());
     }
 
+    @Override
     public MuleMessage[] getMessagesAsArray()
     {
         checkValidPayload();
-        List list = getMessageList();
+        List<MuleMessage> list = getMessageList();
         MuleMessage[] messages = new MuleMessage[list.size()];
-        messages = (MuleMessage[])list.toArray(messages);
+        messages = list.toArray(messages);
         return messages;
     }
 
+    @Override
     public Object[] getPayloadsAsArray()
     {
         checkValidPayload();
-        List list = getPayloadList();
+        List<Object> list = getPayloadList();
         Object[] payloads = new Object[list.size()];
         payloads = list.toArray(payloads);
         return payloads;
     }
 
+    @Override
     public void removedMessage(MuleMessage message)
     {
         checkValidPayload();
@@ -140,6 +143,7 @@ public class DefaultMessageCollection extends DefaultMuleMessage implements Mule
         getPayloadList().remove(message.getPayload());
     }
 
+    @Override
     public void addMessage(MuleMessage message, int index)
     {
         checkValidPayload();
@@ -147,6 +151,7 @@ public class DefaultMessageCollection extends DefaultMuleMessage implements Mule
         getPayloadList().add(index, message.getPayload());
     }
 
+    @Override
     public void addMessages(MuleEvent[] events)
     {
         checkValidPayload();
@@ -157,16 +162,17 @@ public class DefaultMessageCollection extends DefaultMuleMessage implements Mule
         }
     }
 
-    public void addMessages(List messages)
+    @Override
+    public void addMessages(List<MuleMessage> messages)
     {
         checkValidPayload();
-        for (Iterator iterator = messages.iterator(); iterator.hasNext(); )
+        for (MuleMessage message : messages)
         {
-            MuleMessage message = (MuleMessage) iterator.next();
             addMessage(message);
         }
     }
 
+    @Override
     public void addMessages(MuleMessage[] messages)
     {
         checkValidPayload();
@@ -176,22 +182,24 @@ public class DefaultMessageCollection extends DefaultMuleMessage implements Mule
         }
     }
 
+    @Override
     public MuleMessage getMessage(int index)
     {
         checkValidPayload();
-        return (MuleMessage) getMessageList().get(index);
+        return getMessageList().get(index);
     }
 
-    protected List getMessageList()
+    protected List<MuleMessage> getMessageList()
     {
         checkValidPayload();
         return messageList;
     }
 
-    protected List getPayloadList()
+    @SuppressWarnings("unchecked")
+    protected List<Object> getPayloadList()
     {
         checkValidPayload();
-        return (List) getPayload();
+        return (List<Object>) getPayload();
     }
 
     @Override
@@ -224,16 +232,16 @@ public class DefaultMessageCollection extends DefaultMuleMessage implements Mule
         else
         {
             DataType outputDataType = DataTypeFactory.create(outputType);
-            List results = new ArrayList(getMessageList().size());
-            for (Iterator iterator = getMessageList().iterator(); iterator.hasNext(); )
+            List<Object> results = new ArrayList<Object>(getMessageList().size());
+            for (MuleMessage message : getMessageList())
             {
-                MuleMessage message = (MuleMessage) iterator.next();
                 results.add(message.getPayload(outputDataType));
             }
             return results;
         }
     }
 
+    @Override
     public int size()
     {
         checkValidPayload();
@@ -307,6 +315,7 @@ public class DefaultMessageCollection extends DefaultMuleMessage implements Mule
     /**
      * We need to overload this if we find we want to make this class available to users, but the copy will be expensive;
      */
+    @Override
     public ThreadSafeAccess newThreadCopy()
     {
         checkValidPayload();

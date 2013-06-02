@@ -34,14 +34,15 @@ import org.apache.activemq.transport.TransportListener;
 public class ActiveMQTestReconnectionConnectionFactoryWrapper extends ActiveMQConnectionFactory
     implements TargetInvocationHandler, TestReconnectionConnectionFactoryWrapper
 {
-    private static List calledMethods;
+    private static List<Object> calledMethods;
     private static volatile boolean enabled = true;
     private static Connection connection;
 
+    @Override
     public void init()
     {
         enabled = true;
-        calledMethods = new CopyOnWriteArrayList();
+        calledMethods = new CopyOnWriteArrayList<Object>();
     }
 
     public ActiveMQTestReconnectionConnectionFactoryWrapper()
@@ -85,10 +86,10 @@ public class ActiveMQTestReconnectionConnectionFactoryWrapper extends ActiveMQCo
     }
 
     @Override
-    public QueueConnection createQueueConnection(String userName, String password) throws JMSException
+    public QueueConnection createQueueConnection(String user, String passwd) throws JMSException
     {
         registration();
-        connection = super.createQueueConnection(userName, password);
+        connection = super.createQueueConnection(user, passwd);
         return (QueueConnection) Proxy.newProxyInstance(
             ActiveMQTestReconnectionConnectionFactoryWrapper.class.getClassLoader(), new Class[]{Connection.class,
                 TopicConnection.class, QueueConnection.class, StatsCapable.class, Closeable.class,
@@ -107,10 +108,10 @@ public class ActiveMQTestReconnectionConnectionFactoryWrapper extends ActiveMQCo
     }
 
     @Override
-    public TopicConnection createTopicConnection(String userName, String password) throws JMSException
+    public TopicConnection createTopicConnection(String user, String passwd) throws JMSException
     {
         registration();
-        connection = super.createTopicConnection(userName, password);
+        connection = super.createTopicConnection(user, passwd);
         return (TopicConnection) Proxy.newProxyInstance(
             ActiveMQTestReconnectionConnectionFactoryWrapper.class.getClassLoader(), new Class[]{Connection.class,
                 TopicConnection.class, QueueConnection.class, StatsCapable.class, Closeable.class,
@@ -118,12 +119,14 @@ public class ActiveMQTestReconnectionConnectionFactoryWrapper extends ActiveMQCo
     }
 
     // For InvocationHandler interface
+    @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
     {
         registration();
         return method.invoke(connection, args);
     }
 
+    @Override
     public Object getTargetObject()
     {
         return connection;
@@ -132,7 +135,7 @@ public class ActiveMQTestReconnectionConnectionFactoryWrapper extends ActiveMQCo
     /**
      * If enabled == true, do nothing. If not, throw a JMSException to simulate a
      * connection error to mule.
-     * 
+     *
      * @throws JMSException
      */
     private void registration() throws JMSException
@@ -161,26 +164,30 @@ public class ActiveMQTestReconnectionConnectionFactoryWrapper extends ActiveMQCo
         //}
     }
 
-    public List getCalledMethods()
+    @Override
+    public List<Object> getCalledMethods()
     {
         return calledMethods;
     }
 
+    @Override
     public boolean isEnabled()
     {
         return enabled;
     }
 
+    @Override
     public void setEnabled(boolean enabled)
     {
         ActiveMQTestReconnectionConnectionFactoryWrapper.enabled = enabled;
     }
 
+    @Override
     public void closeConnection()
     {
         try
         {
-            this.connection.close();
+            connection.close();
         }
         catch (Exception e)
         {

@@ -13,6 +13,11 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
+import org.mule.api.MuleException;
+import org.mule.api.MuleMessage;
+import org.mule.module.client.MuleClient;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -20,19 +25,14 @@ import java.util.List;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
 
 public class VMRequestorTestCase extends AbstractServiceAndFlowTestCase
 {
-
     public VMRequestorTestCase(ConfigVariant variant, String configResources)
     {
         super(variant, configResources);
     }
-    
+
     @Parameters
     public static Collection<Object[]> parameters()
     {
@@ -45,14 +45,13 @@ public class VMRequestorTestCase extends AbstractServiceAndFlowTestCase
     @Test
     public void testRequestorWithUpdateonMessage() throws Exception
     {
-
         for (int i = 0; i < 10; i++)
         {
             makeClientRequest("test" + i);
         }
 
         MuleClient client = new MuleClient(muleContext);
-        List results = new ArrayList();
+        List<String> results = new ArrayList<String>();
         MuleMessage result = null;
         for (int i = 0; i < 10; i++)
         {
@@ -72,6 +71,7 @@ public class VMRequestorTestCase extends AbstractServiceAndFlowTestCase
         final MuleClient client = new MuleClient(muleContext);
         Thread t = new Thread(new Runnable()
         {
+            @Override
             public void run()
             {
                 try
@@ -87,5 +87,4 @@ public class VMRequestorTestCase extends AbstractServiceAndFlowTestCase
         }, "test-thread");
         t.start();
     }
-    
 }

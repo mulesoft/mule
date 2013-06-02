@@ -21,7 +21,6 @@ import org.apache.commons.lang.CharUtils;
 // @ThreadSafe
 public class StringUtils extends org.apache.commons.lang.StringUtils
 {
-
     /**
      * Like {@link org.mule.util.StringUtils#split(String, String)}, but
      * additionally trims whitespace from the result tokens.
@@ -39,13 +38,12 @@ public class StringUtils extends org.apache.commons.lang.StringUtils
         }
 
         String[] rawTokens = split(string, delim);
-        List tokens = new ArrayList();
-        String token;
+        List<String> tokens = new ArrayList<String>();
         if (rawTokens != null)
         {
             for (int i = 0; i < rawTokens.length; i++)
             {
-                token = trim(rawTokens[i]);
+                String token = trim(rawTokens[i]);
                 if (isNotEmpty(token))
                 {
                     tokens.add(token);
@@ -57,7 +55,7 @@ public class StringUtils extends org.apache.commons.lang.StringUtils
 
     /**
      * Convert a hexadecimal string into its byte representation.
-     * 
+     *
      * @param hex The hexadecimal string.
      * @return The converted bytes or <code>null</code> if the hex String is null.
      */
@@ -105,7 +103,7 @@ public class StringUtils extends org.apache.commons.lang.StringUtils
 
     /**
      * Convert a byte array to a hexadecimal string.
-     * 
+     *
      * @param bytes The bytes to format.
      * @param uppercase When <code>true</code> creates uppercase hex characters
      *            instead of lowercase (the default).
@@ -135,5 +133,4 @@ public class StringUtils extends org.apache.commons.lang.StringUtils
     // lookup tables needed for toHexString(byte[], boolean)
     private static final String HEX_CHARACTERS = "0123456789abcdef";
     private static final String HEX_CHARACTERS_UC = HEX_CHARACTERS.toUpperCase();
-
 }

@@ -18,7 +18,6 @@ import org.mule.util.IOUtils;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
 
 import org.custommonkey.xmlunit.XMLUnit;
 import org.w3c.dom.Document;
@@ -51,10 +50,12 @@ public class InlineXQueryTransformerWithParamsTestCase extends AbstractTransform
                 "    return <cd-title>{data($cd/title)}</cd-title>\n" +
                 "} \n</cd-listings>");
         transformer.setReturnDataType(DataTypeFactory.STRING);
-        Properties params = new Properties();
-        params.setProperty("title", "#[header:ListTitle]");
-        params.setProperty("rating", "#[header:ListRating]");
+
+        Map<String, Object> params = new HashMap<String, Object>();
+        params.put("title", "#[header:ListTitle]");
+        params.put("rating", "#[header:ListRating]");
         transformer.setContextProperties(params);
+
         transformer.setMuleContext(muleContext);
         transformer.initialise();
         return transformer;

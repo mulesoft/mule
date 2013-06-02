@@ -84,8 +84,7 @@ public abstract class AbstractTransformer implements Transformer, AnnotatedObjec
      * A list of supported Class types that the source payload passed into this
      * transformer
      */
-    @SuppressWarnings("unchecked")
-    protected final List<DataType<?>> sourceTypes = new CopyOnWriteArrayList/*<DataType>*/();
+    protected final List<DataType<?>> sourceTypes = new CopyOnWriteArrayList<DataType<?>>();
 
     /**
      * Determines whether the transformer will throw an exception if the message
@@ -113,6 +112,7 @@ public abstract class AbstractTransformer implements Transformer, AnnotatedObjec
         super();
     }
 
+    @Override
     public MuleEvent process(MuleEvent event) throws MuleException
     {
         if (event != null && event.getMessage() != null)
@@ -199,6 +199,7 @@ public abstract class AbstractTransformer implements Transformer, AnnotatedObjec
     /**
      * @return transformer name
      */
+    @Override
     public String getName()
     {
         if (name == null)
@@ -211,6 +212,7 @@ public abstract class AbstractTransformer implements Transformer, AnnotatedObjec
     /**
      * @param string
      */
+    @Override
     public void setName(String string)
     {
         if (string == null)
@@ -223,11 +225,13 @@ public abstract class AbstractTransformer implements Transformer, AnnotatedObjec
     }
 
     @Deprecated
+    @Override
     public Class<?> getReturnClass()
     {
         return returnType.getType();
     }
 
+    @Override
     public void setReturnDataType(DataType<?> type)
     {
         this.returnType = type.cloneDataType();
@@ -235,11 +239,13 @@ public abstract class AbstractTransformer implements Transformer, AnnotatedObjec
         this.mimeType = type.getMimeType();
     }
 
+    @Override
     public DataType<?> getReturnDataType()
     {
         return returnType;
     }
 
+    @Override
     @Deprecated
     public void setReturnClass(Class<?> newClass)
     {
@@ -266,11 +272,13 @@ public abstract class AbstractTransformer implements Transformer, AnnotatedObjec
         }
     }
 
+    @Override
     public String getMimeType()
     {
         return mimeType;
     }
 
+    @Override
     public String getEncoding()
     {
         return encoding;
@@ -296,11 +304,13 @@ public abstract class AbstractTransformer implements Transformer, AnnotatedObjec
     }
 
     @Deprecated
+    @Override
     public boolean isSourceTypeSupported(Class<?> aClass)
     {
         return isSourceDataTypeSupported(DataTypeFactory.create(aClass), false);
     }
 
+    @Override
     public boolean isSourceDataTypeSupported(DataType<?> dataType)
     {
         return isSourceDataTypeSupported(dataType, false);
@@ -358,11 +368,13 @@ public abstract class AbstractTransformer implements Transformer, AnnotatedObjec
         return false;
     }
 
+    @Override
     public final Object transform(Object src) throws TransformerException
     {
         return transform(src, getEncoding(src));
     }
 
+    @Override
     public Object transform(Object src, String enc) throws TransformerException
     {
         Object payload = src;
@@ -461,11 +473,13 @@ public abstract class AbstractTransformer implements Transformer, AnnotatedObjec
         return InputStream.class.isAssignableFrom(srcCls) || StreamSource.class.isAssignableFrom(srcCls);
     }
 
+    @Override
     public ImmutableEndpoint getEndpoint()
     {
         return endpoint;
     }
 
+    @Override
     public void setEndpoint(ImmutableEndpoint endpoint)
     {
         this.endpoint = endpoint;
@@ -479,6 +493,7 @@ public abstract class AbstractTransformer implements Transformer, AnnotatedObjec
      *
      * @throws InitialisationException
      */
+    @Override
     public void initialise() throws InitialisationException
     {
         // do nothing, subclasses may override
@@ -488,6 +503,7 @@ public abstract class AbstractTransformer implements Transformer, AnnotatedObjec
      * Template method where deriving classes can do any clean up any resources or state
      * before the object is disposed.
      */
+    @Override
     public void dispose()
     {
         // do nothing, subclasses may override
@@ -510,6 +526,7 @@ public abstract class AbstractTransformer implements Transformer, AnnotatedObjec
     }
 
     @Deprecated
+    @Override
     public List<Class<?>> getSourceTypes()
     {
         //A work around to support the legacy API
@@ -521,11 +538,13 @@ public abstract class AbstractTransformer implements Transformer, AnnotatedObjec
         return Collections.unmodifiableList(sourceClasses);
     }
 
+    @Override
     public List<DataType<?>> getSourceDataTypes()
     {
         return Collections.unmodifiableList(sourceTypes);
     }
 
+    @Override
     public boolean isIgnoreBadInput()
     {
         return ignoreBadInput;
@@ -550,26 +569,31 @@ public abstract class AbstractTransformer implements Transformer, AnnotatedObjec
         return sb.toString();
     }
 
+    @Override
     public boolean isAcceptNull()
     {
         return false;
     }
 
+    @Override
     public void setMuleContext(MuleContext context)
     {
         this.muleContext = context;
     }
 
-    public final Object getAnnotation(QName name)
+    @Override
+    public final Object getAnnotation(QName qName)
     {
-        return annotations.get(name);
+        return annotations.get(qName);
     }
 
+    @Override
     public final Map<QName, Object> getAnnotations()
     {
         return Collections.unmodifiableMap(annotations);
     }
 
+    @Override
     public synchronized final void setAnnotations(Map<QName, Object> newAnnotations)
     {
         annotations.clear();

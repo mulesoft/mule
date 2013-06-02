@@ -49,16 +49,15 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * This is the base class for exception strategies which contains several helper methods.  However, you should 
- * probably inherit from <code>AbstractMessagingExceptionStrategy</code> (if you are creating a Messaging Exception Strategy) 
+ * This is the base class for exception strategies which contains several helper methods.  However, you should
+ * probably inherit from <code>AbstractMessagingExceptionStrategy</code> (if you are creating a Messaging Exception Strategy)
  * or <code>AbstractSystemExceptionStrategy</code> (if you are creating a System Exception Strategy) rather than directly from this class.
  */
 public abstract class AbstractExceptionListener extends AbstractMessageProcessorOwner implements GlobalNameableObject
 {
     protected transient Log logger = LogFactory.getLog(getClass());
 
-    @SuppressWarnings("unchecked")
-    protected List<MessageProcessor> messageProcessors = new CopyOnWriteArrayList();
+    protected List<MessageProcessor> messageProcessors = new CopyOnWriteArrayList<MessageProcessor>();
 
     protected AtomicBoolean initialised = new AtomicBoolean(false);
 
@@ -69,11 +68,13 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
 
     protected String globalName;
 
+    @Override
     public String getGlobalName()
     {
         return globalName;
     }
 
+    @Override
     public void setGlobalName(String globalName)
     {
         this.globalName = globalName;
@@ -93,7 +94,7 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
                    || (commitTxFilter != null && !commitTxFilter.accept(t.getClass().getName()));
         }
     }
-    
+
     public List<MessageProcessor> getMessageProcessors()
     {
         return messageProcessors;
@@ -125,7 +126,7 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
         return messageProcessors.remove(processor);
     }
 
-    protected Throwable getExceptionType(Throwable t, Class exceptionType)
+    protected Throwable getExceptionType(Throwable t, Class<? extends Throwable> exceptionType)
     {
         while (t != null)
         {
@@ -145,9 +146,10 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
      * a service or connector. This implementation ensures that initialise is called
      * only once. The actual initialisation code is contained in the
      * <code>doInitialise()</code> method.
-     * 
+     *
      * @throws InitialisationException
      */
+    @Override
     public final synchronized void initialise() throws InitialisationException
     {
         if (!initialised.get())
@@ -158,7 +160,7 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
         }
     }
 
-    protected void doInitialise(MuleContext muleContext) throws InitialisationException
+    protected void doInitialise(MuleContext context) throws InitialisationException
     {
         logger.info("Initialising exception listener: " + toString());
     }
@@ -184,7 +186,7 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
      * dispatch. The message dispatched from this method will be an
      * <code>ExceptionMessage</code> which contains the exception thrown the
      * MuleMessage and any context information.
-     * 
+     *
      * @param event the MuleEvent being processed when the exception occurred
      * @param t the exception thrown. This will be sent with the ExceptionMessage
      * @see ExceptionMessage
@@ -252,6 +254,7 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
     /**
      * @deprecated use {@link #rollback(Exception)} instead
      */
+    @Deprecated
     protected void rollback(RollbackSourceCallback rollbackMethod)
     {
         Transaction tx = TransactionCoordination.getInstance().getTransaction();
@@ -260,8 +263,8 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
             try
             {
                 tx.rollback();
-                
-                // TODO The following was in the catch clause of TransactionTemplate previously.  
+
+                // TODO The following was in the catch clause of TransactionTemplate previously.
                 // Do we need to do this here?  If so, where can we store these variables (suspendedXATx, joinedExternal)
                 // so that they are available to us in the exception handler?
                 //
@@ -301,7 +304,7 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
 
     /**
      * Used to log the error passed into this Exception Listener
-     * 
+     *
      * @param t the exception thrown
      */
     protected void logException(Throwable t)
@@ -321,7 +324,7 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
      * Logs a fatal error message to the logging system. This should be used mostly
      * if an error occurs in the exception listener itself. This implementation logs
      * the the message itself to the logs if it is not null
-     * 
+     *
      * @param event The MuleEvent currently being processed
      * @param t the fatal exception to log
      */
@@ -347,7 +350,7 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
      * Fires a server notification to all registered
      * {@link org.mule.api.context.notification.ExceptionNotificationListener}
      * eventManager.
-     * 
+     *
      * @param notification the notification to fire.
      */
     protected void fireNotification(ServerNotification notification)
@@ -392,7 +395,7 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
     {
         this.rollbackTxFilter = rollbackTxFilter;
     }
-    
+
     @Override
     protected List<MessageProcessor> getOwnedMessageProcessors()
     {
@@ -489,10 +492,10 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
         }
     }
 
-    void processOutboundRouterStatistics(FlowConstruct flowConstruct)
+    void processOutboundRouterStatistics(FlowConstruct construct)
     {
         List<MessageProcessor> processors = getMessageProcessors();
-        FlowConstructStatistics statistics = flowConstruct.getStatistics();
+        FlowConstructStatistics statistics = construct.getStatistics();
         if (CollectionUtils.isNotEmpty(processors) && statistics instanceof ServiceStatistics)
         {
             if (statistics.isEnabled())

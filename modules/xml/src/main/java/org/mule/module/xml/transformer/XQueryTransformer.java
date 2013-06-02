@@ -24,7 +24,6 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -41,6 +40,7 @@ import net.sf.saxon.javax.xml.xquery.XQItemType;
 import net.sf.saxon.javax.xml.xquery.XQPreparedExpression;
 import net.sf.saxon.javax.xml.xquery.XQResultSequence;
 import net.sf.saxon.xqj.SaxonXQDataSource;
+
 import org.apache.commons.pool.BasePoolableObjectFactory;
 import org.apache.commons.pool.impl.GenericObjectPool;
 import org.dom4j.io.DOMWriter;
@@ -68,7 +68,7 @@ public class XQueryTransformer extends AbstractXmlTransformer implements Disposa
 
     private volatile String xqueryFile;
     private volatile String xquery;
-    private volatile Map contextProperties;
+    private volatile Map<String, Object> contextProperties;
     private volatile XQCommonHandler commonHandler;
     private volatile XQConnection connection;
     protected Configuration configuration;
@@ -97,13 +97,9 @@ public class XQueryTransformer extends AbstractXmlTransformer implements Disposa
         this.xqueryFile = xqueryFile;
     }
 
-    /**
-     *
-     */
     @Override
     public void initialise() throws InitialisationException
     {
-
         if (xquery != null && xqueryFile != null)
         {
             throw new InitialisationException(XmlMessages.canOnlySetFileOrXQuery(), this);
@@ -165,12 +161,12 @@ public class XQueryTransformer extends AbstractXmlTransformer implements Disposa
 
                 XQResultSequence result = transformer.executeQuery();
                 //No support for return Arrays yet
-                List results = new ArrayList();
+                List<Object> results = new ArrayList<Object>();
                 while (result.next())
                 {
                     XQItem item = result.getItem();
 
-                    Class type = returnType.getType();
+                    Class<?> type = returnType.getType();
                     if (Node.class.isAssignableFrom(type) || Node[].class.isAssignableFrom(type))
                     {
                         results.add(item.getNode());
@@ -254,10 +250,9 @@ public class XQueryTransformer extends AbstractXmlTransformer implements Disposa
         // set transformation parameters
         if (contextProperties != null)
         {
-            for (Iterator i = contextProperties.entrySet().iterator(); i.hasNext();)
+            for (Map.Entry<String, Object> parameter : contextProperties.entrySet())
             {
-                Map.Entry parameter = (Map.Entry) i.next();
-                String key = (String) parameter.getKey();
+                String key = parameter.getKey();
                 Object o = evaluateTransformParameter(key, parameter.getValue(), message);
 
                 if (o instanceof String)
@@ -310,11 +305,9 @@ public class XQueryTransformer extends AbstractXmlTransformer implements Disposa
         // Replace transformation parameters with null values
         if (contextProperties != null)
         {
-            for (Iterator i = contextProperties.entrySet().iterator(); i.hasNext(); )
+            for (Map.Entry<String, Object> parameter: contextProperties.entrySet())
             {
-                Map.Entry parameter = (Map.Entry) i.next();
-                String key = (String) parameter.getKey();
-
+                String key = parameter.getKey();
                 transformer.bindAtomicValue(new QName(key), "", connection.createAtomicItemType(XQItemType.XQBASETYPE_STRING));
             }
         }
@@ -485,7 +478,7 @@ public class XQueryTransformer extends AbstractXmlTransformer implements Disposa
      * @see javax.xml.transform.Transformer#setParameter(java.lang.String,
      *      java.lang.Object)
      */
-    public Map getContextProperties()
+    public Map<String, Object> getContextProperties()
     {
         return contextProperties;
     }
@@ -497,7 +490,7 @@ public class XQueryTransformer extends AbstractXmlTransformer implements Disposa
      * @see javax.xml.transform.Transformer#setParameter(java.lang.String,
      *      java.lang.Object)
      */
-    public void setContextProperties(Map contextProperties)
+    public void setContextProperties(Map<String, Object> contextProperties)
     {
         this.contextProperties = contextProperties;
     }

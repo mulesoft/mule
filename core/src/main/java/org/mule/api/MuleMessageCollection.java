@@ -26,7 +26,7 @@ public interface MuleMessageCollection extends MuleMessage
 
     void addMessages(MuleEvent[] events);
 
-    void addMessages(List messages);
+    void addMessages(List<MuleMessage> messages);
 
     void removedMessage(MuleMessage message);
 
