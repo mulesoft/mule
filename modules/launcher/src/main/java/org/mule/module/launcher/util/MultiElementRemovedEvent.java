@@ -14,21 +14,21 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-/**
-*
-*/
-public class MultiElementRemovedEvent extends ElementEvent {
+public class MultiElementRemovedEvent extends ElementEvent
+{
+    private List<Object> values = new ArrayList<Object>();
 
-    private List values = new ArrayList();
-
-    public MultiElementRemovedEvent(Object source, List values) {
+    public MultiElementRemovedEvent(Object source, List<?> values)
+    {
         super(source, OLDVALUE, NEWVALUE, ElementEvent.MULTI_ADD, 0);
-        if (values != null) {
+        if (values != null)
+        {
             this.values.addAll(values);
         }
     }
 
-    public List getValues() {
+    public List<Object> getValues()
+    {
         return Collections.unmodifiableList(values);
     }
 }

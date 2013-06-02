@@ -14,8 +14,6 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.ImmutableEndpoint;
-import org.mule.api.transaction.Transaction;
-import org.mule.transaction.TransactionCoordination;
 import org.mule.transport.jdbc.JdbcConnector;
 import org.mule.transport.jdbc.JdbcUtils;
 import org.mule.util.ArrayUtils;
@@ -28,27 +26,28 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 
 /**
- * Implements strategy for handling normal select statements + acks.  
+ * Implements strategy for handling normal select statements + acks.
  */
 public  class SelectSqlStatementStrategy implements SqlStatementStrategy
 {
     protected transient Logger logger = Logger.getLogger(getClass());
-    
+
+    @Override
     public MuleMessage executeStatement(JdbcConnector connector, ImmutableEndpoint endpoint,
                                         MuleEvent event, long timeout, Connection connection) throws Exception
     {
         logger.debug("Trying to receive a message with a timeout of " + timeout);
-        
+
         String[] stmts = connector.getReadAndAckStatements(endpoint);
-        
+
         //Unparsed SQL statements (with #[foo] parameters)
         String readStmt = stmts[0];
         String ackStmt = stmts[1];
-        
+
         //Storage for params (format is #[foo])
-        List readParams = new ArrayList();
-        List ackParams = new ArrayList();
-        
+        List<String> readParams = new ArrayList<String>();
+        List<String> ackParams = new ArrayList<String>();
+
         //Prepared statement form (with ? placeholders instead of #[foo] params)
         readStmt = connector.parseStatement(readStmt, readParams);
         ackStmt = connector.parseStatement(ackStmt, ackParams);

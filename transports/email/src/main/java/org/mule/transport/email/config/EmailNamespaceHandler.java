@@ -30,7 +30,7 @@ public class EmailNamespaceHandler extends AbstractMuleNamespaceHandler
 
     static
     {
-        Map<String, Flags.Flag> mapping = new HashMap<String, Flags.Flag>();
+        Map<String, Object> mapping = new HashMap<String, Object>();
         mapping.put("ANSWERED", Flags.Flag.ANSWERED);
         mapping.put("DELETED", Flags.Flag.DELETED);
         mapping.put("DRAFT", Flags.Flag.DRAFT);
@@ -42,6 +42,7 @@ public class EmailNamespaceHandler extends AbstractMuleNamespaceHandler
         DEFAULT_PROCESS_MESSAGE_ACTION = new SimplePropertyConfiguration.IndentityMapValueMap(mapping);
     }
 
+    @Override
     public void init()
     {
         registerBeanDefinitionParser("email-to-string-transformer", new MessageProcessorDefinitionParser(EmailMessageToString.class));

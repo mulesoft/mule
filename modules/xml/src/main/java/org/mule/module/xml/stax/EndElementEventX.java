@@ -32,5 +32,4 @@ public class EndElementEventX extends EndElementEvent
     {
         return namespaces2;
     }
-
 }

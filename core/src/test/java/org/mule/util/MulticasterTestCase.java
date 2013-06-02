@@ -10,6 +10,8 @@
 
 package org.mule.util;
 
+import static org.junit.Assert.assertTrue;
+
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.tck.testmodels.fruit.Apple;
@@ -22,16 +24,13 @@ import java.util.List;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertTrue;
-
 @SmallTest
 public class MulticasterTestCase extends AbstractMuleTestCase
 {
-
     @Test
     public void testMulticating() throws Exception
     {
-        List fruit = new ArrayList();
+        List<Fruit> fruit = new ArrayList<Fruit>();
         Apple apple = new Apple();
         Banana banana = new Banana();
         WaterMelon melon = new WaterMelon();
@@ -46,5 +45,4 @@ public class MulticasterTestCase extends AbstractMuleTestCase
         assertTrue(banana.isBitten());
         assertTrue(melon.isBitten());
     }
-
 }

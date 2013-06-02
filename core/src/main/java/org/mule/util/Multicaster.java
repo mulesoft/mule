@@ -33,22 +33,22 @@ public final class Multicaster
         // no-op
     }
 
-    public static Object create(Class theInterface, Collection objects)
+    public static Object create(Class<?> theInterface, Collection<?> objects)
     {
-        return create(new Class[]{theInterface}, objects);
+        return create(new Class[]{ theInterface }, objects);
     }
 
-    public static Object create(Class theInterface, Collection objects, InvokeListener listener)
+    public static Object create(Class<?> theInterface, Collection<?> objects, InvokeListener listener)
     {
-        return create(new Class[]{theInterface}, objects, listener);
+        return create(new Class[]{ theInterface }, objects, listener);
     }
 
-    public static Object create(Class[] interfaces, Collection objects)
+    public static Object create(Class<?>[] interfaces, Collection<?> objects)
     {
         return create(interfaces, objects, null);
     }
 
-    public static Object create(Class[] interfaces, Collection objects, InvokeListener listener)
+    public static Object create(Class<?>[] interfaces, Collection<?> objects, InvokeListener listener)
     {
         return Proxy.newProxyInstance(Thread.currentThread().getContextClassLoader(), interfaces,
             new CastingHandler(objects, listener));
@@ -56,27 +56,28 @@ public final class Multicaster
 
     private static class CastingHandler implements InvocationHandler
     {
-        private final Collection objects;
+        private final Collection<?> objects;
         private final InvokeListener listener;
 
-        public CastingHandler(Collection objects)
+        public CastingHandler(Collection<?> objects)
         {
             this(objects, null);
         }
 
-        public CastingHandler(Collection objects, InvokeListener listener)
+        public CastingHandler(Collection<?> objects, InvokeListener listener)
         {
             this.objects = objects;
             this.listener = listener;
         }
 
+        @Override
         public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
         {
-            List results = new ArrayList();
+            List<Object> results = new ArrayList<Object>();
             Object item = null;
             Object result;
 
-            for (Iterator iterator = objects.iterator(); iterator.hasNext();)
+            for (Iterator<?> iterator = objects.iterator(); iterator.hasNext();)
             {
                 try
                 {
@@ -114,5 +115,4 @@ public final class Multicaster
 
         Throwable onException(Object object, Method method, Object[] args, Throwable t);
     }
-
 }

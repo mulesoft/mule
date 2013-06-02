@@ -10,22 +10,20 @@
 
 package org.mule.util;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
 @SmallTest
 public class StringMessageUtilsTestCase extends AbstractMuleTestCase
 {
-
     @Test
     public void testToString() throws Exception
     {
@@ -74,14 +72,14 @@ public class StringMessageUtilsTestCase extends AbstractMuleTestCase
         assertEquals("{1.1,2.02}", result);
 
         // create a Collection that is too long to be printed
-        test = new ArrayList(100);
+        List<Integer> list = new ArrayList<Integer>(100);
         for (int i = 0; i < 100; i++)
         {
-            ((Collection) test).add(new Integer(i));
+            list.add(new Integer(i));
         }
 
         // the String will contain not more than exactly MAX_ARRAY_LENGTH elements
-        result = StringMessageUtils.toString(test);
+        result = StringMessageUtils.toString(list);
         assertTrue(((String) result).endsWith("[..]]"));
         assertEquals(StringMessageUtils.MAX_ELEMENTS - 1, StringUtils.countMatches((String) result, ","));
 
@@ -188,6 +186,7 @@ public class StringMessageUtilsTestCase extends AbstractMuleTestCase
             super(name);
         }
 
+        @Override
         public String toString()
         {
             return getName();

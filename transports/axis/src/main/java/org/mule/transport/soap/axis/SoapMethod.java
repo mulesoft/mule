@@ -15,7 +15,6 @@ import org.mule.util.ClassUtils;
 import org.mule.util.StringUtils;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.StringTokenizer;
 
@@ -28,9 +27,9 @@ import javax.xml.rpc.ParameterMode;
 public class SoapMethod
 {
     private QName name;
-    private List namedParameters = new ArrayList();
+    private List<NamedParameter> namedParameters = new ArrayList<NamedParameter>();
     private QName returnType;
-    private Class returnClass = Object.class;
+    private Class<?> returnClass = Object.class;
 
     public SoapMethod(String methodName, String paramsString) throws ClassNotFoundException
     {
@@ -40,11 +39,11 @@ public class SoapMethod
     /**
      * Creates a Soap Method using the param string set in the MUle configuration
      * file
-     * 
+     *
      * @param methodName the name of the method
      * @param params the param string to parse
      */
-    public SoapMethod(String methodName, List params) throws ClassNotFoundException
+    public SoapMethod(String methodName, List<String> params) throws ClassNotFoundException
     {
         this(QNamePropertyEditor.convert(methodName), params);
     }
@@ -52,7 +51,7 @@ public class SoapMethod
     public SoapMethod(QName methodName, String paramsString) throws ClassNotFoundException
     {
         name = methodName;
-        List params = new ArrayList();
+        List<String> params = new ArrayList<String>();
         for (StringTokenizer stringTokenizer = new StringTokenizer(paramsString, ","); stringTokenizer.hasMoreTokens();)
         {
             params.add(stringTokenizer.nextToken().trim());
@@ -60,25 +59,21 @@ public class SoapMethod
         initParams(params);
     }
 
-    public SoapMethod(QName methodName, List params) throws ClassNotFoundException
+    public SoapMethod(QName methodName, List<String> params) throws ClassNotFoundException
     {
         name = methodName;
         initParams(params);
     }
 
-    private void initParams(List params) throws ClassNotFoundException
+    private void initParams(List<String> params) throws ClassNotFoundException
     {
-
-        NamedParameter param;
-        for (Iterator iterator = params.iterator(); iterator.hasNext();)
+        for (String s : params)
         {
-            String s = (String)iterator.next();
-
             for (StringTokenizer tokenizer = new StringTokenizer(s, ";"); tokenizer.hasMoreTokens();)
             {
-                String name = tokenizer.nextToken();
+                String qName = tokenizer.nextToken();
                 String type = tokenizer.nextToken();
-                if (name.equalsIgnoreCase("return"))
+                if (qName.equalsIgnoreCase("return"))
                 {
                     if (type.startsWith("qname{"))
                     {
@@ -89,7 +84,7 @@ public class SoapMethod
                         returnType = NamedParameter.createQName(type);
                     }
                 }
-                else if (name.equalsIgnoreCase("returnClass"))
+                else if (qName.equalsIgnoreCase("returnClass"))
                 {
                     returnClass = ClassUtils.loadClass(type, getClass());
                 }
@@ -97,13 +92,13 @@ public class SoapMethod
                 {
                     String mode = tokenizer.nextToken();
                     QName paramName;
-                    if (name.startsWith("qname{"))
+                    if (qName.startsWith("qname{"))
                     {
-                        paramName = QNamePropertyEditor.convert(name);
+                        paramName = QNamePropertyEditor.convert(qName);
                     }
                     else
                     {
-                        paramName = new QName(getName().getNamespaceURI(), name, getName().getPrefix());
+                        paramName = new QName(getName().getNamespaceURI(), qName, getName().getPrefix());
                     }
                     QName qtype;
                     if (type.startsWith("qname{"))
@@ -114,7 +109,7 @@ public class SoapMethod
                     {
                         qtype = NamedParameter.createQName(type);
                     }
-                    param = new NamedParameter(paramName, qtype, mode);
+                    NamedParameter param = new NamedParameter(paramName, qtype, mode);
                     addNamedParameter(param);
                 }
             }
@@ -133,20 +128,20 @@ public class SoapMethod
         this.returnType = returnType;
     }
 
-    public SoapMethod(QName name, QName returnType, Class returnClass)
+    public SoapMethod(QName name, QName returnType, Class<?> returnClass)
     {
         this.name = name;
         this.returnType = returnType;
         this.returnClass = returnClass;
     }
 
-    public SoapMethod(QName name, Class returnClass)
+    public SoapMethod(QName name, Class<?> returnClass)
     {
         this.name = name;
         this.returnClass = returnClass;
     }
 
-    public SoapMethod(QName name, List namedParameters, QName returnType)
+    public SoapMethod(QName name, List<NamedParameter> namedParameters, QName returnType)
     {
         this.name = name;
         this.namedParameters = namedParameters;
@@ -158,24 +153,24 @@ public class SoapMethod
         namedParameters.add(param);
     }
 
-    public NamedParameter addNamedParameter(QName name, QName type, String mode)
+    public NamedParameter addNamedParameter(QName qName, QName type, String mode)
     {
-        if (StringUtils.isBlank(name.getNamespaceURI()))
+        if (StringUtils.isBlank(qName.getNamespaceURI()))
         {
-            name = new QName(getName().getNamespaceURI(), name.getLocalPart(), name.getPrefix());
+            qName = new QName(getName().getNamespaceURI(), qName.getLocalPart(), qName.getPrefix());
         }
-        NamedParameter param = new NamedParameter(name, type, mode);
+        NamedParameter param = new NamedParameter(qName, type, mode);
         namedParameters.add(param);
         return param;
     }
 
-    public NamedParameter addNamedParameter(QName name, QName type, ParameterMode mode)
+    public NamedParameter addNamedParameter(QName qName, QName type, ParameterMode mode)
     {
-        if (StringUtils.isBlank(name.getNamespaceURI()))
+        if (StringUtils.isBlank(qName.getNamespaceURI()))
         {
-            name = new QName(getName().getNamespaceURI(), name.getLocalPart(), name.getPrefix());
+            qName = new QName(getName().getNamespaceURI(), qName.getLocalPart(), qName.getPrefix());
         }
-        NamedParameter param = new NamedParameter(name, type, mode);
+        NamedParameter param = new NamedParameter(qName, type, mode);
         namedParameters.add(param);
         return param;
     }
@@ -190,7 +185,7 @@ public class SoapMethod
         return name;
     }
 
-    public List getNamedParameters()
+    public List<NamedParameter> getNamedParameters()
     {
         return namedParameters;
     }
@@ -205,12 +200,12 @@ public class SoapMethod
         this.returnType = returnType;
     }
 
-    public Class getReturnClass()
+    public Class<?> getReturnClass()
     {
         return returnClass;
     }
 
-    public void setReturnDataType(Class returnClass)
+    public void setReturnDataType(Class<?> returnClass)
     {
         this.returnClass = returnClass;
     }

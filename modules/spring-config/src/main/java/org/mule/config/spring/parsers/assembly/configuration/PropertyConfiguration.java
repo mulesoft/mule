@@ -22,10 +22,9 @@ import java.util.Map;
  */
 public interface PropertyConfiguration
 {
-
     void addReference(String propertyName);
 
-    void addMapping(String propertyName, Map mappings);
+    void addMapping(String propertyName, Map<String, Object> mappings);
 
     void addMapping(String propertyName, String mappings);
 

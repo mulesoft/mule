@@ -129,9 +129,9 @@ public class JXPathExtractor extends AbstractTransformer
                 Object obj = xpath.evaluate(doc);
                 if (obj instanceof List)
                 {
-                    for (int i = 0; i < ((List) obj).size(); i++)
+                    for (int i = 0; i < ((List<?>) obj).size(); i++)
                     {
-                        final Node node = (Node) ((List) obj).get(i);
+                        final Node node = (Node) ((List<?>) obj).get(i);
                         result = add(result, node);
 
                         if (singleResult)
@@ -160,6 +160,7 @@ public class JXPathExtractor extends AbstractTransformer
 
     }
 
+    @SuppressWarnings("unchecked")
     private Object add(Object result, Object value)
     {
         Object formattedResult = getResult(value);
@@ -171,10 +172,10 @@ public class JXPathExtractor extends AbstractTransformer
         {
             if (result == null)
             {
-                result = new ArrayList();
+                result = new ArrayList<Object>();
             }
 
-            ((List) result).add(formattedResult);
+            ((List<Object>) result).add(formattedResult);
         }
         return result;
     }

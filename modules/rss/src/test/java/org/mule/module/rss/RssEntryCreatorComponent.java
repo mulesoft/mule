@@ -18,14 +18,15 @@ import java.util.List;
 //Currently not used
 public class RssEntryCreatorComponent
 {
-
     public SyndEntry readFeed(String title, String content) throws Exception
     {
         SyndEntry entry = new SyndEntryImpl();
         entry.setTitle(title);
-        List contents = new ArrayList();
+
+        List<String> contents = new ArrayList<String>();
         contents.add(content);
         entry.setContents(contents);
+
         entry.setAuthor("Ross Mason");
         return entry;
     }

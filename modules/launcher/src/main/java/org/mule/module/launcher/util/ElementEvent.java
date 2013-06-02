@@ -15,8 +15,8 @@ import java.beans.PropertyChangeEvent;
 /**
 *
 */
-public abstract class ElementEvent<E> extends PropertyChangeEvent {
-
+public abstract class ElementEvent<E> extends PropertyChangeEvent
+{
     public static final int ADDED = 0;
     public static final int UPDATED = 1;
     public static final int REMOVED = 2;
@@ -31,47 +31,53 @@ public abstract class ElementEvent<E> extends PropertyChangeEvent {
     private int type;
     private int index;
 
-    public ElementEvent(Object source, Object oldValue, Object newValue, int index, int type) {
+    public ElementEvent(Object source, Object oldValue, Object newValue, int index, int type)
+    {
         super(source, PROPERTY_NAME, oldValue, newValue);
-        switch (type) {
-            case ADDED:
-            case UPDATED:
-            case REMOVED:
-            case CLEARED:
-            case MULTI_ADD:
-            case MULTI_REMOVE:
+        switch (type)
+        {
+            case ADDED :
+            case UPDATED :
+            case REMOVED :
+            case CLEARED :
+            case MULTI_ADD :
+            case MULTI_REMOVE :
                 this.type = type;
                 break;
-            default:
+            default :
                 this.type = UPDATED;
                 break;
         }
         this.index = index;
     }
 
-    public int getIndex() {
+    public int getIndex()
+    {
         return index;
     }
 
-    public int getType() {
+    public int getType()
+    {
         return type;
     }
 
-    public String getTypeAsString() {
-        switch (type) {
-            case ADDED:
+    public String getTypeAsString()
+    {
+        switch (type)
+        {
+            case ADDED :
                 return "ADDED";
-            case UPDATED:
+            case UPDATED :
                 return "UPDATED";
-            case REMOVED:
+            case REMOVED :
                 return "REMOVED";
-            case CLEARED:
+            case CLEARED :
                 return "CLEARED";
-            case MULTI_ADD:
+            case MULTI_ADD :
                 return "MULTI_ADD";
-            case MULTI_REMOVE:
+            case MULTI_REMOVE :
                 return "MULTI_REMOVE";
-            default:
+            default :
                 return "UPDATED";
         }
     }

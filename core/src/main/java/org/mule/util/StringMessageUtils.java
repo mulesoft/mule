@@ -60,10 +60,12 @@ public final class StringMessageUtils
 
     public static String getBoilerPlate(String message, char c, int maxlength)
     {
-        return getBoilerPlate(new ArrayList(Arrays.asList(new String[]{message})), c, maxlength);
+        List<String> messages = Arrays.asList(new String[]{message});
+        messages = new ArrayList<String>(messages);
+        return getBoilerPlate(messages, c, maxlength);
     }
 
-    public static String getBoilerPlate(List messages, char c, int maxlength)
+    public static String getBoilerPlate(List<String> messages, char c, int maxlength)
     {
         int size;
         StringBuffer buf = new StringBuffer(messages.size() * maxlength);
@@ -210,13 +212,13 @@ public final class StringMessageUtils
         {
             return "null";
         }
-        else if (o instanceof Class)
+        else if (o instanceof Class<?>)
         {
-            return ((Class) o).getName();
+            return ((Class<?>) o).getName();
         }
         else if (o instanceof Map)
         {
-            return MapUtils.toString((Map) o, false);
+            return MapUtils.toString((Map<?, ?>) o, false);
         }
         else if (o.getClass().isArray())
         {
@@ -224,7 +226,7 @@ public final class StringMessageUtils
         }
         else if (o instanceof Collection)
         {
-            return CollectionUtils.toString((Collection) o, MAX_ELEMENTS);
+            return CollectionUtils.toString((Collection<?>) o, MAX_ELEMENTS);
         }
         else
         {
@@ -246,7 +248,7 @@ public final class StringMessageUtils
             PropertyScope scope = PropertyScope.ALL_SCOPES[i];
             try
             {
-                Set names = new TreeSet(m.getPropertyNames(scope));
+                Set<Object> names = new TreeSet<Object>(m.getPropertyNames(scope));
                 buf.append("  ").append(scope.getScopeName().toUpperCase()).append(" scoped properties:").append(SystemUtils.LINE_SEPARATOR);
 
                 for (Object name : names)

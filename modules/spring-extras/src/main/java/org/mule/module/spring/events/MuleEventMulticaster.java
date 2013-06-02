@@ -31,6 +31,7 @@ import org.mule.api.lifecycle.Callable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.model.Model;
+import org.mule.api.routing.filter.Filter;
 import org.mule.api.routing.filter.ObjectFilter;
 import org.mule.api.service.Service;
 import org.mule.api.source.CompositeMessageSource;
@@ -159,7 +160,7 @@ public class MuleEventMulticaster
     /**
      * The filter used to match subscriptions
      */
-    protected Class subscriptionFilter = WildcardFilter.class;
+    protected Class<? extends Filter> subscriptionFilter = WildcardFilter.class;
 
     /**
      * Used to store parsed endpoints
@@ -168,11 +169,13 @@ public class MuleEventMulticaster
 
     protected MuleContext muleContext;
 
+    @Override
     public void setMuleContext(MuleContext context)
     {
         this.muleContext = context;
     }
 
+    @Override
     public void initialise() throws InitialisationException
     {
         if (asynchronous)
@@ -203,6 +206,7 @@ public class MuleEventMulticaster
      * @see AsynchronousEventListener
      * @see ThreadingProfile
      */
+    @Override
     public void addApplicationListener(ApplicationListener listener)
     {
         Object listenerToAdd = listener;
@@ -220,6 +224,7 @@ public class MuleEventMulticaster
      *
      * @param listener the listener to remove
      */
+    @Override
     public void removeApplicationListener(ApplicationListener listener)
     {
         for (Iterator iterator = listeners.iterator(); iterator.hasNext();)
@@ -245,35 +250,40 @@ public class MuleEventMulticaster
         listeners.remove(listener);
     }
 
+    @Override
     public void addApplicationListenerBean(String s)
-       {
-           Object listener = applicationContext.getBean(s);
-           if(listener instanceof ApplicationListener)
-           {
-               addApplicationListener((ApplicationListener)listener);
-           }
-           else
-           {
-               throw new IllegalArgumentException(SpringMessages.beanNotInstanceOfApplicationListener(s).getMessage());
-           }
-       }
+    {
+        Object listener = applicationContext.getBean(s);
+        if (listener instanceof ApplicationListener)
+        {
+            addApplicationListener((ApplicationListener)listener);
+        }
+        else
+        {
+            throw new IllegalArgumentException(SpringMessages.beanNotInstanceOfApplicationListener(s)
+                .getMessage());
+        }
+    }
 
-       public void removeApplicationListenerBean(String s)
-       {
-           Object listener = applicationContext.getBean(s);
-           if(listener instanceof ApplicationListener)
-           {
-               removeApplicationListener((ApplicationListener)listener);
-           }
-           else
-           {
-               throw new IllegalArgumentException(SpringMessages.beanNotInstanceOfApplicationListener(s).getMessage());
-           }
-       }
+    @Override
+    public void removeApplicationListenerBean(String s)
+    {
+        Object listener = applicationContext.getBean(s);
+        if (listener instanceof ApplicationListener)
+        {
+            removeApplicationListener((ApplicationListener)listener);
+        }
+        else
+        {
+            throw new IllegalArgumentException(SpringMessages.beanNotInstanceOfApplicationListener(s)
+                .getMessage());
+        }
+    }
 
     /**
      * Removes all the listeners from the multicaster
      */
+    @Override
     public void removeAllListeners()
     {
         listeners.clear();
@@ -292,6 +302,7 @@ public class MuleEventMulticaster
      *
      * @param e the application event received by the context
      */
+    @Override
     public void multicastEvent(ApplicationEvent e)
     {
         MuleApplicationEvent muleEvent = null;
@@ -450,6 +461,7 @@ public class MuleEventMulticaster
      *
      * @param context the context received by Mule
      */
+    @Override
     public Object onCall(MuleEventContext context) throws TransformerException, MalformedEndpointException
     {
         multicastEvent(new MuleApplicationEvent(context.getMessage().getPayload(), context, applicationContext));
@@ -524,6 +536,7 @@ public class MuleEventMulticaster
      * @param applicationContext application context
      * @throws BeansException
      */
+    @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException
     {
         this.applicationContext = applicationContext;
@@ -542,8 +555,7 @@ public class MuleEventMulticaster
 
     protected void setSubscriptionsOnService(Service service) throws MuleException
     {
-        String[] subscriptions;
-        List endpoints = new ArrayList();
+        List<String> endpoints = new ArrayList<String>();
         for (Iterator iterator = listeners.iterator(); iterator.hasNext();)
         {
             ApplicationListener listener = (ApplicationListener) iterator.next();
@@ -553,7 +565,7 @@ public class MuleEventMulticaster
             }
             if (listener instanceof MuleSubscriptionEventListener)
             {
-                subscriptions = ((MuleSubscriptionEventListener) listener).getSubscriptions();
+                String[] subscriptions = ((MuleSubscriptionEventListener) listener).getSubscriptions();
                 for (int i = 0; i < subscriptions.length; i++)
                 {
                     if (subscriptions[i].indexOf("*") == -1 && MuleEndpointURI.isMuleUri(subscriptions[i]))
@@ -570,13 +582,9 @@ public class MuleEventMulticaster
         }
         if (endpoints.size() > 0)
         {
-            String endpoint;
-            for (Iterator iterator = endpoints.iterator(); iterator.hasNext();)
+            for (String endpoint : endpoints)
             {
-                endpoint = (String) iterator.next();
-
-                InboundEndpoint ep = muleContext.getEndpointFactory().getInboundEndpoint(
-                    endpoint);
+                InboundEndpoint ep = muleContext.getEndpointFactory().getInboundEndpoint(endpoint);
 
                 // check whether the endpoint has already been set on the
                 // MuleEventMulticaster
@@ -709,7 +717,7 @@ public class MuleEventMulticaster
      * @return the class of the filter to use. The default is WildcardFilter
      * @see WildcardFilter
      */
-    public Class getSubscriptionFilter()
+    public Class<? extends Filter> getSubscriptionFilter()
     {
         return subscriptionFilter;
     }
@@ -719,7 +727,7 @@ public class MuleEventMulticaster
      *
      * @param subscriptionFilter the class of the filter to use.
      */
-    public void setSubscriptionFilter(Class subscriptionFilter)
+    public void setSubscriptionFilter(Class<? extends Filter> subscriptionFilter)
     {
         this.subscriptionFilter = subscriptionFilter;
     }
@@ -771,6 +779,7 @@ public class MuleEventMulticaster
             super();
         }
 
+        @Override
         public void exceptionThrown(Exception e)
         {
             logger.error(e.getMessage(), e);

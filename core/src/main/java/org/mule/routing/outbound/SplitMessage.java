@@ -22,7 +22,7 @@ import java.util.List;
  */
 public class SplitMessage
 {
-    private List parts = new ArrayList();
+    private List<MessagePart> parts = new ArrayList<MessagePart>();
 
     public void addPart(Object part, OutboundEndpoint endpoint)
     {
@@ -31,7 +31,7 @@ public class SplitMessage
 
     public MessagePart getPart(int i)
     {
-        return (MessagePart) parts.get(i);
+        return parts.get(i);
     }
 
     public int size()
@@ -70,6 +70,7 @@ public class SplitMessage
         }
 
 
+        @Override
         public String toString()
         {
             final StringBuffer sb = new StringBuffer();
