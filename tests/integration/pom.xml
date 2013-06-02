@@ -72,6 +72,7 @@
             <type>pom</type>
             <scope>test</scope>
         </dependency>
+        <!--  Include all Mule Patterns -->
         <dependency>
             <groupId>org.mule.patterns</groupId>
             <artifactId>mule-patterns-all</artifactId>
@@ -79,12 +80,14 @@
             <type>pom</type>
             <scope>test</scope>
         </dependency>
+
+        <!-- Test jars -->
         <!-- some tests reference cxf test classes -->
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-cxf</artifactId>
-            <classifier>tests</classifier>
             <version>${project.version}</version>
+            <classifier>tests</classifier>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -99,7 +102,6 @@
                 </exclusion>
             </exclusions>
         </dependency>
-        <!-- Test jars -->
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-spring-security</artifactId>
@@ -147,6 +149,7 @@
             <groupId>hsqldb</groupId>
             <artifactId>hsqldb</artifactId>
             <version>1.8.0.7</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.h2database</groupId>
@@ -172,15 +175,13 @@
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
-
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-email</artifactId>
-            <classifier>tests</classifier>
             <version>${project.version}</version>
+            <classifier>tests</classifier>
             <scope>test</scope>
         </dependency>
-
         <dependency>
             <groupId>com.icegreen</groupId>
             <artifactId>greenmail</artifactId>
@@ -196,6 +197,13 @@
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-jdbc</artifactId>
+            <version>${project.version}</version>
+            <classifier>tests</classifier>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-annotations</artifactId>
             <version>${project.version}</version>
             <classifier>tests</classifier>
             <scope>test</scope>
