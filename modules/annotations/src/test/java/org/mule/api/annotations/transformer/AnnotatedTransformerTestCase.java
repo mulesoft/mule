@@ -78,9 +78,9 @@ public class AnnotatedTransformerTestCase extends AbstractMuleContextTestCase
     }
 
     @Transformer
-    public ArrayList<String> dummy(InputStream in)
+    public ArrayList<Object> dummy(InputStream in)
     {
-        return new ArrayList<String>();
+        return new ArrayList<Object>();
     }
 
     @Transformer(sourceTypes = {FileInputStream.class, ByteArrayInputStream.class}, priorityWeighting = 9)

@@ -59,9 +59,9 @@ public class CollectionTransformerTestCase extends AbstractMuleTestCase
     }
 
     @Transformer
-    public ArrayList<String> dummy(InputStream in)
+    public ArrayList<Object> dummy(InputStream in)
     {
-        return new ArrayList<String>();
+        return new ArrayList<Object>();
     }
 
     @Transformer
