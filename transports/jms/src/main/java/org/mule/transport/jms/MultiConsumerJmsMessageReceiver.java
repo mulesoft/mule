@@ -84,9 +84,9 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
             logger.debug("Creating " + receiversCount + " sub-receivers for " + endpoint.getEndpointURI());
         }
 
-        consumers = new CopyOnWriteArrayList();
+        consumers = new CopyOnWriteArrayList<SubReceiver>();
     }
-        
+
     @Override
     protected void doStart() throws MuleException
     {
@@ -125,7 +125,7 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
         {
             throw new IllegalStateException("List should be empty, there may be a concurrency issue here (see EE-1275)");
         }
-        
+
         SubReceiver sub;
         for (int i = 0; i < receiversCount; i++)
         {
@@ -178,7 +178,7 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
         protected volatile boolean connected;
         protected volatile boolean started;
         protected volatile boolean isProcessingMessage;
-        
+
         protected void doConnect() throws MuleException
         {
             subLogger.debug("SUB doConnect()");
@@ -236,9 +236,9 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
             {
                 doConnect();
             }
-            
+
             try
-            { 
+            {
                 consumer.setMessageListener(this);
                 started = true;
             }
@@ -285,7 +285,7 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
         protected void createConsumer() throws Exception
         {
             subLogger.debug("SUB createConsumer()");
-            
+
             try
             {
                 JmsSupport jmsSupport = jmsConnector.getJmsSupport();
@@ -342,12 +342,13 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
             }
         }
 
+        @Override
         public void onMessage(final Message message)
         {
             try
             {
                 isProcessingMessage = true;
-                // Note: Despite the name "Worker", there is no new thread created here in order to maintain synchronicity for exception handling.  
+                // Note: Despite the name "Worker", there is no new thread created here in order to maintain synchronicity for exception handling.
                 JmsWorker worker = new JmsWorker(message, MultiConsumerJmsMessageReceiver.this, this);
                 worker.processMessages();
             }
@@ -355,13 +356,14 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
             {
                 // Use this rollback method in case a transaction has not been configured on the endpoint.
                 RollbackSourceCallback rollbackMethod = new RollbackSourceCallback()
-                {                    
+                {
+                    @Override
                     public void rollback()
                     {
                         recoverSession();
                     }
                 };
-                
+
                 if (e instanceof MessagingException)
                 {
                     MessagingException messagingException = (MessagingException) e;
