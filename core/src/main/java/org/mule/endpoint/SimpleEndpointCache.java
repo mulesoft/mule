@@ -29,20 +29,21 @@ import java.util.concurrent.ConcurrentMap;
 public class SimpleEndpointCache implements EndpointCache
 {
     protected MuleContext muleContext;
-    private ConcurrentMap inboundEndpointCache = new ConcurrentHashMap();
-    private ConcurrentMap outboundEndpointCache = new ConcurrentHashMap();
+    private ConcurrentMap<String, InboundEndpoint> inboundEndpointCache = new ConcurrentHashMap<String, InboundEndpoint>();
+    private ConcurrentMap<String, OutboundEndpoint> outboundEndpointCache = new ConcurrentHashMap<String, OutboundEndpoint>();
 
     public SimpleEndpointCache(MuleContext muleContext)
     {
         this.muleContext = muleContext;
     }
 
+    @Override
     public OutboundEndpoint getOutboundEndpoint(String uri,
-                                                   MessageExchangePattern mep,
-                                                   Long responseTimeout) throws MuleException
+                                                MessageExchangePattern mep,
+                                                Long responseTimeout) throws MuleException
     {
-        OutboundEndpoint endpoint = (OutboundEndpoint) outboundEndpointCache.get(uri + ":" + mep.toString()
-                                                                                 + ":" + responseTimeout);
+        String key = uri + ":" + mep.toString() + ":" + responseTimeout;
+        OutboundEndpoint endpoint = outboundEndpointCache.get(key);
         if (endpoint == null)
         {
             EndpointBuilder endpointBuilder = muleContext.getEndpointFactory()
@@ -53,8 +54,7 @@ public class SimpleEndpointCache implements EndpointCache
                 endpointBuilder.setResponseTimeout(responseTimeout.intValue());
             }
             endpoint = muleContext.getEndpointFactory().getOutboundEndpoint(endpointBuilder);
-            OutboundEndpoint concurrentlyAddedEndpoint = (OutboundEndpoint) outboundEndpointCache.putIfAbsent(
-                uri + ":" + mep.toString() + ":" + responseTimeout, endpoint);
+            OutboundEndpoint concurrentlyAddedEndpoint = outboundEndpointCache.putIfAbsent(key, endpoint);
             if (concurrentlyAddedEndpoint != null)
             {
                 return concurrentlyAddedEndpoint;
@@ -63,17 +63,18 @@ public class SimpleEndpointCache implements EndpointCache
         return endpoint;
     }
 
+    @Override
     public InboundEndpoint getInboundEndpoint(String uri, MessageExchangePattern mep) throws MuleException
     {
-        InboundEndpoint endpoint = (InboundEndpoint) inboundEndpointCache.get(uri + ":" + mep.toString());
+        String key = uri + ":" + mep.toString();
+        InboundEndpoint endpoint = inboundEndpointCache.get(key);
         if (endpoint == null)
         {
             EndpointBuilder endpointBuilder = muleContext.getEndpointFactory()
                 .getEndpointBuilder(uri);
             endpointBuilder.setExchangePattern(mep);
             endpoint = muleContext.getEndpointFactory().getInboundEndpoint(endpointBuilder);
-            InboundEndpoint concurrentlyAddedEndpoint = (InboundEndpoint) inboundEndpointCache.putIfAbsent(
-                uri + ":" + mep.toString(), endpoint);
+            InboundEndpoint concurrentlyAddedEndpoint = inboundEndpointCache.putIfAbsent(key, endpoint);
             if (concurrentlyAddedEndpoint != null)
             {
                 return concurrentlyAddedEndpoint;
