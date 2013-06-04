@@ -15,7 +15,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.probe.PollingProber;
@@ -43,7 +43,7 @@ import org.mortbay.jetty.client.HttpClient;
 public class AjaxFunctionalTestCase extends AbstractServiceAndFlowTestCase
 {
     public static int SERVER_PORT = -1;
-    
+
     private HttpClient httpClient;
     private BayeuxClient bayeuxClient;
 
@@ -65,7 +65,7 @@ public class AjaxFunctionalTestCase extends AbstractServiceAndFlowTestCase
             {ConfigVariant.SERVICE, "ajax-embedded-functional-test-service.xml"},
             {ConfigVariant.FLOW, "ajax-embedded-functional-test-flow.xml"}
         });
-    }      
+    }
 
     @Override
     protected void doSetUp() throws Exception
@@ -78,7 +78,7 @@ public class AjaxFunctionalTestCase extends AbstractServiceAndFlowTestCase
         bayeuxClient = new BayeuxClient(httpClient, new Address("localhost", SERVER_PORT), "/ajax/cometd");
         // need to start the client before you can add subscriptions
         bayeuxClient.start();
-        
+
         assertTrue("httpClient is not running", httpClient.isRunning());
         assertTrue("bayeuxClient is not running", bayeuxClient.isRunning());
         muleContext.start();
@@ -91,7 +91,7 @@ public class AjaxFunctionalTestCase extends AbstractServiceAndFlowTestCase
         {
             muleContext.stop();
         }
-        
+
         if (httpClient.isRunning())
         {
             httpClient.stop();
@@ -119,7 +119,7 @@ public class AjaxFunctionalTestCase extends AbstractServiceAndFlowTestCase
          * Give mule and the clients time to warm up; we get an intermittent failure,
          * see if this helps
          */
-        Thread.sleep(5000); 
+        Thread.sleep(5000);
         final Latch latch = new Latch();
 
         final AtomicReference<Object> data = new AtomicReference<Object>();
@@ -128,7 +128,6 @@ public class AjaxFunctionalTestCase extends AbstractServiceAndFlowTestCase
             @Override
             public void deliver(Client fromClient, Client toClient, Message message)
             {
-
                 if (message.getData() != null)
                 {
                     // This simulates what the browser would receive
@@ -139,13 +138,13 @@ public class AjaxFunctionalTestCase extends AbstractServiceAndFlowTestCase
         });
         bayeuxClient.subscribe("/test1");
 
-        MuleClient muleClient = new MuleClient(muleContext);
+        MuleClient muleClient = muleContext.getClient();
         muleClient.dispatch("vm://in1", "Ross", null);
 
         latch.await(10, TimeUnit.SECONDS);
         assertNotNull(data.get());
-        
-        // parse the result string into java objects.  different jvms return it in different order, so we can't do a straight string comparison 
+
+        // parse the result string into java objects.  different jvms return it in different order, so we can't do a straight string comparison
         ObjectMapper mapper = new ObjectMapper();
         Map<?, ?> result  = mapper.readValue((String) data.get(), Map.class);
         assertEquals("/test1", result.get("channel"));
@@ -155,7 +154,7 @@ public class AjaxFunctionalTestCase extends AbstractServiceAndFlowTestCase
     @Test
     public void testClientPublishWithString() throws Exception
     {
-        MuleClient muleClient = new MuleClient(muleContext);
+        MuleClient muleClient = muleContext.getClient();
 
         bayeuxClient.publish("/test2", "Ross", null);
         final MuleMessage msg = muleClient.request("vm://in2", RECEIVE_TIMEOUT * 2);
@@ -177,5 +176,4 @@ public class AjaxFunctionalTestCase extends AbstractServiceAndFlowTestCase
         assertNotNull(msg);
         assertEquals("Ross Received", msg.getPayloadAsString());
     }
-
 }

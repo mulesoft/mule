@@ -10,8 +10,13 @@
 
 package org.mule.transport.ajax;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.util.concurrent.Latch;
@@ -33,14 +38,8 @@ import org.mortbay.cometd.client.BayeuxClient;
 import org.mortbay.jetty.client.Address;
 import org.mortbay.jetty.client.HttpClient;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 public class AjaxFunctionalJsonBindingsTestCase extends AbstractServiceAndFlowTestCase
 {
-
     public AjaxFunctionalJsonBindingsTestCase(ConfigVariant variant, String configResources)
     {
         super(variant, configResources);
@@ -116,7 +115,7 @@ public class AjaxFunctionalJsonBindingsTestCase extends AbstractServiceAndFlowTe
         });
         client.subscribe("/test1");
 
-        MuleClient muleClient = new MuleClient(muleContext);
+        MuleClient muleClient = muleContext.getClient();
         muleClient.dispatch("vm://in1", "Ross", null);
         assertTrue("data did not arrive on time", latch.await(DEFAULT_TEST_TIMEOUT_SECS,
                                                                     TimeUnit.SECONDS));
@@ -135,7 +134,8 @@ public class AjaxFunctionalJsonBindingsTestCase extends AbstractServiceAndFlowTe
     public void testClientPublishWithJsonObject() throws Exception
     {
         client.publish("/test2", "{\"name\":\"Ross\"}", null);
-        MuleClient muleClient = new MuleClient(muleContext);
+
+        MuleClient muleClient = muleContext.getClient();
         MuleMessage msg = muleClient.request("vm://in2", 5000L);
 
         assertNotNull(msg);
