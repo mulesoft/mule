@@ -18,12 +18,11 @@ import java.util.ListIterator;
  */
 public class ExceptionUtils extends org.apache.commons.lang.exception.ExceptionUtils
 {
-
     /**
      * This method returns true if the throwable contains a {@link Throwable} that
      * matches the specified class or subclass in the exception chain. Subclasses of
      * the specified class do match.
-     * 
+     *
      * @param throwable the throwable to inspect, may be null
      * @param type the type to search for, subclasses match, null returns false
      * @return the index into the throwable chain, false if no match or null input
@@ -37,19 +36,19 @@ public class ExceptionUtils extends org.apache.commons.lang.exception.ExceptionU
      * This method returns the throwable closest to the root cause that matches the
      * specified class or subclass. Any null argument will make the method return
      * null.
-     * 
+     *
      * @param throwable the throwable to inspect, may be null
      * @param type the type to search for, subclasses match, null returns null
      * @return the throwablethat is closest to the root in the throwable chain that
      *         matches the type or subclass of that type.
      */
-    public static Throwable getDeepestOccurenceOfType(Throwable throwable, Class<?> type)
+    @SuppressWarnings("unchecked")
+    public static <ET> ET getDeepestOccurenceOfType(Throwable throwable, Class<ET> type)
     {
         if (throwable == null || type == null)
         {
             return null;
         }
-        @SuppressWarnings("unchecked")
         List<Throwable> throwableList = getThrowableList(throwable);
         ListIterator<Throwable> listIterator = throwableList.listIterator(throwableList.size());
         while (listIterator.hasPrevious())
@@ -57,7 +56,7 @@ public class ExceptionUtils extends org.apache.commons.lang.exception.ExceptionU
             Throwable candidate = listIterator.previous();
             if (type.isAssignableFrom(candidate.getClass()))
             {
-                return candidate;
+                return (ET)candidate;
             }
         }
         return null;
