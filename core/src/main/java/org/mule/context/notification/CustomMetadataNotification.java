@@ -38,6 +38,17 @@ public class CustomMetadataNotification extends CustomNotification implements Bl
     protected final Map<String, String> metaData;
 
     public CustomMetadataNotification(final MuleEvent source, final MessageProcessor processor,
+                                      final String name, final Map<String, String> metaData,
+                                      int action)
+    {
+        super(source, action);
+
+        this.processor = processor;
+        this.name = name;
+        this.metaData = metaData;
+    }
+
+    public CustomMetadataNotification(final MuleEvent source, final MessageProcessor processor,
                                       final String name, final Map<String, String> metaData)
     {
         super(source, CustomMetadataNotification.CUSTOM_EVENT_EVENT_ACTION);
