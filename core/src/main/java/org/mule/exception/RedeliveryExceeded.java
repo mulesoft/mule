@@ -18,7 +18,6 @@ import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorChain;
-import org.mule.processor.AbstractMessageProcessorOwner;
 import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
 
 import java.util.Collections;
@@ -27,7 +26,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 public class RedeliveryExceeded implements MessageProcessor, FlowConstructAware, Initialisable
 {
-    private List<MessageProcessor> messageProcessors = new CopyOnWriteArrayList();
+    private List<MessageProcessor> messageProcessors = new CopyOnWriteArrayList<MessageProcessor>();
     private MessageProcessorChain configuredMessageProcessors;
     private FlowConstruct flowConstruct;
 

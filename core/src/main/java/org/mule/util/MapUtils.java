@@ -19,7 +19,6 @@ import java.util.Map;
 // @ThreadSafe
 public class MapUtils extends org.apache.commons.collections.MapUtils
 {
-
     /**
      * Convenience method for CollectionUtil#mapWithKeysAndValues(Class, Iterator,
      * Iterator); keys and values can be null or empty.
@@ -49,7 +48,7 @@ public class MapUtils extends org.apache.commons.collections.MapUtils
     /**
      * Create & populate a Map of arbitrary class. Populating stops when either the
      * keys or values iterator is null or exhausted.
-     * 
+     *
      * @param mapClass the Class of the Map to instantiate
      * @param keys iterator for Objects ued as keys
      * @param values iterator for Objects used as values
@@ -89,7 +88,7 @@ public class MapUtils extends org.apache.commons.collections.MapUtils
     /**
      * Creates a String representation of the given Map, with optional newlines
      * between elements.
-     * 
+     *
      * @param props the map to format
      * @param newline indicates whether elements are to be split across lines
      * @return the formatted String
@@ -114,7 +113,7 @@ public class MapUtils extends org.apache.commons.collections.MapUtils
 
         for (i = 0; i < entries.length - 1; i++)
         {
-            Map.Entry property = (Map.Entry) entries[i];
+            Map.Entry<?, ?> property = (Map.Entry<?, ?>) entries[i];
             buf.append(property.getKey());
             buf.append('=');
             buf.append(PropertiesUtils.maskedPropertyValue(property));
@@ -130,7 +129,7 @@ public class MapUtils extends org.apache.commons.collections.MapUtils
         }
 
         // don't forget the last one
-        Map.Entry lastProperty = (Map.Entry) entries[i];
+        Map.Entry<?, ?> lastProperty = (Map.Entry<?, ?>) entries[i];
         buf.append(lastProperty.getKey().toString());
         buf.append('=');
         buf.append(PropertiesUtils.maskedPropertyValue(lastProperty));
@@ -143,5 +142,4 @@ public class MapUtils extends org.apache.commons.collections.MapUtils
         buf.append('}');
         return buf.toString();
     }
-
 }
