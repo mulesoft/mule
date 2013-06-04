@@ -12,13 +12,13 @@ package org.mule.api.oauth;
 
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
-import org.mule.api.callback.DefaultHttpCallbackAdapter;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.construct.FlowConstructAware;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
+import org.mule.api.oauth.callback.DefaultHttpCallbackAdapter;
 import org.mule.api.store.ObjectStore;
 import org.mule.common.security.oauth.OAuthManager;
 

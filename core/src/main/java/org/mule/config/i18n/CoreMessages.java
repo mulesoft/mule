@@ -74,6 +74,11 @@ public class CoreMessages extends MessageFactory
         return factory.createMessage(BUNDLE_PATH, 6, version);
     }
 
+    public static Message minMuleVersionNotMet(String minVersion)
+    {
+        return factory.createMessage(BUNDLE_PATH, 344, minVersion);
+    }
+
     public static Message shutdownNormally(Date date)
     {
         return factory.createMessage(BUNDLE_PATH, 7, date);

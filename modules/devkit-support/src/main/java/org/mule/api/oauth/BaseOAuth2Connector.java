@@ -11,6 +11,7 @@
 package org.mule.api.oauth;
 
 import org.mule.api.MuleEvent;
+import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.ProcessAdapter;
 import org.mule.api.ProcessTemplate;
@@ -20,6 +21,10 @@ import org.mule.api.capability.ModuleCapability;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.lifecycle.Startable;
+import org.mule.api.lifecycle.Stoppable;
+import org.mule.api.oauth.callback.RestoreAccessTokenCallback;
+import org.mule.api.oauth.callback.SaveAccessTokenCallback;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.filter.Filter;
 import org.mule.common.security.oauth.OAuth2Connector;
@@ -29,10 +34,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public abstract class BaseOAuth2Connector
-    implements OAuth2Connector, Capabilities, Disposable, Initialisable, ProcessAdapter<BaseOAuth2Connector>
+    implements OAuth2Connector, Capabilities, Disposable, Initialisable, Startable, Stoppable,
+    ProcessAdapter<BaseOAuth2Connector>
 {
 
     private static final long serialVersionUID = 8010641516561465465L;
+
+    private SaveAccessTokenCallback oauthSaveAccessToken;
+    private RestoreAccessTokenCallback oauthRestoreAccessToken;
 
     /**
      * Returns true if this module implements such capability
@@ -97,6 +106,16 @@ public abstract class BaseOAuth2Connector
     {
     }
 
+    @Override
+    public void start() throws MuleException
+    {
+    }
+
+    @Override
+    public void stop() throws MuleException
+    {
+    }
+
     public final <P> ProcessTemplate<P, BaseOAuth2Connector> getProcessTemplate()
     {
         final BaseOAuth2Connector object = this;
@@ -120,6 +139,26 @@ public abstract class BaseOAuth2Connector
             }
 
         };
+    }
+
+    public SaveAccessTokenCallback getOauthSaveAccessToken()
+    {
+        return oauthSaveAccessToken;
+    }
+
+    public void setOauthSaveAccessToken(SaveAccessTokenCallback oauthSaveAccessToken)
+    {
+        this.oauthSaveAccessToken = oauthSaveAccessToken;
+    }
+
+    public RestoreAccessTokenCallback getOauthRestoreAccessToken()
+    {
+        return oauthRestoreAccessToken;
+    }
+
+    public void setOauthRestoreAccessToken(RestoreAccessTokenCallback oauthRestoreAccessToken)
+    {
+        this.oauthRestoreAccessToken = oauthRestoreAccessToken;
     }
 
 }
