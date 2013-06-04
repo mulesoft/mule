@@ -85,12 +85,6 @@
             <artifactId>wsdl4j</artifactId>
             <version>1.6.1</version>
         </dependency>
-        <!-- needed by the Axis Service component -->
-        <dependency>
-            <groupId>org.mule.modules</groupId>
-            <artifactId>mule-module-client</artifactId>
-            <version>${project.version}</version>
-        </dependency>
 
         <!-- Unit tests -->
         <dependency>

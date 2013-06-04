@@ -16,7 +16,7 @@ import static org.junit.Assert.assertTrue;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -45,7 +45,8 @@ public class WebServiceWrapperWithAxisTestCase extends FunctionalTestCase
     @Test
     public void testWsCall() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
+
         MuleMessage result = client.send("vm://testin", new DefaultMuleMessage(testString, muleContext));
         assertNotNull(result.getPayload());
         assertEquals("Payload", "Received: " + testString, result.getPayloadAsString());
@@ -54,7 +55,8 @@ public class WebServiceWrapperWithAxisTestCase extends FunctionalTestCase
     @Test
     public void testWsCallWithUrlFromMessage() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
+
         Map<String, Object> props = new HashMap<String, Object>();
         props.put("ws.service.url", "http://localhost:" + dynamicPort1.getNumber() + "/services/TestUMO?method=receive");
         MuleMessage result = client.send("vm://testin2", testString, props);
@@ -65,7 +67,8 @@ public class WebServiceWrapperWithAxisTestCase extends FunctionalTestCase
     @Test
     public void testWsCallWithComplexParameters() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
+
         client.dispatch("vm://queue.in", new Object[]{new Long(3), new Long(3)},null);
         MuleMessage result = client.request("vm://queue.out", RECEIVE_TIMEOUT);
         assertNotNull(result.getPayload());

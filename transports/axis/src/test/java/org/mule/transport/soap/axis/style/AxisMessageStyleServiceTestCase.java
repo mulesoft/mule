@@ -10,9 +10,12 @@
 
 package org.mule.transport.soap.axis.style;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import org.mule.api.MuleMessage;
+import org.mule.api.client.MuleClient;
 import org.mule.api.config.MuleProperties;
-import org.mule.module.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.soap.axis.NamedParameter;
@@ -29,9 +32,6 @@ import org.apache.axis.client.Call;
 import org.apache.axis.client.Service;
 import org.junit.Rule;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 public class AxisMessageStyleServiceTestCase extends FunctionalTestCase
 {
@@ -178,10 +178,10 @@ public class AxisMessageStyleServiceTestCase extends FunctionalTestCase
         }
         else
         {
-
             // Now try with the MuleClient
-            MuleClient client = new MuleClient(muleContext);
-            Map props = new HashMap();
+            MuleClient client = muleContext.getClient();
+
+            Map<String, Object> props = new HashMap<String, Object>();
             if (useSoapMethod)
             {
                 SoapMethod soapMethod = new SoapMethod(method);
@@ -207,5 +207,4 @@ public class AxisMessageStyleServiceTestCase extends FunctionalTestCase
             assertEquals(expectedResult, result.getPayloadAsString());
         }
     }
-
 }

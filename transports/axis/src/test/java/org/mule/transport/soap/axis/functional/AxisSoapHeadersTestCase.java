@@ -10,9 +10,11 @@
 
 package org.mule.transport.soap.axis.functional;
 
+import static org.junit.Assert.assertEquals;
+
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -22,11 +24,8 @@ import java.util.Map;
 import org.junit.Rule;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-
 public class AxisSoapHeadersTestCase extends FunctionalTestCase
 {
-
     private static final String EXPECTED_RESPONSE = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"><soapenv:Body><echoResponse soapenv:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\"><echoReturn xsi:type=\"xsd:string\">Test Message</echoReturn></echoResponse></soapenv:Body></soapenv:Envelope>";
 
     @Rule
@@ -34,7 +33,6 @@ public class AxisSoapHeadersTestCase extends FunctionalTestCase
 
     @Rule
     public DynamicPort dynamicPort2 = new DynamicPort("port2");
-
 
     @Override
     protected String getConfigResources()
@@ -45,8 +43,7 @@ public class AxisSoapHeadersTestCase extends FunctionalTestCase
     @Test
     public void testSoapRequest() throws Exception
     {
-
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         Map<String, Object> properties = new HashMap<String, Object>();
         properties.put("http.method", "POST");
 
@@ -74,5 +71,4 @@ public class AxisSoapHeadersTestCase extends FunctionalTestCase
 
         assertEquals(EXPECTED_RESPONSE, reply.getPayloadAsString());
     }
-
 }

@@ -10,9 +10,12 @@
 
 package org.mule.transport.soap.axis;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
 
 import java.util.HashMap;
@@ -24,12 +27,8 @@ import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
 public class AxisServiceUsingCxfEndpointTestCase extends FunctionalTestCase
 {
-
     @Override
     protected String getConfigResources()
     {
@@ -39,20 +38,20 @@ public class AxisServiceUsingCxfEndpointTestCase extends FunctionalTestCase
     @Test
     public void testAxis() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
-        MuleMessage reply = client.send("vm://axis.in", new DefaultMuleMessage("Test String", muleContext));
+        MuleClient client = muleContext.getClient();
 
+        MuleMessage reply = client.send("vm://axis.in", new DefaultMuleMessage("Test String", muleContext));
         assertNotNull(reply);
         assertNotNull(reply.getPayload());
         assertEquals(reply.getPayloadAsString(), "Received: Test String");
-        logger.info(reply.getPayloadAsString());
     }
 
     @Test
     public void testRequestWsdl() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
-        Map props = new HashMap();
+        MuleClient client = muleContext.getClient();
+
+        Map<String, Object> props = new HashMap<String, Object>();
         props.put("http.method", "GET");
         MuleMessage reply = client.send("http://localhost:63381/services/AxisService?WSDL", "", props);
 
@@ -60,10 +59,7 @@ public class AxisServiceUsingCxfEndpointTestCase extends FunctionalTestCase
         assertNotNull(reply.getPayload());
 
         Document document = DocumentHelper.parseText(reply.getPayloadAsString());
-        List nodes;
-
-        nodes = document.selectNodes("//wsdl:definitions/wsdl:service");
+        List<?> nodes = document.selectNodes("//wsdl:definitions/wsdl:service");
         assertEquals(((Element)nodes.get(0)).attribute("name").getStringValue(), "AxisService");
     }
-
 }

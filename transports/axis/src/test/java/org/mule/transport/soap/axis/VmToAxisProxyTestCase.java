@@ -10,19 +10,18 @@
 
 package org.mule.transport.soap.axis;
 
+import static org.junit.Assert.assertNotNull;
+
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import org.junit.Rule;
 import org.junit.Test;
 
-import static org.junit.Assert.assertNotNull;
-
 public class VmToAxisProxyTestCase extends FunctionalTestCase
 {
-
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
@@ -40,9 +39,8 @@ public class VmToAxisProxyTestCase extends FunctionalTestCase
             return;
         }
 
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage result = client.send("vm://proxy", "ibm", null);
         assertNotNull(result);
     }
-
 }
