@@ -13,8 +13,8 @@ package org.mule.module.jersey;
 import static org.junit.Assert.assertEquals;
 
 import org.mule.api.MuleMessage;
+import org.mule.api.client.MuleClient;
 import org.mule.api.config.MuleProperties;
-import org.mule.module.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.http.HttpConnector;
@@ -33,7 +33,6 @@ import org.mortbay.jetty.servlet.ServletHolder;
 
 public abstract class AbstractServletTestCase extends AbstractServiceAndFlowTestCase
 {
-
     @Rule
     public DynamicPort httpPort = new DynamicPort("httpPort");
 
@@ -57,8 +56,8 @@ public abstract class AbstractServletTestCase extends AbstractServiceAndFlowTest
         ServletHolder holder = new ServletHolder(MuleReceiverServlet.class);
         root.addServlet(holder, context);
 
-        ServletContext context = root.getServletContext();
-        context.setAttribute(MuleProperties.MULE_CONTEXT_PROPERTY, muleContext);
+        ServletContext servletContext = root.getServletContext();
+        servletContext.setAttribute(MuleProperties.MULE_CONTEXT_PROPERTY, muleContext);
 
         httpServer.start();
     }
@@ -75,7 +74,7 @@ public abstract class AbstractServletTestCase extends AbstractServiceAndFlowTest
 
     public void doTestBasic(String root) throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
 
         MuleMessage result = client.send(root + "/helloworld", "", null);
         assertEquals((Integer)200, result.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0));
@@ -94,5 +93,4 @@ public abstract class AbstractServletTestCase extends AbstractServiceAndFlowTest
         assertEquals("Hello World Delete", result.getPayloadAsString());
         assertEquals((Integer)200, result.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0));
     }
-
 }
