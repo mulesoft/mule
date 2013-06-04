@@ -9,6 +9,7 @@
  */
 package org.mule.test.integration;
 
+import org.mule.api.AnnotatedObject;
 import org.mule.api.MuleContext;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.construct.FlowConstruct;
@@ -39,9 +40,12 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertTrue;
 
+import javax.xml.namespace.QName;
+
 public class PollingTestCase extends FunctionalTestCase
 {
 
+    public static final QName DOCUMENTATION_NAME = new QName("http://www.mulesoft.org/schema/mule/documentation", "name");
     private static List<String> registeredValues = new ArrayList<String>();
     private static List<CustomMetadataNotification> registeredNotification = new ArrayList<CustomMetadataNotification>();
 
@@ -150,6 +154,35 @@ public class PollingTestCase extends FunctionalTestCase
 
         assertEquals(WatermarkAction.WATERMARK_RETRIEVED_ACTION_NAME, registeredNotification.get(0).getName());
         assertEquals(WatermarkAction.WATERMARK_STORED_ATTRIBUTE_NAME, registeredNotification.get(1).getName());
+    }
+
+    @Test
+    public void watermarkWithUpdateExpression() throws Exception
+    {
+        getDafultObjectStore().store("test", "testValue");
+        executePollOf("watermarkWithUpdateExpression");
+        Thread.sleep(2000);
+        ObjectStore os = getDafultObjectStore();
+        assertTrue(os.contains("test"));
+        assertEquals(Boolean.TRUE, os.retrieve("test"));
+        assertEquals(-1, registeredValues.indexOf("noKey"));
+    }
+
+    @Test
+    public void watermarkWithAnnotations() throws Exception
+    {
+        muleContext.registerListener(new WatermarkNotificationListener());
+        getDafultObjectStore().store("test", "testValue");
+        executePollOf("watermarkWithAnnotations");
+        Thread.sleep(2000);
+        ObjectStore os = getDafultObjectStore();
+        assertTrue(os.contains("test"));
+        assertEquals("keyPresent", os.retrieve("test"));
+
+        assertEquals(WatermarkAction.WATERMARK_RETRIEVED_ACTION_NAME, registeredNotification.get(0).getName());
+        assertEquals("watermark", ((AnnotatedObject) registeredNotification.get(0).getProcessor()).getAnnotation(DOCUMENTATION_NAME));
+        assertEquals(WatermarkAction.WATERMARK_STORED_ATTRIBUTE_NAME, registeredNotification.get(1).getName());
+        assertEquals("watermark", ((AnnotatedObject) registeredNotification.get(1).getProcessor()).getAnnotation(DOCUMENTATION_NAME));
 
     }
 

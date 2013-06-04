@@ -1,5 +1,6 @@
 package org.mule.transport.polling.watermark;
 
+import org.mule.api.AnnotatedObject;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.expression.ExpressionManager;
@@ -9,12 +10,15 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.xml.namespace.QName;
+
 /**
  * Abstract definition of a Watermark Action (Retrieve/Store). It has common attributes between watermark functionality
  * as well as common methods
  */
-public abstract class WatermarkAction
+public abstract class WatermarkAction implements AnnotatedObject
 {
+
     public static final String WATERMARK_RETRIEVED_ACTION_NAME = "Watermark Retrieved";
     public static final String WATERMARK_VARIABLE_ATTRIBUTE = "watermark variable";
     public static final String WATERMARK_VALUE_ATTRIBUTE = "watermark value";
@@ -41,6 +45,12 @@ public abstract class WatermarkAction
      * @see org.mule.transport.polling.watermark.builder.DefaultWatermarkConfiguration#variable
      */
     protected String variable;
+
+    /**
+     * The watermark annotations
+     */
+    protected Map<QName, Object> annotations = new HashMap<QName, Object>();
+
 
     protected WatermarkAction(MuleContext muleContext, ObjectStore objectStore, String variable)
     {
@@ -78,6 +88,27 @@ public abstract class WatermarkAction
         metaData.put(WATERMARK_VARIABLE_ATTRIBUTE, evaluatedVariable);
         metaData.put(WATERMARK_VALUE_ATTRIBUTE, watermarkValue.toString());
         return metaData;
+    }
+
+    @Override
+    public Object getAnnotation(QName name)
+    {
+        return annotations.get(name);
+    }
+
+    @Override
+    public Map<QName, Object> getAnnotations()
+    {
+        return annotations;
+    }
+
+    @Override
+    public void setAnnotations(Map<QName, Object> annotations)
+    {
+        if (annotations != null)
+        {
+            this.annotations = annotations;
+        }
     }
 
 

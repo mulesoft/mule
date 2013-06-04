@@ -13,6 +13,12 @@ import org.mule.processor.chain.SimpleMessageProcessorChainBuilder;
 import org.mule.transport.polling.watermark.WatermarkRetrieveMessageProcessor;
 import org.mule.transport.polling.watermark.WatermarkStorePipelineListener;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+import javax.xml.namespace.QName;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -59,6 +65,12 @@ public class DefaultWatermarkConfiguration implements WatermarkConfiguration, Mu
     private MuleContext muleContext;
 
     /**
+     * The configuration annotations
+     */
+    private Map<QName, Object> annotations = new HashMap<QName, Object>();
+
+
+    /**
      * If there is a message source configured it creates a chain of message processors where the first message processor
      * is the {@link org.mule.transport.polling.watermark.WatermarkRetrieveMessageProcessor}
      *
@@ -68,7 +80,7 @@ public class DefaultWatermarkConfiguration implements WatermarkConfiguration, Mu
     public MessageProcessor buildMessageSourceFrom(MessageProcessor processor)
     {
         WatermarkRetrieveMessageProcessor watermarkSource =
-                new WatermarkRetrieveMessageProcessor(muleContext, objectStore, variable, defaultExpression);
+                WatermarkRetrieveMessageProcessor.create(muleContext, objectStore, variable, defaultExpression, annotations);
 
         if (processor != null)
         {
@@ -95,7 +107,8 @@ public class DefaultWatermarkConfiguration implements WatermarkConfiguration, Mu
     {
         try
         {
-            WatermarkStorePipelineListener watermarkListener = new WatermarkStorePipelineListener(muleContext, objectStore, variable, updateExpression);
+            WatermarkStorePipelineListener watermarkListener =
+                    WatermarkStorePipelineListener.create(muleContext, objectStore, variable, updateExpression, annotations);
             watermarkListener.setFlowConstruct(flowConstruct);
             muleContext.registerListener(watermarkListener);
         }
@@ -131,5 +144,23 @@ public class DefaultWatermarkConfiguration implements WatermarkConfiguration, Mu
     public void setMuleContext(MuleContext context)
     {
         this.muleContext = context;
+    }
+
+    @Override
+    public Object getAnnotation(QName name)
+    {
+        return annotations.get(name);
+    }
+
+    @Override
+    public Map<QName, Object> getAnnotations()
+    {
+        return annotations;
+    }
+
+    @Override
+    public void setAnnotations(Map<QName, Object> annotations)
+    {
+        this.annotations = annotations;
     }
 }

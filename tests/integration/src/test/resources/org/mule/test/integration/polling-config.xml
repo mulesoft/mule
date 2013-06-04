@@ -5,6 +5,7 @@
       xmlns:spring="http://www.springframework.org/schema/beans"
       xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
       xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
       xsi:schemaLocation="
                http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
@@ -81,6 +82,16 @@
         <component class="org.mule.test.integration.PollingTestCase$FooComponent"/>
     </flow>
 
+
+    <flow name="watermarkWithAnnotations">
+        <poll frequency="1000">
+            <watermark variable="test" default-expression="#[string:noKey]" doc:name="watermark"/>
+            <outbound-endpoint ref="foo"/>
+        </poll>
+        <set-payload value="#[string:valueUpdated]"/>
+        <set-variable variableName="test" value="keyPresent"/>
+        <component class="org.mule.test.integration.PollingTestCase$FooComponent"/>
+    </flow>
 
     <spring:bean name="pollStopper" class="org.mule.test.integration.PollingTestCase$PollStopper"/>
 </mule>

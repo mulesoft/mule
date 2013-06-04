@@ -13,6 +13,9 @@ import org.mule.context.notification.CustomMetadataNotification;
 import org.mule.context.notification.PipelineMessageNotification;
 
 import java.io.Serializable;
+import java.util.Map;
+
+import javax.xml.namespace.QName;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -21,7 +24,7 @@ import org.apache.commons.logging.LogFactory;
  * {@link PipelineMessageNotificationListener} that acts only for a particular {@link FlowConstruct} on the action
  * {@link PipelineMessageNotification#PROCESS_END}. This listener stores the watermark value in the object store
  * with the watermark variable.
- *
+ * <p/>
  * It also implements the {@link MessageProcessor} interface as we need a message processor to fire
  * a {@link CustomMetadataNotification}. Also we open the possibility to use this class as part of a processor chain
  */
@@ -45,7 +48,22 @@ public class WatermarkStorePipelineListener extends WatermarkAction
      */
     private FlowConstruct flowConstruct;
 
-    public WatermarkStorePipelineListener(MuleContext muleContext,
+    /**
+     * Factory method to create a Watermark listener
+     */
+    public static WatermarkStorePipelineListener create(MuleContext muleContext,
+                                                        ObjectStore objectStore,
+                                                        String variable,
+                                                        String updateExpression,
+                                                        Map<QName, Object> annotations)
+    {
+        WatermarkStorePipelineListener listener =
+                new WatermarkStorePipelineListener(muleContext, objectStore, variable, updateExpression);
+        listener.setAnnotations(annotations);
+        return listener;
+    }
+
+    protected WatermarkStorePipelineListener(MuleContext muleContext,
                                           ObjectStore objectStore,
                                           String variable,
                                           String updateExpression)

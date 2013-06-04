@@ -14,11 +14,14 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.xml.namespace.QName;
+
 /**
  * A Watermark message processor that will act as message source of the {@link org.mule.api.construct.FlowConstruct}
  */
 public class WatermarkRetrieveMessageProcessor extends WatermarkAction implements MessageProcessor
 {
+
     /**
      * The default expression to update the watermark variable
      *
@@ -26,7 +29,24 @@ public class WatermarkRetrieveMessageProcessor extends WatermarkAction implement
      */
     private String defaultExpression;
 
-    public WatermarkRetrieveMessageProcessor(MuleContext muleContext,
+
+    /**
+     * Factory to create a WatermarkRetrieveMessageProcessor
+     */
+    public static WatermarkRetrieveMessageProcessor create(MuleContext muleContext,
+                                                           ObjectStore objectStore,
+                                                           String variable,
+                                                           String defaultExpression,
+                                                           Map<QName, Object> annotations)
+    {
+        WatermarkRetrieveMessageProcessor messageProcessor =
+                new WatermarkRetrieveMessageProcessor(muleContext, objectStore, variable, defaultExpression);
+        messageProcessor.setAnnotations(annotations);
+
+        return messageProcessor;
+    }
+
+    protected WatermarkRetrieveMessageProcessor(MuleContext muleContext,
                                              ObjectStore objectStore,
                                              String variable,
                                              String defaultExpression)
@@ -63,8 +83,6 @@ public class WatermarkRetrieveMessageProcessor extends WatermarkAction implement
 
         return event;
     }
-
-
 
 
 }

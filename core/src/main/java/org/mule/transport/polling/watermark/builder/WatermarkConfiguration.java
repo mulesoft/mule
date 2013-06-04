@@ -1,5 +1,6 @@
 package org.mule.transport.polling.watermark.builder;
 
+import org.mule.api.AnnotatedObject;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.processor.MessageProcessor;
 
@@ -8,7 +9,7 @@ import org.mule.api.processor.MessageProcessor;
  * This class works as a builder of the {@link org.mule.transport.polling.watermark.WatermarkRetrieveMessageProcessor}
  * and a register of the {@link org.mule.transport.polling.watermark.WatermarkStorePipelineListener}
  */
-public interface WatermarkConfiguration
+public interface WatermarkConfiguration extends AnnotatedObject
 {
 
     /**
