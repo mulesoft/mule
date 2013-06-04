@@ -56,13 +56,13 @@ public class PGPExpiredIntegrationTestCase extends AbstractServiceAndFlowTestCas
 
         client.dispatch("vm://in", new DefaultMuleMessage(payload, muleContext));
 
-        MuleMessage message = client.request("vm://out", 1000);
+        MuleMessage message = client.request("vm://out", 5000);
         assertNull(message);
 
-        assertNotNull(exceptionFromFlow);
+        assertNotNull("flow's exception strategy should have caught an exception", exceptionFromFlow);
         InvalidPublicKeyException ipke =
             ExceptionUtils.getDeepestOccurenceOfType(exceptionFromFlow, InvalidPublicKeyException.class);
-        assertNotNull(ipke);
+        assertNotNull("root cause must be a InvalidPublicKeyException", ipke);
         assertTrue(ipke.getMessage().contains("has expired"));
     }
 
