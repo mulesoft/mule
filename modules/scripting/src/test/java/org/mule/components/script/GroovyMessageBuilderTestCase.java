@@ -14,7 +14,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 
 import java.util.Arrays;
@@ -24,7 +24,7 @@ import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
 public class GroovyMessageBuilderTestCase extends AbstractServiceAndFlowTestCase
-{    
+{
     public GroovyMessageBuilderTestCase(ConfigVariant variant, String configResources)
     {
         super(variant, configResources);
@@ -37,15 +37,14 @@ public class GroovyMessageBuilderTestCase extends AbstractServiceAndFlowTestCase
             {ConfigVariant.SERVICE, "groovy-messagebuilder-config-service.xml"},
             {ConfigVariant.FLOW, "groovy-messagebuilder-config-flow.xml"}
         });
-    }      
-    
+    }
+
     @Test
     public void testFunctionBehaviour() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage m = client.send("groovy1.endpoint", "Test:", null);
         assertNotNull(m);
         assertEquals("Test: A B Received", m.getPayloadAsString());
     }
-
 }

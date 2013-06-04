@@ -14,7 +14,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 
 import java.util.Arrays;
@@ -38,16 +38,15 @@ public class GroovyBindingFunctionalTestCase extends AbstractServiceAndFlowTestC
             {ConfigVariant.SERVICE, "groovy-binding-config-service.xml"},
             {ConfigVariant.FLOW, "groovy-binding-config-flow.xml"}
         });
-    }      
-    
+    }
+
     @Test
     public void testBindingCallout() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         client.dispatch("client_request", "Important Message", null);
         MuleMessage response = client.request("client_response", 2000);
         assertNotNull(response);
         assertEquals("Important Message Received by Callout1 Received by Callout2", response.getPayloadAsString());
     }
-
 }

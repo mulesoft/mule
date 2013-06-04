@@ -10,18 +10,17 @@
 
 package org.mule.module.scripting;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
 public class GroovyRegistryLookupTestCase extends FunctionalTestCase
 {
-
     @Override
     protected String getConfigResources()
     {
@@ -32,14 +31,14 @@ public class GroovyRegistryLookupTestCase extends FunctionalTestCase
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
-        
+
         muleContext.getRegistry().registerObject("hello", new Hello());
     }
 
     @Test
     public void testBindingCallout() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage response = client.send("vm://test", "", null);
         assertNotNull(response);
         assertEquals("hello", response.getPayloadAsString());
@@ -47,10 +46,9 @@ public class GroovyRegistryLookupTestCase extends FunctionalTestCase
 
     public static class Hello
     {
-        public String sayHello() 
+        public String sayHello()
         {
             return "hello";
         }
     }
-
 }

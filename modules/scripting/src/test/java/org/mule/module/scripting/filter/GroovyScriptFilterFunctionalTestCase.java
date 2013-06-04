@@ -15,7 +15,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 
 import java.util.Arrays;
@@ -26,7 +26,6 @@ import org.junit.runners.Parameterized.Parameters;
 
 public class GroovyScriptFilterFunctionalTestCase extends AbstractServiceAndFlowTestCase
 {
-
     public GroovyScriptFilterFunctionalTestCase(ConfigVariant variant, String configResources)
     {
         super(variant, configResources);
@@ -42,12 +41,12 @@ public class GroovyScriptFilterFunctionalTestCase extends AbstractServiceAndFlow
             {ConfigVariant.SERVICE, "groovy-filter-config-service.xml"},
             {ConfigVariant.FLOW, "groovy-filter-config-flow.xml"}
         });
-    }      
-    
+    }
+
     @Test
     public void testFilterScript() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         client.dispatch("vm://in1", "hello", null);
         MuleMessage response = client.request("vm://out1", RECEIVE_TIMEOUT);
         assertNotNull(response);

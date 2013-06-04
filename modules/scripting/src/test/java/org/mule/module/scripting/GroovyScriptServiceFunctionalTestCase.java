@@ -14,18 +14,17 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
 
 import org.junit.Test;
 
 public class GroovyScriptServiceFunctionalTestCase extends FunctionalTestCase
 {
-
     @Test
     public void testInlineScript() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         client.dispatch("vm://in1", "Important Message", null);
         MuleMessage response = client.request("vm://out1", RECEIVE_TIMEOUT);
         assertNotNull(response);
@@ -35,7 +34,7 @@ public class GroovyScriptServiceFunctionalTestCase extends FunctionalTestCase
     @Test
     public void testFileBasedScript() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         client.dispatch("vm://in2", "Important Message", null);
         MuleMessage response = client.request("vm://out2", RECEIVE_TIMEOUT);
         assertNotNull(response);
@@ -45,7 +44,7 @@ public class GroovyScriptServiceFunctionalTestCase extends FunctionalTestCase
     @Test
     public void testReferencedScript() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         client.dispatch("vm://in3", "Important Message", null);
         MuleMessage response = client.request("vm://out3", RECEIVE_TIMEOUT);
         assertNotNull(response);
@@ -55,7 +54,7 @@ public class GroovyScriptServiceFunctionalTestCase extends FunctionalTestCase
     @Test
     public void testScriptVariables() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         client.dispatch("vm://in4", "Important Message", null);
         MuleMessage response = client.request("vm://out4", RECEIVE_TIMEOUT);
         assertNotNull(response);
