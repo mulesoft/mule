@@ -78,6 +78,8 @@ public class MessageProcessorPollingMessageReceiver extends AbstractPollingMessa
     {
         super.doInitialise();
 
+        checkWatermark();
+
         sourceMessageProcessor = watermark().buildMessageSourceFrom(configuredMessageSource());
         watermark().registerPipelineNotificationListener(this.getFlowConstruct());
 
@@ -87,7 +89,6 @@ public class MessageProcessorPollingMessageReceiver extends AbstractPollingMessa
             setFrequency(tempPolling);
         }
     }
-
 
     @Override
     public void poll() throws Exception
@@ -155,6 +156,14 @@ public class MessageProcessorPollingMessageReceiver extends AbstractPollingMessa
             }
         }
         return false;
+    }
+
+    private void checkWatermark() throws InitialisationException
+    {
+        if ( watermark() == null ){
+            throw new InitialisationException(CoreMessages.createStaticMessage(
+                    "The watermark configuration must not be null"), this);
+        }
     }
 
     private WatermarkConfiguration watermark()

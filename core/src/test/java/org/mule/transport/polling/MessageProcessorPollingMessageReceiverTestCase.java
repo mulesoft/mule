@@ -26,12 +26,27 @@ import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.tck.SensingNullMessageProcessor;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.transport.NullPayload;
+import org.mule.transport.polling.watermark.builder.NullWatermarkConfiguration;
+import org.mule.transport.polling.watermark.builder.WatermarkConfiguration;
 
 import org.junit.Test;
 import org.mockito.Mockito;
 
 public class MessageProcessorPollingMessageReceiverTestCase extends AbstractMuleContextTestCase
 {
+
+    @Test(expected = InitialisationException.class)
+    public void testNotWatermarkConfigured() throws MuleException
+    {
+        createReceiver(new MessageProcessor()
+        {
+            public MuleEvent process(MuleEvent event) throws MuleException
+            {
+                return null;
+            }
+        }, null);
+
+    }
 
     @Test
     public void testNullResponseFromNestedMP() throws Exception
@@ -43,7 +58,7 @@ public class MessageProcessorPollingMessageReceiverTestCase extends AbstractMule
             {
                 return null;
             }
-        });
+        }, new NullWatermarkConfiguration());
 
         SensingNullMessageProcessor flow = getSensingNullMessageProcessor();
         receiver.setListener(flow);
@@ -64,7 +79,7 @@ public class MessageProcessorPollingMessageReceiverTestCase extends AbstractMule
                 return new DefaultMuleEvent(new DefaultMuleMessage(NullPayload.getInstance(), muleContext),
                     event);
             }
-        });
+        }, new NullWatermarkConfiguration());
 
         SensingNullMessageProcessor flow = getSensingNullMessageProcessor();
         receiver.setListener(flow);
@@ -84,7 +99,7 @@ public class MessageProcessorPollingMessageReceiverTestCase extends AbstractMule
             {
                 return new DefaultMuleEvent(new DefaultMuleMessage("", muleContext), event);
             }
-        });
+        }, new NullWatermarkConfiguration());
 
         SensingNullMessageProcessor flow = getSensingNullMessageProcessor();
         receiver.setListener(flow);
@@ -100,7 +115,7 @@ public class MessageProcessorPollingMessageReceiverTestCase extends AbstractMule
 
         try
         {
-            createReceiver(muleContext.getEndpointFactory().getOutboundEndpoint("test://test2"));
+            createReceiver(muleContext.getEndpointFactory().getOutboundEndpoint("test://test2"), new NullWatermarkConfiguration());
 
             org.junit.Assert.fail("Exception expected");
         }
@@ -112,12 +127,14 @@ public class MessageProcessorPollingMessageReceiverTestCase extends AbstractMule
 
     }
 
-    private MessageProcessorPollingMessageReceiver createReceiver(MessageProcessor processor)
+    private MessageProcessorPollingMessageReceiver createReceiver(MessageProcessor processor,
+                                                                  WatermarkConfiguration watermarkConfiguration)
         throws MuleException
     {
         EndpointURIEndpointBuilder builder = new EndpointURIEndpointBuilder("test://test", muleContext);
         builder.setProperty(MessageProcessorPollingMessageReceiver.SOURCE_MESSAGE_PROCESSOR_PROPERTY_NAME,
             processor);
+        builder.setProperty(MessageProcessorPollingMessageReceiver.WATERMARK_PROPERTY_NAME, watermarkConfiguration);
 
         InboundEndpoint inboundEndpoint = muleContext.getEndpointFactory().getInboundEndpoint(builder);
 
@@ -127,5 +144,6 @@ public class MessageProcessorPollingMessageReceiverTestCase extends AbstractMule
         receiver.initialise();
         return receiver;
     }
+
 
 }
