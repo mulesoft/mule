@@ -36,7 +36,7 @@ public class DefaultMuleVersionCheckerTestCase
 
         Attributes attributes = Mockito.mock(Attributes.class);
         Mockito.when(manifest.getMainAttributes()).thenReturn(attributes);
-        Mockito.when(attributes.getValue(Mockito.any(Attributes.Name.class))).thenReturn("3.4.0");
+        Mockito.when(attributes.getValue(Mockito.any(Attributes.Name.class))).thenReturn("3.4");
 
         Field manifestField = null;
         try
@@ -66,19 +66,12 @@ public class DefaultMuleVersionCheckerTestCase
         Assert.assertEquals(this.checker.getMuleVersion(), MuleManifest.getProductVersion());
     }
 
-    @Test
-    public void assertGreaterMajorVersion()
+    @Test(expected=ConfigurationException.class)
+    public void assertGreaterMajorVersion() throws ConfigurationException
     {
         String version = this.addVersion(this.getVersion(), "1.0.0");
-        try
-        {
-            this.checker.assertRuntimeGreaterOrEquals(version);
-            Assert.fail("Was expecting a failure do to major mule version");
-        }
-        catch (ConfigurationException e)
-        {
-            // sucess
-        }
+        this.checker.assertRuntimeGreaterOrEquals(version);
+        Assert.fail("Was expecting a failure do to major mule version");
     }
 
     @Test
@@ -109,19 +102,12 @@ public class DefaultMuleVersionCheckerTestCase
         }
     }
 
-    @Test
-    public void assertGreaterMinorVersion()
+    @Test(expected=ConfigurationException.class)
+    public void assertGreaterMinorVersion() throws ConfigurationException
     {
         String version = this.addVersion(this.getVersion(), "0.1.0");
-        try
-        {
-            this.checker.assertRuntimeGreaterOrEquals(version);
-            Assert.fail("was expecting failure due to minor mule version");
-        }
-        catch (ConfigurationException e)
-        {
-            // success
-        }
+        this.checker.assertRuntimeGreaterOrEquals(version);
+        Assert.fail("was expecting failure due to minor mule version");
     }
 
     @Test
@@ -138,19 +124,12 @@ public class DefaultMuleVersionCheckerTestCase
         }
     }
 
-    @Test
-    public void assertGreaterPatchVersion()
+    @Test(expected=ConfigurationException.class)
+    public void assertGreaterPatchVersion() throws ConfigurationException
     {
         String version = this.addVersion(this.getVersion(), "0.0.1");
-        try
-        {
-            this.checker.assertRuntimeGreaterOrEquals(version);
-            Assert.fail("was expecting failure due to minor mule version");
-        }
-        catch (ConfigurationException e)
-        {
-            // success
-        }
+        this.checker.assertRuntimeGreaterOrEquals(version);
+        Assert.fail("was expecting failure due to minor mule version");
     }
 
     @Test
@@ -191,6 +170,10 @@ public class DefaultMuleVersionCheckerTestCase
         for (; i < currentRuntimeVersion.length; i++)
         {
             newVersion.append(".0");
+        }
+        
+        for (; i < deltaVersion.length; i++) {
+            newVersion.append('.').append(deltaVersion[i]);
         }
 
         return newVersion.toString();

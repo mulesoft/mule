@@ -66,7 +66,9 @@ public class DefaultMuleVersionChecker implements MuleVersionChecker
             }
 
             String[] currentRuntimeVersion = runtimeVersion.split("\\.");
-            for (int i = 0; (i < expectedMinVersion.length); i++)
+            int i = 0;
+
+            for (; (i < currentRuntimeVersion.length); i++)
             {
                 try
                 {
@@ -76,7 +78,7 @@ public class DefaultMuleVersionChecker implements MuleVersionChecker
                     }
                     if (Integer.parseInt(currentRuntimeVersion[i]) < Integer.parseInt(expectedMinVersion[i]))
                     {
-                        throw new ConfigurationException(CoreMessages.minMuleVersionNotMet(minVersion));
+                        this.throwException(minVersion);
                     }
                 }
                 catch (NumberFormatException nfe)
@@ -92,7 +94,20 @@ public class DefaultMuleVersionChecker implements MuleVersionChecker
                         runtimeVersion));
                 }
             }
+
+            for (; i < expectedMinVersion.length; i++)
+            {
+                if (!"0".equals(expectedMinVersion[i]))
+                {
+                    this.throwException(minVersion);
+                }
+            }
         }
+    }
+
+    private void throwException(String minVersion) throws ConfigurationException
+    {
+        throw new ConfigurationException(CoreMessages.minMuleVersionNotMet(minVersion));
     }
 
 }
