@@ -8,11 +8,12 @@
  * LICENSE.txt file.
  */
 
-package org.mule.api.processor;
+package org.mule.oauth.processor;
 
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.config.i18n.MessageFactory;
 
 import java.net.URLDecoder;

@@ -10,7 +10,6 @@
 
 package org.mule.api.capability;
 
-import org.mule.common.Capability;
 
 /**
  * This interface is implemented for every {@link org.mule.api.annotations.Module}
@@ -25,5 +24,5 @@ public interface Capabilities
      * @param capability The capability to test for
      * @return True if it does, false otherwise
      */
-    boolean isCapableOf(Capability capability);
+    boolean isCapableOf(ModuleCapability capability);
 }
