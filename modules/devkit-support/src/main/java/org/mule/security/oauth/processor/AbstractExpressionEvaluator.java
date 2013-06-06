@@ -1,5 +1,5 @@
 
-package org.mule.oauth.processor;
+package org.mule.security.oauth.processor;
 
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;

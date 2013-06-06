@@ -8,20 +8,18 @@
  * LICENSE.txt file.
  */
 
-package org.mule.oauth.process;
+package org.mule.security.oauth.process;
 
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.ProcessInterceptor;
 import org.mule.api.ProcessTemplate;
-import org.mule.api.callback.ManagedAccessTokenProcessInterceptor;
-import org.mule.api.callback.ProcessCallback;
-import org.mule.api.callback.ProcessCallbackProcessInterceptor;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.filter.Filter;
 import org.mule.common.security.oauth.OAuthAdapter;
-import org.mule.common.security.oauth.OAuthManager;
+import org.mule.security.oauth.OAuthManager;
+import org.mule.security.oauth.callback.ProcessCallback;
 
 public class ManagedAccessTokenProcessTemplate<P> implements ProcessTemplate<P, OAuthAdapter>
 {
@@ -31,8 +29,11 @@ public class ManagedAccessTokenProcessTemplate<P> implements ProcessTemplate<P, 
     public ManagedAccessTokenProcessTemplate(OAuthManager<OAuthAdapter> oauthManager, MuleContext muleContext)
     {
         ProcessInterceptor<P, OAuthAdapter> processCallbackProcessInterceptor = new ProcessCallbackProcessInterceptor<P, OAuthAdapter>();
-        ProcessInterceptor<P, OAuthAdapter> refreshTokenProcessInterceptor = new RefreshTokenProcessInterceptor(
+
+        @SuppressWarnings("unchecked")
+        ProcessInterceptor<P, OAuthAdapter> refreshTokenProcessInterceptor = (ProcessInterceptor<P, OAuthAdapter>) new RefreshTokenProcessInterceptor(
             processCallbackProcessInterceptor);
+
         ProcessInterceptor<P, OAuthAdapter> managedAccessTokenProcessInterceptor = new ManagedAccessTokenProcessInterceptor<P>(
             refreshTokenProcessInterceptor, oauthManager, muleContext);
         processInterceptor = managedAccessTokenProcessInterceptor;

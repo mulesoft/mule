@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.oauth.processor;
+package org.mule.security.oauth.processor;
 
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;

@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.oauth.processor;
+package org.mule.security.oauth.processor;
 
 public abstract class AbstractConnectedProcessor extends AbstractExpressionEvaluator
 {

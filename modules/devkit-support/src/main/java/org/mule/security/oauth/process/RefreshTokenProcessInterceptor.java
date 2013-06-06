@@ -8,16 +8,16 @@
  * LICENSE.txt file.
  */
 
-package org.mule.oauth.process;
+package org.mule.security.oauth.process;
 
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.ProcessInterceptor;
-import org.mule.api.callback.ProcessCallback;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.filter.Filter;
 import org.mule.common.security.oauth.OAuth2Adapter;
-import org.mule.oauth.processor.AbstractExpressionEvaluator;
+import org.mule.security.oauth.callback.ProcessCallback;
+import org.mule.security.oauth.processor.AbstractExpressionEvaluator;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

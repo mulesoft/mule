@@ -8,25 +8,15 @@
  * LICENSE.txt file.
  */
 
-package org.mule.api.oauth.callback;
+package org.mule.security.oauth;
 
-import org.mule.api.transport.Connector;
-
-public interface HttpCallbackAdapter
+/**
+ * Callback returned by methods that are annotated with @Source
+ * <p/>
+ * It will be executed when the MessageSource is being stopped.
+ */
+public interface StopSourceCallback
 {
 
-    Integer getLocalPort();
-
-    Integer getRemotePort();
-
-    String getDomain();
-
-    Connector getConnector();
-
-    Boolean getAsync();
-
-    String getPath();
-
+    void stop() throws Exception;
 }
-
-

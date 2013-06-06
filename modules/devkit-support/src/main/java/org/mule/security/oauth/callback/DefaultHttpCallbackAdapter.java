@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.api.oauth.callback;
+package org.mule.security.oauth.callback;
 
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;

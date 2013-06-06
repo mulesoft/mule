@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.api.oauth;
+package org.mule.security.oauth;
 
 import org.mule.api.MetadataAware;
 import org.mule.api.MuleContext;
@@ -26,12 +26,12 @@ import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
-import org.mule.api.oauth.callback.DefaultHttpCallbackAdapter;
 import org.mule.api.store.ObjectStore;
 import org.mule.common.security.oauth.OAuthAdapter;
-import org.mule.common.security.oauth.OAuthManager;
 import org.mule.common.security.oauth.OAuthState;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.security.oauth.callback.DefaultHttpCallbackAdapter;
+import org.mule.security.oauth.process.ManagedAccessTokenProcessTemplate;
 
 import java.util.Map;
 
@@ -41,8 +41,8 @@ import org.apache.commons.pool.KeyedPoolableObjectFactory;
 import org.apache.commons.pool.impl.GenericKeyedObjectPool;
 
 public abstract class BaseOAuthManager<C extends OAuthAdapter> extends DefaultHttpCallbackAdapter
-    implements OAuthManager<C>, MuleContextAware, Initialisable, Capabilities, MetadataAware,
-    OAuthManager<OAuthAdapter>, ProcessAdapter<OAuthAdapter>
+    implements MuleContextAware, Initialisable, Capabilities, MetadataAware, OAuthManager<OAuthAdapter>,
+    ProcessAdapter<OAuthAdapter>
 {
 
     private static Log logger = LogFactory.getLog(BaseOAuthManager.class);
@@ -57,6 +57,7 @@ public abstract class BaseOAuthManager<C extends OAuthAdapter> extends DefaultHt
      * muleContext
      */
     protected MuleContext muleContext;
+
     /**
      * Flow Construct
      */
@@ -69,10 +70,16 @@ public abstract class BaseOAuthManager<C extends OAuthAdapter> extends DefaultHt
      * Access Token Pool Factory
      */
     private KeyedPoolableObjectFactory accessTokenPoolFactory;
+
     /**
      * Access Token Pool
      */
     private GenericKeyedObjectPool accessTokenPool;
+
+    protected abstract OAuthAdapter instantiateAdapter();
+
+    protected abstract KeyedPoolableObjectFactory createPoolFactory(OAuthManager<OAuthAdapter> oauthManager,
+                                                                    ObjectStore<OAuthState> objectStore);
 
     /**
      * Retrieves defaultUnauthorizedConnector
@@ -93,8 +100,9 @@ public abstract class BaseOAuthManager<C extends OAuthAdapter> extends DefaultHt
     }
 
     /**
-     * Retrieves consumerKey
+     * {@inheritDoc}
      */
+    @Override
     public String getConsumerKey()
     {
         return this.consumerKey;
@@ -111,8 +119,9 @@ public abstract class BaseOAuthManager<C extends OAuthAdapter> extends DefaultHt
     }
 
     /**
-     * Retrieves consumerSecret
+     * {@inheritDoc}
      */
+    @Override
     public String getConsumerSecret()
     {
         return this.consumerSecret;
@@ -155,14 +164,15 @@ public abstract class BaseOAuthManager<C extends OAuthAdapter> extends DefaultHt
     }
 
     /**
-     * Retrieves muleContext
+     * {@inheritDoc}
      */
-    public MuleContext getMuleContext()
+    @Override
+    public final MuleContext getMuleContext()
     {
         return this.muleContext;
     }
 
-    public void setMuleContext(MuleContext muleContext)
+    public final void setMuleContext(MuleContext muleContext)
     {
         this.muleContext = muleContext;
         if (defaultUnauthorizedConnector instanceof MuleContextAware)
@@ -243,19 +253,14 @@ public abstract class BaseOAuthManager<C extends OAuthAdapter> extends DefaultHt
     }
 
     /**
-     * Retrieves accessTokenPoolFactory
+     * {@inheritDoc}
      */
     public KeyedPoolableObjectFactory getAccessTokenPoolFactory()
     {
         return this.accessTokenPoolFactory;
     }
 
-    protected abstract OAuthAdapter instantiateAdapter();
-
-    protected abstract KeyedPoolableObjectFactory createPoolFactory(OAuthManager<OAuthAdapter> oauthManager,
-                                                                    ObjectStore<OAuthState> objectStore);
-
-    public void initialise() throws InitialisationException
+    public final void initialise() throws InitialisationException
     {
         GenericKeyedObjectPool.Config config = new GenericKeyedObjectPool.Config();
         config.testOnBorrow = true;
@@ -273,14 +278,14 @@ public abstract class BaseOAuthManager<C extends OAuthAdapter> extends DefaultHt
         accessTokenPoolFactory = this.createPoolFactory(this, this.accessTokenObjectStore);
         accessTokenPool = new GenericKeyedObjectPool(accessTokenPoolFactory, config);
         defaultUnauthorizedConnector = this.instantiateAdapter();
-        
+
         if (defaultUnauthorizedConnector instanceof Initialisable)
         {
             ((Initialisable) defaultUnauthorizedConnector).initialise();
         }
     }
 
-    public void start() throws MuleException
+    public final void start() throws MuleException
     {
         if (defaultUnauthorizedConnector instanceof Startable)
         {
@@ -288,7 +293,7 @@ public abstract class BaseOAuthManager<C extends OAuthAdapter> extends DefaultHt
         }
     }
 
-    public void stop() throws MuleException
+    public final void stop() throws MuleException
     {
         if (defaultUnauthorizedConnector instanceof Stoppable)
         {
@@ -296,18 +301,17 @@ public abstract class BaseOAuthManager<C extends OAuthAdapter> extends DefaultHt
         }
     }
 
-    public void dispose()
+    public final void dispose()
     {
         if (defaultUnauthorizedConnector instanceof Disposable)
         {
             ((Disposable) defaultUnauthorizedConnector).dispose();
         }
     }
-    
-    protected abstract void setCustomProperties(OAuthAdapter adapter);
-    
 
-    public OAuthAdapter createAccessToken(String verifier) throws Exception
+    protected abstract void setCustomProperties(OAuthAdapter adapter);
+
+    public final OAuthAdapter createAccessToken(String verifier) throws Exception
     {
         OAuthAdapter connector = this.instantiateAdapter();
         connector.setOauthVerifier(verifier);
@@ -315,25 +319,25 @@ public abstract class BaseOAuthManager<C extends OAuthAdapter> extends DefaultHt
         connector.setAccessTokenUrl(getAccessTokenUrl());
         connector.setConsumerKey(getConsumerKey());
         connector.setConsumerSecret(getConsumerSecret());
-        
+
         this.setCustomProperties(connector);
-        
+
         if (connector instanceof MuleContextAware)
         {
-            ((MuleContextAware)connector).setMuleContext(muleContext);
+            ((MuleContextAware) connector).setMuleContext(muleContext);
         }
         if (connector instanceof Initialisable)
         {
-            ((Initialisable)connector).initialise();
+            ((Initialisable) connector).initialise();
         }
         if (connector instanceof Startable)
         {
-            ((Startable)connector).start();
+            ((Startable) connector).start();
         }
         return connector;
     }
 
-    public OAuthAdapter acquireAccessToken(String userId) throws Exception
+    public final OAuthAdapter acquireAccessToken(String userId) throws Exception
     {
         if (logger.isDebugEnabled())
         {
@@ -363,7 +367,7 @@ public abstract class BaseOAuthManager<C extends OAuthAdapter> extends DefaultHt
         return object;
     }
 
-    public void releaseAccessToken(String userId, OAuthAdapter connector) throws Exception
+    public final void releaseAccessToken(String userId, OAuthAdapter connector) throws Exception
     {
         if (logger.isDebugEnabled())
         {
@@ -392,7 +396,7 @@ public abstract class BaseOAuthManager<C extends OAuthAdapter> extends DefaultHt
         }
     }
 
-    public void destroyAccessToken(String userId, OAuthAdapter connector) throws Exception
+    public final void destroyAccessToken(String userId, OAuthAdapter connector) throws Exception
     {
         if (logger.isDebugEnabled())
         {
@@ -424,7 +428,7 @@ public abstract class BaseOAuthManager<C extends OAuthAdapter> extends DefaultHt
     /**
      * Returns true if this module implements such capability
      */
-    public boolean isCapableOf(ModuleCapability capability)
+    public final boolean isCapableOf(ModuleCapability capability)
     {
         if (capability == ModuleCapability.LIFECYCLE_CAPABLE)
         {
@@ -442,12 +446,12 @@ public abstract class BaseOAuthManager<C extends OAuthAdapter> extends DefaultHt
     }
 
     @Override
-    public <P> ProcessTemplate<P, OAuthAdapter> getProcessTemplate()
+    public final <P> ProcessTemplate<P, OAuthAdapter> getProcessTemplate()
     {
-        return new ManagedAccessTokenProcessTemplate(this, getMuleContext());
+        return new ManagedAccessTokenProcessTemplate<P>(this, getMuleContext());
     }
 
-    public String authorize(Map<String, String> extraParameters, String authorizationUrl, String redirectUri)
+    public final String authorize(Map<String, String> extraParameters, String authorizationUrl, String redirectUri)
     {
         StringBuilder urlBuilder = new StringBuilder();
         if (authorizationUrl != null)

@@ -8,15 +8,14 @@
  * LICENSE.txt file.
  */
 
-package org.mule.api.callback;
+package org.mule.security.oauth;
 
-/**
- * Callback returned by methods that are annotated with @Source
- * <p/>
- * It will be executed when the MessageSource is being stopped.
- */
-public interface StopSourceCallback
+import org.mule.api.context.MuleContextAware;
+import org.mule.api.lifecycle.Startable;
+import org.mule.api.lifecycle.Stoppable;
+
+public interface HttpCallback extends Startable, Stoppable, MuleContextAware
 {
 
-    void stop() throws Exception;
+    String getUrl();
 }

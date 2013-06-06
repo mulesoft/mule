@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.api.callback;
+package org.mule.security.oauth.process;
 
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
@@ -19,9 +19,10 @@ import org.mule.api.routing.filter.Filter;
 import org.mule.common.connection.exception.UnableToAcquireConnectionException;
 import org.mule.common.connection.exception.UnableToReleaseConnectionException;
 import org.mule.common.security.oauth.OAuthAdapter;
-import org.mule.common.security.oauth.OAuthManager;
-import org.mule.oauth.processor.AbstractConnectedProcessor;
-import org.mule.oauth.processor.AbstractExpressionEvaluator;
+import org.mule.security.oauth.OAuthManager;
+import org.mule.security.oauth.callback.ProcessCallback;
+import org.mule.security.oauth.processor.AbstractConnectedProcessor;
+import org.mule.security.oauth.processor.AbstractExpressionEvaluator;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

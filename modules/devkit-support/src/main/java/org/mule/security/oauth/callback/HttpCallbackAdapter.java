@@ -8,14 +8,25 @@
  * LICENSE.txt file.
  */
 
-package org.mule.api.callback;
+package org.mule.security.oauth.callback;
 
-import org.mule.api.context.MuleContextAware;
-import org.mule.api.lifecycle.Startable;
-import org.mule.api.lifecycle.Stoppable;
+import org.mule.api.transport.Connector;
 
-public interface HttpCallback extends Startable, Stoppable, MuleContextAware
+public interface HttpCallbackAdapter
 {
 
-    String getUrl();
+    Integer getLocalPort();
+
+    Integer getRemotePort();
+
+    String getDomain();
+
+    Connector getConnector();
+
+    Boolean getAsync();
+
+    String getPath();
+
 }
+
+

@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.api.callback;
+package org.mule.security.oauth;
 
 import org.mule.MessageExchangePattern;
 import org.mule.api.DefaultMuleException;
