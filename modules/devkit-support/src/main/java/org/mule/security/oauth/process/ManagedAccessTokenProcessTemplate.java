@@ -17,7 +17,7 @@ import org.mule.api.ProcessInterceptor;
 import org.mule.api.ProcessTemplate;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.filter.Filter;
-import org.mule.common.security.oauth.OAuthAdapter;
+import org.mule.security.oauth.OAuthAdapter;
 import org.mule.security.oauth.OAuthManager;
 import org.mule.security.oauth.callback.ProcessCallback;
 

@@ -17,7 +17,6 @@ import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.store.ObjectStore;
 import org.mule.api.store.ObjectStoreException;
-import org.mule.common.security.oauth.OAuthAdapter;
 import org.mule.common.security.oauth.OAuthState;
 
 import org.apache.commons.logging.Log;

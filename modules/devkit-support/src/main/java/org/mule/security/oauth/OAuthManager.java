@@ -11,7 +11,6 @@
 package org.mule.security.oauth;
 
 import org.mule.api.MuleContext;
-import org.mule.common.security.oauth.OAuthAdapter;
 
 import org.apache.commons.pool.KeyedPoolableObjectFactory;
 

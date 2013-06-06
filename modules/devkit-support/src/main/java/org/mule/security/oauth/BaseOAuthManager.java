@@ -27,7 +27,6 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.store.ObjectStore;
-import org.mule.common.security.oauth.OAuthAdapter;
 import org.mule.common.security.oauth.OAuthState;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.security.oauth.callback.DefaultHttpCallbackAdapter;

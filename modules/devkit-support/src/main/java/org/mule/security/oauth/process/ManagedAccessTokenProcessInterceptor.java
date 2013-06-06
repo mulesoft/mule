@@ -18,7 +18,7 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.filter.Filter;
 import org.mule.common.connection.exception.UnableToAcquireConnectionException;
 import org.mule.common.connection.exception.UnableToReleaseConnectionException;
-import org.mule.common.security.oauth.OAuthAdapter;
+import org.mule.security.oauth.OAuthAdapter;
 import org.mule.security.oauth.OAuthManager;
 import org.mule.security.oauth.callback.ProcessCallback;
 import org.mule.security.oauth.processor.AbstractConnectedProcessor;
