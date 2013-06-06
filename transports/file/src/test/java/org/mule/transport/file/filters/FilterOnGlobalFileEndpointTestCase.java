@@ -10,7 +10,11 @@
 
 package org.mule.transport.file.filters;
 
-import org.mule.module.client.MuleClient;
+import static junit.framework.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+import org.mule.api.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.util.FileUtils;
 
@@ -18,10 +22,6 @@ import java.io.File;
 import java.io.IOException;
 
 import org.junit.Test;
-
-import static junit.framework.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 public class FilterOnGlobalFileEndpointTestCase extends FunctionalTestCase
 {
@@ -93,9 +93,9 @@ public class FilterOnGlobalFileEndpointTestCase extends FunctionalTestCase
         assertTrue(txtFile.exists());
         assertTrue(xmlFile.exists());
 
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         client.request("globalEP", 1000);
-        
+
         assertTrue(txtFile.exists());
         assertFalse(xmlFile.exists());
     }

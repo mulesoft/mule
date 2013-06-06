@@ -14,7 +14,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -49,7 +49,7 @@ public class FileFunctionalTestCase extends AbstractFileFunctionalTestCase
         Map<String, Object> props = new HashMap<String, Object>();
         props.put(TARGET_FILE, target.getName());
 
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         client.dispatch("send", TEST_MESSAGE, props);
         waitForFileSystem();
 
@@ -61,7 +61,7 @@ public class FileFunctionalTestCase extends AbstractFileFunctionalTestCase
     public void testDirectRequest() throws Exception
     {
         File target = initForRequest();
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         String url = fileToUrl(target) + "?connector=receiveConnector";
         logger.debug(url);
         MuleMessage message = client.request(url, 100000);
@@ -83,7 +83,7 @@ public class FileFunctionalTestCase extends AbstractFileFunctionalTestCase
         out.close();
         target.deleteOnExit();
 
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         Thread.sleep(1000);
         MuleMessage message = client.request("vm://receive?connector=vmQueue", 100000);
         assertEquals(TEST_MESSAGE, message.getPayloadAsString());
