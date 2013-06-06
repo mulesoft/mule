@@ -15,7 +15,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -25,7 +25,6 @@ import org.junit.runners.Parameterized.Parameters;
 
 public class FtpMessageRequesterTestCase extends AbstractFtpServerTestCase
 {
-
     public FtpMessageRequesterTestCase(ConfigVariant variant, String configResources)
     {
         super(variant, configResources);
@@ -33,18 +32,18 @@ public class FtpMessageRequesterTestCase extends AbstractFtpServerTestCase
 
     @Parameters
     public static Collection<Object[]> parameters()
-    {               
+    {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.FLOW, "ftp-message-requester-test.xml"}            
+            {ConfigVariant.FLOW, "ftp-message-requester-test.xml"}
         });
-    }      
-    
+    }
+
     @Test
     public void testMessageRequester() throws Exception
     {
         createFileOnFtpServer("test.txt");
 
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage message = client.request(getMuleFtpEndpoint(), getTimeout());
         assertNotNull(message);
         assertEquals(TEST_MESSAGE, message.getPayloadAsString());
@@ -54,5 +53,3 @@ public class FtpMessageRequesterTestCase extends AbstractFtpServerTestCase
         assertNull(message2);
     }
 }
-
-

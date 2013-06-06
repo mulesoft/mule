@@ -15,7 +15,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import org.mule.api.MuleEventContext;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
 
@@ -32,7 +32,7 @@ public class FtpFunctionalTestCase extends AbstractFtpServerTestCase
 {
     public FtpFunctionalTestCase(ConfigVariant variant, String configResources)
     {
-        super(variant, configResources);     
+        super(variant, configResources);
     }
 
     @Parameters
@@ -42,8 +42,8 @@ public class FtpFunctionalTestCase extends AbstractFtpServerTestCase
             {ConfigVariant.SERVICE, "ftp-functional-test-service.xml"},
             {ConfigVariant.FLOW, "ftp-functional-test-flow.xml"}
         });
-    }      
-    
+    }
+
     @Test
     public void testSendAndRequest() throws Exception
     {
@@ -56,7 +56,7 @@ public class FtpFunctionalTestCase extends AbstractFtpServerTestCase
         FunctionalTestComponent ftc = (FunctionalTestComponent) component;
         ftc.setEventCallback(new FunctionalEventCallback(latch, message));
 
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         client.dispatch(getMuleFtpEndpoint(), TEST_MESSAGE, null);
 
         // TODO DZ: need a reliable way to check the file once it's been written to
