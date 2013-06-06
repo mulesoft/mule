@@ -10,8 +10,11 @@
 
 package org.mule.transport.email.functional;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.email.GreenMailUtilities;
@@ -22,9 +25,6 @@ import com.icegreen.greenmail.util.ServerSetup;
 
 import org.junit.Rule;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 public class ImapMessageRequesterTestCase extends FunctionalTestCase
 {
@@ -74,14 +74,11 @@ public class ImapMessageRequesterTestCase extends FunctionalTestCase
     public void testMessageRequester() throws Exception
     {
         String imapUri = String.format("imap://%1s:%2s@localhost:%3d/INBOX", USER, PASSWORD, PORT);
-        
-        MuleClient client = new MuleClient(muleContext);
+
+        MuleClient client = muleContext.getClient();
         MuleMessage message = client.request(imapUri, RECEIVE_TIMEOUT);
-        
+
         assertNotNull(message);
         assertEquals(MESSAGE, message.getPayload());
     }
-
 }
-
-
