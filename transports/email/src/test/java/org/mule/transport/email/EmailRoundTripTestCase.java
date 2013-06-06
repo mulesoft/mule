@@ -13,9 +13,8 @@ import static org.junit.Assert.assertTrue;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
-import org.mule.tck.AbstractServiceAndFlowTestCase.ConfigVariant;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.email.functional.AbstractEmailFunctionalTestCase;
 
@@ -41,7 +40,6 @@ import org.junit.runners.Parameterized.Parameters;
  */
 public class EmailRoundTripTestCase extends AbstractServiceAndFlowTestCase
 {
-
     public EmailRoundTripTestCase(ConfigVariant variant, String configResources)
     {
         super(variant, configResources);
@@ -66,7 +64,7 @@ public class EmailRoundTripTestCase extends AbstractServiceAndFlowTestCase
 
     @Rule
     public DynamicPort dynamicPort6 = new DynamicPort("port6");
-    
+
     @Parameters
     public static Collection<Object[]> parameters()
     {
@@ -74,7 +72,7 @@ public class EmailRoundTripTestCase extends AbstractServiceAndFlowTestCase
             {ConfigVariant.SERVICE, "email-round-trip-test-service.xml"},
             {ConfigVariant.FLOW, "email-round-trip-test-flow.xml"}
         });
-    }      
+    }
 
     @Override
     protected MuleContext createMuleContext() throws Exception
@@ -109,6 +107,7 @@ public class EmailRoundTripTestCase extends AbstractServiceAndFlowTestCase
      * Stop the servers when the test ends
      * @throws Exception
      */
+    @Override
     protected void doTearDown() throws Exception
     {
         greenMailSupport.stopServers();
@@ -120,7 +119,7 @@ public class EmailRoundTripTestCase extends AbstractServiceAndFlowTestCase
     {
         // first, check that the conversion happened - we should have a copy of
         // the message as rfc822 encoded bytes on vm://rfc822
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage message = client.request("vm://rfc822", RECEIVE_TIMEOUT);
         assertTrue(message.getPayload() instanceof byte[]);
 
@@ -130,5 +129,4 @@ public class EmailRoundTripTestCase extends AbstractServiceAndFlowTestCase
         assertNotNull("did not receive any messages", messages);
         assertEquals("did not receive 1 mail", 1, messages.length);
     }
-
 }
