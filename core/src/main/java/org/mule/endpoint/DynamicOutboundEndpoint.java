@@ -10,9 +10,7 @@
 
 package org.mule.endpoint;
 
-import org.mule.DefaultMuleEvent;
 import org.mule.MessageExchangePattern;
-import org.mule.ResponseOutputStream;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -36,6 +34,7 @@ import org.mule.api.transport.Connector;
 import org.mule.api.transport.DispatchException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.processor.AbstractRedeliveryPolicy;
+import org.mule.util.ObjectNameHelper;
 
 import java.util.Collections;
 import java.util.List;
@@ -165,6 +164,8 @@ public class DynamicOutboundEndpoint implements OutboundEndpoint
         {
             EndpointBuilder staticBuilder = (EndpointBuilder) builder.clone();
             staticBuilder.setURIBuilder(new URIBuilder(uri));
+            String endpointName = ObjectNameHelper.getEndpointNameFor(uri);
+            staticBuilder.setName(endpointName);
             return staticBuilder.buildOutboundEndpoint();
         }
         catch (CloneNotSupportedException e)
@@ -211,7 +212,6 @@ public class DynamicOutboundEndpoint implements OutboundEndpoint
     {
         return prototypeEndpoint.getRetryPolicyTemplate();
     }
-
 
     public String getEncoding()
     {
