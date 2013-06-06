@@ -28,11 +28,19 @@ import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.store.ObjectStore;
 import org.mule.common.security.oauth.OAuthState;
+import org.mule.common.security.oauth.exception.UnableToAcquireAccessTokenException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.security.oauth.callback.DefaultHttpCallbackAdapter;
 import org.mule.security.oauth.process.ManagedAccessTokenProcessTemplate;
+import org.mule.util.IOUtils;
 
+import java.io.OutputStreamWriter;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLDecoder;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -75,10 +83,36 @@ public abstract class BaseOAuthManager<C extends OAuthAdapter> extends DefaultHt
      */
     private GenericKeyedObjectPool accessTokenPool;
 
+    /**
+     * Creates a concrete instance of the OAuthAdapter that corresponds with this
+     * OAuthManager
+     * 
+     * @return an instance of {@link org.mule.security.oauth.OAuthAdapter}
+     */
     protected abstract OAuthAdapter instantiateAdapter();
 
+    /**
+     * Returns the concrete instance of
+     * {@link org.apache.commons.pool.KeyedPoolableObjectFactory} that's going to be
+     * in charge of creating the objects in the pool
+     * 
+     * @param oauthManager the OAuthManager that will manage the created objects
+     * @param objectStore an instance of {@link org.mule.api.store.ObjectStore} that
+     *            will be responsible for storing instances of
+     *            {@link org.mule.common.security.oauth.OAuthState}
+     * @return an instance of
+     *         {@link org.apache.commons.pool.KeyedPoolableObjectFactory}
+     */
     protected abstract KeyedPoolableObjectFactory createPoolFactory(OAuthManager<OAuthAdapter> oauthManager,
                                                                     ObjectStore<OAuthState> objectStore);
+
+    /**
+     * Populates the adapter with custom properties not accessible from the base
+     * interface.
+     * 
+     * @param adapter an instance of {@link org.mule.security.oauth.OAuthAdapter}
+     */
+    protected abstract void setCustomProperties(OAuthAdapter adapter);
 
     /**
      * Retrieves defaultUnauthorizedConnector
@@ -308,8 +342,6 @@ public abstract class BaseOAuthManager<C extends OAuthAdapter> extends DefaultHt
         }
     }
 
-    protected abstract void setCustomProperties(OAuthAdapter adapter);
-
     public final OAuthAdapter createAccessToken(String verifier) throws Exception
     {
         OAuthAdapter connector = this.instantiateAdapter();
@@ -425,6 +457,228 @@ public abstract class BaseOAuthManager<C extends OAuthAdapter> extends DefaultHt
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String buildAuthorizeUrl(Map<String, String> extraParameters,
+                                    String authorizationUrl,
+                                    String redirectUri)
+    {
+        StringBuilder urlBuilder = new StringBuilder();
+        if (authorizationUrl != null)
+        {
+            urlBuilder.append(authorizationUrl);
+        }
+        else
+        {
+            urlBuilder.append(this.authorizationUrl);
+        }
+        urlBuilder.append("?");
+        urlBuilder.append("response_type=code&");
+        urlBuilder.append("client_id=");
+        urlBuilder.append(getConsumerKey());
+        urlBuilder.append("&redirect_uri=");
+        urlBuilder.append(redirectUri);
+        for (String parameter : extraParameters.keySet())
+        {
+            urlBuilder.append("&");
+            urlBuilder.append(parameter);
+            urlBuilder.append("=");
+            urlBuilder.append(extraParameters.get(parameter));
+        }
+
+        if (logger.isDebugEnabled())
+        {
+            logger.debug(("Authorization URL has been generated as follows: " + urlBuilder));
+        }
+
+        return urlBuilder.toString();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean restoreAccessToken(OAuthAdapter adapter, RestoreAccessTokenCallback callback)
+    {
+        if (callback != null)
+        {
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Attempting to restore access token...");
+            }
+
+            try
+            {
+                callback.restoreAccessToken();
+                String accessToken = callback.getAccessToken();
+                adapter.setAccessToken(accessToken);
+
+                if (logger.isDebugEnabled())
+                {
+                    logger.debug(String.format("Access token and secret has been restored successfully [accessToken = %s]", accessToken));
+                }
+                return true;
+            }
+            catch (Exception e)
+            {
+                logger.error("Cannot restore access token, an unexpected error occurred", e);
+            }
+        }
+        return false;
+    }
+
+    private void fetchAndExtract(OAuthAdapter adapter,
+                                 RestoreAccessTokenCallback restoreCallback,
+                                 SaveAccessTokenCallback saveCallback,
+                                 String accessTokenUrl,
+                                 String requestBodyParam,
+                                 Pattern accessCodePattern) throws UnableToAcquireAccessTokenException
+    {
+        this.restoreAccessToken(adapter, restoreCallback);
+        if (adapter.getAccessToken() == null)
+        {
+            try
+            {
+                if (logger.isDebugEnabled())
+                {
+                    logger.debug("Retrieving access token...");
+                }
+
+                HttpURLConnection conn = ((HttpURLConnection) new URL(accessTokenUrl).openConnection());
+                conn.setRequestMethod("POST");
+                conn.setDoOutput(true);
+
+                if (logger.isDebugEnabled())
+                {
+                    logger.debug(String.format("Sending request to [%s] using the following as content [%s]", accessTokenUrl, requestBodyParam));
+                }
+
+                OutputStreamWriter out = new OutputStreamWriter(conn.getOutputStream());
+                out.write(requestBodyParam);
+                out.close();
+                String response = IOUtils.toString(conn.getInputStream());
+
+                if (logger.isDebugEnabled())
+                {
+                    logger.debug(String.format("Received response [%s]", response));
+                }
+
+                Matcher matcher = accessCodePattern.matcher(response);
+                if (matcher.find() && (matcher.groupCount() >= 1))
+                {
+                    adapter.setAccessToken(URLDecoder.decode(matcher.group(1), "UTF-8"));
+
+                    if (logger.isDebugEnabled())
+                    {
+                        logger.debug(String.format("Access token retrieved successfully [accessToken = %s]", adapter.getAccessToken()));
+                    }
+                    
+                    if (saveCallback != null)
+                    {
+                        try
+                        {
+                            if (logger.isDebugEnabled())
+                            {
+                                logger.debug(String.format("Attempting to save access token...[accessToken = %s]", adapter.getAccessToken()));
+                            }
+                            saveCallback.saveAccessToken(adapter.getAccessToken(), null);
+                        }
+                        catch (Exception e)
+                        {
+                            logger.error("Cannot save access token, an unexpected error occurred", e);
+                        }
+                    }
+                    
+                    if (logger.isDebugEnabled())
+                    {
+                        StringBuilder messageStringBuilder = new StringBuilder();
+                        messageStringBuilder.append("Attempting to extract expiration time using ");
+                        messageStringBuilder.append("[expirationPattern = ");
+                        messageStringBuilder.append("\"expires_in\"")
+                        :([^&]+?),");
+                        messageStringBuilder.append("] ");
+                        LOGGER.debug(messageStringBuilder.toString());
+                    }
+                    Matcher expirationMatcher = EXPIRATION_TIME_PATTERN.matcher(response);
+                    if (expirationMatcher.find() && (expirationMatcher.groupCount() >= 1))
+                    {
+                        Long expirationSecsAhead = Long.parseLong(expirationMatcher.group(1));
+                        expiration = new Date((System.currentTimeMillis() + (expirationSecsAhead * 1000)));
+                        if (LOGGER.isDebugEnabled())
+                        {
+                            StringBuilder messageStringBuilder = new StringBuilder();
+                            messageStringBuilder.append("Token expiration extracted successfully ");
+                            messageStringBuilder.append("[expiration = ");
+                            messageStringBuilder.append(expiration);
+                            messageStringBuilder.append("] ");
+                            LOGGER.debug(messageStringBuilder.toString());
+                        }
+                    }
+                    else
+                    {
+                        if (LOGGER.isDebugEnabled())
+                        {
+                            StringBuilder messageStringBuilder = new StringBuilder();
+                            messageStringBuilder.append("Token expiration could not be extracted from ");
+                            messageStringBuilder.append("[response = ");
+                            messageStringBuilder.append(response);
+                            messageStringBuilder.append("] ");
+                            LOGGER.debug(messageStringBuilder.toString());
+                        }
+                    }
+                    if (LOGGER.isDebugEnabled())
+                    {
+                        StringBuilder messageStringBuilder = new StringBuilder();
+                        messageStringBuilder.append("Attempting to extract refresh token time using ");
+                        messageStringBuilder.append("[refreshTokenPattern = ");
+                        messageStringBuilder.append("\"refresh_token\":\"([^&]+?)\"");
+                        messageStringBuilder.append("] ");
+                        LOGGER.debug(messageStringBuilder.toString());
+                    }
+                    Matcher refreshTokenMatcher = REFRESH_TOKEN_PATTERN.matcher(response);
+                    if (refreshTokenMatcher.find() && (refreshTokenMatcher.groupCount() >= 1))
+                    {
+                        refreshToken = refreshTokenMatcher.group(1);
+                        if (LOGGER.isDebugEnabled())
+                        {
+                            StringBuilder messageStringBuilder = new StringBuilder();
+                            messageStringBuilder.append("Refresh token extracted successfully ");
+                            messageStringBuilder.append("[refresh token = ");
+                            messageStringBuilder.append(refreshToken);
+                            messageStringBuilder.append("] ");
+                            LOGGER.debug(messageStringBuilder.toString());
+                        }
+                    }
+                    else
+                    {
+                        if (LOGGER.isDebugEnabled())
+                        {
+                            StringBuilder messageStringBuilder = new StringBuilder();
+                            messageStringBuilder.append("Refresh token could not be extracted from ");
+                            messageStringBuilder.append("[response = ");
+                            messageStringBuilder.append(response);
+                            messageStringBuilder.append("] ");
+                            LOGGER.debug(messageStringBuilder.toString());
+                        }
+                    }
+                    fetchCallbackParameters(response);
+                    postAuthorize();
+                }
+                else
+                {
+                    throw new Exception(String.format("OAuth access token could not be extracted from: %s",
+                        response));
+                }
+            }
+            catch (Exception e)
+            {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    /**
      * Returns true if this module implements such capability
      */
     public final boolean isCapableOf(ModuleCapability capability)
@@ -450,7 +704,9 @@ public abstract class BaseOAuthManager<C extends OAuthAdapter> extends DefaultHt
         return new ManagedAccessTokenProcessTemplate<P>(this, getMuleContext());
     }
 
-    public final String authorize(Map<String, String> extraParameters, String authorizationUrl, String redirectUri)
+    public final String authorize(Map<String, String> extraParameters,
+                                  String authorizationUrl,
+                                  String redirectUri)
     {
         StringBuilder urlBuilder = new StringBuilder();
         if (authorizationUrl != null)

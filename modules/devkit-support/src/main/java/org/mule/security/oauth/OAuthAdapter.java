@@ -1,10 +1,11 @@
 
 package org.mule.security.oauth;
 
+import org.mule.common.security.oauth.OAuthConnector;
 import org.mule.common.security.oauth.exception.NotAuthorizedException;
 import org.mule.common.security.oauth.exception.UnableToAcquireAccessTokenException;
 
-public interface OAuthAdapter
+public interface OAuthAdapter extends OAuthConnector
 {
 
     /**
@@ -25,12 +26,12 @@ public interface OAuthAdapter
      * Retrieve access token
      */
     String getAccessToken();
-    
+
     /**
      * Retrieve refresh token
      */
     String getRefreshToken();
-    
+
     /**
      * Set refresh token
      */
@@ -72,7 +73,8 @@ public interface OAuthAdapter
     RestoreAccessTokenCallback getOauthRestoreAccessToken();
 
     void hasBeenAuthorized() throws NotAuthorizedException;
-    
+
     public void fetchAccessToken(String accessTokenUrl, String redirectUri)
-                    throws UnableToAcquireAccessTokenException;
+        throws UnableToAcquireAccessTokenException;
+
 }
