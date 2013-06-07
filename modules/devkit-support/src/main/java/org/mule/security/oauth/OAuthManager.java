@@ -11,6 +11,7 @@
 package org.mule.security.oauth;
 
 import org.mule.api.MuleContext;
+import org.mule.common.security.oauth.exception.UnableToAcquireAccessTokenException;
 
 import java.util.Map;
 
@@ -112,5 +113,15 @@ public interface OAuthManager<C extends OAuthAdapter>
      *         adapter. <code>false</code> otherwise
      */
     public boolean restoreAccessToken(OAuthAdapter adapter);
+
+    /**
+     * Makes an http call to the adapter's accessTokenUrl and extracts the access token, which is then set into the adapter
+     * 
+     * @param adapter the connector's adapter
+     * @param redirectUri the redirection URI
+     * @throws UnableToAcquireAccessTokenException
+     */
+    public void fetchAccessToken(OAuthAdapter adapter, String redirectUri)
+        throws UnableToAcquireAccessTokenException;
 
 }

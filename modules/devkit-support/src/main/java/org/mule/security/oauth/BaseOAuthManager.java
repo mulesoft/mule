@@ -37,6 +37,8 @@ import org.mule.security.oauth.util.HttpUtil;
 import org.mule.security.oauth.util.HttpUtilImpl;
 import org.mule.security.oauth.util.OAuthResponseParser;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.Date;
 import java.util.Map;
 
@@ -376,6 +378,34 @@ public abstract class BaseOAuthManager<C extends OAuthAdapter> extends DefaultHt
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void fetchAccessToken(OAuthAdapter adapter, String redirectUri)
+        throws UnableToAcquireAccessTokenException
+    {
+        StringBuilder builder = new StringBuilder();
+        try
+        {
+            builder.append("code=");
+            builder.append(URLEncoder.encode(adapter.getOauthVerifier(), "UTF-8"));
+            builder.append("&client_id=");
+            builder.append(URLEncoder.encode(adapter.getConsumerKey(), "UTF-8"));
+            builder.append("&client_secret=");
+            builder.append(URLEncoder.encode(adapter.getConsumerSecret(), "UTF-8"));
+            builder.append("&grant_type=");
+            builder.append(URLEncoder.encode("authorization_code", "UTF-8"));
+            builder.append("&redirect_uri=");
+            builder.append(URLEncoder.encode(redirectUri, "UTF-8"));
+        }
+        catch (UnsupportedEncodingException e)
+        {
+            throw new RuntimeException(e);
+        }
+        this.fetchAndExtract(adapter, builder.toString());
+    }
+
     private void fetchAndExtract(OAuthAdapter adapter, String requestBody)
         throws UnableToAcquireAccessTokenException
     {
@@ -385,7 +415,7 @@ public abstract class BaseOAuthManager<C extends OAuthAdapter> extends DefaultHt
         {
             return;
         }
-        
+
         if (logger.isDebugEnabled())
         {
             logger.debug("Retrieving access token...");
