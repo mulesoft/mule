@@ -15,7 +15,7 @@ import static org.junit.Assert.assertNotNull;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -34,7 +34,7 @@ public class JdbcFunctionalTestCase extends AbstractJdbcFunctionalTestCase
         super(variant, configResources);
         setPopulateTestData(false);
     }
-    
+
     @Parameters
     public static Collection<Object[]> parameters()
     {
@@ -42,15 +42,15 @@ public class JdbcFunctionalTestCase extends AbstractJdbcFunctionalTestCase
             {ConfigVariant.SERVICE, AbstractJdbcFunctionalTestCase.getConfig() + ",jdbc-functional-config-service.xml"},
             {ConfigVariant.FLOW, AbstractJdbcFunctionalTestCase.getConfig() + ",jdbc-functional-config-flow.xml"}
         });
-    }      
-    
+    }
+
     @Test
     public void testDirectSql() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage message = client.request("jdbc://SELECT * FROM TEST", 1000);
         assertResultSetEmpty(message);
-        
+
         QueryRunner qr = jdbcConnector.getQueryRunner();
         int updated = qr.update(jdbcConnector.getConnection(), "INSERT INTO TEST(TYPE, DATA) VALUES (1, '" + TEST_MESSAGE + "')");
         assertEquals(1, updated);
@@ -61,11 +61,11 @@ public class JdbcFunctionalTestCase extends AbstractJdbcFunctionalTestCase
     @Test
     public void testSend() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         client.send("jdbc://writeTest?type=2", new DefaultMuleMessage(TEST_MESSAGE, muleContext));
 
         QueryRunner qr = jdbcConnector.getQueryRunner();
-        Object[] obj2 = 
+        Object[] obj2 =
             (Object[]) qr.query(jdbcConnector.getConnection(), "SELECT DATA FROM TEST WHERE TYPE = 2", new ArrayHandler());
         assertNotNull(obj2);
         assertEquals(1, obj2.length);
@@ -75,13 +75,13 @@ public class JdbcFunctionalTestCase extends AbstractJdbcFunctionalTestCase
     @Test
     public void testSendMap() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
-        Map map = new HashMap();
+        MuleClient client = muleContext.getClient();
+        Map<String, Object> map = new HashMap<String, Object>();
         map.put("data", TEST_MESSAGE);
         client.send("jdbc://writeMap?type=2", new DefaultMuleMessage(map, muleContext));
 
         QueryRunner qr = jdbcConnector.getQueryRunner();
-        Object[] obj2 = 
+        Object[] obj2 =
             (Object[]) qr.query(jdbcConnector.getConnection(), "SELECT DATA FROM TEST WHERE TYPE = 2", new ArrayHandler());
         assertNotNull(obj2);
         assertEquals(1, obj2.length);
@@ -91,7 +91,7 @@ public class JdbcFunctionalTestCase extends AbstractJdbcFunctionalTestCase
     @Test
     public void testReceive() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage message = client.request("jdbc://getTest?type=1", 1000);
         assertResultSetEmpty(message);
 
@@ -108,13 +108,13 @@ public class JdbcFunctionalTestCase extends AbstractJdbcFunctionalTestCase
     public void testReceiveAndSend() throws Exception
     {
         QueryRunner qr = jdbcConnector.getQueryRunner();
-        qr.update(jdbcConnector.getConnection(), 
+        qr.update(jdbcConnector.getConnection(),
             "INSERT INTO TEST(TYPE, DATA, ACK, RESULT) VALUES (1, '" + TEST_MESSAGE + "', NULL, NULL)");
 
         long t0 = System.currentTimeMillis();
         while (System.currentTimeMillis() - t0 < 20000)
         {
-            Object[] rs = 
+            Object[] rs =
                 (Object[]) qr.query(jdbcConnector.getConnection(), "SELECT COUNT(*) FROM TEST WHERE TYPE = 2", new ArrayHandler());
             assertNotNull(rs);
             assertEquals(1, rs.length);
@@ -125,7 +125,7 @@ public class JdbcFunctionalTestCase extends AbstractJdbcFunctionalTestCase
             Thread.sleep(100);
         }
 
-        Object[] obj2 = 
+        Object[] obj2 =
             (Object[]) qr.query(jdbcConnector.getConnection(), "SELECT DATA FROM TEST WHERE TYPE = 2", new ArrayHandler());
         assertNotNull(obj2);
         assertEquals(1, obj2.length);

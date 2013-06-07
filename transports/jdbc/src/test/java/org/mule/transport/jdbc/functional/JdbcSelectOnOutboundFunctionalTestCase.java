@@ -16,7 +16,7 @@ import static org.junit.Assert.assertTrue;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 
 import java.io.Serializable;
 import java.util.Arrays;
@@ -41,7 +41,7 @@ public class JdbcSelectOnOutboundFunctionalTestCase extends AbstractJdbcFunction
             {ConfigVariant.SERVICE, AbstractJdbcFunctionalTestCase.getConfig() + ",jdbc-select-outbound-service.xml"},
             {ConfigVariant.FLOW, AbstractJdbcFunctionalTestCase.getConfig() + ",jdbc-select-outbound-flow.xml"}
         });
-    }      
+    }
 
     @Test
     public void testSelectOnOutbound() throws Exception
@@ -52,45 +52,51 @@ public class JdbcSelectOnOutboundFunctionalTestCase extends AbstractJdbcFunction
     @Test
     public void testSelectOnOutboundByExpression() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
+
         MyMessage payload = new MyMessage(2);
         MuleMessage reply = client.send("vm://terra", new DefaultMuleMessage(payload, muleContext));
         assertNotNull(reply.getPayload());
         assertTrue(reply.getPayload() instanceof List);
-        List resultList = (List)reply.getPayload();
+
+        List<?> resultList = (List<?>)reply.getPayload();
         assertTrue(resultList.size() == 1);
         assertTrue(resultList.get(0) instanceof Map);
-        Map resultMap = (Map) resultList.get(0);
+
+        Map<?, ?> resultMap = (Map<?, ?>) resultList.get(0);
         assertEquals(new Integer(2), resultMap.get("TYPE"));
         assertEquals(TEST_VALUES[1], resultMap.get("DATA"));
     }
 
     @Test
-    public void testChain2SelectAlwaysBegin() throws Exception 
-    { 
-        doSelectOnOutbound("vm://chain.always.begin"); 
-    } 
+    public void testChain2SelectAlwaysBegin() throws Exception
+    {
+        doSelectOnOutbound("vm://chain.always.begin");
+    }
 
     @Test
-    public void testChain2SelectBeginOrJoin() throws Exception 
-    { 
-        doSelectOnOutbound("vm://chain.begin.or.join"); 
+    public void testChain2SelectBeginOrJoin() throws Exception
+    {
+        doSelectOnOutbound("vm://chain.begin.or.join");
     }
-    
+
     private void doSelectOnOutbound(String endpoint) throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
+
         MuleMessage reply = client.send(endpoint, new Object(), null);
         assertNotNull(reply.getPayload());
         assertTrue(reply.getPayload() instanceof List);
-        List resultList = (List) reply.getPayload();
+
+        List<?> resultList = (List<?>) reply.getPayload();
         assertTrue(resultList.size() == 1);
         assertTrue(resultList.get(0) instanceof Map);
-        Map resultMap = (Map) resultList.get(0);
+
+        Map<?, ?> resultMap = (Map<?, ?>) resultList.get(0);
         assertEquals(new Integer(1), resultMap.get("TYPE"));
         assertEquals(TEST_VALUES[0], resultMap.get("DATA"));
     }
-    
+
     public static class MyMessage implements Serializable
     {
         public MyMessage(int type)

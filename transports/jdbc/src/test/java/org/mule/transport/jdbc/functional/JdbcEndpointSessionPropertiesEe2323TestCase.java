@@ -10,21 +10,21 @@
 
 package org.mule.transport.jdbc.functional;
 
-import org.hamcrest.core.IsNull;
-import org.junit.Test;
-import org.junit.runners.Parameterized;
+import static org.junit.Assert.assertThat;
+
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 
 import java.util.Arrays;
 import java.util.Collection;
 
-import static org.junit.Assert.assertThat;
+import org.hamcrest.core.IsNull;
+import org.junit.Test;
+import org.junit.runners.Parameterized;
 
 public class JdbcEndpointSessionPropertiesEe2323TestCase extends AbstractJdbcFunctionalTestCase
 {
-
     public JdbcEndpointSessionPropertiesEe2323TestCase(ConfigVariant variant, String configResources)
     {
         super(variant, configResources);
@@ -41,10 +41,9 @@ public class JdbcEndpointSessionPropertiesEe2323TestCase extends AbstractJdbcFun
     @Test
     public void testSelectOnOutbound() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage response = client.send("vm://Flow1s1", new DefaultMuleMessage(new Object(), muleContext));
         assertThat(response, IsNull.<Object>notNullValue());
         assertThat(response.getExceptionPayload(), IsNull.<Object>nullValue());
     }
-
 }

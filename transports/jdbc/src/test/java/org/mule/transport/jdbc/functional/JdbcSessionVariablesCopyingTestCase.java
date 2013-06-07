@@ -17,7 +17,7 @@ import static org.junit.Assert.assertNull;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.transport.NullPayload;
 
 import java.util.Arrays;
@@ -28,7 +28,6 @@ import org.junit.runners.Parameterized.Parameters;
 
 public class JdbcSessionVariablesCopyingTestCase extends AbstractJdbcFunctionalTestCase
 {
-
     public JdbcSessionVariablesCopyingTestCase(ConfigVariant variant, String configResources)
     {
         super(variant, configResources);
@@ -45,8 +44,8 @@ public class JdbcSessionVariablesCopyingTestCase extends AbstractJdbcFunctionalT
     @Test
     public void testMessagePropertiesCopying() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
-        
+        MuleClient client = muleContext.getClient();
+
         MuleMessage message = new DefaultMuleMessage(TEST_MESSAGE, muleContext);
         // provide a valid type header so the JDBC query actually returns something
         message.setOutboundProperty("type", 1);
@@ -57,5 +56,4 @@ public class JdbcSessionVariablesCopyingTestCase extends AbstractJdbcFunctionalT
         assertFalse(result.getPayload() instanceof NullPayload);
         assertEquals("test", result.getSessionProperty("test"));
     }
-
 }
