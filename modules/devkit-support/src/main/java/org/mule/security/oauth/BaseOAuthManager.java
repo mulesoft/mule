@@ -84,7 +84,7 @@ public abstract class BaseOAuthManager<C extends OAuthAdapter> extends DefaultHt
     private GenericKeyedObjectPool accessTokenPool;
 
     private HttpUtil httpUtil;
-    private OAuthResponseParser responseParser;
+    private OAuthResponseParser oauthResponseParser;
 
     /**
      * Creates a concrete instance of the OAuthAdapter that corresponds with this
@@ -156,9 +156,9 @@ public abstract class BaseOAuthManager<C extends OAuthAdapter> extends DefaultHt
             this.httpUtil = new HttpUtilImpl();
         }
 
-        if (this.responseParser == null)
+        if (this.oauthResponseParser == null)
         {
-            this.responseParser = new DefaultOAuthResponseParser();
+            this.oauthResponseParser = new DefaultOAuthResponseParser();
         }
     }
 
@@ -432,7 +432,7 @@ public abstract class BaseOAuthManager<C extends OAuthAdapter> extends DefaultHt
             logger.debug(String.format("Received response [%s]", response));
         }
 
-        adapter.setAccessToken(this.responseParser.extractAccessCode(adapter.getAccessCodePattern(), response));
+        adapter.setAccessToken(this.oauthResponseParser.extractAccessCode(adapter.getAccessCodePattern(), response));
         if (logger.isDebugEnabled())
         {
             logger.debug(String.format("Access token retrieved successfully [accessToken = %s]",
@@ -448,7 +448,7 @@ public abstract class BaseOAuthManager<C extends OAuthAdapter> extends DefaultHt
                 adapter.getExpirationTimePattern().pattern()));
         }
 
-        Date expiration = this.responseParser.extractExpirationTime(adapter.getExpirationTimePattern(),
+        Date expiration = this.oauthResponseParser.extractExpirationTime(adapter.getExpirationTimePattern(),
             response);
         if (expiration != null)
         {
@@ -475,7 +475,7 @@ public abstract class BaseOAuthManager<C extends OAuthAdapter> extends DefaultHt
             logger.debug("Attempting to extract refresh token time using [refreshTokenPattern = \"refresh_token\":\"([^&]+?)\"]");
         }
 
-        String refreshToken = this.responseParser.extractRefreshToken(adapter.getRefreshTokenPattern(),
+        String refreshToken = this.oauthResponseParser.extractRefreshToken(adapter.getRefreshTokenPattern(),
             response);
 
         if (refreshToken != null)
@@ -760,10 +760,9 @@ public abstract class BaseOAuthManager<C extends OAuthAdapter> extends DefaultHt
     {
         this.httpUtil = httpUtil;
     }
-
-    public void setResponseParser(OAuthResponseParser responseParser)
+    
+    public void setOauthResponseParser(OAuthResponseParser oauthResponseParser)
     {
-        this.responseParser = responseParser;
+        this.oauthResponseParser = oauthResponseParser;
     }
-
 }
