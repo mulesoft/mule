@@ -12,6 +12,7 @@ package org.mule.security.oauth;
 
 import org.mule.api.MuleContext;
 import org.mule.common.security.oauth.exception.UnableToAcquireAccessTokenException;
+import org.mule.security.oauth.callback.HttpCallbackAdapter;
 
 import java.util.Map;
 
@@ -26,7 +27,7 @@ import org.apache.commons.pool.KeyedPoolableObjectFactory;
  * 
  * @param <C> Actual connector object that represents a connection
  */
-public interface OAuthManager<C extends OAuthAdapter>
+public interface OAuthManager<C extends OAuthAdapter> extends HttpCallbackAdapter
 {
 
     /**
@@ -70,21 +71,6 @@ public interface OAuthManager<C extends OAuthAdapter>
      * Retrieve default unauthorized connector
      */
     C getDefaultUnauthorizedConnector();
-
-    /**
-     * Retrieves consumerKey
-     */
-    public String getConsumerKey();
-
-    /**
-     * Retrieves consumerSecret
-     */
-    public String getConsumerSecret();
-
-    /**
-     * Returns the mule context
-     */
-    public MuleContext getMuleContext();
 
     /**
      * Retrieves accessTokenPoolFactory
@@ -133,5 +119,33 @@ public interface OAuthManager<C extends OAuthAdapter>
      */
     public void fetchAccessToken(OAuthAdapter adapter, String redirectUri)
         throws UnableToAcquireAccessTokenException;
+    
+    /**
+     * Returns the url to hit in order to obtain an access token
+     * @return
+     */
+    public String getAccessTokenUrl();
+    
+    /**
+     * Sets accessTokenUrl
+     * 
+     * @param value Value to set
+     */
+    public void setAccessTokenUrl(String url);
+    
+    /**
+     * Retrieves consumerKey
+     */
+    public String getConsumerKey();
+
+    /**
+     * Retrieves consumerSecret
+     */
+    public String getConsumerSecret();
+
+    /**
+     * Returns the mule context
+     */
+    public MuleContext getMuleContext();
 
 }

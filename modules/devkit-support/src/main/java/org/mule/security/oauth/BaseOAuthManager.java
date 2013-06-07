@@ -582,6 +582,7 @@ public abstract class BaseOAuthManager<C extends OAuthAdapter> extends DefaultHt
     /**
      * Retrieves defaultUnauthorizedConnector
      */
+    @Override
     public OAuthAdapter getDefaultUnauthorizedConnector()
     {
         return this.defaultUnauthorizedConnector;
@@ -737,6 +738,7 @@ public abstract class BaseOAuthManager<C extends OAuthAdapter> extends DefaultHt
      * 
      * @param value Value to set
      */
+    @Override
     public void setAccessTokenUrl(String value)
     {
         this.accessTokenUrl = value;
@@ -745,6 +747,7 @@ public abstract class BaseOAuthManager<C extends OAuthAdapter> extends DefaultHt
     /**
      * Retrieves accessTokenUrl
      */
+    @Override
     public String getAccessTokenUrl()
     {
         return this.accessTokenUrl;
