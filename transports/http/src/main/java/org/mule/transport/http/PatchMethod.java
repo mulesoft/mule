@@ -10,9 +10,9 @@
 
 package org.mule.transport.http;
 
-import org.apache.commons.httpclient.HttpMethodBase;
+import org.apache.commons.httpclient.methods.EntityEnclosingMethod;
 
-public class PatchMethod extends HttpMethodBase
+public class PatchMethod extends EntityEnclosingMethod
 {
     public PatchMethod()
     {
