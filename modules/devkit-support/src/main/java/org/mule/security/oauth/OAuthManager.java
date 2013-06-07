@@ -115,7 +115,17 @@ public interface OAuthManager<C extends OAuthAdapter>
     public boolean restoreAccessToken(OAuthAdapter adapter);
 
     /**
-     * Makes an http call to the adapter's accessTokenUrl and extracts the access token, which is then set into the adapter
+     * if refresh token is available, then it makes an http call to refresh the access token.
+     * All newly obtained tokens are set into the adapter
+     *  
+     * @param adapter the connector's adapter
+     * @throws UnableToAcquireAccessTokenException
+     */
+    public void refreshAccessToken(OAuthAdapter adapter) throws UnableToAcquireAccessTokenException;
+
+    /**
+     * Makes an http call to the adapter's accessTokenUrl and extracts the access
+     * token, which is then set into the adapter
      * 
      * @param adapter the connector's adapter
      * @param redirectUri the redirection URI

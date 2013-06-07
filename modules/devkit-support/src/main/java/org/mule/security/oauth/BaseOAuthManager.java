@@ -382,7 +382,7 @@ public abstract class BaseOAuthManager<C extends OAuthAdapter> extends DefaultHt
      * {@inheritDoc}
      */
     @Override
-    public void fetchAccessToken(OAuthAdapter adapter, String redirectUri)
+    public final void fetchAccessToken(OAuthAdapter adapter, String redirectUri)
         throws UnableToAcquireAccessTokenException
     {
         StringBuilder builder = new StringBuilder();
@@ -403,6 +403,34 @@ public abstract class BaseOAuthManager<C extends OAuthAdapter> extends DefaultHt
         {
             throw new RuntimeException(e);
         }
+        this.fetchAndExtract(adapter, builder.toString());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public final void refreshAccessToken(OAuthAdapter adapter) throws UnableToAcquireAccessTokenException
+    {
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("Trying to refresh access token...");
+        }
+        if (adapter.getRefreshToken() == null)
+        {
+            throw new IllegalStateException("Cannot refresh access token since refresh token is null");
+        }
+
+        StringBuilder builder = new StringBuilder();
+        builder.append("grant_type=refresh_token");
+        builder.append("&client_id=");
+        builder.append(getConsumerKey());
+        builder.append("&client_secret=");
+        builder.append(getConsumerSecret());
+        builder.append("&refresh_token=");
+        builder.append(adapter.getRefreshToken());
+
+        adapter.setAccessToken(null);
         this.fetchAndExtract(adapter, builder.toString());
     }
 
@@ -432,7 +460,8 @@ public abstract class BaseOAuthManager<C extends OAuthAdapter> extends DefaultHt
             logger.debug(String.format("Received response [%s]", response));
         }
 
-        adapter.setAccessToken(this.oauthResponseParser.extractAccessCode(adapter.getAccessCodePattern(), response));
+        adapter.setAccessToken(this.oauthResponseParser.extractAccessCode(adapter.getAccessCodePattern(),
+            response));
         if (logger.isDebugEnabled())
         {
             logger.debug(String.format("Access token retrieved successfully [accessToken = %s]",
@@ -760,7 +789,7 @@ public abstract class BaseOAuthManager<C extends OAuthAdapter> extends DefaultHt
     {
         this.httpUtil = httpUtil;
     }
-    
+
     public void setOauthResponseParser(OAuthResponseParser oauthResponseParser)
     {
         this.oauthResponseParser = oauthResponseParser;
