@@ -25,9 +25,7 @@ public interface OAuth2Adapter extends OAuthAdapter
     void fetchAccessToken(String accessTokenUrl, String redirectUri)
         throws UnableToAcquireAccessTokenException;
 
-    void setExpiration(java.util.Date value);
-
-    boolean hasTokenExpired();
+    public boolean hasTokenExpired();
 
     void refreshAccessToken(String accessTokenUrl) throws UnableToAcquireAccessTokenException;
 

@@ -104,15 +104,13 @@ public interface OAuthManager<C extends OAuthAdapter>
                                     String redirectUri);
 
     /**
-     * Tries to use the callback to restore an access token. If the token is
-     * successfuly retrieved then it is set into the given adapter
+     * Tries to use the adapter's restore an access token to retrieve the token. If
+     * the token is successfuly retrieved then it is set into the given adapter
      * 
      * @param adapter the adapter on which the access token will be set upon success
-     * @param callback the callback to be executed to retrieve the token. If
-     *            <code>null</code> value is provided, then no token is fetched
      * @return <code>true</code> if a token could be retrieved and set into the
      *         adapter. <code>false</code> otherwise
      */
-    public boolean restoreAccessToken(OAuthAdapter adapter, RestoreAccessTokenCallback callback);
+    public boolean restoreAccessToken(OAuthAdapter adapter);
 
 }

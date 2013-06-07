@@ -19,14 +19,14 @@ import org.mule.api.store.ObjectStore;
 import org.mule.api.store.ObjectStoreException;
 import org.mule.common.security.oauth.OAuthState;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.commons.pool.KeyedPoolableObjectFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class BaseOAuthClientFactory implements KeyedPoolableObjectFactory
 {
 
-    private static final transient Log logger = LogFactory.getLog(BaseOAuthClientFactory.class);
+    private static transient Logger logger = LoggerFactory.getLogger(BaseOAuthClientFactory.class);
 
     private OAuthManager<OAuthAdapter> oauthManager;
     private ObjectStore<OAuthState> objectStore;

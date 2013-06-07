@@ -4,6 +4,11 @@ package org.mule.security.oauth;
 import org.mule.common.security.oauth.OAuthConnector;
 import org.mule.common.security.oauth.exception.NotAuthorizedException;
 import org.mule.common.security.oauth.exception.UnableToAcquireAccessTokenException;
+import org.mule.security.oauth.callback.RestoreAccessTokenCallback;
+import org.mule.security.oauth.callback.SaveAccessTokenCallback;
+
+import java.util.Date;
+import java.util.regex.Pattern;
 
 public interface OAuthAdapter extends OAuthConnector
 {
@@ -13,36 +18,39 @@ public interface OAuthAdapter extends OAuthConnector
      * 
      * @return A String representing the OAuth verifier
      */
-    String getOauthVerifier();
+    public String getOauthVerifier();
 
     /**
      * Set OAuth verifier
      * 
      * @param value OAuth verifier to set
      */
-    void setOauthVerifier(String value);
+    public void setOauthVerifier(String value);
 
     /**
      * Retrieve access token
      */
-    String getAccessToken();
+    public String getAccessToken();
 
     /**
      * Retrieve refresh token
      */
-    String getRefreshToken();
+    public String getRefreshToken();
 
     /**
      * Set refresh token
      */
-    void setRefreshToken(String refreshToken);
+    public void setRefreshToken(String refreshToken);
 
-    /**
-     * Set access token
-     * 
-     * @param value
-     */
-    void setAccessToken(String value);
+    public void setAccessTokenUrl(String url);
+
+    public void setConsumerKey(String consumerKey);
+
+    public void setConsumerSecret(String consumerSecret);
+
+    public void setAccessToken(String accessToken);
+
+    public void setAuthorizationUrl(String authorizationUrl);
 
     /**
      * Set the callback to be called when the access token and secret need to be
@@ -50,7 +58,7 @@ public interface OAuthAdapter extends OAuthConnector
      * 
      * @param saveCallback Callback to be called
      */
-    void setOauthSaveAccessToken(SaveAccessTokenCallback saveCallback);
+    public void setOauthSaveAccessToken(SaveAccessTokenCallback saveCallback);
 
     /**
      * Set the callback to be called when the access token and secret need to be
@@ -58,23 +66,46 @@ public interface OAuthAdapter extends OAuthConnector
      * 
      * @param restoreCallback Callback to be called
      */
-    void setOauthRestoreAccessToken(RestoreAccessTokenCallback restoreCallback);
+    public void setOauthRestoreAccessToken(RestoreAccessTokenCallback restoreCallback);
 
     /**
      * Get the callback to be called when the access token and secret need to be
      * saved for later restoration
      */
-    SaveAccessTokenCallback getOauthSaveAccessToken();
+    public SaveAccessTokenCallback getOauthSaveAccessToken();
 
     /**
      * Get the callback to be called when the access token and secret need to be
      * restored
      */
-    RestoreAccessTokenCallback getOauthRestoreAccessToken();
+    public RestoreAccessTokenCallback getOauthRestoreAccessToken();
 
-    void hasBeenAuthorized() throws NotAuthorizedException;
+    public void hasBeenAuthorized() throws NotAuthorizedException;
 
     public void fetchAccessToken(String accessTokenUrl, String redirectUri)
         throws UnableToAcquireAccessTokenException;
+    
+    /**
+     * Returns a compiled {@link java.util.regex.Pattern}
+     * which can be used to extract the access code from a String 
+     */
+    public Pattern getAccessCodePattern();
+    
+    /**
+     * Returns a compiled {@link java.util.regex.Pattern}
+     * which can be used to extract the refresh token from a String 
+     */
+    public Pattern getRefreshTokenPattern();
+    
+    /**
+     * Returns a compiled {@link java.util.regex.Pattern}
+     * which can be used to extract the expiration time from a String 
+     */
+    public Pattern getExpirationTimePattern();
+    
+    /**
+     * Sets expiration
+     */
+    public void setExpiration(Date value);
 
 }

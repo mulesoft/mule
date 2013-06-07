@@ -1,5 +1,5 @@
 
-package org.mule.security.oauth;
+package org.mule.security.oauth.callback;
 
 
 public interface SaveAccessTokenCallback

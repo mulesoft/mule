@@ -19,14 +19,14 @@ import org.mule.security.oauth.OAuth2Adapter;
 import org.mule.security.oauth.callback.ProcessCallback;
 import org.mule.security.oauth.processor.AbstractExpressionEvaluator;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class RefreshTokenProcessInterceptor<T> extends AbstractExpressionEvaluator
     implements ProcessInterceptor<T, OAuth2Adapter>
 {
 
-    private transient static final Log logger = LogFactory.getLog(RefreshTokenProcessInterceptor.class);
+    private transient static final Logger logger = LoggerFactory.getLogger(RefreshTokenProcessInterceptor.class);
     private final ProcessInterceptor<T, OAuth2Adapter> next;
 
     public RefreshTokenProcessInterceptor(ProcessInterceptor<T, OAuth2Adapter> next)

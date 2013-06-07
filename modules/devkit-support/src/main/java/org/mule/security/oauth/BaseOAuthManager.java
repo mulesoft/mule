@@ -14,7 +14,6 @@ import org.mule.api.MetadataAware;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.ProcessAdapter;
-import org.mule.api.ProcessTemplate;
 import org.mule.api.capability.Capabilities;
 import org.mule.api.capability.ModuleCapability;
 import org.mule.api.config.MuleProperties;
@@ -31,28 +30,27 @@ import org.mule.common.security.oauth.OAuthState;
 import org.mule.common.security.oauth.exception.UnableToAcquireAccessTokenException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.security.oauth.callback.DefaultHttpCallbackAdapter;
-import org.mule.security.oauth.process.ManagedAccessTokenProcessTemplate;
-import org.mule.util.IOUtils;
+import org.mule.security.oauth.callback.RestoreAccessTokenCallback;
+import org.mule.security.oauth.callback.SaveAccessTokenCallback;
+import org.mule.security.oauth.util.DefaultOAuthResponseParser;
+import org.mule.security.oauth.util.HttpUtil;
+import org.mule.security.oauth.util.HttpUtilImpl;
+import org.mule.security.oauth.util.OAuthResponseParser;
 
-import java.io.OutputStreamWriter;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.URLDecoder;
+import java.util.Date;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.commons.pool.KeyedPoolableObjectFactory;
 import org.apache.commons.pool.impl.GenericKeyedObjectPool;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class BaseOAuthManager<C extends OAuthAdapter> extends DefaultHttpCallbackAdapter
-    implements MuleContextAware, Initialisable, Capabilities, MetadataAware, OAuthManager<OAuthAdapter>,
-    ProcessAdapter<OAuthAdapter>
+    implements MuleContextAware, Initialisable, Capabilities, Startable, Stoppable, MetadataAware,
+    Disposable, OAuthManager<OAuthAdapter>, ProcessAdapter<OAuthAdapter>
 {
 
-    private static Log logger = LogFactory.getLog(BaseOAuthManager.class);
+    private static transient Logger logger = LoggerFactory.getLogger(BaseOAuthManager.class);
 
     private OAuthAdapter defaultUnauthorizedConnector;
     private String consumerKey;
@@ -82,6 +80,9 @@ public abstract class BaseOAuthManager<C extends OAuthAdapter> extends DefaultHt
      * Access Token Pool
      */
     private GenericKeyedObjectPool accessTokenPool;
+
+    private HttpUtil httpUtil;
+    private OAuthResponseParser responseParser;
 
     /**
      * Creates a concrete instance of the OAuthAdapter that corresponds with this
@@ -113,6 +114,438 @@ public abstract class BaseOAuthManager<C extends OAuthAdapter> extends DefaultHt
      * @param adapter an instance of {@link org.mule.security.oauth.OAuthAdapter}
      */
     protected abstract void setCustomProperties(OAuthAdapter adapter);
+
+    /**
+     * Extracts any custom parameters from the OAuth response and sets them
+     * accordingly on the adapter
+     * 
+     * @param adapter the adapter on which the custom parameters will be set on
+     * @param response the response obatined from the OAuth provider
+     */
+    protected abstract void fetchCallbackParameters(OAuthAdapter adapter, String response);
+
+    @Override
+    public final void initialise() throws InitialisationException
+    {
+        GenericKeyedObjectPool.Config config = new GenericKeyedObjectPool.Config();
+        config.testOnBorrow = true;
+        if (accessTokenObjectStore == null)
+        {
+            accessTokenObjectStore = muleContext.getRegistry().lookupObject(
+                MuleProperties.DEFAULT_USER_OBJECT_STORE_NAME);
+            if (accessTokenObjectStore == null)
+            {
+                throw new InitialisationException(
+                    CoreMessages.createStaticMessage("There is no default user object store on this Mule instance."),
+                    this);
+            }
+        }
+        accessTokenPoolFactory = this.createPoolFactory(this, this.accessTokenObjectStore);
+        accessTokenPool = new GenericKeyedObjectPool(accessTokenPoolFactory, config);
+        defaultUnauthorizedConnector = this.instantiateAdapter();
+
+        if (defaultUnauthorizedConnector instanceof Initialisable)
+        {
+            ((Initialisable) defaultUnauthorizedConnector).initialise();
+        }
+
+        if (this.httpUtil == null)
+        {
+            this.httpUtil = new HttpUtilImpl();
+        }
+
+        if (this.responseParser == null)
+        {
+            this.responseParser = new DefaultOAuthResponseParser();
+        }
+    }
+
+    @Override
+    public final void start() throws MuleException
+    {
+        if (defaultUnauthorizedConnector instanceof Startable)
+        {
+            ((Startable) defaultUnauthorizedConnector).start();
+        }
+    }
+
+    @Override
+    public final void stop() throws MuleException
+    {
+        if (defaultUnauthorizedConnector instanceof Stoppable)
+        {
+            ((Stoppable) defaultUnauthorizedConnector).stop();
+        }
+    }
+
+    @Override
+    public final void dispose()
+    {
+        if (defaultUnauthorizedConnector instanceof Disposable)
+        {
+            ((Disposable) defaultUnauthorizedConnector).dispose();
+        }
+    }
+
+    public final OAuthAdapter createAccessToken(String verifier) throws Exception
+    {
+        OAuthAdapter connector = this.instantiateAdapter();
+        connector.setOauthVerifier(verifier);
+        connector.setAuthorizationUrl(getAuthorizationUrl());
+        connector.setAccessTokenUrl(getAccessTokenUrl());
+        connector.setConsumerKey(getConsumerKey());
+        connector.setConsumerSecret(getConsumerSecret());
+
+        this.setCustomProperties(connector);
+
+        if (connector instanceof MuleContextAware)
+        {
+            ((MuleContextAware) connector).setMuleContext(muleContext);
+        }
+        if (connector instanceof Initialisable)
+        {
+            ((Initialisable) connector).initialise();
+        }
+        if (connector instanceof Startable)
+        {
+            ((Startable) connector).start();
+        }
+        return connector;
+    }
+
+    public final OAuthAdapter acquireAccessToken(String userId) throws Exception
+    {
+        if (logger.isDebugEnabled())
+        {
+            StringBuilder messageStringBuilder = new StringBuilder();
+            messageStringBuilder.append("Pool Statistics before acquiring [key ");
+            messageStringBuilder.append(userId);
+            messageStringBuilder.append("] [active=");
+            messageStringBuilder.append(accessTokenPool.getNumActive(userId));
+            messageStringBuilder.append("] [idle=");
+            messageStringBuilder.append(accessTokenPool.getNumIdle(userId));
+            messageStringBuilder.append("]");
+            logger.debug(messageStringBuilder.toString());
+        }
+        OAuthAdapter object = ((OAuthAdapter) accessTokenPool.borrowObject(userId));
+        if (logger.isDebugEnabled())
+        {
+            StringBuilder messageStringBuilder = new StringBuilder();
+            messageStringBuilder.append("Pool Statistics after acquiring [key ");
+            messageStringBuilder.append(userId);
+            messageStringBuilder.append("] [active=");
+            messageStringBuilder.append(accessTokenPool.getNumActive(userId));
+            messageStringBuilder.append("] [idle=");
+            messageStringBuilder.append(accessTokenPool.getNumIdle(userId));
+            messageStringBuilder.append("]");
+            logger.debug(messageStringBuilder.toString());
+        }
+        return object;
+    }
+
+    public final void releaseAccessToken(String userId, OAuthAdapter connector) throws Exception
+    {
+        if (logger.isDebugEnabled())
+        {
+            StringBuilder messageStringBuilder = new StringBuilder();
+            messageStringBuilder.append("Pool Statistics before releasing [key ");
+            messageStringBuilder.append(userId);
+            messageStringBuilder.append("] [active=");
+            messageStringBuilder.append(accessTokenPool.getNumActive(userId));
+            messageStringBuilder.append("] [idle=");
+            messageStringBuilder.append(accessTokenPool.getNumIdle(userId));
+            messageStringBuilder.append("]");
+            logger.debug(messageStringBuilder.toString());
+        }
+        accessTokenPool.returnObject(userId, connector);
+        if (logger.isDebugEnabled())
+        {
+            StringBuilder messageStringBuilder = new StringBuilder();
+            messageStringBuilder.append("Pool Statistics after releasing [key ");
+            messageStringBuilder.append(userId);
+            messageStringBuilder.append("] [active=");
+            messageStringBuilder.append(accessTokenPool.getNumActive(userId));
+            messageStringBuilder.append("] [idle=");
+            messageStringBuilder.append(accessTokenPool.getNumIdle(userId));
+            messageStringBuilder.append("]");
+            logger.debug(messageStringBuilder.toString());
+        }
+    }
+
+    public final void destroyAccessToken(String userId, OAuthAdapter connector) throws Exception
+    {
+        if (logger.isDebugEnabled())
+        {
+            StringBuilder messageStringBuilder = new StringBuilder();
+            messageStringBuilder.append("Pool Statistics before destroying [key ");
+            messageStringBuilder.append(userId);
+            messageStringBuilder.append("] [active=");
+            messageStringBuilder.append(accessTokenPool.getNumActive(userId));
+            messageStringBuilder.append("] [idle=");
+            messageStringBuilder.append(accessTokenPool.getNumIdle(userId));
+            messageStringBuilder.append("]");
+            logger.debug(messageStringBuilder.toString());
+        }
+        accessTokenPool.invalidateObject(userId, connector);
+        if (logger.isDebugEnabled())
+        {
+            StringBuilder messageStringBuilder = new StringBuilder();
+            messageStringBuilder.append("Pool Statistics after destroying [key ");
+            messageStringBuilder.append(userId);
+            messageStringBuilder.append("] [active=");
+            messageStringBuilder.append(accessTokenPool.getNumActive(userId));
+            messageStringBuilder.append("] [idle=");
+            messageStringBuilder.append(accessTokenPool.getNumIdle(userId));
+            messageStringBuilder.append("]");
+            logger.debug(messageStringBuilder.toString());
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String buildAuthorizeUrl(Map<String, String> extraParameters,
+                                    String authorizationUrl,
+                                    String redirectUri)
+    {
+        StringBuilder urlBuilder = new StringBuilder();
+        if (authorizationUrl != null)
+        {
+            urlBuilder.append(authorizationUrl);
+        }
+        else
+        {
+            urlBuilder.append(this.authorizationUrl);
+        }
+        urlBuilder.append("?");
+        urlBuilder.append("response_type=code&");
+        urlBuilder.append("client_id=");
+        urlBuilder.append(getConsumerKey());
+        urlBuilder.append("&redirect_uri=");
+        urlBuilder.append(redirectUri);
+        for (String parameter : extraParameters.keySet())
+        {
+            urlBuilder.append("&");
+            urlBuilder.append(parameter);
+            urlBuilder.append("=");
+            urlBuilder.append(extraParameters.get(parameter));
+        }
+
+        if (logger.isDebugEnabled())
+        {
+            logger.debug(("Authorization URL has been generated as follows: " + urlBuilder));
+        }
+
+        return urlBuilder.toString();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean restoreAccessToken(OAuthAdapter adapter)
+    {
+        RestoreAccessTokenCallback callback = adapter.getOauthRestoreAccessToken();
+        if (callback != null)
+        {
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Attempting to restore access token...");
+            }
+
+            try
+            {
+                callback.restoreAccessToken();
+                String accessToken = callback.getAccessToken();
+                adapter.setAccessToken(accessToken);
+
+                if (logger.isDebugEnabled())
+                {
+                    logger.debug(String.format(
+                        "Access token and secret has been restored successfully [accessToken = %s]",
+                        accessToken));
+                }
+                return true;
+            }
+            catch (Exception e)
+            {
+                logger.error("Cannot restore access token, an unexpected error occurred", e);
+            }
+        }
+        return false;
+    }
+
+    private void fetchAndExtract(OAuthAdapter adapter, String requestBody)
+        throws UnableToAcquireAccessTokenException
+    {
+        this.restoreAccessToken(adapter);
+
+        if (adapter.getAccessToken() != null)
+        {
+            return;
+        }
+        
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("Retrieving access token...");
+        }
+
+        String accessTokenUrl = adapter.getAccessTokenUrl() != null
+                                                                   ? adapter.getAccessTokenUrl()
+                                                                   : this.accessTokenUrl;
+
+        String response = this.httpUtil.post(accessTokenUrl, requestBody);
+
+        if (logger.isDebugEnabled())
+        {
+            logger.debug(String.format("Received response [%s]", response));
+        }
+
+        adapter.setAccessToken(this.responseParser.extractAccessCode(adapter.getAccessCodePattern(), response));
+        if (logger.isDebugEnabled())
+        {
+            logger.debug(String.format("Access token retrieved successfully [accessToken = %s]",
+                adapter.getAccessToken()));
+        }
+
+        this.saveAccessToken(adapter);
+
+        if (logger.isDebugEnabled())
+        {
+            logger.debug(String.format(
+                "Attempting to extract expiration time using [expirationPattern = %s]",
+                adapter.getExpirationTimePattern().pattern()));
+        }
+
+        Date expiration = this.responseParser.extractExpirationTime(adapter.getExpirationTimePattern(),
+            response);
+        if (expiration != null)
+        {
+
+            adapter.setExpiration(expiration);
+
+            if (logger.isDebugEnabled())
+            {
+                logger.debug(String.format("Token expiration extracted successfully [expiration = %s]",
+                    expiration));
+            }
+        }
+        else
+        {
+            if (logger.isDebugEnabled())
+            {
+                logger.debug(String.format("Token expiration could not be extracted from [response = %s]",
+                    response));
+            }
+        }
+
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("Attempting to extract refresh token time using [refreshTokenPattern = \"refresh_token\":\"([^&]+?)\"]");
+        }
+
+        String refreshToken = this.responseParser.extractRefreshToken(adapter.getRefreshTokenPattern(),
+            response);
+
+        if (refreshToken != null)
+        {
+            if (logger.isDebugEnabled())
+            {
+                logger.debug(String.format("Refresh token extracted successfully [refresh token = %s]",
+                    refreshToken));
+            }
+        }
+        else
+        {
+            if (logger.isDebugEnabled())
+            {
+                logger.debug(String.format("Refresh token could not be extracted from [response = %s]",
+                    response));
+            }
+        }
+
+        this.fetchCallbackParameters(adapter, response);
+        adapter.postAuth();
+    }
+
+    private void saveAccessToken(OAuthAdapter adapter)
+    {
+        SaveAccessTokenCallback saveCallback = adapter.getOauthSaveAccessToken();
+
+        if (saveCallback != null)
+        {
+            try
+            {
+                if (logger.isDebugEnabled())
+                {
+                    logger.debug(String.format("Attempting to save access token...[accessToken = %s]",
+                        adapter.getAccessToken()));
+                }
+                saveCallback.saveAccessToken(adapter.getAccessToken(), null);
+            }
+            catch (Exception e)
+            {
+                logger.error("Cannot save access token, an unexpected error occurred", e);
+            }
+        }
+    }
+
+    /**
+     * Returns true if this module implements such capability
+     */
+    public final boolean isCapableOf(ModuleCapability capability)
+    {
+        if (capability == ModuleCapability.LIFECYCLE_CAPABLE)
+        {
+            return true;
+        }
+        if (capability == ModuleCapability.OAUTH2_CAPABLE)
+        {
+            return true;
+        }
+        if (capability == ModuleCapability.OAUTH_ACCESS_TOKEN_MANAGEMENT_CAPABLE)
+        {
+            return true;
+        }
+        return false;
+    }
+
+    public final String authorize(Map<String, String> extraParameters,
+                                  String authorizationUrl,
+                                  String redirectUri)
+    {
+        StringBuilder urlBuilder = new StringBuilder();
+        if (authorizationUrl != null)
+        {
+            urlBuilder.append(authorizationUrl);
+        }
+        else
+        {
+            urlBuilder.append(this.authorizationUrl);
+        }
+        urlBuilder.append("?");
+        urlBuilder.append("response_type=code&");
+        urlBuilder.append("client_id=");
+        urlBuilder.append(getConsumerKey());
+        urlBuilder.append("&redirect_uri=");
+        urlBuilder.append(redirectUri);
+        String scope = getScope();
+        if (scope != null)
+        {
+            urlBuilder.append("&scope=");
+            urlBuilder.append(scope);
+        }
+        for (String parameter : extraParameters.keySet())
+        {
+            urlBuilder.append("&");
+            urlBuilder.append(parameter);
+            urlBuilder.append("=");
+            urlBuilder.append(extraParameters.get(parameter));
+        }
+        logger.debug(("Authorization URL has been generated as follows: " + urlBuilder));
+        return urlBuilder.toString();
+    }
 
     /**
      * Retrieves defaultUnauthorizedConnector
@@ -293,451 +726,14 @@ public abstract class BaseOAuthManager<C extends OAuthAdapter> extends DefaultHt
         return this.accessTokenPoolFactory;
     }
 
-    public final void initialise() throws InitialisationException
+    public void setHttpUtil(HttpUtil httpUtil)
     {
-        GenericKeyedObjectPool.Config config = new GenericKeyedObjectPool.Config();
-        config.testOnBorrow = true;
-        if (accessTokenObjectStore == null)
-        {
-            accessTokenObjectStore = muleContext.getRegistry().lookupObject(
-                MuleProperties.DEFAULT_USER_OBJECT_STORE_NAME);
-            if (accessTokenObjectStore == null)
-            {
-                throw new InitialisationException(
-                    CoreMessages.createStaticMessage("There is no default user object store on this Mule instance."),
-                    this);
-            }
-        }
-        accessTokenPoolFactory = this.createPoolFactory(this, this.accessTokenObjectStore);
-        accessTokenPool = new GenericKeyedObjectPool(accessTokenPoolFactory, config);
-        defaultUnauthorizedConnector = this.instantiateAdapter();
-
-        if (defaultUnauthorizedConnector instanceof Initialisable)
-        {
-            ((Initialisable) defaultUnauthorizedConnector).initialise();
-        }
+        this.httpUtil = httpUtil;
     }
 
-    public final void start() throws MuleException
+    public void setResponseParser(OAuthResponseParser responseParser)
     {
-        if (defaultUnauthorizedConnector instanceof Startable)
-        {
-            ((Startable) defaultUnauthorizedConnector).start();
-        }
-    }
-
-    public final void stop() throws MuleException
-    {
-        if (defaultUnauthorizedConnector instanceof Stoppable)
-        {
-            ((Stoppable) defaultUnauthorizedConnector).stop();
-        }
-    }
-
-    public final void dispose()
-    {
-        if (defaultUnauthorizedConnector instanceof Disposable)
-        {
-            ((Disposable) defaultUnauthorizedConnector).dispose();
-        }
-    }
-
-    public final OAuthAdapter createAccessToken(String verifier) throws Exception
-    {
-        OAuthAdapter connector = this.instantiateAdapter();
-        connector.setOauthVerifier(verifier);
-        connector.setAuthorizationUrl(getAuthorizationUrl());
-        connector.setAccessTokenUrl(getAccessTokenUrl());
-        connector.setConsumerKey(getConsumerKey());
-        connector.setConsumerSecret(getConsumerSecret());
-
-        this.setCustomProperties(connector);
-
-        if (connector instanceof MuleContextAware)
-        {
-            ((MuleContextAware) connector).setMuleContext(muleContext);
-        }
-        if (connector instanceof Initialisable)
-        {
-            ((Initialisable) connector).initialise();
-        }
-        if (connector instanceof Startable)
-        {
-            ((Startable) connector).start();
-        }
-        return connector;
-    }
-
-    public final OAuthAdapter acquireAccessToken(String userId) throws Exception
-    {
-        if (logger.isDebugEnabled())
-        {
-            StringBuilder messageStringBuilder = new StringBuilder();
-            messageStringBuilder.append("Pool Statistics before acquiring [key ");
-            messageStringBuilder.append(userId);
-            messageStringBuilder.append("] [active=");
-            messageStringBuilder.append(accessTokenPool.getNumActive(userId));
-            messageStringBuilder.append("] [idle=");
-            messageStringBuilder.append(accessTokenPool.getNumIdle(userId));
-            messageStringBuilder.append("]");
-            logger.debug(messageStringBuilder.toString());
-        }
-        OAuthAdapter object = ((OAuthAdapter) accessTokenPool.borrowObject(userId));
-        if (logger.isDebugEnabled())
-        {
-            StringBuilder messageStringBuilder = new StringBuilder();
-            messageStringBuilder.append("Pool Statistics after acquiring [key ");
-            messageStringBuilder.append(userId);
-            messageStringBuilder.append("] [active=");
-            messageStringBuilder.append(accessTokenPool.getNumActive(userId));
-            messageStringBuilder.append("] [idle=");
-            messageStringBuilder.append(accessTokenPool.getNumIdle(userId));
-            messageStringBuilder.append("]");
-            logger.debug(messageStringBuilder.toString());
-        }
-        return object;
-    }
-
-    public final void releaseAccessToken(String userId, OAuthAdapter connector) throws Exception
-    {
-        if (logger.isDebugEnabled())
-        {
-            StringBuilder messageStringBuilder = new StringBuilder();
-            messageStringBuilder.append("Pool Statistics before releasing [key ");
-            messageStringBuilder.append(userId);
-            messageStringBuilder.append("] [active=");
-            messageStringBuilder.append(accessTokenPool.getNumActive(userId));
-            messageStringBuilder.append("] [idle=");
-            messageStringBuilder.append(accessTokenPool.getNumIdle(userId));
-            messageStringBuilder.append("]");
-            logger.debug(messageStringBuilder.toString());
-        }
-        accessTokenPool.returnObject(userId, connector);
-        if (logger.isDebugEnabled())
-        {
-            StringBuilder messageStringBuilder = new StringBuilder();
-            messageStringBuilder.append("Pool Statistics after releasing [key ");
-            messageStringBuilder.append(userId);
-            messageStringBuilder.append("] [active=");
-            messageStringBuilder.append(accessTokenPool.getNumActive(userId));
-            messageStringBuilder.append("] [idle=");
-            messageStringBuilder.append(accessTokenPool.getNumIdle(userId));
-            messageStringBuilder.append("]");
-            logger.debug(messageStringBuilder.toString());
-        }
-    }
-
-    public final void destroyAccessToken(String userId, OAuthAdapter connector) throws Exception
-    {
-        if (logger.isDebugEnabled())
-        {
-            StringBuilder messageStringBuilder = new StringBuilder();
-            messageStringBuilder.append("Pool Statistics before destroying [key ");
-            messageStringBuilder.append(userId);
-            messageStringBuilder.append("] [active=");
-            messageStringBuilder.append(accessTokenPool.getNumActive(userId));
-            messageStringBuilder.append("] [idle=");
-            messageStringBuilder.append(accessTokenPool.getNumIdle(userId));
-            messageStringBuilder.append("]");
-            logger.debug(messageStringBuilder.toString());
-        }
-        accessTokenPool.invalidateObject(userId, connector);
-        if (logger.isDebugEnabled())
-        {
-            StringBuilder messageStringBuilder = new StringBuilder();
-            messageStringBuilder.append("Pool Statistics after destroying [key ");
-            messageStringBuilder.append(userId);
-            messageStringBuilder.append("] [active=");
-            messageStringBuilder.append(accessTokenPool.getNumActive(userId));
-            messageStringBuilder.append("] [idle=");
-            messageStringBuilder.append(accessTokenPool.getNumIdle(userId));
-            messageStringBuilder.append("]");
-            logger.debug(messageStringBuilder.toString());
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String buildAuthorizeUrl(Map<String, String> extraParameters,
-                                    String authorizationUrl,
-                                    String redirectUri)
-    {
-        StringBuilder urlBuilder = new StringBuilder();
-        if (authorizationUrl != null)
-        {
-            urlBuilder.append(authorizationUrl);
-        }
-        else
-        {
-            urlBuilder.append(this.authorizationUrl);
-        }
-        urlBuilder.append("?");
-        urlBuilder.append("response_type=code&");
-        urlBuilder.append("client_id=");
-        urlBuilder.append(getConsumerKey());
-        urlBuilder.append("&redirect_uri=");
-        urlBuilder.append(redirectUri);
-        for (String parameter : extraParameters.keySet())
-        {
-            urlBuilder.append("&");
-            urlBuilder.append(parameter);
-            urlBuilder.append("=");
-            urlBuilder.append(extraParameters.get(parameter));
-        }
-
-        if (logger.isDebugEnabled())
-        {
-            logger.debug(("Authorization URL has been generated as follows: " + urlBuilder));
-        }
-
-        return urlBuilder.toString();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean restoreAccessToken(OAuthAdapter adapter, RestoreAccessTokenCallback callback)
-    {
-        if (callback != null)
-        {
-            if (logger.isDebugEnabled())
-            {
-                logger.debug("Attempting to restore access token...");
-            }
-
-            try
-            {
-                callback.restoreAccessToken();
-                String accessToken = callback.getAccessToken();
-                adapter.setAccessToken(accessToken);
-
-                if (logger.isDebugEnabled())
-                {
-                    logger.debug(String.format("Access token and secret has been restored successfully [accessToken = %s]", accessToken));
-                }
-                return true;
-            }
-            catch (Exception e)
-            {
-                logger.error("Cannot restore access token, an unexpected error occurred", e);
-            }
-        }
-        return false;
-    }
-
-    private void fetchAndExtract(OAuthAdapter adapter,
-                                 RestoreAccessTokenCallback restoreCallback,
-                                 SaveAccessTokenCallback saveCallback,
-                                 String accessTokenUrl,
-                                 String requestBodyParam,
-                                 Pattern accessCodePattern) throws UnableToAcquireAccessTokenException
-    {
-        this.restoreAccessToken(adapter, restoreCallback);
-        if (adapter.getAccessToken() == null)
-        {
-            try
-            {
-                if (logger.isDebugEnabled())
-                {
-                    logger.debug("Retrieving access token...");
-                }
-
-                HttpURLConnection conn = ((HttpURLConnection) new URL(accessTokenUrl).openConnection());
-                conn.setRequestMethod("POST");
-                conn.setDoOutput(true);
-
-                if (logger.isDebugEnabled())
-                {
-                    logger.debug(String.format("Sending request to [%s] using the following as content [%s]", accessTokenUrl, requestBodyParam));
-                }
-
-                OutputStreamWriter out = new OutputStreamWriter(conn.getOutputStream());
-                out.write(requestBodyParam);
-                out.close();
-                String response = IOUtils.toString(conn.getInputStream());
-
-                if (logger.isDebugEnabled())
-                {
-                    logger.debug(String.format("Received response [%s]", response));
-                }
-
-                Matcher matcher = accessCodePattern.matcher(response);
-                if (matcher.find() && (matcher.groupCount() >= 1))
-                {
-                    adapter.setAccessToken(URLDecoder.decode(matcher.group(1), "UTF-8"));
-
-                    if (logger.isDebugEnabled())
-                    {
-                        logger.debug(String.format("Access token retrieved successfully [accessToken = %s]", adapter.getAccessToken()));
-                    }
-                    
-                    if (saveCallback != null)
-                    {
-                        try
-                        {
-                            if (logger.isDebugEnabled())
-                            {
-                                logger.debug(String.format("Attempting to save access token...[accessToken = %s]", adapter.getAccessToken()));
-                            }
-                            saveCallback.saveAccessToken(adapter.getAccessToken(), null);
-                        }
-                        catch (Exception e)
-                        {
-                            logger.error("Cannot save access token, an unexpected error occurred", e);
-                        }
-                    }
-                    
-                    if (logger.isDebugEnabled())
-                    {
-                        StringBuilder messageStringBuilder = new StringBuilder();
-                        messageStringBuilder.append("Attempting to extract expiration time using ");
-                        messageStringBuilder.append("[expirationPattern = ");
-                        messageStringBuilder.append("\"expires_in\"")
-                        :([^&]+?),");
-                        messageStringBuilder.append("] ");
-                        LOGGER.debug(messageStringBuilder.toString());
-                    }
-                    Matcher expirationMatcher = EXPIRATION_TIME_PATTERN.matcher(response);
-                    if (expirationMatcher.find() && (expirationMatcher.groupCount() >= 1))
-                    {
-                        Long expirationSecsAhead = Long.parseLong(expirationMatcher.group(1));
-                        expiration = new Date((System.currentTimeMillis() + (expirationSecsAhead * 1000)));
-                        if (LOGGER.isDebugEnabled())
-                        {
-                            StringBuilder messageStringBuilder = new StringBuilder();
-                            messageStringBuilder.append("Token expiration extracted successfully ");
-                            messageStringBuilder.append("[expiration = ");
-                            messageStringBuilder.append(expiration);
-                            messageStringBuilder.append("] ");
-                            LOGGER.debug(messageStringBuilder.toString());
-                        }
-                    }
-                    else
-                    {
-                        if (LOGGER.isDebugEnabled())
-                        {
-                            StringBuilder messageStringBuilder = new StringBuilder();
-                            messageStringBuilder.append("Token expiration could not be extracted from ");
-                            messageStringBuilder.append("[response = ");
-                            messageStringBuilder.append(response);
-                            messageStringBuilder.append("] ");
-                            LOGGER.debug(messageStringBuilder.toString());
-                        }
-                    }
-                    if (LOGGER.isDebugEnabled())
-                    {
-                        StringBuilder messageStringBuilder = new StringBuilder();
-                        messageStringBuilder.append("Attempting to extract refresh token time using ");
-                        messageStringBuilder.append("[refreshTokenPattern = ");
-                        messageStringBuilder.append("\"refresh_token\":\"([^&]+?)\"");
-                        messageStringBuilder.append("] ");
-                        LOGGER.debug(messageStringBuilder.toString());
-                    }
-                    Matcher refreshTokenMatcher = REFRESH_TOKEN_PATTERN.matcher(response);
-                    if (refreshTokenMatcher.find() && (refreshTokenMatcher.groupCount() >= 1))
-                    {
-                        refreshToken = refreshTokenMatcher.group(1);
-                        if (LOGGER.isDebugEnabled())
-                        {
-                            StringBuilder messageStringBuilder = new StringBuilder();
-                            messageStringBuilder.append("Refresh token extracted successfully ");
-                            messageStringBuilder.append("[refresh token = ");
-                            messageStringBuilder.append(refreshToken);
-                            messageStringBuilder.append("] ");
-                            LOGGER.debug(messageStringBuilder.toString());
-                        }
-                    }
-                    else
-                    {
-                        if (LOGGER.isDebugEnabled())
-                        {
-                            StringBuilder messageStringBuilder = new StringBuilder();
-                            messageStringBuilder.append("Refresh token could not be extracted from ");
-                            messageStringBuilder.append("[response = ");
-                            messageStringBuilder.append(response);
-                            messageStringBuilder.append("] ");
-                            LOGGER.debug(messageStringBuilder.toString());
-                        }
-                    }
-                    fetchCallbackParameters(response);
-                    postAuthorize();
-                }
-                else
-                {
-                    throw new Exception(String.format("OAuth access token could not be extracted from: %s",
-                        response));
-                }
-            }
-            catch (Exception e)
-            {
-                throw new RuntimeException(e);
-            }
-        }
-    }
-
-    /**
-     * Returns true if this module implements such capability
-     */
-    public final boolean isCapableOf(ModuleCapability capability)
-    {
-        if (capability == ModuleCapability.LIFECYCLE_CAPABLE)
-        {
-            return true;
-        }
-        if (capability == ModuleCapability.OAUTH2_CAPABLE)
-        {
-            return true;
-        }
-        if (capability == ModuleCapability.OAUTH_ACCESS_TOKEN_MANAGEMENT_CAPABLE)
-        {
-            return true;
-        }
-        return false;
-    }
-
-    @Override
-    public final <P> ProcessTemplate<P, OAuthAdapter> getProcessTemplate()
-    {
-        return new ManagedAccessTokenProcessTemplate<P>(this, getMuleContext());
-    }
-
-    public final String authorize(Map<String, String> extraParameters,
-                                  String authorizationUrl,
-                                  String redirectUri)
-    {
-        StringBuilder urlBuilder = new StringBuilder();
-        if (authorizationUrl != null)
-        {
-            urlBuilder.append(authorizationUrl);
-        }
-        else
-        {
-            urlBuilder.append(this.authorizationUrl);
-        }
-        urlBuilder.append("?");
-        urlBuilder.append("response_type=code&");
-        urlBuilder.append("client_id=");
-        urlBuilder.append(getConsumerKey());
-        urlBuilder.append("&redirect_uri=");
-        urlBuilder.append(redirectUri);
-        String scope = getScope();
-        if (scope != null)
-        {
-            urlBuilder.append("&scope=");
-            urlBuilder.append(scope);
-        }
-        for (String parameter : extraParameters.keySet())
-        {
-            urlBuilder.append("&");
-            urlBuilder.append(parameter);
-            urlBuilder.append("=");
-            urlBuilder.append(extraParameters.get(parameter));
-        }
-        logger.debug(("Authorization URL has been generated as follows: " + urlBuilder));
-        return urlBuilder.toString();
+        this.responseParser = responseParser;
     }
 
 }
