@@ -15,10 +15,9 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import org.mule.api.MuleMessage;
+import org.mule.api.client.MuleClient;
 import org.mule.api.expression.RequiredValueException;
-import org.mule.module.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
-import org.mule.tck.AbstractServiceAndFlowTestCase.ConfigVariant;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.util.Arrays;
@@ -32,10 +31,9 @@ import org.junit.runners.Parameterized.Parameters;
 
 public class HttpFunctionalWithQueryTestCase extends AbstractServiceAndFlowTestCase
 {
-    
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
-    
+
     public HttpFunctionalWithQueryTestCase(ConfigVariant variant, String configResources)
     {
         super(variant, configResources);
@@ -48,12 +46,12 @@ public class HttpFunctionalWithQueryTestCase extends AbstractServiceAndFlowTestC
             {ConfigVariant.SERVICE, "http-functional-test-with-query-service.xml"},
             {ConfigVariant.FLOW, "http-functional-test-with-query-flow.xml"}
         });
-    }      
-    
+    }
+
     @Test
     public void testSend() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage result = client.send("clientEndpoint1", null, null);
         assertEquals("boobar", result.getPayloadAsString());
     }
@@ -61,7 +59,7 @@ public class HttpFunctionalWithQueryTestCase extends AbstractServiceAndFlowTestC
     @Test
     public void testSendWithParams() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         Map<String, Object> props = new HashMap<String, Object>();
         props.put("foo", "noo");
         props.put("far", "nar");
@@ -72,7 +70,7 @@ public class HttpFunctionalWithQueryTestCase extends AbstractServiceAndFlowTestC
     @Test
     public void testSendWithBadParams() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         Map<String, Object> props = new HashMap<String, Object>();
         props.put("hoo", "noo");
         props.put("har", "nar");

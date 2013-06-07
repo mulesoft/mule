@@ -14,7 +14,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.io.BufferedReader;
@@ -67,7 +67,7 @@ public class HttpCookieTestCase extends AbstractMockHttpServerTestCase
         Map<String, Object> properties = new HashMap<String, Object>();
         properties.put("COOKIE_HEADER", "MYCOOKIE");
 
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         client.dispatch("vm://vm-in", "foobar", properties);
 
         assertTrue(latch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS));

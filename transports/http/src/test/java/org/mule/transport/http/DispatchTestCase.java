@@ -10,11 +10,13 @@
 
 package org.mule.transport.http;
 
+import static org.junit.Assert.assertEquals;
+
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleException;
+import org.mule.api.client.MuleClient;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.module.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -27,8 +29,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.junit.Rule;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
 
 public class DispatchTestCase extends FunctionalTestCase
 {
@@ -47,12 +47,12 @@ public class DispatchTestCase extends FunctionalTestCase
         final int THREADS = 10;
         final CountDownLatch latch = new CountDownLatch(THREADS);
 
-        final MuleClient client = new MuleClient(muleContext);
+        final MuleClient client = muleContext.getClient();
 
         final byte[] buf = new byte[8192];
         Arrays.fill(buf, (byte) 'a');
 
-        client.send(((InboundEndpoint) client.getMuleContext().getRegistry().lookupObject("inEchoService")).getAddress(),
+        client.send(((InboundEndpoint) muleContext.getRegistry().lookupObject("inEchoService")).getAddress(),
             new DefaultMuleMessage(new ByteArrayInputStream(buf), muleContext));
 
         for (int i = 0; i < THREADS; i++)
@@ -68,7 +68,7 @@ public class DispatchTestCase extends FunctionalTestCase
                     {
                         for (int j = 0; j < 20; j++)
                         {
-                            client.dispatch(((InboundEndpoint) client.getMuleContext().getRegistry().lookupObject("inEchoService")).getAddress(),
+                            client.dispatch(((InboundEndpoint) muleContext.getRegistry().lookupObject("inEchoService")).getAddress(),
                                 new DefaultMuleMessage(buf, muleContext), props);
                         }
 

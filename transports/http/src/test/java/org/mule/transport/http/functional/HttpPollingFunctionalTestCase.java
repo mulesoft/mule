@@ -13,23 +13,23 @@ package org.mule.transport.http.functional;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+import org.mule.api.MuleEventContext;
+import org.mule.api.MuleMessage;
+import org.mule.api.client.MuleClient;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.functional.EventCallback;
+import org.mule.tck.functional.FunctionalTestComponent;
+import org.mule.tck.junit4.rule.DynamicPort;
+
 import java.util.Arrays;
 import java.util.Collection;
 
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-import org.mule.api.MuleEventContext;
-import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
-import org.mule.tck.functional.EventCallback;
-import org.mule.tck.functional.FunctionalTestComponent;
-import org.mule.tck.junit4.rule.DynamicPort;
 
 public class HttpPollingFunctionalTestCase extends AbstractServiceAndFlowTestCase
 {
-
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
@@ -52,16 +52,17 @@ public class HttpPollingFunctionalTestCase extends AbstractServiceAndFlowTestCas
         assertNotNull(ftc);
         ftc.setEventCallback(new EventCallback()
         {
+            @Override
             public void eventReceived(MuleEventContext context, Object component) throws Exception
             {
                 assertEquals("The Accept header should be set on the incoming message", "application/xml",
                     context.getMessage().<String> getInboundProperty("Accept"));
             }
         });
-        MuleClient client = new MuleClient(muleContext);
+
+        MuleClient client = muleContext.getClient();
         MuleMessage result = client.request("vm://toclient", RECEIVE_TIMEOUT);
         assertNotNull(result.getPayload());
         assertEquals("foo", result.getPayloadAsString());
     }
-
 }

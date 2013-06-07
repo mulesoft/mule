@@ -12,6 +12,12 @@ package org.mule.transport.http.components;
 
 import static org.junit.Assert.assertTrue;
 
+import org.mule.api.client.MuleClient;
+import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.transport.http.HttpConstants;
+import org.mule.transport.http.functional.AbstractMockHttpServerTestCase;
+import org.mule.transport.http.functional.MockHttpServer;
+
 import java.io.BufferedReader;
 import java.util.Arrays;
 import java.util.Collection;
@@ -22,15 +28,9 @@ import java.util.concurrent.TimeUnit;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.junit4.rule.DynamicPort;
-import org.mule.transport.http.HttpConstants;
-import org.mule.transport.http.functional.AbstractMockHttpServerTestCase;
-import org.mule.transport.http.functional.MockHttpServer;
 
 public class RestServiceComponentDeleteTestCase extends AbstractMockHttpServerTestCase
 {
-
     private CountDownLatch serverRequestCompleteLatch = new CountDownLatch(1);
     private boolean deleteRequestFound = false;
 
@@ -59,7 +59,7 @@ public class RestServiceComponentDeleteTestCase extends AbstractMockHttpServerTe
     @Test
     public void testRestServiceComponentDelete() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         client.send("vm://fromTest", TEST_MESSAGE, null);
 
         assertTrue(serverRequestCompleteLatch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS));

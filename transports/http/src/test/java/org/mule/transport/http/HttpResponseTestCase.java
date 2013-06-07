@@ -16,11 +16,10 @@ import static org.junit.Assert.assertTrue;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
@@ -47,7 +46,7 @@ public class HttpResponseTestCase extends FunctionalTestCase
     @Test
     public void testHttpResponseError() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         Map<String, Object> properties = new HashMap<String, Object>();
         properties.put("errorMessage", "ERROR !!!! ");
         DefaultMuleMessage muleMessage = new DefaultMuleMessage(HTTP_BODY, properties, muleContext);
@@ -59,7 +58,7 @@ public class HttpResponseTestCase extends FunctionalTestCase
     @Test
     public void testHttpResponseMove() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         DefaultMuleMessage muleMessage = new DefaultMuleMessage(HTTP_BODY, muleContext);
         MuleMessage response = client.send("http://localhost:" + dynamicPort.getNumber() + "/resources/move", muleMessage);
         assertEquals(HTTP_BODY, response.getPayloadAsString());
@@ -70,7 +69,7 @@ public class HttpResponseTestCase extends FunctionalTestCase
     @Test
     public void testHttpResponseAll() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         DefaultMuleMessage muleMessage = new DefaultMuleMessage(HTTP_BODY, muleContext);
         MuleMessage response = client.send("http://localhost:" + dynamicPort.getNumber() + "/resources/all", muleMessage);
         assertEquals("Custom body", response.getPayloadAsString());
@@ -88,7 +87,7 @@ public class HttpResponseTestCase extends FunctionalTestCase
     @Test
     public void testHttpResponseAllWithExpressions() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         Map<String, Object> properties = populateProperties();
 
         DefaultMuleMessage muleMessage = new DefaultMuleMessage(HTTP_BODY, properties, muleContext);
@@ -155,5 +154,4 @@ public class HttpResponseTestCase extends FunctionalTestCase
         assertEquals(12, cookieDate.get(GregorianCalendar.DAY_OF_MONTH));
         assertEquals(11, cookieDate.get(GregorianCalendar.MONTH));
     }
-
 }

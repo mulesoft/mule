@@ -16,8 +16,8 @@ import static org.junit.Assert.assertTrue;
 
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
+import org.mule.api.client.MuleClient;
 import org.mule.api.construct.FlowConstruct;
-import org.mule.module.client.MuleClient;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.transport.http.HttpConstants;
@@ -33,7 +33,6 @@ import org.junit.runners.Parameterized.Parameters;
 
 public class HttpsFunctionalTestCase extends HttpFunctionalTestCase
 {
-
     public HttpsFunctionalTestCase(ConfigVariant variant, String configResources)
     {
         super(variant, configResources);
@@ -46,14 +45,14 @@ public class HttpsFunctionalTestCase extends HttpFunctionalTestCase
             {ConfigVariant.SERVICE, "https-functional-test-service.xml"},
             {ConfigVariant.FLOW, "https-functional-test-flow.xml"}
         });
-    }     
-    
+    }
+
     @Override
     public void testSend() throws Exception
-    {               
+    {
         FlowConstruct testSedaService = muleContext.getRegistry().lookupFlowConstruct("testComponent");
         FunctionalTestComponent testComponent = (FunctionalTestComponent) getComponent(testSedaService);
-               
+
         assertNotNull(testComponent);
 
         final AtomicBoolean callbackMade = new AtomicBoolean(false);
@@ -68,12 +67,12 @@ public class HttpsFunctionalTestCase extends HttpFunctionalTestCase
         };
         testComponent.setEventCallback(callback);
 
-        MuleClient client = new MuleClient(muleContext);
-        
+        MuleClient client = muleContext.getClient();
+
         Map<String, Object> props = new HashMap<String, Object>();
         props.put(HttpConstants.HEADER_CONTENT_TYPE, "text/plain;charset=UTF-8");
         MuleMessage result = client.send("clientEndpoint", TEST_MESSAGE, props);
-        
+
         assertNotNull(result);
         assertEquals(TEST_MESSAGE + " Received", result.getPayloadAsString());
         assertTrue("Callback never fired", callbackMade.get());

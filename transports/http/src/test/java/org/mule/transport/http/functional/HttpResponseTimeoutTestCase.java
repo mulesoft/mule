@@ -17,9 +17,9 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import org.mule.api.MuleMessage;
+import org.mule.api.client.MuleClient;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.transport.DispatchException;
-import org.mule.module.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.util.ExceptionUtils;
@@ -39,7 +39,6 @@ import org.junit.runners.Parameterized.Parameters;
  */
 public class HttpResponseTimeoutTestCase extends AbstractServiceAndFlowTestCase
 {
-
     protected static String PAYLOAD = "Eugene";
     protected static int DEFAULT_RESPONSE_TIMEOUT = 2000;
     protected MuleClient muleClient;
@@ -59,8 +58,8 @@ public class HttpResponseTimeoutTestCase extends AbstractServiceAndFlowTestCase
             {ConfigVariant.SERVICE, "http-response-timeout-config-service.xml"},
             {ConfigVariant.FLOW, "http-response-timeout-config-flow.xml"}
         });
-    }      
-        
+    }
+
     protected String getPayload()
     {
         return PAYLOAD;
@@ -70,12 +69,12 @@ public class HttpResponseTimeoutTestCase extends AbstractServiceAndFlowTestCase
     {
         return getPayload() + " processed";
     }
-    
+
     @Override
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
-        muleClient = new MuleClient(muleContext);
+        muleClient = muleContext.getClient();
     }
 
     @Test
@@ -117,7 +116,7 @@ public class HttpResponseTimeoutTestCase extends AbstractServiceAndFlowTestCase
 
         try
         {
-            muleClient.send(((InboundEndpoint) muleClient.getMuleContext().getRegistry().lookupObject("inDelayService")).getAddress(), getPayload(), null, 1000);
+            muleClient.send(((InboundEndpoint) muleContext.getRegistry().lookupObject("inDelayService")).getAddress(), getPayload(), null, 1000);
             fail("SocketTimeoutException expected");
         }
         catch (Exception e)
@@ -135,7 +134,7 @@ public class HttpResponseTimeoutTestCase extends AbstractServiceAndFlowTestCase
     public void testIncreaseMuleClientSendResponseTimeout() throws Exception
     {
         Date beforeCall = new Date();
-        MuleMessage message = muleClient.send(((InboundEndpoint) muleClient.getMuleContext().getRegistry().lookupObject("inDelayService")).getAddress(), getPayload(), null, 3000);
+        MuleMessage message = muleClient.send(((InboundEndpoint) muleContext.getRegistry().lookupObject("inDelayService")).getAddress(), getPayload(), null, 3000);
         Date afterCall = new Date();
 
         // If everything is good the we'll have received a result after more than 10s
@@ -144,5 +143,4 @@ public class HttpResponseTimeoutTestCase extends AbstractServiceAndFlowTestCase
         assertNotNull(getProcessedPayload(), message.getPayloadAsString());
         assertTrue((afterCall.getTime() - beforeCall.getTime()) > DEFAULT_RESPONSE_TIMEOUT);
     }
-
 }

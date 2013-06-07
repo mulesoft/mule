@@ -14,7 +14,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.http.HttpConstants;
@@ -28,7 +28,6 @@ import org.junit.runners.Parameterized.Parameters;
 
 public class HttpHeadersTestCase extends AbstractServiceAndFlowTestCase
 {
-
     @Rule
     public DynamicPort dynamicPort1 = new DynamicPort("port1");
 
@@ -47,21 +46,20 @@ public class HttpHeadersTestCase extends AbstractServiceAndFlowTestCase
             {ConfigVariant.SERVICE, "http-headers-config-service.xml"},
             {ConfigVariant.FLOW, "http-headers-config-flow.xml"}
         });
-    }      
-    
+    }
+
     @Test
-    public void testJettyHeaders() throws Exception 
+    public void testJettyHeaders() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage result = client.send("clientEndpoint", null, null);
 
         String contentTypeProperty = result.getInboundProperty(HttpConstants.HEADER_CONTENT_TYPE);
-        assertNotNull(contentTypeProperty); 
+        assertNotNull(contentTypeProperty);
         assertEquals("application/x-download", contentTypeProperty);
 
         String contentDispositionProperty = result.getInboundProperty(HttpConstants.HEADER_CONTENT_DISPOSITION);
         assertNotNull(contentDispositionProperty);
         assertEquals("attachment; filename=foo.zip", contentDispositionProperty);
     }
-
 }

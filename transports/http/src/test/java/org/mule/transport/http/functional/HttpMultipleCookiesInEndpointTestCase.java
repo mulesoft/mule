@@ -14,7 +14,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -27,7 +27,6 @@ import org.junit.runners.Parameterized.Parameters;
 
 public class HttpMultipleCookiesInEndpointTestCase extends AbstractServiceAndFlowTestCase
 {
-
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
@@ -43,18 +42,15 @@ public class HttpMultipleCookiesInEndpointTestCase extends AbstractServiceAndFlo
             {ConfigVariant.SERVICE, "http-multiple-cookies-on-endpoint-test-service.xml"},
             {ConfigVariant.FLOW, "http-multiple-cookies-on-endpoint-test-flow.xml"}
         });
-    }      
-    
+    }
+
     @Test
     public void testThatThe2CookiesAreSentAndReceivedByTheComponent() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage response = client.send("vm://in", "HELLO", null);
         assertNotNull(response);
         assertNotNull(response.getPayload());
         assertEquals("Both Cookies Found!", response.getPayloadAsString());
     }
-
 }
-
-

@@ -15,7 +15,7 @@ import static org.junit.Assert.assertNotNull;
 
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.functional.StringAppendTestTransformer;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -29,7 +29,6 @@ import org.junit.runners.Parameterized.Parameters;
 
 public class HttpTransformersMule1815TestCase extends AbstractServiceAndFlowTestCase
 {
-
     public static final String OUTBOUND_MESSAGE = "Test message";
 
     @Rule
@@ -43,7 +42,7 @@ public class HttpTransformersMule1815TestCase extends AbstractServiceAndFlowTest
 
     @Rule
     public DynamicPort dynamicPort4 = new DynamicPort("port4");
-   
+
     public HttpTransformersMule1815TestCase(ConfigVariant variant, String configResources)
     {
         super(variant, configResources);
@@ -56,11 +55,11 @@ public class HttpTransformersMule1815TestCase extends AbstractServiceAndFlowTest
             {ConfigVariant.SERVICE, "http-transformers-mule-1815-test-service.xml"},
             {ConfigVariant.FLOW, "http-transformers-mule-1815-test-flow.xml"}
         });
-    }      
-    
+    }
+
     private MuleMessage sendTo(String uri) throws MuleException
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage message = client.send(uri, OUTBOUND_MESSAGE, null);
         assertNotNull(message);
         return message;
@@ -115,5 +114,4 @@ public class HttpTransformersMule1815TestCase extends AbstractServiceAndFlowTest
                 StringAppendTestTransformer.appendDefault(OUTBOUND_MESSAGE)) + " Received",
                 sendTo("inbound").getPayloadAsString());
     }
-
 }

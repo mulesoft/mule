@@ -10,9 +10,12 @@
 
 package org.mule.transport.http.functional;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.tck.junit4.FunctionalTestCase;
@@ -22,12 +25,8 @@ import org.mule.transport.http.HttpConnector;
 import org.junit.Rule;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
 public class HttpStemTestCase extends FunctionalTestCase
 {
-
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
@@ -40,21 +39,22 @@ public class HttpStemTestCase extends FunctionalTestCase
     @Test
     public void testStemMatching() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         int port = dynamicPort.getNumber();
         doTest(client, "http://localhost:" + port + "/foo", "/foo", "/foo");
         doTest(client, "http://localhost:" + port + "/foo/baz", "/foo", "/foo/baz");
         doTest(client, "http://localhost:" + port + "/bar", "/bar", "/bar");
         doTest(client, "http://localhost:" + port + "/bar/baz", "/bar", "/bar/baz");
     }
-    
+
     protected void doTest(MuleClient client, final String url, final String contextPath, final String requestPath) throws Exception
     {
         FunctionalTestComponent testComponent = (FunctionalTestComponent) getComponent(contextPath);
         assertNotNull(testComponent);
-         
+
         EventCallback callback = new EventCallback()
         {
+            @Override
             public void eventReceived(final MuleEventContext context, final Object component) throws Exception
             {
                 MuleMessage msg = context.getMessage();
@@ -63,13 +63,12 @@ public class HttpStemTestCase extends FunctionalTestCase
                 assertEquals(contextPath, msg.getInboundProperty(HttpConnector.HTTP_CONTEXT_PATH_PROPERTY));
             }
         };
-     
+
         testComponent.setEventCallback(callback);
-         
+
         MuleMessage result = client.send(url, "Hello World", null);
         assertEquals("Hello World Received", result.getPayloadAsString());
         final int status = result.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0);
         assertEquals(200, status);
     }
-
 }

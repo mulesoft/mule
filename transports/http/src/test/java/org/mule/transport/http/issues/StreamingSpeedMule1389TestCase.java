@@ -22,7 +22,6 @@ import org.junit.runners.Parameterized.Parameters;
 
 public class StreamingSpeedMule1389TestCase extends AbstractStreamingCapacityTestCase
 {
-
     @Rule
     public DynamicPort dynamicPort1 = new DynamicPort("port1");
 
