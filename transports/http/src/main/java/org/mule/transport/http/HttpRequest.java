@@ -29,11 +29,15 @@ import org.apache.commons.httpclient.NameValuePair;
  */
 public class HttpRequest
 {
-
     private RequestLine requestLine = null;
     private HeaderGroup headers = new HeaderGroup();
     private InputStream entity = null;
     private String defaultEncoding;
+
+    public HttpRequest(final RequestLine requestLine, final Header[] headers, String defaultEncoding) throws IOException
+    {
+        this(requestLine, headers, null, defaultEncoding);
+    }
 
     public HttpRequest(final RequestLine requestLine, final Header[] headers, final InputStream content, String defaultEncoding)
         throws IOException
@@ -43,45 +47,46 @@ public class HttpRequest
         {
             throw new IllegalArgumentException("Request line may not be null");
         }
-        this.defaultEncoding = defaultEncoding;
         this.requestLine = requestLine;
+        this.defaultEncoding = defaultEncoding;
         if (headers != null)
         {
             this.headers.setHeaders(headers);
         }
-        if (content != null)
+        if (content != null && shouldProcessContent())
         {
-            // only PUT and POST have content
-            String methodname = requestLine.getMethod();
-            if (HttpConstants.METHOD_POST.equalsIgnoreCase(methodname)
-                || HttpConstants.METHOD_PUT.equalsIgnoreCase(methodname))
+            Header contentLength = this.headers.getFirstHeader(HttpConstants.HEADER_CONTENT_LENGTH);
+            Header transferEncoding = this.headers.getFirstHeader(HttpConstants.HEADER_TRANSFER_ENCODING);
+            InputStream in = content;
+            if (transferEncoding != null)
             {
-                Header contentLength = this.headers.getFirstHeader(HttpConstants.HEADER_CONTENT_LENGTH);
-                Header transferEncoding = this.headers.getFirstHeader(HttpConstants.HEADER_TRANSFER_ENCODING);
-                InputStream in = content;
-                if (transferEncoding != null)
+                if (transferEncoding.getValue().indexOf(HttpConstants.TRANSFER_ENCODING_CHUNKED) != -1)
                 {
-                    if (transferEncoding.getValue().indexOf(HttpConstants.TRANSFER_ENCODING_CHUNKED) != -1)
-                    {
-                        in = new ChunkedInputStream(in);
-                    }
+                    in = new ChunkedInputStream(in);
                 }
-                else if (contentLength != null)
-                {
-                    long len = getContentLength();
-                    if (len >= 0)
-                    {
-                        in = new ContentLengthInputStream(in, len);
-                    }
-                }
-                this.entity = in;
             }
+            else if (contentLength != null)
+            {
+                long len = getContentLength();
+                if (len >= 0)
+                {
+                    in = new ContentLengthInputStream(in, len);
+                }
+            }
+            this.entity = in;
         }
     }
 
-    public HttpRequest(final RequestLine requestLine, final Header[] headers, String defaultEncoding) throws IOException
+    private boolean shouldProcessContent()
     {
-        this(requestLine, headers, null, defaultEncoding);
+        String methodName = requestLine.getMethod();
+        if (HttpConstants.METHOD_POST.equalsIgnoreCase(methodName) ||
+            HttpConstants.METHOD_PUT.equalsIgnoreCase(methodName) ||
+            HttpConstants.METHOD_PATCH.equalsIgnoreCase(methodName))
+        {
+            return true;
+        }
+        return false;
     }
 
     public RequestLine getRequestLine()
@@ -119,10 +124,10 @@ public class HttpRequest
         {
             return;
         }
-        Header[] headers = this.headers.getHeaders(s);
-        for (int i = 0; i < headers.length; i++)
+        Header[] headersToRemove = this.headers.getHeaders(s);
+        for (int i = 0; i < headersToRemove.length; i++)
         {
-            this.headers.removeHeader(headers[i]);
+            this.headers.removeHeader(headersToRemove[i]);
         }
     }
 
