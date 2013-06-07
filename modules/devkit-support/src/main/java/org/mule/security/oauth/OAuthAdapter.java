@@ -82,27 +82,31 @@ public interface OAuthAdapter extends OAuthConnector
 
     public void hasBeenAuthorized() throws NotAuthorizedException;
 
-    public void fetchAccessToken(String accessTokenUrl, String redirectUri)
-        throws UnableToAcquireAccessTokenException;
-    
     /**
-     * Returns a compiled {@link java.util.regex.Pattern}
-     * which can be used to extract the access code from a String 
+     * Acquire access token and secret
+     * 
+     * @throws UnableToAcquireAccessTokenException
+     */
+    public void fetchAccessToken(String accessTokenUrl) throws UnableToAcquireAccessTokenException;
+
+    /**
+     * Returns a compiled {@link java.util.regex.Pattern} which can be used to
+     * extract the access code from a String
      */
     public Pattern getAccessCodePattern();
-    
+
     /**
-     * Returns a compiled {@link java.util.regex.Pattern}
-     * which can be used to extract the refresh token from a String 
+     * Returns a compiled {@link java.util.regex.Pattern} which can be used to
+     * extract the refresh token from a String
      */
     public Pattern getRefreshTokenPattern();
-    
+
     /**
-     * Returns a compiled {@link java.util.regex.Pattern}
-     * which can be used to extract the expiration time from a String 
+     * Returns a compiled {@link java.util.regex.Pattern} which can be used to
+     * extract the expiration time from a String
      */
     public Pattern getExpirationTimePattern();
-    
+
     /**
      * Sets expiration
      */

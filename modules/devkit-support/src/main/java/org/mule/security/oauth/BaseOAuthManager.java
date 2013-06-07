@@ -14,6 +14,7 @@ import org.mule.api.MetadataAware;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.ProcessAdapter;
+import org.mule.api.ProcessTemplate;
 import org.mule.api.capability.Capabilities;
 import org.mule.api.capability.ModuleCapability;
 import org.mule.api.config.MuleProperties;
@@ -32,6 +33,7 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.security.oauth.callback.DefaultHttpCallbackAdapter;
 import org.mule.security.oauth.callback.RestoreAccessTokenCallback;
 import org.mule.security.oauth.callback.SaveAccessTokenCallback;
+import org.mule.security.oauth.process.OAuthProcessTemplate;
 import org.mule.security.oauth.util.DefaultOAuthResponseParser;
 import org.mule.security.oauth.util.HttpUtil;
 import org.mule.security.oauth.util.HttpUtilImpl;
@@ -307,9 +309,9 @@ public abstract class BaseOAuthManager<C extends OAuthAdapter> extends DefaultHt
      * {@inheritDoc}
      */
     @Override
-    public String buildAuthorizeUrl(Map<String, String> extraParameters,
-                                    String authorizationUrl,
-                                    String redirectUri)
+    public final String buildAuthorizeUrl(Map<String, String> extraParameters,
+                                          String authorizationUrl,
+                                          String redirectUri)
     {
         StringBuilder urlBuilder = new StringBuilder();
         if (authorizationUrl != null)
@@ -570,40 +572,11 @@ public abstract class BaseOAuthManager<C extends OAuthAdapter> extends DefaultHt
         return false;
     }
 
-    public final String authorize(Map<String, String> extraParameters,
-                                  String authorizationUrl,
-                                  String redirectUri)
+    @Override
+    @SuppressWarnings("unchecked")
+    public <T> ProcessTemplate<T, OAuthAdapter> getProcessTemplate()
     {
-        StringBuilder urlBuilder = new StringBuilder();
-        if (authorizationUrl != null)
-        {
-            urlBuilder.append(authorizationUrl);
-        }
-        else
-        {
-            urlBuilder.append(this.authorizationUrl);
-        }
-        urlBuilder.append("?");
-        urlBuilder.append("response_type=code&");
-        urlBuilder.append("client_id=");
-        urlBuilder.append(getConsumerKey());
-        urlBuilder.append("&redirect_uri=");
-        urlBuilder.append(redirectUri);
-        String scope = getScope();
-        if (scope != null)
-        {
-            urlBuilder.append("&scope=");
-            urlBuilder.append(scope);
-        }
-        for (String parameter : extraParameters.keySet())
-        {
-            urlBuilder.append("&");
-            urlBuilder.append(parameter);
-            urlBuilder.append("=");
-            urlBuilder.append(extraParameters.get(parameter));
-        }
-        logger.debug(("Authorization URL has been generated as follows: " + urlBuilder));
-        return urlBuilder.toString();
+        return (ProcessTemplate<T, OAuthAdapter>) new OAuthProcessTemplate(this);
     }
 
     /**
