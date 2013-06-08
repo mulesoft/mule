@@ -14,7 +14,7 @@ import static org.junit.Assert.assertEquals;
 
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.transport.NullPayload;
 
 import org.junit.Test;
@@ -26,17 +26,16 @@ import org.junit.Test;
  */
 public class JmsTemporaryReplyToTestCase extends AbstractJmsFunctionalTestCase
 {
-
     @Override
     protected String getConfigResources()
     {
         return "integration/jms-temporary-replyTo.xml";
     }
-    
+
     @Test
     public void testTemporaryReplyEnabledSync() throws MuleException
     {
-        MuleClient muleClient = new MuleClient(muleContext);
+        MuleClient muleClient = muleContext.getClient();
         MuleMessage response = muleClient.send("vm://in1Sync", TEST_MESSAGE, null);
         assertEquals(TEST_MESSAGE + " TestService1", response.getPayload());
     }
@@ -44,24 +43,24 @@ public class JmsTemporaryReplyToTestCase extends AbstractJmsFunctionalTestCase
     @Test
     public void testTemporaryReplyDisabledSync() throws MuleException
     {
-        MuleClient muleClient = new MuleClient(muleContext);
+        MuleClient muleClient = muleContext.getClient();
         MuleMessage response = muleClient.send("vm://in2Sync", TEST_MESSAGE, null);
         assertEquals(TEST_MESSAGE, response.getPayload());
-    }    
-    
+    }
+
     @Test
     public void testDisableTemporaryReplyOnTheConnector() throws MuleException
     {
-        MuleClient muleClient = new MuleClient(muleContext);
+        MuleClient muleClient = muleContext.getClient();
         MuleMessage response = muleClient.send("vm://in3", TEST_MESSAGE, null);
-        
+
         assertEquals(NullPayload.getInstance(), response.getPayload());
     }
 
     @Test
     public void testExplicitReplyToAsyncSet() throws MuleException
     {
-        MuleClient muleClient = new MuleClient(muleContext);
+        MuleClient muleClient = muleContext.getClient();
         MuleMessage response = muleClient.send("vm://in4", TEST_MESSAGE, null);
         // We get the original message back, not the result from the remote component
         assertEquals(TEST_MESSAGE + " TestService1", response.getPayload());

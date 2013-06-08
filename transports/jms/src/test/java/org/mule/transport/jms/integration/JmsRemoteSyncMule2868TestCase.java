@@ -10,17 +10,16 @@
 
 package org.mule.transport.jms.integration;
 
+import static org.junit.Assert.assertEquals;
+
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-
 public class JmsRemoteSyncMule2868TestCase extends AbstractJmsFunctionalTestCase
 {
-
     @Override
     protected String getConfigResources()
     {
@@ -30,9 +29,8 @@ public class JmsRemoteSyncMule2868TestCase extends AbstractJmsFunctionalTestCase
     @Test
     public void testMule2868() throws MuleException
     {
-        MuleClient muleClient = new MuleClient(muleContext);
+        MuleClient muleClient = muleContext.getClient();
         MuleMessage response = muleClient.send("vm://in", "test", null);
         assertEquals("test Received", response.getPayload());
     }
-
 }

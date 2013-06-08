@@ -10,20 +10,19 @@
 
 package org.mule.transport.jms.integration;
 
+import static org.junit.Assert.assertEquals;
+
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-
 public class JmsCustomCorrelationIdTestCase extends AbstractJmsFunctionalTestCase
 {
-
     @Override
     protected String getConfigResources()
     {
@@ -33,10 +32,12 @@ public class JmsCustomCorrelationIdTestCase extends AbstractJmsFunctionalTestCas
     @Test
     public void testExplicitReplyToAsyncSet() throws MuleException
     {
-        MuleClient muleClient = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
+
         Map<String, Object> props = new HashMap<String, Object>();
         props.put("customCorrelation", "abcdefghij");
-        MuleMessage response = muleClient.send("vm://in4", TEST_MESSAGE, props);
+
+        MuleMessage response = client.send("vm://in4", TEST_MESSAGE, props);
         // We get the original message back, not the result from the remote component
         assertEquals(TEST_MESSAGE + " TestService1", response.getPayload());
     }

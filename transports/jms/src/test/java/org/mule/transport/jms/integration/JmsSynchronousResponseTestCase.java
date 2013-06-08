@@ -10,17 +10,17 @@
 
 package org.mule.transport.jms.integration;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.transport.NullPayload;
 import org.mule.transport.jms.JmsConstants;
 import org.mule.util.StringUtils;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 
 /**
@@ -28,7 +28,6 @@ import static org.junit.Assert.assertTrue;
  */
 public class JmsSynchronousResponseTestCase extends AbstractJmsFunctionalTestCase
 {
-
     @Override
     protected String getConfigResources()
     {
@@ -38,7 +37,7 @@ public class JmsSynchronousResponseTestCase extends AbstractJmsFunctionalTestCas
     @Test
     public void testResponseWithoutReplyTo() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
 
         MuleMessage response = client.send("out1", "TEST_MESSAGE", null);
         assertNotNull(response);
@@ -49,7 +48,7 @@ public class JmsSynchronousResponseTestCase extends AbstractJmsFunctionalTestCas
     @Test
     public void testResponseWithoutReplyToEndpointProperties() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
 
         MuleMessage response = client.send("out2", "TEST_MESSAGE", null);
         assertNotNull(response);
@@ -60,7 +59,7 @@ public class JmsSynchronousResponseTestCase extends AbstractJmsFunctionalTestCas
     @Test
     public void testResponseWithReplyTo() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
 
         MuleMessage response = client.send("out3", "TEST_MESSAGE", null);
         assertNotNull(response);

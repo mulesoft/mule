@@ -9,14 +9,13 @@
  */
 package org.mule.transport.jms.integration;
 
-import org.hamcrest.core.Is;
-import org.hamcrest.core.IsNull;
-import org.junit.Test;
-import org.junit.runners.Parameterized;
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertThat;
+
 import org.mule.api.MuleMessage;
+import org.mule.api.client.MuleClient;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.transport.PropertyScope;
-import org.mule.module.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 
 import java.util.Arrays;
@@ -24,12 +23,13 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
+import org.hamcrest.core.Is;
+import org.hamcrest.core.IsNull;
+import org.junit.Test;
+import org.junit.runners.Parameterized;
 
 public class JmsResponseElementTestCase extends AbstractServiceAndFlowTestCase
 {
-
     public static final String MESSAGE = "A Message";
     public static final String EXPECTED_MODIFIED_MESSAGE = "A Message jms flow content";
     public static final int TIMEOUT = 3000;
@@ -52,7 +52,7 @@ public class JmsResponseElementTestCase extends AbstractServiceAndFlowTestCase
     @Test
     public void testOutboundEndpointResponse() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage response = client.send("vm://vminbound", "some message", null);
         assertThat(response.getPayloadAsString(), is(EXPECTED_MODIFIED_MESSAGE));
         assertThat(response.<String>getProperty("test", PropertyScope.INBOUND), Is.is("test"));
@@ -62,7 +62,7 @@ public class JmsResponseElementTestCase extends AbstractServiceAndFlowTestCase
     @Test
     public void testInboundEndpointResponse() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage response = client.send("vm://vminbound2", MESSAGE, null);
         assertThat(response.getPayloadAsString(), is(EXPECTED_MODIFIED_MESSAGE));
         assertThat(response.getExceptionPayload(), IsNull.<Object>nullValue());
@@ -71,11 +71,14 @@ public class JmsResponseElementTestCase extends AbstractServiceAndFlowTestCase
     @Test
     public void testInboundEndpointResponseWithReplyTo() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
-        Map messageProperties = new HashMap();
+        MuleClient client = muleContext.getClient();
+
+        Map<String, Object> messageProperties = new HashMap<String, Object>();
         String replyToUri = "jms://out2";
         messageProperties.put(MuleProperties.MULE_REPLY_TO_PROPERTY, replyToUri);
+
         client.dispatch("jms://out", MESSAGE, messageProperties);
+
         MuleMessage response = client.request(replyToUri, TIMEOUT);
         assertThat(response.getPayloadAsString(), is(EXPECTED_MODIFIED_MESSAGE));
         assertThat(response.getExceptionPayload(), IsNull.<Object>nullValue());
@@ -86,13 +89,9 @@ public class JmsResponseElementTestCase extends AbstractServiceAndFlowTestCase
     @Test
     public void testInboundEndpointOneWay() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage response = client.send("jms://in3", MESSAGE, null);
         assertThat(response.getPayloadAsString(), is(EXPECTED_MODIFIED_MESSAGE));
         assertThat(response.getExceptionPayload(), IsNull.<Object>nullValue());
     }
-
-
-
 }
-

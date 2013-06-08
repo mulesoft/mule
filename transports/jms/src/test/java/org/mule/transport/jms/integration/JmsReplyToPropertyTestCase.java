@@ -15,7 +15,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -34,7 +34,7 @@ public class JmsReplyToPropertyTestCase extends AbstractJmsFunctionalTestCase
     @Test
     public void testReplyTo() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         Map<String, Object> props = new HashMap<String, Object>();
         props.put("JMSReplyTo", "middle");
         client.dispatch("in", DEFAULT_INPUT_MESSAGE, props);
