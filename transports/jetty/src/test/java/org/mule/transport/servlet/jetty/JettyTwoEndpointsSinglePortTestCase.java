@@ -15,8 +15,8 @@ import static org.junit.Assert.assertNotNull;
 
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
+import org.mule.api.client.MuleClient;
 import org.mule.api.transformer.DataType;
-import org.mule.module.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -58,7 +58,7 @@ public class JettyTwoEndpointsSinglePortTestCase extends AbstractServiceAndFlowT
     @Test
     public void testSendToEachWithBadEndpoint() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
 
         sendWithResponse("http://localhost:" + dynamicPort.getNumber() + "/mycomponent1", "test", "mycomponent1", 5);
         sendWithResponse("http://localhost:" + dynamicPort.getNumber() + "/mycomponent2", "test", "mycomponent2", 5);
@@ -77,7 +77,7 @@ public class JettyTwoEndpointsSinglePortTestCase extends AbstractServiceAndFlowT
     protected void sendWithResponse(String endpoint, String message, String response, int noOfMessages)
         throws MuleException
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
 
         List<Object> results = new ArrayList<Object>();
         for (int i = 0; i < noOfMessages; i++)

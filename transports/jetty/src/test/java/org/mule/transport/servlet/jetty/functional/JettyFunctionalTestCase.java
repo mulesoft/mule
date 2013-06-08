@@ -15,7 +15,7 @@ import static org.junit.Assert.assertNotNull;
 
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.tck.junit4.FunctionalTestCase;
@@ -34,7 +34,6 @@ import org.junit.Test;
  */
 public class JettyFunctionalTestCase extends FunctionalTestCase
 {
-
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
@@ -49,9 +48,10 @@ public class JettyFunctionalTestCase extends FunctionalTestCase
     {
         FunctionalTestComponent testComponent = getFunctionalTestComponent("normalExecutionFlow");
         assertNotNull(testComponent);
-        
+
         EventCallback callback = new EventCallback()
         {
+            @Override
             public void eventReceived(MuleEventContext context, Object component) throws Exception
             {
                 MuleMessage msg = context.getMessage();
@@ -63,20 +63,19 @@ public class JettyFunctionalTestCase extends FunctionalTestCase
         };
 
         testComponent.setEventCallback(callback);
-        
-        MuleClient client = new MuleClient(muleContext);
+
+        MuleClient client = muleContext.getClient();
         MuleMessage response = client.send("http://localhost:" + dynamicPort.getNumber() + "/normal", TEST_MESSAGE, null);
         assertEquals("200", response.getInboundProperty("http.status"));
         assertEquals(TEST_MESSAGE + " received", IOUtils.toString((InputStream) response.getPayload()));
     }
-    
+
     @Test
     public void testExceptionExecutionFlow() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage response = client.send("http://localhost:" + dynamicPort.getNumber() + "/exception", TEST_MESSAGE, null);
         assertEquals("500", response.getInboundProperty("http.status"));
         assertNotNull(response.getExceptionPayload());
     }
-
 }

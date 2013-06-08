@@ -14,7 +14,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
 import org.mule.transport.http.functional.HttpFunctionalTestCase;
@@ -48,9 +48,11 @@ public class JettyHttpEncodingFunctionalTestCase extends HttpFunctionalTestCase
     @Test
     public void testSendWithProperResponseContentType() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
+
         Map<String, Object> messageProperties = new HashMap<String, Object>();
         messageProperties.put(HttpConstants.HEADER_CONTENT_TYPE, getSendEncoding());
+
         MuleMessage reply = client.send("clientEndpoint", TEST_MESSAGE, messageProperties);
         assertNotNull(reply);
         assertEquals("200", reply.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY));
@@ -65,9 +67,11 @@ public class JettyHttpEncodingFunctionalTestCase extends HttpFunctionalTestCase
     @Test
     public void testSendWithInvalidResponseContentType() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
+
         Map<String, Object> messageProperties = new HashMap<String, Object>();
         messageProperties.put(HttpConstants.HEADER_CONTENT_TYPE, getSendEncoding());
+
         MuleMessage reply = client.send("clientEndpoint2", TEST_MESSAGE, messageProperties);
         assertNotNull(reply);
         assertEquals("200", reply.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY));

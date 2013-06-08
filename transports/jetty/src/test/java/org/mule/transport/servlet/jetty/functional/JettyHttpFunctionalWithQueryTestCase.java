@@ -13,8 +13,8 @@ package org.mule.transport.servlet.jetty.functional;
 import static org.junit.Assert.assertEquals;
 
 import org.mule.api.MuleMessage;
+import org.mule.api.client.MuleClient;
 import org.mule.api.transport.DispatchException;
-import org.mule.module.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -29,7 +29,6 @@ import org.junit.runners.Parameterized.Parameters;
 
 public class JettyHttpFunctionalWithQueryTestCase extends AbstractServiceAndFlowTestCase
 {
-
     @Rule
     public DynamicPort port = new DynamicPort("port1");
 
@@ -45,12 +44,12 @@ public class JettyHttpFunctionalWithQueryTestCase extends AbstractServiceAndFlow
             {ConfigVariant.SERVICE, "jetty-http-functional-test-with-query-service.xml"},
             {ConfigVariant.FLOW, "jetty-http-functional-test-with-query-flow.xml"}
         });
-    }      
-    
+    }
+
     @Test
     public void testSend() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         Map<String, Object> props = new HashMap<String, Object>();
         MuleMessage result = client.send("clientEndpoint1", null, props);
         assertEquals("boobar", result.getPayloadAsString());
@@ -59,7 +58,7 @@ public class JettyHttpFunctionalWithQueryTestCase extends AbstractServiceAndFlow
     @Test
     public void testSendWithParams() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         Map<String, Object> props = new HashMap<String, Object>();
         props.put("foo", "noo");
         props.put("far", "nar");
@@ -70,7 +69,7 @@ public class JettyHttpFunctionalWithQueryTestCase extends AbstractServiceAndFlow
     @Test(expected = DispatchException.class)
     public void testSendWithBadParams() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         Map<String, Object> props = new HashMap<String, Object>();
         props.put("hoo", "noo");
         props.put("har", "nar");

@@ -15,12 +15,11 @@ import static org.junit.Assert.assertNotNull;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.transport.http.HttpConnector;
 
 public class JettyHttpBadEncodingFunctionalTestCase extends JettyHttpEncodingFunctionalTestCase
 {
-
     public JettyHttpBadEncodingFunctionalTestCase(ConfigVariant variant, String configResources)
     {
         super(variant, configResources);
@@ -29,7 +28,7 @@ public class JettyHttpBadEncodingFunctionalTestCase extends JettyHttpEncodingFun
     @Override
     public void testSend() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
 
         // Send as bytes so that the StringRequestEntity isn't used. If it is used
         // it will throw an exception and stop us from testing the server side.
@@ -40,5 +39,4 @@ public class JettyHttpBadEncodingFunctionalTestCase extends JettyHttpEncodingFun
         assertEquals("500", reply.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY));
         assertNotNull(reply.getExceptionPayload());
     }
-
 }
