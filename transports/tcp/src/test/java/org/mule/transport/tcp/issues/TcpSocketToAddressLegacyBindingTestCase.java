@@ -13,7 +13,7 @@ package org.mule.transport.tcp.issues;
 import static org.junit.Assert.assertEquals;
 
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.transport.tcp.TcpPropertyHelper;
 
@@ -40,7 +40,7 @@ public class TcpSocketToAddressLegacyBindingTestCase extends AbstractTcpSocketTo
     @Test
     public void testRequestNotUsingLoopbackAddressAtLocalhost() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage result;
 
         // Iterate over local addresses.
@@ -52,5 +52,4 @@ public class TcpSocketToAddressLegacyBindingTestCase extends AbstractTcpSocketTo
             assertEquals(TEST_MESSAGE + " Received", result.getPayloadAsString());
         }
     }
-
 }

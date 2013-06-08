@@ -14,8 +14,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
 import org.mule.api.MuleMessage;
+import org.mule.api.client.MuleClient;
 import org.mule.api.transport.DispatchException;
-import org.mule.module.client.MuleClient;
 
 import java.net.InetAddress;
 import java.net.SocketException;
@@ -27,7 +27,6 @@ import org.junit.Test;
  */
 public class TcpSocketToAddressBindingTestCase extends AbstractTcpSocketToAddressBindingTestCase
 {
-
     public TcpSocketToAddressBindingTestCase() throws SocketException
     {
         super();
@@ -36,7 +35,7 @@ public class TcpSocketToAddressBindingTestCase extends AbstractTcpSocketToAddres
     @Test
     public void testRequestUsingLoopbackAddressAtLoopbackAddress() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage result;
 
         // Request using loopback address at endpoint listening at 127.0.0.1 should get an appropiate response.
@@ -47,7 +46,7 @@ public class TcpSocketToAddressBindingTestCase extends AbstractTcpSocketToAddres
     @Test
     public void testRequestUsingLocalhostAtLocalhost() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage result;
 
         // Request using localhost address at endpoint listening at localhost should get an appropiate response.
@@ -58,7 +57,7 @@ public class TcpSocketToAddressBindingTestCase extends AbstractTcpSocketToAddres
     @Test
     public void testRequestUsingLoopbackAddressAtAllAddresses() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage result;
 
         // Request using loopback address at endpoint listening at all addresses should get an appropiate response.
@@ -69,7 +68,7 @@ public class TcpSocketToAddressBindingTestCase extends AbstractTcpSocketToAddres
     @Test
     public void testRequestNotUsingLoopbackAddressAtLoopbackAddress() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage result;
 
         // Iterate over local addresses.
@@ -91,7 +90,7 @@ public class TcpSocketToAddressBindingTestCase extends AbstractTcpSocketToAddres
     @Test
     public void testRequestNotUsingLoopbackAddressAtAllAddresses() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage result;
 
         // Iterate over local addresses.
