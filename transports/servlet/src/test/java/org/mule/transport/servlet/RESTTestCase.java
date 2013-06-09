@@ -10,16 +10,16 @@
 
 package org.mule.transport.servlet;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.util.WebServiceOnlineCheck;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 public class RESTTestCase extends FunctionalTestCase
 {
@@ -53,7 +53,7 @@ public class RESTTestCase extends FunctionalTestCase
     @Test
     public void testRest1ParamPost() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage reply  = client.send("vm://in1", new DefaultMuleMessage("IBM", muleContext));
 
         assertNotNull(reply);
@@ -64,7 +64,7 @@ public class RESTTestCase extends FunctionalTestCase
     @Test
     public void testRest2ParamsPost() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage reply  = client.send("vm://in2", new DefaultMuleMessage(new Object[]{"ARS","ARS"}, muleContext));
 
         assertNotNull(reply.getPayloadAsString());
@@ -74,7 +74,7 @@ public class RESTTestCase extends FunctionalTestCase
     @Test
     public void testRest1ParamGet() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage reply  = client.send("vm://in3", new DefaultMuleMessage(new Object[]{"IBM"}, muleContext));
 
         assertNotNull(reply);
@@ -86,7 +86,7 @@ public class RESTTestCase extends FunctionalTestCase
     @Test
     public void testRest2ParamsGet() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage reply  = client.send("vm://in4", new DefaultMuleMessage(new Object[]{"ARS","ARS"}, muleContext));
 
         String replyStr = reply.getPayloadAsString();
