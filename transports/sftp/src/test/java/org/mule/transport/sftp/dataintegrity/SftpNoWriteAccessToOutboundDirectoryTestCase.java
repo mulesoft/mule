@@ -14,15 +14,15 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import org.mule.api.transport.DispatchException;
+import org.mule.transport.sftp.SftpClient;
+
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-import org.mule.api.transport.DispatchException;
-import org.mule.module.client.MuleClient;
-import org.mule.transport.sftp.SftpClient;
 
 /**
  * Verify that the original file is not lost if the outbound directory doesn't exist
@@ -59,14 +59,12 @@ public class SftpNoWriteAccessToOutboundDirectoryTestCase extends AbstractSftpDa
     @Test
     public void testNoWriteAccessToOutboundDirectory() throws Exception
     {
-        MuleClient muleClient = new MuleClient(muleContext);
-
-        SftpClient sftpClient = getSftpClient(muleClient, OUTBOUND_ENDPOINT_NAME);
+        SftpClient client = getSftpClient(OUTBOUND_ENDPOINT_NAME);
 
         try
         {
             // change the chmod to "dr-x------" on the outbound-directory
-            remoteChmod(muleClient, sftpClient, OUTBOUND_ENDPOINT_NAME, 00500);
+            remoteChmod(client, OUTBOUND_ENDPOINT_NAME, 00500);
 
             // Send an file to the SFTP server, which the inbound-outboundEndpoint
             // then can pick up
@@ -79,12 +77,11 @@ public class SftpNoWriteAccessToOutboundDirectoryTestCase extends AbstractSftpDa
                 exception.getCause() instanceof IOException);
             assertEquals("Permission denied", exception.getCause().getMessage());
 
-            verifyInAndOutFiles(muleClient, INBOUND_ENDPOINT_NAME, OUTBOUND_ENDPOINT_NAME, true, false);
+            verifyInAndOutFiles(INBOUND_ENDPOINT_NAME, OUTBOUND_ENDPOINT_NAME, true, false);
         }
         finally
         {
-            sftpClient.disconnect();
+            client.disconnect();
         }
     }
-
 }

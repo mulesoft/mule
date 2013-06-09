@@ -15,8 +15,8 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import org.mule.api.MuleEventContext;
+import org.mule.api.client.MuleClient;
 import org.mule.api.transport.PropertyScope;
-import org.mule.module.client.MuleClient;
 import org.mule.tck.functional.EventCallback;
 
 import java.io.IOException;
@@ -40,7 +40,6 @@ import org.junit.runners.Parameterized.Parameters;
  */
 public class SftpPoolingFunctionalTestCase extends AbstractSftpTestCase
 {
-
     private static final long TIMEOUT = 30000;
 
     private List<String> sendFiles;
@@ -89,8 +88,6 @@ public class SftpPoolingFunctionalTestCase extends AbstractSftpTestCase
     {
         final CountDownLatch latch = new CountDownLatch(sendFiles.size());
         final AtomicInteger loopCount = new AtomicInteger(0);
-
-        MuleClient client = new MuleClient(muleContext);
 
         receiveFiles = new ArrayList<String>();
 
@@ -144,6 +141,7 @@ public class SftpPoolingFunctionalTestCase extends AbstractSftpTestCase
 
         getFunctionalTestComponent("receiving").setEventCallback(callback);
 
+        MuleClient client = muleContext.getClient();
         for (String sendFile : sendFiles)
         {
             Map<String, Object> props = new HashMap<String, Object>();

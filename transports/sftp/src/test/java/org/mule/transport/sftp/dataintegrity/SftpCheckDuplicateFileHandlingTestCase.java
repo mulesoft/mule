@@ -14,7 +14,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import org.mule.api.MuleException;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.probe.PollingProber;
@@ -72,7 +72,7 @@ public class SftpCheckDuplicateFileHandlingTestCase extends AbstractServiceAndFl
 
     private Prober prober = new PollingProber(2000, 100);
 
-    private static MuleClient muleClient;
+    private MuleClient muleClient;
 
     @Parameters
     public static Collection<Object[]> parameters()
@@ -116,20 +116,20 @@ public class SftpCheckDuplicateFileHandlingTestCase extends AbstractServiceAndFl
      * Returns a SftpClient that is logged in to the sftp server that the endpoint is
      * configured against.
      */
-    protected SftpClient getSftpClient(String host, int port, String user, String password)
+    protected SftpClient getSftpClient(String host, int clientPort, String user, String password)
         throws IOException
     {
-        SftpClient sftpClient = new SftpClient(host);
-        sftpClient.setPort(port);
+        SftpClient client = new SftpClient(host);
+        client.setPort(clientPort);
         try
         {
-            sftpClient.login(user, password);
+            client.login(user, password);
         }
         catch (Exception e)
         {
             fail("Login failed: " + e);
         }
-        return sftpClient;
+        return client;
     }
 
     @Before
@@ -137,7 +137,7 @@ public class SftpCheckDuplicateFileHandlingTestCase extends AbstractServiceAndFl
     {
         sftpServer = new SftpServer(port.getNumber());
         sftpServer.start();
-        muleClient = new MuleClient(muleContext);
+        muleClient = muleContext.getClient();
         sftpClient = getSftpClient("localhost", port.getNumber(), "muletest1", "muletest1");
         sftpClient.mkdir("inbound");
         sftpClient.mkdir("outbound");
@@ -154,5 +154,4 @@ public class SftpCheckDuplicateFileHandlingTestCase extends AbstractServiceAndFl
         sftpClient.recursivelyDeleteDirectory("inbound2");
         sftpServer.stop();
     }
-
 }

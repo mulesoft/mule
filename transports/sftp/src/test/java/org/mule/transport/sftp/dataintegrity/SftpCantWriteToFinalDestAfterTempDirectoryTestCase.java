@@ -15,16 +15,16 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.transport.DispatchException;
+import org.mule.transport.sftp.SftpClient;
+
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-import org.mule.api.endpoint.ImmutableEndpoint;
-import org.mule.api.transport.DispatchException;
-import org.mule.module.client.MuleClient;
-import org.mule.transport.sftp.SftpClient;
 
 /**
  * Tests that files are not deleted if the final destination is not writable when
@@ -32,7 +32,6 @@ import org.mule.transport.sftp.SftpClient;
  */
 public class SftpCantWriteToFinalDestAfterTempDirectoryTestCase extends AbstractSftpDataIntegrityTestCase
 {
-
     private static String INBOUND_ENDPOINT_NAME = "inboundEndpoint";
     private static String OUTBOUND_ENDPOINT_NAME = "outboundEndpoint";
 
@@ -66,17 +65,14 @@ public class SftpCantWriteToFinalDestAfterTempDirectoryTestCase extends Abstract
     @Test
     public void testCantWriteToFinalDestAfterTempDirectory() throws Exception
     {
-        MuleClient muleClient = new MuleClient(muleContext);
-
         // Must create the temp directory before we change the access rights
-        createRemoteDirectory(muleClient, OUTBOUND_ENDPOINT_NAME, "uploading");
+        createRemoteDirectory(OUTBOUND_ENDPOINT_NAME, "uploading");
 
-        SftpClient sftpClient = getSftpClient(muleClient, OUTBOUND_ENDPOINT_NAME);
-
+        SftpClient client = getSftpClient(OUTBOUND_ENDPOINT_NAME);
         try
         {
             // change the chmod to "dr-x------" on the outbound-directory
-            remoteChmod(muleClient, sftpClient, OUTBOUND_ENDPOINT_NAME, 00500);
+            remoteChmod(client, OUTBOUND_ENDPOINT_NAME, 00500);
 
             // Send an file to the SFTP server, which the inbound-outboundEndpoint
             // then can pick up
@@ -91,15 +87,15 @@ public class SftpCantWriteToFinalDestAfterTempDirectoryTestCase extends Abstract
 
             assertEquals("Permission denied", exception.getCause().getMessage());
 
-            verifyInAndOutFiles(muleClient, INBOUND_ENDPOINT_NAME, OUTBOUND_ENDPOINT_NAME, true, false);
+            verifyInAndOutFiles(INBOUND_ENDPOINT_NAME, OUTBOUND_ENDPOINT_NAME, true, false);
 
-            ImmutableEndpoint endpoint = (ImmutableEndpoint) muleClient.getProperty(OUTBOUND_ENDPOINT_NAME);
+            ImmutableEndpoint endpoint = muleContext.getRegistry().lookupObject(OUTBOUND_ENDPOINT_NAME);
             assertFalse("The inbound file should not be left in the TEMP-dir", super.verifyFileExists(
-                sftpClient, endpoint.getEndpointURI().getPath() + "/" + TEMP_DIR, FILENAME));
+                client, endpoint.getEndpointURI().getPath() + "/" + TEMP_DIR, FILENAME));
         }
         finally
         {
-            sftpClient.disconnect();
+            client.disconnect();
         }
     }
 }

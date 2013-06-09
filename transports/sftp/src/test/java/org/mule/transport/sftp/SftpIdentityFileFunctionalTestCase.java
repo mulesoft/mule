@@ -15,7 +15,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import org.mule.api.MuleEventContext;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
 
@@ -97,7 +97,7 @@ public class SftpIdentityFileFunctionalTestCase extends AbstractSftpTestCase
             }
         };
 
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
 
         // Ensure that no other files exists
         // cleanupRemoteFtpDirectory(client, INBOUND_ENDPOINT_NAME);
@@ -112,14 +112,10 @@ public class SftpIdentityFileFunctionalTestCase extends AbstractSftpTestCase
 
         ftc.setEventCallback(callback);
 
-        logger.debug("before dispatch");
-        // Send an file to the SFTP server, which the inbound-endpoint then can pick
-        // up
-        client.dispatch(getAddressByEndpoint(client, INBOUND_ENDPOINT_NAME), TEST_MESSAGE, properties);
-        logger.debug("before retrieve");
+        // Send an file to the SFTP server, which the inbound-endpoint then can pick up
+        client.dispatch(getAddressByEndpoint(INBOUND_ENDPOINT_NAME), TEST_MESSAGE, properties);
 
         latch.await(DEFAULT_TIMEOUT, TimeUnit.MILLISECONDS);
-
         assertEquals(TEST_MESSAGE, message.get());
     }
 }

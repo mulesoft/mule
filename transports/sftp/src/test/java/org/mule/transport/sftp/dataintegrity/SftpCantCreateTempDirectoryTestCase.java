@@ -12,7 +12,7 @@ package org.mule.transport.sftp.dataintegrity;
 
 import static org.junit.Assert.assertTrue;
 
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.transport.sftp.LatchDownExceptionListener;
 
 import java.util.Arrays;
@@ -20,7 +20,6 @@ import java.util.Collection;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import org.junit.After;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
@@ -45,6 +44,7 @@ public class SftpCantCreateTempDirectoryTestCase extends AbstractSftpDataIntegri
             {ConfigVariant.FLOW, "dataintegrity/sftp-dataintegrity-common-with-tempdir-config-flow.xml"}});
     }
 
+    @Override
     public void before() throws Exception
     {
         super.before();
@@ -69,14 +69,14 @@ public class SftpCantCreateTempDirectoryTestCase extends AbstractSftpDataIntegri
     @Test
     public void testCantCreateTempDirectory() throws Exception
     {
-        MuleClient muleClient = new MuleClient(muleContext);
         Runtime.getRuntime().exec(new String[]{"chmod", "320", OUTBOUND_ENDPOINT_DIR});
         final CountDownLatch exceptionLatch = new CountDownLatch(1);
         muleContext.registerListener(new LatchDownExceptionListener(exceptionLatch));
+
+        MuleClient muleClient = muleContext.getClient();
         muleClient.dispatch("sftp://localhost:" + port.getNumber() + "/" + INBOUND_ENDPOINT_NAME,
             TEST_MESSAGE, MESSAGE_PROPERTIES);
         assertTrue(exceptionLatch.await(EXCEPTION_TIMEOUT, TimeUnit.MILLISECONDS));
         assertTrue(Arrays.asList(sftpClient.listFiles()).contains(FILENAME));
     }
-
 }
