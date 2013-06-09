@@ -12,18 +12,18 @@ package org.mule.transport.ssl.issues;
 
 import static org.junit.Assert.assertEquals;
 
+import org.mule.api.MuleMessage;
+import org.mule.api.client.MuleClient;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+
 import java.util.Arrays;
 import java.util.Collection;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
 
 public class MultipleConnectorsMule1765TestCase extends AbstractServiceAndFlowTestCase
 {
-
     protected static String TEST_SSL_MESSAGE = "Test SSL Request";
 
     public MultipleConnectorsMule1765TestCase(ConfigVariant variant, String configResources)
@@ -41,7 +41,7 @@ public class MultipleConnectorsMule1765TestCase extends AbstractServiceAndFlowTe
     @Test
     public void testSend() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage result = client.send("clientEndpoint", TEST_SSL_MESSAGE, null);
         assertEquals(TEST_SSL_MESSAGE + " Received", result.getPayloadAsString());
     }
