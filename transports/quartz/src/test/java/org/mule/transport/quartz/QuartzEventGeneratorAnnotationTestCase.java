@@ -10,20 +10,19 @@
 
 package org.mule.transport.quartz;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transport.NullPayload;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-
 public class QuartzEventGeneratorAnnotationTestCase extends FunctionalTestCase
 {
-
     @Override
     protected String getConfigResources()
     {
@@ -33,7 +32,7 @@ public class QuartzEventGeneratorAnnotationTestCase extends FunctionalTestCase
     @Test
     public void testReceiveEvent() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
 
         MuleMessage result = client.request("vm://intervalQueue", RECEIVE_TIMEOUT * 2);
         assertNotNull(result);

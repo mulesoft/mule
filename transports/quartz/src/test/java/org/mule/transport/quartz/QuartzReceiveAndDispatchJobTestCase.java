@@ -13,19 +13,19 @@ package org.mule.transport.quartz;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+import org.mule.api.client.MuleClient;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.functional.CountdownCallback;
+import org.mule.tck.functional.FunctionalTestComponent;
+
 import java.util.Arrays;
 import java.util.Collection;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
-import org.mule.tck.functional.CountdownCallback;
-import org.mule.tck.functional.FunctionalTestComponent;
 
 public class QuartzReceiveAndDispatchJobTestCase extends AbstractServiceAndFlowTestCase
 {
-
     public QuartzReceiveAndDispatchJobTestCase(ConfigVariant variant, String configResources)
     {
         super(variant, configResources);
@@ -46,7 +46,7 @@ public class QuartzReceiveAndDispatchJobTestCase extends AbstractServiceAndFlowT
         CountdownCallback count = new CountdownCallback(3);
         component.setEventCallback(count);
 
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         client.dispatch("vm://event.queue", "quartz test", null);
         client.dispatch("vm://event.queue", "quartz test", null);
         client.dispatch("vm://event.queue", "quartz test", null);

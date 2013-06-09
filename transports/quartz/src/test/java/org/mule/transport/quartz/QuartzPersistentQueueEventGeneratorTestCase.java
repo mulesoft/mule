@@ -14,19 +14,19 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 
+import org.mule.api.MuleMessage;
+import org.mule.api.client.MuleClient;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.transport.NullPayload;
+
 import java.util.Arrays;
 import java.util.Collection;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
-import org.mule.transport.NullPayload;
 
 public class QuartzPersistentQueueEventGeneratorTestCase extends AbstractServiceAndFlowTestCase
 {
-
     private static final long TIMEOUT = 30000;
 
     public QuartzPersistentQueueEventGeneratorTestCase(ConfigVariant variant, String configResources)
@@ -45,7 +45,7 @@ public class QuartzPersistentQueueEventGeneratorTestCase extends AbstractService
     @Test
     public void testReceiveEvent() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
 
         MuleMessage result = client.request("vm://resultQueue", TIMEOUT);
         assertNotNull(result);

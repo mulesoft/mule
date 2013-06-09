@@ -13,19 +13,19 @@ package org.mule.transport.quartz;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import org.mule.api.MuleMessage;
+import org.mule.api.client.MuleClient;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.transport.quartz.jobs.ScheduledDispatchJobConfig;
+
 import java.util.Arrays;
 import java.util.Collection;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
-import org.mule.transport.quartz.jobs.ScheduledDispatchJobConfig;
 
 public class QuartzPersistentCustomJobFromMessageTestCase extends AbstractServiceAndFlowTestCase
 {
-
     private static final long TIMEOUT = 30000;
 
     public QuartzPersistentCustomJobFromMessageTestCase(ConfigVariant variant, String configResources)
@@ -44,7 +44,7 @@ public class QuartzPersistentCustomJobFromMessageTestCase extends AbstractServic
     @Test
     public void testSendToCustomEventScheduler() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
 
         ScheduledDispatchJobConfig jobConfig = new ScheduledDispatchJobConfig();
         jobConfig.setMuleContext(muleContext);
