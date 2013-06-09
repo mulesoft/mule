@@ -10,19 +10,17 @@
 
 package org.mule.transport.vm.functional.transactions;
 
-import org.hamcrest.core.Is;
-import org.hamcrest.core.IsInstanceOf;
-import org.hamcrest.core.IsNull;
-import org.junit.Before;
-import org.junit.Test;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
+
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
+import org.mule.api.client.MuleClient;
 import org.mule.api.lifecycle.Callable;
 import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.message.DefaultExceptionPayload;
 import org.mule.message.ExceptionMessage;
-import org.mule.module.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transformer.AbstractTransformer;
 import org.mule.transport.NullPayload;
@@ -30,12 +28,14 @@ import org.mule.util.concurrent.Latch;
 
 import java.util.concurrent.TimeUnit;
 
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
+import org.hamcrest.core.Is;
+import org.hamcrest.core.IsInstanceOf;
+import org.hamcrest.core.IsNull;
+import org.junit.Before;
+import org.junit.Test;
 
 public class VmExceptionStrategyOneWayTestCase extends FunctionalTestCase
 {
-
     public static final int TIMEOUT = 3000;
     public static final String ORIGINAL_MESSAGE = "some message";
     private static Latch outboundComponentLatch;
@@ -59,7 +59,7 @@ public class VmExceptionStrategyOneWayTestCase extends FunctionalTestCase
     @Test
     public void testDeadLetterQueueWithInboundEndpointException() throws Exception
     {
-        MuleClient muleClient = new MuleClient(muleContext);
+        MuleClient muleClient = muleContext.getClient();
         MuleMessage response = muleClient.send("vm://in1", ORIGINAL_MESSAGE, null);
         if (!deadLetterQueueLatch.await(TIMEOUT, TimeUnit.MILLISECONDS)) {
             fail("dead letter queue must be reached");
@@ -74,7 +74,7 @@ public class VmExceptionStrategyOneWayTestCase extends FunctionalTestCase
     @Test
     public void testDeadLetterQueueWithInboundEndpointResponseException() throws Exception
     {
-        MuleClient muleClient = new MuleClient(muleContext);
+        MuleClient muleClient = muleContext.getClient();
         MuleMessage response = muleClient.send("vm://in2", ORIGINAL_MESSAGE, null);
         //TODO PLG - ES - fix this, DLQ call fails since tx was resolved already
         /*if (!deadLetterQueueLatch.await(TIMEOUT, MILLISECONDS)) {
@@ -93,7 +93,7 @@ public class VmExceptionStrategyOneWayTestCase extends FunctionalTestCase
     @Test
     public void testDeadLetterQueueWithComponentException() throws Exception
     {
-        MuleClient muleClient = new MuleClient(muleContext);
+        MuleClient muleClient = muleContext.getClient();
         MuleMessage response = muleClient.send("vm://in3", ORIGINAL_MESSAGE, null);
         if (!deadLetterQueueLatch.await(TIMEOUT, TimeUnit.MILLISECONDS)) {
             fail("dead letter queue must be reached");
@@ -108,7 +108,7 @@ public class VmExceptionStrategyOneWayTestCase extends FunctionalTestCase
     @Test
     public void testDeadLetterQueueWithOutboundEndpointException() throws Exception
     {
-        MuleClient muleClient = new MuleClient(muleContext);
+        MuleClient muleClient = muleContext.getClient();
         MuleMessage response = muleClient.send("vm://in4", ORIGINAL_MESSAGE, null);
         if (!deadLetterQueueLatch.await(TIMEOUT, TimeUnit.MILLISECONDS)) {
             fail("dead letter queue must be reached");
@@ -122,7 +122,6 @@ public class VmExceptionStrategyOneWayTestCase extends FunctionalTestCase
 
     public static class FailingTransformer extends AbstractTransformer
     {
-
         @Override
         protected Object doTransform(Object src, String enc) throws TransformerException
         {
@@ -132,7 +131,7 @@ public class VmExceptionStrategyOneWayTestCase extends FunctionalTestCase
 
     public static class DeadLetterQueueComponent implements Callable
     {
-
+        @Override
         public Object onCall(MuleEventContext eventContext) throws Exception
         {
             deadLetterQueueLatch.release();
@@ -146,7 +145,7 @@ public class VmExceptionStrategyOneWayTestCase extends FunctionalTestCase
 
     public static class OutboundComponent implements Callable
     {
-
+        @Override
         public Object onCall(MuleEventContext eventContext) throws Exception
         {
             outboundComponentLatch.release();

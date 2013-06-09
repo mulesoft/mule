@@ -14,6 +14,10 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import org.mule.api.MuleMessage;
+import org.mule.api.client.MuleClient;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
@@ -21,14 +25,10 @@ import java.util.Set;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
 
 public class PersistentBoundedQueueTestCase extends AbstractServiceAndFlowTestCase
 {
-
-    // add some sizeable delat, as queue store ordering won't be guaranteed
+    // add some sizeable delay, as queue store ordering won't be guaranteed
     private static final int SLEEP = 100;
 
     public PersistentBoundedQueueTestCase(ConfigVariant variant, String configResources)
@@ -47,7 +47,7 @@ public class PersistentBoundedQueueTestCase extends AbstractServiceAndFlowTestCa
     @Test
     public void testBoundedQueue() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         client.dispatch("vm://in", "Test1", null);
         Thread.sleep(SLEEP);
         client.dispatch("vm://in", "Test2", null);
@@ -59,8 +59,7 @@ public class PersistentBoundedQueueTestCase extends AbstractServiceAndFlowTestCa
         Thread.sleep(muleContext.getConfiguration().getDefaultQueueTimeout());
 
         // poll the 'out' queue 3 times, the first 2 times we must have a result. The
-        // 3rd message
-        // must have been discarded as the queue was bounded.
+        // 3rd message must have been discarded as the queue was bounded.
         Set<String> results = new HashSet<String>();
         pollOutQueue(client, results);
         pollOutQueue(client, results);

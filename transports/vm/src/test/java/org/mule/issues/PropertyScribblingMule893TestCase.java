@@ -10,9 +10,12 @@
 
 package org.mule.issues;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import org.mule.api.MuleMessage;
+import org.mule.api.client.MuleClient;
 import org.mule.api.config.MuleProperties;
-import org.mule.module.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
 
 import java.util.HashMap;
@@ -20,12 +23,8 @@ import java.util.Map;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
 public class PropertyScribblingMule893TestCase extends FunctionalTestCase
 {
-
     @Override
     protected String getConfigResources()
     {
@@ -35,10 +34,10 @@ public class PropertyScribblingMule893TestCase extends FunctionalTestCase
     @Test
     public void testSingleMessage() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         Map<String, Object> properties = new HashMap<String, Object>();
         properties.put(MuleProperties.MULE_REPLY_TO_PROPERTY, "receive");
-        
+
         client.dispatch("dispatch", "Message", properties);
         MuleMessage response = client.request("receive", 3000L);
         assertNotNull("Response is null", response);
@@ -53,5 +52,4 @@ public class PropertyScribblingMule893TestCase extends FunctionalTestCase
             testSingleMessage();
         }
     }
-
 }

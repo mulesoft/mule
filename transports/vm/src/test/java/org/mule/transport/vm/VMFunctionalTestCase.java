@@ -14,10 +14,11 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+
 import org.mule.api.MuleMessage;
+import org.mule.api.client.MuleClient;
 import org.mule.api.store.ObjectStoreException;
 import org.mule.api.store.QueueStore;
-import org.mule.module.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.util.store.SimpleMemoryObjectStore;
 
@@ -48,7 +49,7 @@ public class VMFunctionalTestCase extends AbstractServiceAndFlowTestCase
     @Test
     public void testSingleMessage() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         client.dispatch("vm://in", "Marco", null);
         MuleMessage response = client.request("vm://out", RECEIVE_TIMEOUT);
         assertNotNull("Response is null", response);
@@ -58,7 +59,7 @@ public class VMFunctionalTestCase extends AbstractServiceAndFlowTestCase
     @Test
     public void testRequest() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         client.dispatch("vm://in", "Marco", null);
         MuleMessage response = client.request("vm://out", RECEIVE_TIMEOUT);
         assertNotNull("Response is null", response);
@@ -68,7 +69,7 @@ public class VMFunctionalTestCase extends AbstractServiceAndFlowTestCase
     @Test
     public void testMultipleMessages() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         client.dispatch("vm://in", "Marco", null);
         client.dispatch("vm://in", "Marco", null);
         client.dispatch("vm://in", "Marco", null);
@@ -87,7 +88,7 @@ public class VMFunctionalTestCase extends AbstractServiceAndFlowTestCase
     @Test
     public void testOneWayChain() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         client.dispatch("vm://in1", "Marco", null);
         MuleMessage response = client.request("vm://out1", RECEIVE_TIMEOUT);
         assertNotNull("Response is null", response);
@@ -98,7 +99,7 @@ public class VMFunctionalTestCase extends AbstractServiceAndFlowTestCase
     @Test
     public void testRequestResponseChain() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage response = client.send("vm://in2", "Marco", null);
         assertNotNull("Response is null", response);
         assertEquals("Polo", response.getPayload());
@@ -107,7 +108,7 @@ public class VMFunctionalTestCase extends AbstractServiceAndFlowTestCase
     @Test
     public void testNoMessageDuplication() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         client.dispatch("vm://in", "Marco", null);
         MuleMessage response = client.request("vm://out", RECEIVE_TIMEOUT);
         assertNotNull("Response is null", response);

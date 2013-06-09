@@ -14,7 +14,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
 
 import java.util.Collections;
@@ -33,7 +33,7 @@ public class SessionPropertiesTestCase extends FunctionalTestCase
     @Test
     public void testVmToVmSessionPropertiesTestCase() throws Exception
     {
-        final MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         Map<String, Object> properties = Collections.emptyMap();
         MuleMessage response = client.send("vm://Flow1s1", "some message", properties, 1200000);
         assertNotNullAndNotExceptionResponse(response);
@@ -42,7 +42,7 @@ public class SessionPropertiesTestCase extends FunctionalTestCase
     @Test
     public void testVm1ToVm2ThenVm1ToVm2SessionPropertiesTestCase() throws Exception
     {
-        final MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         Map<String, Object> properties = Collections.emptyMap();
         MuleMessage response = client.send("vm://Flow1s2", "some message", properties, 1200000);
         assertNotNullAndNotExceptionResponse(response);

@@ -19,10 +19,10 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import org.mule.api.MuleMessage;
+import org.mule.api.client.MuleClient;
 import org.mule.api.execution.ExecutionCallback;
 import org.mule.api.execution.ExecutionTemplate;
 import org.mule.api.transaction.TransactionConfig;
-import org.mule.module.client.MuleClient;
 import org.mule.transaction.IllegalTransactionStateException;
 import org.mule.util.ExceptionUtils;
 
@@ -43,9 +43,9 @@ public class ExternalTransactionTestCase extends AbstractExternalTransactionTest
 
     public ExternalTransactionTestCase(ConfigVariant variant, String configResources)
     {
-        super(variant, configResources);   
+        super(variant, configResources);
     }
-    
+
     @Parameters
     public static Collection<Object[]> parameters()
     {
@@ -53,8 +53,8 @@ public class ExternalTransactionTestCase extends AbstractExternalTransactionTest
             {ConfigVariant.SERVICE, "org/mule/test/config/external-transaction-config-service.xml"},
             {ConfigVariant.FLOW, "org/mule/test/config/external-transaction-config-flow.xml"}
         });
-    }      
-    
+    }
+
     @Test
     public void testBeginOrJoinTransaction() throws Exception
     {
@@ -333,11 +333,13 @@ public class ExternalTransactionTestCase extends AbstractExternalTransactionTest
     @Test
     public void testConfiguration() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
-        tm = client.getMuleContext().getTransactionManager();
+        tm = muleContext.getTransactionManager();
+
         tm.begin();
+        MuleClient client = muleContext.getClient();
         client.send("vm://entry?connector=vm-normal", "OK", null);
         tm.commit();
+
         MuleMessage response = client.request("queue2", WAIT);
         assertNull("Response is not null", response);
 

@@ -15,7 +15,7 @@ import static org.junit.Assert.assertNotNull;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 
 import java.util.Arrays;
@@ -26,7 +26,6 @@ import org.junit.runners.Parameterized.Parameters;
 
 public class CustomFilterMule2437TestCase extends AbstractServiceAndFlowTestCase
 {
-
     private static final long TIMEOUT = 3000L;
 
     public CustomFilterMule2437TestCase(ConfigVariant variant, String configResources)
@@ -41,8 +40,8 @@ public class CustomFilterMule2437TestCase extends AbstractServiceAndFlowTestCase
             {ConfigVariant.SERVICE, "issues/custom-filter-mule-2437-test-service.xml"},
             {ConfigVariant.FLOW, "issues/custom-filter-mule-2437-test-flow.xml"}
         });
-    }      
-    
+    }
+
     @Test
     public void testVowels() throws Exception
     {
@@ -57,11 +56,10 @@ public class CustomFilterMule2437TestCase extends AbstractServiceAndFlowTestCase
 
     protected void doTest(String message, String destination) throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         client.dispatch("vm://in", new DefaultMuleMessage(message, muleContext));
         MuleMessage response = client.request(destination, TIMEOUT);
         assertNotNull(response);
         assertEquals(message, response.getPayloadAsString());
     }
-
 }

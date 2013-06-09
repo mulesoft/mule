@@ -15,6 +15,11 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import org.mule.DefaultMuleMessage;
+import org.mule.api.MuleMessage;
+import org.mule.api.client.MuleClient;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+
 import java.io.File;
 import java.util.Arrays;
 import java.util.Collection;
@@ -24,19 +29,14 @@ import javax.activation.FileDataSource;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-import org.mule.DefaultMuleMessage;
-import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
 
 public class VMAttachmentsTestCase extends AbstractServiceAndFlowTestCase
 {
-
     public VMAttachmentsTestCase(ConfigVariant variant, String configResources)
     {
         super(variant, configResources);
     }
-   
+
     @Parameters
     public static Collection<Object[]> parameters()
     {
@@ -54,7 +54,7 @@ public class VMAttachmentsTestCase extends AbstractServiceAndFlowTestCase
                                                         + getConfigResources()).getAbsoluteFile());
         msg.addOutboundAttachment("test-attachment", new DataHandler(ds));
 
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage reply = client.send("vm-in", msg);
 
         assertNotNull(reply);
@@ -63,7 +63,6 @@ public class VMAttachmentsTestCase extends AbstractServiceAndFlowTestCase
             fail(reply.getExceptionPayload().getException().getCause().toString());
         }
 
-        //TODO MULE-5000 attachments should be on the inbound
         assertEquals(1, reply.getInboundAttachmentNames().size());
         assertNotNull(reply.getInboundAttachment("mule"));
         assertTrue(reply.getInboundAttachment("mule").getContentType().startsWith("image/gif"));

@@ -14,6 +14,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import org.mule.api.MuleMessage;
+import org.mule.api.client.MuleClient;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
@@ -23,20 +27,16 @@ import java.util.StringTokenizer;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
 
 public class VMQueueTestCase extends AbstractServiceAndFlowTestCase
 {
-
     public static final long WAIT = 3000L;
 
     public VMQueueTestCase(ConfigVariant variant, String configResources)
     {
         super(variant, configResources);
     }
-    
+
     @Parameters
     public static Collection<Object[]> parameters()
     {
@@ -49,7 +49,7 @@ public class VMQueueTestCase extends AbstractServiceAndFlowTestCase
     @Test
     public void testSingleMessage() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         client.dispatch("queue", "Marco", null);
         MuleMessage response = client.request("queue", WAIT);
         assertNotNull("Response is null", response);
@@ -59,9 +59,9 @@ public class VMQueueTestCase extends AbstractServiceAndFlowTestCase
     @Test
     public void testMultipleMessages() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
-        Set polos = new HashSet(Arrays.asList(new String[]{"Marco", "Niccolo", "Maffeo"}));
-        Iterator people = polos.iterator();
+        MuleClient client = muleContext.getClient();
+        Set<String> polos = new HashSet<String>(Arrays.asList(new String[]{"Marco", "Niccolo", "Maffeo"}));
+        Iterator<String> people = polos.iterator();
         while (people.hasNext())
         {
             client.dispatch("queue", people.next(), null);
@@ -80,9 +80,9 @@ public class VMQueueTestCase extends AbstractServiceAndFlowTestCase
     @Test
     public void testPassThrough() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
-        Set polos = new HashSet(Arrays.asList(new String[]{"Marco", "Niccolo", "Maffeo"}));
-        Iterator people = polos.iterator();
+        MuleClient client = muleContext.getClient();
+        Set<String> polos = new HashSet<String>(Arrays.asList(new String[]{"Marco", "Niccolo", "Maffeo"}));
+        Iterator<String> people = polos.iterator();
         while (people.hasNext())
         {
             client.dispatch("vm://entry", people.next(), null);
@@ -93,18 +93,18 @@ public class VMQueueTestCase extends AbstractServiceAndFlowTestCase
             MuleMessage response = client.request("queue", WAIT);
             assertNotNull("Response is null", response);
             String person = (String) response.getPayload();
-            String name = new StringTokenizer(person).nextToken();
-            assertTrue(name, polos.contains(name));
-            polos.remove(name);
+            String personName = new StringTokenizer(person).nextToken();
+            assertTrue(personName, polos.contains(personName));
+            polos.remove(personName);
         }
     }
 
     @Test
     public void testNamedEndpoint() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
-        Set polos = new HashSet(Arrays.asList(new String[]{"Marco", "Niccolo", "Maffeo"}));
-        Iterator people = polos.iterator();
+        MuleClient client = muleContext.getClient();
+        Set<String> polos = new HashSet<String>(Arrays.asList(new String[]{"Marco", "Niccolo", "Maffeo"}));
+        Iterator<String> people = polos.iterator();
         while (people.hasNext())
         {
             client.dispatch("entry", people.next(), null);
@@ -115,10 +115,9 @@ public class VMQueueTestCase extends AbstractServiceAndFlowTestCase
             MuleMessage response = client.request("queue", WAIT);
             assertNotNull("Response is null", response);
             String person = (String) response.getPayload();
-            String name = new StringTokenizer(person).nextToken();
-            assertTrue(name, polos.contains(name));
-            polos.remove(name);
+            String personName = new StringTokenizer(person).nextToken();
+            assertTrue(personName, polos.contains(personName));
+            polos.remove(personName);
         }
     }
-
 }

@@ -9,18 +9,6 @@
  */
 package org.mule.transport.vm.functional.transactions;
 
-
-import org.junit.Assert;
-import org.junit.Test;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.junit4.FunctionalTestCase;
-import org.mule.util.concurrent.Latch;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
-import java.util.concurrent.atomic.AtomicInteger;
-
 public class XARollbackTestCase extends RollbackTestCase
 {
     @Override

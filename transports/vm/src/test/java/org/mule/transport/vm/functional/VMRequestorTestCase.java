@@ -15,7 +15,7 @@ import static org.junit.Assert.fail;
 
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 
 import java.util.ArrayList;
@@ -50,7 +50,7 @@ public class VMRequestorTestCase extends AbstractServiceAndFlowTestCase
             makeClientRequest("test" + i);
         }
 
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         List<String> results = new ArrayList<String>();
         MuleMessage result = null;
         for (int i = 0; i < 10; i++)
@@ -68,7 +68,7 @@ public class VMRequestorTestCase extends AbstractServiceAndFlowTestCase
 
     protected void makeClientRequest(final String message) throws MuleException
     {
-        final MuleClient client = new MuleClient(muleContext);
+        final MuleClient client = muleContext.getClient();
         Thread t = new Thread(new Runnable()
         {
             @Override

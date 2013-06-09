@@ -14,18 +14,18 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
+import org.mule.api.MuleMessage;
+import org.mule.api.client.MuleClient;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+
 import java.util.Arrays;
 import java.util.Collection;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
 
 public class PersistentVMQueueTestCase extends AbstractServiceAndFlowTestCase
 {
-
     private static final int RECEIVE_TIMEOUT = 5000;
 
     public PersistentVMQueueTestCase(ConfigVariant variant, String configResources)
@@ -46,7 +46,8 @@ public class PersistentVMQueueTestCase extends AbstractServiceAndFlowTestCase
     {
         String input = "Test message";
         String[] output = {"Test", "message"};
-        MuleClient client = new MuleClient(muleContext);
+
+        MuleClient client = muleContext.getClient();
         client.dispatch("vm://receiver", input, null);
         MuleMessage result = client.request("vm://out", RECEIVE_TIMEOUT);
         assertNotNull(result);
@@ -65,7 +66,8 @@ public class PersistentVMQueueTestCase extends AbstractServiceAndFlowTestCase
     {
         String input = "Test message";
         String[] output = {"Test", "message"};
-        MuleClient client = new MuleClient(muleContext);
+
+        MuleClient client = muleContext.getClient();
         client.dispatch("vm://flowReceiver", input, null);
         MuleMessage result = client.request("vm://flowOut", RECEIVE_TIMEOUT);
         assertNotNull(result);
@@ -78,5 +80,4 @@ public class PersistentVMQueueTestCase extends AbstractServiceAndFlowTestCase
             assertEquals(output[i], payload[i]);
         }
     }
-
 }
