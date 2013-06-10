@@ -16,14 +16,14 @@ import org.mule.transport.NullPayload;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class AbstractDevkitBasedMessageProcessor<O> extends AbstractConnectedProcessor
+public abstract class AbstractDevkitBasedMessageProcessor extends AbstractConnectedProcessor
     implements FlowConstructAware, MuleContextAware
 {
 
     /**
      * Module object
      */
-    protected O moduleObject;
+    protected Object moduleObject;
     /**
      * Mule Context
      */
@@ -75,7 +75,7 @@ public abstract class AbstractDevkitBasedMessageProcessor<O> extends AbstractCon
      * 
      * @param value Value to set
      */
-    public void setModuleObject(O value)
+    public void setModuleObject(Object value)
     {
         this.moduleObject = value;
     }
@@ -90,19 +90,18 @@ public abstract class AbstractDevkitBasedMessageProcessor<O> extends AbstractCon
      * @throws IllegalAccessException
      * @throws RegistrationException
      */
-    @SuppressWarnings("unchecked")
-    protected O findOrCreate(Class<O> moduleClass, boolean shouldAutoCreate, MuleEvent muleEvent)
+    protected Object findOrCreate(Class<?> moduleClass, boolean shouldAutoCreate, MuleEvent muleEvent)
         throws IllegalAccessException, InstantiationException, ConfigurationException, RegistrationException
     {
         Object temporaryObject = moduleObject;
         if (temporaryObject == null)
         {
-            temporaryObject = ((O) muleContext.getRegistry().lookupObject(moduleClass));
+            temporaryObject = (muleContext.getRegistry().lookupObject(moduleClass));
             if (temporaryObject == null)
             {
                 if (shouldAutoCreate)
                 {
-                    temporaryObject = ((O) moduleClass.newInstance());
+                    temporaryObject = (moduleClass.newInstance());
                     muleContext.getRegistry().registerObject(moduleClass.getName(), temporaryObject);
                 }
                 else
@@ -113,7 +112,7 @@ public abstract class AbstractDevkitBasedMessageProcessor<O> extends AbstractCon
         }
         if (temporaryObject instanceof String)
         {
-            temporaryObject = ((O) muleContext.getExpressionManager().evaluate(((String) temporaryObject),
+            temporaryObject = (muleContext.getExpressionManager().evaluate(((String) temporaryObject),
                 muleEvent, true));
             if (temporaryObject == null)
             {
@@ -121,7 +120,7 @@ public abstract class AbstractDevkitBasedMessageProcessor<O> extends AbstractCon
                     MessageFactory.createStaticMessage("Cannot find object by config name"));
             }
         }
-        return ((O) temporaryObject);
+        return temporaryObject;
     }
 
     /**

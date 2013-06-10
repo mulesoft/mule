@@ -10,7 +10,6 @@
 
 package org.mule.security.oauth.processor;
 
-import org.mule.api.DefaultMuleException;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -38,7 +37,7 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 public abstract class BaseAuthorizeMessageProcessor<T extends OAuthManager<OAuthAdapter>> extends
-    AbstractDevkitBasedMessageProcessor<T>
+    AbstractDevkitBasedMessageProcessor
     implements FlowConstructAware, MuleContextAware, Initialisable, Startable, Stoppable,
     InterceptingMessageProcessor
 {
@@ -54,34 +53,22 @@ public abstract class BaseAuthorizeMessageProcessor<T extends OAuthManager<OAuth
     protected abstract Class<T> getOAuthManagerClass();
 
     @Override
+    @SuppressWarnings("unchecked")
     public final void start() throws MuleException
     {
-        T moduleObject = null;
-        try
-        {
-            moduleObject = this.findOrCreate(this.getOAuthManagerClass(), false, null);
-        }
-        catch (IllegalAccessException e)
-        {
-            throw new DefaultMuleException(CoreMessages.failedToStart("authorize"), e);
-        }
-        catch (InstantiationException e)
-        {
-            throw new DefaultMuleException(CoreMessages.failedToStart("authorize"), e);
-        }
-
-        this.setModuleObject(moduleObject);
+        OAuthManager<OAuthAdapter> module = this.getOAuthManager();
 
         if (oauthCallback == null)
         {
+
             FetchAccessTokenMessageProcessor fetchAccessTokenMessageProcessor = new FetchAccessTokenMessageProcessor(
-                moduleObject);
+                (OAuthManager<OAuthAdapter>) moduleObject);
+
             oauthCallback = new DefaultHttpCallback(Arrays.asList(
                 new ExtractAuthorizationCodeMessageProcessor(Pattern.compile(this.getAuthCodeRegex())),
-                fetchAccessTokenMessageProcessor, listener), getMuleContext(), moduleObject.getDomain(),
-                moduleObject.getLocalPort(), moduleObject.getRemotePort(), moduleObject.getPath(),
-                moduleObject.getAsync(), getFlowConstruct().getExceptionListener(),
-                moduleObject.getConnector());
+                fetchAccessTokenMessageProcessor, listener), getMuleContext(), module.getDomain(),
+                module.getLocalPort(), module.getRemotePort(), module.getPath(), module.getAsync(),
+                getFlowConstruct().getExceptionListener(), module.getConnector());
             fetchAccessTokenMessageProcessor.setRedirectUri(oauthCallback.getUrl());
             if (accessTokenUrl != null)
             {
@@ -89,7 +76,7 @@ public abstract class BaseAuthorizeMessageProcessor<T extends OAuthManager<OAuth
             }
             else
             {
-                fetchAccessTokenMessageProcessor.setAccessTokenUrl(moduleObject.getAccessTokenUrl());
+                fetchAccessTokenMessageProcessor.setAccessTokenUrl(module.getAccessTokenUrl());
             }
             oauthCallback.start();
         }
@@ -104,11 +91,20 @@ public abstract class BaseAuthorizeMessageProcessor<T extends OAuthManager<OAuth
         }
     }
 
-    private T getOAuthManager()
+    @SuppressWarnings("unchecked")
+    private OAuthManager<OAuthAdapter> getOAuthManager()
     {
         try
         {
-            return this.findOrCreate(this.getOAuthManagerClass(), false, null);
+            Object maybeAManager = this.findOrCreate(this.getOAuthManagerClass(), false, null);
+            if (!(maybeAManager instanceof OAuthManager))
+            {
+                throw new IllegalStateException(String.format(
+                    "Object of class %s does not implement OAuthManager", this.getOAuthManagerClass()
+                        .getCanonicalName()));
+            }
+
+            return (OAuthManager<OAuthAdapter>) maybeAManager;
         }
         catch (Exception e)
         {
@@ -116,7 +112,7 @@ public abstract class BaseAuthorizeMessageProcessor<T extends OAuthManager<OAuth
         }
     }
 
-    private Map<String, String> getExtraParameters(MuleEvent event, T moduleObject)
+    private Map<String, String> getExtraParameters(MuleEvent event, OAuthManager<OAuthAdapter> moduleObject)
         throws MessagingException, TransformerException
     {
         Set<AuthorizationParameter<?>> params = moduleObject.getDefaultUnauthorizedConnector()
@@ -173,10 +169,9 @@ public abstract class BaseAuthorizeMessageProcessor<T extends OAuthManager<OAuth
      */
     public MuleEvent process(MuleEvent event) throws MuleException
     {
-        T moduleObject = null;
         try
         {
-            moduleObject = this.getOAuthManager();
+            OAuthManager<OAuthAdapter> moduleObject = this.getOAuthManager();
 
             String transformedAuthorizationUrl = this.toString(event, this.authorizationUrl);
             String transformedAccessTokenUrl = this.toString(event, this.accessTokenUrl);
