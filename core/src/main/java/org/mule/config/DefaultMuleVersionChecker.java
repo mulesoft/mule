@@ -6,8 +6,8 @@ import org.mule.api.config.MuleVersionChecker;
 import org.mule.config.i18n.CoreMessages;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /*
  * $Id$
@@ -26,7 +26,7 @@ import org.apache.commons.logging.LogFactory;
 public class DefaultMuleVersionChecker implements MuleVersionChecker
 {
 
-    protected transient static final Log logger = LogFactory.getLog(DefaultMuleVersionChecker.class);
+    protected transient static final Logger logger = LoggerFactory.getLogger(DefaultMuleVersionChecker.class);
 
     /**
      * {@inheritDoc}
