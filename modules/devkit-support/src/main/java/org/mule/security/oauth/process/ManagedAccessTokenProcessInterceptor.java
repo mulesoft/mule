@@ -18,7 +18,7 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.filter.Filter;
 import org.mule.common.connection.exception.UnableToAcquireConnectionException;
 import org.mule.common.connection.exception.UnableToReleaseConnectionException;
-import org.mule.security.oauth.OAuthAdapter;
+import org.mule.security.oauth.OAuth2Adapter;
 import org.mule.security.oauth.OAuth2Manager;
 import org.mule.security.oauth.callback.ProcessCallback;
 import org.mule.security.oauth.processor.AbstractConnectedProcessor;
@@ -28,16 +28,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class ManagedAccessTokenProcessInterceptor<T> extends AbstractExpressionEvaluator
-    implements ProcessInterceptor<T, OAuthAdapter>
+    implements ProcessInterceptor<T, OAuth2Adapter>
 {
 
     private static Logger logger = LoggerFactory.getLogger(ManagedAccessTokenProcessInterceptor.class);
-    private final OAuth2Manager<OAuthAdapter> oauthManager;
+    private final OAuth2Manager<OAuth2Adapter> oauthManager;
     private final MuleContext muleContext;
-    private final ProcessInterceptor<T, OAuthAdapter> next;
+    private final ProcessInterceptor<T, OAuth2Adapter> next;
 
-    public ManagedAccessTokenProcessInterceptor(ProcessInterceptor<T, OAuthAdapter> next,
-                                                OAuth2Manager<OAuthAdapter> oauthManager,
+    public ManagedAccessTokenProcessInterceptor(ProcessInterceptor<T, OAuth2Adapter> next,
+                                                OAuth2Manager<OAuth2Adapter> oauthManager,
                                                 MuleContext muleContext)
     {
         this.next = next;
@@ -45,10 +45,10 @@ public class ManagedAccessTokenProcessInterceptor<T> extends AbstractExpressionE
         this.muleContext = muleContext;
     }
 
-    public T execute(ProcessCallback<T, OAuthAdapter> processCallback, OAuthAdapter object, MessageProcessor messageProcessor, MuleEvent event)
+    public T execute(ProcessCallback<T, OAuth2Adapter> processCallback, OAuth2Adapter object, MessageProcessor messageProcessor, MuleEvent event)
     throws Exception
 {
-    OAuthAdapter connector = null;
+    OAuth2Adapter connector = null;
     if (!processCallback.isProtected()) {
         return processCallback.process(oauthManager.getDefaultUnauthorizedConnector());
     }
@@ -100,8 +100,8 @@ public class ManagedAccessTokenProcessInterceptor<T> extends AbstractExpressionE
     }
 }
 
-    public T execute(ProcessCallback<T, OAuthAdapter> processCallback,
-                     OAuthAdapter object,
+    public T execute(ProcessCallback<T, OAuth2Adapter> processCallback,
+                     OAuth2Adapter object,
                      Filter filter,
                      MuleMessage message) throws Exception
     {

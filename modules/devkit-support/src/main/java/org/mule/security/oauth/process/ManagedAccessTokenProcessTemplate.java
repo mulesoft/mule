@@ -17,36 +17,37 @@ import org.mule.api.ProcessInterceptor;
 import org.mule.api.ProcessTemplate;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.filter.Filter;
-import org.mule.security.oauth.OAuthAdapter;
+import org.mule.security.oauth.OAuth2Adapter;
 import org.mule.security.oauth.OAuth2Manager;
+import org.mule.security.oauth.OAuth2Adapter;
 import org.mule.security.oauth.callback.ProcessCallback;
 
-public class ManagedAccessTokenProcessTemplate<P> implements ProcessTemplate<P, OAuthAdapter>
+public class ManagedAccessTokenProcessTemplate<P> implements ProcessTemplate<P, OAuth2Adapter>
 {
 
-    private final ProcessInterceptor<P, OAuthAdapter> processInterceptor;
+    private final ProcessInterceptor<P, OAuth2Adapter> processInterceptor;
 
-    public ManagedAccessTokenProcessTemplate(OAuth2Manager<OAuthAdapter> oauthManager, MuleContext muleContext)
+    public ManagedAccessTokenProcessTemplate(OAuth2Manager<OAuth2Adapter> oauthManager, MuleContext muleContext)
     {
-        ProcessInterceptor<P, OAuthAdapter> processCallbackProcessInterceptor = new ProcessCallbackProcessInterceptor<P, OAuthAdapter>();
+        ProcessInterceptor<P, OAuth2Adapter> processCallbackProcessInterceptor = new ProcessCallbackProcessInterceptor<P, OAuth2Adapter>();
 
         @SuppressWarnings("unchecked")
-        ProcessInterceptor<P, OAuthAdapter> refreshTokenProcessInterceptor = (ProcessInterceptor<P, OAuthAdapter>) new RefreshTokenProcessInterceptor(
+        ProcessInterceptor<P, OAuth2Adapter> refreshTokenProcessInterceptor = (ProcessInterceptor<P, OAuth2Adapter>) new RefreshTokenProcessInterceptor(
             processCallbackProcessInterceptor);
 
-        ProcessInterceptor<P, OAuthAdapter> managedAccessTokenProcessInterceptor = new ManagedAccessTokenProcessInterceptor<P>(
+        ProcessInterceptor<P, OAuth2Adapter> managedAccessTokenProcessInterceptor = new ManagedAccessTokenProcessInterceptor<P>(
             refreshTokenProcessInterceptor, oauthManager, muleContext);
         processInterceptor = managedAccessTokenProcessInterceptor;
     }
 
-    public P execute(ProcessCallback<P, OAuthAdapter> processCallback,
+    public P execute(ProcessCallback<P, OAuth2Adapter> processCallback,
                      MessageProcessor messageProcessor,
                      MuleEvent event) throws Exception
     {
         return processInterceptor.execute(processCallback, null, messageProcessor, event);
     }
 
-    public P execute(ProcessCallback<P, OAuthAdapter> processCallback, Filter filter, MuleMessage message)
+    public P execute(ProcessCallback<P, OAuth2Adapter> processCallback, Filter filter, MuleMessage message)
         throws Exception
     {
         return processInterceptor.execute(processCallback, null, filter, message);
