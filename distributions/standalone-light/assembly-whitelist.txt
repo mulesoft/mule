@@ -288,6 +288,7 @@
 /mule-standalone-nodocs-${productVersion}/lib/opt/servlet-api-2.5-20081211.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/smack-3.1.0.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/smackx-3.1.0.jar
+/mule-standalone-nodocs-${productVersion}/lib/opt/signpost-core-1.2.1.2.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/spring-aop-3.2.1.RELEASE.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/spring-beans-3.2.1.RELEASE.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/spring-context-3.2.1.RELEASE.jar

@@ -3,10 +3,16 @@ package org.mule.security.oauth.processor;
 
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
+import org.mule.api.MuleException;
 import org.mule.api.config.ConfigurationException;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.construct.FlowConstructAware;
 import org.mule.api.context.MuleContextAware;
+import org.mule.api.lifecycle.Disposable;
+import org.mule.api.lifecycle.Initialisable;
+import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.lifecycle.Startable;
+import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.registry.RegistrationException;
 import org.mule.api.transformer.Transformer;
 import org.mule.config.i18n.MessageFactory;
@@ -17,7 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class AbstractDevkitBasedMessageProcessor extends AbstractConnectedProcessor
-    implements FlowConstructAware, MuleContextAware
+    implements FlowConstructAware, MuleContextAware, Startable, Disposable, Stoppable, Initialisable
 {
 
     /**
@@ -39,7 +45,8 @@ public abstract class AbstractDevkitBasedMessageProcessor extends AbstractConnec
      * 
      * @param value Value to set
      */
-    public void setMuleContext(MuleContext value)
+    @Override
+    public final void setMuleContext(MuleContext value)
     {
         this.muleContext = value;
     }
@@ -47,7 +54,7 @@ public abstract class AbstractDevkitBasedMessageProcessor extends AbstractConnec
     /**
      * Retrieves muleContext
      */
-    public MuleContext getMuleContext()
+    public final MuleContext getMuleContext()
     {
         return this.muleContext;
     }
@@ -57,7 +64,8 @@ public abstract class AbstractDevkitBasedMessageProcessor extends AbstractConnec
      * 
      * @param value Value to set
      */
-    public void setFlowConstruct(FlowConstruct value)
+    @Override
+    public final void setFlowConstruct(FlowConstruct value)
     {
         this.flowConstruct = value;
     }
@@ -65,7 +73,7 @@ public abstract class AbstractDevkitBasedMessageProcessor extends AbstractConnec
     /**
      * Retrieves flowConstruct
      */
-    public FlowConstruct getFlowConstruct()
+    public final FlowConstruct getFlowConstruct()
     {
         return this.flowConstruct;
     }
@@ -75,7 +83,7 @@ public abstract class AbstractDevkitBasedMessageProcessor extends AbstractConnec
      * 
      * @param value Value to set
      */
-    public void setModuleObject(Object value)
+    public final void setModuleObject(Object value)
     {
         this.moduleObject = value;
     }
@@ -90,7 +98,7 @@ public abstract class AbstractDevkitBasedMessageProcessor extends AbstractConnec
      * @throws IllegalAccessException
      * @throws RegistrationException
      */
-    protected Object findOrCreate(Class<?> moduleClass, boolean shouldAutoCreate, MuleEvent muleEvent)
+    protected final Object findOrCreate(Class<?> moduleClass, boolean shouldAutoCreate, MuleEvent muleEvent)
         throws IllegalAccessException, InstantiationException, ConfigurationException, RegistrationException
     {
         Object temporaryObject = moduleObject;
@@ -126,7 +134,7 @@ public abstract class AbstractDevkitBasedMessageProcessor extends AbstractConnec
     /**
      * Overwrites the event payload with the specified one
      */
-    public void overwritePayload(MuleEvent event, Object resultPayload) throws Exception
+    public final void overwritePayload(MuleEvent event, Object resultPayload) throws Exception
     {
         TransformerTemplate.OverwitePayloadCallback overwritePayloadCallback = null;
         if (resultPayload == null)
@@ -142,6 +150,33 @@ public abstract class AbstractDevkitBasedMessageProcessor extends AbstractConnec
         transformerList = new ArrayList<Transformer>();
         transformerList.add(new TransformerTemplate(overwritePayloadCallback));
         event.getMessage().applyTransformers(event, transformerList);
+    }
+
+    /**
+     * Obtains the expression manager from the Mule context and initialises the
+     * connector. If a target object has not been set already it will search the Mule
+     * registry for a default one.
+     * 
+     * @throws InitialisationException
+     */
+    @Override
+    public final void initialise() throws InitialisationException
+    {
+    }
+
+    @Override
+    public void start() throws MuleException
+    {
+    }
+
+    @Override
+    public void stop() throws MuleException
+    {
+    }
+
+    @Override
+    public final void dispose()
+    {
     }
 
 }

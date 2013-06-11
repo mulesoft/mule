@@ -3,14 +3,12 @@ package org.mule.security.oauth;
 
 import org.mule.common.security.oauth.OAuthConnector;
 import org.mule.common.security.oauth.exception.NotAuthorizedException;
-import org.mule.common.security.oauth.exception.UnableToAcquireAccessTokenException;
 import org.mule.security.oauth.callback.RestoreAccessTokenCallback;
 import org.mule.security.oauth.callback.SaveAccessTokenCallback;
 
-import java.util.Date;
-import java.util.regex.Pattern;
+import java.io.Serializable;
 
-public interface OAuthAdapter extends OAuthConnector
+public interface OAuthAdapter extends OAuthConnector, Serializable
 {
 
     /**
@@ -27,26 +25,7 @@ public interface OAuthAdapter extends OAuthConnector
      */
     public void setOauthVerifier(String value);
 
-    /**
-     * Retrieve access token
-     */
-    public String getAccessToken();
-
-    /**
-     * Retrieve refresh token
-     */
-    public String getRefreshToken();
-
-    /**
-     * Set refresh token
-     */
-    public void setRefreshToken(String refreshToken);
-
     public void setAccessTokenUrl(String url);
-
-    public void setConsumerKey(String consumerKey);
-
-    public void setConsumerSecret(String consumerSecret);
 
     public void setAccessToken(String accessToken);
 
@@ -81,35 +60,5 @@ public interface OAuthAdapter extends OAuthConnector
     public RestoreAccessTokenCallback getOauthRestoreAccessToken();
 
     public void hasBeenAuthorized() throws NotAuthorizedException;
-
-    /**
-     * Acquire access token and secret
-     * 
-     * @throws UnableToAcquireAccessTokenException
-     */
-    public void fetchAccessToken(String accessTokenUrl) throws UnableToAcquireAccessTokenException;
-
-    /**
-     * Returns a compiled {@link java.util.regex.Pattern} which can be used to
-     * extract the access code from a String
-     */
-    public Pattern getAccessCodePattern();
-
-    /**
-     * Returns a compiled {@link java.util.regex.Pattern} which can be used to
-     * extract the refresh token from a String
-     */
-    public Pattern getRefreshTokenPattern();
-
-    /**
-     * Returns a compiled {@link java.util.regex.Pattern} which can be used to
-     * extract the expiration time from a String
-     */
-    public Pattern getExpirationTimePattern();
-
-    /**
-     * Sets expiration
-     */
-    public void setExpiration(Date value);
 
 }

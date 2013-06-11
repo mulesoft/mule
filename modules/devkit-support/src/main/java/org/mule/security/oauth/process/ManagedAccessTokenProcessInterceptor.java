@@ -19,7 +19,7 @@ import org.mule.api.routing.filter.Filter;
 import org.mule.common.connection.exception.UnableToAcquireConnectionException;
 import org.mule.common.connection.exception.UnableToReleaseConnectionException;
 import org.mule.security.oauth.OAuthAdapter;
-import org.mule.security.oauth.OAuthManager;
+import org.mule.security.oauth.OAuth2Manager;
 import org.mule.security.oauth.callback.ProcessCallback;
 import org.mule.security.oauth.processor.AbstractConnectedProcessor;
 import org.mule.security.oauth.processor.AbstractExpressionEvaluator;
@@ -32,12 +32,12 @@ public class ManagedAccessTokenProcessInterceptor<T> extends AbstractExpressionE
 {
 
     private static Logger logger = LoggerFactory.getLogger(ManagedAccessTokenProcessInterceptor.class);
-    private final OAuthManager<OAuthAdapter> oauthManager;
+    private final OAuth2Manager<OAuthAdapter> oauthManager;
     private final MuleContext muleContext;
     private final ProcessInterceptor<T, OAuthAdapter> next;
 
     public ManagedAccessTokenProcessInterceptor(ProcessInterceptor<T, OAuthAdapter> next,
-                                                OAuthManager<OAuthAdapter> oauthManager,
+                                                OAuth2Manager<OAuthAdapter> oauthManager,
                                                 MuleContext muleContext)
     {
         this.next = next;

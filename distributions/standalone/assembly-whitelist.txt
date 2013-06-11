@@ -624,6 +624,7 @@
 /mule-standalone-${productVersion}/lib/opt/saxon-dom-8.9.0.4-osgi.jar
 /mule-standalone-${productVersion}/lib/opt/saxon-xqj-8.9.0.4.jar
 /mule-standalone-${productVersion}/lib/opt/servlet-api-2.5-20081211.jar
+/mule-standalone-${productVersion}/lib/opt/signpost-core-1.2.1.2.jar
 /mule-standalone-${productVersion}/lib/opt/smack-3.1.0.jar
 /mule-standalone-${productVersion}/lib/opt/smackx-3.1.0.jar
 /mule-standalone-${productVersion}/lib/opt/spring-aop-3.2.1.RELEASE.jar

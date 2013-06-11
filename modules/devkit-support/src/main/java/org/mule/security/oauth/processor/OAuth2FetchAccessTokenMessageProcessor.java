@@ -15,17 +15,17 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.config.i18n.MessageFactory;
-import org.mule.security.oauth.OAuthAdapter;
-import org.mule.security.oauth.OAuthManager;
+import org.mule.security.oauth.OAuth2Adapter;
+import org.mule.security.oauth.OAuth2Manager;
 
-public class FetchAccessTokenMessageProcessor implements MessageProcessor
+public class OAuth2FetchAccessTokenMessageProcessor implements MessageProcessor
 {
 
     public String redirectUri;
     private String accessTokenUrl = null;
-    private OAuthManager<OAuthAdapter> oauthManager;
+    private OAuth2Manager<OAuth2Adapter> oauthManager;
 
-    public FetchAccessTokenMessageProcessor(OAuthManager<OAuthAdapter> oauthManager)
+    public OAuth2FetchAccessTokenMessageProcessor(OAuth2Manager<OAuth2Adapter> oauthManager)
     {
         this.oauthManager = oauthManager;
     }
@@ -62,7 +62,7 @@ public class FetchAccessTokenMessageProcessor implements MessageProcessor
     {
         try
         {
-            OAuthAdapter oauthAdapter = this.oauthManager.createAccessToken(((String) event.getMessage()
+            OAuth2Adapter oauthAdapter = this.oauthManager.createAccessToken(((String) event.getMessage()
                 .getInvocationProperty("_oauthVerifier")));
             if (oauthAdapter.getAccessTokenUrl() == null)
             {

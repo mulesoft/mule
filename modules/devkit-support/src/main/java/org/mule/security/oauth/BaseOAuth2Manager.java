@@ -49,14 +49,14 @@ import org.apache.commons.pool.impl.GenericKeyedObjectPool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class BaseOAuthManager<C extends OAuthAdapter> extends DefaultHttpCallbackAdapter
+public abstract class BaseOAuth2Manager<C extends OAuth2Adapter> extends DefaultHttpCallbackAdapter
     implements MuleContextAware, Initialisable, Capabilities, Startable, Stoppable, MetadataAware,
-    Disposable, OAuthManager<OAuthAdapter>, ProcessAdapter<OAuthAdapter>
+    Disposable, OAuth2Manager<OAuth2Adapter>, ProcessAdapter<OAuth2Adapter>
 {
 
-    private static transient Logger logger = LoggerFactory.getLogger(BaseOAuthManager.class);
+    private static transient Logger logger = LoggerFactory.getLogger(BaseOAuth2Manager.class);
 
-    private OAuthAdapter defaultUnauthorizedConnector;
+    private OAuth2Adapter defaultUnauthorizedConnector;
     private String consumerKey;
     private String consumerSecret;
     private String applicationName;
@@ -89,12 +89,12 @@ public abstract class BaseOAuthManager<C extends OAuthAdapter> extends DefaultHt
     private OAuthResponseParser oauthResponseParser;
 
     /**
-     * Creates a concrete instance of the OAuthAdapter that corresponds with this
+     * Creates a concrete instance of the OAuth2Adapter that corresponds with this
      * OAuthManager
      * 
-     * @return an instance of {@link org.mule.security.oauth.OAuthAdapter}
+     * @return an instance of {@link org.mule.security.oauth.OAuth2Adapter}
      */
-    protected abstract OAuthAdapter instantiateAdapter();
+    protected abstract OAuth2Adapter instantiateAdapter();
 
     /**
      * Returns the concrete instance of
@@ -108,16 +108,16 @@ public abstract class BaseOAuthManager<C extends OAuthAdapter> extends DefaultHt
      * @return an instance of
      *         {@link org.apache.commons.pool.KeyedPoolableObjectFactory}
      */
-    protected abstract KeyedPoolableObjectFactory createPoolFactory(OAuthManager<OAuthAdapter> oauthManager,
+    protected abstract KeyedPoolableObjectFactory createPoolFactory(OAuth2Manager<OAuth2Adapter> oauthManager,
                                                                     ObjectStore<OAuthState> objectStore);
 
     /**
      * Populates the adapter with custom properties not accessible from the base
      * interface.
      * 
-     * @param adapter an instance of {@link org.mule.security.oauth.OAuthAdapter}
+     * @param adapter an instance of {@link org.mule.security.oauth.OAuth2Adapter}
      */
-    protected abstract void setCustomProperties(OAuthAdapter adapter);
+    protected abstract void setCustomProperties(OAuth2Adapter adapter);
 
     /**
      * Extracts any custom parameters from the OAuth response and sets them
@@ -126,7 +126,7 @@ public abstract class BaseOAuthManager<C extends OAuthAdapter> extends DefaultHt
      * @param adapter the adapter on which the custom parameters will be set on
      * @param response the response obatined from the OAuth provider
      */
-    protected abstract void fetchCallbackParameters(OAuthAdapter adapter, String response);
+    protected abstract void fetchCallbackParameters(OAuth2Adapter adapter, String response);
 
     @Override
     public final void initialise() throws InitialisationException
@@ -191,9 +191,9 @@ public abstract class BaseOAuthManager<C extends OAuthAdapter> extends DefaultHt
         }
     }
 
-    public final OAuthAdapter createAccessToken(String verifier) throws Exception
+    public final OAuth2Adapter createAccessToken(String verifier) throws Exception
     {
-        OAuthAdapter connector = this.instantiateAdapter();
+        OAuth2Adapter connector = this.instantiateAdapter();
         connector.setOauthVerifier(verifier);
         connector.setAuthorizationUrl(getAuthorizationUrl());
         connector.setAccessTokenUrl(getAccessTokenUrl());
@@ -217,7 +217,7 @@ public abstract class BaseOAuthManager<C extends OAuthAdapter> extends DefaultHt
         return connector;
     }
 
-    public final OAuthAdapter acquireAccessToken(String userId) throws Exception
+    public final OAuth2Adapter acquireAccessToken(String userId) throws Exception
     {
         if (logger.isDebugEnabled())
         {
@@ -231,7 +231,7 @@ public abstract class BaseOAuthManager<C extends OAuthAdapter> extends DefaultHt
             messageStringBuilder.append("]");
             logger.debug(messageStringBuilder.toString());
         }
-        OAuthAdapter object = ((OAuthAdapter) accessTokenPool.borrowObject(userId));
+        OAuth2Adapter object = ((OAuth2Adapter) accessTokenPool.borrowObject(userId));
         if (logger.isDebugEnabled())
         {
             StringBuilder messageStringBuilder = new StringBuilder();
@@ -247,7 +247,7 @@ public abstract class BaseOAuthManager<C extends OAuthAdapter> extends DefaultHt
         return object;
     }
 
-    public final void releaseAccessToken(String userId, OAuthAdapter connector) throws Exception
+    public final void releaseAccessToken(String userId, OAuth2Adapter connector) throws Exception
     {
         if (logger.isDebugEnabled())
         {
@@ -276,7 +276,7 @@ public abstract class BaseOAuthManager<C extends OAuthAdapter> extends DefaultHt
         }
     }
 
-    public final void destroyAccessToken(String userId, OAuthAdapter connector) throws Exception
+    public final void destroyAccessToken(String userId, OAuth2Adapter connector) throws Exception
     {
         if (logger.isDebugEnabled())
         {
@@ -348,7 +348,7 @@ public abstract class BaseOAuthManager<C extends OAuthAdapter> extends DefaultHt
      * {@inheritDoc}
      */
     @Override
-    public boolean restoreAccessToken(OAuthAdapter adapter)
+    public boolean restoreAccessToken(OAuth2Adapter adapter)
     {
         RestoreAccessTokenCallback callback = adapter.getOauthRestoreAccessToken();
         if (callback != null)
@@ -384,7 +384,7 @@ public abstract class BaseOAuthManager<C extends OAuthAdapter> extends DefaultHt
      * {@inheritDoc}
      */
     @Override
-    public final void fetchAccessToken(OAuthAdapter adapter, String redirectUri)
+    public final void fetchAccessToken(OAuth2Adapter adapter, String redirectUri)
         throws UnableToAcquireAccessTokenException
     {
         StringBuilder builder = new StringBuilder();
@@ -412,7 +412,7 @@ public abstract class BaseOAuthManager<C extends OAuthAdapter> extends DefaultHt
      * {@inheritDoc}
      */
     @Override
-    public final void refreshAccessToken(OAuthAdapter adapter) throws UnableToAcquireAccessTokenException
+    public final void refreshAccessToken(OAuth2Adapter adapter) throws UnableToAcquireAccessTokenException
     {
         if (logger.isDebugEnabled())
         {
@@ -436,7 +436,7 @@ public abstract class BaseOAuthManager<C extends OAuthAdapter> extends DefaultHt
         this.fetchAndExtract(adapter, builder.toString());
     }
 
-    private void fetchAndExtract(OAuthAdapter adapter, String requestBody)
+    private void fetchAndExtract(OAuth2Adapter adapter, String requestBody)
         throws UnableToAcquireAccessTokenException
     {
         this.restoreAccessToken(adapter);
@@ -530,7 +530,7 @@ public abstract class BaseOAuthManager<C extends OAuthAdapter> extends DefaultHt
         adapter.postAuth();
     }
 
-    private void saveAccessToken(OAuthAdapter adapter)
+    private void saveAccessToken(OAuth2Adapter adapter)
     {
         SaveAccessTokenCallback saveCallback = adapter.getOauthSaveAccessToken();
 
@@ -574,16 +574,16 @@ public abstract class BaseOAuthManager<C extends OAuthAdapter> extends DefaultHt
 
     @Override
     @SuppressWarnings("unchecked")
-    public <T> ProcessTemplate<T, OAuthAdapter> getProcessTemplate()
+    public <T> ProcessTemplate<T, OAuth2Adapter> getProcessTemplate()
     {
-        return (ProcessTemplate<T, OAuthAdapter>) new OAuthProcessTemplate(this);
+        return (ProcessTemplate<T, OAuth2Adapter>) new OAuthProcessTemplate(this);
     }
 
     /**
      * Retrieves defaultUnauthorizedConnector
      */
     @Override
-    public OAuthAdapter getDefaultUnauthorizedConnector()
+    public OAuth2Adapter getDefaultUnauthorizedConnector()
     {
         return this.defaultUnauthorizedConnector;
     }

@@ -18,7 +18,7 @@ import org.mule.api.ProcessTemplate;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.filter.Filter;
 import org.mule.security.oauth.OAuthAdapter;
-import org.mule.security.oauth.OAuthManager;
+import org.mule.security.oauth.OAuth2Manager;
 import org.mule.security.oauth.callback.ProcessCallback;
 
 public class ManagedAccessTokenProcessTemplate<P> implements ProcessTemplate<P, OAuthAdapter>
@@ -26,7 +26,7 @@ public class ManagedAccessTokenProcessTemplate<P> implements ProcessTemplate<P, 
 
     private final ProcessInterceptor<P, OAuthAdapter> processInterceptor;
 
-    public ManagedAccessTokenProcessTemplate(OAuthManager<OAuthAdapter> oauthManager, MuleContext muleContext)
+    public ManagedAccessTokenProcessTemplate(OAuth2Manager<OAuthAdapter> oauthManager, MuleContext muleContext)
     {
         ProcessInterceptor<P, OAuthAdapter> processCallbackProcessInterceptor = new ProcessCallbackProcessInterceptor<P, OAuthAdapter>();
 

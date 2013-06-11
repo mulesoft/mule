@@ -27,7 +27,7 @@ import org.apache.commons.pool.KeyedPoolableObjectFactory;
  * 
  * @param <C> Actual connector object that represents a connection
  */
-public interface OAuthManager<C extends OAuthAdapter> extends HttpCallbackAdapter
+public interface OAuth2Manager<C extends OAuth2Adapter> extends HttpCallbackAdapter
 {
 
     /**
@@ -98,7 +98,7 @@ public interface OAuthManager<C extends OAuthAdapter> extends HttpCallbackAdapte
      * @return <code>true</code> if a token could be retrieved and set into the
      *         adapter. <code>false</code> otherwise
      */
-    public boolean restoreAccessToken(OAuthAdapter adapter);
+    public boolean restoreAccessToken(OAuth2Adapter adapter);
 
     /**
      * if refresh token is available, then it makes an http call to refresh the access token.
@@ -107,7 +107,7 @@ public interface OAuthManager<C extends OAuthAdapter> extends HttpCallbackAdapte
      * @param adapter the connector's adapter
      * @throws UnableToAcquireAccessTokenException
      */
-    public void refreshAccessToken(OAuthAdapter adapter) throws UnableToAcquireAccessTokenException;
+    public void refreshAccessToken(OAuth2Adapter adapter) throws UnableToAcquireAccessTokenException;
 
     /**
      * Makes an http call to the adapter's accessTokenUrl and extracts the access
@@ -117,7 +117,7 @@ public interface OAuthManager<C extends OAuthAdapter> extends HttpCallbackAdapte
      * @param redirectUri the redirection URI
      * @throws UnableToAcquireAccessTokenException
      */
-    public void fetchAccessToken(OAuthAdapter adapter, String redirectUri)
+    public void fetchAccessToken(OAuth2Adapter adapter, String redirectUri)
         throws UnableToAcquireAccessTokenException;
     
     /**

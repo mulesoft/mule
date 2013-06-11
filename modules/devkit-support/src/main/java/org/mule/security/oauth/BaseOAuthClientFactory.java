@@ -28,20 +28,20 @@ public abstract class BaseOAuthClientFactory implements KeyedPoolableObjectFacto
 
     private static transient Logger logger = LoggerFactory.getLogger(BaseOAuthClientFactory.class);
 
-    private OAuthManager<OAuthAdapter> oauthManager;
+    private OAuth2Manager<OAuth2Adapter> oauthManager;
     private ObjectStore<OAuthState> objectStore;
 
-    public BaseOAuthClientFactory(OAuthManager<OAuthAdapter> oauthManager, ObjectStore<OAuthState> objectStore)
+    public BaseOAuthClientFactory(OAuth2Manager<OAuth2Adapter> oauthManager, ObjectStore<OAuthState> objectStore)
     {
         this.oauthManager = oauthManager;
         this.objectStore = objectStore;
     }
 
-    protected abstract Class<? extends OAuthAdapter> getAdapterClass();
+    protected abstract Class<? extends OAuth2Adapter> getAdapterClass();
 
-    protected abstract void setCustomAdapterProperties(OAuthAdapter adapter, OAuthState state);
+    protected abstract void setCustomAdapterProperties(OAuth2Adapter adapter, OAuthState state);
 
-    protected abstract void setCustomStateProperties(OAuthAdapter adapter, OAuthState state);
+    protected abstract void setCustomStateProperties(OAuth2Adapter adapter, OAuthState state);
 
     @Override
     public final Object makeObject(Object key) throws Exception
@@ -60,8 +60,8 @@ public abstract class BaseOAuthClientFactory implements KeyedPoolableObjectFacto
 
         state = this.objectStore.retrieve((String) key);
 
-        OAuthAdapter connector = this.getAdapterClass()
-            .getConstructor(OAuthManager.class)
+        OAuth2Adapter connector = this.getAdapterClass()
+            .getConstructor(OAuth2Manager.class)
             .newInstance(this.oauthManager);
         
         connector.setConsumerKey(oauthManager.getConsumerKey());
@@ -127,7 +127,7 @@ public abstract class BaseOAuthClientFactory implements KeyedPoolableObjectFacto
             throw new IllegalArgumentException("Invalid connector type");
         }
 
-        OAuthAdapter connector = (OAuthAdapter) obj;
+        OAuth2Adapter connector = (OAuth2Adapter) obj;
 
         OAuthState state = null;
         try
@@ -185,7 +185,7 @@ public abstract class BaseOAuthClientFactory implements KeyedPoolableObjectFacto
             throw new IllegalArgumentException("Invalid connector type");
         }
 
-        OAuthAdapter connector = (OAuthAdapter) obj;
+        OAuth2Adapter connector = (OAuth2Adapter) obj;
 
         OAuthState state = null;
 

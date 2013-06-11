@@ -1,12 +1,15 @@
 
 package org.mule.security.oauth;
 
+import org.mule.common.security.oauth.OAuth2Connector;
 import org.mule.common.security.oauth.exception.UnableToAcquireAccessTokenException;
 import org.mule.common.security.oauth.exception.UnableToAcquireRequestTokenException;
 
+import java.util.Date;
 import java.util.Map;
+import java.util.regex.Pattern;
 
-public interface OAuth2Adapter extends OAuthAdapter
+public interface OAuth2Adapter extends OAuthAdapter, OAuth2Connector
 {
 
     /**
@@ -19,9 +22,57 @@ public interface OAuth2Adapter extends OAuthAdapter
     public String authorize(Map<String, String> extraParameters, String accessTokenUrl, String redirectUri)
         throws UnableToAcquireRequestTokenException;
 
+    /**
+     * Acquire access token and secret
+     * 
+     * @throws UnableToAcquireAccessTokenException
+     */
+    public void fetchAccessToken(String accessTokenUrl) throws UnableToAcquireAccessTokenException;
+
     public boolean hasTokenExpired();
 
     public void refreshAccessToken(String accessTokenUrl) throws UnableToAcquireAccessTokenException;
 
+    /**
+     * Retrieve access token
+     */
+    public String getAccessToken();
+
+    /**
+     * Returns a compiled {@link java.util.regex.Pattern} which can be used to
+     * extract the access code from a String
+     */
+    public Pattern getAccessCodePattern();
+
+    /**
+     * Retrieve refresh token
+     */
     public String getRefreshToken();
+
+    /**
+     * Set refresh token
+     */
+    public void setRefreshToken(String refreshToken);
+
+    /**
+     * Returns a compiled {@link java.util.regex.Pattern} which can be used to
+     * extract the refresh token from a String
+     */
+    public Pattern getRefreshTokenPattern();
+
+    /**
+     * Returns a compiled {@link java.util.regex.Pattern} which can be used to
+     * extract the expiration time from a String
+     */
+    public Pattern getExpirationTimePattern();
+
+    /**
+     * Sets expiration
+     */
+    public void setExpiration(Date value);
+
+    public void setConsumerKey(String consumerKey);
+
+    public void setConsumerSecret(String consumerSecret);
+
 }
