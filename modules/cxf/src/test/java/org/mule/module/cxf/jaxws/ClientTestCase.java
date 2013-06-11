@@ -10,12 +10,13 @@
 
 package org.mule.module.cxf.jaxws;
 
+import static org.junit.Assert.assertEquals;
+
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.probe.PollingProber;
-import org.mule.tck.probe.Probe;
 import org.mule.tck.probe.Prober;
 
 import java.util.HashMap;
@@ -25,11 +26,8 @@ import org.apache.hello_world_soap_http.GreeterImpl;
 import org.junit.Rule;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-
 public class ClientTestCase extends FunctionalTestCase
 {
-
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
@@ -53,7 +51,7 @@ public class ClientTestCase extends FunctionalTestCase
     @Test
     public void testClientWithMuleClient() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         Map<String, Object> props = new HashMap<String, Object>();
         props.put("operation", "greetMe");
         MuleMessage result = client.send("clientEndpoint", "Dan", props);
@@ -71,5 +69,4 @@ public class ClientTestCase extends FunctionalTestCase
 
         return (GreeterImpl) instance;
     }
-
 }

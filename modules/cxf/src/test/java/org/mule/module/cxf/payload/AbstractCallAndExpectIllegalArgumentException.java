@@ -10,15 +10,15 @@
 
 package org.mule.module.cxf.payload;
 
-import org.mule.api.MuleContext;
-import org.mule.api.MuleException;
-import org.mule.api.transport.DispatchException;
-import org.mule.module.client.MuleClient;
-import org.mule.module.cxf.CxfOutboundMessageProcessor;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+
+import org.mule.api.MuleContext;
+import org.mule.api.MuleException;
+import org.mule.api.client.MuleClient;
+import org.mule.api.transport.DispatchException;
+import org.mule.module.cxf.CxfOutboundMessageProcessor;
 
 /**
  * This is an abstract utility class that helps the testing of
@@ -42,9 +42,10 @@ abstract class AbstractCallAndExpectIllegalArgumentException implements CallAndE
         this.muleContext = muleContext;
     }
 
+    @Override
     public void callEndpointAndExecuteAsserts() throws MuleException
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         try
         {
             client.send(outputEndpointName, payload, null);

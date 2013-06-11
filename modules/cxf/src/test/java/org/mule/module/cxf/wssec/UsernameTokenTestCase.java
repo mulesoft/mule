@@ -30,7 +30,7 @@ public class UsernameTokenTestCase extends AbstractServiceAndFlowTestCase
 
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
-    
+
     public UsernameTokenTestCase(ConfigVariant variant, String configResources)
     {
         super(variant, configResources);
@@ -43,14 +43,14 @@ public class UsernameTokenTestCase extends AbstractServiceAndFlowTestCase
             {ConfigVariant.SERVICE, "org/mule/module/cxf/wssec/cxf-secure-service-service.xml, org/mule/module/cxf/wssec/username-token-conf.xml"},
             {ConfigVariant.FLOW, "org/mule/module/cxf/wssec/cxf-secure-service-flow.xml, org/mule/module/cxf/wssec/username-token-conf.xml"}
         });
-    }      
-        
+    }
+
     @Override
     protected void doSetUp() throws Exception
     {
-        ClientPasswordCallback.setPassword("secret");        
+        ClientPasswordCallback.setPassword("secret");
         super.doSetUp();
-        
+
         greetLatch = getGreeter().getLatch();
     }
 
@@ -65,7 +65,6 @@ public class UsernameTokenTestCase extends AbstractServiceAndFlowTestCase
         Object instance = getComponent("greeterService");
         return (GreeterWithLatch) instance;
     }
-
 }
 
 

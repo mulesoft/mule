@@ -15,8 +15,8 @@ import static org.junit.Assert.assertNotNull;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
+import org.mule.api.client.MuleClient;
 import org.mule.api.transformer.TransformerException;
-import org.mule.module.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transformer.AbstractTransformer;
@@ -43,7 +43,7 @@ public class HolderTestCase extends FunctionalTestCase
     public void testClientEchoHolder() throws Exception
     {
         MuleMessage request = new DefaultMuleMessage("TEST", (Map<String,Object>)null, muleContext);
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage received = client.send("vm://echoClient", request);
         assertNotNull(received);
         Object[] payload = (Object[])received.getPayload();
@@ -56,7 +56,7 @@ public class HolderTestCase extends FunctionalTestCase
     public void testClientProxyEchoHolder() throws Exception
     {
         MuleMessage request = new DefaultMuleMessage("TEST", (Map<String,Object>)null, muleContext);
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage received = client.send("vm://echoClientProxy", request);
         assertNotNull(received);
         Object[] payload = (Object[])received.getPayload();
@@ -69,7 +69,7 @@ public class HolderTestCase extends FunctionalTestCase
     public void testClientProxyEcho2Holder() throws Exception
     {
         MuleMessage request = new DefaultMuleMessage("TEST", (Map<String,Object>)null, muleContext);
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage received = client.send("vm://echo2ClientProxy", request);
         assertNotNull(received);
         Object[] payload = (Object[])received.getPayload();
@@ -81,7 +81,7 @@ public class HolderTestCase extends FunctionalTestCase
     public void testClientProxyEcho3Holder() throws Exception
     {
         MuleMessage request = new DefaultMuleMessage("TEST", (Map<String,Object>)null, muleContext);
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage received = client.send("vm://echo3ClientProxy", request);
         assertNotNull(received);
         Object[] payload = (Object[])received.getPayload();
@@ -136,5 +136,4 @@ public class HolderTestCase extends FunctionalTestCase
             return objArray;
         }
     }
-
 }

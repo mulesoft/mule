@@ -14,7 +14,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.http.HttpConstants;
@@ -30,7 +30,6 @@ import org.junit.runners.Parameterized.Parameters;
 
 public class Http10TestCase extends AbstractServiceAndFlowTestCase
 {
-
     @ClassRule
     public static DynamicPort dynamicPort = new DynamicPort("port1");
 
@@ -52,7 +51,7 @@ public class Http10TestCase extends AbstractServiceAndFlowTestCase
     @Test
     public void testHttp10TransformerNotOnProtocol() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
 
         Map<String,Object> props = new HashMap<String, Object>();
         MuleMessage result = client.send("cxfOutbound", "Dan", props);
@@ -65,7 +64,7 @@ public class Http10TestCase extends AbstractServiceAndFlowTestCase
     @Test
     public void testHttp10TransformerOnProtocol() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
 
         Map<String, Object> props = new HashMap<String, Object>();
         MuleMessage result = client.send("cxfOutbound2", "Dan", props);

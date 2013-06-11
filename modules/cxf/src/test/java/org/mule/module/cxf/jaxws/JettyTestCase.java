@@ -13,7 +13,7 @@ package org.mule.module.cxf.jaxws;
 import static org.junit.Assert.assertEquals;
 
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.probe.PollingProber;
@@ -52,8 +52,8 @@ public class JettyTestCase extends AbstractServiceAndFlowTestCase
             {ConfigVariant.SERVICE, "jetty-conf-service.xml"},
             {ConfigVariant.FLOW, "jetty-conf-flow.xml"}
         });
-    }      
-    
+    }
+
     @BeforeClass
     public static void setUpDefaultBus()
     {
@@ -69,7 +69,7 @@ public class JettyTestCase extends AbstractServiceAndFlowTestCase
     @Test
     public void testClientWithMuleClient() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         Map<String, Object> props = new HashMap<String, Object>();
         props.put("operation", "greetMe");
         MuleMessage result = client.send("clientEndpoint", "Dan", props);
@@ -89,5 +89,4 @@ public class JettyTestCase extends AbstractServiceAndFlowTestCase
 
         return (GreeterImpl) instance;
     }
-
 }

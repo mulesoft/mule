@@ -16,12 +16,12 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 
 import org.mule.api.MuleMessage;
+import org.mule.api.client.MuleClient;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.context.notification.EndpointMessageNotificationListener;
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.context.notification.EndpointMessageNotification;
-import org.mule.module.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -64,8 +64,7 @@ public class CxfCustomHttpHeaderTestCase extends AbstractServiceAndFlowTestCase 
     {
         latch = new CountDownLatch(2);
         muleContext.registerListener(this);
-        MuleClient client = new MuleClient(muleContext);
-        endpointAddress = ((InboundEndpoint) client.getMuleContext().getRegistry()
+        endpointAddress = ((InboundEndpoint) muleContext.getRegistry()
                         .lookupObject("cxfInbound")).getAddress() + "?method=onReceive";
     }
 
@@ -86,7 +85,7 @@ public class CxfCustomHttpHeaderTestCase extends AbstractServiceAndFlowTestCase 
         props.put(MuleProperties.MULE_METHOD_PROPERTY, "onReceive");
         props.put(myProperty, myProperty);
 
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage reply = client.send("cxf:" + endpointAddress, payload, props);
 
         assertNotNull(reply);

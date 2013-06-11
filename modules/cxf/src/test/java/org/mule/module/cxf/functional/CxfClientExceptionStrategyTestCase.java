@@ -8,7 +8,6 @@
  * LICENSE.txt file.
  */
 
-
 package org.mule.module.cxf.functional;
 
 import static org.junit.Assert.assertNotNull;
@@ -19,9 +18,9 @@ import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
+import org.mule.api.client.MuleClient;
 import org.mule.api.transformer.TransformerException;
 import org.mule.message.ExceptionMessage;
-import org.mule.module.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transformer.AbstractTransformer;
@@ -46,10 +45,11 @@ public class CxfClientExceptionStrategyTestCase extends FunctionalTestCase
     public void testCxfClientExceptionStrategy() throws Exception
     {
         MuleMessage request = new DefaultMuleMessage("hello", (Map<String,Object>)null, muleContext);
-        MuleClient client = new MuleClient(muleContext);
+
+        MuleClient client = muleContext.getClient();
         client.dispatch("vm://helloClient", request);
 
-        MuleMessage out = client.request("vm://out", org.mule.tck.FunctionalTestCase.RECEIVE_TIMEOUT);
+        MuleMessage out = client.request("vm://out", FunctionalTestCase.RECEIVE_TIMEOUT);
 
         assertNotNull(out);
         assertTrue(out.getPayload() instanceof ExceptionMessage);
@@ -70,5 +70,4 @@ public class CxfClientExceptionStrategyTestCase extends FunctionalTestCase
             return src;
         }
     }
-
 }

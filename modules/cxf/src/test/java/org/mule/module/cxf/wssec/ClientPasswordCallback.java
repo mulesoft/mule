@@ -20,20 +20,21 @@ import org.apache.ws.security.WSPasswordCallback;
 
 /**
  * This callback simply supplies the password so that it's not stored in our config file.
- * You will need to call 
- *   ClientPasswordCallback.setPassword("password"); 
+ * You will need to call
+ *   ClientPasswordCallback.setPassword("password");
  * from your code before invoking the secure service.
  */
 public class ClientPasswordCallback implements CallbackHandler
 {
     private static String password;
-    
+
     public static void setPassword(String password)
     {
         ClientPasswordCallback.password = password;
     }
 
-    public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException 
+    @Override
+    public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException
     {
         WSPasswordCallback pc = (WSPasswordCallback) callbacks[0];
 

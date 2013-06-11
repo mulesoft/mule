@@ -14,7 +14,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -27,7 +27,6 @@ import org.junit.runners.Parameterized.Parameters;
 
 public class ClientSimpleFrontendTestCase extends AbstractServiceAndFlowTestCase
 {
-
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
@@ -43,18 +42,17 @@ public class ClientSimpleFrontendTestCase extends AbstractServiceAndFlowTestCase
             {ConfigVariant.SERVICE, "aegis-conf-service.xml"},
             {ConfigVariant.FLOW, "aegis-conf-flow.xml"}
         });
-    }      
-    
+    }
+
     @Test
     public void testEchoWsdl() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage result = client.send("vm://test", "some payload", null);
 
         assertNotNull(result.getPayload());
         assertEquals("Hello some payload", result.getPayload());
     }
-
 }
 
 

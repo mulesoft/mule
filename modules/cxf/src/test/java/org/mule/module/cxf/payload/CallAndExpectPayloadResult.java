@@ -10,12 +10,12 @@
 
 package org.mule.module.cxf.payload;
 
+import static org.junit.Assert.assertEquals;
+
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
-
-import static org.junit.Assert.assertEquals;
+import org.mule.api.client.MuleClient;
 
 class CallAndExpectPayloadResult implements CallAndExpect
 {
@@ -35,9 +35,10 @@ class CallAndExpectPayloadResult implements CallAndExpect
         this.muleContext = muleContext;
     }
 
+    @Override
     public void callEndpointAndExecuteAsserts() throws MuleException
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage result = client.send(outputEndpointName, payload, null);
 
         assertEquals(here(), expectedPayloadResult, result.getPayload());

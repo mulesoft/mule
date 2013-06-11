@@ -15,7 +15,7 @@ import static org.junit.Assert.assertNotNull;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -52,7 +52,7 @@ public class WebServiceWrapperWithCxfTestCase extends AbstractServiceAndFlowTest
     @Test
     public void testWsCall() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage result = client.send("vm://testin", new DefaultMuleMessage(testString, muleContext));
         assertNotNull(result.getPayload());
         assertEquals("Payload", testString, result.getPayloadAsString());
@@ -61,7 +61,7 @@ public class WebServiceWrapperWithCxfTestCase extends AbstractServiceAndFlowTest
     @Test
     public void testWsCallWithUrlFromMessage() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         Map<String, Object> props = new HashMap<String, Object>();
         props.put("ws.service.url", "http://localhost:" + dynamicPort.getNumber()
                                             + "/services/TestUMO?method=onReceive");

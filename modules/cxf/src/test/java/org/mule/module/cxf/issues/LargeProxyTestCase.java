@@ -10,8 +10,10 @@
 
 package org.mule.module.cxf.issues;
 
+import static org.junit.Assert.assertTrue;
+
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -21,8 +23,6 @@ import java.util.concurrent.TimeUnit;
 import org.junit.Rule;
 import org.junit.Test;
 
-import static org.junit.Assert.assertTrue;
-
 /**
  * Tests large requests sent to the proxy and back.
  *
@@ -30,7 +30,6 @@ import static org.junit.Assert.assertTrue;
  */
 public class LargeProxyTestCase extends FunctionalTestCase
 {
-
     @Rule
     public DynamicPort dynamicPort1 = new DynamicPort("port1");
 
@@ -47,7 +46,7 @@ public class LargeProxyTestCase extends FunctionalTestCase
     public void testLargeMessageWithEchoProxy() throws Exception
     {
         int length = 5000;
-        final MuleClient client = new MuleClient(muleContext);
+        final MuleClient client = muleContext.getClient();
 
         StringBuffer b = new StringBuffer();
         int counter = 1;
@@ -74,7 +73,7 @@ public class LargeProxyTestCase extends FunctionalTestCase
 
         Runnable runnable = new Runnable()
         {
-
+            @Override
             public void run()
             {
                 for (int i = 0; i < 20; i++)

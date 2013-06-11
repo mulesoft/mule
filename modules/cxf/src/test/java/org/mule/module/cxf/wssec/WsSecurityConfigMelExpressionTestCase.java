@@ -14,11 +14,11 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import org.mule.tck.junit4.FunctionalTestCase;
-import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
+import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.util.Map;
 
@@ -44,7 +44,7 @@ public class WsSecurityConfigMelExpressionTestCase extends FunctionalTestCase
     {
         ClientPasswordCallback.setPassword("secret");
         MuleMessage request = new DefaultMuleMessage("PasswordText", (Map<String,Object>)null, muleContext);
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage received = client.send("vm://greetMe", request);
 
         assertNotNull(received);
@@ -57,7 +57,7 @@ public class WsSecurityConfigMelExpressionTestCase extends FunctionalTestCase
     {
         ClientPasswordCallback.setPassword("secret");
         MuleMessage request = new DefaultMuleMessage("UnknownPasswordEncoding", (Map<String,Object>)null, muleContext);
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage received = client.send("vm://greetMe", request);
 
         assertNotNull(received);
@@ -65,5 +65,4 @@ public class WsSecurityConfigMelExpressionTestCase extends FunctionalTestCase
         assertTrue(received.getExceptionPayload().getException().getCause() instanceof SOAPFaultException);
         assertTrue(((SOAPFaultException) received.getExceptionPayload().getException().getCause()).getMessage().contains("Security processing failed"));
     }
-    
 }

@@ -13,6 +13,14 @@ package org.mule.module.cxf;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+import org.mule.DefaultMuleMessage;
+import org.mule.api.MuleMessage;
+import org.mule.api.client.MuleClient;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.transport.http.HttpConstants;
+import org.mule.util.StringUtils;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -23,17 +31,9 @@ import org.dom4j.Element;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-import org.mule.DefaultMuleMessage;
-import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
-import org.mule.tck.junit4.rule.DynamicPort;
-import org.mule.transport.http.HttpConstants;
-import org.mule.util.StringUtils;
 
 public class CxfBadSoapRequestTestCase extends AbstractServiceAndFlowTestCase
 {
-
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
@@ -41,7 +41,7 @@ public class CxfBadSoapRequestTestCase extends AbstractServiceAndFlowTestCase
     {
         super(variant, configResources);
     }
-        
+
     @Parameters
     public static Collection<Object[]> parameters()
     {
@@ -54,7 +54,7 @@ public class CxfBadSoapRequestTestCase extends AbstractServiceAndFlowTestCase
     @Test
     public void testSoapDocumentError() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
 
         String soapRequest = "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">"
                              + "<soap:Body>"
@@ -70,10 +70,10 @@ public class CxfBadSoapRequestTestCase extends AbstractServiceAndFlowTestCase
         assertNotNull(reply.getPayload());
 
         String ct = reply.getInboundProperty(HttpConstants.HEADER_CONTENT_TYPE, StringUtils.EMPTY);
-        assertEquals("text/xml; charset=UTF-8", ct);        
-        
+        assertEquals("text/xml; charset=UTF-8", ct);
+
         Document document = DocumentHelper.parseText(reply.getPayloadAsString());
-        List fault = document.selectNodes("//soap:Envelope/soap:Body/soap:Fault/faultcode");
+        List<?> fault = document.selectNodes("//soap:Envelope/soap:Body/soap:Fault/faultcode");
 
         assertEquals(1, fault.size());
         Element faultCodeElement = (Element) fault.get(0);
@@ -86,5 +86,4 @@ public class CxfBadSoapRequestTestCase extends AbstractServiceAndFlowTestCase
         assertEquals("Message part {http://www.muleumo.org}ssss was not recognized.  (Does it exist in service WSDL?)",
             faultStringElement.getStringValue());
     }
-
 }

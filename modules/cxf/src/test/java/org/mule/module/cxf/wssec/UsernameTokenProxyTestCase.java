@@ -17,7 +17,7 @@ import static org.junit.Assert.assertTrue;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -29,12 +29,11 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
-public class UsernameTokenProxyTestCase extends AbstractServiceAndFlowTestCase 
+public class UsernameTokenProxyTestCase extends AbstractServiceAndFlowTestCase
 {
-
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
-    
+
     public UsernameTokenProxyTestCase(ConfigVariant variant, String configResources)
     {
         super(variant, configResources);
@@ -47,20 +46,19 @@ public class UsernameTokenProxyTestCase extends AbstractServiceAndFlowTestCase
             {ConfigVariant.SERVICE, "org/mule/module/cxf/wssec/cxf-secure-proxy-service.xml, org/mule/module/cxf/wssec/username-token-conf.xml"},
             {ConfigVariant.FLOW, "org/mule/module/cxf/wssec/cxf-secure-proxy-flow.xml, org/mule/module/cxf/wssec/username-token-conf.xml"}
         });
-    }      
+    }
 
     @Override
     protected void doSetUp() throws Exception
     {
-        ClientPasswordCallback.setPassword("secret");        
+        ClientPasswordCallback.setPassword("secret");
         super.doSetUp();
     }
 
     @Test
-    public void testProxyEnvelope() throws Exception 
+    public void testProxyEnvelope() throws Exception
     {
         MuleMessage result = sendRequest("http://localhost:" + dynamicPort.getNumber() + "/proxy-envelope");
-        System.out.println(result.getPayloadAsString());
         assertFalse(result.getPayloadAsString().contains("Fault"));
         assertTrue(result.getPayloadAsString().contains("joe"));
     }
@@ -70,14 +68,13 @@ public class UsernameTokenProxyTestCase extends AbstractServiceAndFlowTestCase
     {
         MuleMessage result = sendRequest("http://localhost:" + dynamicPort.getNumber() + "/proxy-body");
 
-        System.out.println(result.getPayloadAsString());
         assertFalse(result.getPayloadAsString().contains("Fault"));
         assertFalse(result.getPayloadAsString().contains("joe"));
     }
 
     protected MuleMessage sendRequest(String url) throws MuleException
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
 
         InputStream stream = getClass().getResourceAsStream(getMessageResource());
         assertNotNull(stream);
@@ -90,5 +87,4 @@ public class UsernameTokenProxyTestCase extends AbstractServiceAndFlowTestCase
     {
         return "/org/mule/module/cxf/wssec/in-message.xml";
     }
-
 }

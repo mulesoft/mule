@@ -17,8 +17,8 @@ import static org.junit.Assert.assertTrue;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
+import org.mule.api.client.MuleClient;
 import org.mule.config.ConfigResource;
-import org.mule.module.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -31,7 +31,6 @@ import org.junit.Test;
 
 public class WSProxyTestCase extends FunctionalTestCase
 {
-
     @Rule
     public DynamicPort dynamicPort1 = new DynamicPort("port1");
 
@@ -50,7 +49,7 @@ public class WSProxyTestCase extends FunctionalTestCase
     @Test
     public void testDirectRequest() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage result = client.send("wsdl-cxf:http://localhost:" + dynamicPort1.getNumber() + "/WebService?wsdl&method=echo",
             new DefaultMuleMessage("mule", muleContext));
         assertEquals ("mule", result.getPayloadAsString());
@@ -59,7 +58,7 @@ public class WSProxyTestCase extends FunctionalTestCase
     @Test
     public void testWsdlProxyRequest() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         Map<String, Object> props = new HashMap<String, Object>();
         props.put("http.method", "GET");
         MuleMessage replyMessage = client.send("http://localhost:" + dynamicPort2.getNumber() + "/webServiceProxy?wsdl",
@@ -77,7 +76,7 @@ public class WSProxyTestCase extends FunctionalTestCase
     @Test
     public void testProxyRequest() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage result = client.send("wsdl-cxf:http://localhost:" + dynamicPort2.getNumber() + "/webServiceProxy?wsdl&method=echo",
             new DefaultMuleMessage("mule", muleContext));
         assertEquals ("mule", result.getPayloadAsString());
@@ -86,7 +85,7 @@ public class WSProxyTestCase extends FunctionalTestCase
     @Test
     public void testWsdlFileRequest() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         Map<String, Object> props = new HashMap<String, Object>();
         props.put("http.method", "GET");
         MuleMessage replyMessage = client.send("http://localhost:" + dynamicPort3.getNumber() + "/webServiceProxy?wsdl",
@@ -103,7 +102,7 @@ public class WSProxyTestCase extends FunctionalTestCase
     @Test
     public void testWsdlFileProxyRequest() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage result = client.send("wsdl-cxf:http://localhost:" + dynamicPort3.getNumber() + "/webServiceProxy?wsdl&method=echo",
             new DefaultMuleMessage("mule", muleContext));
         assertEquals ("mule", result.getPayloadAsString());
@@ -112,7 +111,7 @@ public class WSProxyTestCase extends FunctionalTestCase
     @Test
     public void testWsdlFileNotReloaded() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage result = client.send("wsdl-cxf:http://localhost:" + dynamicPort3.getNumber() + "/webServiceProxy?wsdl&method=echo",
             new DefaultMuleMessage("mule", muleContext));
         assertEquals ("mule", result.getPayloadAsString());
@@ -137,8 +136,7 @@ public class WSProxyTestCase extends FunctionalTestCase
         finally
         {
             // put the file back
-            (new File(tmpWsdlFilePathname)).renameTo(new File(wsdlFilePathname));
+            new File(tmpWsdlFilePathname).renameTo(new File(wsdlFilePathname));
         }
     }
-
 }
