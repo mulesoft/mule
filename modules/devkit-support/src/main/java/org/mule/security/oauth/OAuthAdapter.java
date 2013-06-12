@@ -1,14 +1,13 @@
 
 package org.mule.security.oauth;
 
-import org.mule.common.security.oauth.OAuthConnector;
 import org.mule.common.security.oauth.exception.NotAuthorizedException;
 import org.mule.security.oauth.callback.RestoreAccessTokenCallback;
 import org.mule.security.oauth.callback.SaveAccessTokenCallback;
 
 import java.io.Serializable;
 
-public interface OAuthAdapter extends OAuthConnector, Serializable
+public interface OAuthAdapter extends Serializable
 {
 
     /**
