@@ -10,12 +10,17 @@
 
 package org.mule.example.loanbroker.tests;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
+import org.mule.api.client.MuleClient;
 import org.mule.example.loanbroker.messages.Customer;
 import org.mule.example.loanbroker.messages.CustomerQuoteRequest;
 import org.mule.example.loanbroker.messages.LoanQuote;
-import org.mule.module.client.MuleClient;
 import org.mule.transport.NullPayload;
 import org.mule.util.ExceptionHolder;
 import org.mule.util.StringMessageUtils;
@@ -24,11 +29,6 @@ import java.beans.ExceptionListener;
 import java.util.concurrent.CountDownLatch;
 
 import org.apache.commons.lang.time.StopWatch;
-
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 /**
  * Tests the Loan Broker application asynchronously.  Note that a simple thread delay is used to wait for the
@@ -59,7 +59,7 @@ public abstract class AbstractAsynchronousLoanBrokerTestCase extends AbstractLoa
     @Override
     public void testSingleLoanRequest() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         Customer c = new Customer("Ross Mason", 1234);
         CustomerQuoteRequest request = new CustomerQuoteRequest(c, 10000, 48);
         // Send asynchronous request
@@ -78,7 +78,7 @@ public abstract class AbstractAsynchronousLoanBrokerTestCase extends AbstractLoa
     @Override
     public void testLotsOfLoanRequests() throws Exception
     {
-        final MuleClient client = new MuleClient(muleContext);
+        final MuleClient client = muleContext.getClient();
         Customer c = new Customer("Ross Mason", 1234);
         CustomerQuoteRequest[] requests = new CustomerQuoteRequest[3];
         requests[0] = new CustomerQuoteRequest(c, 100000, 48);
@@ -130,7 +130,6 @@ public abstract class AbstractAsynchronousLoanBrokerTestCase extends AbstractLoa
 
     private class ClientReceiver implements Runnable
     {
-
         private CountDownLatch latch;
         private int numberOfRequests;
         private ExceptionListener exListener;
@@ -142,12 +141,13 @@ public abstract class AbstractAsynchronousLoanBrokerTestCase extends AbstractLoa
             this.exListener = exListener;
         }
 
+        @Override
         public void run()
         {
             int i = 0;
             try
             {
-                MuleClient client = new MuleClient(muleContext);
+                MuleClient client = muleContext.getClient();
                 MuleMessage result = null;
                 for (i = 0; i < numberOfRequests; i++)
                 {
