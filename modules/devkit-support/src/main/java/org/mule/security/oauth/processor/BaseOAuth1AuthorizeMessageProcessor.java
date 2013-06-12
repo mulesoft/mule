@@ -10,101 +10,55 @@
 
 package org.mule.security.oauth.processor;
 
-import org.mule.api.DefaultMuleException;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
-import org.mule.api.construct.FlowConstructAware;
-import org.mule.api.context.MuleContextAware;
-import org.mule.api.lifecycle.Initialisable;
-import org.mule.api.lifecycle.Startable;
-import org.mule.api.lifecycle.Stoppable;
-import org.mule.api.processor.InterceptingMessageProcessor;
-import org.mule.api.processor.MessageProcessor;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.security.oauth.DefaultHttpCallback;
-import org.mule.security.oauth.HttpCallback;
+import org.mule.security.oauth.OAuth1Adapter;
+import org.mule.security.oauth.OAuth1Manager;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.regex.Pattern;
 
-public abstract class BaseOAuth1AuthorizeMessageProcessor extends
-    AbstractDevkitBasedMessageProcessor
-    implements FlowConstructAware, MuleContextAware, Initialisable, Startable, Stoppable,
-    InterceptingMessageProcessor
+public abstract class BaseOAuth1AuthorizeMessageProcessor extends AbstractAuthorizeMessageProcessor
 {
 
-    private MessageProcessor listener;
-    private String authorizationUrl = null;
-    private String accessTokenUrl = null;
     private String requestTokenUrl = null;
-    private HttpCallback oauthCallback;
-    private String state;
 
-    protected abstract String getAuthCodeRegex();
-    
+    protected abstract Class<? extends OAuth1Adapter> getAdapterClass();
+
     @Override
     public void start() throws MuleException
     {
-        LinkedInConnectorOAuth1Adapter moduleObject = null;
-        try
-        {
-//            moduleObject = findOrCreate(LinkedInConnectorOAuth1Adapter.class, false, null);
-        }
-        catch (IllegalAccessException e)
-        {
-            throw new DefaultMuleException(CoreMessages.failedToStart("authorize"), e);
-        }
-        catch (InstantiationException e)
-        {
-            throw new DefaultMuleException(CoreMessages.failedToStart("authorize"), e);
-        }
-        if (oauthCallback == null)
-        {
-            OAuth1FetchAccessTokenMessageProcessor fetchAccessTokenMessageProcessor = new OAuth1FetchAccessTokenMessageProcessor(
-                moduleObject);
-            oauthCallback = new DefaultHttpCallback(Arrays.asList(
-                new ExtractAuthorizationCodeMessageProcessor(Pattern.compile(this.getAuthCodeRegex())),
-                fetchAccessTokenMessageProcessor, listener), getMuleContext(), moduleObject.getDomain(),
-                moduleObject.getLocalPort(), moduleObject.getRemotePort(), moduleObject.getPath(),
-                moduleObject.getAsync(), getFlowConstruct().getExceptionListener(),
-                moduleObject.getConnector());
-            fetchAccessTokenMessageProcessor.setRedirectUri(oauthCallback.getUrl());
-            if (accessTokenUrl != null)
-            {
-                fetchAccessTokenMessageProcessor.setAccessTokenUrl(accessTokenUrl);
-            }
-            else
-            {
-                fetchAccessTokenMessageProcessor.setAccessTokenUrl(moduleObject.getAccessTokenUrl());
-            }
-            if (requestTokenUrl != null)
-            {
-                fetchAccessTokenMessageProcessor.setRequestTokenUrl(requestTokenUrl);
-            }
-            else
-            {
-                fetchAccessTokenMessageProcessor.setRequestTokenUrl(moduleObject.getRequestTokenUrl());
-            }
-            if (authorizationUrl != null)
-            {
-                fetchAccessTokenMessageProcessor.setAuthorizationUrl(authorizationUrl);
-            }
-            else
-            {
-                fetchAccessTokenMessageProcessor.setAuthorizationUrl(moduleObject.getAuthorizationUrl());
-            }
-            oauthCallback.start();
-        }
-    }
+        OAuth1Adapter moduleObject = this.getAdapter();
+        OAuth1Manager manager = moduleObject.getOauth1Manager();
+        OAuth1FetchAccessTokenMessageProcessor fetchAccessTokenMessageProcessor = new OAuth1FetchAccessTokenMessageProcessor(
+            moduleObject);
+        this.startCallback(manager, fetchAccessTokenMessageProcessor);
 
-    public void stop() throws MuleException
-    {
-        if (oauthCallback != null)
+        if (this.getAccessTokenUrl() != null)
         {
-            oauthCallback.stop();
+            fetchAccessTokenMessageProcessor.setAccessTokenUrl(this.getAccessTokenUrl());
+        }
+        else
+        {
+            fetchAccessTokenMessageProcessor.setAccessTokenUrl(moduleObject.getAccessTokenUrl());
+        }
+        if (requestTokenUrl != null)
+        {
+            fetchAccessTokenMessageProcessor.setRequestTokenUrl(requestTokenUrl);
+        }
+        else
+        {
+            fetchAccessTokenMessageProcessor.setRequestTokenUrl(moduleObject.getRequestTokenUrl());
+        }
+        if (this.getAuthorizationUrl() != null)
+        {
+            fetchAccessTokenMessageProcessor.setAuthorizationUrl(this.getAuthorizationUrl());
+        }
+        else
+        {
+            fetchAccessTokenMessageProcessor.setAuthorizationUrl(moduleObject.getAuthorizationUrl());
         }
     }
 
@@ -114,38 +68,25 @@ public abstract class BaseOAuth1AuthorizeMessageProcessor extends
      * @param event MuleEvent to be processed
      * @throws MuleException
      */
-    public MuleEvent process(MuleEvent event) throws MuleException
+    public final MuleEvent process(MuleEvent event) throws MuleException
     {
-        LinkedInConnectorOAuth1Adapter moduleObject = null;
+        OAuth1Adapter moduleObject = this.getAdapter();
         try
         {
-            moduleObject = findOrCreate(LinkedInConnectorOAuth1Adapter.class, false, null);
             Map<String, String> extraParameters = new HashMap<String, String>();
-            if (state != null)
+
+            if (this.getState() != null)
             {
-                try
-                {
-                    String transformerState = ((String) evaluateAndTransform(getMuleContext(), event,
-                        AuthorizeMessageProcessor.class.getDeclaredField("state").getGenericType(), null,
-                        state));
-                    extraParameters.put("state", transformerState);
-                }
-                catch (NoSuchFieldException e)
-                {
-                    throw new MessagingException(CoreMessages.createStaticMessage("internal error"), event, e);
-                }
+                extraParameters.put("state", this.toString(event, this.getState()));
             }
-            String transformedAuthorizationUrl = ((String) evaluateAndTransform(getMuleContext(), event,
-                AuthorizeMessageProcessor.class.getDeclaredField("authorizationUrl").getGenericType(), null,
-                authorizationUrl));
-            String transformedAccessTokenUrl = ((String) evaluateAndTransform(getMuleContext(), event,
-                AuthorizeMessageProcessor.class.getDeclaredField("accessTokenUrl").getGenericType(), null,
-                accessTokenUrl));
-            moduleObject.setAccessTokenUrl(transformedAccessTokenUrl);
-            String location = moduleObject.authorize(extraParameters, requestTokenUrl, accessTokenUrl,
-                authorizationUrl, oauthCallback.getUrl());
+
+            moduleObject.setAccessTokenUrl(this.toString(event, this.getAccessTokenUrl()));
+
+            String location = moduleObject.authorize(extraParameters, requestTokenUrl,
+                this.getAccessTokenUrl(), this.getAuthorizationUrl(), this.getOauthCallback().getUrl());
             event.getMessage().setOutboundProperty("http.status", "302");
             event.getMessage().setOutboundProperty("Location", location);
+
             return event;
         }
         catch (Exception e)
@@ -153,51 +94,25 @@ public abstract class BaseOAuth1AuthorizeMessageProcessor extends
             throw new MessagingException(CoreMessages.failedToInvoke("authorize"), event, e);
         }
     }
-    
-    /**
-     * Sets listener
-     * 
-     * @param value Value to set
-     */
-    public void setListener(MessageProcessor value)
-    {
-        this.listener = value;
-    }
 
-    /**
-     * Sets authorizationUrl
-     * 
-     * @param value Value to set
-     */
-    public void setAuthorizationUrl(String value)
+    private OAuth1Adapter getAdapter()
     {
-        this.authorizationUrl = value;
-    }
+        try
+        {
+            Object maybeAnAdapter = this.findOrCreate(this.getAdapterClass(), false, null);
+            if (!(maybeAnAdapter instanceof OAuth1Adapter))
+            {
+                throw new IllegalStateException(String.format(
+                    "Object of class %s does not implement OAuth1Adapter", this.getAdapterClass()
+                        .getCanonicalName()));
+            }
 
-    /**
-     * Retrieves authorizationUrl
-     */
-    public String getAuthorizationUrl()
-    {
-        return this.authorizationUrl;
-    }
-
-    /**
-     * Sets accessTokenUrl
-     * 
-     * @param value Value to set
-     */
-    public void setAccessTokenUrl(String value)
-    {
-        this.accessTokenUrl = value;
-    }
-
-    /**
-     * Retrieves accessTokenUrl
-     */
-    public String getAccessTokenUrl()
-    {
-        return this.accessTokenUrl;
+            return (OAuth1Adapter) maybeAnAdapter;
+        }
+        catch (Exception e)
+        {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
@@ -216,16 +131,6 @@ public abstract class BaseOAuth1AuthorizeMessageProcessor extends
     public String getRequestTokenUrl()
     {
         return this.requestTokenUrl;
-    }
-
-    /**
-     * Sets state
-     * 
-     * @param value Value to set
-     */
-    public void setState(String value)
-    {
-        this.state = value;
     }
 
 }

@@ -13,49 +13,19 @@ package org.mule.security.oauth.processor;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
-import org.mule.api.processor.MessageProcessor;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.security.oauth.OAuth2Adapter;
 import org.mule.security.oauth.OAuth2Manager;
 
-public class OAuth2FetchAccessTokenMessageProcessor implements MessageProcessor
+public class OAuth2FetchAccessTokenMessageProcessor extends FetchAccessTokenMessageProcessor
 {
 
-    public String redirectUri;
-    private String accessTokenUrl = null;
+    
     private OAuth2Manager<OAuth2Adapter> oauthManager;
 
     public OAuth2FetchAccessTokenMessageProcessor(OAuth2Manager<OAuth2Adapter> oauthManager)
     {
         this.oauthManager = oauthManager;
-    }
-
-    /**
-     * Sets redirectUri
-     * 
-     * @param value Value to set
-     */
-    public void setRedirectUri(String value)
-    {
-        this.redirectUri = value;
-    }
-
-    /**
-     * Sets accessTokenUrl
-     * 
-     * @param value Value to set
-     */
-    public void setAccessTokenUrl(String value)
-    {
-        this.accessTokenUrl = value;
-    }
-
-    /**
-     * Retrieves accessTokenUrl
-     */
-    public String getAccessTokenUrl()
-    {
-        return this.accessTokenUrl;
     }
 
     public MuleEvent process(MuleEvent event) throws MuleException
@@ -66,9 +36,9 @@ public class OAuth2FetchAccessTokenMessageProcessor implements MessageProcessor
                 .getInvocationProperty("_oauthVerifier")));
             if (oauthAdapter.getAccessTokenUrl() == null)
             {
-                oauthAdapter.setAccessTokenUrl(this.accessTokenUrl);
+                oauthAdapter.setAccessTokenUrl(this.getAccessTokenUrl());
             }
-            oauthAdapter.fetchAccessToken(this.redirectUri);
+            oauthAdapter.fetchAccessToken(this.getRedirectUri());
             oauthManager.getAccessTokenPoolFactory().passivateObject(oauthAdapter.getAccessTokenId(),
                 oauthAdapter);
             event.getMessage().setInvocationProperty("OAuthAccessTokenId", oauthAdapter.getAccessTokenId());

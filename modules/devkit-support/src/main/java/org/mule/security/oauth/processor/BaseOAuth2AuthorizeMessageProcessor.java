@@ -13,81 +13,37 @@ package org.mule.security.oauth.processor;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
-import org.mule.api.construct.FlowConstructAware;
-import org.mule.api.context.MuleContextAware;
-import org.mule.api.lifecycle.Initialisable;
-import org.mule.api.lifecycle.Startable;
-import org.mule.api.lifecycle.Stoppable;
-import org.mule.api.processor.InterceptingMessageProcessor;
-import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transformer.TransformerException;
-import org.mule.api.transformer.TransformerMessagingException;
 import org.mule.common.security.oauth.AuthorizationParameter;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.security.oauth.DefaultHttpCallback;
-import org.mule.security.oauth.HttpCallback;
 import org.mule.security.oauth.OAuth2Adapter;
 import org.mule.security.oauth.OAuth2Manager;
 
 import java.lang.reflect.Field;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.regex.Pattern;
 
 public abstract class BaseOAuth2AuthorizeMessageProcessor<T extends OAuth2Manager<OAuth2Adapter>> extends
-    AbstractDevkitBasedMessageProcessor
-    implements FlowConstructAware, MuleContextAware, Initialisable, Startable, Stoppable,
-    InterceptingMessageProcessor
+    AbstractAuthorizeMessageProcessor
 {
-
-    private MessageProcessor listener;
-    private String authorizationUrl = null;
-    private String accessTokenUrl = null;
-    private HttpCallback oauthCallback;
-    private String state;
-
-    protected abstract String getAuthCodeRegex();
 
     protected abstract Class<T> getOAuthManagerClass();
 
     @Override
-    @SuppressWarnings("unchecked")
     public final void start() throws MuleException
     {
         OAuth2Manager<OAuth2Adapter> module = this.getOAuthManager();
-
-        if (oauthCallback == null)
+        FetchAccessTokenMessageProcessor fetchAccessTokenMessageProcessor = new OAuth2FetchAccessTokenMessageProcessor((OAuth2Manager<OAuth2Adapter>) module);
+        this.startCallback(module, fetchAccessTokenMessageProcessor);
+        
+        if (this.getAccessTokenUrl() != null)
         {
-
-            OAuth2FetchAccessTokenMessageProcessor fetchAccessTokenMessageProcessor = new OAuth2FetchAccessTokenMessageProcessor(
-                (OAuth2Manager<OAuth2Adapter>) moduleObject);
-
-            oauthCallback = new DefaultHttpCallback(Arrays.asList(
-                new ExtractAuthorizationCodeMessageProcessor(Pattern.compile(this.getAuthCodeRegex())),
-                fetchAccessTokenMessageProcessor, listener), getMuleContext(), module.getDomain(),
-                module.getLocalPort(), module.getRemotePort(), module.getPath(), module.getAsync(),
-                getFlowConstruct().getExceptionListener(), module.getConnector());
-            fetchAccessTokenMessageProcessor.setRedirectUri(oauthCallback.getUrl());
-            if (accessTokenUrl != null)
-            {
-                fetchAccessTokenMessageProcessor.setAccessTokenUrl(accessTokenUrl);
-            }
-            else
-            {
-                fetchAccessTokenMessageProcessor.setAccessTokenUrl(module.getAccessTokenUrl());
-            }
-            oauthCallback.start();
+            fetchAccessTokenMessageProcessor.setAccessTokenUrl(this.getAccessTokenUrl());
         }
-    }
-
-    @Override
-    public final void stop() throws MuleException
-    {
-        if (oauthCallback != null)
+        else
         {
-            oauthCallback.stop();
+            fetchAccessTokenMessageProcessor.setAccessTokenUrl(module.getAccessTokenUrl());
         }
     }
 
@@ -119,9 +75,9 @@ public abstract class BaseOAuth2AuthorizeMessageProcessor<T extends OAuth2Manage
             .getAuthorizationParameters();
 
         Map<String, String> extraParameters = new HashMap<String, String>();
-        if (state != null)
+        if (this.getState() != null)
         {
-            extraParameters.put("state", this.toString(event, this.state));
+            extraParameters.put("state", this.toString(event, this.getState()));
         }
 
         if (params != null)
@@ -167,18 +123,18 @@ public abstract class BaseOAuth2AuthorizeMessageProcessor<T extends OAuth2Manage
      * @param event MuleEvent to be processed
      * @throws MuleException
      */
-    public MuleEvent process(MuleEvent event) throws MuleException
+    public final MuleEvent process(MuleEvent event) throws MuleException
     {
         try
         {
             OAuth2Manager<OAuth2Adapter> moduleObject = this.getOAuthManager();
 
-            String transformedAuthorizationUrl = this.toString(event, this.authorizationUrl);
-            String transformedAccessTokenUrl = this.toString(event, this.accessTokenUrl);
+            String transformedAuthorizationUrl = this.toString(event, this.getAuthorizationUrl());
+            String transformedAccessTokenUrl = this.toString(event, this.getAccessTokenUrl());
 
             moduleObject.setAccessTokenUrl(transformedAccessTokenUrl);
             String location = moduleObject.buildAuthorizeUrl(this.getExtraParameters(event, moduleObject),
-                transformedAuthorizationUrl, oauthCallback.getUrl());
+                transformedAuthorizationUrl, this.getOauthCallback().getUrl());
 
             event.getMessage().setOutboundProperty("http.status", "302");
             event.getMessage().setOutboundProperty("Location", location);
@@ -191,76 +147,6 @@ public abstract class BaseOAuth2AuthorizeMessageProcessor<T extends OAuth2Manage
         }
     }
 
-    private String toString(MuleEvent event, Object value)
-    {
-        try
-        {
-            return (String) evaluateAndTransform(getMuleContext(), event, String.class, null, value);
-        }
-        catch (TransformerException e)
-        {
-            throw new RuntimeException(e);
-        }
-        catch (TransformerMessagingException e)
-        {
-            throw new RuntimeException(e);
-        }
-    }
-
-    /**
-     * Sets listener
-     * 
-     * @param value Value to set
-     */
-    public void setListener(MessageProcessor value)
-    {
-        this.listener = value;
-    }
-
-    /**
-     * Sets authorizationUrl
-     * 
-     * @param value Value to set
-     */
-    public void setAuthorizationUrl(String value)
-    {
-        this.authorizationUrl = value;
-    }
-
-    /**
-     * Retrieves authorizationUrl
-     */
-    public String getAuthorizationUrl()
-    {
-        return this.authorizationUrl;
-    }
-
-    /**
-     * Sets accessTokenUrl
-     * 
-     * @param value Value to set
-     */
-    public void setAccessTokenUrl(String value)
-    {
-        this.accessTokenUrl = value;
-    }
-
-    /**
-     * Retrieves accessTokenUrl
-     */
-    public String getAccessTokenUrl()
-    {
-        return this.accessTokenUrl;
-    }
-
-    /**
-     * Sets state
-     * 
-     * @param value Value to set
-     */
-    public void setState(String value)
-    {
-        this.state = value;
-    }
+  
 
 }

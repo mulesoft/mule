@@ -76,5 +76,7 @@ public interface OAuth1Adapter extends OAuthAdapter
      * @param consumer an instance of {@link oauth.signpost.OAuthConsumer}
      */
     public void setConsumer(OAuthConsumer consumer);
+    
+    public OAuth1Manager getOauth1Manager();
 
 }

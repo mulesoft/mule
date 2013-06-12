@@ -19,7 +19,6 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.filter.Filter;
 import org.mule.security.oauth.OAuth2Adapter;
 import org.mule.security.oauth.OAuth2Manager;
-import org.mule.security.oauth.OAuth2Adapter;
 import org.mule.security.oauth.callback.ProcessCallback;
 
 public class ManagedAccessTokenProcessTemplate<P> implements ProcessTemplate<P, OAuth2Adapter>

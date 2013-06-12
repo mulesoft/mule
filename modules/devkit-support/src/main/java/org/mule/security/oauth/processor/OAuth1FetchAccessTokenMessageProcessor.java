@@ -13,31 +13,28 @@ package org.mule.security.oauth.processor;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
-import org.mule.api.processor.MessageProcessor;
 import org.mule.config.i18n.MessageFactory;
-import org.mule.security.oauth.OAuth1Manager;
+import org.mule.security.oauth.OAuth1Adapter;
 
-public class OAuth1FetchAccessTokenMessageProcessor implements MessageProcessor
+public class OAuth1FetchAccessTokenMessageProcessor extends FetchAccessTokenMessageProcessor
 {
 
-    public String redirectUri;
-    private String accessTokenUrl = null;
     private String authorizationUrl = null;
     private String requestTokenUrl = null;
-    private OAuth1Manager oauthManager = null;
+    private OAuth1Adapter adapter = null;
 
-    public OAuth1FetchAccessTokenMessageProcessor(OAuth1Manager oauthManager)
+    public OAuth1FetchAccessTokenMessageProcessor(OAuth1Adapter oauthManager)
     {
-        this.oauthManager = oauthManager;
+        this.adapter = oauthManager;
     }
 
     public final MuleEvent process(MuleEvent event) throws MuleException
     {
         try
         {
-            this.oauthManager.setOauthVerifier(((String) event.getMessage().getInvocationProperty(
+            this.adapter.setOauthVerifier(((String) event.getMessage().getInvocationProperty(
                 "_oauthVerifier")));
-            this.oauthManager.fetchAccessToken(requestTokenUrl, accessTokenUrl, authorizationUrl, redirectUri);
+            this.adapter.fetchAccessToken(requestTokenUrl, this.getAccessTokenUrl(), authorizationUrl, this.getRedirectUri());
         }
         catch (Exception e)
         {
@@ -45,34 +42,6 @@ public class OAuth1FetchAccessTokenMessageProcessor implements MessageProcessor
                 event, e);
         }
         return event;
-    }
-
-    /**
-     * Sets redirectUri
-     * 
-     * @param value Value to set
-     */
-    public void setRedirectUri(String value)
-    {
-        this.redirectUri = value;
-    }
-
-    /**
-     * Sets accessTokenUrl
-     * 
-     * @param value Value to set
-     */
-    public void setAccessTokenUrl(String value)
-    {
-        this.accessTokenUrl = value;
-    }
-
-    /**
-     * Retrieves accessTokenUrl
-     */
-    public String getAccessTokenUrl()
-    {
-        return this.accessTokenUrl;
     }
 
     /**
