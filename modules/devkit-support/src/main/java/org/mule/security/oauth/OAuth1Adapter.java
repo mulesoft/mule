@@ -3,7 +3,6 @@ package org.mule.security.oauth;
 
 import oauth.signpost.OAuthConsumer;
 
-import org.mule.common.security.oauth.OAuth1Connector;
 import org.mule.common.security.oauth.exception.UnableToAcquireAccessTokenException;
 import org.mule.common.security.oauth.exception.UnableToAcquireRequestTokenException;
 

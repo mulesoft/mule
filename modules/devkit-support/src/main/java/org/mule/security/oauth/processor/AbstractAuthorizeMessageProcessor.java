@@ -23,8 +23,6 @@ import org.mule.api.transformer.TransformerException;
 import org.mule.api.transformer.TransformerMessagingException;
 import org.mule.security.oauth.DefaultHttpCallback;
 import org.mule.security.oauth.HttpCallback;
-import org.mule.security.oauth.OAuth2Adapter;
-import org.mule.security.oauth.OAuth2Manager;
 import org.mule.security.oauth.callback.HttpCallbackAdapter;
 
 import java.util.Arrays;
@@ -47,7 +45,8 @@ public abstract class AbstractAuthorizeMessageProcessor extends AbstractDevkitBa
     {
         if (oauthCallback == null)
         {
-            oauthCallback = new DefaultHttpCallback(Arrays.asList(new ExtractAuthorizationCodeMessageProcessor(Pattern.compile(this.getAuthCodeRegex())), fetchAccessTokenMessageProcessor, this.listener),
+            oauthCallback = new DefaultHttpCallback(Arrays.asList(
+                new ExtractAuthorizationCodeMessageProcessor(Pattern.compile(this.getAuthCodeRegex())), fetchAccessTokenMessageProcessor, this.listener),
                 getMuleContext(), adapter.getDomain(),
                 adapter.getLocalPort(), adapter.getRemotePort(), adapter.getPath(), adapter.getAsync(),
                 getFlowConstruct().getExceptionListener(), adapter.getConnector());

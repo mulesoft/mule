@@ -48,7 +48,7 @@ public abstract class BaseOAuth2AuthorizeMessageProcessor<T extends OAuth2Manage
     }
 
     @SuppressWarnings("unchecked")
-    private OAuth2Manager<OAuth2Adapter> getOAuthManager()
+    protected OAuth2Manager<OAuth2Adapter> getOAuthManager()
     {
         try
         {

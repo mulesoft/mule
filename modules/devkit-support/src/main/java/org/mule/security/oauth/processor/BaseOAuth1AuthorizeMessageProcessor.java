@@ -95,7 +95,7 @@ public abstract class BaseOAuth1AuthorizeMessageProcessor extends AbstractAuthor
         }
     }
 
-    private OAuth1Adapter getAdapter()
+    protected OAuth1Adapter getAdapter()
     {
         try
         {

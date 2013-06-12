@@ -18,8 +18,6 @@ import oauth.signpost.exception.OAuthCommunicationException;
 import oauth.signpost.exception.OAuthExpectationFailedException;
 import oauth.signpost.exception.OAuthMessageSignerException;
 import oauth.signpost.exception.OAuthNotAuthorizedException;
-import oauth.signpost.signature.AuthorizationHeaderSigningStrategy;
-import oauth.signpost.signature.HmacSha1MessageSigner;
 
 import org.mule.common.security.oauth.exception.NotAuthorizedException;
 import org.mule.common.security.oauth.exception.UnableToAcquireAccessTokenException;
@@ -306,8 +304,8 @@ public abstract class BaseOAuth1Manager extends DefaultHttpCallbackAdapter imple
         if (consumer == null)
         {
             consumer = new DefaultOAuthConsumer(adapter.getConsumerKey(), adapter.getConsumerSecret());
-            consumer.setMessageSigner(new HmacSha1MessageSigner());
-            consumer.setSigningStrategy(new AuthorizationHeaderSigningStrategy());
+            consumer.setMessageSigner(adapter.getMessageSigner());
+            consumer.setSigningStrategy(adapter.getSigningStrategy());
             
             adapter.setConsumer(consumer);
         }

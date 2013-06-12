@@ -1,7 +1,6 @@
 
 package org.mule.security.oauth;
 
-import org.mule.common.security.oauth.OAuth2Connector;
 import org.mule.common.security.oauth.exception.UnableToAcquireAccessTokenException;
 import org.mule.common.security.oauth.exception.UnableToAcquireRequestTokenException;
 
