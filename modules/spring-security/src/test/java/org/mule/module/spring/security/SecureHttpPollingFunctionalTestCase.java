@@ -13,19 +13,20 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import org.mule.api.MuleMessage;
+import org.mule.api.client.MuleClient;
+import org.mule.api.context.notification.SecurityNotificationListener;
+import org.mule.context.notification.SecurityNotification;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.transport.http.HttpConnector;
+import org.mule.util.concurrent.Latch;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-import org.mule.api.MuleMessage;
-import org.mule.api.context.notification.SecurityNotificationListener;
-import org.mule.context.notification.SecurityNotification;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
-import org.mule.transport.http.HttpConnector;
-import org.mule.util.concurrent.Latch;
 
 public class SecureHttpPollingFunctionalTestCase extends AbstractServiceAndFlowTestCase
 {
@@ -55,7 +56,8 @@ public class SecureHttpPollingFunctionalTestCase extends AbstractServiceAndFlowT
                 latch.countDown();
             }
         });
-        MuleClient client = new MuleClient(muleContext);
+
+        MuleClient client = muleContext.getClient();
         MuleMessage result = client.request("vm://toclient", 5000);
         assertNotNull(result);
         assertEquals("foo", result.getPayloadAsString());
@@ -64,7 +66,7 @@ public class SecureHttpPollingFunctionalTestCase extends AbstractServiceAndFlowT
         //This seems a little odd that we forward the exception to the outbound endpoint, but I guess users
         // can just add a filter
         assertNotNull(result);
-        final int status = result.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0);
+        int status = result.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0);
         assertEquals(401, status);
         assertTrue(latch.await(1000, TimeUnit.MILLISECONDS));
     }

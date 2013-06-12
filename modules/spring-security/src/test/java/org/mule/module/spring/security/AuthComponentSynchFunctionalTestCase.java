@@ -16,10 +16,10 @@ import static org.junit.Assert.assertTrue;
 
 import org.mule.api.EncryptionStrategy;
 import org.mule.api.MuleMessage;
+import org.mule.api.client.MuleClient;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.security.UnauthorisedException;
 import org.mule.component.ComponentException;
-import org.mule.module.client.MuleClient;
 import org.mule.security.MuleCredentials;
 import org.mule.tck.junit4.FunctionalTestCase;
 
@@ -32,7 +32,6 @@ import org.springframework.security.core.context.SecurityContextImpl;
 
 public class AuthComponentSynchFunctionalTestCase extends FunctionalTestCase
 {
-
     @Override
     protected String getConfigResources()
     {
@@ -40,23 +39,23 @@ public class AuthComponentSynchFunctionalTestCase extends FunctionalTestCase
     }
 
     @Override
-    // Clear the security context after each test.
     public void doTearDown()
     {
+        // Clear the security context after each test.
         SecurityContextHolder.setContext(new SecurityContextImpl());
     }
 
     @Test
     public void testCaseGoodAuthenticationGoodAuthorisation() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
-        Map props = new HashMap();
+        MuleClient client = muleContext.getClient();
 
-        EncryptionStrategy strategy = muleContext
-            .getSecurityManager()
-            .getEncryptionStrategy("PBE");
+        EncryptionStrategy strategy = muleContext.getSecurityManager().getEncryptionStrategy("PBE");
         String header = MuleCredentials.createHeader("marie", "marie", "PBE", strategy);
+
+        Map<String, Object> props = new HashMap<String, Object>();
         props.put(MuleProperties.MULE_USER_PROPERTY, header);
+
         MuleMessage m = client.send("vm://test", "Marie", props);
         assertNotNull(m);
         assertTrue(m.getPayload().equals("Marie"));
@@ -65,14 +64,14 @@ public class AuthComponentSynchFunctionalTestCase extends FunctionalTestCase
     @Test
     public void testCaseGoodAuthenticationBadAuthorisation() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
-        Map props = new HashMap();
+        MuleClient client = muleContext.getClient();
 
-        EncryptionStrategy strategy = muleContext
-            .getSecurityManager()
-            .getEncryptionStrategy("PBE");
+        EncryptionStrategy strategy = muleContext.getSecurityManager().getEncryptionStrategy("PBE");
         String header = MuleCredentials.createHeader("anon", "anon", "PBE", strategy);
+
+        Map<String, Object> props = new HashMap<String, Object>();
         props.put(MuleProperties.MULE_USER_PROPERTY, header);
+
         MuleMessage result = client.send("vm://test", "Marie", props);
         assertNotNull(result);
         assertNotNull(result.getExceptionPayload());
@@ -82,18 +81,18 @@ public class AuthComponentSynchFunctionalTestCase extends FunctionalTestCase
     @Test
     public void testCaseBadAuthentication() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
-        Map props = new HashMap();
+        MuleClient client = muleContext.getClient();
 
         EncryptionStrategy strategy = muleContext
             .getSecurityManager()
             .getEncryptionStrategy("PBE");
         String header = MuleCredentials.createHeader("anonX", "anonX", "PBE", strategy);
+        Map<String, Object> props = new HashMap<String, Object>();
         props.put(MuleProperties.MULE_USER_PROPERTY, header);
+
         MuleMessage result = client.send("vm://test", "Marie", props);
         assertNotNull(result);
         assertNotNull(result.getExceptionPayload());
         assertEquals(UnauthorisedException.class, result.getExceptionPayload().getException().getClass());
     }
-
 }

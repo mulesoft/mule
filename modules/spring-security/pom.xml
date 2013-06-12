@@ -10,8 +10,8 @@
     <packaging>jar</packaging>
     <name>Spring Security</name>
     <description>
-        Mule Spring Security support exposes Spring Security Authentication providers 
-        and Method interceptors to authenticate event traffic via endpoints and provide method level 
+        Mule Spring Security support exposes Spring Security Authentication providers
+        and Method interceptors to authenticate event traffic via endpoints and provide method level
         authorization on components.
     </description>
     <dependencies>
@@ -97,12 +97,6 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-aop</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.modules</groupId>
-            <artifactId>mule-module-client</artifactId>
-            <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
