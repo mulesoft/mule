@@ -14,7 +14,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transport.NullPayload;
 
@@ -36,7 +36,7 @@ public class EchoTestCase extends FunctionalTestCase
     @Test
     public void httpGetToFlowUrlEchoesSentMessage() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
 
         Map<String, Object> props = new HashMap<String, Object>();
         props.put("http.method", "GET");
