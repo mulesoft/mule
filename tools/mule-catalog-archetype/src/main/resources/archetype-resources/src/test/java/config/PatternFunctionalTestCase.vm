@@ -4,7 +4,7 @@
 
 package ${patternConfigPackageName};
 
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
 
 import org.junit.Test;
@@ -24,7 +24,7 @@ public class ${patternClassName}FunctionalTestCase extends FunctionalTestCase
     {
         super.doSetUp();
 
-        muleClient = new MuleClient(muleContext);
+        muleClient = muleContext.getClient();
     }
 
     @Test
