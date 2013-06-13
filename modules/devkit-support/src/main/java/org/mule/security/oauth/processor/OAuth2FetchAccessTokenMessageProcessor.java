@@ -32,7 +32,7 @@ public class OAuth2FetchAccessTokenMessageProcessor extends FetchAccessTokenMess
     {
         try
         {
-            OAuth2Adapter oauthAdapter = this.oauthManager.createAccessToken(((String) event.getMessage()
+            OAuth2Adapter oauthAdapter = this.oauthManager.createAdapter(((String) event.getMessage()
                 .getInvocationProperty("_oauthVerifier")));
             if (oauthAdapter.getAccessTokenUrl() == null)
             {

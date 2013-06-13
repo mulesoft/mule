@@ -31,14 +31,14 @@ public interface OAuth2Manager<C extends OAuth2Adapter> extends HttpCallbackAdap
 {
 
     /**
-     * Create a new access token using the specified verifier and insert it into the
-     * pool
+     * Create a new adapter using the specified verifier and insert it into the
+     * pool. This adapter will be already initialized and started
      * 
      * @param verifier OAuth verifier
      * @return A newly created connector
      * @throws Exception If the access token cannot be retrieved
      */
-    C createAccessToken(String verifier) throws Exception;
+    C createAdapter(String verifier) throws Exception;
 
     /**
      * Borrow an access token from the pool
