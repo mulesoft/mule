@@ -71,9 +71,10 @@ public class CxfConfiguration implements Initialisable, Disposable, MuleContextA
         {
             bus = new SpringBusFactory().createBus((String) null, true);
 
-            // Register query handler to generate WSDL or XSD that was removed in cxf 2.5
-            bus.getExtension(QueryHandlerRegistry.class).registerHandler(new WSDLQueryHandler(bus));
         }
+
+        // Register query handler to generate WSDL or XSD that was removed in cxf 2.5
+        bus.getExtension(QueryHandlerRegistry.class).registerHandler(new WSDLQueryHandler(bus));
 
         if (!initializeStaticBusInstance)
         {
