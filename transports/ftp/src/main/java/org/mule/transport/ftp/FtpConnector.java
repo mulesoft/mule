@@ -639,6 +639,7 @@ public class FtpConnector extends AbstractConnector
     {
         EndpointURI uri = endpoint.getEndpointURI();
         FTPClient client = this.getFtp(uri);
+        client.setDataTimeout(endpoint.getResponseTimeout());
 
         this.enterActiveOrPassiveMode(client, endpoint);
         this.setupFileType(client, endpoint);
