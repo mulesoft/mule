@@ -121,29 +121,6 @@ public interface OAuth2Manager<C extends OAuth2Adapter> extends HttpCallbackAdap
         throws UnableToAcquireAccessTokenException;
     
     /**
-     * Returns the url to hit in order to obtain an access token
-     * @return
-     */
-    public String getAccessTokenUrl();
-    
-    /**
-     * Sets accessTokenUrl
-     * 
-     * @param value Value to set
-     */
-    public void setAccessTokenUrl(String url);
-    
-    /**
-     * Retrieves consumerKey
-     */
-    public String getConsumerKey();
-
-    /**
-     * Retrieves consumerSecret
-     */
-    public String getConsumerSecret();
-
-    /**
      * Returns the mule context
      */
     public MuleContext getMuleContext();

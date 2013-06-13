@@ -46,7 +46,6 @@ import java.util.Map;
 import org.apache.commons.pool.KeyedPoolableObjectFactory;
 import org.apache.commons.pool.impl.GenericKeyedObjectPool;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public abstract class BaseOAuth2Manager<C extends OAuth2Adapter> extends DefaultHttpCallbackAdapter
     implements MuleContextAware, Initialisable, Capabilities, Startable, Stoppable, Disposable,
@@ -54,8 +53,6 @@ public abstract class BaseOAuth2Manager<C extends OAuth2Adapter> extends Default
 {
 
     private OAuth2Adapter defaultUnauthorizedConnector;
-    private String consumerKey;
-    private String consumerSecret;
     private String applicationName;
     private String scope;
 
@@ -69,8 +66,6 @@ public abstract class BaseOAuth2Manager<C extends OAuth2Adapter> extends Default
      */
     protected FlowConstruct flowConstruct;
     private ObjectStore<OAuthState> accessTokenObjectStore;
-    private String authorizationUrl = null;
-    private String accessTokenUrl = null;
 
     /**
      * Access Token Pool Factory
@@ -198,10 +193,10 @@ public abstract class BaseOAuth2Manager<C extends OAuth2Adapter> extends Default
     {
         OAuth2Adapter connector = this.instantiateAdapter();
         connector.setOauthVerifier(verifier);
-        connector.setAuthorizationUrl(getAuthorizationUrl());
-        connector.setAccessTokenUrl(getAccessTokenUrl());
-        connector.setConsumerKey(getConsumerKey());
-        connector.setConsumerSecret(getConsumerSecret());
+        connector.setAuthorizationUrl(getDefaultUnauthorizedConnector().getAuthorizationUrl());
+        connector.setAccessTokenUrl(getDefaultUnauthorizedConnector().getAccessTokenUrl());
+        connector.setConsumerKey(this.getDefaultUnauthorizedConnector().getConsumerKey());
+        connector.setConsumerSecret(this.getDefaultUnauthorizedConnector().getConsumerSecret());
 
         this.setCustomProperties(connector);
 
@@ -299,12 +294,12 @@ public abstract class BaseOAuth2Manager<C extends OAuth2Adapter> extends Default
         }
         else
         {
-            urlBuilder.append(this.authorizationUrl);
+            urlBuilder.append(this.getDefaultUnauthorizedConnector().getAuthorizationUrl());
         }
         urlBuilder.append("?");
         urlBuilder.append("response_type=code&");
         urlBuilder.append("client_id=");
-        urlBuilder.append(getConsumerKey());
+        urlBuilder.append(this.getDefaultUnauthorizedConnector().getConsumerKey());
         urlBuilder.append("&redirect_uri=");
         urlBuilder.append(redirectUri);
         for (String parameter : extraParameters.keySet())
@@ -432,7 +427,7 @@ public abstract class BaseOAuth2Manager<C extends OAuth2Adapter> extends Default
 
         String accessTokenUrl = adapter.getAccessTokenUrl() != null
                                                                    ? adapter.getAccessTokenUrl()
-                                                                   : this.accessTokenUrl;
+                                                                   : this.getDefaultUnauthorizedConnector().getAccessTokenUrl();
 
         String response = this.httpUtil.post(accessTokenUrl, requestBody);
 
@@ -571,44 +566,6 @@ public abstract class BaseOAuth2Manager<C extends OAuth2Adapter> extends Default
     }
 
     /**
-     * Sets consumerKey
-     * 
-     * @param value Value to set
-     */
-    public void setConsumerKey(String value)
-    {
-        this.consumerKey = value;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getConsumerKey()
-    {
-        return this.consumerKey;
-    }
-
-    /**
-     * Sets consumerSecret
-     * 
-     * @param value Value to set
-     */
-    public void setConsumerSecret(String value)
-    {
-        this.consumerSecret = value;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getConsumerSecret()
-    {
-        return this.consumerSecret;
-    }
-
-    /**
      * Sets applicationName
      * 
      * @param value Value to set
@@ -695,44 +652,6 @@ public abstract class BaseOAuth2Manager<C extends OAuth2Adapter> extends Default
     public void setAccessTokenObjectStore(ObjectStore<OAuthState> value)
     {
         this.accessTokenObjectStore = value;
-    }
-
-    /**
-     * Sets authorizationUrl
-     * 
-     * @param value Value to set
-     */
-    public void setAuthorizationUrl(String value)
-    {
-        this.authorizationUrl = value;
-    }
-
-    /**
-     * Retrieves authorizationUrl
-     */
-    public String getAuthorizationUrl()
-    {
-        return this.authorizationUrl;
-    }
-
-    /**
-     * Sets accessTokenUrl
-     * 
-     * @param value Value to set
-     */
-    @Override
-    public void setAccessTokenUrl(String value)
-    {
-        this.accessTokenUrl = value;
-    }
-
-    /**
-     * Retrieves accessTokenUrl
-     */
-    @Override
-    public String getAccessTokenUrl()
-    {
-        return this.accessTokenUrl;
     }
 
     /**

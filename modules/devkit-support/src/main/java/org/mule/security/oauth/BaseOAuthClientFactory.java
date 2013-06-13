@@ -64,8 +64,8 @@ public abstract class BaseOAuthClientFactory implements KeyedPoolableObjectFacto
             .getConstructor(OAuth2Manager.class)
             .newInstance(this.oauthManager);
         
-        connector.setConsumerKey(oauthManager.getConsumerKey());
-        connector.setConsumerSecret(oauthManager.getConsumerSecret());
+        connector.setConsumerKey(oauthManager.getDefaultUnauthorizedConnector().getConsumerKey());
+        connector.setConsumerSecret(oauthManager.getDefaultUnauthorizedConnector().getConsumerSecret());
         connector.setAccessToken(state.getAccessToken());
         connector.setAuthorizationUrl(state.getAuthorizationUrl());
         connector.setAccessTokenUrl(state.getAccessTokenUrl());

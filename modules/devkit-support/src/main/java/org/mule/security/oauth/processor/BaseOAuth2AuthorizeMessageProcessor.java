@@ -43,7 +43,7 @@ public abstract class BaseOAuth2AuthorizeMessageProcessor<T extends OAuth2Manage
         }
         else
         {
-            fetchAccessTokenMessageProcessor.setAccessTokenUrl(module.getAccessTokenUrl());
+            fetchAccessTokenMessageProcessor.setAccessTokenUrl(module.getDefaultUnauthorizedConnector().getAccessTokenUrl());
         }
     }
 
@@ -132,7 +132,7 @@ public abstract class BaseOAuth2AuthorizeMessageProcessor<T extends OAuth2Manage
             String transformedAuthorizationUrl = this.toString(event, this.getAuthorizationUrl());
             String transformedAccessTokenUrl = this.toString(event, this.getAccessTokenUrl());
 
-            moduleObject.setAccessTokenUrl(transformedAccessTokenUrl);
+            moduleObject.getDefaultUnauthorizedConnector().setAccessTokenUrl(transformedAccessTokenUrl);
             String location = moduleObject.buildAuthorizeUrl(this.getExtraParameters(event, moduleObject),
                 transformedAuthorizationUrl, this.getOauthCallback().getUrl());
 
