@@ -121,7 +121,7 @@ public class OAuth2ManagerTestCase
     public void createAdapter() throws Exception
     {
         final String verifier = "verifier";
-        
+
         Mockito.when(adapter.getAuthorizationUrl()).thenReturn("authorizationUrl");
         Mockito.when(adapter.getAccessTokenUrl()).thenReturn("accessTokenUrl");
         Mockito.when(adapter.getConsumerKey()).thenReturn("consumerKey");
@@ -209,7 +209,9 @@ public class OAuth2ManagerTestCase
         Mockito.when(adapter.getAccessCodePattern()).thenReturn(accessTokenPattern);
         Mockito.when(adapter.getRefreshTokenPattern()).thenReturn(refreshTokenPattern);
         Mockito.when(adapter.getExpirationTimePattern()).thenReturn(expirationPattern);
-        Mockito.when(this.httpUtil.post(this.manager.getDefaultUnauthorizedConnector().getAccessTokenUrl(), requestBody)).thenReturn(response);
+        Mockito.when(
+            this.httpUtil.post(this.manager.getDefaultUnauthorizedConnector().getAccessTokenUrl(),
+                requestBody)).thenReturn(response);
         Mockito.when(this.oauthResponseParser.extractAccessCode(accessTokenPattern, response)).thenReturn(
             accessToken);
         Mockito.when(this.oauthResponseParser.extractExpirationTime(expirationPattern, response)).thenReturn(
@@ -219,7 +221,8 @@ public class OAuth2ManagerTestCase
 
         this.manager.fetchAccessToken(adapter, redirectUri);
 
-        Mockito.verify(this.httpUtil).post(this.manager.getDefaultUnauthorizedConnector().getAccessTokenUrl(), requestBody);
+        Mockito.verify(this.httpUtil).post(
+            this.manager.getDefaultUnauthorizedConnector().getAccessTokenUrl(), requestBody);
         Mockito.verify(this.oauthResponseParser).extractAccessCode(accessTokenPattern, response);
         Mockito.verify(this.adapter).setAccessToken(accessToken);
         Mockito.verify(this.adapter).setExpiration(expiration);
@@ -260,7 +263,9 @@ public class OAuth2ManagerTestCase
         Mockito.when(adapter.getRefreshTokenPattern()).thenReturn(refreshTokenPattern);
         Mockito.when(adapter.getExpirationTimePattern()).thenReturn(expirationPattern);
         Mockito.when(adapter.getRefreshToken()).thenReturn(refreshToken);
-        Mockito.when(this.httpUtil.post(this.manager.getDefaultUnauthorizedConnector().getAccessTokenUrl(), requestBody)).thenReturn(response);
+        Mockito.when(
+            this.httpUtil.post(this.manager.getDefaultUnauthorizedConnector().getAccessTokenUrl(),
+                requestBody)).thenReturn(response);
         Mockito.when(this.oauthResponseParser.extractAccessCode(accessTokenPattern, response)).thenReturn(
             accessToken);
         Mockito.when(this.oauthResponseParser.extractExpirationTime(expirationPattern, response)).thenReturn(
@@ -271,7 +276,8 @@ public class OAuth2ManagerTestCase
         this.manager.refreshAccessToken(adapter);
 
         Mockito.verify(this.adapter).setAccessToken(null);
-        Mockito.verify(this.httpUtil).post(this.manager.getDefaultUnauthorizedConnector().getAccessTokenUrl(), requestBody);
+        Mockito.verify(this.httpUtil).post(
+            this.manager.getDefaultUnauthorizedConnector().getAccessTokenUrl(), requestBody);
         Mockito.verify(this.oauthResponseParser).extractAccessCode(accessTokenPattern, response);
         Mockito.verify(this.adapter).setAccessToken(accessToken);
         Mockito.verify(this.adapter).setExpiration(expiration);
