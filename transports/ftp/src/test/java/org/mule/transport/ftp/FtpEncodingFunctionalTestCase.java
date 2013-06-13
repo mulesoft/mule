@@ -61,7 +61,7 @@ public class FtpEncodingFunctionalTestCase extends AbstractFtpServerTestCase
         assertEquals(TEST_MESSAGE_EUC_JP_ENCODED, message.getPayloadAsString());
     }
 
-    private File createDataFile(File folder, String encoding, final String testMessage) throws Exception
+    protected File createDataFile(File folder, String encoding, final String testMessage) throws Exception
     {
         File target = File.createTempFile("mule-file-test-", ".txt", folder);
         target.deleteOnExit();

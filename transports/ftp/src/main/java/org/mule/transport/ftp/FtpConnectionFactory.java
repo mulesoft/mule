@@ -30,7 +30,8 @@ public class FtpConnectionFactory implements PoolableObjectFactory
 
     public Object makeObject() throws Exception
     {
-        FTPClient client = new FTPClient();
+        FTPClient client = createFtpClient();
+
         if (uri.getPort() > 0)
         {
             client.connect(uri.getHost(), uri.getPort());
@@ -52,6 +53,11 @@ public class FtpConnectionFactory implements PoolableObjectFactory
             throw new IOException("Ftp error. Couldn't set BINARY transfer type: " + client.getReplyCode());
         }
         return client;
+    }
+
+    protected FTPClient createFtpClient()
+    {
+        return new FTPClient();
     }
 
     public void destroyObject(Object obj) throws Exception
