@@ -6,18 +6,17 @@
  */
 package org.mule.test.integration.messaging.meps;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
 public class InOutOutOnlyAsyncRouterTestCase extends FunctionalTestCase
 {
-
     public static final long TIMEOUT = 3000;
 
     @Override
@@ -29,7 +28,7 @@ public class InOutOutOnlyAsyncRouterTestCase extends FunctionalTestCase
     @Test
     public void testExchange() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
 
         MuleMessage result = client.send("inboundEndpoint", "some data", null);
         assertNotNull(result);

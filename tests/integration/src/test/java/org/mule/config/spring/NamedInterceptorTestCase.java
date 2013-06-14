@@ -7,7 +7,7 @@
 package org.mule.config.spring;
 
 import org.mule.api.MuleException;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -33,7 +33,7 @@ public class NamedInterceptorTestCase extends AbstractInterceptorTestCase
     @Test
     public void testInterceptor() throws MuleException, InterruptedException
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         client.send("vm://in", MESSAGE, null);
         assertMessageIntercepted();
     }

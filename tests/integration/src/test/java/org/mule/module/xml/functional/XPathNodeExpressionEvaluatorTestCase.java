@@ -7,7 +7,7 @@
 package org.mule.module.xml.functional;
 
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 
 import java.util.Arrays;
@@ -49,10 +49,9 @@ public class XPathNodeExpressionEvaluatorTestCase extends AbstractServiceAndFlow
     @Test
     public void testExpressionTransformerUsingXpathNode() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
 
         MuleMessage message = client.send("vm://testInput", SAMPLE_REQUEST, null);
-
         XMLAssert.assertXMLEqual(EXPECTED_RESPONSE, message.getPayloadAsString());
     }
 }

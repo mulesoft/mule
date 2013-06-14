@@ -6,8 +6,11 @@
  */
 package org.mule.test.cookbook.quartz;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 
 import java.util.Arrays;
@@ -15,9 +18,6 @@ import java.util.Collection;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 /**
  * The Quartz transport can be used to trigger an event to be received by the
@@ -46,7 +46,7 @@ public class TriggerNoArgsServiceMethodTestCase extends AbstractServiceAndFlowTe
     @Test
     public void testTrigger() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
 
         // Our method should have fired and we can pick up the result
         MuleMessage result = client.request("resultQueue", 2000);

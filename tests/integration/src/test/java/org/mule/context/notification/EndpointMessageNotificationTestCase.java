@@ -6,14 +6,14 @@
  */
 package org.mule.context.notification;
 
-import org.mule.module.client.MuleClient;
+import static org.junit.Assert.assertNotNull;
+
+import org.mule.api.client.MuleClient;
 
 import java.util.Arrays;
 import java.util.Collection;
 
 import org.junit.runners.Parameterized.Parameters;
-
-import static org.junit.Assert.assertNotNull;
 
 public class EndpointMessageNotificationTestCase extends AbstractNotificationTestCase
 {
@@ -39,7 +39,7 @@ public class EndpointMessageNotificationTestCase extends AbstractNotificationTes
     @Override
     public void doTest() throws Exception
     {
-        final MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         assertNotNull(client.send("vm://in-1?connector=direct", "hello sweet world", null));
         client.dispatch("vm://in-2?connector=direct", "goodbye cruel world", null);
         assertNotNull(client.request("vm://out-2?connector=queue", 5000));

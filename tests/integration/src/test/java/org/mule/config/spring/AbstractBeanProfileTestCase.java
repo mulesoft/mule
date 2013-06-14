@@ -11,7 +11,6 @@ import static org.junit.Assert.assertNotNull;
 
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
 
 public abstract class AbstractBeanProfileTestCase extends FunctionalTestCase
@@ -25,12 +24,10 @@ public abstract class AbstractBeanProfileTestCase extends FunctionalTestCase
 
     public void profile(String appended) throws MuleException
     {
-        MuleClient client = new MuleClient(muleContext);
+        org.mule.api.client.MuleClient client = muleContext.getClient();
         client.dispatch("vm://in", "Homero", null);
         MuleMessage response = client.request("vm://out", RECEIVE_TIMEOUT);
         assertNotNull("Response is null", response);
         assertEquals("Homero" + appended, response.getPayload());
     }
 }
-
-

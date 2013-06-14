@@ -7,7 +7,7 @@
 package org.mule.test.integration.construct;
 
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.util.StringUtils;
@@ -35,7 +35,6 @@ public class HttpProxyTestCase extends AbstractServiceAndFlowTestCase
     public HttpProxyTestCase(ConfigVariant variant, String configResources)
     {
         super(variant, configResources);
-
     }
 
     @Parameters
@@ -53,7 +52,7 @@ public class HttpProxyTestCase extends AbstractServiceAndFlowTestCase
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
-        muleClient = new MuleClient(muleContext);
+        muleClient = muleContext.getClient();
     }
 
     @Test

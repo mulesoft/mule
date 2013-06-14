@@ -6,8 +6,11 @@
  */
 package org.mule.module.xml.functional;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.transport.NullPayload;
 
@@ -16,9 +19,6 @@ import java.util.Collection;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
 
 public abstract class AbstractXmlPropertyExtractorTestCase extends AbstractServiceAndFlowTestCase
 {
@@ -46,7 +46,7 @@ public abstract class AbstractXmlPropertyExtractorTestCase extends AbstractServi
     @Test
     public void testMatch() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         client.dispatch("vm://in", getMatchMessage(), null);
         MuleMessage message = client.request("vm://match1", RECEIVE_TIMEOUT);
 
@@ -63,7 +63,7 @@ public abstract class AbstractXmlPropertyExtractorTestCase extends AbstractServi
     @Test
     public void testError() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         client.dispatch("vm://in", getErrorMessage(), null);
         MuleMessage message = client.request("vm://error", RECEIVE_TIMEOUT);
         assertNotNull(message);

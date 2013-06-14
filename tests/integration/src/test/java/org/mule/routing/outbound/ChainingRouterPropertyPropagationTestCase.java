@@ -6,24 +6,24 @@
  */
 package org.mule.routing.outbound;
 
-import org.mule.DefaultMuleMessage;
-import org.mule.api.MuleEventContext;
-import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.junit4.FunctionalTestCase;
-import org.mule.tck.functional.EventCallback;
-import org.mule.tck.functional.FunctionalTestComponent;
-
-import java.util.concurrent.atomic.AtomicBoolean;
-import org.junit.Test;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import org.mule.DefaultMuleMessage;
+import org.mule.api.MuleEventContext;
+import org.mule.api.MuleMessage;
+import org.mule.api.client.MuleClient;
+import org.mule.tck.functional.EventCallback;
+import org.mule.tck.functional.FunctionalTestComponent;
+import org.mule.tck.junit4.FunctionalTestCase;
+
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import org.junit.Test;
+
 public class ChainingRouterPropertyPropagationTestCase extends FunctionalTestCase
 {
-
     @Override
     protected String getConfigResources()
     {
@@ -40,6 +40,7 @@ public class ChainingRouterPropertyPropagationTestCase extends FunctionalTestCas
         final AtomicBoolean hop1made = new AtomicBoolean(false);
         EventCallback callback1 = new EventCallback()
         {
+            @Override
             public void eventReceived(final MuleEventContext context, final Object component) throws Exception
             {
                 assertTrue(hop1made.compareAndSet(false, true));
@@ -51,6 +52,7 @@ public class ChainingRouterPropertyPropagationTestCase extends FunctionalTestCas
         final AtomicBoolean hop2made = new AtomicBoolean(false);
         EventCallback callback2 = new EventCallback()
         {
+            @Override
             public void eventReceived(final MuleEventContext context, final Object component) throws Exception
             {
                 MuleMessage msg = context.getMessage();
@@ -65,7 +67,7 @@ public class ChainingRouterPropertyPropagationTestCase extends FunctionalTestCas
         hop1.setEventCallback(callback1);
         hop2.setEventCallback(callback2);
 
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         DefaultMuleMessage request = new DefaultMuleMessage("payload", muleContext);
         MuleMessage reply = client.send("inboundEndpoint", request);
         assertNotNull(reply);
@@ -76,5 +78,4 @@ public class ChainingRouterPropertyPropagationTestCase extends FunctionalTestCas
         assertEquals("hop1", reply.getInboundProperty("TICKET"));
         assertEquals("10000", reply.getInboundProperty("TTL"));
     }
-
 }

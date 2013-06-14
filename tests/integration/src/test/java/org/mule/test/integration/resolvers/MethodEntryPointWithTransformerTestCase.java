@@ -6,8 +6,11 @@
  */
 package org.mule.test.integration.resolvers;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 
 import java.util.Arrays;
@@ -15,9 +18,6 @@ import java.util.Collection;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 public class MethodEntryPointWithTransformerTestCase extends AbstractServiceAndFlowTestCase
 {
@@ -44,7 +44,7 @@ public class MethodEntryPointWithTransformerTestCase extends AbstractServiceAndF
     @Test
     public void testReceivesMethodPropertyFromAPropertyTransformer() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage response = client.send("vm://in", "payload", null);
         assertNotNull(response);
         assertNotNull(response.getPayload());

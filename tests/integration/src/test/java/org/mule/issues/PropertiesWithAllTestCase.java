@@ -7,17 +7,17 @@
 package org.mule.issues;
 
 
-import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.junit4.FunctionalTestCase;
-
-import org.junit.Rule;
-import org.junit.Test;
-import org.mule.tck.junit4.rule.DynamicPort;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+
+import org.mule.api.MuleMessage;
+import org.mule.api.client.MuleClient;
+import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
+
+import org.junit.Rule;
+import org.junit.Test;
 
 public class PropertiesWithAllTestCase extends FunctionalTestCase
 {
@@ -33,7 +33,7 @@ public class PropertiesWithAllTestCase extends FunctionalTestCase
     @Test
     public void testSessionAndOutboundProperties() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage response = client.send("vm://in", "Hello", null);
         assertNotNull(response);
         assertEquals("foo", response.getSessionProperty("foo"));

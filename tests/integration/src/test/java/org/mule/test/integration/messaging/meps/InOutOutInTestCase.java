@@ -6,8 +6,11 @@
  */
 package org.mule.test.integration.messaging.meps;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
 
 import java.util.HashMap;
@@ -15,12 +18,8 @@ import java.util.Map;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
 public class InOutOutInTestCase extends FunctionalTestCase
 {
-
     public static final long TIMEOUT = 3000;
 
     @Override
@@ -32,9 +31,9 @@ public class InOutOutInTestCase extends FunctionalTestCase
     @Test
     public void testExchange() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
 
-        Map props = new HashMap();
+        Map<String, Object> props = new HashMap<String, Object>();
         props.put("foo", "bar");
         MuleMessage result = client.send("inboundEndpoint", "some data", props);
         assertNotNull(result);

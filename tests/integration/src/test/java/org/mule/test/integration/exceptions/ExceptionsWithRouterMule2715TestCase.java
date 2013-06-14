@@ -6,10 +6,13 @@
  */
 package org.mule.test.integration.exceptions;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.api.MuleMessage;
+import org.mule.api.client.MuleClient;
 import org.mule.api.transformer.TransformerMessagingException;
 import org.mule.message.ExceptionMessage;
-import org.mule.module.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 
 import java.util.Arrays;
@@ -17,9 +20,6 @@ import java.util.Collection;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 public class ExceptionsWithRouterMule2715TestCase extends AbstractServiceAndFlowTestCase
 {
@@ -54,7 +54,7 @@ public class ExceptionsWithRouterMule2715TestCase extends AbstractServiceAndFlow
 
     protected void doTest(String path) throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         client.dispatch("vm://" + path, MESSAGE, null);
         MuleMessage response = client.request("vm://error", TIMEOUT);
         assertNotNull(response);

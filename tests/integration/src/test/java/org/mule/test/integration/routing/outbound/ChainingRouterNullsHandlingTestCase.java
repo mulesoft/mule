@@ -12,7 +12,7 @@ import static org.junit.Assert.assertNull;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 
 import java.util.Arrays;
@@ -38,9 +38,9 @@ public class ChainingRouterNullsHandlingTestCase extends AbstractServiceAndFlowT
     @Test
     public void testNoComponentFails() throws Exception
     {
-        MuleClient muleClient = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage message = new DefaultMuleMessage("thePayload", muleContext);
-        MuleMessage result = muleClient.send("vm://incomingPass", message);
+        MuleMessage result = client.send("vm://incomingPass", message);
         assertNull("Shouldn't have any exceptions", result.getExceptionPayload());
         assertEquals("thePayload Received component1 Received component2Pass", result.getPayloadAsString());
     }
@@ -50,7 +50,8 @@ public class ChainingRouterNullsHandlingTestCase extends AbstractServiceAndFlowT
     {
         MuleMessage message = new DefaultMuleMessage("thePayload", muleContext);
 
-        MuleMessage result = muleContext.getClient().send("vm://incomingLastFail", message);
+        MuleClient client = muleContext.getClient();
+        MuleMessage result = client.send("vm://incomingLastFail", message);
         assertNotNull(result);
         assertNotNull(result.getExceptionPayload());
         assertEquals(Component2Exception.class, result.getExceptionPayload().getRootException().getClass());
@@ -61,7 +62,8 @@ public class ChainingRouterNullsHandlingTestCase extends AbstractServiceAndFlowT
     public void testFirstComponentFails() throws Exception
     {
         MuleMessage message = new DefaultMuleMessage("thePayload", muleContext);
-        MuleMessage result = muleContext.getClient().send("vm://incomingFirstFail", message);
+        MuleClient client = muleContext.getClient();
+        MuleMessage result = client.send("vm://incomingFirstFail", message);
         assertNotNull(result);
         assertNotNull(result.getExceptionPayload());
         assertEquals(Component1Exception.class, result.getExceptionPayload().getRootException().getClass());

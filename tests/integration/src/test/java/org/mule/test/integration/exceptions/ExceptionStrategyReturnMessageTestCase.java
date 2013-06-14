@@ -11,7 +11,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transport.NullPayload;
 
@@ -28,7 +28,7 @@ public class ExceptionStrategyReturnMessageTestCase extends FunctionalTestCase
     @Test
     public void testReturnPayloadDefaultStrategy() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage msg = client.send("vm://in-default-strategy", "Test Message", null);
 
         assertNotNull(msg);
@@ -42,7 +42,7 @@ public class ExceptionStrategyReturnMessageTestCase extends FunctionalTestCase
     @Test
     public void testReturnPayloadCustomStrategy() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage msg = client.send("vm://in-custom-strategy", "Test Message", null);
 
         assertNotNull(msg);

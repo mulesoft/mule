@@ -6,9 +6,12 @@
  */
 package org.mule.issues;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.api.MuleEventContext;
+import org.mule.api.client.MuleClient;
 import org.mule.api.lifecycle.Callable;
-import org.mule.module.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transformer.simple.ObjectToString;
@@ -19,9 +22,6 @@ import java.util.Collection;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 public class HttpReturnsJaxbObject5531TestCase extends AbstractServiceAndFlowTestCase
 {
@@ -55,7 +55,7 @@ public class HttpReturnsJaxbObject5531TestCase extends AbstractServiceAndFlowTes
     public void testGetWeather() throws Exception
     {
         String testUrl = "http://localhost:" + port1.getNumber() + "/test/weather";
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         Object response = client.send(testUrl, "hello", null);
         assertNotNull(response);
         String stringResponse = (String) new ObjectToString().transform(response, "UTF-8");

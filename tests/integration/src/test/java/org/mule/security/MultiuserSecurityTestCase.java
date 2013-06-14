@@ -6,11 +6,14 @@
  */
 package org.mule.security;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import org.mule.api.EncryptionStrategy;
 import org.mule.api.MuleMessage;
+import org.mule.api.client.MuleClient;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.transport.SessionHandler;
-import org.mule.module.client.MuleClient;
 import org.mule.session.MuleSessionHandler;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 
@@ -22,9 +25,6 @@ import java.util.Map;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 /**
  * Tests multi-user security against a security provider which only authenticates
@@ -52,7 +52,7 @@ public class MultiuserSecurityTestCase extends AbstractServiceAndFlowTestCase
     @Test
     public void testMultipleAuthentications() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         SessionHandler sessionHandler = new MuleSessionHandler();
         MuleMessage reply;
         Map<String, Object> props;

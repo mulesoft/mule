@@ -6,14 +6,15 @@
  */
 package org.mule.issues;
 
+import static org.junit.Assert.assertEquals;
+
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transformer.AbstractMessageTransformer;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -21,7 +22,6 @@ import java.util.Set;
 
 import org.junit.Rule;
 import org.junit.Test;
-import static org.junit.Assert.assertEquals;
 
 public class MessageRootIdPropagationTestCase extends FunctionalTestCase
 {
@@ -38,14 +38,13 @@ public class MessageRootIdPropagationTestCase extends FunctionalTestCase
     public void testRootIDs() throws Exception
     {
         RootIDGatherer.initialize();
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
 
         DefaultMuleMessage msg = new DefaultMuleMessage("Hello", muleContext);
         msg.setOutboundProperty("where", "client");
         RootIDGatherer.process(msg);
-        MuleMessage response = client.send("vm://vmin", msg);
+        client.send("vm://vmin", msg);
         Thread.sleep(1000);
-        System.out.println(RootIDGatherer.getIdMap());
         assertEquals(6, RootIDGatherer.getMessageCount());
         assertEquals(1, RootIDGatherer.getIds().size());
     }
@@ -76,7 +75,7 @@ public class MessageRootIdPropagationTestCase extends FunctionalTestCase
         }
 
         @Override
-        public Object transformMessage(MuleMessage msg, String encoding)
+        public Object transformMessage(MuleMessage msg, String outputEncoding)
         {
             process(msg);
             return msg.getPayload();

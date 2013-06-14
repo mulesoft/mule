@@ -10,7 +10,6 @@ import org.junit.Test;
 
 public class BeanProfileOneTestCase extends AbstractBeanProfileTestCase
 {
-
     @Override
     protected String getConfigResources()
     {

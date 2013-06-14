@@ -6,8 +6,12 @@
  */
 package org.mule.test.components;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.transport.NullPayload;
 
@@ -16,10 +20,6 @@ import java.util.Collection;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 public class ComponentReturningNullFlowTestCase extends AbstractServiceAndFlowTestCase
 {
@@ -39,7 +39,7 @@ public class ComponentReturningNullFlowTestCase extends AbstractServiceAndFlowTe
     @Test
     public void testNullReturnStopsFlow() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
 
         MuleMessage msg = client.send("vm://in", "test data", null);
         assertNotNull(msg);

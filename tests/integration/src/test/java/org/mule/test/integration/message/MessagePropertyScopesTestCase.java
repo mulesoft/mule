@@ -6,8 +6,12 @@
  */
 package org.mule.test.integration.message;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.transport.NullPayload;
 
@@ -17,10 +21,6 @@ import java.util.Collection;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 public class MessagePropertyScopesTestCase extends AbstractServiceAndFlowTestCase
 {
@@ -41,7 +41,7 @@ public class MessagePropertyScopesTestCase extends AbstractServiceAndFlowTestCas
     @Test
     public void testSessionProperty() throws Exception {
 
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage response = client.send("vm://in1", "Hello World", null);
         assertNotNull(response);
         String payload = response.getPayloadAsString();
@@ -53,7 +53,7 @@ public class MessagePropertyScopesTestCase extends AbstractServiceAndFlowTestCas
     @Test
     public void testInvocationProperty() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage response = client.send("vm://in2", "Hello World", null);
         // scope = "invocation" should not propagate the property on to the next service
         assertTrue(response.getPayload() instanceof NullPayload);

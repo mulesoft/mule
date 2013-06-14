@@ -6,13 +6,13 @@
  */
 package org.mule.test.integration.message;
 
+import static org.junit.Assert.assertEquals;
+
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
 
 
 /**
@@ -20,7 +20,6 @@ import static org.junit.Assert.assertEquals;
  */
 public class MessagePropertyInResponseTransformersTestCase extends FunctionalTestCase
 {
-
     @Override
     protected String getConfigResources()
     {
@@ -30,7 +29,7 @@ public class MessagePropertyInResponseTransformersTestCase extends FunctionalTes
     @Test
     public void testSend() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage result = client.send("http://localhost:63081/ser",
             "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:sim=\"http://simple.component.mule.org/\"><soapenv:Header/><soapenv:Body><sim:echo><sim:echo>aaa</sim:echo></sim:echo></soapenv:Body></soapenv:Envelope>", null);
         assertEquals(

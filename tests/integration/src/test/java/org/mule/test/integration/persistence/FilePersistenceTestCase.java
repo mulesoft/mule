@@ -6,7 +6,11 @@
  */
 package org.mule.test.integration.persistence;
 
-import org.mule.module.client.MuleClient;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+
+import org.mule.api.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.util.FileUtils;
 
@@ -16,10 +20,6 @@ import java.util.Collection;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
 
 public class FilePersistenceTestCase extends AbstractServiceAndFlowTestCase
 {
@@ -46,7 +46,7 @@ public class FilePersistenceTestCase extends AbstractServiceAndFlowTestCase
         File store = FileUtils.newFile(path);
         assertFalse(store.exists());
 
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         client.dispatch("vm://test.queue", "test", null);
         // Give the vm dispatcher chance to persist message. Cannot use send because
         // send does not use queue.

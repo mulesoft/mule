@@ -11,9 +11,9 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import org.mule.api.MuleMessage;
+import org.mule.api.client.MuleClient;
 import org.mule.api.routing.RoutingException;
 import org.mule.message.ExceptionMessage;
-import org.mule.module.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
 
 import java.io.ByteArrayInputStream;
@@ -32,7 +32,7 @@ public class MulticastRouterTestCase extends FunctionalTestCase
     public void testAll() throws Exception
     {
         ByteArrayInputStream bis = new ByteArrayInputStream("Hello, world".getBytes("UTF-8"));
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         client.dispatch("vm://inbound1", bis, null);
 
         MuleMessage response = client.request("vm://output1", 2000);
@@ -46,7 +46,8 @@ public class MulticastRouterTestCase extends FunctionalTestCase
     public void testFirstSuccessful() throws Exception
     {
         ByteArrayInputStream bis = new ByteArrayInputStream("Hello, world".getBytes("UTF-8"));
-        MuleClient client = new MuleClient(muleContext);
+
+        MuleClient client = muleContext.getClient();
         client.dispatch("vm://inbound2", bis, null);
 
         MuleMessage response = client.request("vm://output4", 2000);

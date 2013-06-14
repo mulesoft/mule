@@ -12,7 +12,7 @@ import static org.junit.Assert.assertTrue;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleMessageCollection;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 
 import java.util.Arrays;
@@ -46,7 +46,8 @@ public class ExpressionRecipientListSyncTestCase extends AbstractServiceAndFlowT
     public void testRecipientList() throws Exception
     {
         String message = "test";
-        MuleClient client = new MuleClient(muleContext);
+
+        MuleClient client = muleContext.getClient();
         Map<String, Object> props = new HashMap<String, Object>(3);
         props.put("recipient1", "vm://service1.queue?exchangePattern=request-response");
         props.put("recipient2", "vm://service2.queue?exchangePattern=request-response");

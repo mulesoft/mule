@@ -17,21 +17,21 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleMessageCollection;
+import org.mule.api.client.MuleClient;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.store.ObjectStoreException;
-import org.mule.module.client.MuleClient;
 import org.mule.routing.AggregationException;
 import org.mule.routing.EventGroup;
 import org.mule.routing.SimpleCollectionAggregator;
 import org.mule.routing.correlation.CollectionCorrelatorCallback;
 import org.mule.routing.correlation.EventCorrelatorCallback;
-import org.mule.session.DefaultMuleSession;
 import org.mule.tck.junit4.FunctionalTestCase;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
 import org.junit.Test;
 
 /**
@@ -44,17 +44,21 @@ public class AggregationTestCase extends FunctionalTestCase
     {
         return "org/mule/test/integration/routing/outbound/aggregation-config.xml";
     }
-    
+
     @Test
     public void testCollectionAggregator() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
+
         String payload = "Long string that wil be broken uop into multiple messages";
         client.dispatch("vm://in", payload, null);
         MuleMessage msg = client.request("vm://collectionCreated", 5000);
         assertNotNull(msg);
         assertTrue(msg instanceof MuleMessageCollection);
+
         MuleMessageCollection collection = (MuleMessageCollection) msg;
+
+        @SuppressWarnings("unchecked")
         List<byte[]> chunks = (List<byte[]>) collection.getPayload();
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         for (byte[] chunk : chunks)
@@ -68,15 +72,16 @@ public class AggregationTestCase extends FunctionalTestCase
     @Test
     public void testCustomAggregator() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         String payload = "Long string that wil be broken uop into multiple messages";
         client.dispatch("vm://in2", payload, null);
         MuleMessage msg = client.request("vm://collectionCreated2", 5000);
         assertNotNull(msg);
         assertNotNull(msg.getPayload());
         assertTrue(msg.getPayload() instanceof List);
+
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        for (Object obj : (List)msg.getPayload())
+        for (Object obj : (List<?>)msg.getPayload())
         {
             assertTrue(obj instanceof MuleEvent);
             MuleEvent event = (MuleEvent) obj;
@@ -89,9 +94,9 @@ public class AggregationTestCase extends FunctionalTestCase
     public static class Aggregator extends SimpleCollectionAggregator
     {
         @Override
-        protected EventCorrelatorCallback getCorrelatorCallback(MuleContext muleContext)
+        protected EventCorrelatorCallback getCorrelatorCallback(MuleContext context)
         {
-            return new MyCollectionCorrelatorCallback(muleContext, persistentStores, storePrefix);
+            return new MyCollectionCorrelatorCallback(context, persistentStores, storePrefix);
         }
     }
 
@@ -111,7 +116,7 @@ public class AggregationTestCase extends FunctionalTestCase
             try
             {
                 iter = events.iterator(true);
-            } 
+            }
             catch (ObjectStoreException e)
             {
                 throw new AggregationException(events, null, e);

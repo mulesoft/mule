@@ -6,9 +6,14 @@
  */
 package org.mule.test.integration.messaging.meps;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.api.MuleMessage;
+import org.mule.api.client.MuleClient;
 import org.mule.api.config.MuleProperties;
-import org.mule.module.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.util.WebServiceOnlineCheck;
 import org.mule.transport.http.HttpConstants;
@@ -19,15 +24,9 @@ import java.util.Map;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-
 @Ignore("MULE-6926: flaky test (Relies on an external server which can go offline after isDisabledInThisEnvironment is executed)")
 public class MessagePropertiesPropagationTestCase extends FunctionalTestCase
 {
-
     @Override
     protected boolean isFailOnTimeout()
     {
@@ -35,7 +34,7 @@ public class MessagePropertiesPropagationTestCase extends FunctionalTestCase
         // that the 3rd-party web service is off-line.
         return false;
     }
-    
+
     /**
      * If a simple call to the web service indicates that it is not responding properly,
      * we disable the test case so as to not report a test failure which has nothing to do
@@ -59,14 +58,14 @@ public class MessagePropertiesPropagationTestCase extends FunctionalTestCase
     @Test
     public void testPropagatedPropertiesWithHttpTransport() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
-        
+        MuleClient client = muleContext.getClient();
+
         Map<String, Object> props = new HashMap<String, Object>();
         props.put("Content-Type", "application/x-www-form-urlencoded");
         props.put(MuleProperties.MULE_CORRELATION_ID_PROPERTY, "TestID");
         props.put(MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY, "TestGroupSize");
         props.put(MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY, "TestSequence");
-        
+
         MuleMessage response = client.send("vm://httpService1", "symbol=IBM", props);
         assertNotNull(response);
         checkPayLoad(response.getPayloadAsString());
@@ -81,7 +80,7 @@ public class MessagePropertiesPropagationTestCase extends FunctionalTestCase
     @Test
     public void testPropagatedPropertiesWithCxfTransport() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
 
         Map<String, Object> props = new HashMap<String, Object>();
         props.put(MuleProperties.MULE_CORRELATION_ID_PROPERTY, "TestID");
@@ -103,7 +102,7 @@ public class MessagePropertiesPropagationTestCase extends FunctionalTestCase
     @Test
     public void testNotPropagatedPropertiesWithHttpTransport() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
 
         Map<String, Object> props = new HashMap<String, Object>();
         props.put("Content-Type", "application/x-www-form-urlencoded");
@@ -126,7 +125,7 @@ public class MessagePropertiesPropagationTestCase extends FunctionalTestCase
     @Test
     public void testNotPropagatedPropertiesWithCxfTransport() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
 
         Map<String, Object> props = new HashMap<String, Object>();
         props.put("some", "thing");
@@ -147,7 +146,7 @@ public class MessagePropertiesPropagationTestCase extends FunctionalTestCase
     @Test
     public void testForcePropagatedPropertiesWithHttpTransport() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
 
         Map<String, Object> props = new HashMap<String, Object>();
         props.put("Content-Type", "application/x-www-form-urlencoded");
@@ -167,7 +166,7 @@ public class MessagePropertiesPropagationTestCase extends FunctionalTestCase
      */
     public void xtestForcePropagatedPropertiesWithCxfTransport() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
 
         Map<String, Object> props = new HashMap<String, Object>();
         props.put("some", "thing");
@@ -179,7 +178,7 @@ public class MessagePropertiesPropagationTestCase extends FunctionalTestCase
         assertEquals("thing", response.getOutboundProperty("some"));
         assertEquals("stuff", response.getOutboundProperty("other"));
     }
-    
+
     private void checkPayLoad(String payload)
     {
         assertNotNull("payload is null", payload);

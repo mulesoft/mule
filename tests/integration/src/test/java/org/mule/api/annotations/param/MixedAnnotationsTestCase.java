@@ -13,7 +13,7 @@ import static org.junit.Assert.fail;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.util.ExceptionUtils;
 import org.mule.util.StringDataSource;
@@ -74,7 +74,7 @@ public class MixedAnnotationsTestCase extends AbstractServiceAndFlowTestCase
     @Test
     public void testProcessAllAnnotated() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage message = client.send("vm://allAnnotated", muleMessage);
         assertNotNull("return message from MuleClient.send() should not be null", message);
         assertTrue("Message payload should be a Map", message.getPayload() instanceof Map);
@@ -104,7 +104,8 @@ public class MixedAnnotationsTestCase extends AbstractServiceAndFlowTestCase
     public void testPayloadNotAnnotated() throws Exception
     {
         // When using param annotations every param needs t obe annotated
-        MuleMessage message = muleContext.getClient().send("vm://someAnnotated", muleMessage);
+        MuleClient client = muleContext.getClient();
+        MuleMessage message = client.send("vm://someAnnotated", muleMessage);
         assertNotNull(message);
         assertNotNull(message.getExceptionPayload());
         assertEquals(IllegalArgumentException.class,

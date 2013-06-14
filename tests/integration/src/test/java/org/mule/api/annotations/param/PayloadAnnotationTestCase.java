@@ -11,8 +11,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import org.mule.api.MuleMessage;
+import org.mule.api.client.MuleClient;
 import org.mule.api.transformer.TransformerException;
-import org.mule.module.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.util.ExceptionUtils;
 import org.mule.util.IOUtils;
@@ -43,7 +43,7 @@ public class PayloadAnnotationTestCase extends AbstractServiceAndFlowTestCase
     @Test
     public void testPayloadNoTransform() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage message = client.send("vm://payload1", "foo", null);
         assertNotNull("return message from MuleClient.send() should not be null", message);
         assertTrue("Message payload should be a String", message.getPayload() instanceof String);
@@ -53,7 +53,7 @@ public class PayloadAnnotationTestCase extends AbstractServiceAndFlowTestCase
     @Test
     public void testPayloadAutoTransform() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage message = client.send("vm://payload2", "foo", null);
         assertNotNull("return message from MuleClient.send() should not be null", message);
         assertTrue("Message payload should be a String", message.getPayload() instanceof InputStream);
@@ -63,7 +63,7 @@ public class PayloadAnnotationTestCase extends AbstractServiceAndFlowTestCase
     @Test
     public void testPayloadFailedTransform() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage message = client.send("vm://payload3", null, null);
         assertNotNull(message);
         assertNotNull(message.getExceptionPayload());

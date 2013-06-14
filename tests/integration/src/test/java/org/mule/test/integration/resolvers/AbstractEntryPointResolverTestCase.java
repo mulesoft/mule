@@ -6,13 +6,13 @@
  */
 package org.mule.test.integration.resolvers;
 
+import static org.junit.Assert.assertEquals;
+
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 
 import java.util.Map;
-
-import static org.junit.Assert.assertEquals;
 
 public abstract class AbstractEntryPointResolverTestCase extends AbstractServiceAndFlowTestCase
 {
@@ -28,7 +28,7 @@ public abstract class AbstractEntryPointResolverTestCase extends AbstractService
 
     protected void doTest(String path, Object payload, String result, Map properties) throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage response = client.send("vm://" + path, payload, properties);
         assertEquals(result, response.getPayloadAsString());
     }

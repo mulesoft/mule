@@ -6,8 +6,11 @@
  */
 package org.mule.module.xml.functional;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.api.MuleEventContext;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
@@ -22,9 +25,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 public class XStreamAdditionalConvertersTestCase extends AbstractServiceAndFlowTestCase
 {
@@ -60,7 +60,7 @@ public class XStreamAdditionalConvertersTestCase extends AbstractServiceAndFlowT
         String timestamp = converter.toString(new Date(System.currentTimeMillis()));
         String input = "<test-bean><createDate>" + timestamp + "</createDate></test-bean>";
 
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         client.dispatch("vm://FromTest", input, null);
 
         assertTrue(latch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS));

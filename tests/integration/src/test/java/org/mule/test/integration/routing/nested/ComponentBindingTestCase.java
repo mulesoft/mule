@@ -6,23 +6,23 @@
  */
 package org.mule.test.integration.routing.nested;
 
-import org.junit.Test;
-import org.junit.runners.Parameterized;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 
 import java.util.Arrays;
 import java.util.Collection;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import org.junit.Test;
+import org.junit.runners.Parameterized;
 
 public class ComponentBindingTestCase extends AbstractServiceAndFlowTestCase
 {
     private static final int number = 0xC0DE;
-
 
     public ComponentBindingTestCase(AbstractServiceAndFlowTestCase.ConfigVariant variant, String configResources)
     {
@@ -58,7 +58,7 @@ public class ComponentBindingTestCase extends AbstractServiceAndFlowTestCase
 
     private void internalTest(String prefix) throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         String message = "Mule";
         client.dispatch(prefix + "invoker.in", message, null);
         MuleMessage reply = client.request(prefix + "invoker.out", RECEIVE_TIMEOUT);

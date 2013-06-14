@@ -7,7 +7,7 @@
 package org.mule.test.integration.messaging.meps;
 
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.transport.NullPayload;
 
@@ -64,7 +64,7 @@ public class InOptionalOutOutOnlyJMSTestCase extends AbstractServiceAndFlowTestC
     @Test
     public void testExchange() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
 
         MuleMessage result = client.send("inboundEndpoint", "some data", null);
         assertNotNull(result);

@@ -6,15 +6,15 @@
  */
 package org.mule.test.integration.message;
 
-import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.junit4.FunctionalTestCase;
-import org.mule.tck.NonSerializableObject;
-
-import org.junit.Test;
-
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+
+import org.mule.api.MuleMessage;
+import org.mule.api.client.MuleClient;
+import org.mule.tck.NonSerializableObject;
+import org.mule.tck.junit4.FunctionalTestCase;
+
+import org.junit.Test;
 
 /**
  * see EE-2307
@@ -33,7 +33,7 @@ public class SessionPropertyChainingRouterTestCase extends FunctionalTestCase
     @Test
     public void testRouter() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage response = client.send("vm://in", "test message", null);
         assertNotNull(response);
         assertTrue("Response is " + response.getPayload(), response.getPayload() instanceof NonSerializableObject);

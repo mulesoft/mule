@@ -7,11 +7,12 @@
 package org.mule.shutdown;
 
 import static org.junit.Assert.assertTrue;
+
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
+import org.mule.api.client.MuleClient;
 import org.mule.api.transport.DispatchException;
-import org.mule.module.client.MuleClient;
 import org.mule.tck.junit4.rule.SystemProperty;
 
 import java.util.HashMap;
@@ -21,7 +22,6 @@ import org.junit.Test;
 
 public class ExpiredShutdownTimeoutRequestResponseTestCase extends AbstractShutdownTimeoutRequestResponseTestCase
 {
-
     @Rule
     public SystemProperty contextShutdownTimeout = new SystemProperty("contextShutdownTimeout", "100");
 
@@ -51,7 +51,7 @@ public class ExpiredShutdownTimeoutRequestResponseTestCase extends AbstractShutd
 
     private void doShutDownTest(final String url) throws MuleException, InterruptedException
     {
-        final MuleClient client = new MuleClient(muleContext);
+        final MuleClient client = muleContext.getClient();
         final boolean[] results = new boolean[] {false};
 
         Thread t = new Thread()

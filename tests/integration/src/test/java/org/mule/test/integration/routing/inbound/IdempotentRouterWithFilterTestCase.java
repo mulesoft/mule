@@ -6,10 +6,15 @@
  */
 package org.mule.test.integration.routing.inbound;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
+
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 
 import java.util.Arrays;
@@ -17,11 +22,6 @@ import java.util.Collection;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.fail;
 
 public class IdempotentRouterWithFilterTestCase extends AbstractServiceAndFlowTestCase
 {
@@ -53,7 +53,7 @@ public class IdempotentRouterWithFilterTestCase extends AbstractServiceAndFlowTe
 
         try
         {
-            myClient = new MuleClient(muleContext);
+            myClient = muleContext.getClient();
             myClient.dispatch("vm://FromTestCase", myMessage);
             response = myClient.request("vm://ToTestCase", 5000);
         }
@@ -80,7 +80,7 @@ public class IdempotentRouterWithFilterTestCase extends AbstractServiceAndFlowTe
 
         try
         {
-            myClient = new MuleClient(muleContext);
+            myClient = muleContext.getClient();
             myClient.dispatch("vm://FromTestCase", myMessage);
             response = myClient.request("vm://ToTestCase", 5000);
         }

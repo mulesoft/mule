@@ -6,9 +6,11 @@
  */
 package org.mule.issues;
 
+import static org.junit.Assert.assertNull;
+
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -18,8 +20,6 @@ import java.util.Collection;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-
-import static org.junit.Assert.assertNull;
 
 public class InOutOutOnlyMessageCopyMule3007TestCase extends AbstractServiceAndFlowTestCase
 {
@@ -43,9 +43,8 @@ public class InOutOutOnlyMessageCopyMule3007TestCase extends AbstractServiceAndF
     @Test
     public void testStreamMessage() throws MuleException
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         String url = String.format("http://localhost:%1d/services", port1.getNumber());
-        System.out.println(url);
         MuleMessage response = client.send(url, "test", null);
         assertNull(response.getExceptionPayload());
     }
