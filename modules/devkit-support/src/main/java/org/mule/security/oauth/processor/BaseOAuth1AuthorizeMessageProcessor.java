@@ -34,8 +34,7 @@ public abstract class BaseOAuth1AuthorizeMessageProcessor extends AbstractAuthor
         OAuth1Manager manager = moduleObject.getOauth1Manager();
         OAuth1FetchAccessTokenMessageProcessor fetchAccessTokenMessageProcessor = new OAuth1FetchAccessTokenMessageProcessor(
             moduleObject);
-        this.startCallback(manager, fetchAccessTokenMessageProcessor);
-
+        
         if (this.getAccessTokenUrl() != null)
         {
             fetchAccessTokenMessageProcessor.setAccessTokenUrl(this.getAccessTokenUrl());
@@ -44,6 +43,7 @@ public abstract class BaseOAuth1AuthorizeMessageProcessor extends AbstractAuthor
         {
             fetchAccessTokenMessageProcessor.setAccessTokenUrl(moduleObject.getAccessTokenUrl());
         }
+        
         if (requestTokenUrl != null)
         {
             fetchAccessTokenMessageProcessor.setRequestTokenUrl(requestTokenUrl);
@@ -52,6 +52,7 @@ public abstract class BaseOAuth1AuthorizeMessageProcessor extends AbstractAuthor
         {
             fetchAccessTokenMessageProcessor.setRequestTokenUrl(moduleObject.getRequestTokenUrl());
         }
+        
         if (this.getAuthorizationUrl() != null)
         {
             fetchAccessTokenMessageProcessor.setAuthorizationUrl(this.getAuthorizationUrl());
@@ -60,6 +61,8 @@ public abstract class BaseOAuth1AuthorizeMessageProcessor extends AbstractAuthor
         {
             fetchAccessTokenMessageProcessor.setAuthorizationUrl(moduleObject.getAuthorizationUrl());
         }
+        
+        this.startCallback(manager, fetchAccessTokenMessageProcessor);
     }
 
     /**

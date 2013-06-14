@@ -297,7 +297,7 @@ public abstract class BaseOAuth1Manager extends DefaultHttpCallbackAdapter imple
         }
     }
 
-    private OAuthConsumer getConsumer(OAuth1Adapter adapter)
+    protected OAuthConsumer getConsumer(OAuth1Adapter adapter)
     {
         OAuthConsumer consumer = adapter.getConsumer();
         

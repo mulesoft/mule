@@ -20,7 +20,6 @@ import org.mule.common.security.oauth.AuthorizationParameter;
 import org.mule.security.oauth.HttpCallback;
 import org.mule.security.oauth.OAuth2Adapter;
 import org.mule.security.oauth.OAuth2Manager;
-import org.mule.security.oauth.callback.HttpCallbackAdapter;
 import org.mule.tck.size.SmallTest;
 
 import java.lang.reflect.Type;

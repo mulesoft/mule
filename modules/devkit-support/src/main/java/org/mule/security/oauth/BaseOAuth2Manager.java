@@ -125,6 +125,7 @@ public abstract class BaseOAuth2Manager<C extends OAuth2Adapter> extends Default
     @Override
     public final void initialise() throws InitialisationException
     {
+        super.initialise();
         GenericKeyedObjectPool.Config config = new GenericKeyedObjectPool.Config();
         config.testOnBorrow = true;
         if (accessTokenObjectStore == null)
