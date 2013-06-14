@@ -66,7 +66,7 @@ public class DefaultMuleVersionCheckerTestCase
         Assert.assertEquals(this.checker.getMuleVersion(), MuleManifest.getProductVersion());
     }
 
-    @Test(expected=ConfigurationException.class)
+    @Test(expected = ConfigurationException.class)
     public void assertGreaterMajorVersion() throws ConfigurationException
     {
         String version = this.addVersion(this.getVersion(), "1.0.0");
@@ -74,35 +74,21 @@ public class DefaultMuleVersionCheckerTestCase
         Assert.fail("Was expecting a failure do to major mule version");
     }
 
-    @Test
-    public void assertLowerMajorVersion()
+    @Test(expected = ConfigurationException.class)
+    public void assertLowerMajorVersion() throws ConfigurationException
     {
         String version = this.addVersion(this.getVersion(), "-1.0.0");
-        try
-        {
-            this.checker.assertRuntimeGreaterOrEquals(version);
-        }
-        catch (ConfigurationException e)
-        {
-            Assert.fail("was expecting failure due to minor mule version");
-        }
+        this.checker.assertRuntimeGreaterOrEquals(version);
     }
 
-    @Test
-    public void assertLowerMinorVersion()
+    @Test(expected = ConfigurationException.class)
+    public void assertLowerMinorVersion() throws ConfigurationException
     {
         String version = this.addVersion(this.getVersion(), "0.-1.0");
-        try
-        {
-            this.checker.assertRuntimeGreaterOrEquals(version);
-        }
-        catch (ConfigurationException e)
-        {
-            Assert.fail("was expecting failure due to minor mule version");
-        }
+        this.checker.assertRuntimeGreaterOrEquals(version);
     }
 
-    @Test(expected=ConfigurationException.class)
+    @Test(expected = ConfigurationException.class)
     public void assertGreaterMinorVersion() throws ConfigurationException
     {
         String version = this.addVersion(this.getVersion(), "0.1.0");
@@ -110,21 +96,14 @@ public class DefaultMuleVersionCheckerTestCase
         Assert.fail("was expecting failure due to minor mule version");
     }
 
-    @Test
-    public void assertLowerPatchVersion()
+    @Test(expected = ConfigurationException.class)
+    public void assertLowerPatchVersion() throws ConfigurationException
     {
         String version = this.addVersion(this.getVersion(), "0.0.-1");
-        try
-        {
-            this.checker.assertRuntimeGreaterOrEquals(version);
-        }
-        catch (ConfigurationException e)
-        {
-            Assert.fail("was expecting failure due to minor mule version");
-        }
+        this.checker.assertRuntimeGreaterOrEquals(version);
     }
 
-    @Test(expected=ConfigurationException.class)
+    @Test(expected = ConfigurationException.class)
     public void assertGreaterPatchVersion() throws ConfigurationException
     {
         String version = this.addVersion(this.getVersion(), "0.0.1");
@@ -171,8 +150,9 @@ public class DefaultMuleVersionCheckerTestCase
         {
             newVersion.append(".0");
         }
-        
-        for (; i < deltaVersion.length; i++) {
+
+        for (; i < deltaVersion.length; i++)
+        {
             newVersion.append('.').append(deltaVersion[i]);
         }
 
