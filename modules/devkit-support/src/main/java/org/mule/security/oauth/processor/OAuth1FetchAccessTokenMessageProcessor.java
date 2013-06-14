@@ -23,9 +23,9 @@ public class OAuth1FetchAccessTokenMessageProcessor extends FetchAccessTokenMess
     private String requestTokenUrl = null;
     private OAuth1Adapter adapter = null;
 
-    public OAuth1FetchAccessTokenMessageProcessor(OAuth1Adapter oauthManager)
+    public OAuth1FetchAccessTokenMessageProcessor(OAuth1Adapter adapter)
     {
-        this.adapter = oauthManager;
+        this.adapter = adapter;
     }
 
     public final MuleEvent process(MuleEvent event) throws MuleException

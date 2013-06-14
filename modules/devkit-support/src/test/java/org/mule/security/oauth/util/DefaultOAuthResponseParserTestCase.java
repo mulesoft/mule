@@ -10,6 +10,8 @@
 
 package org.mule.security.oauth.util;
 
+import org.mule.tck.size.SmallTest;
+
 import java.util.Date;
 import java.util.regex.Pattern;
 
@@ -17,6 +19,7 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 
+@SmallTest
 public class DefaultOAuthResponseParserTestCase
 {
 
@@ -40,19 +43,35 @@ public class DefaultOAuthResponseParserTestCase
             "ya29.AHES6ZTtm7SuokEB-RGtbBty9IIlNiP9-eNMMQKtXdMP3sfjL1Fc");
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void noAccessToken()
+    {
+        this.parser.extractAccessCode(ACCESS_CODE_PATTERN, "i have no token for you");
+    }
+
     @Test
     public void refreshToken()
     {
         Assert.assertEquals(parser.extractRefreshToken(REFRESH_TOKEN_PATTERN, response),
             "1/HKSmLFXzqP0leUihZp2xUt3-5wkU7Gmu2Os_eBnzw74");
     }
-
+    
+    @Test
+    public void noRefreshToken() {
+        Assert.assertNull(parser.extractRefreshToken(REFRESH_TOKEN_PATTERN, "no refresh token for you"));
+    }
+    
     @Test
     public void expirationTime()
     {
         Date now = new Date();
         Date expiration = parser.extractExpirationTime(EXPIRATION_TIME_PATTERN, response);
         Assert.assertTrue((expiration.getTime() - now.getTime()) >= (3600 * 1000));
+    }
+    
+    @Test
+    public void noExpirationTime() {
+        Assert.assertNull(this.parser.extractExpirationTime(EXPIRATION_TIME_PATTERN, "you're out of time"));
     }
 
 }
