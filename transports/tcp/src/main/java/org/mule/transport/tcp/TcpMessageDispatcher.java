@@ -157,9 +157,10 @@ public class TcpMessageDispatcher extends AbstractMessageDispatcher
 
         };
 
-        if (timeout >= 0)
+        int soTimeout = endpoint.getResponseTimeout() != 0 ? endpoint.getResponseTimeout() : timeout;
+        if (soTimeout >= 0)
         {
-            socket.setSoTimeout(timeout);
+            socket.setSoTimeout(soTimeout);
         }
 
         try
