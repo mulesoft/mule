@@ -77,6 +77,11 @@ public interface OAuth1Adapter extends OAuthAdapter, OAuth1Connector
      */
     public void setConsumer(OAuthConsumer consumer);
     
+    /**
+     * Sets the adapter to a blank unauthorized state
+     */
+    public void reset();
+    
     public OAuth1Manager getOauth1Manager();
 
 }
