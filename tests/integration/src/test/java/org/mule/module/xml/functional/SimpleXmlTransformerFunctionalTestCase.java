@@ -16,7 +16,7 @@ import static org.junit.Assert.assertTrue;
 
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
 
 import org.custommonkey.xmlunit.XMLAssert;
@@ -27,7 +27,7 @@ public class SimpleXmlTransformerFunctionalTestCase extends FunctionalTestCase
     public static final String SERIALIZED = "<org.mule.module.xml.functional.SimpleXmlTransformerFunctionalTestCase_-Parent>\n" +
             "  <child>\n" +
             "    <name>theChild</name>\n" +
-            "  </child>\n" + 
+            "  </child>\n" +
             "</org.mule.module.xml.functional.SimpleXmlTransformerFunctionalTestCase_-Parent>";
 
 
@@ -40,7 +40,7 @@ public class SimpleXmlTransformerFunctionalTestCase extends FunctionalTestCase
     @Test
     public void testXmlOut() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         client.dispatch("xml-in", SERIALIZED, null);
         Parent parent = (Parent) request(client, "xml-object-out", Parent.class);
         assertNotNull(parent);
@@ -51,12 +51,11 @@ public class SimpleXmlTransformerFunctionalTestCase extends FunctionalTestCase
     @Test
     public void testObjectXmlOut() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         client.dispatch("object-in", new Parent(new Child("theChild")), null);
         String xml = (String) request(client, "object-xml-out", String.class);
         XMLAssert.assertXMLEqual(SERIALIZED, xml);
     }
-
 
     protected Object request(MuleClient client, String endpoint, Class<?> clazz) throws MuleException
     {
@@ -95,22 +94,22 @@ public class SimpleXmlTransformerFunctionalTestCase extends FunctionalTestCase
     public static class Child
     {
         private String name;
-        
+
         public Child()
         {
             this(null);
         }
-        
+
         public Child(String name)
         {
             this.name = name;
         }
-        
+
         public String getName()
         {
             return name;
         }
-        
+
         public void setName(String name)
         {
             this.name = name;

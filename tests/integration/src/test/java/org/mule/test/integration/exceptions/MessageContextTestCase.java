@@ -10,9 +10,11 @@
 
 package org.mule.test.integration.exceptions;
 
+import static org.junit.Assert.assertNotNull;
+
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 
 import java.util.Arrays;
@@ -20,8 +22,6 @@ import java.util.Collection;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-
-import static org.junit.Assert.assertNotNull;
 
 public class MessageContextTestCase extends AbstractServiceAndFlowTestCase
 {
@@ -45,8 +45,8 @@ public class MessageContextTestCase extends AbstractServiceAndFlowTestCase
     @Test
     public void testAlternateExceptionStrategy() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
-        DefaultMuleMessage msg = new DefaultMuleMessage("Hello World", client.getMuleContext());
+        MuleClient client = muleContext.getClient();
+        DefaultMuleMessage msg = new DefaultMuleMessage("Hello World", muleContext);
         MuleMessage response = client.send("testin", msg, 200000);
         assertNotNull(response);
     }

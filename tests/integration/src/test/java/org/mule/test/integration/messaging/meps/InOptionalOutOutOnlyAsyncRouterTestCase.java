@@ -14,18 +14,19 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
+import org.mule.DefaultMuleMessage;
+import org.mule.api.MuleMessage;
+import org.mule.api.client.MuleClient;
+import org.mule.api.construct.FlowConstruct;
+import org.mule.api.service.Service;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.transport.NullPayload;
+
 import java.util.Arrays;
 import java.util.Collection;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-import org.mule.DefaultMuleMessage;
-import org.mule.api.MuleMessage;
-import org.mule.api.construct.FlowConstruct;
-import org.mule.api.service.Service;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
-import org.mule.transport.NullPayload;
 
 public class InOptionalOutOutOnlyAsyncRouterTestCase extends AbstractServiceAndFlowTestCase
 {
@@ -51,7 +52,7 @@ public class InOptionalOutOutOnlyAsyncRouterTestCase extends AbstractServiceAndF
     @Test
     public void testExchange() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
 
         MuleMessage result = client.send("inboundEndpoint", "some data", null);
         assertNotNull(result);

@@ -14,18 +14,17 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
 
 import org.junit.Test;
 
 public class InterceptorFlowTestCase extends FunctionalTestCase
 {
-
     @Test
     public void testDefaultJavaComponentShortcut() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         client.dispatch("in", "hello world", null);
         MuleMessage message = client.request("out", 3000);
         assertNotNull(message);

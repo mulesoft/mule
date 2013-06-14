@@ -14,7 +14,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
 
 import java.util.ArrayList;
@@ -32,7 +32,7 @@ public abstract class AbstractPipelineTestCase extends FunctionalTestCase
     @Test
     public void testPipelineSynchronous() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         List<MuleMessage> results = new ArrayList<MuleMessage>();
         for (int i = 0; i < getNumberOfMessages(); i++)
         {
@@ -51,7 +51,7 @@ public abstract class AbstractPipelineTestCase extends FunctionalTestCase
     @Test
     public void testPipelineAsynchronous() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
 
         for (int i = 0; i < getNumberOfMessages(); i++)
         {

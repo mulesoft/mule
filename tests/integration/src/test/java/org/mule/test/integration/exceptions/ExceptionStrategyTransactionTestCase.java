@@ -10,10 +10,13 @@
 
 package org.mule.test.integration.exceptions;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
+
 import org.mule.api.MuleEvent;
+import org.mule.api.client.MuleClient;
 import org.mule.api.transaction.TransactionException;
 import org.mule.exception.DefaultMessagingExceptionStrategy;
-import org.mule.module.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.transaction.TransactionCoordination;
 
@@ -22,9 +25,6 @@ import java.util.Collection;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
 
 /**
  * When exception strategies are used with transactions it should be possible to send
@@ -51,7 +51,7 @@ public class ExceptionStrategyTransactionTestCase extends AbstractServiceAndFlow
     @Test
     public void testRequestReply() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         client.dispatch("InputQueueClient", "payload", null);
 
         // There should be a message on ExceptionQueue
@@ -66,7 +66,7 @@ public class ExceptionStrategyTransactionTestCase extends AbstractServiceAndFlow
     @Test
     public void testNoInfiniteLoop() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         client.dispatch("InputQueueClient2", "payload", null);
 
         Thread.sleep(500);
@@ -108,5 +108,4 @@ public class ExceptionStrategyTransactionTestCase extends AbstractServiceAndFlow
             }
         }
     }
-
 }

@@ -10,8 +10,12 @@
 
 package org.mule.test.integration.exceptions;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
+
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 
 import java.util.Arrays;
@@ -21,10 +25,6 @@ import java.util.Map;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
 
 public class ExceptionStrategyMessagePropertiesTestCase extends AbstractServiceAndFlowTestCase
 {
@@ -52,7 +52,7 @@ public class ExceptionStrategyMessagePropertiesTestCase extends AbstractServiceA
         tester1.start();
         tester2.start();
 
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage msg;
         for (int i = 0; i < numMessages; ++i)
         {
@@ -69,7 +69,7 @@ public class ExceptionStrategyMessagePropertiesTestCase extends AbstractServiceA
         {
             try
             {
-                MuleClient client = new MuleClient(muleContext);
+                MuleClient client = muleContext.getClient();
 
                 Map<String, Object> props = new HashMap<String, Object>();
                 props.put("foo", "bar");

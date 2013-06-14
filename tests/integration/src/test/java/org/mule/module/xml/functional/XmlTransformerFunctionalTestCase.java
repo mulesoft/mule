@@ -10,9 +10,13 @@
 
 package org.mule.module.xml.functional;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -21,10 +25,6 @@ import org.custommonkey.xmlunit.XMLAssert;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 import org.w3c.dom.Document;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 public class XmlTransformerFunctionalTestCase extends AbstractXmlFunctionalTestCase
 {
@@ -50,7 +50,7 @@ public class XmlTransformerFunctionalTestCase extends AbstractXmlFunctionalTestC
 
     protected MuleClient sendXml() throws MuleException
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         client.dispatch("xml-in", SIMPLE_XML, null);
         return client;
     }
@@ -62,7 +62,7 @@ public class XmlTransformerFunctionalTestCase extends AbstractXmlFunctionalTestC
 
     protected MuleClient sendObject(String endpoint) throws MuleException
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         client.dispatch(endpoint, new Parent(new Child()), null);
         return client;
     }

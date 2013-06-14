@@ -11,10 +11,9 @@ package org.mule.context.notification.processors;
 
 import static org.junit.Assert.assertNotNull;
 
+import org.mule.api.client.MuleClient;
 import org.mule.context.notification.Node;
 import org.mule.context.notification.RestrictedNode;
-import org.mule.context.notification.processors.AbstractMessageProcessorNotificationTestCase;
-import org.mule.module.client.MuleClient;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -24,7 +23,6 @@ import org.junit.runners.Parameterized;
 
 public class MessageProcessorNotificationTestCase extends AbstractMessageProcessorNotificationTestCase
 {
-
     public MessageProcessorNotificationTestCase(ConfigVariant variant, String configResources)
     {
         super(variant, configResources);
@@ -42,7 +40,7 @@ public class MessageProcessorNotificationTestCase extends AbstractMessageProcess
     {
         List<String> testList = Arrays.asList("test", "with", "collection");
 
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         assertNotNull(client.send("vm://in-single", "test", null));
         assertNotNull(client.send("vm://in-processorChain", "test", null));
         assertNotNull(client.send("vm://customProcessor", "test", null));

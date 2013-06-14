@@ -13,7 +13,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.mule.context.notification.ExceptionStrategyNotification.PROCESS_END;
 import static org.mule.context.notification.ExceptionStrategyNotification.PROCESS_START;
 
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -22,7 +22,6 @@ import org.junit.runners.Parameterized;
 
 public class ExceptionStrategyNotificationTestCase extends AbstractNotificationTestCase
 {
-
     public ExceptionStrategyNotificationTestCase(ConfigVariant variant, String configResources)
     {
         super(variant, configResources);
@@ -38,7 +37,7 @@ public class ExceptionStrategyNotificationTestCase extends AbstractNotificationT
     @Override
     public void doTest() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         assertNotNull(client.send("vm://in-catch", "test", null));
         assertNotNull(client.send("vm://in-rollback", "test", null));
         assertNotNull(client.send("vm://in-choice-es", "test", null));

@@ -10,8 +10,11 @@
 
 package org.mule.test.integration.components;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+import org.mule.api.client.MuleClient;
 import org.mule.lifecycle.JSR250LifecycleTrackerComponent;
-import org.mule.module.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 
 import java.util.Arrays;
@@ -19,9 +22,6 @@ import java.util.Collection;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 public class JSR250LifecycleTrackerComponentFunctionalTestCase extends AbstractServiceAndFlowTestCase
 {
@@ -141,12 +141,11 @@ public class JSR250LifecycleTrackerComponentFunctionalTestCase extends AbstractS
 
     private JSR250LifecycleTrackerComponent exerciseComponent(final String serviceName) throws Exception
     {
-        MuleClient muleClient = new MuleClient(muleContext);
-        final JSR250LifecycleTrackerComponent ltc = (JSR250LifecycleTrackerComponent) muleClient.send(
+        MuleClient client = muleContext.getClient();
+        final JSR250LifecycleTrackerComponent ltc = (JSR250LifecycleTrackerComponent) client.send(
             "vm://" + serviceName + ".In", null, null).getPayload();
 
         assertNotNull(ltc);
-
         return ltc;
     }
 }

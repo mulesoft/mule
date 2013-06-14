@@ -10,10 +10,14 @@
 
 package org.mule.test.integration.exceptions;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
+import org.mule.api.client.MuleClient;
 import org.mule.message.ExceptionMessage;
-import org.mule.module.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 
 import java.util.Arrays;
@@ -21,10 +25,6 @@ import java.util.Collection;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 
 public class ExceptionListenerTestCase extends AbstractServiceAndFlowTestCase
 {
@@ -48,7 +48,7 @@ public class ExceptionListenerTestCase extends AbstractServiceAndFlowTestCase
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
-        client = new MuleClient(muleContext);
+        client = muleContext.getClient();
     }
 
     @Test
