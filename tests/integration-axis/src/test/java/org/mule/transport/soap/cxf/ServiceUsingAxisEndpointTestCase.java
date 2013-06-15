@@ -15,7 +15,7 @@ import static org.junit.Assert.assertNotNull;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -37,7 +37,7 @@ public class ServiceUsingAxisEndpointTestCase extends FunctionalTestCase
     @Test
     public void testCXF() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage reply = client.send("vm://cxf.in", new DefaultMuleMessage("Testing String", muleContext));
 
         assertNotNull(reply);
@@ -48,7 +48,7 @@ public class ServiceUsingAxisEndpointTestCase extends FunctionalTestCase
     @Test
     public void testRequestWsdl() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         Map<String, Object> props = new HashMap<String, Object>();
         props.put("http.method", "GET");
         MuleMessage reply = client.send("http://localhost:" + dynamicPort.getNumber() + "/services/CxfService?wsdl",

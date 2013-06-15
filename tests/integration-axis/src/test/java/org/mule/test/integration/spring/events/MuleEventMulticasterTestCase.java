@@ -10,23 +10,23 @@
 
 package org.mule.test.integration.spring.events;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.util.concurrent.atomic.AtomicInteger;
+
 import org.junit.Rule;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
 public class MuleEventMulticasterTestCase extends FunctionalTestCase
 {
-
     private final AtomicInteger eventCount = new AtomicInteger(0);
 
     @Rule
@@ -38,20 +38,15 @@ public class MuleEventMulticasterTestCase extends FunctionalTestCase
         return "org/mule/test/integration/spring/events/mule-events-example-app-context.xml";
     }
 
-    @Override
-    protected void doSetUp() throws Exception
-    {
-        eventCount.set(0);
-    }
-
     @Test
     public void testReceiveAsWebService() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         OrderManagerBean orderManager = muleContext.getRegistry().get("orderManagerBean");
         assertNotNull(orderManager);
         EventCallback callback = new EventCallback()
         {
+            @Override
             public void eventReceived(MuleEventContext context, Object o) throws Exception
             {
                 eventCount.incrementAndGet();

@@ -10,21 +10,20 @@
 
 package org.mule.test.usecases.axis.clientbridge;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import org.junit.Rule;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 public class ClientBridgeTestCase extends FunctionalTestCase
 {
-
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
@@ -37,14 +36,14 @@ public class ClientBridgeTestCase extends FunctionalTestCase
     @Test
     public void testBridgeVMToAxis() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
-        MuleMessage message = client.send("vm://complexRequest", new ComplexData("Foo", new Integer(84)), null);
+        MuleClient client = muleContext.getClient();
 
+        MuleMessage message = client.send("vm://complexRequest", new ComplexData("Foo", new Integer(84)), null);
         assertNotNull(message);
         assertTrue(message.getPayload() instanceof ComplexData);
+
         ComplexData result = (ComplexData)message.getPayload();
         assertEquals(new Integer(84), result.getSomeInteger());
         assertEquals("Foo", result.getSomeString());
     }
-
 }

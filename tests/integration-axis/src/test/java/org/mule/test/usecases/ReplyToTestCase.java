@@ -10,9 +10,14 @@
 
 package org.mule.test.usecases;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.NullPayload;
@@ -20,17 +25,11 @@ import org.mule.transport.NullPayload;
 import org.junit.ClassRule;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-
 /**
  * see MULE-2721
- */ 
+ */
 public class ReplyToTestCase extends FunctionalTestCase
 {
-    
     private static final long RECEIVE_DELAY = 3000;
 
     @ClassRule
@@ -53,11 +52,11 @@ public class ReplyToTestCase extends FunctionalTestCase
     @Test
     public void testVm() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
-        
+        MuleClient client = muleContext.getClient();
+
         MuleMessage msg = new DefaultMuleMessage("testing", muleContext);
         msg.setReplyTo("ReplyTo");
-        
+
         // Send asynchronous request
         client.dispatch("EchoVm", msg, null);
 
@@ -69,17 +68,17 @@ public class ReplyToTestCase extends FunctionalTestCase
 
         // Make sure there are no more responses
         result = client.request("ReplyTo", RECEIVE_DELAY);
-        assertNull("Extra message received at replyTo destination: " + result, result);        
+        assertNull("Extra message received at replyTo destination: " + result, result);
     }
 
     @Test
     public void testAxis() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
-        
+        MuleClient client = muleContext.getClient();
+
         MuleMessage msg = new DefaultMuleMessage("testing", muleContext);
         msg.setReplyTo("ReplyTo");
-        
+
         // Send asynchronous request
         client.dispatch("EchoAxisSend", msg, null);
 
@@ -91,17 +90,17 @@ public class ReplyToTestCase extends FunctionalTestCase
 
         // Make sure there are no more responses
         result = client.request("ReplyTo", RECEIVE_DELAY);
-        assertNull("Extra message received at replyTo destination: " + result, result);        
+        assertNull("Extra message received at replyTo destination: " + result, result);
     }
 
     @Test
     public void testCxf() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
-        
+        MuleClient client = muleContext.getClient();
+
         MuleMessage msg = new DefaultMuleMessage("testing", muleContext);
         msg.setReplyTo("ReplyTo");
-        
+
         // Send asynchronous request
         client.dispatch("EchoCxfSend", msg, null);
 
@@ -113,6 +112,6 @@ public class ReplyToTestCase extends FunctionalTestCase
 
         // Make sure there are no more responses
         result = client.request("ReplyTo", RECEIVE_DELAY);
-        assertNull("Extra message received at replyTo destination: " + result, result);        
+        assertNull("Extra message received at replyTo destination: " + result, result);
     }
 }

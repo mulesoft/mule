@@ -15,7 +15,6 @@ package org.mule.test.integration.transport.axis;
  */
 public class AxisOverJMSWithTransactionsTestCase extends AbstractAxisOverJMSWithTransactionsTestCase
 {
-
     @Override
     protected String getConfigResources()
     {

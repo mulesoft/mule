@@ -10,8 +10,11 @@
 
 package org.mule.test.usecases.axis;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.soap.axis.AxisConnector;
@@ -22,12 +25,8 @@ import java.util.Map;
 import org.junit.Rule;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
 public class AxisClientWithComplexTypesTestCase extends FunctionalTestCase
 {
-    
     private Trade trade = null;
     private String uri = null;
 
@@ -55,15 +54,16 @@ public class AxisClientWithComplexTypesTestCase extends FunctionalTestCase
     @Test
     public void testSendComplexDOCLIT() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
-        Map props = new HashMap();
+        MuleClient client = muleContext.getClient();
+
+        Map<String, Object> props = new HashMap<String, Object>();
         props.put(AxisConnector.STYLE, "Document");
         props.put(AxisConnector.USE, "Literal");
 
         SubmitTrade submittrade = new SubmitTrade();
         submittrade.setArg0(trade);
 
-        // We need to name the parameters weh using Doc/Lit
+        // We need to name the parameters when using Doc/Lit
         // SoapMethod method = new SoapMethod(new QName("submitTrade"),
         // SubmitTradeResponse.class);
         // method.addNamedParameter(new NamedParameter(new QName("submitTrade"),
@@ -78,12 +78,11 @@ public class AxisClientWithComplexTypesTestCase extends FunctionalTestCase
     @Test
     public void testSendComplexRPCENC() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
 
         MuleMessage result = client.send(uri, trade, null);
         assertNotNull(result);
         TradeStatus status = (TradeStatus)result.getPayload();
         assertEquals("RECEIVED", status.getStatus());
     }
-
 }
