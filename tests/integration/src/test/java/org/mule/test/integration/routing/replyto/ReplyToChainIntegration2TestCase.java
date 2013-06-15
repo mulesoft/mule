@@ -8,6 +8,7 @@ package org.mule.test.integration.routing.replyto;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;

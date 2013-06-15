@@ -10,6 +10,7 @@ import org.hamcrest.core.IsNull;
 import org.junit.Ignore;
 import org.junit.Test;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
@@ -19,10 +20,6 @@ import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.util.concurrent.Latch;
 
 import java.util.concurrent.TimeUnit;
-
-import org.hamcrest.core.IsNull;
-import org.junit.Test;
-import static org.junit.Assert.fail;
 
 /*
 EE-2430 - Check that JMS SubReceiver executes concurrently.
