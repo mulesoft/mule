@@ -10,13 +10,16 @@
 
 package org.mule.test.integration.routing;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.DefaultMuleMessage;
-import org.mule.api.MuleEvent;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleMessageCollection;
+import org.mule.api.client.MuleClient;
 import org.mule.api.lifecycle.Callable;
-import org.mule.module.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 
 import java.util.Arrays;
@@ -25,11 +28,6 @@ import java.util.List;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 public class InboundAggregationNoTimeoutTestCase extends AbstractServiceAndFlowTestCase
 {
@@ -51,7 +49,7 @@ public class InboundAggregationNoTimeoutTestCase extends AbstractServiceAndFlowT
     public void testAggregatorWithNoTimeout() throws Exception
     {
         MuleMessage message = new DefaultMuleMessage("test", muleContext);
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         client.dispatch("vm://distributor.queue", message);
 
         MuleMessage result = client.request("vm://results", 10000);

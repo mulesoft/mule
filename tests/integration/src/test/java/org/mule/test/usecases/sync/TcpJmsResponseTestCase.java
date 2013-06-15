@@ -14,7 +14,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 
 import java.util.Arrays;
@@ -25,7 +25,6 @@ import org.junit.runners.Parameterized.Parameters;
 
 public class TcpJmsResponseTestCase extends AbstractServiceAndFlowTestCase
 {
-
     public TcpJmsResponseTestCase(ConfigVariant variant, String configResources)
     {
         super(variant, configResources);
@@ -42,7 +41,7 @@ public class TcpJmsResponseTestCase extends AbstractServiceAndFlowTestCase
     @Test
     public void testSyncResponse() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage message = client.send("tcp://localhost:4444", "request", null);
         assertNotNull(message);
         assertEquals("Received: request", message.getPayloadAsString());

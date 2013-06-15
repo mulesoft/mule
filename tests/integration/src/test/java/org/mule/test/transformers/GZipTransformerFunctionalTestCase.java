@@ -15,10 +15,9 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.util.IOUtils;
-import org.mule.util.SerializationUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -42,7 +41,7 @@ public class GZipTransformerFunctionalTestCase extends FunctionalTestCase
     public void testCompressDecompressByteArray() throws Exception
     {
         byte[] testDataByteArray = TEST_DATA.getBytes();
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
 
         // Compress input.
         MuleMessage compressedResponse = client.send("vm://compressInput", testDataByteArray, null);
@@ -62,7 +61,7 @@ public class GZipTransformerFunctionalTestCase extends FunctionalTestCase
     public void testCompressDecompressInputStream() throws Exception
     {
         ByteArrayInputStream bis = new ByteArrayInputStream(TEST_DATA.getBytes());
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
 
         // Compress input.
         MuleMessage compressedResponse = client.send("vm://compressInput", bis, null);

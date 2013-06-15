@@ -10,7 +10,9 @@
 
 package org.mule.test.integration.security;
 
-import org.mule.module.client.MuleClient;
+import static org.junit.Assert.assertEquals;
+
+import org.mule.api.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 
 import java.util.Arrays;
@@ -18,8 +20,6 @@ import java.util.Collection;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * See MULE-3851
@@ -43,15 +43,17 @@ public class OutboundHttpEndpointAuthenticationTestCase extends AbstractServiceA
     @Test
     public void testOutboundAutenticationSend() throws Exception
     {
-        MuleClient mc = new MuleClient(muleContext);
-        assertEquals(TEST_MESSAGE, mc.send("outbound", TEST_MESSAGE, null).getPayloadAsString());
+        MuleClient client = muleContext.getClient();
+        String payload = client.send("outbound", TEST_MESSAGE, null).getPayloadAsString();
+        assertEquals(TEST_MESSAGE, payload);
     }
 
     @Test
     public void testOutboundAutenticationDispatch() throws Exception
     {
-        MuleClient mc = new MuleClient(muleContext);
-        mc.dispatch("outbound", TEST_MESSAGE, null);
-        assertEquals(TEST_MESSAGE, mc.request("out", RECEIVE_TIMEOUT).getPayloadAsString());
+        MuleClient client = muleContext.getClient();
+        client.dispatch("outbound", TEST_MESSAGE, null);
+        String payload = client.request("out", RECEIVE_TIMEOUT).getPayloadAsString();
+        assertEquals(TEST_MESSAGE, payload);
     }
 }

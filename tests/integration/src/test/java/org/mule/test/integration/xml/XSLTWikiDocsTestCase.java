@@ -10,8 +10,12 @@
 
 package org.mule.test.integration.xml;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.util.IOUtils;
 
@@ -23,10 +27,6 @@ import java.util.Map;
 import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 
 //START SNIPPET: test-code
 public class XSLTWikiDocsTestCase extends AbstractServiceAndFlowTestCase
@@ -60,7 +60,7 @@ public class XSLTWikiDocsTestCase extends AbstractServiceAndFlowTestCase
                 "org/mule/test/integration/xml/cd-catalog-result-with-params.xml", getClass());
 
         //Create a new Mule Client
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
 
         //These are the message roperties that will get passed into the XQuery context
         Map<String, Object> props = new HashMap<String, Object>();
@@ -74,7 +74,6 @@ public class XSLTWikiDocsTestCase extends AbstractServiceAndFlowTestCase
         //Compare results
 
         assertTrue(XMLUnit.compareXML(message.getPayloadAsString(), resultData).similar());
-
     }
 }
 //END SNIPPET: test-code

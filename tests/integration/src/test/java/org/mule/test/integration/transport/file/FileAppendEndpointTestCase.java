@@ -10,7 +10,9 @@
 
 package org.mule.test.integration.transport.file;
 
-import org.mule.module.client.MuleClient;
+import static org.junit.Assert.assertFalse;
+
+import org.mule.api.client.MuleClient;
 import org.mule.util.FileUtils;
 
 import java.io.File;
@@ -19,8 +21,6 @@ import java.util.Collection;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-
-import static org.junit.Assert.assertFalse;
 
 public class FileAppendEndpointTestCase extends FileAppendConnectorTestCase
 {
@@ -55,7 +55,7 @@ public class FileAppendEndpointTestCase extends FileAppendConnectorTestCase
         // 'outputAppend' on a
         // file endpoint is no longer supported. You may configure it on a file
         // connector instead.
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         client.dispatch("vm://fileappend", "Hello1", null);
 
         assertFalse(outputFile.exists());

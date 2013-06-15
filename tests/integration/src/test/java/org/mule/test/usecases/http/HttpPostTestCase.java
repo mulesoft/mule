@@ -10,8 +10,11 @@
 
 package org.mule.test.usecases.http;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 
 import java.util.Arrays;
@@ -19,9 +22,6 @@ import java.util.Collection;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 public class HttpPostTestCase extends AbstractServiceAndFlowTestCase
 {
@@ -42,7 +42,7 @@ public class HttpPostTestCase extends AbstractServiceAndFlowTestCase
     @Test
     public void testPost() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage message = client.send("httpRequest", "payload", null);
         assertNotNull(message);
         assertNotNull(message.getPayloadAsString());

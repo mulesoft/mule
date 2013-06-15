@@ -10,8 +10,11 @@
 
 package org.mule.test.usecases.sync;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 
 import java.util.Arrays;
@@ -21,9 +24,6 @@ import java.util.Map;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 public class HttpJmsBridgeTestCase extends AbstractServiceAndFlowTestCase
 {
@@ -44,14 +44,14 @@ public class HttpJmsBridgeTestCase extends AbstractServiceAndFlowTestCase
     @Test
     public void testBridge() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         String payload = "payload";
 
         Map<String, Object> headers = new HashMap<String, Object>();
         final String customHeader = "X-Custom-Header";
         headers.put(customHeader, "value");
 
-        client.sendNoReceive("http://localhost:4444/in", payload, headers);
+        client.dispatch("http://localhost:4444/in", payload, headers);
 
         MuleMessage msg = client.request("vm://out", 10000);
         assertNotNull(msg);

@@ -10,9 +10,12 @@
 
 package org.mule.test.routing;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+import org.mule.api.client.MuleClient;
 import org.mule.api.context.notification.RoutingNotificationListener;
 import org.mule.context.notification.RoutingNotification;
-import org.mule.module.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.functional.FunctionalTestComponent;
 
@@ -23,9 +26,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 public class CollectionAggregatorRouterTimeoutTestCase extends AbstractServiceAndFlowTestCase
 {
@@ -62,7 +62,7 @@ public class CollectionAggregatorRouterTimeoutTestCase extends AbstractServiceAn
         FunctionalTestComponent vortex = (FunctionalTestComponent) getComponent("vortex");
         FunctionalTestComponent aggregator = (FunctionalTestComponent) getComponent("aggregator");
 
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         List<String> list = Arrays.asList("first", "second");
         client.dispatch("vm://splitter", list, null);
 

@@ -10,8 +10,11 @@
 
 package org.mule.test.integration.routing;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 
 import java.util.Arrays;
@@ -19,9 +22,6 @@ import java.util.Collection;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 public class EndpointBridgingTestCase extends AbstractServiceAndFlowTestCase
 {
@@ -41,7 +41,7 @@ public class EndpointBridgingTestCase extends AbstractServiceAndFlowTestCase
     @Test
     public void testSynchronousBridging() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage result = client.send("vm://bridge.inbound", "test", null);
         assertNotNull(result);
         assertEquals("Received: test", result.getPayloadAsString());
