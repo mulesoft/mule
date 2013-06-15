@@ -6,18 +6,17 @@
  */
 package org.mule.test.usecases.sync;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
 public class TcpToFileTestCase extends FunctionalTestCase
 {
-
     @Override
     protected String getConfigResources()
     {
@@ -27,10 +26,10 @@ public class TcpToFileTestCase extends FunctionalTestCase
     @Test
     public void testSyncResponse() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
-        String payload = "payload";
+        MuleClient client = muleContext.getClient();
+       String payload = "payload";
 
-        client.sendNoReceive("tcp://localhost:4444", payload, null);
+        client.send("tcp://localhost:4444", payload, null);
 
         MuleMessage msg = client.request("file://temp/tests/mule", 10000);
         assertNotNull(msg);

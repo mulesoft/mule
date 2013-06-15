@@ -11,7 +11,7 @@ import static org.junit.Assert.assertNull;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 
 import java.util.Arrays;
@@ -42,7 +42,7 @@ public class PropertiesTestCase extends AbstractServiceAndFlowTestCase
     @Test
     public void testProperties() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
 
         MuleMessage msg1 = createOutboundMessage();
         MuleMessage response = client.send("vm://in", msg1);

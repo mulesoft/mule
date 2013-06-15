@@ -10,9 +10,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import org.mule.api.MuleMessageCollection;
+import org.mule.api.client.MuleClient;
 import org.mule.api.store.ObjectStore;
 import org.mule.api.store.ObjectStoreException;
-import org.mule.module.client.MuleClient;
 import org.mule.routing.EventGroup;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.util.store.DefaultObjectStoreFactoryBean;
@@ -49,7 +49,7 @@ public class CollectionAggregatorRouterSerializationTestCase extends FunctionalT
     @Test
     public void eventGroupDeserialization() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         List<String> list = Arrays.asList("first", "second");
         client.dispatch("vm://splitter", list, null);
         MuleMessageCollection request = (MuleMessageCollection) client.request("vm://out?connector=queue", 10000);

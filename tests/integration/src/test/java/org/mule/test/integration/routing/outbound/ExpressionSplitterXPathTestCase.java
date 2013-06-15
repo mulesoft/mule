@@ -6,9 +6,13 @@
  */
 package org.mule.test.integration.routing.outbound;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleMessageCollection;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 
 import java.util.Arrays;
@@ -18,10 +22,6 @@ import java.util.List;
 import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 public class ExpressionSplitterXPathTestCase extends AbstractServiceAndFlowTestCase
 {
@@ -76,7 +76,7 @@ public class ExpressionSplitterXPathTestCase extends AbstractServiceAndFlowTestC
     @Test
     public void testRecipientList() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage result = client.send("vm://distributor.queue", MESSAGE, null);
 
         assertNotNull(result);

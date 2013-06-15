@@ -6,9 +6,11 @@
  */
 package org.mule.test.routing;
 
+import static org.junit.Assert.assertNotNull;
+
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
 
 import java.util.ArrayList;
@@ -16,14 +18,12 @@ import java.util.List;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertNotNull;
-
 public class RoundRobinTestCase extends FunctionalTestCase
 {
-
     private static final int NUMBER_OF_MESSAGES = 10;
     private static final int NUMBER_OF_WRITERS = 10;
     private static final int NUMBER_OF_ENDPOINTS = 5;
+
     private MuleClient client;
 
     @Override
@@ -35,7 +35,7 @@ public class RoundRobinTestCase extends FunctionalTestCase
     @Test
     public void testRoundRobin() throws Exception
     {
-        client = new MuleClient(muleContext);
+        client = muleContext.getClient();
         List<Thread> writers = new ArrayList<Thread>();
         for (int i = 0; i < NUMBER_OF_WRITERS; i++)
         {
@@ -70,6 +70,7 @@ public class RoundRobinTestCase extends FunctionalTestCase
             this.id = id;
         }
 
+        @Override
         public void run()
         {
             for (int i = 0; i < NUMBER_OF_MESSAGES; i++)

@@ -6,25 +6,26 @@
  */
 package org.mule.test.usecases.routing.response;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.routing.requestreply.AbstractAsyncRequestReplyRequester;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.SensingNullMessageProcessor;
+import org.mule.util.store.SimpleMemoryObjectStore;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-import org.mule.util.store.SimpleMemoryObjectStore;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 public class ResponseAggregatorTestCase extends AbstractServiceAndFlowTestCase
 {
@@ -44,7 +45,7 @@ public class ResponseAggregatorTestCase extends AbstractServiceAndFlowTestCase
     @Test
     public void testSyncResponse() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage message = client.send("http://localhost:28081", "request", null);
         assertNotNull(message);
         assertEquals("Received: request", new String(message.getPayloadAsBytes()));
@@ -85,7 +86,7 @@ public class ResponseAggregatorTestCase extends AbstractServiceAndFlowTestCase
     {
         private RelaxedAsyncReplyMP() throws MuleException
         {
-            store = new SimpleMemoryObjectStore();
+            store = new SimpleMemoryObjectStore<Serializable>();
             name = "asyncReply";
             start();
         }

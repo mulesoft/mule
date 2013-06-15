@@ -16,9 +16,9 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleMessageCollection;
+import org.mule.api.client.MuleClient;
 import org.mule.api.expression.RequiredValueException;
 import org.mule.api.transport.PropertyScope;
-import org.mule.module.client.MuleClient;
 import org.mule.tck.functional.FlowAssert;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
@@ -40,7 +40,6 @@ import org.junit.Test;
 
 public class ForeachTestCase extends FunctionalTestCase
 {
-
     @Rule
     public SystemProperty systemProperty = new SystemProperty("batch.size", "3");
 
@@ -49,7 +48,7 @@ public class ForeachTestCase extends FunctionalTestCase
     @Before
     public void setUp() throws Exception
     {
-        client = new MuleClient(muleContext);
+        client = muleContext.getClient();
     }
 
     @Override
@@ -390,7 +389,7 @@ public class ForeachTestCase extends FunctionalTestCase
             assertEquals("The nested counters are not consistent", i+1, out.getInboundProperty("i"));
         }
     }
-    
+
     private ArrayList<ArrayList<String>> createNestedPayload()
     {
         final ArrayList<ArrayList<String>> payload = new ArrayList<ArrayList<String>>();
@@ -406,7 +405,7 @@ public class ForeachTestCase extends FunctionalTestCase
         payload.add(elem1);
         payload.add(elem2);
         payload.add(elem3);
-        
+
         return payload;
     }
 
@@ -449,7 +448,7 @@ public class ForeachTestCase extends FunctionalTestCase
         MuleMessage parent = new DefaultMuleMessage(null, muleContext);
         client.send("vm://input-19", parent);
 
-        Map<String,String> m = new HashMap();
+        Map<String,String> m = new HashMap<String, String>();
         m.put("key1", "val1");
         m.put("key2", "val2");
 
@@ -470,7 +469,7 @@ public class ForeachTestCase extends FunctionalTestCase
         MuleMessage parent = new DefaultMuleMessage(null, muleContext);
         client.send("vm://input-20", parent);
 
-        Map<String,String> m = new HashMap();
+        Map<String,String> m = new HashMap<String, String>();
         m.put("key1", "val1");
         m.put("key2", "val2");
 
@@ -534,5 +533,3 @@ public class ForeachTestCase extends FunctionalTestCase
         latch.await(10, TimeUnit.SECONDS);
     }
 }
-
-

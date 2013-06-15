@@ -6,9 +6,15 @@
  */
 package org.mule.test.usecases.http;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertNull;
+
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.transport.NullPayload;
 import org.mule.transport.http.HttpConnector;
@@ -19,12 +25,6 @@ import java.util.Collection;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertNull;
 
 public class HttpResponseTestCase extends AbstractServiceAndFlowTestCase
 {
@@ -45,7 +45,7 @@ public class HttpResponseTestCase extends AbstractServiceAndFlowTestCase
     @Test
     public void testNullPayloadUsingAsync() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage reply = client.send("http://localhost:8990", new DefaultMuleMessage("test", muleContext));
 
         //TODO RM: What should really be returned when doing an async request?
@@ -58,7 +58,7 @@ public class HttpResponseTestCase extends AbstractServiceAndFlowTestCase
     @Test
     public void testPayloadIsNotEmptyNoRemoteSynch() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage reply = client.send("http://localhost:8999", new DefaultMuleMessage("test", muleContext));
         assertNotNull(reply.getPayload());
         assertFalse(reply.getPayload() instanceof NullPayload);
@@ -68,7 +68,7 @@ public class HttpResponseTestCase extends AbstractServiceAndFlowTestCase
     @Test
     public void testPayloadIsNotEmptyWithRemoteSynch() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage reply = client.send("http://localhost:8989", new DefaultMuleMessage("test", muleContext));
         assertNotNull(reply.getPayload());
         assertFalse(reply.getPayload() instanceof NullPayload);
@@ -82,7 +82,7 @@ public class HttpResponseTestCase extends AbstractServiceAndFlowTestCase
     @Test
     public void testChunkingContentLength() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage reply = client.send("http://localhost:8988", new DefaultMuleMessage("test", muleContext));
         assertNotNull(reply.getPayload());
         assertFalse(reply.getPayload() instanceof NullPayload);
@@ -93,12 +93,11 @@ public class HttpResponseTestCase extends AbstractServiceAndFlowTestCase
     @Test
     public void testNoChunkingContentLength() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage reply = client.send("http://localhost:8987", new DefaultMuleMessage("test", muleContext));
         assertNotNull(reply.getPayload());
         assertFalse(reply.getPayload() instanceof NullPayload);
         assertNotSame("chunked", reply.getInboundProperty(HttpConstants.HEADER_TRANSFER_ENCODING));
         assertNotNull(reply.getInboundProperty(HttpConstants.HEADER_CONTENT_LENGTH));
     }
-
 }

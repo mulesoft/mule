@@ -6,20 +6,19 @@
  */
 package org.mule.test.integration.routing;
 
-import org.mule.api.MuleMessage;
-import org.mule.api.MuleMessageCollection;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.junit4.FunctionalTestCase;
-
-import org.junit.Test;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import org.mule.api.MuleMessage;
+import org.mule.api.MuleMessageCollection;
+import org.mule.api.client.MuleClient;
+import org.mule.tck.junit4.FunctionalTestCase;
+
+import org.junit.Test;
+
 public class AsyncReplyNoTimeoutTestCase extends FunctionalTestCase
 {
-    
     @Override
     protected String getConfigResources()
     {
@@ -30,10 +29,12 @@ public class AsyncReplyNoTimeoutTestCase extends FunctionalTestCase
     public void testAggregatorWithNoTimeout() throws Exception
     {
         String message = "test";
-        MuleClient client = new MuleClient(muleContext);
+
+        MuleClient client = muleContext.getClient();
         MuleMessage result = client.send("vm://distributor.queue", message, null);
         assertNotNull(result);
         assertTrue(result instanceof MuleMessageCollection);
+
         MuleMessageCollection mc = (MuleMessageCollection)result;
         assertEquals(3, mc.size());
         for (int i = 0; i < mc.getMessagesAsArray().length; i++)

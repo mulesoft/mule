@@ -6,14 +6,14 @@
  */
 package org.mule.test.integration.transport.jms.scripting;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 /**
  * Defines a scenario when we request a jms message from inside a groovy script
@@ -33,7 +33,7 @@ public abstract class AbstractJmsRequestFromScriptTestCase extends FunctionalTes
     @Test
     public void testRequestingMessageFromScript() throws Exception
     {
-        MuleClient muleClient = new MuleClient(muleContext);
+        MuleClient muleClient = muleContext.getClient();
 
         // Sends data to process
         muleClient.send("vm://in", TEST_MESSAGE, null);

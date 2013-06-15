@@ -6,10 +6,13 @@
  */
 package org.mule.test.integration.transport.cxf;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
+import org.mule.api.client.MuleClient;
 import org.mule.api.transport.PropertyScope;
-import org.mule.module.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 
 import java.util.Arrays;
@@ -18,9 +21,6 @@ import java.util.Collection;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 public class CxfOverJMSTestCase extends AbstractServiceAndFlowTestCase
 {
@@ -49,7 +49,7 @@ public class CxfOverJMSTestCase extends AbstractServiceAndFlowTestCase
     @Test
     public void testCxf() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         client.dispatch("jms://TestComponent", new DefaultMuleMessage(req, muleContext));
         MuleMessage message = client.request("jms://testout", 10000);
         assertNotNull(message.getPayload());
@@ -59,7 +59,7 @@ public class CxfOverJMSTestCase extends AbstractServiceAndFlowTestCase
     @Test
     public void testCxfClientOverJMS() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         DefaultMuleMessage msg = new DefaultMuleMessage("hello", muleContext);
         msg.setProperty("method", "echo", PropertyScope.INVOCATION);
         client.dispatch("cxf:jms://TestComponent2", msg);
@@ -74,7 +74,7 @@ public class CxfOverJMSTestCase extends AbstractServiceAndFlowTestCase
     @Test
     public void testCxfOverJMSSyncProxy() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage result = client.send("http://localhost:63081/services/testBridge",
             new DefaultMuleMessage(req, muleContext));
         assertNotNull(result.getPayload());

@@ -6,8 +6,12 @@
  */
 package org.mule.test.integration.transport.cxf;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.module.cxf.support.OutputPayloadInterceptor;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.testmodels.mule.TestExceptionStrategy;
@@ -21,10 +25,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
 
 public class CxfAndXslTransformerOnSoapTestCase extends AbstractServiceAndFlowTestCase
 {
@@ -76,7 +76,7 @@ public class CxfAndXslTransformerOnSoapTestCase extends AbstractServiceAndFlowTe
         TestExceptionStrategy exceptionStrategy = new TestExceptionStrategy();
         muleContext.setExceptionListener(exceptionStrategy);
 
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage result = client.send("http://localhost:28181/ScratchCardServiceV1", msg, null);
         assertNotNull("The result shouln't have been null", result);
         final String payloadAsString = result.getPayloadAsString();

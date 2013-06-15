@@ -6,19 +6,18 @@
  */
 package org.mule.test.integration.transport.jms;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
 public class ComponentBindingTestCase extends FunctionalTestCase
 {
-
     @Override
     protected String getConfigResources()
     {
@@ -28,7 +27,7 @@ public class ComponentBindingTestCase extends FunctionalTestCase
     @Test
     public void testBinding() throws MuleException
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         String message = "Mule";
         client.dispatch("jms://invoker.in", message, null);
         MuleMessage reply = client.request("jms://invoker.out", 10000);

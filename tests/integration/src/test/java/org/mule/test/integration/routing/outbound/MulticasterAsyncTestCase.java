@@ -6,8 +6,11 @@
  */
 package org.mule.test.integration.routing.outbound;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 
@@ -18,9 +21,6 @@ import java.util.List;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 public class MulticasterAsyncTestCase extends AbstractServiceAndFlowTestCase
 {
@@ -41,7 +41,7 @@ public class MulticasterAsyncTestCase extends AbstractServiceAndFlowTestCase
     @Test
     public void testSplitter() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         client.dispatch("vm://distributor.queue", new Apple(), null);
 
         List<Object> results = new ArrayList<Object>(3);
@@ -62,5 +62,4 @@ public class MulticasterAsyncTestCase extends AbstractServiceAndFlowTestCase
         assertTrue(results.contains("Apple Received in ServiceTwo"));
         assertTrue(results.contains("Apple Received in ServiceThree"));
     }
-
 }

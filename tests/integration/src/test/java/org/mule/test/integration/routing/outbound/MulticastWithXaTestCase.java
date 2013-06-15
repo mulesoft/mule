@@ -6,21 +6,20 @@
  */
 package org.mule.test.integration.routing.outbound;
 
+import static org.junit.Assert.assertNotNull;
+
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertNotNull;
 
 /**
  * Make sure to run an external amq broker, otherwise the test isn't possible.
  */
 public class MulticastWithXaTestCase extends FunctionalTestCase
 {
-
     @Override
     protected String getConfigResources()
     {
@@ -30,8 +29,8 @@ public class MulticastWithXaTestCase extends FunctionalTestCase
     @Test
     public void testName() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
-        MuleMessage msg = new DefaultMuleMessage("Hi", client.getMuleContext());
+        MuleClient client = muleContext.getClient();
+        MuleMessage msg = new DefaultMuleMessage("Hi", muleContext);
         client.dispatch("jms://Myflow.input?connector=simpleJmsConnector", msg);
         MuleMessage result = client.request("jms://Myflow.finishedOriginal?connector=simpleJmsConnector", 10000);
         assertNotNull(result);

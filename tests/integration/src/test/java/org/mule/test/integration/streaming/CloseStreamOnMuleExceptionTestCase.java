@@ -6,7 +6,9 @@
  */
 package org.mule.test.integration.streaming;
 
-import org.mule.module.client.MuleClient;
+import static org.junit.Assert.assertTrue;
+
+import org.mule.api.client.MuleClient;
 import org.mule.module.xml.stax.DelegateXMLStreamReader;
 import org.mule.module.xml.stax.StaxSource;
 import org.mule.module.xml.util.XMLUtils;
@@ -32,8 +34,6 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 import org.xml.sax.InputSource;
-
-import static org.junit.Assert.assertTrue;
 
 public class CloseStreamOnMuleExceptionTestCase extends AbstractServiceAndFlowTestCase
 {
@@ -63,7 +63,7 @@ public class CloseStreamOnMuleExceptionTestCase extends AbstractServiceAndFlowTe
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
-        client = new MuleClient(muleContext);
+        client = muleContext.getClient();
         inputStream = new TestByteArrayInputStream(xmlText.getBytes());
         streamReaderLatch = new Latch();
     }

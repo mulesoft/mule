@@ -6,8 +6,12 @@
  */
 package org.mule.test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 
 import java.util.Arrays;
@@ -15,10 +19,6 @@ import java.util.Collection;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 
 /**
  * This test has been re-written to use entry point resolvers.
@@ -43,7 +43,7 @@ public class NoArgsCallWrapperFunctionalTestCase extends AbstractServiceAndFlowT
     @Test
     public void testNoArgsCallWrapper() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         client.dispatch("vm://invoke", "test", null);
         MuleMessage reply = client.request("vm://out", RECEIVE_TIMEOUT);
         assertNotNull(reply);
@@ -54,7 +54,7 @@ public class NoArgsCallWrapperFunctionalTestCase extends AbstractServiceAndFlowT
     @Test
     public void testWithInjectedDelegate() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         client.dispatch("vm://invokeWithInjected", "test", null);
         MuleMessage reply = client.request("vm://outWithInjected", RECEIVE_TIMEOUT);
         assertNotNull(reply);

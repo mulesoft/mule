@@ -6,10 +6,13 @@
  */
 package org.mule.test.integration.routing;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+import org.mule.api.client.MuleClient;
 import org.mule.api.context.notification.EndpointMessageNotificationListener;
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.context.notification.EndpointMessageNotification;
-import org.mule.module.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.functional.FunctionalTestNotification;
 import org.mule.tck.functional.FunctionalTestNotificationListener;
@@ -23,9 +26,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.apache.commons.lang.SerializationUtils;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 public class MessageChunkingTestCase extends AbstractServiceAndFlowTestCase
 {
@@ -119,7 +119,7 @@ public class MessageChunkingTestCase extends AbstractServiceAndFlowTestCase
             }
         }, "ChunkingObjectReceiver");
 
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         client.dispatch("vm://inbound.object.channel", simpleSerializableObject, null);
         // Wait for the message to be received and tested (in the listener above)
         assertTrue(chunkingReceiverLatch.await(20L, TimeUnit.SECONDS));
@@ -164,7 +164,7 @@ public class MessageChunkingTestCase extends AbstractServiceAndFlowTestCase
             }
         }, "ChunkingReceiver");
 
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         client.dispatch("vm://inbound.channel", data, null);
         // Wait for the message to be received and tested (in the listener above)
         assertTrue(chunkingReceiverLatch.await(20L, TimeUnit.SECONDS));

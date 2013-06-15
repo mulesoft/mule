@@ -6,28 +6,28 @@
  */
 package org.mule.test.integration.transaction;
 
+import static org.junit.Assert.assertThat;
+
+import org.mule.api.MuleEventContext;
+import org.mule.api.MuleMessage;
+import org.mule.api.client.MuleClient;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.functional.EventCallback;
+import org.mule.tck.functional.FunctionalTestComponent;
+import org.mule.util.concurrent.Latch;
+
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.concurrent.TimeUnit;
+
 import org.hamcrest.core.IsNull;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
-import org.mule.api.MuleEventContext;
-import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.functional.EventCallback;
-import org.mule.tck.functional.FunctionalTestComponent;
-import org.mule.util.concurrent.Latch;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
-
-import java.util.Arrays;
-import java.util.Collection;
-
-import static org.junit.Assert.assertThat;
 
 
 public class XaTransactionJdbcJmsTestCase extends AbstractDerbyTestCase
 {
-
     public static final int TIMEOUT = 3000;
 
     public XaTransactionJdbcJmsTestCase(AbstractServiceAndFlowTestCase.ConfigVariant variant, String configResources)
@@ -66,11 +66,11 @@ public class XaTransactionJdbcJmsTestCase extends AbstractDerbyTestCase
     public void testTransactionFromJdbcToJms() throws Exception
     {
         final Latch latch = new Latch();
-        MuleClient muleClient = new MuleClient(muleContext);
         muleContext.start();
         FunctionalTestComponent ftc = getFunctionalTestComponent("JdbcToJms");
         ftc.setEventCallback(new EventCallback()
         {
+            @Override
             public void eventReceived(MuleEventContext context, Object component) throws Exception
             {
                 latch.release();
@@ -78,7 +78,9 @@ public class XaTransactionJdbcJmsTestCase extends AbstractDerbyTestCase
         });
         execSqlUpdate("INSERT INTO TEST(TYPE, DATA) VALUES (1, 'Test1')");
         latch.await(TIMEOUT, TimeUnit.MILLISECONDS);
-        MuleMessage muleMessage = muleClient.request("myQueueNotXa", TIMEOUT);
+
+        MuleClient client = muleContext.getClient();
+        MuleMessage muleMessage = client.request("myQueueNotXa", TIMEOUT);
         assertThat("a message should be commit to jms",muleMessage, IsNull.<Object>notNullValue());
         assertThat("no exception should happen",muleMessage.getExceptionPayload(), IsNull.<Object>nullValue());
     }

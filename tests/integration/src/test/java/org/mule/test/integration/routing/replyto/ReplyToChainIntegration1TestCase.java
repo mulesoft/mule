@@ -6,9 +6,12 @@
  */
 package org.mule.test.integration.routing.replyto;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import org.mule.api.MuleMessage;
+import org.mule.api.client.MuleClient;
 import org.mule.api.config.MuleProperties;
-import org.mule.module.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
 
 import java.util.HashMap;
@@ -16,12 +19,8 @@ import java.util.Map;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
 public class ReplyToChainIntegration1TestCase extends FunctionalTestCase
 {
-
     @Override
     protected String getConfigResources()
     {
@@ -33,23 +32,23 @@ public class ReplyToChainIntegration1TestCase extends FunctionalTestCase
     {
         String message = "test";
 
-        MuleClient client = new MuleClient(muleContext);
-        Map props = new HashMap();
+        Map<String, Object> props = new HashMap<String, Object>();
         props.put(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, "false");
+
+        MuleClient client = muleContext.getClient();
         MuleMessage result = client.send("vm://pojo1", message, props);
         assertNotNull(result);
         assertEquals("Received: " + message, result.getPayloadAsString());
     }
-    
+
     @Test
     public void testReplyToChainWithoutProps() throws Exception
     {
         String message = "test";
 
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage result = client.send("vm://pojo1", message, null);
         assertNotNull(result);
         assertEquals("Received: " + message, result.getPayloadAsString());
     }
-
 }

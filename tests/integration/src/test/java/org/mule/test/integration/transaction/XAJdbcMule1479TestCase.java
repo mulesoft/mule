@@ -6,21 +6,20 @@
  */
 package org.mule.test.integration.transaction;
 
-import org.junit.runners.Parameterized;
-import org.mule.module.client.MuleClient;
+import static org.junit.Assert.assertEquals;
+
+import org.mule.api.client.MuleClient;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
 import org.junit.Test;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
-
-import static org.junit.Assert.assertEquals;
+import org.junit.runners.Parameterized;
 
 public class XAJdbcMule1479TestCase extends AbstractDerbyTestCase
 {
-    
     public XAJdbcMule1479TestCase(AbstractServiceAndFlowTestCase.ConfigVariant variant, String configResources)
     {
         super(variant, configResources);
@@ -52,14 +51,14 @@ public class XAJdbcMule1479TestCase extends AbstractDerbyTestCase
     @Test
     public void testJdbcXa() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         client.dispatch("vm://in","test",null);
-        
+
         for (int i = 0; i < 10; i++)
         {
-            List results = execSqlQuery("SELECT * FROM TEST");
+            List<?> results = execSqlQuery("SELECT * FROM TEST");
             assertEquals(0, results.size());
-            
+
             Thread.sleep(1000);
         }
     }
@@ -67,10 +66,10 @@ public class XAJdbcMule1479TestCase extends AbstractDerbyTestCase
     @Test
     public void testJmsXa() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         client.dispatch("vm://in1", "test", null);
-        
-        List results = null;
+
+        List<?> results = null;
         for (int i = 0; i < 10; i++)
         {
             results = execSqlQuery("SELECT * FROM TEST");
@@ -78,11 +77,10 @@ public class XAJdbcMule1479TestCase extends AbstractDerbyTestCase
             {
                 break;
             }
-            
+
             Thread.sleep(1000);
         }
 
         assertEquals(1, results.size());
     }
-
 }

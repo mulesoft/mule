@@ -6,20 +6,21 @@
  */
 package org.mule.test.integration.spring.events.async;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.api.client.MuleClient;
 import org.mule.tck.functional.EventCallback;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.test.integration.spring.events.Order;
 import org.mule.test.integration.spring.events.OrderManagerBean;
 
 import java.util.concurrent.atomic.AtomicInteger;
-import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import org.junit.Test;
 
 /**
  * <code>SpringEventsJmsExampleTestCase</code> is a testcase used to test the
@@ -28,7 +29,6 @@ import static org.junit.Assert.assertTrue;
  */
 public class SpringEventsJmsAsyncExampleTestCase extends FunctionalTestCase
 {
-
     private final AtomicInteger eventCount = new AtomicInteger(0);
 
     @Override
@@ -54,6 +54,7 @@ public class SpringEventsJmsAsyncExampleTestCase extends FunctionalTestCase
         // invoked
         EventCallback callback = new EventCallback()
         {
+            @Override
             public void eventReceived(MuleEventContext context, Object o) throws Exception
             {
                 eventCount.incrementAndGet();
@@ -61,7 +62,7 @@ public class SpringEventsJmsAsyncExampleTestCase extends FunctionalTestCase
         };
         subscriptionBean.setEventCallback(callback);
 
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         Order order = new Order("Sausage and Mash");
         client.send("jms://orders.queue", order, null);
         Thread.sleep(1000);

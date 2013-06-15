@@ -6,18 +6,17 @@
  */
 package org.mule.test.integration.routing.replyto;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
 public class ReplyToChainIntegration3TestCase extends FunctionalTestCase
 {
-
     @Override
     protected String getConfigResources()
     {
@@ -29,11 +28,10 @@ public class ReplyToChainIntegration3TestCase extends FunctionalTestCase
     {
         String message = "test";
 
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         client.dispatch("vm://pojo1", message, null);
         MuleMessage result = client.request("jms://response", 10000);
         assertNotNull(result);
         assertEquals("Received: " + message, result.getPayload());
     }
-    
 }

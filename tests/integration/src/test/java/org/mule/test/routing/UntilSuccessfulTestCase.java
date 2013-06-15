@@ -6,11 +6,13 @@
  */
 package org.mule.test.routing;
 
+import static org.junit.Assert.assertEquals;
+
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
+import org.mule.api.client.MuleClient;
 import org.mule.api.processor.MessageProcessor;
-import org.mule.module.client.MuleClient;
 import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.util.store.AbstractPartitionedObjectStore;
@@ -21,8 +23,6 @@ import java.util.List;
 
 import org.apache.commons.lang.RandomStringUtils;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
 
 public class UntilSuccessfulTestCase extends FunctionalTestCase
 {
@@ -41,7 +41,7 @@ public class UntilSuccessfulTestCase extends FunctionalTestCase
     {
         super.doSetUp();
 
-        client = new MuleClient(muleContext);
+        client = muleContext.getClient();
 
         targetMessageProcessor = getFunctionalTestComponent("target-mp");
         deadLetterQueueProcessor = getFunctionalTestComponent("dlq-processor");

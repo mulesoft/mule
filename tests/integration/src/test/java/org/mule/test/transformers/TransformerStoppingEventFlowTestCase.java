@@ -6,17 +6,17 @@
  */
 package org.mule.test.transformers;
 
-import org.mule.api.MuleMessage;
-import org.mule.api.transformer.TransformerException;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.junit4.FunctionalTestCase;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import org.mule.RequestContext;
+import org.mule.api.MuleMessage;
+import org.mule.api.client.MuleClient;
+import org.mule.api.transformer.TransformerException;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transformer.AbstractTransformer;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 public class TransformerStoppingEventFlowTestCase extends FunctionalTestCase
 {
@@ -30,7 +30,7 @@ public class TransformerStoppingEventFlowTestCase extends FunctionalTestCase
     @Test
     public void testNullReturnStopsFlow() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
 
         MuleMessage msg = client.send("vm://in", TEST_MESSAGE, null);
         assertNotNull(msg);
@@ -41,9 +41,8 @@ public class TransformerStoppingEventFlowTestCase extends FunctionalTestCase
 
     public static final class StopFlowTransformer extends AbstractTransformer
     {
-
-
-        protected Object doTransform(Object src, String encoding) throws TransformerException
+        @Override
+        protected Object doTransform(Object src, String outputEncoding) throws TransformerException
         {
             RequestContext.getEventContext().setStopFurtherProcessing(true);
             return src;

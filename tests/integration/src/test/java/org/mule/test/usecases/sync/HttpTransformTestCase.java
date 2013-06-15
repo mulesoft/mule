@@ -10,7 +10,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transformer.compression.GZipUncompressTransformer;
@@ -52,8 +52,8 @@ public class HttpTransformTestCase extends AbstractServiceAndFlowTestCase
     @Test
     public void testTransform() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
-        MuleMessage message = client.send(String.format("http://localhost:%d/RemoteService", httpPort1.getNumber()), "payload", null);
+        MuleClient client = muleContext.getClient();
+    	MuleMessage message = client.send(String.format("http://localhost:%d/RemoteService", httpPort1.getNumber()), "payload", null);
         assertNotNull(message);
         GZipUncompressTransformer gu = new GZipUncompressTransformer();
         gu.setMuleContext(muleContext);
@@ -66,7 +66,7 @@ public class HttpTransformTestCase extends AbstractServiceAndFlowTestCase
     @Test
     public void testBinary() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         ArrayList<Integer> payload = new ArrayList<Integer>();
         payload.add(42);
         MuleMessage message = client.send(String.format("http://localhost:%d/RemoteService", httpPort2.getNumber()), SerializationUtils.serialize(payload), null);
@@ -81,7 +81,7 @@ public class HttpTransformTestCase extends AbstractServiceAndFlowTestCase
     @Test
     public void testBinaryWithBridge() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         Object payload = Arrays.asList(42);
         MuleMessage message = client.send("vm://LocalService", payload, null);
         assertNotNull(message);

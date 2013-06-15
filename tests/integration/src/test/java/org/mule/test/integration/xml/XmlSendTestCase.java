@@ -6,8 +6,11 @@
  */
 package org.mule.test.integration.xml;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.http.HttpConnector;
@@ -19,9 +22,6 @@ import java.util.Collection;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 public class XmlSendTestCase extends AbstractServiceAndFlowTestCase
 {
@@ -49,7 +49,7 @@ public class XmlSendTestCase extends AbstractServiceAndFlowTestCase
 
         assertNotNull(xml);
 
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
 
         // this will submit the xml via a POST request
         MuleMessage message = client.send("http://localhost:" + dynamicPort.getNumber() + "/xml-parse", xml, null);
@@ -68,7 +68,7 @@ public class XmlSendTestCase extends AbstractServiceAndFlowTestCase
 
         assertNotNull(xml);
 
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
 
         // this will submit the xml via a POST request
         MuleMessage message = client.send("http://localhost:" + dynamicPort.getNumber() + "/xml-xslt-parse", xml, null);
@@ -82,7 +82,7 @@ public class XmlSendTestCase extends AbstractServiceAndFlowTestCase
 
         assertNotNull(xml);
 
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
 
         // this will submit the xml via a POST request
         MuleMessage message = client.send("http://localhost:" + dynamicPort.getNumber() + "/validate", xml, null);
@@ -96,5 +96,4 @@ public class XmlSendTestCase extends AbstractServiceAndFlowTestCase
         message = client.send("http://localhost:" + dynamicPort.getNumber() + "/validate", xml, null);
         assertEquals("200", message.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY));
     }
-
 }

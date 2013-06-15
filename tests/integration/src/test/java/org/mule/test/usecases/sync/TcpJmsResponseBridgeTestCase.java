@@ -10,6 +10,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.LocalMuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -18,7 +19,6 @@ import org.junit.Test;
 
 public class TcpJmsResponseBridgeTestCase extends FunctionalTestCase
 {
-
     @Rule
     public final DynamicPort tcpPort = new DynamicPort("tcpPort");
 

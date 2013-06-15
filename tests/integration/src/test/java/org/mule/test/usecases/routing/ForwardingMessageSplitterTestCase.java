@@ -6,8 +6,11 @@
  */
 package org.mule.test.usecases.routing;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 
 import java.util.ArrayList;
@@ -17,9 +20,6 @@ import java.util.List;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 public class ForwardingMessageSplitterTestCase extends AbstractServiceAndFlowTestCase
 {
@@ -40,7 +40,7 @@ public class ForwardingMessageSplitterTestCase extends AbstractServiceAndFlowTes
     @Test
     public void testSyncResponse() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
 
         List<Object> payload = new ArrayList<Object>();
         payload.add("hello");

@@ -7,39 +7,30 @@
 package org.mule.test.usecases.routing.response;
 
 
-import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
-import java.util.Arrays;
-import java.util.Collection;
+import org.mule.api.MuleMessage;
+import org.mule.api.client.MuleClient;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import org.junit.Test;
-import org.junit.runners.Parameterized;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertEquals;
 /**
  * Test the request-reply construct in flows
  */
-public class RequestReplyInFlowTestCase extends AbstractServiceAndFlowTestCase
+public class RequestReplyInFlowTestCase extends FunctionalTestCase
 {
-        @Parameterized.Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigResources()
     {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.FLOW, "org/mule/test/usecases/routing/response/request-reply-flow.xml"}});
-    }
-
-    public RequestReplyInFlowTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
+        return "org/mule/test/usecases/routing/response/request-reply-flow.xml";
     }
 
     @Test
     public void testRequestReply() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         client.dispatch("vm://input", "Message went", null);
         MuleMessage reply = client.request("vm://destination", 10000);
         assertNotNull(reply);

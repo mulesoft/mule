@@ -8,11 +8,12 @@ package org.mule.test.usecases.routing.response;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+
 import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
+import org.mule.api.client.MuleClient;
 import org.mule.api.store.ObjectStore;
 import org.mule.api.store.ObjectStoreException;
-import org.mule.module.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.util.SerializationUtils;
@@ -27,7 +28,6 @@ import org.junit.Test;
 
 public class SerializationOnResposeAggregatorTestCase extends FunctionalTestCase
 {
-
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
@@ -48,7 +48,7 @@ public class SerializationOnResposeAggregatorTestCase extends FunctionalTestCase
     @Test
     public void testSyncResponse() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage message = client.send("http://localhost:" + dynamicPort.getNumber() , "request", null);
         assertNotNull(message);
         assertEquals("request processed", new String(message.getPayloadAsBytes()));
@@ -56,7 +56,6 @@ public class SerializationOnResposeAggregatorTestCase extends FunctionalTestCase
 
     private static class TestObjectStoreFactory extends MuleDefaultObjectStoreFactory
     {
-
         @Override
         public ObjectStore<Serializable> createDefaultInMemoryObjectStore()
         {
@@ -64,9 +63,8 @@ public class SerializationOnResposeAggregatorTestCase extends FunctionalTestCase
         }
     }
 
-    private static class TestObjectStore<T extends Serializable> extends SimpleMemoryObjectStore
+    private static class TestObjectStore<T extends Serializable> extends SimpleMemoryObjectStore<Serializable>
     {
-
         @Override
         protected void doStore(Serializable key, Serializable value) throws ObjectStoreException
         {

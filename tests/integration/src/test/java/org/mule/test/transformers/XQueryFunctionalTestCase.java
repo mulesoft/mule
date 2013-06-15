@@ -6,8 +6,12 @@
  */
 package org.mule.test.transformers;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.util.IOUtils;
 
@@ -17,13 +21,8 @@ import java.util.Map;
 import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Test;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-
 public class XQueryFunctionalTestCase extends FunctionalTestCase
 {
-
     @Override
     protected String getConfigResources()
     {
@@ -44,10 +43,10 @@ public class XQueryFunctionalTestCase extends FunctionalTestCase
         String resultData = IOUtils.getResourceAsString("org/mule/test/integration/xml/cd-catalog-result-with-params.xml", getClass());
 
         //Create a new Mule Client
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
 
         //These are the message roperties that will get passed into the XQuery context
-        Map props = new HashMap();
+        Map<String, Object> props = new HashMap<String, Object>();
         props.put("ListTitle", "MyList");
         props.put("ListRating", new Integer(6));
 

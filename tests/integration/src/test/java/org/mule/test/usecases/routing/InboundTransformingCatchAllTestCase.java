@@ -6,45 +6,32 @@
  */
 package org.mule.test.usecases.routing;
 
-import org.mule.DefaultMuleMessage;
-import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
-
-import java.util.Arrays;
-import java.util.Collection;
-
-import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
-
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+
+import org.mule.DefaultMuleMessage;
+import org.mule.api.MuleMessage;
+import org.mule.api.client.MuleClient;
+import org.mule.tck.junit4.FunctionalTestCase;
+
+import org.junit.Test;
 
 /*
  * In this Test Case we make use of a Custom Catch All Strategy in order to show how
  * to send the transformed message instead of the non-transformed message.
  */
-public class InboundTransformingCatchAllTestCase extends AbstractServiceAndFlowTestCase
+public class InboundTransformingCatchAllTestCase extends FunctionalTestCase
 {
-    @Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigResources()
     {
-        return Arrays.asList(new Object[][]{{ConfigVariant.SERVICE,
-            "org/mule/test/usecases/routing/inbound-transforming-catchall-service.xml"}
-
-        });
+        return "org/mule/test/usecases/routing/inbound-transforming-catchall-service.xml";
     }
-
-    public InboundTransformingCatchAllTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
-
 
     @Test
     public void testNormal() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         client.dispatch("vm://in1", new DefaultMuleMessage("HELLO!", muleContext));
         MuleMessage msg = client.request("vm://catchall", 3000);
         assertNotNull(msg);

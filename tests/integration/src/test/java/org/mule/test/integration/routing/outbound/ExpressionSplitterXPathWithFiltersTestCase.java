@@ -6,15 +6,15 @@
  */
 package org.mule.test.integration.routing.outbound;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
 
 import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Test;
-
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 
 public class ExpressionSplitterXPathWithFiltersTestCase extends FunctionalTestCase
 {
@@ -45,7 +45,7 @@ public class ExpressionSplitterXPathWithFiltersTestCase extends FunctionalTestCa
     @Test
     public void testRecipientList() throws Exception
     {
-        client = new MuleClient(muleContext);
+        client = muleContext.getClient();
         client.dispatch("vm://distributor.queue", MESSAGE, null);
 
         readFromQueue("vm://service1.out", 2, "One");

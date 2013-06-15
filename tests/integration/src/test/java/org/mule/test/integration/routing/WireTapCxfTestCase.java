@@ -6,9 +6,13 @@
  */
 package org.mule.test.integration.routing;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.api.MuleMessage;
+import org.mule.api.client.MuleClient;
 import org.mule.api.context.notification.ServerNotification;
-import org.mule.module.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.functional.FunctionalTestNotificationListener;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -21,10 +25,6 @@ import java.util.concurrent.TimeUnit;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 public class WireTapCxfTestCase extends AbstractServiceAndFlowTestCase
 {
@@ -68,7 +68,7 @@ public class WireTapCxfTestCase extends AbstractServiceAndFlowTestCase
         String msg = "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">"
                      + "<soap:Body><echo><text>foo</text></echo></soap:Body></soap:Envelope>";
 
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage response = client.send(url, msg, null);
         assertNotNull(response);
 
