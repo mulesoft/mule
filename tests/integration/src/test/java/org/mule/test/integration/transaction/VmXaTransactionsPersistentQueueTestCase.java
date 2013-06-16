@@ -6,14 +6,11 @@
  */
 package org.mule.test.integration.transaction;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
-import org.mule.transport.NullPayload;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -46,10 +43,8 @@ public class VmXaTransactionsPersistentQueueTestCase extends AbstractServiceAndF
     public void testOutboundRouterTransactions() throws Exception
     {
         MuleClient client = muleContext.getClient();
-        MuleMessage msg = client.send("vm://in", TEST_MESSAGE, null, (int) timeout);
 
-        assertNotNull(msg);
-        assertNull(msg.getExceptionPayload());
-        assertEquals(NullPayload.getInstance(), msg.getPayload());
+        MuleMessage msg = client.send("vm://in", TEST_MESSAGE, null, (int) timeout);
+        assertNull(msg);
     }
 }

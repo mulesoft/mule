@@ -10,7 +10,7 @@ import static org.junit.Assert.assertEquals;
 
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.api.client.MuleClient;
+import org.mule.module.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
 
 import java.util.HashMap;
@@ -31,7 +31,7 @@ public class RedeliveryPolicyTestCase extends FunctionalTestCase
     {
         for (int i = 0; i < 100; i++)
         {
-            MuleClient client = muleContext.getClient();
+            MuleClient client = new MuleClient(muleContext);
             client.send("vm://success", "hello", null);
         }
         checkNumberOfMessages("vm://dead-letter-queue", 0, 1000);
@@ -44,7 +44,7 @@ public class RedeliveryPolicyTestCase extends FunctionalTestCase
         int failure = 0;
         for (int i = 0; i < 100; i++)
         {
-            MuleClient client = muleContext.getClient();
+            MuleClient client = new MuleClient(muleContext);
             MuleMessage msg = client.send("vm://limitedFailures", "hello", null);
             if (msg.getExceptionPayload() != null)
             {
@@ -69,7 +69,8 @@ public class RedeliveryPolicyTestCase extends FunctionalTestCase
         {
             for (int j = 0; j < 10; j++)
             {
-                MuleClient client = muleContext.getClient();
+
+                MuleClient client = new MuleClient(muleContext);
                 String payload = "hello" + j;
                 MuleMessage msg = client.send("vm://manyRealFailures", payload, null);
                 if (msg.getExceptionPayload() != null)
@@ -90,7 +91,7 @@ public class RedeliveryPolicyTestCase extends FunctionalTestCase
     protected void checkNumberOfMessages(String url, int size, long timeout) throws MuleException
     {
         int count = 0;
-        MuleClient client = muleContext.getClient();
+        MuleClient client = new MuleClient(muleContext);
         while (client.request(url, timeout) != null)
         {
             count++;

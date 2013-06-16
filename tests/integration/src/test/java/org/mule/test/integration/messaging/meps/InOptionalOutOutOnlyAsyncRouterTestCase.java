@@ -21,7 +21,6 @@ import org.mule.api.construct.FlowConstruct;
 import org.mule.api.service.Service;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
-import org.mule.transport.NullPayload;
 
 public class InOptionalOutOutOnlyAsyncRouterTestCase extends AbstractServiceAndFlowTestCase
 {
@@ -50,9 +49,7 @@ public class InOptionalOutOutOnlyAsyncRouterTestCase extends AbstractServiceAndF
         MuleClient client = new MuleClient(muleContext);
 
         MuleMessage result = client.send("inboundEndpoint", "some data", null);
-        assertNotNull(result);
-        assertEquals(NullPayload.getInstance(), result.getPayload());
-        assertNull(result.getExceptionPayload());
+        assertNull(result);
 
         DefaultMuleMessage msg = new DefaultMuleMessage("some data", muleContext);
         msg.setOutboundProperty("foo", "bar");

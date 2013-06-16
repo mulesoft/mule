@@ -6,7 +6,10 @@
  */
 package org.mule.context.notification;
 
-import org.mule.module.client.MuleClient;
+import static org.junit.Assert.assertNull;
+
+import org.mule.api.MuleMessage;
+import org.mule.api.client.MuleClient;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -34,8 +37,9 @@ public class ExceptionNotificationTestCase extends AbstractNotificationTestCase
     @Override
     public void doTest() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
-        assertNotNull(client.send("vm://in-1", "hello world", null));
+        MuleClient client = muleContext.getClient();
+        MuleMessage result = client.send("vm://in-1", "hello world", null);
+        assertNull(result);
     }
 
     @Override
