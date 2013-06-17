@@ -55,7 +55,7 @@ public class HttpServerConnection
         }
 
         this.socket = socket;
-        setSocketTcpNoDelay();
+        setSocketTcpNoDelay(connector.isSendTcpNoDelay());
         this.socket.setKeepAlive(connector.isKeepAlive());
         
         if (connector.getReceiveBufferSize() != Connector.INT_VALUE_NOT_SET
@@ -74,11 +74,11 @@ public class HttpServerConnection
         this.encoding = encoding;
     }
 
-    private void setSocketTcpNoDelay() throws IOException
+    private void setSocketTcpNoDelay(boolean tcpNoDelay) throws IOException
     {
         try
         {
-            socket.setTcpNoDelay(true);
+            socket.setTcpNoDelay(tcpNoDelay);
         }
         catch (SocketException se)
         {
@@ -323,13 +323,52 @@ public class HttpServerConnection
         outstream.flush();
     }
 
+    /**
+     * Returns the value of the SO_TIMEOUT for the underlying socket.
+     *
+     * @return The value of the SO_TIMEOUT for the underlying socket.
+     * @throws SocketException If there is an error in the underlying protocol.
+     */
     public int getSocketTimeout() throws SocketException
     {
-        return this.socket.getSoTimeout();
+        return socket.getSoTimeout();
     }
 
     public void setSocketTimeout(int timeout) throws SocketException
     {
-        this.socket.setSoTimeout(timeout);
+        socket.setSoTimeout(timeout);
+    }
+
+    /**
+     * Tests if SO_KEEPALIVE is enabled in the underlying socket.
+     *
+     * @return a <code>boolean</code> indicating whether or not SO_KEEPALIVE is enabled.
+     * @throws SocketException If there is an error in the underlying protocol.
+     */
+    public boolean isSocketKeepAlive() throws SocketException
+    {
+        return socket.getKeepAlive();
+    }
+
+    /**
+     * Tests if TCP_NODELAY is enabled in the underlying socket.
+     *
+     * @return a <code>boolean</code> indicating whether or not TCP_NODELAY is enabled.
+     * @throws SocketException If there is an error in the underlying protocol.
+     */
+    public boolean isSocketTcpNoDelay() throws SocketException
+    {
+        return socket.getTcpNoDelay();
+    }
+
+    /**
+     * Gets the value of the SO_RCVBUF for the underlying socket.
+     *
+     * @return The value of the SO_RCVBUF for the underlying socket.
+     * @throws SocketException If there is an error in the underlying protocol.
+     */
+    public int getSocketReceiverBufferSize() throws SocketException
+    {
+        return socket.getReceiveBufferSize();
     }
 }
