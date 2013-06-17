@@ -21,21 +21,26 @@ public interface MetadataAware
     /**
      * Returns the user-friendly name of this module
      */
-    String getModuleName();
+    public String getModuleName();
 
     /**
      * Returns the version of this module
      */
-    String getModuleVersion();
+    public String getModuleVersion();
 
     /**
      * Returns the version of the DevKit used to create this module
      */
-    String getDevkitVersion();
+    public String getDevkitVersion();
 
     /**
      * Returns the build of the DevKit used to create this module
      */
-    String getDevkitBuild();
+    public String getDevkitBuild();
+
+    /**
+     * Returns the minimun compatible runtime version
+     */
+    public String getMinMuleVersion();
 
 }

@@ -10,7 +10,7 @@
 
 package org.mule.api;
 
-import org.mule.api.callback.ProcessCallback;
+import org.mule.security.oauth.callback.ProcessCallback;
 
 public interface ProcessInterceptor<T, O>
 {
