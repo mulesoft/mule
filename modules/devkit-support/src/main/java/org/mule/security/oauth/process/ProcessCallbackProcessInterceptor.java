@@ -12,7 +12,7 @@ package org.mule.security.oauth.process;
 
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.ProcessInterceptor;
+import org.mule.api.devkit.ProcessInterceptor;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.filter.Filter;
 import org.mule.security.oauth.callback.ProcessCallback;

@@ -12,9 +12,9 @@ package org.mule.security.oauth;
 
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
-import org.mule.api.capability.ModuleCapability;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.context.MuleContextAware;
+import org.mule.api.devkit.capability.ModuleCapability;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;

@@ -10,7 +10,7 @@
 
 package org.mule.security.oauth.callback;
 
-import org.mule.api.ProcessTemplate;
+import org.mule.api.devkit.ProcessTemplate;
 
 /**
  * Callback with logic to execute within a controlled environment provided by {@link ProcessTemplate}

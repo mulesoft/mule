@@ -12,14 +12,14 @@ package org.mule.security.oauth;
 
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
-import org.mule.api.ProcessAdapter;
-import org.mule.api.ProcessTemplate;
-import org.mule.api.capability.Capabilities;
-import org.mule.api.capability.ModuleCapability;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.construct.FlowConstructAware;
 import org.mule.api.context.MuleContextAware;
+import org.mule.api.devkit.ProcessAdapter;
+import org.mule.api.devkit.ProcessTemplate;
+import org.mule.api.devkit.capability.Capabilities;
+import org.mule.api.devkit.capability.ModuleCapability;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;

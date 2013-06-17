@@ -12,8 +12,8 @@ package org.mule.security.oauth.process;
 
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.ProcessTemplate;
-import org.mule.api.capability.Capabilities;
+import org.mule.api.devkit.ProcessTemplate;
+import org.mule.api.devkit.capability.Capabilities;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.filter.Filter;
 import org.mule.security.oauth.OAuthAdapter;

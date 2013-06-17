@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.api;
+package org.mule.api.devkit;
 
 public interface ProcessAdapter<O>
 {

@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.api.capability;
+package org.mule.api.devkit.capability;
 
 import javax.resource.spi.ConnectionManager;
 
