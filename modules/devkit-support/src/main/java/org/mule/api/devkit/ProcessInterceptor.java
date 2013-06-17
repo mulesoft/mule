@@ -10,8 +10,6 @@
 
 package org.mule.api.devkit;
 
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleMessage;
 import org.mule.security.oauth.callback.ProcessCallback;
 
 public interface ProcessInterceptor<T, O>
