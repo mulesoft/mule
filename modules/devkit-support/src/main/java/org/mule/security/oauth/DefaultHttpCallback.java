@@ -15,6 +15,7 @@ import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
+import org.mule.api.callback.HttpCallback;
 import org.mule.api.construct.FlowConstructInvalidException;
 import org.mule.api.endpoint.EndpointFactory;
 import org.mule.api.endpoint.InboundEndpoint;
@@ -37,7 +38,7 @@ import java.util.UUID;
 import org.apache.log4j.Logger;
 
 /**
- * Default implementation of {@link org.mule.security.oauth.HttpCallback}. This class
+ * Default implementation of {@link org.mule.api.callback.HttpCallback}. This class
  * does not only start the http inbound endpoint that is able to receive the
  * callbacks, it also contains a processor chain to be invoked upon reception.
  */

@@ -12,6 +12,7 @@ package org.mule.security.oauth.processor;
 
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
+import org.mule.api.callback.HttpCallback;
 import org.mule.api.construct.FlowConstructAware;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Initialisable;
@@ -22,7 +23,6 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transformer.TransformerMessagingException;
 import org.mule.security.oauth.DefaultHttpCallback;
-import org.mule.security.oauth.HttpCallback;
 import org.mule.security.oauth.callback.HttpCallbackAdapter;
 
 import java.util.Arrays;

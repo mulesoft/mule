@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.security.oauth;
+package org.mule.api.callback;
 
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Startable;

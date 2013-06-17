@@ -13,9 +13,9 @@ package org.mule.security.oauth.processor;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
+import org.mule.api.callback.HttpCallback;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transformer.TransformerMessagingException;
-import org.mule.security.oauth.HttpCallback;
 import org.mule.security.oauth.OAuth1Adapter;
 import org.mule.tck.size.SmallTest;
 
