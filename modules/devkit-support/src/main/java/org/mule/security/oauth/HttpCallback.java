@@ -14,8 +14,14 @@ import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
 
+/**
+ * Base interface for components that publish a http callback.
+ */
 public interface HttpCallback extends Startable, Stoppable, MuleContextAware
 {
 
+    /**
+     * @return the url that the callback is listening on
+     */
     String getUrl();
 }

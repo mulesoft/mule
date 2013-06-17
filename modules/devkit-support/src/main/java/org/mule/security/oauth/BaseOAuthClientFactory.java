@@ -31,18 +31,58 @@ public abstract class BaseOAuthClientFactory implements KeyedPoolableObjectFacto
     private OAuth2Manager<OAuth2Adapter> oauthManager;
     private ObjectStore<OAuthState> objectStore;
 
-    public BaseOAuthClientFactory(OAuth2Manager<OAuth2Adapter> oauthManager, ObjectStore<OAuthState> objectStore)
+    public BaseOAuthClientFactory(OAuth2Manager<OAuth2Adapter> oauthManager,
+                                  ObjectStore<OAuthState> objectStore)
     {
         this.oauthManager = oauthManager;
         this.objectStore = objectStore;
     }
 
+    /**
+     * Returns the class of the concrete implementation of
+     * {@link org.mule.security.oauth.OAuth2Adapter} that this factory is supposed to
+     * generate
+     */
     protected abstract Class<? extends OAuth2Adapter> getAdapterClass();
 
+    /**
+     * Implementors can levarage this method to move custom property values from the
+     * state to the adapter You can leave this method blank if not needed in your
+     * case.
+     * 
+     * @param adapter a {@link org.mule.security.oauth.OAuth2Adapter} which supports
+     *            custom properties
+     * @param state a {@link org.mule.security.oauth.OAuth2Adapter} which is carrying
+     *            custom properties.
+     */
     protected abstract void setCustomAdapterProperties(OAuth2Adapter adapter, OAuthState state);
 
+    /**
+     * Implementos can leverage this method to move custom property values from the
+     * adapter to the state. You can leave this method blank if not needed in your
+     * case.
+     * 
+     * @param adapter a {@link org.mule.security.oauth.OAuth2Adapter} which is
+     *            carrying custom properties
+     * @param state a {@link org.mule.security.oauth.OAuth2Adapter}
+     */
     protected abstract void setCustomStateProperties(OAuth2Adapter adapter, OAuthState state);
 
+    /**
+     * This method creates an instance of
+     * {@link org.mule.security.oauth.OAuth2Adapter} which concrete type depends on
+     * the return of
+     * {@link org.mule.security.oauth.BaseOAuthClientFactory.getAdapterClass} The
+     * adapter is fully initialized and interfaces such as
+     * {@link org.mule.api.lifecycle.Initialisable},
+     * {@link org.mule.api.context.MuleContextAware} and
+     * {@link org.mule.api.lifecycle.Startable} are respected by invoking the
+     * corresponding methods in case the adapter implements them. Finally, the
+     * {@link org.mule.security.oauth.OAuth2Connector.postAuth()} method is invoked.
+     * 
+     * @param the key of the object at the object store
+     * @throws IllegalArgumentException if key is not a String
+     */
     @Override
     public final Object makeObject(Object key) throws Exception
     {
@@ -63,7 +103,7 @@ public abstract class BaseOAuthClientFactory implements KeyedPoolableObjectFacto
         OAuth2Adapter connector = this.getAdapterClass()
             .getConstructor(OAuth2Manager.class)
             .newInstance(this.oauthManager);
-        
+
         connector.setConsumerKey(oauthManager.getDefaultUnauthorizedConnector().getConsumerKey());
         connector.setConsumerSecret(oauthManager.getDefaultUnauthorizedConnector().getConsumerSecret());
         connector.setAccessToken(state.getAccessToken());
@@ -90,6 +130,18 @@ public abstract class BaseOAuthClientFactory implements KeyedPoolableObjectFacto
         return connector;
     }
 
+    /**
+     * If obj implements {@link org.mule.api.lifecycle.Stoppable} or
+     * {@link org.mule.api.lifecycle.Disposable}, the object is destroyed by invoking
+     * the corresponding methods
+     * 
+     * @param key the key of the object at the object store
+     * @param obj an instance of {@link org.mule.security.oauth.OAuth2Adapter}
+     * @throws IllegalArgumetException if key is not a string or if obj is not an
+     *             instance of the type returned by {@link
+     *             org.mule.security.oauth.BaseOAuthClientFactory.getAdapterClass()}
+     */
+    @Override
     public final void destroyObject(Object key, Object obj) throws Exception
     {
         if (!(key instanceof String))
@@ -113,6 +165,17 @@ public abstract class BaseOAuthClientFactory implements KeyedPoolableObjectFacto
         }
     }
 
+    /**
+     * Validates the object by checking that it exists at the object store and that
+     * the state of the given object is consisten with the persisted state
+     * 
+     * @param key the key of the object at the object store
+     * @param obj an instance of {@link org.mule.security.oauth.OAuth2Adapter}
+     * @throws IllegalArgumetException if key is not a string or if obj is not an
+     *             instance of the type returned by {@link
+     *             org.mule.security.oauth.BaseOAuthClientFactory.getAdapterClass()}
+     */
+    @Override
     public final boolean validateObject(Object key, Object obj)
     {
         if (!(key instanceof String))
@@ -167,10 +230,26 @@ public abstract class BaseOAuthClientFactory implements KeyedPoolableObjectFacto
         return true;
     }
 
+    /**
+     * This default implementation does nothing
+     */
+    @Override
     public void activateObject(Object key, Object obj) throws Exception
     {
     }
 
+    /**
+     * Passivates the object by updating the state of the persisted object with the
+     * one of the given one. If the object doesn't exist in the object store then it
+     * is created
+     * 
+     * @param key the key of the object at the object store
+     * @param obj an instance of {@link org.mule.security.oauth.OAuth2Adapter}
+     * @throws IllegalArgumetException if key is not a string or if obj is not an
+     *             instance of the type returned by {@link
+     *             org.mule.security.oauth.BaseOAuthClientFactory.getAdapterClass()}
+     */
+    @Override
     public final void passivateObject(Object key, Object obj) throws Exception
     {
         if (!(key instanceof String))

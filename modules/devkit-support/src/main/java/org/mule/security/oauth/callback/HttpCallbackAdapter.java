@@ -12,6 +12,9 @@ package org.mule.security.oauth.callback;
 
 import org.mule.api.transport.Connector;
 
+/**
+ * Adapter interface for Http callbacks
+ */
 public interface HttpCallbackAdapter
 {
 

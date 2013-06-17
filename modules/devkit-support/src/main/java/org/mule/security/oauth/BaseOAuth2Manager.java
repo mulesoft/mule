@@ -79,7 +79,10 @@ public abstract class BaseOAuth2Manager<C extends OAuth2Adapter> extends Default
 
     private HttpUtil httpUtil;
     private OAuthResponseParser oauthResponseParser;
-    
+
+    /**
+     * @return the logger to be used when logging messages.
+     */
     protected abstract Logger getLogger();
 
     /**
@@ -159,6 +162,11 @@ public abstract class BaseOAuth2Manager<C extends OAuth2Adapter> extends Default
         }
     }
 
+    /**
+     * if {@link org.mule.api.lifecycle.Startable}, then
+     * {@link org.mule.security.oauth.BaseOAuth2Manager.defaultUnauthorizedConnector}
+     * is started
+     */
     @Override
     public final void start() throws MuleException
     {
@@ -168,6 +176,11 @@ public abstract class BaseOAuth2Manager<C extends OAuth2Adapter> extends Default
         }
     }
 
+    /**
+     * if {@link org.mule.api.lifecycle.Stoppable}, then
+     * {@link org.mule.security.oauth.BaseOAuth2Manager.defaultUnauthorizedConnector}
+     * is stopped
+     */
     @Override
     public final void stop() throws MuleException
     {
@@ -177,6 +190,11 @@ public abstract class BaseOAuth2Manager<C extends OAuth2Adapter> extends Default
         }
     }
 
+    /**
+     * if {@link org.mule.api.lifecycle.Disposable}, then
+     * {@link org.mule.security.oauth.BaseOAuth2Manager.defaultUnauthorizedConnector}
+     * is disposed
+     */
     @Override
     public final void dispose()
     {
@@ -224,16 +242,18 @@ public abstract class BaseOAuth2Manager<C extends OAuth2Adapter> extends Default
     {
         if (getLogger().isDebugEnabled())
         {
-            getLogger().debug(String.format("Pool Statistics before acquiring [key %s] [active=%d] [idle=%d]",
-                userId, accessTokenPool.getNumActive(userId), accessTokenPool.getNumIdle(userId)));
+            getLogger().debug(
+                String.format("Pool Statistics before acquiring [key %s] [active=%d] [idle=%d]", userId,
+                    accessTokenPool.getNumActive(userId), accessTokenPool.getNumIdle(userId)));
         }
 
         OAuth2Adapter object = ((OAuth2Adapter) accessTokenPool.borrowObject(userId));
 
         if (getLogger().isDebugEnabled())
         {
-            getLogger().debug(String.format("Pool Statistics after acquiring [key %s] [active=%d] [idle=%d]",
-                userId, accessTokenPool.getNumActive(userId), accessTokenPool.getNumIdle(userId)));
+            getLogger().debug(
+                String.format("Pool Statistics after acquiring [key %s] [active=%d] [idle=%d]", userId,
+                    accessTokenPool.getNumActive(userId), accessTokenPool.getNumIdle(userId)));
         }
         return object;
     }
@@ -246,16 +266,18 @@ public abstract class BaseOAuth2Manager<C extends OAuth2Adapter> extends Default
     {
         if (getLogger().isDebugEnabled())
         {
-            getLogger().debug(String.format("Pool Statistics before releasing [key %s] [active=%d] [idle=%d]",
-                userId, accessTokenPool.getNumActive(userId), accessTokenPool.getNumIdle(userId)));
+            getLogger().debug(
+                String.format("Pool Statistics before releasing [key %s] [active=%d] [idle=%d]", userId,
+                    accessTokenPool.getNumActive(userId), accessTokenPool.getNumIdle(userId)));
         }
 
         accessTokenPool.returnObject(userId, connector);
 
         if (getLogger().isDebugEnabled())
         {
-            getLogger().debug(String.format("Pool Statistics after releasing [key %s] [active=%d] [idle=%d]",
-                userId, accessTokenPool.getNumActive(userId), accessTokenPool.getNumIdle(userId)));
+            getLogger().debug(
+                String.format("Pool Statistics after releasing [key %s] [active=%d] [idle=%d]", userId,
+                    accessTokenPool.getNumActive(userId), accessTokenPool.getNumIdle(userId)));
         }
     }
 
@@ -267,16 +289,18 @@ public abstract class BaseOAuth2Manager<C extends OAuth2Adapter> extends Default
     {
         if (getLogger().isDebugEnabled())
         {
-            getLogger().debug(String.format("Pool Statistics before destroying [key %s] [active=%d] [idle=%d]",
-                userId, accessTokenPool.getNumActive(userId), accessTokenPool.getNumIdle(userId)));
+            getLogger().debug(
+                String.format("Pool Statistics before destroying [key %s] [active=%d] [idle=%d]", userId,
+                    accessTokenPool.getNumActive(userId), accessTokenPool.getNumIdle(userId)));
         }
 
         accessTokenPool.invalidateObject(userId, connector);
 
         if (getLogger().isDebugEnabled())
         {
-            getLogger().debug(String.format("Pool Statistics after destroying [key %s] [active=%d] [idle=%d]",
-                userId, accessTokenPool.getNumActive(userId), accessTokenPool.getNumIdle(userId)));
+            getLogger().debug(
+                String.format("Pool Statistics after destroying [key %s] [active=%d] [idle=%d]", userId,
+                    accessTokenPool.getNumActive(userId), accessTokenPool.getNumIdle(userId)));
         }
     }
 
@@ -341,9 +365,10 @@ public abstract class BaseOAuth2Manager<C extends OAuth2Adapter> extends Default
 
                 if (getLogger().isDebugEnabled())
                 {
-                    getLogger().debug(String.format(
-                        "Access token and secret has been restored successfully [accessToken = %s]",
-                        accessToken));
+                    getLogger().debug(
+                        String.format(
+                            "Access token and secret has been restored successfully [accessToken = %s]",
+                            accessToken));
                 }
                 return true;
             }
@@ -428,7 +453,8 @@ public abstract class BaseOAuth2Manager<C extends OAuth2Adapter> extends Default
 
         String accessTokenUrl = adapter.getAccessTokenUrl() != null
                                                                    ? adapter.getAccessTokenUrl()
-                                                                   : this.getDefaultUnauthorizedConnector().getAccessTokenUrl();
+                                                                   : this.getDefaultUnauthorizedConnector()
+                                                                       .getAccessTokenUrl();
 
         String response = this.httpUtil.post(accessTokenUrl, requestBody);
 
@@ -441,17 +467,18 @@ public abstract class BaseOAuth2Manager<C extends OAuth2Adapter> extends Default
             response));
         if (getLogger().isDebugEnabled())
         {
-            getLogger().debug(String.format("Access token retrieved successfully [accessToken = %s]",
-                adapter.getAccessToken()));
+            getLogger().debug(
+                String.format("Access token retrieved successfully [accessToken = %s]",
+                    adapter.getAccessToken()));
         }
 
         this.saveAccessToken(adapter);
 
         if (getLogger().isDebugEnabled())
         {
-            getLogger().debug(String.format(
-                "Attempting to extract expiration time using [expirationPattern = %s]",
-                adapter.getExpirationTimePattern().pattern()));
+            getLogger().debug(
+                String.format("Attempting to extract expiration time using [expirationPattern = %s]",
+                    adapter.getExpirationTimePattern().pattern()));
         }
 
         Date expiration = this.oauthResponseParser.extractExpirationTime(adapter.getExpirationTimePattern(),
@@ -463,22 +490,23 @@ public abstract class BaseOAuth2Manager<C extends OAuth2Adapter> extends Default
 
             if (getLogger().isDebugEnabled())
             {
-                getLogger().debug(String.format("Token expiration extracted successfully [expiration = %s]",
-                    expiration));
+                getLogger().debug(
+                    String.format("Token expiration extracted successfully [expiration = %s]", expiration));
             }
         }
         else
         {
             if (getLogger().isDebugEnabled())
             {
-                getLogger().debug(String.format("Token expiration could not be extracted from [response = %s]",
-                    response));
+                getLogger().debug(
+                    String.format("Token expiration could not be extracted from [response = %s]", response));
             }
         }
 
         if (getLogger().isDebugEnabled())
         {
-            getLogger().debug("Attempting to extract refresh token time using [refreshTokenPattern = \"refresh_token\":\"([^&]+?)\"]");
+            getLogger().debug(
+                "Attempting to extract refresh token time using [refreshTokenPattern = \"refresh_token\":\"([^&]+?)\"]");
         }
 
         String refreshToken = this.oauthResponseParser.extractRefreshToken(adapter.getRefreshTokenPattern(),
@@ -486,21 +514,21 @@ public abstract class BaseOAuth2Manager<C extends OAuth2Adapter> extends Default
 
         if (refreshToken != null)
         {
-            
+
             adapter.setRefreshToken(refreshToken);
-            
+
             if (getLogger().isDebugEnabled())
             {
-                getLogger().debug(String.format("Refresh token extracted successfully [refresh token = %s]",
-                    refreshToken));
+                getLogger().debug(
+                    String.format("Refresh token extracted successfully [refresh token = %s]", refreshToken));
             }
         }
         else
         {
             if (getLogger().isDebugEnabled())
             {
-                getLogger().debug(String.format("Refresh token could not be extracted from [response = %s]",
-                    response));
+                getLogger().debug(
+                    String.format("Refresh token could not be extracted from [response = %s]", response));
             }
         }
 
@@ -518,8 +546,9 @@ public abstract class BaseOAuth2Manager<C extends OAuth2Adapter> extends Default
             {
                 if (getLogger().isDebugEnabled())
                 {
-                    getLogger().debug(String.format("Attempting to save access token...[accessToken = %s]",
-                        adapter.getAccessToken()));
+                    getLogger().debug(
+                        String.format("Attempting to save access token...[accessToken = %s]",
+                            adapter.getAccessToken()));
                 }
                 saveCallback.saveAccessToken(adapter.getAccessToken(), null);
             }

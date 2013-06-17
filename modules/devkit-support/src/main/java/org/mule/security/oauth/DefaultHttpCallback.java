@@ -36,6 +36,11 @@ import java.util.UUID;
 
 import org.apache.log4j.Logger;
 
+/**
+ * Default implementation of {@link org.mule.security.oauth.HttpCallback}. This class
+ * does not only start the http inbound endpoint that is able to receive the
+ * callbacks, it also contains a processor chain to be invoked upon reception.
+ */
 public class DefaultHttpCallback implements HttpCallback
 {
 
@@ -413,6 +418,10 @@ public class DefaultHttpCallback implements HttpCallback
         return endpointFactory.getInboundEndpoint(inBuilder);
     }
 
+    /**
+     * Starts a http inbound endpoint served by the underlying connector. It also
+     * builds a processor chain to be invoked upon callback reception.
+     */
     public void start() throws MuleException
     {
         this.localUrl = url.replaceFirst(domain, "localhost");
@@ -452,6 +461,9 @@ public class DefaultHttpCallback implements HttpCallback
         LOGGER.debug(String.format("Created flow with http inbound endpoint listening at: %s", url));
     }
 
+    /**
+     * Stops and disposes the processor chain and the inbound endpoint.
+     */
     public void stop() throws MuleException
     {
         if (flowConstruct != null)
