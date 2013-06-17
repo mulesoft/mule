@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.security.oauth;
+package org.mule.api.callback;
 
 import java.util.Map;
 

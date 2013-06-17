@@ -8,8 +8,8 @@ import org.mule.RequestContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
+import org.mule.api.callback.SourceCallback;
 import org.mule.api.processor.MessageProcessor;
-import org.mule.security.oauth.SourceCallback;
 
 import java.util.Map;
 
