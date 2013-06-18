@@ -18,6 +18,7 @@ import java.lang.reflect.Field;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
 
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -28,6 +29,7 @@ public class DefaultMuleVersionCheckerTestCase
 {
 
     private MuleVersionChecker checker;
+    private Field manifestField;
 
     @Before
     public void setUp()
@@ -38,7 +40,7 @@ public class DefaultMuleVersionCheckerTestCase
         Mockito.when(manifest.getMainAttributes()).thenReturn(attributes);
         Mockito.when(attributes.getValue(Mockito.any(Attributes.Name.class))).thenReturn("3.4");
 
-        Field manifestField = null;
+        this.manifestField = null;
         try
         {
             manifestField = MuleManifest.class.getDeclaredField("manifest");
@@ -58,6 +60,19 @@ public class DefaultMuleVersionCheckerTestCase
         }
 
         this.checker = new DefaultMuleVersionChecker();
+    }
+    
+    @After
+    public void tearDown() {
+        try
+        {
+            manifestField.set(null, null);
+        }
+        catch (IllegalAccessException e)
+        {
+            throw new RuntimeException("Could not set manifest field", e);
+        }
+
     }
 
     @Test
