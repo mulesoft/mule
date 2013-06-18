@@ -19,6 +19,14 @@ import org.mule.api.store.ObjectStore;
 import org.mule.api.store.ObjectStoreException;
 import org.mule.common.security.oauth.OAuthState;
 
+import java.beans.IntrospectionException;
+import java.beans.Introspector;
+import java.beans.PropertyDescriptor;
+import java.io.Serializable;
+import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.commons.pool.KeyedPoolableObjectFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,12 +35,30 @@ public abstract class BaseOAuthClientFactory implements KeyedPoolableObjectFacto
 {
 
     private static transient Logger logger = LoggerFactory.getLogger(BaseOAuthClientFactory.class);
+    private static transient Map<String, PropertyDescriptor> oauthStateProperties = new HashMap<String, PropertyDescriptor>();
+
+    static
+    {
+        try
+        {
+            for (PropertyDescriptor pd : Introspector.getBeanInfo(OAuthState.class, Object.class)
+                .getPropertyDescriptors())
+            {
+                oauthStateProperties.put(pd.getName(), pd);
+            }
+        }
+        catch (IntrospectionException e)
+        {
+            throw new RuntimeException(
+                "Error initializing OAuthClientFactory. Could not introspect OAuthState", e);
+        }
+    }
 
     private OAuth2Manager<OAuth2Adapter> oauthManager;
-    private ObjectStore<OAuthState> objectStore;
+    private ObjectStore<Serializable> objectStore;
 
     public BaseOAuthClientFactory(OAuth2Manager<OAuth2Adapter> oauthManager,
-                                  ObjectStore<OAuthState> objectStore)
+                                  ObjectStore<Serializable> objectStore)
     {
         this.oauthManager = oauthManager;
         this.objectStore = objectStore;
@@ -91,14 +117,13 @@ public abstract class BaseOAuthClientFactory implements KeyedPoolableObjectFacto
             throw new IllegalArgumentException("Invalid key type");
         }
 
-        OAuthState state = null;
         if (!this.objectStore.contains(((String) key)))
         {
             throw new RuntimeException(
                 (("There is no access token stored under the key " + ((String) key)) + ". You need to call the <authorize> message processor. The key will be given to you via a flow variable after the OAuth dance is completed. You can extract it using flowVars['tokenId']."));
         }
 
-        state = this.objectStore.retrieve((String) key);
+        OAuthState state = this.retrieveOAuthState((String) key, true);
 
         OAuth2Adapter connector = this.getAdapterClass()
             .getConstructor(OAuth2Manager.class)
@@ -128,6 +153,99 @@ public abstract class BaseOAuthClientFactory implements KeyedPoolableObjectFacto
 
         connector.postAuth();
         return connector;
+    }
+
+    /**
+     * This method is to provide backwards compatibility with connectors generated
+     * using devkit 3.4.0 or lower. Those connectors used one custom OAuthState class
+     * per connector which disabled the possibility of token sharing. The
+     * {@link org.mule.common.security.oauth.OAuthState} solves that problem but
+     * generates a migration issues with applications using such a connector and
+     * wishing to upgrade. This method retrieves a value from the ObjectStore and if
+     * it's not a generic org.mule.common.security.oauth.OAuthState instance it
+     * translates it to one, generating an ongoing migration process. If
+     * <code>replace</code> is true, then the value in the ObjectStore is replaced.
+     * Once Mule 3.4.0 reaches end of life status, this method can be replaced by
+     * simple object store lookup
+     * 
+     * @param key the object store key
+     * @param replace if true and if the obtained value is not an instance of
+     *            {@link org.mule.common.security.oauth.OAuthState}, then the value
+     *            is replaced in the object store by the transformed instance
+     */
+    private synchronized OAuthState retrieveOAuthState(String key, boolean replace)
+    {
+        Object state = null;
+        try
+        {
+            state = this.objectStore.retrieve(key);
+        }
+        catch (ObjectStoreException e)
+        {
+            throw new RuntimeException("Error retrievin value from object store with key " + key, e);
+        }
+
+        if (state != null && !(state instanceof OAuthState))
+        {
+
+            OAuthState newState = new OAuthState();
+
+            try
+            {
+                for (PropertyDescriptor beanProperty : Introspector.getBeanInfo(state.getClass(),
+                    Object.class).getPropertyDescriptors())
+                {
+                    Object value = beanProperty.getReadMethod().invoke(state, (Object[]) null);
+                    if (value != null)
+                    {
+                        PropertyDescriptor stateProperty = oauthStateProperties.get(beanProperty.getName());
+                        if (stateProperty != null)
+                        {
+                            stateProperty.getWriteMethod().invoke(newState, value);
+                        }
+                        else
+                        {
+                            newState.setCustomProperty(beanProperty.getName(), value.toString());
+                        }
+                    }
+                }
+            }
+            catch (IllegalAccessException e)
+            {
+                throw new RuntimeException("Error accessing value through reflection", e);
+            }
+            catch (IntrospectionException e)
+            {
+                throw new RuntimeException("Error introspecting object of class "
+                                           + state.getClass().getCanonicalName(), e);
+            }
+            catch (IllegalArgumentException e)
+            {
+                throw new RuntimeException("Error setting value through reflection", e);
+            }
+            catch (InvocationTargetException e)
+            {
+                throw new RuntimeException("Object threw exception while setting value by reflection", e);
+            }
+
+            state = newState;
+
+            if (replace)
+            {
+                try
+                {
+                    this.objectStore.remove(key);
+                    this.objectStore.store(key, newState);
+                }
+                catch (ObjectStoreException e)
+                {
+                    throw new RuntimeException("ObjectStore threw exception while replacing instance", e);
+                }
+            }
+        }
+
+        return (OAuthState) state;
+
     }
 
     /**
@@ -192,7 +310,6 @@ public abstract class BaseOAuthClientFactory implements KeyedPoolableObjectFacto
 
         OAuth2Adapter connector = (OAuth2Adapter) obj;
 
-        OAuthState state = null;
         try
         {
             if (!this.objectStore.contains(k))
@@ -200,7 +317,7 @@ public abstract class BaseOAuthClientFactory implements KeyedPoolableObjectFacto
                 return false;
             }
 
-            state = this.objectStore.retrieve(k);
+            OAuthState state = this.retrieveOAuthState(k, true);
 
             if (connector.getAccessToken() == null)
             {
@@ -268,9 +385,9 @@ public abstract class BaseOAuthClientFactory implements KeyedPoolableObjectFacto
 
         OAuthState state = null;
 
-        if (this.objectStore.contains(((String) key)))
+        if (this.objectStore.contains(k))
         {
-            state = this.objectStore.retrieve(k);
+            state = this.retrieveOAuthState(k, false);
             this.objectStore.remove(k);
         }
 
