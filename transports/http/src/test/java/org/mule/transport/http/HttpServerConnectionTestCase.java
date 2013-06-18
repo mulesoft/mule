@@ -52,7 +52,7 @@ public class HttpServerConnectionTestCase extends AbstractMuleContextTestCase
         try
         {
             // Establish server and client connections.
-            serverSocket = httpConnector.getServerSocketFactory().createServerSocket(port1.getNumber(), TcpConnector.DEFAULT_BACKLOG, false);
+            serverSocket = httpConnector.getServerSocketFactory().createServerSocket(port1.getNumber(), TcpConnector.DEFAULT_BACKLOG, true);
             clientServerSocket = new Socket("localhost", port1.getNumber());
             serverClientSocket = serverSocket.accept();
 
