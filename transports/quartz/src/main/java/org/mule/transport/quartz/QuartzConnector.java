@@ -18,7 +18,9 @@ import org.mule.api.transport.ConnectorException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.transport.AbstractConnector;
 
+import java.util.HashSet;
 import java.util.Properties;
+import java.util.Set;
 
 import org.quartz.Scheduler;
 import org.quartz.SchedulerFactory;
@@ -46,6 +48,10 @@ public class QuartzConnector extends AbstractConnector
     public static final String PROPERTY_JOB_DYNAMIC = "jobDynamic";
 
     public static final String DEFAULT_GROUP_NAME = "mule";
+    public static final String QUARTZ_INSTANCE_NAME_PROPERTY = "org.quartz.scheduler.instanceName";
+
+    private static final Object instanceNamesLock = new Object();
+    private static final Set<String> instanceNames = new HashSet<String>();
 
     /**
      * Properties to be used for creating the scheduler.  If no properties are given, the
@@ -81,6 +87,10 @@ public class QuartzConnector extends AbstractConnector
             factoryProperties.setProperty("org.quartz.scheduler.instanceName",
                 "scheduler-" + muleContext.getConfiguration().getId());
         }
+        else
+        {
+            ensureUniqueInstanceNameBetweenMuleApps(instanceName);
+        }
 
         try
         {
@@ -94,7 +104,7 @@ public class QuartzConnector extends AbstractConnector
         }
         catch (Exception e)
         {
-            throw new InitialisationException(CoreMessages.initialisationFailure("Quartz conntector"), e, this);
+            throw new InitialisationException(CoreMessages.initialisationFailure("Quartz connector"), e, this);
         }
     }
 
@@ -111,6 +121,42 @@ public class QuartzConnector extends AbstractConnector
         catch (Exception e)
         {
             logger.warn(CoreMessages.failedToStop("Quartz provider"), e);
+        }
+
+        String instanceName = factoryProperties.getProperty(QUARTZ_INSTANCE_NAME_PROPERTY);
+        if (instanceName != null)
+        {
+            removeUpInstanceName(instanceName);
+        }
+    }
+
+    private void ensureUniqueInstanceNameBetweenMuleApps(String instanceName) throws InitialisationException
+    {
+        synchronized (instanceNamesLock)
+        {
+            if (instanceNames.contains(instanceName))
+            {
+                throw new InitialisationException(CoreMessages.initialisationFailure(String.format("Value '%s' of quartz connector property '%s' cannot be reused in different applications", instanceName, QUARTZ_INSTANCE_NAME_PROPERTY)), this);
+            }
+
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Adding quartz instance name:" + instanceName);
+            }
+            instanceNames.add(instanceName);
+        }
+    }
+
+    private void removeUpInstanceName(String instanceName)
+    {
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("Removing quartz instance name:" + instanceName);
+        }
+
+        synchronized (instanceNamesLock)
+        {
+            instanceNames.remove(instanceName);
         }
     }
 
