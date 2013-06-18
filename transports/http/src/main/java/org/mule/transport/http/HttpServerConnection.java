@@ -367,7 +367,7 @@ public class HttpServerConnection
      * @return The value of the SO_RCVBUF for the underlying socket.
      * @throws SocketException If there is an error in the underlying protocol.
      */
-    public int getSocketReceiverBufferSize() throws SocketException
+    public int getSocketReceiveBufferSize() throws SocketException
     {
         return socket.getReceiveBufferSize();
     }
