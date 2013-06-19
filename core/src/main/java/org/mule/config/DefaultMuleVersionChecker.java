@@ -1,4 +1,3 @@
-
 package org.mule.config;
 
 import org.mule.api.config.ConfigurationException;
