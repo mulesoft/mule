@@ -15,6 +15,7 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.config.i18n.MessageFactory;
+import org.mule.security.oauth.OAuthProperties;
 
 import java.net.URLDecoder;
 import java.util.regex.Matcher;
@@ -34,7 +35,7 @@ public class ExtractAuthorizationCodeMessageProcessor implements MessageProcesso
     {
         try
         {
-            event.getMessage().setInvocationProperty("_oauthVerifier",
+            event.getMessage().setInvocationProperty(OAuthProperties.VERIFIER,
                 extractAuthorizationCode(event.getMessageAsString()));
         }
         catch (Exception e)

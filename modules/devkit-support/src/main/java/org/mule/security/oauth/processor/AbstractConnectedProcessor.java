@@ -34,7 +34,7 @@ public abstract class AbstractConnectedProcessor extends AbstractExpressionEvalu
     protected String _sessionIdType;
     protected Object serviceEndpoint;
     protected String _serviceEndpointType;
-    private Object accessTokenId;
+    private String accessTokenId;
 
     /**
      * Sets proxyUsername
@@ -219,7 +219,7 @@ public abstract class AbstractConnectedProcessor extends AbstractExpressionEvalu
     /**
      * Retrieves accessTokenId
      */
-    public Object getAccessTokenId()
+    public String getAccessTokenId()
     {
         return this.accessTokenId;
     }
@@ -229,7 +229,7 @@ public abstract class AbstractConnectedProcessor extends AbstractExpressionEvalu
      * 
      * @param value Value to set
      */
-    public void setAccessTokenId(Object value)
+    public void setAccessTokenId(String value)
     {
         this.accessTokenId = value;
     }

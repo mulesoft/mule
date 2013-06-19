@@ -21,13 +21,13 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.store.ObjectStore;
-import org.mule.common.security.oauth.OAuthState;
 import org.mule.security.oauth.callback.RestoreAccessTokenCallback;
 import org.mule.security.oauth.callback.SaveAccessTokenCallback;
 import org.mule.security.oauth.util.HttpUtil;
 import org.mule.security.oauth.util.OAuthResponseParser;
 import org.mule.tck.size.SmallTest;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -40,7 +40,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.Spy;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,11 +49,10 @@ import org.slf4j.LoggerFactory;
 public class OAuth2ManagerTestCase
 {
 
-    @Spy
-    private TestOAuth2Manager manager = new TestOAuth2Manager();
+    private TestOAuth2Manager manager;
 
     @Mock
-    private ObjectStore<OAuthState> accessTokenObjectStore = null;
+    private ObjectStore<Serializable> accessTokenObjectStore = null;
 
     private MuleContext muleContext = null;
 
@@ -63,7 +61,7 @@ public class OAuth2ManagerTestCase
 
     @Mock(extraInterfaces = {Initialisable.class, Startable.class, Stoppable.class, Disposable.class,
         MuleContextAware.class})
-    private OAuth2Adapter adapter = null;
+    private OAuth2Adapter adapter;
 
     @Mock
     private HttpUtil httpUtil;
@@ -80,6 +78,7 @@ public class OAuth2ManagerTestCase
                 Mockito.eq(MuleProperties.DEFAULT_USER_OBJECT_STORE_NAME))).thenReturn(
             this.accessTokenObjectStore);
 
+        this.manager = Mockito.spy(new TestOAuth2Manager());
         this.manager.setMuleContext(this.muleContext);
         this.manager.setHttpUtil(this.httpUtil);
         this.manager.setOauthResponseParser(this.oauthResponseParser);
@@ -93,7 +92,6 @@ public class OAuth2ManagerTestCase
     {
         Assert.assertSame(this.manager.getAccessTokenObjectStore(), this.accessTokenObjectStore);
         Mockito.verify(this.manager).createPoolFactory(this.manager, this.accessTokenObjectStore);
-        Mockito.verify(this.manager).instantiateAdapter();
         Mockito.verify((Initialisable) this.adapter).initialise();
     }
 
@@ -138,7 +136,7 @@ public class OAuth2ManagerTestCase
         Mockito.verify(adapter).setConsumerSecret(Mockito.eq(this.adapter.getConsumerSecret()));
 
         Mockito.verify(this.manager).setCustomProperties(adapter);
-        Mockito.verify((MuleContextAware) adapter).setMuleContext(this.muleContext);
+        Mockito.verify((MuleContextAware) adapter, Mockito.atLeastOnce()).setMuleContext(this.muleContext);
     }
 
     @Test
@@ -327,7 +325,7 @@ public class OAuth2ManagerTestCase
 
         @Override
         protected KeyedPoolableObjectFactory createPoolFactory(OAuth2Manager<OAuth2Adapter> oauthManager,
-                                                               ObjectStore<OAuthState> objectStore)
+                                                               ObjectStore<Serializable> objectStore)
         {
             return objectFactory;
         }

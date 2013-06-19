@@ -34,16 +34,19 @@ public abstract class BaseOAuth2AuthorizeMessageProcessor<T extends OAuth2Manage
     public final void start() throws MuleException
     {
         OAuth2Manager<OAuth2Adapter> module = this.getOAuthManager();
-        FetchAccessTokenMessageProcessor fetchAccessTokenMessageProcessor = new OAuth2FetchAccessTokenMessageProcessor((OAuth2Manager<OAuth2Adapter>) module);
+        FetchAccessTokenMessageProcessor fetchAccessTokenMessageProcessor = new OAuth2FetchAccessTokenMessageProcessor(
+            (OAuth2Manager<OAuth2Adapter>) module, this.getAccessTokenId());
+
         this.startCallback(module, fetchAccessTokenMessageProcessor);
-        
+
         if (this.getAccessTokenUrl() != null)
         {
             fetchAccessTokenMessageProcessor.setAccessTokenUrl(this.getAccessTokenUrl());
         }
         else
         {
-            fetchAccessTokenMessageProcessor.setAccessTokenUrl(module.getDefaultUnauthorizedConnector().getAccessTokenUrl());
+            fetchAccessTokenMessageProcessor.setAccessTokenUrl(module.getDefaultUnauthorizedConnector()
+                .getAccessTokenUrl());
         }
     }
 
@@ -123,6 +126,7 @@ public abstract class BaseOAuth2AuthorizeMessageProcessor<T extends OAuth2Manage
      * @param event MuleEvent to be processed
      * @throws MuleException
      */
+    @Override
     public final MuleEvent process(MuleEvent event) throws MuleException
     {
         try
@@ -146,7 +150,5 @@ public abstract class BaseOAuth2AuthorizeMessageProcessor<T extends OAuth2Manage
             throw new MessagingException(CoreMessages.failedToInvoke("authorize"), event, e);
         }
     }
-
-  
 
 }

@@ -38,21 +38,19 @@ public abstract class BaseOAuth2UnauthorizeMessageProcessor<T extends OAuth2Mana
      * @throws MuleException
      */
     @Override
-    public MuleEvent process(MuleEvent event) throws MuleException
+    public final MuleEvent process(MuleEvent event) throws MuleException
     {
         OAuth2Manager<OAuth2Adapter> manager = this.getOAuthManager();
         try
         {
-            String transformedToken = ((String) evaluateAndTransform(getMuleContext(), event, String.class,
-                null, getAccessTokenId()));
+            String accessTokenId = this.getAccessTokenId(event, this, manager);
 
             if (logger.isDebugEnabled())
             {
-                logger.debug("Attempting to acquire access token using from store for user "
-                             + transformedToken);
+                logger.debug("Attempting to acquire access token using from store for user " + accessTokenId);
             }
 
-            OAuth2Adapter connector = manager.acquireAccessToken(transformedToken);
+            OAuth2Adapter connector = manager.acquireAccessToken(accessTokenId);
 
             if (connector == null)
             {
@@ -63,15 +61,15 @@ public abstract class BaseOAuth2UnauthorizeMessageProcessor<T extends OAuth2Mana
                 if (logger.isDebugEnabled())
                 {
                     logger.debug(String.format("Access Token has been acquired for [tokenId= %s]",
-                        transformedToken));
+                        accessTokenId));
                 }
 
-                manager.destroyAccessToken(transformedToken, connector);
+                manager.destroyAccessToken(accessTokenId, connector);
 
                 if (logger.isDebugEnabled())
                 {
                     logger.debug(String.format(
-                        "Access token for [tokenId= %s] has been successfully destroyed", transformedToken));
+                        "Access token for [tokenId= %s] has been successfully destroyed", accessTokenId));
                 }
             }
         }

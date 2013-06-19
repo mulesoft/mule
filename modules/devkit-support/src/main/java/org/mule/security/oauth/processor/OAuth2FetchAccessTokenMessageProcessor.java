@@ -16,32 +16,49 @@ import org.mule.api.MuleException;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.security.oauth.OAuth2Adapter;
 import org.mule.security.oauth.OAuth2Manager;
+import org.mule.security.oauth.OAuthProperties;
+
+import org.apache.commons.lang.StringUtils;
 
 public class OAuth2FetchAccessTokenMessageProcessor extends FetchAccessTokenMessageProcessor
 {
 
-    
     private OAuth2Manager<OAuth2Adapter> oauthManager;
 
-    public OAuth2FetchAccessTokenMessageProcessor(OAuth2Manager<OAuth2Adapter> oauthManager)
+    public OAuth2FetchAccessTokenMessageProcessor(OAuth2Manager<OAuth2Adapter> oauthManager,
+                                                  String accessTokenId)
     {
         this.oauthManager = oauthManager;
+        this.setAccessTokenId(accessTokenId);
     }
 
+    @Override
     public MuleEvent process(MuleEvent event) throws MuleException
     {
         try
         {
             OAuth2Adapter oauthAdapter = this.oauthManager.createAdapter(((String) event.getMessage()
-                .getInvocationProperty("_oauthVerifier")));
+                .getInvocationProperty(OAuthProperties.VERIFIER)));
+
             if (oauthAdapter.getAccessTokenUrl() == null)
             {
                 oauthAdapter.setAccessTokenUrl(this.getAccessTokenUrl());
             }
             oauthAdapter.fetchAccessToken(this.getRedirectUri());
-            oauthManager.getAccessTokenPoolFactory().passivateObject(oauthAdapter.getAccessTokenId(),
+
+            String transformedAccessTokenId = StringUtils.isBlank(this.getAccessTokenId())
+                                                                                     ? this.oauthManager.getDefaultUnauthorizedConnector()
+                                                                                         .getName()
+                                                                                     : this.getAccessTokenId();
+
+            transformedAccessTokenId = (String) this.evaluateAndTransform(event.getMuleContext(), event,
+                String.class, null, transformedAccessTokenId);
+
+            this.oauthManager.getAccessTokenPoolFactory().passivateObject(transformedAccessTokenId,
                 oauthAdapter);
-            event.getMessage().setInvocationProperty("OAuthAccessTokenId", oauthAdapter.getAccessTokenId());
+
+            event.getMessage().setInvocationProperty(OAuthProperties.ACCESS_TOKEN_ID,
+                transformedAccessTokenId);
         }
         catch (Exception e)
         {

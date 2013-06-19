@@ -39,6 +39,7 @@ public class TestOAuth2Adapter
     private OAuth2Manager<OAuth2Adapter> manager;
     private MuleContext muleContext;
 
+    private String name;
     private boolean postAuth = false;
     private boolean start = false;
     private boolean stop = false;
@@ -222,14 +223,6 @@ public class TestOAuth2Adapter
     }
 
     @Override
-    @Deprecated
-    public String getAccessTokenId()
-    {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
     public String authorize(Map<String, String> extraParameters, String accessTokenUrl, String redirectUri)
         throws UnableToAcquireRequestTokenException
     {
@@ -355,5 +348,19 @@ public class TestOAuth2Adapter
     {
         return muleContext;
     }
+
+    @Override
+    public String getName()
+    {
+        return name;
+    }
+
+    @Override
+    public void setName(String name)
+    {
+        this.name = name;
+    }
+    
+    
 
 }

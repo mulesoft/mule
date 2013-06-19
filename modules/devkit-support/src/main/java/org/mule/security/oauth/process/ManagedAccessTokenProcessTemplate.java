@@ -26,7 +26,8 @@ public class ManagedAccessTokenProcessTemplate<P> implements ProcessTemplate<P, 
 
     private final ProcessInterceptor<P, OAuth2Adapter> processInterceptor;
 
-    public ManagedAccessTokenProcessTemplate(OAuth2Manager<OAuth2Adapter> oauthManager, MuleContext muleContext)
+    public ManagedAccessTokenProcessTemplate(OAuth2Manager<OAuth2Adapter> oauthManager,
+                                             MuleContext muleContext)
     {
         ProcessInterceptor<P, OAuth2Adapter> processCallbackProcessInterceptor = new ProcessCallbackProcessInterceptor<P, OAuth2Adapter>();
 
@@ -35,7 +36,7 @@ public class ManagedAccessTokenProcessTemplate<P> implements ProcessTemplate<P, 
             processCallbackProcessInterceptor);
 
         ProcessInterceptor<P, OAuth2Adapter> managedAccessTokenProcessInterceptor = new ManagedAccessTokenProcessInterceptor<P>(
-            refreshTokenProcessInterceptor, oauthManager, muleContext);
+            refreshTokenProcessInterceptor, oauthManager);
         processInterceptor = managedAccessTokenProcessInterceptor;
     }
 

@@ -36,7 +36,6 @@ public class OAuth2UnauthorizeMessageProcessorTestCase
 
     private static final String accessTokenId = "accessTokenId";
 
-    @Mock
     private OAuth2Manager<OAuth2Adapter> manager;
 
     @Mock
@@ -45,11 +44,14 @@ public class OAuth2UnauthorizeMessageProcessorTestCase
     private BaseOAuth2UnauthorizeMessageProcessor<OAuth2Manager<OAuth2Adapter>> processor;
 
     @Before
+    @SuppressWarnings("unchecked")
     public void setUp()
     {
         this.processor = new TestUnauthorizeMessageProcessor();
         this.processor.setAccessTokenId(accessTokenId);
         this.processor.setModuleObject(this.manager);
+        
+        this.manager = Mockito.mock(OAuth2Manager.class, Mockito.RETURNS_DEEP_STUBS);
     }
 
     @Test
@@ -63,7 +65,15 @@ public class OAuth2UnauthorizeMessageProcessorTestCase
     @Test(expected = DefaultMuleException.class)
     public void unathorizeNotExistent() throws Exception
     {
+        Mockito.when(this.manager.acquireAccessToken(Mockito.anyString())).thenReturn(null);
         this.processor.process(Mockito.mock(MuleEvent.class));
+    }
+    
+    @Test
+    public void idFromConfig() throws Exception {
+        this.processor.setAccessTokenId(null);
+        Mockito.when(this.manager.getDefaultUnauthorizedConnector().getName()).thenReturn(accessTokenId);
+        this.unathorize();
     }
 
     private class TestUnauthorizeMessageProcessor extends
@@ -74,6 +84,12 @@ public class OAuth2UnauthorizeMessageProcessorTestCase
         protected Class<OAuth2Manager<OAuth2Adapter>> getOAuthManagerClass()
         {
             return null;
+        }
+        
+        @Override
+        protected OAuth2Manager<OAuth2Adapter> getOAuthManager()
+        {
+            return manager;
         }
 
         @Override

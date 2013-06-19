@@ -12,7 +12,8 @@ package org.mule.security.oauth.processor;
 
 import org.mule.api.processor.MessageProcessor;
 
-public abstract class FetchAccessTokenMessageProcessor implements MessageProcessor
+public abstract class FetchAccessTokenMessageProcessor extends AbstractDevkitBasedMessageProcessor
+    implements MessageProcessor
 {
 
     private String redirectUri;

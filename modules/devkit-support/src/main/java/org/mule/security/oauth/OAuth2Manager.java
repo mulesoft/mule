@@ -43,11 +43,11 @@ public interface OAuth2Manager<C extends OAuth2Adapter> extends HttpCallbackAdap
     /**
      * Borrow an access token from the pool
      * 
-     * @param userId User identification used to borrow the access token
+     * @param accessTokenId User identification used to borrow the access token
      * @return An existing authorized connector
      * @throws Exception If the access token cannot be retrieved
      */
-    C acquireAccessToken(String userId) throws Exception;
+    C acquireAccessToken(String accessTokenId) throws Exception;
 
     /**
      * Return an access token to the pool
