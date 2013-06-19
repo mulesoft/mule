@@ -18,9 +18,9 @@ import org.mule.api.transport.ConnectorException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.transport.AbstractConnector;
 
-import java.util.HashSet;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
-import java.util.Set;
 
 import org.quartz.Scheduler;
 import org.quartz.SchedulerFactory;
@@ -50,7 +50,7 @@ public class QuartzConnector extends AbstractConnector
     public static final String QUARTZ_INSTANCE_NAME_PROPERTY = "org.quartz.scheduler.instanceName";
 
     private static final Object instanceNamesLock = new Object();
-    private static final Set<String> instanceNames = new HashSet<String>();
+    private static final Map<String, QuartzConnector> instanceNames = new HashMap<String, QuartzConnector>();
 
     /**
      * Properties to be used for creating the scheduler.  If no properties are given, the
@@ -132,16 +132,17 @@ public class QuartzConnector extends AbstractConnector
     {
         synchronized (instanceNamesLock)
         {
-            if (instanceNames.contains(instanceName))
+            if (instanceNames.keySet().contains(instanceName))
             {
                 throw new InitialisationException(CoreMessages.initialisationFailure(String.format("Value '%s' of quartz connector property '%s' cannot be reused in different applications", instanceName, QUARTZ_INSTANCE_NAME_PROPERTY)), this);
             }
 
             if (logger.isDebugEnabled())
             {
-                logger.debug("Adding quartz instance name:" + instanceName);
+                logger.debug("Adding quartz instance name: " + instanceName);
             }
-            instanceNames.add(instanceName);
+
+            instanceNames.put(instanceName, this);
         }
     }
 
@@ -149,12 +150,15 @@ public class QuartzConnector extends AbstractConnector
     {
         if (logger.isDebugEnabled())
         {
-            logger.debug("Removing quartz instance name:" + instanceName);
+            logger.debug("Removing quartz instance name: " + instanceName);
         }
 
         synchronized (instanceNamesLock)
         {
-            instanceNames.remove(instanceName);
+            if (instanceNames.get(instanceName) == this)
+            {
+                instanceNames.remove(instanceName);
+            }
         }
     }
 
