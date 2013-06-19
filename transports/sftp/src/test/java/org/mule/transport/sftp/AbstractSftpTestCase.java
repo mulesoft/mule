@@ -56,7 +56,6 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.apache.commons.lang.SystemUtils;
 import org.junit.Before;
 import org.junit.Rule;
 
@@ -870,40 +869,23 @@ public abstract class AbstractSftpTestCase extends AbstractServiceAndFlowTestCas
 
         if (!parentParent.canWrite())
         {
-            // setWritable is only available on JDK6 and beyond
-            //if (!parentParent.setWritable(true))
-                //throw new IOException("Failed to set readonly-folder: " + parentParent + " to writeable");
-            // FIXME DZ: since setWritable doesnt exist on jdk5, need to detect os to make dir writable
-            if(SystemUtils.IS_OS_WINDOWS)
+            if (!parentParent.setWritable(true))
             {
-                Runtime.getRuntime().exec("attrib -r /D" + parentParent.getAbsolutePath());
-            }
-            else if(SystemUtils.IS_OS_UNIX || SystemUtils.IS_OS_LINUX)
-            {
-                Runtime.getRuntime().exec("chmod +w " + parentParent.getAbsolutePath());
-            }
-            else
-            {
-                throw new IOException("This test is not supported on your detected platform : " + SystemUtils.OS_NAME);
+                throw new IOException("Failed to set readonly-folder: " + parentParent + " to writeable");
             }
         }
 
         if (parent.exists())
         {
-            // FIXME DZ: since setWritable doesnt exist on jdk5, need to detect os to make dir writable
-            if (SystemUtils.IS_OS_WINDOWS)
+            if (!parent.setWritable(true))
             {
-                Runtime.getRuntime().exec("attrib -r /D" + parent.getAbsolutePath());
+                throw new IOException("Failed to set readonly-folder: " + parent + " to writeable");
             }
-            else if(SystemUtils.IS_OS_UNIX || SystemUtils.IS_OS_LINUX)
+
+            if (!parent.delete())
             {
-                Runtime.getRuntime().exec("chmod +w " + parent.getAbsolutePath());
+                throw new IOException("Failed to delete folder: " + parent);
             }
-            else
-            {
-                throw new IOException("This test is not supported on your detected platform : " + SystemUtils.OS_NAME);
-            }
-            if (!parent.delete()) throw new IOException("Failed to delete folder: " + parent);
         }
     }
 
