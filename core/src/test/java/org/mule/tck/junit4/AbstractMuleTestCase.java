@@ -266,9 +266,9 @@ public abstract class AbstractMuleTestCase
     @Before
     public final void initializeMuleTest()
     {
-        printTestHeader();
         skipTestWhenExcluded();
         skipTestWhenDisabledInCurrentEnvironment();
+        printTestHeader();
     }
 
     private void printTestHeader()
