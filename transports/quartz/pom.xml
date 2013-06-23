@@ -17,10 +17,14 @@
             <artifactId>quartz</artifactId>
             <version>${quartzVersion}</version>
         </dependency>
-        <!-- The Mule client is needed for EndpointPollingJob and ScheduledDispatchJob -->
+        <dependency>
+            <groupId>org.mule</groupId>
+            <artifactId>mule-core</artifactId>
+            <version>${project.version}</version>
+        </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
-            <artifactId>mule-module-client</artifactId>
+            <artifactId>mule-module-spring-config</artifactId>
             <version>${project.version}</version>
         </dependency>
 
