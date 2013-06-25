@@ -11,6 +11,7 @@
 package org.mule.security.oauth;
 
 import org.mule.api.MuleContext;
+import org.mule.common.security.oauth.exception.NotAuthorizedException;
 import org.mule.common.security.oauth.exception.UnableToAcquireAccessTokenException;
 import org.mule.security.oauth.callback.HttpCallbackAdapter;
 
@@ -31,8 +32,8 @@ public interface OAuth2Manager<C extends OAuth2Adapter> extends HttpCallbackAdap
 {
 
     /**
-     * Create a new adapter using the specified verifier and insert it into the
-     * pool. This adapter will be already initialized and started
+     * Create a new adapter using the specified verifier and insert it into the pool.
+     * This adapter will be already initialized and started
      * 
      * @param verifier OAuth verifier
      * @return A newly created connector
@@ -101,9 +102,9 @@ public interface OAuth2Manager<C extends OAuth2Adapter> extends HttpCallbackAdap
     public boolean restoreAccessToken(OAuth2Adapter adapter);
 
     /**
-     * if refresh token is available, then it makes an http call to refresh the access token.
-     * All newly obtained tokens are set into the adapter
-     *  
+     * if refresh token is available, then it makes an http call to refresh the
+     * access token. All newly obtained tokens are set into the adapter
+     * 
      * @param adapter the connector's adapter
      * @throws UnableToAcquireAccessTokenException
      */
@@ -119,10 +120,18 @@ public interface OAuth2Manager<C extends OAuth2Adapter> extends HttpCallbackAdap
      */
     public void fetchAccessToken(OAuth2Adapter adapter, String redirectUri)
         throws UnableToAcquireAccessTokenException;
-    
+
     /**
      * Returns the mule context
      */
     public MuleContext getMuleContext();
+
+    /**
+     * Validates that there's an access token for the given adapter.
+     * 
+     * @param adapter the adapter which authorization you want to test
+     * @throws NotAuthorizedException if no access token available for this adapter
+     */
+    public void hasBeenAuthorized(OAuth2Adapter adapter) throws NotAuthorizedException;
 
 }

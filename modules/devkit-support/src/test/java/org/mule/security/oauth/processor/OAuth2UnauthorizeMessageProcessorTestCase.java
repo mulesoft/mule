@@ -40,6 +40,8 @@ public class OAuth2UnauthorizeMessageProcessorTestCase
 
     @Mock
     private OAuth2Adapter adapter;
+    
+    private MuleEvent event;
 
     private BaseOAuth2UnauthorizeMessageProcessor<OAuth2Manager<OAuth2Adapter>> processor;
 
@@ -52,13 +54,16 @@ public class OAuth2UnauthorizeMessageProcessorTestCase
         this.processor.setModuleObject(this.manager);
         
         this.manager = Mockito.mock(OAuth2Manager.class, Mockito.RETURNS_DEEP_STUBS);
+        
+        this.event = Mockito.mock(MuleEvent.class, Mockito.RETURNS_DEEP_STUBS);
+        Mockito.when(this.event.getMessage().getPayload()).thenReturn("");
     }
 
     @Test
     public void unathorize() throws Exception
     {
         Mockito.when(this.manager.acquireAccessToken(accessTokenId)).thenReturn(this.adapter);
-        this.processor.process(Mockito.mock(MuleEvent.class));
+        this.processor.process(this.event);
         Mockito.verify(this.manager).destroyAccessToken(accessTokenId, adapter);
     }
 
@@ -66,7 +71,7 @@ public class OAuth2UnauthorizeMessageProcessorTestCase
     public void unathorizeNotExistent() throws Exception
     {
         Mockito.when(this.manager.acquireAccessToken(Mockito.anyString())).thenReturn(null);
-        this.processor.process(Mockito.mock(MuleEvent.class));
+        this.processor.process(this.event);
     }
     
     @Test

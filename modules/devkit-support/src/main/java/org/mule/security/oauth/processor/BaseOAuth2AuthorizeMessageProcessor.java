@@ -124,31 +124,24 @@ public abstract class BaseOAuth2AuthorizeMessageProcessor<T extends OAuth2Manage
      * Starts the OAuth authorization process
      * 
      * @param event MuleEvent to be processed
-     * @throws MuleException
+     * @throws Exception
      */
     @Override
-    public final MuleEvent process(MuleEvent event) throws MuleException
+    protected final MuleEvent doProcess(MuleEvent event) throws Exception
     {
-        try
-        {
-            OAuth2Manager<OAuth2Adapter> moduleObject = this.getOAuthManager();
+        OAuth2Manager<OAuth2Adapter> moduleObject = this.getOAuthManager();
 
-            String transformedAuthorizationUrl = this.toString(event, this.getAuthorizationUrl());
-            String transformedAccessTokenUrl = this.toString(event, this.getAccessTokenUrl());
+        String transformedAuthorizationUrl = this.toString(event, this.getAuthorizationUrl());
+        String transformedAccessTokenUrl = this.toString(event, this.getAccessTokenUrl());
 
-            moduleObject.getDefaultUnauthorizedConnector().setAccessTokenUrl(transformedAccessTokenUrl);
-            String location = moduleObject.buildAuthorizeUrl(this.getExtraParameters(event, moduleObject),
-                transformedAuthorizationUrl, this.getOauthCallback().getUrl());
+        moduleObject.getDefaultUnauthorizedConnector().setAccessTokenUrl(transformedAccessTokenUrl);
+        String location = moduleObject.buildAuthorizeUrl(this.getExtraParameters(event, moduleObject),
+            transformedAuthorizationUrl, this.getOauthCallback().getUrl());
 
-            event.getMessage().setOutboundProperty("http.status", "302");
-            event.getMessage().setOutboundProperty("Location", location);
+        event.getMessage().setOutboundProperty("http.status", "302");
+        event.getMessage().setOutboundProperty("Location", location);
 
-            return event;
-        }
-        catch (Exception e)
-        {
-            throw new MessagingException(CoreMessages.failedToInvoke("authorize"), event, e);
-        }
+        return event;
     }
 
 }

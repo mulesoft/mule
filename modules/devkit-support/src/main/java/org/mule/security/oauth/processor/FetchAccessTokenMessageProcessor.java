@@ -19,6 +19,11 @@ public abstract class FetchAccessTokenMessageProcessor extends AbstractDevkitBas
     private String redirectUri;
     private String accessTokenUrl = null;
 
+    public FetchAccessTokenMessageProcessor()
+    {
+        super("fetch-access-token");
+    }
+
     /**
      * Sets redirectUri
      * 

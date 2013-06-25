@@ -52,6 +52,7 @@ public class TestOAuth2Adapter
     private String authorizationUrl;
     private String accessTokenUrl;
     private String refreshToken;
+    private OnNoTokenPolicy onNoTokenPolicy;
 
     public TestOAuth2Adapter(OAuth2Manager<OAuth2Adapter> manager)
     {
@@ -360,7 +361,16 @@ public class TestOAuth2Adapter
     {
         this.name = name;
     }
-    
-    
 
+    @Override
+    public OnNoTokenPolicy getOnNoTokenPolicy()
+    {
+        return onNoTokenPolicy;
+    }
+
+    public void setOnNoTokenPolicy(OnNoTokenPolicy onNoTokenPolicy)
+    {
+        this.onNoTokenPolicy = onNoTokenPolicy;
+    }
+    
 }

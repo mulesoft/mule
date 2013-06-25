@@ -12,7 +12,6 @@ package org.mule.security.oauth.processor;
 
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.security.oauth.OAuth1Adapter;
 
@@ -28,13 +27,18 @@ public class OAuth1FetchAccessTokenMessageProcessor extends FetchAccessTokenMess
         this.adapter = adapter;
     }
 
-    public final MuleEvent process(MuleEvent event) throws MuleException
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected final MuleEvent doProcess(MuleEvent event) throws Exception
     {
         try
         {
-            this.adapter.setOauthVerifier(((String) event.getMessage().getInvocationProperty(
-                "_oauthVerifier")));
-            this.adapter.fetchAccessToken(requestTokenUrl, this.getAccessTokenUrl(), authorizationUrl, this.getRedirectUri());
+            this.adapter.setOauthVerifier(((String) event.getMessage()
+                .getInvocationProperty("_oauthVerifier")));
+            this.adapter.fetchAccessToken(requestTokenUrl, this.getAccessTokenUrl(), authorizationUrl,
+                this.getRedirectUri());
         }
         catch (Exception e)
         {

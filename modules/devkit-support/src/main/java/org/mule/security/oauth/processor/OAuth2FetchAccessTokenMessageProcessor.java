@@ -12,7 +12,6 @@ package org.mule.security.oauth.processor;
 
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.security.oauth.OAuth2Adapter;
 import org.mule.security.oauth.OAuth2Manager;
@@ -32,8 +31,11 @@ public class OAuth2FetchAccessTokenMessageProcessor extends FetchAccessTokenMess
         this.setAccessTokenId(accessTokenId);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public MuleEvent process(MuleEvent event) throws MuleException
+    protected MuleEvent doProcess(MuleEvent event) throws Exception
     {
         try
         {
@@ -47,9 +49,9 @@ public class OAuth2FetchAccessTokenMessageProcessor extends FetchAccessTokenMess
             oauthAdapter.fetchAccessToken(this.getRedirectUri());
 
             String transformedAccessTokenId = StringUtils.isBlank(this.getAccessTokenId())
-                                                                                     ? this.oauthManager.getDefaultUnauthorizedConnector()
-                                                                                         .getName()
-                                                                                     : this.getAccessTokenId();
+                                                                                          ? this.oauthManager.getDefaultUnauthorizedConnector()
+                                                                                              .getName()
+                                                                                          : this.getAccessTokenId();
 
             transformedAccessTokenId = (String) this.evaluateAndTransform(event.getMuleContext(), event,
                 String.class, null, transformedAccessTokenId);

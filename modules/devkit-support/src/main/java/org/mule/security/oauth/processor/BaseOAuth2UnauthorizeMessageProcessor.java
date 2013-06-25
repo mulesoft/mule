@@ -3,7 +3,6 @@ package org.mule.security.oauth.processor;
 
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.common.connection.exception.UnableToAcquireConnectionException;
 import org.mule.config.i18n.CoreMessages;
@@ -31,14 +30,19 @@ public abstract class BaseOAuth2UnauthorizeMessageProcessor<T extends OAuth2Mana
 
     protected abstract Class<T> getOAuthManagerClass();
 
+    public BaseOAuth2UnauthorizeMessageProcessor()
+    {
+        super("unauthorize");
+    }
+
     /**
      * Unauthorize the connector
      * 
      * @param event MuleEvent to be processed
-     * @throws MuleException
+     * @throws Exception
      */
     @Override
-    public final MuleEvent process(MuleEvent event) throws MuleException
+    protected final MuleEvent doProcess(MuleEvent event) throws Exception
     {
         OAuth2Manager<OAuth2Adapter> manager = this.getOAuthManager();
         try

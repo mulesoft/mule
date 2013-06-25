@@ -16,6 +16,7 @@ import org.mule.api.devkit.ProcessTemplate;
 import org.mule.api.devkit.capability.Capabilities;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.filter.Filter;
+import org.mule.common.security.oauth.exception.NotAuthorizedException;
 import org.mule.security.oauth.OAuthAdapter;
 import org.mule.security.oauth.callback.ProcessCallback;
 
@@ -33,21 +34,25 @@ public class OAuthProcessTemplate<P> implements ProcessTemplate<P, Capabilities>
                      MessageProcessor messageProcessor,
                      MuleEvent event) throws Exception
     {
-        if (processCallback.isProtected())
-        {
-            ((OAuthAdapter) object).hasBeenAuthorized();
-        }
+        this.verifyAuthentication(processCallback);
         return processCallback.process(object);
     }
 
     public P execute(ProcessCallback<P, Capabilities> processCallback, Filter filter, MuleMessage message)
         throws Exception
     {
+        this.verifyAuthentication(processCallback);
+        return processCallback.process(object);
+    }
+
+    private void verifyAuthentication(ProcessCallback<P, Capabilities> processCallback)
+        throws NotAuthorizedException
+    {
+        OAuthAdapter adapter = (OAuthAdapter) object;
         if (processCallback.isProtected())
         {
-            ((OAuthAdapter) object).hasBeenAuthorized();
+            adapter.hasBeenAuthorized();
         }
-        return processCallback.process(object);
     }
 
 }

@@ -21,6 +21,7 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.store.ObjectStore;
+import org.mule.common.security.oauth.exception.NotAuthorizedException;
 import org.mule.security.oauth.callback.RestoreAccessTokenCallback;
 import org.mule.security.oauth.callback.SaveAccessTokenCallback;
 import org.mule.security.oauth.util.HttpUtil;
@@ -40,7 +41,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.invocation.InvocationOnMock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.stubbing.Answer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -292,6 +295,41 @@ public class OAuth2ManagerTestCase
     public void refreshWithoutToken() throws Exception
     {
         this.manager.refreshAccessToken(this.adapter);
+    }
+
+    @Test
+    public void hasBeenAuthorized() throws NotAuthorizedException
+    {
+        Mockito.when(this.adapter.getAccessToken()).thenReturn("accessTokenId");
+        this.manager.hasBeenAuthorized(this.adapter);
+    }
+
+    @Test
+    public void hasBeenAuthorizedWithRestore() throws NotAuthorizedException
+    {
+        RestoreAccessTokenCallback callback = Mockito.mock(RestoreAccessTokenCallback.class);
+        Mockito.when(this.adapter.getOauthRestoreAccessToken()).thenReturn(callback);
+        final String accessToken = "accessToken";
+        Mockito.when(callback.getAccessToken()).thenReturn(accessToken);
+
+        Mockito.when(this.adapter.getAccessToken()).thenReturn(null).thenAnswer(new Answer<String>()
+        {
+
+            @Override
+            public String answer(InvocationOnMock invocation) throws Throwable
+            {
+                Mockito.verify(adapter).setAccessToken(accessToken);
+                return accessToken;
+            }
+        });
+
+        this.manager.hasBeenAuthorized(this.adapter);
+    }
+
+    @Test(expected = NotAuthorizedException.class)
+    public void hasBeenAuthorizedFailure() throws NotAuthorizedException
+    {
+        this.manager.hasBeenAuthorized(this.adapter);
     }
 
     @Test

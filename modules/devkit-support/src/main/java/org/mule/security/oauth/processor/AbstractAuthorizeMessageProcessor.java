@@ -38,25 +38,31 @@ public abstract class AbstractAuthorizeMessageProcessor extends AbstractDevkitBa
     private String accessTokenUrl = null;
     private HttpCallback oauthCallback;
     private String state;
-    
+
+    public AbstractAuthorizeMessageProcessor()
+    {
+        super("authorize");
+    }
+
     protected abstract String getAuthCodeRegex();
-    
-    protected void startCallback(HttpCallbackAdapter adapter, FetchAccessTokenMessageProcessor fetchAccessTokenMessageProcessor) throws MuleException
+
+    protected void startCallback(HttpCallbackAdapter adapter,
+                                 FetchAccessTokenMessageProcessor fetchAccessTokenMessageProcessor)
+        throws MuleException
     {
         if (oauthCallback == null)
         {
             oauthCallback = new DefaultHttpCallback(Arrays.asList(
-                new ExtractAuthorizationCodeMessageProcessor(Pattern.compile(this.getAuthCodeRegex())), fetchAccessTokenMessageProcessor, this.listener),
-                getMuleContext(), adapter.getDomain(),
+                new ExtractAuthorizationCodeMessageProcessor(Pattern.compile(this.getAuthCodeRegex())),
+                fetchAccessTokenMessageProcessor, this.listener), getMuleContext(), adapter.getDomain(),
                 adapter.getLocalPort(), adapter.getRemotePort(), adapter.getPath(), adapter.getAsync(),
                 getFlowConstruct().getExceptionListener(), adapter.getConnector());
-            
+
             fetchAccessTokenMessageProcessor.setRedirectUri(oauthCallback.getUrl());
             oauthCallback.start();
         }
     }
-    
-    
+
     @Override
     public final void stop() throws MuleException
     {
@@ -65,7 +71,7 @@ public abstract class AbstractAuthorizeMessageProcessor extends AbstractDevkitBa
             this.oauthCallback.stop();
         }
     }
-    
+
     protected String toString(MuleEvent event, Object value)
     {
         try
@@ -81,7 +87,7 @@ public abstract class AbstractAuthorizeMessageProcessor extends AbstractDevkitBa
             throw new RuntimeException(e);
         }
     }
-    
+
     /**
      * Sets listener
      * 
@@ -157,5 +163,5 @@ public abstract class AbstractAuthorizeMessageProcessor extends AbstractDevkitBa
     {
         return state;
     }
-    
+
 }

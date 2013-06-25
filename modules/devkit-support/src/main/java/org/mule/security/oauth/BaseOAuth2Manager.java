@@ -26,6 +26,7 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.store.ObjectStore;
+import org.mule.common.security.oauth.exception.NotAuthorizedException;
 import org.mule.common.security.oauth.exception.UnableToAcquireAccessTokenException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.security.oauth.callback.DefaultHttpCallbackAdapter;
@@ -248,8 +249,9 @@ public abstract class BaseOAuth2Manager<C extends OAuth2Adapter> extends Default
         if (getLogger().isDebugEnabled())
         {
             getLogger().debug(
-                String.format("Pool Statistics before acquiring [key %s] [active=%d] [idle=%d]", accessTokenId,
-                    accessTokenPool.getNumActive(accessTokenId), accessTokenPool.getNumIdle(accessTokenId)));
+                String.format("Pool Statistics before acquiring [key %s] [active=%d] [idle=%d]",
+                    accessTokenId, accessTokenPool.getNumActive(accessTokenId),
+                    accessTokenPool.getNumIdle(accessTokenId)));
         }
 
         OAuth2Adapter object = ((OAuth2Adapter) accessTokenPool.borrowObject(accessTokenId));
@@ -257,8 +259,9 @@ public abstract class BaseOAuth2Manager<C extends OAuth2Adapter> extends Default
         if (getLogger().isDebugEnabled())
         {
             getLogger().debug(
-                String.format("Pool Statistics after acquiring [key %s] [active=%d] [idle=%d]", accessTokenId,
-                    accessTokenPool.getNumActive(accessTokenId), accessTokenPool.getNumIdle(accessTokenId)));
+                String.format("Pool Statistics after acquiring [key %s] [active=%d] [idle=%d]",
+                    accessTokenId, accessTokenPool.getNumActive(accessTokenId),
+                    accessTokenPool.getNumIdle(accessTokenId)));
         }
         return object;
     }
@@ -411,6 +414,23 @@ public abstract class BaseOAuth2Manager<C extends OAuth2Adapter> extends Default
             throw new RuntimeException(e);
         }
         this.fetchAndExtract(adapter, builder.toString());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public final void hasBeenAuthorized(OAuth2Adapter adapter) throws NotAuthorizedException
+    {
+        if (adapter.getAccessToken() == null)
+        {
+            this.restoreAccessToken(adapter);
+            if (adapter.getAccessToken() == null)
+            {
+                throw new NotAuthorizedException(
+                    "This connector has not yet been authorized, please authorize by calling \"authorize\".");
+            }
+        }
     }
 
     /**

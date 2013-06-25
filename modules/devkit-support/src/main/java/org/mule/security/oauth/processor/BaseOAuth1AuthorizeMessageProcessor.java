@@ -10,10 +10,8 @@
 
 package org.mule.security.oauth.processor;
 
-import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
-import org.mule.config.i18n.CoreMessages;
 import org.mule.security.oauth.OAuth1Adapter;
 import org.mule.security.oauth.OAuth1Manager;
 
@@ -34,7 +32,7 @@ public abstract class BaseOAuth1AuthorizeMessageProcessor extends AbstractAuthor
         OAuth1Manager manager = moduleObject.getOauth1Manager();
         OAuth1FetchAccessTokenMessageProcessor fetchAccessTokenMessageProcessor = new OAuth1FetchAccessTokenMessageProcessor(
             moduleObject);
-        
+
         if (this.getAccessTokenUrl() != null)
         {
             fetchAccessTokenMessageProcessor.setAccessTokenUrl(this.getAccessTokenUrl());
@@ -43,7 +41,7 @@ public abstract class BaseOAuth1AuthorizeMessageProcessor extends AbstractAuthor
         {
             fetchAccessTokenMessageProcessor.setAccessTokenUrl(moduleObject.getAccessTokenUrl());
         }
-        
+
         if (requestTokenUrl != null)
         {
             fetchAccessTokenMessageProcessor.setRequestTokenUrl(requestTokenUrl);
@@ -52,7 +50,7 @@ public abstract class BaseOAuth1AuthorizeMessageProcessor extends AbstractAuthor
         {
             fetchAccessTokenMessageProcessor.setRequestTokenUrl(moduleObject.getRequestTokenUrl());
         }
-        
+
         if (this.getAuthorizationUrl() != null)
         {
             fetchAccessTokenMessageProcessor.setAuthorizationUrl(this.getAuthorizationUrl());
@@ -61,7 +59,7 @@ public abstract class BaseOAuth1AuthorizeMessageProcessor extends AbstractAuthor
         {
             fetchAccessTokenMessageProcessor.setAuthorizationUrl(moduleObject.getAuthorizationUrl());
         }
-        
+
         this.startCallback(manager, fetchAccessTokenMessageProcessor);
     }
 
@@ -71,31 +69,24 @@ public abstract class BaseOAuth1AuthorizeMessageProcessor extends AbstractAuthor
      * @param event MuleEvent to be processed
      * @throws MuleException
      */
-    public final MuleEvent process(MuleEvent event) throws MuleException
+    protected final MuleEvent doProcess(MuleEvent event) throws Exception
     {
         OAuth1Adapter moduleObject = this.getAdapter();
-        try
+        Map<String, String> extraParameters = new HashMap<String, String>();
+
+        if (this.getState() != null)
         {
-            Map<String, String> extraParameters = new HashMap<String, String>();
-
-            if (this.getState() != null)
-            {
-                extraParameters.put("state", this.toString(event, this.getState()));
-            }
-
-            moduleObject.setAccessTokenUrl(this.toString(event, this.getAccessTokenUrl()));
-
-            String location = moduleObject.authorize(extraParameters, requestTokenUrl,
-                this.getAccessTokenUrl(), this.getAuthorizationUrl(), this.getOauthCallback().getUrl());
-            event.getMessage().setOutboundProperty("http.status", "302");
-            event.getMessage().setOutboundProperty("Location", location);
-
-            return event;
+            extraParameters.put("state", this.toString(event, this.getState()));
         }
-        catch (Exception e)
-        {
-            throw new MessagingException(CoreMessages.failedToInvoke("authorize"), event, e);
-        }
+
+        moduleObject.setAccessTokenUrl(this.toString(event, this.getAccessTokenUrl()));
+
+        String location = moduleObject.authorize(extraParameters, requestTokenUrl, this.getAccessTokenUrl(),
+            this.getAuthorizationUrl(), this.getOauthCallback().getUrl());
+        event.getMessage().setOutboundProperty("http.status", "302");
+        event.getMessage().setOutboundProperty("Location", location);
+
+        return event;
     }
 
     protected OAuth1Adapter getAdapter()
