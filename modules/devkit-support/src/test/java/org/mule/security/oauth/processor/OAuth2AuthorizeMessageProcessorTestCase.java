@@ -12,7 +12,6 @@ package org.mule.security.oauth.processor;
 
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.callback.HttpCallback;
 import org.mule.api.transformer.TransformerException;
@@ -20,6 +19,7 @@ import org.mule.api.transformer.TransformerMessagingException;
 import org.mule.common.security.oauth.AuthorizationParameter;
 import org.mule.security.oauth.OAuth2Adapter;
 import org.mule.security.oauth.OAuth2Manager;
+import org.mule.security.oauth.OAuthProperties;
 import org.mule.tck.size.SmallTest;
 
 import java.lang.reflect.Type;
@@ -42,6 +42,8 @@ import org.mockito.stubbing.Answer;
 public class OAuth2AuthorizeMessageProcessorTestCase
 {
 
+    private static final String eventId = "eventId";
+
     private OAuth2Manager<OAuth2Adapter> manager;
     private TestAuthorizeMessageProcessor processor;
     private MuleEvent event;
@@ -52,6 +54,7 @@ public class OAuth2AuthorizeMessageProcessorTestCase
     {
         this.manager = Mockito.mock(OAuth2Manager.class, Mockito.RETURNS_DEEP_STUBS);
         this.event = Mockito.mock(MuleEvent.class, Mockito.RETURNS_DEEP_STUBS);
+        Mockito.when(this.event.getId()).thenReturn(eventId);
 
         this.processor = new TestAuthorizeMessageProcessor();
         HttpCallback callback = Mockito.mock(HttpCallback.class);
@@ -70,7 +73,7 @@ public class OAuth2AuthorizeMessageProcessorTestCase
 
     @Test
     @SuppressWarnings("unchecked")
-    public void process() throws MuleException
+    public void process() throws Exception
     {
         final String state = "state";
         final String authorizeUrl = "authorizeUrl";
@@ -92,9 +95,12 @@ public class OAuth2AuthorizeMessageProcessorTestCase
                 public String answer(InvocationOnMock invocation) throws Throwable
                 {
                     Map<String, String> parameters = (Map<String, String>) invocation.getArguments()[0];
-                    Assert.assertEquals(state, parameters.get("state"));
+                    String expectedState = String.format(OAuthProperties.EVENT_STATE_TEMPLATE, eventId)
+                                           + state;
+                    Assert.assertEquals(expectedState, parameters.get("state"));
                     Assert.assertEquals(customField.toLowerCase(), parameters.get("customField"));
-                    Assert.assertEquals(anotherCustomField.toLowerCase(), parameters.get("anotherCustomField"));
+                    Assert.assertEquals(anotherCustomField.toLowerCase(),
+                        parameters.get("anotherCustomField"));
 
                     return authorizeUrl;
                 }
@@ -102,8 +108,10 @@ public class OAuth2AuthorizeMessageProcessorTestCase
 
         this.processor.process(event);
 
-        Mockito.verify(this.event.getMessage()).setOutboundProperty("http.status", "302");
-        Mockito.verify(this.event.getMessage()).setOutboundProperty("Location", authorizeUrl);
+        Mockito.verify(this.manager).storeAuthorizationEvent(this.event);
+        Mockito.verify(this.event.getMessage()).setOutboundProperty(OAuthProperties.HTTP_STATUS, "302");
+        Mockito.verify(this.event.getMessage()).setOutboundProperty(OAuthProperties.CALLBACK_LOCATION,
+            authorizeUrl);
 
     }
 
@@ -119,6 +127,7 @@ public class OAuth2AuthorizeMessageProcessorTestCase
         return parameters;
     }
 
+    @SuppressWarnings("unused")
     private class TestAuthorizeMessageProcessor extends
         BaseOAuth2AuthorizeMessageProcessor<OAuth2Manager<OAuth2Adapter>>
     {

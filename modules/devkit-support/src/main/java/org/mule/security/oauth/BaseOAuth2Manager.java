@@ -10,8 +10,12 @@
 
 package org.mule.security.oauth;
 
+import org.mule.DefaultMuleMessage;
+import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
+import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.construct.FlowConstructAware;
@@ -25,10 +29,13 @@ import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
+import org.mule.api.store.ObjectDoesNotExistException;
 import org.mule.api.store.ObjectStore;
+import org.mule.api.store.ObjectStoreException;
 import org.mule.common.security.oauth.exception.NotAuthorizedException;
 import org.mule.common.security.oauth.exception.UnableToAcquireAccessTokenException;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.config.i18n.MessageFactory;
 import org.mule.security.oauth.callback.DefaultHttpCallbackAdapter;
 import org.mule.security.oauth.callback.RestoreAccessTokenCallback;
 import org.mule.security.oauth.callback.SaveAccessTokenCallback;
@@ -461,6 +468,68 @@ public abstract class BaseOAuth2Manager<C extends OAuth2Adapter> extends Default
         this.fetchAndExtract(adapter, builder.toString());
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void storeAuthorizationEvent(MuleEvent event) throws Exception
+    {
+        MuleMessage message = event.getMessage();
+
+        if (message instanceof DefaultMuleMessage)
+        {
+            DefaultMuleMessage dmm = (DefaultMuleMessage) message;
+            if (dmm.isConsumable())
+            {
+                try
+                {
+                    message.setPayload(message.getPayload(String.class));
+                }
+                catch (Exception e)
+                {
+                    throw new MessagingException(
+                        MessageFactory.createStaticMessage(String.format(
+                            "event can't be persisted because payload of class %s couldn't be consumed into a string",
+                            message.getPayload().getClass().getCanonicalName())), event, e);
+                }
+            }
+        }
+
+        if (!(message.getPayload() instanceof Serializable))
+        {
+            throw new MessagingException(
+                MessageFactory.createStaticMessage(String.format(
+                    "In order to perform the OAuth authorization dance the mule event needs to be stored in the object store. However, the message has a payload of class %s which is not serializable.",
+                    message.getPayload().getClass().getCanonicalName())), event);
+        }
+
+        try
+        {
+            this.accessTokenObjectStore.store(this.buildAuthorizationEventKey(event.getId()), event);
+        }
+        catch (ObjectStoreException e)
+        {
+            throw new MessagingException(
+                MessageFactory.createStaticMessage("Exception was thrown when trying to store the message into object store. Please check that all message properties are serializable"),
+                event, e);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public MuleEvent restoreAuthorizationEvent(String eventId)
+        throws ObjectStoreException, ObjectDoesNotExistException
+    {
+        return (MuleEvent) this.accessTokenObjectStore.retrieve(this.buildAuthorizationEventKey(eventId));
+    }
+
+    private String buildAuthorizationEventKey(String eventId)
+    {
+        return String.format(OAuthProperties.AUTHORIZATION_EVENT_KEY_TEMPLATE, eventId);
+    }
+
     private void fetchAndExtract(OAuth2Adapter adapter, String requestBody)
         throws UnableToAcquireAccessTokenException
     {
@@ -587,6 +656,7 @@ public abstract class BaseOAuth2Manager<C extends OAuth2Adapter> extends Default
     /**
      * Returns true if this module implements such capability
      */
+    @Override
     public final boolean isCapableOf(ModuleCapability capability)
     {
         if (capability == ModuleCapability.LIFECYCLE_CAPABLE)
@@ -605,7 +675,7 @@ public abstract class BaseOAuth2Manager<C extends OAuth2Adapter> extends Default
     }
 
     @Override
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked", "rawtypes"})
     public <T> ProcessTemplate<T, OAuth2Adapter> getProcessTemplate()
     {
         return (ProcessTemplate<T, OAuth2Adapter>) new OAuthProcessTemplate(this);
@@ -665,6 +735,7 @@ public abstract class BaseOAuth2Manager<C extends OAuth2Adapter> extends Default
         return this.muleContext;
     }
 
+    @Override
     public final void setMuleContext(MuleContext muleContext)
     {
         this.muleContext = muleContext;
@@ -765,5 +836,10 @@ public abstract class BaseOAuth2Manager<C extends OAuth2Adapter> extends Default
     public void setConsumerSecret(String value)
     {
         this.defaultUnauthorizedConnector.setConsumerSecret(value);
+    }
+    
+    protected void setDefaultUnauthorizedConnector(OAuth2Adapter defaultUnauthorizedConnector)
+    {
+        this.defaultUnauthorizedConnector = defaultUnauthorizedConnector;
     }
 }

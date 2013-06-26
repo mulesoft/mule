@@ -61,7 +61,7 @@ public class RefreshTokenProcessInterceptor<T> extends AbstractExpressionEvaluat
                             }
                             try
                             {
-                                object.refreshAccessToken(object.getAccessTokenUrl());
+                                object.refreshAccessToken();
                             }
                             catch (Exception newException)
                             {

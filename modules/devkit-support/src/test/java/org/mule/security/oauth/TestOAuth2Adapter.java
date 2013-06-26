@@ -246,7 +246,7 @@ public class TestOAuth2Adapter
     }
 
     @Override
-    public void refreshAccessToken(String accessTokenUrl) throws UnableToAcquireAccessTokenException
+    public void refreshAccessToken() throws UnableToAcquireAccessTokenException
     {
         // TODO Auto-generated method stub
 

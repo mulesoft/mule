@@ -35,7 +35,6 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.junit.After;
-import org.junit.Before;
 
 /**
  * A base test case for tests that initialize Mule using a configuration file. The

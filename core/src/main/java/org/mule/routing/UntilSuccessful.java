@@ -38,15 +38,18 @@ import org.mule.routing.outbound.AbstractOutboundRouter;
 import org.mule.util.queue.QueueKey;
 import org.mule.util.store.QueuePersistenceObjectStore;
 
+import java.io.NotSerializableException;
 import java.io.Serializable;
 import java.util.concurrent.TimeUnit;
 
 /**
- * UntilSuccessful attempts to route a message to the message processor it contains in an asynchronous manner. Routing
- * is considered successful if no exception has been raised and, optionally, if the response matches an expression.
- * UntilSuccessful can optionally be configured to synchronously return an acknowledgment message when it has scheduled
- * the event for processing. UntilSuccessful is backed by a {@link ListableObjectStore} for storing the events that are
- * pending (re)processing.
+ * UntilSuccessful attempts to route a message to the message processor it contains
+ * in an asynchronous manner. Routing is considered successful if no exception has
+ * been raised and, optionally, if the response matches an expression.
+ * UntilSuccessful can optionally be configured to synchronously return an
+ * acknowledgment message when it has scheduled the event for processing.
+ * UntilSuccessful is backed by a {@link ListableObjectStore} for storing the events
+ * that are pending (re)processing.
  */
 public class UntilSuccessful extends AbstractOutboundRouter
 {
@@ -164,7 +167,8 @@ public class UntilSuccessful extends AbstractOutboundRouter
         catch (final Exception e)
         {
             throw new MessagingException(
-                MessageFactory.createStaticMessage("Failed to prepare message for processing"), event, e, this);
+                MessageFactory.createStaticMessage("Failed to prepare message for processing"), event, e,
+                this);
         }
 
         try
@@ -186,7 +190,8 @@ public class UntilSuccessful extends AbstractOutboundRouter
         catch (final Exception e)
         {
             throw new MessagingException(
-                MessageFactory.createStaticMessage("Failed to schedule the event for processing"), event, e, this);
+                MessageFactory.createStaticMessage("Failed to schedule the event for processing"), event, e,
+                this);
         }
     }
 
@@ -267,9 +272,11 @@ public class UntilSuccessful extends AbstractOutboundRouter
 
     public static Serializable buildQueueKey(final MuleEvent muleEvent)
     {
-        // the key is built in way to prevent UntilSuccessful workers across a cluster to compete for the same
+        // the key is built in way to prevent UntilSuccessful workers across a
+        // cluster to compete for the same
         // events over a shared object store
-        String key = muleEvent.getFlowConstruct() + "-" + muleEvent.getMuleContext().getClusterId() + "-" + muleEvent.getId();
+        String key = muleEvent.getFlowConstruct() + "-" + muleEvent.getMuleContext().getClusterId() + "-"
+                     + muleEvent.getId();
         return new QueueKey(QueuePersistenceObjectStore.DEFAULT_QUEUE_STORE, key);
     }
 
@@ -286,7 +293,8 @@ public class UntilSuccessful extends AbstractOutboundRouter
 
             if (deliveryAttemptCount <= getMaxRetries())
             {
-                // we store the incremented version unless the max attempt count has been reached
+                // we store the incremented version unless the max attempt count has
+                // been reached
                 message.setInvocationProperty(PROCESS_ATTEMPT_COUNT_PROPERTY_NAME, deliveryAttemptCount + 1);
                 objectStore.store(eventStoreKey, mutableEvent);
             }
@@ -306,8 +314,11 @@ public class UntilSuccessful extends AbstractOutboundRouter
         if (dlqMP == null)
         {
             logger.info("Retry attempts exhausted and no DLQ defined");
-            RetryPolicyExhaustedException retryPolicyExhaustedException = new RetryPolicyExhaustedException(CoreMessages.createStaticMessage("until-successful retries exhausted"), this);
-            event.getFlowConstruct().getExceptionListener().handleException(new MessagingException(event,retryPolicyExhaustedException),event);
+            RetryPolicyExhaustedException retryPolicyExhaustedException = new RetryPolicyExhaustedException(
+                CoreMessages.createStaticMessage("until-successful retries exhausted"), this);
+            event.getFlowConstruct()
+                .getExceptionListener()
+                .handleException(new MessagingException(event, retryPolicyExhaustedException), event);
             return;
         }
 
@@ -318,11 +329,13 @@ public class UntilSuccessful extends AbstractOutboundRouter
         }
         catch (MessagingException e)
         {
-            event.getFlowConstruct().getExceptionListener().handleException(e,event);
+            event.getFlowConstruct().getExceptionListener().handleException(e, event);
         }
         catch (Exception e)
         {
-            event.getFlowConstruct().getExceptionListener().handleException(new MessagingException(event,e),event);
+            event.getFlowConstruct()
+                .getExceptionListener()
+                .handleException(new MessagingException(event, e), event);
         }
     }
 
@@ -400,6 +413,13 @@ public class UntilSuccessful extends AbstractOutboundRouter
             if (((DefaultMuleMessage) message).isConsumable())
             {
                 message.getPayloadAsBytes();
+            }
+            else
+            {
+                if (!(message.getPayload() instanceof Serializable))
+                {
+                    throw new NotSerializableException(message.getPayload().getClass().getCanonicalName());
+                }
             }
         }
         else

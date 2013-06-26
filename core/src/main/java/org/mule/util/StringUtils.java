@@ -12,6 +12,8 @@ package org.mule.util;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang.CharUtils;
 
@@ -22,8 +24,8 @@ import org.apache.commons.lang.CharUtils;
 public class StringUtils extends org.apache.commons.lang.StringUtils
 {
     /**
-     * Like {@link org.mule.util.StringUtils#split(String, String)}, but
-     * additionally trims whitespace from the result tokens.
+     * Like {@link org.mule.util.StringUtils#split(String, String)}, but additionally
+     * trims whitespace from the result tokens.
      */
     public static String[] splitAndTrim(String string, String delim)
     {
@@ -55,7 +57,7 @@ public class StringUtils extends org.apache.commons.lang.StringUtils
 
     /**
      * Convert a hexadecimal string into its byte representation.
-     *
+     * 
      * @param hex The hexadecimal string.
      * @return The converted bytes or <code>null</code> if the hex String is null.
      */
@@ -103,7 +105,7 @@ public class StringUtils extends org.apache.commons.lang.StringUtils
 
     /**
      * Convert a byte array to a hexadecimal string.
-     *
+     * 
      * @param bytes The bytes to format.
      * @param uppercase When <code>true</code> creates uppercase hex characters
      *            instead of lowercase (the default).
@@ -128,6 +130,34 @@ public class StringUtils extends org.apache.commons.lang.StringUtils
         }
 
         return str.toString();
+    }
+
+    /**
+     * Matches the given value to the given pattern. Then returns the group at
+     * matchIndex.
+     * 
+     * @param pattern the pattern to use as regexp
+     * @param value the value to evaluate
+     * @param matchIndex the group index to be returned
+     * @return the value of the group at the given index
+     * @throws IllegalArgumentException if no match found at the given index. Also if
+     *             value or pattern are null
+     */
+    public static String match(Pattern pattern, String value, int matchIndex) throws IllegalArgumentException
+    {
+        if (value == null || pattern == null)
+        {
+            throw new IllegalArgumentException("pattern and value cannot be null");
+        }
+        Matcher matcher = pattern.matcher(value);
+        if (matcher.find() && (matcher.groupCount() >= matchIndex))
+        {
+            return matcher.group(matchIndex);
+        }
+
+        throw new IllegalArgumentException(String.format(
+            "String %s did not produced any match for pattern %s at index %d", value, pattern.pattern(),
+            matchIndex));
     }
 
     // lookup tables needed for toHexString(byte[], boolean)

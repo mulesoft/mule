@@ -14,6 +14,7 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.security.oauth.OAuth1Adapter;
 import org.mule.security.oauth.OAuth1Manager;
+import org.mule.security.oauth.OAuthProperties;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -83,8 +84,8 @@ public abstract class BaseOAuth1AuthorizeMessageProcessor extends AbstractAuthor
 
         String location = moduleObject.authorize(extraParameters, requestTokenUrl, this.getAccessTokenUrl(),
             this.getAuthorizationUrl(), this.getOauthCallback().getUrl());
-        event.getMessage().setOutboundProperty("http.status", "302");
-        event.getMessage().setOutboundProperty("Location", location);
+        event.getMessage().setOutboundProperty(OAuthProperties.HTTP_STATUS, "302");
+        event.getMessage().setOutboundProperty(OAuthProperties.CALLBACK_LOCATION, location);
 
         return event;
     }

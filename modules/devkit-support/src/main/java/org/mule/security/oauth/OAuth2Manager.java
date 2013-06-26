@@ -11,6 +11,9 @@
 package org.mule.security.oauth;
 
 import org.mule.api.MuleContext;
+import org.mule.api.MuleEvent;
+import org.mule.api.store.ObjectDoesNotExistException;
+import org.mule.api.store.ObjectStoreException;
 import org.mule.common.security.oauth.exception.NotAuthorizedException;
 import org.mule.common.security.oauth.exception.UnableToAcquireAccessTokenException;
 import org.mule.security.oauth.callback.HttpCallbackAdapter;
@@ -133,5 +136,38 @@ public interface OAuth2Manager<C extends OAuth2Adapter> extends HttpCallbackAdap
      * @throws NotAuthorizedException if no access token available for this adapter
      */
     public void hasBeenAuthorized(OAuth2Adapter adapter) throws NotAuthorizedException;
+
+    /**
+     * This method is expected to receive the <code>MuleEvent</code> corresponding to
+     * the execution of an OAuth2 authorize processor. The event will be persisted in
+     * this manager's object store following these rules:
+     * <ul>
+     * <li>If the message payload is consumable, then it will be consumed and
+     * transformed to a <code>String</code> that is then set as payload. Failure to
+     * do this will result in exception</li>
+     * <li>If the message payload is not <code>Serializable</code> then an exception
+     * will be thrown.</li>
+     * <li>This event's key in the object store will result from replacing the
+     * event's id into the template on
+     * {@link org.mule.security.oauth.OAuthProperties.AUTHORIZATION_EVENT_KEY_TEMPLATE}
+     * </ul>
+     * 
+     * @param event a mule event
+     * @throws Exception
+     */
+    public void storeAuthorizationEvent(MuleEvent event) throws Exception;
+
+    /**
+     * Recovers a MuleEvent from the object store. The key that is fetched comes from
+     * replacing the given eventId into the template on
+     * {@link org.mule.security.oauth.OAuthProperties.AUTHORIZATION_EVENT_KEY_TEMPLATE}
+     * 
+     * @param eventId the id of the event to be restored
+     * @return a {@link org.mule.api.MuleEvent}
+     * @throws ObjectStoreException if there was an error accessing the object store
+     * @throws ObjectDoesNotExistException if there's no entry for the event id
+     */
+    public MuleEvent restoreAuthorizationEvent(String eventId)
+        throws ObjectStoreException, ObjectDoesNotExistException;
 
 }

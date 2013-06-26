@@ -26,6 +26,7 @@ import org.mule.security.oauth.DefaultHttpCallback;
 import org.mule.security.oauth.callback.HttpCallbackAdapter;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.regex.Pattern;
 
 public abstract class AbstractAuthorizeMessageProcessor extends AbstractDevkitBasedMessageProcessor
@@ -52,7 +53,7 @@ public abstract class AbstractAuthorizeMessageProcessor extends AbstractDevkitBa
     {
         if (oauthCallback == null)
         {
-            oauthCallback = new DefaultHttpCallback(Arrays.asList(
+            oauthCallback = new DefaultHttpCallback(this.buildCallbackProcessorList(
                 new ExtractAuthorizationCodeMessageProcessor(Pattern.compile(this.getAuthCodeRegex())),
                 fetchAccessTokenMessageProcessor, this.listener), getMuleContext(), adapter.getDomain(),
                 adapter.getLocalPort(), adapter.getRemotePort(), adapter.getPath(), adapter.getAsync(),
@@ -61,6 +62,11 @@ public abstract class AbstractAuthorizeMessageProcessor extends AbstractDevkitBa
             fetchAccessTokenMessageProcessor.setRedirectUri(oauthCallback.getUrl());
             oauthCallback.start();
         }
+    }
+
+    protected List<MessageProcessor> buildCallbackProcessorList(MessageProcessor... processors)
+    {
+        return Arrays.asList(processors);
     }
 
     @Override
@@ -93,6 +99,7 @@ public abstract class AbstractAuthorizeMessageProcessor extends AbstractDevkitBa
      * 
      * @param value Value to set
      */
+    @Override
     public void setListener(MessageProcessor value)
     {
         this.listener = value;

@@ -18,6 +18,10 @@ public interface OAuthProperties
 
     public static final String VERIFIER = "_oauthVerifier";
     public static final String ACCESS_TOKEN_ID = "OAuthAccessTokenId";
+    public static final String EVENT_STATE_TEMPLATE = "<<MULE_EVENT_ID=%s>>";
+    public static final String HTTP_STATUS = "http.status";
+    public static final String CALLBACK_LOCATION = "Location";
+    public static final String AUTHORIZATION_EVENT_KEY_TEMPLATE = "%s-authorization-event";
 }
 
 
