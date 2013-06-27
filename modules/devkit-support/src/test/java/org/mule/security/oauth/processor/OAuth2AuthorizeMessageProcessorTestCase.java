@@ -20,6 +20,7 @@ import org.mule.common.security.oauth.AuthorizationParameter;
 import org.mule.security.oauth.OAuth2Adapter;
 import org.mule.security.oauth.OAuth2Manager;
 import org.mule.security.oauth.OAuthProperties;
+import org.mule.security.oauth.notification.OAuthAuthorizeNotification;
 import org.mule.tck.size.SmallTest;
 
 import java.lang.reflect.Type;
@@ -32,6 +33,7 @@ import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.runners.MockitoJUnitRunner;
@@ -48,6 +50,9 @@ public class OAuth2AuthorizeMessageProcessorTestCase
     private TestAuthorizeMessageProcessor processor;
     private MuleEvent event;
 
+    @Mock
+    private MuleContext muleContext;
+
     @Before
     @SuppressWarnings("unchecked")
     public void setUp()
@@ -63,6 +68,7 @@ public class OAuth2AuthorizeMessageProcessorTestCase
         this.processor.setOauthCallback(callback);
 
         this.processor.setModuleObject(this.manager);
+        this.processor.setMuleContext(this.muleContext);
     }
 
     @Test
@@ -112,7 +118,9 @@ public class OAuth2AuthorizeMessageProcessorTestCase
         Mockito.verify(this.event.getMessage()).setOutboundProperty(OAuthProperties.HTTP_STATUS, "302");
         Mockito.verify(this.event.getMessage()).setOutboundProperty(OAuthProperties.CALLBACK_LOCATION,
             authorizeUrl);
-
+        Mockito.verify(this.muleContext).fireNotification(
+            Mockito.argThat(new OAuthNotificationMatcher(
+                OAuthAuthorizeNotification.OAUTH_AUTHORIZATION_BEGIN, this.event)));
     }
 
     private Set<AuthorizationParameter<?>> getAuthorizePropertiesWithoutDefaults()

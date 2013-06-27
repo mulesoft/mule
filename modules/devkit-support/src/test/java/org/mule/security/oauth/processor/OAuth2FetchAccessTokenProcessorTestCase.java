@@ -11,6 +11,7 @@
 package org.mule.security.oauth.processor;
 
 import org.mule.api.MessagingException;
+import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.store.ObjectDoesNotExistException;
@@ -19,6 +20,7 @@ import org.mule.api.transport.PropertyScope;
 import org.mule.security.oauth.OAuth2Adapter;
 import org.mule.security.oauth.OAuth2Manager;
 import org.mule.security.oauth.OAuthProperties;
+import org.mule.security.oauth.notification.OAuthAuthorizeNotification;
 import org.mule.tck.size.SmallTest;
 
 import java.util.UUID;
@@ -28,6 +30,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.runners.MockitoJUnitRunner;
@@ -48,6 +51,9 @@ public class OAuth2FetchAccessTokenProcessorTestCase
     private OAuth2FetchAccessTokenMessageProcessor processor;
     private MuleEvent event;
     private MuleEvent restoredEvent;
+    
+    @Mock
+    private MuleContext muleContext;
 
     @Before
     @SuppressWarnings({"unchecked", "deprecation"})
@@ -63,6 +69,7 @@ public class OAuth2FetchAccessTokenProcessorTestCase
         Mockito.when(this.manager.restoreAuthorizationEvent(eventId)).thenReturn(restoredEvent);
 
         this.processor = new OAuth2FetchAccessTokenMessageProcessor(this.manager, null);
+        this.processor.setMuleContext(this.muleContext);
 
         this.event = Mockito.mock(MuleEvent.class, Mockito.RETURNS_DEEP_STUBS);
         Mockito.when(event.getMessage().getInvocationProperty(OAuthProperties.VERIFIER)).thenReturn(verifier);
@@ -88,6 +95,10 @@ public class OAuth2FetchAccessTokenProcessorTestCase
         {
             Mockito.verify(this.manager).restoreAuthorizationEvent(eventId);
         }
+        
+        Mockito.verify(this.muleContext).fireNotification(
+            Mockito.argThat(new OAuthNotificationMatcher(
+                OAuthAuthorizeNotification.OAUTH_AUTHORIZATION_END, this.event)));
     }
 
     @Test

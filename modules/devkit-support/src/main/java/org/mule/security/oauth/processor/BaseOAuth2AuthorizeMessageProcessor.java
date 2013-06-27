@@ -51,7 +51,7 @@ public abstract class BaseOAuth2AuthorizeMessageProcessor<T extends OAuth2Manage
                 .getAccessTokenUrl());
         }
     }
-    
+
     /**
      * Starts the OAuth authorization process
      * 
@@ -73,6 +73,7 @@ public abstract class BaseOAuth2AuthorizeMessageProcessor<T extends OAuth2Manage
         MuleMessage message = event.getMessage();
 
         moduleObject.storeAuthorizationEvent(event);
+        this.notifyAuthorizeStart(event);
 
         message.setOutboundProperty(OAuthProperties.HTTP_STATUS, "302");
         message.setOutboundProperty(OAuthProperties.CALLBACK_LOCATION, location);

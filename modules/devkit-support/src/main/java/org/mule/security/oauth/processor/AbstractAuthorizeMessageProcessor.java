@@ -24,6 +24,7 @@ import org.mule.api.transformer.TransformerException;
 import org.mule.api.transformer.TransformerMessagingException;
 import org.mule.security.oauth.DefaultHttpCallback;
 import org.mule.security.oauth.callback.HttpCallbackAdapter;
+import org.mule.security.oauth.notification.OAuthAuthorizeNotification;
 
 import java.util.Arrays;
 import java.util.List;
@@ -67,6 +68,12 @@ public abstract class AbstractAuthorizeMessageProcessor extends AbstractDevkitBa
     protected List<MessageProcessor> buildCallbackProcessorList(MessageProcessor... processors)
     {
         return Arrays.asList(processors);
+    }
+
+    protected void notifyAuthorizeStart(MuleEvent event)
+    {
+        muleContext.fireNotification(new OAuthAuthorizeNotification(event,
+            OAuthAuthorizeNotification.OAUTH_AUTHORIZATION_BEGIN));
     }
 
     @Override

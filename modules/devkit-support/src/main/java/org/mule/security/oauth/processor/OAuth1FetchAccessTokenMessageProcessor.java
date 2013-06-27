@@ -33,6 +33,7 @@ public class OAuth1FetchAccessTokenMessageProcessor extends FetchAccessTokenMess
     @Override
     protected final MuleEvent doProcess(MuleEvent event) throws Exception
     {
+        this.notifyCallbackReception(event);
         try
         {
             this.adapter.setOauthVerifier(((String) event.getMessage()

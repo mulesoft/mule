@@ -10,8 +10,10 @@
 
 package org.mule.security.oauth.processor;
 
+import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.security.oauth.OAuth1Adapter;
+import org.mule.security.oauth.notification.OAuthAuthorizeNotification;
 import org.mule.tck.size.SmallTest;
 
 import org.junit.Before;
@@ -33,6 +35,9 @@ public class OAuth1FetchAccessTokenProcessorTestCase
 
     @Mock
     private OAuth1Adapter adapter;
+    
+    @Mock
+    private MuleContext muleContext;
 
     private MuleEvent event;
 
@@ -48,6 +53,7 @@ public class OAuth1FetchAccessTokenProcessorTestCase
         this.processor.setRedirectUri(redirectUri);
         this.processor.setAuthorizationUrl(authorizationUrl);
         this.processor.setRequestTokenUrl(requestTokenUrl);
+        this.processor.setMuleContext(this.muleContext);
     }
 
     @Test
@@ -60,6 +66,10 @@ public class OAuth1FetchAccessTokenProcessorTestCase
         
         Mockito.verify(this.adapter).fetchAccessToken(requestTokenUrl, accessTokenUrl, authorizationUrl, redirectUri);
         Mockito.verify(this.adapter).setOauthVerifier(verifier);
+        
+        Mockito.verify(this.muleContext).fireNotification(
+            Mockito.argThat(new OAuthNotificationMatcher(
+                OAuthAuthorizeNotification.OAUTH_AUTHORIZATION_END, this.event)));
     }
 
 }

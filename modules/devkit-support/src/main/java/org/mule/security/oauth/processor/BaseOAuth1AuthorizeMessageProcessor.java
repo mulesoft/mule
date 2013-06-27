@@ -84,6 +84,9 @@ public abstract class BaseOAuth1AuthorizeMessageProcessor extends AbstractAuthor
 
         String location = moduleObject.authorize(extraParameters, requestTokenUrl, this.getAccessTokenUrl(),
             this.getAuthorizationUrl(), this.getOauthCallback().getUrl());
+
+        this.notifyAuthorizeStart(event);
+
         event.getMessage().setOutboundProperty(OAuthProperties.HTTP_STATUS, "302");
         event.getMessage().setOutboundProperty(OAuthProperties.CALLBACK_LOCATION, location);
 

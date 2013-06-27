@@ -49,6 +49,7 @@ public class OAuth2FetchAccessTokenMessageProcessor extends FetchAccessTokenMess
     @Override
     protected MuleEvent doProcess(MuleEvent event) throws Exception
     {
+        this.notifyCallbackReception(event);
         MuleEvent restoredEvent = this.restoreOriginalEvent(event);
 
         try
