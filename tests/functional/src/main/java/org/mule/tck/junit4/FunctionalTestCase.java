@@ -239,6 +239,25 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase
     }
 
     /**
+     * Runs the given flow and asserts for property name in the outbound scope to
+     * match the expected value
+     * 
+     * @param flowName the name of the flow to be executed
+     * @param propertyName the name of the property to test
+     * @param expect the expected value
+     * @throws Exception
+     */
+    protected <T> void runFlowAndExpectProperty(String flowName, String propertyName, T expect)
+        throws Exception
+    {
+        Flow flow = lookupFlowConstruct(flowName);
+        MuleEvent event = getTestEvent(null);
+        MuleEvent responseEvent = flow.process(event);
+
+        Assert.assertEquals(expect, responseEvent.getMessage().getOutboundProperty(propertyName));
+    }
+
+    /**
      * Run the flow specified by name using the specified payload and assert equality
      * on the expected output
      * 
