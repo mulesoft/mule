@@ -35,6 +35,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.junit.After;
+import org.junit.Assert;
 
 /**
  * A base test case for tests that initialize Mule using a configuration file. The
@@ -105,7 +106,7 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase
             // Retrieve the first component
             for (MessageProcessor processor : flow.getMessageProcessors())
             {
-                if(processor instanceof Component)
+                if (processor instanceof Component)
                 {
                     return getComponentObject(((Component) processor));
                 }
@@ -113,13 +114,13 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase
         }
 
         throw new RegistrationException(
-                MessageFactory.createStaticMessage("Can't get component from flow construct "
-                                                   + flowConstruct.getName()));
+            MessageFactory.createStaticMessage("Can't get component from flow construct "
+                                               + flowConstruct.getName()));
     }
 
     /**
      * A convenience method to get a type-safe reference to the FunctionTestComponent
-     *
+     * 
      * @param serviceName service name as declared in the config
      * @return test component
      * @since 2.2
@@ -172,19 +173,94 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase
             flow.stop();
         }
     }
-    
+
+    /**
+     * Tests the given flow with a one-way message exchange pattern
+     * 
+     * @param flowName the name of the flow to be executed
+     * @throws Exception
+     */
     protected void testFlow(String flowName) throws Exception
     {
         testFlow(flowName, getTestEvent("data", MessageExchangePattern.ONE_WAY));
     }
 
+    /**
+     * Looks up the given flow in the registry and processes it with the given event.
+     * A flow asserting is then executed by calling {@link
+     * org.mule.tck.functional.FlowAssert.verify(String)}
+     * 
+     * @param flowName the name of the flow to be executed
+     * @param event the event ot execute with
+     * @throws Exception
+     */
     protected void testFlow(String flowName, MuleEvent event) throws Exception
     {
-        Flow flow = (Flow) muleContext.getRegistry().lookupFlowConstruct(flowName);
+        Flow flow = this.lookupFlowConstruct(flowName);
         flow.process(event);
         FlowAssert.verify(flowName);
     }
-    
+
+    /**
+     * Runs the given flow with a default event
+     * 
+     * @param flowName the name of the flow to be executed
+     * @return the resulting <code>MuleEvent</code>
+     * @throws Exception
+     */
+    protected <T> MuleEvent runFlow(String flowName) throws Exception
+    {
+        return this.runFlow(flowName, null);
+    }
+
+    /**
+     * Executes the given flow with a default message carrying the payload
+     * 
+     * @param flowName the name of the flow to be executed
+     * @param payload the payload to use int he message
+     * @return the resulting <code>MuleEvent</code>
+     * @throws Exception
+     */
+    protected <T> MuleEvent runFlow(String flowName, T payload) throws Exception
+    {
+        Flow flow = lookupFlowConstruct(flowName);
+        return flow.process(getTestEvent(payload));
+    }
+
+    /**
+     * Run the flow specified by name and assert equality on the expected output
+     * 
+     * @param flowName The name of the flow to run
+     * @param expect The expected output
+     */
+    protected <T> void runFlowAndExpect(String flowName, T expect) throws Exception
+    {
+        Assert.assertEquals(expect, this.runFlow(flowName).getMessage().getPayload());
+    }
+
+    /**
+     * Run the flow specified by name using the specified payload and assert equality
+     * on the expected output
+     * 
+     * @param flowName The name of the flow to run
+     * @param expect The expected output
+     * @param payload The payload of the input event
+     */
+    protected <T, U> void runFlowWithPayloadAndExpect(String flowName, T expect, U payload) throws Exception
+    {
+        Assert.assertEquals(expect, this.runFlow(flowName).getMessage().getPayload());
+    }
+
+    /**
+     * Retrieve a flow by name from the registry
+     * 
+     * @param name Name of the flow to retrieve
+     */
+    protected Flow lookupFlowConstruct(String name)
+    {
+        return (Flow) muleContext.getRegistry().lookupFlowConstruct(name);
+    }
+
     @After
     public final void clearFlowAssertions() throws Exception
     {

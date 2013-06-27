@@ -211,7 +211,7 @@
 			<groupId>org.mule.modules</groupId>
 			<artifactId>mule-module-devkit-support</artifactId>
 			<version>${project.version}</version>
-			<classifier>tests</classifier>
+			<type>test-jar</type>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>

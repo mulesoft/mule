@@ -21,9 +21,10 @@ import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.store.ObjectDoesNotExistException;
 import org.mule.api.store.ObjectStore;
 import org.mule.api.store.ObjectStoreException;
+import org.mule.security.oauth.BaseOAuth2Manager;
 import org.mule.security.oauth.OAuth2Adapter;
+import org.mule.security.oauth.OAuth2Manager;
 import org.mule.security.oauth.OAuthProperties;
-import org.mule.security.oauth.TestOAuth2Manager;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.util.store.InMemoryObjectStore;
 
@@ -35,6 +36,8 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class OAuth2AuthorizationEventTestCase extends FunctionalTestCase
 {
@@ -143,6 +146,50 @@ public class OAuth2AuthorizationEventTestCase extends FunctionalTestCase
             new ObjectStoreException());
         this.manager.setAccessTokenObjectStore(failingOS);
         this.manager.restoreAuthorizationEvent(eventId);
+    }
+    
+    private class TestOAuth2Manager extends BaseOAuth2Manager<OAuth2Adapter> {
+        private final transient Logger logger = LoggerFactory.getLogger(TestOAuth2Manager.class);
+
+        private KeyedPoolableObjectFactory objectFactory;
+        private OAuth2Adapter adapter;
+
+        public TestOAuth2Manager(KeyedPoolableObjectFactory objectFactory, OAuth2Adapter adapter)
+        {
+            this.objectFactory = objectFactory;
+            this.adapter = adapter;
+            this.setDefaultUnauthorizedConnector(this.adapter);
+        }
+
+        @Override
+        protected Logger getLogger()
+        {
+            return logger;
+        }
+
+        @Override
+        protected KeyedPoolableObjectFactory createPoolFactory(OAuth2Manager<OAuth2Adapter> oauthManager,
+                                                               ObjectStore<Serializable> objectStore)
+        {
+            return objectFactory;
+        }
+
+        @Override
+        protected void fetchCallbackParameters(OAuth2Adapter adapter, String response)
+        {
+        }
+
+        @Override
+        protected void setCustomProperties(OAuth2Adapter adapter)
+        {
+        }
+
+        @Override
+        protected OAuth2Adapter instantiateAdapter()
+        {
+            return adapter;
+        }
+
     }
 
 }
