@@ -214,7 +214,7 @@ public abstract class AbstractDevkitBasedMessageProcessor extends AbstractConnec
      * @throws InitialisationException
      */
     @Override
-    public final void initialise() throws InitialisationException
+    public void initialise() throws InitialisationException
     {
     }
 
